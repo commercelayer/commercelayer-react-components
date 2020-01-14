@@ -22,17 +22,21 @@ const Price = (props: PriceProps) => {
   } = props
   const [formattedAmount, setFormattedAmount] = useState('')
   const [formattedCompare, setFormattedCompare] = useState('')
+  const [showCompare, setShowCompare] = useState(false)
   useEffect(() => {
     if (prices[skuCode]) {
       const amount = prices[skuCode].formattedAmount
       const compare = prices[skuCode].formattedCompareAtAmount
-      console.log('amount', amount)
+      if (prices[skuCode].compareAtAmountCents > prices[skuCode].amountCents) {
+        setShowCompare(true)
+      }
       setFormattedAmount(amount)
       setFormattedCompare(compare)
     }
     return () => {
       setFormattedAmount('')
       setFormattedCompare('')
+      setShowCompare(false)
     }
   }, [prices])
   const Template = () =>
@@ -41,7 +45,9 @@ const Price = (props: PriceProps) => {
     ) : (
       <Fragment>
         <span className={amountClassName}>{formattedAmount}</span>
-        <span className={compareClassName}>{formattedCompare}</span>
+        {showCompare && (
+          <span className={compareClassName}>{formattedCompare}</span>
+        )}
       </Fragment>
     )
   return children ? (

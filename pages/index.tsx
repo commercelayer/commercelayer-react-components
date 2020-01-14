@@ -9,8 +9,14 @@ import VariantSelector from '../src/components/VariantSelector'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
-const Title = props => (
-  <div className="font-bold text-2xl mb-2">{props.title}</div>
+const Title = ({ title }) => (
+  <div className="font-bold text-2xl mb-2 bg-green-300">{title}</div>
+)
+
+const Type = ({ text }) => (
+  <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
+    #{text}
+  </span>
 )
 
 const TestTemplate = props => {
@@ -50,8 +56,8 @@ const Home = () => {
     <Fragment>
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <Title title="Prices" />
-        <PriceContainer>
-          <Price skuCode="BABYONBU000000E63E7412MX">
+        <PriceContainer skuCode="BABYONBU000000E63E7412MX">
+          <Price>
             <TestTemplate />
           </Price>
           <Price
@@ -60,14 +66,54 @@ const Home = () => {
             compareClassName="line-through"
           />
         </PriceContainer>
+        <br />
+        <br />
         <Title title="Preselect Prices by skuCode" />
-        <PriceContainer skuCode="BABYONBU000000E63E7412MX">
-          <Price amountClassName="font-bold" compareClassName="line-through" />
+        <PriceContainer>
+          <Price
+            skuCode="BABYONBU000000E63E746MXX"
+            amountClassName="font-bold"
+            compareClassName="line-through"
+          />
         </PriceContainer>
+        <br />
+        <br />
+        <Title title="Variant" />
         <VariantContainer>
+          <Type text="select type" />
           <VariantSelector
-            type="select"
+            name="variant1"
             skuCodes={['BABYONBU000000E63E746MXX', 'BABYONBU000000E63E7412MX']}
+            variantLabels={['6 months', '12 months']}
+          />
+          <br />
+          <br />
+          <Type text="radio type" />
+          <VariantSelector
+            name="variant"
+            type="radio"
+            skuCodes={['BABYONBU000000E63E746MXX', 'BABYONBU000000E63E7412MX']}
+            variantLabels={['6 months', '12 months']}
+          />
+        </VariantContainer>
+        <br />
+        <br />
+        <Title title="Preselect Variant by skuCode" />
+        <VariantContainer skuCode="BABYONBU000000E63E746MXX">
+          <Type text="select type" />
+          <VariantSelector
+            name="variant1"
+            skuCodes={['BABYONBU000000E63E746MXX', 'BABYONBU000000E63E7412MX']}
+            variantLabels={['6 months', '12 months']}
+          />
+          <br />
+          <br />
+          <Type text="radio type" />
+          <VariantSelector
+            name="variant1"
+            type="radio"
+            skuCodes={['BABYONBU000000E63E746MXX', 'BABYONBU000000E63E7412MX']}
+            variantLabels={['6 months', '12 months']}
           />
         </VariantContainer>
       </CommerceLayer>

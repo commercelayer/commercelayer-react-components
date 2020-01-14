@@ -8,10 +8,14 @@ export default function MultiParent({
   children,
   ...props
 }: MultiParentInterface) {
-  const cloned = children.map((child, k) => (
-    <Fragment key={k}>
-      {cloneElement(child, { ...props, ...child.props })}
-    </Fragment>
-  ))
+  const cloned = children.map((child, k) => {
+    return typeof child.type === 'string' ? (
+      child
+    ) : (
+      <Fragment key={k}>
+        {cloneElement(child, { ...props, ...child.props })}
+      </Fragment>
+    )
+  })
   return <Fragment>{cloned}</Fragment>
 }

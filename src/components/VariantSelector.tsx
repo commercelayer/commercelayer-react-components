@@ -1,12 +1,19 @@
-import React from 'react'
+import React, { Fragment } from 'react'
+import VariantTemplate from './VariantTemplate'
+import Parent from './utils/Parent'
 
 export interface VariantSelectorProps {
+  skuCodes: string[]
+  name: string
   children?: any
-  skuCodes?: string[]
-  skuCode?: string
-  type: 'select' | 'radio'
-  setSkuCode?: () => void
+  currentSkuCode?: string
+  type?: 'select' | 'radio'
+  setCurrentSkuCode?: () => void
   className?: string
+  variants?: object
+  loading?: boolean
+  placeholder?: string
+  variantLabels?: string[]
 }
 
 export default function VariantSelector({
@@ -14,10 +21,41 @@ export default function VariantSelector({
   type,
   ...props
 }: VariantSelectorProps) {
-  const options = props.skuCodes.map(sku => {
-    if (type === 'select') {
-      return null
-    }
-  })
-  return null
+  const {
+    variants,
+    loading,
+    placeholder,
+    variantLabels,
+    currentSkuCode,
+    setCurrentSkuCode,
+    name
+  } = props
+  console.log('--- skuCode VARIANT SELECTOR ---', currentSkuCode)
+  const DefaultTemplate = () =>
+    loading ? (
+      <Fragment>Loading...</Fragment>
+    ) : (
+      <VariantTemplate
+        variants={variants}
+        type={type}
+        placeholder={placeholder}
+        variantLabels={variantLabels}
+        skuCode={currentSkuCode}
+        onChange={setCurrentSkuCode}
+        name={name}
+      />
+    )
+  return children ? (
+    <Parent {...props}>{children}</Parent>
+  ) : (
+    <Fragment>
+      <DefaultTemplate />
+    </Fragment>
+  )
+}
+
+VariantSelector.defaultProps = {
+  placeholder: 'select your size',
+  variantLabels: [],
+  type: 'select'
 }

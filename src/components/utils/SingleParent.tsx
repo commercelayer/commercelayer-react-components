@@ -5,7 +5,9 @@ export interface SingleParentInterface {
 }
 
 export default function SingleParent({ children, ...props }) {
-  return (
+  return typeof children.type === 'string' ? (
+    children
+  ) : (
     <Fragment>
       {cloneElement(children, { ...props, ...children.props })}
     </Fragment>
