@@ -8,7 +8,7 @@ const getChildrenProp: getChildrenPropInterface = (children, propName) => {
   if (_.isArray(children)) {
     return children.map(child => child.props[propName])
   } else {
-    return [children.props[propName]]
+    return children.props[propName] ? [children.props[propName]] : []
   }
 }
 

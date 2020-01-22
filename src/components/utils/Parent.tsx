@@ -1,16 +1,29 @@
-import React from 'react'
+import React, {
+  Children,
+  Fragment,
+  ReactChild,
+  cloneElement,
+  ReactElement
+} from 'react'
 import _ from 'lodash'
-import MultiParent from './MultiParent'
-import SingleParent from './SingleParent'
 
 export interface ParentProps {
   children: any
 }
 
 export default function Parent({ children, ...props }: ParentProps) {
-  return _.isArray(children) ? (
-    <MultiParent {...props}>{children}</MultiParent>
-  ) : (
-    <SingleParent {...props}>{children}</SingleParent>
-  )
+  const childs = Children.map(children, (child, k) => {
+    if (typeof child.type === 'string') {
+      console.error(
+        `${child.type} component is not allowed. You can make a template with a function component.`
+      )
+      return null
+    }
+    return (
+      <Fragment key={k}>
+        {cloneElement(child, { ...props, ...child.props })}
+      </Fragment>
+    )
+  })
+  return <Fragment>{childs}</Fragment>
 }

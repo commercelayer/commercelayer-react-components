@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, FunctionComponent } from 'react'
 import VariantTemplate from './VariantTemplate'
 import Parent from './utils/Parent'
 
@@ -6,9 +6,9 @@ export interface VariantSelectorProps {
   skuCodes: string[]
   name: string
   children?: any
-  currentSkuCode?: string
+  skuCode?: string
   type?: 'select' | 'radio'
-  setCurrentSkuCode?: () => void
+  setSkuCode?: () => void
   className?: string
   variants?: object
   loading?: boolean
@@ -16,21 +16,20 @@ export interface VariantSelectorProps {
   variantLabels?: string[]
 }
 
-export default function VariantSelector({
+const VariantSelector: FunctionComponent<VariantSelectorProps> = ({
   children,
   type,
   ...props
-}: VariantSelectorProps) {
+}) => {
   const {
     variants,
     loading,
     placeholder,
     variantLabels,
-    currentSkuCode,
-    setCurrentSkuCode,
+    skuCode,
+    setSkuCode,
     name
   } = props
-  console.log('--- skuCode VARIANT SELECTOR ---', currentSkuCode)
   const DefaultTemplate = () =>
     loading ? (
       <Fragment>Loading...</Fragment>
@@ -40,8 +39,8 @@ export default function VariantSelector({
         type={type}
         placeholder={placeholder}
         variantLabels={variantLabels}
-        skuCode={currentSkuCode}
-        onChange={setCurrentSkuCode}
+        skuCode={skuCode}
+        onChange={setSkuCode}
         name={name}
       />
     )
@@ -59,3 +58,5 @@ VariantSelector.defaultProps = {
   variantLabels: [],
   type: 'select'
 }
+
+export default VariantSelector

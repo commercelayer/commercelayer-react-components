@@ -1,4 +1,4 @@
-import React, { Fragment, cloneElement, ReactElement } from 'react'
+import React, { Fragment, cloneElement, ReactElement, Children } from 'react'
 
 export interface MultiParentInterface {
   children: ReactElement[]
@@ -8,9 +8,9 @@ export default function MultiParent({
   children,
   ...props
 }: MultiParentInterface) {
-  const cloned = children.map((child, k) => {
+  const cloned = Children.map(children, (child, k) => {
     return typeof child.type === 'string' ? (
-      child
+      <Fragment key={k}>{cloneElement(child, { ...child.props })}</Fragment>
     ) : (
       <Fragment key={k}>
         {cloneElement(child, { ...props, ...child.props })}

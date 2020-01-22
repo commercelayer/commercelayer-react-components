@@ -9,11 +9,27 @@ import VariantSelector from '../src/components/VariantSelector'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
-const Title = ({ title }) => (
+export const Nav = ({ links }) => (
+  <nav className="flex items-center justify-between flex-wrap bg-red-500 p-6">
+    <ul className="flex">
+      {links.map((l: string, i: number) => {
+        return (
+          <li key={i} className="mr-6">
+            <a className="hover:text-blue-800 capitalize" href={l}>
+              {l === '/' ? 'home' : l.replace('/', ' ')}
+            </a>
+          </li>
+        )
+      })}
+    </ul>
+  </nav>
+)
+
+export const Title = ({ title }) => (
   <div className="font-bold text-2xl mb-2 bg-green-300">{title}</div>
 )
 
-const Type = ({ text }) => (
+export const Type = ({ text }) => (
   <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
     #{text}
   </span>
@@ -54,8 +70,9 @@ const Home = () => {
   }, [])
   return (
     <Fragment>
+      <Nav links={['/order']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
-        <Title title="Prices" />
+        {/* <Title title="Prices" />
         <PriceContainer skuCode="BABYONBU000000E63E7412MX">
           <Price>
             <TestTemplate />
@@ -115,7 +132,7 @@ const Home = () => {
             skuCodes={['BABYONBU000000E63E746MXX', 'BABYONBU000000E63E7412MX']}
             variantLabels={['6 months', '12 months']}
           />
-        </VariantContainer>
+        </VariantContainer> */}
       </CommerceLayer>
     </Fragment>
   )

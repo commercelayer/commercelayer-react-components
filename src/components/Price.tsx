@@ -1,4 +1,10 @@
-import { Fragment, useState, useEffect, ReactNode } from 'react'
+import {
+  Fragment,
+  useState,
+  useEffect,
+  ReactNode,
+  FunctionComponent
+} from 'react'
 import _ from 'lodash'
 import Parent from './utils/Parent'
 
@@ -11,15 +17,29 @@ export interface PriceProps {
   compareClassName?: string
 }
 
-const Price = (props: PriceProps) => {
-  const {
-    prices,
-    loading,
-    skuCode,
-    children,
-    amountClassName,
-    compareClassName
-  } = props
+export interface PriceTemplateProps {
+  formattedAmount: string
+  formattedCompare: string
+  showCompare: boolean
+  amountClassName?: string
+  compareClassName?: string
+  loading?: boolean
+}
+
+const PriceTemplate: FunctionComponent<PriceTemplateProps> = props =>
+  props.loading ? (
+    <Fragment>{'Loading...'}</Fragment>
+  ) : (
+    <Fragment>
+      <span className={props.amountClassName}>{props.formattedAmount}</span>
+      {props.showCompare && (
+        <span className={props.compareClassName}>{props.formattedCompare}</span>
+      )}
+    </Fragment>
+  )
+
+const Price: FunctionComponent<PriceProps> = props => {
+  const { prices, skuCode, children } = props
   const [formattedAmount, setFormattedAmount] = useState('')
   const [formattedCompare, setFormattedCompare] = useState('')
   const [showCompare, setShowCompare] = useState(false)
@@ -39,22 +59,17 @@ const Price = (props: PriceProps) => {
       setShowCompare(false)
     }
   }, [prices])
-  const Template = () =>
-    loading ? (
-      <Fragment>{'Loading...'}</Fragment>
-    ) : (
-      <Fragment>
-        <span className={amountClassName}>{formattedAmount}</span>
-        {showCompare && (
-          <span className={compareClassName}>{formattedCompare}</span>
-        )}
-      </Fragment>
-    )
+
   return children ? (
     <Parent {...props}>{children}</Parent>
   ) : (
     <Fragment>
-      <Template />
+      <PriceTemplate
+        showCompare={showCompare}
+        formattedAmount={formattedAmount}
+        formattedCompare={formattedCompare}
+        {...props}
+      />
     </Fragment>
   )
 }

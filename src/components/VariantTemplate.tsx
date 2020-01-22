@@ -1,4 +1,12 @@
-import React, { Fragment } from 'react'
+import React, {
+  Fragment,
+  ReactEventHandler,
+  FormEvent,
+  ChangeEvent,
+  SelectHTMLAttributes,
+  OptionHTMLAttributes,
+  FunctionComponent
+} from 'react'
 import _ from 'lodash'
 
 export interface VariantTemplateProps {
@@ -6,12 +14,12 @@ export interface VariantTemplateProps {
   type: string
   placeholder: string
   variantLabels: string[]
-  onChange: (e: string) => void // TODO: make required
+  onChange: (skuCode: string, skuId: string) => void // TODO: make required
   name: string
   skuCode?: string
 }
 
-export default function VariantTemplate(props: VariantTemplateProps) {
+const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
   const {
     name,
     variants,
@@ -21,11 +29,14 @@ export default function VariantTemplate(props: VariantTemplateProps) {
     skuCode,
     onChange
   } = props
-  console.log('skuCode selected', skuCode)
   const vars = _.keys(variants).map((v, k) => {
     const checked = skuCode === v
     return type === 'select' ? (
-      <option key={variants[v].id} value={variants[v].code}>
+      <option
+        key={variants[v].id}
+        data-sku-id={variants[v].id}
+        value={variants[v].code}
+      >
         {variantLabels.length > 0 ? variantLabels[k] : variants[v].name}
       </option>
     ) : (
@@ -35,7 +46,7 @@ export default function VariantTemplate(props: VariantTemplateProps) {
           type="radio"
           name={name}
           value={variants[v].code}
-          onChange={e => onChange(e.target.value)}
+          onChange={e => onChange(e.target.value, variants[v].id)}
         />
         {variantLabels.length > 0 ? variantLabels[k] : variants[v].name}
       </Fragment>
@@ -45,7 +56,12 @@ export default function VariantTemplate(props: VariantTemplateProps) {
     return (
       <select
         name={name}
-        onChange={(e: any) => onChange(e.target.value)}
+        onChange={(e: any) => {
+          const v = e.target.value
+          const i = e.target.selectedIndex
+          const id = e.target[i].dataset.skuId
+          onChange(v, id)
+        }}
         value={skuCode}
       >
         <option>{placeholder}</option>
@@ -55,3 +71,5 @@ export default function VariantTemplate(props: VariantTemplateProps) {
   }
   return <Fragment>{vars}</Fragment>
 }
+
+export default VariantTemplate

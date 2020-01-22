@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, FunctionComponent } from 'react'
 import Parent from './utils/Parent'
 import getChildrenProp from '../utils/getChildrenProp'
 import { Sku } from '@commercelayer/js-sdk'
@@ -10,21 +10,31 @@ export interface VariantContainerProps {
   accessToken?: string
 }
 
-export default function VariantContainer({
+const VariantContainer: FunctionComponent<VariantContainerProps> = ({
   children,
+  skuCode,
   ...props
-}: VariantContainerProps) {
-  const { skuCode } = props
+}) => {
+  // TODO: Refactor with useReducer
   const [loading, setLoading] = useState(false)
   const [variants, setVariants] = useState({})
   const [currentSkuCode, setCurrentSkuCode] = useState('')
+  const [currentSkuId, setCurrentSkuId] = useState('')
+  const [currentSkuInventory, setCurrentSkuInventory] = useState({})
   const skuCodes = getChildrenProp(children, 'skuCodes')
-  console.log('skuCode', currentSkuCode, skuCode)
   const parentProps = {
     loading,
     variants,
-    currentSkuCode,
-    setCurrentSkuCode,
+    skuId: currentSkuId,
+    skuCode: currentSkuCode || skuCode,
+    currentSkuInventory,
+    setSkuCode: (code: string, id: string): void => {
+      setCurrentSkuCode(code)
+      setCurrentSkuId(id)
+      Sku.find(id).then(s => {
+        setCurrentSkuInventory(s.inventory)
+      })
+    },
     ...props
   }
   useEffect(() => {
@@ -33,7 +43,6 @@ export default function VariantContainer({
       setCurrentSkuCode(skuCode)
     }
     if (skuCodes.length >= 1 && props.accessToken) {
-      console.log('--- getSkus ---')
       Sku.where({ codeIn: skuCodes.join(',') })
         .perPage(25)
         .all()
@@ -49,6 +58,7 @@ export default function VariantContainer({
       setLoading(false)
     }
   }, [props.accessToken])
-  console.log('parentProps', parentProps)
   return <Parent {...parentProps}>{children}</Parent>
 }
+
+export default VariantContainer

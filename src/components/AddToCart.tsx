@@ -1,17 +1,31 @@
-// TODO: add action to onClick event
-import React from 'react'
+import React, { FunctionComponent } from 'react'
+import Parent from './utils/Parent'
+
+// TODO: Extends interface from OrderContainer
 
 export interface AddToCartProps {
   className?: string
   label?: string
-  onClick?: () => void
+  addToCart?: (skuCode, skuId) => void
   disabled?: boolean
+  skuCode?: string
+  skuId?: string
+  orderId?: string
 }
 
-export default function AddToCart(props) {
-  return (
-    <button className={props.className}>
-      {props.label ? props.label : 'add to cart'}
+const AddToCart: FunctionComponent<AddToCartProps> = props => {
+  const { label, className, children, addToCart, skuCode, skuId } = props
+  const handleClick = () => {
+    addToCart(skuCode, skuId)
+  }
+  const disabled = !skuCode
+  return children ? (
+    <Parent {...props}>{children}</Parent>
+  ) : (
+    <button disabled={disabled} className={className} onClick={handleClick}>
+      {label ? label : 'add to cart'}
     </button>
   )
 }
+
+export default AddToCart
