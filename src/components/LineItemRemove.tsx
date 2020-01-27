@@ -1,17 +1,20 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useContext } from 'react'
 import { LineItemCollection } from '@commercelayer/js-sdk/dist/LineItem'
+import LineItemChildrenContext from './context/LineItemChildrenContext'
+import LineItemContext from './context/LineItemContext'
 
 export interface LineItemRemove {
-  lineItem?: LineItemCollection
   deleteLineItem?: (lineItemId: string) => void
   className?: string
   label?: string
 }
 
 const LineItemRemove: FunctionComponent<LineItemRemove> = props => {
+  const { lineItem } = useContext(LineItemChildrenContext)
+  const { deleteLineItem } = useContext(LineItemContext)
   const handleRemove = e => {
     e.preventDefault()
-    props.deleteLineItem(props.lineItem.id)
+    deleteLineItem(lineItem.id)
   }
   return (
     <a className={props.className} href="#" onClick={handleRemove}>

@@ -1,8 +1,18 @@
 import { LineItemCollection } from '@commercelayer/js-sdk'
 import { GeneralReducer } from '../@types/index'
 
+export interface updateLineItemInterface {
+  (lineItemId: string, quantity: number): void
+}
+
+export interface deleteLineItemInterface {
+  (lineItemId: string): void
+}
+
 export interface LineItemState {
   lineItems: LineItemCollection[]
+  updateLineItem?: updateLineItemInterface
+  deleteLineItem?: deleteLineItemInterface
 }
 
 export interface LineItemActions {

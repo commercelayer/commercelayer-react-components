@@ -2,7 +2,8 @@ import React, {
   useEffect,
   FunctionComponent,
   ReactElement,
-  useReducer
+  useReducer,
+  useContext
 } from 'react'
 import { LineItem } from '@commercelayer/js-sdk'
 import Parent from './utils/Parent'
@@ -11,34 +12,32 @@ import { LineItemProps } from './LineItem'
 import lineItemReducer, {
   lineItemInitialState
 } from '../reducers/LineItemReducer'
+import OrderContext from './context/OrderContext'
+import LineItemContext from './context/LineItemContext'
 
 export interface LineItemsContainer extends OrderContainerActions {
   children?: ReactElement<LineItemProps>[] | ReactElement<LineItemProps>
 }
 
 const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
-  const { order, children } = props
+  const { children } = props
+  const { order, getOrder, orderId } = useContext(OrderContext)
   const [state, dispatch] = useReducer(lineItemReducer, lineItemInitialState)
   const updateLineItem = (lineItemId, quantity = 1) => {
     const update = LineItem.find(lineItemId).then((lnIt: any) => {
       return lnIt.update({ quantity })
     })
-    update.then(() => props.getOrder(props.orderId))
+    update.then(() => getOrder(orderId))
   }
   const deleteLineItem = lineItemId => {
     const deleteItem = LineItem.find(lineItemId).then(lnI => {
       return lnI.destroy()
     })
-    deleteItem.then(() => props.getOrder(props.orderId))
+    deleteItem.then(() => getOrder(orderId))
   }
-  const parentProps = {
-    lineItems: state.lineItems,
-    updateLineItem,
-    deleteLineItem,
-    ...props
-  }
+  console.log('Line item container ==> order', order)
   useEffect(() => {
-    if (props.order) {
+    if (order) {
       const lItems = order.lineItems().toArray()
       dispatch({
         type: 'setLineItems',
@@ -52,7 +51,16 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
       })
     }
   }, [order])
-  return <Parent {...parentProps}>{children}</Parent>
+  const lineItemValue = {
+    lineItems: state.lineItems,
+    updateLineItem,
+    deleteLineItem
+  }
+  return (
+    <LineItemContext.Provider value={lineItemValue}>
+      {children}
+    </LineItemContext.Provider>
+  )
 }
 
 export default LineItemsContainer

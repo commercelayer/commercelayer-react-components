@@ -1,64 +1,131 @@
-import React, { useState, useEffect, FunctionComponent } from 'react'
-import Parent from './utils/Parent'
+import React, {
+  useEffect,
+  FunctionComponent,
+  useReducer,
+  useContext,
+  ReactNode
+} from 'react'
 import getChildrenProp from '../utils/getChildrenProp'
 import { Sku } from '@commercelayer/js-sdk'
 import getSkus from '../utils/getSkus'
+import variantReducer, {
+  variantInitialState,
+  setCurrentQuantityInterface
+} from '../reducers/VariantReducer'
+import CommerceLayerContext from './context/CommerceLayerContext'
+import VariantContext from './context/VariantContext'
+import { setSkuCodeInterface, VariantState } from '../reducers/VariantReducer'
 
 export interface VariantContainerProps {
-  children: any
+  children: ReactNode
   skuCode?: string
-  accessToken?: string
 }
 
 const VariantContainer: FunctionComponent<VariantContainerProps> = ({
   children,
-  skuCode,
-  ...props
+  skuCode
 }) => {
-  // TODO: Refactor with useReducer
-  const [loading, setLoading] = useState(false)
-  const [variants, setVariants] = useState({})
-  const [currentSkuCode, setCurrentSkuCode] = useState('')
-  const [currentSkuId, setCurrentSkuId] = useState('')
-  const [currentSkuInventory, setCurrentSkuInventory] = useState({})
+  const { accessToken } = useContext(CommerceLayerContext)
+  const [state, dispatch] = useReducer(variantReducer, variantInitialState)
   const skuCodes = getChildrenProp(children, 'skuCodes')
-  const parentProps = {
-    loading,
-    variants,
-    skuId: currentSkuId,
-    skuCode: currentSkuCode || skuCode,
-    currentSkuInventory,
-    setSkuCode: (code: string, id: string): void => {
-      setCurrentSkuCode(code)
-      setCurrentSkuId(id)
-      Sku.find(id).then(s => {
-        setCurrentSkuInventory(s.inventory)
-      })
-    },
-    ...props
+  const setCurrentQuantity: setCurrentQuantityInterface = quantity => {
+    dispatch({
+      type: 'setCurrentQuantity',
+      payload: quantity
+    })
   }
-  useEffect(() => {
-    setLoading(true)
-    if (skuCode) {
-      setCurrentSkuCode(skuCode)
+  const setSkuCode: setSkuCodeInterface = (code, id) => {
+    if (id) {
+      dispatch({
+        type: 'setCurrentSkuCode',
+        payload: code
+      })
+      dispatch({
+        type: 'setCurrentSkuId',
+        payload: id
+      })
+      Sku.find(id).then(s => {
+        dispatch({
+          type: 'setCurrentSkuInventory',
+          payload: s.inventory
+        })
+      })
+    } else {
+      dispatch({
+        type: 'setCurrentSkuCode',
+        payload: ''
+      })
+      dispatch({
+        type: 'setCurrentSkuId',
+        payload: ''
+      })
+      dispatch({
+        type: 'setCurrentSkuInventory',
+        payload: {
+          available: false,
+          quantity: 0
+        }
+      })
     }
-    if (skuCodes.length >= 1 && props.accessToken) {
+  }
+
+  useEffect(() => {
+    dispatch({
+      type: 'setLoading',
+      payload: true
+    })
+    if (skuCode) {
+      dispatch({
+        type: 'setCurrentSkuCode',
+        payload: skuCode
+      })
+    }
+    if (skuCodes.length >= 1 && accessToken) {
       Sku.where({ codeIn: skuCodes.join(',') })
         .perPage(25)
         .all()
         .then(r => {
           const skusObj = getSkus(r.toArray())
-          setVariants(skusObj)
-          setLoading(false)
+          dispatch({
+            type: 'setVariants',
+            payload: skusObj
+          })
+          dispatch({
+            type: 'setLoading',
+            payload: false
+          })
         })
     }
     return () => {
-      setVariants({})
-      setCurrentSkuCode('')
-      setLoading(false)
+      dispatch({
+        type: 'setCurrentSkuCode',
+        payload: ''
+      })
+      dispatch({
+        type: 'setVariants',
+        payload: null
+      })
+      dispatch({
+        type: 'setLoading',
+        payload: false
+      })
     }
-  }, [props.accessToken])
-  return <Parent {...parentProps}>{children}</Parent>
+  }, [accessToken])
+  const variantValue: VariantState = {
+    loading: state.loading,
+    variants: state.variants,
+    currentSkuId: state.currentSkuId,
+    currentSkuCode: state.currentSkuCode || skuCode,
+    currentSkuInventory: state.currentSkuInventory,
+    currentQuantity: state.currentQuantity,
+    setCurrentQuantity,
+    setSkuCode
+  }
+  return (
+    <VariantContext.Provider value={variantValue}>
+      {children}
+    </VariantContext.Provider>
+  )
 }
 
 export default VariantContainer

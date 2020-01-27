@@ -1,13 +1,16 @@
-import React, { useEffect, useState, FunctionComponent } from 'react'
+import React, {
+  useEffect,
+  FunctionComponent,
+  useReducer,
+  useContext
+} from 'react'
 import Parent from './utils/Parent'
 import { getLocalOrder, setLocalOrder } from '../utils/localStorage'
-import {
-  Order,
-  LineItem,
-  Sku,
-  Item,
-  OrderCollection
-} from '@commercelayer/js-sdk'
+import { Order, LineItem, Sku, OrderCollection } from '@commercelayer/js-sdk'
+import orderReducer, { orderInitialState } from '../reducers/OrderReducer'
+import CommerceLayerContext from './context/CommerceLayerContext'
+import OrderContext from './context/OrderContext'
+import { addToCartInterface, getOrderInterface } from '../reducers/OrderReducer'
 
 export interface OrderContainerActions {
   setOrderId?: (orderId: string) => void
@@ -22,30 +25,39 @@ export interface OrderContainerProps {
   children: any
   accessToken?: string
 }
-// TODO: refactor with useReducer
 const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
-  const { children, accessToken, persistKey } = props
-  const [orderId, setOrderId] = useState('')
-  const [order, setOrder] = useState(null)
-  console.log('--- ORDER ---', order)
+  const { children, persistKey } = props
+  const [state, dispatch] = useReducer(orderReducer, orderInitialState)
+  const { accessToken } = useContext(CommerceLayerContext)
+  console.log('--- ORDER ---', state.order)
   const createOrder = async () => {
-    if (orderId) return orderId
+    if (state.orderId) return state.orderId
     const o = await Order.create({})
     if (o.id) {
-      setOrderId(o.id)
+      dispatch({
+        type: 'setOrderId',
+        payload: o.id
+      })
+      dispatch({
+        type: 'setOrder',
+        payload: o
+      })
       setLocalOrder(persistKey, o.id)
-      setOrder(o)
       return o.id
     }
   }
-  const getOrder = async (id: string) => {
+  const getOrder: getOrderInterface = async id => {
     const o = await Order.includes('line_items').find(id)
-    if (o) setOrder(o)
+    if (o)
+      dispatch({
+        type: 'setOrder',
+        payload: o
+      })
   }
-  const addToCart = async (
-    skuCode: string,
-    skuId: string,
-    quantity: number = 1
+  const addToCart: addToCartInterface = async (
+    skuCode,
+    skuId,
+    quantity = 1
   ) => {
     const id = await createOrder()
     if (id) {
@@ -61,29 +73,44 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
       LineItem.create(attrs).then(() => getOrder(id))
     }
   }
-  const parentProps = {
-    orderId,
-    order,
-    addToCart,
-    getOrder,
-    ...props
-  }
+  // const parentProps = {
+  //   orderId: state.orderId,
+  //   order: state.order,
+  //   addToCart,
+  //   getOrder,
+  //   ...props
+  // }
   useEffect(() => {
     if (accessToken) {
       const localOrder = getLocalOrder(persistKey)
       if (localOrder) {
-        setOrderId(localOrder)
-        if (!order) {
+        dispatch({
+          type: 'setOrderId',
+          payload: localOrder
+        })
+        if (!state.order) {
           getOrder(localOrder)
         }
       }
     }
 
     return () => {
-      setOrderId('')
+      dispatch({
+        type: 'setOrderId',
+        payload: ''
+      })
     }
-  }, [accessToken, order])
-  return <Parent {...parentProps}>{children}</Parent>
+  }, [accessToken, state.order])
+  const orderObj = {
+    order: state.order,
+    orderId: state.orderId,
+    loading: state.loading,
+    addToCart,
+    getOrder
+  }
+  return (
+    <OrderContext.Provider value={orderObj}>{children}</OrderContext.Provider>
+  )
 }
 
 export default OrderContainer

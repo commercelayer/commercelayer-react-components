@@ -1,16 +1,22 @@
-import React, { Fragment, FunctionComponent, useState, useEffect } from 'react'
-import { LineItemCollection } from '@commercelayer/js-sdk'
+import React, {
+  Fragment,
+  FunctionComponent,
+  useState,
+  useEffect,
+  useContext
+} from 'react'
 import _ from 'lodash'
 import getAmount from '../utils/getAmount'
+import LineItemChildrenContext from './context/LineItemChildrenContext'
 
 export interface LineItemPriceProps {
   format?: 'formatted' | 'cents' | 'float'
   type?: 'total' | 'option' | 'unit'
-  lineItem?: LineItemCollection
 }
 
 const LineItemPrice: FunctionComponent<LineItemPriceProps> = props => {
-  const { lineItem, format, type } = props
+  const { format, type } = props
+  const { lineItem } = useContext(LineItemChildrenContext)
   const [price, setPrice] = useState(null)
   useEffect(() => {
     const p = getAmount('amount', type, format, lineItem)

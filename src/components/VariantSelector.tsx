@@ -1,6 +1,8 @@
-import React, { Fragment, FunctionComponent } from 'react'
+import React, { Fragment, FunctionComponent, useContext } from 'react'
 import VariantTemplate from './VariantTemplate'
 import Parent from './utils/Parent'
+import VariantContext from './context/VariantContext'
+import { variantInitialState } from '../reducers/VariantReducer'
 
 export interface VariantSelectorProps {
   skuCodes: string[]
@@ -21,15 +23,10 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = ({
   type,
   ...props
 }) => {
-  const {
-    variants,
-    loading,
-    placeholder,
-    variantLabels,
-    skuCode,
-    setSkuCode,
-    name
-  } = props
+  const { placeholder, variantLabels, skuCode, name } = props
+  const { setSkuCode, currentSkuCode, loading, variants } = useContext(
+    VariantContext
+  )
   const DefaultTemplate = () =>
     loading ? (
       <Fragment>Loading...</Fragment>
@@ -39,7 +36,7 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = ({
         type={type}
         placeholder={placeholder}
         variantLabels={variantLabels}
-        skuCode={skuCode}
+        skuCode={currentSkuCode || skuCode}
         onChange={setSkuCode}
         name={name}
       />

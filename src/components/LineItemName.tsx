@@ -1,5 +1,7 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useContext } from 'react'
+import LineItemChildrenContext from './context/LineItemChildrenContext'
 
 export default function LineItemName(props) {
-  return <p className={props.className}>{props.lineItem.name}</p>
+  const { lineItem } = useContext(LineItemChildrenContext)
+  return <p className={props.className}>{lineItem.name}</p>
 }

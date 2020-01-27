@@ -5,6 +5,11 @@ export interface GeneralComponent {
   style?: CSSProperties
 }
 
+export interface GeneralActions {
+  type: string
+  payload: any
+}
+
 export interface GeneralReducer<S, A> {
   (state: S, action: A): S
 }

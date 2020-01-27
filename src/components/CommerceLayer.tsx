@@ -1,7 +1,13 @@
-import React, { ReactElement, FunctionComponent } from 'react'
+import React, {
+  ReactElement,
+  FunctionComponent,
+  useState,
+  useContext
+} from 'react'
 import Parent from './utils/Parent'
 import { initCLayer } from '@commercelayer/js-sdk'
 import { OrderContainerProps } from './OrderContainer'
+import CommerceLayerContext from './context/CommerceLayerContext'
 
 export interface CommerceLayerProps {
   children: any
@@ -17,7 +23,11 @@ const CommerceLayer: FunctionComponent<CommerceLayerProps> = ({
   if (accessToken && endpoint) {
     initCLayer({ accessToken, endpoint })
   }
-  return <Parent {...props}>{children}</Parent>
+  return (
+    <CommerceLayerContext.Provider value={{ accessToken, endpoint }}>
+      {children}
+    </CommerceLayerContext.Provider>
+  )
 }
 
 export default CommerceLayer

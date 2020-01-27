@@ -15,9 +15,10 @@ import LineItemName from '../src/components/LineItemName'
 import LineItemQuantity from '../src/components/LineItemQuantity'
 import LineItemPrice from '../src/components/LineItemPrice'
 import LineItemRemove from '../src/components/LineItemRemove'
-import Total from '../src/components/OrderTotal'
+import Total from '../src/components/Total'
 import Checkout from '../src/components/Checkout'
 import SubTotal from '../src/components/SubTotal'
+import QuantitySelector from '../src/components/QuantitySelector'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -39,36 +40,45 @@ export default function Order() {
     <Fragment>
       <Nav links={['/']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
-        <OrderContainer persistKey="orderUS">
-          <Title title="Order Container" />
-          <VariantContainer>
-            <Type text="select type" />
-            <VariantSelector
-              name="variant1"
-              skuCodes={[
-                'BABYONBU000000E63E746MXX',
-                'BABYONBU000000E63E7412MX'
-              ]}
-              variantLabels={['6 months', '12 months']}
-            />
-            <PriceContainer skuCode="BABYONBU000000E63E746MXX">
-              <Price />
-            </PriceContainer>
-            <AddToCart className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" />
-          </VariantContainer>
-          <Total className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" />
-          <SubTotal className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" />
-          <LineItemsContainer>
-            <LineItem type="skus">
-              <LineItemImage width={80} />
-              <LineItemName />
-              <LineItemQuantity />
-              <LineItemPrice />
-              <LineItemRemove className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" />
-            </LineItem>
-          </LineItemsContainer>
-          <Checkout className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded" />
-        </OrderContainer>
+        <div>
+          <OrderContainer persistKey="orderUS">
+            <Title title="Order Container" />
+            <VariantContainer>
+              <Type text="select type" />
+              <VariantSelector
+                name="variant1"
+                skuCodes={[
+                  'BABYONBU000000E63E746MXX',
+                  'BABYONBU000000E63E7412MX'
+                ]}
+                variantLabels={['6 months', '12 months']}
+              />
+              <div>
+                <PriceContainer skuCode="BABYONBU000000E63E746MXX">
+                  <Price />
+                </PriceContainer>
+              </div>
+              <QuantitySelector />
+              <AddToCart className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" />
+            </VariantContainer>
+            <div className="flex mb-4">
+              <Total className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" />
+              <SubTotal className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative" />
+            </div>
+            <LineItemsContainer>
+              <LineItem type="skus">
+                <div>
+                  <LineItemImage width={80} />
+                </div>
+                <LineItemName />
+                <LineItemQuantity />
+                <LineItemPrice />
+                <LineItemRemove className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" />
+              </LineItem>
+            </LineItemsContainer>
+            <Checkout className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded" />
+          </OrderContainer>
+        </div>
       </CommerceLayer>
     </Fragment>
   )

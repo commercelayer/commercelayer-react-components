@@ -3,15 +3,14 @@ import {
   useState,
   useEffect,
   ReactNode,
-  FunctionComponent
+  FunctionComponent,
+  useContext
 } from 'react'
 import _ from 'lodash'
 import Parent from './utils/Parent'
+import PriceContext from './context/PriceContext'
 
 export interface PriceProps {
-  skuCode?: string
-  prices?: object
-  loading?: boolean
   children?: ReactNode
   amountClassName?: string
   compareClassName?: string
@@ -39,7 +38,8 @@ const PriceTemplate: FunctionComponent<PriceTemplateProps> = props =>
   )
 
 const Price: FunctionComponent<PriceProps> = props => {
-  const { prices, skuCode, children } = props
+  const { children } = props
+  const { prices, skuCode, loading } = useContext(PriceContext)
   const [formattedAmount, setFormattedAmount] = useState('')
   const [formattedCompare, setFormattedCompare] = useState('')
   const [showCompare, setShowCompare] = useState(false)
@@ -68,6 +68,7 @@ const Price: FunctionComponent<PriceProps> = props => {
         showCompare={showCompare}
         formattedAmount={formattedAmount}
         formattedCompare={formattedCompare}
+        loading={loading}
         {...props}
       />
     </Fragment>
