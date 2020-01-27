@@ -21,19 +21,20 @@
   },
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
-    "@commercelayer/js-auth": "^2.0.1",
-    "@commercelayer/js-sdk": "^2.0.1",
+    "@commercelayer/js-auth": "^2.0.2",
+    "@commercelayer/js-sdk": "^2.1.0",
     "lodash": "^4.17.15",
     "react": "^16.12.0",
     "react-dom": "^16.12.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.149",
-    "@types/node": "^13.1.8",
-    "@types/react": "^16.9.17",
+    "@types/node": "^13.5.0",
+    "@types/react": "^16.9.19",
     "@zeit/next-css": "^1.0.1",
     "autoprefixer": "^9.7.4",
-    "next": "^9.2.0",
+    "cypress": "^3.8.3",
+    "next": "^9.2.1",
     "postcss-loader": "^3.0.0",
     "tailwindcss": "^1.1.4",
     "typescript": "^3.7.5"
