@@ -1,0 +1,236 @@
+{
+  "url": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/?include=line_items",
+  "method": "GET",
+  "data": {
+    "data": {
+      "id": "LqaMAhJOnq",
+      "type": "orders",
+      "links": {
+        "self": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq"
+      },
+      "attributes": {
+        "number": 1608,
+        "status": "draft",
+        "payment_status": "unpaid",
+        "fulfillment_status": "unfulfilled",
+        "guest": true,
+        "editable": true,
+        "placeable": false,
+        "customer_email": null,
+        "language_code": "en",
+        "currency_code": "EUR",
+        "tax_included": true,
+        "tax_rate": null,
+        "freight_taxable": null,
+        "requires_billing_info": false,
+        "country_code": null,
+        "shipping_country_code_lock": "US",
+        "coupon_code": null,
+        "gift_card_code": null,
+        "gift_card_or_coupon_code": null,
+        "subtotal_amount_cents": 5800,
+        "subtotal_amount_float": 58,
+        "formatted_subtotal_amount": "€58,00",
+        "shipping_amount_cents": 0,
+        "shipping_amount_float": 0,
+        "formatted_shipping_amount": "€0,00",
+        "payment_method_amount_cents": 0,
+        "payment_method_amount_float": 0,
+        "formatted_payment_method_amount": "€0,00",
+        "discount_amount_cents": 0,
+        "discount_amount_float": 0,
+        "formatted_discount_amount": "€0,00",
+        "adjustment_amount_cents": 0,
+        "adjustment_amount_float": 0,
+        "formatted_adjustment_amount": "€0,00",
+        "gift_card_amount_cents": 0,
+        "gift_card_amount_float": 0,
+        "formatted_gift_card_amount": "€0,00",
+        "total_tax_amount_cents": 0,
+        "total_tax_amount_float": 0,
+        "formatted_total_tax_amount": "€0,00",
+        "subtotal_tax_amount_cents": 0,
+        "subtotal_tax_amount_float": 0,
+        "formatted_subtotal_tax_amount": "€0,00",
+        "shipping_tax_amount_cents": 0,
+        "shipping_tax_amount_float": 0,
+        "formatted_shipping_tax_amount": "€0,00",
+        "payment_method_tax_amount_cents": 0,
+        "payment_method_tax_amount_float": 0,
+        "formatted_payment_method_tax_amount": "€0,00",
+        "discount_tax_amount_cents": 0,
+        "discount_tax_amount_float": 0,
+        "formatted_discount_tax_amount": "€0,00",
+        "adjustment_tax_amount_cents": 0,
+        "adjustment_tax_amount_float": 0,
+        "formatted_adjustment_tax_amount": "€0,00",
+        "total_amount_cents": 5800,
+        "total_amount_float": 58,
+        "formatted_total_amount": "€58,00",
+        "total_taxable_amount_cents": 5800,
+        "total_taxable_amount_float": 58,
+        "formatted_total_taxable_amount": "€58,00",
+        "subtotal_taxable_amount_cents": 5800,
+        "subtotal_taxable_amount_float": 58,
+        "formatted_subtotal_taxable_amount": "€58,00",
+        "shipping_taxable_amount_cents": 0,
+        "shipping_taxable_amount_float": 0,
+        "formatted_shipping_taxable_amount": "€0,00",
+        "payment_method_taxable_amount_cents": 0,
+        "payment_method_taxable_amount_float": 0,
+        "formatted_payment_method_taxable_amount": "€0,00",
+        "discount_taxable_amount_cents": 0,
+        "discount_taxable_amount_float": 0,
+        "formatted_discount_taxable_amount": "€0,00",
+        "adjustment_taxable_amount_cents": 0,
+        "adjustment_taxable_amount_float": 0,
+        "formatted_adjustment_taxable_amount": "€0,00",
+        "total_amount_with_taxes_cents": 5800,
+        "total_amount_with_taxes_float": 58,
+        "formatted_total_amount_with_taxes": "€58,00",
+        "fees_amount_cents": 0,
+        "fees_amount_float": 0,
+        "formatted_fees_amount": "€0,00",
+        "skus_count": 2,
+        "line_item_options_count": 0,
+        "shipments_count": 0,
+        "payment_source_details": null,
+        "token": "ddc3a44b009c28ee6e12ff184201ba23",
+        "cart_url": "https://example.com/cart",
+        "return_url": "https://example.com/return",
+        "terms_url": "https://example.com/terms",
+        "privacy_url": "https://example.com/privacy",
+        "checkout_url": "https://the-blue-brand-2.commercelayer.co/checkout/ddc3a44b009c28ee6e12ff184201ba23",
+        "placed_at": null,
+        "approved_at": null,
+        "cancelled_at": null,
+        "payment_updated_at": null,
+        "fulfillment_updated_at": null,
+        "created_at": "2019-12-13T10:13:43.266Z",
+        "updated_at": "2019-12-13T10:13:43.583Z",
+        "reference": null,
+        "metadata": {}
+      },
+      "relationships": {
+        "market": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/relationships/market",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/market"
+          }
+        },
+        "customer": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/relationships/customer",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/customer"
+          }
+        },
+        "shipping_address": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/relationships/shipping_address",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/shipping_address"
+          }
+        },
+        "billing_address": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/relationships/billing_address",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/billing_address"
+          }
+        },
+        "available_payment_methods": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/relationships/available_payment_methods",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/available_payment_methods"
+          }
+        },
+        "payment_method": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/relationships/payment_method",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/payment_method"
+          }
+        },
+        "payment_source": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/relationships/payment_source",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/payment_source"
+          }
+        },
+        "line_items": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/relationships/line_items",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/line_items"
+          },
+          "data": [
+            {
+              "type": "line_items",
+              "id": "zNnEatGYxv"
+            }
+          ]
+        },
+        "shipments": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/relationships/shipments",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/LqaMAhJOnq/shipments"
+          }
+        }
+      },
+      "meta": {
+        "mode": "test"
+      }
+    },
+    "included": [
+      {
+        "id": "zNnEatGYxv",
+        "type": "line_items",
+        "links": {
+          "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv"
+        },
+        "attributes": {
+          "sku_code": "BABYONBU000000E63E74NBXX",
+          "quantity": 2,
+          "currency_code": "EUR",
+          "unit_amount_cents": 2900,
+          "unit_amount_float": 29,
+          "formatted_unit_amount": "€29,00",
+          "options_amount_cents": 0,
+          "options_amount_float": 0,
+          "formatted_options_amount": "€0,00",
+          "total_amount_cents": 5800,
+          "total_amount_float": 58,
+          "formatted_total_amount": "€58,00",
+          "name": "Black Baby Onesie Short Sleeve with Pink Logo (New born)",
+          "image_url": "",
+          "tax_rate": null,
+          "tax_breakdown": {},
+          "item_type": "skus",
+          "created_at": "2019-12-13T10:13:43.545Z",
+          "updated_at": "2019-12-13T10:13:43.545Z",
+          "reference": null,
+          "metadata": {}
+        },
+        "relationships": {
+          "order": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/relationships/order",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/order"
+            }
+          },
+          "item": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/relationships/item",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/item"
+            }
+          },
+          "line_item_options": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/relationships/line_item_options",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/line_item_options"
+            }
+          }
+        },
+        "meta": {
+          "mode": "test"
+        }
+      }
+    ]
+  }
+}

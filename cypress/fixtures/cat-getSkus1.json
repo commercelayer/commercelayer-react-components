@@ -1,0 +1,128 @@
+{
+  "url": "https://the-blue-brand-2.commercelayer.co/api/skus/?filter[q][code_in]=BABYONBU000000E63E74NBXX,BABYONBU000000E63E746MXXFAKE,BABYONBU000000E63E7412MX&page[size]=25",
+  "method": "GET",
+  "data": {
+    "data": [
+      {
+        "id": "bWRwRSmvPB",
+        "type": "skus",
+        "links": {
+          "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB"
+        },
+        "attributes": {
+          "code": "BABYONBU000000E63E74NBXX",
+          "name": "Black Baby Onesie Short Sleeve with Pink Logo (New born)",
+          "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam pellentesque in neque vitae tincidunt. In gravida eu ipsum non condimentum. Curabitur libero leo, gravida a dictum vestibulum, sollicitudin vel quam.",
+          "image_url": "https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90",
+          "tag_names": "",
+          "pieces_per_pack": null,
+          "weight": null,
+          "unit_of_weight": null,
+          "created_at": "2019-09-24T08:56:49.667Z",
+          "updated_at": "2019-09-24T08:56:49.667Z",
+          "reference": "BABYONBU000000E63E74",
+          "metadata": {}
+        },
+        "relationships": {
+          "shipping_category": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/relationships/shipping_category",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/shipping_category"
+            }
+          },
+          "prices": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/relationships/prices",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/prices"
+            }
+          },
+          "stock_items": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/relationships/stock_items",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/stock_items"
+            }
+          },
+          "delivery_lead_times": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/relationships/delivery_lead_times",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/delivery_lead_times"
+            }
+          },
+          "sku_options": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/relationships/sku_options",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/sku_options"
+            }
+          }
+        },
+        "meta": {
+          "mode": "test"
+        }
+      },
+      {
+        "id": "wBeDdSgYQW",
+        "type": "skus",
+        "links": {
+          "self": "https://the-blue-brand-2.commercelayer.co/api/skus/wBeDdSgYQW"
+        },
+        "attributes": {
+          "code": "BABYONBU000000E63E7412MX",
+          "name": "Black Baby Onesie Short Sleeve with Pink Logo (12 Months)",
+          "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam pellentesque in neque vitae tincidunt. In gravida eu ipsum non condimentum. Curabitur libero leo, gravida a dictum vestibulum, sollicitudin vel quam.",
+          "image_url": "https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90",
+          "tag_names": "",
+          "pieces_per_pack": null,
+          "weight": null,
+          "unit_of_weight": null,
+          "created_at": "2019-09-24T08:56:49.735Z",
+          "updated_at": "2019-09-24T08:56:49.735Z",
+          "reference": "BABYONBU000000E63E74",
+          "metadata": {}
+        },
+        "relationships": {
+          "shipping_category": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/skus/wBeDdSgYQW/relationships/shipping_category",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/skus/wBeDdSgYQW/shipping_category"
+            }
+          },
+          "prices": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/skus/wBeDdSgYQW/relationships/prices",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/skus/wBeDdSgYQW/prices"
+            }
+          },
+          "stock_items": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/skus/wBeDdSgYQW/relationships/stock_items",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/skus/wBeDdSgYQW/stock_items"
+            }
+          },
+          "delivery_lead_times": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/skus/wBeDdSgYQW/relationships/delivery_lead_times",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/skus/wBeDdSgYQW/delivery_lead_times"
+            }
+          },
+          "sku_options": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/skus/wBeDdSgYQW/relationships/sku_options",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/skus/wBeDdSgYQW/sku_options"
+            }
+          }
+        },
+        "meta": {
+          "mode": "test"
+        }
+      }
+    ],
+    "meta": {
+      "record_count": 2,
+      "page_count": 1
+    },
+    "links": {
+      "first": "https://the-blue-brand-2.commercelayer.co/api/skus?filter%5Bq%5D%5Bcode_in%5D=BABYONBU000000E63E74NBXX%2CBABYONBU000000E63E746MXXFAKE%2CBABYONBU000000E63E7412MX&page%5Bnumber%5D=1&page%5Bsize%5D=25",
+      "last": "https://the-blue-brand-2.commercelayer.co/api/skus?filter%5Bq%5D%5Bcode_in%5D=BABYONBU000000E63E74NBXX%2CBABYONBU000000E63E746MXXFAKE%2CBABYONBU000000E63E7412MX&page%5Bnumber%5D=1&page%5Bsize%5D=25"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "url": "https://the-blue-brand-2.commercelayer.co/oauth/token",
+  "method": "POST",
+  "data": {
+    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJvcmdhbml6YXRpb24iOnsiaWQiOjM1fSwiYXBwbGljYXRpb24iOnsiaWQiOjEzMSwia2luZCI6InNhbGVzX2NoYW5uZWwiLCJwdWJsaWMiOnRydWV9LCJ0ZXN0Ijp0cnVlLCJleHAiOjE1NzYyMzgxMTUsIm1hcmtldCI6eyJpZCI6NDgsInByaWNlX2xpc3RfaWQiOjUyLCJzdG9ja19sb2NhdGlvbl9pZHMiOls2Myw2NF0sImdlb2NvZGVyX2lkIjpudWxsfSwicmFuZCI6MC45MTI1Mzc1Mjg2NzQ4OTc4fQ.OlgjVLpcKDt_3JKJYfzO7GPJahyrzxITKpfZKt2oX9Scild3_0cqCChz98zZNE4S3yA-xdfF25zp6Tf98wDwjQ",
+    "token_type": "bearer",
+    "expires_in": 6093,
+    "scope": "market:48",
+    "created_at": 1576230915
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "url": "https://the-blue-brand-2.commercelayer.co/api/line_items/",
+  "method": "POST",
+  "data": {
+    "data": {
+      "id": "zNnEatGYxv",
+      "type": "line_items",
+      "links": {
+        "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv"
+      },
+      "attributes": {
+        "sku_code": "BABYONBU000000E63E74NBXX",
+        "quantity": 2,
+        "currency_code": "EUR",
+        "unit_amount_cents": 2900,
+        "unit_amount_float": 29,
+        "formatted_unit_amount": "€29,00",
+        "options_amount_cents": 0,
+        "options_amount_float": 0,
+        "formatted_options_amount": "€0,00",
+        "total_amount_cents": 5800,
+        "total_amount_float": 58,
+        "formatted_total_amount": "€58,00",
+        "name": "Black Baby Onesie Short Sleeve with Pink Logo (New born)",
+        "image_url": "",
+        "tax_rate": null,
+        "tax_breakdown": {},
+        "item_type": "skus",
+        "created_at": "2019-12-13T10:13:43.545Z",
+        "updated_at": "2019-12-13T10:13:43.545Z",
+        "reference": null,
+        "metadata": {}
+      },
+      "relationships": {
+        "order": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/relationships/order",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/order"
+          }
+        },
+        "item": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/relationships/item",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/item"
+          }
+        },
+        "line_item_options": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/relationships/line_item_options",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/zNnEatGYxv/line_item_options"
+          }
+        }
+      },
+      "meta": {
+        "mode": "test"
+      }
+    }
+  }
+}

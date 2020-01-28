@@ -1,0 +1,12 @@
+[
+  "accessToken",
+  "getSkus",
+  "getPricesCat",
+  "getSkus1",
+  "createOrder",
+  "createLineItems",
+  "getOrder",
+  "getLineItems",
+  "deleteLineItems",
+  "getOrder1"
+]

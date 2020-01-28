@@ -1,0 +1,196 @@
+{
+  "url": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/?include=prices&page[size]=25",
+  "method": "GET",
+  "data": {
+    "data": {
+      "id": "bWRwRSmvPB",
+      "type": "skus",
+      "links": {
+        "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB"
+      },
+      "attributes": {
+        "code": "BABYONBU000000E63E74NBXX",
+        "name": "Black Baby Onesie Short Sleeve with Pink Logo (New born)",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam pellentesque in neque vitae tincidunt. In gravida eu ipsum non condimentum. Curabitur libero leo, gravida a dictum vestibulum, sollicitudin vel quam.",
+        "image_url": "https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90",
+        "tag_names": "",
+        "pieces_per_pack": null,
+        "weight": null,
+        "unit_of_weight": null,
+        "inventory": {
+          "available": true,
+          "quantity": 36,
+          "levels": [
+            {
+              "quantity": 9,
+              "delivery_lead_times": [
+                {
+                  "shipping_method": {
+                    "name": "Standard Shipping",
+                    "reference": null,
+                    "price_amount_cents": 700,
+                    "free_over_amount_cents": 9900,
+                    "formatted_price_amount": "€7,00",
+                    "formatted_free_over_amount": "€99,00"
+                  },
+                  "min": {
+                    "hours": 72,
+                    "days": 3
+                  },
+                  "max": {
+                    "hours": 120,
+                    "days": 5
+                  }
+                },
+                {
+                  "shipping_method": {
+                    "name": "Express Delivery",
+                    "reference": null,
+                    "price_amount_cents": 1200,
+                    "free_over_amount_cents": null,
+                    "formatted_price_amount": "€12,00",
+                    "formatted_free_over_amount": null
+                  },
+                  "min": {
+                    "hours": 48,
+                    "days": 2
+                  },
+                  "max": {
+                    "hours": 72,
+                    "days": 3
+                  }
+                }
+              ]
+            },
+            {
+              "quantity": 27,
+              "delivery_lead_times": [
+                {
+                  "shipping_method": {
+                    "name": "Standard Shipping",
+                    "reference": null,
+                    "price_amount_cents": 700,
+                    "free_over_amount_cents": 9900,
+                    "formatted_price_amount": "€7,00",
+                    "formatted_free_over_amount": "€99,00"
+                  },
+                  "min": {
+                    "hours": 96,
+                    "days": 4
+                  },
+                  "max": {
+                    "hours": 144,
+                    "days": 6
+                  }
+                },
+                {
+                  "shipping_method": {
+                    "name": "Express Delivery",
+                    "reference": null,
+                    "price_amount_cents": 1200,
+                    "free_over_amount_cents": null,
+                    "formatted_price_amount": "€12,00",
+                    "formatted_free_over_amount": null
+                  },
+                  "min": {
+                    "hours": 72,
+                    "days": 3
+                  },
+                  "max": {
+                    "hours": 96,
+                    "days": 4
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "created_at": "2019-09-24T08:56:49.667Z",
+        "updated_at": "2019-09-24T08:56:49.667Z",
+        "reference": "BABYONBU000000E63E74",
+        "metadata": {}
+      },
+      "relationships": {
+        "shipping_category": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/relationships/shipping_category",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/shipping_category"
+          }
+        },
+        "prices": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/relationships/prices",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/prices"
+          },
+          "data": [
+            {
+              "type": "prices",
+              "id": "maJJmUrXEa"
+            }
+          ]
+        },
+        "stock_items": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/relationships/stock_items",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/stock_items"
+          }
+        },
+        "delivery_lead_times": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/relationships/delivery_lead_times",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/delivery_lead_times"
+          }
+        },
+        "sku_options": {
+          "links": {
+            "self": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/relationships/sku_options",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/skus/bWRwRSmvPB/sku_options"
+          }
+        }
+      },
+      "meta": {
+        "mode": "test"
+      }
+    },
+    "included": [
+      {
+        "id": "maJJmUrXEa",
+        "type": "prices",
+        "links": {
+          "self": "https://the-blue-brand-2.commercelayer.co/api/prices/maJJmUrXEa"
+        },
+        "attributes": {
+          "currency_code": "EUR",
+          "sku_code": "BABYONBU000000E63E74NBXX",
+          "amount_cents": 2900,
+          "amount_float": 29,
+          "formatted_amount": "€29,00",
+          "compare_at_amount_cents": 3770,
+          "compare_at_amount_float": 37.7,
+          "formatted_compare_at_amount": "€37,70",
+          "created_at": "2019-09-24T08:56:49.673Z",
+          "updated_at": "2019-09-24T08:56:49.673Z",
+          "reference": null,
+          "metadata": {}
+        },
+        "relationships": {
+          "price_list": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/prices/maJJmUrXEa/relationships/price_list",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/prices/maJJmUrXEa/price_list"
+            }
+          },
+          "sku": {
+            "links": {
+              "self": "https://the-blue-brand-2.commercelayer.co/api/prices/maJJmUrXEa/relationships/sku",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/prices/maJJmUrXEa/sku"
+            }
+          }
+        },
+        "meta": {
+          "mode": "test"
+        }
+      }
+    ]
+  }
+}
