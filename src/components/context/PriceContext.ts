@@ -4,7 +4,8 @@ import { PriceState } from '../../reducers/PriceReducer'
 const initial: PriceState = {
   loading: false,
   prices: {},
-  skuCode: ''
+  skuCode: '',
+  skuCodes: []
 }
 
 const PriceContext = createContext(initial)

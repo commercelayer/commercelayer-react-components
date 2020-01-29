@@ -101,7 +101,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
       })
     }
   }, [accessToken, state.order])
-  const orderObj = {
+  const orderValue = {
     order: state.order,
     orderId: state.orderId,
     loading: state.loading,
@@ -109,7 +109,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
     getOrder
   }
   return (
-    <OrderContext.Provider value={orderObj}>{children}</OrderContext.Provider>
+    <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
   )
 }
 

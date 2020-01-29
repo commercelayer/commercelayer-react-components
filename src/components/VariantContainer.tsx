@@ -5,7 +5,6 @@ import React, {
   useContext,
   ReactNode
 } from 'react'
-import getChildrenProp from '../utils/getChildrenProp'
 import { Sku } from '@commercelayer/js-sdk'
 import getSkus from '../utils/getSkus'
 import variantReducer, {
@@ -14,7 +13,11 @@ import variantReducer, {
 } from '../reducers/VariantReducer'
 import CommerceLayerContext from './context/CommerceLayerContext'
 import VariantContext from './context/VariantContext'
-import { setSkuCodeInterface, VariantState } from '../reducers/VariantReducer'
+import {
+  setSkuCodeInterface,
+  VariantState,
+  setSkuCodesInterface
+} from '../reducers/VariantReducer'
 
 export interface VariantContainerProps {
   children: ReactNode
@@ -27,11 +30,16 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = ({
 }) => {
   const { accessToken } = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(variantReducer, variantInitialState)
-  const skuCodes = getChildrenProp(children, 'skuCodes')
   const setCurrentQuantity: setCurrentQuantityInterface = quantity => {
     dispatch({
       type: 'setCurrentQuantity',
       payload: quantity
+    })
+  }
+  const setSkuCodes: setSkuCodesInterface = skuCodes => {
+    dispatch({
+      type: 'setSkuCodes',
+      payload: skuCodes
     })
   }
   const setSkuCode: setSkuCodeInterface = (code, id) => {
@@ -70,18 +78,18 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = ({
   }
 
   useEffect(() => {
-    dispatch({
-      type: 'setLoading',
-      payload: true
-    })
     if (skuCode) {
       dispatch({
         type: 'setCurrentSkuCode',
         payload: skuCode
       })
     }
-    if (skuCodes.length >= 1 && accessToken) {
-      Sku.where({ codeIn: skuCodes.join(',') })
+    if (state.skuCodes.length >= 1 && accessToken) {
+      dispatch({
+        type: 'setLoading',
+        payload: true
+      })
+      Sku.where({ codeIn: state.skuCodes.join(',') })
         .perPage(25)
         .all()
         .then(r => {
@@ -114,12 +122,14 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = ({
   const variantValue: VariantState = {
     loading: state.loading,
     variants: state.variants,
+    skuCodes: state.skuCodes,
     currentSkuId: state.currentSkuId,
     currentSkuCode: state.currentSkuCode || skuCode,
     currentSkuInventory: state.currentSkuInventory,
     currentQuantity: state.currentQuantity,
     setCurrentQuantity,
-    setSkuCode
+    setSkuCode,
+    setSkuCodes
   }
   return (
     <VariantContext.Provider value={variantValue}>

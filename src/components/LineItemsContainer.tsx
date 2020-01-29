@@ -35,7 +35,6 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
     })
     deleteItem.then(() => getOrder(orderId))
   }
-  console.log('Line item container ==> order', order)
   useEffect(() => {
     if (order) {
       const lItems = order.lineItems().toArray()

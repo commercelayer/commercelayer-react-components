@@ -9,17 +9,17 @@ import { OrderCollection } from '@commercelayer/js-sdk'
 import getAmount from '../utils/getAmount'
 import OrderContext from './context/OrderContext'
 
-export interface SubTotalProps extends GeneralComponent {
+export interface AdjustmentProps extends GeneralComponent {
   order?: OrderCollection
   format?: 'formatted' | 'cents' | 'float'
 }
 
-const SubTotal: FunctionComponent<SubTotalProps> = props => {
+const Adjustment: FunctionComponent<AdjustmentProps> = props => {
   const { format, ...p } = props
   const { order } = useContext(OrderContext)
   const [price, setPrice] = useState(null)
   useEffect(() => {
-    const p = getAmount('amount', 'subtotal', format, order)
+    const p = getAmount('amount', 'adjustment', format, order)
     setPrice(p)
     return () => {
       setPrice(null)
@@ -28,8 +28,8 @@ const SubTotal: FunctionComponent<SubTotalProps> = props => {
   return <span {...p}>{price}</span>
 }
 
-SubTotal.defaultProps = {
+Adjustment.defaultProps = {
   format: 'formatted'
 }
 
-export default SubTotal
+export default Adjustment

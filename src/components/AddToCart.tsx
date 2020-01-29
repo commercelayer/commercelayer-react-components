@@ -2,14 +2,13 @@ import React, { FunctionComponent, useContext } from 'react'
 import Parent from './utils/Parent'
 import OrderContext from './context/OrderContext'
 import VariantContext from './context/VariantContext'
+import { GeneralComponent } from '../@types/index'
 
-// TODO: Extends interface from OrderContainer
-
-export interface AddToCartProps {
-  className?: string
+export interface AddToCartProps extends GeneralComponent {
   label?: string
   disabled?: boolean
   skuCode?: string
+  children?: FunctionComponent
 }
 
 const AddToCart: FunctionComponent<AddToCartProps> = props => {
@@ -23,10 +22,14 @@ const AddToCart: FunctionComponent<AddToCartProps> = props => {
   }
   const sCode = skuCode || currentSkuCode
   const disabled = !sCode
-
-  // TODO: passing right props to the children
+  const parentProps = {
+    handleClick,
+    disabled,
+    label,
+    ...props
+  }
   return children ? (
-    <Parent {...props}>{children}</Parent>
+    <Parent {...parentProps}>{children}</Parent>
   ) : (
     <button disabled={disabled} className={className} onClick={handleClick}>
       {label ? label : 'add to cart'}

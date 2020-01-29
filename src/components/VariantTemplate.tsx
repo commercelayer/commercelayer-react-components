@@ -1,20 +1,14 @@
-import React, {
-  Fragment,
-  ReactEventHandler,
-  FormEvent,
-  ChangeEvent,
-  SelectHTMLAttributes,
-  OptionHTMLAttributes,
-  FunctionComponent
-} from 'react'
+import React, { Fragment, FunctionComponent } from 'react'
 import _ from 'lodash'
+import { GeneralComponent } from '../@types'
+import { setSkuCodeInterface } from '../reducers/VariantReducer'
 
-export interface VariantTemplateProps {
+export interface VariantTemplateProps extends GeneralComponent {
   variants: object
   type: string
   placeholder: string
   variantLabels: string[]
-  onChange: (skuCode: string, skuId: string) => void // TODO: make required
+  onChange: setSkuCodeInterface
   name: string
   skuCode?: string
 }
@@ -27,7 +21,8 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
     placeholder,
     variantLabels,
     skuCode,
-    onChange
+    onChange,
+    ...prs
   } = props
   const vars = _.keys(variants).map((v, k) => {
     const checked = skuCode === v
@@ -47,6 +42,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
           name={name}
           value={variants[v].code}
           onChange={e => onChange(e.target.value, variants[v].id)}
+          {...prs}
         />
         {variantLabels.length > 0 ? variantLabels[k] : variants[v].name}
       </Fragment>
@@ -63,6 +59,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
           onChange(v, id)
         }}
         value={skuCode}
+        {...prs}
       >
         <option>{placeholder}</option>
         {vars}

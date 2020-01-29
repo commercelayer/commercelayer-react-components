@@ -8,19 +8,20 @@ export interface LineItemImageProps extends GeneralComponent {
   width?: number
   src?: string
   lineItem?: LineItemCollection
+  children?: FunctionComponent
 }
 
 const LineItemImage: FunctionComponent<LineItemImageProps> = props => {
   const { lineItem } = useContext(LineItemChildrenContext)
+  const src = props.src || lineItem.imageUrl
+  const parenProps = {
+    src,
+    ...props
+  }
   return props.children ? (
-    <Parent {...props}>{props.children}</Parent>
+    <Parent {...parenProps}>{props.children}</Parent>
   ) : (
-    <img
-      style={props.style}
-      className={props.className}
-      width={props.width}
-      src={props.src ?? lineItem.imageUrl}
-    />
+    <img src={src} {...props} />
   )
 }
 export default LineItemImage

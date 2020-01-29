@@ -7,7 +7,7 @@ export interface TotalProps {
 }
 
 const Total = props => {
-  const { format, className, style } = props
+  const { format, ...p } = props
   const { order } = useContext(OrderContext)
   const [price, setPrice] = useState(null)
   useEffect(() => {
@@ -17,11 +17,7 @@ const Total = props => {
       setPrice(null)
     }
   }, [order])
-  return (
-    <span style={style} className={className}>
-      {price}
-    </span>
-  )
+  return <span {...p}>{price}</span>
 }
 
 Total.defaultProps = {

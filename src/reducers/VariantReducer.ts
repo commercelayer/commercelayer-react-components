@@ -9,6 +9,10 @@ export interface setSkuCodeInterface {
   (code: string, id: string): void
 }
 
+export interface setSkuCodesInterface {
+  (skuCodes: string[]): void
+}
+
 export interface VariantsObject {
   [key: string]: SkuCollection
 }
@@ -16,6 +20,7 @@ export interface VariantsObject {
 export interface VariantState {
   loading: boolean
   variants: VariantsObject
+  skuCodes: string[]
   currentSkuCode: string
   currentSkuId: string
   currentSkuInventory:
@@ -26,6 +31,7 @@ export interface VariantState {
       }
   currentQuantity: number
   setSkuCode?: setSkuCodeInterface
+  setSkuCodes?: setSkuCodesInterface
   setCurrentQuantity?: setCurrentQuantityInterface
 }
 
@@ -33,6 +39,7 @@ export interface VariantActions extends GeneralActions {
   type:
     | 'setLoading'
     | 'setVariants'
+    | 'setSkuCodes'
     | 'setCurrentSkuCode'
     | 'setCurrentSkuId'
     | 'setCurrentSkuInventory'
@@ -42,6 +49,7 @@ export interface VariantActions extends GeneralActions {
 export const variantInitialState: VariantState = {
   loading: false,
   variants: {},
+  skuCodes: [],
   currentSkuCode: '',
   currentSkuId: '',
   currentSkuInventory: {
@@ -60,6 +68,9 @@ const variantReducer: GeneralReducer<VariantState, VariantActions> = (
   }
   if (action.type === 'setVariants') {
     state = { ...state, variants: action.payload }
+  }
+  if (action.type === 'setSkuCodes') {
+    state = { ...state, skuCodes: action.payload }
   }
   if (action.type === 'setCurrentSkuCode') {
     state = { ...state, currentSkuCode: action.payload }

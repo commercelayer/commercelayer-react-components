@@ -1,6 +1,8 @@
 import { CSSProperties } from 'react'
 
 export interface GeneralComponent {
+  id?: string
+  key?: string
   className?: string
   style?: CSSProperties
 }

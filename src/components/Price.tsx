@@ -2,7 +2,6 @@ import {
   Fragment,
   useState,
   useEffect,
-  ReactNode,
   FunctionComponent,
   useContext
 } from 'react'
@@ -11,9 +10,10 @@ import Parent from './utils/Parent'
 import PriceContext from './context/PriceContext'
 
 export interface PriceProps {
-  children?: ReactNode
+  children?: FunctionComponent
   amountClassName?: string
   compareClassName?: string
+  skuCode?: string
 }
 
 export interface PriceTemplateProps {
@@ -36,22 +36,29 @@ const PriceTemplate: FunctionComponent<PriceTemplateProps> = props =>
       )}
     </Fragment>
   )
-
 const Price: FunctionComponent<PriceProps> = props => {
   const { children } = props
-  const { prices, skuCode, loading } = useContext(PriceContext)
+  const { prices, skuCode, loading, skuCodes, setSkuCodes } = useContext(
+    PriceContext
+  )
   const [formattedAmount, setFormattedAmount] = useState('')
   const [formattedCompare, setFormattedCompare] = useState('')
   const [showCompare, setShowCompare] = useState(false)
+  const sCode = skuCode || props.skuCode
   useEffect(() => {
-    if (prices[skuCode]) {
-      const amount = prices[skuCode].formattedAmount
-      const compare = prices[skuCode].formattedCompareAtAmount
-      if (prices[skuCode].compareAtAmountCents > prices[skuCode].amountCents) {
+    if (!_.isEmpty(prices) && prices[sCode]) {
+      const amount = prices[sCode].formattedAmount
+      const compare = prices[sCode].formattedCompareAtAmount
+      if (prices[sCode].compareAtAmountCents > prices[sCode].amountCents) {
         setShowCompare(true)
       }
       setFormattedAmount(amount)
       setFormattedCompare(compare)
+    } else {
+      if (sCode && _.indexOf(skuCodes, sCode) === -1) {
+        skuCodes.push(sCode)
+        setSkuCodes(skuCodes)
+      }
     }
     return () => {
       setFormattedAmount('')
@@ -60,8 +67,15 @@ const Price: FunctionComponent<PriceProps> = props => {
     }
   }, [prices])
 
+  const parentProps = {
+    showCompare,
+    formattedAmount,
+    formattedCompare,
+    loading,
+    ...props
+  }
   return children ? (
-    <Parent {...props}>{children}</Parent>
+    <Parent {...parentProps}>{children}</Parent>
   ) : (
     <Fragment>
       <PriceTemplate

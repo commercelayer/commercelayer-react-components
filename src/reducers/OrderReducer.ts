@@ -38,7 +38,6 @@ const orderReducer: GeneralReducer<OrderState, OrderActions> = (
     state = { ...state, orderId: action.payload }
   }
   if (action.type === 'setOrder') {
-    console.log('=== SET ORDER ACTION === ')
     state = { ...state, order: action.payload }
   }
   return state

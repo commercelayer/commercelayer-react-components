@@ -1,5 +1,4 @@
 import React, {
-  useState,
   useEffect,
   FunctionComponent,
   useContext,
@@ -7,42 +6,45 @@ import React, {
   useReducer
 } from 'react'
 import { Sku } from '@commercelayer/js-sdk'
-import Parent from './utils/Parent'
 import getPrices from '../utils/getPrices'
-import getChildrenProp from '../utils/getChildrenProp'
 import _ from 'lodash'
 import CommerceLayerContext from './context/CommerceLayerContext'
 import VariantContext from './context/VariantContext'
 import priceReducer from '../reducers/PriceReducer'
-import { priceInitialState } from '../reducers/PriceReducer'
+import { priceInitialState, PriceState } from '../reducers/PriceReducer'
 import PriceContext from './context/PriceContext'
+import { setSkuCodesInterface } from '../reducers/VariantReducer'
 
 export interface PriceContainerProps {
   children: ReactNode
-  accessToken?: string
   skuCode?: string
 }
 
 const PriceContainer: FunctionComponent<PriceContainerProps> = ({
   children,
-  skuCode,
-  ...props
+  skuCode
 }) => {
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
-  const skuCodes = getChildrenProp(children, 'skuCode')
   const { accessToken } = useContext(CommerceLayerContext)
   const { currentSkuCode } = useContext(VariantContext)
-  if (_.indexOf(skuCodes, skuCode) === -1 && skuCode) skuCodes.push(skuCode)
-  if (_.indexOf(skuCodes, currentSkuCode) === -1 && currentSkuCode)
-    skuCodes.push(currentSkuCode)
+  if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
+    state.skuCodes.push(skuCode)
+  if (_.indexOf(state.skuCodes, currentSkuCode) === -1 && currentSkuCode)
+    state.skuCodes.push(currentSkuCode)
 
+  const setSkuCodes: setSkuCodesInterface = skuCodes => {
+    dispatch({
+      type: 'setSkuCodes',
+      payload: skuCodes
+    })
+  }
   useEffect(() => {
     dispatch({
       type: 'setLoading',
       payload: true
     })
-    if (skuCodes.length >= 1 && accessToken) {
-      Sku.where({ codeIn: skuCodes.join(',') })
+    if (state.skuCodes.length >= 1 && accessToken) {
+      Sku.where({ codeIn: state.skuCodes.join(',') })
         .includes('prices')
         .perPage(25)
         .all()
@@ -69,13 +71,15 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = ({
       })
     }
   }, [accessToken, currentSkuCode])
-  const priceObj = {
+  const priceValue: PriceState = {
     loading: state.loading,
     prices: state.prices,
-    skuCode: currentSkuCode || skuCode
+    skuCode: currentSkuCode || skuCode,
+    skuCodes: state.skuCodes,
+    setSkuCodes
   }
   return (
-    <PriceContext.Provider value={priceObj}>{children}</PriceContext.Provider>
+    <PriceContext.Provider value={priceValue}>{children}</PriceContext.Provider>
   )
 }
 

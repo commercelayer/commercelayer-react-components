@@ -4,6 +4,7 @@ import { VariantState } from '../../reducers/VariantReducer'
 const initial: VariantState = {
   loading: false,
   variants: {},
+  skuCodes: [],
   currentSkuCode: '',
   currentSkuId: '',
   currentQuantity: 1,

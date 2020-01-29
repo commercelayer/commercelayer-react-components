@@ -4,8 +4,11 @@ import Parent from './utils/Parent'
 import VariantContext from './context/VariantContext'
 
 export interface QuantitySelectorProps extends GeneralComponent {
+  min?: number
+  max?: number
   defaultValue?: number
   skuCode?: string
+  children?: FunctionComponent
   currentSkuInventory?: {
     available: boolean
     quantity: number
@@ -13,7 +16,7 @@ export interface QuantitySelectorProps extends GeneralComponent {
 }
 
 const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
-  const { skuCode, className, style, defaultValue, children } = props
+  const { skuCode, className, style, defaultValue, children, min, max } = props
   const {
     currentSkuCode,
     currentSkuInventory,
@@ -24,16 +27,23 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
   const handleChange = e => {
     setCurrentQuantity(e.target.value)
   }
-  // TODO: Passing right props to the children
+  const maxInv = max || currentSkuInventory.quantity
+  const parentProps = {
+    min,
+    max: maxInv,
+    disabled,
+    handleChange,
+    ...props
+  }
   return children ? (
-    <Parent {...props}>{children}</Parent>
+    <Parent {...parentProps}>{children}</Parent>
   ) : (
     <input
       style={style}
       className={className}
       type="number"
-      min="1"
-      max={currentSkuInventory.quantity}
+      min={min}
+      max={maxInv}
       defaultValue={defaultValue}
       disabled={disabled}
       onChange={handleChange}
@@ -42,6 +52,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
 }
 
 QuantitySelector.defaultProps = {
+  min: 1,
   defaultValue: 1
 }
 

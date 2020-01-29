@@ -2,24 +2,22 @@ import React, {
   FunctionComponent,
   Fragment,
   ReactElement,
-  useContext
+  useContext,
+  ReactNode
 } from 'react'
-import { LineItemCollection } from '@commercelayer/js-sdk/dist/LineItem'
-import Parent from './utils/Parent'
 import { LineItemPriceProps } from './LineItemPrice'
 import { LineItemImageProps } from './LineItemImage'
 import LineItemContext from './context/LineItemContext'
 import LineItemChildrenContext from './context/LineItemChildrenContext'
 
 export interface LineItemProps {
-  children?: ReactElement<LineItemPriceProps | LineItemImageProps>[] // TODO: set type
+  children?: ReactNode
   type?: 'skus' | 'gift_cards'
 }
 
 const LineItem: FunctionComponent<LineItemProps> = props => {
   const { type } = props
   const { lineItems } = useContext(LineItemContext)
-  console.log('lineItems', lineItems)
   const items = lineItems
     .filter(l => l.itemType === type)
     .map((lineItem, k) => {

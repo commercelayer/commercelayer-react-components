@@ -5,21 +5,19 @@ import React, {
   useContext
 } from 'react'
 import { GeneralComponent } from '../@types/index'
-import { OrderCollection } from '@commercelayer/js-sdk'
 import getAmount from '../utils/getAmount'
 import OrderContext from './context/OrderContext'
 
-export interface SubTotalProps extends GeneralComponent {
-  order?: OrderCollection
+export interface PaymentMethodProps extends GeneralComponent {
   format?: 'formatted' | 'cents' | 'float'
 }
 
-const SubTotal: FunctionComponent<SubTotalProps> = props => {
+const PaymentMethod: FunctionComponent<PaymentMethodProps> = props => {
   const { format, ...p } = props
   const { order } = useContext(OrderContext)
   const [price, setPrice] = useState(null)
   useEffect(() => {
-    const p = getAmount('amount', 'subtotal', format, order)
+    const p = getAmount('total', 'paymentMethod', format, order)
     setPrice(p)
     return () => {
       setPrice(null)
@@ -28,8 +26,8 @@ const SubTotal: FunctionComponent<SubTotalProps> = props => {
   return <span {...p}>{price}</span>
 }
 
-SubTotal.defaultProps = {
+PaymentMethod.defaultProps = {
   format: 'formatted'
 }
 
-export default SubTotal
+export default PaymentMethod

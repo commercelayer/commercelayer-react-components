@@ -1,16 +1,22 @@
-import React, { Fragment, FunctionComponent, useContext } from 'react'
+import React, {
+  Fragment,
+  FunctionComponent,
+  useContext,
+  useEffect
+} from 'react'
 import VariantTemplate from './VariantTemplate'
 import Parent from './utils/Parent'
 import VariantContext from './context/VariantContext'
-import { variantInitialState } from '../reducers/VariantReducer'
+import { GeneralComponent } from '../@types/index'
+import { setSkuCodeInterface } from '../reducers/VariantReducer'
 
-export interface VariantSelectorProps {
+export interface VariantSelectorProps extends GeneralComponent {
   skuCodes: string[]
   name: string
   children?: any
   skuCode?: string
   type?: 'select' | 'radio'
-  setSkuCode?: () => void
+  setSkuCode?: setSkuCodeInterface
   className?: string
   variants?: object
   loading?: boolean
@@ -23,10 +29,21 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = ({
   type,
   ...props
 }) => {
-  const { placeholder, variantLabels, skuCode, name } = props
-  const { setSkuCode, currentSkuCode, loading, variants } = useContext(
-    VariantContext
-  )
+  const { placeholder, variantLabels, skuCode, name, skuCodes, ...prs } = props
+  const {
+    setSkuCode,
+    currentSkuCode,
+    loading,
+    variants,
+    setSkuCodes
+  } = useContext(VariantContext)
+  useEffect(() => {
+    setSkuCodes(skuCodes)
+    return () => {
+      setSkuCodes([])
+    }
+  }, [skuCodes])
+  const sCode = currentSkuCode || skuCode
   const DefaultTemplate = () =>
     loading ? (
       <Fragment>Loading...</Fragment>
@@ -36,13 +53,22 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = ({
         type={type}
         placeholder={placeholder}
         variantLabels={variantLabels}
-        skuCode={currentSkuCode || skuCode}
+        skuCode={sCode}
         onChange={setSkuCode}
         name={name}
+        {...prs}
       />
     )
+  const parentProps = {
+    variants,
+    loading,
+    variantLabels,
+    setSkuCode,
+    skuCode: sCode,
+    ...props
+  }
   return children ? (
-    <Parent {...props}>{children}</Parent>
+    <Parent {...parentProps}>{children}</Parent>
   ) : (
     <Fragment>
       <DefaultTemplate />

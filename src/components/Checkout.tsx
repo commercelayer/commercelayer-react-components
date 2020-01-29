@@ -1,15 +1,15 @@
-import React, { FunctionComponent, CSSProperties } from 'react'
-import { OrderCollection } from '@commercelayer/js-sdk'
+import React, { FunctionComponent, CSSProperties, useContext } from 'react'
 import { GeneralComponent } from '../@types/index'
+import OrderContext from './context/OrderContext'
 
 export interface CheckoutProps extends GeneralComponent {
-  order?: OrderCollection
   label?: string
 }
 
 const Checkout: FunctionComponent<CheckoutProps> = props => {
-  return props.order ? (
-    <a className={props.className} href={props.order.checkoutUrl}>
+  const { order } = useContext(OrderContext)
+  return order ? (
+    <a style={props.style} className={props.className} href={order.checkoutUrl}>
       {props.label}
     </a>
   ) : null

@@ -9,7 +9,7 @@ export interface DiscountProps extends GeneralComponent {
 }
 
 const Discount: FunctionComponent<DiscountProps> = props => {
-  const { order, format, className, style } = props
+  const { order, format, ...p } = props
   const [price, setPrice] = useState(null)
   useEffect(() => {
     const p = getAmount('amount', 'discount', format, order)
@@ -18,11 +18,7 @@ const Discount: FunctionComponent<DiscountProps> = props => {
       setPrice(null)
     }
   }, [order])
-  return (
-    <span style={style} className={className}>
-      {price}
-    </span>
-  )
+  return <span {...p}>{price}</span>
 }
 
 Discount.defaultProps = {

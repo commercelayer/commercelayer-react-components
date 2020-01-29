@@ -7,10 +7,17 @@ export interface GetAmountInterface {
 const getAmount: GetAmountInterface = (base, type, format, obj) => {
   let v = ''
   _.keys(obj).map(k => {
-    if (k.toLowerCase() === `${format}${type}${base}`.toLowerCase()) {
+    const key = k.toLowerCase()
+    const typeOne = `${format}${type}${base}`.toLowerCase()
+    const typeTwo = `${type}${base}${format}`.toLowerCase()
+    const typeThree = `${format}${base}${type}`.toLowerCase()
+    if (key === typeOne) {
       v = obj[k]
     }
-    if (k.toLowerCase() === `${type}${base}${format}`.toLowerCase()) {
+    if (key === typeTwo) {
+      v = obj[k]
+    }
+    if (key === typeThree) {
       v = obj[k]
     }
   })
