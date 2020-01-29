@@ -10,7 +10,7 @@ import VariantSelector from '../src/components/VariantSelector'
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
 export const Nav = ({ links }) => (
-  <nav className="flex items-center justify-between flex-wrap bg-red-500 p-6">
+  <nav className="flex items-center justify-between flex-wrap bg-blue-500 p-6">
     <ul className="flex">
       {links.map((l: string, i: number) => {
         return (
@@ -35,25 +35,6 @@ export const Type = ({ text }) => (
   </span>
 )
 
-const TestTemplate = props => {
-  const { prices, skuCode } = props
-  const [formattedAmount, setFormattedAmount] = useState('')
-  useEffect(() => {
-    if (prices[skuCode]) {
-      const amount = prices[skuCode].formattedAmount
-      setFormattedAmount(amount)
-    }
-    return () => {
-      setFormattedAmount('')
-    }
-  }, [prices])
-  return (
-    <Fragment>
-      <div className="text-red-800">{formattedAmount}</div>
-    </Fragment>
-  )
-}
-
 const Home = () => {
   const [token, setToken] = useState('')
   useEffect(() => {
@@ -72,11 +53,8 @@ const Home = () => {
     <Fragment>
       <Nav links={['/order']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
-        {/* <Title title="Prices" />
+        <Title title="Prices" />
         <PriceContainer skuCode="BABYONBU000000E63E7412MX">
-          <Price>
-            <TestTemplate />
-          </Price>
           <Price
             skuCode="BABYONBU000000E63E746MXX"
             amountClassName="font-bold"
@@ -132,7 +110,7 @@ const Home = () => {
             skuCodes={['BABYONBU000000E63E746MXX', 'BABYONBU000000E63E7412MX']}
             variantLabels={['6 months', '12 months']}
           />
-        </VariantContainer> */}
+        </VariantContainer>
       </CommerceLayer>
     </Fragment>
   )
