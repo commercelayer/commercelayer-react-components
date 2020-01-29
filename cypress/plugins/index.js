@@ -12,14 +12,18 @@
 // the project's config changing)
 
 const fs = require('fs')
+const wp = require('@cypress/webpack-preprocessor')
 
 module.exports = (on, config) => {
+  const options = {
+    webpackOptions: require('../../webpack.config')
+  }
+  on('file:preprocessor', wp(options))
   on('task', {
     readFileMaybe(filename) {
       if (fs.existsSync(filename)) {
         return fs.readFileSync(filename, 'utf8')
       }
-
       return null
     }
   })

@@ -1,6 +1,5 @@
 /// <reference types="Cypress" />
-const lodash = require('lodash')
-const fixRoute = require('../support/utils').fixRoute
+import { fixRoute } from '../support/utils'
 
 Cypress.env('pages').map(page => {
   if (page.mainTitle === '') return false
@@ -83,9 +82,9 @@ Cypress.env('pages').map(page => {
       } else {
         cy.wait('@getPrices')
         cy.get('#add-to-bag').as('addToBag')
-        cy.get('.clayer-add-to-bag-quantity').as('addToBagQuantity')
+        cy.get('#quantity-selector').as('addToBagQuantity')
         cy.get('@addToBagQuantity').should('be.disabled')
-        cy.get('@addToBag').should('have.class', 'disabled')
+        cy.get('@addToBag').should('have.attr', 'disabled')
       }
 
       // SELECT SKU WITH SELECT INPUT
