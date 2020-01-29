@@ -1,12 +1,3 @@
 [
-  "accessToken",
-  "getPrices",
-  "getSkus",
-  "retrieveSku",
-  "createOrder",
-  "createLineItems",
-  "getOrder",
-  "getLineItems",
-  "deleteLineItems",
-  "getOrder1"
+  "accessToken"
 ]

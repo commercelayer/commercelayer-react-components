@@ -4,7 +4,8 @@
   "description": "Commerce Layer React Components",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:cypress:open": "cypress open",
+    "test:cypress:record": "cypress open --env RECORD=1",
     "dev": "next",
     "build": "next build",
     "start": "next start"
@@ -14,7 +15,10 @@
     "url": "git+https://github.com/commercelayer/commercelayer-react-components.git"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Alessandro Casazza",
+    "email": "alessandro@commercelayer.io"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/commercelayer/commercelayer-react-components/issues"

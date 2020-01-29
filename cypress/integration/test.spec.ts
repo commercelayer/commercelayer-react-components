@@ -3,6 +3,8 @@ const lodash = require('lodash')
 const fixRoute = require('../support/utils').fixRoute
 
 Cypress.env('pages').map(page => {
+  if (page.mainTitle === '') return false
+  if (page.path === '') return false
   describe(page.mainTitle, () => {
     const xhrData = {}
     const aliasRoutes = {}
