@@ -78,8 +78,17 @@ const Home = () => {
           <Type text="select type" />
           <VariantSelector
             name="variant1"
-            skuCodes={['BABYONBU000000E63E746MXX', 'BABYONBU000000E63E7412MX']}
-            variantLabels={['6 months', '12 months']}
+            skuCodes={[
+              { label: '6 months', code: 'BABYONBU000000E63E746MXX' },
+              {
+                label: '12 months',
+                code: 'BABYONBU000000E63E7412MX'
+              },
+              {
+                label: '24 months',
+                code: 'BABYONBU000000E63E746MXXFAKE'
+              }
+            ]}
           />
           <br />
           <br />
@@ -87,8 +96,17 @@ const Home = () => {
           <VariantSelector
             name="variant"
             type="radio"
-            skuCodes={['BABYONBU000000E63E746MXX', 'BABYONBU000000E63E7412MX']}
-            variantLabels={['6 months', '12 months']}
+            skuCodes={[
+              { label: '6 months', code: 'BABYONBU000000E63E746MXX' },
+              {
+                label: '12 months',
+                code: 'BABYONBU000000E63E7412MX'
+              },
+              {
+                label: '24 months',
+                code: 'BABYONBU000000E63E746MXXFAKE'
+              }
+            ]}
           />
         </VariantContainer>
         <br />
@@ -98,8 +116,17 @@ const Home = () => {
           <Type text="select type" />
           <VariantSelector
             name="variant1"
-            skuCodes={['BABYONBU000000E63E746MXX', 'BABYONBU000000E63E7412MX']}
-            variantLabels={['6 months', '12 months']}
+            skuCodes={[
+              { label: '6 months', code: 'BABYONBU000000E63E746MXX' },
+              {
+                label: '12 months',
+                code: 'BABYONBU000000E63E7412MX'
+              },
+              {
+                label: '24 months',
+                code: 'BABYONBU000000E63E746MXXFAKE'
+              }
+            ]}
           />
           <br />
           <br />
@@ -107,8 +134,17 @@ const Home = () => {
           <VariantSelector
             name="variant1"
             type="radio"
-            skuCodes={['BABYONBU000000E63E746MXX', 'BABYONBU000000E63E7412MX']}
-            variantLabels={['6 months', '12 months']}
+            skuCodes={[
+              { label: '6 months', code: 'BABYONBU000000E63E746MXX' },
+              {
+                label: '12 months',
+                code: 'BABYONBU000000E63E7412MX'
+              },
+              {
+                label: '24 months',
+                code: 'BABYONBU000000E63E746MXXFAKE'
+              }
+            ]}
           />
         </VariantContainer>
       </CommerceLayer>

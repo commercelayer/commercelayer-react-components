@@ -9,7 +9,7 @@ export interface LineItemImageProps extends GeneralComponent {
   children?: FunctionComponent
 }
 
-const LineItemName = props => {
+const LineItemName: FunctionComponent<LineItemImageProps> = props => {
   const { lineItem } = useContext(LineItemChildrenContext)
   const parentProps = {
     name: lineItem.name,

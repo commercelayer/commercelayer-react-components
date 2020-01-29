@@ -11,6 +11,10 @@ const getAmount: GetAmountInterface = (base, type, format, obj) => {
     const typeOne = `${format}${type}${base}`.toLowerCase()
     const typeTwo = `${type}${base}${format}`.toLowerCase()
     const typeThree = `${format}${base}${type}`.toLowerCase()
+    console.log('key', key)
+    console.log('typeOne', typeOne)
+    console.log('typeTwo', typeTwo)
+    console.log('typeThree', typeThree)
     if (key === typeOne) {
       v = obj[k]
     }

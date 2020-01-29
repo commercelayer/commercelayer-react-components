@@ -1,11 +1,11 @@
 import { GeneralReducer, GeneralActions } from '../@types/index'
 import { OrderCollection } from '@commercelayer/js-sdk'
 
-export interface getOrderInterface {
+export interface GetOrder {
   (orderId: string): void
 }
 
-export interface addToCartInterface {
+export interface AddToCartInterface {
   (skuCode: string, skuId: string, quantity?: number): void
 }
 
@@ -13,8 +13,8 @@ export interface OrderState {
   loading: boolean
   orderId: string
   order: OrderCollection
-  getOrder?: getOrderInterface | null
-  addToCart?: addToCartInterface | null
+  getOrder?: GetOrder | null
+  addToCart?: AddToCartInterface | null
 }
 
 export interface OrderActions extends GeneralActions {

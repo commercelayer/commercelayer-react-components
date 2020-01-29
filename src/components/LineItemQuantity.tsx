@@ -9,13 +9,14 @@ export interface LineItemQuantityProps extends GeneralComponent {
   children?: FunctionComponent
   lineItem?: LineItemCollection
   updateLineItem?: (lineItemId, quantity) => void
+  max?: number
 }
 
 const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = props => {
   const { lineItem } = useContext(LineItemChildrenContext)
   const { updateLineItem } = useContext(LineItemContext)
   const options = []
-  for (let i = 0; i < 50; i++) {
+  for (let i = 1; i <= props.max; i++) {
     options.push(
       <option key={i} value={i}>
         {i}
@@ -38,6 +39,10 @@ const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = props => {
       {options}
     </select>
   )
+}
+
+LineItemQuantity.defaultProps = {
+  max: 50
 }
 
 export default LineItemQuantity

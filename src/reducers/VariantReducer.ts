@@ -1,16 +1,17 @@
 import { GeneralReducer, GeneralActions } from '../@types/index'
 import { SkuCollection, InventoryCollection } from '@commercelayer/js-sdk'
+import { SkuCodePropObj } from '../components/VariantSelector'
 
-export interface setCurrentQuantityInterface {
+export interface SetCurrentQuantity {
   (quantity: number): void
 }
 
-export interface setSkuCodeInterface {
+export interface SetSkuCodeVariant {
   (code: string, id: string): void
 }
 
-export interface setSkuCodesInterface {
-  (skuCodes: string[]): void
+export interface SetSkuCodesVariant {
+  (skuCodes: SkuCodePropObj[]): void
 }
 
 export interface VariantsObject {
@@ -30,9 +31,9 @@ export interface VariantState {
         quantity: 0
       }
   currentQuantity: number
-  setSkuCode?: setSkuCodeInterface
-  setSkuCodes?: setSkuCodesInterface
-  setCurrentQuantity?: setCurrentQuantityInterface
+  setSkuCode?: SetSkuCodeVariant
+  setSkuCodes?: SetSkuCodesVariant
+  setCurrentQuantity?: SetCurrentQuantity
 }
 
 export interface VariantActions extends GeneralActions {

@@ -16,7 +16,7 @@ export interface QuantitySelectorProps extends GeneralComponent {
 }
 
 const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
-  const { skuCode, className, style, defaultValue, children, min, max } = props
+  const { skuCode, children, min, max, ...p } = props
   const {
     currentSkuCode,
     currentSkuInventory,
@@ -24,7 +24,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
   } = useContext(VariantContext)
   const sCode = skuCode || currentSkuCode
   const disabled = !sCode
-  const handleChange = e => {
+  const handleChange = (e): void => {
     setCurrentQuantity(e.target.value)
   }
   const maxInv = max || currentSkuInventory.quantity
@@ -39,14 +39,11 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <input
-      style={style}
-      className={className}
       type="number"
-      min={min}
       max={maxInv}
-      defaultValue={defaultValue}
       disabled={disabled}
       onChange={handleChange}
+      {...p}
     />
   )
 }

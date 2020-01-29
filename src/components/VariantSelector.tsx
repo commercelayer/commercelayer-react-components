@@ -2,26 +2,31 @@ import React, {
   Fragment,
   FunctionComponent,
   useContext,
-  useEffect
+  useEffect,
+  ReactElement
 } from 'react'
 import VariantTemplate from './VariantTemplate'
 import Parent from './utils/Parent'
 import VariantContext from './context/VariantContext'
 import { GeneralComponent } from '../@types/index'
-import { setSkuCodeInterface } from '../reducers/VariantReducer'
+import { SetSkuCodesVariant } from '../reducers/VariantReducer'
+
+export interface SkuCodePropObj {
+  label: string
+  code: string
+}
 
 export interface VariantSelectorProps extends GeneralComponent {
-  skuCodes: string[]
+  skuCodes: SkuCodePropObj[]
   name: string
-  children?: any
+  children?: FunctionComponent
   skuCode?: string
   type?: 'select' | 'radio'
-  setSkuCode?: setSkuCodeInterface
+  setSkuCode?: SetSkuCodesVariant
   className?: string
   variants?: object
   loading?: boolean
   placeholder?: string
-  variantLabels?: string[]
 }
 
 const VariantSelector: FunctionComponent<VariantSelectorProps> = ({
@@ -29,7 +34,7 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = ({
   type,
   ...props
 }) => {
-  const { placeholder, variantLabels, skuCode, name, skuCodes, ...prs } = props
+  const { placeholder, skuCode, name, skuCodes, ...prs } = props
   const {
     setSkuCode,
     currentSkuCode,
@@ -39,12 +44,12 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = ({
   } = useContext(VariantContext)
   useEffect(() => {
     setSkuCodes(skuCodes)
-    return () => {
+    return (): void => {
       setSkuCodes([])
     }
   }, [skuCodes])
   const sCode = currentSkuCode || skuCode
-  const DefaultTemplate = () =>
+  const DefaultTemplate = (): ReactElement =>
     loading ? (
       <Fragment>Loading...</Fragment>
     ) : (
@@ -52,8 +57,8 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = ({
         variants={variants}
         type={type}
         placeholder={placeholder}
-        variantLabels={variantLabels}
         skuCode={sCode}
+        skuCodes={skuCodes}
         onChange={setSkuCode}
         name={name}
         {...prs}
@@ -62,7 +67,7 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = ({
   const parentProps = {
     variants,
     loading,
-    variantLabels,
+    skuCodes,
     setSkuCode,
     skuCode: sCode,
     ...props
@@ -77,8 +82,7 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = ({
 }
 
 VariantSelector.defaultProps = {
-  placeholder: 'select your size',
-  variantLabels: [],
+  placeholder: 'select variant',
   type: 'select'
 }
 

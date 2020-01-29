@@ -1,4 +1,4 @@
-import React, { FunctionComponent, CSSProperties, useContext } from 'react'
+import React, { FunctionComponent, useContext } from 'react'
 import { GeneralComponent } from '../@types/index'
 import OrderContext from './context/OrderContext'
 

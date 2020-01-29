@@ -1,28 +1,14 @@
-import React, { FunctionComponent, useState, useEffect } from 'react'
+import React, { FunctionComponent } from 'react'
 import { GeneralComponent } from '../@types/index'
-import { OrderCollection } from '@commercelayer/js-sdk'
-import getAmount from '../utils/getAmount'
+import GeneralOrderPrice from './utils/GeneralOrderPrice'
 
 export interface DiscountProps extends GeneralComponent {
-  order?: OrderCollection
   format?: 'formatted' | 'cents' | 'float'
+  children?: FunctionComponent
 }
 
 const Discount: FunctionComponent<DiscountProps> = props => {
-  const { order, format, ...p } = props
-  const [price, setPrice] = useState(null)
-  useEffect(() => {
-    const p = getAmount('amount', 'discount', format, order)
-    setPrice(p)
-    return () => {
-      setPrice(null)
-    }
-  }, [order])
-  return <span {...p}>{price}</span>
-}
-
-Discount.defaultProps = {
-  format: 'formatted'
+  return <GeneralOrderPrice base="amount" type="discount" {...props} />
 }
 
 export default Discount

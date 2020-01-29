@@ -1,4 +1,4 @@
-import {
+import React, {
   Fragment,
   useState,
   useEffect,
@@ -60,7 +60,7 @@ const Price: FunctionComponent<PriceProps> = props => {
         setSkuCodes(skuCodes)
       }
     }
-    return () => {
+    return (): void => {
       setFormattedAmount('')
       setFormattedCompare('')
       setShowCompare(false)

@@ -10,10 +10,9 @@ import getPrices from '../utils/getPrices'
 import _ from 'lodash'
 import CommerceLayerContext from './context/CommerceLayerContext'
 import VariantContext from './context/VariantContext'
-import priceReducer from '../reducers/PriceReducer'
+import priceReducer, { SetSkuCodesPrice } from '../reducers/PriceReducer'
 import { priceInitialState, PriceState } from '../reducers/PriceReducer'
 import PriceContext from './context/PriceContext'
-import { setSkuCodesInterface } from '../reducers/VariantReducer'
 
 export interface PriceContainerProps {
   children: ReactNode
@@ -32,7 +31,7 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = ({
   if (_.indexOf(state.skuCodes, currentSkuCode) === -1 && currentSkuCode)
     state.skuCodes.push(currentSkuCode)
 
-  const setSkuCodes: setSkuCodesInterface = skuCodes => {
+  const setSkuCodes: SetSkuCodesPrice = skuCodes => {
     dispatch({
       type: 'setSkuCodes',
       payload: skuCodes
@@ -60,7 +59,7 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = ({
           })
         })
     }
-    return () => {
+    return (): void => {
       dispatch({
         type: 'setPrices',
         payload: {}

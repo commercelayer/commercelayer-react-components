@@ -15,12 +15,15 @@ import LineItemName from '../src/components/LineItemName'
 import LineItemQuantity from '../src/components/LineItemQuantity'
 import LineItemPrice from '../src/components/LineItemPrice'
 import LineItemRemove from '../src/components/LineItemRemove'
-import Total from '../src/components/Total'
 import Checkout from '../src/components/Checkout'
 import SubTotal from '../src/components/SubTotal'
 import QuantitySelector from '../src/components/QuantitySelector'
-import TaxAmount from '../src/components/TaxAmount'
 import LineItemsCount from '../src/components/LineItemsCount'
+import Total from '../src/components/Total'
+import Discount from '../src/components/Discount'
+import Shipping from '../src/components/Shipping'
+import Taxes from '../src/components/Taxes'
+import GiftCard from '../src/components/GiftCard'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -28,8 +31,10 @@ const CustomAddToCart = props => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
   return (
     <button
+      id="add-to-bag"
       className={`${classes} ${props.className}`}
       onClick={props.handleClick}
+      disabled={props.disabled}
     >
       Custom add to cart
     </button>
@@ -76,17 +81,27 @@ export default function Order() {
                   </div>
                   <div className="m-2">
                     <VariantSelector
+                      id="variant-selector"
                       className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                       name="variant1"
                       skuCodes={[
-                        'BABYONBU000000E63E746MXX',
-                        'BABYONBU000000E63E7412MX'
+                        { label: '6 months', code: 'BABYONBU000000E63E746MXX' },
+                        {
+                          label: '12 months',
+                          code: 'BABYONBU000000E63E7412MX'
+                        },
+                        {
+                          label: '24 months',
+                          code: 'BABYONBU000000E63E746MXXFAKE'
+                        }
                       ]}
-                      variantLabels={['6 months', '12 months']}
                     />
                   </div>
                   <div className="m-2">
-                    <QuantitySelector className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" />
+                    <QuantitySelector
+                      id="quantity-selector"
+                      className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    />
                   </div>
                   <div className="m-2">
                     <AddToCart className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
@@ -101,24 +116,72 @@ export default function Order() {
               Your shopping bag contains{' '}
               <LineItemsCount className="font-bold" /> items
             </p>
-            <div className="flex items-center m-2">
-              <h1 className="text-lg mr-2">Total: </h1>
-              <Total />
-            </div>
             <div className="flex flex-col p-2">
               <LineItemsContainer>
                 <LineItem type="skus">
-                  <div className="flex justify-around items-center border-t">
+                  <div className="flex justify-around items-center border-b">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName className="p-2" />
-                    <LineItemQuantity className="p-2" />
+                    <LineItemQuantity max={10} className="p-2" />
                     <LineItemPrice className="p-2" />
                     <LineItemRemove className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" />
                   </div>
                 </LineItem>
               </LineItemsContainer>
             </div>
-            <div className="flex flex-row-reverse border-t p-2">
+            <div className="flex flex-col w-1/2 m-auto">
+              <div className="flex items-center p-2 justify-around font-medium text-left">
+                <div className="w-full">
+                  <p className="text-lg">Subtotal </p>
+                </div>
+                <div className="text-right">
+                  <SubTotal />
+                </div>
+              </div>
+              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                <div className="w-full">
+                  <p className="text-lg">Discount </p>
+                </div>
+                <div className="text-right">
+                  <Discount />
+                </div>
+              </div>
+              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                <div className="w-full">
+                  <p className="text-lg">Shipping </p>
+                </div>
+                <div className="text-right">
+                  <Shipping />
+                </div>
+              </div>
+              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                <div className="w-full">
+                  <p className="text-lg">
+                    Taxes <span className="text-sm font-tin">(included)</span>
+                  </p>
+                </div>
+                <div className="text-right">
+                  <Taxes />
+                </div>
+              </div>
+              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                <div className="w-full">
+                  <p className="text-lg">Gift card </p>
+                </div>
+                <div className="text-right">
+                  <GiftCard />
+                </div>
+              </div>
+              <div className=" flex items-center p-2 justify-around font-bold text-left">
+                <div className="w-full">
+                  <p className="text-lg mr-2">Total </p>
+                </div>
+                <div className="text-right">
+                  <Total />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-center p-2">
               <Checkout className="mt-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded" />
             </div>
           </OrderContainer>

@@ -9,14 +9,14 @@ import { Sku } from '@commercelayer/js-sdk'
 import getSkus from '../utils/getSkus'
 import variantReducer, {
   variantInitialState,
-  setCurrentQuantityInterface
+  SetCurrentQuantity
 } from '../reducers/VariantReducer'
 import CommerceLayerContext from './context/CommerceLayerContext'
 import VariantContext from './context/VariantContext'
 import {
-  setSkuCodeInterface,
+  SetSkuCodeVariant,
   VariantState,
-  setSkuCodesInterface
+  SetSkuCodesVariant
 } from '../reducers/VariantReducer'
 
 export interface VariantContainerProps {
@@ -30,19 +30,20 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = ({
 }) => {
   const { accessToken } = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(variantReducer, variantInitialState)
-  const setCurrentQuantity: setCurrentQuantityInterface = quantity => {
+  const setCurrentQuantity: SetCurrentQuantity = quantity => {
     dispatch({
       type: 'setCurrentQuantity',
       payload: quantity
     })
   }
-  const setSkuCodes: setSkuCodesInterface = skuCodes => {
+  const setSkuCodes: SetSkuCodesVariant = skuCodes => {
+    const sCodes = skuCodes.map(s => s.code)
     dispatch({
       type: 'setSkuCodes',
-      payload: skuCodes
+      payload: sCodes
     })
   }
-  const setSkuCode: setSkuCodeInterface = (code, id) => {
+  const setSkuCode: SetSkuCodeVariant = (code, id) => {
     if (id) {
       dispatch({
         type: 'setCurrentSkuCode',
@@ -104,7 +105,7 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = ({
           })
         })
     }
-    return () => {
+    return (): void => {
       dispatch({
         type: 'setCurrentSkuCode',
         payload: ''

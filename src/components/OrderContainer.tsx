@@ -4,13 +4,12 @@ import React, {
   useReducer,
   useContext
 } from 'react'
-import Parent from './utils/Parent'
 import { getLocalOrder, setLocalOrder } from '../utils/localStorage'
 import { Order, LineItem, Sku, OrderCollection } from '@commercelayer/js-sdk'
 import orderReducer, { orderInitialState } from '../reducers/OrderReducer'
 import CommerceLayerContext from './context/CommerceLayerContext'
 import OrderContext from './context/OrderContext'
-import { addToCartInterface, getOrderInterface } from '../reducers/OrderReducer'
+import { AddToCartInterface, GetOrder } from '../reducers/OrderReducer'
 
 export interface OrderContainerActions {
   setOrderId?: (orderId: string) => void
@@ -46,7 +45,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
       return o.id
     }
   }
-  const getOrder: getOrderInterface = async id => {
+  const getOrder: GetOrder = async id => {
     const o = await Order.includes('line_items').find(id)
     if (o)
       dispatch({
@@ -54,7 +53,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
         payload: o
       })
   }
-  const addToCart: addToCartInterface = async (
+  const addToCart: AddToCartInterface = async (
     skuCode,
     skuId,
     quantity = 1

@@ -1,12 +1,9 @@
 import React, {
   FunctionComponent,
   Fragment,
-  ReactElement,
   useContext,
   ReactNode
 } from 'react'
-import { LineItemPriceProps } from './LineItemPrice'
-import { LineItemImageProps } from './LineItemImage'
 import LineItemContext from './context/LineItemContext'
 import LineItemChildrenContext from './context/LineItemChildrenContext'
 

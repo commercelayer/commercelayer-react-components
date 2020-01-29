@@ -1,17 +1,22 @@
 import { GeneralReducer, GeneralActions } from '../@types/index'
 import { PriceCollection } from '@commercelayer/js-sdk'
-import { setSkuCodesInterface } from './VariantReducer'
 
 export interface PricesInterface {
   [key: string]: PriceCollection
 }
 
+type SkuCodesPrice = string[]
+
+export interface SetSkuCodesPrice {
+  (skuCodes: SkuCodesPrice): void
+}
+
 export interface PriceState {
   loading: boolean
   prices: PricesInterface
-  skuCodes: string[]
+  skuCodes: SkuCodesPrice
   skuCode?: string
-  setSkuCodes?: setSkuCodesInterface
+  setSkuCodes?: SetSkuCodesPrice
 }
 
 export interface PriceActions extends GeneralActions {

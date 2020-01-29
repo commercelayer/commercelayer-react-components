@@ -17,7 +17,7 @@ const AddToCart: FunctionComponent<AddToCartProps> = props => {
   const { currentSkuCode, currentSkuId, currentQuantity } = useContext(
     VariantContext
   )
-  const handleClick = () => {
+  const handleClick = (): void => {
     addToCart(currentSkuCode, currentSkuId, currentQuantity)
   }
   const sCode = skuCode || currentSkuCode

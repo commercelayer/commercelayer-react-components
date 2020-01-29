@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { SkuCollection } from '@commercelayer/js-sdk'
 
-export default function getPrices(prices: SkuCollection[]) {
+const getPrices = (prices: SkuCollection[]): object => {
   const obj = {}
   prices.map(sku => {
     const price = _.first(sku.prices().toArray())
@@ -9,3 +9,5 @@ export default function getPrices(prices: SkuCollection[]) {
   })
   return obj
 }
+
+export default getPrices

@@ -1,16 +1,9 @@
-import React, {
-  ReactElement,
-  FunctionComponent,
-  useState,
-  useContext
-} from 'react'
-import Parent from './utils/Parent'
+import React, { FunctionComponent, ReactNode } from 'react'
 import { initCLayer } from '@commercelayer/js-sdk'
-import { OrderContainerProps } from './OrderContainer'
 import CommerceLayerContext from './context/CommerceLayerContext'
 
 export interface CommerceLayerProps {
-  children: any
+  children: ReactNode
   accessToken: string
   endpoint: string
 }

@@ -1,11 +1,9 @@
 import React, {
-  Fragment,
   FunctionComponent,
   useState,
   useEffect,
   useContext
 } from 'react'
-import _ from 'lodash'
 import getAmount from '../utils/getAmount'
 import LineItemChildrenContext from './context/LineItemChildrenContext'
 import Parent from './utils/Parent'
@@ -24,7 +22,7 @@ const LineItemPrice: FunctionComponent<LineItemPriceProps> = props => {
   useEffect(() => {
     const p = getAmount('amount', type, format, lineItem)
     setPrice(p)
-    return () => {
+    return (): void => {
       setPrice('')
     }
   }, [lineItem])

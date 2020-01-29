@@ -13,7 +13,7 @@ export interface LineItemRemove extends GeneralComponent {
 const LineItemRemove: FunctionComponent<LineItemRemove> = props => {
   const { lineItem } = useContext(LineItemChildrenContext)
   const { deleteLineItem } = useContext(LineItemContext)
-  const handleRemove = e => {
+  const handleRemove = (e): void => {
     e.preventDefault()
     deleteLineItem(lineItem.id)
   }

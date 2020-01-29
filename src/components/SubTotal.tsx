@@ -1,35 +1,14 @@
-import React, {
-  FunctionComponent,
-  useState,
-  useEffect,
-  useContext
-} from 'react'
+import React, { FunctionComponent } from 'react'
 import { GeneralComponent } from '../@types/index'
-import { OrderCollection } from '@commercelayer/js-sdk'
-import getAmount from '../utils/getAmount'
-import OrderContext from './context/OrderContext'
+import GeneralOrderPrice from './utils/GeneralOrderPrice'
 
 export interface SubTotalProps extends GeneralComponent {
-  order?: OrderCollection
   format?: 'formatted' | 'cents' | 'float'
+  children?: FunctionComponent
 }
 
 const SubTotal: FunctionComponent<SubTotalProps> = props => {
-  const { format, ...p } = props
-  const { order } = useContext(OrderContext)
-  const [price, setPrice] = useState(null)
-  useEffect(() => {
-    const p = getAmount('amount', 'subtotal', format, order)
-    setPrice(p)
-    return () => {
-      setPrice(null)
-    }
-  }, [order])
-  return <span {...p}>{price}</span>
-}
-
-SubTotal.defaultProps = {
-  format: 'formatted'
+  return <GeneralOrderPrice base="amount" type="subtotal" {...props} />
 }
 
 export default SubTotal

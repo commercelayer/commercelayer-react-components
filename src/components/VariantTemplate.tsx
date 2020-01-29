@@ -1,15 +1,16 @@
 import React, { Fragment, FunctionComponent } from 'react'
 import _ from 'lodash'
 import { GeneralComponent } from '../@types'
-import { setSkuCodeInterface } from '../reducers/VariantReducer'
+import { SetSkuCodeVariant } from '../reducers/VariantReducer'
+import { SkuCodePropObj } from './VariantSelector'
 
 export interface VariantTemplateProps extends GeneralComponent {
   variants: object
   type: string
   placeholder: string
-  variantLabels: string[]
-  onChange: setSkuCodeInterface
+  onChange: SetSkuCodeVariant
   name: string
+  skuCodes: SkuCodePropObj[]
   skuCode?: string
 }
 
@@ -19,7 +20,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
     variants,
     type,
     placeholder,
-    variantLabels,
+    skuCodes,
     skuCode,
     onChange,
     ...prs
@@ -32,7 +33,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
         data-sku-id={variants[v].id}
         value={variants[v].code}
       >
-        {variantLabels.length > 0 ? variantLabels[k] : variants[v].name}
+        {skuCodes.length > 0 ? skuCodes[k].label : variants[v].name}
       </option>
     ) : (
       <Fragment key={variants[v].id}>
@@ -41,10 +42,10 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
           type="radio"
           name={name}
           value={variants[v].code}
-          onChange={e => onChange(e.target.value, variants[v].id)}
+          onChange={(e): void => onChange(e.target.value, variants[v].id)}
           {...prs}
         />
-        {variantLabels.length > 0 ? variantLabels[k] : variants[v].name}
+        {skuCodes.length > 0 ? skuCodes[k].label : variants[v].name}
       </Fragment>
     )
   })
@@ -52,7 +53,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
     return (
       <select
         name={name}
-        onChange={(e: any) => {
+        onChange={(e): void => {
           const v = e.target.value
           const i = e.target.selectedIndex
           const id = e.target[i].dataset.skuId

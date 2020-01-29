@@ -23,7 +23,7 @@ const LineItemsCount: FunctionComponent<LineItemsCountProps> = props => {
       const qty = getLineItemsCount(lineItems)
       setQuantity(qty)
     }
-    return () => {
+    return (): void => {
       setQuantity(0)
     }
   }, [order])
