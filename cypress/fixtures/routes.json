@@ -5,22 +5,22 @@
     "alias": "accessToken"
   },
   "getPrices": {
-    "url": "/api/skus/?filter[q][code_in]=BABYONBU000000E63E74NBXX&include=prices&page[size]=25",
+    "url": "/api/skus/?filter[q][code_in]=BABYONBU000000E63E746MXX&include=prices&page[size]=25",
     "method": "GET",
     "alias": "getPrices"
   },
   "getPricesCat": {
-    "url": "/api/skus/?filter[q][code_in]=BABYONBU000000E63E74NBXX,BABYONBU000000E63E746MXXFAKE,BABYONBU000000E63E7412MX&include=prices&page[size]=25",
+    "url": "/api/skus/?filter[q][code_in]=BABYONBU000000E63E746MXX,BABYONBU000000E63E7412MX,BABYONBU000000E63E746MXXFAKE&include=prices&page[size]=25",
     "method": "GET",
     "alias": "getPricesCat"
   },
   "getSkus": {
-    "url": "/api/skus/?filter[q][code_in]=BABYONBU000000E63E74NBXX,BABYONBU000000E63E746MXXFAKE,BABYONBU000000E63E7412MX&page[size]=25",
+    "url": "/api/skus/?filter[q][code_in]=BABYONBU000000E63E746MXX,BABYONBU000000E63E7412MX,BABYONBU000000E63E746MXXFAKE&page[size]=25",
     "method": "GET",
     "alias": "getSkus"
   },
   "retrieveSku": {
-    "url": "/api/skus/bWRwRSmvPB/?include=prices&page[size]=25",
+    "url": "/api/skus/LwaMAhJdQw/?include=prices&page[size]=25",
     "method": "GET",
     "alias": "retrieveSku"
   },
