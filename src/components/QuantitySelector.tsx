@@ -1,7 +1,8 @@
-import React, { FunctionComponent, useContext } from 'react'
+import React, { FunctionComponent, useContext, useEffect } from 'react'
 import { GeneralComponent } from '../@types/index'
 import Parent from './utils/Parent'
 import VariantContext from './context/VariantContext'
+import OrderContext from './context/OrderContext'
 
 export interface QuantitySelectorProps extends GeneralComponent {
   min?: number
@@ -22,12 +23,23 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
     currentSkuInventory,
     setCurrentQuantity
   } = useContext(VariantContext)
+  const { setSingleQuantity } = useContext(OrderContext)
   const sCode = skuCode || currentSkuCode
   const disabled = !sCode
   const handleChange = (e): void => {
-    setCurrentQuantity(e.target.value)
+    const quantity = e.target.value
+    if (setCurrentQuantity) {
+      setCurrentQuantity(quantity)
+    } else if (skuCode) {
+      setSingleQuantity(skuCode, quantity)
+    }
   }
-  const maxInv = max || currentSkuInventory.quantity
+  useEffect(() => {
+    if (skuCode && !setCurrentQuantity) {
+      setSingleQuantity(skuCode, min)
+    }
+  }, [])
+  const maxInv = max || currentSkuInventory.quantity || 50
   const parentProps = {
     min,
     max: maxInv,

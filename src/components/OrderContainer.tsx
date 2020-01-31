@@ -2,14 +2,23 @@ import React, {
   useEffect,
   FunctionComponent,
   useReducer,
-  useContext
+  useContext,
+  ReactNode
 } from 'react'
 import { getLocalOrder, setLocalOrder } from '../utils/localStorage'
 import { Order, LineItem, Sku, OrderCollection } from '@commercelayer/js-sdk'
-import orderReducer, { orderInitialState } from '../reducers/OrderReducer'
+import orderReducer, {
+  orderInitialState,
+  OrderState
+} from '../reducers/OrderReducer'
 import CommerceLayerContext from './context/CommerceLayerContext'
 import OrderContext from './context/OrderContext'
-import { AddToCartInterface, GetOrder } from '../reducers/OrderReducer'
+import { SetSingleQuantity } from '../reducers/OrderReducer'
+import {
+  AddToCartInterface,
+  GetOrder,
+  CreateOrder
+} from '../reducers/OrderReducer'
 
 export interface OrderContainerActions {
   setOrderId?: (orderId: string) => void
@@ -21,7 +30,7 @@ export interface OrderContainerActions {
 export interface OrderContainerProps {
   id?: string
   persistKey: string
-  children: any
+  children: ReactNode
   accessToken?: string
 }
 const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
@@ -29,17 +38,21 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const { accessToken } = useContext(CommerceLayerContext)
   console.log('--- ORDER ---', state.order)
-  const createOrder = async () => {
+  const createOrder: CreateOrder = async () => {
     if (state.orderId) return state.orderId
     const o = await Order.create({})
     if (o.id) {
       dispatch({
         type: 'setOrderId',
-        payload: o.id
+        payload: {
+          orderId: o.id
+        }
       })
       dispatch({
         type: 'setOrder',
-        payload: o
+        payload: {
+          order: o
+        }
       })
       setLocalOrder(persistKey, o.id)
       return o.id
@@ -50,42 +63,51 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
     if (o)
       dispatch({
         type: 'setOrder',
-        payload: o
+        payload: {
+          order: o
+        }
       })
+  }
+  const setSingleQuantity: SetSingleQuantity = (code, quantity) => {
+    const o = {}
+    o[code] = Number(quantity)
+    dispatch({
+      type: 'setSingleQuantity',
+      payload: {
+        singleQuantity: o
+      }
+    })
   }
   const addToCart: AddToCartInterface = async (
     skuCode,
-    skuId,
+    skuId = '',
     quantity = 1
   ) => {
     const id = await createOrder()
     if (id) {
       const order = Order.build({ id })
-      const item = Sku.build({ id: skuId })
       const attrs = {
         order,
-        item,
         skuCode,
         quantity,
+        // eslint-disable-next-line @typescript-eslint/camelcase
         _update_quantity: 1
+      }
+      if (skuId) {
+        attrs['item'] = Sku.build({ id: skuId })
       }
       LineItem.create(attrs).then(() => getOrder(id))
     }
   }
-  // const parentProps = {
-  //   orderId: state.orderId,
-  //   order: state.order,
-  //   addToCart,
-  //   getOrder,
-  //   ...props
-  // }
   useEffect(() => {
     if (accessToken) {
       const localOrder = getLocalOrder(persistKey)
       if (localOrder) {
         dispatch({
           type: 'setOrderId',
-          payload: localOrder
+          payload: {
+            orderId: localOrder
+          }
         })
         if (!state.order) {
           getOrder(localOrder)
@@ -93,20 +115,25 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
       }
     }
 
-    return () => {
+    return (): void => {
       dispatch({
         type: 'setOrderId',
-        payload: ''
+        payload: {
+          orderId: ''
+        }
       })
     }
   }, [accessToken, state.order])
-  const orderValue = {
+  const orderValue: OrderState = {
     order: state.order,
     orderId: state.orderId,
     loading: state.loading,
+    singleQuantity: state.singleQuantity,
+    setSingleQuantity,
     addToCart,
     getOrder
   }
+  console.log('--- orderValue ---', orderValue)
   return (
     <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
   )

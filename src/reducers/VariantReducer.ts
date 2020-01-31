@@ -31,6 +31,7 @@ export interface VariantState {
         quantity: 0
       }
   currentQuantity: number
+  currentPrices: SkuCollection[]
   setSkuCode?: SetSkuCodeVariant
   setSkuCodes?: SetSkuCodesVariant
   setCurrentQuantity?: SetCurrentQuantity
@@ -45,6 +46,7 @@ export interface VariantActions extends GeneralActions {
     | 'setCurrentSkuId'
     | 'setCurrentSkuInventory'
     | 'setCurrentQuantity'
+    | 'setCurrentPrices'
 }
 
 export const variantInitialState: VariantState = {
@@ -57,16 +59,14 @@ export const variantInitialState: VariantState = {
     available: false,
     quantity: 0
   },
-  currentQuantity: 1
+  currentQuantity: 1,
+  currentPrices: []
 }
 
 const variantReducer: GeneralReducer<VariantState, VariantActions> = (
   state,
   action
 ) => {
-  if (action.type === 'setLoading') {
-    state = { ...state, loading: action.payload }
-  }
   if (action.type === 'setVariants') {
     state = { ...state, variants: action.payload }
   }

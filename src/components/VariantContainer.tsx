@@ -53,12 +53,18 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = ({
         type: 'setCurrentSkuId',
         payload: id
       })
-      Sku.find(id).then(s => {
-        dispatch({
-          type: 'setCurrentSkuInventory',
-          payload: s.inventory
+      Sku.includes('prices')
+        .find(id)
+        .then(s => {
+          dispatch({
+            type: 'setCurrentSkuInventory',
+            payload: s.inventory
+          })
+          dispatch({
+            type: 'setCurrentPrices',
+            payload: [s]
+          })
         })
-      })
     } else {
       dispatch({
         type: 'setCurrentSkuCode',
@@ -128,6 +134,7 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = ({
     currentSkuCode: state.currentSkuCode || skuCode,
     currentSkuInventory: state.currentSkuInventory,
     currentQuantity: state.currentQuantity,
+    currentPrices: state.currentPrices,
     setCurrentQuantity,
     setSkuCode,
     setSkuCodes

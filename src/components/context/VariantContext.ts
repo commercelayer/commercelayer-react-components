@@ -8,6 +8,7 @@ const initial: VariantState = {
   currentSkuCode: '',
   currentSkuId: '',
   currentQuantity: 1,
+  currentPrices: [],
   currentSkuInventory: {
     available: false,
     quantity: 0

@@ -25,7 +25,7 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = ({
 }) => {
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const { accessToken } = useContext(CommerceLayerContext)
-  const { currentSkuCode } = useContext(VariantContext)
+  const { currentSkuCode, currentPrices } = useContext(VariantContext)
   if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
   if (_.indexOf(state.skuCodes, currentSkuCode) === -1 && currentSkuCode)
@@ -42,7 +42,17 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = ({
       type: 'setLoading',
       payload: true
     })
-    if (state.skuCodes.length >= 1 && accessToken) {
+    if (currentPrices.length > 0) {
+      const pricesObj = getPrices(currentPrices)
+      dispatch({
+        type: 'setPrices',
+        payload: pricesObj
+      })
+      dispatch({
+        type: 'setLoading',
+        payload: false
+      })
+    } else if (state.skuCodes.length >= 1 && accessToken) {
       Sku.where({ codeIn: state.skuCodes.join(',') })
         .includes('prices')
         .perPage(25)
@@ -69,7 +79,7 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = ({
         payload: false
       })
     }
-  }, [accessToken, currentSkuCode])
+  }, [accessToken, currentPrices])
   const priceValue: PriceState = {
     loading: state.loading,
     prices: state.prices,

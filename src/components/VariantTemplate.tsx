@@ -16,7 +16,7 @@ export interface VariantTemplateProps extends GeneralComponent {
 
 const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
   const {
-    name,
+    id,
     variants,
     type,
     placeholder,
@@ -38,9 +38,9 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
     ) : (
       <Fragment key={variants[v].id}>
         <input
+          id={id && `${id}-${k}`}
           defaultChecked={checked}
           type="radio"
-          name={name}
           value={variants[v].code}
           onChange={(e): void => onChange(e.target.value, variants[v].id)}
           {...prs}
@@ -52,7 +52,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
   if (type === 'select') {
     return (
       <select
-        name={name}
+        id={id}
         onChange={(e): void => {
           const v = e.target.value
           const i = e.target.selectedIndex
