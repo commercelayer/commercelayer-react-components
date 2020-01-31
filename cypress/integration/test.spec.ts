@@ -89,26 +89,27 @@ Cypress.env('pages').map(page => {
 
       // SELECT SKU WITH SELECT INPUT
       if (page.typeSelectSku === 'select') {
-        cy.get('.clayer-variant-select')
-          .select('New born')
-          .should('have.value', 'bWRwRSmvPB')
+        cy.get('#variant-selector').as('variant-selector')
+        cy.get('@variant-selector').select('12 months')
+        cy.get('@variant-selector').should(
+          'have.value',
+          'BABYONBU000000E63E7412MX'
+        )
       }
       // SELECT SKU WITH RADIO INPUT
       if (page.typeSelectSku === 'radio') {
-        cy.get(':nth-child(1) > .control > .radio > .clayer-variant')
+        cy.get('#variant-selector-1')
+          .as('variant-selector-1')
           .check()
-          .should('have.value', 'bWRwRSmvPB')
+        cy.get('@variant-selector-1')
+          .should('be.checked')
+          .should('have.value', 'BABYONBU000000E63E7412MX')
       }
       if (page.typeSelectSku !== 'category') {
         cy.wait(['@retrieveSku'])
       }
       cy.get('@addToBagQuantity').should('not.be.disabled')
-      cy.get('@addToBag').should('not.have.class', 'disabled')
-      cy.get('@addToBag').should(
-        'have.attr',
-        'data-sku-code',
-        'BABYONBU000000E63E74NBXX'
-      )
+      cy.get('@addToBag').should('not.have.attr', 'disabled')
 
       cy.get('@addToBagQuantity').type('{backspace}2')
       cy.get('@addToBagQuantity').should('contain.value', '2')
@@ -116,40 +117,29 @@ Cypress.env('pages').map(page => {
       cy.get('@addToBag').click()
 
       cy.wait(['@createOrder', '@createLineItems', '@getOrder'])
-      cy.get('.clayer-shopping-bag-items-count').should('contain.text', '2')
-      cy.get(':nth-child(7) > .clayer-shopping-bag-total').should(
+      cy.get('#items-count')
+        .as('item-count')
+        .should('contain.text', '2')
+      cy.get('#total-amount').should('contain.text', '€58,00')
+      cy.get('#line-item-name').should(
         'contain.text',
-        '€58,00'
+        'Black Baby Onesie Short Sleeve with Pink Logo (12 Months)'
       )
-      cy.get('#clayer-shopping-bag-container').should('have.class', 'open')
-      cy.get('.clayer-shopping-bag-item-name').should(
-        'contain.text',
-        'Black Baby Onesie Short Sleeve with Pink Logo (New born)'
-      )
-      cy.get('.clayer-shopping-bag-item-qty-container > select').should(
-        'have.value',
-        '2'
-      )
-      cy.get('.clayer-shopping-bag-item-total-amount').should(
-        'contain.text',
-        '€58,00'
-      )
-      cy.get('.clayer-shopping-bag-item-remove').should(
-        'contain.text',
-        'remove'
-      )
-      cy.get('.clayer-shopping-bag-item-remove').click()
+      cy.get('#line-item-quantity').should('have.value', '2')
+      cy.get('#line-item-total').should('contain.text', '€58,00')
+      cy.get('#line-item-remove').should('contain.text', 'remove')
+      cy.get('#line-item-remove').click()
 
       // FIXME: Cypress bug
       if (Cypress.env('RECORD')) {
         cy.wait(['@deleteLineItems', '@getLineItems', '@getOrder'])
-        cy.get('.clayer-shopping-bag-items-count').should('contain.text', '0')
+        cy.get('@item-count').should('contain.text', '0')
       } else {
         // cy.server({ enable: false })
         // cy.wait('@getOrder')
       }
-      cy.get('.clayer-shopping-bag-toggle').click()
-      cy.get('#clayer-shopping-bag-container').should('not.have.class', 'open')
+      // cy.get('.clayer-shopping-bag-toggle').click()
+      // cy.get('#clayer-shopping-bag-container').should('not.have.class', 'open')
     })
     // it('Product Page Select', () => {
     //   cy.visit('/product-page-select.html')

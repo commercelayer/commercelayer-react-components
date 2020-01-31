@@ -3,13 +3,13 @@
   "method": "POST",
   "data": {
     "data": {
-      "id": "lNmnptgbDy",
+      "id": "akMlZtzxBy",
       "type": "line_items",
       "links": {
-        "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/lNmnptgbDy"
+        "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy"
       },
       "attributes": {
-        "sku_code": "BABYONBU000000E63E74NBXX",
+        "sku_code": "BABYONBU000000E63E7412MX",
         "quantity": 2,
         "currency_code": "EUR",
         "unit_amount_cents": 2900,
@@ -21,33 +21,33 @@
         "total_amount_cents": 5800,
         "total_amount_float": 58,
         "formatted_total_amount": "€58,00",
-        "name": "Black Baby Onesie Short Sleeve with Pink Logo (New born)",
+        "name": "Black Baby Onesie Short Sleeve with Pink Logo (12 Months)",
         "image_url": "https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90",
         "tax_rate": null,
         "tax_breakdown": {},
         "item_type": "skus",
-        "created_at": "2019-12-13T10:13:46.816Z",
-        "updated_at": "2019-12-13T10:13:46.816Z",
+        "created_at": "2020-01-30T11:05:46.587Z",
+        "updated_at": "2020-01-30T11:05:46.587Z",
         "reference": null,
         "metadata": {}
       },
       "relationships": {
         "order": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/lNmnptgbDy/relationships/order",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/lNmnptgbDy/order"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/relationships/order",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/order"
           }
         },
         "item": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/lNmnptgbDy/relationships/item",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/lNmnptgbDy/item"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/relationships/item",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/item"
           }
         },
         "line_item_options": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/lNmnptgbDy/relationships/line_item_options",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/lNmnptgbDy/line_item_options"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/relationships/line_item_options",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/line_item_options"
           }
         }
       },

@@ -20,7 +20,7 @@
     "alias": "getSkus"
   },
   "retrieveSku": {
-    "url": "/api/skus/LwaMAhJdQw/?include=prices&page[size]=25",
+    "url": "/api/skus/wBeDdSgYQW/?include=prices",
     "method": "GET",
     "alias": "retrieveSku"
   },

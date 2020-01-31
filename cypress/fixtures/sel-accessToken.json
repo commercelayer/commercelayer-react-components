@@ -2,10 +2,10 @@
   "url": "https://the-blue-brand-2.commercelayer.co/oauth/token",
   "method": "POST",
   "data": {
-    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJvcmdhbml6YXRpb24iOnsiaWQiOjM1fSwiYXBwbGljYXRpb24iOnsiaWQiOjEzMSwia2luZCI6InNhbGVzX2NoYW5uZWwiLCJwdWJsaWMiOnRydWV9LCJ0ZXN0Ijp0cnVlLCJleHAiOjE1ODAzMjQwOTQsIm1hcmtldCI6eyJpZCI6NDgsInByaWNlX2xpc3RfaWQiOjUyLCJzdG9ja19sb2NhdGlvbl9pZHMiOls2Myw2NF0sImdlb2NvZGVyX2lkIjpudWxsfSwicmFuZCI6MC43MDM3MTUzNzA5MDQzMDgxfQ.vbXYWSEaOTgfGmLtWDBYyUiZ275dhOQp7gOi2SFpABYIrvtnInRAsnnlm4Dzs3Gv-wPf-VnlnPhY3zCNQozNqg",
+    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJvcmdhbml6YXRpb24iOnsiaWQiOjM1fSwiYXBwbGljYXRpb24iOnsiaWQiOjEzMSwia2luZCI6InNhbGVzX2NoYW5uZWwiLCJwdWJsaWMiOnRydWV9LCJ0ZXN0Ijp0cnVlLCJleHAiOjE1ODAzODgzNTgsIm1hcmtldCI6eyJpZCI6NDgsInByaWNlX2xpc3RfaWQiOjUyLCJzdG9ja19sb2NhdGlvbl9pZHMiOls2Myw2NF0sImdlb2NvZGVyX2lkIjpudWxsfSwicmFuZCI6MC4wNzU3MDMwMDkxNjE2OTAxNX0.T4o_UUz844pCocS1cXX_93BBj4SVdYrOpUmwh_rQseQBXaDd5co06iqdMekHXP8LkDqdEV9Zg4Ix6nDwhc-49Q",
     "token_type": "bearer",
-    "expires_in": 1412,
+    "expires_in": 6017,
     "scope": "market:48",
-    "created_at": 1580316894
+    "created_at": 1580381158
   }
 }

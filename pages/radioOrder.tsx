@@ -57,7 +57,7 @@ export default function Order() {
   }, [])
   return (
     <Fragment>
-      <Nav links={['/', '/multiOrder']} />
+      <Nav links={['/']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer persistKey="orderUS">
@@ -81,8 +81,9 @@ export default function Order() {
                   </div>
                   <div className="m-2">
                     <VariantSelector
+                      type="radio"
                       id="variant-selector"
-                      className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                      className="mx-2"
                       name="variant1"
                       skuCodes={[
                         { label: '6 months', code: 'BABYONBU000000E63E746MXX' },
