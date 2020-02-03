@@ -54,14 +54,19 @@ const Home = () => {
       <Nav links={['/order']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <Title title="Prices" />
-        <PriceContainer skuCode="BABYONBU000000E63E7412MX">
+        <PriceContainer>
           <Price
             skuCode="BABYONBU000000E63E746MXX"
             amountClassName="font-bold"
             compareClassName="line-through"
           />
+          <Price
+            skuCode="BABYONBU000000E63E7412MX"
+            amountClassName="font-bold"
+            compareClassName="line-through"
+          />
         </PriceContainer>
-        <br />
+        {/* <br />
         <br />
         <Title title="Preselect Prices by skuCode" />
         <PriceContainer>
@@ -146,7 +151,7 @@ const Home = () => {
               }
             ]}
           />
-        </VariantContainer>
+        </VariantContainer> */}
       </CommerceLayer>
     </Fragment>
   )

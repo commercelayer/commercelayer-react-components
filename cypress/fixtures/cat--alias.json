@@ -1,8 +1,6 @@
 [
   "accessToken",
-  "getSkus",
   "getPricesCat",
-  "getSkus1",
   "createOrder",
   "createLineItems",
   "getOrder",

@@ -3,10 +3,10 @@
   "method": "POST",
   "data": {
     "data": {
-      "id": "akMlZtzxBy",
+      "id": "LvbmetOMzk",
       "type": "line_items",
       "links": {
-        "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy"
+        "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/LvbmetOMzk"
       },
       "attributes": {
         "sku_code": "BABYONBU000000E63E7412MX",
@@ -26,28 +26,28 @@
         "tax_rate": null,
         "tax_breakdown": {},
         "item_type": "skus",
-        "created_at": "2020-01-30T11:05:46.587Z",
-        "updated_at": "2020-01-30T11:05:46.587Z",
+        "created_at": "2020-02-03T17:36:34.857Z",
+        "updated_at": "2020-02-03T17:36:34.857Z",
         "reference": null,
         "metadata": {}
       },
       "relationships": {
         "order": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/relationships/order",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/order"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/LvbmetOMzk/relationships/order",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/LvbmetOMzk/order"
           }
         },
         "item": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/relationships/item",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/item"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/LvbmetOMzk/relationships/item",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/LvbmetOMzk/item"
           }
         },
         "line_item_options": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/relationships/line_item_options",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/akMlZtzxBy/line_item_options"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/LvbmetOMzk/relationships/line_item_options",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/LvbmetOMzk/line_item_options"
           }
         }
       },

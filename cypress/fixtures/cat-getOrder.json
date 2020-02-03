@@ -1,15 +1,15 @@
 {
-  "url": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/?include=line_items",
+  "url": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/?include=line_items",
   "method": "GET",
   "data": {
     "data": {
-      "id": "JNpyAhVAGw",
+      "id": "mNvoJhMvOw",
       "type": "orders",
       "links": {
-        "self": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw"
+        "self": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw"
       },
       "attributes": {
-        "number": 1610,
+        "number": 1762,
         "status": "draft",
         "payment_status": "unpaid",
         "fulfillment_status": "unfulfilled",
@@ -24,7 +24,7 @@
         "freight_taxable": null,
         "requires_billing_info": false,
         "country_code": null,
-        "shipping_country_code_lock": "US",
+        "shipping_country_code_lock": null,
         "coupon_code": null,
         "gift_card_code": null,
         "gift_card_or_coupon_code": null,
@@ -95,81 +95,81 @@
         "line_item_options_count": 0,
         "shipments_count": 0,
         "payment_source_details": null,
-        "token": "dad6a7004388cce30a6c905d691b122a",
-        "cart_url": "https://example.com/cart",
-        "return_url": "https://example.com/return",
-        "terms_url": "https://example.com/terms",
-        "privacy_url": "https://example.com/privacy",
-        "checkout_url": "https://the-blue-brand-2.commercelayer.co/checkout/dad6a7004388cce30a6c905d691b122a",
+        "token": "bb2f5874871ebdae5494abad7448c407",
+        "cart_url": null,
+        "return_url": null,
+        "terms_url": null,
+        "privacy_url": null,
+        "checkout_url": "https://the-blue-brand-2.commercelayer.co/checkout/bb2f5874871ebdae5494abad7448c407",
         "placed_at": null,
         "approved_at": null,
         "cancelled_at": null,
         "payment_updated_at": null,
         "fulfillment_updated_at": null,
-        "created_at": "2019-12-13T10:13:49.048Z",
-        "updated_at": "2019-12-13T10:13:49.296Z",
+        "created_at": "2020-02-03T17:36:38.138Z",
+        "updated_at": "2020-02-03T17:36:38.329Z",
         "reference": null,
         "metadata": {}
       },
       "relationships": {
         "market": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/relationships/market",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/market"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/relationships/market",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/market"
           }
         },
         "customer": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/relationships/customer",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/customer"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/relationships/customer",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/customer"
           }
         },
         "shipping_address": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/relationships/shipping_address",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/shipping_address"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/relationships/shipping_address",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/shipping_address"
           }
         },
         "billing_address": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/relationships/billing_address",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/billing_address"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/relationships/billing_address",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/billing_address"
           }
         },
         "available_payment_methods": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/relationships/available_payment_methods",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/available_payment_methods"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/relationships/available_payment_methods",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/available_payment_methods"
           }
         },
         "payment_method": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/relationships/payment_method",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/payment_method"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/relationships/payment_method",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/payment_method"
           }
         },
         "payment_source": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/relationships/payment_source",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/payment_source"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/relationships/payment_source",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/payment_source"
           }
         },
         "line_items": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/relationships/line_items",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/line_items"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/relationships/line_items",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/line_items"
           },
           "data": [
             {
               "type": "line_items",
-              "id": "YyaoMtqKJv"
+              "id": "lygnYtomRN"
             }
           ]
         },
         "shipments": {
           "links": {
-            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/relationships/shipments",
-            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/JNpyAhVAGw/shipments"
+            "self": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/relationships/shipments",
+            "related": "https://the-blue-brand-2.commercelayer.co/api/orders/mNvoJhMvOw/shipments"
           }
         }
       },
@@ -179,13 +179,13 @@
     },
     "included": [
       {
-        "id": "YyaoMtqKJv",
+        "id": "lygnYtomRN",
         "type": "line_items",
         "links": {
-          "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/YyaoMtqKJv"
+          "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/lygnYtomRN"
         },
         "attributes": {
-          "sku_code": "BABYONBU000000E63E74NBXX",
+          "sku_code": "BABYONBU000000E63E7412MX",
           "quantity": 2,
           "currency_code": "EUR",
           "unit_amount_cents": 2900,
@@ -197,33 +197,33 @@
           "total_amount_cents": 5800,
           "total_amount_float": 58,
           "formatted_total_amount": "€58,00",
-          "name": "Black Baby Onesie Short Sleeve with Pink Logo (New born)",
+          "name": "Black Baby Onesie Short Sleeve with Pink Logo (12 Months)",
           "image_url": "https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90",
           "tax_rate": null,
           "tax_breakdown": {},
           "item_type": "skus",
-          "created_at": "2019-12-13T10:13:49.259Z",
-          "updated_at": "2019-12-13T10:13:49.259Z",
+          "created_at": "2020-02-03T17:36:38.301Z",
+          "updated_at": "2020-02-03T17:36:38.301Z",
           "reference": null,
           "metadata": {}
         },
         "relationships": {
           "order": {
             "links": {
-              "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/YyaoMtqKJv/relationships/order",
-              "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/YyaoMtqKJv/order"
+              "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/lygnYtomRN/relationships/order",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/lygnYtomRN/order"
             }
           },
           "item": {
             "links": {
-              "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/YyaoMtqKJv/relationships/item",
-              "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/YyaoMtqKJv/item"
+              "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/lygnYtomRN/relationships/item",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/lygnYtomRN/item"
             }
           },
           "line_item_options": {
             "links": {
-              "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/YyaoMtqKJv/relationships/line_item_options",
-              "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/YyaoMtqKJv/line_item_options"
+              "self": "https://the-blue-brand-2.commercelayer.co/api/line_items/lygnYtomRN/relationships/line_item_options",
+              "related": "https://the-blue-brand-2.commercelayer.co/api/line_items/lygnYtomRN/line_item_options"
             }
           }
         },

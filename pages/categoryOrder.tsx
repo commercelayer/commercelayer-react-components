@@ -61,75 +61,123 @@ export default function Order() {
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer persistKey="orderUS">
-            <div className="w-full md:flex md:flex-row justify-between">
-              <div className="flex-col border rounded-lg shadow p-5 m-3">
-                <div className="p-2">
-                  <img
-                    className="rounded-lg"
-                    src="https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90"
-                  />
-                </div>
-                <div>
-                  <p className="font-medium text-lg">
-                    Black Baby Onesie Short Sleeve with Pink Logo (6 Months)
-                  </p>
-                </div>
-                <div className="pt-2">
-                  <p className="font-light text-xs text-gray-700">
-                    BABYONBU000000E63E746MXX
-                  </p>
-                </div>
-                <div className="pt-2">
-                  <PriceContainer skuCode="BABYONBU000000E63E746MXX">
+            <PriceContainer>
+              <div className="w-full md:flex md:flex-row justify-between">
+                <div className="flex-col border rounded-lg shadow p-5 m-3">
+                  <div className="p-2">
+                    <img
+                      className="rounded-lg"
+                      src="https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90"
+                    />
+                  </div>
+                  <div>
+                    <p className="font-medium text-lg">
+                      Black Baby Onesie Short Sleeve with Pink Logo (6 Months)
+                    </p>
+                  </div>
+                  <div className="pt-2">
+                    <p className="font-light text-xs text-gray-700">
+                      BABYONBU000000E63E746MXX
+                    </p>
+                  </div>
+                  <div className="pt-2">
                     <Price
+                      skuCode="BABYONBU000000E63E746MXX"
                       amountClassName="text-green-600 text-xl m-1"
                       compareClassName="text-gray-600 text-xl m-1 line-through font-light"
                     />
-                  </PriceContainer>
+                  </div>
+                  <div className="pt-2">
+                    <QuantitySelector
+                      className="block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                      skuCode="BABYONBU000000E63E746MXX"
+                    />
+                  </div>
+                  <div className="pt-2">
+                    <AddToCart
+                      skuCode="BABYONBU000000E63E746MXX"
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    />
+                  </div>
                 </div>
-                <div className="pt-2">
-                  <QuantitySelector
-                    className="block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    skuCode="BABYONBU000000E63E746MXX"
-                  />
-                </div>
-                <div className="pt-2">
-                  <AddToCart skuCode="BABYONBU000000E63E746MXX" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" />
-                </div>
-              </div>
-              <div className="flex-col border rounded-lg shadow p-5 m-3">
-                <div className="p-2">
-                  <img
-                    className="rounded-lg"
-                    src="https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90"
-                  />
-                </div>
-                <div>
-                  <p className="font-medium text-lg">
-                    Black Baby Onesie Short Sleeve with Pink Logo (12 Months)
-                  </p>
-                </div>
-                <div className="pt-2">
-                  <p className="font-light text-xs text-gray-700">
-                    BABYONBU000000E63E7412MX
-                  </p>
-                </div>
-                <div className="pt-2">
-                  <PriceContainer skuCode="BABYONBU000000E63E7412MX">
+                <div className="flex-col border rounded-lg shadow p-5 m-3">
+                  <div className="p-2">
+                    <img
+                      className="rounded-lg"
+                      src="https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90"
+                    />
+                  </div>
+                  <div>
+                    <p className="font-medium text-lg">
+                      Black Baby Onesie Short Sleeve with Pink Logo (12 Months)
+                    </p>
+                  </div>
+                  <div className="pt-2">
+                    <p className="font-light text-xs text-gray-700">
+                      BABYONBU000000E63E7412MX
+                    </p>
+                  </div>
+                  <div className="pt-2">
                     <Price
+                      skuCode="BABYONBU000000E63E7412MX"
                       amountClassName="text-green-600 text-xl m-1"
                       compareClassName="text-gray-600 text-xl m-1 line-through font-light"
                     />
-                  </PriceContainer>
+                  </div>
+                  <div className="pt-2">
+                    <QuantitySelector
+                      id="quantity-selector"
+                      className="block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                      skuCode="BABYONBU000000E63E7412MX"
+                    />
+                  </div>
+                  <div className="pt-2">
+                    <AddToCart
+                      id="add-to-bag"
+                      skuCode="BABYONBU000000E63E7412MX"
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    />
+                  </div>
                 </div>
-                <div className="pt-2">
-                  <QuantitySelector className="block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" skuCode="BABYONBU000000E63E7412MX" />
-                </div>
-                <div className="pt-2">
-                  <AddToCart skuCode="BABYONBU000000E63E7412MX" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" />
+                <div className="flex-col border rounded-lg shadow p-5 m-3">
+                  <div className="p-2">
+                    <img
+                      className="rounded-lg"
+                      src="https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90"
+                    />
+                  </div>
+                  <div>
+                    <p className="font-medium text-lg">
+                      Black Baby Onesie Short Sleeve with Pink Logo (24 Months)
+                    </p>
+                  </div>
+                  <div className="pt-2">
+                    <p className="font-light text-xs text-gray-700">
+                      BABYONBU000000E63E746MXXFAKE
+                    </p>
+                  </div>
+                  <div className="pt-2">
+                    <Price
+                      skuCode="BABYONBU000000E63E746MXXFAKE"
+                      amountClassName="text-green-600 text-xl m-1"
+                      compareClassName="text-gray-600 text-xl m-1 line-through font-light"
+                    />
+                  </div>
+                  <div className="pt-2">
+                    <QuantitySelector
+                      className="block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                      skuCode="BABYONBU000000E63E746MXXFAKE"
+                    />
+                  </div>
+                  <div className="pt-2">
+                    <AddToCart
+                      skuCode="BABYONBU000000E63E746MXXFAKE"
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            </PriceContainer>
             <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
             <p className="text-sm m-2">
               Your shopping bag contains{' '}

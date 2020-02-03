@@ -72,15 +72,13 @@ Cypress.env('pages').map(page => {
       }
     })
     it(page.title, () => {
-      cy.wait(['@accessToken', '@getSkus'])
+      cy.wait(['@accessToken'])
       if (page.typeSelectSku === 'category') {
         cy.wait('@getPricesCat')
-        cy.get(':nth-child(1) > .box > .button').as('addToBag')
-        cy.get('#add-to-bag-quantity-BABYONBU000000E63E74NBXX').as(
-          'addToBagQuantity'
-        )
+        cy.get('#quantity-selector').as('addToBagQuantity')
+        cy.get('#add-to-bag').as('addToBag')
       } else {
-        cy.wait('@getPrices')
+        cy.wait(['@getPrices', '@getSkus'])
         cy.get('#add-to-bag').as('addToBag')
         cy.get('#quantity-selector').as('addToBagQuantity')
         cy.get('@addToBagQuantity').should('be.disabled')
