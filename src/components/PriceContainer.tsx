@@ -13,6 +13,7 @@ import VariantContext from './context/VariantContext'
 import priceReducer, { SetSkuCodesPrice } from '../reducers/PriceReducer'
 import { priceInitialState, PriceState } from '../reducers/PriceReducer'
 import PriceContext from './context/PriceContext'
+// import OrderContext from './context/OrderContext'
 
 export interface PriceContainerProps {
   children: ReactNode
@@ -26,31 +27,32 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = ({
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const { accessToken } = useContext(CommerceLayerContext)
   const { currentSkuCode, currentPrices } = useContext(VariantContext)
-  if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
-    state.skuCodes.push(skuCode)
-  if (_.indexOf(state.skuCodes, currentSkuCode) === -1 && currentSkuCode)
-    state.skuCodes.push(currentSkuCode)
-
+  // const { currentSkuPrices, setCurrentSkuPrices } = useContext(OrderContext)
+  // if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
+  //   state.skuCodes.push(skuCode)
+  // if (_.indexOf(state.skuCodes, currentSkuCode) === -1 && currentSkuCode)
+  //   state.skuCodes.push(currentSkuCode)
+  console.log('skuCodes', state.skuCodes)
   const setSkuCodes: SetSkuCodesPrice = skuCodes => {
     dispatch({
       type: 'setSkuCodes',
-      payload: skuCodes
+      payload: { skuCodes }
     })
   }
   useEffect(() => {
     dispatch({
       type: 'setLoading',
-      payload: true
+      payload: { loading: true }
     })
     if (currentPrices.length > 0) {
       const pricesObj = getPrices(currentPrices)
       dispatch({
         type: 'setPrices',
-        payload: pricesObj
+        payload: { prices: pricesObj }
       })
       dispatch({
         type: 'setLoading',
-        payload: false
+        payload: { loading: false }
       })
     } else if (state.skuCodes.length >= 1 && accessToken) {
       Sku.where({ codeIn: state.skuCodes.join(',') })
@@ -61,22 +63,24 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = ({
           const pricesObj = getPrices(r.toArray())
           dispatch({
             type: 'setPrices',
-            payload: pricesObj
+            payload: { prices: pricesObj }
           })
           dispatch({
             type: 'setLoading',
-            payload: false
+            payload: { loading: false }
           })
         })
     }
     return (): void => {
       dispatch({
         type: 'setPrices',
-        payload: {}
+        payload: {
+          prices: {}
+        }
       })
       dispatch({
         type: 'setLoading',
-        payload: false
+        payload: { loading: false }
       })
     }
   }, [accessToken, currentPrices])

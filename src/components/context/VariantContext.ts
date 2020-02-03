@@ -2,6 +2,7 @@ import { createContext } from 'react'
 import { VariantState } from '../../reducers/VariantReducer'
 
 const initial: VariantState = {
+  active: false,
   loading: false,
   variants: {},
   skuCodes: [],

@@ -5,20 +5,17 @@ import React, {
   useContext,
   ReactNode
 } from 'react'
-import { getLocalOrder, setLocalOrder } from '../utils/localStorage'
+import { getLocalOrder } from '../utils/localStorage'
 import { Order, LineItem, Sku, OrderCollection } from '@commercelayer/js-sdk'
 import orderReducer, {
   orderInitialState,
-  OrderState
+  OrderState,
+  createOrder
 } from '../reducers/OrderReducer'
 import CommerceLayerContext from './context/CommerceLayerContext'
 import OrderContext from './context/OrderContext'
-import { SetSingleQuantity } from '../reducers/OrderReducer'
-import {
-  AddToCartInterface,
-  GetOrder,
-  CreateOrder
-} from '../reducers/OrderReducer'
+import { getApiOrder, setSingleQuantity } from '../reducers/OrderReducer'
+import { AddToCartInterface } from '../reducers/OrderReducer'
 
 export interface OrderContainerActions {
   setOrderId?: (orderId: string) => void
@@ -33,57 +30,21 @@ export interface OrderContainerProps {
   children: ReactNode
   accessToken?: string
 }
+
 const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
   const { children, persistKey } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const { accessToken } = useContext(CommerceLayerContext)
-  console.log('--- ORDER ---', state.order)
-  const createOrder: CreateOrder = async () => {
-    if (state.orderId) return state.orderId
-    const o = await Order.create({})
-    if (o.id) {
-      dispatch({
-        type: 'setOrderId',
-        payload: {
-          orderId: o.id
-        }
-      })
-      dispatch({
-        type: 'setOrder',
-        payload: {
-          order: o
-        }
-      })
-      setLocalOrder(persistKey, o.id)
-      return o.id
-    }
-  }
-  const getOrder: GetOrder = async id => {
-    const o = await Order.includes('line_items').find(id)
-    if (o)
-      dispatch({
-        type: 'setOrder',
-        payload: {
-          order: o
-        }
-      })
-  }
-  const setSingleQuantity: SetSingleQuantity = (code, quantity) => {
-    const o = {}
-    o[code] = Number(quantity)
-    dispatch({
-      type: 'setSingleQuantity',
-      payload: {
-        singleQuantity: o
-      }
-    })
-  }
+  // console.log('--- ORDER ---', state.order)
+  const addOrder = (): Promise<string> =>
+    createOrder(persistKey, state, dispatch)
+  const getOrder = (id): void => getApiOrder(id, dispatch)
   const addToCart: AddToCartInterface = async (
     skuCode,
     skuId = '',
     quantity = 1
   ) => {
-    const id = await createOrder()
+    const id = await addOrder()
     if (id) {
       const order = Order.build({ id })
       const attrs = {
@@ -129,7 +90,8 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
     orderId: state.orderId,
     loading: state.loading,
     singleQuantity: state.singleQuantity,
-    setSingleQuantity,
+    setSingleQuantity: (code, quantity) =>
+      setSingleQuantity(code, quantity, dispatch),
     addToCart,
     getOrder
   }

@@ -3,6 +3,8 @@ import { GeneralComponent } from '../@types/index'
 import Parent from './utils/Parent'
 import VariantContext from './context/VariantContext'
 import OrderContext from './context/OrderContext'
+import PriceContext from './context/PriceContext'
+import _ from 'lodash'
 
 export interface QuantitySelectorProps extends GeneralComponent {
   min?: number
@@ -23,8 +25,9 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
     currentSkuInventory,
     setCurrentQuantity
   } = useContext(VariantContext)
+  const { prices } = useContext(PriceContext)
   const { setSingleQuantity } = useContext(OrderContext)
-  const sCode = skuCode || currentSkuCode
+  const sCode = !_.isEmpty(prices) ? prices[skuCode] : skuCode || currentSkuCode
   const disabled = !sCode
   const handleChange = (e): void => {
     const quantity = e.target.value

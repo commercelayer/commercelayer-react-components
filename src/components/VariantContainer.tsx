@@ -33,52 +33,54 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = ({
   const setCurrentQuantity: SetCurrentQuantity = quantity => {
     dispatch({
       type: 'setCurrentQuantity',
-      payload: quantity
+      payload: { currentQuantity: quantity }
     })
   }
   const setSkuCodes: SetSkuCodesVariant = skuCodes => {
     const sCodes = skuCodes.map(s => s.code)
     dispatch({
       type: 'setSkuCodes',
-      payload: sCodes
+      payload: { skuCodes: sCodes, active: true }
     })
   }
   const setSkuCode: SetSkuCodeVariant = (code, id) => {
     if (id) {
       dispatch({
         type: 'setCurrentSkuCode',
-        payload: code
+        payload: { currentSkuCode: code }
       })
       dispatch({
         type: 'setCurrentSkuId',
-        payload: id
+        payload: { currentSkuId: id }
       })
       Sku.includes('prices')
         .find(id)
         .then(s => {
           dispatch({
             type: 'setCurrentSkuInventory',
-            payload: s.inventory
+            payload: { currentSkuInventory: s.inventory }
           })
           dispatch({
             type: 'setCurrentPrices',
-            payload: [s]
+            payload: { currentPrices: [s] }
           })
         })
     } else {
       dispatch({
         type: 'setCurrentSkuCode',
-        payload: ''
+        payload: { currentSkuCode: '' }
       })
       dispatch({
         type: 'setCurrentSkuId',
-        payload: ''
+        payload: { currentSkuId: '' }
       })
       dispatch({
         type: 'setCurrentSkuInventory',
         payload: {
-          available: false,
-          quantity: 0
+          currentSkuInventory: {
+            available: false,
+            quantity: 0
+          }
         }
       })
     }
@@ -88,13 +90,13 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = ({
     if (skuCode) {
       dispatch({
         type: 'setCurrentSkuCode',
-        payload: skuCode
+        payload: { currentSkuCode: skuCode }
       })
     }
     if (state.skuCodes.length >= 1 && accessToken) {
       dispatch({
         type: 'setLoading',
-        payload: true
+        payload: { loading: true, active: true }
       })
       Sku.where({ codeIn: state.skuCodes.join(',') })
         .perPage(25)
@@ -103,30 +105,35 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = ({
           const skusObj = getSkus(r.toArray())
           dispatch({
             type: 'setVariants',
-            payload: skusObj
+            payload: {
+              variants: skusObj
+            }
           })
           dispatch({
             type: 'setLoading',
-            payload: false
+            payload: {
+              loading: false
+            }
           })
         })
     }
     return (): void => {
       dispatch({
         type: 'setCurrentSkuCode',
-        payload: ''
+        payload: { currentSkuCode: '' }
       })
       dispatch({
         type: 'setVariants',
-        payload: null
+        payload: { variants: null }
       })
       dispatch({
         type: 'setLoading',
-        payload: false
+        payload: { loading: false, active: false }
       })
     }
   }, [accessToken])
   const variantValue: VariantState = {
+    active: state.active,
     loading: state.loading,
     variants: state.variants,
     skuCodes: state.skuCodes,
@@ -139,6 +146,7 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = ({
     setSkuCode,
     setSkuCodes
   }
+  console.log('variantValue', variantValue)
   return (
     <VariantContext.Provider value={variantValue}>
       {children}

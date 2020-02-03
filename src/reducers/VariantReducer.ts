@@ -19,6 +19,7 @@ export interface VariantsObject {
 }
 
 export interface VariantState {
+  active: boolean
   loading: boolean
   variants: VariantsObject
   skuCodes: string[]
@@ -50,6 +51,7 @@ export interface VariantActions extends GeneralActions {
 }
 
 export const variantInitialState: VariantState = {
+  active: false,
   loading: false,
   variants: {},
   skuCodes: [],
@@ -67,23 +69,19 @@ const variantReducer: GeneralReducer<VariantState, VariantActions> = (
   state,
   action
 ) => {
-  if (action.type === 'setVariants') {
-    state = { ...state, variants: action.payload }
-  }
-  if (action.type === 'setSkuCodes') {
-    state = { ...state, skuCodes: action.payload }
-  }
-  if (action.type === 'setCurrentSkuCode') {
-    state = { ...state, currentSkuCode: action.payload }
-  }
-  if (action.type === 'setCurrentSkuId') {
-    state = { ...state, currentSkuId: action.payload }
-  }
-  if (action.type === 'setCurrentSkuInventory') {
-    state = { ...state, currentSkuInventory: action.payload }
-  }
-  if (action.type === 'setCurrentQuantity') {
-    state = { ...state, currentQuantity: action.payload }
+  const actions = [
+    'setLoading',
+    'setVariants',
+    'setSkuCodes',
+    'setCurrentSkuCode',
+    'setCurrentSkuId',
+    'setCurrentSkuInventory',
+    'setCurrentQuantity',
+    'setCurrentPrices'
+  ]
+  if (actions.indexOf(action.type)) {
+    const data = action.payload
+    state = { ...state, ...data }
   }
   return state
 }

@@ -9,7 +9,7 @@ export interface GeneralComponent {
 
 export interface GeneralActions {
   type: string
-  payload: any
+  payload: object
 }
 
 export interface GeneralReducer<S, A> {

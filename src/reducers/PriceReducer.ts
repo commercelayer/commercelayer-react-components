@@ -1,7 +1,7 @@
 import { GeneralReducer, GeneralActions } from '../@types/index'
 import { PriceCollection } from '@commercelayer/js-sdk'
 
-export interface PricesInterface {
+export interface Prices {
   [key: string]: PriceCollection
 }
 
@@ -13,7 +13,7 @@ export interface SetSkuCodesPrice {
 
 export interface PriceState {
   loading: boolean
-  prices: PricesInterface
+  prices: Prices
   skuCodes: SkuCodesPrice
   skuCode?: string
   setSkuCodes?: SetSkuCodesPrice
@@ -33,14 +33,10 @@ const priceReducer: GeneralReducer<PriceState, PriceActions> = (
   state,
   action
 ) => {
-  if (action.type === 'setLoading') {
-    state = { ...state, loading: action.payload }
-  }
-  if (action.type === 'setPrices') {
-    state = { ...state, prices: action.payload }
-  }
-  if (action.type === 'setSkuCodes') {
-    state = { ...state, skuCodes: action.payload }
+  const actions = ['setLoading', 'setPrices', 'setSkuCodes']
+  if (actions.indexOf(action.type)) {
+    const data = action.payload
+    state = { ...state, ...data }
   }
   return state
 }

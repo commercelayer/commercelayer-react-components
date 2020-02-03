@@ -3,6 +3,8 @@ import Parent from './utils/Parent'
 import OrderContext from './context/OrderContext'
 import VariantContext from './context/VariantContext'
 import { GeneralComponent } from '../@types/index'
+import PriceContext from './context/PriceContext'
+import _ from 'lodash'
 
 export interface AddToCartProps extends GeneralComponent {
   label?: string
@@ -12,12 +14,15 @@ export interface AddToCartProps extends GeneralComponent {
 }
 
 const AddToCart: FunctionComponent<AddToCartProps> = props => {
-  const { label, className, children, skuCode } = props
+  const { label, children, skuCode, ...p } = props
   const { addToCart, singleQuantity } = useContext(OrderContext)
   const { currentSkuCode, currentSkuId, currentQuantity } = useContext(
     VariantContext
   )
-  const sCode = skuCode || currentSkuCode
+  const { prices } = useContext(PriceContext)
+  const sCode = !_.isEmpty(prices)
+    ? prices[skuCode]?.skuCode
+    : skuCode || currentSkuCode
   const handleClick = (): void => {
     const qty = skuCode ? singleQuantity[skuCode] : currentQuantity
     addToCart(sCode, currentSkuId, qty)
@@ -32,7 +37,7 @@ const AddToCart: FunctionComponent<AddToCartProps> = props => {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <button disabled={disabled} className={className} onClick={handleClick}>
+    <button disabled={disabled} onClick={handleClick} {...p}>
       {label ? label : 'add to cart'}
     </button>
   )
