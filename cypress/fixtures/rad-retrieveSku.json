@@ -26,24 +26,6 @@
               "delivery_lead_times": [
                 {
                   "shipping_method": {
-                    "name": "Standard Shipping",
-                    "reference": null,
-                    "price_amount_cents": 700,
-                    "free_over_amount_cents": 9900,
-                    "formatted_price_amount": "€7,00",
-                    "formatted_free_over_amount": "€99,00"
-                  },
-                  "min": {
-                    "hours": 72,
-                    "days": 3
-                  },
-                  "max": {
-                    "hours": 120,
-                    "days": 5
-                  }
-                },
-                {
-                  "shipping_method": {
                     "name": "Express Delivery",
                     "reference": null,
                     "price_amount_cents": 1200,
@@ -59,12 +41,48 @@
                     "hours": 72,
                     "days": 3
                   }
+                },
+                {
+                  "shipping_method": {
+                    "name": "Standard Shipping",
+                    "reference": null,
+                    "price_amount_cents": 700,
+                    "free_over_amount_cents": 9900,
+                    "formatted_price_amount": "€7,00",
+                    "formatted_free_over_amount": "€99,00"
+                  },
+                  "min": {
+                    "hours": 72,
+                    "days": 3
+                  },
+                  "max": {
+                    "hours": 120,
+                    "days": 5
+                  }
                 }
               ]
             },
             {
               "quantity": 47,
               "delivery_lead_times": [
+                {
+                  "shipping_method": {
+                    "name": "Express Delivery",
+                    "reference": null,
+                    "price_amount_cents": 1200,
+                    "free_over_amount_cents": null,
+                    "formatted_price_amount": "€12,00",
+                    "formatted_free_over_amount": null
+                  },
+                  "min": {
+                    "hours": 72,
+                    "days": 3
+                  },
+                  "max": {
+                    "hours": 96,
+                    "days": 4
+                  }
+                },
                 {
                   "shipping_method": {
                     "name": "Standard Shipping",
@@ -81,24 +99,6 @@
                   "max": {
                     "hours": 144,
                     "days": 6
-                  }
-                },
-                {
-                  "shipping_method": {
-                    "name": "Express Delivery",
-                    "reference": null,
-                    "price_amount_cents": 1200,
-                    "free_over_amount_cents": null,
-                    "formatted_price_amount": "€12,00",
-                    "formatted_free_over_amount": null
-                  },
-                  "min": {
-                    "hours": 72,
-                    "days": 3
-                  },
-                  "max": {
-                    "hours": 96,
-                    "days": 4
                   }
                 }
               ]
