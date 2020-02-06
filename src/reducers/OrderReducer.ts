@@ -1,17 +1,27 @@
 import { GeneralReducer, GeneralActions } from '../@types/index'
-import { OrderCollection, Order } from '@commercelayer/js-sdk'
+import CLayer, {
+  OrderCollection,
+  Order,
+  SkuCollection
+} from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import { setLocalOrder } from '../utils/localStorage'
+import { CommerceLayerConfig } from '../components/context/CommerceLayerContext'
 
 export interface GetOrder {
-  (orderId: string, dispacth?: Dispatch<OrderActions>): void
+  (
+    orderId: string,
+    dispacth?: Dispatch<OrderActions>,
+    config?: CommerceLayerConfig
+  ): void
 }
 
 export interface CreateOrder {
   (
     persistKey: string,
     state?: OrderState,
-    dispatch?: Dispatch<OrderActions>
+    dispatch?: Dispatch<OrderActions>,
+    config?: CommerceLayerConfig
   ): Promise<string>
 }
 
@@ -31,9 +41,14 @@ export interface SetSingleQuantity {
   ): void
 }
 
-export const createOrder: CreateOrder = async (persistKey, state, dispatch) => {
+export const createOrder: CreateOrder = async (
+  persistKey,
+  state,
+  dispatch,
+  config
+) => {
   if (state.orderId) return state.orderId
-  const o = await Order.create({})
+  const o = await CLayer.Order.withCredentials(config).create({})
   if (o.id) {
     dispatch({
       type: 'setOrderId',
@@ -52,8 +67,10 @@ export const createOrder: CreateOrder = async (persistKey, state, dispatch) => {
   }
 }
 
-export const getApiOrder: GetOrder = async (id, dispatch) => {
-  const o = await Order.includes('line_items').find(id)
+export const getApiOrder: GetOrder = async (id, dispatch, config) => {
+  const o = await CLayer.Order.withCredentials(config)
+    .includes('line_items')
+    .find(id)
   if (o)
     dispatch({
       type: 'setOrder',
@@ -78,24 +95,74 @@ export const setSingleQuantity: SetSingleQuantity = (
   })
 }
 
+export interface Items {
+  [skuCode: string]: SkuCollection
+}
+
+export interface SetItems {
+  (items: Items, dispatch: Dispatch<OrderActions>)
+}
+
+export const setItems: SetItems = (items, dispatch) => {
+  dispatch({
+    type: 'setItems',
+    payload: {
+      items
+    }
+  })
+}
+
+export const setCurrentItem: SetItems = (currentItem, dispatch) => {
+  dispatch({
+    type: 'setItems',
+    payload: {
+      currentItem
+    }
+  })
+}
+
+export interface UnsetOrderState {
+  (dispatch: Dispatch<OrderActions>)
+}
+
+export const unsetOrderState: UnsetOrderState = dispatch => {
+  dispatch({
+    type: 'setOrderId',
+    payload: {
+      orderId: ''
+    }
+  })
+}
+
 export interface OrderState {
   loading: boolean
   orderId: string
   order: OrderCollection
+  items: Items
+  currentItem?: Items
   getOrder?: GetOrder | null
   addToCart?: AddToCartInterface | null
   singleQuantity?: SingleQuantity
   setSingleQuantity?: SetSingleQuantity
+  setItems?: (items: Items) => SetItems
+  setCurrentItem?: (items: Items) => SetItems
 }
 
 export interface OrderActions extends GeneralActions {
-  type: 'setLoading' | 'setOrderId' | 'setOrder' | 'setSingleQuantity'
+  type:
+    | 'setLoading'
+    | 'setOrderId'
+    | 'setOrder'
+    | 'setSingleQuantity'
+    | 'setItems'
+    | 'setCurrentItem'
 }
 
 export const orderInitialState: OrderState = {
   loading: false,
   orderId: '',
-  order: null
+  order: null,
+  items: {}
 }
 
 const orderReducer: GeneralReducer<OrderState, OrderActions> = (
@@ -108,9 +175,11 @@ const orderReducer: GeneralReducer<OrderState, OrderActions> = (
     'setOrder',
     'setSingleQuantity',
     'setCurrentSkuCodes',
-    'setCurrentSkuPrices'
+    'setCurrentSkuPrices',
+    'setItems',
+    'setCurrentItem'
   ]
-  if (actions.indexOf(action.type)) {
+  if (actions.indexOf(action.type) !== -1) {
     const data = action.payload
     state = { ...state, ...data }
   }

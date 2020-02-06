@@ -4,7 +4,8 @@ import { OrderState } from '../../reducers/OrderReducer'
 const initial: OrderState = {
   loading: false,
   orderId: '',
-  order: null
+  order: null,
+  items: {}
 }
 
 const OrderContext = createContext(initial)

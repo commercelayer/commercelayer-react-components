@@ -8,6 +8,7 @@ import { GeneralComponent } from '../@types/index'
 import Parent from './utils/Parent'
 import OrderContext from './context/OrderContext'
 import getLineItemsCount from '../utils/getLineItemsCount'
+import _ from 'lodash'
 
 export interface LineItemsCountProps extends GeneralComponent {
   children?: FunctionComponent
@@ -18,8 +19,8 @@ const LineItemsCount: FunctionComponent<LineItemsCountProps> = props => {
   const { order } = useContext(OrderContext)
   const [quantity, setQuantity] = useState(0)
   useEffect(() => {
-    if (order) {
-      const lineItems = order.lineItems().toArray()
+    if (!_.isEmpty(order)) {
+      const lineItems = order?.lineItems().toArray()
       const qty = getLineItemsCount(lineItems)
       setQuantity(qty)
     }

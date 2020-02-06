@@ -21,7 +21,7 @@ export interface QuantitySelectorProps extends GeneralComponent {
 const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
   const { skuCode, children, min, max, ...p } = props
   const {
-    currentSkuCode,
+    skuCode: currentSkuCode,
     currentSkuInventory,
     setCurrentQuantity
   } = useContext(VariantContext)

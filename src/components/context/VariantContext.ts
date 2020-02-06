@@ -2,17 +2,17 @@ import { createContext } from 'react'
 import { VariantState } from '../../reducers/VariantReducer'
 
 const initial: VariantState = {
-  active: false,
   loading: false,
   variants: {},
   skuCodes: [],
-  currentSkuCode: '',
+  skuCode: '',
   currentSkuId: '',
   currentQuantity: 1,
   currentPrices: [],
   currentSkuInventory: {
     available: false,
-    quantity: 0
+    quantity: 0,
+    levels: []
   }
 }
 

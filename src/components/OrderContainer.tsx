@@ -6,16 +6,21 @@ import React, {
   ReactNode
 } from 'react'
 import { getLocalOrder } from '../utils/localStorage'
-import { Order, LineItem, Sku, OrderCollection } from '@commercelayer/js-sdk'
+import CLayer, { OrderCollection } from '@commercelayer/js-sdk'
 import orderReducer, {
   orderInitialState,
   OrderState,
-  createOrder
+  createOrder,
+  setCurrentItem
 } from '../reducers/OrderReducer'
 import CommerceLayerContext from './context/CommerceLayerContext'
 import OrderContext from './context/OrderContext'
-import { getApiOrder, setSingleQuantity } from '../reducers/OrderReducer'
-import { AddToCartInterface } from '../reducers/OrderReducer'
+import {
+  getApiOrder,
+  setSingleQuantity,
+  setItems
+} from '../reducers/OrderReducer'
+import { AddToCartInterface, unsetOrderState } from '../reducers/OrderReducer'
 
 export interface OrderContainerActions {
   setOrderId?: (orderId: string) => void
@@ -28,17 +33,17 @@ export interface OrderContainerProps {
   id?: string
   persistKey: string
   children: ReactNode
-  accessToken?: string
 }
 
 const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
   const { children, persistKey } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
-  const { accessToken } = useContext(CommerceLayerContext)
+  const config = useContext(CommerceLayerContext)
+  console.log('ORDER CONTAINER -- ', config)
   // console.log('--- ORDER ---', state.order)
   const addOrder = (): Promise<string> =>
-    createOrder(persistKey, state, dispatch)
-  const getOrder = (id): void => getApiOrder(id, dispatch)
+    createOrder(persistKey, state, dispatch, config)
+  const getOrder = (id): void => getApiOrder(id, dispatch, config)
   const addToCart: AddToCartInterface = async (
     skuCode,
     skuId = '',
@@ -46,7 +51,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
   ) => {
     const id = await addOrder()
     if (id) {
-      const order = Order.build({ id })
+      const order = CLayer.Order.withCredentials(config).build({ id })
       const attrs = {
         order,
         skuCode,
@@ -55,13 +60,15 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
         _update_quantity: 1
       }
       if (skuId) {
-        attrs['item'] = Sku.build({ id: skuId })
+        attrs['item'] = CLayer.Sku.withCredentials(config).build({ id: skuId })
       }
-      LineItem.create(attrs).then(() => getOrder(id))
+      CLayer.LineItem.withCredentials(config)
+        .create(attrs)
+        .then(() => getOrder(id))
     }
   }
   useEffect(() => {
-    if (accessToken) {
+    if (config.accessToken) {
       const localOrder = getLocalOrder(persistKey)
       if (localOrder) {
         dispatch({
@@ -75,27 +82,22 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
         }
       }
     }
-
-    return (): void => {
-      dispatch({
-        type: 'setOrderId',
-        payload: {
-          orderId: ''
-        }
-      })
-    }
-  }, [accessToken, state.order])
+    return (): void => unsetOrderState(dispatch)
+  }, [config.accessToken, state.order])
   const orderValue: OrderState = {
     order: state.order,
     orderId: state.orderId,
     loading: state.loading,
+    items: state.items,
     singleQuantity: state.singleQuantity,
+    currentItem: state.currentItem,
     setSingleQuantity: (code, quantity) =>
       setSingleQuantity(code, quantity, dispatch),
     addToCart,
-    getOrder
+    getOrder,
+    setItems: items => setItems(items, dispatch),
+    setCurrentItem: item => setCurrentItem(item, dispatch)
   }
-  console.log('--- orderValue ---', orderValue)
   return (
     <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
   )

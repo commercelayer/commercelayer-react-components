@@ -29,6 +29,7 @@ import Taxes from '../src/components/Taxes'
 import GiftCard from '../src/components/GiftCard'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
+const endpoint1 = 'https://the-lime-brand-2.commercelayer.co'
 
 const CustomAddToCart = props => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
@@ -55,19 +56,17 @@ export default function Order() {
         endpoint,
         scope: 'market:48'
       })
-      console.log('token ---> ', accessToken)
+      console.log('Token BLUE BRAND ---> ', accessToken)
       setToken(accessToken)
     }
     const getToken1 = async () => {
-      const { accessToken } = await getIntegrationToken({
+      const { accessToken } = await getSalesChannelToken({
         clientId:
-          'b1aa32826ce12ba2f74c59a555e3ed98a7db4ec710b14575b7e97f0a49fb9a4d',
-        clientSecret:
-          '8fed019759490ba13c482cc2541ef77c6b8d0b3df04db80807110784fbfec021',
-        endpoint,
-        scope: 'market:48'
+          '24938609156dc7391cd5dfdea32b828ef2c20e02bccfccda6510ed59c09935ac',
+        endpoint: endpoint1,
+        scope: 'market:50'
       })
-      console.log('token1 ---> ', accessToken)
+      console.log('token1 LIME BRAND ---> ', accessToken)
       setToken1(accessToken)
     }
     getToken()
@@ -212,9 +211,9 @@ export default function Order() {
           </OrderContainer>
         </div>
       </CommerceLayer>
-      <CommerceLayer accessToken={token1} endpoint={endpoint}>
+      <CommerceLayer accessToken={token1} endpoint={endpoint1}>
         <div className="container mx-auto mt-5">
-          <OrderContainer persistKey="orderIT">
+          <OrderContainer persistKey="orderLimeIT">
             <div className="md:flex">
               <div className="md:flex-shrink-0">
                 <img

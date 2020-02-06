@@ -1,6 +1,11 @@
 import { createContext } from 'react'
 
-const initial = {
+export interface CommerceLayerConfig {
+  accessToken: string
+  endpoint: string
+}
+
+const initial: CommerceLayerConfig = {
   accessToken: '',
   endpoint: ''
 }

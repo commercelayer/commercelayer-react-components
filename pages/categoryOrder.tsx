@@ -24,6 +24,8 @@ import Discount from '../src/components/Discount'
 import Shipping from '../src/components/Shipping'
 import Taxes from '../src/components/Taxes'
 import GiftCard from '../src/components/GiftCard'
+import AvailabilityContainer from '../src/components/AvailabilityContainer'
+import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -98,6 +100,11 @@ export default function Order() {
                       skuCode="BABYONBU000000E63E746MXX"
                       className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                     />
+                  </div>
+                  <div className="pt-2">
+                    <AvailabilityContainer>
+                      <AvailabilityTemplate />
+                    </AvailabilityContainer>
                   </div>
                 </div>
                 <div className="flex-col border rounded-lg shadow p-5 m-3">

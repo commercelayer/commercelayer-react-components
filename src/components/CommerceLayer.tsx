@@ -1,23 +1,18 @@
-import React, { FunctionComponent, ReactNode } from 'react'
-import { initCLayer } from '@commercelayer/js-sdk'
+import React, { FunctionComponent, ReactNode, useState, useEffect } from 'react'
+// import { initCLayer } from '@commercelayer/js-sdk'
 import CommerceLayerContext from './context/CommerceLayerContext'
+import { CommerceLayerConfig } from './context/CommerceLayerContext'
 
-export interface CommerceLayerProps {
+export interface CommerceLayerProps extends CommerceLayerConfig {
   children: ReactNode
   accessToken: string
   endpoint: string
 }
 
-const CommerceLayer: FunctionComponent<CommerceLayerProps> = ({
-  children,
-  ...props
-}) => {
-  const { accessToken, endpoint } = props
-  if (accessToken && endpoint) {
-    initCLayer({ accessToken, endpoint })
-  }
+const CommerceLayer: FunctionComponent<CommerceLayerProps> = props => {
+  const { children, ...p } = props
   return (
-    <CommerceLayerContext.Provider value={{ accessToken, endpoint }}>
+    <CommerceLayerContext.Provider value={p}>
       {children}
     </CommerceLayerContext.Provider>
   )

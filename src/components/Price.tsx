@@ -3,7 +3,8 @@ import React, {
   useState,
   useEffect,
   FunctionComponent,
-  useContext
+  useContext,
+  ReactElement
 } from 'react'
 import _ from 'lodash'
 import Parent from './utils/Parent'
@@ -14,6 +15,7 @@ export interface PriceProps {
   amountClassName?: string
   compareClassName?: string
   skuCode?: string
+  loader?: ReactElement
 }
 
 export interface PriceTemplateProps {
@@ -23,11 +25,12 @@ export interface PriceTemplateProps {
   amountClassName?: string
   compareClassName?: string
   loading?: boolean
+  loader?: ReactElement
 }
 
 const PriceTemplate: FunctionComponent<PriceTemplateProps> = props =>
   props.loading ? (
-    <Fragment>{'Loading...'}</Fragment>
+    <Fragment>{props.loader || 'Loading...'}</Fragment>
   ) : (
     <Fragment>
       <span className={props.amountClassName}>{props.formattedAmount}</span>

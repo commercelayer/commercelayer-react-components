@@ -1,6 +1,7 @@
 import { GeneralReducer, GeneralActions } from '../@types/index'
 import { SkuCollection, InventoryCollection } from '@commercelayer/js-sdk'
 import { SkuCodePropObj } from '../components/VariantSelector'
+import { Dispatch } from 'react'
 
 export interface SetCurrentQuantity {
   (quantity: number): void
@@ -10,8 +11,8 @@ export interface SetSkuCodeVariant {
   (code: string, id: string): void
 }
 
-export interface SetSkuCodesVariant {
-  (skuCodes: SkuCodePropObj[]): void
+export interface SetVariantSkuCodes {
+  (skuCodes: SkuCodePropObj[], dispatch: Dispatch<VariantActions>): void
 }
 
 export interface VariantsObject {
@@ -19,22 +20,16 @@ export interface VariantsObject {
 }
 
 export interface VariantState {
-  active: boolean
   loading: boolean
   variants: VariantsObject
   skuCodes: string[]
-  currentSkuCode: string
+  skuCode: string
   currentSkuId: string
-  currentSkuInventory:
-    | InventoryCollection
-    | {
-        available: false
-        quantity: 0
-      }
+  currentSkuInventory: InventoryCollection
   currentQuantity: number
   currentPrices: SkuCollection[]
   setSkuCode?: SetSkuCodeVariant
-  setSkuCodes?: SetSkuCodesVariant
+  setSkuCodes?: (skuCodes: SkuCodePropObj[]) => void
   setCurrentQuantity?: SetCurrentQuantity
 }
 
@@ -43,23 +38,50 @@ export interface VariantActions extends GeneralActions {
     | 'setLoading'
     | 'setVariants'
     | 'setSkuCodes'
-    | 'setCurrentSkuCode'
+    | 'setSkuCode'
     | 'setCurrentSkuId'
     | 'setCurrentSkuInventory'
     | 'setCurrentQuantity'
     | 'setCurrentPrices'
 }
 
+export const setVariantSkuCodes: SetVariantSkuCodes = (skuCodes, dispatch) => {
+  const sCodes = skuCodes.map(s => s.code)
+  dispatch({
+    type: 'setSkuCodes',
+    payload: { skuCodes: sCodes }
+  })
+}
+
+export interface UnsetVariantState {
+  (dispatch: Dispatch<VariantActions>): void
+}
+
+export const unsetVariantState: UnsetVariantState = dispatch => {
+  dispatch({
+    type: 'setSkuCode',
+    payload: { skuCode: '' }
+  })
+  dispatch({
+    type: 'setVariants',
+    payload: { variants: {} }
+  })
+  dispatch({
+    type: 'setLoading',
+    payload: { loading: false }
+  })
+}
+
 export const variantInitialState: VariantState = {
-  active: false,
   loading: false,
   variants: {},
   skuCodes: [],
-  currentSkuCode: '',
+  skuCode: '',
   currentSkuId: '',
   currentSkuInventory: {
     available: false,
-    quantity: 0
+    quantity: 0,
+    levels: []
   },
   currentQuantity: 1,
   currentPrices: []
@@ -73,13 +95,13 @@ const variantReducer: GeneralReducer<VariantState, VariantActions> = (
     'setLoading',
     'setVariants',
     'setSkuCodes',
-    'setCurrentSkuCode',
+    'setSkuCode',
     'setCurrentSkuId',
     'setCurrentSkuInventory',
     'setCurrentQuantity',
     'setCurrentPrices'
   ]
-  if (actions.indexOf(action.type)) {
+  if (actions.indexOf(action.type) !== -1) {
     const data = action.payload
     state = { ...state, ...data }
   }

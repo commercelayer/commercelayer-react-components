@@ -5,34 +5,39 @@ import React, {
   ReactNode,
   useReducer
 } from 'react'
-import { Sku } from '@commercelayer/js-sdk'
 import getPrices from '../utils/getPrices'
 import _ from 'lodash'
 import CommerceLayerContext from './context/CommerceLayerContext'
-import VariantContext from './context/VariantContext'
-import priceReducer, { SetSkuCodesPrice } from '../reducers/PriceReducer'
-import { priceInitialState, PriceState } from '../reducers/PriceReducer'
+import priceReducer, {
+  SetSkuCodesPrice,
+  unsetPriceState
+} from '../reducers/PriceReducer'
+import {
+  priceInitialState,
+  PriceState,
+  getSkusPrice
+} from '../reducers/PriceReducer'
 import PriceContext from './context/PriceContext'
-// import OrderContext from './context/OrderContext'
+import OrderContext from './context/OrderContext'
 
 export interface PriceContainerProps {
   children: ReactNode
   skuCode?: string
 }
 
-const PriceContainer: FunctionComponent<PriceContainerProps> = ({
-  children,
-  skuCode
-}) => {
+const PriceContainer: FunctionComponent<PriceContainerProps> = props => {
+  const { children, skuCode } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
-  const { accessToken } = useContext(CommerceLayerContext)
-  const { currentSkuCode, currentPrices } = useContext(VariantContext)
-  // const { currentSkuPrices, setCurrentSkuPrices } = useContext(OrderContext)
-  // if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
-  //   state.skuCodes.push(skuCode)
+  // TODO: Move to OrderContainer
+  const config = useContext(CommerceLayerContext)
+  const { setItems, items } = useContext(OrderContext)
+
+  // const { currentSkuCode, currentPrices } = useContext(VariantContext)
+  if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
+    state.skuCodes.push(skuCode)
   // if (_.indexOf(state.skuCodes, currentSkuCode) === -1 && currentSkuCode)
   //   state.skuCodes.push(currentSkuCode)
-  console.log('skuCodes', state.skuCodes)
+  const sCode = skuCode // TODO: add current by OrderContainer
   const setSkuCodes: SetSkuCodesPrice = skuCodes => {
     dispatch({
       type: 'setSkuCodes',
@@ -44,50 +49,34 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = ({
       type: 'setLoading',
       payload: { loading: true }
     })
-    if (currentPrices.length > 0) {
-      const pricesObj = getPrices(currentPrices)
+    if (!_.isEmpty(items)) {
+      const p = getPrices(items)
       dispatch({
         type: 'setPrices',
-        payload: { prices: pricesObj }
+        payload: { prices: p }
       })
       dispatch({
         type: 'setLoading',
         payload: { loading: false }
       })
-    } else if (state.skuCodes.length >= 1 && accessToken) {
-      Sku.where({ codeIn: state.skuCodes.join(',') })
-        .includes('prices')
-        .perPage(25)
-        .all()
-        .then(r => {
-          const pricesObj = getPrices(r.toArray())
-          dispatch({
-            type: 'setPrices',
-            payload: { prices: pricesObj }
+    } else {
+      if (config.accessToken) {
+        if (state.skuCodes.length > 0 || skuCode) {
+          getSkusPrice((skuCode && [skuCode]) || state.skuCodes, {
+            config,
+            dispatch,
+            setItems,
+            items
           })
-          dispatch({
-            type: 'setLoading',
-            payload: { loading: false }
-          })
-        })
-    }
-    return (): void => {
-      dispatch({
-        type: 'setPrices',
-        payload: {
-          prices: {}
         }
-      })
-      dispatch({
-        type: 'setLoading',
-        payload: { loading: false }
-      })
+      }
     }
-  }, [accessToken, currentPrices])
+    return (): void => unsetPriceState(dispatch)
+  }, [config.accessToken])
   const priceValue: PriceState = {
     loading: state.loading,
     prices: state.prices,
-    skuCode: currentSkuCode || skuCode,
+    skuCode: sCode,
     skuCodes: state.skuCodes,
     setSkuCodes
   }

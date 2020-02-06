@@ -14,6 +14,8 @@ import lineItemReducer, {
 import OrderContext from './context/OrderContext'
 import LineItemContext from './context/LineItemContext'
 import { UpdateLineItem, DeleteLineItem } from '../reducers/LineItemReducer'
+import CommerceLayerContext from './context/CommerceLayerContext'
+import _ from 'lodash'
 
 export interface LineItemsContainer extends OrderContainerActions {
   children?: ReactElement<LineItemProps>[] | ReactElement<LineItemProps>
@@ -36,8 +38,8 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
     deleteItem.then(() => getOrder(orderId))
   }
   useEffect(() => {
-    if (order) {
-      const lItems = order.lineItems().toArray()
+    if (!_.isEmpty(order)) {
+      const lItems = order?.lineItems().toArray()
       dispatch({
         type: 'setLineItems',
         lineItems: lItems
