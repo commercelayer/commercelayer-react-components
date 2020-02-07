@@ -113,12 +113,12 @@ export interface UnsetPriceState {
 }
 
 export const unsetPriceState: UnsetPriceState = dispatch => {
-  // dispatch({
-  //   type: 'setPrices',
-  //   payload: {
-  //     prices: {}
-  //   }
-  // })
+  dispatch({
+    type: 'setPrices',
+    payload: {
+      prices: {}
+    }
+  })
   dispatch({
     type: 'setLoading',
     payload: { loading: false }

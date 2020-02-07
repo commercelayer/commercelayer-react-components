@@ -19,6 +19,7 @@ import {
 } from '../reducers/PriceReducer'
 import PriceContext from './context/PriceContext'
 import OrderContext from './context/OrderContext'
+import getCurrentItemKey from '../utils/getCurrentItemKey'
 
 export interface PriceContainerProps {
   children: ReactNode
@@ -28,16 +29,15 @@ export interface PriceContainerProps {
 const PriceContainer: FunctionComponent<PriceContainerProps> = props => {
   const { children, skuCode } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
-  // TODO: Move to OrderContainer
   const config = useContext(CommerceLayerContext)
-  const { setItems, items } = useContext(OrderContext)
-
+  const { setItems, items, currentItem } = useContext(OrderContext)
+  // TODO: Remove comments
   // const { currentSkuCode, currentPrices } = useContext(VariantContext)
   if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
   // if (_.indexOf(state.skuCodes, currentSkuCode) === -1 && currentSkuCode)
   //   state.skuCodes.push(currentSkuCode)
-  const sCode = skuCode // TODO: add current by OrderContainer
+  const sCode = getCurrentItemKey(currentItem) || skuCode
   const setSkuCodes: SetSkuCodesPrice = skuCodes => {
     dispatch({
       type: 'setSkuCodes',
@@ -45,34 +45,36 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = props => {
     })
   }
   useEffect(() => {
-    dispatch({
-      type: 'setLoading',
-      payload: { loading: true }
-    })
-    if (!_.isEmpty(items)) {
+    if (currentItem) {
+      const p = getPrices(currentItem)
+      dispatch({
+        type: 'setPrices',
+        payload: { prices: p }
+      })
+    }
+    if (!_.isEmpty(items) && _.isEmpty(currentItem)) {
       const p = getPrices(items)
       dispatch({
         type: 'setPrices',
         payload: { prices: p }
       })
-      dispatch({
-        type: 'setLoading',
-        payload: { loading: false }
-      })
-    } else {
-      if (config.accessToken) {
-        if (state.skuCodes.length > 0 || skuCode) {
-          getSkusPrice((skuCode && [skuCode]) || state.skuCodes, {
-            config,
-            dispatch,
-            setItems,
-            items
-          })
-        }
+    }
+    if (config.accessToken && _.isEmpty(currentItem)) {
+      if (state.skuCodes.length > 0 || skuCode) {
+        dispatch({
+          type: 'setLoading',
+          payload: { loading: true }
+        })
+        getSkusPrice((skuCode && [skuCode]) || state.skuCodes, {
+          config,
+          dispatch,
+          setItems,
+          items
+        })
       }
     }
     return (): void => unsetPriceState(dispatch)
-  }, [config.accessToken])
+  }, [config.accessToken, currentItem])
   const priceValue: PriceState = {
     loading: state.loading,
     prices: state.prices,
