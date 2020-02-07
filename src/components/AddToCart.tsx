@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useContext } from 'react'
 import Parent from './utils/Parent'
 import OrderContext from '../context/OrderContext'
-import VariantContext from '../context/VariantContext'
 import { GeneralComponent } from '../@types/index'
-import PriceContext from '../context/PriceContext'
 import _ from 'lodash'
+import ItemContext from '../context/ItemContext'
+import getCurrentItemKey from '../utils/getCurrentItemKey'
 
 export interface AddToCartProps extends GeneralComponent {
   label?: string
@@ -16,16 +16,14 @@ export interface AddToCartProps extends GeneralComponent {
 const AddToCart: FunctionComponent<AddToCartProps> = props => {
   const { label, children, skuCode, ...p } = props
   const { addToCart } = useContext(OrderContext)
-  const { skuCode: currentSkuCode, currentSkuId, currentQuantity } = useContext(
-    VariantContext
-  )
-  const { prices } = useContext(PriceContext)
-  const sCode = !_.isEmpty(prices)
-    ? prices[skuCode]?.skuCode
-    : skuCode || currentSkuCode
+  const { item, items, quantity } = useContext(ItemContext)
+  const sCode =
+    !_.isEmpty(items) && skuCode
+      ? items[skuCode]?.code
+      : skuCode || getCurrentItemKey(item)
   const handleClick = (): void => {
-    // const qty = skuCode ? singleQuantity[skuCode] : currentQuantity
-    // addToCart(sCode, currentSkuId, qty)
+    const qty = quantity[sCode]
+    addToCart(sCode, item[sCode].id, qty)
   }
   const disabled = !sCode
   const parentProps = {
