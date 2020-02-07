@@ -11,6 +11,8 @@ import availabilityReducer, {
 } from '../reducers/AvailabilityReducer'
 import AvailabilityContext from '../context/AvailabilityContext'
 import _ from 'lodash'
+import ItemContext from '../context/ItemContext'
+import getCurrentItemKey from '../utils/getCurrentItemKey'
 
 export interface AvailabilityContainerProps {
   children: ReactNode
@@ -19,14 +21,15 @@ export interface AvailabilityContainerProps {
 
 const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = props => {
   const { children } = props
-  const { currentSkuInventory } = useContext(VariantContext)
+  const { item } = useContext(ItemContext)
   const [state, dispatch] = useReducer(
     availabilityReducer,
     availabilityInitialState
   )
   useEffect(() => {
-    if (currentSkuInventory.levels.length > 0) {
-      const firstLevel = _.first(currentSkuInventory.levels)
+    const skuCode = getCurrentItemKey(item)
+    if (skuCode) {
+      const firstLevel = _.first(item[skuCode].inventory.levels)
       if (firstLevel.deliveryLeadTimes.length > 0) {
         const firstDelivery = _.first(firstLevel.deliveryLeadTimes)
         dispatch({
@@ -41,7 +44,7 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = pro
         payload: {}
       })
     }
-  }, [currentSkuInventory])
+  }, [item])
   return (
     <AvailabilityContext.Provider value={{ ...state }}>
       {children}
