@@ -9,7 +9,6 @@ import VariantTemplate from './VariantTemplate'
 import Parent from './utils/Parent'
 import VariantContext from './context/VariantContext'
 import { GeneralComponent } from '../@types/index'
-import { SetVariantSkuCodes } from '../reducers/VariantReducer'
 
 export interface SkuCodePropObj {
   label: string
@@ -26,6 +25,7 @@ export interface VariantSelectorProps extends GeneralComponent {
   variants?: object
   loading?: boolean
   placeholder?: string
+  loader?: ReactElement
 }
 
 const VariantSelector: FunctionComponent<VariantSelectorProps> = props => {
@@ -46,7 +46,7 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = props => {
   const sCode = variantSkuCode || skuCode
   const DefaultTemplate = (): ReactElement =>
     loading ? (
-      <Fragment>Loading...</Fragment>
+      <Fragment>{props.loader || 'Loading...'}</Fragment>
     ) : (
       <VariantTemplate
         variants={variants}

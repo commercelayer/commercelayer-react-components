@@ -18,6 +18,7 @@ import { SetSkuCodeVariant, VariantState } from '../reducers/VariantReducer'
 import OrderContext from './context/OrderContext'
 import { setVariantSkuCodes } from '../reducers/VariantReducer'
 import _ from 'lodash'
+import getCurrentItemKey from '../utils/getCurrentItemKey'
 
 export interface VariantContainerProps {
   children: ReactNode
@@ -27,8 +28,11 @@ export interface VariantContainerProps {
 const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
   const { children, skuCode } = props
   const config = useContext(CommerceLayerContext)
-  const { setCurrentItem, setItems, items } = useContext(OrderContext)
+  const { setCurrentItem, setItems, items, currentItem } = useContext(
+    OrderContext
+  )
   const [state, dispatch] = useReducer(variantReducer, variantInitialState)
+  const sCode = getCurrentItemKey(currentItem) || skuCode || state.skuCode
   const setCurrentQuantity: SetCurrentQuantity = quantity => {
     dispatch({
       type: 'setCurrentQuantity',
@@ -37,45 +41,14 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
   }
   const setSkuCode: SetSkuCodeVariant = (code, id) => {
     if (id) {
-      dispatch({
-        type: 'setSkuCode',
-        payload: { skuCode: code }
-      })
-      dispatch({
-        type: 'setCurrentSkuId',
-        payload: { currentSkuId: id }
-      })
       CLayer.Sku.withCredentials(config)
         .includes('prices')
         .find(id)
         .then(s => {
-          dispatch({
-            type: 'setCurrentSkuInventory',
-            payload: { currentSkuInventory: s.inventory }
-          })
-          dispatch({
-            type: 'setCurrentPrices',
-            payload: { currentPrices: [s] }
+          setCurrentItem({
+            [`${code}`]: s
           })
         })
-    } else {
-      dispatch({
-        type: 'setSkuCode',
-        payload: { skuCode: '' }
-      })
-      dispatch({
-        type: 'setCurrentSkuId',
-        payload: { currentSkuId: '' }
-      })
-      dispatch({
-        type: 'setCurrentSkuInventory',
-        payload: {
-          currentSkuInventory: {
-            available: false,
-            quantity: 0
-          }
-        }
-      })
     }
   }
   if (!_.isEmpty(items) && !_.isEmpty(state.variants)) {
@@ -85,12 +58,6 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
     }
   }
   useEffect(() => {
-    if (skuCode) {
-      dispatch({
-        type: 'setSkuCode',
-        payload: { skuCode: skuCode }
-      })
-    }
     if (state.skuCodes.length >= 1 && config.accessToken) {
       dispatch({
         type: 'setLoading',
@@ -103,6 +70,9 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
         .all()
         .then(r => {
           const skusObj = getSkus(r.toArray())
+          if (skuCode) {
+            setSkuCode(skusObj[skuCode].code, skusObj[skuCode].id)
+          }
           dispatch({
             type: 'setVariants',
             payload: {
@@ -124,7 +94,7 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
     variants: state.variants,
     skuCodes: state.skuCodes,
     currentSkuId: state.currentSkuId,
-    skuCode: state.skuCode || skuCode,
+    skuCode: sCode,
     currentSkuInventory: state.currentSkuInventory,
     currentQuantity: state.currentQuantity,
     currentPrices: state.currentPrices,

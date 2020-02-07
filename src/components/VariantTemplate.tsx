@@ -62,7 +62,9 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
         value={skuCode}
         {...prs}
       >
-        <option>{placeholder}</option>
+        <option selected disabled>
+          {placeholder}
+        </option>
         {vars}
       </select>
     )
