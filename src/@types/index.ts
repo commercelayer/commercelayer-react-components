@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react'
+import { CSSProperties, Dispatch } from 'react'
 
 export interface GeneralComponent {
   id?: string
@@ -14,4 +14,8 @@ export interface GeneralActions {
 
 export interface GeneralReducer<S, A> {
   (state: S, action: A): S
+}
+
+export interface GeneralUnsetState<A> {
+  (dispatch: Dispatch<A>): void
 }

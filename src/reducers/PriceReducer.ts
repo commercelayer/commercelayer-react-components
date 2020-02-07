@@ -3,8 +3,8 @@ import CLayer, { PriceCollection } from '@commercelayer/js-sdk'
 import getPrices from '../utils/getPrices'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import { Dispatch } from 'react'
-import { Items } from './OrderReducer'
 import getSkus from '../utils/getSkus'
+import { Items } from './ItemReducer'
 
 export interface Prices {
   [key: string]: PriceCollection

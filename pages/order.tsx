@@ -26,6 +26,7 @@ import Taxes from '../src/components/Taxes'
 import GiftCard from '../src/components/GiftCard'
 import AvailabilityContainer from '../src/components/AvailabilityContainer'
 import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
+import ItemContainer from '../src/components/ItemContainer'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -63,61 +64,66 @@ export default function Order() {
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer persistKey="orderUS">
-            <div className="md:flex">
-              <div className="md:flex-shrink-0">
-                <img
-                  className="rounded-lg md:w-56"
-                  src="https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90"
-                />
-              </div>
-              <div className="mt-4 md:mt-0 md:ml-6">
-                <h1 className="text-4xl">Tutina da Bambino</h1>
-                <div className="w-auto m-2">
-                  <PriceContainer skuCode="BABYONBU000000E63E746MXX">
-                    <Price
-                      amountClassName="text-green-600 text-2xl m-1"
-                      compareClassName="text-gray-500 text-2xl m-1 line-through"
-                    />
-                  </PriceContainer>
-                </div>
-                <VariantContainer>
-                  <div className="m-2">
-                    <VariantSelector
-                      id="variant-selector"
-                      className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                      name="variant1"
-                      skuCodes={[
-                        { label: '6 months', code: 'BABYONBU000000E63E746MXX' },
-                        {
-                          label: '12 months',
-                          code: 'BABYONBU000000E63E7412MX'
-                        },
-                        {
-                          label: '24 months',
-                          code: 'BABYONBU000000E63E746MXXFAKE'
-                        }
-                      ]}
-                    />
-                  </div>
-                </VariantContainer>
-                <div className="m-2">
-                  <QuantitySelector
-                    id="quantity-selector"
-                    className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            <ItemContainer>
+              <div className="md:flex">
+                <div className="md:flex-shrink-0">
+                  <img
+                    className="rounded-lg md:w-56"
+                    src="https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90"
                   />
                 </div>
-                <div className="m-2">
-                  <AddToCart className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    {CustomAddToCart}
-                  </AddToCart>
-                </div>
-                <div className="m-2">
-                  <AvailabilityContainer>
-                    <AvailabilityTemplate />
-                  </AvailabilityContainer>
+                <div className="mt-4 md:mt-0 md:ml-6">
+                  <h1 className="text-4xl">Tutina da Bambino</h1>
+                  <div className="w-auto m-2">
+                    <PriceContainer skuCode="BABYONBU000000E63E746MXX">
+                      <Price
+                        amountClassName="text-green-600 text-2xl m-1"
+                        compareClassName="text-gray-500 text-2xl m-1 line-through"
+                      />
+                    </PriceContainer>
+                  </div>
+                  <VariantContainer>
+                    <div className="m-2">
+                      <VariantSelector
+                        id="variant-selector"
+                        className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                        name="variant1"
+                        skuCodes={[
+                          {
+                            label: '6 months',
+                            code: 'BABYONBU000000E63E746MXX'
+                          },
+                          {
+                            label: '12 months',
+                            code: 'BABYONBU000000E63E7412MX'
+                          },
+                          {
+                            label: '24 months',
+                            code: 'BABYONBU000000E63E746MXXFAKE'
+                          }
+                        ]}
+                      />
+                    </div>
+                  </VariantContainer>
+                  <div className="m-2">
+                    <QuantitySelector
+                      id="quantity-selector"
+                      className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    />
+                  </div>
+                  <div className="m-2">
+                    <AddToCart className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                      {CustomAddToCart}
+                    </AddToCart>
+                  </div>
+                  <div className="m-2">
+                    <AvailabilityContainer>
+                      <AvailabilityTemplate />
+                    </AvailabilityContainer>
+                  </div>
                 </div>
               </div>
-            </div>
+            </ItemContainer>
             <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
             <p className="text-sm m-2">
               Your shopping bag contains{' '}

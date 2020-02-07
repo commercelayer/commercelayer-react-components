@@ -10,16 +10,11 @@ import CLayer, { OrderCollection } from '@commercelayer/js-sdk'
 import orderReducer, {
   orderInitialState,
   OrderState,
-  createOrder,
-  setCurrentItem
+  createOrder
 } from '../reducers/OrderReducer'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import OrderContext from '../context/OrderContext'
-import {
-  getApiOrder,
-  setSingleQuantity,
-  setItems
-} from '../reducers/OrderReducer'
+import { getApiOrder } from '../reducers/OrderReducer'
 import { AddToCartInterface, unsetOrderState } from '../reducers/OrderReducer'
 
 export interface OrderContainerActions {
@@ -88,15 +83,15 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
     order: state.order,
     orderId: state.orderId,
     loading: state.loading,
-    items: state.items,
-    singleQuantity: state.singleQuantity,
-    currentItem: state.currentItem,
-    setSingleQuantity: (code, quantity) =>
-      setSingleQuantity(code, quantity, dispatch),
+    // items: state.items,
+    // singleQuantity: state.singleQuantity,
+    // currentItem: state.currentItem,
+    // setSingleQuantity: (code, quantity) =>
+    //   setSingleQuantity(code, quantity, dispatch),
     addToCart,
-    getOrder,
-    setItems: items => setItems(items, dispatch),
-    setCurrentItem: item => setCurrentItem(item, dispatch)
+    getOrder
+    // setItems: items => setItems(items, dispatch),
+    // setCurrentItem: item => setCurrentItem(item, dispatch)
   }
   return (
     <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>

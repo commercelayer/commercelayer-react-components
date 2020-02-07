@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { SkuCollection } from '@commercelayer/js-sdk'
 import { Prices } from '../reducers/PriceReducer'
-import { Items } from '../reducers/OrderReducer'
+import { Items } from '../reducers/ItemReducer'
 
 const getPrices = (prices: SkuCollection[] | Items): Prices => {
   const obj = {}

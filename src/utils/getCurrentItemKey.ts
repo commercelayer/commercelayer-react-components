@@ -1,5 +1,5 @@
-import { Items } from '../reducers/OrderReducer'
 import _ from 'lodash'
+import { Items } from '../reducers/ItemReducer'
 
 export interface GetCurrentItemKey {
   (item: Items): string

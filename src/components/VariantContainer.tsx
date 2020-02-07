@@ -15,10 +15,10 @@ import variantReducer, {
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import VariantContext from '../context/VariantContext'
 import { SetSkuCodeVariant, VariantState } from '../reducers/VariantReducer'
-import OrderContext from '../context/OrderContext'
 import { setVariantSkuCodes } from '../reducers/VariantReducer'
 import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
+import ItemContext from '../context/ItemContext'
 
 export interface VariantContainerProps {
   children: ReactNode
@@ -28,9 +28,12 @@ export interface VariantContainerProps {
 const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
   const { children, skuCode } = props
   const config = useContext(CommerceLayerContext)
-  const { setCurrentItem, setItems, items, currentItem } = useContext(
-    OrderContext
-  )
+  const {
+    setItem: setCurrentItem,
+    setItems,
+    items,
+    item: currentItem
+  } = useContext(ItemContext)
   const [state, dispatch] = useReducer(variantReducer, variantInitialState)
   const sCode = getCurrentItemKey(currentItem) || skuCode || state.skuCode
   const setCurrentQuantity: SetCurrentQuantity = quantity => {

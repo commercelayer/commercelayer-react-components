@@ -18,8 +18,8 @@ import {
   getSkusPrice
 } from '../reducers/PriceReducer'
 import PriceContext from '../context/PriceContext'
-import OrderContext from '../context/OrderContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
+import ItemContext from '../context/ItemContext'
 
 export interface PriceContainerProps {
   children: ReactNode
@@ -30,9 +30,9 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = props => {
   const { children, skuCode } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
-  const { setItems, items, currentItem } = useContext(OrderContext)
+  const { setItems, items, item: currentItem } = useContext(ItemContext)
+  // const { setItems, items, currentItem } = useContext(OrderContext)
   // TODO: Remove comments
-  // const { currentSkuCode, currentPrices } = useContext(VariantContext)
   if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
   // if (_.indexOf(state.skuCodes, currentSkuCode) === -1 && currentSkuCode)
