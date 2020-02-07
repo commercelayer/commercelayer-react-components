@@ -10,24 +10,29 @@ export interface Items {
   [skuCode: string]: SkuCollection
 }
 
-export interface SetItems {
-  (object: Items, dispatch: Dispatch<ItemActions>)
+export interface ItemQuantity {
+  [skuCode: string]: number
 }
 
-export const setItems: SetItems = (items, dispatch) => {
-  dispatch({
-    type: 'setItems',
-    payload: {
-      items
-    }
-  })
+type ItemParams = {
+  type: ItemActionType
+  key: 'items' | 'item' | 'quantity'
 }
 
-export const setItem: SetItems = (item, dispatch) => {
+export interface SetItemState {
+  (
+    data: Items | ItemQuantity,
+    params: ItemParams,
+    dispatch: Dispatch<ItemActions>
+  )
+}
+
+// TODO: Set to other reducer files
+export const setItemState: SetItemState = (data, params, dispatch) => {
   dispatch({
-    type: 'setItem',
+    type: params.type,
     payload: {
-      item
+      [`${params.key}`]: data
     }
   })
 }
@@ -48,7 +53,7 @@ export const unsetItemState: GeneralUnsetState<ItemActions> = dispatch => {
   dispatch({
     type: 'setQuantity',
     payload: {
-      quantity: 1
+      quantity: {}
     }
   })
 }
@@ -56,10 +61,10 @@ export const unsetItemState: GeneralUnsetState<ItemActions> = dispatch => {
 export interface ItemState {
   items?: Items
   item?: Items
-  quantity?: number
-  setItems?: (items: Items) => SetItems
-  setItem?: (items: Items) => SetItems
-  setQuantity?: any
+  quantity?: ItemQuantity
+  setItems?: (items: Items) => SetItemState
+  setItem?: (item: Items) => SetItemState
+  setQuantity?: (quantity: ItemQuantity) => SetItemState
 }
 
 type ItemActionType = 'setItem' | 'setItems' | 'setQuantity'
@@ -72,7 +77,7 @@ export interface ItemActions extends GeneralActions {
 export const itemInitialState: ItemState = {
   items: {},
   item: {},
-  quantity: 1
+  quantity: {}
 }
 
 const itemReducer: GeneralReducer<ItemState, ItemActions> = (state, action) => {

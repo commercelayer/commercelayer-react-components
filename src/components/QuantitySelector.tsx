@@ -1,9 +1,6 @@
-import React, { FunctionComponent, useContext, useEffect } from 'react'
+import React, { FunctionComponent, useContext } from 'react'
 import { GeneralComponent } from '../@types/index'
 import Parent from './utils/Parent'
-import VariantContext from '../context/VariantContext'
-import OrderContext from '../context/OrderContext'
-import PriceContext from '../context/PriceContext'
 import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
@@ -22,29 +19,15 @@ export interface QuantitySelectorProps extends GeneralComponent {
 
 const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
   const { skuCode, children, min, max, ...p } = props
-  // const {
-  //   skuCode: currentSkuCode,
-  //   currentSkuInventory,
-  //   setCurrentQuantity
-  // } = useContext(VariantContext)
-  // const { prices } = useContext(PriceContext)
-  // const { setSingleQuantity } = useContext(OrderContext)
-  const { item: currentItem } = useContext(ItemContext)
+  const { item: currentItem, setQuantity } = useContext(ItemContext)
   const sCode = skuCode || getCurrentItemKey(currentItem)
   const disabled = !sCode
   const handleChange = (e): void => {
-    const quantity = e.target.value
-    // if (setCurrentQuantity) {
-    //   setCurrentQuantity(quantity)
-    // } else if (skuCode) {
-    //   setSingleQuantity(skuCode, quantity)
-    // }
+    const quantity = Number(e.target.value)
+    if (sCode) {
+      setQuantity({ [`${sCode}`]: quantity })
+    }
   }
-  useEffect(() => {
-    // if (skuCode && !setCurrentQuantity) {
-    //   setSingleQuantity(skuCode, min)
-    // }
-  }, [])
   const inventory = _.isEmpty(currentItem)
     ? 50
     : currentItem[sCode]?.inventory?.quantity

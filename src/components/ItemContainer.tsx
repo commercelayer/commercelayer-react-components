@@ -2,8 +2,7 @@ import React, { FunctionComponent, ReactNode, useReducer } from 'react'
 import ItemContext from '../context/ItemContext'
 import itemReducer, {
   itemInitialState,
-  setItems,
-  setItem
+  setItemState
 } from '../reducers/ItemReducer'
 import { ItemState } from '../reducers/ItemReducer'
 
@@ -18,8 +17,12 @@ const ItemContainer: FunctionComponent<ItemContainerProps> = props => {
     item: state.item,
     items: state.items,
     quantity: state.quantity,
-    setItems: items => setItems(items, dispatch),
-    setItem: item => setItem(item, dispatch)
+    setItems: items =>
+      setItemState(items, { type: 'setItems', key: 'items' }, dispatch),
+    setItem: item =>
+      setItemState(item, { type: 'setItem', key: 'item' }, dispatch),
+    setQuantity: item =>
+      setItemState(item, { type: 'setQuantity', key: 'quantity' }, dispatch)
   }
   return (
     <ItemContext.Provider value={itemValue}>{children}</ItemContext.Provider>

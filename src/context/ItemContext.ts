@@ -4,7 +4,7 @@ import { ItemState } from '../reducers/ItemReducer'
 const initial: ItemState = {
   item: {},
   items: {},
-  quantity: 0
+  quantity: {}
 }
 
 const ItemContext = createContext(initial)
