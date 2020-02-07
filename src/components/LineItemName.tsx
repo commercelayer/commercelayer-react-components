@@ -1,5 +1,5 @@
 import React, { useContext, FunctionComponent } from 'react'
-import LineItemChildrenContext from './context/LineItemChildrenContext'
+import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import Parent from './utils/Parent'
 import { GeneralComponent } from '../@types'
 import { LineItemCollection } from '@commercelayer/js-sdk'

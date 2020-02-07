@@ -1,7 +1,7 @@
 import React, { FunctionComponent, ReactNode, useState, useEffect } from 'react'
 // import { initCLayer } from '@commercelayer/js-sdk'
-import CommerceLayerContext from './context/CommerceLayerContext'
-import { CommerceLayerConfig } from './context/CommerceLayerContext'
+import CommerceLayerContext from '../context/CommerceLayerContext'
+import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 
 export interface CommerceLayerProps extends CommerceLayerConfig {
   children: ReactNode

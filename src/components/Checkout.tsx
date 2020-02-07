@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useContext } from 'react'
 import { GeneralComponent } from '../@types/index'
-import OrderContext from './context/OrderContext'
+import OrderContext from '../context/OrderContext'
 
 export interface CheckoutProps extends GeneralComponent {
   label?: string

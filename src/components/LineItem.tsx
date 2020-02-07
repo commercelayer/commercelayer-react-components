@@ -4,8 +4,8 @@ import React, {
   useContext,
   ReactNode
 } from 'react'
-import LineItemContext from './context/LineItemContext'
-import LineItemChildrenContext from './context/LineItemChildrenContext'
+import LineItemContext from '../context/LineItemContext'
+import LineItemChildrenContext from '../context/LineItemChildrenContext'
 
 export interface LineItemProps {
   children?: ReactNode

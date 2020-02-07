@@ -1,5 +1,5 @@
 import React, { useContext, FunctionComponent } from 'react'
-import AvailabilityContext from './context/AvailabilityContext'
+import AvailabilityContext from '../context/AvailabilityContext'
 import Parent from './utils/Parent'
 import { GeneralComponent } from '../@types/index'
 import _ from 'lodash'

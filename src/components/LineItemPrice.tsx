@@ -5,7 +5,7 @@ import React, {
   useContext
 } from 'react'
 import getAmount from '../utils/getAmount'
-import LineItemChildrenContext from './context/LineItemChildrenContext'
+import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import Parent from './utils/Parent'
 import { GeneralComponent } from '../@types/index'
 

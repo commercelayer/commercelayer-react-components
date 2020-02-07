@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { LineItemState } from '../../reducers/LineItemReducer'
+import { LineItemState } from '../reducers/LineItemReducer'
 
 const initial: LineItemState = {
   lineItems: []

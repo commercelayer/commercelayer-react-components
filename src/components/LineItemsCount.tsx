@@ -6,7 +6,7 @@ import React, {
 } from 'react'
 import { GeneralComponent } from '../@types/index'
 import Parent from './utils/Parent'
-import OrderContext from './context/OrderContext'
+import OrderContext from '../context/OrderContext'
 import getLineItemsCount from '../utils/getLineItemsCount'
 import _ from 'lodash'
 

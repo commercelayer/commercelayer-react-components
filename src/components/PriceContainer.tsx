@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import getPrices from '../utils/getPrices'
 import _ from 'lodash'
-import CommerceLayerContext from './context/CommerceLayerContext'
+import CommerceLayerContext from '../context/CommerceLayerContext'
 import priceReducer, {
   SetSkuCodesPrice,
   unsetPriceState
@@ -17,8 +17,8 @@ import {
   PriceState,
   getSkusPrice
 } from '../reducers/PriceReducer'
-import PriceContext from './context/PriceContext'
-import OrderContext from './context/OrderContext'
+import PriceContext from '../context/PriceContext'
+import OrderContext from '../context/OrderContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 
 export interface PriceContainerProps {

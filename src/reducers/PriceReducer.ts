@@ -1,7 +1,7 @@
 import { GeneralReducer, GeneralActions } from '../@types/index'
 import CLayer, { PriceCollection } from '@commercelayer/js-sdk'
 import getPrices from '../utils/getPrices'
-import { CommerceLayerConfig } from '../components/context/CommerceLayerContext'
+import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import { Dispatch } from 'react'
 import { Items } from './OrderReducer'
 import getSkus from '../utils/getSkus'

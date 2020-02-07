@@ -5,11 +5,11 @@ import React, {
   FunctionComponent,
   useEffect
 } from 'react'
-import VariantContext from './context/VariantContext'
+import VariantContext from '../context/VariantContext'
 import availabilityReducer, {
   availabilityInitialState
 } from '../reducers/AvailabilityReducer'
-import AvailabilityContext from './context/AvailabilityContext'
+import AvailabilityContext from '../context/AvailabilityContext'
 import _ from 'lodash'
 
 export interface AvailabilityContainerProps {

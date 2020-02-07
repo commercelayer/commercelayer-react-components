@@ -12,10 +12,10 @@ import variantReducer, {
   SetCurrentQuantity,
   unsetVariantState
 } from '../reducers/VariantReducer'
-import CommerceLayerContext from './context/CommerceLayerContext'
-import VariantContext from './context/VariantContext'
+import CommerceLayerContext from '../context/CommerceLayerContext'
+import VariantContext from '../context/VariantContext'
 import { SetSkuCodeVariant, VariantState } from '../reducers/VariantReducer'
-import OrderContext from './context/OrderContext'
+import OrderContext from '../context/OrderContext'
 import { setVariantSkuCodes } from '../reducers/VariantReducer'
 import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'

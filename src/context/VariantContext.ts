@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { VariantState } from '../../reducers/VariantReducer'
+import { VariantState } from '../reducers/VariantReducer'
 
 const initial: VariantState = {
   loading: false,

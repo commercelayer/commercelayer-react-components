@@ -1,10 +1,11 @@
 import React, { FunctionComponent, useContext, useEffect } from 'react'
 import { GeneralComponent } from '../@types/index'
 import Parent from './utils/Parent'
-import VariantContext from './context/VariantContext'
-import OrderContext from './context/OrderContext'
-import PriceContext from './context/PriceContext'
+import VariantContext from '../context/VariantContext'
+import OrderContext from '../context/OrderContext'
+import PriceContext from '../context/PriceContext'
 import _ from 'lodash'
+import getCurrentItemKey from '../utils/getCurrentItemKey'
 
 export interface QuantitySelectorProps extends GeneralComponent {
   min?: number
@@ -20,29 +21,32 @@ export interface QuantitySelectorProps extends GeneralComponent {
 
 const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
   const { skuCode, children, min, max, ...p } = props
-  const {
-    skuCode: currentSkuCode,
-    currentSkuInventory,
-    setCurrentQuantity
-  } = useContext(VariantContext)
-  const { prices } = useContext(PriceContext)
-  const { setSingleQuantity } = useContext(OrderContext)
-  const sCode = !_.isEmpty(prices) ? prices[skuCode] : skuCode || currentSkuCode
+  // const {
+  //   skuCode: currentSkuCode,
+  //   currentSkuInventory,
+  //   setCurrentQuantity
+  // } = useContext(VariantContext)
+  // const { prices } = useContext(PriceContext)
+  const { setSingleQuantity, currentItem } = useContext(OrderContext)
+  const sCode = skuCode || getCurrentItemKey(currentItem)
   const disabled = !sCode
   const handleChange = (e): void => {
     const quantity = e.target.value
-    if (setCurrentQuantity) {
-      setCurrentQuantity(quantity)
-    } else if (skuCode) {
-      setSingleQuantity(skuCode, quantity)
-    }
+    // if (setCurrentQuantity) {
+    //   setCurrentQuantity(quantity)
+    // } else if (skuCode) {
+    //   setSingleQuantity(skuCode, quantity)
+    // }
   }
   useEffect(() => {
-    if (skuCode && !setCurrentQuantity) {
-      setSingleQuantity(skuCode, min)
-    }
+    // if (skuCode && !setCurrentQuantity) {
+    //   setSingleQuantity(skuCode, min)
+    // }
   }, [])
-  const maxInv = max || currentSkuInventory.quantity || 50
+  const inventory = _.isEmpty(currentItem)
+    ? 50
+    : currentItem[sCode]?.inventory?.quantity
+  const maxInv = max || inventory
   const parentProps = {
     min,
     max: maxInv,

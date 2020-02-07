@@ -6,7 +6,7 @@ import CLayer, {
 } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import { setLocalOrder } from '../utils/localStorage'
-import { CommerceLayerConfig } from '../components/context/CommerceLayerContext'
+import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 
 export interface GetOrder {
   (
@@ -130,6 +130,12 @@ export const unsetOrderState: UnsetOrderState = dispatch => {
     type: 'setOrderId',
     payload: {
       orderId: ''
+    }
+  })
+  dispatch({
+    type: 'setOrder',
+    payload: {
+      order: null
     }
   })
 }

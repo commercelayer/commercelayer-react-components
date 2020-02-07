@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import VariantTemplate from './VariantTemplate'
 import Parent from './utils/Parent'
-import VariantContext from './context/VariantContext'
+import VariantContext from '../context/VariantContext'
 import { GeneralComponent } from '../@types/index'
 
 export interface SkuCodePropObj {
@@ -43,7 +43,7 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = props => {
       setSkuCodes([])
     }
   }, [skuCodes])
-  const sCode = variantSkuCode || skuCode
+  const sCode = variantSkuCode || skuCode || ''
   const DefaultTemplate = (): ReactElement =>
     loading ? (
       <Fragment>{props.loader || 'Loading...'}</Fragment>

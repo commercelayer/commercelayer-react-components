@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { PriceState } from '../../reducers/PriceReducer'
+import { PriceState } from '../reducers/PriceReducer'
 
 const initial: PriceState = {
   loading: false,

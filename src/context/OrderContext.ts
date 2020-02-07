@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { OrderState } from '../../reducers/OrderReducer'
+import { OrderState } from '../reducers/OrderReducer'
 
 const initial: OrderState = {
   loading: false,

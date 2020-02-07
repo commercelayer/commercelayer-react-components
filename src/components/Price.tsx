@@ -8,7 +8,7 @@ import React, {
 } from 'react'
 import _ from 'lodash'
 import Parent from './utils/Parent'
-import PriceContext from './context/PriceContext'
+import PriceContext from '../context/PriceContext'
 
 export interface PriceProps {
   children?: FunctionComponent

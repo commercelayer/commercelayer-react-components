@@ -2,7 +2,7 @@ import React, { FunctionComponent, useContext } from 'react'
 import { GeneralComponent } from '../@types/index'
 import { LineItemCollection } from '@commercelayer/js-sdk/dist/LineItem'
 import Parent from './utils/Parent'
-import LineItemChildrenContext from './context/LineItemChildrenContext'
+import LineItemChildrenContext from '../context/LineItemChildrenContext'
 
 export interface LineItemImageProps extends GeneralComponent {
   width?: number

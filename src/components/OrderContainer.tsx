@@ -13,8 +13,8 @@ import orderReducer, {
   createOrder,
   setCurrentItem
 } from '../reducers/OrderReducer'
-import CommerceLayerContext from './context/CommerceLayerContext'
-import OrderContext from './context/OrderContext'
+import CommerceLayerContext from '../context/CommerceLayerContext'
+import OrderContext from '../context/OrderContext'
 import {
   getApiOrder,
   setSingleQuantity,
@@ -51,7 +51,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
   ) => {
     const id = await addOrder()
     if (id) {
-      const order = CLayer.Order.withCredentials(config).build({ id })
+      const order = CLayer.Order.build({ id })
       const attrs = {
         order,
         skuCode,
@@ -60,7 +60,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
         _update_quantity: 1
       }
       if (skuId) {
-        attrs['item'] = CLayer.Sku.withCredentials(config).build({ id: skuId })
+        attrs['item'] = CLayer.Sku.build({ id: skuId })
       }
       CLayer.LineItem.withCredentials(config)
         .create(attrs)
@@ -83,7 +83,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
       }
     }
     return (): void => unsetOrderState(dispatch)
-  }, [config.accessToken, state.order])
+  }, [config.accessToken])
   const orderValue: OrderState = {
     order: state.order,
     orderId: state.orderId,

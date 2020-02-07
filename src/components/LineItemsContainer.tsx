@@ -11,10 +11,10 @@ import { LineItemProps } from './LineItem'
 import lineItemReducer, {
   lineItemInitialState
 } from '../reducers/LineItemReducer'
-import OrderContext from './context/OrderContext'
-import LineItemContext from './context/LineItemContext'
+import OrderContext from '../context/OrderContext'
+import LineItemContext from '../context/LineItemContext'
 import { UpdateLineItem, DeleteLineItem } from '../reducers/LineItemReducer'
-import CommerceLayerContext from './context/CommerceLayerContext'
+import CommerceLayerContext from '../context/CommerceLayerContext'
 import _ from 'lodash'
 
 export interface LineItemsContainer extends OrderContainerActions {
@@ -26,12 +26,14 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
   const { order, getOrder, orderId } = useContext(OrderContext)
   const [state, dispatch] = useReducer(lineItemReducer, lineItemInitialState)
   const updateLineItem: UpdateLineItem = (lineItemId, quantity = 1) => {
+    // TODO: withCredentials
     const update = LineItem.find(lineItemId).then((lnIt: any) => {
       return lnIt.update({ quantity })
     })
     update.then(() => getOrder(orderId))
   }
   const deleteLineItem: DeleteLineItem = lineItemId => {
+    // TODO: withCredentials
     const deleteItem = LineItem.find(lineItemId).then(lnI => {
       return lnI.destroy()
     })

@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useContext } from 'react'
 import Parent from './utils/Parent'
-import OrderContext from './context/OrderContext'
-import VariantContext from './context/VariantContext'
+import OrderContext from '../context/OrderContext'
+import VariantContext from '../context/VariantContext'
 import { GeneralComponent } from '../@types/index'
-import PriceContext from './context/PriceContext'
+import PriceContext from '../context/PriceContext'
 import _ from 'lodash'
 
 export interface AddToCartProps extends GeneralComponent {

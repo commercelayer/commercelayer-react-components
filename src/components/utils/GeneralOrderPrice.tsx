@@ -1,4 +1,4 @@
-import OrderContext from '../context/OrderContext'
+import OrderContext from '../../context/OrderContext'
 import getAmount from '../../utils/getAmount'
 import Parent from './Parent'
 import React, {

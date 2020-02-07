@@ -1,8 +1,8 @@
 import React, { FunctionComponent, CSSProperties, useContext } from 'react'
 import { LineItemCollection } from '@commercelayer/js-sdk/dist/LineItem'
 import { GeneralComponent } from '../@types/index'
-import LineItemChildrenContext from './context/LineItemChildrenContext'
-import LineItemContext from './context/LineItemContext'
+import LineItemChildrenContext from '../context/LineItemChildrenContext'
+import LineItemContext from '../context/LineItemContext'
 import Parent from './utils/Parent'
 
 export interface LineItemQuantityProps extends GeneralComponent {

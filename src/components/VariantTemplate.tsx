@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { GeneralComponent } from '../@types'
 import { SetSkuCodeVariant } from '../reducers/VariantReducer'
 import { SkuCodePropObj } from './VariantSelector'
+import VariantContainer from './VariantContainer'
 
 export interface VariantTemplateProps extends GeneralComponent {
   variants: object
@@ -62,9 +63,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
         value={skuCode}
         {...prs}
       >
-        <option selected disabled>
-          {placeholder}
-        </option>
+        <option disabled={!!skuCode}>{placeholder}</option>
         {vars}
       </select>
     )
