@@ -23,7 +23,7 @@ const AddToCart: FunctionComponent<AddToCartProps> = props => {
       : skuCode || getCurrentItemKey(item)
   const handleClick = (): void => {
     const qty = quantity[sCode]
-    addToCart(sCode, item[sCode].id, qty)
+    addToCart(sCode, item[sCode]?.id, qty)
   }
   const disabled = !sCode
   const parentProps = {

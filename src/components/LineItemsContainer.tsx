@@ -5,7 +5,7 @@ import React, {
   useReducer,
   useContext
 } from 'react'
-import { LineItem } from '@commercelayer/js-sdk'
+import CLayer, { LineItem } from '@commercelayer/js-sdk'
 import { OrderContainerActions } from './OrderContainer'
 import { LineItemProps } from './LineItem'
 import lineItemReducer, {
@@ -24,19 +24,22 @@ export interface LineItemsContainer extends OrderContainerActions {
 const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
   const { children } = props
   const { order, getOrder, orderId } = useContext(OrderContext)
+  const config = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(lineItemReducer, lineItemInitialState)
   const updateLineItem: UpdateLineItem = (lineItemId, quantity = 1) => {
-    // TODO: withCredentials
-    const update = LineItem.find(lineItemId).then((lnIt: any) => {
-      return lnIt.update({ quantity })
-    })
+    const update = CLayer.LineItem.withCredentials(config)
+      .find(lineItemId)
+      .then((lnIt: any) => {
+        return lnIt.update({ quantity })
+      })
     update.then(() => getOrder(orderId))
   }
   const deleteLineItem: DeleteLineItem = lineItemId => {
-    // TODO: withCredentials
-    const deleteItem = LineItem.find(lineItemId).then(lnI => {
-      return lnI.destroy()
-    })
+    const deleteItem = CLayer.LineItem.withCredentials(config)
+      .find(lineItemId)
+      .then(lnI => {
+        return lnI.destroy()
+      })
     deleteItem.then(() => getOrder(orderId))
   }
   useEffect(() => {

@@ -19,18 +19,19 @@ export interface QuantitySelectorProps extends GeneralComponent {
 
 const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
   const { skuCode, children, min, max, ...p } = props
-  const { item: currentItem, setQuantity } = useContext(ItemContext)
-  const sCode = skuCode || getCurrentItemKey(currentItem)
+  const { item, setQuantity, items, quantity } = useContext(ItemContext)
+  const sCode =
+    !_.isEmpty(items) && skuCode
+      ? items[skuCode]?.code
+      : skuCode || getCurrentItemKey(item)
   const disabled = !sCode
   const handleChange = (e): void => {
-    const quantity = Number(e.target.value)
+    const qty = Number(e.target.value)
     if (sCode) {
-      setQuantity({ [`${sCode}`]: quantity })
+      setQuantity({ ...quantity, [`${sCode}`]: qty })
     }
   }
-  const inventory = _.isEmpty(currentItem)
-    ? 50
-    : currentItem[sCode]?.inventory?.quantity
+  const inventory = _.isEmpty(item) ? 50 : item[sCode]?.inventory?.quantity
   const maxInv = max || inventory
   const parentProps = {
     min,

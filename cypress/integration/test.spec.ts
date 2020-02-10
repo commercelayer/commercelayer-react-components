@@ -37,7 +37,7 @@ Cypress.env('pages').map(page => {
             aliasRoutes[aliasK] = {
               [method]: alias
             }
-            cy.route({ method, url }).as(alias)
+            // cy.route({ method, url }).as(alias)
           })
         })
       } else {
@@ -72,13 +72,13 @@ Cypress.env('pages').map(page => {
       }
     })
     it(page.title, () => {
-      cy.wait(['@accessToken'])
+      // cy.wait(['@accessToken'])
       if (page.typeSelectSku === 'category') {
-        cy.wait('@getPricesCat')
+        // cy.wait('@getPricesCat')
         cy.get('#quantity-selector').as('addToBagQuantity')
         cy.get('#add-to-bag').as('addToBag')
       } else {
-        cy.wait(['@getPrices', '@getSkus'])
+        // cy.wait(['@getPrices', '@getSkus'])
         cy.get('#add-to-bag').as('addToBag')
         cy.get('#quantity-selector').as('addToBagQuantity')
         cy.get('@addToBagQuantity').should('be.disabled')
@@ -104,7 +104,7 @@ Cypress.env('pages').map(page => {
           .should('have.value', 'BABYONBU000000E63E7412MX')
       }
       if (page.typeSelectSku !== 'category') {
-        cy.wait(['@retrieveSku'])
+        // cy.wait(['@retrieveSku'])
       }
       cy.get('@addToBagQuantity').should('not.be.disabled')
       cy.get('@addToBag').should('not.have.attr', 'disabled')
@@ -114,7 +114,7 @@ Cypress.env('pages').map(page => {
 
       cy.get('@addToBag').click()
 
-      cy.wait(['@createOrder', '@createLineItems', '@getOrder'])
+      // cy.wait(['@createOrder', '@createLineItems', '@getOrder'])
       cy.get('#items-count')
         .as('item-count')
         .should('contain.text', '2')
@@ -130,7 +130,7 @@ Cypress.env('pages').map(page => {
 
       // FIXME: Cypress bug
       if (Cypress.env('RECORD')) {
-        cy.wait(['@deleteLineItems', '@getLineItems', '@getOrder'])
+        // cy.wait(['@deleteLineItems', '@getLineItems', '@getOrder'])
         cy.get('@item-count').should('contain.text', '0')
       } else {
         // cy.server({ enable: false })
