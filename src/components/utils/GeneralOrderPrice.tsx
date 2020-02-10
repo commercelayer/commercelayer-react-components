@@ -15,7 +15,7 @@ export interface GeneralOrderPriceProps extends GeneralComponent {
   type: string
   children?: FunctionComponent
 }
-
+// TODO: Change name with Base
 const GeneralOrderPrice: FunctionComponent<GeneralOrderPriceProps> = props => {
   const { format, base, type, ...p } = props
   const { order } = useContext(OrderContext)
