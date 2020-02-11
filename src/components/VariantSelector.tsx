@@ -8,14 +8,14 @@ import React, {
 import VariantTemplate from './VariantTemplate'
 import Parent from './utils/Parent'
 import VariantContext from '../context/VariantContext'
-import { GeneralComponent } from '../@types/index'
+import { BaseComponent } from '../@types/index'
 
 export interface SkuCodePropObj {
   label: string
   code: string
 }
 
-export interface VariantSelectorProps extends GeneralComponent {
+export interface VariantSelectorProps extends BaseComponent {
   skuCodes: SkuCodePropObj[]
   name: string
   children?: FunctionComponent

@@ -1,8 +1,8 @@
 import React, { FunctionComponent, useContext } from 'react'
-import { GeneralComponent } from '../@types/index'
+import { BaseComponent } from '../@types/index'
 import OrderContext from '../context/OrderContext'
 
-export interface CheckoutProps extends GeneralComponent {
+export interface CheckoutProps extends BaseComponent {
   label?: string
 }
 

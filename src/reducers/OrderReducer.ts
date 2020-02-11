@@ -1,4 +1,4 @@
-import { GeneralReducer, GeneralActions } from '../@types/index'
+import { BaseReducer, BaseAction } from '../@types/index'
 import CLayer, {
   OrderCollection
   // Order,
@@ -154,7 +154,7 @@ export interface OrderState {
   // setCurrentItem?: (items: Items) => SetItems
 }
 
-export interface OrderActions extends GeneralActions {
+export interface OrderActions extends BaseAction {
   type:
     | 'setLoading'
     | 'setOrderId'
@@ -171,10 +171,7 @@ export const orderInitialState: OrderState = {
   // items: {}
 }
 
-const orderReducer: GeneralReducer<OrderState, OrderActions> = (
-  state,
-  action
-) => {
+const orderReducer: BaseReducer<OrderState, OrderActions> = (state, action) => {
   const actions = [
     'setLoading',
     'setOrderId',

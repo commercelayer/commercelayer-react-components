@@ -1,14 +1,14 @@
 import React, { FunctionComponent } from 'react'
-import { GeneralComponent } from '../@types/index'
-import GeneralOrderPrice from './utils/GeneralOrderPrice'
+import { BaseComponent } from '../@types/index'
+import BaseOrderPrice from './utils/BaseOrderPrice'
 
-export interface TaxAmountProps extends GeneralComponent {
+export interface TaxAmountProps extends BaseComponent {
   format?: 'formatted' | 'cents' | 'float'
   children?: FunctionComponent
 }
 
 const Taxes: FunctionComponent<TaxAmountProps> = props => {
-  return <GeneralOrderPrice base="amount" type="totalTax" {...props} />
+  return <BaseOrderPrice base="amount" type="totalTax" {...props} />
 }
 
 export default Taxes

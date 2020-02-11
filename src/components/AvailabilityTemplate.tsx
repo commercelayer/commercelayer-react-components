@@ -1,10 +1,10 @@
 import React, { useContext, FunctionComponent } from 'react'
 import AvailabilityContext from '../context/AvailabilityContext'
 import Parent from './utils/Parent'
-import { GeneralComponent } from '../@types/index'
+import { BaseComponent } from '../@types/index'
 import _ from 'lodash'
 
-export interface AvailabilityTemplateProps extends GeneralComponent {
+export interface AvailabilityTemplateProps extends BaseComponent {
   children?: FunctionComponent
   timeFormat?: 'days' | 'hours'
   showShippingMethodName?: boolean

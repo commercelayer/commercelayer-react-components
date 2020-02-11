@@ -7,16 +7,16 @@ import React, {
   useEffect,
   useContext
 } from 'react'
-import { GeneralComponent } from '../../@types'
+import { BaseComponent } from '../../@types'
 
-export interface GeneralOrderPriceProps extends GeneralComponent {
+export interface BaseOrderPriceProps extends BaseComponent {
   format?: 'formatted' | 'cents' | 'float'
   base: string
   type: string
   children?: FunctionComponent
 }
 // TODO: Change name with Base
-const GeneralOrderPrice: FunctionComponent<GeneralOrderPriceProps> = props => {
+const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = props => {
   const { format, base, type, ...p } = props
   const { order } = useContext(OrderContext)
   const [price, setPrice] = useState(null)
@@ -37,8 +37,8 @@ const GeneralOrderPrice: FunctionComponent<GeneralOrderPriceProps> = props => {
   )
 }
 
-GeneralOrderPrice.defaultProps = {
+BaseOrderPrice.defaultProps = {
   format: 'formatted'
 }
 
-export default GeneralOrderPrice
+export default BaseOrderPrice

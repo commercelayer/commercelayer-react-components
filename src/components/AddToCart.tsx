@@ -1,12 +1,12 @@
 import React, { FunctionComponent, useContext } from 'react'
 import Parent from './utils/Parent'
 import OrderContext from '../context/OrderContext'
-import { GeneralComponent } from '../@types/index'
+import { BaseComponent } from '../@types/index'
 import _ from 'lodash'
 import ItemContext from '../context/ItemContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 
-export interface AddToCartProps extends GeneralComponent {
+export interface AddToCartProps extends BaseComponent {
   label?: string
   disabled?: boolean
   skuCode?: string

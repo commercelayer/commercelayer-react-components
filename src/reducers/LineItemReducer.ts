@@ -1,5 +1,5 @@
 import { LineItemCollection } from '@commercelayer/js-sdk'
-import { GeneralReducer } from '../@types/index'
+import { BaseReducer } from '../@types/index'
 
 export interface UpdateLineItem {
   (lineItemId: string, quantity: number): void
@@ -24,7 +24,7 @@ export const lineItemInitialState: LineItemState = {
   lineItems: []
 }
 
-const lineItemReducer: GeneralReducer<LineItemState, LineItemActions> = (
+const lineItemReducer: BaseReducer<LineItemState, LineItemActions> = (
   state,
   action
 ) => {

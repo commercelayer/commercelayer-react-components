@@ -1,8 +1,4 @@
-import {
-  GeneralReducer,
-  GeneralActions,
-  GeneralUnsetState
-} from '../@types/index'
+import { BaseReducer, BaseAction, BaseUnsetState } from '../@types/index'
 import { SkuCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 
@@ -37,7 +33,7 @@ export const setItemState: SetItemState = (data, params, dispatch) => {
   })
 }
 
-export const unsetItemState: GeneralUnsetState<ItemActions> = dispatch => {
+export const unsetItemState: BaseUnsetState<ItemActions> = dispatch => {
   dispatch({
     type: 'setItem',
     payload: {
@@ -69,7 +65,7 @@ export interface ItemState {
 
 type ItemActionType = 'setItem' | 'setItems' | 'setQuantity'
 
-export interface ItemActions extends GeneralActions {
+export interface ItemActions extends BaseAction {
   type: ItemActionType
   payload: ItemState
 }
@@ -80,7 +76,7 @@ export const itemInitialState: ItemState = {
   quantity: {}
 }
 
-const itemReducer: GeneralReducer<ItemState, ItemActions> = (state, action) => {
+const itemReducer: BaseReducer<ItemState, ItemActions> = (state, action) => {
   const actions: ItemActionType[] = ['setItem', 'setItems', 'setQuantity']
   if (actions.indexOf(action.type) !== -1) {
     const data = action.payload

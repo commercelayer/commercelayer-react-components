@@ -4,13 +4,13 @@ import React, {
   useState,
   useEffect
 } from 'react'
-import { GeneralComponent } from '../@types/index'
+import { BaseComponent } from '../@types/index'
 import Parent from './utils/Parent'
 import OrderContext from '../context/OrderContext'
 import getLineItemsCount from '../utils/getLineItemsCount'
 import _ from 'lodash'
 
-export interface LineItemsCountProps extends GeneralComponent {
+export interface LineItemsCountProps extends BaseComponent {
   children?: FunctionComponent
 }
 

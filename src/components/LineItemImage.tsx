@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useContext } from 'react'
-import { GeneralComponent } from '../@types/index'
+import { BaseComponent } from '../@types/index'
 import { LineItemCollection } from '@commercelayer/js-sdk/dist/LineItem'
 import Parent from './utils/Parent'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 
-export interface LineItemImageProps extends GeneralComponent {
+export interface LineItemImageProps extends BaseComponent {
   width?: number
   src?: string
   lineItem?: LineItemCollection

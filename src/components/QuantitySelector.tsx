@@ -1,11 +1,11 @@
 import React, { FunctionComponent, useContext } from 'react'
-import { GeneralComponent } from '../@types/index'
+import { BaseComponent } from '../@types/index'
 import Parent from './utils/Parent'
 import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
 
-export interface QuantitySelectorProps extends GeneralComponent {
+export interface QuantitySelectorProps extends BaseComponent {
   min?: number
   max?: number
   defaultValue?: number

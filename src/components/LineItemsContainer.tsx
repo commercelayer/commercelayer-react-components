@@ -5,7 +5,7 @@ import React, {
   useReducer,
   useContext
 } from 'react'
-import CLayer, { LineItem } from '@commercelayer/js-sdk'
+import CLayer from '@commercelayer/js-sdk'
 import { OrderContainerActions } from './OrderContainer'
 import { LineItemProps } from './LineItem'
 import lineItemReducer, {
@@ -29,7 +29,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
   const updateLineItem: UpdateLineItem = (lineItemId, quantity = 1) => {
     const update = CLayer.LineItem.withCredentials(config)
       .find(lineItemId)
-      .then((lnIt: any) => {
+      .then(lnIt => {
         return lnIt.update({ quantity })
       })
     update.then(() => getOrder(orderId))

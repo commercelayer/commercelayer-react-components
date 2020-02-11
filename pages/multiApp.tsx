@@ -26,7 +26,7 @@ import Total from '../src/components/Total'
 import Discount from '../src/components/Discount'
 import Shipping from '../src/components/Shipping'
 import Taxes from '../src/components/Taxes'
-import GiftCard from '../src/components/GiftCard'
+import GiftCard from '../src/components/GiftCardPrice'
 import ItemContainer from '../src/components/ItemContainer'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'

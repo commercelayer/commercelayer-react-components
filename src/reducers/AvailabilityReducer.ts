@@ -1,4 +1,4 @@
-import { GeneralReducer, GeneralActions } from '../@types/index'
+import { BaseReducer, BaseAction } from '../@types/index'
 
 export interface LeadTimes {
   hours: number
@@ -20,13 +20,13 @@ export interface AvailabilityState {
   max?: LeadTimes
 }
 
-export interface AvailabilityAction extends GeneralActions {
+export interface AvailabilityAction extends BaseAction {
   type: 'setAvailability'
 }
 
 export const availabilityInitialState: AvailabilityState = {}
 
-const availabilityReducer: GeneralReducer<
+const availabilityReducer: BaseReducer<
   AvailabilityState,
   AvailabilityAction
 > = (state, action) => {

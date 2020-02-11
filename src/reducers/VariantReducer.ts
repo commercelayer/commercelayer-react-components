@@ -1,4 +1,4 @@
-import { GeneralReducer, GeneralActions } from '../@types/index'
+import { BaseReducer, BaseAction } from '../@types/index'
 import { SkuCollection, InventoryCollection } from '@commercelayer/js-sdk'
 import { SkuCodePropObj } from '../components/VariantSelector'
 import { Dispatch } from 'react'
@@ -33,7 +33,7 @@ export interface VariantState {
   setCurrentQuantity?: SetCurrentQuantity
 }
 
-export interface VariantActions extends GeneralActions {
+export interface VariantActions extends BaseAction {
   type:
     | 'setLoading'
     | 'setVariants'
@@ -87,7 +87,7 @@ export const variantInitialState: VariantState = {
   currentPrices: []
 }
 
-const variantReducer: GeneralReducer<VariantState, VariantActions> = (
+const variantReducer: BaseReducer<VariantState, VariantActions> = (
   state,
   action
 ) => {

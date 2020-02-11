@@ -1,11 +1,11 @@
 import React, { Fragment, FunctionComponent } from 'react'
 import _ from 'lodash'
-import { GeneralComponent } from '../@types'
+import { BaseComponent } from '../@types'
 import { SetSkuCodeVariant } from '../reducers/VariantReducer'
 import { SkuCodePropObj } from './VariantSelector'
 import VariantContainer from './VariantContainer'
 
-export interface VariantTemplateProps extends GeneralComponent {
+export interface VariantTemplateProps extends BaseComponent {
   variants: object
   type: string
   placeholder: string
