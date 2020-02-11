@@ -5,7 +5,7 @@
     "alias": "accessToken"
   },
   "getPrices": {
-    "url": "https://the-blue-brand-2.commercelayer.co/api/skus?filter[q][code_in]=BABYONBU000000E63E746MXX&include=prices&page[size]=25",
+    "url": "/api/skus?filter[q][code_in]=BABYONBU000000E63E746MXX&include=prices&page[size]=25",
     "method": "GET",
     "alias": "getPrices"
   },
@@ -15,7 +15,7 @@
     "alias": "getPricesCat"
   },
   "getSkus": {
-    "url": "https://the-blue-brand-2.commercelayer.co/api/skus?filter[q][code_in]=BABYONBU000000E63E746MXX,BABYONBU000000E63E7412MX,BABYONBU000000E63E746MXXFAKE&include=prices&page[size]=25",
+    "url": "/api/skus?filter[q][code_in]=BABYONBU000000E63E746MXX,BABYONBU000000E63E7412MX,BABYONBU000000E63E746MXXFAKE&include=prices&page[size]=25",
     "method": "GET",
     "alias": "getSkus"
   },
@@ -25,12 +25,12 @@
     "alias": "retrieveSku"
   },
   "createOrder": {
-    "url": "/api/orders/",
+    "url": "/api/orders",
     "method": "POST",
     "alias": "createOrder"
   },
   "createLineItems": {
-    "url": "/api/line_items/",
+    "url": "/api/line_items",
     "method": "POST",
     "alias": "createLineItems"
   },
