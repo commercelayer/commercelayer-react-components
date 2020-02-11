@@ -6,6 +6,7 @@
   "scripts": {
     "test:cypress:open": "cypress open",
     "test:cypress:record": "cypress open --env RECORD=1",
+    "test:cypress:clear": "cypress cache clear",
     "dev": "next",
     "build": "next build",
     "start": "next start"
@@ -25,7 +26,7 @@
   },
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
-    "@commercelayer/js-sdk": "^2.2.1",
+    "@commercelayer/js-sdk": "^2.2.2",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
@@ -34,11 +35,11 @@
     "@types/lodash": "^4.14.149",
     "@types/node": "^13.7.0",
     "@types/react": "^16.9.19",
-    "@typescript-eslint/eslint-plugin": "^2.19.0",
-    "@typescript-eslint/parser": "^2.19.0",
+    "@typescript-eslint/eslint-plugin": "^2.19.2",
+    "@typescript-eslint/parser": "^2.19.2",
     "@zeit/next-css": "^1.0.1",
     "autoprefixer": "^9.7.4",
-    "cypress": "^4.0.0",
+    "cypress": "^4.0.1",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-react": "^7.18.3",

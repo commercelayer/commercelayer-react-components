@@ -1,3 +1,5 @@
 node_modules
 .next
 .vscode
+cypress/fixtures/!routes.json
+cypress/fixtures/!fixture.json
