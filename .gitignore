@@ -3,3 +3,4 @@ node_modules
 .vscode
 cypress/fixtures/!routes.json
 cypress/fixtures/!fixture.json
+cypress/fixtures/*.json
