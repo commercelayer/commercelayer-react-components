@@ -30,7 +30,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
     const update = CLayer.LineItem.withCredentials(config)
       .find(lineItemId)
       .then(lnIt => {
-        return lnIt.update({ quantity })
+        return lnIt.withCredentials(config).update({ quantity })
       })
     update.then(() => getOrder(orderId))
   }
@@ -38,7 +38,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
     const deleteItem = CLayer.LineItem.withCredentials(config)
       .find(lineItemId)
       .then(lnI => {
-        return lnI.destroy()
+        return lnI.withCredentials(config).destroy()
       })
     deleteItem.then(() => getOrder(orderId))
   }

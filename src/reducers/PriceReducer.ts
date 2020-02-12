@@ -1,10 +1,11 @@
-import { BaseReducer, BaseAction } from '../@types/index'
+import { BaseAction } from '../@types/index'
 import CLayer, { PriceCollection } from '@commercelayer/js-sdk'
 import getPrices from '../utils/getPrices'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import { Dispatch } from 'react'
 import getSkus from '../utils/getSkus'
 import { Items } from './ItemReducer'
+import baseReducer from '../utils/baseReducer'
 
 export interface Prices {
   [key: string]: PriceCollection
@@ -125,13 +126,15 @@ export const unsetPriceState: UnsetPriceState = dispatch => {
   })
 }
 
-const priceReducer: BaseReducer<PriceState, PriceAction> = (state, action) => {
-  const actions = ['setLoading', 'setPrices', 'setSkuCodes']
-  if (actions.indexOf(action.type) !== -1) {
-    const data = action.payload
-    state = { ...state, ...data }
-  }
-  return state
-}
+export type PriceActionType = 'setLoading' | 'setPrices' | 'setSkuCodes'
+
+const typeAction: PriceActionType[] = ['setLoading', 'setPrices', 'setSkuCodes']
+
+const priceReducer = (state: PriceState, reducer: PriceAction): PriceState =>
+  baseReducer<PriceState, PriceAction, PriceActionType[]>(
+    state,
+    reducer,
+    typeAction
+  )
 
 export default priceReducer

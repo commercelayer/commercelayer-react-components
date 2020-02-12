@@ -1,4 +1,5 @@
 import { BaseReducer, BaseAction } from '../@types/index'
+import baseReducer from '../utils/baseReducer'
 
 export interface LeadTimes {
   hours: number
@@ -26,16 +27,18 @@ export interface AvailabilityAction extends BaseAction {
 
 export const availabilityInitialState: AvailabilityState = {}
 
-const availabilityReducer: BaseReducer<
-  AvailabilityState,
-  AvailabilityAction
-> = (state, action) => {
-  const actions = ['setAvailability']
-  if (actions.indexOf(action.type) !== -1) {
-    const data = action.payload
-    state = { ...state, ...data }
-  }
-  return state
-}
+export type AvailabilityActionType = 'setAvailability'
+
+const typeAction: AvailabilityActionType[] = ['setAvailability']
+
+const availabilityReducer = (
+  state: AvailabilityState,
+  reducer: AvailabilityAction
+): AvailabilityState =>
+  baseReducer<AvailabilityState, AvailabilityAction, AvailabilityActionType[]>(
+    state,
+    reducer,
+    typeAction
+  )
 
 export default availabilityReducer
