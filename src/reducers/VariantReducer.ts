@@ -21,7 +21,7 @@ export interface VariantsObject {
 
 export interface VariantState {
   loading?: boolean
-  variants?: VariantsObject
+  variants?: VariantsObject | object
   skuCodes?: string[]
   skuCode?: string
   currentSkuId?: string

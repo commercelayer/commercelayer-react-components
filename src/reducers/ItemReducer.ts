@@ -1,7 +1,6 @@
-import { BaseReducer, BaseAction, BaseUnsetState } from '../@types/index'
+import { BaseUnsetState } from '../@types/index'
 import { SkuCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
-import { PriceAction } from './PriceReducer'
 import baseReducer from '../utils/baseReducer'
 
 export interface Items {
@@ -60,9 +59,9 @@ export interface ItemState {
   items?: Items
   item?: Items
   quantity?: ItemQuantity
-  setItems?: (items: Items) => SetItemState
-  setItem?: (item: Items) => SetItemState
-  setQuantity?: (quantity: ItemQuantity) => SetItemState
+  setItems?: (items: Items) => void
+  setItem?: (item: Items) => void
+  setQuantity?: (quantity: ItemQuantity) => void
 }
 
 type ItemActionType = 'setItem' | 'setItems' | 'setQuantity'

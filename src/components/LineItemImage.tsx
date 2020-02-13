@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useContext } from 'react'
 import { BaseComponent } from '../@types/index'
-import { LineItemCollection } from '@commercelayer/js-sdk/dist/LineItem'
+import { LineItemCollection } from '@commercelayer/js-sdk'
 import Parent from './utils/Parent'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 

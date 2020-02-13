@@ -1,5 +1,5 @@
-import React, { FunctionComponent, CSSProperties, useContext } from 'react'
-import { LineItemCollection } from '@commercelayer/js-sdk/dist/LineItem'
+import React, { FunctionComponent, useContext } from 'react'
+import { LineItemCollection } from '@commercelayer/js-sdk'
 import { BaseComponent } from '../@types/index'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import LineItemContext from '../context/LineItemContext'
@@ -23,7 +23,7 @@ const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = props => {
       </option>
     )
   }
-  const handleChange = e => {
+  const handleChange = (e): void => {
     const quantity = e.target.value
     updateLineItem(lineItem.id, quantity)
   }
