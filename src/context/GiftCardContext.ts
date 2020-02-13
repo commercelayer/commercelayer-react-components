@@ -1,7 +1,6 @@
 import { createContext } from 'react'
+import { giftCardInitialState } from '../reducers/GiftCardReducer'
 
-const initial = {}
-
-const GiftCardContext = createContext(initial)
+const GiftCardContext = createContext(giftCardInitialState)
 
 export default GiftCardContext
