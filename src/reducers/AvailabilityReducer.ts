@@ -1,4 +1,3 @@
-import { BaseReducer, BaseAction } from '../@types/index'
 import baseReducer from '../utils/baseReducer'
 
 export interface LeadTimes {
@@ -21,8 +20,9 @@ export interface AvailabilityState {
   max?: LeadTimes
 }
 
-export interface AvailabilityAction extends BaseAction {
+export interface AvailabilityAction {
   type: 'setAvailability'
+  payload: AvailabilityState
 }
 
 export const availabilityInitialState: AvailabilityState = {}

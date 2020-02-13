@@ -1,5 +1,5 @@
 import { LineItemCollection } from '@commercelayer/js-sdk'
-import { BaseReducer } from '../@types/index'
+import baseReducer from '../utils/baseReducer'
 
 export interface UpdateLineItem {
   (lineItemId: string, quantity: number): void
@@ -15,23 +15,27 @@ export interface LineItemState {
   deleteLineItem?: DeleteLineItem
 }
 
-export interface LineItemActions {
+export interface LineItemAction {
   type: 'setLineItems'
-  lineItems: LineItemCollection[]
+  payload: LineItemState
 }
 
 export const lineItemInitialState: LineItemState = {
   lineItems: []
 }
 
-const lineItemReducer: BaseReducer<LineItemState, LineItemActions> = (
-  state,
-  action
-) => {
-  if (action.type === 'setLineItems') {
-    state = { ...state, lineItems: action.lineItems }
-  }
-  return state
-}
+export type LineItemActionType = 'setLineItems'
+
+const actionType: LineItemActionType[] = ['setLineItems']
+
+const lineItemReducer = (
+  state: LineItemState,
+  reducer: LineItemAction
+): LineItemState =>
+  baseReducer<LineItemState, LineItemAction, LineItemActionType[]>(
+    state,
+    reducer,
+    actionType
+  )
 
 export default lineItemReducer

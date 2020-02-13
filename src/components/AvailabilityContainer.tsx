@@ -5,7 +5,6 @@ import React, {
   FunctionComponent,
   useEffect
 } from 'react'
-import VariantContext from '../context/VariantContext'
 import availabilityReducer, {
   availabilityInitialState
 } from '../reducers/AvailabilityReducer'

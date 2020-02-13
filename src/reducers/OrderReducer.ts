@@ -1,4 +1,3 @@
-import { BaseAction } from '../@types/index'
 import CLayer, { OrderCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import { setLocalOrder } from '../utils/localStorage'
@@ -84,22 +83,23 @@ export const unsetOrderState: UnsetOrderState = dispatch => {
   })
 }
 
-export interface OrderState {
-  loading: boolean
-  orderId: string
-  order: OrderCollection
+export interface OrderPayload {
+  loading?: boolean
+  orderId?: string
+  order?: OrderCollection
   getOrder?: GetOrder | null
   addToCart?: AddToCartInterface | null
 }
 
-// TODO: Add payload interface with State extends
-export interface OrderActions extends BaseAction {
-  type:
-    | 'setLoading'
-    | 'setOrderId'
-    | 'setOrder'
-    | 'setSingleQuantity'
-    | 'setCurrentItem'
+export interface OrderState extends OrderPayload {
+  loading: boolean
+  orderId: string
+  order: OrderCollection
+}
+
+export interface OrderActions {
+  type: OrderActionType
+  payload: OrderPayload
 }
 
 export const orderInitialState: OrderState = {

@@ -1,4 +1,3 @@
-import { BaseReducer, BaseAction } from '../@types/index'
 import { SkuCollection, InventoryCollection } from '@commercelayer/js-sdk'
 import { SkuCodePropObj } from '../components/VariantSelector'
 import { Dispatch } from 'react'

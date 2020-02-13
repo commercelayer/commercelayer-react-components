@@ -1,6 +1,8 @@
 import { BaseReducer, BaseAction, BaseUnsetState } from '../@types/index'
 import { SkuCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
+import { PriceAction } from './PriceReducer'
+import baseReducer from '../utils/baseReducer'
 
 export interface Items {
   [skuCode: string]: SkuCollection
@@ -19,8 +21,8 @@ export interface SetItemState {
   (
     data: Items | ItemQuantity,
     params: ItemParams,
-    dispatch: Dispatch<ItemActions>
-  )
+    dispatch: Dispatch<ItemAction>
+  ): void
 }
 
 // TODO: Set to other reducer files
@@ -33,7 +35,7 @@ export const setItemState: SetItemState = (data, params, dispatch) => {
   })
 }
 
-export const unsetItemState: BaseUnsetState<ItemActions> = dispatch => {
+export const unsetItemState: BaseUnsetState<ItemAction> = dispatch => {
   dispatch({
     type: 'setItem',
     payload: {
@@ -65,7 +67,9 @@ export interface ItemState {
 
 type ItemActionType = 'setItem' | 'setItems' | 'setQuantity'
 
-export interface ItemActions extends BaseAction {
+const actionType: ItemActionType[] = ['setItem', 'setItems', 'setQuantity']
+
+export interface ItemAction {
   type: ItemActionType
   payload: ItemState
 }
@@ -76,13 +80,11 @@ export const itemInitialState: ItemState = {
   quantity: {}
 }
 
-const itemReducer: BaseReducer<ItemState, ItemActions> = (state, action) => {
-  const actions: ItemActionType[] = ['setItem', 'setItems', 'setQuantity']
-  if (actions.indexOf(action.type) !== -1) {
-    const data = action.payload
-    state = { ...state, ...data }
-  }
-  return state
-}
+const itemReducer = (state: ItemState, reducer: ItemAction): ItemState =>
+  baseReducer<ItemState, ItemAction, ItemActionType[]>(
+    state,
+    reducer,
+    actionType
+  )
 
 export default itemReducer

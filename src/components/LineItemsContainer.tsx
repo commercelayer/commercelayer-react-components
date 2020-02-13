@@ -47,13 +47,13 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
       const lItems = order?.lineItems().toArray()
       dispatch({
         type: 'setLineItems',
-        lineItems: lItems
+        payload: { lineItems: lItems }
       })
     }
     return (): void => {
       dispatch({
         type: 'setLineItems',
-        lineItems: []
+        payload: { lineItems: [] }
       })
     }
   }, [order])
