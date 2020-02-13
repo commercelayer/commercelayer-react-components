@@ -16,6 +16,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/member-delimiter-style': 0,
     'react/prop-types': 0
+    // '@typescript-eslint/no-explicit-any': 0
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
   },
