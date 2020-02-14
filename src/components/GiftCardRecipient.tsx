@@ -1,19 +1,41 @@
-import React, { FunctionComponent, Fragment, ReactNode, useRef } from 'react'
+import React, {
+  FunctionComponent,
+  Fragment,
+  ReactNode,
+  useRef,
+  useContext
+} from 'react'
 import PropTypes from 'prop-types'
+import validateFormFields from '../utils/validateFormFields'
+import _ from 'lodash'
+import GiftCardContext from '../context/GiftCardContext'
+import { GiftCardRecipientI } from '../reducers/GiftCardReducer'
+
+type RequiredFields = 'email'
 
 export interface GiftCardRecipientProps {
   children: ReactNode
   id?: string
   customer?: object // Customer Collection
+  onSubmit?: () => void
 }
 
 const GiftCardRecipient: FunctionComponent<GiftCardRecipientProps> = props => {
   const { children } = props
+  const { addGiftCardRecipient } = useContext(GiftCardContext)
   const name = 'giftCardRecipientForm'
   const ref = useRef(null)
-  const handleSubmit = (): void => {
-    console.log('ref', ref)
-    debugger
+  const handleSubmit = (e): void => {
+    e.preventDefault()
+    const { errors, values } = validateFormFields<RequiredFields[]>(
+      ref.current.elements,
+      ['email']
+    )
+    if (_.isEmpty(errors)) {
+      // TODO: ADD CALLBACK TO MANAGE THE EVENT
+      addGiftCardRecipient(values as GiftCardRecipientI)
+      ref.current.reset()
+    }
   }
   return (
     <Fragment>
