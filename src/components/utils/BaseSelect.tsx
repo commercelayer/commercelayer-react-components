@@ -1,12 +1,11 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { BaseComponent } from '../../@types/index'
 import Parent from './Parent'
 
-interface OptionType {
+export interface OptionType {
   label: string
   value: number | string
-  selected?: boolean
 }
 
 export interface BaseSelectProps extends BaseComponent {
@@ -20,10 +19,14 @@ export interface BaseSelectProps extends BaseComponent {
 
 const BaseSelect: FunctionComponent<BaseSelectProps> = props => {
   const { options, children, placeholder, ...p } = props
-  options.unshift(placeholder)
+  useEffect(() => {
+    if (options.indexOf(placeholder) === -1) {
+      options.unshift(placeholder)
+    }
+  }, [])
   const Options = options.map((o, k) => {
     return (
-      <option selected={o.selected} key={k} value={o.value}>
+      <option key={k} value={o.value}>
         {o.label}
       </option>
     )
@@ -50,17 +53,16 @@ BaseSelect.propTypes = {
   ).isRequired,
   placeholder: PropTypes.exact({
     label: PropTypes.string.isRequired,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    selected: PropTypes.bool
-  })
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
+  }),
+  value: PropTypes.string
 }
 
 BaseSelect.defaultProps = {
   options: [],
   placeholder: {
     label: 'select an option',
-    value: '',
-    selected: true
+    value: ''
   }
 }
 
