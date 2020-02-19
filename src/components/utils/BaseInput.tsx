@@ -3,7 +3,13 @@ import PropTypes from 'prop-types'
 import { BaseComponent } from '../../@types/index'
 import Parent from './Parent'
 
-export type BaseInputType = 'text' | 'email' | 'number' | 'date' | 'checkbox'
+export type BaseInputType =
+  | 'text'
+  | 'email'
+  | 'number'
+  | 'date'
+  | 'checkbox'
+  | 'textarea'
 
 export interface BaseInputProps extends BaseComponent {
   name: string
@@ -13,7 +19,9 @@ export interface BaseInputProps extends BaseComponent {
 
 const BaseInput: FunctionComponent<BaseInputProps> = props => {
   const { children, ...p } = props
-  return children ? <Parent {...p}>{children}</Parent> : <input {...p} />
+  const input =
+    props.type === 'textarea' ? <textarea {...p} /> : <input {...p} />
+  return children ? <Parent {...p}>{children}</Parent> : input
 }
 
 BaseInput.propTypes = {
@@ -23,7 +31,8 @@ BaseInput.propTypes = {
     'email',
     'number',
     'date',
-    'checkbox'
+    'checkbox',
+    'textarea'
   ]).isRequired
 }
 

@@ -11,7 +11,9 @@ type GiftCardInputName =
   | 'imageUrl'
   | 'expiresAt'
   | 'referenceOrigin'
-  | 'recipientEmail'
+  | 'email'
+  | 'firstName'
+  | 'lastName'
   | 'reference'
 
 export interface GiftCardInputProps extends BaseComponent {
@@ -19,6 +21,7 @@ export interface GiftCardInputProps extends BaseComponent {
   name: GiftCardInputName
   children?: FunctionComponent
   placeholder?: string
+  required?: boolean
 }
 
 const GiftCardInput: FunctionComponent<GiftCardInputProps> = props => {
@@ -42,7 +45,9 @@ GiftCardInput.propTypes = {
     'imageUrl',
     'expiresAt',
     'referenceOrigin',
-    'recipientEmail',
+    'email',
+    'firstName',
+    'lastName',
     'reference'
   ]).isRequired,
   children: PropTypes.func,

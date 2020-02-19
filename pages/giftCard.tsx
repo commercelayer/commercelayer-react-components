@@ -9,6 +9,7 @@ import SubmitButton from '../src/components/SubmitButton'
 import GiftCard from '../src/components/GiftCard'
 import GiftCardInput from '../src/components/GiftCardInput'
 import GiftCardCurrencySelector from '../src/components/GiftCardCurrencySelector'
+import MetadataInput from '../src/components/MetadataInput'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -61,36 +62,6 @@ const Home = () => {
         <Title title="Gift Card" />
         <div className="p-2">
           <GiftCardContainer>
-            <h2>GiftCard Recipient</h2>
-            <GiftCardRecipient>
-              <div className="p-2">
-                <GiftCardRecipientInput
-                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  name="email"
-                  type="email"
-                  placeholder="Email"
-                />
-              </div>
-              <div className="p-2">
-                <GiftCardRecipientInput
-                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  name="firstName"
-                  type="text"
-                  placeholder="Firstname"
-                />
-              </div>
-              <div className="p-2">
-                <GiftCardRecipientInput
-                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  name="lastName"
-                  type="text"
-                  placeholder="Lastname"
-                />
-              </div>
-              <div className="p-2">
-                <SubmitButton className="shadow bg-green-500 hover:bg-green-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded" />
-              </div>
-            </GiftCardRecipient>
             <GiftCard>
               <h2>Create a GiftCard</h2>
               <div className="p-2">
@@ -101,7 +72,46 @@ const Home = () => {
                   className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   type="number"
                   name="balanceCents"
-                  placeholder="Insert a number"
+                  placeholder="Amount"
+                />
+              </div>
+              <div className="p-2">
+                <GiftCardInput
+                  className="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  type="checkbox"
+                  name="singleUse"
+                />
+                <span className="ml-2 align-middle">Single use</span>
+              </div>
+              <div className="p-2">
+                <GiftCardInput
+                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  type="text"
+                  name="email"
+                  placeholder="Email"
+                />
+              </div>
+              <div className="p-2">
+                <GiftCardInput
+                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  type="text"
+                  name="firstName"
+                  placeholder="First name"
+                />
+              </div>
+              <div className="p-2">
+                <GiftCardInput
+                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  type="text"
+                  name="lastName"
+                  placeholder="Last name"
+                />
+              </div>
+              <div className="p-2">
+                <MetadataInput
+                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  type="textarea"
+                  name="message"
                 />
               </div>
               <div className="p-2">

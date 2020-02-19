@@ -10,7 +10,8 @@ import CommerceLayerContext from '../context/CommerceLayerContext'
 import giftCardReducer, {
   GiftCardState,
   giftCardInitialState,
-  addGiftCardRecipient
+  addGiftCardRecipient,
+  addGiftCard
 } from '../reducers/GiftCardReducer'
 
 export interface GiftCardContainer {
@@ -24,6 +25,7 @@ const GiftCardContainer: FunctionComponent<GiftCardContainer> = props => {
   const giftCardValue: GiftCardState = {
     addGiftCardRecipient: values =>
       addGiftCardRecipient(values, config, dispatch),
+    addGiftCard: values => addGiftCard(values, config, dispatch),
     ...state
   }
   return (

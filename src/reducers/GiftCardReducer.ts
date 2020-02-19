@@ -1,5 +1,5 @@
 import baseReducer from '../utils/baseReducer'
-import { CustomerCollection } from '@commercelayer/js-sdk/dist/resources/Customer'
+import { CustomerCollection } from '@commercelayer/js-sdk'
 import { BaseMetadata } from '../@types'
 import CLayer, {
   MarketCollection,
@@ -7,6 +7,7 @@ import CLayer, {
 } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
+import _ from 'lodash'
 
 export type GiftCardActionType = 'setAvailability' | 'setGiftCardRecipient'
 
@@ -28,6 +29,9 @@ export interface GiftCardI {
   rechargeable?: boolean
   imageUrl?: string
   expiresAt?: null | Date
+  firstName?: string
+  lastName?: string
+  email?: string
   referenceOrigin?: string
   recipientEmail?: string
   reference?: string
@@ -43,6 +47,7 @@ export interface GiftCardState extends GiftCardActionPayload {
   currencyCode: string
   balanceCent: number
   addGiftCardRecipient?: (values: GiftCardRecipientI & object) => void
+  addGiftCard?: (values: GiftCardI & object) => void
 }
 
 export interface GiftCardAction {
@@ -83,7 +88,6 @@ export const addGiftCardRecipient: AddGiftCardRecipient = async (
     const recipient = await CLayer.GiftCardRecipient.withCredentials(
       config
     ).create(values)
-    debugger
     dispatch({
       type: 'setGiftCardRecipient',
       payload: {
@@ -97,11 +101,27 @@ export const addGiftCardRecipient: AddGiftCardRecipient = async (
 
 export const addGiftCard: AddGiftCard = async (values, config, dispatch) => {
   try {
-    await CLayer.GiftCard.withCredentials(config).create(values)
+    const { firstName, lastName, email, ...val } = values
+    const giftCardValue = {
+      recipientEmail: email,
+      ...val
+    } as GiftCardI
+    const recipientValues = {}
+    const giftCard = await CLayer.GiftCard.withCredentials(config)
+      .includes('giftCardRecipient')
+      .create(giftCardValue)
+    if (firstName) recipientValues['firstName'] = firstName
+    if (lastName) recipientValues['lastName'] = lastName
+    if (!_.isEmpty(recipientValues)) {
+      await giftCard
+        .withCredentials(config)
+        .giftCardRecipient()
+        .update(recipientValues)
+    }
     dispatch({
       type: 'setGiftCardRecipient',
       payload: {
-        ...values
+        ...giftCardValue
       }
     })
   } catch (error) {

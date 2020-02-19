@@ -20,7 +20,7 @@ export interface ValidateFormFields {
 }
 
 export interface ValidateValue {
-  <V extends string, N extends string, T extends string>(
+  <V extends string | boolean, N extends string, T extends string>(
     val: V,
     name: N,
     type: T
@@ -36,7 +36,7 @@ export const validateValue: ValidateValue = (val, name, type) => {
       }
     }
   }
-  if (type === 'email' && !val.match(EMAIL_PATTERN)) {
+  if (type === 'email' && _.isString(val) && !val.match(EMAIL_PATTERN)) {
     return {
       [`${name}`]: {
         code: 'INVALID_FORMAT',
@@ -48,14 +48,22 @@ export const validateValue: ValidateValue = (val, name, type) => {
 
 const validateFormFields: ValidateFormFields = (fields, required) => {
   let errors = {}
-  let values = {}
+  let values = { metadata: {} }
   _.map(fields, (v: FormField) => {
+    const isTick = !!v['checked']
+    const val = isTick ? isTick : v.value
     if (required.indexOf(v.getAttribute('name')) !== -1 || v.required) {
-      errors = { ...validateValue(v.value, v.name, v.type) }
-      values = { ...values, [`${v.name}`]: v.value }
+      errors = { ...validateValue(val, v.name, v.type) }
+      values = { ...values, [`${v.name}`]: val }
     }
     if (v.getAttribute('name')) {
-      values = { ...values, [`${v.name}`]: v.value }
+      const isMetadata = !!v.getAttribute('data-metadata')
+      values = isMetadata
+        ? {
+            ...values,
+            metadata: { ...values.metadata, [`${v.name}`]: val }
+          }
+        : { ...values, [`${v.name}`]: val }
     }
   })
   return { errors, values }
