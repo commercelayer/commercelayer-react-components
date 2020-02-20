@@ -23,16 +23,19 @@ const GiftCard: FunctionComponent<GiftCardProps> = props => {
   const { children } = props
   const name = 'giftCardForm'
   const ref = useRef(null)
-  const { addGiftCard } = useContext(GiftCardContext)
+  const { addGiftCard, addGiftCardError } = useContext(GiftCardContext)
   const handleSubmit = (e): void => {
     e.preventDefault()
     const { errors, values } = validateFormFields<RequiredFields[]>(
       ref.current.elements,
-      ['currencyCode', 'balanceCents']
+      ['currencyCode', 'balanceCents'],
+      'giftCard'
     )
     if (_.isEmpty(errors)) {
       addGiftCard(values as GiftCardI)
       ref.current.reset()
+    } else {
+      addGiftCardError(errors)
     }
     console.log('errors', errors)
   }

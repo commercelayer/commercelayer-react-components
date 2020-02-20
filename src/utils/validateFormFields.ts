@@ -1,59 +1,66 @@
 import _ from 'lodash'
 import { BaseState } from '../@types/index'
+import { BaseErrorType, BaseError } from '../components/Errors'
 
 const EMAIL_PATTERN = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/
 
 type FormField = HTMLInputElement | HTMLSelectElement
 
-export interface ErrorsObj {
-  [key: string]: {
-    code: string
-    title: string
-  }
-}
-
 export interface ValidateFormFields {
-  <R extends string[]>(fields: HTMLFormControlsCollection, required: R): {
-    errors: ErrorsObj
+  <R extends string[]>(
+    fields: HTMLFormControlsCollection,
+    required: R,
+    base: BaseErrorType
+  ): {
+    errors: BaseError[]
     values: BaseState
   }
 }
 
 export interface ValidateValue {
-  <V extends string | boolean, N extends string, T extends string>(
+  <
+    V extends string | boolean,
+    N extends string,
+    T extends string,
+    B extends BaseErrorType
+  >(
     val: V,
     name: N,
-    type: T
-  ): ErrorsObj
+    type: T,
+    base: B
+  ): BaseError
 }
 
-export const validateValue: ValidateValue = (val, name, type) => {
+export const validateValue: ValidateValue = (val, name, type, base) => {
   if (!val) {
     return {
-      [`${name}`]: {
-        code: 'EMPTY_FIELD',
-        title: 'Field is required'
-      }
+      field: name,
+      code: 'VALIDATION_ERROR',
+      message: `${name} - is required`,
+      base
     }
   }
   if (type === 'email' && _.isString(val) && !val.match(EMAIL_PATTERN)) {
     return {
-      [`${name}`]: {
-        code: 'INVALID_FORMAT',
-        title: 'Invalid format'
-      }
+      field: name,
+      code: 'VALIDATION_ERROR',
+      message: `${name} - is not valid`,
+      base
     }
   }
 }
 
-const validateFormFields: ValidateFormFields = (fields, required) => {
-  let errors = {}
+const validateFormFields: ValidateFormFields = (fields, required, base) => {
+  const errors = []
   let values = { metadata: {} }
   _.map(fields, (v: FormField) => {
     const isTick = !!v['checked']
     const val = isTick ? isTick : v.value
     if (required.indexOf(v.getAttribute('name')) !== -1 || v.required) {
-      errors = { ...validateValue(val, v.name, v.type) }
+      const error = validateValue(val, v.name, v.type, base)
+      if (!_.isEmpty(error)) {
+        errors.push(error)
+      }
       values = { ...values, [`${v.name}`]: val }
     }
     if (v.getAttribute('name')) {

@@ -8,8 +8,13 @@ import CLayer, {
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import _ from 'lodash'
+import { BaseError } from '../components/Errors'
 
-export type GiftCardActionType = 'setAvailability' | 'setGiftCardRecipient'
+export type GiftCardActionType =
+  | 'setAvailability'
+  | 'setGiftCardRecipient'
+  | 'setGiftCardErrors'
+  | 'setGiftCardLoading'
 
 export interface GiftCardRecipientI {
   email: string
@@ -41,6 +46,8 @@ export interface GiftCardI {
 export interface GiftCardActionPayload extends GiftCardI {
   market?: MarketCollection
   giftCardRecipient?: GiftCardRecipientCollection
+  errors?: BaseError[]
+  loading?: boolean
 }
 
 export interface GiftCardState extends GiftCardActionPayload {
@@ -48,6 +55,8 @@ export interface GiftCardState extends GiftCardActionPayload {
   balanceCent: number
   addGiftCardRecipient?: (values: GiftCardRecipientI & object) => void
   addGiftCard?: (values: GiftCardI & object) => void
+  addGiftCardError?: (errors: BaseError[]) => void
+  addGiftCardLoading?: (loading: boolean) => void
 }
 
 export interface GiftCardAction {
@@ -60,7 +69,9 @@ export const giftCardInitialState: GiftCardState = {
   balanceCent: 0,
   singleUse: false,
   rechargeable: true,
-  expiresAt: null
+  loading: false,
+  expiresAt: null,
+  errors: []
 }
 
 export interface AddGiftCardRecipient {
@@ -77,6 +88,14 @@ export interface AddGiftCard {
     config: CommerceLayerConfig,
     dispatch: Dispatch<GiftCardAction>
   ): void
+}
+
+export interface AddGiftCardError {
+  <V extends BaseError[]>(errors: V, dispatch: Dispatch<GiftCardAction>): void
+}
+
+export interface AddGiftCardLoading {
+  <V extends boolean>(loading: V, dispatch: Dispatch<GiftCardAction>): void
 }
 
 export const addGiftCardRecipient: AddGiftCardRecipient = async (
@@ -99,8 +118,19 @@ export const addGiftCardRecipient: AddGiftCardRecipient = async (
   }
 }
 
+export const addGiftCardLoading: AddGiftCardLoading = (loading, dispatch) => {
+  console.log('setLoading', loading)
+  dispatch({
+    type: 'setGiftCardLoading',
+    payload: {
+      loading
+    }
+  })
+}
+
 export const addGiftCard: AddGiftCard = async (values, config, dispatch) => {
   try {
+    addGiftCardLoading(true, dispatch)
     const { firstName, lastName, email, ...val } = values
     const giftCardValue = {
       recipientEmail: email,
@@ -124,12 +154,41 @@ export const addGiftCard: AddGiftCard = async (values, config, dispatch) => {
         ...giftCardValue
       }
     })
-  } catch (error) {
-    console.error(error)
+    addGiftCardLoading(false, dispatch)
+  } catch (r) {
+    const errors = []
+    r.errors().each((field, error) => {
+      // TODO: Add function to correct different code and field
+      if (error.field === 'recipientEmail') error.field = 'email'
+      if (error.code === 'VALIDATIONERROR') error.code = 'VALIDATION_ERROR'
+      error['base'] = 'giftCard'
+      errors.push(error)
+    })
+    dispatch({
+      type: 'setGiftCardErrors',
+      payload: {
+        errors
+      }
+    })
+    addGiftCardLoading(false, dispatch)
   }
 }
 
-const type: GiftCardActionType[] = ['setAvailability', 'setGiftCardRecipient']
+export const addGiftCardError: AddGiftCardError = (errors, dispatch) => {
+  dispatch({
+    type: 'setGiftCardErrors',
+    payload: {
+      errors
+    }
+  })
+}
+
+const type: GiftCardActionType[] = [
+  'setAvailability',
+  'setGiftCardRecipient',
+  'setGiftCardErrors',
+  'setGiftCardLoading'
+]
 
 const giftCardReducer = (
   state: GiftCardState,

@@ -11,7 +11,9 @@ import giftCardReducer, {
   GiftCardState,
   giftCardInitialState,
   addGiftCardRecipient,
-  addGiftCard
+  addGiftCard,
+  addGiftCardError,
+  addGiftCardLoading
 } from '../reducers/GiftCardReducer'
 
 export interface GiftCardContainer {
@@ -26,6 +28,8 @@ const GiftCardContainer: FunctionComponent<GiftCardContainer> = props => {
     addGiftCardRecipient: values =>
       addGiftCardRecipient(values, config, dispatch),
     addGiftCard: values => addGiftCard(values, config, dispatch),
+    addGiftCardError: errors => addGiftCardError(errors, dispatch),
+    addGiftCardLoading: loading => addGiftCardLoading(loading, dispatch),
     ...state
   }
   return (
