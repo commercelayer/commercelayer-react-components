@@ -1,12 +1,6 @@
 import { createContext } from 'react'
-import { OrderState } from '../reducers/OrderReducer'
+import { orderInitialState } from '../reducers/OrderReducer'
 
-const initial: OrderState = {
-  loading: false,
-  orderId: '',
-  order: null
-}
-
-const OrderContext = createContext(initial)
+const OrderContext = createContext(orderInitialState)
 
 export default OrderContext

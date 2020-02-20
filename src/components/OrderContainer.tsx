@@ -6,16 +6,15 @@ import React, {
   ReactNode
 } from 'react'
 import { getLocalOrder } from '../utils/localStorage'
-import CLayer, { OrderCollection } from '@commercelayer/js-sdk'
 import orderReducer, {
   orderInitialState,
-  OrderState,
-  createOrder
+  OrderState
 } from '../reducers/OrderReducer'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import OrderContext from '../context/OrderContext'
-import { getApiOrder } from '../reducers/OrderReducer'
-import { AddToCartInterface, unsetOrderState } from '../reducers/OrderReducer'
+import { getApiOrder, addToCart } from '../reducers/OrderReducer'
+import { unsetOrderState } from '../reducers/OrderReducer'
+import { OrderCollection } from '@commercelayer/js-sdk'
 
 export interface OrderContainerActions {
   setOrderId?: (orderId: string) => void
@@ -34,34 +33,6 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
   const { children, persistKey } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const config = useContext(CommerceLayerContext)
-  console.log('ORDER CONTAINER -- ', config)
-  // console.log('--- ORDER ---', state.order)
-  const addOrder = (): Promise<string> =>
-    createOrder(persistKey, state, dispatch, config)
-  const getOrder = (id): void => getApiOrder(id, dispatch, config)
-  const addToCart: AddToCartInterface = async (
-    skuCode,
-    skuId = '',
-    quantity = 1
-  ) => {
-    const id = await addOrder()
-    if (id) {
-      const order = CLayer.Order.build({ id })
-      const attrs = {
-        order,
-        skuCode,
-        quantity,
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        _update_quantity: 1
-      }
-      if (skuId) {
-        attrs['item'] = CLayer.Sku.build({ id: skuId })
-      }
-      CLayer.LineItem.withCredentials(config)
-        .create(attrs)
-        .then(() => getOrder(id))
-    }
-  }
   useEffect(() => {
     if (config.accessToken) {
       const localOrder = getLocalOrder(persistKey)
@@ -73,7 +44,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
           }
         })
         if (!state.order) {
-          getOrder(localOrder)
+          getApiOrder({ id: localOrder, dispatch, config })
         }
       }
     }
@@ -83,15 +54,9 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
     order: state.order,
     orderId: state.orderId,
     loading: state.loading,
-    // items: state.items,
-    // singleQuantity: state.singleQuantity,
-    // currentItem: state.currentItem,
-    // setSingleQuantity: (code, quantity) =>
-    //   setSingleQuantity(code, quantity, dispatch),
-    addToCart,
-    getOrder
-    // setItems: items => setItems(items, dispatch),
-    // setCurrentItem: item => setCurrentItem(item, dispatch)
+    addToCart: values =>
+      addToCart({ ...values, persistKey, dispatch, state, config }),
+    getOrder: id => getApiOrder({ id, dispatch, config })
   }
   return (
     <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
