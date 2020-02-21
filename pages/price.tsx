@@ -23,11 +23,17 @@ const Home = () => {
     getToken()
   }, [])
   const Loader = () => <div>test...</div>
+  const loading = l => {
+    debugger
+  }
   return (
     <Fragment>
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <OrderContainer persistKey="testItems">
-          <PriceContainer skuCode="BABYONBU000000E63E746MXX">
+          <PriceContainer
+            skuCode="BABYONBU000000E63E746MXX"
+            onLoading={loading}
+          >
             <Price
               amountClassName="font-bold"
               compareClassName="line-through"

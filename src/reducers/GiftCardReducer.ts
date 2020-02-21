@@ -9,6 +9,7 @@ import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import _ from 'lodash'
 import { BaseError } from '../components/Errors'
+import getErrorsByCollection from '../utils/getErrorsByCollection'
 
 export type GiftCardActionType =
   | 'setAvailability'
@@ -156,14 +157,7 @@ export const addGiftCard: AddGiftCard = async (values, config, dispatch) => {
     })
     addGiftCardLoading(false, dispatch)
   } catch (r) {
-    const errors = []
-    r.errors().each((field, error) => {
-      // TODO: Add function to correct different code and field
-      if (error.field === 'recipientEmail') error.field = 'email'
-      if (error.code === 'VALIDATIONERROR') error.code = 'VALIDATION_ERROR'
-      error['base'] = 'giftCard'
-      errors.push(error)
-    })
+    const errors = getErrorsByCollection(r, 'giftCard')
     dispatch({
       type: 'setGiftCardErrors',
       payload: {

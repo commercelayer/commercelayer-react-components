@@ -10,19 +10,32 @@ import VariantSelector from '../src/components/VariantSelector'
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
 export const Nav = ({ links }) => (
-  <nav className="flex items-center justify-between flex-wrap bg-blue-500 p-6">
-    <ul className="flex">
-      {links.map((l: string, i: number) => {
-        return (
-          <li key={i} className="mr-6">
-            <a className="hover:text-blue-800 capitalize" href={l}>
-              {l === '/' ? 'home' : l.replace('/', ' ')}
-            </a>
-          </li>
-        )
-      })}
-    </ul>
-  </nav>
+  <header className="dark p-6">
+    <div className="container mx-auto">
+      <nav className="flex flex-row items-center">
+        <div className="flex items-center mr-10">
+          <a href="/" className="w-48">
+            <img src="//commercelayer.io/assets/img/commercelayer_logo_white.svg?v=2" />
+          </a>
+        </div>
+        <div className="flex w-full justify-end">
+          <div className="">
+            {links.map((l: string, i: number) => {
+              return (
+                <a
+                  key={i}
+                  className="dark capitalize text-base font-normal mr-5"
+                  href={l}
+                >
+                  {l === '/' ? 'home' : l.replace('/', ' ')}
+                </a>
+              )
+            })}
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
 )
 
 export const Title = ({ title }) => (
@@ -50,23 +63,23 @@ const Home = () => {
     getToken()
   }, [])
   return (
-    <Fragment>
-      <Nav links={['/order']} />
-      <CommerceLayer accessToken={token} endpoint={endpoint}>
-        <Title title="Prices" />
-        <PriceContainer>
-          <Price
-            skuCode="BABYONBU000000E63E746MXX"
-            amountClassName="font-bold"
-            compareClassName="line-through"
-          />
-          <Price
-            skuCode="BABYONBU000000E63E7412MX"
-            amountClassName="font-bold"
-            compareClassName="line-through"
-          />
-        </PriceContainer>
-        {/* <br />
+    <section className="bg-gray-100">
+      <Nav links={['/order', '/multiOrder', '/multiApp', '/giftCard']} />
+      <div className="container mx-auto">
+        <CommerceLayer accessToken={token} endpoint={endpoint}>
+          <PriceContainer>
+            <Price
+              skuCode="BABYONBU000000E63E746MXX"
+              amountClassName="font-bold"
+              compareClassName="line-through"
+            />
+            <Price
+              skuCode="BABYONBU000000E63E7412MX"
+              amountClassName="font-bold"
+              compareClassName="line-through"
+            />
+          </PriceContainer>
+          {/* <br />
         <br />
         <Title title="Preselect Prices by skuCode" />
         <PriceContainer>
@@ -152,8 +165,9 @@ const Home = () => {
             ]}
           />
         </VariantContainer> */}
-      </CommerceLayer>
-    </Fragment>
+        </CommerceLayer>
+      </div>
+    </section>
   )
 }
 

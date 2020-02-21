@@ -19,6 +19,7 @@ import { setVariantSkuCodes } from '../reducers/VariantReducer'
 import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
+import getErrorsByCollection from '../utils/getErrorsByCollection'
 
 export interface VariantContainerProps {
   children: ReactNode
@@ -36,12 +37,14 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
   } = useContext(ItemContext)
   const [state, dispatch] = useReducer(variantReducer, variantInitialState)
   const sCode = getCurrentItemKey(currentItem) || skuCode || state.skuCode
+  // TODO move to reducer
   const setCurrentQuantity: SetCurrentQuantity = quantity => {
     dispatch({
       type: 'setCurrentQuantity',
       payload: { currentQuantity: quantity }
     })
   }
+  // TODO move to reducer
   const setSkuCode: SetSkuCodeVariant = (code, id) => {
     if (id) {
       CLayer.Sku.withCredentials(config)
@@ -50,6 +53,15 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
         .then(s => {
           setCurrentItem({
             [`${code}`]: s
+          })
+        })
+        .catch(c => {
+          const errors = getErrorsByCollection(c, 'variant')
+          dispatch({
+            type: 'setErrors',
+            payload: {
+              errors
+            }
           })
         })
     }
@@ -66,6 +78,7 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
         type: 'setLoading',
         payload: { loading: true }
       })
+      // TODO move to reducer
       CLayer.Sku.withCredentials(config)
         .where({ codeIn: state.skuCodes.join(',') })
         .includes('prices')
@@ -86,6 +99,15 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
             type: 'setLoading',
             payload: {
               loading: false
+            }
+          })
+        })
+        .catch(c => {
+          const errors = getErrorsByCollection(c, 'variant')
+          dispatch({
+            type: 'setErrors',
+            payload: {
+              errors
             }
           })
         })

@@ -31,12 +31,8 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = props => {
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
   const { setItems, items, item: currentItem } = useContext(ItemContext)
-  // const { setItems, items, currentItem } = useContext(OrderContext)
-  // TODO: Remove comments
   if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
-  // if (_.indexOf(state.skuCodes, currentSkuCode) === -1 && currentSkuCode)
-  //   state.skuCodes.push(currentSkuCode)
   const sCode = getCurrentItemKey(currentItem) || skuCode
   const setSkuCodes: SetSkuCodesPrice = skuCodes => {
     dispatch({

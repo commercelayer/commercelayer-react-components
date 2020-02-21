@@ -6,6 +6,8 @@ import { Dispatch } from 'react'
 import getSkus from '../utils/getSkus'
 import { Items } from './ItemReducer'
 import baseReducer from '../utils/baseReducer'
+import getErrorsByCollection from '../utils/getErrorsByCollection'
+import { BaseError } from '../components/Errors'
 
 export interface Prices {
   [key: string]: PriceCollection
@@ -21,18 +23,20 @@ export interface PriceState {
   loading: boolean
   prices: Prices
   skuCodes: SkuCodesPrice
+  errors?: BaseError[]
   skuCode?: string
   setSkuCodes?: SetSkuCodesPrice
 }
 
 export interface PriceAction extends BaseAction {
-  type: 'setLoading' | 'setPrices' | 'setSkuCodes'
+  type: PriceActionType
 }
 
 export const priceInitialState: PriceState = {
   loading: false,
   prices: {},
-  skuCodes: []
+  skuCodes: [],
+  errors: []
 }
 
 export interface GetSkusPrice {
@@ -107,6 +111,15 @@ export const getSkusPrice: GetSkusPrice = (
         })
       }
     })
+    .catch(c => {
+      const errors = getErrorsByCollection(c, 'price')
+      dispatch({
+        type: 'setErrors',
+        payload: {
+          errors
+        }
+      })
+    })
 }
 
 export interface UnsetPriceState {
@@ -126,9 +139,18 @@ export const unsetPriceState: UnsetPriceState = dispatch => {
   })
 }
 
-export type PriceActionType = 'setLoading' | 'setPrices' | 'setSkuCodes'
+export type PriceActionType =
+  | 'setLoading'
+  | 'setPrices'
+  | 'setSkuCodes'
+  | 'setErrors'
 
-const typeAction: PriceActionType[] = ['setLoading', 'setPrices', 'setSkuCodes']
+const typeAction: PriceActionType[] = [
+  'setLoading',
+  'setPrices',
+  'setSkuCodes',
+  'setErrors'
+]
 
 const priceReducer = (state: PriceState, reducer: PriceAction): PriceState =>
   baseReducer<PriceState, PriceAction, PriceActionType[]>(

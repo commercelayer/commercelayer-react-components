@@ -1,4 +1,5 @@
 import { CSSProperties, Dispatch } from 'react'
+import { BaseError } from '../components/Errors'
 
 export interface BaseComponent {
   id?: string
@@ -14,6 +15,7 @@ export interface BaseAction<A = string> {
 
 export interface BaseState {
   [key: string]: any
+  errors?: BaseError[]
 }
 
 export type BaseActionType<T = string> = T[]

@@ -2,6 +2,7 @@ import { SkuCollection, InventoryCollection } from '@commercelayer/js-sdk'
 import { SkuCodePropObj } from '../components/VariantSelector'
 import { Dispatch } from 'react'
 import baseReducer from '../utils/baseReducer'
+import { BaseError } from '../components/Errors'
 
 export interface SetCurrentQuantity {
   (quantity: number): void
@@ -24,6 +25,7 @@ export interface VariantState {
   variants?: VariantsObject | object
   skuCodes?: string[]
   skuCode?: string
+  errors?: BaseError[]
   currentSkuId?: string
   currentSkuInventory?: InventoryCollection
   currentQuantity?: number
@@ -70,6 +72,7 @@ export const variantInitialState: VariantState = {
   variants: {},
   skuCodes: [],
   skuCode: '',
+  errors: [],
   currentSkuId: '',
   currentSkuInventory: {
     available: false,
@@ -89,6 +92,7 @@ export type VariantActionType =
   | 'setCurrentSkuInventory'
   | 'setCurrentQuantity'
   | 'setCurrentPrices'
+  | 'setErrors'
 
 const actionType: VariantActionType[] = [
   'setLoading',
@@ -98,7 +102,8 @@ const actionType: VariantActionType[] = [
   'setCurrentSkuId',
   'setCurrentSkuInventory',
   'setCurrentQuantity',
-  'setCurrentPrices'
+  'setCurrentPrices',
+  'setErrors'
 ]
 
 const variantReducer = (

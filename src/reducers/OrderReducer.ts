@@ -4,6 +4,7 @@ import { setLocalOrder } from '../utils/localStorage'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import baseReducer from '../utils/baseReducer'
 import { BaseError } from '../components/Errors'
+import getErrorsByCollection from '../utils/getErrorsByCollection'
 
 export interface GetOrderParams {
   id: string
@@ -121,7 +122,7 @@ export const getApiOrder: GetOrder = async params => {
 }
 
 export const addToCart: AddToCart = async params => {
-  const { skuCode, skuId, quantity, config } = params
+  const { skuCode, skuId, quantity, config, dispatch } = params
   try {
     const id = await createOrder(params)
     const order = CLayer.Order.build({ id })
@@ -136,9 +137,14 @@ export const addToCart: AddToCart = async params => {
     }
     await CLayer.LineItem.withCredentials(config).create(attrs)
     await getApiOrder({ id, ...params })
-  } catch (error) {
-    // TODO: Set errors
-    console.log('error', error)
+  } catch (col) {
+    const errors = getErrorsByCollection(col, 'order')
+    dispatch({
+      type: 'setErrors',
+      payload: {
+        errors
+      }
+    })
   }
 }
 

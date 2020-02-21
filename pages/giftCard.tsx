@@ -11,6 +11,7 @@ import GiftCardInput from '../src/components/GiftCardInput'
 import GiftCardCurrencySelector from '../src/components/GiftCardCurrencySelector'
 import MetadataInput from '../src/components/MetadataInput'
 import Errors from '../src/components/Errors'
+import { BaseError } from '../src/components/Errors'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -21,7 +22,7 @@ const messages = [
     field: 'email'
   },
   { code: 'VALIDATION_ERROR', message: 'Errore di validazione' }
-]
+] as BaseError[]
 
 export const Nav = ({ links }) => (
   <nav className="flex items-center justify-between flex-wrap bg-gray-800 p-6 text-gray-200">
@@ -96,12 +97,16 @@ const Home = () => {
               <div className="p-2">
                 <GiftCardInput
                   className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  type="email"
+                  type="text"
                   name="email"
                   placeholder="Email"
                   required
                 />
-                <Errors base="giftCard" field="email" messages={messages} />
+                <Errors
+                  resourceKey="giftCard"
+                  field="email"
+                  messages={messages}
+                />
               </div>
               <div className="p-2">
                 <GiftCardInput
@@ -130,7 +135,7 @@ const Home = () => {
                 <SubmitButton className="shadow bg-purple-500 hover:bg-purple-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded" />
               </div>
             </GiftCard>
-            <Errors base="giftCard" />
+            <Errors resourceKey="giftCard" />
           </GiftCardContainer>
         </div>
       </CommerceLayer>

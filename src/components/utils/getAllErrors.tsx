@@ -27,11 +27,11 @@ const getAllErrors: GetAllErrors = params => {
         )
       )
     }
-    return (
-      <span key={k} {...props}>
-        {objMsg?.message || v.message}
-      </span>
-    )
+    // return (
+    //   <span key={k} {...props}>
+    //     {objMsg?.message || v.message}
+    //   </span>
+    // )
   })
 }
 

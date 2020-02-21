@@ -6,28 +6,65 @@ import GiftCardContext from '../context/GiftCardContext'
 import OrderContext from '../context/OrderContext'
 import getAllErrors from './utils/getAllErrors'
 
-export type BaseErrorType = 'order' | 'giftCard' | 'lineItem' | 'variant'
+export type ResourceErrorType =
+  | 'order'
+  | 'giftCard'
+  | 'lineItem'
+  | 'variant'
+  | 'price'
+
+export type CodeErrorType =
+  | 'RECORD_NOT_FOUND'
+  | 'UNAUTHORIZED'
+  | 'INVALID_TOKEN'
+  | 'VALIDATION_ERROR'
+  | 'INVALID_RESOURCE'
+  | 'FILTER_NOT_ALLOWED'
+  | 'INVALID_FIELD_VALUE'
+  | 'INVALID_FIELD'
+  | 'PARAM_NOT_ALLOWED'
+  | 'PARAM_MISSING'
+  | 'INVALID_FILTER_VALUE'
+  | 'KEY_ORDER_MISMATCH'
+  | 'KEY_NOT_INCLUDED_IN_URL'
+  | 'INVALID_INCLUDE'
+  | 'RELATION_EXISTS'
+  | 'INVALID_SORT_CRITERIA'
+  | 'INVALID_LINKS_OBJECT'
+  | 'TYPE_MISMATCH'
+  | 'INVALID_PAGE_OBJECT'
+  | 'INVALID_PAGE_VALUE'
+  | 'INVALID_FIELD_FORMAT'
+  | 'INVALID_FILTERS_SYNTAX'
+  | 'SAVE_FAILED'
+  | 'INVALID_DATA_FORMAT'
+  | 'FORBIDDEN'
+  | 'RECORD_NOT_FOUND'
+  | 'NOT_ACCEPTABLE'
+  | 'UNSUPPORTED_MEDIA_TYPE'
+  | 'LOCKED'
+  | 'INTERNAL_SERVER_ERROR'
 
 export interface BaseError {
-  code: string
+  code: CodeErrorType
   message: string
-  base?: BaseErrorType
+  resourceKey?: ResourceErrorType
   field?: string
 }
 
 export interface ErrorsProps extends BaseComponent {
-  base: BaseErrorType
+  resourceKey: ResourceErrorType
   messages?: BaseError[]
-  field?: string
+  field?: string | undefined
   children?: FunctionComponent
 }
 
 const Errors: FunctionComponent<ErrorsProps> = props => {
-  const { children, messages, base, field, ...p } = props
+  const { children, messages, resourceKey, field, ...p } = props
   const { errors: orderErrors } = useContext(OrderContext)
   const { errors: giftCardErrors } = useContext(GiftCardContext)
   const allErrors = orderErrors.concat(giftCardErrors)
-  const parentProps = { messages, base, field, ...p }
+  const parentProps = { messages, resourceKey, field, ...p }
   const msgErrors = getAllErrors({ allErrors, field, messages, props: p })
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -37,7 +74,7 @@ const Errors: FunctionComponent<ErrorsProps> = props => {
 }
 
 Errors.propTypes = {
-  base: PropTypes.oneOf<BaseErrorType>([
+  resourceKey: PropTypes.oneOf<ResourceErrorType>([
     'order',
     'giftCard',
     'lineItem',
@@ -48,7 +85,8 @@ Errors.propTypes = {
 }
 
 Errors.defaultProps = {
-  messages: []
+  messages: [],
+  field: 'base'
 }
 
 export default Errors
