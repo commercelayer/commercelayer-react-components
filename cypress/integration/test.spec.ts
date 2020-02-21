@@ -38,7 +38,6 @@ Cypress.env('pages').map(page => {
             aliasRoutes[aliasK] = {
               [method]: alias
             }
-            debugger
             console.log('method', method)
             console.log('url', url)
             console.log('alias', alias)
@@ -73,7 +72,8 @@ Cypress.env('pages').map(page => {
           cy.writeFile(path, xhrData[v])
         })
         const path = `./cypress/fixtures/${page.filePrefix}-alias.json`
-        cy.writeFile(path, Object.keys(xhrData))
+        const keys = Object.keys(xhrData)
+        cy.writeFile(path, keys)
       }
     })
     it(page.title, () => {
