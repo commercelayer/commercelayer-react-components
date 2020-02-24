@@ -4,8 +4,6 @@ import Price from '../src/components/Price'
 import PriceContainer from '../src/components/PriceContainer'
 import CommerceLayer from '../src/components/CommerceLayer'
 import '../styles/styles.css'
-import VariantContainer from '../src/components/VariantContainer'
-import VariantSelector from '../src/components/VariantSelector'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -48,6 +46,15 @@ export const Type = ({ text }) => (
   </span>
 )
 
+const skus = [
+  'BABYONBU000000E63E746MXX',
+  'BABYONBU000000E63E7412MX',
+  'LSLEEVMMFFFFFF000000LXXX',
+  'CANVASAUE63E74FFFFFF1824',
+  'HATBEAMUB7B7B7E63E74XXXX',
+  'SOCKXXMUFFFFFF000000MXXX'
+]
+
 const Home = () => {
   const [token, setToken] = useState('')
   useEffect(() => {
@@ -67,18 +74,34 @@ const Home = () => {
       <Nav links={['/order', '/multiOrder', '/multiApp', '/giftCard']} />
       <div className="container mx-auto">
         <CommerceLayer accessToken={token} endpoint={endpoint}>
-          <PriceContainer>
-            <Price
-              skuCode="BABYONBU000000E63E746MXX"
-              amountClassName="font-bold"
-              compareClassName="line-through"
-            />
-            <Price
-              skuCode="BABYONBU000000E63E7412MX"
-              amountClassName="font-bold"
-              compareClassName="line-through"
-            />
-          </PriceContainer>
+          <div className="flex flex-row flex-wrap justify-around">
+            <PriceContainer>
+              {skus.map((s, k) => {
+                const lImg = s.substring(0, s.length - 4)
+                return (
+                  <div key={k} className="text-center p-3">
+                    <img
+                      src={`https://img.commercelayer.io/skus/${lImg}.png?fm=png&q=70`}
+                      className="rounded-lg md:w-56"
+                    />
+                    <Price
+                      skuCode={s}
+                      amountClassName="font-bold"
+                      compareClassName="line-through"
+                    />
+                    <div className="p-3">
+                      <a
+                        className="mt-2 primary font-bold py-2 px-4 rounded"
+                        href="/order"
+                      >
+                        Order
+                      </a>
+                    </div>
+                  </div>
+                )
+              })}
+            </PriceContainer>
+          </div>
           {/* <br />
         <br />
         <Title title="Preselect Prices by skuCode" />

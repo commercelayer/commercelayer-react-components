@@ -10,3 +10,13 @@
 a.dark {
   color: white;
 }
+
+.primary {
+  background-color: #ffde00;
+  border-color: #ffde00;
+  color: #131313;
+}
+.primary:hover {
+  background-color: #e6c800;
+  border-color: #e6c800;
+}

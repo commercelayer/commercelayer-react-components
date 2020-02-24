@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
-import { Nav, Title, Type } from '.'
+import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
 import VariantContainer from '../src/components/VariantContainer'
 import VariantSelector from '../src/components/VariantSelector'
@@ -60,7 +60,7 @@ export default function Order() {
   }, [])
   return (
     <Fragment>
-      <Nav links={['/', '/multiOrder']} />
+      <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer persistKey="orderUS">
@@ -112,7 +112,7 @@ export default function Order() {
                     />
                   </div>
                   <div className="m-2">
-                    <AddToCart className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    <AddToCart className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                       {CustomAddToCart}
                     </AddToCart>
                   </div>
@@ -202,7 +202,10 @@ export default function Order() {
               </div>
             </div>
             <div className="flex justify-center p-2">
-              <Checkout className="mt-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded" />
+              <Checkout
+                className="mt-2 primary font-bold py-2 px-4 rounded"
+                label="Checkout"
+              />
             </div>
           </OrderContainer>
         </div>
