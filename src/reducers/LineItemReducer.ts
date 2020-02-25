@@ -1,13 +1,30 @@
-import { LineItemCollection } from '@commercelayer/js-sdk'
+import CLayer, { LineItemCollection } from '@commercelayer/js-sdk'
 import baseReducer from '../utils/baseReducer'
 import { BaseError } from '../components/Errors'
+import { Dispatch } from 'react'
+import { CommerceLayerConfig } from '../context/CommerceLayerContext'
+import { getOrderContext } from './OrderReducer'
+import getErrorsByCollection from '../utils/getErrorsByCollection'
+import _ from 'lodash'
 
-export interface UpdateLineItem {
-  (lineItemId: string, quantity: number): void
+export type UpdateLineItemParams = {
+  lineItemId: string
+  quantity?: number
+  dispatch: Dispatch<LineItemAction>
+  config: CommerceLayerConfig
+  getOrder: getOrderContext
+  orderId: string
+  errors: BaseError[]
 }
 
+export interface UpdateLineItem {
+  (params: UpdateLineItemParams): void
+}
+
+export type DeleteLineItemParam = {} & UpdateLineItemParams
+
 export interface DeleteLineItem {
-  (lineItemId: string): void
+  (params: DeleteLineItemParam): void
 }
 
 export interface LineItemPayload {
@@ -16,13 +33,81 @@ export interface LineItemPayload {
 }
 
 export interface LineItemState extends LineItemPayload {
-  updateLineItem?: UpdateLineItem
-  deleteLineItem?: DeleteLineItem
+  updateLineItem?: (lineItemId: string, quantity?: number) => void
+  deleteLineItem?: (lineItemId: string) => void
 }
 
 export interface LineItemAction {
   type: LineItemActionType
   payload: LineItemPayload
+}
+
+export const updateLineItem: UpdateLineItem = async params => {
+  const {
+    config,
+    lineItemId,
+    quantity,
+    getOrder,
+    orderId,
+    dispatch,
+    errors
+  } = params
+  try {
+    const lineItem = await CLayer.LineItem.withCredentials(config).find(
+      lineItemId
+    )
+    const update = await lineItem.withCredentials(config).update({ quantity })
+    if (!update.errors().empty()) {
+      throw update
+    }
+    await getOrder(orderId)
+    if (!_.isEmpty(errors)) {
+      dispatch({
+        type: 'setErrors',
+        payload: {
+          errors: []
+        }
+      })
+    }
+  } catch (c) {
+    const errors = getErrorsByCollection(c, 'lineItem')
+    dispatch({
+      type: 'setErrors',
+      payload: {
+        errors
+      }
+    })
+  }
+}
+
+export const deleteLineItem: DeleteLineItem = async params => {
+  const { config, lineItemId, getOrder, orderId, dispatch, errors } = params
+  try {
+    const lineItem = await CLayer.LineItem.withCredentials(config).find(
+      lineItemId
+    )
+    const destroyLineItem = await lineItem.withCredentials(config).destroy()
+    if (!destroyLineItem.errors().empty()) {
+      throw destroyLineItem
+    }
+    await getOrder(orderId)
+    if (!_.isEmpty(errors)) {
+      dispatch({
+        type: 'setErrors',
+        payload: {
+          errors: []
+        }
+      })
+    }
+  } catch (c) {
+    const errors = getErrorsByCollection(c, 'lineItem')
+    dispatch({
+      type: 'setErrors',
+      payload: {
+        errors
+      }
+    })
+  }
 }
 
 export const lineItemInitialState: LineItemState = {

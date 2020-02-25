@@ -51,11 +51,13 @@ type AddToCartValues = {
   quantity?: number
 }
 
+export type getOrderContext = (id: string) => void
+
 export interface OrderState extends OrderPayload {
   loading: boolean
   orderId: string
   order: OrderCollection
-  getOrder?: (id: string) => void
+  getOrder?: getOrderContext
   addToCart?: (values: AddToCartValues) => void
 }
 

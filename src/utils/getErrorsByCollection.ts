@@ -68,14 +68,20 @@ const trasformCode: TransformCode = code => {
   return newCode
 }
 
-const getErrorsByCollection: GetErrorsByCollection = collection => {
+const getErrorsByCollection: GetErrorsByCollection = (
+  collection,
+  resourceType
+) => {
   const errors = []
   if (collection.errors) {
     collection.errors().each((field, error) => {
       // TODO Add function to correct different field
       if (error.field === 'recipientEmail') error.field = 'email'
       error.code = trasformCode(error.code)
-      error['resourceType'] = 'giftCard'
+      error['resourceKey'] = resourceType
+      // TODO check types
+      // @ts-ignore
+      error['id'] = collection.id
       errors.push(error)
     })
   }

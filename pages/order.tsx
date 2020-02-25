@@ -27,6 +27,7 @@ import GiftCard from '../src/components/GiftCardPrice'
 import AvailabilityContainer from '../src/components/AvailabilityContainer'
 import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 import ItemContainer from '../src/components/ItemContainer'
+import Errors from '../src/components/Errors'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -132,13 +133,18 @@ export default function Order() {
             <div className="flex flex-col p-2">
               <LineItemsContainer>
                 <LineItem>
-                  <div className="flex justify-around items-center border-b">
+                  <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
                     <LineItemQuantity
                       id="line-item-quantity"
-                      max={10}
+                      max={100}
                       className="p-2"
+                    />
+                    <Errors
+                      className="text-red-700 p-2"
+                      resourceKey="lineItem"
+                      field="quantity"
                     />
                     <LineItemPrice id="line-item-total" className="p-2" />
                     <LineItemRemove
@@ -148,7 +154,7 @@ export default function Order() {
                   </div>
                 </LineItem>
                 <LineItem type="gift_cards">
-                  <div className="flex justify-around items-center border-b p-2">
+                  <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage
                       className="p-2"
                       width={40}

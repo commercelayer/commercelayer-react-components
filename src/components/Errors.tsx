@@ -5,6 +5,8 @@ import Parent from './utils/Parent'
 import GiftCardContext from '../context/GiftCardContext'
 import OrderContext from '../context/OrderContext'
 import getAllErrors from './utils/getAllErrors'
+import LineItemContext from '../context/LineItemContext'
+import LineItemChildrenContext from '../context/LineItemChildrenContext'
 
 export type ResourceErrorType =
   | 'order'
@@ -50,6 +52,7 @@ export interface BaseError {
   message: string
   resourceKey?: ResourceErrorType
   field?: string
+  id?: string
 }
 
 export interface ErrorsProps extends BaseComponent {
@@ -63,9 +66,21 @@ const Errors: FunctionComponent<ErrorsProps> = props => {
   const { children, messages, resourceKey, field, ...p } = props
   const { errors: orderErrors } = useContext(OrderContext)
   const { errors: giftCardErrors } = useContext(GiftCardContext)
-  const allErrors = orderErrors.concat(giftCardErrors)
+  const { errors: lineItemErrors } = useContext(LineItemContext)
+  const { lineItem } = useContext(LineItemChildrenContext)
+  // TODO add other errors
+  console.log('orderErrors', orderErrors)
+  console.log('giftCardErrors', giftCardErrors)
+  console.log('lineItemErrors', lineItemErrors)
+  const allErrors = [...giftCardErrors, ...orderErrors, ...lineItemErrors]
   const parentProps = { messages, resourceKey, field, ...p }
-  const msgErrors = getAllErrors({ allErrors, field, messages, props: p })
+  const msgErrors = getAllErrors({
+    allErrors,
+    field,
+    messages,
+    props: p,
+    lineItem
+  })
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
