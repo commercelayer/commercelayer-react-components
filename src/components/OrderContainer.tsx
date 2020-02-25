@@ -51,9 +51,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
     return (): void => unsetOrderState(dispatch)
   }, [config.accessToken])
   const orderValue: OrderState = {
-    order: state.order,
-    orderId: state.orderId,
-    loading: state.loading,
+    ...state,
     addToCart: values =>
       addToCart({ ...values, persistKey, dispatch, state, config }),
     getOrder: id => getApiOrder({ id, dispatch, config })

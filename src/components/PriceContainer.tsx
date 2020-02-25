@@ -72,10 +72,8 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = props => {
     return (): void => unsetPriceState(dispatch)
   }, [config.accessToken, currentItem])
   const priceValue: PriceState = {
-    loading: state.loading,
-    prices: state.prices,
+    ...state,
     skuCode: sCode,
-    skuCodes: state.skuCodes,
     setSkuCodes
   }
   return (

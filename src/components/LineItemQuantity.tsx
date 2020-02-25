@@ -10,6 +10,7 @@ export interface LineItemQuantityProps extends BaseComponent {
   lineItem?: LineItemCollection
   updateLineItem?: (lineItemId, quantity) => void
   max?: number
+  disabled?: boolean
 }
 
 const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = props => {

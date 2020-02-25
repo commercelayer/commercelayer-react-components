@@ -14,9 +14,7 @@ const ItemContainer: FunctionComponent<ItemContainerProps> = props => {
   const { children } = props
   const [state, dispatch] = useReducer(itemReducer, itemInitialState)
   const itemValue: ItemState = {
-    item: state.item,
-    items: state.items,
-    quantity: state.quantity,
+    ...state,
     setItems: items =>
       setItemState(items, { type: 'setItems', key: 'items' }, dispatch),
     setItem: item =>

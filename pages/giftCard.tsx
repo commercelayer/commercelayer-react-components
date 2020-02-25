@@ -13,6 +13,7 @@ import MetadataInput from '../src/components/MetadataInput'
 import Errors from '../src/components/Errors'
 import { BaseError } from '../src/components/Errors'
 import { Nav } from '.'
+import OrderContainer from '../src/components/OrderContainer'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -55,74 +56,79 @@ const Home = () => {
     <Fragment>
       <Nav links={['/order', '/multiOrder', '/multiApp']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
-        <div className="container mx-auto p-2">
-          <GiftCardContainer>
-            <GiftCard>
-              <h2 className="text-xl">Create a GiftCard</h2>
-              <div className="p-2">
-                <GiftCardCurrencySelector className="block w-1/3  border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" />
-              </div>
-              <div className="p-2">
-                <GiftCardInput
-                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  type="number"
-                  name="balanceCents"
-                  placeholder="Amount*"
-                />
-              </div>
-              <div className="p-2">
-                <GiftCardInput
-                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  type="text"
-                  name="email"
-                  placeholder="Email*"
-                  required
-                />
-                <Errors
-                  resourceKey="giftCard"
-                  field="email"
-                  messages={messages}
-                />
-              </div>
-              <div className="p-2">
-                <GiftCardInput
-                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  type="text"
-                  name="firstName"
-                  placeholder="First name"
-                />
-              </div>
-              <div className="p-2">
-                <GiftCardInput
-                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  type="text"
-                  name="lastName"
-                  placeholder="Last name"
-                />
-              </div>
-              <div className="p-2">
-                <MetadataInput
-                  className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  type="textarea"
-                  name="message"
-                  placeholder="Message"
-                />
-              </div>
-              <div className="p-2">
-                <GiftCardInput
-                  className="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  type="checkbox"
-                  name="singleUse"
-                />
-                <span className="ml-2 align-middle">Single use</span>
-              </div>
-              <div className="p-2">
-                <SubmitButton label="Create" className="shadow primary focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded" />
-              </div>
-            </GiftCard>
-            <Errors resourceKey="giftCard" />
-          </GiftCardContainer>
-        </div>
+        <OrderContainer persistKey="orderUS">
+          <div className="container mx-auto p-2">
+            <GiftCardContainer>
+              <GiftCard>
+                <h2 className="text-xl">Create a GiftCard</h2>
+                <div className="p-2">
+                  <GiftCardCurrencySelector className="block w-1/3  border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" />
+                </div>
+                <div className="p-2">
+                  <GiftCardInput
+                    className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="number"
+                    name="balanceCents"
+                    placeholder="Amount*"
+                  />
+                </div>
+                <div className="p-2">
+                  <GiftCardInput
+                    className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="text"
+                    name="email"
+                    placeholder="Email*"
+                    required
+                  />
+                  <Errors
+                    resourceKey="giftCard"
+                    field="email"
+                    messages={messages}
+                  />
+                </div>
+                <div className="p-2">
+                  <GiftCardInput
+                    className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="text"
+                    name="firstName"
+                    placeholder="First name"
+                  />
+                </div>
+                <div className="p-2">
+                  <GiftCardInput
+                    className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="text"
+                    name="lastName"
+                    placeholder="Last name"
+                  />
+                </div>
+                <div className="p-2">
+                  <MetadataInput
+                    className="shadow appearance-none border rounded w-1/3 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="textarea"
+                    name="message"
+                    placeholder="Message"
+                  />
+                </div>
+                <div className="p-2">
+                  <GiftCardInput
+                    className="shadow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="checkbox"
+                    name="singleUse"
+                  />
+                  <span className="ml-2 align-middle">Single use</span>
+                </div>
+                <div className="p-2">
+                  <SubmitButton
+                    label="Create"
+                    className="shadow primary focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+                  />
+                </div>
+              </GiftCard>
+              <Errors resourceKey="giftCard" />
+            </GiftCardContainer>
+          </div>
+        </OrderContainer>
       </CommerceLayer>
     </Fragment>
   )

@@ -131,7 +131,7 @@ export default function Order() {
             </p>
             <div className="flex flex-col p-2">
               <LineItemsContainer>
-                <LineItem type="skus">
+                <LineItem>
                   <div className="flex justify-around items-center border-b">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
@@ -139,6 +139,27 @@ export default function Order() {
                       id="line-item-quantity"
                       max={10}
                       className="p-2"
+                    />
+                    <LineItemPrice id="line-item-total" className="p-2" />
+                    <LineItemRemove
+                      id="line-item-remove"
+                      className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    />
+                  </div>
+                </LineItem>
+                <LineItem type="gift_cards">
+                  <div className="flex justify-around items-center border-b p-2">
+                    <LineItemImage
+                      className="p-2"
+                      width={40}
+                      src="//contentful-gatsby-demo-it.netlify.com/icons/icon-48x48.png?v=c6e799c5132154cb5f3634994be3f8aa"
+                    />
+                    <LineItemName id="line-item-name" className="p-2" />
+                    <LineItemQuantity
+                      id="line-item-quantity"
+                      max={10}
+                      className="p-2"
+                      disabled
                     />
                     <LineItemPrice id="line-item-total" className="p-2" />
                     <LineItemRemove

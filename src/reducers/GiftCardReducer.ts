@@ -42,6 +42,7 @@ export interface GiftCardI {
   recipientEmail?: string
   reference?: string
   metadata?: BaseMetadata
+  orderId?: string
 }
 
 export interface GiftCardActionPayload extends GiftCardI {
@@ -132,7 +133,7 @@ export const addGiftCardLoading: AddGiftCardLoading = (loading, dispatch) => {
 export const addGiftCard: AddGiftCard = async (values, config, dispatch) => {
   try {
     addGiftCardLoading(true, dispatch)
-    const { firstName, lastName, email, ...val } = values
+    const { firstName, lastName, email, orderId, ...val } = values
     const giftCardValue = {
       recipientEmail: email,
       ...val
@@ -148,6 +149,15 @@ export const addGiftCard: AddGiftCard = async (values, config, dispatch) => {
         .withCredentials(config)
         .giftCardRecipient()
         .update(recipientValues)
+    }
+    if (orderId) {
+      const order = CLayer.Order.build({ id: orderId })
+      const item = CLayer.GiftCard.build({ id: giftCard.id })
+      await CLayer.LineItem.withCredentials(config).create({
+        quantity: 1,
+        order,
+        item
+      })
     }
     dispatch({
       type: 'setGiftCardRecipient',

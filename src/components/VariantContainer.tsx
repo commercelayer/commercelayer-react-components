@@ -115,14 +115,7 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
     return (): void => unsetVariantState(dispatch)
   }, [config])
   const variantValue: VariantState = {
-    loading: state.loading,
-    variants: state.variants,
-    skuCodes: state.skuCodes,
-    currentSkuId: state.currentSkuId,
-    skuCode: sCode,
-    currentSkuInventory: state.currentSkuInventory,
-    currentQuantity: state.currentQuantity,
-    currentPrices: state.currentPrices,
+    ...state,
     setCurrentQuantity,
     setSkuCode,
     setSkuCodes: skuCodes => setVariantSkuCodes(skuCodes, dispatch)

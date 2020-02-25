@@ -81,7 +81,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
     }
   }, [order])
   const lineItemValue = {
-    lineItems: state.lineItems,
+    ...state,
     updateLineItem,
     deleteLineItem
   }
