@@ -2,7 +2,7 @@
   "name": "@commercelayer/react-components",
   "version": "1.0.0",
   "description": "Commerce Layer React Components",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test:cypress:open": "cypress open",
     "test:cypress:record": "cypress open --env RECORD=1",
