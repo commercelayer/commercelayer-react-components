@@ -74,6 +74,7 @@ const getErrorsByCollection: GetErrorsByCollection = (
 ) => {
   const errors = []
   if (collection.errors) {
+    // @ts-ignore
     collection.errors().each((field, error) => {
       // TODO Add function to correct different field
       if (error.field === 'recipientEmail') error.field = 'email'
