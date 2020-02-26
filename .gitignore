@@ -1,6 +1,7 @@
 node_modules
 .next
 .vscode
+dist
 cypress/fixtures/!routes.json
 cypress/fixtures/!fixture.json
 cypress/fixtures/*.json

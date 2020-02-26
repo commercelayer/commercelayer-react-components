@@ -1,13 +1,6 @@
 import { createContext } from 'react'
-import { PriceState } from '../reducers/PriceReducer'
+import { priceInitialState } from '../reducers/PriceReducer'
 
-const initial: PriceState = {
-  loading: false,
-  prices: {},
-  skuCode: '',
-  skuCodes: []
-}
-
-const PriceContext = createContext(initial)
+const PriceContext = createContext(priceInitialState)
 
 export default PriceContext

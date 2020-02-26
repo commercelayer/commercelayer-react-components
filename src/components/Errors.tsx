@@ -14,6 +14,7 @@ export type ResourceErrorType =
   | 'lineItem'
   | 'variant'
   | 'price'
+  | 'skuOption'
 
 export type CodeErrorType =
   | 'RECORD_NOT_FOUND'
