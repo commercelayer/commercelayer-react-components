@@ -20,3 +20,7 @@ a.dark {
   background-color: #e6c800;
   border-color: #e6c800;
 }
+
+.options > span:first-child {
+  text-transform: capitalize;
+}

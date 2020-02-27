@@ -23,11 +23,15 @@ import Total from '../src/components/Total'
 import Discount from '../src/components/Discount'
 import Shipping from '../src/components/Shipping'
 import Taxes from '../src/components/Taxes'
-import GiftCard from '../src/components/GiftCardPrice'
+import GiftCardPrice from '../src/components/GiftCardPrice'
 import AvailabilityContainer from '../src/components/AvailabilityContainer'
 import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 import ItemContainer from '../src/components/ItemContainer'
 import Errors from '../src/components/Errors'
+import SkuOptionsContainer from '../src/components/SkuOptionsContainer'
+import SkuOption from '../src/components/SkuOption'
+import SkuOptionInput from '../src/components/SkuOptionInput'
+import LineItemOptions from '../src/components/LineItemOptions'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -107,6 +111,18 @@ export default function Order() {
                     </div>
                   </VariantContainer>
                   <div className="m-2">
+                    <SkuOptionsContainer>
+                      <SkuOption name="Embossing">
+                        <SkuOptionInput
+                          name="message"
+                          type="text"
+                          className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                          placeholder="Message"
+                        />
+                      </SkuOption>
+                    </SkuOptionsContainer>
+                  </div>
+                  <div className="m-2">
                     <QuantitySelector
                       id="quantity-selector"
                       className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -119,7 +135,7 @@ export default function Order() {
                   </div>
                   <div className="m-2">
                     <AvailabilityContainer>
-                      <AvailabilityTemplate />
+                      <AvailabilityTemplate showShippingMethodName />
                     </AvailabilityContainer>
                   </div>
                 </div>
@@ -136,6 +152,7 @@ export default function Order() {
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
+                    <LineItemOptions className="options" />
                     <LineItemQuantity
                       id="line-item-quantity"
                       max={100}
@@ -216,7 +233,7 @@ export default function Order() {
                   <p className="text-lg">Gift card </p>
                 </div>
                 <div className="text-right">
-                  <GiftCard />
+                  <GiftCardPrice />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around font-bold text-left">
