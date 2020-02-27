@@ -74,13 +74,14 @@ const getErrorsByCollection: GetErrorsByCollection = (
 ) => {
   const errors = []
   if (collection.errors) {
+    // NOTE Add type to SDK
     // @ts-ignore
     collection.errors().each((field, error) => {
       // TODO Add function to correct different field
       if (error.field === 'recipientEmail') error.field = 'email'
       error.code = trasformCode(error.code)
       error['resourceKey'] = resourceType
-      // TODO check types
+      // NOTE Add type to SDK
       // @ts-ignore
       error['id'] = collection.id
       errors.push(error)

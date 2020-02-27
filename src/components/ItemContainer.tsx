@@ -5,12 +5,15 @@ import itemReducer, {
   setItemState
 } from '../reducers/ItemReducer'
 import { ItemState } from '../reducers/ItemReducer'
+import PropTypes from 'prop-types'
 
 export interface ItemContainerProps {
   children: ReactNode
+  skuCode?: string
 }
 
 const ItemContainer: FunctionComponent<ItemContainerProps> = props => {
+  // TODO add skuCode to workflow
   const { children } = props
   const [state, dispatch] = useReducer(itemReducer, itemInitialState)
   const itemValue: ItemState = {
@@ -20,11 +23,18 @@ const ItemContainer: FunctionComponent<ItemContainerProps> = props => {
     setItem: item =>
       setItemState(item, { type: 'setItem', key: 'item' }, dispatch),
     setQuantity: item =>
-      setItemState(item, { type: 'setQuantity', key: 'quantity' }, dispatch)
+      setItemState(item, { type: 'setQuantity', key: 'quantity' }, dispatch),
+    setOption: item =>
+      setItemState(item, { type: 'setOption', key: 'option' }, dispatch)
   }
   return (
     <ItemContext.Provider value={itemValue}>{children}</ItemContext.Provider>
   )
+}
+
+ItemContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+  skuCode: PropTypes.string
 }
 
 export default ItemContainer

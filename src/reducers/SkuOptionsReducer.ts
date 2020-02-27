@@ -28,8 +28,9 @@ export const getSkuOptions: GetSkuOptions = async params => {
     const sku = await CLayer.Sku.withCredentials(config)
       .includes('skuOptions')
       .findBy({ code: skuCode })
+    // NOTE Add type to SDK
     // @ts-ignore
-    const skuOptions = sku.skuOptions().toArray() // TODO add type
+    const skuOptions = sku.skuOptions().toArray()
     dispatch({
       type: 'setSkuOptions',
       payload: {

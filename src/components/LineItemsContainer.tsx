@@ -1,12 +1,10 @@
 import React, {
   useEffect,
   FunctionComponent,
-  ReactElement,
   useReducer,
-  useContext
+  useContext,
+  ReactNode
 } from 'react'
-import { OrderContainerActions } from './OrderContainer'
-import { LineItemProps } from './LineItem'
 import lineItemReducer, {
   lineItemInitialState,
   updateLineItem,
@@ -17,9 +15,10 @@ import OrderContext from '../context/OrderContext'
 import LineItemContext from '../context/LineItemContext'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import _ from 'lodash'
+import PropTypes from 'prop-types'
 
-export interface LineItemsContainer extends OrderContainerActions {
-  children?: ReactElement<LineItemProps>[] | ReactElement<LineItemProps>
+export interface LineItemsContainer {
+  children?: ReactNode
 }
 
 const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
@@ -69,6 +68,10 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
       {children}
     </LineItemContext.Provider>
   )
+}
+
+LineItemsContainer.propTypes = {
+  children: PropTypes.node
 }
 
 export default LineItemsContainer

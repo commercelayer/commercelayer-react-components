@@ -6,10 +6,13 @@ import React, {
 } from 'react'
 import LineItemContext from '../context/LineItemContext'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
+import PropTypes from 'prop-types'
+
+type LineItemType = 'skus' | 'gift_cards'
 
 export interface LineItemProps {
   children?: ReactNode
-  type?: 'skus' | 'gift_cards'
+  type?: LineItemType
 }
 
 const LineItem: FunctionComponent<LineItemProps> = props => {
@@ -32,6 +35,11 @@ const LineItem: FunctionComponent<LineItemProps> = props => {
 
 LineItem.defaultProps = {
   type: 'skus'
+}
+
+LineItem.propTypes = {
+  children: PropTypes.node,
+  type: PropTypes.oneOf<LineItemType>(['skus', 'gift_cards'])
 }
 
 export default LineItem

@@ -14,17 +14,10 @@ import CommerceLayerContext from '../context/CommerceLayerContext'
 import OrderContext from '../context/OrderContext'
 import { getApiOrder, addToCart } from '../reducers/OrderReducer'
 import { unsetOrderState } from '../reducers/OrderReducer'
-import { OrderCollection } from '@commercelayer/js-sdk'
-
-export interface OrderContainerActions {
-  setOrderId?: (orderId: string) => void
-  getOrder?: (orderId: string) => void
-  orderId?: string
-  order?: OrderCollection
-}
+import PropTypes from 'prop-types'
 
 export interface OrderContainerProps {
-  id?: string
+  id?: string // TODO to valuate
   persistKey: string
   children: ReactNode
 }
@@ -59,6 +52,11 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
   return (
     <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
   )
+}
+
+OrderContainer.propTypes = {
+  children: PropTypes.node,
+  persistKey: PropTypes.string.isRequired
 }
 
 export default OrderContainer

@@ -2,14 +2,12 @@ import React, { useContext, FunctionComponent } from 'react'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import Parent from './utils/Parent'
 import { BaseComponent } from '../@types'
-import { LineItemCollection } from '@commercelayer/js-sdk'
 
-export interface LineItemImageProps extends BaseComponent {
-  lineItem?: LineItemCollection
+export interface LineItemNameProps extends BaseComponent {
   children?: FunctionComponent
 }
 
-const LineItemName: FunctionComponent<LineItemImageProps> = props => {
+const LineItemName: FunctionComponent<LineItemNameProps> = props => {
   const { lineItem } = useContext(LineItemChildrenContext)
   const parentProps = {
     name: lineItem.name,
@@ -21,5 +19,7 @@ const LineItemName: FunctionComponent<LineItemImageProps> = props => {
     <p {...props}>{lineItem.name}</p>
   )
 }
+
+// TODO add propTypes
 
 export default LineItemName

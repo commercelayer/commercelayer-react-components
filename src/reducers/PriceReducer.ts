@@ -2,7 +2,7 @@ import { BaseAction } from '../@types/index'
 import CLayer, { PriceCollection } from '@commercelayer/js-sdk'
 import getPrices from '../utils/getPrices'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
-import { Dispatch } from 'react'
+import { Dispatch, ReactElement } from 'react'
 import getSkus from '../utils/getSkus'
 import { Items } from './ItemReducer'
 import baseReducer from '../utils/baseReducer'
@@ -26,6 +26,7 @@ export interface PriceState {
   errors?: BaseError[]
   skuCode?: string
   setSkuCodes?: SetSkuCodesPrice
+  loader?: ReactElement
 }
 
 export interface PriceAction extends BaseAction {
@@ -76,39 +77,49 @@ export const getSkusPrice: GetSkusPrice = (
       })
 
       if (r.hasNextPage()) {
-        r.nextPage().then(r => {
-          const pricesObj = getPrices(r.toArray())
-          const i = getSkus(r.toArray())
-          if (setItems) {
-            setItems({ ...items, ...i })
-          }
-          dispatch({
-            type: 'setPrices',
-            payload: { prices: pricesObj }
+        debugger
+        // NOTE Add type to SDK
+        // @ts-ignore
+        r.withCredentials(config)
+          .nextPage()
+          .then(r => {
+            debugger
+            const pricesObj = getPrices(r.toArray())
+            const i = getSkus(r.toArray())
+            if (setItems) {
+              setItems({ ...items, ...i })
+            }
+            dispatch({
+              type: 'setPrices',
+              payload: { prices: pricesObj }
+            })
+            dispatch({
+              type: 'setLoading',
+              payload: { loading: false }
+            })
           })
-          dispatch({
-            type: 'setLoading',
-            payload: { loading: false }
-          })
-        })
       }
 
       if (r.hasPrevPage()) {
-        r.prevPage().then(r => {
-          const pricesObj = getPrices(r.toArray())
-          const i = getSkus(r.toArray())
-          if (setItems) {
-            setItems({ ...items, ...i })
-          }
-          dispatch({
-            type: 'setPrices',
-            payload: { prices: pricesObj }
+        // NOTE Add type to SDK
+        // @ts-ignore
+        r.withCredentials(config)
+          .prevPage()
+          .then(r => {
+            const pricesObj = getPrices(r.toArray())
+            const i = getSkus(r.toArray())
+            if (setItems) {
+              setItems({ ...items, ...i })
+            }
+            dispatch({
+              type: 'setPrices',
+              payload: { prices: pricesObj }
+            })
+            dispatch({
+              type: 'setLoading',
+              payload: { loading: false }
+            })
           })
-          dispatch({
-            type: 'setLoading',
-            payload: { loading: false }
-          })
-        })
       }
     })
     .catch(c => {
