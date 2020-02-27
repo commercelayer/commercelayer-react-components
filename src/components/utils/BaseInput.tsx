@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, ChangeEvent } from 'react'
 import PropTypes from 'prop-types'
 import { BaseComponent } from '../../@types/index'
 import Parent from './Parent'
@@ -15,6 +15,9 @@ export interface BaseInputProps extends BaseComponent {
   name: string
   type: BaseInputType
   children?: FunctionComponent
+  onChange?: (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void
 }
 
 const BaseInput: FunctionComponent<BaseInputProps> = props => {
@@ -33,7 +36,8 @@ BaseInput.propTypes = {
     'date',
     'checkbox',
     'textarea'
-  ]).isRequired
+  ]).isRequired,
+  onChange: PropTypes.func
 }
 
 export default BaseInput

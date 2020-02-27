@@ -5,6 +5,8 @@ import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import baseReducer from '../utils/baseReducer'
 import { BaseError } from '../components/Errors'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
+import { ItemOption } from './ItemReducer'
+import _ from 'lodash'
 
 export interface GetOrderParams {
   id: string
@@ -28,6 +30,7 @@ export interface AddToCartParams {
   state: OrderState
   skuId?: string
   quantity?: number
+  option?: ItemOption
 }
 
 export interface AddToCart {
@@ -49,6 +52,7 @@ type AddToCartValues = {
   skuCode: string
   skuId?: string
   quantity?: number
+  option?: ItemOption
 }
 
 export type getOrderContext = (id: string) => void
@@ -112,7 +116,7 @@ export const createOrder: CreateOrder = async params => {
 export const getApiOrder: GetOrder = async params => {
   const { id, dispatch, config } = params
   const o = await CLayer.Order.withCredentials(config)
-    .includes('line_items')
+    .includes('lineItems.lineItemOptions')
     .find(id)
   if (o)
     dispatch({
@@ -124,7 +128,7 @@ export const getApiOrder: GetOrder = async params => {
 }
 
 export const addToCart: AddToCart = async params => {
-  const { skuCode, skuId, quantity, config, dispatch } = params
+  const { skuCode, skuId, quantity, option, config, dispatch } = params
   try {
     const id = await createOrder(params)
     const order = CLayer.Order.build({ id })
@@ -137,7 +141,17 @@ export const addToCart: AddToCart = async params => {
     if (skuId) {
       attrs['item'] = CLayer.Sku.build({ id: skuId })
     }
-    await CLayer.LineItem.withCredentials(config).create(attrs)
+    const lineItem = await CLayer.LineItem.withCredentials(config).create(attrs)
+    if (!_.isEmpty(option)) {
+      const { options, skuOptionId } = option
+      const skuOption = CLayer.SkuOption.build({ id: skuOptionId })
+      await CLayer.LineItemOption.withCredentials(config).create({
+        quantity: 1,
+        options,
+        lineItem,
+        skuOption
+      })
+    }
     await getApiOrder({ id, ...params })
   } catch (col) {
     const errors = getErrorsByCollection(col, 'order')

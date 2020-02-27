@@ -16,14 +16,20 @@ export interface AddToCartProps extends BaseComponent {
 const AddToCart: FunctionComponent<AddToCartProps> = props => {
   const { label, children, skuCode, ...p } = props
   const { addToCart } = useContext(OrderContext)
-  const { item, items, quantity } = useContext(ItemContext)
+  const { item, items, quantity, option } = useContext(ItemContext)
   const sCode =
     !_.isEmpty(items) && skuCode
       ? items[skuCode]?.code
       : skuCode || getCurrentItemKey(item)
   const handleClick = (): void => {
     const qty = quantity[sCode]
-    addToCart({ skuCode: sCode, skuId: item[sCode]?.id, quantity: qty })
+    const opt = option[sCode]
+    addToCart({
+      skuCode: sCode,
+      skuId: item[sCode]?.id,
+      quantity: qty,
+      option: opt
+    })
   }
   const disabled = !sCode
   const parentProps = {

@@ -1,7 +1,7 @@
-import React, { FunctionComponent, ReactNode, useState, useEffect } from 'react'
-// import { initCLayer } from '@commercelayer/js-sdk'
+import React, { FunctionComponent, ReactNode } from 'react'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
+import PropTypes from 'prop-types'
 
 export interface CommerceLayerProps extends CommerceLayerConfig {
   children: ReactNode
@@ -16,6 +16,12 @@ const CommerceLayer: FunctionComponent<CommerceLayerProps> = props => {
       {children}
     </CommerceLayerContext.Provider>
   )
+}
+
+CommerceLayer.propTypes = {
+  children: PropTypes.node.isRequired,
+  accessToken: PropTypes.string.isRequired,
+  endpoint: PropTypes.string.isRequired
 }
 
 export default CommerceLayer
