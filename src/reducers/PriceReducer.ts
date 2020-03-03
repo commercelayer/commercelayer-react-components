@@ -56,70 +56,51 @@ export const getSkusPrice: GetSkusPrice = (
   skuCodes,
   { config, dispatch, setItems, items }
 ) => {
+  let allPrices = {}
+  let allSkus = {}
   CLayer.Sku.withCredentials(config)
     .where({ codeIn: skuCodes.join(',') })
     .includes('prices')
     .perPage(25)
     .all()
-    .then(r => {
+    .then(async r => {
       const pricesObj = getPrices(r.toArray())
       const i = getSkus(r.toArray())
+      allPrices = { ...allPrices, ...pricesObj }
+      allSkus = { ...allSkus, ...items, ...i }
       if (setItems) {
-        setItems({ ...items, ...i })
+        setItems(allSkus)
       }
       dispatch({
         type: 'setPrices',
-        payload: { prices: pricesObj }
+        payload: { prices: allPrices }
       })
       dispatch({
         type: 'setLoading',
         payload: { loading: false }
       })
 
-      if (r.hasNextPage()) {
-        debugger
-        // NOTE Add type to SDK
-        // @ts-ignore
-        r.withCredentials(config)
-          .nextPage()
-          .then(r => {
-            debugger
-            const pricesObj = getPrices(r.toArray())
-            const i = getSkus(r.toArray())
-            if (setItems) {
-              setItems({ ...items, ...i })
-            }
-            dispatch({
-              type: 'setPrices',
-              payload: { prices: pricesObj }
-            })
-            dispatch({
-              type: 'setLoading',
-              payload: { loading: false }
-            })
+      const meta = r.getMetaInfo()
+      let col = r
+      for (let i = 1; i < meta.pageCount; i++) {
+        if (col.hasNextPage()) {
+          col = await col.withCredentials(config).nextPage()
+          const pricesObj = getPrices(col.toArray())
+          const i = getSkus(col.toArray())
+          allPrices = { ...allPrices, ...pricesObj }
+          allSkus = { ...allSkus, ...items, ...i }
+          if (setItems) {
+            setItems(allSkus)
+          }
+          dispatch({
+            type: 'setPrices',
+            payload: { prices: allPrices }
           })
-      }
-
-      if (r.hasPrevPage()) {
-        // NOTE Add type to SDK
-        // @ts-ignore
-        r.withCredentials(config)
-          .prevPage()
-          .then(r => {
-            const pricesObj = getPrices(r.toArray())
-            const i = getSkus(r.toArray())
-            if (setItems) {
-              setItems({ ...items, ...i })
-            }
-            dispatch({
-              type: 'setPrices',
-              payload: { prices: pricesObj }
-            })
-            dispatch({
-              type: 'setLoading',
-              payload: { loading: false }
-            })
+          dispatch({
+            type: 'setLoading',
+            payload: { loading: false }
           })
+        }
       }
     })
     .catch(c => {

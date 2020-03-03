@@ -5,6 +5,7 @@ import { BaseComponent } from '../@types/index'
 import _ from 'lodash'
 import ItemContext from '../context/ItemContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
+import PropTypes from 'prop-types'
 
 export interface AddToCartProps extends BaseComponent {
   label?: string
@@ -45,6 +46,13 @@ const AddToCart: FunctionComponent<AddToCartProps> = props => {
       {label ? label : 'add to cart'}
     </button>
   )
+}
+
+AddToCart.propTypes = {
+  children: PropTypes.func,
+  label: PropTypes.string,
+  disabled: PropTypes.bool,
+  skuCode: PropTypes.string
 }
 
 export default AddToCart

@@ -29,7 +29,8 @@ const GiftCardRecipient: FunctionComponent<GiftCardRecipientProps> = props => {
     e.preventDefault()
     const { errors, values } = validateFormFields<RequiredFields[]>(
       ref.current.elements,
-      ['email']
+      ['email'],
+      'giftCard'
     )
     if (_.isEmpty(errors)) {
       // TODO: ADD CALLBACK TO MANAGE THE EVENT
