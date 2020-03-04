@@ -28,20 +28,24 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
       ? items[skuCode]?.code
       : skuCode || getCurrentItemKey(item)
   const disabled = !sCode
-  const inventory = _.isEmpty(item) ? 50 : item[sCode]?.inventory?.quantity
-  const maxInv = max || inventory
+  const inventory = _.isEmpty(item) ? '50' : item[sCode]?.inventory?.quantity
+  const maxInv = max || `${inventory}`
   useEffect(() => {
     setValue(min)
+    if (sCode) {
+      const qty = Number(min)
+      setQuantity({ ...quantity, [`${sCode}`]: qty })
+    }
     return (): void => {
       setValue(min)
     }
   }, [item])
   const handleChange = (e): void => {
-    const qty = e.target.value
+    const qty = e.target.value as string
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
     setValue(qty)
     if (sCode && valid) {
-      setQuantity({ ...quantity, [`${sCode}`]: qty })
+      setQuantity({ ...quantity, [`${sCode}`]: Number(qty) })
     }
   }
   const handleBlur = (e): void => {
@@ -49,7 +53,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
     if (!valid) {
       const resetVal = Number(qty) < Number(min) ? min : maxInv
-      setValue(resetVal as string)
+      setValue(resetVal)
     }
   }
   const parentProps = {

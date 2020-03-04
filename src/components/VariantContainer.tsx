@@ -66,13 +66,13 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
         })
     }
   }
-  if (!_.isEmpty(items) && !_.isEmpty(state.variants)) {
-    if (!_.isEqual(items, state.variants)) {
-      const mergeItems = { ...items, ...state.variants }
-      setItems(mergeItems)
-    }
-  }
   useEffect(() => {
+    if (!_.isEmpty(items) && !_.isEmpty(state.variants)) {
+      if (!_.isEqual(items, state.variants)) {
+        const mergeItems = { ...items, ...state.variants }
+        setItems(mergeItems)
+      }
+    }
     if (state.skuCodes.length >= 1 && config.accessToken) {
       dispatch({
         type: 'setLoading',
