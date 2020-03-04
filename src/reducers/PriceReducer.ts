@@ -82,7 +82,7 @@ export const getSkusPrice: GetSkusPrice = (
 
       const meta = r.getMetaInfo()
       let col = r
-      for (let i = 1; i < meta.pageCount; i++) {
+      for (let key = 1; key < meta.pageCount; key++) {
         if (col.hasNextPage()) {
           col = await col.withCredentials(config).nextPage()
           const pricesObj = getPrices(col.toArray())
