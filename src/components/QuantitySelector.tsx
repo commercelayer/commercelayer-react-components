@@ -53,7 +53,9 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
     if (!valid) {
       const resetVal = Number(qty) < Number(min) ? min : maxInv
+      console.log('resetVal', resetVal)
       setValue(resetVal)
+      setQuantity({ ...quantity, [`${sCode}`]: Number(resetVal) })
     }
   }
   const parentProps = {
