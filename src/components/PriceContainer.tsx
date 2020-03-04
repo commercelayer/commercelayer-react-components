@@ -3,7 +3,8 @@ import React, {
   FunctionComponent,
   useContext,
   ReactNode,
-  useReducer
+  useReducer,
+  ReactElement
 } from 'react'
 import getPrices from '../utils/getPrices'
 import _ from 'lodash'
@@ -20,14 +21,16 @@ import {
 import PriceContext from '../context/PriceContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
+import PropTypes from 'prop-types'
 
 export interface PriceContainerProps {
   children: ReactNode
   skuCode?: string
+  loader?: ReactElement
 }
 
 const PriceContainer: FunctionComponent<PriceContainerProps> = props => {
-  const { children, skuCode } = props
+  const { children, skuCode, loader } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
   const { setItems, items, item: currentItem } = useContext(ItemContext)
@@ -74,11 +77,17 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = props => {
   const priceValue: PriceState = {
     ...state,
     skuCode: sCode,
+    loader,
     setSkuCodes
   }
   return (
     <PriceContext.Provider value={priceValue}>{children}</PriceContext.Provider>
   )
+}
+
+PriceContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+  skuCode: PropTypes.string
 }
 
 export default PriceContainer
