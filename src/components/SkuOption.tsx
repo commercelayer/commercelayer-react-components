@@ -16,7 +16,6 @@ export interface SkuOptionProps {
 const SkuOption: FunctionComponent<SkuOptionProps> = props => {
   const { name } = props
   const { skuOptions, skuCode } = useContext(SkuOptionsContext)
-  console.log('skuOptions', skuOptions)
   const items = skuOptions
     .filter(l => l.name === name)
     .map((skuOption, k) => {
