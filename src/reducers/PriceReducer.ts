@@ -61,7 +61,6 @@ export const getSkusPrice: GetSkusPrice = (
   CLayer.Sku.withCredentials(config)
     .where({ codeIn: skuCodes.join(',') })
     .includes('prices')
-    .perPage(25)
     .all()
     .then(async r => {
       const pricesObj = getPrices(r.toArray())
