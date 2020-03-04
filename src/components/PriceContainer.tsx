@@ -2,9 +2,7 @@ import React, {
   useEffect,
   FunctionComponent,
   useContext,
-  ReactNode,
-  useReducer,
-  ReactElement
+  useReducer
 } from 'react'
 import getPrices from '../utils/getPrices'
 import _ from 'lodash'
@@ -21,16 +19,20 @@ import {
 import PriceContext from '../context/PriceContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface PriceContainerProps {
-  children: ReactNode
-  skuCode?: string
-  loader?: ReactElement
+const PriceContainerProps = {
+  children: PropTypes.node.isRequired,
+  skuCode: PropTypes.string,
+  loader: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+  perPage: PropTypes.number
 }
 
-const PriceContainer: FunctionComponent<PriceContainerProps> = props => {
-  const { children, skuCode, loader } = props
+export type PCProps = InferProps<typeof PriceContainerProps>
+
+const PriceContainer: FunctionComponent<PCProps> = props => {
+  const { children, skuCode, loader, perPage } = props
+  console.log('loader', loader)
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
   const { setItems, items, item: currentItem } = useContext(ItemContext)
@@ -68,7 +70,8 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = props => {
           config,
           dispatch,
           setItems,
-          items
+          items,
+          perPage
         })
       }
     }
@@ -85,9 +88,10 @@ const PriceContainer: FunctionComponent<PriceContainerProps> = props => {
   )
 }
 
-PriceContainer.propTypes = {
-  children: PropTypes.node.isRequired,
-  skuCode: PropTypes.string
+PriceContainer.propTypes = PriceContainerProps
+
+PriceContainer.defaultProps = {
+  perPage: 10
 }
 
 export default PriceContainer

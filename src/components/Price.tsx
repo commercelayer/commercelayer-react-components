@@ -3,29 +3,27 @@ import React, {
   useState,
   useEffect,
   FunctionComponent,
-  useContext,
-  ReactElement
+  useContext
 } from 'react'
 import _ from 'lodash'
 import Parent from './utils/Parent'
 import PriceContext from '../context/PriceContext'
+import PropTypes from 'prop-types'
+import { LoaderType } from '../reducers/PriceReducer'
 
 export interface PriceProps {
   children?: FunctionComponent
   amountClassName?: string
   compareClassName?: string
   skuCode?: string
-  loader?: ReactElement
+  showCompare?: boolean
 }
 
-export interface PriceTemplateProps {
+export interface PriceTemplateProps extends PriceProps {
   formattedAmount: string
   formattedCompare: string
-  showCompare: boolean
-  amountClassName?: string
-  compareClassName?: string
   loading?: boolean
-  loader?: ReactElement
+  loader?: LoaderType
 }
 
 const PriceTemplate: FunctionComponent<PriceTemplateProps> = props =>
@@ -41,9 +39,14 @@ const PriceTemplate: FunctionComponent<PriceTemplateProps> = props =>
   )
 const Price: FunctionComponent<PriceProps> = props => {
   const { children } = props
-  const { prices, skuCode, loading, skuCodes, setSkuCodes } = useContext(
-    PriceContext
-  )
+  const {
+    prices,
+    skuCode,
+    loading,
+    skuCodes,
+    setSkuCodes,
+    loader
+  } = useContext(PriceContext)
   const [formattedAmount, setFormattedAmount] = useState('')
   const [formattedCompare, setFormattedCompare] = useState('')
   const [showCompare, setShowCompare] = useState(false)
@@ -75,6 +78,7 @@ const Price: FunctionComponent<PriceProps> = props => {
     formattedAmount,
     formattedCompare,
     loading,
+    loader,
     ...props
   }
   return children ? (
@@ -86,10 +90,19 @@ const Price: FunctionComponent<PriceProps> = props => {
         formattedAmount={formattedAmount}
         formattedCompare={formattedCompare}
         loading={loading}
+        loader={loader}
         {...props}
       />
     </Fragment>
   )
+}
+
+Price.propTypes = {
+  children: PropTypes.func,
+  amountClassName: PropTypes.string,
+  compareClassName: PropTypes.string,
+  skuCode: PropTypes.string,
+  showCompare: PropTypes.bool
 }
 
 export default Price

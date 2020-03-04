@@ -2,12 +2,13 @@ import { BaseAction } from '../@types/index'
 import CLayer, { PriceCollection } from '@commercelayer/js-sdk'
 import getPrices from '../utils/getPrices'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
-import { Dispatch, ReactElement } from 'react'
+import { Dispatch } from 'react'
 import getSkus from '../utils/getSkus'
 import { Items } from './ItemReducer'
 import baseReducer from '../utils/baseReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import { BaseError } from '../components/Errors'
+import { PCProps } from '../components/PriceContainer'
 
 export interface Prices {
   [key: string]: PriceCollection
@@ -19,6 +20,8 @@ export interface SetSkuCodesPrice {
   (skuCodes: SkuCodesPrice): void
 }
 
+export type LoaderType = PCProps['loader']
+
 export interface PriceState {
   loading: boolean
   prices: Prices
@@ -26,7 +29,7 @@ export interface PriceState {
   errors?: BaseError[]
   skuCode?: string
   setSkuCodes?: SetSkuCodesPrice
-  loader?: ReactElement
+  loader?: LoaderType
 }
 
 export interface PriceAction extends BaseAction {
@@ -48,19 +51,21 @@ export interface GetSkusPrice {
       dispatch: Dispatch<PriceAction>
       setItems: (item: Items | object) => void
       items: Items
+      perPage?: number
     }
   ): void
 }
 
 export const getSkusPrice: GetSkusPrice = (
   skuCodes,
-  { config, dispatch, setItems, items }
+  { config, dispatch, setItems, items, perPage }
 ) => {
   let allPrices = {}
   let allSkus = {}
   CLayer.Sku.withCredentials(config)
     .where({ codeIn: skuCodes.join(',') })
     .includes('prices')
+    .perPage(perPage)
     .all()
     .then(async r => {
       const pricesObj = getPrices(r.toArray())
