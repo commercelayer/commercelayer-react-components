@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
-    "@commercelayer/js-sdk": "^2.5.1",
+    "@commercelayer/js-sdk": "^2.5.2",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
@@ -43,7 +43,9 @@
     "cypress": "^4.1.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
+    "eslint-config-react-app": "^5.2.0",
     "eslint-plugin-react": "^7.18.3",
+    "eslint-plugin-react-hooks": "^2.5.0",
     "next": "^9.2.2",
     "postcss-loader": "^3.0.0",
     "prettier": "^1.19.1",
