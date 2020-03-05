@@ -1,17 +1,14 @@
-import React, {
-  FunctionComponent,
-  Fragment,
-  useContext,
-  ReactNode
-} from 'react'
+import React, { FunctionComponent, Fragment, useContext } from 'react'
 import SkuOptionChildrenContext from '../context/SkuOptionChildrenContext'
 import SkuOptionsContext from '../context/SkuOptionsContext'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface SkuOptionProps {
-  children?: ReactNode
-  name: string
+const SOProps = {
+  name: PropTypes.string.isRequired,
+  children: PropTypes.node
 }
+
+export type SkuOptionProps = InferProps<typeof SOProps>
 
 const SkuOption: FunctionComponent<SkuOptionProps> = props => {
   const { name } = props
@@ -31,9 +28,6 @@ const SkuOption: FunctionComponent<SkuOptionProps> = props => {
   return <Fragment>{items}</Fragment>
 }
 
-SkuOption.propTypes = {
-  name: PropTypes.string.isRequired,
-  children: PropTypes.node
-}
+SkuOption.propTypes = SOProps
 
 export default SkuOption

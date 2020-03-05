@@ -1,12 +1,14 @@
 import React, { FunctionComponent } from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 import Parent from './utils/Parent'
 import { BaseComponent } from '../@types/index'
 
-export interface SubmitButtonProps extends BaseComponent {
-  label?: string
-  children?: FunctionComponent
+const SBProps = {
+  children: PropTypes.func,
+  label: PropTypes.string
 }
+
+export type SubmitButtonProps = InferProps<typeof SBProps> & BaseComponent
 
 const SubmitButton: FunctionComponent<SubmitButtonProps> = props => {
   const { children, label, ...p } = props
@@ -23,10 +25,7 @@ const SubmitButton: FunctionComponent<SubmitButtonProps> = props => {
   )
 }
 
-SubmitButton.propTypes = {
-  children: PropTypes.func,
-  label: PropTypes.string
-}
+SubmitButton.propTypes = SBProps
 
 SubmitButton.defaultProps = {
   label: 'submit'

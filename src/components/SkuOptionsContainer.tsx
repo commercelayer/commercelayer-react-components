@@ -1,11 +1,10 @@
 import React, {
-  ReactNode,
   FunctionComponent,
   useReducer,
   useContext,
   useEffect
 } from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 import SkuOptionsContext from '../context/SkuOptionsContext'
 import skuOptionsReducer, {
   skuOptionsInitialState,
@@ -17,10 +16,12 @@ import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
 import { getSkuOptions } from '../reducers/SkuOptionsReducer'
 
-export interface SkuOptionsContainerProp {
-  children: ReactNode
-  skuCode?: string
+const SOCProps = {
+  children: PropTypes.node.isRequired,
+  skuCode: PropTypes.string
 }
+
+export type SkuOptionsContainerProp = InferProps<typeof SOCProps>
 
 const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = props => {
   const { skuCode, children } = props
@@ -52,9 +53,6 @@ const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = props =>
   )
 }
 
-SkuOptionsContainer.propTypes = {
-  children: PropTypes.node.isRequired,
-  skuCode: PropTypes.string
-}
+SkuOptionsContainer.propTypes = SOCProps
 
 export default SkuOptionsContainer

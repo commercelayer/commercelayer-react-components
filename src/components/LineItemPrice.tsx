@@ -8,12 +8,18 @@ import getAmount from '../utils/getAmount'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import Parent from './utils/Parent'
 import { BaseComponent } from '../@types/index'
+import { BaseOrderComponentProps, BOCProps } from './utils/BaseOrderPrice'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface LineItemPriceProps extends BaseComponent {
-  format?: 'formatted' | 'cents' | 'float'
-  type?: 'total' | 'option' | 'unit'
-  children?: FunctionComponent
+type TypePrice = 'total' | 'option' | 'unit'
+
+const LIPProps = {
+  ...BOCProps,
+  type: PropTypes.oneOf<TypePrice>(['total', 'unit', 'option'])
 }
+
+export type LineItemPriceProps = InferProps<typeof LIPProps> &
+  BaseOrderComponentProps
 
 const LineItemPrice: FunctionComponent<LineItemPriceProps> = props => {
   const { format, type, ...p } = props
@@ -36,6 +42,8 @@ const LineItemPrice: FunctionComponent<LineItemPriceProps> = props => {
     <span {...p}>{price}</span>
   )
 }
+
+LineItemPrice.propTypes = LIPProps
 
 LineItemPrice.defaultProps = {
   format: 'formatted',

@@ -2,12 +2,15 @@ import React, { useContext, FunctionComponent, Fragment } from 'react'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import Parent from './utils/Parent'
 import { BaseComponent } from '../@types'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 import _ from 'lodash'
 
-export interface LineItemOptionsProps extends BaseComponent {
-  children?: FunctionComponent
+const LIOptionsProps = {
+  children: PropTypes.func
 }
+
+export type LineItemOptionsProps = InferProps<typeof LIOptionsProps> &
+  BaseComponent
 
 const LineItemOptions: FunctionComponent<LineItemOptionsProps> = props => {
   const { lineItem } = useContext(LineItemChildrenContext)
@@ -34,8 +37,6 @@ const LineItemOptions: FunctionComponent<LineItemOptionsProps> = props => {
   )
 }
 
-LineItemOptions.propTypes = {
-  children: PropTypes.func
-}
+LineItemOptions.propTypes = LIOptionsProps
 
 export default LineItemOptions

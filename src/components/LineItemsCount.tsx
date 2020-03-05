@@ -9,10 +9,15 @@ import Parent from './utils/Parent'
 import OrderContext from '../context/OrderContext'
 import getLineItemsCount from '../utils/getLineItemsCount'
 import _ from 'lodash'
+import { InferProps } from 'prop-types'
+import PropTypes from 'prop-types'
 
-export interface LineItemsCountProps extends BaseComponent {
-  children?: FunctionComponent
+const LItemsCProps = {
+  children: PropTypes.func
 }
+
+export type LineItemsCountProps = InferProps<typeof LItemsCProps> &
+  BaseComponent
 
 const LineItemsCount: FunctionComponent<LineItemsCountProps> = props => {
   const { children, ...p } = props
@@ -38,5 +43,7 @@ const LineItemsCount: FunctionComponent<LineItemsCountProps> = props => {
     <span {...p}>{quantity}</span>
   )
 }
+
+LineItemsCount.propTypes = LItemsCProps
 
 export default LineItemsCount

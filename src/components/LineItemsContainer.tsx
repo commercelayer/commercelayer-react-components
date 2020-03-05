@@ -19,6 +19,7 @@ import PropTypes from 'prop-types'
 
 export interface LineItemsContainer {
   children?: ReactNode
+  // TODO add perPage and its integration
 }
 
 const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {

@@ -2,22 +2,24 @@ import React, {
   Fragment,
   useState,
   useEffect,
-  FunctionComponent,
-  useContext
+  useContext,
+  FunctionComponent
 } from 'react'
 import _ from 'lodash'
 import Parent from './utils/Parent'
 import PriceContext from '../context/PriceContext'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 import { LoaderType } from '../reducers/PriceReducer'
 
-export interface PriceProps {
-  children?: FunctionComponent
-  amountClassName?: string
-  compareClassName?: string
-  skuCode?: string
-  showCompare?: boolean
+const PProps = {
+  children: PropTypes.func,
+  amountClassName: PropTypes.string,
+  compareClassName: PropTypes.string,
+  skuCode: PropTypes.string,
+  showCompare: PropTypes.bool
 }
+
+export type PriceProps = InferProps<typeof PProps>
 
 export interface PriceTemplateProps extends PriceProps {
   formattedAmount: string
@@ -97,12 +99,6 @@ const Price: FunctionComponent<PriceProps> = props => {
   )
 }
 
-Price.propTypes = {
-  children: PropTypes.func,
-  amountClassName: PropTypes.string,
-  compareClassName: PropTypes.string,
-  skuCode: PropTypes.string,
-  showCompare: PropTypes.bool
-}
+Price.propTypes = PProps
 
 export default Price

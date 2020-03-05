@@ -32,7 +32,6 @@ export type PCProps = InferProps<typeof PriceContainerProps>
 
 const PriceContainer: FunctionComponent<PCProps> = props => {
   const { children, skuCode, loader, perPage } = props
-  console.log('loader', loader)
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
   const { setItems, items, item: currentItem } = useContext(ItemContext)

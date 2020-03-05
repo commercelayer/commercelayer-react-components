@@ -1,6 +1,5 @@
 import React, {
   useContext,
-  ReactNode,
   useReducer,
   FunctionComponent,
   useEffect
@@ -12,11 +11,14 @@ import AvailabilityContext from '../context/AvailabilityContext'
 import _ from 'lodash'
 import ItemContext from '../context/ItemContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface AvailabilityContainerProps {
-  children: ReactNode
-  skuId?: string
+const ACProps = {
+  children: PropTypes.node.isRequired,
+  skuCode: PropTypes.string
 }
+
+export type AvailabilityContainerProps = InferProps<typeof ACProps>
 
 const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = props => {
   const { children } = props
@@ -26,7 +28,7 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = pro
     availabilityInitialState
   )
   useEffect(() => {
-    const skuCode = getCurrentItemKey(item)
+    const skuCode = props.skuCode || getCurrentItemKey(item)
     if (skuCode) {
       const firstLevel = _.first(item[skuCode].inventory.levels)
       if (firstLevel.deliveryLeadTimes.length > 0) {
@@ -50,5 +52,7 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = pro
     </AvailabilityContext.Provider>
   )
 }
+
+AvailabilityContainer.propTypes = ACProps
 
 export default AvailabilityContainer

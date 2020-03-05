@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 import { BaseComponent } from '../@types/index'
 import BaseInput, { BaseInputType } from './utils/BaseInput'
 
@@ -16,20 +16,7 @@ type GiftCardInputName =
   | 'lastName'
   | 'reference'
 
-export interface GiftCardInputProps extends BaseComponent {
-  type: BaseInputType
-  name: GiftCardInputName
-  children?: FunctionComponent
-  placeholder?: string
-  required?: boolean
-}
-
-const GiftCardInput: FunctionComponent<GiftCardInputProps> = props => {
-  const { ...p } = props
-  return <BaseInput {...p} />
-}
-
-GiftCardInput.propTypes = {
+const GCIProps = {
   type: PropTypes.oneOf<BaseInputType>([
     'text',
     'email',
@@ -53,5 +40,14 @@ GiftCardInput.propTypes = {
   children: PropTypes.func,
   placeholder: PropTypes.string
 }
+
+export type GiftCardInputProps = InferProps<typeof GCIProps> & BaseComponent
+
+const GiftCardInput: FunctionComponent<GiftCardInputProps> = props => {
+  const { ...p } = props
+  return <BaseInput {...p} />
+}
+
+GiftCardInput.propTypes = GCIProps
 
 export default GiftCardInput

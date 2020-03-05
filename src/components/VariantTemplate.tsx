@@ -1,19 +1,16 @@
 import React, { Fragment, FunctionComponent } from 'react'
 import _ from 'lodash'
-import { BaseComponent } from '../@types'
-import { SetSkuCodeVariant } from '../reducers/VariantReducer'
-import { SkuCodePropObj } from './VariantSelector'
-import VariantContainer from './VariantContainer'
+import { VSProps, VariantSelectorProps } from './VariantSelector'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface VariantTemplateProps extends BaseComponent {
-  variants: object
-  type: string
-  placeholder: string
-  onChange: SetSkuCodeVariant
-  name: string
-  skuCodes: SkuCodePropObj[]
-  skuCode?: string
+const VTProps = {
+  ...VSProps,
+  variants: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired
 }
+
+export type VariantTemplateProps = InferProps<typeof VTProps> &
+  VariantSelectorProps
 
 const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
   const {
@@ -70,5 +67,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
   }
   return <Fragment>{vars}</Fragment>
 }
+
+VariantTemplate.propTypes = VTProps
 
 export default VariantTemplate

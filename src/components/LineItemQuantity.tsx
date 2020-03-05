@@ -1,17 +1,17 @@
 import React, { FunctionComponent, useContext } from 'react'
-import { LineItemCollection } from '@commercelayer/js-sdk'
 import { BaseComponent } from '../@types/index'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import LineItemContext from '../context/LineItemContext'
 import Parent from './utils/Parent'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface LineItemQuantityProps extends BaseComponent {
-  children?: FunctionComponent
-  lineItem?: LineItemCollection
-  updateLineItem?: (lineItemId, quantity) => void
-  max?: number
-  disabled?: boolean
+const LIQProps = {
+  children: PropTypes.func,
+  max: PropTypes.number,
+  disabled: PropTypes.bool
 }
+
+export type LineItemQuantityProps = InferProps<typeof LIQProps> & BaseComponent
 
 const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = props => {
   const { lineItem } = useContext(LineItemChildrenContext)
@@ -41,6 +41,8 @@ const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = props => {
     </select>
   )
 }
+
+LineItemQuantity.propTypes = LIQProps
 
 LineItemQuantity.defaultProps = {
   max: 50

@@ -5,14 +5,16 @@ import { BaseComponent } from '../@types/index'
 import _ from 'lodash'
 import ItemContext from '../context/ItemContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface AddToCartProps extends BaseComponent {
-  label?: string
-  disabled?: boolean
-  skuCode?: string
-  children?: FunctionComponent
+const ATCProps = {
+  children: PropTypes.func,
+  label: PropTypes.string,
+  disabled: PropTypes.bool,
+  skuCode: PropTypes.string
 }
+
+export type AddToCartProps = InferProps<typeof ATCProps> & BaseComponent
 
 const AddToCart: FunctionComponent<AddToCartProps> = props => {
   const { label, children, skuCode, ...p } = props
@@ -48,11 +50,6 @@ const AddToCart: FunctionComponent<AddToCartProps> = props => {
   )
 }
 
-AddToCart.propTypes = {
-  children: PropTypes.func,
-  label: PropTypes.string,
-  disabled: PropTypes.bool,
-  skuCode: PropTypes.string
-}
+AddToCart.propTypes = ATCProps
 
 export default AddToCart

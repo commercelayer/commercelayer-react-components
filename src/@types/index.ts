@@ -1,12 +1,15 @@
-import { CSSProperties, Dispatch } from 'react'
+import { Dispatch } from 'react'
 import { BaseError } from '../components/Errors'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface BaseComponent {
-  id?: string
-  key?: string
-  className?: string
-  style?: CSSProperties
+const BC = {
+  id: PropTypes.string,
+  key: PropTypes.string,
+  className: PropTypes.string,
+  style: PropTypes.object
 }
+
+export type BaseComponent = InferProps<typeof BC>
 
 export interface BaseAction<A = string> {
   type: A

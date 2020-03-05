@@ -2,11 +2,13 @@ import React, { useContext, FunctionComponent } from 'react'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import Parent from './utils/Parent'
 import { BaseComponent } from '../@types'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface LineItemNameProps extends BaseComponent {
-  children?: FunctionComponent
+const LINProps = {
+  children: PropTypes.func
 }
+
+export type LineItemNameProps = InferProps<typeof LINProps> & BaseComponent
 
 const LineItemName: FunctionComponent<LineItemNameProps> = props => {
   const { lineItem } = useContext(LineItemChildrenContext)
@@ -21,8 +23,6 @@ const LineItemName: FunctionComponent<LineItemNameProps> = props => {
   )
 }
 
-LineItemName.propTypes = {
-  children: PropTypes.func
-}
+LineItemName.propTypes = LINProps
 
 export default LineItemName

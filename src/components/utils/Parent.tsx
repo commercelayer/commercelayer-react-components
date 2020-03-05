@@ -1,20 +1,17 @@
-import React, {
-  Children,
-  Fragment,
-  ReactChild,
-  cloneElement,
-  ReactElement,
-  HTMLProps,
-  FunctionComponent
-} from 'react'
-import _ from 'lodash'
+import PropTypes, { InferProps } from 'prop-types'
+import React, { FunctionComponent } from 'react'
 
-export interface ParentProps {
-  children: FunctionComponent
+const PProps = {
+  children: PropTypes.func.isRequired
 }
+
+export type ParentProps = InferProps<typeof PProps>
 
 const Parent: FunctionComponent<ParentProps> = props => {
   const Child = props.children
   return <Child {...props} />
 }
+
+Parent.propTypes = PProps
+
 export default Parent

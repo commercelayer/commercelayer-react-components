@@ -1,10 +1,13 @@
 import React, { FunctionComponent, useContext } from 'react'
 import { BaseComponent } from '../@types/index'
 import OrderContext from '../context/OrderContext'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface CheckoutProps extends BaseComponent {
-  label?: string
+const CProps = {
+  label: PropTypes.string
 }
+
+export type CheckoutProps = InferProps<typeof CProps> & BaseComponent
 
 const Checkout: FunctionComponent<CheckoutProps> = props => {
   const { order } = useContext(OrderContext)
@@ -18,5 +21,7 @@ const Checkout: FunctionComponent<CheckoutProps> = props => {
 Checkout.defaultProps = {
   label: 'checkout'
 }
+
+Checkout.propTypes = CProps
 
 export default Checkout

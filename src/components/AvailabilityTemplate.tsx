@@ -3,15 +3,18 @@ import AvailabilityContext from '../context/AvailabilityContext'
 import Parent from './utils/Parent'
 import { BaseComponent } from '../@types/index'
 import _ from 'lodash'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 
 type TimeFormat = 'days' | 'hours'
 
-export interface AvailabilityTemplateProps extends BaseComponent {
-  children?: FunctionComponent
-  timeFormat?: TimeFormat
-  showShippingMethodName?: boolean
+const ATProps = {
+  timeFormat: PropTypes.oneOf<TimeFormat>(['days', 'hours']),
+  showShippingMethodName: PropTypes.bool,
+  children: PropTypes.func
 }
+
+export type AvailabilityTemplateProps = InferProps<typeof ATProps> &
+  BaseComponent
 
 const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = props => {
   const { timeFormat, showShippingMethodName, children, ...p } = props
@@ -42,10 +45,6 @@ AvailabilityTemplate.defaultProps = {
   showShippingMethodName: false
 }
 
-AvailabilityTemplate.propTypes = {
-  timeFormat: PropTypes.oneOf<TimeFormat>(['days', 'hours']),
-  showShippingMethodName: PropTypes.bool,
-  children: PropTypes.func
-}
+AvailabilityTemplate.propTypes = ATProps
 
 export default AvailabilityTemplate

@@ -1,13 +1,16 @@
-import React, { FunctionComponent, ReactNode } from 'react'
+import React, { FunctionComponent } from 'react'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface CommerceLayerProps extends CommerceLayerConfig {
-  children: ReactNode
-  accessToken: string
-  endpoint: string
+const CLProps = {
+  children: PropTypes.node.isRequired,
+  accessToken: PropTypes.string.isRequired,
+  endpoint: PropTypes.string.isRequired
 }
+
+export type CommerceLayerProps = InferProps<typeof CLProps> &
+  CommerceLayerConfig
 
 const CommerceLayer: FunctionComponent<CommerceLayerProps> = props => {
   const { children, ...p } = props
@@ -18,10 +21,6 @@ const CommerceLayer: FunctionComponent<CommerceLayerProps> = props => {
   )
 }
 
-CommerceLayer.propTypes = {
-  children: PropTypes.node.isRequired,
-  accessToken: PropTypes.string.isRequired,
-  endpoint: PropTypes.string.isRequired
-}
+CommerceLayer.propTypes = CLProps
 
 export default CommerceLayer

@@ -9,15 +9,17 @@ import Parent from './utils/Parent'
 import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface QuantitySelectorProps extends BaseComponent {
-  min?: string
-  max?: string
-  value?: string
-  skuCode?: string
-  children?: FunctionComponent
+const QSProps = {
+  children: PropTypes.func,
+  min: PropTypes.string,
+  max: PropTypes.string,
+  value: PropTypes.string,
+  skuCode: PropTypes.string
 }
+
+export type QuantitySelectorProps = InferProps<typeof QSProps> & BaseComponent
 
 const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
   const { skuCode, children, min, max, ...p } = props
@@ -87,12 +89,6 @@ QuantitySelector.defaultProps = {
   min: '1'
 }
 
-QuantitySelector.propTypes = {
-  children: PropTypes.func,
-  min: PropTypes.string,
-  max: PropTypes.string,
-  value: PropTypes.string,
-  skuCode: PropTypes.string
-}
+QuantitySelector.propTypes = QSProps
 
 export default QuantitySelector

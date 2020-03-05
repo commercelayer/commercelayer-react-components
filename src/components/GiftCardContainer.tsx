@@ -4,7 +4,7 @@ import React, {
   useReducer,
   useContext
 } from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 import GiftCardContext from '../context/GiftCardContext'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import giftCardReducer, {
@@ -17,9 +17,11 @@ import giftCardReducer, {
 } from '../reducers/GiftCardReducer'
 import OrderContext from '../context/OrderContext'
 
-export interface GiftCardContainer {
-  children: ReactNode
+const GCCProps = {
+  children: PropTypes.node.isRequired
 }
+
+export type GiftCardContainer = InferProps<typeof GCCProps>
 
 const GiftCardContainer: FunctionComponent<GiftCardContainer> = props => {
   const { children } = props
@@ -42,8 +44,6 @@ const GiftCardContainer: FunctionComponent<GiftCardContainer> = props => {
   )
 }
 
-GiftCardContainer.propTypes = {
-  children: PropTypes.node
-}
+GiftCardContainer.propTypes = GCCProps
 
 export default GiftCardContainer

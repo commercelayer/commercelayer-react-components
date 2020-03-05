@@ -8,13 +8,25 @@ import React, {
   useContext
 } from 'react'
 import { BaseComponent } from '../../@types'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface BaseOrderPriceProps extends BaseComponent {
-  format?: 'formatted' | 'cents' | 'float'
-  base: string
-  type: string
-  children?: FunctionComponent
+export const BOPProps = {
+  base: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
+  children: PropTypes.func,
+  format: PropTypes.oneOf(['formatted', 'cents', 'float'])
 }
+
+export const BOCProps = {
+  children: BOPProps['children'],
+  format: BOPProps['format']
+}
+
+export type BaseOrderComponentProps = InferProps<typeof BOCProps> &
+  BaseComponent
+
+export type BaseOrderPriceProps = InferProps<typeof BOPProps> & BaseComponent
+
 const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = props => {
   const { format, base, type, ...p } = props
   const { order } = useContext(OrderContext)
@@ -35,6 +47,8 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = props => {
     <span {...p}>{price}</span>
   )
 }
+
+BaseOrderPrice.propTypes = BOPProps
 
 BaseOrderPrice.defaultProps = {
   format: 'formatted'

@@ -2,8 +2,7 @@ import React, {
   useEffect,
   FunctionComponent,
   useReducer,
-  useContext,
-  ReactNode
+  useContext
 } from 'react'
 import { getLocalOrder } from '../utils/localStorage'
 import orderReducer, {
@@ -14,13 +13,14 @@ import CommerceLayerContext from '../context/CommerceLayerContext'
 import OrderContext from '../context/OrderContext'
 import { getApiOrder, addToCart } from '../reducers/OrderReducer'
 import { unsetOrderState } from '../reducers/OrderReducer'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface OrderContainerProps {
-  id?: string // TODO to valuate
-  persistKey: string
-  children: ReactNode
+const OCProps = {
+  children: PropTypes.node.isRequired,
+  persistKey: PropTypes.string.isRequired
 }
+
+export type OrderContainerProps = InferProps<typeof OCProps>
 
 const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
   const { children, persistKey } = props
@@ -54,9 +54,6 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
   )
 }
 
-OrderContainer.propTypes = {
-  children: PropTypes.node,
-  persistKey: PropTypes.string.isRequired
-}
+OrderContainer.propTypes = OCProps
 
 export default OrderContainer

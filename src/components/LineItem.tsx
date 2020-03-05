@@ -1,19 +1,16 @@
-import React, {
-  FunctionComponent,
-  Fragment,
-  useContext,
-  ReactNode
-} from 'react'
+import React, { FunctionComponent, Fragment, useContext } from 'react'
 import LineItemContext from '../context/LineItemContext'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 
 type LineItemType = 'skus' | 'gift_cards'
 
-export interface LineItemProps {
-  children?: ReactNode
-  type?: LineItemType
+const LIProps = {
+  children: PropTypes.node.isRequired,
+  type: PropTypes.oneOf<LineItemType>(['skus', 'gift_cards'])
 }
+
+export type LineItemProps = InferProps<typeof LIProps>
 
 const LineItem: FunctionComponent<LineItemProps> = props => {
   const { type } = props
@@ -37,9 +34,6 @@ LineItem.defaultProps = {
   type: 'skus'
 }
 
-LineItem.propTypes = {
-  children: PropTypes.node,
-  type: PropTypes.oneOf<LineItemType>(['skus', 'gift_cards'])
-}
+LineItem.propTypes = LIProps
 
 export default LineItem

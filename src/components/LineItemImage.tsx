@@ -1,15 +1,16 @@
 import React, { FunctionComponent, useContext } from 'react'
 import { BaseComponent } from '../@types/index'
-import { LineItemCollection } from '@commercelayer/js-sdk'
 import Parent from './utils/Parent'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface LineItemImageProps extends BaseComponent {
-  width?: number
-  src?: string
-  lineItem?: LineItemCollection
-  children?: FunctionComponent
+const LIIProps = {
+  width: PropTypes.number,
+  src: PropTypes.string,
+  children: PropTypes.func
 }
+
+export type LineItemImageProps = InferProps<typeof LIIProps> & BaseComponent
 
 const LineItemImage: FunctionComponent<LineItemImageProps> = props => {
   const { lineItem } = useContext(LineItemChildrenContext)
@@ -24,4 +25,7 @@ const LineItemImage: FunctionComponent<LineItemImageProps> = props => {
     <img src={src} {...props} />
   )
 }
+
+LineItemImage.propTypes = LIIProps
+
 export default LineItemImage

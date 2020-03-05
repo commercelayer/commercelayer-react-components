@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 import { BaseComponent } from '../../@types/index'
 import Parent from './Parent'
 
@@ -8,14 +8,24 @@ export interface OptionType {
   value: number | string
 }
 
-export interface BaseSelectProps extends BaseComponent {
-  name: string
-  options: OptionType[]
-  value?: string
-  required?: boolean
-  placeholder?: OptionType
-  children?: FunctionComponent
+const BSProps = {
+  children: PropTypes.func,
+  options: PropTypes.arrayOf<OptionType>(
+    PropTypes.exact({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+      selected: PropTypes.bool
+    })
+  ).isRequired,
+  placeholder: PropTypes.exact({
+    label: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
+  }),
+  value: PropTypes.string
 }
+
+export type BaseSelectProps = InferProps<typeof BSProps> & BaseComponent
 
 const BaseSelect: FunctionComponent<BaseSelectProps> = props => {
   const { options, children, placeholder, ...p } = props
@@ -42,21 +52,7 @@ const BaseSelect: FunctionComponent<BaseSelectProps> = props => {
   )
 }
 
-BaseSelect.propTypes = {
-  options: PropTypes.arrayOf<OptionType>(
-    PropTypes.exact({
-      label: PropTypes.string.isRequired,
-      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-        .isRequired,
-      selected: PropTypes.bool
-    })
-  ).isRequired,
-  placeholder: PropTypes.exact({
-    label: PropTypes.string.isRequired,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
-  }),
-  value: PropTypes.string
-}
+BaseSelect.propTypes = BSProps
 
 BaseSelect.defaultProps = {
   options: [],

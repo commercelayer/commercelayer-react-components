@@ -3,14 +3,16 @@ import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import LineItemContext from '../context/LineItemContext'
 import Parent from './utils/Parent'
 import { BaseComponent } from '../@types/index'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface LineItemRemove extends BaseComponent {
-  children?: FunctionComponent
-  className?: string
-  label?: string
+const LIRProps = {
+  children: PropTypes.func,
+  label: PropTypes.string
 }
 
-const LineItemRemove: FunctionComponent<LineItemRemove> = props => {
+export type LineItemRemoveProps = InferProps<typeof LIRProps> & BaseComponent
+
+const LineItemRemove: FunctionComponent<LineItemRemoveProps> = props => {
   const { lineItem } = useContext(LineItemChildrenContext)
   const { deleteLineItem } = useContext(LineItemContext)
   const handleRemove = (e): void => {
@@ -29,6 +31,8 @@ const LineItemRemove: FunctionComponent<LineItemRemove> = props => {
     </a>
   )
 }
+
+LineItemRemove.propTypes = LIRProps
 
 LineItemRemove.defaultProps = {
   label: 'remove'

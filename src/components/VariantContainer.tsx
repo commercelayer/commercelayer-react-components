@@ -2,8 +2,7 @@ import React, {
   useEffect,
   FunctionComponent,
   useReducer,
-  useContext,
-  ReactNode
+  useContext
 } from 'react'
 import CLayer from '@commercelayer/js-sdk'
 import getSkus from '../utils/getSkus'
@@ -20,11 +19,14 @@ import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface VariantContainerProps {
-  children: ReactNode
-  skuCode?: string
+const VCProps = {
+  children: PropTypes.node.isRequired,
+  skuCode: PropTypes.string
 }
+
+export type VariantContainerProps = InferProps<typeof VCProps>
 
 const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
   const { children, skuCode } = props
@@ -82,7 +84,6 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
       CLayer.Sku.withCredentials(config)
         .where({ codeIn: state.skuCodes.join(',') })
         .includes('prices')
-        .perPage(25)
         .all()
         .then(r => {
           const skusObj = getSkus(r.toArray())
@@ -127,5 +128,7 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
     </VariantContext.Provider>
   )
 }
+
+VariantContainer.propTypes = VCProps
 
 export default VariantContainer

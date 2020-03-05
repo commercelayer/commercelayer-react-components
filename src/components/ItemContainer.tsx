@@ -1,16 +1,18 @@
-import React, { FunctionComponent, ReactNode, useReducer } from 'react'
+import React, { FunctionComponent, useReducer } from 'react'
 import ItemContext from '../context/ItemContext'
 import itemReducer, {
   itemInitialState,
   setItemState
 } from '../reducers/ItemReducer'
 import { ItemState } from '../reducers/ItemReducer'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface ItemContainerProps {
-  children: ReactNode
-  skuCode?: string
+const ICProps = {
+  children: PropTypes.node.isRequired,
+  skuCode: PropTypes.string
 }
+
+export type ItemContainerProps = InferProps<typeof ICProps>
 
 const ItemContainer: FunctionComponent<ItemContainerProps> = props => {
   // TODO add skuCode to workflow
@@ -32,9 +34,6 @@ const ItemContainer: FunctionComponent<ItemContainerProps> = props => {
   )
 }
 
-ItemContainer.propTypes = {
-  children: PropTypes.node.isRequired,
-  skuCode: PropTypes.string
-}
+ItemContainer.propTypes = ICProps
 
 export default ItemContainer
