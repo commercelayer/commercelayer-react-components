@@ -22,7 +22,8 @@ const BSProps = {
     label: PropTypes.string.isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
   }),
-  value: PropTypes.string
+  value: PropTypes.string,
+  name: PropTypes.string.isRequired
 }
 
 export type BaseSelectProps = InferProps<typeof BSProps> & BaseComponent
