@@ -29,6 +29,7 @@ export const VSProps = {
   loader: PropTypes.element,
   placeholder: PropTypes.string,
   skuCode: PropTypes.string
+  // TODO Does metadata add?
 }
 
 export type VariantSelectorProps = InferProps<typeof VSProps> & BaseComponent

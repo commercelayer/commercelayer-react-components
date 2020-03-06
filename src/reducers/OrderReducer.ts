@@ -7,6 +7,7 @@ import { BaseError } from '../components/Errors'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import { ItemOption } from './ItemReducer'
 import _ from 'lodash'
+import { BaseMetadataObject } from '../@types/index'
 
 export interface GetOrderParams {
   id: string
@@ -31,6 +32,7 @@ export interface AddToCartParams {
   skuId?: string
   quantity?: number
   option?: ItemOption
+  orderMetadata?: BaseMetadataObject
 }
 
 export interface AddToCart {
@@ -92,9 +94,15 @@ const actionType: OrderActionType[] = [
 ]
 
 export const createOrder: CreateOrder = async params => {
-  const { persistKey, state, dispatch, config } = params
+  const {
+    persistKey,
+    state,
+    dispatch,
+    config,
+    orderMetadata: metadata
+  } = params
   if (state.orderId) return state.orderId
-  const o = await CLayer.Order.withCredentials(config).create({})
+  const o = await CLayer.Order.withCredentials(config).create({ metadata })
   if (o.id) {
     dispatch({
       type: 'setOrderId',

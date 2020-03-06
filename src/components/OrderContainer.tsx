@@ -14,16 +14,18 @@ import OrderContext from '../context/OrderContext'
 import { getApiOrder, addToCart } from '../reducers/OrderReducer'
 import { unsetOrderState } from '../reducers/OrderReducer'
 import PropTypes, { InferProps } from 'prop-types'
+import { BMObject } from '../@types/index'
 
 const OCProps = {
   children: PropTypes.node.isRequired,
-  persistKey: PropTypes.string.isRequired
+  persistKey: PropTypes.string.isRequired,
+  metadata: BMObject
 }
 
 export type OrderContainerProps = InferProps<typeof OCProps>
 
 const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
-  const { children, persistKey } = props
+  const { children, persistKey, metadata } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
@@ -46,7 +48,14 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
   const orderValue: OrderState = {
     ...state,
     addToCart: values =>
-      addToCart({ ...values, persistKey, dispatch, state, config }),
+      addToCart({
+        ...values,
+        persistKey,
+        dispatch,
+        state,
+        config,
+        orderMetadata: metadata
+      }),
     getOrder: id => getApiOrder({ id, dispatch, config })
   }
   return (

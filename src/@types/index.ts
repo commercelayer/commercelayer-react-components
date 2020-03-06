@@ -2,12 +2,15 @@ import { Dispatch } from 'react'
 import { BaseError } from '../components/Errors'
 import PropTypes, { InferProps } from 'prop-types'
 
-const BC = {
+export const BC = {
   id: PropTypes.string,
   key: PropTypes.string,
   className: PropTypes.string,
   style: PropTypes.object
 }
+
+export const BMObject = PropTypes.objectOf(PropTypes.string)
+export type BaseMetadataObject = InferProps<typeof BMObject>
 
 export type BaseComponent = InferProps<typeof BC>
 

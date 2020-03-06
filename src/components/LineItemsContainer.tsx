@@ -2,8 +2,7 @@ import React, {
   useEffect,
   FunctionComponent,
   useReducer,
-  useContext,
-  ReactNode
+  useContext
 } from 'react'
 import lineItemReducer, {
   lineItemInitialState,
@@ -15,12 +14,13 @@ import OrderContext from '../context/OrderContext'
 import LineItemContext from '../context/LineItemContext'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import _ from 'lodash'
-import PropTypes from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 
-export interface LineItemsContainer {
-  children?: ReactNode
-  // TODO add perPage and its integration
+const LItemsCProps = {
+  children: PropTypes.node.isRequired
 }
+
+export type LineItemsContainer = InferProps<typeof LItemsCProps>
 
 const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
   const { children } = props
@@ -71,8 +71,6 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
   )
 }
 
-LineItemsContainer.propTypes = {
-  children: PropTypes.node
-}
+LineItemsContainer.propTypes = LItemsCProps
 
 export default LineItemsContainer

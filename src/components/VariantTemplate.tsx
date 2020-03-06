@@ -1,12 +1,23 @@
 import React, { Fragment, FunctionComponent } from 'react'
 import _ from 'lodash'
-import { VSProps, VariantSelectorProps } from './VariantSelector'
+import { VariantSelectorProps } from './VariantSelector'
 import PropTypes, { InferProps } from 'prop-types'
 
 const VTProps = {
-  ...VSProps,
   variants: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
+  skuCodes: PropTypes.arrayOf(
+    PropTypes.exact({
+      label: PropTypes.string.isRequired,
+      code: PropTypes.string.isRequired
+    }).isRequired
+  ).isRequired,
+  name: PropTypes.string.isRequired,
+  children: PropTypes.func,
+  type: PropTypes.oneOf(['select', 'radio']),
+  loader: PropTypes.element,
+  placeholder: PropTypes.string,
+  skuCode: PropTypes.string
 }
 
 export type VariantTemplateProps = InferProps<typeof VTProps> &
