@@ -1,4 +1,7 @@
-import CLayer, { LineItemCollection } from '@commercelayer/js-sdk'
+import CLayer, {
+  LineItemCollection,
+  OrderCollection
+} from '@commercelayer/js-sdk'
 import baseReducer from '../utils/baseReducer'
 import { BaseError } from '../components/Errors'
 import { Dispatch } from 'react'
@@ -27,6 +30,16 @@ export interface DeleteLineItem {
   (params: DeleteLineItemParam): void
 }
 
+export type GetLineItemsParams = {
+  dispatch: Dispatch<LineItemAction>
+  config: CommerceLayerConfig
+  order: OrderCollection
+}
+
+export interface GetLineItems {
+  (params: GetLineItemsParams): void
+}
+
 export interface LineItemPayload {
   lineItems?: LineItemCollection[]
   errors?: BaseError[]
@@ -40,6 +53,42 @@ export interface LineItemState extends LineItemPayload {
 export interface LineItemAction {
   type: LineItemActionType
   payload: LineItemPayload
+}
+
+export const getLineItems: GetLineItems = params => {
+  const { order, dispatch, config } = params
+  let allLineItems = []
+  order
+    .withCredentials(config)
+    .lineItems()
+    .includes('lineItemOptions')
+    .all()
+    .then(async res => {
+      debugger
+      const items = res.toArray()
+      allLineItems = [...allLineItems, ...items]
+      dispatch({
+        type: 'setLineItems',
+        payload: {
+          lineItems: allLineItems
+        }
+      })
+      let colResp = res
+      if (colResp.hasNextPage()) {
+        const pageCount = res.pageCount()
+        for (let index = 1; index < pageCount; index++) {
+          colResp = await colResp.nextPage()
+          const nextItems = colResp.toArray()
+          allLineItems = [...allLineItems, ...nextItems]
+          dispatch({
+            type: 'setLineItems',
+            payload: {
+              lineItems: allLineItems
+            }
+          })
+        }
+      }
+    })
 }
 
 export const updateLineItem: UpdateLineItem = async params => {

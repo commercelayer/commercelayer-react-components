@@ -8,7 +8,8 @@ import lineItemReducer, {
   lineItemInitialState,
   updateLineItem,
   LineItemState,
-  deleteLineItem
+  deleteLineItem,
+  getLineItems
 } from '../reducers/LineItemReducer'
 import OrderContext from '../context/OrderContext'
 import LineItemContext from '../context/LineItemContext'
@@ -29,10 +30,10 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
   const [state, dispatch] = useReducer(lineItemReducer, lineItemInitialState)
   useEffect(() => {
     if (!_.isEmpty(order)) {
-      const lItems = order?.lineItems().toArray()
-      dispatch({
-        type: 'setLineItems',
-        payload: { lineItems: lItems }
+      getLineItems({
+        order,
+        dispatch,
+        config
       })
     }
     return (): void => {

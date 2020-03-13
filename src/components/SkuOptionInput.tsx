@@ -16,11 +16,13 @@ const SkuOptionInput: FunctionComponent<BaseInputProps> = props => {
   const handleChange: HandleChange = e => {
     const val = e.target.value
     const o = {
-      ...option,
       [skuCode]: {
-        skuOptionId: skuOption.id,
-        options: {
-          [name]: val
+        ...option[skuCode],
+        [skuOption.id]: {
+          skuOptionId: skuOption.id,
+          options: {
+            [name]: val
+          }
         }
       }
     }

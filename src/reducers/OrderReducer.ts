@@ -123,9 +123,7 @@ export const createOrder: CreateOrder = async params => {
 
 export const getApiOrder: GetOrder = async params => {
   const { id, dispatch, config } = params
-  const o = await CLayer.Order.withCredentials(config)
-    .includes('lineItems.lineItemOptions')
-    .find(id)
+  const o = await CLayer.Order.withCredentials(config).find(id)
   if (o)
     dispatch({
       type: 'setOrder',
@@ -150,14 +148,17 @@ export const addToCart: AddToCart = async params => {
       attrs['item'] = CLayer.Sku.build({ id: skuId })
     }
     const lineItem = await CLayer.LineItem.withCredentials(config).create(attrs)
+    // FIXME add only one skuOption, it must add multiple
     if (!_.isEmpty(option)) {
-      const { options, skuOptionId } = option
-      const skuOption = CLayer.SkuOption.build({ id: skuOptionId })
-      await CLayer.LineItemOption.withCredentials(config).create({
-        quantity: 1,
-        options,
-        lineItem,
-        skuOption
+      _.map(option, async opt => {
+        const { options, skuOptionId } = opt
+        const skuOption = CLayer.SkuOption.build({ id: skuOptionId })
+        await CLayer.LineItemOption.withCredentials(config).create({
+          quantity: 1,
+          options,
+          lineItem,
+          skuOption
+        })
       })
     }
     await getApiOrder({ id, ...params })

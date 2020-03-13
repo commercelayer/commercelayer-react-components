@@ -12,9 +12,11 @@ export interface ItemQuantity {
 }
 
 export interface ItemOption {
-  skuOptionId: string
-  options: {
-    [key: string]: string
+  [key: string]: {
+    skuOptionId: string
+    options: {
+      [key: string]: string
+    }
   }
 }
 

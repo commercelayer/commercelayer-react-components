@@ -20,10 +20,11 @@ const LineItemOptions: FunctionComponent<LineItemOptionsProps> = props => {
     ...props
   }
   const options = lineItemOptions.map((o, k) => {
+    const name = o.name
     const opts = _.map(o.options, (v, k) => {
       return (
         <p key={k} {...props}>
-          <span>{`${k}: `}</span>
+          <span>{`${name}: `}</span>
           <span>{`${v}`}</span>
         </p>
       )
