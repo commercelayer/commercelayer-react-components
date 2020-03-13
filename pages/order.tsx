@@ -120,10 +120,20 @@ export default function Order() {
                           placeholder="Message"
                         />
                       </SkuOption>
+                      <SkuOption name="Color">
+                        <SkuOptionInput
+                          name="color"
+                          type="text"
+                          className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                          placeholder="Color"
+                        />
+                      </SkuOption>
                     </SkuOptionsContainer>
                   </div>
                   <div className="m-2">
                     <QuantitySelector
+                      min="2"
+                      max="12"
                       id="quantity-selector"
                       className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     />
