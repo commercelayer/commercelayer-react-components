@@ -2,7 +2,7 @@ import { createContext } from 'react'
 import { LineItemCollection } from '@commercelayer/js-sdk'
 
 export interface InitialLineItemContext {
-  lineItem?: LineItemCollection | null
+  lineItem?: LineItemCollection
 }
 
 const initial: InitialLineItemContext = {}

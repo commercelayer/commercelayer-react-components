@@ -32,6 +32,7 @@ import SkuOptionsContainer from '../src/components/SkuOptionsContainer'
 import SkuOption from '../src/components/SkuOption'
 import SkuOptionInput from '../src/components/SkuOptionInput'
 import LineItemOptions from '../src/components/LineItemOptions'
+import LineItemOption from '../src/components/LineItemOption'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -53,6 +54,7 @@ export default function Order() {
   const [token, setToken] = useState('')
   useEffect(() => {
     const getToken = async () => {
+      // @ts-ignore
       const { accessToken } = await getSalesChannelToken({
         clientId:
           '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
@@ -119,13 +121,19 @@ export default function Order() {
                           className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                           placeholder="Message"
                         />
+                        <SkuOptionInput
+                          name="size"
+                          type="text"
+                          className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                          placeholder="Size"
+                        />
                       </SkuOption>
                       <SkuOption name="Color">
                         <SkuOptionInput
-                          name="color"
+                          name="back"
                           type="text"
                           className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                          placeholder="Color"
+                          placeholder="Back color"
                         />
                       </SkuOption>
                     </SkuOptionsContainer>
@@ -151,18 +159,41 @@ export default function Order() {
                 </div>
               </div>
             </ItemContainer>
-            <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
-            <p className="text-sm m-2">
-              Your shopping bag contains{' '}
-              <LineItemsCount id="items-count" className="font-bold" /> items
-            </p>
-            <div className="flex flex-col p-2">
-              <LineItemsContainer>
+            <LineItemsContainer>
+              <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
+              <p className="text-sm m-2">
+                Your shopping bag contains{' '}
+                <LineItemsCount id="items-count" className="font-bold" /> items
+              </p>
+              <div className="flex flex-col p-2">
                 <LineItem>
-                  <div className="flex justify-between items-center border-b p-5">
+                  <div className="flex justify-around items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
-                    <LineItemOptions className="options" />
+                    <div>
+                      <LineItemOptions name="Embossing" className="font-bold">
+                        <div className="flex flex-col justify-between text-sm">
+                          <LineItemOption
+                            optionKeyClassName="font-medium capitalize underline"
+                            name="message"
+                          />
+                          <LineItemOption
+                            name="size"
+                            optionKeyClassName="font-medium capitalize underline"
+                          />
+                        </div>
+                      </LineItemOptions>
+                    </div>
+                    <div>
+                      <LineItemOptions name="Color" className="font-bold">
+                        <div className="flex flex-col justify-between text-sm">
+                          <LineItemOption
+                            name="back"
+                            optionKeyClassName="font-medium capitalize underline"
+                          />
+                        </div>
+                      </LineItemOptions>
+                    </div>
                     <LineItemQuantity
                       id="line-item-quantity"
                       max={100}
@@ -201,8 +232,8 @@ export default function Order() {
                     />
                   </div>
                 </LineItem>
-              </LineItemsContainer>
-            </div>
+              </div>
+            </LineItemsContainer>
             <div className="flex flex-col w-1/2 m-auto">
               <div className="flex items-center p-2 justify-around font-medium text-left">
                 <div className="w-full">

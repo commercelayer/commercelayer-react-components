@@ -35,3 +35,4 @@ export { default as SkuOptionsContainer } from './components/SkuOptionsContainer
 export { default as SkuOption } from './components/SkuOption'
 export { default as SkuOptionInput } from './components/SkuOptionInput'
 export { default as LineItemOptions } from './components/LineItemOptions'
+export { default as LineItemOption } from './components/LineItemOption'

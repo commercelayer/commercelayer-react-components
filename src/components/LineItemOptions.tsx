@@ -1,43 +1,45 @@
 import React, { useContext, FunctionComponent, Fragment } from 'react'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
-import Parent from './utils/Parent'
 import { BaseComponent } from '../@types'
 import PropTypes, { InferProps } from 'prop-types'
-import _ from 'lodash'
+import LineItemOptionChildrenContext from '../context/LineItemOptionChildrenContext'
 
 const LIOptionsProps = {
-  children: PropTypes.func
+  name: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  showName: PropTypes.bool
 }
 
-export type LineItemOptionsProps = InferProps<typeof LIOptionsProps> &
-  BaseComponent
+export type LineItemOptionsProps = BaseComponent &
+  InferProps<typeof LIOptionsProps>
 
 const LineItemOptions: FunctionComponent<LineItemOptionsProps> = props => {
+  const { name, children, showName, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
-  const lineItemOptions = lineItem.lineItemOptions().toArray()
-  const parentProps = {
-    lineItemOptions,
-    ...props
-  }
-  const options = lineItemOptions.map((o, k) => {
-    const name = o.name
-    const opts = _.map(o.options, (v, k) => {
+  const lineItemOptions = lineItem ? lineItem.lineItemOptions().toArray() : []
+  const options = lineItemOptions
+    .filter(o => o.name === name)
+    .map((o, k) => {
+      const title = showName ? <span {...p}>{name}</span> : null
+      const valueProps = {
+        lineItemOption: o
+      }
       return (
-        <p key={k} {...props}>
-          <span>{`${name}: `}</span>
-          <span>{`${v}`}</span>
-        </p>
+        <Fragment key={k}>
+          {title}
+          <LineItemOptionChildrenContext.Provider value={valueProps}>
+            {children}
+          </LineItemOptionChildrenContext.Provider>
+        </Fragment>
       )
     })
-    return <Fragment key={k}>{opts}</Fragment>
-  })
-  return props.children ? (
-    <Parent {...parentProps}>{props.children}</Parent>
-  ) : (
-    <Fragment>{options}</Fragment>
-  )
+  return <Fragment>{options}</Fragment>
 }
 
 LineItemOptions.propTypes = LIOptionsProps
+
+LineItemOptions.defaultProps = {
+  showName: true
+}
 
 export default LineItemOptions

@@ -4,6 +4,7 @@ import ItemContext from '../context/ItemContext'
 import SkuOptionChildrenContext from '../context/SkuOptionChildrenContext'
 import { BOCProps } from './utils/BaseOrderPrice'
 import { BaseInputProps } from './utils/BaseInput'
+import _ from 'lodash'
 
 type HandleChange = (
   event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -15,17 +16,23 @@ const SkuOptionInput: FunctionComponent<BaseInputProps> = props => {
   const { skuOption, skuCode } = useContext(SkuOptionChildrenContext)
   const handleChange: HandleChange = e => {
     const val = e.target.value
+    const options = _.has(option, `${skuCode}.${skuOption.id}`)
+      ? option[skuCode][skuOption.id]['options']
+      : {}
     const o = {
       [skuCode]: {
         ...option[skuCode],
         [skuOption.id]: {
           skuOptionId: skuOption.id,
           options: {
+            ...options,
             [name]: val
           }
         }
       }
     }
+    console.log('o', o)
+    console.log('option', option)
     setOption(o)
   }
   return <BaseInput onChange={handleChange} {...props} />

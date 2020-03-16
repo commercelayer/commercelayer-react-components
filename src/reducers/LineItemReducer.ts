@@ -57,14 +57,13 @@ export interface LineItemAction {
 
 export const getLineItems: GetLineItems = params => {
   const { order, dispatch, config } = params
-  let allLineItems = []
+  let allLineItems: LineItemCollection[] = []
   order
     .withCredentials(config)
     .lineItems()
     .includes('lineItemOptions')
     .all()
     .then(async res => {
-      debugger
       const items = res.toArray()
       allLineItems = [...allLineItems, ...items]
       dispatch({
@@ -74,8 +73,8 @@ export const getLineItems: GetLineItems = params => {
         }
       })
       let colResp = res
-      if (colResp.hasNextPage()) {
-        const pageCount = res.pageCount()
+      const pageCount = res.pageCount()
+      if (colResp.hasNextPage() && pageCount) {
         for (let index = 1; index < pageCount; index++) {
           colResp = await colResp.nextPage()
           const nextItems = colResp.toArray()

@@ -4,7 +4,6 @@ import PropTypes, { InferProps } from 'prop-types'
 
 export const BC = {
   id: PropTypes.string,
-  key: PropTypes.string,
   className: PropTypes.string,
   style: PropTypes.object
 }
@@ -40,4 +39,14 @@ export interface BaseUnsetState<A> {
 
 export interface BaseMetadata {
   [key: string]: string
+}
+
+export type InferPropTypes<
+  PropTypes,
+  DefaultProps = {},
+  Props = InferProps<PropTypes>
+> = {
+  [Key in keyof Props]: Key extends keyof DefaultProps
+    ? Props[Key] | DefaultProps[Key]
+    : Props[Key]
 }

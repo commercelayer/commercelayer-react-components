@@ -13,13 +13,13 @@ export type LineItemNameProps = InferProps<typeof LINProps> & BaseComponent
 const LineItemName: FunctionComponent<LineItemNameProps> = props => {
   const { lineItem } = useContext(LineItemChildrenContext)
   const parentProps = {
-    name: lineItem.name,
+    name: lineItem?.name,
     ...props
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <p {...props}>{lineItem.name}</p>
+    <p {...props}>{lineItem?.name}</p>
   )
 }
 
