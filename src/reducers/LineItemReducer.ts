@@ -76,7 +76,7 @@ export const getLineItems: GetLineItems = params => {
       const pageCount = res.pageCount()
       if (colResp.hasNextPage() && pageCount) {
         for (let index = 1; index < pageCount; index++) {
-          colResp = await colResp.nextPage()
+          colResp = await colResp.withCredentials(config).nextPage()
           const nextItems = colResp.toArray()
           allLineItems = [...allLineItems, ...nextItems]
           dispatch({

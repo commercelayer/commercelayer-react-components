@@ -31,8 +31,6 @@ const SkuOptionInput: FunctionComponent<BaseInputProps> = props => {
         }
       }
     }
-    console.log('o', o)
-    console.log('option', option)
     setOption(o)
   }
   return <BaseInput onChange={handleChange} {...props} />
