@@ -9,37 +9,20 @@ import _ from 'lodash'
 import Parent from './utils/Parent'
 import PriceContext from '../context/PriceContext'
 import PropTypes, { InferProps } from 'prop-types'
-import { LoaderType } from '../reducers/PriceReducer'
+import { BC } from '../@types'
+import { getPricesComponent } from '../utils/getPrices'
 
-const PProps = {
+export const PriceProps = {
+  ...BC,
   children: PropTypes.func,
-  amountClassName: PropTypes.string,
   compareClassName: PropTypes.string,
   skuCode: PropTypes.string,
   showCompare: PropTypes.bool
 }
 
-export type PriceProps = InferProps<typeof PProps>
+export type PPropsType = InferProps<typeof PriceProps>
 
-export interface PriceTemplateProps extends PriceProps {
-  formattedAmount: string
-  formattedCompare: string
-  loading?: boolean
-  loader?: LoaderType
-}
-
-const PriceTemplate: FunctionComponent<PriceTemplateProps> = props =>
-  props.loading ? (
-    <Fragment>{props.loader || 'Loading...'}</Fragment>
-  ) : (
-    <Fragment>
-      <span className={props.amountClassName}>{props.formattedAmount}</span>
-      {props.showCompare && (
-        <span className={props.compareClassName}>{props.formattedCompare}</span>
-      )}
-    </Fragment>
-  )
-const Price: FunctionComponent<PriceProps> = props => {
+const Price: FunctionComponent<PPropsType> = props => {
   const { children } = props
   const {
     prices,
@@ -49,19 +32,12 @@ const Price: FunctionComponent<PriceProps> = props => {
     setSkuCodes,
     loader
   } = useContext(PriceContext)
-  const [formattedAmount, setFormattedAmount] = useState('')
-  const [formattedCompare, setFormattedCompare] = useState('')
-  const [showCompare, setShowCompare] = useState(false)
+  const [skuPrices, setSkuPrices] = useState([])
   const sCode = skuCode || props.skuCode
   useEffect(() => {
     if (!_.isEmpty(prices) && prices[sCode]) {
-      const amount = prices[sCode].formattedAmount
-      const compare = prices[sCode].formattedCompareAtAmount
-      if (prices[sCode].compareAtAmountCents > prices[sCode].amountCents) {
-        setShowCompare(true)
-      }
-      setFormattedAmount(amount)
-      setFormattedCompare(compare)
+      console.log('prices[sCode]', prices[sCode])
+      setSkuPrices(prices[sCode])
     } else {
       if (sCode && _.indexOf(skuCodes, sCode) === -1) {
         skuCodes.push(sCode)
@@ -69,36 +45,22 @@ const Price: FunctionComponent<PriceProps> = props => {
       }
     }
     return (): void => {
-      setFormattedAmount('')
-      setFormattedCompare('')
-      setShowCompare(false)
+      setSkuPrices([])
     }
   }, [prices])
-
   const parentProps = {
-    showCompare,
-    formattedAmount,
-    formattedCompare,
     loading,
     loader,
     ...props
   }
+  const pricesComponent = getPricesComponent(skuPrices, parentProps)
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <Fragment>
-      <PriceTemplate
-        showCompare={showCompare}
-        formattedAmount={formattedAmount}
-        formattedCompare={formattedCompare}
-        loading={loading}
-        loader={loader}
-        {...props}
-      />
-    </Fragment>
+    <Fragment>{pricesComponent}</Fragment>
   )
 }
 
-Price.propTypes = PProps
+Price.propTypes = PriceProps
 
 export default Price

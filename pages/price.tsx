@@ -32,24 +32,25 @@ const Home = () => {
             loader={<Loader />}
           >
             <Price
-              amountClassName="font-bold"
+              className="font-bold"
               compareClassName="line-through"
+              showCompare
             />
             <Price
               skuCode="BABYONBU000000E63E7412MX"
-              amountClassName="font-bold"
+              className="font-bold"
               compareClassName="line-through"
             />
           </PriceContainer>
           <PriceContainer>
             <Price
               skuCode="BABYONBU000000E63E746MXX"
-              amountClassName="font-bold"
+              className="font-bold"
               compareClassName="line-through"
             />
             <Price
               skuCode="BABYONBU000000E63E7412MX"
-              amountClassName="font-bold"
+              className="font-bold"
               compareClassName="line-through"
             />
           </PriceContainer>

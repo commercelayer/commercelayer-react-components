@@ -93,7 +93,7 @@ export default function Order() {
                     <div className="w-auto m-2">
                       <PriceContainer skuCode="BABYONBU000000E63E746MXX">
                         <Price
-                          amountClassName="text-green-600 text-2xl m-1"
+                          className="text-green-600 text-2xl m-1"
                           compareClassName="text-gray-500 text-2xl m-1 line-through"
                         />
                       </PriceContainer>
@@ -234,7 +234,7 @@ export default function Order() {
                     <div className="w-auto m-2">
                       <PriceContainer skuCode="BABYONBUFFFFFF00000012MX">
                         <Price
-                          amountClassName="text-green-600 text-2xl m-1"
+                          className="text-green-600 text-2xl m-1"
                           compareClassName="text-gray-500 text-2xl m-1 line-through"
                         />
                       </PriceContainer>

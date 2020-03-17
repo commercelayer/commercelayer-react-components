@@ -10,8 +10,10 @@ import getErrorsByCollection from '../utils/getErrorsByCollection'
 import { BaseError } from '../components/Errors'
 import { PCProps } from '../components/PriceContainer'
 
+export type SkuPrices = PriceCollection[]
+
 export interface Prices {
-  [key: string]: PriceCollection
+  [key: string]: SkuPrices
 }
 
 type SkuCodesPrice = string[]
@@ -51,30 +53,31 @@ export interface GetSkusPrice {
       dispatch: Dispatch<PriceAction>
       setItems: (item: Items | object) => void
       items: Items
-      perPage?: number
+      perPage: number
+      filters: object
     }
   ): void
 }
 
 export const getSkusPrice: GetSkusPrice = (
   skuCodes,
-  { config, dispatch, setItems, items, perPage }
+  { config, dispatch, setItems, items, perPage, filters }
 ) => {
   let allPrices = {}
-  let allSkus = {}
-  CLayer.Sku.withCredentials(config)
-    .where({ codeIn: skuCodes.join(',') })
-    .includes('prices')
+  // let allSkus = {}
+  CLayer.Price.withCredentials(config)
+    .where({ skuCodeIn: skuCodes.join(','), ...filters })
     .perPage(perPage)
     .all()
     .then(async r => {
       const pricesObj = getPrices(r.toArray())
-      const i = getSkus(r.toArray())
+      // const i = getSkus(r.toArray())
       allPrices = { ...allPrices, ...pricesObj }
-      allSkus = { ...allSkus, ...items, ...i }
-      if (setItems) {
-        setItems(allSkus)
-      }
+      // TODO checking it
+      // allSkus = { ...allSkus, ...items, ...i }
+      // if (setItems) {
+      //   setItems(allSkus)
+      // }
       dispatch({
         type: 'setPrices',
         payload: { prices: allPrices }
@@ -90,12 +93,13 @@ export const getSkusPrice: GetSkusPrice = (
         if (col.hasNextPage()) {
           col = await col.withCredentials(config).nextPage()
           const pricesObj = getPrices(col.toArray())
-          const i = getSkus(col.toArray())
+          // const i = getSkus(col.toArray())
           allPrices = { ...allPrices, ...pricesObj }
-          allSkus = { ...allSkus, ...items, ...i }
-          if (setItems) {
-            setItems(allSkus)
-          }
+          // TODO checking it
+          // allSkus = { ...allSkus, ...items, ...i }
+          // if (setItems) {
+          //   setItems(allSkus)
+          // }
           dispatch({
             type: 'setPrices',
             payload: { prices: allPrices }

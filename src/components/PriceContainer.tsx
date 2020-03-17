@@ -21,17 +21,18 @@ import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
 import PropTypes, { InferProps } from 'prop-types'
 
-const PriceContainerProps = {
+export const PriceContainerProps = {
   children: PropTypes.node.isRequired,
   skuCode: PropTypes.string,
   loader: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
-  perPage: PropTypes.number
+  perPage: PropTypes.number,
+  filters: PropTypes.object
 }
 
 export type PCProps = InferProps<typeof PriceContainerProps>
 
 const PriceContainer: FunctionComponent<PCProps> = props => {
-  const { children, skuCode, loader, perPage } = props
+  const { children, skuCode, loader, perPage, filters } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
   const { setItems, items, item: currentItem } = useContext(ItemContext)
@@ -70,7 +71,8 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
           dispatch,
           setItems,
           items,
-          perPage
+          perPage,
+          filters
         })
       }
     }
@@ -90,7 +92,8 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
 PriceContainer.propTypes = PriceContainerProps
 
 PriceContainer.defaultProps = {
-  perPage: 10
+  perPage: 10,
+  filters: {}
 }
 
 export default PriceContainer

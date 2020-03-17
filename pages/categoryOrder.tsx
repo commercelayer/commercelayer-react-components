@@ -87,7 +87,7 @@ export default function Order() {
                     <div className="pt-2">
                       <Price
                         skuCode="BABYONBU000000E63E746MXX"
-                        amountClassName="text-green-600 text-xl m-1"
+                        className="text-green-600 text-xl m-1"
                         compareClassName="text-gray-600 text-xl m-1 line-through font-light"
                       />
                     </div>
@@ -130,7 +130,7 @@ export default function Order() {
                     <div className="pt-2">
                       <Price
                         skuCode="BABYONBU000000E63E7412MX"
-                        amountClassName="text-green-600 text-xl m-1"
+                        className="text-green-600 text-xl m-1"
                         compareClassName="text-gray-600 text-xl m-1 line-through font-light"
                       />
                     </div>
@@ -170,7 +170,7 @@ export default function Order() {
                     <div className="pt-2">
                       <Price
                         skuCode="BABYONBU000000E63E746MXXFAKE"
-                        amountClassName="text-green-600 text-xl m-1"
+                        className="text-green-600 text-xl m-1"
                         compareClassName="text-gray-600 text-xl m-1 line-through font-light"
                       />
                     </div>
