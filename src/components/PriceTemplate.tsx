@@ -1,6 +1,5 @@
 import React, { Fragment, FunctionComponent } from 'react'
 import PropTypes, { InferProps } from 'prop-types'
-import { PriceContainerProps } from './PriceContainer'
 import { BC } from '../@types'
 import { PPropsType } from './Price'
 
@@ -9,7 +8,7 @@ export const PriceTemplateProps = {
   formattedAmount: PropTypes.string,
   formattedCompare: PropTypes.string,
   loading: PropTypes.bool,
-  loader: PriceContainerProps.loader
+  loader: PropTypes.oneOfType([PropTypes.element, PropTypes.string])
 }
 
 export type PTemplateProps = InferProps<typeof PriceTemplateProps> & PPropsType
