@@ -4,7 +4,7 @@ import getPrices from '../utils/getPrices'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import { Dispatch } from 'react'
 import getSkus from '../utils/getSkus'
-import { Items } from './ItemReducer'
+import { Items, ItemPrices } from './ItemReducer'
 import baseReducer from '../utils/baseReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import { BaseError } from '../components/Errors'
@@ -51,8 +51,8 @@ export interface GetSkusPrice {
     options?: {
       config: CommerceLayerConfig
       dispatch: Dispatch<PriceAction>
-      setItems: (item: Items | object) => void
-      items: Items
+      setPrices: (item: ItemPrices) => void
+      prices: ItemPrices
       perPage: number
       filters: object
     }
@@ -61,23 +61,19 @@ export interface GetSkusPrice {
 
 export const getSkusPrice: GetSkusPrice = (
   skuCodes,
-  { config, dispatch, setItems, items, perPage, filters }
+  { config, dispatch, setPrices, prices, perPage, filters }
 ) => {
   let allPrices = {}
-  // let allSkus = {}
   CLayer.Price.withCredentials(config)
     .where({ skuCodeIn: skuCodes.join(','), ...filters })
     .perPage(perPage)
     .all()
     .then(async r => {
       const pricesObj = getPrices(r.toArray())
-      // const i = getSkus(r.toArray())
       allPrices = { ...allPrices, ...pricesObj }
-      // TODO checking it
-      // allSkus = { ...allSkus, ...items, ...i }
-      // if (setItems) {
-      //   setItems(allSkus)
-      // }
+      if (setPrices) {
+        setPrices(allPrices)
+      }
       dispatch({
         type: 'setPrices',
         payload: { prices: allPrices }
@@ -93,13 +89,10 @@ export const getSkusPrice: GetSkusPrice = (
         if (col.hasNextPage()) {
           col = await col.withCredentials(config).nextPage()
           const pricesObj = getPrices(col.toArray())
-          // const i = getSkus(col.toArray())
           allPrices = { ...allPrices, ...pricesObj }
-          // TODO checking it
-          // allSkus = { ...allSkus, ...items, ...i }
-          // if (setItems) {
-          //   setItems(allSkus)
-          // }
+          if (setPrices) {
+            setPrices(allPrices)
+          }
           dispatch({
             type: 'setPrices',
             payload: { prices: allPrices }

@@ -34,6 +34,7 @@ export type GetLineItemsParams = {
   dispatch: Dispatch<LineItemAction>
   config: CommerceLayerConfig
   order: OrderCollection
+  filters: object
 }
 
 export interface GetLineItems {
@@ -56,11 +57,14 @@ export interface LineItemAction {
 }
 
 export const getLineItems: GetLineItems = params => {
-  const { order, dispatch, config } = params
+  const { order, dispatch, config, filters } = params
   let allLineItems: LineItemCollection[] = []
   order
     .withCredentials(config)
     .lineItems()
+    // TODO add interface to SDK
+    // @ts-ignore
+    .where(filters)
     .includes('lineItemOptions')
     .all()
     .then(async res => {

@@ -18,13 +18,15 @@ import _ from 'lodash'
 import PropTypes, { InferProps } from 'prop-types'
 
 const LItemsCProps = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
+  filters: PropTypes.object
+  // TODO add loader prop
 }
 
 export type LineItemsContainer = InferProps<typeof LItemsCProps>
 
 const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
-  const { children } = props
+  const { children, filters } = props
   const { order, getOrder, orderId } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(lineItemReducer, lineItemInitialState)
@@ -33,7 +35,8 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
       getLineItems({
         order,
         dispatch,
-        config
+        config,
+        filters
       })
     }
     return (): void => {
@@ -73,5 +76,9 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
 }
 
 LineItemsContainer.propTypes = LItemsCProps
+
+LineItemsContainer.defaultProps = {
+  filters: {}
+}
 
 export default LineItemsContainer

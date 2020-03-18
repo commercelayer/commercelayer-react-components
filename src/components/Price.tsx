@@ -36,7 +36,6 @@ const Price: FunctionComponent<PPropsType> = props => {
   const sCode = skuCode || props.skuCode
   useEffect(() => {
     if (!_.isEmpty(prices) && prices[sCode]) {
-      console.log('prices[sCode]', prices[sCode])
       setSkuPrices(prices[sCode])
     } else {
       if (sCode && _.indexOf(skuCodes, sCode) === -1) {

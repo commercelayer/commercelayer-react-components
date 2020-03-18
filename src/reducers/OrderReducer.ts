@@ -148,7 +148,6 @@ export const addToCart: AddToCart = async params => {
       attrs['item'] = CLayer.Sku.build({ id: skuId })
     }
     const lineItem = await CLayer.LineItem.withCredentials(config).create(attrs)
-    // FIXME add only one skuOption, it must add multiple
     if (!_.isEmpty(option)) {
       _.map(option, async opt => {
         const { options, skuOptionId } = opt

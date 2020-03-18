@@ -35,7 +35,9 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
   const { children, skuCode, loader, perPage, filters } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
-  const { setItems, items, item: currentItem } = useContext(ItemContext)
+  const { setPrices, prices, items, item: currentItem } = useContext(
+    ItemContext
+  )
   if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
   const sCode = getCurrentItemKey(currentItem) || skuCode
@@ -46,11 +48,10 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
     })
   }
   useEffect(() => {
-    if (currentItem) {
-      const p = getPrices(currentItem)
+    if (currentItem && _.has(prices, sCode)) {
       dispatch({
         type: 'setPrices',
-        payload: { prices: p }
+        payload: { prices }
       })
     }
     if (!_.isEmpty(items) && _.isEmpty(currentItem)) {
@@ -60,17 +61,20 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
         payload: { prices: p }
       })
     }
-    if (config.accessToken && _.isEmpty(currentItem)) {
+    if (
+      (config.accessToken && _.isEmpty(currentItem)) ||
+      (config.accessToken && !_.has(prices, sCode))
+    ) {
       if (state.skuCodes.length > 0 || skuCode) {
         dispatch({
           type: 'setLoading',
           payload: { loading: true }
         })
-        getSkusPrice((skuCode && [skuCode]) || state.skuCodes, {
+        getSkusPrice((sCode && [sCode]) || state.skuCodes, {
           config,
           dispatch,
-          setItems,
-          items,
+          setPrices,
+          prices,
           perPage,
           filters
         })

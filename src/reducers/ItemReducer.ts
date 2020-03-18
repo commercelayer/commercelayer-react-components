@@ -1,10 +1,14 @@
 import { BaseUnsetState } from '../@types/index'
-import { SkuCollection } from '@commercelayer/js-sdk'
+import { SkuCollection, PriceCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import baseReducer from '../utils/baseReducer'
 
 export interface Items {
   [skuCode: string]: SkuCollection
+}
+
+export interface ItemPrices {
+  [skuCode: string]: PriceCollection
 }
 
 export interface ItemQuantity {
@@ -26,12 +30,12 @@ export interface ItemOptions {
 
 type ItemParams = {
   type: ItemActionType
-  key: 'items' | 'item' | 'quantity' | 'option'
+  key: 'items' | 'item' | 'quantity' | 'option' | 'prices'
 }
 
 export interface SetItemState {
   (
-    data: Items | ItemQuantity | ItemOptions,
+    data: Items | ItemQuantity | ItemOptions | ItemPrices,
     params: ItemParams,
     dispatch: Dispatch<ItemAction>
   ): void
@@ -79,19 +83,27 @@ export interface ItemState {
   item?: Items
   quantity?: ItemQuantity
   option?: ItemOptions
+  prices?: ItemPrices
   setItems?: (items: Items) => void
   setItem?: (item: Items) => void
   setQuantity?: (quantity: ItemQuantity) => void
   setOption?: (option: ItemOptions) => void
+  setPrices?: (prices: ItemPrices) => void
 }
 
-type ItemActionType = 'setItem' | 'setItems' | 'setQuantity' | 'setOption'
+type ItemActionType =
+  | 'setItem'
+  | 'setItems'
+  | 'setQuantity'
+  | 'setOption'
+  | 'setPrices'
 
 const actionType: ItemActionType[] = [
   'setItem',
   'setItems',
   'setQuantity',
-  'setOption'
+  'setOption',
+  'setPrices'
 ]
 
 export interface ItemAction {
@@ -103,7 +115,8 @@ export const itemInitialState: ItemState = {
   items: {},
   item: {},
   quantity: {},
-  option: {}
+  option: {},
+  prices: {}
 }
 
 const itemReducer = (state: ItemState, reducer: ItemAction): ItemState =>

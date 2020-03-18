@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react'
 import Price from '../src/components/Price'
 import PriceContainer from '../src/components/PriceContainer'
 import CommerceLayer from '../src/components/CommerceLayer'
-import '../styles/styles.css'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 

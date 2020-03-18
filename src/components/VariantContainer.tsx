@@ -4,70 +4,37 @@ import React, {
   useReducer,
   useContext
 } from 'react'
-import CLayer from '@commercelayer/js-sdk'
-import getSkus from '../utils/getSkus'
 import variantReducer, {
   variantInitialState,
-  SetCurrentQuantity,
-  unsetVariantState
+  unsetVariantState,
+  setSkuCode,
+  getVariants
 } from '../reducers/VariantReducer'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import VariantContext from '../context/VariantContext'
-import { SetSkuCodeVariant, VariantState } from '../reducers/VariantReducer'
+import { VariantState } from '../reducers/VariantReducer'
 import { setVariantSkuCodes } from '../reducers/VariantReducer'
 import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
-import getErrorsByCollection from '../utils/getErrorsByCollection'
 import PropTypes, { InferProps } from 'prop-types'
 
 const VCProps = {
   children: PropTypes.node.isRequired,
-  skuCode: PropTypes.string
+  skuCode: PropTypes.string,
+  filters: PropTypes.object
 }
 
 export type VariantContainerProps = InferProps<typeof VCProps>
 
 const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
-  const { children, skuCode } = props
+  const { children, skuCode, filters } = props
   const config = useContext(CommerceLayerContext)
-  const {
-    setItem: setCurrentItem,
-    setItems,
-    items,
-    item: currentItem
-  } = useContext(ItemContext)
+  const { setItem, setItems, items, item: currentItem } = useContext(
+    ItemContext
+  )
   const [state, dispatch] = useReducer(variantReducer, variantInitialState)
   const sCode = getCurrentItemKey(currentItem) || skuCode || state.skuCode
-  // TODO move to reducer
-  const setCurrentQuantity: SetCurrentQuantity = quantity => {
-    dispatch({
-      type: 'setCurrentQuantity',
-      payload: { currentQuantity: quantity }
-    })
-  }
-  // TODO move to reducer
-  const setSkuCode: SetSkuCodeVariant = (code, id) => {
-    if (id) {
-      CLayer.Sku.withCredentials(config)
-        .includes('prices')
-        .find(id)
-        .then(s => {
-          setCurrentItem({
-            [`${code}`]: s
-          })
-        })
-        .catch(c => {
-          const errors = getErrorsByCollection(c, 'variant')
-          dispatch({
-            type: 'setErrors',
-            payload: {
-              errors
-            }
-          })
-        })
-    }
-  }
   useEffect(() => {
     if (!_.isEmpty(items) && !_.isEmpty(state.variants)) {
       if (!_.isEqual(items, state.variants)) {
@@ -80,46 +47,15 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
         type: 'setLoading',
         payload: { loading: true }
       })
-      // TODO move to reducer
-      CLayer.Sku.withCredentials(config)
-        .where({ codeIn: state.skuCodes.join(',') })
-        .includes('prices')
-        .all()
-        .then(r => {
-          const skusObj = getSkus(r.toArray())
-          if (skuCode) {
-            setSkuCode(skusObj[skuCode].code, skusObj[skuCode].id)
-          }
-          dispatch({
-            type: 'setVariants',
-            payload: {
-              variants: skusObj
-            }
-          })
-          dispatch({
-            type: 'setLoading',
-            payload: {
-              loading: false
-            }
-          })
-        })
-        .catch(c => {
-          const errors = getErrorsByCollection(c, 'variant')
-          dispatch({
-            type: 'setErrors',
-            payload: {
-              errors
-            }
-          })
-        })
+      getVariants({ config, state, dispatch, setItem, skuCode: sCode, filters })
     }
     return (): void => unsetVariantState(dispatch)
   }, [config])
   const variantValue: VariantState = {
     ...state,
     skuCode: sCode,
-    setCurrentQuantity,
-    setSkuCode,
+    setSkuCode: (code, id) =>
+      setSkuCode({ code, id, config, setItem, dispatch }),
     setSkuCodes: skuCodes => setVariantSkuCodes(skuCodes, dispatch)
   }
   return (
@@ -130,5 +66,10 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = props => {
 }
 
 VariantContainer.propTypes = VCProps
+
+VariantContainer.defaultProps = {
+  skuCode: '',
+  filters: {}
+}
 
 export default VariantContainer

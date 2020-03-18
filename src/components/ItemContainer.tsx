@@ -27,7 +27,9 @@ const ItemContainer: FunctionComponent<ItemContainerProps> = props => {
     setQuantity: item =>
       setItemState(item, { type: 'setQuantity', key: 'quantity' }, dispatch),
     setOption: item =>
-      setItemState(item, { type: 'setOption', key: 'option' }, dispatch)
+      setItemState(item, { type: 'setOption', key: 'option' }, dispatch),
+    setPrices: item =>
+      setItemState(item, { type: 'setPrices', key: 'prices' }, dispatch)
   }
   return (
     <ItemContext.Provider value={itemValue}>{children}</ItemContext.Provider>
