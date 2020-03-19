@@ -20,11 +20,12 @@ import PriceContext from '../context/PriceContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
 import PropTypes, { InferProps } from 'prop-types'
+import { PTLoader } from '../@types/index'
 
 export const PriceContainerProps = {
   children: PropTypes.node.isRequired,
   skuCode: PropTypes.string,
-  loader: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+  loader: PTLoader,
   perPage: PropTypes.number,
   filters: PropTypes.object
 }
@@ -51,7 +52,7 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
     if (currentItem && _.has(prices, sCode)) {
       dispatch({
         type: 'setPrices',
-        payload: { prices }
+        payload: { prices: prices }
       })
     }
     if (!_.isEmpty(items) && _.isEmpty(currentItem)) {
@@ -66,10 +67,6 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
       (config.accessToken && !_.has(prices, sCode))
     ) {
       if (state.skuCodes.length > 0 || skuCode) {
-        dispatch({
-          type: 'setLoading',
-          payload: { loading: true }
-        })
         getSkusPrice((sCode && [sCode]) || state.skuCodes, {
           config,
           dispatch,
@@ -97,7 +94,8 @@ PriceContainer.propTypes = PriceContainerProps
 
 PriceContainer.defaultProps = {
   perPage: 10,
-  filters: {}
+  filters: {},
+  loader: 'Loading...'
 }
 
 export default PriceContainer

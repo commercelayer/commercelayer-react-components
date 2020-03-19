@@ -10,14 +10,14 @@ type RequiredFields = 'currencyCode' | 'balanceCents'
 
 const GCProps = {
   children: PropTypes.node.isRequired,
-  metadata: PropTypes.objectOf(PropTypes.string)
+  metadata: PropTypes.objectOf(PropTypes.string),
+  onSubmit: PropTypes.func
 }
 
 export type GiftCardProps = InferProps<typeof GCProps> & BaseComponent
 
-// TODO: add onSubmit prop with callback
 const GiftCard: FunctionComponent<GiftCardProps> = props => {
-  const { children } = props
+  const { children, onSubmit } = props
   const name = 'giftCardForm'
   const ref = useRef(null)
   const { addGiftCard, addGiftCardError } = useContext(GiftCardContext)
@@ -31,10 +31,12 @@ const GiftCard: FunctionComponent<GiftCardProps> = props => {
     if (_.isEmpty(errors)) {
       addGiftCard(values as GiftCardI)
       ref.current.reset()
+      if (onSubmit) {
+        onSubmit(values)
+      }
     } else {
       addGiftCardError(errors)
     }
-    console.log('errors', errors)
   }
   return (
     <Fragment>
@@ -46,5 +48,10 @@ const GiftCard: FunctionComponent<GiftCardProps> = props => {
 }
 
 GiftCard.propTypes = GCProps
+
+GiftCard.defaultProps = {
+  onSubmit: null,
+  metadata: {}
+}
 
 export default GiftCard

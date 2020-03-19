@@ -1,7 +1,6 @@
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 import { Fragment, useEffect, useState } from 'react'
 import CommerceLayer from '../src/components/CommerceLayer'
-import '../styles/styles.css'
 import GiftCardContainer from '../src/components/GiftCardContainer'
 import SubmitButton from '../src/components/SubmitButton'
 import GiftCard from '../src/components/GiftCard'
@@ -69,6 +68,7 @@ const Home = () => {
                     name="balanceCents"
                     placeholder="Amount*"
                   />
+                  <Errors resourceKey="giftCard" field="balanceCents" />
                 </div>
                 <div className="p-2">
                   <GiftCardInput
@@ -76,7 +76,6 @@ const Home = () => {
                     type="text"
                     name="email"
                     placeholder="Email*"
-                    required
                   />
                   <Errors
                     resourceKey="giftCard"

@@ -3,11 +3,22 @@ import LineItemContext from '../context/LineItemContext'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import PropTypes, { InferProps } from 'prop-types'
 
-type LineItemType = 'skus' | 'gift_cards'
+type LineItemType =
+  | 'skus'
+  | 'gift_cards'
+  | 'shipments'
+  | 'paymentMethods'
+  | 'promotions'
 
 const LIProps = {
   children: PropTypes.node.isRequired,
-  type: PropTypes.oneOf<LineItemType>(['skus', 'gift_cards'])
+  type: PropTypes.oneOf<LineItemType>([
+    'skus',
+    'gift_cards',
+    'shipments',
+    'paymentMethods',
+    'promotions'
+  ])
 }
 
 export type LineItemProps = InferProps<typeof LIProps>

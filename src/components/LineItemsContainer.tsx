@@ -16,17 +16,18 @@ import LineItemContext from '../context/LineItemContext'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import _ from 'lodash'
 import PropTypes, { InferProps } from 'prop-types'
+import { PTLoader } from '../@types'
 
 const LItemsCProps = {
   children: PropTypes.node.isRequired,
-  filters: PropTypes.object
-  // TODO add loader prop
+  filters: PropTypes.object,
+  loader: PTLoader
 }
 
 export type LineItemsContainer = InferProps<typeof LItemsCProps>
 
 const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
-  const { children, filters } = props
+  const { children, filters, loader } = props
   const { order, getOrder, orderId } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(lineItemReducer, lineItemInitialState)
@@ -48,6 +49,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
   }, [order])
   const lineItemValue: LineItemState = {
     ...state,
+    loader,
     updateLineItem: (lineItemId, quantity = 1) =>
       updateLineItem({
         lineItemId,
@@ -70,7 +72,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
   }
   return (
     <LineItemContext.Provider value={lineItemValue}>
-      {children}
+      {state.loading ? loader : children}
     </LineItemContext.Provider>
   )
 }
@@ -78,7 +80,8 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
 LineItemsContainer.propTypes = LItemsCProps
 
 LineItemsContainer.defaultProps = {
-  filters: {}
+  filters: {},
+  loader: 'Loading...'
 }
 
 export default LineItemsContainer

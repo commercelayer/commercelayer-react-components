@@ -9,6 +9,7 @@ import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import _ from 'lodash'
+import { LoaderType } from '../@types'
 
 export type UpdateLineItemParams = {
   lineItemId: string
@@ -42,6 +43,8 @@ export interface GetLineItems {
 }
 
 export interface LineItemPayload {
+  loading?: boolean
+  loader?: LoaderType
   lineItems?: LineItemCollection[]
   errors?: BaseError[]
 }
@@ -68,6 +71,12 @@ export const getLineItems: GetLineItems = params => {
     .includes('lineItemOptions')
     .all()
     .then(async res => {
+      dispatch({
+        type: 'setLoading',
+        payload: {
+          loading: false
+        }
+      })
       const items = res.toArray()
       allLineItems = [...allLineItems, ...items]
       dispatch({
@@ -91,6 +100,15 @@ export const getLineItems: GetLineItems = params => {
           })
         }
       }
+    })
+    .catch(c => {
+      const errors = getErrorsByCollection(c, 'lineItem')
+      dispatch({
+        type: 'setErrors',
+        payload: {
+          errors
+        }
+      })
     })
 }
 
@@ -163,13 +181,18 @@ export const deleteLineItem: DeleteLineItem = async params => {
 }
 
 export const lineItemInitialState: LineItemState = {
+  loading: true,
   lineItems: [],
   errors: []
 }
 
-export type LineItemActionType = 'setLineItems' | 'setErrors'
+export type LineItemActionType = 'setLineItems' | 'setErrors' | 'setLoading'
 
-const actionType: LineItemActionType[] = ['setLineItems', 'setErrors']
+const actionType: LineItemActionType[] = [
+  'setLineItems',
+  'setErrors',
+  'setLoading'
+]
 
 const lineItemReducer = (
   state: LineItemState,

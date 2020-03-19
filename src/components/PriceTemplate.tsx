@@ -6,17 +6,13 @@ import { PPropsType } from './Price'
 export const PriceTemplateProps = {
   ...BC,
   formattedAmount: PropTypes.string,
-  formattedCompare: PropTypes.string,
-  loading: PropTypes.bool,
-  loader: PropTypes.oneOfType([PropTypes.element, PropTypes.string])
+  formattedCompare: PropTypes.string
 }
 
 export type PTemplateProps = InferProps<typeof PriceTemplateProps> & PPropsType
 
-const PriceTemplate: FunctionComponent<PTemplateProps> = props =>
-  props.loading ? (
-    <Fragment>{props.loader || 'Loading...'}</Fragment>
-  ) : (
+const PriceTemplate: FunctionComponent<PTemplateProps> = props => {
+  return (
     <Fragment>
       <span className={props.className}>{props.formattedAmount}</span>
       {props.showCompare && (
@@ -24,7 +20,7 @@ const PriceTemplate: FunctionComponent<PTemplateProps> = props =>
       )}
     </Fragment>
   )
-
+}
 PriceTemplate.propTypes = PriceTemplateProps
 
 PriceTemplate.defaultProps = {

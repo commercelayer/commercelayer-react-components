@@ -1,14 +1,12 @@
-import { BaseAction } from '../@types/index'
+import { BaseAction, LoaderType } from '../@types'
 import CLayer, { PriceCollection } from '@commercelayer/js-sdk'
 import getPrices from '../utils/getPrices'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import { Dispatch } from 'react'
-import getSkus from '../utils/getSkus'
-import { Items, ItemPrices } from './ItemReducer'
+import { ItemPrices } from './ItemReducer'
 import baseReducer from '../utils/baseReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import { BaseError } from '../components/Errors'
-import { PCProps } from '../components/PriceContainer'
 
 export type SkuPrices = PriceCollection[]
 
@@ -21,8 +19,6 @@ type SkuCodesPrice = string[]
 export interface SetSkuCodesPrice {
   (skuCodes: SkuCodesPrice): void
 }
-
-export type LoaderType = PCProps['loader']
 
 export interface PriceState {
   loading: boolean
@@ -39,7 +35,7 @@ export interface PriceAction extends BaseAction {
 }
 
 export const priceInitialState: PriceState = {
-  loading: false,
+  loading: true,
   prices: {},
   skuCodes: [],
   errors: []
@@ -70,7 +66,7 @@ export const getSkusPrice: GetSkusPrice = (
     .all()
     .then(async r => {
       const pricesObj = getPrices(r.toArray())
-      allPrices = { ...allPrices, ...pricesObj }
+      allPrices = { ...allPrices, ...prices, ...pricesObj }
       if (setPrices) {
         setPrices(allPrices)
       }
@@ -82,11 +78,10 @@ export const getSkusPrice: GetSkusPrice = (
         type: 'setLoading',
         payload: { loading: false }
       })
-
       const meta = r.getMetaInfo()
       let col = r
-      for (let key = 1; key < meta.pageCount; key++) {
-        if (col.hasNextPage()) {
+      if (col.hasNextPage()) {
+        for (let key = 1; key < meta.pageCount; key++) {
           col = await col.withCredentials(config).nextPage()
           const pricesObj = getPrices(col.toArray())
           allPrices = { ...allPrices, ...pricesObj }
@@ -96,10 +91,6 @@ export const getSkusPrice: GetSkusPrice = (
           dispatch({
             type: 'setPrices',
             payload: { prices: allPrices }
-          })
-          dispatch({
-            type: 'setLoading',
-            payload: { loading: false }
           })
         }
       }

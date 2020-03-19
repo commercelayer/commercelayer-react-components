@@ -1,12 +1,19 @@
 import { Dispatch } from 'react'
 import { BaseError } from '../components/Errors'
-import PropTypes, { InferProps } from 'prop-types'
+import PropTypes, { InferProps, ReactElementLike } from 'prop-types'
 
 export const BC = {
   id: PropTypes.string,
   className: PropTypes.string,
   style: PropTypes.object
 }
+
+export const PTLoader = PropTypes.oneOfType([
+  PropTypes.element,
+  PropTypes.string
+])
+
+export type LoaderType = string | ReactElementLike
 
 export const BMObject = PropTypes.objectOf(PropTypes.string)
 export type BaseMetadataObject = InferProps<typeof BMObject>

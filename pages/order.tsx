@@ -1,5 +1,8 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import { getSalesChannelToken } from '@commercelayer/js-auth'
+import {
+  getSalesChannelToken,
+  getIntegrationToken
+} from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
@@ -55,13 +58,21 @@ export default function Order() {
   useEffect(() => {
     const getToken = async () => {
       // @ts-ignore
-      const { accessToken } = await getSalesChannelToken({
+      // const { accessToken } = await getSalesChannelToken({
+      //   clientId:
+      //     '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
+      //   endpoint,
+      //   scope: 'market:48'
+      // })
+      const token = await getIntegrationToken({
         clientId:
-          '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
+          'b1aa32826ce12ba2f74c59a555e3ed98a7db4ec710b14575b7e97f0a49fb9a4d',
+        clientSecret:
+          '8fed019759490ba13c482cc2541ef77c6b8d0b3df04db80807110784fbfec021',
         endpoint,
         scope: 'market:48'
       })
-      setToken(accessToken)
+      setToken(token.accessToken)
     }
     getToken()
   }, [])
@@ -159,8 +170,8 @@ export default function Order() {
                 </div>
               </div>
             </ItemContainer>
+            <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
             <LineItemsContainer>
-              <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
               <p className="text-sm m-2">
                 Your shopping bag contains{' '}
                 <LineItemsCount id="items-count" className="font-bold" /> items
