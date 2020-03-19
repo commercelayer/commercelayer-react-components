@@ -1,28 +1,32 @@
+const { resolve, join } = require('path')
+const webpack = require('webpack')
+
 module.exports = {
+  entry: './src/index.ts',
   mode: 'development',
-  // make sure the source maps work
-  devtool: 'eval-source-map',
-  // webpack will transpile TS and JS files
-  resolve: {
-    extensions: ['.ts', '.js']
-  },
   module: {
     rules: [
       {
-        // every time webpack sees a TS file (except for node_modules)
-        // webpack will use "ts-loader" to transpile it to JavaScript
-        test: /\.ts$/,
-        exclude: [/node_modules/],
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              // skip typechecking for speed
-              transpileOnly: true
-            }
-          }
-        ]
+        test: /\.tsx|.ts?$/,
+        exclude: /node_modules\/(?!(cypress-react-unit-test)\/).*/,
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-typescript', '@babel/preset-react']
+        }
       }
     ]
-  }
+  },
+  resolve: { extensions: ['*', '.js', '.ts', '.jsx', '.tsx'] },
+  output: {
+    path: resolve(__dirname, 'dist/'),
+    publicPath: '/dist/',
+    filename: 'bundle.js'
+  },
+  devServer: {
+    contentBase: join(__dirname, 'cypress/support/'),
+    port: 3000,
+    publicPath: 'http://localhost:3000/dist/',
+    hotOnly: true
+  },
+  plugins: [new webpack.HotModuleReplacementPlugin()]
 }
