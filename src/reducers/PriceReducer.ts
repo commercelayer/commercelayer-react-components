@@ -44,7 +44,7 @@ export const priceInitialState: PriceState = {
 export interface GetSkusPrice {
   (
     skuCodes: SkuCodesPrice,
-    options?: {
+    options: {
       config: CommerceLayerConfig
       dispatch: Dispatch<PriceAction>
       setPrices: (item: ItemPrices) => void
@@ -80,7 +80,7 @@ export const getSkusPrice: GetSkusPrice = (
       })
       const meta = r.getMetaInfo()
       let col = r
-      if (col.hasNextPage()) {
+      if (col.hasNextPage() && meta.pageCount) {
         for (let key = 1; key < meta.pageCount; key++) {
           col = await col.withCredentials(config).nextPage()
           const pricesObj = getPrices(col.toArray())

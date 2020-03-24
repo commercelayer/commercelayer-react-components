@@ -8,13 +8,19 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
+    "sourceMap": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "removeComments": true,
+    "noUnusedLocals": true,
+    "declaration": true,
+    "outDir": "./dist",
+    "pretty": true
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "spec"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }

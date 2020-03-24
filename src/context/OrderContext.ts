@@ -1,6 +1,6 @@
 import { createContext } from 'react'
-import { orderInitialState } from '../reducers/OrderReducer'
+import { orderInitialState, OrderState } from '../reducers/OrderReducer'
 
-const OrderContext = createContext(orderInitialState)
+const OrderContext = createContext<OrderState>(orderInitialState)
 
 export default OrderContext

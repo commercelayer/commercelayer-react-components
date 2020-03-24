@@ -33,12 +33,10 @@ type ItemParams = {
   key: 'items' | 'item' | 'quantity' | 'option' | 'prices'
 }
 
+type DataType = Items | ItemQuantity | ItemOptions | ItemPrices
+
 export interface SetItemState {
-  (
-    data: Items | ItemQuantity | ItemOptions | ItemPrices,
-    params: ItemParams,
-    dispatch: Dispatch<ItemAction>
-  ): void
+  (data: DataType, params: ItemParams, dispatch: Dispatch<ItemAction>): void
 }
 
 // TODO: Set to other reducer files
@@ -55,13 +53,13 @@ export const unsetItemState: BaseUnsetState<ItemAction> = dispatch => {
   dispatch({
     type: 'setItem',
     payload: {
-      item: null
+      item: {}
     }
   })
   dispatch({
     type: 'setItems',
     payload: {
-      items: null
+      items: {}
     }
   })
   dispatch({

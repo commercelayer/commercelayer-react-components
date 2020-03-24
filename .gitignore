@@ -5,3 +5,4 @@ dist
 cypress/fixtures/!routes.json
 cypress/fixtures/!fixture.json
 cypress/fixtures/*.json
+coverage

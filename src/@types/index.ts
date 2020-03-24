@@ -16,7 +16,9 @@ export const PTLoader = PropTypes.oneOfType([
 export type LoaderType = string | ReactElementLike
 
 export const BMObject = PropTypes.objectOf(PropTypes.string)
-export type BaseMetadataObject = InferProps<typeof BMObject>
+export type BaseMetadataObject = {
+  [key: string]: string | undefined | null
+}
 
 export type BaseComponent = InferProps<typeof BC>
 
@@ -31,6 +33,10 @@ export interface BaseState {
 }
 
 export type BaseActionType<T = string> = T[]
+
+export interface BFSetStateContainer<T> {
+  <P extends T>(param: P): void
+}
 
 export interface BaseReducer {
   <S extends BaseState, A extends BaseAction, T extends BaseActionType>(

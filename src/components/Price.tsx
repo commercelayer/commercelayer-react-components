@@ -35,7 +35,7 @@ const Price: FunctionComponent<PPropsType> = props => {
   const [skuPrices, setSkuPrices] = useState([])
   const sCode = skuCode || props.skuCode
   useEffect(() => {
-    if (!_.isEmpty(prices) && prices[sCode]) {
+    if (!_.isEmpty(prices) && _.has(prices, `${sCode}`)) {
       setSkuPrices(prices[sCode])
     } else {
       if (sCode && _.indexOf(skuCodes, sCode) === -1) {
@@ -65,5 +65,9 @@ const Price: FunctionComponent<PPropsType> = props => {
 }
 
 Price.propTypes = PriceProps
+
+Price.defaultProps = {
+  skuCode: ''
+}
 
 export default Price

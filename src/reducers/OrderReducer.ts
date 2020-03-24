@@ -11,8 +11,8 @@ import { BaseMetadataObject } from '../@types/index'
 
 export interface GetOrderParams {
   id: string
-  dispatch?: Dispatch<OrderActions>
-  config?: CommerceLayerConfig
+  dispatch: Dispatch<OrderActions>
+  config: CommerceLayerConfig
 }
 
 export interface GetOrder {
@@ -50,7 +50,7 @@ export interface OrderPayload {
   errors?: BaseError[]
 }
 
-type AddToCartValues = {
+export type AddToCartValues = {
   skuCode: string
   skuId?: string
   quantity?: number
@@ -103,22 +103,21 @@ export const createOrder: CreateOrder = async params => {
   } = params
   if (state.orderId) return state.orderId
   const o = await CLayer.Order.withCredentials(config).create({ metadata })
-  if (o.id) {
-    dispatch({
-      type: 'setOrderId',
-      payload: {
-        orderId: o.id
-      }
-    })
-    dispatch({
-      type: 'setOrder',
-      payload: {
-        order: o
-      }
-    })
-    setLocalOrder(persistKey, o.id)
-    return o.id
-  }
+  if (!o.id) return ''
+  dispatch({
+    type: 'setOrderId',
+    payload: {
+      orderId: o.id
+    }
+  })
+  dispatch({
+    type: 'setOrder',
+    payload: {
+      order: o
+    }
+  })
+  setLocalOrder(persistKey, o.id)
+  return o.id
 }
 
 export const getApiOrder: GetOrder = async params => {

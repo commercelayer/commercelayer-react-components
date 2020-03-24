@@ -16,7 +16,7 @@ import {
   PriceState,
   getSkusPrice
 } from '../reducers/PriceReducer'
-import PriceContext from '../context/PriceContext'
+import PriceContext, { PriceContextValue } from '../context/PriceContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
 import PropTypes, { InferProps } from 'prop-types'
@@ -79,10 +79,10 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
     }
     return (): void => unsetPriceState(dispatch)
   }, [config.accessToken, currentItem])
-  const priceValue: PriceState = {
+  const priceValue: PriceContextValue = {
     ...state,
     skuCode: sCode,
-    loader,
+    loader: loader || 'Loading...',
     setSkuCodes
   }
   return (
@@ -95,7 +95,8 @@ PriceContainer.propTypes = PriceContainerProps
 PriceContainer.defaultProps = {
   perPage: 10,
   filters: {},
-  loader: 'Loading...'
+  loader: 'Loading...',
+  skuCode: ''
 }
 
 export default PriceContainer

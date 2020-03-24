@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from 'react'
 import CommerceLayerContext from '../context/CommerceLayerContext'
-import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import PropTypes, { InferProps } from 'prop-types'
 
 const CLProps = {
@@ -9,8 +8,7 @@ const CLProps = {
   endpoint: PropTypes.string.isRequired
 }
 
-export type CommerceLayerProps = InferProps<typeof CLProps> &
-  CommerceLayerConfig
+export type CommerceLayerProps = InferProps<typeof CLProps>
 
 const CommerceLayer: FunctionComponent<CommerceLayerProps> = props => {
   const { children, ...p } = props

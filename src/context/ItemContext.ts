@@ -1,12 +1,28 @@
 import { createContext } from 'react'
-import { ItemState } from '../reducers/ItemReducer'
+import {
+  ItemState,
+  Items,
+  ItemQuantity,
+  ItemOptions,
+  ItemPrices
+} from '../reducers/ItemReducer'
 
-const initial: ItemState = {
-  item: {},
-  items: {},
-  quantity: {}
+export interface InitItemContext extends ItemState {
+  item: Items
+  items: Items
+  quantity: ItemQuantity
+  option: ItemOptions
+  prices: ItemPrices
 }
 
-const ItemContext = createContext(initial)
+export const initialItemContext: InitItemContext = {
+  item: {},
+  items: {},
+  quantity: {},
+  option: {},
+  prices: {}
+}
+
+const ItemContext = createContext<InitItemContext>(initialItemContext)
 
 export default ItemContext

@@ -7,7 +7,7 @@ import React, {
 import { getLocalOrder } from '../utils/localStorage'
 import orderReducer, {
   orderInitialState,
-  OrderState
+  AddToCartValues
 } from '../reducers/OrderReducer'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import OrderContext from '../context/OrderContext'
@@ -45,18 +45,18 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
     }
     return (): void => unsetOrderState(dispatch)
   }, [config.accessToken])
-  const orderValue: OrderState = {
+  const orderValue = {
     ...state,
-    addToCart: values =>
+    addToCart: (values: AddToCartValues): void =>
       addToCart({
         ...values,
         persistKey,
         dispatch,
         state,
         config,
-        orderMetadata: metadata
+        orderMetadata: metadata || {}
       }),
-    getOrder: id => getApiOrder({ id, dispatch, config })
+    getOrder: (id: string): void => getApiOrder({ id, dispatch, config })
   }
   return (
     <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
@@ -64,5 +64,9 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
 }
 
 OrderContainer.propTypes = OCProps
+
+OrderContainer.defaultProps = {
+  metadata: {}
+}
 
 export default OrderContainer
