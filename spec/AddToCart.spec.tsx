@@ -1,20 +1,60 @@
-/// <reference types="jest"/>
 import React from 'react'
 import { AddToCart } from '../src'
 import renderer from 'react-test-renderer'
 import PropTypes from 'prop-types'
 
 test('<AddToCart/>', () => {
-  // expect.assertions(6)
+  expect.assertions(7)
   const component = renderer.create(<AddToCart />)
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
   const proptypes = root.type['propTypes']
-  console.log('root', root)
   expect(tree).toMatchSnapshot()
-  expect(root.type['propTypes'].children).toBe(PropTypes.func)
+
+  expect(proptypes.children).toBe(PropTypes.func)
   expect(proptypes.label).toBe(PropTypes.string)
-  expect(rendered.props.children).toBe('add to cart')
   expect(proptypes.skuCode).toBe(PropTypes.string)
+  expect(proptypes.disabled).toBe(PropTypes.bool)
+
+  expect(rendered.props.children).toBe('add to cart')
+  expect(rendered.props.disabled).toBe(true)
+})
+
+test('<AddToCart with props />', () => {
+  expect.assertions(4)
+  const component = renderer.create(
+    <AddToCart label="Add to basket" disabled={false} skuCode="SKUCODE12345" />
+  )
+  const tree = component.toJSON()
+  const root = component.toTree()
+  const rendered = root.rendered
+  expect(tree).toMatchSnapshot()
+  expect(rendered.props.children).toBe('Add to basket')
+  expect(rendered.props.disabled).toBe(false)
+  expect(root.props.skuCode).toBe('SKUCODE12345')
+})
+
+test('<AddToCart with custom children />', () => {
+  expect.assertions(8)
+  const CustomComponent = props => <span>{props.label}</span>
+  const component = renderer.create(
+    <AddToCart label="Add to basket" disabled={false} skuCode="SKUCODE12345">
+      {CustomComponent}
+    </AddToCart>
+  )
+  const tree = component.toJSON()
+  const root = component.toTree()
+  const rendered = root.rendered
+  const childRendered = root.rendered.rendered
+  expect(tree).toMatchSnapshot()
+
+  expect(rendered.props.children).toBe(CustomComponent)
+  expect(rendered.props.disabled).toBe(false)
+  expect(rendered.props.label).toBe('Add to basket')
+  expect(rendered.props.skuCode).toBe('SKUCODE12345')
+  expect(rendered.props.handleClick).toBeTruthy()
+
+  expect(childRendered.nodeType).toBe('component')
+  expect(childRendered.type).toBe(CustomComponent)
 })
