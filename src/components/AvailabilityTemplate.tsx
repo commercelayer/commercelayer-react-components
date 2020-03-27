@@ -1,26 +1,28 @@
 import React, { useContext, FunctionComponent } from 'react'
 import AvailabilityContext from '../context/AvailabilityContext'
 import Parent from './utils/Parent'
-import { BaseComponent } from '../@types/index'
 import _ from 'lodash'
-import PropTypes, { InferProps } from 'prop-types'
+import { InferProps } from 'prop-types'
+import components from '../config/components'
 
-type TimeFormat = 'days' | 'hours'
-
-const ATProps = {
-  timeFormat: PropTypes.oneOf<TimeFormat>(['days', 'hours']),
-  showShippingMethodName: PropTypes.bool,
-  children: PropTypes.func
+type DefaultProps = {
+  timeFormat: 'days' | 'hours'
+  showShippingMethodName: boolean
 }
 
-export type AvailabilityTemplateProps = InferProps<typeof ATProps> &
-  BaseComponent
+const propTypes = components.AvailabilityTemplate.props
+const defaultProps = components.AvailabilityTemplate
+  .defaultProps as DefaultProps
+const displayName = components.AvailabilityTemplate.displayName
+
+export type AvailabilityTemplateProps = InferProps<typeof propTypes> &
+  JSX.IntrinsicElements['p']
 
 const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = props => {
   const { timeFormat, showShippingMethodName, children, ...p } = props
   const { min, max, shippingMethod } = useContext(AvailabilityContext)
-  const mn = !_.isEmpty(min) ? min[timeFormat] : ''
-  const mx = !_.isEmpty(max) ? max[timeFormat] : ''
+  const mn = !_.isEmpty(min) ? min[`${timeFormat}`] : ''
+  const mx = !_.isEmpty(max) ? max[`${timeFormat}`] : ''
   const name =
     showShippingMethodName && shippingMethod
       ? `with ${shippingMethod.name}`
@@ -40,11 +42,8 @@ const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = props
   )
 }
 
-AvailabilityTemplate.defaultProps = {
-  timeFormat: 'days',
-  showShippingMethodName: false
-}
-
-AvailabilityTemplate.propTypes = ATProps
+AvailabilityTemplate.propTypes = propTypes
+AvailabilityTemplate.defaultProps = defaultProps
+AvailabilityTemplate.displayName = displayName
 
 export default AvailabilityTemplate

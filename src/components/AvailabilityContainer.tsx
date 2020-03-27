@@ -11,14 +11,13 @@ import AvailabilityContext from '../context/AvailabilityContext'
 import _ from 'lodash'
 import ItemContext from '../context/ItemContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
-import PropTypes, { InferProps } from 'prop-types'
+import { InferProps } from 'prop-types'
+import components from '../config/components'
 
-const ACProps = {
-  children: PropTypes.node.isRequired,
-  skuCode: PropTypes.string
-}
+const propTypes = components.AvailabilityContainer.props
+const displayName = components.AvailabilityContainer.displayName
 
-export type AvailabilityContainerProps = InferProps<typeof ACProps>
+export type AvailabilityContainerProps = InferProps<typeof propTypes>
 
 const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = props => {
   const { children } = props
@@ -30,8 +29,10 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = pro
   useEffect(() => {
     const skuCode = props.skuCode || getCurrentItemKey(item)
     if (skuCode) {
-      const firstLevel = _.first(item[skuCode].inventory.levels)
-      if (firstLevel.deliveryLeadTimes.length > 0) {
+      const firstLevel = _.first(item[skuCode].inventory.levels) || {
+        deliveryLeadTimes: []
+      }
+      if (!_.isEmpty(firstLevel) && firstLevel.deliveryLeadTimes.length > 0) {
         const firstDelivery = _.first(firstLevel.deliveryLeadTimes)
         dispatch({
           type: 'setAvailability',
@@ -53,6 +54,7 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = pro
   )
 }
 
-AvailabilityContainer.propTypes = ACProps
+AvailabilityContainer.propTypes = propTypes
+AvailabilityContainer.displayName = displayName
 
 export default AvailabilityContainer

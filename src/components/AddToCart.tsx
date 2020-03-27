@@ -4,16 +4,14 @@ import OrderContext from '../context/OrderContext'
 import _ from 'lodash'
 import ItemContext from '../context/ItemContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
-import PropTypes, { InferProps } from 'prop-types'
+import { InferProps } from 'prop-types'
+import components from '../config/components'
 
-const ATCProps = {
-  children: PropTypes.func,
-  label: PropTypes.string,
-  skuCode: PropTypes.string,
-  disabled: PropTypes.bool
-}
+const propTypes = components.AddToCart.props
+const defaultProps = components.AddToCart.defaultProps
+const displayName = components.AddToCart.displayName
 
-export type AddToCartProps = InferProps<typeof ATCProps> &
+export type AddToCartProps = InferProps<typeof propTypes> &
   JSX.IntrinsicElements['button']
 
 const AddToCart: FunctionComponent<AddToCartProps> = props => {
@@ -46,11 +44,13 @@ const AddToCart: FunctionComponent<AddToCartProps> = props => {
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <button disabled={autoDisabled} onClick={handleClick} {...p}>
-      {label ? label : 'add to cart'}
+      {label}
     </button>
   )
 }
 
-AddToCart.propTypes = ATCProps
+AddToCart.propTypes = propTypes
+AddToCart.defaultProps = defaultProps
+AddToCart.displayName = displayName
 
 export default AddToCart

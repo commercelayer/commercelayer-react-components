@@ -50,14 +50,14 @@ export interface TransformCode {
 }
 
 const trasformCode: TransformCode = code => {
-  let newCode = null as CodeErrorType
+  let newCode = '' as CodeErrorType
   ERROR_CODES.map(c => {
-    const checkCode = []
+    const checkCode: string[] = []
     const words = c.split('_')
     words.map(w => {
       const rgx = new RegExp(`(?:s|${w})`, 'g')
       const m = code.match(rgx)
-      if (m?.length > 0) {
+      if (m && m?.length > 0) {
         checkCode.push(m[0])
       }
     })
@@ -72,7 +72,7 @@ const getErrorsByCollection: GetErrorsByCollection = (
   collection,
   resourceType
 ) => {
-  const errors = []
+  const errors: BaseError[] = []
   if (collection.errors) {
     collection.errors().each((field, error) => {
       // TODO Add function to correct different field

@@ -9,14 +9,18 @@ export const PriceTemplateProps = {
   formattedCompare: PropTypes.string
 }
 
-export type PTemplateProps = InferProps<typeof PriceTemplateProps> & PPropsType
+export type PTemplateProps = InferProps<typeof PriceTemplateProps> &
+  PPropsType &
+  JSX.IntrinsicElements['span']
 
 const PriceTemplate: FunctionComponent<PTemplateProps> = props => {
   return (
     <Fragment>
       <span className={props.className}>{props.formattedAmount}</span>
       {props.showCompare && (
-        <span className={props.compareClassName}>{props.formattedCompare}</span>
+        <span className={props.compareClassName || ''}>
+          {props.formattedCompare}
+        </span>
       )}
     </Fragment>
   )

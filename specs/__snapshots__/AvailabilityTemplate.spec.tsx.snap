@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<AvailabilityTemplate with custom children /> 1`] = `<span />`;
+
+exports[`<AvailabilityTemplate with props /> 1`] = `
+<p>
+  
+</p>
+`;
+
+exports[`<AvailabilityTemplate/> 1`] = `
+<p>
+  
+</p>
+`;

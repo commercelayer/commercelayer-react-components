@@ -21,6 +21,6 @@
     "outDir": "./dist",
     "pretty": true
   },
-  "exclude": ["node_modules", "spec"],
+  "exclude": ["node_modules", "specs"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }

@@ -1,9 +1,4 @@
-import React, {
-  ReactNode,
-  FunctionComponent,
-  useReducer,
-  useContext
-} from 'react'
+import React, { FunctionComponent, useReducer, useContext } from 'react'
 import PropTypes, { InferProps } from 'prop-types'
 import GiftCardContext from '../context/GiftCardContext'
 import CommerceLayerContext from '../context/CommerceLayerContext'
@@ -45,5 +40,7 @@ const GiftCardContainer: FunctionComponent<GiftCardContainer> = props => {
 }
 
 GiftCardContainer.propTypes = GCCProps
+
+GiftCardContainer.displayName = `CLGiftCardContainer`
 
 export default GiftCardContainer

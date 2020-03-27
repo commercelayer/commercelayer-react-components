@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react'
 import PropTypes, { InferProps } from 'prop-types'
 import BaseSelect from './utils/BaseSelect'
 import { BaseComponent } from '../@types/index'
-import currencyOptions from '../utils/currency.json'
+import currencyOptions from '../config/currency.json'
 
 const GCCSProps = {
   children: PropTypes.func,

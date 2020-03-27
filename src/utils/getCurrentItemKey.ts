@@ -6,7 +6,7 @@ export interface GetCurrentItemKey {
 }
 
 const getCurrentItemKey: GetCurrentItemKey = item => {
-  return _.first(_.keys(item))
+  return _.first(_.keys(item)) || ''
 }
 
 export default getCurrentItemKey

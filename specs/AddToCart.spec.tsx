@@ -17,7 +17,7 @@ test('<AddToCart/>', () => {
   expect(proptypes.skuCode).toBe(PropTypes.string)
   expect(proptypes.disabled).toBe(PropTypes.bool)
 
-  expect(rendered.props.children).toBe('add to cart')
+  expect(rendered.props.children).toBe('Add to cart')
   expect(rendered.props.disabled).toBe(true)
 })
 

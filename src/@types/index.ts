@@ -20,6 +20,8 @@ export type BaseMetadataObject = {
   [key: string]: string | undefined | null
 }
 
+export type TimeFormat = 'days' | 'hours'
+
 export type BaseComponent = InferProps<typeof BC>
 
 export interface BaseAction<A = string> {
@@ -42,7 +44,7 @@ export interface BaseReducer {
   <S extends BaseState, A extends BaseAction, T extends BaseActionType>(
     state: S,
     action: A,
-    type?: T
+    type: T
   ): S
 }
 

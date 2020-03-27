@@ -21,8 +21,8 @@ export interface AvailabilityPayload {
 }
 
 export interface AvailabilityState extends AvailabilityPayload {
-  min?: LeadTimes
-  max?: LeadTimes
+  min: LeadTimes
+  max: LeadTimes
 }
 
 export interface AvailabilityAction {
@@ -31,6 +31,14 @@ export interface AvailabilityAction {
 }
 
 export const availabilityInitialState: AvailabilityState = {
+  min: {
+    days: 0,
+    hours: 0
+  },
+  max: {
+    days: 0,
+    hours: 0
+  },
   errors: []
 }
 

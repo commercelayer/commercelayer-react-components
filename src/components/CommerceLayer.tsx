@@ -1,18 +1,10 @@
 import React, { FunctionComponent } from 'react'
 import CommerceLayerContext from '../context/CommerceLayerContext'
-import PropTypes, { InferProps } from 'prop-types'
-// import OrderContainer from './OrderContainer'
-import { CommerceLayerConfig } from '../context/CommerceLayerContext'
-import validationChildrenType from '../utils/validationChildrenType'
+import { InferProps } from 'prop-types'
+import components from '../config/components'
 
-const CLProps = {
-  children: validationChildrenType.isRequired,
-  accessToken: PropTypes.string.isRequired,
-  endpoint: PropTypes.string.isRequired
-}
-
-export type CommerceLayerProps = InferProps<typeof CLProps> &
-  CommerceLayerConfig
+const propTypes = components.CommerceLayer.props
+export type CommerceLayerProps = InferProps<typeof propTypes>
 
 const CommerceLayer: FunctionComponent<CommerceLayerProps> = props => {
   const { children, ...p } = props
@@ -23,6 +15,6 @@ const CommerceLayer: FunctionComponent<CommerceLayerProps> = props => {
   )
 }
 
-CommerceLayer.propTypes = CLProps
+CommerceLayer.propTypes = propTypes
 
 export default CommerceLayer

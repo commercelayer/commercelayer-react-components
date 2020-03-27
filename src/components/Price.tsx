@@ -36,10 +36,12 @@ const Price: FunctionComponent<PPropsType> = props => {
   const sCode = skuCode || props.skuCode
   useEffect(() => {
     if (!_.isEmpty(prices) && _.has(prices, `${sCode}`)) {
+      // @ts-ignore
       setSkuPrices(prices[sCode])
     } else {
       if (sCode && _.indexOf(skuCodes, sCode) === -1) {
         skuCodes.push(sCode)
+        // @ts-ignore
         setSkuCodes(skuCodes)
       }
     }
@@ -69,5 +71,7 @@ Price.propTypes = PriceProps
 Price.defaultProps = {
   skuCode: ''
 }
+
+Price.displayName = 'CLPrice'
 
 export default Price

@@ -69,4 +69,6 @@ OrderContainer.defaultProps = {
   metadata: {}
 }
 
+OrderContainer.displayName = 'CLOrderContainer'
+
 export default OrderContainer

@@ -11,11 +11,7 @@ import priceReducer, {
   SetSkuCodesPrice,
   unsetPriceState
 } from '../reducers/PriceReducer'
-import {
-  priceInitialState,
-  PriceState,
-  getSkusPrice
-} from '../reducers/PriceReducer'
+import { priceInitialState, getSkusPrice } from '../reducers/PriceReducer'
 import PriceContext, { PriceContextValue } from '../context/PriceContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
@@ -41,7 +37,7 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
   )
   if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
-  const sCode = getCurrentItemKey(currentItem) || skuCode
+  const sCode = getCurrentItemKey(currentItem) || skuCode || ''
   const setSkuCodes: SetSkuCodesPrice = skuCodes => {
     dispatch({
       type: 'setSkuCodes',
@@ -70,10 +66,11 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
         getSkusPrice((sCode && [sCode]) || state.skuCodes, {
           config,
           dispatch,
+          // @ts-ignore
           setPrices,
           prices,
-          perPage,
-          filters
+          perPage: perPage || 0,
+          filters: filters || {}
         })
       }
     }
@@ -98,5 +95,7 @@ PriceContainer.defaultProps = {
   loader: 'Loading...',
   skuCode: ''
 }
+
+PriceContainer.displayName = 'CLPriceContainer'
 
 export default PriceContainer
