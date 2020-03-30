@@ -7,7 +7,6 @@ import React, {
   useEffect,
   useContext
 } from 'react'
-import { BaseComponent } from '../../@types'
 import PropTypes, { InferProps } from 'prop-types'
 
 export const BOPProps = {
@@ -22,27 +21,28 @@ export const BOCProps = {
   format: BOPProps['format']
 }
 
-export type BaseOrderComponentProps = InferProps<typeof BOCProps> &
-  BaseComponent
+export type BaseOrderComponentProps = InferProps<typeof BOCProps>
 
-export type BaseOrderPriceProps = InferProps<typeof BOPProps> & BaseComponent
+export type BaseOrderPriceProps = InferProps<typeof BOPProps> &
+  JSX.IntrinsicElements['span']
 
 const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = props => {
-  const { format, base, type, ...p } = props
+  const { format, base, type, children, ...p } = props
   const { order } = useContext(OrderContext)
-  const [price, setPrice] = useState(null)
+  const [price, setPrice] = useState('')
   useEffect(() => {
-    const p = getAmount(base, type, format, order)
+    const p = getAmount(base, type, format || 'formatted', order)
     setPrice(p)
     return (): void => {
-      setPrice(null)
+      setPrice('')
     }
   }, [order])
   const parentProps = {
+    price,
     ...p
   }
   return props.children ? (
-    <Parent {...parentProps}>{props.children}</Parent>
+    <Parent {...parentProps}>{children}</Parent>
   ) : (
     <span {...p}>{price}</span>
   )

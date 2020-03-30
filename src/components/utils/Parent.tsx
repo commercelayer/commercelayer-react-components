@@ -2,14 +2,14 @@ import PropTypes, { InferProps } from 'prop-types'
 import React, { FunctionComponent } from 'react'
 
 const PProps = {
-  children: PropTypes.func.isRequired
+  children: PropTypes.func
 }
 
 export type ParentProps = InferProps<typeof PProps>
 
 const Parent: FunctionComponent<ParentProps> = props => {
   const Child = props.children
-  return <Child {...props} />
+  return Child ? <Child {...props} /> : null
 }
 
 Parent.propTypes = PProps

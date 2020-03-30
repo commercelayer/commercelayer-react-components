@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import childrenTypes from '../utils/childrenTypes'
-import { TimeFormat } from '../@types'
+import { TimeFormat, BaseOrderComponentPropTypes } from '../@types'
 
 const components = {
   AddToCart: {
@@ -56,6 +56,13 @@ const components = {
       children: childrenTypes.isRequired,
       accessToken: PropTypes.string.isRequired,
       endpoint: PropTypes.string.isRequired
+    }
+  },
+  Discount: {
+    displayName: 'CLDiscount',
+    props: BaseOrderComponentPropTypes,
+    defaultProps: {
+      format: 'formatted'
     }
   }
 }

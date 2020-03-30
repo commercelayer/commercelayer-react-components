@@ -13,6 +13,18 @@ export const PTLoader = PropTypes.oneOfType([
   PropTypes.string
 ])
 
+export const BaseOrderPricePropsTypes = {
+  base: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
+  children: PropTypes.func,
+  format: PropTypes.oneOf(['formatted', 'cents', 'float'])
+}
+
+export const BaseOrderComponentPropTypes = {
+  children: BaseOrderPricePropsTypes['children'],
+  format: BaseOrderPricePropsTypes['format']
+}
+
 export type LoaderType = string | ReactElementLike
 
 export const BMObject = PropTypes.objectOf(PropTypes.string)

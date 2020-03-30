@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 export interface GetAmountInterface {
-  (base: string, type: string, format: string, obj: object): string | number
+  (base: string, type: string, format: string, obj: object): string
 }
 
 const getAmount: GetAmountInterface = (base, type, format, obj) => {
