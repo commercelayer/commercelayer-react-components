@@ -1,0 +1,48 @@
+import React from 'react'
+import { Checkout } from '../src'
+import renderer from 'react-test-renderer'
+import components from '../src/config/components'
+
+const propTypes = components.Checkout.props
+
+test('<Checkout/>', () => {
+  expect.assertions(3)
+  const component = renderer.create(<Checkout />)
+  const tree = component.toJSON()
+  const root = component.toTree()
+  const proptypes = root.type['propTypes']
+  expect(tree).toMatchSnapshot()
+  expect(proptypes.children).toBe(propTypes.children)
+  expect(proptypes.label).toBe(propTypes.label)
+})
+
+test('<Checkout with props />', () => {
+  expect.assertions(3)
+  const component = renderer.create(<Checkout />)
+  const tree = component.toJSON()
+  const root = component.toTree()
+  const rendered = root.rendered
+  expect(tree).toMatchSnapshot()
+  expect(rendered.nodeType).toBe('host')
+  expect(rendered.type).toBe('a')
+})
+
+test('<Checkout with custom children />', () => {
+  expect.assertions(5)
+  const CustomComponent = props => <span>{props.label}</span>
+  const component = renderer.create(
+    <Checkout label="My checkout">{CustomComponent}</Checkout>
+  )
+  const tree = component.toJSON()
+  const root = component.toTree()
+  const rendered = root.rendered
+  const childRendered = root.rendered.rendered
+  expect(tree).toMatchSnapshot()
+
+  expect(rendered.props.children).toBe(CustomComponent)
+
+  expect(childRendered.nodeType).toBe('component')
+  expect(childRendered.type).toBe(CustomComponent)
+
+  expect(childRendered.props.label).toBe('My checkout')
+})

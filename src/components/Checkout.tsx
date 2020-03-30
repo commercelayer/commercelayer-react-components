@@ -1,27 +1,39 @@
 import React, { FunctionComponent, useContext } from 'react'
-import { BaseComponent } from '../@types/index'
 import OrderContext from '../context/OrderContext'
-import PropTypes, { InferProps } from 'prop-types'
+import components from '../config/components'
+import { InferProps } from 'prop-types'
+import Parent from './utils/Parent'
 
-const CProps = {
-  label: PropTypes.string
-}
+const propTypes = components.Checkout.props
+const defaultProps = components.Checkout.defaultProps
+const displayName = components.Checkout.displayName
 
-export type CheckoutProps = InferProps<typeof CProps> & BaseComponent
+export type CheckoutProps = InferProps<typeof propTypes> &
+  JSX.IntrinsicElements['a']
 
 const Checkout: FunctionComponent<CheckoutProps> = props => {
+  const { label, children, ...p } = props
   const { order } = useContext(OrderContext)
-  return order ? (
-    <a style={props.style} className={props.className} href={order.checkoutUrl}>
+  const parentProps = {
+    checkoutUrl: order?.checkoutUrl,
+    label,
+    ...p
+  }
+  return children ? (
+    <Parent {...parentProps}>{children}</Parent>
+  ) : (
+    <a
+      style={props.style}
+      className={props.className}
+      href={order?.checkoutUrl}
+    >
       {props.label}
     </a>
-  ) : null
+  )
 }
 
-Checkout.defaultProps = {
-  label: 'checkout'
-}
-
-Checkout.propTypes = CProps
+Checkout.propTypes = propTypes
+Checkout.defaultProps = defaultProps
+Checkout.displayName = displayName
 
 export default Checkout

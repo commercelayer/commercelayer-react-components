@@ -47,8 +47,6 @@ test('<AvailabilityContainer children required />', () => {
   console.error = jest.fn()
   const component = renderer.create(<AvailabilityContainer />)
   const tree = component.toJSON()
-  const root = component.toTree()
-  console.log('root', root)
   expect(tree).toMatchSnapshot()
 
   expect(console.error.mock.calls[0][0]).toEqual(

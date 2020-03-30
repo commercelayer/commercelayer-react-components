@@ -35,6 +35,16 @@ const components = {
       showShippingMethodName: false
     }
   },
+  Checkout: {
+    displayName: 'CLCheckout',
+    props: {
+      children: PropTypes.func,
+      label: PropTypes.string
+    },
+    defaultProps: {
+      label: 'Checkout'
+    }
+  },
   CommerceLayer: {
     permittedChildren: [
       'OrderContainer',

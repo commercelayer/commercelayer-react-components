@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Checkout with custom children /> 1`] = `
+<span>
+  My checkout
+</span>
+`;
+
+exports[`<Checkout with props /> 1`] = `
+<a>
+  Checkout
+</a>
+`;
+
+exports[`<Checkout/> 1`] = `
+<a>
+  Checkout
+</a>
+`;
