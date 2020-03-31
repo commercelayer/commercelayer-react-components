@@ -73,6 +73,26 @@ const components = {
       messages: [],
       field: 'base'
     }
+  },
+  GiftCard: {
+    permittedChildren: [
+      'GiftCardCurrencySelector',
+      'GiftCardInput',
+      'Errors',
+      'MetadataInput',
+      'SubmitButton',
+      'ReactNode'
+    ],
+    displayName: 'CLGiftCard',
+    props: {
+      children: childrenTypes.isRequired,
+      metadata: PropTypes.objectOf(PropTypes.string),
+      onSubmit: PropTypes.func
+    },
+    defaultProps: {
+      onSubmit: undefined,
+      metadata: {}
+    }
   }
 }
 

@@ -8,8 +8,8 @@ import CLayer, {
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import _ from 'lodash'
-import { BaseError } from '../components/Errors'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
+import { BaseError } from '../@types/errors'
 
 export type GiftCardActionType =
   | 'setAvailability'

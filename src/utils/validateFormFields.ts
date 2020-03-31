@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { BaseState } from '../@types/index'
-import { ResourceErrorType, BaseError } from '../components/Errors'
+import { ResourceErrorType, BaseError } from '../@types/errors'
 
 const EMAIL_PATTERN = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/
 
@@ -28,7 +28,7 @@ export interface ValidateValue {
     name: N,
     type: T,
     resourceType: B
-  ): BaseError
+  ): BaseError | object
 }
 
 export const validateValue: ValidateValue = (val, name, type, resourceType) => {
@@ -48,6 +48,7 @@ export const validateValue: ValidateValue = (val, name, type, resourceType) => {
       resourceType
     }
   }
+  return {}
 }
 
 const validateFormFields: ValidateFormFields = (
@@ -55,15 +56,16 @@ const validateFormFields: ValidateFormFields = (
   required,
   resourceType
 ) => {
-  const errors = []
+  const errors: BaseError[] = []
   let values = { metadata: {} }
   _.map(fields, (v: FormField) => {
     const isTick = !!v['checked']
     const val = isTick ? isTick : v.value
-    if (required.indexOf(v.getAttribute('name')) !== -1 || v.required) {
+    const attrName = v.getAttribute('name')
+    if ((attrName && required.indexOf(attrName) !== -1) || v.required) {
       const error = validateValue(val, v.name, v.type, resourceType)
       if (!_.isEmpty(error)) {
-        errors.push(error)
+        errors.push(error as BaseError)
       }
       values = { ...values, [`${v.name}`]: val }
     }

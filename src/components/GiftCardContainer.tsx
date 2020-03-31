@@ -1,9 +1,8 @@
 import React, { FunctionComponent, useReducer, useContext } from 'react'
 import PropTypes, { InferProps } from 'prop-types'
-import GiftCardContext from '../context/GiftCardContext'
+import GiftCardContext, { GCContext } from '../context/GiftCardContext'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import giftCardReducer, {
-  GiftCardState,
   giftCardInitialState,
   addGiftCardRecipient,
   addGiftCard,
@@ -23,14 +22,14 @@ const GiftCardContainer: FunctionComponent<GiftCardContainer> = props => {
   const [state, dispatch] = useReducer(giftCardReducer, giftCardInitialState)
   const config = useContext(CommerceLayerContext)
   const { orderId } = useContext(OrderContext)
-  const giftCardValue: GiftCardState = {
-    addGiftCardRecipient: values =>
+  const giftCardValue = {
+    ...state,
+    addGiftCardRecipient: (values): void =>
       addGiftCardRecipient(values, config, dispatch),
-    addGiftCard: values =>
+    addGiftCard: (values): void =>
       addGiftCard({ ...values, orderId }, config, dispatch),
-    addGiftCardError: errors => addGiftCardError(errors, dispatch),
-    addGiftCardLoading: loading => addGiftCardLoading(loading, dispatch),
-    ...state
+    addGiftCardError: (errors): void => addGiftCardError(errors, dispatch),
+    addGiftCardLoading: (loading): void => addGiftCardLoading(loading, dispatch)
   }
   return (
     <GiftCardContext.Provider value={giftCardValue}>

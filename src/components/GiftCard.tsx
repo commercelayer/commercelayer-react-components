@@ -1,36 +1,43 @@
-import React, { FunctionComponent, Fragment, useRef, useContext } from 'react'
-import PropTypes, { InferProps } from 'prop-types'
-import { BaseComponent } from '../@types/index'
+import React, {
+  FunctionComponent,
+  Fragment,
+  useRef,
+  useContext,
+  RefObject
+} from 'react'
+import { InferProps } from 'prop-types'
 import validateFormFields from '../utils/validateFormFields'
 import _ from 'lodash'
 import GiftCardContext from '../context/GiftCardContext'
 import { GiftCardI } from '../reducers/GiftCardReducer'
+import components from '../config/components'
 
 type RequiredFields = 'currencyCode' | 'balanceCents'
 
-const GCProps = {
-  children: PropTypes.node.isRequired,
-  metadata: PropTypes.objectOf(PropTypes.string),
-  onSubmit: PropTypes.func
-}
+const propTypes = components.GiftCard.props
+const defaultProps = components.GiftCard.defaultProps
+const displayName = components.GiftCard.displayName
 
-export type GiftCardProps = InferProps<typeof GCProps> & BaseComponent
+export type GiftCardProps = InferProps<typeof propTypes> &
+  JSX.IntrinsicElements['form']
 
 const GiftCard: FunctionComponent<GiftCardProps> = props => {
   const { children, onSubmit } = props
   const name = 'giftCardForm'
-  const ref = useRef(null)
+  const ref: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null)
   const { addGiftCard, addGiftCardError } = useContext(GiftCardContext)
   const handleSubmit = (e): void => {
     e.preventDefault()
+    const elements = ref.current?.elements as HTMLFormControlsCollection
+    const reset = ref.current?.reset() as HTMLFormElement['current']
     const { errors, values } = validateFormFields<RequiredFields[]>(
-      ref.current.elements,
+      elements,
       ['currencyCode', 'balanceCents'],
       'giftCard'
     )
     if (_.isEmpty(errors)) {
       addGiftCard(values as GiftCardI)
-      ref.current.reset()
+      reset()
       if (onSubmit) {
         onSubmit(values)
       }
@@ -47,11 +54,8 @@ const GiftCard: FunctionComponent<GiftCardProps> = props => {
   )
 }
 
-GiftCard.propTypes = GCProps
-
-GiftCard.defaultProps = {
-  onSubmit: null,
-  metadata: {}
-}
+GiftCard.propTypes = propTypes
+GiftCard.defaultProps = defaultProps
+GiftCard.displayName = displayName
 
 export default GiftCard
