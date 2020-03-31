@@ -2,7 +2,7 @@ import { BaseError } from '../components/Errors'
 import _ from 'lodash'
 
 export interface CustomMessages {
-  (messages: BaseError[], v: BaseError): { message?: string }
+  (messages: BaseError[], v: BaseError): { message?: string } | undefined
 }
 
 const customMessages: CustomMessages = (messages = [], v) => {

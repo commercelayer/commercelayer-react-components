@@ -1,6 +1,6 @@
 import { Dispatch } from 'react'
-import { BaseError } from '../components/Errors'
 import PropTypes, { InferProps, ReactElementLike } from 'prop-types'
+import { BaseError } from './errors'
 
 export const BC = {
   id: PropTypes.string,

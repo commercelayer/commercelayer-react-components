@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import childrenTypes from '../utils/childrenTypes'
 import { TimeFormat, BaseOrderComponentPropTypes } from '../@types'
+import { ErrorPropTypes } from '../@types/errors'
 
 const components = {
   AddToCart: {
@@ -63,6 +64,14 @@ const components = {
     props: BaseOrderComponentPropTypes,
     defaultProps: {
       format: 'formatted'
+    }
+  },
+  Errors: {
+    displayName: 'CLErrors',
+    props: ErrorPropTypes,
+    defaultProps: {
+      messages: [],
+      field: 'base'
     }
   }
 }

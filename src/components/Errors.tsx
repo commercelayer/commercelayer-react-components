@@ -1,129 +1,21 @@
 import React, { FunctionComponent, useContext, Fragment } from 'react'
-import PropTypes from 'prop-types'
-import { BaseComponent } from '../@types/index'
+import { InferProps } from 'prop-types'
 import Parent from './utils/Parent'
 import GiftCardContext from '../context/GiftCardContext'
 import OrderContext from '../context/OrderContext'
 import getAllErrors from './utils/getAllErrors'
 import LineItemContext from '../context/LineItemContext'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
+import _ from 'lodash'
+import { BaseError } from '../@types/errors'
+import components from '../config/components'
 
-export type ResourceErrorType =
-  | 'order'
-  | 'giftCard'
-  | 'lineItem'
-  | 'variant'
-  | 'price'
-  | 'skuOption'
+const propTypes = components.Errors.props
+const defaultProps = components.Errors.defaultProps
+const displayName = components.Errors.displayName
 
-export const REType: ResourceErrorType[] = [
-  'order',
-  'giftCard',
-  'lineItem',
-  'variant',
-  'price',
-  'skuOption'
-]
-
-export type CodeErrorType =
-  | 'RECORD_NOT_FOUND'
-  | 'UNAUTHORIZED'
-  | 'INVALID_TOKEN'
-  | 'VALIDATION_ERROR'
-  | 'INVALID_RESOURCE'
-  | 'FILTER_NOT_ALLOWED'
-  | 'INVALID_FIELD_VALUE'
-  | 'INVALID_FIELD'
-  | 'PARAM_NOT_ALLOWED'
-  | 'PARAM_MISSING'
-  | 'INVALID_FILTER_VALUE'
-  | 'KEY_ORDER_MISMATCH'
-  | 'KEY_NOT_INCLUDED_IN_URL'
-  | 'INVALID_INCLUDE'
-  | 'RELATION_EXISTS'
-  | 'INVALID_SORT_CRITERIA'
-  | 'INVALID_LINKS_OBJECT'
-  | 'TYPE_MISMATCH'
-  | 'INVALID_PAGE_OBJECT'
-  | 'INVALID_PAGE_VALUE'
-  | 'INVALID_FIELD_FORMAT'
-  | 'INVALID_FILTERS_SYNTAX'
-  | 'SAVE_FAILED'
-  | 'INVALID_DATA_FORMAT'
-  | 'FORBIDDEN'
-  | 'RECORD_NOT_FOUND'
-  | 'NOT_ACCEPTABLE'
-  | 'UNSUPPORTED_MEDIA_TYPE'
-  | 'LOCKED'
-  | 'INTERNAL_SERVER_ERROR'
-
-const CEType: CodeErrorType[] = [
-  'RECORD_NOT_FOUND',
-  'UNAUTHORIZED',
-  'INVALID_TOKEN',
-  'VALIDATION_ERROR',
-  'INVALID_RESOURCE',
-  'FILTER_NOT_ALLOWED',
-  'INVALID_FIELD_VALUE',
-  'INVALID_FIELD',
-  'PARAM_NOT_ALLOWED',
-  'PARAM_MISSING',
-  'INVALID_FILTER_VALUE',
-  'KEY_ORDER_MISMATCH',
-  'KEY_NOT_INCLUDED_IN_URL',
-  'INVALID_INCLUDE',
-  'RELATION_EXISTS',
-  'INVALID_SORT_CRITERIA',
-  'INVALID_LINKS_OBJECT',
-  'TYPE_MISMATCH',
-  'INVALID_PAGE_OBJECT',
-  'INVALID_PAGE_VALUE',
-  'INVALID_FIELD_FORMAT',
-  'INVALID_FILTERS_SYNTAX',
-  'SAVE_FAILED',
-  'INVALID_DATA_FORMAT',
-  'FORBIDDEN',
-  'RECORD_NOT_FOUND',
-  'NOT_ACCEPTABLE',
-  'UNSUPPORTED_MEDIA_TYPE',
-  'LOCKED',
-  'INTERNAL_SERVER_ERROR'
-]
-
-export interface BaseError {
-  code: CodeErrorType
-  message: string
-  resourceKey?: ResourceErrorType
-  field?: string
-  id?: string
-}
-
-export const BEObject = PropTypes.exact({
-  code: PropTypes.oneOf(CEType).isRequired,
-  message: PropTypes.string.isRequired,
-  resourceKey: PropTypes.oneOf(REType),
-  field: PropTypes.string,
-  id: PropTypes.string
-})
-
-const EProps = {
-  resourceKey: PropTypes.oneOf<ResourceErrorType>([
-    'order',
-    'giftCard',
-    'lineItem',
-    'variant'
-  ]).isRequired,
-  children: PropTypes.func,
-  field: PropTypes.string,
-  messages: PropTypes.arrayOf(BEObject)
-}
-
-export interface ErrorsProps extends BaseComponent {
-  resourceKey: ResourceErrorType
-  messages?: BaseError[]
-  field?: string | undefined
-  children?: FunctionComponent
-}
+export type ErrorsProps = InferProps<typeof propTypes> &
+  JSX.IntrinsicElements['span']
 
 const Errors: FunctionComponent<ErrorsProps> = props => {
   const { children, messages, resourceKey, field, ...p } = props
@@ -131,6 +23,7 @@ const Errors: FunctionComponent<ErrorsProps> = props => {
   const { errors: giftCardErrors } = useContext(GiftCardContext)
   const { errors: lineItemErrors } = useContext(LineItemContext)
   const { lineItem } = useContext(LineItemChildrenContext)
+  const msg = _.isEmpty(messages) ? [] : (messages as BaseError[])
   // TODO add other errors
   const allErrors = [
     ...(giftCardErrors || []),
@@ -140,8 +33,8 @@ const Errors: FunctionComponent<ErrorsProps> = props => {
   const parentProps = { messages, resourceKey, field, ...p }
   const msgErrors = getAllErrors({
     allErrors,
-    field,
-    messages,
+    field: field || 'base',
+    messages: msg,
     props: p,
     lineItem
   })
@@ -152,11 +45,8 @@ const Errors: FunctionComponent<ErrorsProps> = props => {
   )
 }
 
-Errors.propTypes = EProps
-
-Errors.defaultProps = {
-  messages: [],
-  field: 'base'
-}
+Errors.propTypes = propTypes
+Errors.defaultProps = defaultProps
+Errors.displayName = displayName
 
 export default Errors
