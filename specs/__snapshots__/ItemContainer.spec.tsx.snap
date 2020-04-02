@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ItemContainer check children /> 1`] = `null`;
+
+exports[`<ItemContainer proptypes required /> 1`] = `null`;
+
+exports[`<ItemContainer/> 1`] = `
+<div>
+  test
+</div>
+`;
