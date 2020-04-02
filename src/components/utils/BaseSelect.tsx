@@ -1,38 +1,15 @@
 import React, { FunctionComponent, useEffect } from 'react'
-import PropTypes, { InferProps } from 'prop-types'
-import { BaseComponent } from '../../@types/index'
 import Parent from './Parent'
+import { PropsType } from '../../utils/PropsType'
+import { BaseSelectComponentPropTypes } from '../../@types'
 
-export interface OptionType {
-  label: string
-  value: number | string
-}
-
-const BSProps = {
-  children: PropTypes.func,
-  options: PropTypes.arrayOf<OptionType>(
-    PropTypes.exact({
-      label: PropTypes.string.isRequired,
-      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-        .isRequired,
-      selected: PropTypes.bool
-    })
-  ).isRequired,
-  placeholder: PropTypes.exact({
-    label: PropTypes.string.isRequired,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
-  }),
-  value: PropTypes.string,
-  name: PropTypes.string.isRequired
-}
-
-export type BaseSelectProps = InferProps<typeof BSProps> & BaseComponent
+export type BaseSelectProps = PropsType<typeof BaseSelectComponentPropTypes>
 
 const BaseSelect: FunctionComponent<BaseSelectProps> = props => {
-  const { options, children, placeholder, ...p } = props
+  const { options, children, placeholder, value, ...p } = props
   useEffect(() => {
-    if (options.indexOf(placeholder) === -1) {
-      options.unshift(placeholder)
+    if (options.indexOf(placeholder as any) === -1) {
+      options.unshift(placeholder as any)
     }
   }, [])
   const Options = options.map((o, k) => {
@@ -49,13 +26,15 @@ const BaseSelect: FunctionComponent<BaseSelectProps> = props => {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <select {...p}>{Options}</select>
+    <select value={value || ''} {...p}>
+      {Options}
+    </select>
   )
 }
 
-BaseSelect.propTypes = BSProps
-
+BaseSelect.propTypes = BaseSelectComponentPropTypes
 BaseSelect.defaultProps = {
+  value: '',
   options: [],
   placeholder: {
     label: 'select an option',

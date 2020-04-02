@@ -5,12 +5,12 @@ import React, {
   useContext,
   RefObject
 } from 'react'
-import { InferProps } from 'prop-types'
 import validateFormFields from '../utils/validateFormFields'
 import _ from 'lodash'
 import GiftCardContext from '../context/GiftCardContext'
 import { GiftCardI } from '../reducers/GiftCardReducer'
 import components from '../config/components'
+import { PropsType } from '../utils/PropsType'
 
 type RequiredFields = 'currencyCode' | 'balanceCents'
 
@@ -18,7 +18,7 @@ const propTypes = components.GiftCard.props
 const defaultProps = components.GiftCard.defaultProps
 const displayName = components.GiftCard.displayName
 
-export type GiftCardProps = InferProps<typeof propTypes> &
+export type GiftCardProps = PropsType<typeof propTypes> &
   JSX.IntrinsicElements['form']
 
 const GiftCard: FunctionComponent<GiftCardProps> = props => {

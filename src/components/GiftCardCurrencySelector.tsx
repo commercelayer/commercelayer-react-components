@@ -1,30 +1,27 @@
 import React, { FunctionComponent } from 'react'
-import PropTypes, { InferProps } from 'prop-types'
+import { InferProps } from 'prop-types'
 import BaseSelect from './utils/BaseSelect'
-import { BaseComponent } from '../@types/index'
 import currencyOptions from '../config/currency.json'
+import components from '../config/components'
 
-const GCCSProps = {
-  children: PropTypes.func,
-  placeholder: PropTypes.exact({
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    label: PropTypes.string
-  }),
-  value: PropTypes.string,
-  required: PropTypes.bool
-}
+const propTypes = components.GiftCardCurrencySelector.props
+const defaultProps = components.GiftCardCurrencySelector.defaultProps
+const displayName = components.GiftCardCurrencySelector.displayName
 
-export type GiftCardCurrencySelectorProps = InferProps<typeof GCCSProps> &
-  BaseComponent
+export type GiftCardCurrencySelectorProps = InferProps<typeof propTypes>
 
 const GiftCardCurrencySelector: FunctionComponent<GiftCardCurrencySelectorProps> = props => {
-  return <BaseSelect options={currencyOptions} name="currencyCode" {...props} />
+  return (
+    <BaseSelect
+      options={currencyOptions as any}
+      name="currencyCode"
+      {...props}
+    />
+  )
 }
 
-GiftCardCurrencySelector.propTypes = GCCSProps
-
-GiftCardCurrencySelector.defaultProps = {
-  required: true
-}
+GiftCardCurrencySelector.propTypes = propTypes
+GiftCardCurrencySelector.defaultProps = defaultProps
+GiftCardCurrencySelector.displayName = displayName
 
 export default GiftCardCurrencySelector
