@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<LineItem check children /> 1`] = `null`;
+
+exports[`<LineItem proptypes required /> 1`] = `null`;
+
+exports[`<LineItem/> 1`] = `null`;
