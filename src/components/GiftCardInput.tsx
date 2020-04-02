@@ -1,53 +1,19 @@
 import React, { FunctionComponent } from 'react'
-import PropTypes, { InferProps } from 'prop-types'
-import { BaseComponent } from '../@types/index'
-import BaseInput, { BaseInputType } from './utils/BaseInput'
+import BaseInput from './utils/BaseInput'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-type GiftCardInputName =
-  | 'balanceCents'
-  | 'balanceMaxCents'
-  | 'singleUse'
-  | 'rechargeable'
-  | 'imageUrl'
-  | 'expiresAt'
-  | 'referenceOrigin'
-  | 'email'
-  | 'firstName'
-  | 'lastName'
-  | 'reference'
+const propTypes = components.GiftCardInput.props
+const displayName = components.GiftCardInput.displayName
 
-const GCIProps = {
-  type: PropTypes.oneOf<BaseInputType>([
-    'text',
-    'email',
-    'number',
-    'date',
-    'checkbox'
-  ]).isRequired,
-  name: PropTypes.oneOf<GiftCardInputName>([
-    'balanceCents',
-    'balanceMaxCents',
-    'singleUse',
-    'rechargeable',
-    'imageUrl',
-    'expiresAt',
-    'referenceOrigin',
-    'email',
-    'firstName',
-    'lastName',
-    'reference'
-  ]).isRequired,
-  children: PropTypes.func,
-  placeholder: PropTypes.string
-}
-
-export type GiftCardInputProps = InferProps<typeof GCIProps> & BaseComponent
+export type GiftCardInputProps = PropsType<typeof propTypes>
 
 const GiftCardInput: FunctionComponent<GiftCardInputProps> = props => {
-  const { ...p } = props
-  return <BaseInput {...p} />
+  const { placeholder, ...p } = props
+  return <BaseInput placeholder={placeholder || ''} {...p} />
 }
 
-GiftCardInput.propTypes = GCIProps
+GiftCardInput.propTypes = propTypes
+GiftCardInput.displayName = displayName
 
 export default GiftCardInput

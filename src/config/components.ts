@@ -1,11 +1,16 @@
 import PropTypes from 'prop-types'
 import childrenTypes from '../utils/childrenTypes'
-import { TimeFormat, BaseOrderComponentPropTypes } from '../@types'
+import {
+  TimeFormat,
+  BaseOrderComponentPropTypes,
+  BaseInputType,
+  GiftCardInputName
+} from '../@types'
 import { ErrorPropTypes } from '../@types/errors'
 
 const components = {
   AddToCart: {
-    displayName: 'CLAddToCart',
+    displayName: 'AddToCart',
     props: {
       children: PropTypes.func,
       label: PropTypes.string,
@@ -17,7 +22,7 @@ const components = {
     }
   },
   AvailabilityContainer: {
-    displayName: 'CLAvailabilityContainer',
+    displayName: 'AvailabilityContainer',
     permittedChildren: ['AvailabilityTemplate', 'ReactNode'],
     props: {
       children: childrenTypes.isRequired,
@@ -25,7 +30,7 @@ const components = {
     }
   },
   AvailabilityTemplate: {
-    displayName: 'CLAvailabilityTemplate',
+    displayName: 'AvailabilityTemplate',
     props: {
       timeFormat: PropTypes.oneOf<TimeFormat>(['days', 'hours']),
       showShippingMethodName: PropTypes.bool,
@@ -37,7 +42,7 @@ const components = {
     }
   },
   Checkout: {
-    displayName: 'CLCheckout',
+    displayName: 'Checkout',
     props: {
       children: PropTypes.func,
       label: PropTypes.string
@@ -60,14 +65,14 @@ const components = {
     }
   },
   Discount: {
-    displayName: 'CLDiscount',
+    displayName: 'Discount',
     props: BaseOrderComponentPropTypes,
     defaultProps: {
       format: 'formatted'
     }
   },
   Errors: {
-    displayName: 'CLErrors',
+    displayName: 'Errors',
     props: ErrorPropTypes,
     defaultProps: {
       messages: [],
@@ -83,7 +88,7 @@ const components = {
       'SubmitButton',
       'ReactNode'
     ],
-    displayName: 'CLGiftCard',
+    displayName: 'GiftCard',
     props: {
       children: childrenTypes.isRequired,
       metadata: PropTypes.objectOf(PropTypes.string),
@@ -92,6 +97,55 @@ const components = {
     defaultProps: {
       onSubmit: undefined,
       metadata: {}
+    }
+  },
+  GiftCardContainer: {
+    permittedChildren: ['GiftCard', 'ReactNode'],
+    displayName: 'GiftCardContainer',
+    props: {
+      children: childrenTypes.isRequired
+    }
+  },
+  GiftCardCurrencySelector: {
+    displayName: 'GiftCardCurrencySelector',
+    props: {
+      children: PropTypes.func,
+      placeholder: PropTypes.exact({
+        value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        label: PropTypes.string
+      }),
+      value: PropTypes.string,
+      required: PropTypes.bool
+    },
+    defaultProps: {
+      required: true
+    }
+  },
+  GiftCardInput: {
+    displayName: 'GiftCardInput',
+    props: {
+      type: PropTypes.oneOf<BaseInputType>([
+        'text',
+        'email',
+        'number',
+        'date',
+        'checkbox'
+      ]).isRequired,
+      name: PropTypes.oneOf<GiftCardInputName>([
+        'balanceCents',
+        'balanceMaxCents',
+        'singleUse',
+        'rechargeable',
+        'imageUrl',
+        'expiresAt',
+        'referenceOrigin',
+        'email',
+        'firstName',
+        'lastName',
+        'reference'
+      ]).isRequired,
+      children: PropTypes.func,
+      placeholder: PropTypes.string
     }
   }
 }

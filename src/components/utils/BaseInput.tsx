@@ -1,32 +1,11 @@
 import React, { FunctionComponent } from 'react'
-import PropTypes, { InferProps } from 'prop-types'
-import { BaseComponent } from '../../@types/index'
+import { BaseInputComponentPropTypes } from '../../@types/index'
 import Parent from './Parent'
+import { PropsType } from '../../utils/PropsType'
 
-export type BaseInputType =
-  | 'text'
-  | 'email'
-  | 'number'
-  | 'date'
-  | 'checkbox'
-  | 'textarea'
-
-export const BIProps = {
-  children: PropTypes.func,
-  name: PropTypes.string.isRequired,
-  type: PropTypes.oneOf<BaseInputType>([
-    'text',
-    'email',
-    'number',
-    'date',
-    'checkbox',
-    'textarea'
-  ]).isRequired,
-  onChange: PropTypes.func,
-  placeholder: PropTypes.string
-}
-
-export type BaseInputProps = InferProps<typeof BIProps> & BaseComponent
+export type BaseInputProps = PropsType<typeof BaseInputComponentPropTypes> &
+  JSX.IntrinsicElements['input'] &
+  JSX.IntrinsicElements['textarea']
 
 const BaseInput: FunctionComponent<BaseInputProps> = props => {
   const { children, ...p } = props
@@ -35,6 +14,6 @@ const BaseInput: FunctionComponent<BaseInputProps> = props => {
   return children ? <Parent {...p}>{children}</Parent> : input
 }
 
-BaseInput.propTypes = BIProps
+BaseInput.propTypes = BaseInputComponentPropTypes
 
 export default BaseInput

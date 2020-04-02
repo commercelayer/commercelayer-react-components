@@ -25,6 +25,60 @@ export const BaseOrderComponentPropTypes = {
   format: BaseOrderPricePropsTypes['format']
 }
 
+export const BaseSelectComponentPropTypes = {
+  children: PropTypes.func,
+  options: PropTypes.arrayOf(
+    PropTypes.exact({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+      selected: PropTypes.bool
+    }).isRequired
+  ).isRequired,
+  placeholder: PropTypes.exact({
+    label: PropTypes.string,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  }),
+  value: PropTypes.string,
+  name: PropTypes.string.isRequired
+}
+
+export const BaseInputComponentPropTypes = {
+  children: PropTypes.func,
+  name: PropTypes.string.isRequired,
+  type: PropTypes.oneOf<BaseInputType>([
+    'text',
+    'email',
+    'number',
+    'date',
+    'checkbox',
+    'textarea'
+  ]).isRequired,
+  onChange: PropTypes.func,
+  placeholder: PropTypes.string
+}
+
+export type GiftCardInputName =
+  | 'balanceCents'
+  | 'balanceMaxCents'
+  | 'singleUse'
+  | 'rechargeable'
+  | 'imageUrl'
+  | 'expiresAt'
+  | 'referenceOrigin'
+  | 'email'
+  | 'firstName'
+  | 'lastName'
+  | 'reference'
+
+export type BaseInputType =
+  | 'text'
+  | 'email'
+  | 'number'
+  | 'date'
+  | 'checkbox'
+  | 'textarea'
+
 export type LoaderType = string | ReactElementLike
 
 export const BMObject = PropTypes.objectOf(PropTypes.string)

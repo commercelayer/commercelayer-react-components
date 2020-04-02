@@ -1,4 +1,4 @@
-import { isValidElement, Children, ReactNode } from 'react'
+import { isValidElement, Children, ReactNode, ReactElement } from 'react'
 import _ from 'lodash'
 import { Requireable } from 'prop-types'
 import components from '../config/components'
@@ -32,10 +32,10 @@ const checkChildrenTypes: CheckChildrenTypes = (
     const errorMsg = `Invalid prop '${propName}' supplied to ${cpName}. Only components ${itemTypes.join(
       ', '
     )} are allowed.`
-    if (_.isFunction(type)) {
+    if (_.isFunction(type) && _.has(type, 'displayName')) {
       const displayName: string = type['displayName']
       const childComponentName = type.name
-      if (displayName && displayName === `CL${childComponentName}`) {
+      if (displayName && displayName === `${childComponentName}`) {
         if (!itemTypes.includes(childComponentName)) {
           error = new Error(errorMsg)
         }
@@ -55,7 +55,7 @@ childrenTypes['isRequired'] = (
   componentName: string,
   location: string,
   propFullName: string
-): Error | null =>
+): Error | null | Element[] =>
   checkChildrenTypes(
     { ...props, isRequired: true },
     propName,

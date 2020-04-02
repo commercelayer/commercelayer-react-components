@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<GiftCardInput check children type date /> 1`] = `
+<input
+  name="expiresAt"
+  placeholder=""
+  type="date"
+/>
+`;
+
+exports[`<GiftCardInput check children type textarea /> 1`] = `
+<textarea
+  name="reference"
+  placeholder=""
+  type="textarea"
+/>
+`;
+
+exports[`<GiftCardInput check type required /> 1`] = `
+<input
+  placeholder=""
+/>
+`;
+
+exports[`<GiftCardInput/> 1`] = `
+<input
+  name="firstName"
+  placeholder=""
+  type="text"
+/>
+`;
