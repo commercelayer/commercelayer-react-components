@@ -14,7 +14,7 @@ import { PropsType } from '../utils/PropsType'
 
 type RequiredFields = 'currencyCode' | 'balanceCents'
 
-const propTypes = components.GiftCard.props
+const propTypes = components.GiftCard.propTypes
 const defaultProps = components.GiftCard.defaultProps
 const displayName = components.GiftCard.displayName
 

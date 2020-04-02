@@ -1,4 +1,4 @@
-import { isValidElement, Children, ReactNode, ReactElement } from 'react'
+import { isValidElement, Children, ReactNode } from 'react'
 import _ from 'lodash'
 import { Requireable } from 'prop-types'
 import components from '../config/components'
@@ -23,7 +23,7 @@ const checkChildrenTypes: CheckChildrenTypes = (
   const cpName = componentName.replace('CL', '')
   if (_.isEmpty(children) && props['isRequired'])
     error = new Error(
-      `The prop '${propName}' is marked as required in '${cpName}', but its value is '${children}'`
+      `The prop '${propName}' is marked as required in '${cpName}', but its value is '${children}'.`
     )
   Children.map(children, c => {
     if (error) return error

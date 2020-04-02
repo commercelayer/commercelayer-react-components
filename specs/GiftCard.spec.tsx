@@ -3,7 +3,7 @@ import { GiftCard, Price } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 
-const propTypes = components.GiftCard.props
+const propTypes = components.GiftCard.propTypes
 
 test('<GiftCard/>', () => {
   expect.assertions(4)
@@ -29,7 +29,7 @@ test('<GiftCard proptypes required />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][0]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: The prop 'children' is marked as required in 'GiftCard', but its value is 'undefined'`
+      `Warning: Failed prop type: The prop 'children' is marked as required in 'GiftCard', but its value is 'undefined'.`
     )
   )
 })

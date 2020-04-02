@@ -4,7 +4,7 @@ import components from '../config/components'
 import { InferProps } from 'prop-types'
 import Parent from './utils/Parent'
 
-const propTypes = components.Checkout.props
+const propTypes = components.Checkout.propTypes
 const defaultProps = components.Checkout.defaultProps
 const displayName = components.Checkout.displayName
 

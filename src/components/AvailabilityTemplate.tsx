@@ -10,7 +10,7 @@ type DefaultProps = {
   showShippingMethodName: boolean
 }
 
-const propTypes = components.AvailabilityTemplate.props
+const propTypes = components.AvailabilityTemplate.propTypes
 const defaultProps = components.AvailabilityTemplate
   .defaultProps as DefaultProps
 const displayName = components.AvailabilityTemplate.displayName

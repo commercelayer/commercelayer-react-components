@@ -57,7 +57,7 @@ test('<CommerceLayer children required />', () => {
 
   expect(console.error.mock.calls[0][0]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: The prop 'children' is marked as required in 'CommerceLayer', but its value is 'undefined'`
+      `Warning: Failed prop type: The prop 'children' is marked as required in 'CommerceLayer', but its value is 'undefined'.`
     )
   )
 })

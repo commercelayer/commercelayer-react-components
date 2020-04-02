@@ -14,7 +14,7 @@ import getCurrentItemKey from '../utils/getCurrentItemKey'
 import { InferProps } from 'prop-types'
 import components from '../config/components'
 
-const propTypes = components.AvailabilityContainer.props
+const propTypes = components.AvailabilityContainer.propTypes
 const displayName = components.AvailabilityContainer.displayName
 
 export type AvailabilityContainerProps = InferProps<typeof propTypes>

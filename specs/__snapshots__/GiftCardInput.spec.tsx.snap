@@ -22,6 +22,8 @@ exports[`<GiftCardInput check type required /> 1`] = `
 />
 `;
 
+exports[`<GiftCardInput with custom children /> 1`] = `<span />`;
+
 exports[`<GiftCardInput/> 1`] = `
 <input
   name="firstName"

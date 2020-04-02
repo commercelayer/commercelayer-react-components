@@ -3,7 +3,7 @@ import BaseInput from './utils/BaseInput'
 import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
-const propTypes = components.GiftCardInput.props
+const propTypes = components.GiftCardInput.propTypes
 const displayName = components.GiftCardInput.displayName
 
 export type GiftCardInputProps = PropsType<typeof propTypes>

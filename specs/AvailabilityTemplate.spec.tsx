@@ -3,7 +3,7 @@ import { AvailabilityTemplate } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 
-const propTypes = components.AvailabilityTemplate.props
+const propTypes = components.AvailabilityTemplate.propTypes
 
 test('<AvailabilityTemplate/>', () => {
   expect.assertions(4)

@@ -1,9 +1,5 @@
 import { Collection } from '@commercelayer/js-sdk'
-import {
-  BaseError,
-  ResourceErrorType,
-  CodeErrorType
-} from '../components/Errors'
+import { CodeErrorType, ResourceErrorType, BaseError } from '../@types/errors'
 
 const ERROR_CODES: CodeErrorType[] = [
   'RECORD_NOT_FOUND',

@@ -12,7 +12,7 @@ import OrderContext from '../context/OrderContext'
 import components from '../config/components'
 import { PropsType } from '../utils/PropsType'
 
-const propTypes = components.GiftCardContainer.props
+const propTypes = components.GiftCardContainer.propTypes
 const displayName = components.GiftCardContainer.displayName
 
 export type GiftCardContainer = PropsType<typeof propTypes>

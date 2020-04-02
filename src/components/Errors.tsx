@@ -10,7 +10,7 @@ import _ from 'lodash'
 import { BaseError } from '../@types/errors'
 import components from '../config/components'
 
-const propTypes = components.Errors.props
+const propTypes = components.Errors.propTypes
 const defaultProps = components.Errors.defaultProps
 const displayName = components.Errors.displayName
 

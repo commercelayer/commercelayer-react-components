@@ -6,7 +6,7 @@ import { Dispatch } from 'react'
 import { ItemPrices } from './ItemReducer'
 import baseReducer from '../utils/baseReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
-import { BaseError } from '../components/Errors'
+import { BaseError } from '../@types/errors'
 
 export type SkuPrices = PriceCollection[]
 

@@ -1,27 +1,13 @@
 import React, { FunctionComponent, Fragment, useContext } from 'react'
 import LineItemContext from '../context/LineItemContext'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
-import PropTypes, { InferProps } from 'prop-types'
+import components from '../config/components'
+import { PropsType } from '../utils/PropsType'
 
-type LineItemType =
-  | 'skus'
-  | 'gift_cards'
-  | 'shipments'
-  | 'paymentMethods'
-  | 'promotions'
+const propTypes = components.LineItem.propTypes
+const displayName = components.LineItem.displayName
 
-const LIProps = {
-  children: PropTypes.node.isRequired,
-  type: PropTypes.oneOf<LineItemType>([
-    'skus',
-    'gift_cards',
-    'shipments',
-    'paymentMethods',
-    'promotions'
-  ])
-}
-
-export type LineItemProps = InferProps<typeof LIProps>
+export type LineItemProps = PropsType<typeof propTypes>
 
 const LineItem: FunctionComponent<LineItemProps> = props => {
   const { type } = props
@@ -41,10 +27,10 @@ const LineItem: FunctionComponent<LineItemProps> = props => {
   return <Fragment>{items}</Fragment>
 }
 
+LineItem.propTypes = propTypes
+LineItem.displayName = displayName
 LineItem.defaultProps = {
   type: 'skus'
 }
-
-LineItem.propTypes = LIProps
 
 export default LineItem

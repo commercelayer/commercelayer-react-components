@@ -72,6 +72,6 @@ Price.defaultProps = {
   skuCode: ''
 }
 
-Price.displayName = 'CLPrice'
+Price.displayName = 'Price'
 
 export default Price

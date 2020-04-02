@@ -3,8 +3,9 @@ import { GiftCardInput } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 import BaseInput from '../src/components/utils/BaseInput'
+import Parent from '../src/components/utils/Parent'
 
-const propTypes = components.GiftCardInput.props
+const propTypes = components.GiftCardInput.propTypes
 
 test('<GiftCardInput/>', () => {
   expect.assertions(5)
@@ -68,4 +69,20 @@ test('<GiftCardInput check children type date />', () => {
   expect(childRendered.type).toBe('input')
   expect(childRendered.props.name).toBe('expiresAt')
   expect(childRendered.props.type).toBe('date')
+})
+
+test('<GiftCardInput with custom children />', () => {
+  expect.assertions(4)
+  const CustomComponent = props => <span>{props.label}</span>
+  const component = renderer.create(
+    <GiftCardInput>{CustomComponent}</GiftCardInput>
+  )
+  const tree = component.toJSON()
+  const root = component.toTree()
+  const rendered = root.rendered
+  const childRendered = root.rendered.rendered
+  expect(tree).toMatchSnapshot()
+  expect(rendered.props.children).toBe(CustomComponent)
+  expect(childRendered.nodeType).toBe('component')
+  expect(childRendered.type).toBe(Parent)
 })

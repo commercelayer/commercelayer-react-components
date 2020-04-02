@@ -4,7 +4,7 @@ import BaseSelect from './utils/BaseSelect'
 import currencyOptions from '../config/currency.json'
 import components from '../config/components'
 
-const propTypes = components.GiftCardCurrencySelector.props
+const propTypes = components.GiftCardCurrencySelector.propTypes
 const defaultProps = components.GiftCardCurrencySelector.defaultProps
 const displayName = components.GiftCardCurrencySelector.displayName
 

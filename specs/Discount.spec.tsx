@@ -5,7 +5,7 @@ import components from '../src/config/components'
 import BaseOrderPrice from '../src/components/utils/BaseOrderPrice'
 import Parent from '../src/components/utils/Parent'
 
-const propTypes = components.Discount.props
+const propTypes = components.Discount.propTypes
 
 test('<Discount/>', () => {
   expect.assertions(3)

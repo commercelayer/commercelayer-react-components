@@ -13,18 +13,6 @@ export const PTLoader = PropTypes.oneOfType([
   PropTypes.string
 ])
 
-export const BaseOrderPricePropsTypes = {
-  base: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-  children: PropTypes.func,
-  format: PropTypes.oneOf(['formatted', 'cents', 'float'])
-}
-
-export const BaseOrderComponentPropTypes = {
-  children: BaseOrderPricePropsTypes['children'],
-  format: BaseOrderPricePropsTypes['format']
-}
-
 export const BaseSelectComponentPropTypes = {
   children: PropTypes.func,
   options: PropTypes.arrayOf(
@@ -57,6 +45,13 @@ export const BaseInputComponentPropTypes = {
   onChange: PropTypes.func,
   placeholder: PropTypes.string
 }
+
+export type LineItemType =
+  | 'skus'
+  | 'gift_cards'
+  | 'shipments'
+  | 'paymentMethods'
+  | 'promotions'
 
 export type GiftCardInputName =
   | 'balanceCents'
@@ -122,12 +117,16 @@ export interface BaseMetadata {
   [key: string]: string
 }
 
-export type InferPropTypes<
-  PropTypes,
-  DefaultProps = {},
-  Props = InferProps<PropTypes>
-> = {
-  [Key in keyof Props]: Key extends keyof DefaultProps
-    ? Props[Key] | DefaultProps[Key]
-    : Props[Key]
+type BaseFormatPrice = 'formatted' | 'cents' | 'float'
+
+export const baseOrderPricePropTypes = {
+  base: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
+  children: PropTypes.func,
+  format: PropTypes.oneOf<BaseFormatPrice>(['formatted', 'cents', 'float'])
+}
+
+export const baseOrderComponentPricePropTypes = {
+  children: baseOrderPricePropTypes['children'],
+  format: baseOrderPricePropTypes['format']
 }

@@ -96,6 +96,6 @@ PriceContainer.defaultProps = {
   skuCode: ''
 }
 
-PriceContainer.displayName = 'CLPriceContainer'
+PriceContainer.displayName = 'PriceContainer'
 
 export default PriceContainer

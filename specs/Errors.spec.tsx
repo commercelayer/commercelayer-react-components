@@ -3,7 +3,7 @@ import { Errors } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 
-const propTypes = components.Errors.props
+const propTypes = components.Errors.propTypes
 
 test('<Errors/>', () => {
   expect.assertions(5)

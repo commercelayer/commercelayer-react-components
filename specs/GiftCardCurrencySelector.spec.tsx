@@ -4,7 +4,7 @@ import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 import currencyOptions from '../src/config/currency.json'
 
-const propTypes = components.GiftCardCurrencySelector.props
+const propTypes = components.GiftCardCurrencySelector.propTypes
 
 test('<GiftCardCurrencySelector/>', () => {
   expect.assertions(5)

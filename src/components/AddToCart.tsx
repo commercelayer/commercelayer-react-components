@@ -7,7 +7,7 @@ import getCurrentItemKey from '../utils/getCurrentItemKey'
 import { InferProps } from 'prop-types'
 import components from '../config/components'
 
-const propTypes = components.AddToCart.props
+const propTypes = components.AddToCart.propTypes
 const defaultProps = components.AddToCart.defaultProps
 const displayName = components.AddToCart.displayName
 

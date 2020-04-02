@@ -3,7 +3,7 @@ import CommerceLayerContext from '../context/CommerceLayerContext'
 import { InferProps } from 'prop-types'
 import components from '../config/components'
 
-const propTypes = components.CommerceLayer.props
+const propTypes = components.CommerceLayer.propTypes
 export type CommerceLayerProps = InferProps<typeof propTypes>
 
 const CommerceLayer: FunctionComponent<CommerceLayerProps> = props => {

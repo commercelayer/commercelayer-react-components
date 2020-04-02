@@ -2,16 +2,17 @@ import PropTypes from 'prop-types'
 import childrenTypes from '../utils/childrenTypes'
 import {
   TimeFormat,
-  BaseOrderComponentPropTypes,
   BaseInputType,
-  GiftCardInputName
+  GiftCardInputName,
+  baseOrderComponentPricePropTypes,
+  LineItemType
 } from '../@types'
 import { ErrorPropTypes } from '../@types/errors'
 
 const components = {
   AddToCart: {
     displayName: 'AddToCart',
-    props: {
+    propTypes: {
       children: PropTypes.func,
       label: PropTypes.string,
       skuCode: PropTypes.string,
@@ -24,14 +25,14 @@ const components = {
   AvailabilityContainer: {
     displayName: 'AvailabilityContainer',
     permittedChildren: ['AvailabilityTemplate', 'ReactNode'],
-    props: {
+    propTypes: {
       children: childrenTypes.isRequired,
       skuCode: PropTypes.string
     }
   },
   AvailabilityTemplate: {
     displayName: 'AvailabilityTemplate',
-    props: {
+    propTypes: {
       timeFormat: PropTypes.oneOf<TimeFormat>(['days', 'hours']),
       showShippingMethodName: PropTypes.bool,
       children: PropTypes.func
@@ -43,7 +44,7 @@ const components = {
   },
   Checkout: {
     displayName: 'Checkout',
-    props: {
+    propTypes: {
       children: PropTypes.func,
       label: PropTypes.string
     },
@@ -58,7 +59,7 @@ const components = {
       'GiftCardContainer',
       'ReactNode'
     ],
-    props: {
+    propTypes: {
       children: childrenTypes.isRequired,
       accessToken: PropTypes.string.isRequired,
       endpoint: PropTypes.string.isRequired
@@ -66,14 +67,14 @@ const components = {
   },
   Discount: {
     displayName: 'Discount',
-    props: BaseOrderComponentPropTypes,
+    propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
       format: 'formatted'
     }
   },
   Errors: {
     displayName: 'Errors',
-    props: ErrorPropTypes,
+    propTypes: ErrorPropTypes,
     defaultProps: {
       messages: [],
       field: 'base'
@@ -89,7 +90,7 @@ const components = {
       'ReactNode'
     ],
     displayName: 'GiftCard',
-    props: {
+    propTypes: {
       children: childrenTypes.isRequired,
       metadata: PropTypes.objectOf(PropTypes.string),
       onSubmit: PropTypes.func
@@ -102,13 +103,13 @@ const components = {
   GiftCardContainer: {
     permittedChildren: ['GiftCard', 'ReactNode'],
     displayName: 'GiftCardContainer',
-    props: {
+    propTypes: {
       children: childrenTypes.isRequired
     }
   },
   GiftCardCurrencySelector: {
     displayName: 'GiftCardCurrencySelector',
-    props: {
+    propTypes: {
       children: PropTypes.func,
       placeholder: PropTypes.exact({
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -123,7 +124,7 @@ const components = {
   },
   GiftCardInput: {
     displayName: 'GiftCardInput',
-    props: {
+    propTypes: {
       type: PropTypes.oneOf<BaseInputType>([
         'text',
         'email',
@@ -146,6 +147,52 @@ const components = {
       ]).isRequired,
       children: PropTypes.func,
       placeholder: PropTypes.string
+    }
+  },
+  GiftCardPrice: {
+    displayName: 'GiftCardPrice',
+    propTypes: baseOrderComponentPricePropTypes
+  },
+  ItemContainer: {
+    permittedChildren: [
+      'PriceContainer',
+      'VariantContainer',
+      'SkuOptionContainer',
+      'QuantitySelector',
+      'AddToCart',
+      'AvailabilityContainer',
+      'ReactNode'
+    ],
+    displayName: 'ItemContainer',
+    propTypes: {
+      children: childrenTypes.isRequired,
+      skuCode: PropTypes.string
+    }
+  },
+  LineItem: {
+    permittedChildren: [
+      'LineItemImage',
+      'LineItemName',
+      'LineItemOptions',
+      'LineItemQuantity',
+      'LineItemPrice',
+      'LineItemRemove',
+      'Errors',
+      'ReactNode'
+    ],
+    displayName: 'LineItem',
+    propTypes: {
+      children: childrenTypes.isRequired,
+      type: PropTypes.oneOf<LineItemType>([
+        'skus',
+        'gift_cards',
+        'shipments',
+        'paymentMethods',
+        'promotions'
+      ])
+    },
+    defaultProps: {
+      type: 'skus'
     }
   }
 }

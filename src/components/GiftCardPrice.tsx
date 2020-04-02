@@ -1,13 +1,18 @@
 import React, { FunctionComponent } from 'react'
 import BaseOrderPrice from './utils/BaseOrderPrice'
-import { BaseOrderComponentProps, BOCProps } from './utils/BaseOrderPrice'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-export type GiftCardPriceProps = BaseOrderComponentProps
+const propTypes = components.GiftCardPrice.propTypes
+const displayName = components.GiftCardPrice.displayName
+
+export type GiftCardPriceProps = PropsType<typeof propTypes>
 
 const GiftCardPrice: FunctionComponent<GiftCardPriceProps> = props => {
   return <BaseOrderPrice base="amount" type="giftcard" {...props} />
 }
 
-GiftCardPrice.propTypes = BOCProps
+GiftCardPrice.propTypes = propTypes
+GiftCardPrice.displayName = displayName
 
 export default GiftCardPrice

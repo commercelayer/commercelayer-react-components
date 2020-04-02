@@ -7,16 +7,15 @@ import itemReducer, {
   ItemQuantity,
   ItemOptions
 } from '../reducers/ItemReducer'
-import PropTypes, { InferProps } from 'prop-types'
 import { BFSetStateContainer } from '../@types/index'
 import { ItemPrices } from '../reducers/ItemReducer'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-const ICProps = {
-  children: PropTypes.node.isRequired,
-  skuCode: PropTypes.string
-}
+const propTypes = components.ItemContainer.propTypes
+const displayName = components.ItemContainer.displayName
 
-export type ItemContainerProps = InferProps<typeof ICProps>
+export type ItemContainerProps = PropsType<typeof propTypes>
 
 const ItemContainer: FunctionComponent<ItemContainerProps> = props => {
   // TODO add skuCode to workflow
@@ -46,6 +45,7 @@ const ItemContainer: FunctionComponent<ItemContainerProps> = props => {
   )
 }
 
-ItemContainer.propTypes = ICProps
+ItemContainer.propTypes = propTypes
+ItemContainer.displayName = displayName
 
 export default ItemContainer
