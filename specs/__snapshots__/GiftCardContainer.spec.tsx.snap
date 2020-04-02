@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<GiftCardContainer check children /> 1`] = `null`;
+
+exports[`<GiftCardContainer proptypes required /> 1`] = `null`;
+
+exports[`<GiftCardContainer/> 1`] = `
+<div>
+  test
+</div>
+`;
