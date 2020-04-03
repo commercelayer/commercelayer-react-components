@@ -5,7 +5,7 @@ import {
   BaseInputType,
   GiftCardInputName,
   baseOrderComponentPricePropTypes,
-  LineItemType
+  LineItemType,
 } from '../@types'
 import { ErrorPropTypes } from '../@types/errors'
 
@@ -16,69 +16,69 @@ const components = {
       children: PropTypes.func,
       label: PropTypes.string,
       skuCode: PropTypes.string,
-      disabled: PropTypes.bool
+      disabled: PropTypes.bool,
     },
     defaultProps: {
-      label: 'Add to cart'
-    }
+      label: 'Add to cart',
+    },
   },
   AvailabilityContainer: {
     displayName: 'AvailabilityContainer',
     permittedChildren: ['AvailabilityTemplate', 'ReactNode'],
     propTypes: {
       children: childrenTypes.isRequired,
-      skuCode: PropTypes.string
-    }
+      skuCode: PropTypes.string,
+    },
   },
   AvailabilityTemplate: {
     displayName: 'AvailabilityTemplate',
     propTypes: {
       timeFormat: PropTypes.oneOf<TimeFormat>(['days', 'hours']),
       showShippingMethodName: PropTypes.bool,
-      children: PropTypes.func
+      children: PropTypes.func,
     },
     defaultProps: {
       timeFormat: 'days',
-      showShippingMethodName: false
-    }
+      showShippingMethodName: false,
+    },
   },
   Checkout: {
     displayName: 'Checkout',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.string
+      label: PropTypes.string,
     },
     defaultProps: {
-      label: 'Checkout'
-    }
+      label: 'Checkout',
+    },
   },
   CommerceLayer: {
     permittedChildren: [
       'OrderContainer',
       'PriceContainer',
       'GiftCardContainer',
-      'ReactNode'
+      'ReactNode',
     ],
     propTypes: {
       children: childrenTypes.isRequired,
       accessToken: PropTypes.string.isRequired,
-      endpoint: PropTypes.string.isRequired
-    }
+      endpoint: PropTypes.string.isRequired,
+    },
   },
   Discount: {
     displayName: 'Discount',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
-      format: 'formatted'
-    }
+      format: 'formatted',
+    },
   },
   Errors: {
     displayName: 'Errors',
     propTypes: ErrorPropTypes,
     defaultProps: {
       messages: [],
-      field: 'base'
-    }
+      field: 'base',
+    },
   },
   GiftCard: {
     permittedChildren: [
@@ -87,25 +87,25 @@ const components = {
       'Errors',
       'MetadataInput',
       'SubmitButton',
-      'ReactNode'
+      'ReactNode',
     ],
     displayName: 'GiftCard',
     propTypes: {
       children: childrenTypes.isRequired,
       metadata: PropTypes.objectOf(PropTypes.string),
-      onSubmit: PropTypes.func
+      onSubmit: PropTypes.func,
     },
     defaultProps: {
       onSubmit: undefined,
-      metadata: {}
-    }
+      metadata: {},
+    },
   },
   GiftCardContainer: {
     permittedChildren: ['GiftCard', 'ReactNode'],
     displayName: 'GiftCardContainer',
     propTypes: {
-      children: childrenTypes.isRequired
-    }
+      children: childrenTypes.isRequired,
+    },
   },
   GiftCardCurrencySelector: {
     displayName: 'GiftCardCurrencySelector',
@@ -113,14 +113,14 @@ const components = {
       children: PropTypes.func,
       placeholder: PropTypes.exact({
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        label: PropTypes.string
+        label: PropTypes.string,
       }),
       value: PropTypes.string,
-      required: PropTypes.bool
+      required: PropTypes.bool,
     },
     defaultProps: {
-      required: true
-    }
+      required: true,
+    },
   },
   GiftCardInput: {
     displayName: 'GiftCardInput',
@@ -130,7 +130,7 @@ const components = {
         'email',
         'number',
         'date',
-        'checkbox'
+        'checkbox',
       ]).isRequired,
       name: PropTypes.oneOf<GiftCardInputName>([
         'balanceCents',
@@ -143,15 +143,15 @@ const components = {
         'email',
         'firstName',
         'lastName',
-        'reference'
+        'reference',
       ]).isRequired,
       children: PropTypes.func,
-      placeholder: PropTypes.string
-    }
+      placeholder: PropTypes.string,
+    },
   },
   GiftCardPrice: {
     displayName: 'GiftCardPrice',
-    propTypes: baseOrderComponentPricePropTypes
+    propTypes: baseOrderComponentPricePropTypes,
   },
   ItemContainer: {
     permittedChildren: [
@@ -161,13 +161,13 @@ const components = {
       'QuantitySelector',
       'AddToCart',
       'AvailabilityContainer',
-      'ReactNode'
+      'ReactNode',
     ],
     displayName: 'ItemContainer',
     propTypes: {
       children: childrenTypes.isRequired,
-      skuCode: PropTypes.string
-    }
+      skuCode: PropTypes.string,
+    },
   },
   LineItem: {
     permittedChildren: [
@@ -178,7 +178,7 @@ const components = {
       'LineItemPrice',
       'LineItemRemove',
       'Errors',
-      'ReactNode'
+      'ReactNode',
     ],
     displayName: 'LineItem',
     propTypes: {
@@ -188,13 +188,37 @@ const components = {
         'gift_cards',
         'shipments',
         'paymentMethods',
-        'promotions'
-      ])
+        'promotions',
+      ]),
     },
     defaultProps: {
-      type: 'skus'
-    }
-  }
+      type: 'skus',
+    },
+  },
+  LineItemImage: {
+    displayName: 'LineItemImage',
+    propTypes: {
+      width: PropTypes.number,
+      src: PropTypes.string,
+      children: PropTypes.func,
+    },
+  },
+  LineItemName: {
+    displayName: 'LineItemName',
+    propTypes: {
+      children: PropTypes.func,
+    },
+  },
+  LineItemOption: {
+    displayName: 'LineItemOption',
+    propTypes: {
+      name: PropTypes.string.isRequired,
+      children: PropTypes.func,
+      optionKeyClassName: PropTypes.string,
+      optionKeyId: PropTypes.string,
+      optionKeyStyle: PropTypes.object,
+    },
+  },
 }
 
 export default components

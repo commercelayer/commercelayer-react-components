@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<LineItemImage with custom children /> 1`] = `<span />`;
+
+exports[`<LineItemImage/> 1`] = `<img />`;
