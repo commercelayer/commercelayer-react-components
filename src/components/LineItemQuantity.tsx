@@ -1,51 +1,49 @@
-import React, { FunctionComponent, useContext } from 'react'
-import { BaseComponent } from '../@types/index'
+import React, { FunctionComponent, useContext, ReactNode } from 'react'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import LineItemContext from '../context/LineItemContext'
 import Parent from './utils/Parent'
-import PropTypes, { InferProps } from 'prop-types'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-const LIQProps = {
-  children: PropTypes.func,
-  max: PropTypes.number,
-  disabled: PropTypes.bool
-}
+const propTypes = components.LineItemQuantity.propTypes
+const defaultProps = components.LineItemQuantity.defaultProps
+const displayName = components.LineItemQuantity.displayName
 
-export type LineItemQuantityProps = InferProps<typeof LIQProps> & BaseComponent
+export type LineItemQuantityProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['select']
 
-const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = props => {
+const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = (props) => {
   const { lineItem } = useContext(LineItemChildrenContext)
   const { updateLineItem } = useContext(LineItemContext)
-  const options = []
-  for (let i = 1; i <= props.max; i++) {
+  const options: ReactNode[] = []
+  const max = props['max'] || 50
+  for (let i = 1; i <= max; i++) {
     options.push(
-      <option key={i} value={i}>
+      <option key={i} value={`${i}`}>
         {i}
       </option>
     )
   }
   const handleChange = (e): void => {
     const quantity = e.target.value
-    updateLineItem(lineItem.id, quantity)
+    updateLineItem && updateLineItem(lineItem['id'], quantity)
   }
   const parentProps = {
     handleChange,
-    quantity: lineItem.quantity,
-    ...props
+    quantity: lineItem['quantity'],
+    ...props,
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <select value={lineItem.quantity} onChange={handleChange} {...props}>
+    <select value={lineItem['quantity']} onChange={handleChange} {...props}>
       {options}
     </select>
   )
 }
 
-LineItemQuantity.propTypes = LIQProps
-
-LineItemQuantity.defaultProps = {
-  max: 50
-}
+LineItemQuantity.propTypes = propTypes
+LineItemQuantity.defaultProps = defaultProps
+LineItemQuantity.displayName = displayName
 
 export default LineItemQuantity
