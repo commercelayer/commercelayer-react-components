@@ -6,6 +6,9 @@ import {
   GiftCardInputName,
   baseOrderComponentPricePropTypes,
   LineItemType,
+  BasePriceType,
+  BaseFormatPrice,
+  PTLoader,
 } from '../@types'
 import { ErrorPropTypes } from '../@types/errors'
 
@@ -217,6 +220,63 @@ const components = {
       optionKeyClassName: PropTypes.string,
       optionKeyId: PropTypes.string,
       optionKeyStyle: PropTypes.object,
+    },
+  },
+  LineItemOptions: {
+    permittedChildren: ['LineItemOption', 'ReactNode'],
+    displayName: 'LineItemOptions',
+    propTypes: {
+      name: PropTypes.string.isRequired,
+      children: childrenTypes.isRequired,
+      showName: PropTypes.bool,
+    },
+    defaultProps: {
+      showName: true,
+    },
+  },
+  LineItemPrice: {
+    displayName: 'LineItemPrice',
+    propTypes: {
+      ...baseOrderComponentPricePropTypes,
+      type: PropTypes.oneOf<BasePriceType>(['total', 'unit', 'option']),
+    },
+    defaultProps: {
+      format: 'formatted' as BaseFormatPrice,
+      type: 'total' as BasePriceType,
+    },
+  },
+  LineItemQuantity: {
+    displayName: 'LineItemQuantity',
+    propTypes: {
+      children: PropTypes.func,
+      max: PropTypes.number,
+      disabled: PropTypes.bool,
+    },
+    defaultProps: {
+      max: 50,
+    },
+  },
+  LineItemRemove: {
+    displayName: 'LineItemRemove',
+    propTypes: {
+      children: PropTypes.func,
+      label: PropTypes.string,
+    },
+    defaultProps: {
+      label: 'remove',
+    },
+  },
+  LineItemsContainer: {
+    permittedChildren: ['LineItemsCount', 'LineItem', 'ReactNode'],
+    displayName: 'LineItemsContainer',
+    propTypes: {
+      children: childrenTypes.isRequired,
+      filters: PropTypes.object,
+      loader: PTLoader,
+    },
+    defaultProps: {
+      filters: {},
+      loader: 'Loading...',
     },
   },
 }

@@ -5,12 +5,12 @@ import { BaseError } from './errors'
 export const BC = {
   id: PropTypes.string,
   className: PropTypes.string,
-  style: PropTypes.object
+  style: PropTypes.object,
 }
 
 export const PTLoader = PropTypes.oneOfType([
   PropTypes.element,
-  PropTypes.string
+  PropTypes.string,
 ])
 
 export const BaseSelectComponentPropTypes = {
@@ -20,15 +20,15 @@ export const BaseSelectComponentPropTypes = {
       label: PropTypes.string.isRequired,
       value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
         .isRequired,
-      selected: PropTypes.bool
+      selected: PropTypes.bool,
     }).isRequired
   ).isRequired,
   placeholder: PropTypes.exact({
     label: PropTypes.string,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }),
   value: PropTypes.string,
-  name: PropTypes.string.isRequired
+  name: PropTypes.string.isRequired,
 }
 
 export const BaseInputComponentPropTypes = {
@@ -40,10 +40,10 @@ export const BaseInputComponentPropTypes = {
     'number',
     'date',
     'checkbox',
-    'textarea'
+    'textarea',
   ]).isRequired,
   onChange: PropTypes.func,
-  placeholder: PropTypes.string
+  placeholder: PropTypes.string,
 }
 
 export type LineItemType =
@@ -117,16 +117,18 @@ export interface BaseMetadata {
   [key: string]: string
 }
 
-type BaseFormatPrice = 'formatted' | 'cents' | 'float'
+export type BaseFormatPrice = 'formatted' | 'cents' | 'float'
 
 export const baseOrderPricePropTypes = {
   base: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   children: PropTypes.func,
-  format: PropTypes.oneOf<BaseFormatPrice>(['formatted', 'cents', 'float'])
+  format: PropTypes.oneOf<BaseFormatPrice>(['formatted', 'cents', 'float']),
 }
 
 export const baseOrderComponentPricePropTypes = {
   children: baseOrderPricePropTypes['children'],
-  format: baseOrderPricePropTypes['format']
+  format: baseOrderPricePropTypes['format'],
 }
+
+export type BasePriceType = 'total' | 'option' | 'unit'

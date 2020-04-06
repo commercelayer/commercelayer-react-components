@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<LineItemRemove check children format /> 1`] = `
+<a
+  href="#"
+  label="remove product"
+  onClick={[Function]}
+>
+  remove product
+</a>
+`;
+
+exports[`<LineItemRemove with custom children /> 1`] = `
+<span>
+  remove
+</span>
+`;
+
+exports[`<LineItemRemove/> 1`] = `
+<a
+  href="#"
+  label="remove"
+  onClick={[Function]}
+>
+  remove
+</a>
+`;
