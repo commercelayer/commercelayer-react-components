@@ -2,31 +2,27 @@ import React, {
   FunctionComponent,
   useState,
   useEffect,
-  useContext
+  useContext,
 } from 'react'
 import getAmount from '../utils/getAmount'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import Parent from './utils/Parent'
-import { BaseComponent } from '../@types/index'
-import { BaseOrderComponentProps, BOCProps } from './utils/BaseOrderPrice'
-import PropTypes, { InferProps } from 'prop-types'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-type TypePrice = 'total' | 'option' | 'unit'
+const propTypes = components.LineItemPrice.propTypes
+const defaultProps = components.LineItemPrice.defaultProps
+const displayName = components.LineItemPrice.displayName
 
-const LIPProps = {
-  ...BOCProps,
-  type: PropTypes.oneOf<TypePrice>(['total', 'unit', 'option'])
-}
+export type LineItemPriceProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['span']
 
-export type LineItemPriceProps = InferProps<typeof LIPProps> &
-  BaseOrderComponentProps
-
-const LineItemPrice: FunctionComponent<LineItemPriceProps> = props => {
+const LineItemPrice: FunctionComponent<LineItemPriceProps> = (props) => {
   const { format, type, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
-  const [price, setPrice] = useState(null)
+  const [price, setPrice] = useState('')
   useEffect(() => {
-    const p = getAmount('amount', type, format, lineItem)
+    const p = getAmount('amount', type as string, format as string, lineItem)
     setPrice(p)
     return (): void => {
       setPrice('')
@@ -34,7 +30,7 @@ const LineItemPrice: FunctionComponent<LineItemPriceProps> = props => {
   }, [lineItem])
   const parentProps = {
     price,
-    ...p
+    ...p,
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
@@ -43,11 +39,8 @@ const LineItemPrice: FunctionComponent<LineItemPriceProps> = props => {
   )
 }
 
-LineItemPrice.propTypes = LIPProps
-
-LineItemPrice.defaultProps = {
-  format: 'formatted',
-  type: 'total'
-}
+LineItemPrice.propTypes = propTypes
+LineItemPrice.defaultProps = defaultProps
+LineItemPrice.displayName = displayName
 
 export default LineItemPrice
