@@ -3,11 +3,11 @@ import { Dispatch } from 'react'
 import { setLocalOrder } from '../utils/localStorage'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import baseReducer from '../utils/baseReducer'
-import { BaseError } from '../components/Errors'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import { ItemOption } from './ItemReducer'
 import _ from 'lodash'
 import { BaseMetadataObject } from '../@types/index'
+import { BaseError } from '../@types/errors'
 
 export interface GetOrderParams {
   id: string
@@ -46,7 +46,7 @@ export interface UnsetOrderState {
 export interface OrderPayload {
   loading?: boolean
   orderId?: string
-  order?: OrderCollection
+  order?: OrderCollection | null
   errors?: BaseError[]
 }
 
@@ -62,7 +62,7 @@ export type getOrderContext = (id: string) => void
 export interface OrderState extends OrderPayload {
   loading: boolean
   orderId: string
-  order: OrderCollection
+  order: OrderCollection | null
   getOrder?: getOrderContext
   addToCart?: (values: AddToCartValues) => void
 }
@@ -90,16 +90,16 @@ const actionType: OrderActionType[] = [
   'setCurrentSkuCodes',
   'setCurrentSkuPrices',
   'setErrors',
-  'setCurrentItem'
+  'setCurrentItem',
 ]
 
-export const createOrder: CreateOrder = async params => {
+export const createOrder: CreateOrder = async (params) => {
   const {
     persistKey,
     state,
     dispatch,
     config,
-    orderMetadata: metadata
+    orderMetadata: metadata,
   } = params
   if (state.orderId) return state.orderId
   const o = await CLayer.Order.withCredentials(config).create({ metadata })
@@ -107,32 +107,32 @@ export const createOrder: CreateOrder = async params => {
   dispatch({
     type: 'setOrderId',
     payload: {
-      orderId: o.id
-    }
+      orderId: o.id,
+    },
   })
   dispatch({
     type: 'setOrder',
     payload: {
-      order: o
-    }
+      order: o,
+    },
   })
   setLocalOrder(persistKey, o.id)
   return o.id
 }
 
-export const getApiOrder: GetOrder = async params => {
+export const getApiOrder: GetOrder = async (params) => {
   const { id, dispatch, config } = params
   const o = await CLayer.Order.withCredentials(config).find(id)
   if (o)
     dispatch({
       type: 'setOrder',
       payload: {
-        order: o
-      }
+        order: o,
+      },
     })
 }
 
-export const addToCart: AddToCart = async params => {
+export const addToCart: AddToCart = async (params) => {
   const { skuCode, skuId, quantity, option, config, dispatch } = params
   try {
     const id = await createOrder(params)
@@ -141,21 +141,21 @@ export const addToCart: AddToCart = async params => {
       order,
       skuCode,
       quantity: quantity || 1,
-      _updateQuantity: 1
+      _updateQuantity: 1,
     }
     if (skuId) {
       attrs['item'] = CLayer.Sku.build({ id: skuId })
     }
     const lineItem = await CLayer.LineItem.withCredentials(config).create(attrs)
     if (!_.isEmpty(option)) {
-      _.map(option, async opt => {
+      _.map(option, async (opt) => {
         const { options, skuOptionId } = opt
         const skuOption = CLayer.SkuOption.build({ id: skuOptionId })
         await CLayer.LineItemOption.withCredentials(config).create({
           quantity: 1,
           options,
           lineItem,
-          skuOption
+          skuOption,
         })
       })
     }
@@ -165,24 +165,24 @@ export const addToCart: AddToCart = async params => {
     dispatch({
       type: 'setErrors',
       payload: {
-        errors
-      }
+        errors,
+      },
     })
   }
 }
 
-export const unsetOrderState: UnsetOrderState = dispatch => {
+export const unsetOrderState: UnsetOrderState = (dispatch) => {
   dispatch({
     type: 'setOrderId',
     payload: {
-      orderId: ''
-    }
+      orderId: '',
+    },
   })
   dispatch({
     type: 'setOrder',
     payload: {
-      order: null
-    }
+      order: null,
+    },
   })
 }
 
@@ -190,7 +190,7 @@ export const orderInitialState: OrderState = {
   loading: false,
   orderId: '',
   order: null,
-  errors: []
+  errors: [],
 }
 
 const orderReducer = (state: OrderState, reducer: OrderActions): OrderState =>

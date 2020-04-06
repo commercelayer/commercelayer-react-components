@@ -2,31 +2,30 @@ import React, {
   useEffect,
   FunctionComponent,
   useReducer,
-  useContext
+  useContext,
 } from 'react'
 import lineItemReducer, {
   lineItemInitialState,
   updateLineItem,
-  LineItemState,
   deleteLineItem,
-  getLineItems
+  getLineItems,
 } from '../reducers/LineItemReducer'
 import OrderContext from '../context/OrderContext'
-import LineItemContext from '../context/LineItemContext'
+import LineItemContext, {
+  LineItemContextValue,
+} from '../context/LineItemContext'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import _ from 'lodash'
-import PropTypes, { InferProps } from 'prop-types'
-import { PTLoader } from '../@types'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-const LItemsCProps = {
-  children: PropTypes.node.isRequired,
-  filters: PropTypes.object,
-  loader: PTLoader
-}
+const propTypes = components.LineItemsContainer.propTypes
+const defaultProps = components.LineItemsContainer.defaultProps
+const displayName = components.LineItemsContainer.displayName
 
-export type LineItemsContainer = InferProps<typeof LItemsCProps>
+export type LineItemsContainer = PropsType<typeof propTypes>
 
-const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
+const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
   const { children, filters, loader } = props
   const { order, getOrder, orderId } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
@@ -37,17 +36,17 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
         order,
         dispatch,
         config,
-        filters
+        filters: filters || {},
       })
     }
     return (): void => {
       dispatch({
         type: 'setLineItems',
-        payload: { lineItems: [] }
+        payload: { lineItems: [] },
       })
     }
   }, [order])
-  const lineItemValue: LineItemState = {
+  const lineItemValue = {
     ...state,
     loader,
     updateLineItem: (lineItemId, quantity = 1) =>
@@ -58,18 +57,18 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
         config,
         getOrder,
         orderId,
-        errors: state.errors
+        errors: state.errors,
       }),
-    deleteLineItem: lineItemId =>
+    deleteLineItem: (lineItemId) =>
       deleteLineItem({
         lineItemId,
         dispatch,
         config,
         getOrder,
         orderId,
-        errors: state.errors
-      })
-  }
+        errors: state.errors,
+      }),
+  } as LineItemContextValue
   return (
     <LineItemContext.Provider value={lineItemValue}>
       {state.loading ? loader : children}
@@ -77,11 +76,8 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = props => {
   )
 }
 
-LineItemsContainer.propTypes = LItemsCProps
-
-LineItemsContainer.defaultProps = {
-  filters: {},
-  loader: 'Loading...'
-}
+LineItemsContainer.propTypes = propTypes
+LineItemsContainer.defaultProps = defaultProps
+LineItemsContainer.displayName = displayName
 
 export default LineItemsContainer

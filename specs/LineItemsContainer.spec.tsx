@@ -1,50 +1,52 @@
 import React from 'react'
-import { GiftCardContainer, Price } from '../src'
+import { LineItemsContainer, Price } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 
-const propTypes = components.GiftCardContainer.propTypes
+const propTypes = components.LineItemsContainer.propTypes
 
-test('<GiftCardContainer/>', () => {
-  expect.assertions(2)
+test('<LineItemsContainer/>', () => {
+  expect.assertions(4)
   const component = renderer.create(
-    <GiftCardContainer>
+    <LineItemsContainer>
       <div>test</div>
-    </GiftCardContainer>
+    </LineItemsContainer>
   )
   const tree = component.toJSON()
   const root = component.toTree()
   const proptypes = root.type['propTypes']
   expect(tree).toMatchSnapshot()
   expect(proptypes.children).toBe(propTypes.children)
+  expect(proptypes.filters).toBe(propTypes.filters)
+  expect(proptypes.loader).toBe(propTypes.loader)
 })
 
-test('<GiftCardContainer proptypes required />', () => {
+test('<LineItemsContainer proptypes required />', () => {
   expect.assertions(2)
   console.error = jest.fn()
-  const component = renderer.create(<GiftCardContainer />)
+  const component = renderer.create(<LineItemsContainer />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][0]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: The prop 'children' is marked as required in 'GiftCardContainer', but its value is 'undefined'.`
+      `Warning: Failed prop type: The prop 'children' is marked as required in 'LineItemsContainer', but its value is 'undefined'.`
     )
   )
 })
 
-test('<GiftCardContainer check children />', () => {
+test('<LineItemsContainer check children />', () => {
   expect.assertions(2)
   console.error = jest.fn()
   const component = renderer.create(
-    <GiftCardContainer>
+    <LineItemsContainer>
       <Price />
-    </GiftCardContainer>
+    </LineItemsContainer>
   )
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][0]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: Invalid prop 'children' supplied to GiftCardContainer. Only components GiftCard, ReactNode are allowed.`
+      `Warning: Failed prop type: Invalid prop 'children' supplied to LineItemsContainer. Only components LineItemsCount, LineItem, ReactNode are allowed.`
     )
   )
 })

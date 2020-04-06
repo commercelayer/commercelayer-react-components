@@ -1,6 +1,6 @@
 import CLayer, {
   LineItemCollection,
-  OrderCollection
+  OrderCollection,
 } from '@commercelayer/js-sdk'
 import baseReducer from '../utils/baseReducer'
 import { BaseError } from '../components/Errors'
@@ -16,9 +16,9 @@ export type UpdateLineItemParams = {
   quantity?: number
   dispatch: Dispatch<LineItemAction>
   config: CommerceLayerConfig
-  getOrder: getOrderContext
+  getOrder: getOrderContext | undefined
   orderId: string
-  errors: BaseError[]
+  errors: BaseError[] | undefined
 }
 
 export interface UpdateLineItem {
@@ -34,7 +34,7 @@ export interface DeleteLineItem {
 export type GetLineItemsParams = {
   dispatch: Dispatch<LineItemAction>
   config: CommerceLayerConfig
-  order: OrderCollection
+  order: OrderCollection | null
   filters: object
 }
 
@@ -59,60 +59,61 @@ export interface LineItemAction {
   payload: LineItemPayload
 }
 
-export const getLineItems: GetLineItems = params => {
+export const getLineItems: GetLineItems = (params) => {
   const { order, dispatch, config, filters } = params
   let allLineItems: LineItemCollection[] = []
-  order
-    .withCredentials(config)
-    .lineItems()
-    // TODO add interface to SDK
-    // @ts-ignore
-    .where(filters)
-    .includes('lineItemOptions')
-    .all()
-    .then(async res => {
-      dispatch({
-        type: 'setLoading',
-        payload: {
-          loading: false
+  order &&
+    order
+      .withCredentials(config)
+      .lineItems()
+      // TODO add interface to SDK
+      // @ts-ignore
+      .where(filters)
+      .includes('lineItemOptions')
+      .all()
+      .then(async (res) => {
+        dispatch({
+          type: 'setLoading',
+          payload: {
+            loading: false,
+          },
+        })
+        const items = res.toArray()
+        allLineItems = [...allLineItems, ...items]
+        dispatch({
+          type: 'setLineItems',
+          payload: {
+            lineItems: allLineItems,
+          },
+        })
+        let colResp = res
+        const pageCount = res.pageCount()
+        if (colResp.hasNextPage() && pageCount) {
+          for (let index = 1; index < pageCount; index++) {
+            colResp = await colResp.withCredentials(config).nextPage()
+            const nextItems = colResp.toArray()
+            allLineItems = [...allLineItems, ...nextItems]
+            dispatch({
+              type: 'setLineItems',
+              payload: {
+                lineItems: allLineItems,
+              },
+            })
+          }
         }
       })
-      const items = res.toArray()
-      allLineItems = [...allLineItems, ...items]
-      dispatch({
-        type: 'setLineItems',
-        payload: {
-          lineItems: allLineItems
-        }
+      .catch((c) => {
+        const errors = getErrorsByCollection(c, 'lineItem')
+        dispatch({
+          type: 'setErrors',
+          payload: {
+            errors,
+          },
+        })
       })
-      let colResp = res
-      const pageCount = res.pageCount()
-      if (colResp.hasNextPage() && pageCount) {
-        for (let index = 1; index < pageCount; index++) {
-          colResp = await colResp.withCredentials(config).nextPage()
-          const nextItems = colResp.toArray()
-          allLineItems = [...allLineItems, ...nextItems]
-          dispatch({
-            type: 'setLineItems',
-            payload: {
-              lineItems: allLineItems
-            }
-          })
-        }
-      }
-    })
-    .catch(c => {
-      const errors = getErrorsByCollection(c, 'lineItem')
-      dispatch({
-        type: 'setErrors',
-        payload: {
-          errors
-        }
-      })
-    })
 }
 
-export const updateLineItem: UpdateLineItem = async params => {
+export const updateLineItem: UpdateLineItem = async (params) => {
   const {
     config,
     lineItemId,
@@ -120,7 +121,7 @@ export const updateLineItem: UpdateLineItem = async params => {
     getOrder,
     orderId,
     dispatch,
-    errors
+    errors,
   } = params
   try {
     const lineItem = await CLayer.LineItem.withCredentials(config).find(
@@ -135,8 +136,8 @@ export const updateLineItem: UpdateLineItem = async params => {
       dispatch({
         type: 'setErrors',
         payload: {
-          errors: []
-        }
+          errors: [],
+        },
       })
     }
   } catch (c) {
@@ -144,13 +145,13 @@ export const updateLineItem: UpdateLineItem = async params => {
     dispatch({
       type: 'setErrors',
       payload: {
-        errors
-      }
+        errors,
+      },
     })
   }
 }
 
-export const deleteLineItem: DeleteLineItem = async params => {
+export const deleteLineItem: DeleteLineItem = async (params) => {
   const { config, lineItemId, getOrder, orderId, dispatch, errors } = params
   try {
     const lineItem = await CLayer.LineItem.withCredentials(config).find(
@@ -165,8 +166,8 @@ export const deleteLineItem: DeleteLineItem = async params => {
       dispatch({
         type: 'setErrors',
         payload: {
-          errors: []
-        }
+          errors: [],
+        },
       })
     }
   } catch (c) {
@@ -174,8 +175,8 @@ export const deleteLineItem: DeleteLineItem = async params => {
     dispatch({
       type: 'setErrors',
       payload: {
-        errors
-      }
+        errors,
+      },
     })
   }
 }
@@ -183,7 +184,7 @@ export const deleteLineItem: DeleteLineItem = async params => {
 export const lineItemInitialState: LineItemState = {
   loading: true,
   lineItems: [],
-  errors: []
+  errors: [],
 }
 
 export type LineItemActionType = 'setLineItems' | 'setErrors' | 'setLoading'
@@ -191,7 +192,7 @@ export type LineItemActionType = 'setLineItems' | 'setErrors' | 'setLoading'
 const actionType: LineItemActionType[] = [
   'setLineItems',
   'setErrors',
-  'setLoading'
+  'setLoading',
 ]
 
 const lineItemReducer = (

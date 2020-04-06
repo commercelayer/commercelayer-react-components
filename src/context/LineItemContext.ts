@@ -2,14 +2,14 @@ import { createContext } from 'react'
 import { LineItemState } from '../reducers/LineItemReducer'
 import { LineItemCollection } from '@commercelayer/js-sdk'
 
-interface LineItemContext extends LineItemState {
-  lineItems: LineItemCollection[]
+export interface LineItemContextValue extends LineItemState {
+  lineItems: LineItemCollection[] | undefined
 }
 
-const initial: LineItemContext = {
-  lineItems: []
+const initial: LineItemContextValue = {
+  lineItems: [],
 }
 
-const LineItemContext = createContext<LineItemContext>(initial)
+const LineItemContext = createContext<LineItemContextValue>(initial)
 
 export default LineItemContext
