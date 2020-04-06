@@ -2,16 +2,16 @@ import React, {
   useEffect,
   FunctionComponent,
   useReducer,
-  useContext
+  useContext,
 } from 'react'
 import { getLocalOrder } from '../utils/localStorage'
 import orderReducer, {
   orderInitialState,
-  AddToCartValues
+  AddToCartValues,
 } from '../reducers/OrderReducer'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import OrderContext from '../context/OrderContext'
-import { getApiOrder, addToCart } from '../reducers/OrderReducer'
+import { getApiOrder, addToCart, OrderState } from '../reducers/OrderReducer'
 import { unsetOrderState } from '../reducers/OrderReducer'
 import PropTypes, { InferProps } from 'prop-types'
 import { BMObject } from '../@types/index'
@@ -19,12 +19,12 @@ import { BMObject } from '../@types/index'
 const OCProps = {
   children: PropTypes.node.isRequired,
   persistKey: PropTypes.string.isRequired,
-  metadata: BMObject
+  metadata: BMObject,
 }
 
 export type OrderContainerProps = InferProps<typeof OCProps>
 
-const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
+const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
   const { children, persistKey, metadata } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const config = useContext(CommerceLayerContext)
@@ -35,8 +35,8 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
         dispatch({
           type: 'setOrderId',
           payload: {
-            orderId: localOrder
-          }
+            orderId: localOrder,
+          },
         })
         if (!state.order) {
           getApiOrder({ id: localOrder, dispatch, config })
@@ -54,19 +54,21 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = props => {
         dispatch,
         state,
         config,
-        orderMetadata: metadata || {}
+        orderMetadata: metadata || {},
       }),
-    getOrder: (id: string): void => getApiOrder({ id, dispatch, config })
+    getOrder: (id: string): void => getApiOrder({ id, dispatch, config }),
   }
   return (
-    <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
+    <OrderContext.Provider value={orderValue as OrderState}>
+      {children}
+    </OrderContext.Provider>
   )
 }
 
 OrderContainer.propTypes = OCProps
 
 OrderContainer.defaultProps = {
-  metadata: {}
+  metadata: {},
 }
 
 OrderContainer.displayName = 'CLOrderContainer'

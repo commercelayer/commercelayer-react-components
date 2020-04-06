@@ -1,28 +1,29 @@
 import React, { useContext, FunctionComponent, Fragment } from 'react'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
-import { BaseComponent } from '../@types'
-import PropTypes, { InferProps } from 'prop-types'
 import LineItemOptionChildrenContext from '../context/LineItemOptionChildrenContext'
+import _ from 'lodash'
+import components from '../config/components'
+import { PropsType } from '../utils/PropsType'
 
-const LIOptionsProps = {
-  name: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-  showName: PropTypes.bool
-}
+const propTypes = components.LineItemOptions.propTypes
+const defaultProps = components.LineItemOptions.defaultProps
+const displayName = components.LineItemOptions.displayName
 
-export type LineItemOptionsProps = BaseComponent &
-  InferProps<typeof LIOptionsProps>
+export type LineItemOptionsProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['span']
 
-const LineItemOptions: FunctionComponent<LineItemOptionsProps> = props => {
+const LineItemOptions: FunctionComponent<LineItemOptionsProps> = (props) => {
   const { name, children, showName, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
-  const lineItemOptions = lineItem ? lineItem.lineItemOptions().toArray() : []
+  const lineItemOptions = !_.isEmpty(lineItem)
+    ? lineItem['lineItemOptions']().toArray()
+    : []
   const options = lineItemOptions
-    .filter(o => o.name === name)
+    .filter((o) => o.name === name)
     .map((o, k) => {
       const title = showName ? <span {...p}>{name}</span> : null
       const valueProps = {
-        lineItemOption: o
+        lineItemOption: o,
       }
       return (
         <Fragment key={k}>
@@ -36,10 +37,8 @@ const LineItemOptions: FunctionComponent<LineItemOptionsProps> = props => {
   return <Fragment>{options}</Fragment>
 }
 
-LineItemOptions.propTypes = LIOptionsProps
-
-LineItemOptions.defaultProps = {
-  showName: true
-}
+LineItemOptions.propTypes = propTypes
+LineItemOptions.defaultProps = defaultProps
+LineItemOptions.displayName = displayName
 
 export default LineItemOptions
