@@ -1,33 +1,35 @@
 import React, { FunctionComponent, Fragment, useContext } from 'react'
 import SkuOptionChildrenContext from '../context/SkuOptionChildrenContext'
 import SkuOptionsContext from '../context/SkuOptionsContext'
-import PropTypes, { InferProps } from 'prop-types'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-const SOProps = {
-  name: PropTypes.string.isRequired,
-  children: PropTypes.node
-}
+const propTypes = components.SkuOption.propTypes
+const displayName = components.SkuOption.displayName
 
-export type SkuOptionProps = InferProps<typeof SOProps>
+export type SkuOptionProps = PropsType<typeof propTypes>
 
-const SkuOption: FunctionComponent<SkuOptionProps> = props => {
+const SkuOption: FunctionComponent<SkuOptionProps> = (props) => {
   const { name } = props
   const { skuOptions, skuCode } = useContext(SkuOptionsContext)
-  const items = skuOptions
-    .filter(l => l.name === name)
-    .map((skuOption, k) => {
-      return (
-        <SkuOptionChildrenContext.Provider
-          key={k}
-          value={{ skuOption, skuCode }}
-        >
-          {props.children}
-        </SkuOptionChildrenContext.Provider>
-      )
-    })
+  const items =
+    skuOptions &&
+    skuOptions
+      .filter((l) => l.name === name)
+      .map((skuOption, k) => {
+        return (
+          <SkuOptionChildrenContext.Provider
+            key={k}
+            value={{ skuOption, skuCode }}
+          >
+            {props.children}
+          </SkuOptionChildrenContext.Provider>
+        )
+      })
   return <Fragment>{items}</Fragment>
 }
 
-SkuOption.propTypes = SOProps
+SkuOption.propTypes = propTypes
+SkuOption.displayName = displayName
 
 export default SkuOption
