@@ -5,7 +5,7 @@ import React, {
   FunctionComponent,
   useState,
   useEffect,
-  useContext
+  useContext,
 } from 'react'
 import { PropsType } from '../../utils/PropsType'
 import { baseOrderPricePropTypes } from '../../@types'
@@ -13,12 +13,12 @@ import { baseOrderPricePropTypes } from '../../@types'
 export type BaseOrderPriceProps = PropsType<typeof baseOrderPricePropTypes> &
   JSX.IntrinsicElements['span']
 
-const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = props => {
+const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
   const { format, base, type, children, ...p } = props
   const { order } = useContext(OrderContext)
   const [price, setPrice] = useState('')
   useEffect(() => {
-    const p = getAmount(base, type, format || 'formatted', order)
+    const p = getAmount(base, type, format || 'formatted', order || {})
     setPrice(p)
     return (): void => {
       setPrice('')
@@ -26,7 +26,7 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = props => {
   }, [order])
   const parentProps = {
     price,
-    ...p
+    ...p,
   }
   return props.children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -37,7 +37,7 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = props => {
 
 BaseOrderPrice.propTypes = baseOrderPricePropTypes
 BaseOrderPrice.defaultProps = {
-  format: 'formatted'
+  format: 'formatted',
 }
 
 export default BaseOrderPrice

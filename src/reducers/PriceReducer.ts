@@ -38,7 +38,7 @@ export const priceInitialState: PriceState = {
   loading: true,
   prices: {},
   skuCodes: [],
-  errors: []
+  errors: [],
 }
 
 export interface GetSkusPrice {
@@ -47,7 +47,7 @@ export interface GetSkusPrice {
     options: {
       config: CommerceLayerConfig
       dispatch: Dispatch<PriceAction>
-      setPrices: (item: ItemPrices) => void
+      setPrices: ((item: ItemPrices) => void) | undefined
       prices: ItemPrices
       perPage: number
       filters: object
@@ -64,7 +64,7 @@ export const getSkusPrice: GetSkusPrice = (
     .where({ skuCodeIn: skuCodes.join(','), ...filters })
     .perPage(perPage)
     .all()
-    .then(async r => {
+    .then(async (r) => {
       const pricesObj = getPrices(r.toArray())
       allPrices = { ...allPrices, ...prices, ...pricesObj }
       if (setPrices) {
@@ -72,11 +72,11 @@ export const getSkusPrice: GetSkusPrice = (
       }
       dispatch({
         type: 'setPrices',
-        payload: { prices: allPrices }
+        payload: { prices: allPrices },
       })
       dispatch({
         type: 'setLoading',
-        payload: { loading: false }
+        payload: { loading: false },
       })
       const meta = r.getMetaInfo()
       let col = r
@@ -90,18 +90,18 @@ export const getSkusPrice: GetSkusPrice = (
           }
           dispatch({
             type: 'setPrices',
-            payload: { prices: allPrices }
+            payload: { prices: allPrices },
           })
         }
       }
     })
-    .catch(c => {
+    .catch((c) => {
       const errors = getErrorsByCollection(c, 'price')
       dispatch({
         type: 'setErrors',
         payload: {
-          errors
-        }
+          errors,
+        },
       })
     })
 }
@@ -110,16 +110,16 @@ export interface UnsetPriceState {
   (dispatch: Dispatch<PriceAction>): void
 }
 
-export const unsetPriceState: UnsetPriceState = dispatch => {
+export const unsetPriceState: UnsetPriceState = (dispatch) => {
   dispatch({
     type: 'setPrices',
     payload: {
-      prices: {}
-    }
+      prices: {},
+    },
   })
   dispatch({
     type: 'setLoading',
-    payload: { loading: false }
+    payload: { loading: false },
   })
 }
 
@@ -133,7 +133,7 @@ const typeAction: PriceActionType[] = [
   'setLoading',
   'setPrices',
   'setSkuCodes',
-  'setErrors'
+  'setErrors',
 ]
 
 const priceReducer = (state: PriceState, reducer: PriceAction): PriceState =>

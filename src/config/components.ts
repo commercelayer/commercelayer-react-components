@@ -9,8 +9,13 @@ import {
   BasePriceType,
   BaseFormatPrice,
   PTLoader,
+  BMObject,
 } from '../@types'
 import { ErrorPropTypes } from '../@types/errors'
+import {
+  BaseInputComponentPropTypes,
+  baseOrderPricePropTypes,
+} from '../@types/index'
 
 const components = {
   AddToCart: {
@@ -277,6 +282,105 @@ const components = {
     defaultProps: {
       filters: {},
       loader: 'Loading...',
+    },
+  },
+  LineItemsCount: {
+    displayName: 'LineItemsCount',
+    propTypes: {
+      children: PropTypes.func,
+    },
+  },
+  MetadataInput: {
+    displayName: 'MetadataInput',
+    propTypes: BaseInputComponentPropTypes,
+  },
+  OrderContainer: {
+    permittedChildren: [
+      'ItemContainer',
+      'LineItemsContainer',
+      'SubTotal',
+      'Discount',
+      'Shipping',
+      'Taxes',
+      'GiftCardPrice',
+      'Total',
+      'Checkout',
+      'GiftCardContainer',
+      'ReactNode',
+    ],
+    displayName: 'OrderContainer',
+    propTypes: {
+      children: childrenTypes.isRequired,
+      persistKey: PropTypes.string.isRequired,
+      metadata: BMObject,
+    },
+    defaultProps: {
+      metadata: {},
+    },
+  },
+  Price: {
+    displayName: 'Price',
+    propTypes: {
+      children: PropTypes.func,
+      compareClassName: PropTypes.string,
+      skuCode: PropTypes.string,
+      showCompare: PropTypes.bool,
+    },
+    defaultProps: {
+      skuCode: '',
+    },
+  },
+  PriceContainer: {
+    permittedChildren: ['Price', 'ReactNode'],
+    displayName: 'PriceContainer',
+    propTypes: {
+      children: childrenTypes.isRequired,
+      skuCode: PropTypes.string,
+      loader: PTLoader,
+      perPage: PropTypes.number,
+      filters: PropTypes.object,
+    },
+    defaultProps: {
+      perPage: 10,
+      filters: {},
+      loader: 'Loading...',
+      skuCode: '',
+    },
+  },
+  PriceTemplate: {
+    displayName: 'PriceTemplate',
+    propTypes: {
+      formattedAmount: PropTypes.string,
+      formattedCompare: PropTypes.string,
+    },
+    defaultProps: {
+      formattedAmount: '',
+      formattedCompare: '',
+    },
+  },
+  QuantitySelector: {
+    displayName: 'QuantitySelector',
+    propTypes: {
+      children: PropTypes.func,
+      min: PropTypes.string,
+      max: PropTypes.string,
+      value: PropTypes.string,
+      skuCode: PropTypes.string,
+    },
+    defaultProps: {
+      min: '1',
+    },
+  },
+  Shipping: {
+    displayName: 'Shipping',
+    propTypes: baseOrderComponentPricePropTypes,
+  },
+  SkuOption: {
+    permittedChildren: ['SkuOptionInput', 'ReactNode'],
+    displayName: 'SkuOption',
+    propTypes: {
+      children: childrenTypes.isRequired,
+      name: PropTypes.string.isRequired,
     },
   },
 }

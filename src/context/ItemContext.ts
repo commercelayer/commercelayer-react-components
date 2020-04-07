@@ -4,7 +4,7 @@ import {
   Items,
   ItemQuantity,
   ItemOptions,
-  ItemPrices
+  ItemPrices,
 } from '../reducers/ItemReducer'
 
 export interface InitItemContext extends ItemState {
@@ -20,7 +20,7 @@ export const initialItemContext: InitItemContext = {
   items: {},
   quantity: {},
   option: {},
-  prices: {}
+  prices: {},
 }
 
 const ItemContext = createContext<InitItemContext>(initialItemContext)
