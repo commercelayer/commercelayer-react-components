@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<MetadataInput check children type date /> 1`] = `
+<input
+  data-metadata={true}
+  name="expiresAt"
+  type="date"
+/>
+`;
+
+exports[`<MetadataInput check children type textarea /> 1`] = `
+<textarea
+  data-metadata={true}
+  name="reference"
+  type="textarea"
+/>
+`;
+
+exports[`<MetadataInput check type required /> 1`] = `
+<input
+  data-metadata={true}
+/>
+`;
+
+exports[`<MetadataInput with custom children /> 1`] = `<span />`;
+
+exports[`<MetadataInput/> 1`] = `
+<input
+  data-metadata={true}
+  name="firstName"
+  type="text"
+/>
+`;

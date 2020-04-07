@@ -1,12 +1,20 @@
 import React, { FunctionComponent } from 'react'
-import BaseInput, { BIProps, BaseInputProps } from './utils/BaseInput'
+import BaseInput from './utils/BaseInput'
+import components from '../config/components'
+import { PropsType } from '../utils/PropsType'
 
-export type MetadataInputProps = BaseInputProps
+const propTypes = components.MetadataInput.propTypes
+const displayName = components.MetadataInput.displayName
 
-const MetadataInput: FunctionComponent<MetadataInputProps> = props => {
+export type MetadataInputProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['input'] &
+  JSX.IntrinsicElements['textarea']
+
+const MetadataInput: FunctionComponent<MetadataInputProps> = (props) => {
   return <BaseInput data-metadata {...props} />
 }
 
-MetadataInput.propTypes = BIProps
+MetadataInput.propTypes = propTypes
+MetadataInput.displayName = displayName
 
 export default MetadataInput
