@@ -2,30 +2,28 @@ import React, {
   FunctionComponent,
   useContext,
   useState,
-  useEffect
+  useEffect,
 } from 'react'
-import { BaseComponent } from '../@types/index'
 import Parent from './utils/Parent'
 import getLineItemsCount from '../utils/getLineItemsCount'
 import _ from 'lodash'
-import { InferProps } from 'prop-types'
-import PropTypes from 'prop-types'
 import LineItemContext from '../context/LineItemContext'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-const LItemsCProps = {
-  children: PropTypes.func
-}
+const propTypes = components.LineItemsCount.propTypes
+const displayName = components.LineItemsCount.displayName
 
-export type LineItemsCountProps = InferProps<typeof LItemsCProps> &
-  BaseComponent
+export type LineItemsCountProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['span']
 
-const LineItemsCount: FunctionComponent<LineItemsCountProps> = props => {
+const LineItemsCount: FunctionComponent<LineItemsCountProps> = (props) => {
   const { children, ...p } = props
   const { lineItems } = useContext(LineItemContext)
   const [quantity, setQuantity] = useState(0)
   useEffect(() => {
     if (!_.isEmpty(lineItems)) {
-      const qty = getLineItemsCount(lineItems)
+      const qty = getLineItemsCount(lineItems || [])
       setQuantity(qty)
     }
     return (): void => {
@@ -34,7 +32,7 @@ const LineItemsCount: FunctionComponent<LineItemsCountProps> = props => {
   }, [lineItems])
   const parentProps = {
     quantity,
-    ...p
+    ...p,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -43,6 +41,7 @@ const LineItemsCount: FunctionComponent<LineItemsCountProps> = props => {
   )
 }
 
-LineItemsCount.propTypes = LItemsCProps
+LineItemsCount.propTypes = propTypes
+LineItemsCount.displayName = displayName
 
 export default LineItemsCount
