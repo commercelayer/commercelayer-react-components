@@ -2,26 +2,23 @@ import React, {
   FunctionComponent,
   useContext,
   useState,
-  useEffect
+  useEffect,
 } from 'react'
-import { BaseComponent } from '../@types/index'
 import Parent from './utils/Parent'
 import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
-import PropTypes, { InferProps } from 'prop-types'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-const QSProps = {
-  children: PropTypes.func,
-  min: PropTypes.string,
-  max: PropTypes.string,
-  value: PropTypes.string,
-  skuCode: PropTypes.string
-}
+const propTypes = components.QuantitySelector.propTypes
+const defaultProps = components.QuantitySelector.defaultProps
+const displayName = components.QuantitySelector.displayName
 
-export type QuantitySelectorProps = InferProps<typeof QSProps> & BaseComponent
+export type QuantitySelectorProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['input']
 
-const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
+const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
   const { skuCode, children, min, max, ...p } = props
   const { item, setQuantity, items, quantity } = useContext(ItemContext)
   const [value, setValue] = useState(min)
@@ -36,7 +33,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
     setValue(min)
     if (sCode) {
       const qty = Number(min)
-      setQuantity({ ...quantity, [`${sCode}`]: qty })
+      setQuantity && setQuantity({ ...quantity, [`${sCode}`]: qty })
     }
     return (): void => {
       setValue(min)
@@ -47,7 +44,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
     setValue(qty)
     if (sCode && valid) {
-      setQuantity({ ...quantity, [`${sCode}`]: Number(qty) })
+      setQuantity && setQuantity({ ...quantity, [`${sCode}`]: Number(qty) })
     }
   }
   const handleBlur = (e): void => {
@@ -56,7 +53,8 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
     if (!valid) {
       const resetVal = Number(qty) < Number(min) ? min : maxInv
       setValue(resetVal)
-      setQuantity({ ...quantity, [`${sCode}`]: Number(resetVal) })
+      setQuantity &&
+        setQuantity({ ...quantity, [`${sCode}`]: Number(resetVal) })
     }
   }
   const parentProps = {
@@ -66,7 +64,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
     handleChange,
     handleBlur,
     value,
-    ...props
+    ...props,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -84,10 +82,8 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = props => {
   )
 }
 
-QuantitySelector.defaultProps = {
-  min: '1'
-}
-
-QuantitySelector.propTypes = QSProps
+QuantitySelector.propTypes = propTypes
+QuantitySelector.defaultProps = defaultProps
+QuantitySelector.displayName = displayName
 
 export default QuantitySelector
