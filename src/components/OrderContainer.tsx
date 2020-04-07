@@ -13,16 +13,14 @@ import CommerceLayerContext from '../context/CommerceLayerContext'
 import OrderContext from '../context/OrderContext'
 import { getApiOrder, addToCart, OrderState } from '../reducers/OrderReducer'
 import { unsetOrderState } from '../reducers/OrderReducer'
-import PropTypes, { InferProps } from 'prop-types'
-import { BMObject } from '../@types/index'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-const OCProps = {
-  children: PropTypes.node.isRequired,
-  persistKey: PropTypes.string.isRequired,
-  metadata: BMObject,
-}
+const propTypes = components.OrderContainer.propTypes
+const defaultProps = components.OrderContainer.defaultProps
+const displayName = components.OrderContainer.displayName
 
-export type OrderContainerProps = InferProps<typeof OCProps>
+export type OrderContainerProps = PropsType<typeof propTypes>
 
 const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
   const { children, persistKey, metadata } = props
@@ -65,12 +63,8 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
   )
 }
 
-OrderContainer.propTypes = OCProps
-
-OrderContainer.defaultProps = {
-  metadata: {},
-}
-
-OrderContainer.displayName = 'CLOrderContainer'
+OrderContainer.propTypes = propTypes
+OrderContainer.defaultProps = defaultProps
+OrderContainer.displayName = displayName
 
 export default OrderContainer
