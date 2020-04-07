@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Shipping children rendered /> 1`] = `
+<span>
+  
+</span>
+`;
+
+exports[`<Shipping with custom children /> 1`] = `<span />`;
+
+exports[`<Shipping/> 1`] = `
+<span>
+  
+</span>
+`;
