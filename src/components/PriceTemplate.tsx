@@ -1,19 +1,17 @@
 import React, { Fragment, FunctionComponent } from 'react'
-import PropTypes, { InferProps } from 'prop-types'
-import { BC } from '../@types'
 import { PPropsType } from './Price'
+import components from '../config/components'
+import { PropsType } from '../utils/PropsType'
 
-export const PriceTemplateProps = {
-  ...BC,
-  formattedAmount: PropTypes.string,
-  formattedCompare: PropTypes.string
-}
+const propTypes = components.PriceTemplate.propTypes
+const defaultProps = components.PriceTemplate.defaultProps
+const displayName = components.PriceTemplate.displayName
 
-export type PTemplateProps = InferProps<typeof PriceTemplateProps> &
+export type PTemplateProps = PropsType<typeof propTypes> &
   PPropsType &
   JSX.IntrinsicElements['span']
 
-const PriceTemplate: FunctionComponent<PTemplateProps> = props => {
+const PriceTemplate: FunctionComponent<PTemplateProps> = (props) => {
   return (
     <Fragment>
       <span className={props.className}>{props.formattedAmount}</span>
@@ -25,11 +23,9 @@ const PriceTemplate: FunctionComponent<PTemplateProps> = props => {
     </Fragment>
   )
 }
-PriceTemplate.propTypes = PriceTemplateProps
 
-PriceTemplate.defaultProps = {
-  formattedAmount: '',
-  formattedCompare: ''
-}
+PriceTemplate.propTypes = propTypes
+PriceTemplate.defaultProps = defaultProps
+PriceTemplate.displayName = displayName
 
 export default PriceTemplate
