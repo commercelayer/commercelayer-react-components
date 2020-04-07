@@ -3,26 +3,24 @@ import React, {
   useState,
   useEffect,
   useContext,
-  FunctionComponent
+  FunctionComponent,
 } from 'react'
 import _ from 'lodash'
 import Parent from './utils/Parent'
 import PriceContext from '../context/PriceContext'
-import PropTypes, { InferProps } from 'prop-types'
-import { BC } from '../@types'
 import { getPricesComponent } from '../utils/getPrices'
+import { PriceCollection } from '@commercelayer/js-sdk'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-export const PriceProps = {
-  ...BC,
-  children: PropTypes.func,
-  compareClassName: PropTypes.string,
-  skuCode: PropTypes.string,
-  showCompare: PropTypes.bool
-}
+const propTypes = components.Price.propTypes
+const defaultProps = components.Price.defaultProps
+const displayName = components.Price.displayName
 
-export type PPropsType = InferProps<typeof PriceProps>
+export type PPropsType = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['span']
 
-const Price: FunctionComponent<PPropsType> = props => {
+const Price: FunctionComponent<PPropsType> = (props) => {
   const { children } = props
   const {
     prices,
@@ -30,19 +28,17 @@ const Price: FunctionComponent<PPropsType> = props => {
     loading,
     skuCodes,
     setSkuCodes,
-    loader
+    loader,
   } = useContext(PriceContext)
-  const [skuPrices, setSkuPrices] = useState([])
-  const sCode = skuCode || props.skuCode
+  const [skuPrices, setSkuPrices] = useState<PriceCollection[]>([])
+  const sCode = skuCode || (props.skuCode as string)
   useEffect(() => {
     if (!_.isEmpty(prices) && _.has(prices, `${sCode}`)) {
-      // @ts-ignore
       setSkuPrices(prices[sCode])
     } else {
       if (sCode && _.indexOf(skuCodes, sCode) === -1) {
         skuCodes.push(sCode)
-        // @ts-ignore
-        setSkuCodes(skuCodes)
+        setSkuCodes && setSkuCodes(skuCodes)
       }
     }
     return (): void => {
@@ -52,7 +48,7 @@ const Price: FunctionComponent<PPropsType> = props => {
   const parentProps = {
     loading,
     loader,
-    ...props
+    ...props,
   }
   const pricesComponent = getPricesComponent(skuPrices, props)
   return children ? (
@@ -66,12 +62,8 @@ const Price: FunctionComponent<PPropsType> = props => {
   )
 }
 
-Price.propTypes = PriceProps
-
-Price.defaultProps = {
-  skuCode: ''
-}
-
-Price.displayName = 'Price'
+Price.propTypes = propTypes
+Price.defaultProps = defaultProps
+Price.displayName = displayName
 
 export default Price
