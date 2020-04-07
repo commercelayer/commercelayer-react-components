@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<PriceContainer check children /> 1`] = `
+<a>
+  Checkout
+</a>
+`;
+
+exports[`<PriceContainer/> 1`] = `
+<div>
+  test
+</div>
+`;

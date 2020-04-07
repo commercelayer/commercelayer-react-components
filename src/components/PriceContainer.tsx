@@ -2,33 +2,29 @@ import React, {
   useEffect,
   FunctionComponent,
   useContext,
-  useReducer
+  useReducer,
 } from 'react'
 import getPrices from '../utils/getPrices'
 import _ from 'lodash'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import priceReducer, {
   SetSkuCodesPrice,
-  unsetPriceState
+  unsetPriceState,
 } from '../reducers/PriceReducer'
 import { priceInitialState, getSkusPrice } from '../reducers/PriceReducer'
 import PriceContext, { PriceContextValue } from '../context/PriceContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
-import PropTypes, { InferProps } from 'prop-types'
-import { PTLoader } from '../@types/index'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-export const PriceContainerProps = {
-  children: PropTypes.node.isRequired,
-  skuCode: PropTypes.string,
-  loader: PTLoader,
-  perPage: PropTypes.number,
-  filters: PropTypes.object
-}
+const propTypes = components.PriceContainer.propTypes
+const defaultProps = components.PriceContainer.defaultProps
+const displayName = components.PriceContainer.displayName
 
-export type PCProps = InferProps<typeof PriceContainerProps>
+export type PCProps = PropsType<typeof propTypes>
 
-const PriceContainer: FunctionComponent<PCProps> = props => {
+const PriceContainer: FunctionComponent<PCProps> = (props) => {
   const { children, skuCode, loader, perPage, filters } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
@@ -38,24 +34,24 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
   if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
   const sCode = getCurrentItemKey(currentItem) || skuCode || ''
-  const setSkuCodes: SetSkuCodesPrice = skuCodes => {
+  const setSkuCodes: SetSkuCodesPrice = (skuCodes) => {
     dispatch({
       type: 'setSkuCodes',
-      payload: { skuCodes }
+      payload: { skuCodes },
     })
   }
   useEffect(() => {
     if (currentItem && _.has(prices, sCode)) {
       dispatch({
         type: 'setPrices',
-        payload: { prices: prices }
+        payload: { prices: prices },
       })
     }
     if (!_.isEmpty(items) && _.isEmpty(currentItem)) {
       const p = getPrices(items)
       dispatch({
         type: 'setPrices',
-        payload: { prices: p }
+        payload: { prices: p },
       })
     }
     if (
@@ -66,11 +62,10 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
         getSkusPrice((sCode && [sCode]) || state.skuCodes, {
           config,
           dispatch,
-          // @ts-ignore
           setPrices,
           prices,
           perPage: perPage || 0,
-          filters: filters || {}
+          filters: filters || {},
         })
       }
     }
@@ -80,22 +75,15 @@ const PriceContainer: FunctionComponent<PCProps> = props => {
     ...state,
     skuCode: sCode,
     loader: loader || 'Loading...',
-    setSkuCodes
+    setSkuCodes,
   }
   return (
     <PriceContext.Provider value={priceValue}>{children}</PriceContext.Provider>
   )
 }
 
-PriceContainer.propTypes = PriceContainerProps
-
-PriceContainer.defaultProps = {
-  perPage: 10,
-  filters: {},
-  loader: 'Loading...',
-  skuCode: ''
-}
-
-PriceContainer.displayName = 'PriceContainer'
+PriceContainer.propTypes = propTypes
+PriceContainer.defaultProps = defaultProps
+PriceContainer.displayName = displayName
 
 export default PriceContainer
