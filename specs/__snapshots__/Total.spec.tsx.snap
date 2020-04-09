@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Total children rendered /> 1`] = `
+<span>
+  
+</span>
+`;
+
+exports[`<Total with custom children /> 1`] = `<span />`;
+
+exports[`<Total/> 1`] = `
+<span>
+  
+</span>
+`;
