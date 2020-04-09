@@ -1,22 +1,22 @@
 import CLayer, {
   SkuCollection,
-  InventoryCollection
+  InventoryCollection,
 } from '@commercelayer/js-sdk'
 import { SkuCodePropObj } from '../components/VariantSelector'
 import { Dispatch } from 'react'
 import baseReducer from '../utils/baseReducer'
-import { BaseError } from '../components/Errors'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import getSkus from '../utils/getSkus'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import { Items } from './ItemReducer'
+import { BaseError } from '../@types/errors'
 
 type SetSkuCodeVariantParams = {
   code: string
   id: string
   config: CommerceLayerConfig
   dispatch: Dispatch<VariantAction>
-  setItem: (item: Items) => void
+  setItem: ((item: Items) => void) | undefined
 }
 
 export interface SetSkuCodeVariant {
@@ -31,7 +31,7 @@ export interface VariantsObject {
   [key: string]: SkuCollection
 }
 
-export interface VariantState {
+export interface VariantPayload {
   loading?: boolean
   variants?: VariantsObject | object
   skuCodes?: string[]
@@ -45,16 +45,21 @@ export interface VariantState {
   setSkuCodes?: (skuCodes: SkuCodePropObj[]) => void
 }
 
+export interface VariantState extends VariantPayload {
+  skuCodes: string[]
+  variants: VariantsObject | object
+}
+
 export interface VariantAction {
   type: VariantActionType
-  payload: VariantState
+  payload: VariantPayload
 }
 
 export const setVariantSkuCodes: SetVariantSkuCodes = (skuCodes, dispatch) => {
-  const sCodes = skuCodes.map(s => s.code)
+  const sCodes = skuCodes.map((s) => s.code)
   dispatch({
     type: 'setSkuCodes',
-    payload: { skuCodes: sCodes }
+    payload: { skuCodes: sCodes },
   })
 }
 
@@ -62,23 +67,24 @@ export interface UnsetVariantState {
   (dispatch: Dispatch<VariantAction>): void
 }
 
-export const setSkuCode: SetSkuCodeVariant = params => {
+export const setSkuCode: SetSkuCodeVariant = (params) => {
   const { id, code, config, setItem, dispatch } = params
   if (id) {
     CLayer.Sku.withCredentials(config)
       .find(id)
-      .then(s => {
-        setItem({
-          [`${code}`]: s
-        })
+      .then((s) => {
+        setItem &&
+          setItem({
+            [`${code}`]: s,
+          })
       })
-      .catch(c => {
+      .catch((c) => {
         const errors = getErrorsByCollection(c, 'variant')
         dispatch({
           type: 'setErrors',
           payload: {
-            errors
-          }
+            errors,
+          },
         })
       })
   }
@@ -90,19 +96,19 @@ type GetVariantsParams = {
   skuCode: string
   dispatch: Dispatch<VariantAction>
   filters: object
-  setItem: (item: Items) => void
+  setItem: ((item: Items) => void) | undefined
 }
 
 export interface GetVariants {
   (params: GetVariantsParams): void
 }
 
-export const getVariants: GetVariants = params => {
+export const getVariants: GetVariants = (params) => {
   const { config, state, skuCode, dispatch, setItem, filters } = params
   CLayer.Sku.withCredentials(config)
     .where({ codeIn: state.skuCodes.join(','), ...filters })
     .all()
-    .then(r => {
+    .then((r) => {
       const skusObj = getSkus(r.toArray())
       if (skuCode) {
         setSkuCode({
@@ -110,45 +116,45 @@ export const getVariants: GetVariants = params => {
           id: skusObj[skuCode].id,
           config,
           dispatch,
-          setItem
+          setItem,
         })
       }
       dispatch({
         type: 'setVariants',
         payload: {
-          variants: skusObj
-        }
+          variants: skusObj,
+        },
       })
       dispatch({
         type: 'setLoading',
         payload: {
-          loading: false
-        }
+          loading: false,
+        },
       })
     })
-    .catch(c => {
+    .catch((c) => {
       const errors = getErrorsByCollection(c, 'variant')
       dispatch({
         type: 'setErrors',
         payload: {
-          errors
-        }
+          errors,
+        },
       })
     })
 }
 
-export const unsetVariantState: UnsetVariantState = dispatch => {
+export const unsetVariantState: UnsetVariantState = (dispatch) => {
   dispatch({
     type: 'setSkuCode',
-    payload: { skuCode: '' }
+    payload: { skuCode: '' },
   })
   dispatch({
     type: 'setVariants',
-    payload: { variants: {} }
+    payload: { variants: {} },
   })
   dispatch({
     type: 'setLoading',
-    payload: { loading: false }
+    payload: { loading: false },
   })
 }
 
@@ -162,10 +168,10 @@ export const variantInitialState: VariantState = {
   currentSkuInventory: {
     available: false,
     quantity: 0,
-    levels: []
+    levels: [],
   },
   currentQuantity: 1,
-  currentPrices: []
+  currentPrices: [],
 }
 
 export type VariantActionType =
@@ -186,7 +192,7 @@ const actionType: VariantActionType[] = [
   'setCurrentSkuId',
   'setCurrentSkuInventory',
   'setCurrentPrices',
-  'setErrors'
+  'setErrors',
 ]
 
 const variantReducer = (

@@ -3,11 +3,15 @@ import { SkuOptionCollection } from '@commercelayer/js-sdk'
 
 export interface SkuOptionChildrenInitalState {
   skuOption?: SkuOptionCollection | null
-  skuCode?: string
+  skuCode: string
 }
 
-const initial: SkuOptionChildrenInitalState = {}
+const initial: SkuOptionChildrenInitalState = {
+  skuCode: '',
+}
 
-const SkuOptionChildrenContext = createContext(initial)
+const SkuOptionChildrenContext = createContext<SkuOptionChildrenInitalState>(
+  initial
+)
 
 export default SkuOptionChildrenContext

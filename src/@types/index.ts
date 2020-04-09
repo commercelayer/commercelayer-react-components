@@ -132,3 +132,4 @@ export const baseOrderComponentPricePropTypes = {
 }
 
 export type BasePriceType = 'total' | 'option' | 'unit'
+export type BaseSelectorType = 'select' | 'radio'

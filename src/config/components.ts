@@ -10,12 +10,10 @@ import {
   BaseFormatPrice,
   PTLoader,
   BMObject,
+  BaseSelectorType,
 } from '../@types'
 import { ErrorPropTypes } from '../@types/errors'
-import {
-  BaseInputComponentPropTypes,
-  baseOrderPricePropTypes,
-} from '../@types/index'
+import { BaseInputComponentPropTypes } from '../@types/index'
 
 const components = {
   AddToCart: {
@@ -77,7 +75,7 @@ const components = {
     displayName: 'Discount',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
-      format: 'formatted',
+      format: 'formatted' as BaseFormatPrice,
     },
   },
   Errors: {
@@ -381,6 +379,83 @@ const components = {
     propTypes: {
       children: childrenTypes.isRequired,
       name: PropTypes.string.isRequired,
+    },
+  },
+  SkuOptionInput: {
+    displayName: 'SkuOptionInput',
+    propTypes: BaseInputComponentPropTypes,
+  },
+  SkuOptionsContainer: {
+    permittedChildren: ['SkuOption', 'ReactNode'],
+    displayName: 'SkuOptionsContainer',
+    propTypes: {
+      children: childrenTypes.isRequired,
+      skuCode: PropTypes.string,
+    },
+  },
+  SubmitButton: {
+    displayName: 'SubmitButton',
+    propTypes: {
+      children: PropTypes.func,
+      label: PropTypes.string,
+    },
+    defaultProps: {
+      label: 'Submit',
+    },
+  },
+  SubTotal: {
+    displayName: 'SubTotal',
+    propTypes: baseOrderComponentPricePropTypes,
+    defaultProps: {
+      format: 'formatted' as BaseFormatPrice,
+    },
+  },
+  Taxes: {
+    displayName: 'Taxes',
+    propTypes: baseOrderComponentPricePropTypes,
+    defaultProps: {
+      format: 'formatted' as BaseFormatPrice,
+    },
+  },
+  Total: {
+    displayName: 'Total',
+    propTypes: baseOrderComponentPricePropTypes,
+    defaultProps: {
+      format: 'formatted' as BaseFormatPrice,
+    },
+  },
+  VariantContainer: {
+    permittedChildren: ['VariantSelector', 'ReactNode'],
+    displayName: 'VariantContainer',
+    propTypes: {
+      children: childrenTypes.isRequired,
+      skuCode: PropTypes.string,
+      filters: PropTypes.object,
+    },
+    defaultProps: {
+      skuCode: '',
+      filters: {},
+    },
+  },
+  VariantSelector: {
+    displayName: 'VariantSelector',
+    propTypes: {
+      skuCodes: PropTypes.arrayOf(
+        PropTypes.exact({
+          label: PropTypes.string.isRequired,
+          code: PropTypes.string.isRequired,
+        }).isRequired
+      ).isRequired,
+      name: PropTypes.string,
+      children: PropTypes.func,
+      type: PropTypes.oneOf<BaseSelectorType>(['select', 'radio']),
+      loader: PropTypes.element,
+      placeholder: PropTypes.string,
+      skuCode: PropTypes.string,
+    },
+    defaultProps: {
+      placeholder: 'select an variant',
+      type: 'select' as BaseSelectorType,
     },
   },
 }

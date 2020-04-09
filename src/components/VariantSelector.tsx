@@ -3,50 +3,40 @@ import React, {
   FunctionComponent,
   useContext,
   useEffect,
-  ReactElement
+  ReactElement,
 } from 'react'
 import VariantTemplate from './VariantTemplate'
 import Parent from './utils/Parent'
 import VariantContext from '../context/VariantContext'
-import { BaseComponent } from '../@types/index'
-import PropTypes, { InferProps } from 'prop-types'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
+
+const propTypes = components.VariantSelector.propTypes
+const defaultProps = components.VariantSelector.defaultProps
+const displayName = components.VariantSelector.displayName
 
 export interface SkuCodePropObj {
   label: string
   code: string
 }
 
-export const VSProps = {
-  skuCodes: PropTypes.arrayOf(
-    PropTypes.exact({
-      label: PropTypes.string.isRequired,
-      code: PropTypes.string.isRequired
-    }).isRequired
-  ).isRequired,
-  name: PropTypes.string.isRequired,
-  children: PropTypes.func,
-  type: PropTypes.oneOf(['select', 'radio']),
-  loader: PropTypes.element,
-  placeholder: PropTypes.string,
-  skuCode: PropTypes.string
-  // TODO Does metadata add?
-}
+export type VariantSelectorProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['input'] &
+  JSX.IntrinsicElements['select']
 
-export type VariantSelectorProps = InferProps<typeof VSProps> & BaseComponent
-
-const VariantSelector: FunctionComponent<VariantSelectorProps> = props => {
+const VariantSelector: FunctionComponent<VariantSelectorProps> = (props) => {
   const { children, type, placeholder, skuCode, name, skuCodes, ...prs } = props
   const {
     setSkuCode,
     skuCode: variantSkuCode,
     loading,
     variants,
-    setSkuCodes
+    setSkuCodes,
   } = useContext(VariantContext)
   useEffect(() => {
-    setSkuCodes(skuCodes)
+    setSkuCodes && setSkuCodes(skuCodes)
     return (): void => {
-      setSkuCodes([])
+      setSkuCodes && setSkuCodes([])
     }
   }, [skuCodes])
   const sCode = variantSkuCode || skuCode || ''
@@ -57,11 +47,11 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = props => {
       <VariantTemplate
         variants={variants}
         type={type}
-        placeholder={placeholder}
+        placeholder={placeholder as string}
         skuCode={sCode}
         skuCodes={skuCodes}
-        onChange={setSkuCode}
-        name={name}
+        onChange={setSkuCode as any}
+        name={name as string}
         {...prs}
       />
     )
@@ -69,9 +59,9 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = props => {
     variants,
     loading,
     skuCodes,
-    setSkuCode,
+    handleSelect: setSkuCode,
     skuCode: sCode,
-    ...props
+    ...props,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -82,11 +72,8 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = props => {
   )
 }
 
-VariantSelector.propTypes = VSProps
-
-VariantSelector.defaultProps = {
-  placeholder: 'select variant',
-  type: 'select'
-}
+VariantSelector.propTypes = propTypes
+VariantSelector.defaultProps = defaultProps
+VariantSelector.displayName = displayName
 
 export default VariantSelector
