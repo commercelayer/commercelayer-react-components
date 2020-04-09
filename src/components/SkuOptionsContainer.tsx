@@ -2,28 +2,30 @@ import React, {
   FunctionComponent,
   useReducer,
   useContext,
-  useEffect
+  useEffect,
 } from 'react'
 import PropTypes, { InferProps } from 'prop-types'
 import SkuOptionsContext from '../context/SkuOptionsContext'
 import skuOptionsReducer, {
   skuOptionsInitialState,
-  unsetSkuOptionsState
+  unsetSkuOptionsState,
 } from '../reducers/SkuOptionsReducer'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
 import { getSkuOptions } from '../reducers/SkuOptionsReducer'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-const SOCProps = {
-  children: PropTypes.node.isRequired,
-  skuCode: PropTypes.string
-}
+const propTypes = components.SkuOptionsContainer.propTypes
+const displayName = components.SkuOptionsContainer.displayName
 
-export type SkuOptionsContainerProp = InferProps<typeof SOCProps>
+export type SkuOptionsContainerProp = PropsType<typeof propTypes>
 
-const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = props => {
+const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = (
+  props
+) => {
   const { skuCode, children } = props
   const [state, dispatch] = useReducer(
     skuOptionsReducer,
@@ -41,7 +43,7 @@ const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = props =>
       getSkuOptions({
         skuCode: sCode,
         dispatch,
-        config
+        config,
       })
     }
     return (): void => unsetSkuOptionsState(dispatch)
@@ -53,6 +55,7 @@ const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = props =>
   )
 }
 
-SkuOptionsContainer.propTypes = SOCProps
+SkuOptionsContainer.propTypes = propTypes
+SkuOptionsContainer.displayName = displayName
 
 export default SkuOptionsContainer
