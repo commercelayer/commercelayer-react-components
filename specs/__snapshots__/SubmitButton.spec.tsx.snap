@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SubmitButton with custom children /> 1`] = `
+<span>
+  My checkout
+</span>
+`;
+
+exports[`<SubmitButton with props /> 1`] = `
+<button
+  type="submit"
+>
+  submit
+</button>
+`;
+
+exports[`<SubmitButton/> 1`] = `
+<button
+  type="submit"
+>
+  submit
+</button>
+`;

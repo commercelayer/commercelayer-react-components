@@ -1,20 +1,20 @@
 import React, { FunctionComponent } from 'react'
-import PropTypes, { InferProps } from 'prop-types'
 import Parent from './utils/Parent'
-import { BaseComponent } from '../@types/index'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-const SBProps = {
-  children: PropTypes.func,
-  label: PropTypes.string
-}
+const propTypes = components.SubmitButton.propTypes
+const defaultProps = components.SubmitButton.defaultProps
+const displayName = components.SubmitButton.displayName
 
-export type SubmitButtonProps = InferProps<typeof SBProps> & BaseComponent
+export type SubmitButtonProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['button']
 
-const SubmitButton: FunctionComponent<SubmitButtonProps> = props => {
+const SubmitButton: FunctionComponent<SubmitButtonProps> = (props) => {
   const { children, label, ...p } = props
   const parentProps = {
     ...p,
-    label
+    label,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -25,10 +25,8 @@ const SubmitButton: FunctionComponent<SubmitButtonProps> = props => {
   )
 }
 
-SubmitButton.propTypes = SBProps
-
-SubmitButton.defaultProps = {
-  label: 'submit'
-}
+SubmitButton.propTypes = propTypes
+SubmitButton.defaultProps = defaultProps
+SubmitButton.displayName = displayName
 
 export default SubmitButton
