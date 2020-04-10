@@ -458,6 +458,25 @@ const components = {
       type: 'select' as BaseSelectorType,
     },
   },
+  VariantTemplate: {
+    displayName: 'VariantTemplate',
+    propTypes: {
+      variants: PropTypes.object.isRequired,
+      onChange: PropTypes.func,
+      skuCodes: PropTypes.arrayOf(
+        PropTypes.exact({
+          label: PropTypes.string.isRequired,
+          code: PropTypes.string.isRequired,
+        }).isRequired
+      ).isRequired,
+      name: PropTypes.string,
+      children: PropTypes.func,
+      type: PropTypes.oneOf<BaseSelectorType>(['select', 'radio']),
+      loader: PropTypes.element,
+      placeholder: PropTypes.string,
+      skuCode: PropTypes.string,
+    },
+  },
 }
 
 export default components

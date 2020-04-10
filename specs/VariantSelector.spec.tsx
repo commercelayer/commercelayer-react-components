@@ -2,8 +2,6 @@ import React from 'react'
 import { VariantSelector } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
-import currencyOptions from '../src/config/currency.json'
-import Parent from '../src/components/utils/Parent'
 
 const propTypes = components.VariantSelector.propTypes
 
@@ -46,7 +44,6 @@ test('<VariantSelector check children />', () => {
   )
   const tree = component.toJSON()
   const root = component.toTree()
-  const rendered = root.rendered
   expect(tree).toMatchSnapshot()
   expect(root.props.placeholder).toStrictEqual('select variant')
   expect(root.props.type).toStrictEqual('select')
@@ -73,11 +70,8 @@ test('<VariantSelector with custom children />', () => {
   const parentRendered = root.rendered.rendered
   const childRendered = parentRendered.rendered
   expect(tree).toMatchSnapshot()
-
   expect(rendered.props.children).toBe(CustomComponent)
-
   expect(parentRendered.nodeType).toBe('component')
   expect(parentRendered.type).toBe(CustomComponent)
-
   expect(childRendered.props.handleSelect).not.toBeDefined()
 })

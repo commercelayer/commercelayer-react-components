@@ -1,29 +1,16 @@
 import React, { Fragment, FunctionComponent } from 'react'
 import _ from 'lodash'
-import { VariantSelectorProps } from './VariantSelector'
-import PropTypes, { InferProps } from 'prop-types'
+import { PropsType } from '../utils/PropsType'
+import components from '../config/components'
 
-const VTProps = {
-  variants: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  skuCodes: PropTypes.arrayOf(
-    PropTypes.exact({
-      label: PropTypes.string.isRequired,
-      code: PropTypes.string.isRequired
-    }).isRequired
-  ).isRequired,
-  name: PropTypes.string.isRequired,
-  children: PropTypes.func,
-  type: PropTypes.oneOf(['select', 'radio']),
-  loader: PropTypes.element,
-  placeholder: PropTypes.string,
-  skuCode: PropTypes.string
-}
+const propTypes = components.VariantTemplate.propTypes
+const displayName = components.VariantTemplate.displayName
 
-export type VariantTemplateProps = InferProps<typeof VTProps> &
-  VariantSelectorProps
+export type VariantTemplateProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['input'] &
+  JSX.IntrinsicElements['select']
 
-const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
+const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
   const {
     id,
     variants,
@@ -51,7 +38,9 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
           defaultChecked={checked}
           type="radio"
           value={variants[v].code}
-          onChange={(e): void => onChange(e.target.value, variants[v].id)}
+          onChange={(e): void =>
+            onChange && onChange(e.target.value, variants[v].id)
+          }
           {...prs}
         />
         {skuCodes.length > 0 ? skuCodes[k].label : variants[v].name}
@@ -66,9 +55,9 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
           const v = e.target.value
           const i = e.target.selectedIndex
           const id = e.target[i].dataset.skuId
-          onChange(v, id)
+          onChange && onChange(v, id)
         }}
-        value={skuCode}
+        value={skuCode || ''}
         {...prs}
       >
         <option disabled={!!skuCode}>{placeholder}</option>
@@ -79,6 +68,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = props => {
   return <Fragment>{vars}</Fragment>
 }
 
-VariantTemplate.propTypes = VTProps
+VariantTemplate.propTypes = propTypes
+VariantTemplate.displayName = displayName
 
 export default VariantTemplate

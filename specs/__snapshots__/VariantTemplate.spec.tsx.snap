@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<VariantTemplate check type radio /> 1`] = `null`;
+
+exports[`<VariantTemplate check type select /> 1`] = `null`;
+
+exports[`<VariantTemplate/> 1`] = `null`;
