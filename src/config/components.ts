@@ -220,9 +220,10 @@ const components = {
     propTypes: {
       name: PropTypes.string.isRequired,
       children: PropTypes.func,
-      optionKeyClassName: PropTypes.string,
-      optionKeyId: PropTypes.string,
-      optionKeyStyle: PropTypes.object,
+      valueClassName: PropTypes.string,
+      keyClassName: PropTypes.string,
+      keyId: PropTypes.string,
+      keyStyle: PropTypes.object,
     },
   },
   LineItemOptions: {

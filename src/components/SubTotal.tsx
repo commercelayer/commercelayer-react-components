@@ -7,7 +7,8 @@ const propTypes = components.SubTotal.propTypes
 const defaultProps = components.SubTotal.defaultProps
 const displayName = components.SubTotal.displayName
 
-export type SubTotalProps = PropsType<typeof propTypes>
+export type SubTotalProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['span']
 
 const SubTotal: FunctionComponent<SubTotalProps> = (props) => {
   return <BaseOrderPrice base="amount" type="subtotal" {...props} />

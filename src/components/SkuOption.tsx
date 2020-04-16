@@ -20,7 +20,7 @@ const SkuOption: FunctionComponent<SkuOptionProps> = (props) => {
         return (
           <SkuOptionChildrenContext.Provider
             key={k}
-            value={{ skuOption, skuCode }}
+            value={{ skuOption, skuCode: skuCode as string }}
           >
             {props.children}
           </SkuOptionChildrenContext.Provider>

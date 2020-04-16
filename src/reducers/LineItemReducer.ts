@@ -3,13 +3,13 @@ import CLayer, {
   OrderCollection,
 } from '@commercelayer/js-sdk'
 import baseReducer from '../utils/baseReducer'
-import { BaseError } from '../components/Errors'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import _ from 'lodash'
 import { LoaderType } from '../@types'
+import { BaseError } from '../@types/errors'
 
 export type UpdateLineItemParams = {
   lineItemId: string
@@ -131,7 +131,7 @@ export const updateLineItem: UpdateLineItem = async (params) => {
     if (!update.errors().empty()) {
       throw update
     }
-    await getOrder(orderId)
+    getOrder && (await getOrder(orderId))
     if (!_.isEmpty(errors)) {
       dispatch({
         type: 'setErrors',
@@ -161,7 +161,7 @@ export const deleteLineItem: DeleteLineItem = async (params) => {
     if (!destroyLineItem.errors().empty()) {
       throw destroyLineItem
     }
-    await getOrder(orderId)
+    getOrder && (await getOrder(orderId))
     if (!_.isEmpty(errors)) {
       dispatch({
         type: 'setErrors',
@@ -182,7 +182,7 @@ export const deleteLineItem: DeleteLineItem = async (params) => {
 }
 
 export const lineItemInitialState: LineItemState = {
-  loading: true,
+  loading: false,
   lineItems: [],
   errors: [],
 }

@@ -15,10 +15,10 @@ const LineItemOption: FunctionComponent<LineItemOptionProps> = (props) => {
   const {
     name,
     children,
-    optionKeyClassName,
-    optionKeyId,
-    optionKeyStyle,
-    className,
+    keyClassName,
+    keyId,
+    keyStyle,
+    valueClassName,
     id,
     style,
     ...p
@@ -33,14 +33,14 @@ const LineItemOption: FunctionComponent<LineItemOptionProps> = (props) => {
   ) : _.has(lineItemOption, `options.${name}`) ? (
     <Fragment>
       <span
-        id={optionKeyId || ''}
-        style={optionKeyStyle || {}}
-        className={optionKeyClassName || ''}
+        id={keyId as string}
+        style={keyStyle as object}
+        className={keyClassName as string}
         {...p}
       >
         {`${name}:`}
       </span>
-      <span id={id} style={style} className={className} {...p}>
+      <span id={id} style={style} className={valueClassName as string} {...p}>
         {`${lineItemOption['options'][name]}`}
       </span>
     </Fragment>

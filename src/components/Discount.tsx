@@ -6,9 +6,10 @@ import { InferProps } from 'prop-types'
 const propTypes = components.Discount.propTypes
 const displayName = components.Discount.displayName
 
-export type DiscountProps = InferProps<typeof propTypes>
+export type DiscountProps = InferProps<typeof propTypes> &
+  JSX.IntrinsicElements['span']
 
-const Discount: FunctionComponent<DiscountProps> = props => {
+const Discount: FunctionComponent<DiscountProps> = (props) => {
   return <BaseOrderPrice base="amount" type="discount" {...props} />
 }
 

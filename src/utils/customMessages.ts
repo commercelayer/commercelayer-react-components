@@ -1,5 +1,5 @@
-import { BaseError } from '../components/Errors'
 import _ from 'lodash'
+import { BaseError } from '../@types/errors'
 
 export interface CustomMessages {
   (messages: BaseError[], v: BaseError): { message?: string } | undefined
@@ -7,7 +7,7 @@ export interface CustomMessages {
 
 const customMessages: CustomMessages = (messages = [], v) => {
   return _.first(
-    messages.filter(m => {
+    messages.filter((m) => {
       if (m.field === v.field) {
         return m.code === v.code
       }

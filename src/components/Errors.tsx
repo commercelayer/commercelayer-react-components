@@ -17,8 +17,8 @@ const displayName = components.Errors.displayName
 export type ErrorsProps = InferProps<typeof propTypes> &
   JSX.IntrinsicElements['span']
 
-const Errors: FunctionComponent<ErrorsProps> = props => {
-  const { children, messages, resourceKey, field, ...p } = props
+const Errors: FunctionComponent<ErrorsProps> = (props) => {
+  const { children, messages, resource, field, ...p } = props
   const { errors: orderErrors } = useContext(OrderContext)
   const { errors: giftCardErrors } = useContext(GiftCardContext)
   const { errors: lineItemErrors } = useContext(LineItemContext)
@@ -28,15 +28,15 @@ const Errors: FunctionComponent<ErrorsProps> = props => {
   const allErrors = [
     ...(giftCardErrors || []),
     ...(orderErrors || []),
-    ...(lineItemErrors || [])
+    ...(lineItemErrors || []),
   ]
-  const parentProps = { messages, resourceKey, field, ...p }
+  const parentProps = { messages, resource, field, ...p }
   const msgErrors = getAllErrors({
     allErrors,
     field: field || 'base',
     messages: msg,
     props: p,
-    lineItem
+    lineItem: lineItem,
   })
   return children ? (
     <Parent {...parentProps}>{children}</Parent>

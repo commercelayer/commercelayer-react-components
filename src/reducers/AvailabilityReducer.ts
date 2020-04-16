@@ -1,5 +1,5 @@
 import baseReducer from '../utils/baseReducer'
-import { BaseError } from '../components/Errors'
+import { BaseError } from '../@types/errors'
 
 export interface LeadTimes {
   hours: number
@@ -33,13 +33,13 @@ export interface AvailabilityAction {
 export const availabilityInitialState: AvailabilityState = {
   min: {
     days: 0,
-    hours: 0
+    hours: 0,
   },
   max: {
     days: 0,
-    hours: 0
+    hours: 0,
   },
-  errors: []
+  errors: [],
 }
 
 export type AvailabilityActionType = 'setAvailability' | 'setErrors'

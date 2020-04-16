@@ -39,12 +39,6 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
         filters: filters || {},
       })
     }
-    return (): void => {
-      dispatch({
-        type: 'setLineItems',
-        payload: { lineItems: [] },
-      })
-    }
   }, [order])
   const lineItemValue = {
     ...state,

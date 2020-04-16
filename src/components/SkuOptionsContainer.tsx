@@ -4,7 +4,6 @@ import React, {
   useContext,
   useEffect,
 } from 'react'
-import PropTypes, { InferProps } from 'prop-types'
 import SkuOptionsContext from '../context/SkuOptionsContext'
 import skuOptionsReducer, {
   skuOptionsInitialState,

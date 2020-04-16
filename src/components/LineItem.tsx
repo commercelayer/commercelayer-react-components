@@ -9,28 +9,30 @@ const displayName = components.LineItem.displayName
 
 export type LineItemProps = PropsType<typeof propTypes>
 
-const LineItem: FunctionComponent<LineItemProps> = props => {
+const LineItem: FunctionComponent<LineItemProps> = (props) => {
   const { type } = props
   const { lineItems } = useContext(LineItemContext)
-  const items = lineItems
-    .filter(l => l.itemType === type)
-    .map((lineItem, k) => {
-      const lineProps = {
-        lineItem
-      }
-      return (
-        <LineItemChildrenContext.Provider key={k} value={lineProps}>
-          {props.children}
-        </LineItemChildrenContext.Provider>
-      )
-    })
-  return <Fragment>{items}</Fragment>
+  const components =
+    lineItems &&
+    lineItems
+      .filter((l) => l.itemType === type)
+      .map((lineItem, k) => {
+        const lineProps = {
+          lineItem,
+        }
+        return (
+          <LineItemChildrenContext.Provider key={k} value={lineProps}>
+            {props.children}
+          </LineItemChildrenContext.Provider>
+        )
+      })
+  return <Fragment>{components}</Fragment>
 }
 
 LineItem.propTypes = propTypes
 LineItem.displayName = displayName
 LineItem.defaultProps = {
-  type: 'skus'
+  type: 'skus',
 }
 
 export default LineItem

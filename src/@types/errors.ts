@@ -70,7 +70,7 @@ const CEType: CodeErrorType[] = [
   'NOT_ACCEPTABLE',
   'UNSUPPORTED_MEDIA_TYPE',
   'LOCKED',
-  'INTERNAL_SERVER_ERROR'
+  'INTERNAL_SERVER_ERROR',
 ]
 
 export interface BaseError {
@@ -87,7 +87,7 @@ export const REType: ResourceErrorType[] = [
   'lineItem',
   'variant',
   'price',
-  'skuOption'
+  'skuOption',
 ]
 
 export const BaseErrorObject = PropTypes.exact({
@@ -95,19 +95,19 @@ export const BaseErrorObject = PropTypes.exact({
   message: PropTypes.string.isRequired,
   resourceKey: PropTypes.oneOf(REType),
   field: PropTypes.string,
-  id: PropTypes.string
+  id: PropTypes.string,
 })
 
 export const ErrorPropTypes = {
-  resourceKey: PropTypes.oneOf<ResourceErrorType>([
+  resource: PropTypes.oneOf<ResourceErrorType>([
     'order',
     'giftCard',
     'lineItem',
     'variant',
     'price',
-    'skuOption'
+    'skuOption',
   ]).isRequired,
   children: PropTypes.func,
   field: PropTypes.string,
-  messages: PropTypes.arrayOf(BaseErrorObject.isRequired)
+  messages: PropTypes.arrayOf(BaseErrorObject.isRequired),
 }

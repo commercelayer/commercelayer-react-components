@@ -3,8 +3,8 @@ import baseReducer from '../utils/baseReducer'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import CLayer, { SkuOptionCollection } from '@commercelayer/js-sdk'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
-import { BaseError } from '../components/Errors'
 import { BaseUnsetState } from '../@types/index'
+import { BaseError } from '../@types/errors'
 
 export interface SkuOptionsState {
   skuCode?: string
@@ -22,7 +22,7 @@ export interface GetSkuOptions {
   (params: GetSkuOptionsParams): void
 }
 
-export const getSkuOptions: GetSkuOptions = async params => {
+export const getSkuOptions: GetSkuOptions = async (params) => {
   const { skuCode, dispatch, config } = params
   try {
     const sku = await CLayer.Sku.withCredentials(config)
@@ -32,32 +32,34 @@ export const getSkuOptions: GetSkuOptions = async params => {
     dispatch({
       type: 'setSkuOptions',
       payload: {
-        skuOptions
-      }
+        skuOptions,
+      },
     })
   } catch (c) {
     const errors = getErrorsByCollection(c, 'skuOption')
     dispatch({
       type: 'setErrors',
       payload: {
-        errors
-      }
+        errors,
+      },
     })
   }
 }
 
-export const unsetSkuOptionsState: BaseUnsetState<SkuOptionsAction> = dispatch => {
+export const unsetSkuOptionsState: BaseUnsetState<SkuOptionsAction> = (
+  dispatch
+) => {
   dispatch({
     type: 'setSkuOptions',
     payload: {
-      skuOptions: []
-    }
+      skuOptions: [],
+    },
   })
   dispatch({
     type: 'setErrors',
     payload: {
-      errors: []
-    }
+      errors: [],
+    },
   })
 }
 
@@ -72,7 +74,7 @@ export interface SkuOptionsAction {
 
 export const skuOptionsInitialState: SkuOptionsState = {
   skuCode: '',
-  skuOptions: []
+  skuOptions: [],
 }
 
 const skuOptionsReducer = (

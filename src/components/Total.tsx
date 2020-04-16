@@ -7,7 +7,8 @@ const propTypes = components.Total.propTypes
 const defaultProps = components.Total.defaultProps
 const displayName = components.Total.displayName
 
-export type TotalProps = PropsType<typeof propTypes>
+export type TotalProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['span']
 
 const Total: FunctionComponent<TotalProps> = (props) => {
   return <BaseOrderPrice base="totalAmount" type="withTaxes" {...props} />

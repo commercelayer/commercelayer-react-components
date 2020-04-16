@@ -1,8 +1,8 @@
 export interface GetLocalOrderInterface {
-  (key: string): string
+  (key: string): string | null
 }
 
-export const getLocalOrder: GetLocalOrderInterface = key => {
+export const getLocalOrder: GetLocalOrderInterface = (key) => {
   return localStorage.getItem(key)
 }
 
