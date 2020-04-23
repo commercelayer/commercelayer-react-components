@@ -18,6 +18,7 @@ import { BaseInputComponentPropTypes } from '../@types/index'
 const components = {
   AddToCart: {
     displayName: 'AddToCart',
+    description: '',
     propTypes: {
       children: PropTypes.func,
       label: PropTypes.string,
@@ -30,6 +31,7 @@ const components = {
   },
   AvailabilityContainer: {
     displayName: 'AvailabilityContainer',
+    description: '',
     permittedChildren: ['AvailabilityTemplate', 'ReactNode'],
     propTypes: {
       children: childrenTypes.isRequired,
@@ -38,6 +40,7 @@ const components = {
   },
   AvailabilityTemplate: {
     displayName: 'AvailabilityTemplate',
+    description: '',
     propTypes: {
       timeFormat: PropTypes.oneOf<TimeFormat>(['days', 'hours']),
       showShippingMethodName: PropTypes.bool,
@@ -50,6 +53,7 @@ const components = {
   },
   Checkout: {
     displayName: 'Checkout',
+    description: '',
     propTypes: {
       children: PropTypes.func,
       label: PropTypes.string,
@@ -73,6 +77,7 @@ const components = {
   },
   Discount: {
     displayName: 'Discount',
+    description: '',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
       format: 'formatted' as BaseFormatPrice,
@@ -80,6 +85,7 @@ const components = {
   },
   Errors: {
     displayName: 'Errors',
+    description: '',
     propTypes: ErrorPropTypes,
     defaultProps: {
       messages: [],
@@ -96,6 +102,7 @@ const components = {
       'ReactNode',
     ],
     displayName: 'GiftCard',
+    description: '',
     propTypes: {
       children: childrenTypes.isRequired,
       metadata: PropTypes.objectOf(PropTypes.string),
@@ -109,12 +116,14 @@ const components = {
   GiftCardContainer: {
     permittedChildren: ['GiftCard', 'ReactNode'],
     displayName: 'GiftCardContainer',
+    description: '',
     propTypes: {
       children: childrenTypes.isRequired,
     },
   },
   GiftCardCurrencySelector: {
     displayName: 'GiftCardCurrencySelector',
+    description: '',
     propTypes: {
       children: PropTypes.func,
       placeholder: PropTypes.exact({
@@ -130,6 +139,7 @@ const components = {
   },
   GiftCardInput: {
     displayName: 'GiftCardInput',
+    description: '',
     propTypes: {
       type: PropTypes.oneOf<BaseInputType>([
         'text',
@@ -157,6 +167,7 @@ const components = {
   },
   GiftCardPrice: {
     displayName: 'GiftCardPrice',
+    description: '',
     propTypes: baseOrderComponentPricePropTypes,
   },
   ItemContainer: {
@@ -170,6 +181,7 @@ const components = {
       'ReactNode',
     ],
     displayName: 'ItemContainer',
+    description: '',
     propTypes: {
       children: childrenTypes.isRequired,
       skuCode: PropTypes.string,
@@ -187,6 +199,7 @@ const components = {
       'ReactNode',
     ],
     displayName: 'LineItem',
+    description: '',
     propTypes: {
       children: childrenTypes.isRequired,
       type: PropTypes.oneOf<LineItemType>([
@@ -203,6 +216,7 @@ const components = {
   },
   LineItemImage: {
     displayName: 'LineItemImage',
+    description: '',
     propTypes: {
       width: PropTypes.number,
       src: PropTypes.string,
@@ -211,12 +225,14 @@ const components = {
   },
   LineItemName: {
     displayName: 'LineItemName',
+    description: '',
     propTypes: {
       children: PropTypes.func,
     },
   },
   LineItemOption: {
     displayName: 'LineItemOption',
+    description: '',
     propTypes: {
       name: PropTypes.string.isRequired,
       children: PropTypes.func,
@@ -229,6 +245,7 @@ const components = {
   LineItemOptions: {
     permittedChildren: ['LineItemOption', 'ReactNode'],
     displayName: 'LineItemOptions',
+    description: '',
     propTypes: {
       name: PropTypes.string.isRequired,
       children: childrenTypes.isRequired,
@@ -240,6 +257,7 @@ const components = {
   },
   LineItemPrice: {
     displayName: 'LineItemPrice',
+    description: '',
     propTypes: {
       ...baseOrderComponentPricePropTypes,
       type: PropTypes.oneOf<BasePriceType>(['total', 'unit', 'option']),
@@ -251,6 +269,7 @@ const components = {
   },
   LineItemQuantity: {
     displayName: 'LineItemQuantity',
+    description: '',
     propTypes: {
       children: PropTypes.func,
       max: PropTypes.number,
@@ -262,6 +281,7 @@ const components = {
   },
   LineItemRemove: {
     displayName: 'LineItemRemove',
+    description: '',
     propTypes: {
       children: PropTypes.func,
       label: PropTypes.string,
@@ -273,6 +293,7 @@ const components = {
   LineItemsContainer: {
     permittedChildren: ['LineItemsCount', 'LineItem', 'ReactNode'],
     displayName: 'LineItemsContainer',
+    description: '',
     propTypes: {
       children: childrenTypes.isRequired,
       filters: PropTypes.object,
@@ -285,12 +306,14 @@ const components = {
   },
   LineItemsCount: {
     displayName: 'LineItemsCount',
+    description: '',
     propTypes: {
       children: PropTypes.func,
     },
   },
   MetadataInput: {
     displayName: 'MetadataInput',
+    description: '',
     propTypes: BaseInputComponentPropTypes,
   },
   OrderContainer: {
@@ -308,6 +331,7 @@ const components = {
       'ReactNode',
     ],
     displayName: 'OrderContainer',
+    description: '',
     propTypes: {
       children: childrenTypes.isRequired,
       persistKey: PropTypes.string.isRequired,
@@ -319,6 +343,7 @@ const components = {
   },
   Price: {
     displayName: 'Price',
+    description: '',
     propTypes: {
       children: PropTypes.func,
       compareClassName: PropTypes.string,
@@ -332,6 +357,7 @@ const components = {
   PriceContainer: {
     permittedChildren: ['Price', 'ReactNode'],
     displayName: 'PriceContainer',
+    description: '',
     propTypes: {
       children: childrenTypes.isRequired,
       skuCode: PropTypes.string,
@@ -348,6 +374,7 @@ const components = {
   },
   PriceTemplate: {
     displayName: 'PriceTemplate',
+    description: '',
     propTypes: {
       formattedAmount: PropTypes.string,
       formattedCompare: PropTypes.string,
@@ -359,6 +386,7 @@ const components = {
   },
   QuantitySelector: {
     displayName: 'QuantitySelector',
+    description: '',
     propTypes: {
       children: PropTypes.func,
       min: PropTypes.string,
@@ -372,11 +400,13 @@ const components = {
   },
   Shipping: {
     displayName: 'Shipping',
+    description: '',
     propTypes: baseOrderComponentPricePropTypes,
   },
   SkuOption: {
     permittedChildren: ['SkuOptionInput', 'ReactNode'],
     displayName: 'SkuOption',
+    description: '',
     propTypes: {
       children: childrenTypes.isRequired,
       name: PropTypes.string.isRequired,
@@ -384,11 +414,13 @@ const components = {
   },
   SkuOptionInput: {
     displayName: 'SkuOptionInput',
+    description: '',
     propTypes: BaseInputComponentPropTypes,
   },
   SkuOptionsContainer: {
     permittedChildren: ['SkuOption', 'ReactNode'],
     displayName: 'SkuOptionsContainer',
+    description: '',
     propTypes: {
       children: childrenTypes.isRequired,
       skuCode: PropTypes.string,
@@ -396,6 +428,7 @@ const components = {
   },
   SubmitButton: {
     displayName: 'SubmitButton',
+    description: '',
     propTypes: {
       children: PropTypes.func,
       label: PropTypes.string,
@@ -406,6 +439,7 @@ const components = {
   },
   SubTotal: {
     displayName: 'SubTotal',
+    description: '',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
       format: 'formatted' as BaseFormatPrice,
@@ -413,6 +447,7 @@ const components = {
   },
   Taxes: {
     displayName: 'Taxes',
+    description: '',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
       format: 'formatted' as BaseFormatPrice,
@@ -420,6 +455,7 @@ const components = {
   },
   Total: {
     displayName: 'Total',
+    description: '',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
       format: 'formatted' as BaseFormatPrice,
@@ -428,6 +464,7 @@ const components = {
   VariantContainer: {
     permittedChildren: ['VariantSelector', 'ReactNode'],
     displayName: 'VariantContainer',
+    description: '',
     propTypes: {
       children: childrenTypes.isRequired,
       skuCode: PropTypes.string,
@@ -440,6 +477,7 @@ const components = {
   },
   VariantSelector: {
     displayName: 'VariantSelector',
+    description: '',
     propTypes: {
       skuCodes: PropTypes.arrayOf(
         PropTypes.exact({
@@ -461,6 +499,7 @@ const components = {
   },
   VariantTemplate: {
     displayName: 'VariantTemplate',
+    description: '',
     propTypes: {
       variants: PropTypes.object.isRequired,
       onChange: PropTypes.func,

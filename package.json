@@ -3,13 +3,19 @@
   "version": "1.0.0",
   "description": "Commerce Layer React Components",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
   "scripts": {
     "test:cypress:open": "cypress open",
     "test:cypress:record": "cypress open --env RECORD=1",
     "test:cypress:clear": "cypress cache clear",
     "test:jest": "jest",
     "test:jest:watch": "jest --watch",
-    "build": "tsdx build",
+    "build": "tsdx build --tsconfig tsconfig.production.json",
     "dev": "next",
     "start": "next start"
   },
@@ -17,7 +23,13 @@
     "type": "git",
     "url": "git+https://github.com/commercelayer/commercelayer-react-components.git"
   },
-  "keywords": [],
+  "keywords": [
+    "reactjs",
+    "jamstack",
+    "headless",
+    "ecommerce",
+    "api"
+  ],
   "author": {
     "name": "Alessandro Casazza",
     "email": "alessandro@commercelayer.io"
@@ -29,8 +41,7 @@
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
     "@commercelayer/js-sdk": "^2.7.3",
-    "lodash": "^4.17.15",
-    "uni": "0.0.6"
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.8.3",
