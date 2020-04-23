@@ -17,7 +17,13 @@
     "test:jest:watch": "jest --watch",
     "build": "tsdx build --tsconfig tsconfig.production.json",
     "dev": "next",
-    "start": "next start"
+    "start": "next start",
+    "version:patch": "npm version patch",
+    "version:minor": "npm version minor",
+    "version:major": "npm version major",
+    "publish:patch": "npm run build && npm run version:patch && git push --follow-tags && npm publish --access public",
+    "publish:minor": "npm run build && npm run version:minor && git push --follow-tags && npm publish --access public",
+    "publish:major": "npm run build && npm run version:major && git push --follow-tags && npm publish --access public"
   },
   "repository": {
     "type": "git",
