@@ -1,10 +1,8 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
-import { Nav, Title, Type } from '.'
+import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
-import VariantContainer from '../src/components/VariantContainer'
-import VariantSelector from '../src/components/VariantSelector'
 import PriceContainer from '../src/components/PriceContainer'
 import Price from '../src/components/Price'
 import AddToCart from '../src/components/AddToCart'
@@ -30,31 +28,17 @@ import ItemContainer from '../src/components/ItemContainer'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
-const CustomAddToCart = props => {
-  const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
-  return (
-    <button
-      id="add-to-bag"
-      className={`${classes} ${props.className}`}
-      onClick={props.handleClick}
-      disabled={props.disabled}
-    >
-      Custom add to cart
-    </button>
-  )
-}
-
 export default function Order() {
   const [token, setToken] = useState('')
   useEffect(() => {
     const getToken = async () => {
-      const { accessToken } = await getSalesChannelToken({
+      const auth = await getSalesChannelToken({
         clientId:
           '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
         endpoint,
-        scope: 'market:48'
+        scope: 'market:48',
       })
-      setToken(accessToken)
+      setToken(auth?.accessToken as string)
     }
     getToken()
   }, [])
@@ -191,30 +175,28 @@ export default function Order() {
               </PriceContainer>
             </ItemContainer>
             <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
-            <p className="text-sm m-2">
-              Your shopping bag contains{' '}
-              <LineItemsCount id="items-count" className="font-bold" /> items
-            </p>
-            <div className="flex flex-col p-2">
-              <LineItemsContainer>
-                <LineItem type="skus">
-                  <div className="flex justify-around items-center border-b">
-                    <LineItemImage className="p-2" width={80} />
-                    <LineItemName id="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      id="line-item-quantity"
-                      max={10}
-                      className="p-2"
-                    />
-                    <LineItemPrice id="line-item-total" className="p-2" />
-                    <LineItemRemove
-                      id="line-item-remove"
-                      className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                    />
-                  </div>
-                </LineItem>
-              </LineItemsContainer>
-            </div>
+            <LineItemsContainer>
+              <p className="text-sm m-2">
+                Your shopping bag contains{' '}
+                <LineItemsCount id="items-count" className="font-bold" /> items
+              </p>
+              <LineItem type="skus">
+                <div className="flex justify-around items-center border-b">
+                  <LineItemImage className="p-2" width={80} />
+                  <LineItemName id="line-item-name" className="p-2" />
+                  <LineItemQuantity
+                    id="line-item-quantity"
+                    max={10}
+                    className="p-2"
+                  />
+                  <LineItemPrice id="line-item-total" className="p-2" />
+                  <LineItemRemove
+                    id="line-item-remove"
+                    className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  />
+                </div>
+              </LineItem>
+            </LineItemsContainer>
             <div className="flex flex-col w-1/2 m-auto">
               <div className="flex items-center p-2 justify-around font-medium text-left">
                 <div className="w-full">

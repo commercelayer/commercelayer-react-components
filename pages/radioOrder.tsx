@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import { getSalesChannelToken } from '@commercelayer/js-auth'
+import { getIntegrationToken } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
@@ -23,18 +23,26 @@ import Total from '../src/components/Total'
 import Discount from '../src/components/Discount'
 import Shipping from '../src/components/Shipping'
 import Taxes from '../src/components/Taxes'
-import GiftCard from '../src/components/GiftCardPrice'
+import GiftCardPrice from '../src/components/GiftCardPrice'
+import AvailabilityContainer from '../src/components/AvailabilityContainer'
+import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 import ItemContainer from '../src/components/ItemContainer'
+import Errors from '../src/components/Errors'
+import LineItemOptions from '../src/components/LineItemOptions'
+import LineItemOption from '../src/components/LineItemOption'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
 const CustomAddToCart = (props) => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
+  const myClick = () => {
+    props.handleClick()
+  }
   return (
     <button
       id="add-to-bag"
       className={`${classes} ${props.className}`}
-      onClick={props.handleClick}
+      onClick={myClick}
       disabled={props.disabled}
     >
       Custom add to cart
@@ -46,19 +54,28 @@ export default function Order() {
   const [token, setToken] = useState('')
   useEffect(() => {
     const getToken = async () => {
-      const auth = await getSalesChannelToken({
+      // @ts-ignore
+      // const { accessToken } = await getSalesChannelToken({
+      //   clientId:
+      //     '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
+      //   endpoint,
+      //   scope: 'market:48'
+      // })
+      const token = await getIntegrationToken({
         clientId:
-          '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
+          'b1aa32826ce12ba2f74c59a555e3ed98a7db4ec710b14575b7e97f0a49fb9a4d',
+        clientSecret:
+          '8fed019759490ba13c482cc2541ef77c6b8d0b3df04db80807110784fbfec021',
         endpoint,
         scope: 'market:48',
       })
-      setToken(auth?.accessToken as string)
+      if (token) setToken(token.accessToken)
     }
     getToken()
   }, [])
   return (
     <Fragment>
-      <Nav links={['/']} />
+      <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer persistKey="orderUS">
@@ -72,20 +89,20 @@ export default function Order() {
                 </div>
                 <div className="mt-4 md:mt-0 md:ml-6">
                   <h1 className="text-4xl">Tutina da Bambino</h1>
+                  <div className="w-auto m-2">
+                    <PriceContainer skuCode="BABYONBU000000E63E746MXX">
+                      <Price
+                        className="text-green-600 text-2xl m-1"
+                        compareClassName="text-gray-500 text-2xl m-1 line-through"
+                      />
+                    </PriceContainer>
+                  </div>
                   <VariantContainer>
-                    <div className="w-auto m-2">
-                      <PriceContainer skuCode="BABYONBU000000E63E746MXX">
-                        <Price
-                          className="text-green-600 text-2xl m-1"
-                          compareClassName="text-gray-500 text-2xl m-1 line-through"
-                        />
-                      </PriceContainer>
-                    </div>
                     <div className="m-2">
                       <VariantSelector
                         type="radio"
                         id="variant-selector"
-                        className="mx-2"
+                        className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         name="variant1"
                         skuCodes={[
                           {
@@ -103,36 +120,71 @@ export default function Order() {
                         ]}
                       />
                     </div>
-                    <div className="m-2">
-                      <QuantitySelector
-                        id="quantity-selector"
-                        className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                      />
-                    </div>
-                    <div className="m-2">
-                      <AddToCart className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                        {CustomAddToCart}
-                      </AddToCart>
-                    </div>
                   </VariantContainer>
+                  <div className="m-2">
+                    <QuantitySelector
+                      max="12"
+                      id="quantity-selector"
+                      className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    />
+                  </div>
+                  <div className="m-2">
+                    <AddToCart className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                      {CustomAddToCart}
+                    </AddToCart>
+                  </div>
+                  <div className="m-2">
+                    <AvailabilityContainer>
+                      <AvailabilityTemplate showShippingMethodName />
+                    </AvailabilityContainer>
+                  </div>
                 </div>
               </div>
             </ItemContainer>
             <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
-            <p className="text-sm m-2">
-              Your shopping bag contains{' '}
-              <LineItemsCount id="items-count" className="font-bold" /> items
-            </p>
-            <div className="flex flex-col p-2">
-              <LineItemsContainer>
-                <LineItem type="skus">
-                  <div className="flex justify-around items-center border-b">
+            <LineItemsContainer>
+              <p className="text-sm m-2">
+                Your shopping bag contains{' '}
+                <LineItemsCount id="items-count" className="font-bold" /> items
+              </p>
+              <div className="flex flex-col p-2">
+                <LineItem>
+                  <div className="flex justify-around items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
+                    <div>
+                      <LineItemOptions name="Embossing" className="font-bold">
+                        <div className="flex flex-col justify-between text-sm">
+                          <LineItemOption
+                            keyClassName="font-medium capitalize underline"
+                            name="message"
+                          />
+                          <LineItemOption
+                            name="size"
+                            keyClassName="font-medium capitalize underline"
+                          />
+                        </div>
+                      </LineItemOptions>
+                    </div>
+                    <div>
+                      <LineItemOptions name="Color" className="font-bold">
+                        <div className="flex flex-col justify-between text-sm">
+                          <LineItemOption
+                            name="back"
+                            keyClassName="font-medium capitalize underline"
+                          />
+                        </div>
+                      </LineItemOptions>
+                    </div>
                     <LineItemQuantity
                       id="line-item-quantity"
-                      max={10}
+                      max={100}
                       className="p-2"
+                    />
+                    <Errors
+                      className="text-red-700 p-2"
+                      resource="lineItem"
+                      field="quantity"
                     />
                     <LineItemPrice id="line-item-total" className="p-2" />
                     <LineItemRemove
@@ -141,8 +193,29 @@ export default function Order() {
                     />
                   </div>
                 </LineItem>
-              </LineItemsContainer>
-            </div>
+                <LineItem type="gift_cards">
+                  <div className="flex justify-between items-center border-b p-5">
+                    <LineItemImage
+                      className="p-2"
+                      width={40}
+                      src="//contentful-gatsby-demo-it.netlify.com/icons/icon-48x48.png?v=c6e799c5132154cb5f3634994be3f8aa"
+                    />
+                    <LineItemName id="line-item-name" className="p-2" />
+                    <LineItemQuantity
+                      id="line-item-quantity"
+                      max={10}
+                      className="p-2"
+                      disabled
+                    />
+                    <LineItemPrice id="line-item-total" className="p-2" />
+                    <LineItemRemove
+                      id="line-item-remove"
+                      className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    />
+                  </div>
+                </LineItem>
+              </div>
+            </LineItemsContainer>
             <div className="flex flex-col w-1/2 m-auto">
               <div className="flex items-center p-2 justify-around font-medium text-left">
                 <div className="w-full">
@@ -183,7 +256,7 @@ export default function Order() {
                   <p className="text-lg">Gift card </p>
                 </div>
                 <div className="text-right">
-                  <GiftCard />
+                  <GiftCardPrice />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around font-bold text-left">
@@ -196,7 +269,10 @@ export default function Order() {
               </div>
             </div>
             <div className="flex justify-center p-2">
-              <Checkout className="mt-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded" />
+              <Checkout
+                className="mt-2 primary font-bold py-2 px-4 rounded"
+                label="Checkout"
+              />
             </div>
           </OrderContainer>
         </div>
