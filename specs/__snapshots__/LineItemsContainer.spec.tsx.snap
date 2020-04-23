@@ -1,7 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<LineItemsContainer check children /> 1`] = `"Loading..."`;
+exports[`<LineItemsContainer check children /> 1`] = `null`;
 
-exports[`<LineItemsContainer proptypes required /> 1`] = `"Loading..."`;
+exports[`<LineItemsContainer proptypes required /> 1`] = `null`;
 
-exports[`<LineItemsContainer/> 1`] = `"Loading..."`;
+exports[`<LineItemsContainer/> 1`] = `
+<div>
+  test
+</div>
+`;

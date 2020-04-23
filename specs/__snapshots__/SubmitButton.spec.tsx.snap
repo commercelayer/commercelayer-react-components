@@ -10,7 +10,7 @@ exports[`<SubmitButton with props /> 1`] = `
 <button
   type="submit"
 >
-  submit
+  Submit
 </button>
 `;
 
@@ -18,6 +18,6 @@ exports[`<SubmitButton/> 1`] = `
 <button
   type="submit"
 >
-  submit
+  Submit
 </button>
 `;
