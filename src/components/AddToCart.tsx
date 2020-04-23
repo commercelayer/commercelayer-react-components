@@ -14,7 +14,7 @@ const displayName = components.AddToCart.displayName
 export type AddToCartProps = InferProps<typeof propTypes> &
   JSX.IntrinsicElements['button']
 
-const AddToCart: FunctionComponent<AddToCartProps> = props => {
+const AddToCart: FunctionComponent<AddToCartProps> = (props) => {
   const { label, children, skuCode, disabled, ...p } = props
   const { addToCart } = useContext(OrderContext)
   const { item, items, quantity, option } = useContext(ItemContext)
@@ -30,15 +30,15 @@ const AddToCart: FunctionComponent<AddToCartProps> = props => {
         skuCode: sCode,
         skuId: item[sCode]?.id,
         quantity: qty,
-        option: opt
+        option: opt,
       })
   }
   const autoDisabled = disabled || !sCode
   const parentProps = {
     handleClick,
-    disabled,
+    disabled: disabled || autoDisabled,
     label,
-    ...props
+    ...props,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>

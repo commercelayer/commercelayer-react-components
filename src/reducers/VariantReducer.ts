@@ -71,6 +71,7 @@ export const setSkuCode: SetSkuCodeVariant = (params) => {
   const { id, code, config, setItem, dispatch } = params
   if (id) {
     CLayer.Sku.withCredentials(config)
+      .includes('skuOptions')
       .find(id)
       .then((s) => {
         setItem &&

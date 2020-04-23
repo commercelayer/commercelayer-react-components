@@ -7,7 +7,6 @@ import React, {
 import SkuOptionsContext from '../context/SkuOptionsContext'
 import skuOptionsReducer, {
   skuOptionsInitialState,
-  unsetSkuOptionsState,
 } from '../reducers/SkuOptionsReducer'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import _ from 'lodash'
@@ -38,14 +37,12 @@ const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = (
       : skuCode || getCurrentItemKey(item)
   const skuOptionsValue = { ...state, skuCode: sCode }
   useEffect(() => {
-    if (sCode) {
+    if (sCode && item[sCode].skuOptions) {
       getSkuOptions({
-        skuCode: sCode,
+        skuOptions: item[sCode].skuOptions().toArray(),
         dispatch,
-        config,
       })
     }
-    return (): void => unsetSkuOptionsState(dispatch)
   }, [config, sCode])
   return (
     <SkuOptionsContext.Provider value={skuOptionsValue}>
