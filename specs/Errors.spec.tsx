@@ -7,7 +7,7 @@ const propTypes = components.Errors.propTypes
 
 test('<Errors/>', () => {
   expect.assertions(5)
-  const component = renderer.create(<Errors resourceKey="order" />)
+  const component = renderer.create(<Errors resource="order" />)
   const tree = component.toJSON()
   const root = component.toTree()
   const proptypes = root.type['propTypes']
@@ -15,7 +15,7 @@ test('<Errors/>', () => {
   expect(proptypes.children).toBe(propTypes.children)
   expect(proptypes.messages).toBe(propTypes.messages)
   expect(proptypes.field).toBe(propTypes.field)
-  expect(proptypes.resourceKey).toBe(propTypes.resourceKey)
+  expect(proptypes.resource).toBe(propTypes.resource)
 })
 
 test('<Errors proptypes required />', () => {
@@ -26,7 +26,7 @@ test('<Errors proptypes required />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][0]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: The prop `resourceKey` is marked as required in `CLErrors`, but its value is `undefined`'
+      'Warning: Failed prop type: The prop `resource` is marked as required in `Errors`, but its value is `undefined`'
     )
   )
 })
@@ -35,21 +35,21 @@ test('<Errors proptypes validation />', () => {
   expect.assertions(2)
   console.error = jest.fn()
   // @ts-ignore
-  const component = renderer.create(<Errors resourceKey="test" />)
+  const component = renderer.create(<Errors resource="test" />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][0]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: Invalid prop `resourceKey` of value `test` supplied to `CLErrors`, expected one of ["order","giftCard","lineItem","variant","price","skuOption"]'
+      'Warning: Failed prop type: Invalid prop `resource` of value `test` supplied to `Errors`, expected one of ["order","giftCard","lineItem","variant","price","skuOption"]'
     )
   )
 })
 
 test('<Errors with custom children />', () => {
   expect.assertions(5)
-  const CustomComponent = props => <span>{props.label}</span>
+  const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
-    <Errors resourceKey="lineItem" field="quantity">
+    <Errors resource="lineItem" field="quantity">
       {CustomComponent}
     </Errors>
   )
@@ -63,8 +63,8 @@ test('<Errors with custom children />', () => {
   expect(parentRendered.type).toBe(CustomComponent)
   expect(parentRendered.props).toEqual({
     messages: [],
-    resourceKey: 'lineItem',
+    resource: 'lineItem',
     field: 'quantity',
-    children: CustomComponent
+    children: CustomComponent,
   })
 })

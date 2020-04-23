@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
-import { Nav, Title, Type } from '.'
+import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
 import VariantContainer from '../src/components/VariantContainer'
 import VariantSelector from '../src/components/VariantSelector'
@@ -28,7 +28,7 @@ import ItemContainer from '../src/components/ItemContainer'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
-const CustomAddToCart = props => {
+const CustomAddToCart = (props) => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
   return (
     <button
@@ -46,13 +46,13 @@ export default function Order() {
   const [token, setToken] = useState('')
   useEffect(() => {
     const getToken = async () => {
-      const { accessToken } = await getSalesChannelToken({
+      const auth = await getSalesChannelToken({
         clientId:
           '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
         endpoint,
-        scope: 'market:48'
+        scope: 'market:48',
       })
-      setToken(accessToken)
+      setToken(auth?.accessToken as string)
     }
     getToken()
   }, [])
@@ -90,16 +90,16 @@ export default function Order() {
                         skuCodes={[
                           {
                             label: '6 months',
-                            code: 'BABYONBU000000E63E746MXX'
+                            code: 'BABYONBU000000E63E746MXX',
                           },
                           {
                             label: '12 months',
-                            code: 'BABYONBU000000E63E7412MX'
+                            code: 'BABYONBU000000E63E7412MX',
                           },
                           {
                             label: '24 months',
-                            code: 'BABYONBU000000E63E746MXXFAKE'
-                          }
+                            code: 'BABYONBU000000E63E746MXXFAKE',
+                          },
                         ]}
                       />
                     </div>

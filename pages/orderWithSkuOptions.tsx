@@ -28,6 +28,9 @@ import AvailabilityContainer from '../src/components/AvailabilityContainer'
 import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 import ItemContainer from '../src/components/ItemContainer'
 import Errors from '../src/components/Errors'
+import SkuOptionsContainer from '../src/components/SkuOptionsContainer'
+import SkuOption from '../src/components/SkuOption'
+import SkuOptionInput from '../src/components/SkuOptionInput'
 import LineItemOptions from '../src/components/LineItemOptions'
 import LineItemOption from '../src/components/LineItemOption'
 
@@ -120,6 +123,32 @@ export default function Order() {
                       />
                     </div>
                   </VariantContainer>
+                  <div className="m-2">
+                    <SkuOptionsContainer>
+                      <SkuOption name="Embossing">
+                        <SkuOptionInput
+                          name="message"
+                          type="text"
+                          className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                          placeholder="Message"
+                        />
+                        <SkuOptionInput
+                          name="size"
+                          type="text"
+                          className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                          placeholder="Text size"
+                        />
+                      </SkuOption>
+                      <SkuOption name="Color">
+                        <SkuOptionInput
+                          name="back"
+                          type="text"
+                          className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                          placeholder="Back color"
+                        />
+                      </SkuOption>
+                    </SkuOptionsContainer>
+                  </div>
                   <div className="m-2">
                     <QuantitySelector
                       max="12"

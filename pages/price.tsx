@@ -12,6 +12,7 @@ const Home = () => {
   const [token, setToken] = useState('')
   useEffect(() => {
     const getToken = async () => {
+      // @ts-ignore
       const { accessToken } = await getSalesChannelToken({
         clientId:
           '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',

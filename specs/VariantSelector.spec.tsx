@@ -45,7 +45,7 @@ test('<VariantSelector check children />', () => {
   const tree = component.toJSON()
   const root = component.toTree()
   expect(tree).toMatchSnapshot()
-  expect(root.props.placeholder).toStrictEqual('select variant')
+  expect(root.props.placeholder).toStrictEqual('select an variant')
   expect(root.props.type).toStrictEqual('select')
 })
 
