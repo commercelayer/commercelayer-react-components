@@ -11,15 +11,17 @@ export type LineItemNameProps = PropsType<typeof propTypes> &
   JSX.IntrinsicElements['p']
 
 const LineItemName: FunctionComponent<LineItemNameProps> = (props) => {
+  const { label } = props
   const { lineItem } = useContext(LineItemChildrenContext)
+  const labelName = label || lineItem['name']
   const parentProps = {
-    name: lineItem['name'],
+    label: labelName,
     ...props,
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <p {...props}>{lineItem['name']}</p>
+    <p {...props}>{labelName}</p>
   )
 }
 
