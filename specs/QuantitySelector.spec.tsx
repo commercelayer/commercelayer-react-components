@@ -2,7 +2,6 @@ import React from 'react'
 import { QuantitySelector } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
-import BaseInput from '../src/components/utils/BaseInput'
 import Parent from '../src/components/utils/Parent'
 
 const propTypes = components.QuantitySelector.propTypes
@@ -21,6 +20,7 @@ test('<QuantitySelector/>', () => {
   expect(proptypes.max).toBe(propTypes.max)
   expect(proptypes.value).toBe(propTypes.value)
   expect(proptypes.skuCode).toBe(propTypes.skuCode)
+  expect(proptypes.disabled).toBe(propTypes.disabled)
 })
 
 test('<QuantitySelector check children type textarea />', () => {
