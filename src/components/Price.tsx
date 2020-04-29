@@ -50,14 +50,16 @@ const Price: FunctionComponent<PPropsType> = (props) => {
     loader,
     ...props,
   }
-  const pricesComponent = getPricesComponent(skuPrices, props)
+  const pricesComponent =
+    _.isEmpty(prices) || _.isEmpty(skuPrices)
+      ? null
+      : getPricesComponent(skuPrices, props)
+  console.log('pricesComponent', pricesComponent)
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <Fragment>
-      {loading || _.isEmpty(prices) || _.isEmpty(skuPrices)
-        ? loader
-        : pricesComponent}
+      {loading || _.isEmpty(pricesComponent) ? loader : pricesComponent}
     </Fragment>
   )
 }
