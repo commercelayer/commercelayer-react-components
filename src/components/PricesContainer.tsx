@@ -12,19 +12,19 @@ import priceReducer, {
   unsetPriceState,
 } from '../reducers/PriceReducer'
 import { priceInitialState, getSkusPrice } from '../reducers/PriceReducer'
-import PriceContext, { PriceContextValue } from '../context/PriceContext'
+import PricesContext, { PricesContextValue } from '../context/PricesContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
 import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
-const propTypes = components.PriceContainer.propTypes
-const defaultProps = components.PriceContainer.defaultProps
-const displayName = components.PriceContainer.displayName
+const propTypes = components.PricesContainer.propTypes
+const defaultProps = components.PricesContainer.defaultProps
+const displayName = components.PricesContainer.displayName
 
 export type PCProps = PropsType<typeof propTypes>
 
-const PriceContainer: FunctionComponent<PCProps> = (props) => {
+const PricesContainer: FunctionComponent<PCProps> = (props) => {
   const { children, skuCode, loader, perPage, filters } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
@@ -75,19 +75,21 @@ const PriceContainer: FunctionComponent<PCProps> = (props) => {
       }
     }
   }, [config.accessToken, currentItem])
-  const priceValue: PriceContextValue = {
+  const priceValue: PricesContextValue = {
     ...state,
     skuCode: sCode,
     loader: loader || 'Loading...',
     setSkuCodes,
   }
   return (
-    <PriceContext.Provider value={priceValue}>{children}</PriceContext.Provider>
+    <PricesContext.Provider value={priceValue}>
+      {children}
+    </PricesContext.Provider>
   )
 }
 
-PriceContainer.propTypes = propTypes
-PriceContainer.defaultProps = defaultProps
-PriceContainer.displayName = displayName
+PricesContainer.propTypes = propTypes
+PricesContainer.defaultProps = defaultProps
+PricesContainer.displayName = displayName
 
-export default PriceContainer
+export default PricesContainer

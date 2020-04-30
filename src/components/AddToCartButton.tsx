@@ -7,14 +7,14 @@ import getCurrentItemKey from '../utils/getCurrentItemKey'
 import { InferProps } from 'prop-types'
 import components from '../config/components'
 
-const propTypes = components.AddToCart.propTypes
-const defaultProps = components.AddToCart.defaultProps
-const displayName = components.AddToCart.displayName
+const propTypes = components.AddToCartButton.propTypes
+const defaultProps = components.AddToCartButton.defaultProps
+const displayName = components.AddToCartButton.displayName
 
-export type AddToCartProps = InferProps<typeof propTypes> &
+export type AddToCartButtonProps = InferProps<typeof propTypes> &
   JSX.IntrinsicElements['button']
 
-const AddToCart: FunctionComponent<AddToCartProps> = (props) => {
+const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
   const { label, children, skuCode, disabled, ...p } = props
   const { addToCart } = useContext(OrderContext)
   const { item, items, quantity, option, prices } = useContext(ItemContext)
@@ -49,8 +49,8 @@ const AddToCart: FunctionComponent<AddToCartProps> = (props) => {
   )
 }
 
-AddToCart.propTypes = propTypes
-AddToCart.defaultProps = defaultProps
-AddToCart.displayName = displayName
+AddToCartButton.propTypes = propTypes
+AddToCartButton.defaultProps = defaultProps
+AddToCartButton.displayName = displayName
 
-export default AddToCart
+export default AddToCartButton

@@ -4,20 +4,20 @@ import components from '../config/components'
 import { InferProps } from 'prop-types'
 import Parent from './utils/Parent'
 
-const propTypes = components.Checkout.propTypes
-const defaultProps = components.Checkout.defaultProps
-const displayName = components.Checkout.displayName
+const propTypes = components.CheckoutLink.propTypes
+const defaultProps = components.CheckoutLink.defaultProps
+const displayName = components.CheckoutLink.displayName
 
-export type CheckoutProps = InferProps<typeof propTypes> &
+export type CheckoutLinkProps = InferProps<typeof propTypes> &
   JSX.IntrinsicElements['a']
 
-const Checkout: FunctionComponent<CheckoutProps> = props => {
+const CheckoutLink: FunctionComponent<CheckoutLinkProps> = (props) => {
   const { label, children, ...p } = props
   const { order } = useContext(OrderContext)
   const parentProps = {
     checkoutUrl: order?.checkoutUrl,
     label,
-    ...p
+    ...p,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -32,8 +32,8 @@ const Checkout: FunctionComponent<CheckoutProps> = props => {
   )
 }
 
-Checkout.propTypes = propTypes
-Checkout.defaultProps = defaultProps
-Checkout.displayName = displayName
+CheckoutLink.propTypes = propTypes
+CheckoutLink.defaultProps = defaultProps
+CheckoutLink.displayName = displayName
 
-export default Checkout
+export default CheckoutLink

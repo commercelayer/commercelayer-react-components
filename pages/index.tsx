@@ -4,7 +4,7 @@ import {
 } from '@commercelayer/js-auth'
 import React, { useEffect, useState } from 'react'
 import Price from '../src/components/Price'
-import PriceContainer from '../src/components/PriceContainer'
+import PriceContainer from '../src/components/PricesContainer'
 import CommerceLayer from '../src/components/CommerceLayer'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'

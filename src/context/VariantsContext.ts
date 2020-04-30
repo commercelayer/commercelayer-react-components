@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 import { variantInitialState } from '../reducers/VariantReducer'
 
-const VariantContext = createContext(variantInitialState)
+const VariantsContext = createContext(variantInitialState)
 
-export default VariantContext
+export default VariantsContext

@@ -11,7 +11,7 @@ import variantReducer, {
   getVariants,
 } from '../reducers/VariantReducer'
 import CommerceLayerContext from '../context/CommerceLayerContext'
-import VariantContext from '../context/VariantContext'
+import VariantsContext from '../context/VariantsContext'
 import { VariantState } from '../reducers/VariantReducer'
 import { setVariantSkuCodes } from '../reducers/VariantReducer'
 import _ from 'lodash'
@@ -20,13 +20,15 @@ import ItemContext from '../context/ItemContext'
 import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
-const propTypes = components.VariantContainer.propTypes
-const defaultProps = components.VariantContainer.defaultProps
-const displayName = components.VariantContainer.displayName
+const propTypes = components.VariantsContainer.propTypes
+const defaultProps = components.VariantsContainer.defaultProps
+const displayName = components.VariantsContainer.displayName
 
-export type VariantContainerProps = PropsType<typeof propTypes>
+export type VariantsContainerProps = PropsType<typeof propTypes>
 
-const VariantContainer: FunctionComponent<VariantContainerProps> = (props) => {
+const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
+  props
+) => {
   const { children, skuCode, filters } = props
   const config = useContext(CommerceLayerContext)
   const { setItem, setItems, items, item: currentItem } = useContext(
@@ -65,14 +67,14 @@ const VariantContainer: FunctionComponent<VariantContainerProps> = (props) => {
     setSkuCodes: (skuCodes) => setVariantSkuCodes(skuCodes, dispatch),
   }
   return (
-    <VariantContext.Provider value={variantValue}>
+    <VariantsContext.Provider value={variantValue}>
       {children}
-    </VariantContext.Provider>
+    </VariantsContext.Provider>
   )
 }
 
-VariantContainer.propTypes = propTypes
-VariantContainer.defaultProps = defaultProps
-VariantContainer.displayName = displayName
+VariantsContainer.propTypes = propTypes
+VariantsContainer.defaultProps = defaultProps
+VariantsContainer.displayName = displayName
 
-export default VariantContainer
+export default VariantsContainer

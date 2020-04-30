@@ -3,17 +3,17 @@ import BaseOrderPrice from './utils/BaseOrderPrice'
 import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
-const propTypes = components.Shipping.propTypes
-const displayName = components.Shipping.displayName
+const propTypes = components.ShippingAmount.propTypes
+const displayName = components.ShippingAmount.displayName
 
 export type ShippingProps = PropsType<typeof propTypes> &
   JSX.IntrinsicElements['span']
 
-const Shipping: FunctionComponent<ShippingProps> = (props) => {
+const ShippingAmount: FunctionComponent<ShippingProps> = (props) => {
   return <BaseOrderPrice base="amount" type="shipping" {...props} />
 }
 
-Shipping.propTypes = propTypes
-Shipping.displayName = displayName
+ShippingAmount.propTypes = propTypes
+ShippingAmount.displayName = displayName
 
-export default Shipping
+export default ShippingAmount

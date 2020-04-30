@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import _ from 'lodash'
 import Parent from './utils/Parent'
-import PriceContext from '../context/PriceContext'
+import PricesContext from '../context/PricesContext'
 import { getPricesComponent } from '../utils/getPrices'
 import { PriceCollection } from '@commercelayer/js-sdk'
 import { PropsType } from '../utils/PropsType'
@@ -29,7 +29,7 @@ const Price: FunctionComponent<PPropsType> = (props) => {
     skuCodes,
     setSkuCodes,
     loader,
-  } = useContext(PriceContext)
+  } = useContext(PricesContext)
   const [skuPrices, setSkuPrices] = useState<PriceCollection[]>([])
   const sCode = skuCode || (props.skuCode as string)
   useEffect(() => {

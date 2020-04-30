@@ -16,8 +16,8 @@ import { ErrorPropTypes } from '../@types/errors'
 import { BaseInputComponentPropTypes } from '../@types/index'
 
 const components = {
-  AddToCart: {
-    displayName: 'AddToCart',
+  AddToCartButton: {
+    displayName: 'AddToCartButton',
     description: '',
     propTypes: {
       children: PropTypes.func,
@@ -51,8 +51,8 @@ const components = {
       showShippingMethodName: false,
     },
   },
-  Checkout: {
-    displayName: 'Checkout',
+  CheckoutLink: {
+    displayName: 'CheckoutLink',
     description: '',
     propTypes: {
       children: PropTypes.func,
@@ -65,7 +65,7 @@ const components = {
   CommerceLayer: {
     permittedChildren: [
       'OrderContainer',
-      'PriceContainer',
+      'PricesContainer',
       'GiftCardContainer',
       'ReactNode',
     ],
@@ -169,18 +169,18 @@ const components = {
       placeholder: PropTypes.string,
     },
   },
-  GiftCardPrice: {
-    displayName: 'GiftCardPrice',
+  GiftCardAmount: {
+    displayName: 'GiftCardAmount',
     description: '',
     propTypes: baseOrderComponentPricePropTypes,
   },
   ItemContainer: {
     permittedChildren: [
-      'PriceContainer',
-      'VariantContainer',
+      'PricesContainer',
+      'VariantsContainer',
       'SkuOptionContainer',
       'QuantitySelector',
-      'AddToCart',
+      'AddToCartButton',
       'AvailabilityContainer',
       'ReactNode',
     ],
@@ -329,13 +329,13 @@ const components = {
     permittedChildren: [
       'ItemContainer',
       'LineItemsContainer',
-      'SubTotal',
+      'SubTotalAmount',
       'Discount',
-      'Shipping',
-      'Taxes',
-      'GiftCardPrice',
-      'Total',
-      'Checkout',
+      'ShippingAmount',
+      'TaxesAmount',
+      'GiftCardAmount',
+      'TotalAmount',
+      'CheckoutLink',
       'GiftCardContainer',
       'ReactNode',
     ],
@@ -363,9 +363,9 @@ const components = {
       skuCode: '',
     },
   },
-  PriceContainer: {
+  PricesContainer: {
     permittedChildren: ['Price', 'ReactNode'],
-    displayName: 'PriceContainer',
+    displayName: 'PricesContainer',
     description: '',
     propTypes: {
       children: childrenTypes.isRequired,
@@ -408,8 +408,8 @@ const components = {
       min: '1',
     },
   },
-  Shipping: {
-    displayName: 'Shipping',
+  ShippingAmount: {
+    displayName: 'ShippingAmount',
     description: '',
     propTypes: baseOrderComponentPricePropTypes,
   },
@@ -447,33 +447,33 @@ const components = {
       label: 'Submit',
     },
   },
-  SubTotal: {
-    displayName: 'SubTotal',
+  SubTotalAmount: {
+    displayName: 'SubTotalAmount',
     description: '',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
       format: 'formatted' as BaseFormatPrice,
     },
   },
-  Taxes: {
-    displayName: 'Taxes',
+  TaxesAmount: {
+    displayName: 'TaxesAmount',
     description: '',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
       format: 'formatted' as BaseFormatPrice,
     },
   },
-  Total: {
-    displayName: 'Total',
+  TotalAmount: {
+    displayName: 'TotalAmount',
     description: '',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
       format: 'formatted' as BaseFormatPrice,
     },
   },
-  VariantContainer: {
+  VariantsContainer: {
     permittedChildren: ['VariantSelector', 'ReactNode'],
-    displayName: 'VariantContainer',
+    displayName: 'VariantsContainer',
     description: '',
     propTypes: {
       children: childrenTypes.isRequired,

@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import VariantTemplate from './VariantTemplate'
 import Parent from './utils/Parent'
-import VariantContext from '../context/VariantContext'
+import VariantsContext from '../context/VariantsContext'
 import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
@@ -32,7 +32,7 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = (props) => {
     loading,
     variants,
     setSkuCodes,
-  } = useContext(VariantContext)
+  } = useContext(VariantsContext)
   useEffect(() => {
     setSkuCodes && setSkuCodes(skuCodes)
     return (): void => {

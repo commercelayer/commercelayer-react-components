@@ -1,16 +1,16 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import {
   getSalesChannelToken,
-  getIntegrationToken
+  getIntegrationToken,
 } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav, Title, Type } from '.'
 import OrderContainer from '../src/components/OrderContainer'
-import VariantContainer from '../src/components/VariantContainer'
+import VariantContainer from '../src/components/VariantsContainer'
 import VariantSelector from '../src/components/VariantSelector'
-import PriceContainer from '../src/components/PriceContainer'
+import PriceContainer from '../src/components/PricesContainer'
 import Price from '../src/components/Price'
-import AddToCart from '../src/components/AddToCart'
+import AddToCart from '../src/components/AddToCartButton'
 import LineItemsContainer from '../src/components/LineItemsContainer'
 import LineItem from '../src/components/LineItem'
 import LineItemImage from '../src/components/LineItemImage'
@@ -18,21 +18,21 @@ import LineItemName from '../src/components/LineItemName'
 import LineItemQuantity from '../src/components/LineItemQuantity'
 import LineItemPrice from '../src/components/LineItemPrice'
 import LineItemRemove from '../src/components/LineItemRemove'
-import Checkout from '../src/components/Checkout'
-import SubTotal from '../src/components/SubTotal'
+import Checkout from '../src/components/CheckoutLink'
+import SubTotal from '../src/components/SubTotalAmount'
 import QuantitySelector from '../src/components/QuantitySelector'
 import LineItemsCount from '../src/components/LineItemsCount'
-import Total from '../src/components/Total'
+import Total from '../src/components/TotalAmount'
 import Discount from '../src/components/Discount'
-import Shipping from '../src/components/Shipping'
-import Taxes from '../src/components/Taxes'
-import GiftCard from '../src/components/GiftCardPrice'
+import Shipping from '../src/components/ShippingAmount'
+import Taxes from '../src/components/TaxesAmount'
+import GiftCard from '../src/components/GiftCardAmount'
 import ItemContainer from '../src/components/ItemContainer'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 const endpoint1 = 'https://the-lime-brand-2.commercelayer.co'
 
-const CustomAddToCart = props => {
+const CustomAddToCart = (props) => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
   return (
     <button
@@ -55,7 +55,7 @@ export default function Order() {
         clientId:
           '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
         endpoint,
-        scope: 'market:48'
+        scope: 'market:48',
       })
       console.log('Token BLUE BRAND ---> ', accessToken)
       setToken(accessToken)
@@ -65,7 +65,7 @@ export default function Order() {
         clientId:
           '24938609156dc7391cd5dfdea32b828ef2c20e02bccfccda6510ed59c09935ac',
         endpoint: endpoint1,
-        scope: 'market:50'
+        scope: 'market:50',
       })
       console.log('token1 LIME BRAND ---> ', accessToken)
       setToken1(accessToken)
@@ -106,16 +106,16 @@ export default function Order() {
                         skuCodes={[
                           {
                             label: '6 months',
-                            code: 'BABYONBU000000E63E746MXX'
+                            code: 'BABYONBU000000E63E746MXX',
                           },
                           {
                             label: '12 months',
-                            code: 'BABYONBU000000E63E7412MX'
+                            code: 'BABYONBU000000E63E7412MX',
                           },
                           {
                             label: '24 months',
-                            code: 'BABYONBU000000E63E746MXXFAKE'
-                          }
+                            code: 'BABYONBU000000E63E746MXXFAKE',
+                          },
                         ]}
                       />
                     </div>
@@ -247,16 +247,16 @@ export default function Order() {
                         skuCodes={[
                           {
                             label: '12 months',
-                            code: 'BABYONBUFFFFFF00000012MX'
+                            code: 'BABYONBUFFFFFF00000012MX',
                           },
                           {
                             label: '6 months',
-                            code: 'BABYONBUFFFFFFE63E746MXX'
+                            code: 'BABYONBUFFFFFFE63E746MXX',
                           },
                           {
                             label: '24 months',
-                            code: 'BABYONBUFFFFFF00000012MXFAKE'
-                          }
+                            code: 'BABYONBUFFFFFF00000012MXFAKE',
+                          },
                         ]}
                       />
                     </div>
