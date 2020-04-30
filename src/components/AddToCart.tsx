@@ -17,7 +17,7 @@ export type AddToCartProps = InferProps<typeof propTypes> &
 const AddToCart: FunctionComponent<AddToCartProps> = (props) => {
   const { label, children, skuCode, disabled, ...p } = props
   const { addToCart } = useContext(OrderContext)
-  const { item, items, quantity, option } = useContext(ItemContext)
+  const { item, items, quantity, option, prices } = useContext(ItemContext)
   const sCode =
     !_.isEmpty(items) && skuCode
       ? items[skuCode]?.code
@@ -33,7 +33,7 @@ const AddToCart: FunctionComponent<AddToCartProps> = (props) => {
         option: opt,
       })
   }
-  const autoDisabled = disabled || !sCode
+  const autoDisabled = disabled || !prices[sCode] || !sCode
   const parentProps = {
     handleClick,
     disabled: disabled || autoDisabled,

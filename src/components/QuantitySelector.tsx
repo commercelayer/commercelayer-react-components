@@ -20,13 +20,13 @@ export type QuantitySelectorProps = PropsType<typeof propTypes> &
 
 const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
   const { skuCode, children, min, max, ...p } = props
-  const { item, setQuantity, items, quantity } = useContext(ItemContext)
+  const { item, setQuantity, items, quantity, prices } = useContext(ItemContext)
   const [value, setValue] = useState(min)
   const sCode =
     !_.isEmpty(items) && skuCode
       ? items[skuCode]?.code
       : skuCode || getCurrentItemKey(item)
-  const disabled = !sCode
+  const disabled = p.disabled || !prices[sCode] || !sCode
   const inventory = _.isEmpty(item) ? '50' : item[sCode]?.inventory?.quantity
   const maxInv = max || `${inventory}`
   useEffect(() => {

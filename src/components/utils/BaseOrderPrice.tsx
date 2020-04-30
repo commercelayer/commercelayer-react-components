@@ -9,6 +9,7 @@ import React, {
 } from 'react'
 import { PropsType } from '../../utils/PropsType'
 import { baseOrderPricePropTypes } from '../../@types'
+import _ from 'lodash'
 
 export type BaseOrderPriceProps = PropsType<typeof baseOrderPricePropTypes> &
   JSX.IntrinsicElements['span']
@@ -21,7 +22,9 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
     const p = getAmount(base, type, format || 'formatted', order || {})
     setPrice(p)
     return (): void => {
-      setPrice('')
+      if (_.isEmpty(order)) {
+        setPrice('')
+      }
     }
   }, [order])
   const parentProps = {

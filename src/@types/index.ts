@@ -6,6 +6,7 @@ export const BC = {
   id: PropTypes.string,
   className: PropTypes.string,
   style: PropTypes.object,
+  name: PropTypes.string,
 }
 
 export const PTLoader = PropTypes.oneOfType([
@@ -124,11 +125,13 @@ export const baseOrderPricePropTypes = {
   type: PropTypes.string.isRequired,
   children: PropTypes.func,
   format: PropTypes.oneOf<BaseFormatPrice>(['formatted', 'cents', 'float']),
+  ...BC,
 }
 
 export const baseOrderComponentPricePropTypes = {
   children: baseOrderPricePropTypes['children'],
   format: baseOrderPricePropTypes['format'],
+  ...BC,
 }
 
 export type BasePriceType = 'total' | 'option' | 'unit'

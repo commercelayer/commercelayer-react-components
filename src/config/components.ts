@@ -73,6 +73,10 @@ const components = {
       children: childrenTypes.isRequired,
       accessToken: PropTypes.string.isRequired,
       endpoint: PropTypes.string.isRequired,
+      cache: PropTypes.bool,
+    },
+    defaultProps: {
+      cache: false,
     },
   },
   Discount: {
@@ -228,6 +232,7 @@ const components = {
     description: '',
     propTypes: {
       children: PropTypes.func,
+      label: PropTypes.string,
     },
   },
   LineItemOption: {
@@ -309,6 +314,10 @@ const components = {
     description: '',
     propTypes: {
       children: PropTypes.func,
+      id: PropTypes.string,
+      className: PropTypes.string,
+      name: PropTypes.string,
+      style: PropTypes.object,
     },
   },
   MetadataInput: {
@@ -393,6 +402,7 @@ const components = {
       max: PropTypes.string,
       value: PropTypes.string,
       skuCode: PropTypes.string,
+      disabled: PropTypes.bool,
     },
     defaultProps: {
       min: '1',

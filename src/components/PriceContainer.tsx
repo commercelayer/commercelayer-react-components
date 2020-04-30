@@ -69,7 +69,11 @@ const PriceContainer: FunctionComponent<PCProps> = (props) => {
         })
       }
     }
-    return (): void => unsetPriceState(dispatch)
+    return (): void => {
+      if (_.isEmpty(currentItem)) {
+        unsetPriceState(dispatch)
+      }
+    }
   }, [config.accessToken, currentItem])
   const priceValue: PriceContextValue = {
     ...state,

@@ -39,6 +39,14 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
         filters: filters || {},
       })
     }
+    return (): void => {
+      if (_.isEmpty(order)) {
+        dispatch({
+          type: 'setLineItems',
+          payload: { lineItems: [] },
+        })
+      }
+    }
   }, [order])
   const lineItemValue = {
     ...state,

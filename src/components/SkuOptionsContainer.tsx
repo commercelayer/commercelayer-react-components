@@ -43,6 +43,16 @@ const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = (
         dispatch,
       })
     }
+    return (): void => {
+      if (_.isEmpty(sCode)) {
+        dispatch({
+          type: 'setSkuOptions',
+          payload: {
+            skuOptions: [],
+          },
+        })
+      }
+    }
   }, [config, sCode])
   return (
     <SkuOptionsContext.Provider value={skuOptionsValue}>

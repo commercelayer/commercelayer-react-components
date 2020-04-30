@@ -54,7 +54,6 @@ const Price: FunctionComponent<PPropsType> = (props) => {
     _.isEmpty(prices) || _.isEmpty(skuPrices)
       ? null
       : getPricesComponent(skuPrices, props)
-  console.log('pricesComponent', pricesComponent)
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (

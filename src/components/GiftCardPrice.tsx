@@ -6,9 +6,10 @@ import components from '../config/components'
 const propTypes = components.GiftCardPrice.propTypes
 const displayName = components.GiftCardPrice.displayName
 
-export type GiftCardPriceProps = PropsType<typeof propTypes>
+export type GiftCardPriceProps = PropsType<typeof propTypes> &
+  JSX.IntrinsicElements['span']
 
-const GiftCardPrice: FunctionComponent<GiftCardPriceProps> = props => {
+const GiftCardPrice: FunctionComponent<GiftCardPriceProps> = (props) => {
   return <BaseOrderPrice base="amount" type="giftcard" {...props} />
 }
 

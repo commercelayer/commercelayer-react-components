@@ -11,7 +11,7 @@ export interface GetPriceByCode {
 
 export const getPriceByCode: GetPriceByCode = (skuPrices, code = '') => {
   return code
-    ? _.first(skuPrices.filter(p => p.currencyCode === code))
+    ? _.first(skuPrices.filter((p) => p.currencyCode === code))
     : _.first(skuPrices)
 }
 
@@ -44,10 +44,10 @@ export interface GetPrices {
   (prices: PriceCollection[] | Items): Prices
 }
 
-const getPrices: GetPrices = prices => {
+const getPrices: GetPrices = (prices) => {
   const obj = {}
   if (_.isArray(prices)) {
-    prices.map(p => {
+    prices.map((p) => {
       if (_.has(obj, p.skuCode)) {
         obj[p.skuCode].push(p)
       } else {
@@ -55,7 +55,7 @@ const getPrices: GetPrices = prices => {
       }
     })
   } else {
-    _.forEach(prices, item => {
+    _.forEach(prices, (item) => {
       const prices = item.prices().toArray()
       obj[item.code] = prices
     })
