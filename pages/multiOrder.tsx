@@ -23,7 +23,7 @@ import Total from '../src/components/Total'
 import Discount from '../src/components/Discount'
 import Shipping from '../src/components/Shipping'
 import Taxes from '../src/components/Taxes'
-import GiftCard from '../src/components/GiftCardPrice'
+import GiftCardPrice from '../src/components/GiftCardPrice'
 import ItemContainer from '../src/components/ItemContainer'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
@@ -32,7 +32,7 @@ const CustomAddToCart = (props) => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
   return (
     <button
-      id="add-to-bag"
+      name={props.name}
       className={`${classes} ${props.className}`}
       onClick={props.handleClick}
       disabled={props.disabled}
@@ -60,8 +60,8 @@ export default function Order() {
   return (
     <Fragment>
       <Nav links={['/']} />
-      <CommerceLayer accessToken={token} endpoint={endpoint}>
-        <div className="container mx-auto mt-5">
+      <CommerceLayer accessToken={token} endpoint={endpoint} cache>
+        <div className="max-w-full mx-auto mt-5 p-5">
           <OrderContainer persistKey="orderUS">
             <ItemContainer>
               <div className="md:flex">
@@ -84,9 +84,8 @@ export default function Order() {
                     </div>
                     <div className="m-2">
                       <VariantSelector
-                        id="variant-selector"
                         className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        name="variant1"
+                        name="selector-us"
                         skuCodes={[
                           {
                             label: '6 months',
@@ -105,12 +104,15 @@ export default function Order() {
                     </div>
                     <div className="m-2">
                       <QuantitySelector
-                        id="quantity-selector"
+                        name="qty-us"
                         className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                       />
                     </div>
                     <div className="m-2">
-                      <AddToCart className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                      <AddToCart
+                        name="add-us"
+                        className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      >
                         {CustomAddToCart}
                       </AddToCart>
                     </div>
@@ -119,12 +121,12 @@ export default function Order() {
               </div>
             </ItemContainer>
             <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
-            <p className="text-sm m-2">
-              Your shopping bag contains{' '}
-              <LineItemsCount id="items-count" className="font-bold" /> items
-            </p>
-            <div className="flex flex-col p-2">
-              <LineItemsContainer>
+            <LineItemsContainer>
+              <p className="text-sm m-2">
+                Your shopping bag contains{' '}
+                <LineItemsCount name="count-us" className="font-bold" /> items
+              </p>
+              <div className="flex flex-col p-2">
                 <LineItem type="skus">
                   <div className="flex justify-around items-center border-b">
                     <LineItemImage className="p-2" width={80} />
@@ -141,15 +143,15 @@ export default function Order() {
                     />
                   </div>
                 </LineItem>
-              </LineItemsContainer>
-            </div>
+              </div>
+            </LineItemsContainer>
             <div className="flex flex-col w-1/2 m-auto">
               <div className="flex items-center p-2 justify-around font-medium text-left">
                 <div className="w-full">
                   <p className="text-lg">Subtotal </p>
                 </div>
                 <div className="text-right">
-                  <SubTotal />
+                  <SubTotal name="subtotal-us" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -157,7 +159,7 @@ export default function Order() {
                   <p className="text-lg">Discount </p>
                 </div>
                 <div className="text-right">
-                  <Discount />
+                  <Discount name="discount-us" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -165,7 +167,7 @@ export default function Order() {
                   <p className="text-lg">Shipping </p>
                 </div>
                 <div className="text-right">
-                  <Shipping />
+                  <Shipping name="shipping-us" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -175,7 +177,7 @@ export default function Order() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <Taxes />
+                  <Taxes name="taxes-us" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -183,7 +185,7 @@ export default function Order() {
                   <p className="text-lg">Gift card </p>
                 </div>
                 <div className="text-right">
-                  <GiftCard />
+                  <GiftCardPrice name="shipping-us" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around font-bold text-left">
@@ -191,7 +193,7 @@ export default function Order() {
                   <p className="text-lg mr-2">Total </p>
                 </div>
                 <div className="text-right">
-                  <Total id="total-amount" />
+                  <Total name="total-us" />
                 </div>
               </div>
             </div>
@@ -200,14 +202,14 @@ export default function Order() {
             </div>
           </OrderContainer>
         </div>
-        <div className="container mx-auto mt-5">
+        <div className="max-w-full p-5 mx-auto mt-5 bg-gray-900 text-gray-300">
           <OrderContainer persistKey="orderIT">
             <ItemContainer>
               <div className="md:flex">
                 <div className="md:flex-shrink-0">
                   <img
                     className="rounded-lg md:w-56"
-                    src="https://img.commercelayer.io/skus/BABYONBUFFFFFF000000.png?fm=jpg&q=90"
+                    src="https://img.commercelayer.io/skus/BABYONBUFFFFFF000000.png?fm=png&q=90"
                   />
                 </div>
                 <div className="mt-4 md:mt-0 md:ml-6">
@@ -223,9 +225,8 @@ export default function Order() {
                     </div>
                     <div className="m-2">
                       <VariantSelector
-                        id="variant-selector"
                         className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        name="variant1"
+                        name="selector-it"
                         skuCodes={[
                           {
                             label: '12 months',
@@ -233,7 +234,7 @@ export default function Order() {
                           },
                           {
                             label: '6 months',
-                            code: 'BABYONBUFFFFFFE63E746MXX',
+                            code: 'BABYONBUFFFFFF0000006MXX',
                           },
                           {
                             label: '24 months',
@@ -244,12 +245,15 @@ export default function Order() {
                     </div>
                     <div className="m-2">
                       <QuantitySelector
-                        id="quantity-selector"
+                        name="qty-it"
                         className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                       />
                     </div>
                     <div className="m-2">
-                      <AddToCart className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                      <AddToCart
+                        name="add-it"
+                        className="w-full bg-green-500 hover:bg-green-700 text-gray-900 font-bold py-2 px-4 rounded"
+                      >
                         {CustomAddToCart}
                       </AddToCart>
                     </div>
@@ -258,12 +262,12 @@ export default function Order() {
               </div>
             </ItemContainer>
             <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
-            <p className="text-sm m-2">
-              Your shopping bag contains{' '}
-              <LineItemsCount id="items-count" className="font-bold" /> items
-            </p>
-            <div className="flex flex-col p-2">
-              <LineItemsContainer>
+            <LineItemsContainer>
+              <p className="text-sm m-2">
+                Your shopping bag contains{' '}
+                <LineItemsCount name="count-it" className="font-bold" /> items
+              </p>
+              <div className="flex flex-col p-2">
                 <LineItem type="skus">
                   <div className="flex justify-around items-center border-b">
                     <LineItemImage className="p-2" width={80} />
@@ -271,24 +275,24 @@ export default function Order() {
                     <LineItemQuantity
                       id="line-item-quantity"
                       max={10}
-                      className="p-2"
+                      className="p-2 text-gray-900"
                     />
                     <LineItemPrice id="line-item-total" className="p-2" />
                     <LineItemRemove
                       id="line-item-remove"
-                      className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                      className="p-2 bg-red-500 hover:bg-red-700 text-gray-900 font-bold py-2 px-4 rounded"
                     />
                   </div>
                 </LineItem>
-              </LineItemsContainer>
-            </div>
+              </div>
+            </LineItemsContainer>
             <div className="flex flex-col w-1/2 m-auto">
               <div className="flex items-center p-2 justify-around font-medium text-left">
                 <div className="w-full">
                   <p className="text-lg">Subtotal </p>
                 </div>
                 <div className="text-right">
-                  <SubTotal />
+                  <SubTotal name="subtotal-it" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -296,7 +300,7 @@ export default function Order() {
                   <p className="text-lg">Discount </p>
                 </div>
                 <div className="text-right">
-                  <Discount />
+                  <Discount name="discount-it" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -304,7 +308,7 @@ export default function Order() {
                   <p className="text-lg">Shipping </p>
                 </div>
                 <div className="text-right">
-                  <Shipping />
+                  <Shipping name="shipping-it" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -314,7 +318,7 @@ export default function Order() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <Taxes />
+                  <Taxes name="taxes-it" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -322,7 +326,7 @@ export default function Order() {
                   <p className="text-lg">Gift card </p>
                 </div>
                 <div className="text-right">
-                  <GiftCard />
+                  <GiftCardPrice name="giftcard-it" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around font-bold text-left">
@@ -330,12 +334,12 @@ export default function Order() {
                   <p className="text-lg mr-2">Total </p>
                 </div>
                 <div className="text-right">
-                  <Total id="total-amount" />
+                  <Total name="total-it" />
                 </div>
               </div>
             </div>
             <div className="flex justify-center p-2">
-              <Checkout className="mt-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded" />
+              <Checkout className="mt-2 bg-yellow-500 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded" />
             </div>
           </OrderContainer>
         </div>
