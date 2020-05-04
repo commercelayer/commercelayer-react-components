@@ -67,6 +67,7 @@ const components = {
       'OrderContainer',
       'PricesContainer',
       'GiftCardContainer',
+      'AvailabilityContainer',
       'ReactNode',
     ],
     propTypes: {
@@ -79,8 +80,8 @@ const components = {
       cache: false,
     },
   },
-  Discount: {
-    displayName: 'Discount',
+  DiscountAmount: {
+    displayName: 'DiscountAmount',
     description: '',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
@@ -189,6 +190,10 @@ const components = {
     propTypes: {
       children: childrenTypes.isRequired,
       skuCode: PropTypes.string,
+      lineItem: PropTypes.exact({
+        name: PropTypes.string.isRequired,
+        imageUrl: PropTypes.string,
+      }),
     },
   },
   LineItem: {
@@ -330,7 +335,7 @@ const components = {
       'ItemContainer',
       'LineItemsContainer',
       'SubTotalAmount',
-      'Discount',
+      'DiscountAmount',
       'ShippingAmount',
       'TaxesAmount',
       'GiftCardAmount',
@@ -381,18 +386,18 @@ const components = {
       skuCode: '',
     },
   },
-  PriceTemplate: {
-    displayName: 'PriceTemplate',
-    description: '',
-    propTypes: {
-      formattedAmount: PropTypes.string,
-      formattedCompare: PropTypes.string,
-    },
-    defaultProps: {
-      formattedAmount: '',
-      formattedCompare: '',
-    },
-  },
+  // PriceTemplate: {
+  //   displayName: 'PriceTemplate',
+  //   description: '',
+  //   propTypes: {
+  //     formattedAmount: PropTypes.string,
+  //     formattedCompare: PropTypes.string,
+  //   },
+  //   defaultProps: {
+  //     formattedAmount: '',
+  //     formattedCompare: '',
+  //   },
+  // },
   QuantitySelector: {
     displayName: 'QuantitySelector',
     description: '',
@@ -489,10 +494,14 @@ const components = {
     displayName: 'VariantSelector',
     description: '',
     propTypes: {
-      skuCodes: PropTypes.arrayOf(
+      options: PropTypes.arrayOf(
         PropTypes.exact({
           label: PropTypes.string.isRequired,
           code: PropTypes.string.isRequired,
+          lineItem: PropTypes.exact({
+            name: PropTypes.string.isRequired,
+            imageUrl: PropTypes.string,
+          }),
         }).isRequired
       ).isRequired,
       name: PropTypes.string,
@@ -507,26 +516,30 @@ const components = {
       type: 'select' as BaseSelectorType,
     },
   },
-  VariantTemplate: {
-    displayName: 'VariantTemplate',
-    description: '',
-    propTypes: {
-      variants: PropTypes.object.isRequired,
-      onChange: PropTypes.func,
-      skuCodes: PropTypes.arrayOf(
-        PropTypes.exact({
-          label: PropTypes.string.isRequired,
-          code: PropTypes.string.isRequired,
-        }).isRequired
-      ).isRequired,
-      name: PropTypes.string,
-      children: PropTypes.func,
-      type: PropTypes.oneOf<BaseSelectorType>(['select', 'radio']),
-      loader: PropTypes.element,
-      placeholder: PropTypes.string,
-      skuCode: PropTypes.string,
-    },
-  },
+  // VariantTemplate: {
+  //   displayName: 'VariantTemplate',
+  //   description: '',
+  //   propTypes: {
+  //     variants: PropTypes.object.isRequired,
+  //     onChange: PropTypes.func,
+  //     options: PropTypes.arrayOf(
+  //       PropTypes.exact({
+  //         label: PropTypes.string.isRequired,
+  //         code: PropTypes.string.isRequired,
+  //         lineItem: PropTypes.exact({
+  //           name: PropTypes.string.isRequired,
+  //           imageUrl: PropTypes.string,
+  //         }),
+  //       }).isRequired
+  //     ).isRequired,
+  //     name: PropTypes.string,
+  //     children: PropTypes.func,
+  //     type: PropTypes.oneOf<BaseSelectorType>(['select', 'radio']),
+  //     loader: PropTypes.element,
+  //     placeholder: PropTypes.string,
+  //     skuCode: PropTypes.string,
+  //   },
+  // },
 }
 
 export default components
