@@ -5,14 +5,14 @@ import Parent from './utils/Parent'
 import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
-const propTypes = components.LineItemRemove.propTypes
-const defaultProps = components.LineItemRemove.defaultProps
-const displayName = components.LineItemRemove.displayName
+const propTypes = components.LineItemRemoveLink.propTypes
+const defaultProps = components.LineItemRemoveLink.defaultProps
+const displayName = components.LineItemRemoveLink.displayName
 
 export type LineItemRemoveProps = PropsType<typeof propTypes> &
   JSX.IntrinsicElements['a']
 
-const LineItemRemove: FunctionComponent<LineItemRemoveProps> = (props) => {
+const LineItemRemoveLink: FunctionComponent<LineItemRemoveProps> = (props) => {
   const { lineItem } = useContext(LineItemChildrenContext)
   const { deleteLineItem } = useContext(LineItemContext)
   const handleRemove = (e): void => {
@@ -32,8 +32,8 @@ const LineItemRemove: FunctionComponent<LineItemRemoveProps> = (props) => {
   )
 }
 
-LineItemRemove.propTypes = propTypes
-LineItemRemove.defaultProps = defaultProps
-LineItemRemove.displayName = displayName
+LineItemRemoveLink.propTypes = propTypes
+LineItemRemoveLink.defaultProps = defaultProps
+LineItemRemoveLink.displayName = displayName
 
-export default LineItemRemove
+export default LineItemRemoveLink
