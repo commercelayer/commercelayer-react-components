@@ -1,18 +1,27 @@
-import React, { FunctionComponent, useContext } from 'react'
+import React, { FunctionComponent, useContext, PropsWithoutRef } from 'react'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import LineItemContext from '../context/LineItemContext'
 import Parent from './utils/Parent'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
 const propTypes = components.LineItemRemoveLink.propTypes
 const defaultProps = components.LineItemRemoveLink.defaultProps
 const displayName = components.LineItemRemoveLink.displayName
 
-export type LineItemRemoveProps = PropsType<typeof propTypes> &
-  JSX.IntrinsicElements['a']
+type ChildrenLineItemRemoveLinkProps = {
+  handleRemove: () => void
+  label?: string
+}
 
-const LineItemRemoveLink: FunctionComponent<LineItemRemoveProps> = (props) => {
+type LineItemRemoveLinkProps = {
+  children?: (props: ChildrenLineItemRemoveLinkProps) => void
+  label?: string
+} & PropsWithoutRef<JSX.IntrinsicElements['a']>
+
+const LineItemRemoveLink: FunctionComponent<LineItemRemoveLinkProps> = (
+  props
+) => {
+  const { label = 'Remove' } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const { deleteLineItem } = useContext(LineItemContext)
   const handleRemove = (e): void => {
@@ -27,7 +36,7 @@ const LineItemRemoveLink: FunctionComponent<LineItemRemoveProps> = (props) => {
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
     <a {...props} href="#" onClick={handleRemove}>
-      {props.label}
+      {label}
     </a>
   )
 }

@@ -271,7 +271,7 @@ const components = {
       label: PropTypes.string,
     },
     defaultProps: {
-      label: 'remove',
+      label: 'Remove',
     },
   },
   LineItemsContainer: {

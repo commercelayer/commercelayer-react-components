@@ -4,7 +4,7 @@ import {
 } from '@commercelayer/js-auth'
 import React, { useEffect, useState } from 'react'
 import Price from '../src/components/Price'
-import PriceContainer from '../src/components/PricesContainer'
+import PricesContainer from '../src/components/PricesContainer'
 import CommerceLayer from '../src/components/CommerceLayer'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
@@ -368,7 +368,7 @@ const Home = () => {
       <div className="container mx-auto">
         <CommerceLayer accessToken={token} endpoint={endpoint}>
           <div className="flex flex-row flex-wrap justify-around">
-            <PriceContainer perPage={20} loader={<Loading />}>
+            <PricesContainer perPage={20} loader={<Loading />}>
               {skus.map((s, k) => {
                 const lImg = s.substring(0, s.length - 4)
                 return (
@@ -395,18 +395,18 @@ const Home = () => {
                   </div>
                 )
               })}
-            </PriceContainer>
+            </PricesContainer>
           </div>
           {/* <br />
         <br />
         <Title title="Preselect Prices by skuCode" />
-        <PriceContainer>
+        <PricesContainer>
           <Price
             skuCode="BABYONBU000000E63E746MXX"
             amountClassName="font-bold"
             compareClassName="line-through"
           />
-        </PriceContainer>
+        </PricesContainer>
         <br />
         <br />
         <Title title="Variant" />

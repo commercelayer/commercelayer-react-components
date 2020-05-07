@@ -3,27 +3,27 @@ import { getIntegrationToken } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
-import VariantContainer from '../src/components/VariantsContainer'
+import VariantsContainer from '../src/components/VariantsContainer'
 import VariantSelector from '../src/components/VariantSelector'
-import PriceContainer from '../src/components/PricesContainer'
+import PricesContainer from '../src/components/PricesContainer'
 import Price from '../src/components/Price'
-import AddToCart from '../src/components/AddToCartButton'
+import AddToCartButton from '../src/components/AddToCartButton'
 import LineItemsContainer from '../src/components/LineItemsContainer'
 import LineItem from '../src/components/LineItem'
 import LineItemImage from '../src/components/LineItemImage'
 import LineItemName from '../src/components/LineItemName'
 import LineItemQuantity from '../src/components/LineItemQuantity'
-import LineItemPrice from '../src/components/LineItemAmount'
-import LineItemRemove from '../src/components/LineItemRemoveLink'
-import Checkout from '../src/components/CheckoutLink'
-import SubTotal from '../src/components/SubTotalAmount'
+import LineItemAmount from '../src/components/LineItemAmount'
+import LineItemRemoveLink from '../src/components/LineItemRemoveLink'
+import CheckoutLink from '../src/components/CheckoutLink'
+import SubTotalAmount from '../src/components/SubTotalAmount'
 import QuantitySelector from '../src/components/QuantitySelector'
 import LineItemsCount from '../src/components/LineItemsCount'
-import Total from '../src/components/TotalAmount'
-import Discount from '../src/components/DiscountAmount'
-import Shipping from '../src/components/ShippingAmount'
-import Taxes from '../src/components/TaxesAmount'
-import GiftCardPrice from '../src/components/GiftCardAmount'
+import TotalAmount from '../src/components/TotalAmount'
+import DiscountAmount from '../src/components/DiscountAmount'
+import ShippingAmount from '../src/components/ShippingAmount'
+import TaxesAmount from '../src/components/TaxesAmount'
+import GiftCardAmount from '../src/components/GiftCardAmount'
 import AvailabilityContainer from '../src/components/AvailabilityContainer'
 import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 import ItemContainer from '../src/components/ItemContainer'
@@ -93,20 +93,20 @@ export default function Order() {
                 <div className="mt-4 md:mt-0 md:ml-6">
                   <h1 className="text-4xl">Tutina da Bambino</h1>
                   <div className="w-auto m-2">
-                    <PriceContainer skuCode="BABYONBU000000E63E746MXX">
+                    <PricesContainer skuCode="BABYONBU000000E63E746MXX">
                       <Price
                         className="text-green-600 text-2xl m-1"
                         compareClassName="text-gray-500 text-2xl m-1 line-through"
                       />
-                    </PriceContainer>
+                    </PricesContainer>
                   </div>
-                  <VariantContainer>
+                  <VariantsContainer>
                     <div className="m-2">
                       <VariantSelector
                         id="variant-selector"
                         className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         name="variant1"
-                        skuCodes={[
+                        options={[
                           {
                             label: '6 months',
                             code: 'BABYONBU000000E63E746MXX',
@@ -122,7 +122,7 @@ export default function Order() {
                         ]}
                       />
                     </div>
-                  </VariantContainer>
+                  </VariantsContainer>
                   <div className="m-2">
                     <SkuOptionsContainer>
                       <SkuOption name="Embossing">
@@ -151,15 +151,15 @@ export default function Order() {
                   </div>
                   <div className="m-2">
                     <QuantitySelector
-                      max="12"
+                      max={12}
                       id="quantity-selector"
                       className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     />
                   </div>
                   <div className="m-2">
-                    <AddToCart className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    <AddToCartButton className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                       {CustomAddToCart}
-                    </AddToCart>
+                    </AddToCartButton>
                   </div>
                   <div className="m-2">
                     <AvailabilityContainer>
@@ -214,8 +214,8 @@ export default function Order() {
                       resource="lineItem"
                       field="quantity"
                     />
-                    <LineItemPrice id="line-item-total" className="p-2" />
-                    <LineItemRemove
+                    <LineItemAmount id="line-item-total" className="p-2" />
+                    <LineItemRemoveLink
                       id="line-item-remove"
                       className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                     />
@@ -235,8 +235,8 @@ export default function Order() {
                       className="p-2"
                       disabled
                     />
-                    <LineItemPrice id="line-item-total" className="p-2" />
-                    <LineItemRemove
+                    <LineItemAmount id="line-item-total" className="p-2" />
+                    <LineItemRemoveLink
                       id="line-item-remove"
                       className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                     />
@@ -250,7 +250,7 @@ export default function Order() {
                   <p className="text-lg">Subtotal </p>
                 </div>
                 <div className="text-right">
-                  <SubTotal />
+                  <SubTotalAmount />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -258,7 +258,7 @@ export default function Order() {
                   <p className="text-lg">Discount </p>
                 </div>
                 <div className="text-right">
-                  <Discount />
+                  <DiscountAmount />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -266,7 +266,7 @@ export default function Order() {
                   <p className="text-lg">Shipping </p>
                 </div>
                 <div className="text-right">
-                  <Shipping />
+                  <ShippingAmount />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -276,7 +276,7 @@ export default function Order() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <Taxes />
+                  <TaxesAmount />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -284,7 +284,7 @@ export default function Order() {
                   <p className="text-lg">Gift card </p>
                 </div>
                 <div className="text-right">
-                  <GiftCardPrice />
+                  <GiftCardAmount />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around font-bold text-left">
@@ -292,14 +292,14 @@ export default function Order() {
                   <p className="text-lg mr-2">Total </p>
                 </div>
                 <div className="text-right">
-                  <Total id="total-amount" />
+                  <TotalAmount id="total-amount" />
                 </div>
               </div>
             </div>
             <div className="flex justify-center p-2">
-              <Checkout
+              <CheckoutLink
                 className="mt-2 primary font-bold py-2 px-4 rounded"
-                label="Checkout"
+                label="CheckoutLink"
               />
             </div>
           </OrderContainer>

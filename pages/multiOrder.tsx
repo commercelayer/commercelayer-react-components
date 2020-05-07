@@ -3,27 +3,27 @@ import { getSalesChannelToken } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
-import VariantContainer from '../src/components/VariantsContainer'
+import VariantsContainer from '../src/components/VariantsContainer'
 import VariantSelector from '../src/components/VariantSelector'
-import PriceContainer from '../src/components/PricesContainer'
+import PricesContainer from '../src/components/PricesContainer'
 import Price from '../src/components/Price'
-import AddToCart from '../src/components/AddToCartButton'
+import AddToCartButton from '../src/components/AddToCartButton'
 import LineItemsContainer from '../src/components/LineItemsContainer'
 import LineItem from '../src/components/LineItem'
 import LineItemImage from '../src/components/LineItemImage'
 import LineItemName from '../src/components/LineItemName'
 import LineItemQuantity from '../src/components/LineItemQuantity'
-import LineItemPrice from '../src/components/LineItemAmount'
-import LineItemRemove from '../src/components/LineItemRemoveLink'
-import Checkout from '../src/components/CheckoutLink'
-import SubTotal from '../src/components/SubTotalAmount'
+import LineItemAmount from '../src/components/LineItemAmount'
+import LineItemRemoveLink from '../src/components/LineItemRemoveLink'
+import CheckoutLink from '../src/components/CheckoutLink'
+import SubTotalAmount from '../src/components/SubTotalAmount'
 import QuantitySelector from '../src/components/QuantitySelector'
 import LineItemsCount from '../src/components/LineItemsCount'
-import Total from '../src/components/TotalAmount'
-import Discount from '../src/components/DiscountAmount'
-import Shipping from '../src/components/ShippingAmount'
-import Taxes from '../src/components/TaxesAmount'
-import GiftCardPrice from '../src/components/GiftCardAmount'
+import TotalAmount from '../src/components/TotalAmount'
+import DiscountAmount from '../src/components/DiscountAmount'
+import ShippingAmount from '../src/components/ShippingAmount'
+import TaxesAmount from '../src/components/TaxesAmount'
+import GiftCardAmount from '../src/components/GiftCardAmount'
 import ItemContainer from '../src/components/ItemContainer'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
@@ -73,20 +73,20 @@ export default function Order() {
                 </div>
                 <div className="mt-4 md:mt-0 md:ml-6">
                   <h1 className="text-4xl">Tutina da Bambino</h1>
-                  <VariantContainer>
+                  <VariantsContainer>
                     <div className="w-auto m-2">
-                      <PriceContainer skuCode="BABYONBU000000E63E746MXX">
+                      <PricesContainer skuCode="BABYONBU000000E63E746MXX">
                         <Price
                           className="text-green-600 text-2xl m-1"
                           compareClassName="text-gray-500 text-2xl m-1 line-through"
                         />
-                      </PriceContainer>
+                      </PricesContainer>
                     </div>
                     <div className="m-2">
                       <VariantSelector
                         className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         name="selector-us"
-                        skuCodes={[
+                        options={[
                           {
                             label: '6 months',
                             code: 'BABYONBU000000E63E746MXX',
@@ -109,14 +109,14 @@ export default function Order() {
                       />
                     </div>
                     <div className="m-2">
-                      <AddToCart
+                      <AddToCartButton
                         name="add-us"
                         className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                       >
                         {CustomAddToCart}
-                      </AddToCart>
+                      </AddToCartButton>
                     </div>
-                  </VariantContainer>
+                  </VariantsContainer>
                 </div>
               </div>
             </ItemContainer>
@@ -130,17 +130,14 @@ export default function Order() {
                 <LineItem type="skus">
                   <div className="flex justify-around items-center border-b">
                     <LineItemImage className="p-2" width={80} />
-                    <LineItemName id="line-item-name" className="p-2" />
+                    <LineItemName className="p-2" />
                     <LineItemQuantity
-                      id="line-item-quantity"
+                      name="lineItemQuantity-US"
                       max={10}
                       className="p-2"
                     />
-                    <LineItemPrice id="line-item-total" className="p-2" />
-                    <LineItemRemove
-                      id="line-item-remove"
-                      className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                    />
+                    <LineItemAmount className="p-2" />
+                    <LineItemRemoveLink className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" />
                   </div>
                 </LineItem>
               </div>
@@ -151,7 +148,7 @@ export default function Order() {
                   <p className="text-lg">Subtotal </p>
                 </div>
                 <div className="text-right">
-                  <SubTotal name="subtotal-us" />
+                  <SubTotalAmount name="subtotal-us" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -159,7 +156,7 @@ export default function Order() {
                   <p className="text-lg">Discount </p>
                 </div>
                 <div className="text-right">
-                  <Discount name="discount-us" />
+                  <DiscountAmount name="discount-us" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -167,7 +164,7 @@ export default function Order() {
                   <p className="text-lg">Shipping </p>
                 </div>
                 <div className="text-right">
-                  <Shipping name="shipping-us" />
+                  <ShippingAmount name="shipping-us" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -177,7 +174,7 @@ export default function Order() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <Taxes name="taxes-us" />
+                  <TaxesAmount name="taxes-us" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -185,7 +182,7 @@ export default function Order() {
                   <p className="text-lg">Gift card </p>
                 </div>
                 <div className="text-right">
-                  <GiftCardPrice name="shipping-us" />
+                  <GiftCardAmount name="shipping-us" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around font-bold text-left">
@@ -193,12 +190,12 @@ export default function Order() {
                   <p className="text-lg mr-2">Total </p>
                 </div>
                 <div className="text-right">
-                  <Total name="total-us" />
+                  <TotalAmount name="total-us" />
                 </div>
               </div>
             </div>
             <div className="flex justify-center p-2">
-              <Checkout className="mt-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded" />
+              <CheckoutLink className="mt-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded" />
             </div>
           </OrderContainer>
         </div>
@@ -214,20 +211,20 @@ export default function Order() {
                 </div>
                 <div className="mt-4 md:mt-0 md:ml-6">
                   <h1 className="text-4xl">Tutina da Bambino</h1>
-                  <VariantContainer>
+                  <VariantsContainer>
                     <div className="w-auto m-2">
-                      <PriceContainer skuCode="BABYONBUFFFFFF00000012MX">
+                      <PricesContainer skuCode="BABYONBUFFFFFF00000012MX">
                         <Price
                           className="text-green-600 text-2xl m-1"
                           compareClassName="text-gray-500 text-2xl m-1 line-through"
                         />
-                      </PriceContainer>
+                      </PricesContainer>
                     </div>
                     <div className="m-2">
                       <VariantSelector
                         className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         name="selector-it"
-                        skuCodes={[
+                        options={[
                           {
                             label: '12 months',
                             code: 'BABYONBUFFFFFF00000012MX',
@@ -250,14 +247,14 @@ export default function Order() {
                       />
                     </div>
                     <div className="m-2">
-                      <AddToCart
+                      <AddToCartButton
                         name="add-it"
                         className="w-full bg-green-500 hover:bg-green-700 text-gray-900 font-bold py-2 px-4 rounded"
                       >
                         {CustomAddToCart}
-                      </AddToCart>
+                      </AddToCartButton>
                     </div>
-                  </VariantContainer>
+                  </VariantsContainer>
                 </div>
               </div>
             </ItemContainer>
@@ -273,15 +270,12 @@ export default function Order() {
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
                     <LineItemQuantity
-                      id="line-item-quantity"
+                      name="lineItemQuantity-IT"
                       max={10}
                       className="p-2 text-gray-900"
                     />
-                    <LineItemPrice id="line-item-total" className="p-2" />
-                    <LineItemRemove
-                      id="line-item-remove"
-                      className="p-2 bg-red-500 hover:bg-red-700 text-gray-900 font-bold py-2 px-4 rounded"
-                    />
+                    <LineItemAmount id="line-item-total" className="p-2" />
+                    <LineItemRemoveLink className="p-2 bg-red-500 hover:bg-red-700 text-gray-900 font-bold py-2 px-4 rounded" />
                   </div>
                 </LineItem>
               </div>
@@ -292,7 +286,7 @@ export default function Order() {
                   <p className="text-lg">Subtotal </p>
                 </div>
                 <div className="text-right">
-                  <SubTotal name="subtotal-it" />
+                  <SubTotalAmount name="subtotal-it" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -300,7 +294,7 @@ export default function Order() {
                   <p className="text-lg">Discount </p>
                 </div>
                 <div className="text-right">
-                  <Discount name="discount-it" />
+                  <DiscountAmount name="discount-it" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -308,7 +302,7 @@ export default function Order() {
                   <p className="text-lg">Shipping </p>
                 </div>
                 <div className="text-right">
-                  <Shipping name="shipping-it" />
+                  <ShippingAmount name="shipping-it" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -318,7 +312,7 @@ export default function Order() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <Taxes name="taxes-it" />
+                  <TaxesAmount name="taxes-it" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
@@ -326,7 +320,7 @@ export default function Order() {
                   <p className="text-lg">Gift card </p>
                 </div>
                 <div className="text-right">
-                  <GiftCardPrice name="giftcard-it" />
+                  <GiftCardAmount name="giftcard-it" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around font-bold text-left">
@@ -334,12 +328,12 @@ export default function Order() {
                   <p className="text-lg mr-2">Total </p>
                 </div>
                 <div className="text-right">
-                  <Total name="total-it" />
+                  <TotalAmount name="total-it" />
                 </div>
               </div>
             </div>
             <div className="flex justify-center p-2">
-              <Checkout className="mt-2 bg-yellow-500 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded" />
+              <CheckoutLink className="mt-2 bg-yellow-500 hover:bg-yellow-700 text-gray-900 font-bold py-2 px-4 rounded" />
             </div>
           </OrderContainer>
         </div>
