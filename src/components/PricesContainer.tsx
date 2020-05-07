@@ -28,12 +28,16 @@ const PricesContainer: FunctionComponent<PCProps> = (props) => {
   const { children, skuCode, loader, perPage, filters } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
-  const { setPrices, prices, items, item: currentItem } = useContext(
-    ItemContext
-  )
+  const {
+    setPrices,
+    prices,
+    items,
+    item: currentItem,
+    skuCode: itemSkuCode,
+  } = useContext(ItemContext)
   if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
-  const sCode = getCurrentItemKey(currentItem) || skuCode || ''
+  const sCode = getCurrentItemKey(currentItem) || skuCode || itemSkuCode || ''
   const setSkuCodes: SetSkuCodesPrice = (skuCodes) => {
     dispatch({
       type: 'setSkuCodes',

@@ -3,7 +3,9 @@ import { PriceCollection } from '@commercelayer/js-sdk'
 import { Prices, SkuPrices } from '../reducers/PriceReducer'
 import { Items } from '../reducers/ItemReducer'
 import React, { ReactNode } from 'react'
-import PriceTemplate, { PTemplateProps } from '../components/PriceTemplate'
+import PriceTemplate, {
+  PTemplateProps,
+} from '../components/utils/PriceTemplate'
 
 export interface GetPriceByCode {
   (skuPrices: SkuPrices, code: string): PriceCollection | undefined

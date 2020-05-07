@@ -12,7 +12,7 @@ export type LineItemImageProps = PropsType<typeof propTypes> &
 
 const LineItemImage: FunctionComponent<LineItemImageProps> = (props) => {
   const { lineItem } = useContext(LineItemChildrenContext)
-  const src = props.src || lineItem['imageUrl']
+  const src = lineItem['imageUrl']
   const parenProps = {
     src,
     ...props,

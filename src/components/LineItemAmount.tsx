@@ -10,14 +10,14 @@ import Parent from './utils/Parent'
 import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
-const propTypes = components.LineItemPrice.propTypes
-const defaultProps = components.LineItemPrice.defaultProps
-const displayName = components.LineItemPrice.displayName
+const propTypes = components.LineItemAmount.propTypes
+const defaultProps = components.LineItemAmount.defaultProps
+const displayName = components.LineItemAmount.displayName
 
-export type LineItemPriceProps = PropsType<typeof propTypes> &
+export type LineItemAmountProps = PropsType<typeof propTypes> &
   JSX.IntrinsicElements['span']
 
-const LineItemPrice: FunctionComponent<LineItemPriceProps> = (props) => {
+const LineItemAmount: FunctionComponent<LineItemAmountProps> = (props) => {
   const { format, type, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const [price, setPrice] = useState('')
@@ -39,8 +39,8 @@ const LineItemPrice: FunctionComponent<LineItemPriceProps> = (props) => {
   )
 }
 
-LineItemPrice.propTypes = propTypes
-LineItemPrice.defaultProps = defaultProps
-LineItemPrice.displayName = displayName
+LineItemAmount.propTypes = propTypes
+LineItemAmount.defaultProps = defaultProps
+LineItemAmount.displayName = displayName
 
-export default LineItemPrice
+export default LineItemAmount

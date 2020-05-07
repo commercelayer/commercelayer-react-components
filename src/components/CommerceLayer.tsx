@@ -1,15 +1,18 @@
 import React, { FunctionComponent } from 'react'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import components from '../config/components'
-import { PropsType } from '../utils/PropsType'
 
 const propTypes = components.CommerceLayer.propTypes
-const defaultProps = components.CommerceLayer.defaultProps
-export type CommerceLayerProps = PropsType<typeof propTypes>
+
+export type CommerceLayerProps = {
+  accessToken: string
+  endpoint: string
+  cache?: boolean
+}
 
 const CommerceLayer: FunctionComponent<CommerceLayerProps> = (props) => {
   const { children, ...p } = props
-  const cache = p.cache || false
+  const cache = !!p.cache
   return (
     <CommerceLayerContext.Provider value={{ ...p, cache }}>
       {children}
@@ -18,6 +21,8 @@ const CommerceLayer: FunctionComponent<CommerceLayerProps> = (props) => {
 }
 
 CommerceLayer.propTypes = propTypes
-CommerceLayer.defaultProps = defaultProps
+CommerceLayer.defaultProps = {
+  cache: false,
+}
 
 export default CommerceLayer
