@@ -80,7 +80,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
       type="number"
       max={maxInv}
       min={min}
-      value={value}
+      value={value || ''}
       disabled={disabled}
       onChange={handleChange}
       onBlur={handleBlur}
