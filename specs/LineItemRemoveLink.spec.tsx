@@ -1,13 +1,14 @@
 import React from 'react'
-import { Checkout } from '../src'
+import { LineItemRemoveLink } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
+import Parent from '../src/components/utils/Parent'
 
-const propTypes = components.Checkout.propTypes
+const propTypes = components.LineItemRemoveLink.propTypes
 
-test('<Checkout/>', () => {
+test('<LineItemRemoveLink/>', () => {
   expect.assertions(3)
-  const component = renderer.create(<Checkout />)
+  const component = renderer.create(<LineItemRemoveLink />)
   const tree = component.toJSON()
   const root = component.toTree()
   const proptypes = root.type['propTypes']
@@ -16,33 +17,34 @@ test('<Checkout/>', () => {
   expect(proptypes.label).toBe(propTypes.label)
 })
 
-test('<Checkout with props />', () => {
+test('<LineItemRemoveLink check children format />', () => {
   expect.assertions(3)
-  const component = renderer.create(<Checkout />)
+  const component = renderer.create(
+    <LineItemRemoveLink label="remove product" />
+  )
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
   expect(tree).toMatchSnapshot()
-  expect(rendered.nodeType).toBe('host')
   expect(rendered.type).toBe('a')
+  expect(root.props.label).toBe('remove product')
 })
 
-test('<Checkout with custom children />', () => {
-  expect.assertions(5)
-  const CustomComponent = props => <span>{props.label}</span>
+test('<LineItemRemoveLink with custom children />', () => {
+  expect.assertions(7)
+  const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
-    <Checkout label="My checkout">{CustomComponent}</Checkout>
+    <LineItemRemoveLink>{CustomComponent}</LineItemRemoveLink>
   )
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
   const childRendered = root.rendered.rendered
   expect(tree).toMatchSnapshot()
-
-  expect(rendered.props.children).toBe(CustomComponent)
-
+  expect(rendered.type).toBe(Parent)
+  expect(rendered.props.handleRemove).toBeDefined()
   expect(childRendered.nodeType).toBe('component')
   expect(childRendered.type).toBe(CustomComponent)
-
-  expect(childRendered.props.label).toBe('My checkout')
+  expect(childRendered.rendered.nodeType).toBe('host')
+  expect(childRendered.rendered.type).toBe('span')
 })

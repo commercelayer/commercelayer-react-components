@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<AddToCartButton with ItemContainer skuCode /> 1`] = `
+<button
+  disabled={true}
+  onClick={[Function]}
+>
+  Add to cart
+</button>
+`;
+
+exports[`<AddToCartButton with custom children /> 1`] = `
+<span>
+  Add to basket
+</span>
+`;
+
+exports[`<AddToCartButton with props /> 1`] = `
+<button
+  disabled={true}
+  onClick={[Function]}
+>
+  Add to basket
+</button>
+`;
+
+exports[`<AddToCartButton/> 1`] = `
+<button
+  disabled={true}
+  onClick={[Function]}
+>
+  Add to cart
+</button>
+`;

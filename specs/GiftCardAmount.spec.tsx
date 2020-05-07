@@ -1,53 +1,48 @@
 import React from 'react'
-import { LineItemPrice } from '../src'
+import { GiftCardAmount } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
+import BaseOrderPrice from '../src/components/utils/BaseOrderPrice'
 import Parent from '../src/components/utils/Parent'
 
-const propTypes = components.LineItemPrice.propTypes
+const propTypes = components.GiftCardAmount.propTypes
 
-test('<LineItemPrice/>', () => {
-  expect.assertions(4)
-  const component = renderer.create(<LineItemPrice />)
+test('<GiftCardAmount/>', () => {
+  expect.assertions(3)
+  const component = renderer.create(<GiftCardAmount />)
   const tree = component.toJSON()
   const root = component.toTree()
   const proptypes = root.type['propTypes']
   expect(tree).toMatchSnapshot()
   expect(proptypes.children).toBe(propTypes.children)
   expect(proptypes.format).toBe(propTypes.format)
-  expect(proptypes.type).toBe(propTypes.type)
 })
 
-test('<LineItemPrice check children format />', () => {
+test('<GiftCardAmount check children format />', () => {
   expect.assertions(4)
-  const component = renderer.create(
-    <LineItemPrice format="float" type="unit" />
-  )
+  const component = renderer.create(<GiftCardAmount format="float" />)
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
+  const childRendered = rendered.rendered
   expect(tree).toMatchSnapshot()
-  expect(rendered.type).toBe('span')
-  expect(root.props.format).toBe('float')
-  expect(root.props.type).toBe('unit')
+  expect(rendered.type).toBe(BaseOrderPrice)
+  expect(rendered.props.format).toBe('float')
+  expect(childRendered.type).toBe('span')
 })
 
-test('<LineItemPrice with custom children />', () => {
-  expect.assertions(8)
+test('<GiftCardAmount with custom children />', () => {
+  expect.assertions(4)
   const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
-    <LineItemPrice>{CustomComponent}</LineItemPrice>
+    <GiftCardAmount>{CustomComponent}</GiftCardAmount>
   )
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
   const childRendered = root.rendered.rendered
   expect(tree).toMatchSnapshot()
-  expect(rendered.type).toBe(Parent)
-  expect(rendered.props.price).toBe('')
+  expect(rendered.props.children).toBe(CustomComponent)
   expect(childRendered.nodeType).toBe('component')
-  expect(childRendered.type).toBe(CustomComponent)
-  expect(childRendered.props.price).toBe('')
-  expect(childRendered.rendered.nodeType).toBe('host')
-  expect(childRendered.rendered.type).toBe('span')
+  expect(childRendered.type).toBe(Parent)
 })

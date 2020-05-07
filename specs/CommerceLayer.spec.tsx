@@ -27,7 +27,7 @@ test('<CommerceLayer/>', () => {
 test('<CommerceLayer children error />', () => {
   expect.assertions(2)
   console.error = jest.fn()
-  const CustomComponent = props => <span>{props.label}</span>
+  const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
     <CommerceLayer accessToken="myAccessToken" endpoint="myEndpoint">
       <CustomComponent />
@@ -40,7 +40,7 @@ test('<CommerceLayer children error />', () => {
 
   expect(console.error.mock.calls[0][0]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: Invalid prop 'children' supplied to CommerceLayer. Only components OrderContainer, PriceContainer, GiftCardContainer, ReactNode are allowed`
+      `Warning: Failed prop type: Invalid prop 'children' supplied to CommerceLayer. Only components OrderContainer, PricesContainer, GiftCardContainer, ReactNode are allowed`
     )
   )
 })

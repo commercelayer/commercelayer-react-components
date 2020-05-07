@@ -3,24 +3,24 @@ import { getIntegrationToken } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
-import VariantContainer from '../src/components/VariantsContainer'
+import VariantsContainer from '../src/components/VariantsContainer'
 import VariantSelector from '../src/components/VariantSelector'
-import PriceContainer from '../src/components/PricesContainer'
+import PricesContainer from '../src/components/PricesContainer'
 import Price from '../src/components/Price'
-import AddToCart from '../src/components/AddToCartButton'
+import AddToCartButton from '../src/components/AddToCartButton'
 import LineItemsContainer from '../src/components/LineItemsContainer'
 import LineItem from '../src/components/LineItem'
 import LineItemImage from '../src/components/LineItemImage'
 import LineItemName from '../src/components/LineItemName'
 import LineItemQuantity from '../src/components/LineItemQuantity'
-import LineItemPrice from '../src/components/LineItemPrice'
-import LineItemRemove from '../src/components/LineItemRemove'
+import LineItemAmount from '../src/components/LineItemAmount'
+import LineItemRemove from '../src/components/LineItemRemoveLink'
 import Checkout from '../src/components/CheckoutLink'
 import SubTotal from '../src/components/SubTotalAmount'
 import QuantitySelector from '../src/components/QuantitySelector'
 import LineItemsCount from '../src/components/LineItemsCount'
 import Total from '../src/components/TotalAmount'
-import Discount from '../src/components/Discount'
+import Discount from '../src/components/DiscountAmount'
 import Shipping from '../src/components/ShippingAmount'
 import Taxes from '../src/components/TaxesAmount'
 import GiftCardPrice from '../src/components/GiftCardAmount'
@@ -90,23 +90,28 @@ export default function Order() {
                 <div className="mt-4 md:mt-0 md:ml-6">
                   <h1 className="text-4xl">Tutina da Bambino</h1>
                   <div className="w-auto m-2">
-                    <PriceContainer skuCode="BABYONBU000000E63E746MXX">
+                    <PricesContainer skuCode="BABYONBU000000E63E746MXX">
                       <Price
                         className="text-green-600 text-2xl m-1"
                         compareClassName="text-gray-500 text-2xl m-1 line-through"
                       />
-                    </PriceContainer>
+                    </PricesContainer>
                   </div>
-                  <VariantContainer>
+                  <VariantsContainer>
                     <div className="m-2">
                       <VariantSelector
                         id="variant-selector"
                         className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         name="variant1"
-                        skuCodes={[
+                        options={[
                           {
                             label: '6 months',
                             code: 'BABYONBU000000E63E746MXX',
+                            lineItem: {
+                              name: 'Darth Vader (12 Months)',
+                              imageUrl:
+                                'https://i.pinimg.com/736x/a5/32/de/a532de337eff9b1c1c4bfb8df73acea4--darth-vader-stencil-darth-vader-head.jpg?b=t',
+                            },
                           },
                           {
                             label: '12 months',
@@ -119,7 +124,7 @@ export default function Order() {
                         ]}
                       />
                     </div>
-                  </VariantContainer>
+                  </VariantsContainer>
                   <div className="m-2">
                     <QuantitySelector
                       max="12"
@@ -128,9 +133,9 @@ export default function Order() {
                     />
                   </div>
                   <div className="m-2">
-                    <AddToCart className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    <AddToCartButton className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                       {CustomAddToCart}
-                    </AddToCart>
+                    </AddToCartButton>
                   </div>
                   <div className="m-2">
                     <AvailabilityContainer>
@@ -185,7 +190,7 @@ export default function Order() {
                       resource="lineItem"
                       field="quantity"
                     />
-                    <LineItemPrice id="line-item-total" className="p-2" />
+                    <LineItemAmount id="line-item-total" className="p-2" />
                     <LineItemRemove
                       id="line-item-remove"
                       className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -206,7 +211,7 @@ export default function Order() {
                       className="p-2"
                       disabled
                     />
-                    <LineItemPrice id="line-item-total" className="p-2" />
+                    <LineItemAmount id="line-item-total" className="p-2" />
                     <LineItemRemove
                       id="line-item-remove"
                       className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"

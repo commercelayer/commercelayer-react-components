@@ -8,9 +8,9 @@ import GiftCardInput from '../src/components/GiftCardInput'
 import GiftCardCurrencySelector from '../src/components/GiftCardCurrencySelector'
 import MetadataInput from '../src/components/MetadataInput'
 import Errors from '../src/components/Errors'
-import { BaseError } from '../src/components/Errors'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
+import { BaseError } from '../src/@types/errors'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -18,9 +18,9 @@ const messages = [
   {
     code: 'VALIDATION_ERROR',
     message: 'La email non ha un formato valido',
-    field: 'email'
+    field: 'email',
   },
-  { code: 'VALIDATION_ERROR', message: 'Errore di validazione' }
+  { code: 'VALIDATION_ERROR', message: 'Errore di validazione' },
 ] as BaseError[]
 
 export const Title = ({ title }) => (
@@ -39,13 +39,13 @@ const Home = () => {
   const [token, setToken] = useState('')
   useEffect(() => {
     const getToken = async () => {
-      const { accessToken } = await getSalesChannelToken({
+      const auth = await getSalesChannelToken({
         clientId:
           '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
         endpoint,
-        scope: 'market:48'
+        scope: 'market:48',
       })
-      setToken(accessToken)
+      setToken(auth?.accessToken as string)
     }
     getToken()
   }, [])
@@ -68,7 +68,7 @@ const Home = () => {
                     name="balanceCents"
                     placeholder="Amount*"
                   />
-                  <Errors resourceKey="giftCard" field="balanceCents" />
+                  <Errors resource="giftCard" field="balanceCents" />
                 </div>
                 <div className="p-2">
                   <GiftCardInput

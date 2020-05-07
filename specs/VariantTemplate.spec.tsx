@@ -1,15 +1,14 @@
 import React from 'react'
-import VariantTemplate from '../src/components/VariantTemplate'
+import VariantTemplate, {
+  propTypes,
+} from '../src/components/utils/VariantTemplate'
 import renderer from 'react-test-renderer'
-import components from '../src/config/components'
-
-const propTypes = components.VariantTemplate.propTypes
 
 test('<VariantTemplate/>', () => {
   expect.assertions(9)
   const component = renderer.create(
     <VariantTemplate
-      skuCodes={[
+      options={[
         {
           label: '6 months',
           code: 'BABYONBU000000E63E746MXX',
@@ -24,7 +23,7 @@ test('<VariantTemplate/>', () => {
   expect(tree).toMatchSnapshot()
   expect(proptypes.children).toBe(propTypes.children)
   expect(proptypes.placeholder).toBe(propTypes.placeholder)
-  expect(proptypes.skuCodes).toBe(propTypes.skuCodes)
+  expect(proptypes.options).toBe(propTypes.options)
   expect(proptypes.name).toBe(propTypes.name)
   expect(proptypes.type).toBe(propTypes.type)
   expect(proptypes.skuCode).toBe(propTypes.skuCode)

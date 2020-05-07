@@ -7,7 +7,7 @@ import Parent from '../src/components/utils/Parent'
 const propTypes = components.QuantitySelector.propTypes
 
 test('<QuantitySelector/>', () => {
-  expect.assertions(6)
+  expect.assertions(7)
   const component = renderer.create(
     <QuantitySelector type="text" name="firstName" />
   )
@@ -25,15 +25,15 @@ test('<QuantitySelector/>', () => {
 
 test('<QuantitySelector check children type textarea />', () => {
   expect.assertions(5)
-  const component = renderer.create(<QuantitySelector min="1" max="20" />)
+  const component = renderer.create(<QuantitySelector min={1} max={20} />)
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
   expect(tree).toMatchSnapshot()
   expect(rendered.type).toBe('input')
   expect(rendered.nodeType).toBe('host')
-  expect(rendered.props.max).toBe('20')
-  expect(rendered.props.min).toBe('1')
+  expect(rendered.props.max).toBe(20)
+  expect(rendered.props.min).toBe(1)
 })
 
 test('<QuantitySelector with custom children />', () => {

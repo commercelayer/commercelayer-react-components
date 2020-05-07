@@ -1,15 +1,15 @@
 import React from 'react'
-import { Total } from '../src'
+import { TotalAmount } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 import BaseOrderPrice from '../src/components/utils/BaseOrderPrice'
 import Parent from '../src/components/utils/Parent'
 
-const propTypes = components.Total.propTypes
+const propTypes = components.TotalAmount.propTypes
 
-test('<Total/>', () => {
+test('<TotalAmount/>', () => {
   expect.assertions(3)
-  const component = renderer.create(<Total />)
+  const component = renderer.create(<TotalAmount />)
   const tree = component.toJSON()
   const root = component.toTree()
   const proptypes = root.type['propTypes']
@@ -18,9 +18,9 @@ test('<Total/>', () => {
   expect(proptypes.format).toBe(propTypes.format)
 })
 
-test('<Total children rendered />', () => {
+test('<TotalAmount children rendered />', () => {
   expect.assertions(3)
-  const component = renderer.create(<Total />)
+  const component = renderer.create(<TotalAmount />)
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
@@ -29,11 +29,11 @@ test('<Total children rendered />', () => {
   expect(rendered.type).toBe(BaseOrderPrice)
 })
 
-test('<Total with custom children />', () => {
+test('<TotalAmount with custom children />', () => {
   expect.assertions(5)
   const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
-    <Total format="cents">{CustomComponent}</Total>
+    <TotalAmount format="cents">{CustomComponent}</TotalAmount>
   )
   const tree = component.toJSON()
   const root = component.toTree()

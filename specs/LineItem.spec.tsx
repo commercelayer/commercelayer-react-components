@@ -45,7 +45,7 @@ test('<LineItem check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][0]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: Invalid prop 'children' supplied to LineItem. Only components LineItemImage, LineItemName, LineItemOptions, LineItemQuantity, LineItemPrice, LineItemRemove, Errors, ReactNode are allowed.`
+      `Warning: Failed prop type: Invalid prop 'children' supplied to LineItem. Only components LineItemImage, LineItemName, LineItemOptions, LineItemQuantity, LineItemAmount, LineItemRemoveLink, Errors, ReactNode are allowed.`
     )
   )
 })

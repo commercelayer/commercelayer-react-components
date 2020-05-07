@@ -1,15 +1,15 @@
 import React from 'react'
-import { Discount } from '../src'
+import { DiscountAmount } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 import BaseOrderPrice from '../src/components/utils/BaseOrderPrice'
 import Parent from '../src/components/utils/Parent'
 
-const propTypes = components.Discount.propTypes
+const propTypes = components.DiscountAmount.propTypes
 
-test('<Discount/>', () => {
+test('<DiscountAmount/>', () => {
   expect.assertions(3)
-  const component = renderer.create(<Discount />)
+  const component = renderer.create(<DiscountAmount />)
   const tree = component.toJSON()
   const root = component.toTree()
   const proptypes = root.type['propTypes']
@@ -18,9 +18,9 @@ test('<Discount/>', () => {
   expect(proptypes.format).toBe(propTypes.format)
 })
 
-test('<Discount children rendered />', () => {
+test('<DiscountAmount children rendered />', () => {
   expect.assertions(3)
-  const component = renderer.create(<Discount />)
+  const component = renderer.create(<DiscountAmount />)
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
@@ -29,11 +29,11 @@ test('<Discount children rendered />', () => {
   expect(rendered.type).toBe(BaseOrderPrice)
 })
 
-test('<Discount with custom children />', () => {
+test('<DiscountAmount with custom children />', () => {
   expect.assertions(5)
-  const CustomComponent = props => <span>{props.label}</span>
+  const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
-    <Discount format="cents">{CustomComponent}</Discount>
+    <DiscountAmount format="cents">{CustomComponent}</DiscountAmount>
   )
   const tree = component.toJSON()
   const root = component.toTree()

@@ -8,7 +8,7 @@ exports[`<VariantSelector check children /> 1`] = `
   <option
     disabled={false}
   >
-    select an variant
+    Select a variant
   </option>
 </select>
 `;
@@ -23,7 +23,7 @@ exports[`<VariantSelector/> 1`] = `
   <option
     disabled={false}
   >
-    select an variant
+    Select a variant
   </option>
 </select>
 `;

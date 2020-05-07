@@ -1,14 +1,13 @@
 import React from 'react'
-import { LineItemRemove } from '../src'
+import { CheckoutLink } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
-import Parent from '../src/components/utils/Parent'
 
-const propTypes = components.LineItemRemove.propTypes
+const propTypes = components.CheckoutLink.propTypes
 
-test('<LineItemRemove/>', () => {
+test('<CheckoutLink/>', () => {
   expect.assertions(3)
-  const component = renderer.create(<LineItemRemove />)
+  const component = renderer.create(<CheckoutLink />)
   const tree = component.toJSON()
   const root = component.toTree()
   const proptypes = root.type['propTypes']
@@ -17,32 +16,33 @@ test('<LineItemRemove/>', () => {
   expect(proptypes.label).toBe(propTypes.label)
 })
 
-test('<LineItemRemove check children format />', () => {
+test('<CheckoutLink with props />', () => {
   expect.assertions(3)
-  const component = renderer.create(<LineItemRemove label="remove product" />)
+  const component = renderer.create(<CheckoutLink />)
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
   expect(tree).toMatchSnapshot()
+  expect(rendered.nodeType).toBe('host')
   expect(rendered.type).toBe('a')
-  expect(root.props.label).toBe('remove product')
 })
 
-test('<LineItemRemove with custom children />', () => {
-  expect.assertions(7)
+test('<CheckoutLink with custom children />', () => {
+  expect.assertions(5)
   const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
-    <LineItemRemove>{CustomComponent}</LineItemRemove>
+    <CheckoutLink label="My checkout">{CustomComponent}</CheckoutLink>
   )
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
   const childRendered = root.rendered.rendered
   expect(tree).toMatchSnapshot()
-  expect(rendered.type).toBe(Parent)
-  expect(rendered.props.handleRemove).toBeDefined()
+
+  expect(rendered.props.children).toBe(CustomComponent)
+
   expect(childRendered.nodeType).toBe('component')
   expect(childRendered.type).toBe(CustomComponent)
-  expect(childRendered.rendered.nodeType).toBe('host')
-  expect(childRendered.rendered.type).toBe('span')
+
+  expect(childRendered.props.label).toBe('My checkout')
 })

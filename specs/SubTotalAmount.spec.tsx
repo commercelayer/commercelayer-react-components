@@ -1,15 +1,15 @@
 import React from 'react'
-import { GiftCardPrice } from '../src'
+import { SubTotalAmount } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 import BaseOrderPrice from '../src/components/utils/BaseOrderPrice'
 import Parent from '../src/components/utils/Parent'
 
-const propTypes = components.GiftCardPrice.propTypes
+const propTypes = components.SubTotalAmount.propTypes
 
-test('<GiftCardPrice/>', () => {
+test('<SubTotalAmount/>', () => {
   expect.assertions(3)
-  const component = renderer.create(<GiftCardPrice />)
+  const component = renderer.create(<SubTotalAmount />)
   const tree = component.toJSON()
   const root = component.toTree()
   const proptypes = root.type['propTypes']
@@ -18,31 +18,34 @@ test('<GiftCardPrice/>', () => {
   expect(proptypes.format).toBe(propTypes.format)
 })
 
-test('<GiftCardPrice check children format />', () => {
-  expect.assertions(4)
-  const component = renderer.create(<GiftCardPrice format="float" />)
+test('<SubTotalAmount children rendered />', () => {
+  expect.assertions(3)
+  const component = renderer.create(<SubTotalAmount />)
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
-  const childRendered = rendered.rendered
   expect(tree).toMatchSnapshot()
+  expect(rendered.nodeType).toBe('component')
   expect(rendered.type).toBe(BaseOrderPrice)
-  expect(rendered.props.format).toBe('float')
-  expect(childRendered.type).toBe('span')
 })
 
-test('<GiftCardPrice with custom children />', () => {
-  expect.assertions(4)
-  const CustomComponent = props => <span>{props.label}</span>
+test('<SubTotalAmount with custom children />', () => {
+  expect.assertions(5)
+  const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
-    <GiftCardPrice>{CustomComponent}</GiftCardPrice>
+    <SubTotalAmount format="cents">{CustomComponent}</SubTotalAmount>
   )
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
-  const childRendered = root.rendered.rendered
+  const parentRendered = root.rendered.rendered
+  const childRendered = parentRendered.rendered
   expect(tree).toMatchSnapshot()
+
   expect(rendered.props.children).toBe(CustomComponent)
-  expect(childRendered.nodeType).toBe('component')
-  expect(childRendered.type).toBe(Parent)
+
+  expect(parentRendered.nodeType).toBe('component')
+  expect(parentRendered.type).toBe(Parent)
+
+  expect(childRendered.props.price).not.toBeUndefined()
 })

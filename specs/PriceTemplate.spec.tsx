@@ -1,9 +1,7 @@
 import React from 'react'
-import PriceTemplate from '../src/components/PriceTemplate'
+import PriceTemplate from '../src/components/utils/PriceTemplate'
 import renderer from 'react-test-renderer'
-import components from '../src/config/components'
-
-const propTypes = components.PriceTemplate.propTypes
+import PropTypes from 'prop-types'
 
 test('<PriceTemplate/>', () => {
   expect.assertions(3)
@@ -12,8 +10,8 @@ test('<PriceTemplate/>', () => {
   const root = component.toTree()
   const proptypes = root.type['propTypes']
   expect(tree).toMatchSnapshot()
-  expect(proptypes.formattedAmount).toBe(propTypes.formattedAmount)
-  expect(proptypes.formattedCompare).toBe(propTypes.formattedCompare)
+  expect(proptypes.formattedAmount).toBe(PropTypes.string)
+  expect(proptypes.formattedCompare).toBe(PropTypes.string)
 })
 
 test('<PriceTemplate check children format />', () => {

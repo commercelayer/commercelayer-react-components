@@ -4,7 +4,7 @@ import {
 } from '@commercelayer/js-auth'
 import React, { useEffect, useState } from 'react'
 import Price from '../src/components/Price'
-import PriceContainer from '../src/components/PricesContainer'
+import PricesContainer from '../src/components/PricesContainer'
 import CommerceLayer from '../src/components/CommerceLayer'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
@@ -89,7 +89,7 @@ const Home = () => {
       <div className="container mx-auto">
         <CommerceLayer accessToken={token} endpoint={endpoint} cache>
           <div className="flex flex-row flex-wrap justify-around">
-            <PriceContainer
+            <PricesContainer
               perPage={5}
               loader={<Loading />}
               filters={{ priceListCurrencyCodeEq: 'EUR' }}
@@ -120,7 +120,7 @@ const Home = () => {
                   </div>
                 )
               })}
-            </PriceContainer>
+            </PricesContainer>
           </div>
         </CommerceLayer>
       </div>

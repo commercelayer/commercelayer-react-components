@@ -1,5 +1,5 @@
 import React from 'react'
-import { SkuOptionsContainer, Checkout } from '../src'
+import { SkuOptionsContainer, CheckoutLink } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 
@@ -25,7 +25,7 @@ test('<SkuOptionsContainer check children />', () => {
   console.error = jest.fn()
   const component = renderer.create(
     <SkuOptionsContainer>
-      <Checkout />
+      <CheckoutLink />
     </SkuOptionsContainer>
   )
   const tree = component.toJSON()

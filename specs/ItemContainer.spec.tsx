@@ -1,12 +1,12 @@
 import React from 'react'
-import { ItemContainer, Price } from '../src'
+import { ItemContainer, Price, PricesContainer } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 
 const propTypes = components.ItemContainer.propTypes
 
 test('<ItemContainer/>', () => {
-  expect.assertions(3)
+  expect.assertions(4)
   const component = renderer.create(
     <ItemContainer>
       <div>test</div>
@@ -18,6 +18,7 @@ test('<ItemContainer/>', () => {
   expect(tree).toMatchSnapshot()
   expect(proptypes.children).toBe(propTypes.children)
   expect(proptypes.skuCode).toBe(propTypes.skuCode)
+  expect(proptypes.lineItem).toBe(propTypes.lineItem)
 })
 
 test('<ItemContainer proptypes required />', () => {
@@ -45,7 +46,7 @@ test('<ItemContainer check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][0]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: Invalid prop 'children' supplied to ItemContainer. Only components PriceContainer, VariantContainer, SkuOptionContainer, QuantitySelector, AddToCart, AvailabilityContainer, ReactNode are allowed.`
+      `Warning: Failed prop type: Invalid prop 'children' supplied to ItemContainer. Only components PricesContainer, VariantsContainer, SkuOptionContainer, QuantitySelector, AddToCartButton, AvailabilityContainer, ReactNode are allowed.`
     )
   )
 })

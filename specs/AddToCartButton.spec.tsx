@@ -1,11 +1,11 @@
 import React from 'react'
-import { AddToCart } from '../src'
+import { AddToCartButton, ItemContainer } from '../src'
 import renderer from 'react-test-renderer'
 import PropTypes from 'prop-types'
 
-test('<AddToCart/>', () => {
+test('<AddToCartButton/>', () => {
   expect.assertions(7)
-  const component = renderer.create(<AddToCart />)
+  const component = renderer.create(<AddToCartButton />)
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
@@ -21,27 +21,30 @@ test('<AddToCart/>', () => {
   expect(rendered.props.disabled).toBe(true)
 })
 
-test('<AddToCart with props />', () => {
-  expect.assertions(4)
+test('<AddToCartButton with props />', () => {
+  expect.assertions(3)
   const component = renderer.create(
-    <AddToCart label="Add to basket" disabled={false} skuCode="SKUCODE12345" />
+    <AddToCartButton label="Add to basket" skuCode="SKUCODE12345" />
   )
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
   expect(tree).toMatchSnapshot()
   expect(rendered.props.children).toBe('Add to basket')
-  expect(rendered.props.disabled).toBe(false)
   expect(root.props.skuCode).toBe('SKUCODE12345')
 })
 
-test('<AddToCart with custom children />', () => {
+test('<AddToCartButton with custom children />', () => {
   expect.assertions(8)
-  const CustomComponent = props => <span>{props.label}</span>
+  const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
-    <AddToCart label="Add to basket" disabled={false} skuCode="SKUCODE12345">
+    <AddToCartButton
+      label="Add to basket"
+      disabled={false}
+      skuCode="SKUCODE12345"
+    >
       {CustomComponent}
-    </AddToCart>
+    </AddToCartButton>
   )
   const tree = component.toJSON()
   const root = component.toTree()
@@ -57,4 +60,18 @@ test('<AddToCart with custom children />', () => {
 
   expect(childRendered.nodeType).toBe('component')
   expect(childRendered.type).toBe(CustomComponent)
+})
+
+test('<AddToCartButton with ItemContainer skuCode />', () => {
+  expect.assertions(2)
+  const component = renderer.create(
+    <ItemContainer skuCode="SKUCODE12345">
+      <AddToCartButton />
+    </ItemContainer>
+  )
+  const tree = component.toJSON()
+  const root = component.toTree()
+  const childRendered = root.rendered.rendered
+  expect(tree).toMatchSnapshot()
+  expect(childRendered.props.disabled).toBeTruthy()
 })

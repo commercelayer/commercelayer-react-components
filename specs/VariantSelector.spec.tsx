@@ -9,7 +9,7 @@ test('<VariantSelector/>', () => {
   expect.assertions(8)
   const component = renderer.create(
     <VariantSelector
-      skuCodes={[
+      options={[
         {
           label: '6 months',
           code: 'BABYONBU000000E63E746MXX',
@@ -23,7 +23,7 @@ test('<VariantSelector/>', () => {
   expect(tree).toMatchSnapshot()
   expect(proptypes.children).toBe(propTypes.children)
   expect(proptypes.placeholder).toBe(propTypes.placeholder)
-  expect(proptypes.skuCodes).toBe(propTypes.skuCodes)
+  expect(proptypes.options).toBe(propTypes.options)
   expect(proptypes.name).toBe(propTypes.name)
   expect(proptypes.type).toBe(propTypes.type)
   expect(proptypes.loader).toBe(propTypes.loader)
@@ -34,7 +34,7 @@ test('<VariantSelector check children />', () => {
   expect.assertions(3)
   const component = renderer.create(
     <VariantSelector
-      skuCodes={[
+      options={[
         {
           label: '6 months',
           code: 'BABYONBU000000E63E746MXX',
@@ -45,7 +45,7 @@ test('<VariantSelector check children />', () => {
   const tree = component.toJSON()
   const root = component.toTree()
   expect(tree).toMatchSnapshot()
-  expect(root.props.placeholder).toStrictEqual('select an variant')
+  expect(root.props.placeholder).toStrictEqual('Select a variant')
   expect(root.props.type).toStrictEqual('select')
 })
 
@@ -54,7 +54,7 @@ test('<VariantSelector with custom children />', () => {
   const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
     <VariantSelector
-      skuCodes={[
+      options={[
         {
           label: '6 months',
           code: 'BABYONBU000000E63E746MXX',

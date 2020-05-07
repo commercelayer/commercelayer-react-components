@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<GiftCardAmount check children format /> 1`] = `
+<span>
+  
+</span>
+`;
+
+exports[`<GiftCardAmount with custom children /> 1`] = `<span />`;
+
+exports[`<GiftCardAmount/> 1`] = `
+<span>
+  
+</span>
+`;
