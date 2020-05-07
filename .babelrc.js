@@ -1,7 +1,9 @@
-module.exports = {
-  presets: [
-    'next/babel', // HACK Remove to do the build and uncomment others presets
-    // '@babel/preset-env',
-    // '@babel/preset-react',
-  ],
+let presets = {
+  presets: ['@babel/preset-env', '@babel/preset-react'],
 }
+if (process.env.npm_lifecycle_script.search('tsdx build') === -1) {
+  presets = {
+    presets: ['next/babel'],
+  }
+}
+module.exports = presets
