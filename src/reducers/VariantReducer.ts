@@ -2,14 +2,15 @@ import CLayer, {
   SkuCollection,
   InventoryCollection,
 } from '@commercelayer/js-sdk'
-import { SkuCodePropObj } from '../components/VariantSelector'
+import { VariantOptions } from '../components/VariantSelector'
 import { Dispatch } from 'react'
 import baseReducer from '../utils/baseReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import getSkus from '../utils/getSkus'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
-import { Items } from './ItemReducer'
+import { Items, CustomLineItem, SetCustomLineItem } from './ItemReducer'
 import { BaseError } from '../@types/errors'
+import _ from 'lodash'
 
 type SetSkuCodeVariantParams = {
   code: string
@@ -23,13 +24,25 @@ export interface SetSkuCodeVariant {
   (params: SetSkuCodeVariantParams): void
 }
 
+type SetVariantSkuCodesParams = {
+  skuCodes: VariantOptions[]
+  dispatch: Dispatch<VariantAction>
+  setCustomLineItems?: SetCustomLineItem
+}
+
 export interface SetVariantSkuCodes {
-  (skuCodes: SkuCodePropObj[], dispatch: Dispatch<VariantAction>): void
+  (params: SetVariantSkuCodesParams): void
 }
 
 export interface VariantsObject {
   [key: string]: SkuCollection
 }
+
+export type SetSkuCode = (
+  code: string,
+  id: string,
+  lineItem?: CustomLineItem
+) => void
 
 export interface VariantPayload {
   loading?: boolean
@@ -41,8 +54,8 @@ export interface VariantPayload {
   currentSkuInventory?: InventoryCollection
   currentQuantity?: number
   currentPrices?: SkuCollection[]
-  setSkuCode?: (code, id) => void
-  setSkuCodes?: (skuCodes: SkuCodePropObj[]) => void
+  setSkuCode?: SetSkuCode
+  setSkuCodes?: (skuCodes: VariantOptions[]) => void
 }
 
 export interface VariantState extends VariantPayload {
@@ -55,8 +68,21 @@ export interface VariantAction {
   payload: VariantPayload
 }
 
-export const setVariantSkuCodes: SetVariantSkuCodes = (skuCodes, dispatch) => {
-  const sCodes = skuCodes.map((s) => s.code)
+export const setVariantSkuCodes: SetVariantSkuCodes = ({
+  skuCodes,
+  dispatch,
+  setCustomLineItems,
+}) => {
+  const lineItems = {}
+  const sCodes = skuCodes.map((s) => {
+    if (_.has(s, 'lineItem')) {
+      lineItems[s.code] = s.lineItem
+    }
+    return s.code
+  })
+  if (!_.isEmpty(lineItems)) {
+    setCustomLineItems && setCustomLineItems(lineItems)
+  }
   dispatch({
     type: 'setSkuCodes',
     payload: { skuCodes: sCodes },

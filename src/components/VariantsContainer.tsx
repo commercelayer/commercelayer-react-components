@@ -31,11 +31,21 @@ const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
 ) => {
   const { children, skuCode, filters } = props
   const config = useContext(CommerceLayerContext)
-  const { setItem, setItems, items, item: currentItem } = useContext(
-    ItemContext
-  )
+  const {
+    setItem,
+    setItems,
+    items,
+    item: currentItem,
+    setCustomLineItems,
+    skuCode: itemSkuCode,
+  } = useContext(ItemContext)
   const [state, dispatch] = useReducer(variantReducer, variantInitialState)
-  const sCode = getCurrentItemKey(currentItem) || skuCode || state.skuCode || ''
+  const sCode =
+    getCurrentItemKey(currentItem) ||
+    skuCode ||
+    state.skuCode ||
+    itemSkuCode ||
+    ''
   useEffect(() => {
     if (!_.isEmpty(items) && !_.isEmpty(state.variants)) {
       if (!_.isEqual(items, state.variants)) {
@@ -62,9 +72,20 @@ const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
   const variantValue: VariantState = {
     ...state,
     skuCode: sCode,
-    setSkuCode: (code, id) =>
-      setSkuCode({ code, id, config, setItem, dispatch }),
-    setSkuCodes: (skuCodes) => setVariantSkuCodes(skuCodes, dispatch),
+    setSkuCode: (code, id, lineItem) => {
+      if (!_.isEmpty(lineItem)) {
+        setCustomLineItems && setCustomLineItems({ [code]: lineItem || {} })
+      }
+      setSkuCode({
+        code,
+        id,
+        config,
+        setItem,
+        dispatch,
+      })
+    },
+    setSkuCodes: (skuCodes) =>
+      setVariantSkuCodes({ skuCodes, dispatch, setCustomLineItems }),
   }
   return (
     <VariantsContext.Provider value={variantValue}>

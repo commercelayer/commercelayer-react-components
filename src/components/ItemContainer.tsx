@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useReducer } from 'react'
+import React, { FunctionComponent, useReducer, useEffect } from 'react'
 import ItemContext, {
   initialItemContext,
   InitItemContext,
@@ -9,6 +9,8 @@ import itemReducer, {
   Items,
   ItemQuantity,
   ItemOptions,
+  CustomLineItems,
+  CustomLineItem,
 } from '../reducers/ItemReducer'
 import { BFSetStateContainer } from '../@types/index'
 import { ItemPrices } from '../reducers/ItemReducer'
@@ -21,9 +23,20 @@ const displayName = components.ItemContainer.displayName
 export type ItemContainerProps = PropsType<typeof propTypes>
 
 const ItemContainer: FunctionComponent<ItemContainerProps> = (props) => {
-  // TODO add skuCode to workflow
-  const { children } = props
+  const { children, skuCode, lineItem } = props
   const [state, dispatch] = useReducer(itemReducer, itemInitialState)
+  useEffect(() => {
+    if (skuCode) {
+      setItemState(skuCode, { type: 'setSkuCode', key: 'skuCode' }, dispatch)
+    }
+    if (lineItem) {
+      setItemState(
+        lineItem as CustomLineItem,
+        { type: 'setCustomLineItem', key: 'lineItem' },
+        dispatch
+      )
+    }
+  }, [])
   const setItems: BFSetStateContainer<Items> = (items) =>
     setItemState(items, { type: 'setItems', key: 'items' }, dispatch)
   const setItem: BFSetStateContainer<Items> = (item) =>
@@ -34,16 +47,22 @@ const ItemContainer: FunctionComponent<ItemContainerProps> = (props) => {
     setItemState(item, { type: 'setOption', key: 'option' }, dispatch)
   const setPrices: BFSetStateContainer<ItemPrices> = (item) =>
     setItemState(item, { type: 'setPrices', key: 'prices' }, dispatch)
-  const itemValue =
-    {
-      ...initialItemContext,
-      ...state,
-      setItems,
-      setItem,
-      setQuantity,
-      setOption,
-      setPrices,
-    } as InitItemContext
+  const setCustomLineItems: BFSetStateContainer<CustomLineItems> = (item) =>
+    setItemState(
+      item,
+      { type: 'setCustomLineItems', key: 'lineItems' },
+      dispatch
+    )
+  const itemValue = {
+    ...initialItemContext,
+    ...state,
+    setItems,
+    setItem,
+    setQuantity,
+    setOption,
+    setPrices,
+    setCustomLineItems,
+  } as InitItemContext
   return (
     <ItemContext.Provider value={itemValue}>{children}</ItemContext.Provider>
   )

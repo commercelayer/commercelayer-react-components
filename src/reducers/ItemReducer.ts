@@ -28,12 +28,36 @@ export interface ItemOptions {
   [skuCode: string]: ItemOption
 }
 
-type ItemParams = {
-  type: ItemActionType
-  key: 'items' | 'item' | 'quantity' | 'option' | 'prices'
+export type CustomLineItem = {
+  name?: string
+  imageUrl?: string
 }
 
-type DataType = Items | ItemQuantity | ItemOptions | ItemPrices
+export interface CustomLineItems {
+  [skuCode: string]: CustomLineItem
+}
+
+type ItemParams = {
+  type: ItemActionType
+  key:
+    | 'items'
+    | 'item'
+    | 'quantity'
+    | 'option'
+    | 'prices'
+    | 'lineItem'
+    | 'lineItems'
+    | 'skuCode'
+}
+
+type DataType =
+  | Items
+  | ItemQuantity
+  | ItemOptions
+  | ItemPrices
+  | CustomLineItems
+  | CustomLineItem
+  | string
 
 export interface SetItemState {
   (data: DataType, params: ItemParams, dispatch: Dispatch<ItemAction>): void
@@ -44,41 +68,59 @@ export const setItemState: SetItemState = (data, params, dispatch) => {
   dispatch({
     type: params.type,
     payload: {
-      [`${params.key}`]: data
-    }
+      [`${params.key}`]: data,
+    },
   })
 }
 
-export const unsetItemState: BaseUnsetState<ItemAction> = dispatch => {
+export const unsetItemState: BaseUnsetState<ItemAction> = (dispatch) => {
   dispatch({
     type: 'setItem',
     payload: {
-      item: {}
-    }
+      item: {},
+    },
   })
   dispatch({
     type: 'setItems',
     payload: {
-      items: {}
-    }
+      items: {},
+    },
   })
   dispatch({
     type: 'setQuantity',
     payload: {
-      quantity: {}
-    }
+      quantity: {},
+    },
   })
   dispatch({
     type: 'setOption',
     payload: {
-      option: {}
-    }
+      option: {},
+    },
+  })
+  dispatch({
+    type: 'setCustomLineItems',
+    payload: {
+      lineItems: {},
+    },
+  })
+  dispatch({
+    type: 'setCustomLineItem',
+    payload: {
+      lineItem: {},
+    },
   })
 }
 
+export type SetCustomLineItems = (lineItems: CustomLineItems) => void
+export type SetCustomLineItem = (lineItem: CustomLineItem) => void
+
 export interface ItemState {
+  skuCode?: string
   items?: Items
   item?: Items
+  lineItems?: CustomLineItems
+  lineItem?: CustomLineItem
   quantity?: ItemQuantity
   option?: ItemOptions
   prices?: ItemPrices
@@ -87,6 +129,9 @@ export interface ItemState {
   setQuantity?: (quantity: ItemQuantity) => void
   setOption?: (option: ItemOptions) => void
   setPrices?: (prices: ItemPrices) => void
+  setSkuCode?: (skuCode: string) => void
+  setCustomLineItems?: SetCustomLineItems
+  setCustomLineItem?: SetCustomLineItem
 }
 
 type ItemActionType =
@@ -95,13 +140,19 @@ type ItemActionType =
   | 'setQuantity'
   | 'setOption'
   | 'setPrices'
+  | 'setCustomLineItems'
+  | 'setCustomLineItem'
+  | 'setSkuCode'
 
 const actionType: ItemActionType[] = [
   'setItem',
   'setItems',
   'setQuantity',
   'setOption',
-  'setPrices'
+  'setPrices',
+  'setCustomLineItems',
+  'setCustomLineItem',
+  'setSkuCode',
 ]
 
 export interface ItemAction {
@@ -114,7 +165,10 @@ export const itemInitialState: ItemState = {
   item: {},
   quantity: {},
   option: {},
-  prices: {}
+  prices: {},
+  lineItems: {},
+  lineItem: {},
+  skuCode: '',
 }
 
 const itemReducer = (state: ItemState, reducer: ItemAction): ItemState =>

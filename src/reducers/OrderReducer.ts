@@ -4,7 +4,7 @@ import { setLocalOrder } from '../utils/localStorage'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import baseReducer from '../utils/baseReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
-import { ItemOption } from './ItemReducer'
+import { ItemOption, CustomLineItem } from './ItemReducer'
 import _ from 'lodash'
 import { BaseMetadataObject } from '../@types/index'
 import { BaseError } from '../@types/errors'
@@ -32,6 +32,7 @@ export interface AddToCartParams {
   skuId?: string
   quantity?: number
   option?: ItemOption
+  lineItem?: CustomLineItem
   orderMetadata?: BaseMetadataObject
 }
 
@@ -55,6 +56,7 @@ export type AddToCartValues = {
   skuId?: string
   quantity?: number
   option?: ItemOption
+  lineItem?: CustomLineItem
 }
 
 export type getOrderContext = (id: string) => void
@@ -133,20 +135,34 @@ export const getApiOrder: GetOrder = async (params) => {
 }
 
 export const addToCart: AddToCart = async (params) => {
-  const { skuCode, skuId, quantity, option, config, dispatch } = params
+  const {
+    skuCode,
+    skuId,
+    quantity,
+    option,
+    config,
+    dispatch,
+    lineItem,
+  } = params
   try {
     const id = await createOrder(params)
     const order = CLayer.Order.build({ id })
+    const name = lineItem?.name
+    const imageUrl = lineItem?.imageUrl
     const attrs = {
       order,
       skuCode,
+      name,
+      imageUrl,
       quantity: quantity || 1,
       _updateQuantity: 1,
     }
     if (skuId) {
       attrs['item'] = CLayer.Sku.build({ id: skuId })
     }
-    const lineItem = await CLayer.LineItem.withCredentials(config).create(attrs)
+    const lineItemResource = await CLayer.LineItem.withCredentials(
+      config
+    ).create(attrs)
     if (!_.isEmpty(option)) {
       _.map(option, async (opt) => {
         const { options, skuOptionId } = opt
@@ -154,7 +170,7 @@ export const addToCart: AddToCart = async (params) => {
         await CLayer.LineItemOption.withCredentials(config).create({
           quantity: 1,
           options,
-          lineItem,
+          lineItem: lineItemResource,
           skuOption,
         })
       })

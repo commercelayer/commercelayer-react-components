@@ -4,28 +4,39 @@ import React, {
   useContext,
   useEffect,
   ReactElement,
+  ReactNode,
 } from 'react'
-import VariantTemplate from './VariantTemplate'
+import VariantTemplate from './utils/VariantTemplate'
 import Parent from './utils/Parent'
 import VariantsContext from '../context/VariantsContext'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
+import { BaseSelectorType } from '../@types'
 
 const propTypes = components.VariantSelector.propTypes
 const defaultProps = components.VariantSelector.defaultProps
 const displayName = components.VariantSelector.displayName
 
-export interface SkuCodePropObj {
+export type VariantOptions = {
   label: string
   code: string
+  lineItem?: {
+    name: string
+    imageUrl?: string
+  }
 }
 
-export type VariantSelectorProps = PropsType<typeof propTypes> &
-  JSX.IntrinsicElements['input'] &
+export type VariantSelectorProps = {
+  children?: FunctionComponent
+  options: VariantOptions[]
+  type?: BaseSelectorType
+  loader?: ReactNode
+  placeholder?: string
+  skuCode?: string
+} & JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['select']
 
 const VariantSelector: FunctionComponent<VariantSelectorProps> = (props) => {
-  const { children, type, placeholder, skuCode, name, skuCodes, ...prs } = props
+  const { children, type, placeholder, skuCode, name, options, ...prs } = props
   const {
     setSkuCode,
     skuCode: variantSkuCode,
@@ -34,11 +45,11 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = (props) => {
     setSkuCodes,
   } = useContext(VariantsContext)
   useEffect(() => {
-    setSkuCodes && setSkuCodes(skuCodes)
+    setSkuCodes && setSkuCodes(options)
     return (): void => {
       setSkuCodes && setSkuCodes([])
     }
-  }, [skuCodes])
+  }, [options])
   const sCode = variantSkuCode || skuCode || ''
   const DefaultTemplate = (): ReactElement =>
     loading ? (
@@ -49,7 +60,7 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = (props) => {
         type={type}
         placeholder={placeholder as string}
         skuCode={sCode}
-        skuCodes={skuCodes}
+        options={options}
         onChange={setSkuCode as any}
         name={name as string}
         {...prs}
@@ -58,7 +69,7 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = (props) => {
   const parentProps = {
     variants,
     loading,
-    skuCodes,
+    options,
     handleSelect: setSkuCode,
     skuCode: sCode,
     ...props,

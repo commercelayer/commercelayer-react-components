@@ -17,20 +17,31 @@ export type AddToCartButtonProps = InferProps<typeof propTypes> &
 const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
   const { label, children, skuCode, disabled, ...p } = props
   const { addToCart } = useContext(OrderContext)
-  const { item, items, quantity, option, prices } = useContext(ItemContext)
+  const {
+    item,
+    items,
+    quantity,
+    option,
+    prices,
+    lineItems,
+    lineItem,
+    skuCode: itemSkuCode,
+  } = useContext(ItemContext)
   const sCode =
     !_.isEmpty(items) && skuCode
       ? items[skuCode]?.code
-      : skuCode || getCurrentItemKey(item)
+      : skuCode || getCurrentItemKey(item) || (itemSkuCode as string)
   const handleClick = (): void => {
     const qty = quantity[sCode]
     const opt = option[sCode]
+    const customLineItem = !_.isEmpty(lineItem) ? lineItem : lineItems[sCode]
     if (addToCart)
       addToCart({
         skuCode: sCode,
         skuId: item[sCode]?.id,
         quantity: qty,
         option: opt,
+        lineItem: customLineItem,
       })
   }
   const autoDisabled = disabled || !prices[sCode] || !sCode
