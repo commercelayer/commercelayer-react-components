@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
-    "@commercelayer/js-sdk": "^2.9.3",
+    "@commercelayer/js-sdk": "^2.9.4",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
@@ -56,7 +56,7 @@
     "@babel/preset-typescript": "^7.9.0",
     "@commercelayer/cypress-vcr": "^1.0.1",
     "@commercelayer/js-auth": "^2.0.2",
-    "@cypress/webpack-preprocessor": "^5.1.2",
+    "@cypress/webpack-preprocessor": "^5.2.0",
     "@types/jest": "^25.2.1",
     "@types/lodash": "^4.14.150",
     "@types/node": "^13.13.5",
