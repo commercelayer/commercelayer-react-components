@@ -1,19 +1,18 @@
 import React, { FunctionComponent } from 'react'
 import BaseOrderPrice from './utils/BaseOrderPrice'
 import components from '../config/components'
-import { InferProps } from 'prop-types'
+import { BaseAmountComponent } from '../@types'
 
 const propTypes = components.DiscountAmount.propTypes
+const defaultProps = components.DiscountAmount.defaultProps
 const displayName = components.DiscountAmount.displayName
 
-export type DiscountAmountProps = InferProps<typeof propTypes> &
-  JSX.IntrinsicElements['span']
-
-const DiscountAmount: FunctionComponent<DiscountAmountProps> = (props) => {
+const DiscountAmount: FunctionComponent<BaseAmountComponent> = (props) => {
   return <BaseOrderPrice base="amount" type="discount" {...props} />
 }
 
 DiscountAmount.propTypes = propTypes
+DiscountAmount.defaultProps = defaultProps
 DiscountAmount.displayName = displayName
 
 export default DiscountAmount

@@ -12,16 +12,16 @@ exports[`<LineItemRemoveLink check children format /> 1`] = `
 
 exports[`<LineItemRemoveLink with custom children /> 1`] = `
 <span>
-  remove
+  Remove
 </span>
 `;
 
 exports[`<LineItemRemoveLink/> 1`] = `
 <a
   href="#"
-  label="remove"
+  label="Remove"
   onClick={[Function]}
 >
-  remove
+  Remove
 </a>
 `;

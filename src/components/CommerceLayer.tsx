@@ -1,18 +1,18 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, ReactNode } from 'react'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import components from '../config/components'
 
 const propTypes = components.CommerceLayer.propTypes
 
-export type CommerceLayerProps = {
+type CommerceLayerProps = {
+  children: ReactNode
   accessToken: string
   endpoint: string
   cache?: boolean
 }
 
 const CommerceLayer: FunctionComponent<CommerceLayerProps> = (props) => {
-  const { children, ...p } = props
-  const cache = !!p.cache
+  const { children, cache = false, ...p } = props
   return (
     <CommerceLayerContext.Provider value={{ ...p, cache }}>
       {children}

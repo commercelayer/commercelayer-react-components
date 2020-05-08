@@ -1,24 +1,31 @@
-import React, { useContext, FunctionComponent } from 'react'
+import React, { useContext, FunctionComponent, ReactNode } from 'react'
 import AvailabilityContext from '../context/AvailabilityContext'
 import Parent from './utils/Parent'
 import _ from 'lodash'
-import { InferProps } from 'prop-types'
 import components from '../config/components'
-
-type DefaultProps = {
-  timeFormat: 'days' | 'hours'
-  showShippingMethodName: boolean
-}
+import { TimeFormat } from '../@types/index'
+import { LeadTimes, ShippingMethod } from '../reducers/AvailabilityReducer'
 
 const propTypes = components.AvailabilityTemplate.propTypes
 const defaultProps = components.AvailabilityTemplate
-  .defaultProps as DefaultProps
+  .defaultProps as AvailabilityTemplateProps
 const displayName = components.AvailabilityTemplate.displayName
 
-export type AvailabilityTemplateProps = InferProps<typeof propTypes> &
-  JSX.IntrinsicElements['p']
+type ChildrenProps = Omit<AvailabilityTemplateProps, 'children'> & {
+  min: LeadTimes
+  max: LeadTimes
+  shippingMethod: ShippingMethod
+}
 
-const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = props => {
+type AvailabilityTemplateProps = {
+  timeFormat?: TimeFormat
+  showShippingMethodName?: boolean
+  children?: (props: ChildrenProps) => ReactNode
+} & JSX.IntrinsicElements['p']
+
+const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = (
+  props
+) => {
   const { timeFormat, showShippingMethodName, children, ...p } = props
   const { min, max, shippingMethod } = useContext(AvailabilityContext)
   const mn = !_.isEmpty(min) ? min[`${timeFormat}`] : ''
@@ -33,7 +40,7 @@ const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = props
     min,
     max,
     shippingMethod,
-    ...props
+    ...props,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>

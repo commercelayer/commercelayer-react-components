@@ -1,15 +1,20 @@
-import React, { FunctionComponent, useContext } from 'react'
+import React, { FunctionComponent, useContext, ReactNode } from 'react'
 import OrderContext from '../context/OrderContext'
 import components from '../config/components'
-import { InferProps } from 'prop-types'
 import Parent from './utils/Parent'
 
 const propTypes = components.CheckoutLink.propTypes
 const defaultProps = components.CheckoutLink.defaultProps
 const displayName = components.CheckoutLink.displayName
 
-export type CheckoutLinkProps = InferProps<typeof propTypes> &
-  JSX.IntrinsicElements['a']
+type ChildrenProps = Omit<CheckoutLinkProps, 'children'> & {
+  checkoutUrl: string
+}
+
+type CheckoutLinkProps = {
+  children?: (props: ChildrenProps) => ReactNode
+  label?: string
+} & JSX.IntrinsicElements['a']
 
 const CheckoutLink: FunctionComponent<CheckoutLinkProps> = (props) => {
   const { label, children, ...p } = props
@@ -22,12 +27,8 @@ const CheckoutLink: FunctionComponent<CheckoutLinkProps> = (props) => {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a
-      style={props.style}
-      className={props.className}
-      href={order?.checkoutUrl}
-    >
-      {props.label}
+    <a href={order?.checkoutUrl} {...p}>
+      {label}
     </a>
   )
 }

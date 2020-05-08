@@ -3,6 +3,7 @@ import React, {
   useReducer,
   FunctionComponent,
   useEffect,
+  ReactNode,
 } from 'react'
 import availabilityReducer, {
   availabilityInitialState,
@@ -11,27 +12,29 @@ import AvailabilityContext from '../context/AvailabilityContext'
 import _ from 'lodash'
 import ItemContext from '../context/ItemContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
-import { InferProps } from 'prop-types'
 import components from '../config/components'
 
 const propTypes = components.AvailabilityContainer.propTypes
 const displayName = components.AvailabilityContainer.displayName
 
-export type AvailabilityContainerProps = InferProps<typeof propTypes>
+type AvailabilityContainerProps = {
+  children: ReactNode
+  skuCode?: string
+}
 
 const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
   props
 ) => {
-  const { children } = props
+  const { children, skuCode } = props
   const { item, skuCode: itemSkuCode } = useContext(ItemContext)
   const [state, dispatch] = useReducer(
     availabilityReducer,
     availabilityInitialState
   )
   useEffect(() => {
-    const skuCode = props.skuCode || getCurrentItemKey(item) || itemSkuCode
-    if (skuCode) {
-      const firstLevel = _.first(item[skuCode].inventory.levels) || {
+    const sCode = skuCode || getCurrentItemKey(item) || itemSkuCode
+    if (sCode) {
+      const firstLevel = _.first(item[sCode].inventory.levels) || {
         deliveryLeadTimes: [],
       }
       if (!_.isEmpty(firstLevel) && firstLevel.deliveryLeadTimes.length > 0) {

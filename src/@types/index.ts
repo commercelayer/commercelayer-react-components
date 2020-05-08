@@ -1,4 +1,4 @@
-import { Dispatch } from 'react'
+import { Dispatch, ReactNode } from 'react'
 import PropTypes, { InferProps, ReactElementLike } from 'prop-types'
 import { BaseError } from './errors'
 
@@ -136,3 +136,11 @@ export const baseOrderComponentPricePropTypes = {
 
 export type BasePriceType = 'total' | 'option' | 'unit'
 export type BaseSelectorType = 'select' | 'radio'
+
+export type BaseAmountComponentChildren = Omit<BaseAmountComponent, 'children'>
+
+export interface BaseAmountComponent
+  extends Partial<JSX.IntrinsicElements['span']> {
+  children?: (props: BaseAmountComponentChildren) => ReactNode
+  format?: BaseFormatPrice
+}

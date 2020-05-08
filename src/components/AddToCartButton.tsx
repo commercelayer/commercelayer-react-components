@@ -22,11 +22,8 @@ type ChildrenFunctionProps = {
   disabled?: boolean
 } & PropsWithoutRef<JSX.IntrinsicElements['button']>
 
-type AddToCartButtonProps = {
+type AddToCartButtonProps = Omit<ChildrenFunctionProps, 'handleClick'> & {
   children?: (props: ChildrenFunctionProps) => ReactNode
-  label?: string
-  skuCode?: string
-  disabled?: boolean
 } & PropsWithoutRef<JSX.IntrinsicElements['button']>
 
 const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
