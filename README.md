@@ -12,7 +12,7 @@ To get started with Commerce Layer React Components you need to install them and
 
 - [Installation](#installation)
 - [Authentication](#authentication)
-- [Using ES6 import](#using-es6-import)
+- [Import](#import)
 
 ## Installation
 
@@ -42,19 +42,19 @@ All requests to Commerce Layer API must be authenticated with an [OAuth2](https:
 
 This token will be used to authorize the API calls of all its child components. That's why the presence of (at least) one `CommerceLayer` component is mandatory — it must wrap every other component you need to use.
 
-> Please note that — in case you need to fetch data with different token (i.e. from different organizations or using apps with different roles and permissions) — nothing prevents you from putting as many `CommerceLayer` components you want in the same page.
+> Please note that — in case you need to fetch data with different tokens (i.e. from different organizations or using apps with different roles and permissions) — nothing prevents you from putting as many `CommerceLayer` components you want in the same page.
 
-You can check [our documentation](https://docs.commercelayer.io/api/authentication) for more information about the available authorization flows and leverege [Commerce Layer JS Auth](https://github.com/commercelayer/commercelayer-js-auth) to easily interact with our authentication API.
+You can check [our documentation](https://docs.commercelayer.io/api/authentication) for more information about the available authorization flows and leverage [Commerce Layer JS Auth](https://github.com/commercelayer/commercelayer-js-auth) to easily interact with our authentication API.
 
-## Using ES6 import
+## Import
 
-You can use ES6 named import with each single component you plan to use (in addition to `CommerceLayer` one), as follow:
+You can use ES6 named import with every single component you plan to use (in addition to `CommerceLayer` one), as follow:
 
 ```
 import { CommerceLayer, ...otherComponents } from '@commercelayer/react-components'
 ```
 
-Check [this summary table](#list-of-components) for the complete (and constantly updated) list of availabe components.
+Check [this summary table](#list-of-components) for the complete (and constantly updated) list of available components.
 
 # Usage
 
@@ -74,14 +74,14 @@ This example shows how to use Commerce Layer React Components to display the pri
 ```
 import {
   CommerceLayer,
-  PriceContainer,
+  PricesContainer,
   Price
 } from '@commercelayer/react-components'
 
 // your code [...]
 
 <CommerceLayer accessToken="your-access-token" endpoint="https://your-domain.commercelayer.io">
-  <PriceContainer>
+  <PricesContainer>
     <Price
       skuCode="BABYONBU000000E63E7412MX"
       className="your-custom-class"
@@ -97,7 +97,7 @@ import {
       className="your-custom-class"
       compareClassName="your-custom-class"
     />
-  </PriceContainer>
+  </PricesContainer>
 </CommerceLayer>
 
 // your code [...]
@@ -105,21 +105,23 @@ import {
 
 You can style the selling price and the full price as you like by passing the `className` and `compareClassName` props to the `Price` component. You can choose not to show the full price by passing `showCompare={false}` (default is `true`).
 
+If you need to paginate the list of prices, pass the `perPage` prop to the `PricesContainer` component (default is `10`) — to learn how pagination works, check our [API reference](https://docs.commercelayer.io/api/pagination) or our [SDK documentation](https://github.com/commercelayer/commercelayer-js-sdk#how-to-paginate-a-collection-of-skus).
+
 ## Add to cart
 
-This example shows how to use Commerce Layer React Components to implement the "add to cart" functionality on your page, showing the price of the selected SKU variant, its quantity, the information about its availability, and the related button to perform the action:
+This example shows how to use Commerce Layer React Components to implement the "add to cart" functionality on your page, showing the price of the chosen SKU, the possibility to select a variant and its quantity, the information about its availability, and the related button to perform the action:
 
 ```
 import {
   CommerceLayer,
   OrderContainer,
   ItemContainer,
-  PriceContainer,
+  PricesContainer,
   Price,
-  VariantContainer,
+  VariantsContainer,
   VariantSelector,
   QuantitySelector,
-  AddToCart,
+  AddToCartButton,
   AvailabilityContainer,
   AvailabilityTemplate
 } from '@commercelayer/react-components'
@@ -129,30 +131,34 @@ import {
 <CommerceLayer accessToken="your-access-token" endpoint="https://your-domain.commercelayer.io">
   <OrderContainer persistKey="your-persist-key">
     <ItemContainer>
-      <PriceContainer>
+      <PricesContainer>
         <Price skuCode="BABYONBU000000E63E746MXX" />
-      </PriceContainer>
-      <VariantContainer>
+      </PricesContainer>
+      <VariantsContainer>
         <VariantSelector
           placeholder="Select a size"
-          skuCodes={[
+          options={[
             {
               label: '6 months',
               code: 'BABYONBU000000E63E746MXX',
+              lineItem: {
+                name: 'your-item-name',
+                imageUrl: 'https://img.yourdomain.com/your-item-image.png'
+              }
             },
             {
               label: '12 months',
               code: 'BABYONBU000000E63E7412MX',
-            },
-            {
-              label: '24 months',
-              code: 'BABYONBU000000E63E7424MX',
-            },
+              lineItem: {
+                name: 'your-item-name',
+                imageUrl: 'https://img.yourdomain.com/your-item-image.png'
+              }
+            }
           ]}
         />
-      </VariantContainer>
+      </VariantsContainer>
       <QuantitySelector />
-      <AddToCart />
+      <AddToCartButton />
       <AvailabilityContainer>
         <AvailabilityTemplate />
       </AvailabilityContainer>
@@ -163,18 +169,18 @@ import {
 // your code [...]
 ```
 
-For each variant you can show a custom name (i.e. its translation based on location, according to what you defined in your CMS) by setting the value of the `label` key. You can change the type of input by passing `type='radio'` to the `VariantSelector` component (default is `select`).
+For each variant you can define the custom name (i.e. its translation based on location) and image that will be shown on the corresponding line item, by passing the `options` prop to the `VariantSelector` component and properly setting the `lineItem` key — all these content data are usually taken from your CMS, since Commerce Layer doesn't manage any kind of content. You can change the type of input by passing `type="radio"` (default is `select`).
 
 When you add a product to your shopping cart:
 
-- if there is an oder stored in the Local Storage identified by a key that matches the `persistKey` property, a line item is created and it is associated with that order;
+- if there is an order stored in the Local Storage identified by a key that matches the `persistKey` property, a line item is created and it is associated with that order;
 - if no order in the Local Storage matches the `persistKey` property, a new order is created and stored.
 
 > A common best practice — especially for multi-country ecommerce — is to use as `persistKey` a key containing the country code, so that you have a different shopping cart for each country.
 
 ## Shopping cart
 
-This example shows how to use Commerce Layer React Components to build a shopping cart UI, containing the items that are going to be purchased with all their information (image, name, price, quantity) and the option to possibile remove some of them:
+This example shows how to use Commerce Layer React Components to build a shopping cart UI, containing the items that are going to be purchased with all their information (image, name, quantity, price) and the option to possibly remove some of them:
 
 ```
 import {
@@ -186,8 +192,8 @@ import {
   LineItemImage,
   LineItemName,
   LineItemQuantity,
-  LineItemPrice,
-  LineItemRemove,
+  LineItemAmount,
+  LineItemRemoveLink,
   Errors
 } from '@commercelayer/react-components'
 
@@ -197,16 +203,15 @@ import {
   <OrderContainer persistKey="your-persist-key">
     <LineItemsContainer>
       <p className="your-custom-class">
-        Your shopping bag contains{' '}
-        <LineItemsCount /> items
+        Your shopping cart contains <LineItemsCount /> items
       </p>
       <LineItem>
-        <LineItemImage src="your-image-url" width={80} />
-        <LineItemName label="your-item-name" />
-        <LineItemQuantity max={100} />
+        <LineItemImage width={50} />
+        <LineItemName />
+        <LineItemQuantity max={10} />
         <Errors resource="lineItem" field="quantity" />
-        <LineItemPrice />
-        <LineItemRemove />
+        <LineItemAmount />
+        <LineItemRemoveLink />
       </LineItem>
     </LineItemsContainer>
   </OrderContainer>
@@ -215,94 +220,98 @@ import {
 // your code [...]
 ```
 
-For each line item you can show a custom image (by passing the `src` prop to the `LineItemImage` component) and a custom name (by passing the `label` prop to the `LineItemName` component) — usually taken from your CMS.
-
-The `Errors` component lets you show the error (if present) returned by our API on a single attribute of a specific resource. You can customize the error message as you like by passing an object as the `message` prop of the component.
+The `Errors` component lets you show the error (if present) returned by our API on a single attribute of a specific resource. You can customize the error message as you like by passing the `messages` prop to the component.
 
 ## Cart summary
 
-This example shows how to use Commerce Layer React Components to show a sample order summary with all the order line items (including discounts, shipping costs, taxes, and gift cards — if present) and totals.
+This example shows how to use Commerce Layer React Components to show a sample order summary with all the order line items (including discounts, shipping costs, taxes, and gift cards — if present) and totals:
 
 ```
 import {
   CommerceLayer,
   OrderContainer,
-  SubTotal,
-  Discount,
-  Shipping,
-  Taxes,
-  GiftCardPrice,
-  Total,
-  Checkout
+  SubTotalAmount,
+  DiscountAmount,
+  ShippingAmount,
+  TaxesAmount,
+  GiftCardAmount,
+  TotalAmount,
+  CheckoutLink
 } from '@commercelayer/react-components'
 
 // your code [...]
 
 <CommerceLayer accessToken="your-access-token" endpoint="https://your-domain.commercelayer.io">
   <OrderContainer persistKey="your-persist-key">
-    <SubTotal />
-    <Discount />
-    <Shipping />
-    <Taxes />
-    <GiftCardPrice />
-    <Total />
-    <Checkout label="Checkout" />
+    <SubTotalAmount />
+    <DiscountAmount />
+    <ShippingAmount />
+    <TaxesAmount />
+    <GiftCardAmount />
+    <TotalAmount />
+    <CheckoutLink />
   </OrderContainer>
 </CommerceLayer>
 
 // your code [...]
 ```
 
-The `Checkout` component lets you proceed to checkout and links to the checkout URL configured on Commerce Layer (_Settings → Markets_).
+You can change the amount format of each line of the summary by passing the `format` prop to the desired component (default is `formatted`).
+
+The `CheckoutLink` component lets you proceed to checkout and links to the checkout URL configured on Commerce Layer (_Settings → Markets_).
 
 # List of components
 
 These are the currently available Commerce Layer React Components.
 
-| Name                       | Description                                                                                                                                                             |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AddToCart`                | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `AvailabilityContainer`    | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `AvailabilityTemplate`     | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `Checkout`                 | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `CommerceLayer`            | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `Discount`                 | Displays the sum of all the discounts applied to an order. Use the `format` property to change the format of the amount (one of `formatted`, `cent` or `float`).        |
-| `Errors`                   | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `GiftCard`                 | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `GiftCardContainer`        | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `GiftCardCurrencySelector` | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `GiftCardInput`            | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `GiftCardPrice`            | Displays the sum of all the gift cards applied to an order. Use the `format` property to change the format of the amount (one of `formatted`, `cent` or `float`).       |
-| `ItemContainer`            | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `LineItem`                 | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `LineItemImage`            | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `LineItemName`             | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `LineItemOption`           | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `LineItemOptions`          | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `LineItemPrice`            | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `LineItemQuantity`         | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `LineItemRemove`           | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `LineItemsContainer`       | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `LineItemsCount`           | Displays the total number of items associated with an order.                                                                                                            |
-| `MetadataInput`            | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `OrderContainer`           | Wraps an order and it is responsible for interacting with the `orders` API. Use the `persistKey` property to define the Local Storage key and hold the order reference. |
-| `Price`                    | Displays the price of the associated `skuCode`. Use the `showCompare` property to show/hide the full price (if present).                                                |
-| `PriceContainer`           | Wraps one or more `Price` components and it is responsible for calling the `prices` API for all the associated SKUs, with a single query.                               |
-| `PriceTemplate`            | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `QuantitySelector`         | Displays an HTML input where to insert the quantity of the associated `skuCode`. Use the `min` and `max` properties to set the allowed range.                           |
-| `Shipping`                 | Displays the sum of all the shipping costs related to an order. Use the `format` property to change the format of the amount (one of `formatted`, `cent` or `float`).   |
-| `SkuOption`                | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `SkuOptionInput`           | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `SkuOptionsContainer`      | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `SubmitButton`             | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
-| `SubTotal`                 | Displays the order's subtotal amount. Use the `format` property to change the format of the amount (one of `formatted`, `cent` or `float`).                             |
-| `Taxes`                    | Displays the amount of all the taxes applied to an order. Use the `format` property to change the format of the amount (one of `formatted`, `cent` or `float`).         |
-| `Total`                    | Displays the order's total amount. Use the `format` property to change the format of the amount (one of `formatted`, `cent` or `float`).                                |
-| `VariantContainer`         | Wraps one or more `VariantOption` components, holding the selected `skuCode`. It is responsible for calling the `skus` API when the selected variant changes.           |
-| `VariantSelector`          | Displays a select or radio input where you can choose an SKU. The `skuCodes` property all holds the available options to choose from.                                   |
-| `VariantTemplate`          | _Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua._                                           |
+> Please note that not every Commerce Layer React component can be nested into any other one.
 
-For more detailed information on each components, have a look at the configuration file [`src/config/components.ts`](/src/config/components.ts).
+For each component, the table below shows its props (with their default values) and the list of the permitted children (if any):
+
+>
+
+| Name                       | Props (default)                                                                                                 | Children                                                                                                                                                                                                             |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AddToCartButton`          | `disabled`<br />`label` ('Add to cart')<br />`skuCode`                                                          |
+| `AvailabilityContainer`    | `skuCode`                                                                                                       | `AvailabilityTemplate`                                                                                                                                                                                               |
+| `AvailabilityTemplate`     | `showShippingMethodName` (false)<br />`timeFormat` ('days')                                                     |
+| `CheckoutLink`             | `label` ('Checkout')                                                                                            |
+| `CommerceLayer`            | `accessToken`<br />`endpoint`                                                                                   | `GiftCardContainer`<br />`OrderContainer`<br />`PricesContainer`                                                                                                                                                     |
+| `DiscountAmount`           | `className`<br />`format` ('formatted')<br />`id`<br />`name`<br />`style`                                      |
+| `Errors`                   | `field` ('base')<br />`messages` ([])<br />`resource`                                                           |
+| `GiftCard`                 | `metadata` ({})<br />`onSubmit` (undefined)                                                                     | `Errors`<br />`GiftCardCurrencySelector`<br />`GiftCardInput`<br />`MetadataInput`<br />`SubmitButton`                                                                                                               |
+| `GiftCardAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`                                                    |
+| `GiftCardContainer`        |                                                                                                                 | `GiftCard`                                                                                                                                                                                                           |
+| `GiftCardCurrencySelector` | `placeholder`<br />`required` (true)<br />`value`                                                               |
+| `GiftCardInput`            | `name`<br />`placeholder`<br />`type`                                                                           |
+| `ItemContainer`            | `lineItem`<br />`skuCode`                                                                                       | `AddToCartButton`<br />`AvailabilityContainer`<br />`QuantitySelector`<br />`PricesContainer`<br />`SkuOptionContainer`<br />`VariantsContainer`                                                                     |
+| `LineItem`                 | `type` ('skus')                                                                                                 | `Errors`<br />`LineItemAmount`<br />`LineItemImage`<br />`LineItemName`<br />`LineItemOptions`<br />`LineItemQuantity`<br />`LineItemRemoveLink`                                                                     |
+| `LineItemAmount`           | `className`<br />`format` ('formatted')<br />`id`<br />`name`<br />`style`<br />`type` ('total')                |
+| `LineItemImage`            | `width`                                                                                                         |
+| `LineItemName`             |                                                                                                                 |
+| `LineItemOption`           | `keyClassName`<br />`keyId`<br />`keyStyle`<br />`name`<br />`valueClassName`                                   |
+| `LineItemOptions`          | `name`<br /> `showName` (true)                                                                                  | `LineItemOption`                                                                                                                                                                                                     |
+| `LineItemQuantity`         | `disabled`<br />`max` (50)                                                                                      |
+| `LineItemRemoveLink`       | `label` ('Remove')                                                                                              |
+| `LineItemsContainer`       | `filters` ({})<br />`loader` ('Loading...')                                                                     | `LineItem`<br />`LineItemsCount`                                                                                                                                                                                     |
+| `LineItemsCount`           | `className`<br />`id`<br />`name`<br />`style`                                                                  |
+| `MetadataInput`            | `name`<br />`onChange`<br />`placeholder`<br />`type`                                                           |
+| `OrderContainer`           | `metadata` ({})<br />`persistKey`                                                                               | `CheckoutLink`<br />`DiscountAmount`<br />`GiftCardAmount`<br />`GiftCardContainer`<br />`ItemContainer`<br />`LineItemsContainer`<br />`ShippingAmount`<br />`SubTotalAmount`<br />`TaxesAmount`<br />`TotalAmount` |
+| `Price`                    | `compareClassName`<br />`showCompare`<br />`skuCode` ('')                                                       |
+| `PricesContainer`          | `filters` ({})<br />`loader` ('Loading...')<br />`perPage` (10)<br />`skuCode` ('')                             | `Price`                                                                                                                                                                                                              |
+| `QuantitySelector`         | `disabled`<br />`max`<br />`min` (1)<br />`skuCode`<br />`value`                                                |
+| `ShippingAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`                                                    |
+| `SkuOption`                | `name`                                                                                                          | `SkuOptionInput`                                                                                                                                                                                                     |
+| `SkuOptionInput`           | `name`<br />`onChange`<br />`placeholder`<br />`type`                                                           |
+| `SkuOptionsContainer`      | `skuCode`                                                                                                       | `SkuOption`                                                                                                                                                                                                          |
+| `SubmitButton`             | `label` ('Submit')                                                                                              |
+| `SubTotalAmount`           | `className`<br />`format` ('formatted')<br />`id`<br />`name`<br />`style`                                      |
+| `TaxesAmount`              | `className`<br />`format` ('formatted')<br />`id`<br />`name`<br />`style`                                      |
+| `TotalAmount`              | `className`<br />`format` ('formatted')<br />`id`<br />`name`<br />`style`                                      |
+| `VariantsContainer`        | `filters` ({})<br />`skuCode` ('')                                                                              | `VariantSelector`                                                                                                                                                                                                    |
+| `VariantSelector`          | `loader`<br />`name`<br />`options`<br />`placehoder` ('Select a variant')<br />`skuCode`<br />`type`('select') |
+
+For more detailed information on each components (i.e. prop types, required props, etc.), have a look at the configuration file [`src/config/components.ts`](/src/config/components.ts).
 
 ---
 
