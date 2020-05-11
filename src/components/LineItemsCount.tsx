@@ -8,14 +8,19 @@ import Parent from './utils/Parent'
 import getLineItemsCount from '../utils/getLineItemsCount'
 import _ from 'lodash'
 import LineItemContext from '../context/LineItemContext'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
+import { FunctionChildren } from '../@types/index'
 
 const propTypes = components.LineItemsCount.propTypes
 const displayName = components.LineItemsCount.displayName
 
-export type LineItemsCountProps = PropsType<typeof propTypes> &
-  JSX.IntrinsicElements['span']
+type LineItemsCountChildrenProps = Omit<LineItemsCountProps, 'children'> & {
+  qunatity: number
+}
+
+type LineItemsCountProps = {
+  children?: FunctionChildren<LineItemsCountChildrenProps>
+} & JSX.IntrinsicElements['span']
 
 const LineItemsCount: FunctionComponent<LineItemsCountProps> = (props) => {
   const { children, ...p } = props

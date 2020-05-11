@@ -8,18 +8,29 @@ import Parent from './utils/Parent'
 import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
+import { FunctionChildren } from '../@types/index'
 
 const propTypes = components.QuantitySelector.propTypes
 const defaultProps = components.QuantitySelector.defaultProps
 const displayName = components.QuantitySelector.displayName
 
-export type QuantitySelectorProps = PropsType<typeof propTypes> &
-  JSX.IntrinsicElements['input']
+type QuantitySelectorChildrenProps = Omit<QuantitySelectorProps, 'children'> & {
+  handleChange: (event: React.MouseEvent<HTMLInputElement>) => void
+  handleBlur: (event: React.MouseEvent<HTMLInputElement>) => void
+}
+
+type QuantitySelectorProps = {
+  children?: FunctionChildren<QuantitySelectorChildrenProps>
+  disabled?: boolean
+  min?: number
+  max?: number
+  value?: string
+  skuCode?: string
+} & JSX.IntrinsicElements['input']
 
 const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
-  const { skuCode, children, min, max, ...p } = props
+  const { skuCode, children, min = 1, max, ...p } = props
   const {
     item,
     setQuantity,
@@ -80,7 +91,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
       type="number"
       max={maxInv}
       min={min}
-      value={value || ''}
+      value={value}
       disabled={disabled}
       onChange={handleChange}
       onBlur={handleBlur}

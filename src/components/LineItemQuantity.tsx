@@ -2,21 +2,29 @@ import React, { FunctionComponent, useContext, ReactNode } from 'react'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import LineItemContext from '../context/LineItemContext'
 import Parent from './utils/Parent'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
+import { FunctionChildren } from '../@types'
 
 const propTypes = components.LineItemQuantity.propTypes
 const defaultProps = components.LineItemQuantity.defaultProps
 const displayName = components.LineItemQuantity.displayName
 
-export type LineItemQuantityProps = PropsType<typeof propTypes> &
-  JSX.IntrinsicElements['select']
+type LineItemQuantityChildrenProps = Omit<LineItemQuantityProps, 'children'> & {
+  quantity: number
+  handleChange: (event: React.MouseEvent<HTMLSelectElement>) => void
+}
+
+type LineItemQuantityProps = {
+  children?: FunctionChildren<LineItemQuantityChildrenProps>
+  max?: number
+  disabled?: boolean
+} & JSX.IntrinsicElements['select']
 
 const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = (props) => {
+  const { max = 50 } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const { updateLineItem } = useContext(LineItemContext)
   const options: ReactNode[] = []
-  const max = props['max'] || 50
   for (let i = 1; i <= max; i++) {
     options.push(
       <option key={i} value={`${i}`}>

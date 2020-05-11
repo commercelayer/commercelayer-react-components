@@ -99,12 +99,12 @@ const components = {
     displayName: 'GiftCard',
     propTypes: {
       children: childrenTypes.isRequired,
-      metadata: PropTypes.objectOf(PropTypes.string),
+      // metadata: PropTypes.objectOf(PropTypes.string),
       onSubmit: PropTypes.func,
     },
     defaultProps: {
       onSubmit: undefined,
-      metadata: {},
+      // metadata: {},
     },
   },
   GiftCardContainer: {
@@ -118,9 +118,10 @@ const components = {
     displayName: 'GiftCardCurrencySelector',
     propTypes: {
       children: PropTypes.func,
-      placeholder: PropTypes.exact({
-        value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        label: PropTypes.string,
+      placeholder: PropTypes.shape({
+        value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+          .isRequired,
+        label: PropTypes.string.isRequired,
       }),
       value: PropTypes.string,
       required: PropTypes.bool,
@@ -206,6 +207,17 @@ const components = {
       type: 'skus',
     },
   },
+  LineItemAmount: {
+    displayName: 'LineItemAmount',
+    propTypes: {
+      ...baseOrderComponentPricePropTypes,
+      type: PropTypes.oneOf<BasePriceType>(['total', 'unit', 'option']),
+    },
+    defaultProps: {
+      format: 'formatted',
+      type: 'total',
+    },
+  },
   LineItemImage: {
     displayName: 'LineItemImage',
     propTypes: {
@@ -234,23 +246,12 @@ const components = {
     permittedChildren: ['LineItemOption', 'ReactNode'],
     displayName: 'LineItemOptions',
     propTypes: {
-      name: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired, // TODO: Change with ID
       children: childrenTypes.isRequired,
       showName: PropTypes.bool,
     },
     defaultProps: {
       showName: true,
-    },
-  },
-  LineItemAmount: {
-    displayName: 'LineItemAmount',
-    propTypes: {
-      ...baseOrderComponentPricePropTypes,
-      type: PropTypes.oneOf<BasePriceType>(['total', 'unit', 'option']),
-    },
-    defaultProps: {
-      format: 'formatted' as BaseFormatPrice,
-      type: 'total' as BasePriceType,
     },
   },
   LineItemQuantity: {

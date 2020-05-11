@@ -1,4 +1,9 @@
-import React, { FunctionComponent, useReducer, useEffect } from 'react'
+import React, {
+  FunctionComponent,
+  useReducer,
+  useEffect,
+  ReactNode,
+} from 'react'
 import ItemContext, {
   initialItemContext,
   InitItemContext,
@@ -14,13 +19,19 @@ import itemReducer, {
 } from '../reducers/ItemReducer'
 import { BFSetStateContainer } from '../@types/index'
 import { ItemPrices } from '../reducers/ItemReducer'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
 const propTypes = components.ItemContainer.propTypes
 const displayName = components.ItemContainer.displayName
 
-export type ItemContainerProps = PropsType<typeof propTypes>
+type ItemContainerProps = {
+  children: ReactNode
+  skuCode?: string
+  lineItem?: {
+    name: string
+    imageUrl?: string
+  }
+}
 
 const ItemContainer: FunctionComponent<ItemContainerProps> = (props) => {
   const { children, skuCode, lineItem } = props

@@ -1,16 +1,24 @@
-import React, { FunctionComponent, Fragment, useContext } from 'react'
+import React, {
+  FunctionComponent,
+  Fragment,
+  useContext,
+  ReactNode,
+} from 'react'
 import LineItemContext from '../context/LineItemContext'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import components from '../config/components'
-import { PropsType } from '../utils/PropsType'
+import { LineItemType } from '../../dist/@types'
 
 const propTypes = components.LineItem.propTypes
 const displayName = components.LineItem.displayName
 
-export type LineItemProps = PropsType<typeof propTypes>
+type LineItemProps = {
+  children: ReactNode
+  type?: LineItemType
+}
 
 const LineItem: FunctionComponent<LineItemProps> = (props) => {
-  const { type } = props
+  const { type = 'skus' } = props
   const { lineItems } = useContext(LineItemContext)
   const components =
     lineItems &&

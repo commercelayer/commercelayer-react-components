@@ -1,44 +1,44 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { FunctionComponent } from 'react'
-import BaseInput from './utils/BaseInput'
-import { BaseComponent } from '../@types/index'
+// import React from 'react'
+// import PropTypes from 'prop-types'
+// import { FunctionComponent } from 'react'
+// import BaseInput from './utils/BaseInput'
+// import { BaseComponent } from '../@types/index'
 
-type NameType =
-  | 'email'
-  | 'firstName'
-  | 'lastName'
-  | 'referenceOrigin'
-  | 'reference'
+// type NameType =
+//   | 'email'
+//   | 'firstName'
+//   | 'lastName'
+//   | 'referenceOrigin'
+//   | 'reference'
 
-type TypeType = 'email' | 'text'
+// type TypeType = 'email' | 'text'
 
-export interface GiftCardRecipientInputProps extends BaseComponent {
-  name: NameType
-  type: TypeType
-  children?: FunctionComponent
-  placeholder?: string
-  required?: boolean
-}
+// export interface GiftCardRecipientInputProps extends BaseComponent {
+//   name: NameType
+//   type: TypeType
+//   children?: FunctionComponent
+//   placeholder?: string
+//   required?: boolean
+// }
 
-const GiftCardRecipientInput: FunctionComponent<GiftCardRecipientInputProps> = props => {
-  const forceRequired = {
-    required: props.type === 'email' ? true : props.required
-  }
-  return <BaseInput {...props} {...forceRequired} />
-}
+// const GiftCardRecipientInput: FunctionComponent<GiftCardRecipientInputProps> = props => {
+//   const forceRequired = {
+//     required: props.type === 'email' ? true : props.required
+//   }
+//   return <BaseInput {...props} {...forceRequired} />
+// }
 
-GiftCardRecipientInput.propTypes = {
-  name: PropTypes.oneOf<NameType>([
-    'email',
-    'firstName',
-    'lastName',
-    'referenceOrigin',
-    'reference'
-  ]).isRequired,
-  type: PropTypes.oneOf<TypeType>(['email', 'text']).isRequired,
-  placeholder: PropTypes.string,
-  required: PropTypes.bool
-}
+// GiftCardRecipientInput.propTypes = {
+//   name: PropTypes.oneOf<NameType>([
+//     'email',
+//     'firstName',
+//     'lastName',
+//     'referenceOrigin',
+//     'reference'
+//   ]).isRequired,
+//   type: PropTypes.oneOf<TypeType>(['email', 'text']).isRequired,
+//   placeholder: PropTypes.string,
+//   required: PropTypes.bool
+// }
 
-export default GiftCardRecipientInput
+// export default GiftCardRecipientInput

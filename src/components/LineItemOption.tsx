@@ -1,15 +1,31 @@
-import React, { FunctionComponent, useContext, Fragment } from 'react'
+import React, {
+  FunctionComponent,
+  useContext,
+  Fragment,
+  ReactNode,
+  CSSProperties,
+} from 'react'
 import LineItemOptionChildrenContext from '../context/LineItemOptionChildrenContext'
 import _ from 'lodash'
 import Parent from './utils/Parent'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
+import { LineItemOptionCollection } from '@commercelayer/js-sdk'
 
 const propTypes = components.LineItemOption.propTypes
 const displayName = components.LineItemOption.displayName
 
-export type LineItemOptionProps = PropsType<typeof propTypes> &
-  JSX.IntrinsicElements['span']
+type LineItemOptionChildrenProps = Omit<LineItemOptionProps, 'children'> & {
+  lineItemOption: LineItemOptionCollection
+}
+
+type LineItemOptionProps = {
+  children?: (props: LineItemOptionChildrenProps) => ReactNode
+  name: string
+  valueClassName?: string
+  keyClassName?: string
+  keyId?: string
+  keyStyle?: CSSProperties
+} & JSX.IntrinsicElements['span']
 
 const LineItemOption: FunctionComponent<LineItemOptionProps> = (props) => {
   const {
@@ -32,15 +48,10 @@ const LineItemOption: FunctionComponent<LineItemOptionProps> = (props) => {
     <Parent {...parentProps}>{props.children}</Parent>
   ) : _.has(lineItemOption, `options.${name}`) ? (
     <Fragment>
-      <span
-        id={keyId as string}
-        style={keyStyle as object}
-        className={keyClassName as string}
-        {...p}
-      >
+      <span id={keyId} style={keyStyle} className={keyClassName} {...p}>
         {`${name}:`}
       </span>
-      <span id={id} style={style} className={valueClassName as string} {...p}>
+      <span id={id} style={style} className={valueClassName} {...p}>
         {`${lineItemOption['options'][name]}`}
       </span>
     </Fragment>

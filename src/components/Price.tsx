@@ -10,28 +10,37 @@ import Parent from './utils/Parent'
 import PricesContext from '../context/PricesContext'
 import { getPricesComponent } from '../utils/getPrices'
 import { PriceCollection } from '@commercelayer/js-sdk'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
+import { FunctionChildren, LoaderType } from '../@types/index'
 
 const propTypes = components.Price.propTypes
 const defaultProps = components.Price.defaultProps
 const displayName = components.Price.displayName
 
-export type PPropsType = PropsType<typeof propTypes> &
-  JSX.IntrinsicElements['span']
+type PriceChildrenProps = Omit<PriceProps, 'children'> & {
+  loading: boolean
+  loader: LoaderType
+}
 
-const Price: FunctionComponent<PPropsType> = (props) => {
-  const { children } = props
+type PriceProps = {
+  children?: FunctionChildren<PriceChildrenProps>
+  compareClassName?: string
+  showCompare?: boolean
+  skuCode?: string
+} & JSX.IntrinsicElements['span']
+
+const Price: FunctionComponent<PriceProps> = (props) => {
+  const { children, skuCode = '' } = props
   const {
     prices,
-    skuCode,
+    skuCode: pricesSkuCode,
     loading,
     skuCodes,
     setSkuCodes,
     loader,
   } = useContext(PricesContext)
   const [skuPrices, setSkuPrices] = useState<PriceCollection[]>([])
-  const sCode = skuCode || (props.skuCode as string)
+  const sCode = pricesSkuCode || skuCode
   useEffect(() => {
     if (!_.isEmpty(prices) && _.has(prices, `${sCode}`)) {
       setSkuPrices(prices[sCode])

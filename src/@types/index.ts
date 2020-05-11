@@ -17,19 +17,41 @@ export const PTLoader = PropTypes.oneOfType([
 export const BaseSelectComponentPropTypes = {
   children: PropTypes.func,
   options: PropTypes.arrayOf(
-    PropTypes.exact({
+    PropTypes.shape({
       label: PropTypes.string.isRequired,
       value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
         .isRequired,
       selected: PropTypes.bool,
     }).isRequired
   ).isRequired,
-  placeholder: PropTypes.exact({
-    label: PropTypes.string,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  placeholder: PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   }),
   value: PropTypes.string,
   name: PropTypes.string.isRequired,
+}
+
+export interface SelectPlaceholder {
+  label: string
+  value: string | number
+}
+
+type BaseSelectChildrenComponentProps = Omit<
+  BaseSelectComponentProps,
+  'children'
+>
+
+export interface BaseSelectComponentProps {
+  children?: (props: BaseSelectChildrenComponentProps) => ReactNode
+  options: {
+    label: string
+    value: string | number
+    selected?: boolean
+  }[]
+  placeholder?: SelectPlaceholder
+  value?: string
+  name: string
 }
 
 export const BaseInputComponentPropTypes = {
@@ -45,6 +67,16 @@ export const BaseInputComponentPropTypes = {
   ]).isRequired,
   onChange: PropTypes.func,
   placeholder: PropTypes.string,
+}
+
+type BaseInputChildrenComponentProps = Omit<BaseInputComponentProps, 'children'>
+
+export interface BaseInputComponentProps {
+  children?: (props: BaseInputChildrenComponentProps) => ReactNode
+  name: string
+  type: BaseInputType
+  onChange?: (event: React.MouseEvent<HTMLInputElement>) => void
+  placeholder?: string
 }
 
 export type LineItemType =
@@ -115,7 +147,7 @@ export interface BaseUnsetState<A> {
 }
 
 export interface BaseMetadata {
-  [key: string]: string
+  [key: string]: string | undefined | null
 }
 
 export type BaseFormatPrice = 'formatted' | 'cents' | 'float'
@@ -143,4 +175,8 @@ export interface BaseAmountComponent
   extends Partial<JSX.IntrinsicElements['span']> {
   children?: (props: BaseAmountComponentChildren) => ReactNode
   format?: BaseFormatPrice
+}
+
+export interface FunctionChildren<P = {}> {
+  (props: P): ReactNode
 }

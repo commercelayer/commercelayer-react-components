@@ -1,13 +1,15 @@
 import React, { FunctionComponent } from 'react'
-import { BaseInputComponentPropTypes } from '../../@types/index'
+import {
+  BaseInputComponentPropTypes,
+  BaseInputComponentProps,
+} from '../../@types/index'
 import Parent from './Parent'
-import { PropsType } from '../../utils/PropsType'
 
-export type BaseInputProps = PropsType<typeof BaseInputComponentPropTypes> &
+export type BaseInputProps = BaseInputComponentProps &
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
 
-const BaseInput: FunctionComponent<BaseInputProps> = props => {
+const BaseInput: FunctionComponent<BaseInputProps> = (props) => {
   const { children, ...p } = props
   const input =
     props.type === 'textarea' ? <textarea {...p} /> : <input {...p} />

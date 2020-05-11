@@ -3,18 +3,19 @@ import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import LineItemContext from '../context/LineItemContext'
 import Parent from './utils/Parent'
 import components from '../config/components'
+import { FunctionChildren } from '../@types/index'
 
 const propTypes = components.LineItemRemoveLink.propTypes
 const defaultProps = components.LineItemRemoveLink.defaultProps
 const displayName = components.LineItemRemoveLink.displayName
 
 type ChildrenLineItemRemoveLinkProps = {
-  handleRemove: () => void
+  handleRemove: (event: React.MouseEvent<HTMLAnchorElement>) => void
   label?: string
 }
 
 type LineItemRemoveLinkProps = {
-  children?: (props: ChildrenLineItemRemoveLinkProps) => void
+  children?: FunctionChildren<ChildrenLineItemRemoveLinkProps>
   label?: string
 } & PropsWithoutRef<JSX.IntrinsicElements['a']>
 

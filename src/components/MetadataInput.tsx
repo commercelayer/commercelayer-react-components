@@ -1,12 +1,12 @@
 import React, { FunctionComponent } from 'react'
 import BaseInput from './utils/BaseInput'
 import components from '../config/components'
-import { PropsType } from '../utils/PropsType'
+import { BaseInputComponentProps } from '../@types'
 
 const propTypes = components.MetadataInput.propTypes
 const displayName = components.MetadataInput.displayName
 
-export type MetadataInputProps = PropsType<typeof propTypes> &
+export type MetadataInputProps = BaseInputComponentProps &
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
 

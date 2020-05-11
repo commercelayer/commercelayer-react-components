@@ -1,14 +1,19 @@
-import React, { FunctionComponent, useContext } from 'react'
+import React, { FunctionComponent, useContext, ReactNode } from 'react'
 import Parent from './utils/Parent'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import components from '../config/components'
-import { PropsType } from '../utils/PropsType'
 
 const propTypes = components.LineItemImage.propTypes
 const displayName = components.LineItemImage.displayName
 
-export type LineItemImageProps = PropsType<typeof propTypes> &
-  JSX.IntrinsicElements['img']
+type LineItemChildrenProps = Omit<LineItemImageProps, 'children'> & {
+  src: string
+}
+
+type LineItemImageProps = {
+  children?: (props: LineItemChildrenProps) => ReactNode
+  width?: number
+} & JSX.IntrinsicElements['img']
 
 const LineItemImage: FunctionComponent<LineItemImageProps> = (props) => {
   const { lineItem } = useContext(LineItemChildrenContext)

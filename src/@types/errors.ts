@@ -1,4 +1,6 @@
 import PropTypes from 'prop-types'
+import { ReactNode } from 'react'
+import { type } from 'os'
 
 export type CodeErrorType =
   | 'RECORD_NOT_FOUND'
@@ -90,10 +92,10 @@ export const REType: ResourceErrorType[] = [
   'skuOption',
 ]
 
-export const BaseErrorObject = PropTypes.exact({
+export const BaseErrorObject = PropTypes.shape({
   code: PropTypes.oneOf(CEType).isRequired,
   message: PropTypes.string.isRequired,
-  resourceKey: PropTypes.oneOf(REType),
+  resource: PropTypes.oneOf(REType),
   field: PropTypes.string,
   id: PropTypes.string,
 })
@@ -110,4 +112,19 @@ export const ErrorPropTypes = {
   children: PropTypes.func,
   field: PropTypes.string,
   messages: PropTypes.arrayOf(BaseErrorObject.isRequired),
+}
+
+type ErrorChildrenComponentProps = Omit<ErrorComponentProps, 'children'>
+
+export interface ErrorComponentProps {
+  resource: ResourceErrorType
+  children?: (props: ErrorChildrenComponentProps) => ReactNode
+  field?: string
+  messages?: {
+    code: CodeErrorType
+    message: string
+    resource?: ResourceErrorType
+    field?: string
+    id?: string
+  }[]
 }

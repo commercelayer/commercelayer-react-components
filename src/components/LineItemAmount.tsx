@@ -7,22 +7,24 @@ import React, {
 import getAmount from '../utils/getAmount'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import Parent from './utils/Parent'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
+import { BaseAmountComponent, BasePriceType } from '../@types/index'
 
 const propTypes = components.LineItemAmount.propTypes
-const defaultProps = components.LineItemAmount.defaultProps
+const defaultProps = components.LineItemAmount
+  .defaultProps as LineItemAmountProps
 const displayName = components.LineItemAmount.displayName
 
-export type LineItemAmountProps = PropsType<typeof propTypes> &
-  JSX.IntrinsicElements['span']
+export type LineItemAmountProps = BaseAmountComponent & {
+  type?: BasePriceType
+}
 
 const LineItemAmount: FunctionComponent<LineItemAmountProps> = (props) => {
-  const { format, type, ...p } = props
+  const { format = 'formatted', type = 'total', ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const [price, setPrice] = useState('')
   useEffect(() => {
-    const p = getAmount('amount', type as string, format as string, lineItem)
+    const p = getAmount('amount', type, format, lineItem)
     setPrice(p)
     return (): void => {
       setPrice('')

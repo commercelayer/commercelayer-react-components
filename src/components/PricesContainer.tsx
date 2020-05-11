@@ -3,6 +3,7 @@ import React, {
   FunctionComponent,
   useContext,
   useReducer,
+  ReactNode,
 } from 'react'
 import getPrices from '../utils/getPrices'
 import _ from 'lodash'
@@ -15,17 +16,29 @@ import { priceInitialState, getSkusPrice } from '../reducers/PriceReducer'
 import PricesContext, { PricesContextValue } from '../context/PricesContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
+import { LoaderType } from '../@types'
 
 const propTypes = components.PricesContainer.propTypes
 const defaultProps = components.PricesContainer.defaultProps
 const displayName = components.PricesContainer.displayName
 
-export type PCProps = PropsType<typeof propTypes>
+type PricesContainerProps = {
+  children: ReactNode
+  filters?: object
+  loader?: LoaderType
+  perPage?: number
+  skuCode?: string
+}
 
-const PricesContainer: FunctionComponent<PCProps> = (props) => {
-  const { children, skuCode, loader, perPage, filters } = props
+const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
+  const {
+    children,
+    skuCode = '',
+    loader = 'Loading...',
+    perPage = 10,
+    filters = {},
+  } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
   const {
@@ -68,8 +81,8 @@ const PricesContainer: FunctionComponent<PCProps> = (props) => {
           dispatch,
           setPrices,
           prices,
-          perPage: perPage || 0,
-          filters: filters || {},
+          perPage,
+          filters,
         })
       }
     }
@@ -82,7 +95,7 @@ const PricesContainer: FunctionComponent<PCProps> = (props) => {
   const priceValue: PricesContextValue = {
     ...state,
     skuCode: sCode,
-    loader: loader || 'Loading...',
+    loader,
     setSkuCodes,
   }
   return (

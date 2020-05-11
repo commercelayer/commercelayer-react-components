@@ -3,6 +3,7 @@ import React, {
   FunctionComponent,
   useReducer,
   useContext,
+  ReactNode,
 } from 'react'
 import { getLocalOrder } from '../utils/localStorage'
 import orderReducer, {
@@ -13,14 +14,18 @@ import CommerceLayerContext from '../context/CommerceLayerContext'
 import OrderContext from '../context/OrderContext'
 import { getApiOrder, addToCart, OrderState } from '../reducers/OrderReducer'
 import { unsetOrderState } from '../reducers/OrderReducer'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
+import { BaseMetadataObject } from '../@types'
 
 const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps
 const displayName = components.OrderContainer.displayName
 
-export type OrderContainerProps = PropsType<typeof propTypes>
+type OrderContainerProps = {
+  children: ReactNode
+  persistKey: string
+  metadata?: BaseMetadataObject
+}
 
 const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
   const { children, persistKey, metadata } = props

@@ -1,15 +1,23 @@
 import React, { FunctionComponent, useEffect } from 'react'
 import Parent from './Parent'
-import { PropsType } from '../../utils/PropsType'
-import { BaseSelectComponentPropTypes } from '../../@types'
+import {
+  BaseSelectComponentPropTypes,
+  BaseSelectComponentProps,
+} from '../../@types'
 
-export type BaseSelectProps = PropsType<typeof BaseSelectComponentPropTypes>
+export type BaseSelectProps = BaseSelectComponentProps
 
-const BaseSelect: FunctionComponent<BaseSelectProps> = props => {
-  const { options, children, placeholder, value, ...p } = props
+const BaseSelect: FunctionComponent<BaseSelectProps> = (props) => {
+  const {
+    options = [],
+    children,
+    placeholder = { label: 'select an option', value: '' },
+    value = '',
+    ...p
+  } = props
   useEffect(() => {
-    if (options.indexOf(placeholder as any) === -1) {
-      options.unshift(placeholder as any)
+    if (options.indexOf(placeholder) === -1) {
+      options.unshift(placeholder)
     }
   }, [])
   const Options = options.map((o, k) => {
@@ -21,12 +29,12 @@ const BaseSelect: FunctionComponent<BaseSelectProps> = props => {
   })
   const parentProps = {
     options,
-    ...p
+    ...p,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <select value={value || ''} {...p}>
+    <select value={value} {...p}>
       {Options}
     </select>
   )
@@ -38,8 +46,8 @@ BaseSelect.defaultProps = {
   options: [],
   placeholder: {
     label: 'select an option',
-    value: ''
-  }
+    value: '',
+  },
 }
 
 export default BaseSelect

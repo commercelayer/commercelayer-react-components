@@ -3,6 +3,7 @@ import React, {
   FunctionComponent,
   useReducer,
   useContext,
+  ReactNode,
 } from 'react'
 import lineItemReducer, {
   lineItemInitialState,
@@ -16,17 +17,20 @@ import LineItemContext, {
 } from '../context/LineItemContext'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import _ from 'lodash'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
 const propTypes = components.LineItemsContainer.propTypes
 const defaultProps = components.LineItemsContainer.defaultProps
 const displayName = components.LineItemsContainer.displayName
 
-export type LineItemsContainer = PropsType<typeof propTypes>
+type LineItemsContainer = {
+  children: ReactNode
+  filters?: object
+  loader?: ReactNode
+}
 
 const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
-  const { children, filters, loader } = props
+  const { children, filters = {}, loader = 'Loading...' } = props
   const { order, getOrder, orderId } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(lineItemReducer, lineItemInitialState)
@@ -36,7 +40,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
         order,
         dispatch,
         config,
-        filters: filters || {},
+        filters,
       })
     }
     return (): void => {
