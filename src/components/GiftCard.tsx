@@ -21,7 +21,6 @@ const displayName = components.GiftCard.displayName
 
 export type GiftCardProps = {
   children: ReactNode
-  // metadata?: BaseMetadata
   onSubmit?: (values: BaseState) => void
 } & JSX.IntrinsicElements['form']
 

@@ -8,7 +8,7 @@ const propTypes = components.SkuOption.propTypes
 test('<SkuOption/>', () => {
   expect.assertions(3)
   const component = renderer.create(
-    <SkuOption name="unit-test">
+    <SkuOption id="unit-test">
       <div>test</div>
     </SkuOption>
   )
@@ -17,7 +17,7 @@ test('<SkuOption/>', () => {
   const proptypes = root.type['propTypes']
   expect(tree).toMatchSnapshot()
   expect(proptypes.children).toBe(propTypes.children)
-  expect(proptypes.name).toBe(propTypes.name)
+  expect(proptypes.id).toBe(propTypes.id)
 })
 
 test('<SkuOption proptypes required />', () => {
@@ -33,7 +33,7 @@ test('<SkuOption proptypes required />', () => {
   )
   expect(console.error.mock.calls[1][0]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: The prop `name` is marked as required in `SkuOption`, but its value is `undefined`.'
+      'Warning: Failed prop type: The prop `id` is marked as required in `SkuOption`, but its value is `undefined`.'
     )
   )
 })
@@ -42,7 +42,7 @@ test('<SkuOption check children />', () => {
   expect.assertions(2)
   console.error = jest.fn()
   const component = renderer.create(
-    <SkuOption>
+    <SkuOption id="unit-id">
       <Price />
     </SkuOption>
   )

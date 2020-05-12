@@ -8,7 +8,7 @@ const propTypes = components.LineItemOptions.propTypes
 test('<LineItemOptions/>', () => {
   expect.assertions(4)
   const component = renderer.create(
-    <LineItemOptions name="test">
+    <LineItemOptions skuOptionId="test">
       <div>test</div>
     </LineItemOptions>
   )
@@ -17,7 +17,7 @@ test('<LineItemOptions/>', () => {
   const proptypes = root.type['propTypes']
   expect(tree).toMatchSnapshot()
   expect(proptypes.children).toBe(propTypes.children)
-  expect(proptypes.name).toBe(propTypes.name)
+  expect(proptypes.skuOptionId).toBe(propTypes.skuOptionId)
   expect(proptypes.showName).toBe(propTypes.showName)
 })
 
@@ -29,12 +29,12 @@ test('<LineItemOptions proptypes required />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][0]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: The prop `name` is marked as required in `LineItemOptions`, but its value is `undefined`'
+      "Warning: Failed prop type: The prop 'children' is marked as required in 'LineItemOptions', but its value is 'undefined'"
     )
   )
   expect(console.error.mock.calls[1][0]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: The prop 'children' is marked as required in 'LineItemOptions', but its value is 'undefined'.`
+      'Warning: Failed prop type: The prop `skuOptionId` is marked as required in `LineItemOptions`, but its value is `undefined`'
     )
   )
 })
@@ -43,7 +43,7 @@ test('<LineItemOptions check children />', () => {
   expect.assertions(2)
   console.error = jest.fn()
   const component = renderer.create(
-    <LineItemOptions>
+    <LineItemOptions skuOptionId="unit-test">
       <Price />
     </LineItemOptions>
   )

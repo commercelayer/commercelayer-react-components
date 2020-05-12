@@ -15,9 +15,9 @@ test('<LineItemOption/>', () => {
   expect(tree).toMatchSnapshot()
   expect(proptypes.children).toBe(propTypes.children)
   expect(proptypes.name).toBe(propTypes.name)
-  expect(proptypes.optionKeyClassName).toBe(propTypes.optionKeyClassName)
-  expect(proptypes.optionKeyId).toBe(propTypes.optionKeyId)
-  expect(proptypes.optionKeyStyle).toBe(propTypes.optionKeyStyle)
+  expect(proptypes.keyClassName).toBe(propTypes.keyClassName)
+  expect(proptypes.keyId).toBe(propTypes.keyId)
+  expect(proptypes.keyStyle).toBe(propTypes.keyStyle)
 })
 
 test('<LineItemOption proptypes required />', () => {

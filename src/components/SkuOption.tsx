@@ -13,16 +13,16 @@ const displayName = components.SkuOption.displayName
 
 export type SkuOptionProps = {
   children: ReactNode
-  name: string // TODO change with id?
+  id: string
 }
 
 const SkuOption: FunctionComponent<SkuOptionProps> = (props) => {
-  const { name } = props
+  const { id } = props
   const { skuOptions, skuCode } = useContext(SkuOptionsContext)
   const items =
     skuOptions &&
     skuOptions
-      .filter((l) => l.name === name)
+      .filter((l) => l.id === id)
       .map((skuOption, k) => {
         return (
           <SkuOptionChildrenContext.Provider

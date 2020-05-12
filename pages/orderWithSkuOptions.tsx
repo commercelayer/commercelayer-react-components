@@ -125,7 +125,7 @@ export default function Order() {
                   </VariantsContainer>
                   <div className="m-2">
                     <SkuOptionsContainer>
-                      <SkuOption name="Embossing">
+                      <SkuOption id="gNjjvsExNq">
                         <SkuOptionInput
                           name="message"
                           type="text"
@@ -139,7 +139,7 @@ export default function Order() {
                           placeholder="Text size"
                         />
                       </SkuOption>
-                      <SkuOption name="Color">
+                      <SkuOption id="gNlGlsAOBk">
                         <SkuOptionInput
                           name="back"
                           type="text"
@@ -181,7 +181,10 @@ export default function Order() {
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
                     <div>
-                      <LineItemOptions name="Embossing" className="font-bold">
+                      <LineItemOptions
+                        skuOptionId="gNjjvsExNq"
+                        className="font-bold"
+                      >
                         <div className="flex flex-col justify-between text-sm">
                           <LineItemOption
                             keyClassName="font-medium capitalize underline"
@@ -195,7 +198,10 @@ export default function Order() {
                       </LineItemOptions>
                     </div>
                     <div>
-                      <LineItemOptions name="Color" className="font-bold">
+                      <LineItemOptions
+                        skuOptionId="gNlGlsAOBk"
+                        className="font-bold"
+                      >
                         <div className="flex flex-col justify-between text-sm">
                           <LineItemOption
                             name="back"

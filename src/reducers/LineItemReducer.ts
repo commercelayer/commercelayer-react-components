@@ -69,7 +69,7 @@ export const getLineItems: GetLineItems = (params) => {
       // TODO add interface to SDK
       // @ts-ignore
       .where(filters)
-      .includes('lineItemOptions')
+      .includes('lineItemOptions.skuOption')
       .all()
       .then(async (res) => {
         dispatch({

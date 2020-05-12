@@ -99,12 +99,10 @@ const components = {
     displayName: 'GiftCard',
     propTypes: {
       children: childrenTypes.isRequired,
-      // metadata: PropTypes.objectOf(PropTypes.string),
       onSubmit: PropTypes.func,
     },
     defaultProps: {
       onSubmit: undefined,
-      // metadata: {},
     },
   },
   GiftCardContainer: {
@@ -246,9 +244,10 @@ const components = {
     permittedChildren: ['LineItemOption', 'ReactNode'],
     displayName: 'LineItemOptions',
     propTypes: {
-      name: PropTypes.string.isRequired, // TODO: Change with ID
       children: childrenTypes.isRequired,
+      title: PropTypes.string,
       showName: PropTypes.bool,
+      skuOptionId: PropTypes.string.isRequired,
     },
     defaultProps: {
       showName: true,
@@ -378,7 +377,7 @@ const components = {
     displayName: 'SkuOption',
     propTypes: {
       children: childrenTypes.isRequired,
-      name: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
     },
   },
   SkuOptionInput: {
