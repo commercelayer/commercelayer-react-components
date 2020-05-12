@@ -13,7 +13,7 @@ type LineItemChildrenProps = Omit<LineItemImageProps, 'children'> & {
 type LineItemImageProps = {
   children?: (props: LineItemChildrenProps) => ReactNode
   width?: number
-} & JSX.IntrinsicElements['img']
+} & Omit<JSX.IntrinsicElements['img'], 'src' | 'srcSet'>
 
 const LineItemImage: FunctionComponent<LineItemImageProps> = (props) => {
   const { lineItem } = useContext(LineItemChildrenContext)

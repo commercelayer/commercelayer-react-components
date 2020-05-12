@@ -105,6 +105,10 @@ const components = {
       onSubmit: undefined,
     },
   },
+  GiftCardAmount: {
+    displayName: 'GiftCardAmount',
+    propTypes: baseOrderComponentPricePropTypes,
+  },
   GiftCardContainer: {
     permittedChildren: ['GiftCard', 'ReactNode'],
     displayName: 'GiftCardContainer',
@@ -154,10 +158,6 @@ const components = {
       children: PropTypes.func,
       placeholder: PropTypes.string,
     },
-  },
-  GiftCardAmount: {
-    displayName: 'GiftCardAmount',
-    propTypes: baseOrderComponentPricePropTypes,
   },
   ItemContainer: {
     permittedChildren: [

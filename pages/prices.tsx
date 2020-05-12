@@ -64,6 +64,7 @@ const skus = [
   'HATBSBMUFFFFFF000000XXXX',
   'HATBSBMUFFFFFFE63E74XXXX',
   'LSLEEVMM000000E63E74LXXX',
+  'LSLEEVMM000000FFFFFFLXXX',
 ]
 
 const Home = () => {
@@ -80,15 +81,18 @@ const Home = () => {
       })
       setToken(auth?.accessToken as string)
     }
-    getToken()
+    if (!token) {
+      getToken()
+    }
   }, [])
   const Loading = () => <div>Caricamento...</div>
   return (
     <section className="bg-gray-100">
       <Nav links={['/order', '/multiOrder', '/multiApp', '/giftCard']} />
-      <div className="container mx-auto">
-        <CommerceLayer accessToken={token} endpoint={endpoint} cache>
-          <div className="flex flex-row flex-wrap justify-around">
+      <div className="mx-auto">
+        <CommerceLayer accessToken={token} endpoint={endpoint}>
+          <h1 className="text-center text-3xl py-5">Filtered by EUR</h1>
+          <div className="flex flex-row flex-wrap justify-around p-5">
             <PricesContainer
               perPage={5}
               loader={<Loading />}
@@ -97,7 +101,11 @@ const Home = () => {
               {skus.map((s, k) => {
                 const lImg = s.substring(0, s.length - 4)
                 return (
-                  <div key={k} className="text-center p-3">
+                  <div
+                    key={k}
+                    className="text-center p-5 w-full"
+                    style={{ maxWidth: '15rem' }}
+                  >
                     <img
                       src={`https://img.commercelayer.io/skus/${lImg}.png?fm=png&q=70`}
                       className="rounded-lg md:w-56 m-auto"
@@ -112,7 +120,44 @@ const Home = () => {
                     <div className="p-3">
                       <a
                         className="mt-2 primary font-bold py-2 px-4 rounded"
-                        href="/order"
+                        href="#"
+                      >
+                        View Details
+                      </a>
+                    </div>
+                  </div>
+                )
+              })}
+            </PricesContainer>
+          </div>
+          <div className="bg-gray-900">
+            <h1 className="text-center text-3xl py-5 text-white">No filter</h1>
+          </div>
+          <div className="flex flex-row flex-wrap justify-around bg-gray-900 p-5">
+            <PricesContainer>
+              {skus.map((s, k) => {
+                const lImg = s.substring(0, s.length - 4)
+                return (
+                  <div
+                    key={k}
+                    className="text-center p-5 w-full"
+                    style={{ maxWidth: '15rem' }}
+                  >
+                    <img
+                      src={`https://img.commercelayer.io/skus/${lImg}.png?fm=png&q=70`}
+                      className="rounded-lg w-56 m-auto"
+                    />
+                    <div className="flex flex-row flex-wrap justify-center">
+                      <Price
+                        skuCode={s}
+                        className="text-green-600 text-2xl m-1"
+                        compareClassName="text-gray-500 text-2xl m-1 line-through"
+                      />
+                    </div>
+                    <div className="p-3">
+                      <a
+                        className="mt-2 primary font-bold py-2 px-4 rounded"
+                        href="#"
                       >
                         View Details
                       </a>
