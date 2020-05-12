@@ -266,52 +266,52 @@ These are the currently available Commerce Layer React Components.
 
 > Please note that not every Commerce Layer React component can be nested into any other one.
 
-For each component, the table below shows its props (with their default values) and the list of the permitted children (if any):
+For each component, the table below shows its props and the list of the permitted children (if any):
 
 >
 
-| Name                       | Props (default)                                                                                                 | Children                                                                                                                                                                                                             |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AddToCartButton`          | `disabled`<br />`label` ('Add to cart')<br />`skuCode`                                                          |
-| `AvailabilityContainer`    | `skuCode`                                                                                                       | `AvailabilityTemplate`                                                                                                                                                                                               |
-| `AvailabilityTemplate`     | `showShippingMethodName` (false)<br />`timeFormat` ('days')                                                     |
-| `CheckoutLink`             | `label` ('Checkout')                                                                                            |
-| `CommerceLayer`            | `accessToken`<br />`endpoint`                                                                                   | `GiftCardContainer`<br />`OrderContainer`<br />`PricesContainer`                                                                                                                                                     |
-| `DiscountAmount`           | `className`<br />`format` ('formatted')<br />`id`<br />`name`<br />`style`                                      |
-| `Errors`                   | `field` ('base')<br />`messages` ([])<br />`resource`                                                           |
-| `GiftCard`                 | `metadata` ({})<br />`onSubmit` (undefined)                                                                     | `Errors`<br />`GiftCardCurrencySelector`<br />`GiftCardInput`<br />`MetadataInput`<br />`SubmitButton`                                                                                                               |
-| `GiftCardAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`                                                    |
-| `GiftCardContainer`        |                                                                                                                 | `GiftCard`                                                                                                                                                                                                           |
-| `GiftCardCurrencySelector` | `placeholder`<br />`required` (true)<br />`value`                                                               |
-| `GiftCardInput`            | `name`<br />`placeholder`<br />`type`                                                                           |
-| `ItemContainer`            | `lineItem`<br />`skuCode`                                                                                       | `AddToCartButton`<br />`AvailabilityContainer`<br />`QuantitySelector`<br />`PricesContainer`<br />`SkuOptionContainer`<br />`VariantsContainer`                                                                     |
-| `LineItem`                 | `type` ('skus')                                                                                                 | `Errors`<br />`LineItemAmount`<br />`LineItemImage`<br />`LineItemName`<br />`LineItemOptions`<br />`LineItemQuantity`<br />`LineItemRemoveLink`                                                                     |
-| `LineItemAmount`           | `className`<br />`format` ('formatted')<br />`id`<br />`name`<br />`style`<br />`type` ('total')                |
-| `LineItemImage`            | `width`                                                                                                         |
-| `LineItemName`             |                                                                                                                 |
-| `LineItemOption`           | `keyClassName`<br />`keyId`<br />`keyStyle`<br />`name`<br />`valueClassName`                                   |
-| `LineItemOptions`          | `name`<br /> `showName` (true)                                                                                  | `LineItemOption`                                                                                                                                                                                                     |
-| `LineItemQuantity`         | `disabled`<br />`max` (50)                                                                                      |
-| `LineItemRemoveLink`       | `label` ('Remove')                                                                                              |
-| `LineItemsContainer`       | `filters` ({})<br />`loader` ('Loading...')                                                                     | `LineItem`<br />`LineItemsCount`                                                                                                                                                                                     |
-| `LineItemsCount`           | `className`<br />`id`<br />`name`<br />`style`                                                                  |
-| `MetadataInput`            | `name`<br />`onChange`<br />`placeholder`<br />`type`                                                           |
-| `OrderContainer`           | `metadata` ({})<br />`persistKey`                                                                               | `CheckoutLink`<br />`DiscountAmount`<br />`GiftCardAmount`<br />`GiftCardContainer`<br />`ItemContainer`<br />`LineItemsContainer`<br />`ShippingAmount`<br />`SubTotalAmount`<br />`TaxesAmount`<br />`TotalAmount` |
-| `Price`                    | `compareClassName`<br />`showCompare`<br />`skuCode` ('')                                                       |
-| `PricesContainer`          | `filters` ({})<br />`loader` ('Loading...')<br />`perPage` (10)<br />`skuCode` ('')                             | `Price`                                                                                                                                                                                                              |
-| `QuantitySelector`         | `disabled`<br />`max`<br />`min` (1)<br />`skuCode`<br />`value`                                                |
-| `ShippingAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`                                                    |
-| `SkuOption`                | `name`                                                                                                          | `SkuOptionInput`                                                                                                                                                                                                     |
-| `SkuOptionInput`           | `name`<br />`onChange`<br />`placeholder`<br />`type`                                                           |
-| `SkuOptionsContainer`      | `skuCode`                                                                                                       | `SkuOption`                                                                                                                                                                                                          |
-| `SubmitButton`             | `label` ('Submit')                                                                                              |
-| `SubTotalAmount`           | `className`<br />`format` ('formatted')<br />`id`<br />`name`<br />`style`                                      |
-| `TaxesAmount`              | `className`<br />`format` ('formatted')<br />`id`<br />`name`<br />`style`                                      |
-| `TotalAmount`              | `className`<br />`format` ('formatted')<br />`id`<br />`name`<br />`style`                                      |
-| `VariantsContainer`        | `filters` ({})<br />`skuCode` ('')                                                                              | `VariantSelector`                                                                                                                                                                                                    |
-| `VariantSelector`          | `loader`<br />`name`<br />`options`<br />`placehoder` ('Select a variant')<br />`skuCode`<br />`type`('select') |
+| Name                       | Props                                                                            | Children                                                                                                                                                                                                             |
+| -------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AddToCartButton`          | `disabled`<br />`label`<br />`skuCode`                                           |
+| `AvailabilityContainer`    | `skuCode`                                                                        | `AvailabilityTemplate`                                                                                                                                                                                               |
+| `AvailabilityTemplate`     | `showShippingMethodName`<br />`timeFormat`                                       |
+| `CheckoutLink`             | `label`                                                                          |
+| `CommerceLayer`            | `accessToken`<br />`endpoint`                                                    | `GiftCardContainer`<br />`OrderContainer`<br />`PricesContainer`                                                                                                                                                     |
+| `DiscountAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
+| `Errors`                   | `field`<br />`messages`<br />`resource`                                          |
+| `GiftCard`                 | `onSubmit`                                                                       | `Errors`<br />`GiftCardCurrencySelector`<br />`GiftCardInput`<br />`MetadataInput`<br />`SubmitButton`                                                                                                               |
+| `GiftCardAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
+| `GiftCardContainer`        |                                                                                  | `GiftCard`                                                                                                                                                                                                           |
+| `GiftCardCurrencySelector` | `placeholder`<br />`required`<br />`value`                                       |
+| `GiftCardInput`            | `name`<br />`placeholder`<br />`type`                                            |
+| `ItemContainer`            | `lineItem`<br />`skuCode`                                                        | `AddToCartButton`<br />`AvailabilityContainer`<br />`QuantitySelector`<br />`PricesContainer`<br />`SkuOptionContainer`<br />`VariantsContainer`                                                                     |
+| `LineItem`                 | `type`                                                                           | `Errors`<br />`LineItemAmount`<br />`LineItemImage`<br />`LineItemName`<br />`LineItemOptions`<br />`LineItemQuantity`<br />`LineItemRemoveLink`                                                                     |
+| `LineItemAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`<br />`type`         |
+| `LineItemImage`            | `width`                                                                          |
+| `LineItemName`             |                                                                                  |
+| `LineItemOption`           | `keyClassName`<br />`keyId`<br />`keyStyle`<br />`name`<br />`valueClassName`    |
+| `LineItemOptions`          | `title`<br /> `showName`<br />`skuOptionId`                                      | `LineItemOption`                                                                                                                                                                                                     |
+| `LineItemQuantity`         | `disabled`<br />`max`                                                            |
+| `LineItemRemoveLink`       | `label`                                                                          |
+| `LineItemsContainer`       | `filters`<br />`loader`                                                          | `LineItem`<br />`LineItemsCount`                                                                                                                                                                                     |
+| `LineItemsCount`           | `className`<br />`id`<br />`name`<br />`style`                                   |
+| `MetadataInput`            | `name`<br />`onChange`<br />`placeholder`<br />`type`                            |
+| `OrderContainer`           | `metadata`<br />`persistKey`                                                     | `CheckoutLink`<br />`DiscountAmount`<br />`GiftCardAmount`<br />`GiftCardContainer`<br />`ItemContainer`<br />`LineItemsContainer`<br />`ShippingAmount`<br />`SubTotalAmount`<br />`TaxesAmount`<br />`TotalAmount` |
+| `Price`                    | `compareClassName`<br />`showCompare`<br />`skuCode`                             |
+| `PricesContainer`          | `filters`<br />`loader`<br />`perPage`<br />`skuCode`                            | `Price`                                                                                                                                                                                                              |
+| `QuantitySelector`         | `disabled`<br />`max`<br />`min`<br />`skuCode`<br />`value`                     |
+| `ShippingAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
+| `SkuOption`                | `id`                                                                             | `SkuOptionInput`                                                                                                                                                                                                     |
+| `SkuOptionInput`           | `name`<br />`onChange`<br />`placeholder`<br />`type`                            |
+| `SkuOptionsContainer`      | `skuCode`                                                                        | `SkuOption`                                                                                                                                                                                                          |
+| `SubmitButton`             | `label`                                                                          |
+| `SubTotalAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
+| `TaxesAmount`              | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
+| `TotalAmount`              | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
+| `VariantsContainer`        | `filters`<br />`skuCode`                                                         | `VariantSelector`                                                                                                                                                                                                    |
+| `VariantSelector`          | `loader`<br />`name`<br />`options`<br />`placehoder`<br />`skuCode`<br />`type` |
 
-For more detailed information on each components (i.e. prop types, required props, etc.), have a look at the configuration file [`src/config/components.ts`](/src/config/components.ts).
+For more detailed information on each components (i.e. prop types and default values, required props, etc.), have a look at the configuration file [`src/config/components.ts`](/src/config/components.ts).
 
 ---
 
