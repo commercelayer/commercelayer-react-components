@@ -1,18 +1,19 @@
-import React, { FunctionComponent, useContext, ReactNode } from 'react'
+import React, { FunctionComponent, useContext } from 'react'
 import OrderContext from '../context/OrderContext'
 import components from '../config/components'
 import Parent from './utils/Parent'
+import { FunctionChildren } from '../@types/index'
 
 const propTypes = components.CheckoutLink.propTypes
 const defaultProps = components.CheckoutLink.defaultProps
 const displayName = components.CheckoutLink.displayName
 
-type ChildrenProps = Omit<CheckoutLinkProps, 'children'> & {
+type CheckoutLinkChildrenProps = Omit<CheckoutLinkProps, 'children'> & {
   checkoutUrl: string
 }
 
 type CheckoutLinkProps = {
-  children?: (props: ChildrenProps) => ReactNode
+  children?: FunctionChildren<CheckoutLinkChildrenProps>
   label?: string
 } & JSX.IntrinsicElements['a']
 

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { ReactNode } from 'react'
 import { type } from 'os'
+import { FunctionChildren } from './index'
 
 export type CodeErrorType =
   | 'RECORD_NOT_FOUND'
@@ -118,7 +119,7 @@ type ErrorChildrenComponentProps = Omit<ErrorComponentProps, 'children'>
 
 export interface ErrorComponentProps {
   resource: ResourceErrorType
-  children?: (props: ErrorChildrenComponentProps) => ReactNode
+  children?: FunctionChildren<ErrorChildrenComponentProps>
   field?: string
   messages?: {
     code: CodeErrorType

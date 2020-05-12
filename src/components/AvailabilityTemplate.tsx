@@ -1,9 +1,9 @@
-import React, { useContext, FunctionComponent, ReactNode } from 'react'
+import React, { useContext, FunctionComponent } from 'react'
 import AvailabilityContext from '../context/AvailabilityContext'
 import Parent from './utils/Parent'
 import _ from 'lodash'
 import components from '../config/components'
-import { TimeFormat } from '../@types/index'
+import { TimeFormat, FunctionChildren } from '../@types/index'
 import { LeadTimes, ShippingMethod } from '../reducers/AvailabilityReducer'
 
 const propTypes = components.AvailabilityTemplate.propTypes
@@ -11,16 +11,19 @@ const defaultProps = components.AvailabilityTemplate
   .defaultProps as AvailabilityTemplateProps
 const displayName = components.AvailabilityTemplate.displayName
 
-type ChildrenProps = Omit<AvailabilityTemplateProps, 'children'> & {
+type AvailabilityTemplateChildrenProps = Omit<
+  AvailabilityTemplateProps,
+  'children'
+> & {
   min: LeadTimes
   max: LeadTimes
   shippingMethod: ShippingMethod
 }
 
 type AvailabilityTemplateProps = {
+  children?: FunctionChildren<AvailabilityTemplateChildrenProps>
   timeFormat?: TimeFormat
   showShippingMethodName?: boolean
-  children?: (props: ChildrenProps) => ReactNode
 } & JSX.IntrinsicElements['p']
 
 const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = (

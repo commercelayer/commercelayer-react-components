@@ -1,13 +1,20 @@
-import React, { FunctionComponent, Fragment, useContext } from 'react'
+import React, {
+  FunctionComponent,
+  Fragment,
+  useContext,
+  ReactNode,
+} from 'react'
 import SkuOptionChildrenContext from '../context/SkuOptionChildrenContext'
 import SkuOptionsContext from '../context/SkuOptionsContext'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
 const propTypes = components.SkuOption.propTypes
 const displayName = components.SkuOption.displayName
 
-export type SkuOptionProps = PropsType<typeof propTypes>
+export type SkuOptionProps = {
+  children: ReactNode
+  name: string // TODO change with id?
+}
 
 const SkuOption: FunctionComponent<SkuOptionProps> = (props) => {
   const { name } = props

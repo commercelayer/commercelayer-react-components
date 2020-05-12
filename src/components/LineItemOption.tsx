@@ -10,6 +10,7 @@ import _ from 'lodash'
 import Parent from './utils/Parent'
 import components from '../config/components'
 import { LineItemOptionCollection } from '@commercelayer/js-sdk'
+import { FunctionChildren } from '../@types/index'
 
 const propTypes = components.LineItemOption.propTypes
 const displayName = components.LineItemOption.displayName
@@ -19,7 +20,7 @@ type LineItemOptionChildrenProps = Omit<LineItemOptionProps, 'children'> & {
 }
 
 type LineItemOptionProps = {
-  children?: (props: LineItemOptionChildrenProps) => ReactNode
+  children?: FunctionChildren<LineItemOptionChildrenProps>
   name: string
   valueClassName?: string
   keyClassName?: string

@@ -1,17 +1,21 @@
 import React, { FunctionComponent } from 'react'
 import Parent from './utils/Parent'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
+import { FunctionChildren } from '../@types/index'
 
 const propTypes = components.SubmitButton.propTypes
 const defaultProps = components.SubmitButton.defaultProps
 const displayName = components.SubmitButton.displayName
 
-export type SubmitButtonProps = PropsType<typeof propTypes> &
-  JSX.IntrinsicElements['button']
+type SubmitButtonChildrenProps = Omit<SubmitButtonProps, 'children'>
+
+type SubmitButtonProps = {
+  children?: FunctionChildren<SubmitButtonChildrenProps>
+  label?: string
+} & JSX.IntrinsicElements['button']
 
 const SubmitButton: FunctionComponent<SubmitButtonProps> = (props) => {
-  const { children, label, ...p } = props
+  const { children, label = 'Submit', ...p } = props
   const parentProps = {
     ...p,
     label,

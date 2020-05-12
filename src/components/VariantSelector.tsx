@@ -11,12 +11,14 @@ import Parent from './utils/Parent'
 import VariantsContext from '../context/VariantsContext'
 import components from '../config/components'
 import { BaseSelectorType } from '../@types'
+import { FunctionChildren } from '../@types/index'
+import { VariantsObject, SetSkuCode } from '../reducers/VariantReducer'
 
 const propTypes = components.VariantSelector.propTypes
 const defaultProps = components.VariantSelector.defaultProps
 const displayName = components.VariantSelector.displayName
 
-export type VariantOptions = {
+type VariantOptions = {
   label: string
   code: string
   lineItem?: {
@@ -25,8 +27,13 @@ export type VariantOptions = {
   }
 }
 
-export type VariantSelectorProps = {
-  children?: FunctionComponent
+type VariantSelectorChildrenProps = Omit<VariantSelectorProps, 'children'> & {
+  variants: VariantsObject
+  handleSelect: SetSkuCode
+}
+
+type VariantSelectorProps = {
+  children?: FunctionChildren<VariantSelectorChildrenProps>
   options: VariantOptions[]
   type?: BaseSelectorType
   loader?: ReactNode
@@ -61,7 +68,7 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = (props) => {
         placeholder={placeholder as string}
         skuCode={sCode}
         options={options}
-        onChange={setSkuCode as any}
+        handleChange={setSkuCode}
         name={name as string}
         {...prs}
       />

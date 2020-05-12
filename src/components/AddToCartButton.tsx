@@ -1,29 +1,28 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  ReactNode,
-  PropsWithoutRef,
-} from 'react'
+import React, { FunctionComponent, useContext, PropsWithoutRef } from 'react'
 import Parent from './utils/Parent'
 import OrderContext from '../context/OrderContext'
 import _ from 'lodash'
 import ItemContext from '../context/ItemContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import components from '../config/components'
+import { FunctionChildren } from '../@types/index'
 
 const propTypes = components.AddToCartButton.propTypes
 const defaultProps = components.AddToCartButton.defaultProps
 const displayName = components.AddToCartButton.displayName
 
-type ChildrenFunctionProps = {
+type AddToCartButtonChildrenProps = {
   handleClick: () => void
   label?: string
   skuCode?: string
   disabled?: boolean
 } & PropsWithoutRef<JSX.IntrinsicElements['button']>
 
-type AddToCartButtonProps = Omit<ChildrenFunctionProps, 'handleClick'> & {
-  children?: (props: ChildrenFunctionProps) => ReactNode
+type AddToCartButtonProps = Omit<
+  AddToCartButtonChildrenProps,
+  'handleClick'
+> & {
+  children?: FunctionChildren<AddToCartButtonChildrenProps>
 } & PropsWithoutRef<JSX.IntrinsicElements['button']>
 
 const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {

@@ -3,6 +3,7 @@ import React, {
   FunctionComponent,
   useReducer,
   useContext,
+  ReactNode,
 } from 'react'
 import variantReducer, {
   variantInitialState,
@@ -17,19 +18,22 @@ import { setVariantSkuCodes } from '../reducers/VariantReducer'
 import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
 const propTypes = components.VariantsContainer.propTypes
 const defaultProps = components.VariantsContainer.defaultProps
 const displayName = components.VariantsContainer.displayName
 
-export type VariantsContainerProps = PropsType<typeof propTypes>
+type VariantsContainerProps = {
+  children: ReactNode
+  filters?: object
+  skuCode?: string
+}
 
 const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
   props
 ) => {
-  const { children, skuCode, filters } = props
+  const { children, skuCode = '', filters = {} } = props
   const config = useContext(CommerceLayerContext)
   const {
     setItem,
@@ -64,7 +68,7 @@ const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
         dispatch,
         setItem,
         skuCode: sCode,
-        filters: filters || {},
+        filters,
       })
     }
     return (): void => unsetVariantState(dispatch)
@@ -72,9 +76,9 @@ const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
   const variantValue: VariantState = {
     ...state,
     skuCode: sCode,
-    setSkuCode: (code, id, lineItem) => {
+    setSkuCode: (code, id, lineItem = {}) => {
       if (!_.isEmpty(lineItem)) {
-        setCustomLineItems && setCustomLineItems({ [code]: lineItem || {} })
+        setCustomLineItems && setCustomLineItems({ [code]: lineItem })
       }
       setSkuCode({
         code,

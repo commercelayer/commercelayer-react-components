@@ -3,6 +3,7 @@ import React, {
   useReducer,
   useContext,
   useEffect,
+  ReactNode,
 } from 'react'
 import SkuOptionsContext from '../context/SkuOptionsContext'
 import skuOptionsReducer, {
@@ -13,13 +14,15 @@ import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
 import { getSkuOptions } from '../reducers/SkuOptionsReducer'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
 
 const propTypes = components.SkuOptionsContainer.propTypes
 const displayName = components.SkuOptionsContainer.displayName
 
-export type SkuOptionsContainerProp = PropsType<typeof propTypes>
+type SkuOptionsContainerProp = {
+  children: ReactNode
+  skuCode?: string
+}
 
 const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = (
   props

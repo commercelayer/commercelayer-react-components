@@ -1,16 +1,13 @@
 import React, { FunctionComponent } from 'react'
 import BaseOrderPrice from './utils/BaseOrderPrice'
-import { PropsType } from '../utils/PropsType'
 import components from '../config/components'
+import { BaseAmountComponent } from '../@types'
 
 const propTypes = components.TotalAmount.propTypes
 const defaultProps = components.TotalAmount.defaultProps
 const displayName = components.TotalAmount.displayName
 
-export type TotalProps = PropsType<typeof propTypes> &
-  JSX.IntrinsicElements['span']
-
-const TotalAmount: FunctionComponent<TotalProps> = (props) => {
+const TotalAmount: FunctionComponent<BaseAmountComponent> = (props) => {
   return <BaseOrderPrice base="totalAmount" type="withTaxes" {...props} />
 }
 

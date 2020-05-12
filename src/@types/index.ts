@@ -69,13 +69,22 @@ export const BaseInputComponentPropTypes = {
   placeholder: PropTypes.string,
 }
 
-type BaseInputChildrenComponentProps = Omit<BaseInputComponentProps, 'children'>
+type BaseInputChildrenComponentProps = Omit<
+  BaseInputComponentProps,
+  'children'
+> & {
+  handleChange: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void
+}
 
 export interface BaseInputComponentProps {
   children?: (props: BaseInputChildrenComponentProps) => ReactNode
   name: string
   type: BaseInputType
-  onChange?: (event: React.MouseEvent<HTMLInputElement>) => void
+  onChange?: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void
   placeholder?: string
 }
 

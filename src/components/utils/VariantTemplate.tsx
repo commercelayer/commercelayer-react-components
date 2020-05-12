@@ -28,7 +28,7 @@ export const propTypes = {
 
 export type VariantTemplateProps = {
   variants: VariantsObject | object
-  onChange?: SetSkuCode
+  handleChange?: SetSkuCode
   options: VariantOptions[]
   type?: BaseSelectorType
   loader?: ReactNode
@@ -45,7 +45,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
     placeholder,
     options,
     skuCode,
-    onChange,
+    handleChange,
     ...prs
   } = props
   const vars = _.keys(variants).map((v, k) => {
@@ -66,7 +66,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
           type="radio"
           value={variants[v].code}
           onChange={(e): void =>
-            onChange && onChange(e.target.value, variants[v].id)
+            handleChange && handleChange(e.target.value, variants[v].id)
           }
           {...prs}
         />
@@ -82,7 +82,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
           const v = e.target.value
           const i = e.target.selectedIndex
           const id = e.target[i].dataset.skuId as string
-          onChange && onChange(v, id)
+          handleChange && handleChange(v, id)
         }}
         value={skuCode || ''}
         {...prs}
