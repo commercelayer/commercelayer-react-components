@@ -229,11 +229,7 @@ export default function Order() {
                 </LineItem>
                 <LineItem type="gift_cards">
                   <div className="flex justify-between items-center border-b p-5">
-                    <LineItemImage
-                      className="p-2"
-                      width={40}
-                      src="//contentful-gatsby-demo-it.netlify.com/icons/icon-48x48.png?v=c6e799c5132154cb5f3634994be3f8aa"
-                    />
+                    <LineItemImage className="p-2" width={40} />
                     <LineItemName id="line-item-name" className="p-2" />
                     <LineItemQuantity
                       id="line-item-quantity"

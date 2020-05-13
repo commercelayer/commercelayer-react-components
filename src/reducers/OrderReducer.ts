@@ -164,6 +164,8 @@ export const addToCart: AddToCart = async (params) => {
       config
     ).create(attrs)
     if (!_.isEmpty(option)) {
+      console.log('option', option)
+      let c = 0
       _.map(option, async (opt) => {
         const { options, skuOptionId } = opt
         const skuOption = CLayer.SkuOption.build({ id: skuOptionId })
@@ -173,9 +175,14 @@ export const addToCart: AddToCart = async (params) => {
           lineItem: lineItemResource,
           skuOption,
         })
+        c += 1
+        if (c === _.size(option)) {
+          await getApiOrder({ id, ...params })
+        }
       })
+    } else {
+      await getApiOrder({ id, ...params })
     }
-    await getApiOrder({ id, ...params })
   } catch (col) {
     const errors = getErrorsByCollection(col, 'order')
     dispatch({

@@ -82,11 +82,13 @@ describe('Order with SkuOptions', () => {
       '@orders',
       '@insertLineItems',
       '@retrieveLineItems',
+      '@getOrders',
       '@insertLineItemOptions',
+      '@retrieveLineItems',
     ])
 
-    cy.wait(['@getOrders'])
-    cy.wait(['@insertLineItemOptions'])
+    // cy.wait(['@getOrders'])
+    // cy.wait(['@insertLineItemOptions'])
 
     cy.get('#items-count').should('contain.text', '2')
     cy.get('.font-medium > .text-right > span').should('contain.text', '€63,50')
