@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
-    "@commercelayer/js-sdk": "^2.9.4",
+    "@commercelayer/js-sdk": "^2.9.5",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
@@ -57,14 +57,14 @@
     "@commercelayer/cypress-vcr": "^1.0.1",
     "@commercelayer/js-auth": "^2.0.2",
     "@cypress/webpack-preprocessor": "^5.2.0",
-    "@types/jest": "^25.2.1",
+    "@types/jest": "^25.2.2",
     "@types/lodash": "^4.14.150",
-    "@types/node": "^13.13.5",
+    "@types/node": "^14.0.1",
     "@types/prop-types": "^15.7.3",
     "@types/react": "^16.9.35",
     "@types/react-test-renderer": "^16.9.2",
-    "@typescript-eslint/eslint-plugin": "^2.32.0",
-    "@typescript-eslint/parser": "^2.32.0",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.33.0",
     "@zeit/next-css": "^1.0.1",
     "autoprefixer": "^9.7.6",
     "babel-jest": "^26.0.1",
@@ -73,8 +73,8 @@
     "eslint": "^7.0.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-react-app": "^5.2.1",
-    "eslint-plugin-react": "^7.19.0",
-    "eslint-plugin-react-hooks": "^4.0.0",
+    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-react-hooks": "^4.0.2",
     "jest": "^26.0.1",
     "next": "^9.4.0",
     "postcss-loader": "^3.0.0",
@@ -89,7 +89,7 @@
     "ts-jest": "^25.5.1",
     "ts-loader": "^7.0.4",
     "tsdx": "^0.13.2",
-    "typescript": "^3.8.3",
+    "typescript": "^3.9.2",
     "webpack": "^4.43.0"
   },
   "peerDependencies": {
