@@ -110,7 +110,7 @@ const components = {
     propTypes: baseOrderComponentPricePropTypes,
   },
   GiftCardContainer: {
-    permittedChildren: ['GiftCard', 'ReactNode'],
+    permittedChildren: ['GiftCard', 'Errors', 'ReactNode'],
     displayName: 'GiftCardContainer',
     propTypes: {
       children: childrenTypes.isRequired,

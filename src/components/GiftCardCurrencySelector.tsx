@@ -13,7 +13,7 @@ type GiftCardCurrencySelectorProps = Omit<
   'options' | 'name'
 > & {
   required?: boolean
-}
+} & Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'>
 
 const GiftCardCurrencySelector: FunctionComponent<GiftCardCurrencySelectorProps> = (
   props

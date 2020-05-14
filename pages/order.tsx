@@ -156,30 +156,6 @@ export default function Order() {
                   <div className="flex justify-around items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
-                    <div>
-                      <LineItemOptions name="Embossing" className="font-bold">
-                        <div className="flex flex-col justify-between text-sm">
-                          <LineItemOption
-                            keyClassName="font-medium capitalize underline"
-                            name="message"
-                          />
-                          <LineItemOption
-                            name="size"
-                            keyClassName="font-medium capitalize underline"
-                          />
-                        </div>
-                      </LineItemOptions>
-                    </div>
-                    <div>
-                      <LineItemOptions name="Color" className="font-bold">
-                        <div className="flex flex-col justify-between text-sm">
-                          <LineItemOption
-                            name="back"
-                            keyClassName="font-medium capitalize underline"
-                          />
-                        </div>
-                      </LineItemOptions>
-                    </div>
                     <LineItemQuantity
                       id="line-item-quantity"
                       max={100}
@@ -199,11 +175,7 @@ export default function Order() {
                 </LineItem>
                 <LineItem type="gift_cards">
                   <div className="flex justify-between items-center border-b p-5">
-                    <LineItemImage
-                      className="p-2"
-                      width={40}
-                      src="//contentful-gatsby-demo-it.netlify.com/icons/icon-48x48.png?v=c6e799c5132154cb5f3634994be3f8aa"
-                    />
+                    <LineItemImage className="p-2" width={40} />
                     <LineItemName id="line-item-name" className="p-2" />
                     <LineItemQuantity
                       id="line-item-quantity"

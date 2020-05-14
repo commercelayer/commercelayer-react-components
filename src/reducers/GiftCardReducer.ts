@@ -3,13 +3,14 @@ import { CustomerCollection } from '@commercelayer/js-sdk'
 import { BaseMetadata } from '../@types'
 import CLayer, {
   MarketCollection,
-  GiftCardRecipientCollection
+  GiftCardRecipientCollection,
 } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import _ from 'lodash'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import { BaseError } from '../@types/errors'
+import { CreateOrder } from './OrderReducer'
 
 export type GiftCardActionType =
   | 'setAvailability'
@@ -73,7 +74,7 @@ export const giftCardInitialState: GiftCardState = {
   rechargeable: true,
   loading: false,
   expiresAt: null,
-  errors: []
+  errors: [],
 }
 
 export interface AddGiftCardRecipient {
@@ -87,8 +88,12 @@ export interface AddGiftCardRecipient {
 export interface AddGiftCard {
   <V extends GiftCardI>(
     values: V,
-    config: CommerceLayerConfig,
-    dispatch: Dispatch<GiftCardAction>
+    configParameters: {
+      getOrder?: (id: string) => void
+      createOrder?: () => Promise<string>
+      config: CommerceLayerConfig
+      dispatch: Dispatch<GiftCardAction>
+    }
   ): void
 }
 
@@ -112,8 +117,8 @@ export const addGiftCardRecipient: AddGiftCardRecipient = async (
     dispatch({
       type: 'setGiftCardRecipient',
       payload: {
-        giftCardRecipient: recipient
-      }
+        giftCardRecipient: recipient,
+      },
     })
   } catch (error) {
     console.error(error)
@@ -125,23 +130,26 @@ export const addGiftCardLoading: AddGiftCardLoading = (loading, dispatch) => {
   dispatch({
     type: 'setGiftCardLoading',
     payload: {
-      loading
-    }
+      loading,
+    },
   })
 }
 
-export const addGiftCard: AddGiftCard = async (values, config, dispatch) => {
+export const addGiftCard: AddGiftCard = async (
+  values,
+  { config, dispatch, getOrder, createOrder }
+) => {
   try {
     addGiftCardLoading(true, dispatch)
     const { firstName, lastName, email, orderId, ...val } = values
     const giftCardValue = {
       recipientEmail: email,
-      ...val
+      ...val,
     } as GiftCardI
     const recipientValues = {}
-    const giftCard = await CLayer.GiftCard.withCredentials(config)
-      .includes('giftCardRecipient')
-      .create(giftCardValue)
+    const giftCard = await CLayer.GiftCard.withCredentials(config).create(
+      giftCardValue
+    )
     if (firstName) recipientValues['firstName'] = firstName
     if (lastName) recipientValues['lastName'] = lastName
     if (!_.isEmpty(recipientValues)) {
@@ -150,20 +158,24 @@ export const addGiftCard: AddGiftCard = async (values, config, dispatch) => {
         .giftCardRecipient()
         .update(recipientValues)
     }
-    if (orderId) {
-      const order = CLayer.Order.build({ id: orderId })
-      const item = CLayer.GiftCard.build({ id: giftCard.id })
-      await CLayer.LineItem.withCredentials(config).create({
-        quantity: 1,
-        order,
-        item
-      })
+    if (createOrder && getOrder) {
+      const id = orderId || (await createOrder())
+      if (id) {
+        const order = CLayer.Order.build({ id })
+        const item = CLayer.GiftCard.build({ id: giftCard.id })
+        await CLayer.LineItem.withCredentials(config).create({
+          quantity: 1,
+          order,
+          item,
+        })
+        getOrder && getOrder(id)
+      }
     }
     dispatch({
       type: 'setGiftCardRecipient',
       payload: {
-        ...giftCardValue
-      }
+        ...giftCardValue,
+      },
     })
     addGiftCardLoading(false, dispatch)
   } catch (r) {
@@ -171,8 +183,8 @@ export const addGiftCard: AddGiftCard = async (values, config, dispatch) => {
     dispatch({
       type: 'setGiftCardErrors',
       payload: {
-        errors
-      }
+        errors,
+      },
     })
     addGiftCardLoading(false, dispatch)
   }
@@ -182,8 +194,8 @@ export const addGiftCardError: AddGiftCardError = (errors, dispatch) => {
   dispatch({
     type: 'setGiftCardErrors',
     payload: {
-      errors
-    }
+      errors,
+    },
   })
 }
 
@@ -191,7 +203,7 @@ const type: GiftCardActionType[] = [
   'setAvailability',
   'setGiftCardRecipient',
   'setGiftCardErrors',
-  'setGiftCardLoading'
+  'setGiftCardLoading',
 ]
 
 const giftCardReducer = (

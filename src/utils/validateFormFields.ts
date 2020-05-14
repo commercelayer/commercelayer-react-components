@@ -37,7 +37,7 @@ export const validateValue: ValidateValue = (val, name, type, resourceType) => {
       field: name,
       code: 'VALIDATION_ERROR',
       message: `${name} - is required`,
-      resourceType
+      resourceType,
     }
   }
   if (type === 'email' && _.isString(val) && !val.match(EMAIL_PATTERN)) {
@@ -45,7 +45,7 @@ export const validateValue: ValidateValue = (val, name, type, resourceType) => {
       field: name,
       code: 'VALIDATION_ERROR',
       message: `${name} - is not valid`,
-      resourceType
+      resourceType,
     }
   }
   return {}
@@ -60,7 +60,7 @@ const validateFormFields: ValidateFormFields = (
   let values = { metadata: {} }
   _.map(fields, (v: FormField) => {
     const isTick = !!v['checked']
-    const val = isTick ? isTick : v.value
+    const val = isTick ? isTick : v.value === 'on' ? false : v.value
     const attrName = v.getAttribute('name')
     if ((attrName && required.indexOf(attrName) !== -1) || v.required) {
       const error = validateValue(val, v.name, v.type, resourceType)
@@ -74,7 +74,7 @@ const validateFormFields: ValidateFormFields = (
       values = isMetadata
         ? {
             ...values,
-            metadata: { ...values.metadata, [`${v.name}`]: val }
+            metadata: { ...values.metadata, [`${v.name}`]: val },
           }
         : { ...values, [`${v.name}`]: val }
     }

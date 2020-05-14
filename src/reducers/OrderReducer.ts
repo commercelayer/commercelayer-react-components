@@ -19,8 +19,13 @@ export interface GetOrder {
   (params: GetOrderParams): void
 }
 
+type CreateOrderParams = Pick<
+  AddToCartParams,
+  'config' | 'dispatch' | 'persistKey' | 'state' | 'orderMetadata'
+>
+
 export interface CreateOrder {
-  (params: AddToCartParams): Promise<string>
+  (params: CreateOrderParams): Promise<string>
 }
 
 export interface AddToCartParams {
@@ -66,6 +71,7 @@ export interface OrderState extends OrderPayload {
   orderId: string
   order: OrderCollection | null
   getOrder?: getOrderContext
+  createOrder?: () => Promise<string>
   addToCart?: (values: AddToCartValues) => void
 }
 

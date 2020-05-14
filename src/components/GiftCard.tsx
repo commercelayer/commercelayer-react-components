@@ -19,7 +19,7 @@ const propTypes = components.GiftCard.propTypes
 const defaultProps = components.GiftCard.defaultProps
 const displayName = components.GiftCard.displayName
 
-export type GiftCardProps = {
+type GiftCardProps = {
   children: ReactNode
   onSubmit?: (values: BaseState) => void
 } & JSX.IntrinsicElements['form']
@@ -31,8 +31,8 @@ const GiftCard: FunctionComponent<GiftCardProps> = (props) => {
   const { addGiftCard, addGiftCardError } = useContext(GiftCardContext)
   const handleSubmit = (e): void => {
     e.preventDefault()
-    const elements = ref.current?.elements as HTMLFormControlsCollection
-    const reset = ref.current?.reset() as HTMLFormElement['current']
+    const currentForm = ref.current
+    const elements = currentForm?.elements as HTMLFormControlsCollection
     const { errors, values } = validateFormFields<RequiredFields[]>(
       elements,
       ['currencyCode', 'balanceCents'],
@@ -40,7 +40,7 @@ const GiftCard: FunctionComponent<GiftCardProps> = (props) => {
     )
     if (_.isEmpty(errors)) {
       addGiftCard(values as GiftCardI)
-      reset()
+      currentForm?.reset()
       if (onSubmit) {
         onSubmit(values)
       }

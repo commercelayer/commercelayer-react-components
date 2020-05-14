@@ -27,13 +27,16 @@ const GiftCardContainer: FunctionComponent<GiftCardContainer> = (props) => {
   const { children } = props
   const [state, dispatch] = useReducer(giftCardReducer, giftCardInitialState)
   const config = useContext(CommerceLayerContext)
-  const { orderId } = useContext(OrderContext)
+  const { orderId, getOrder, createOrder } = useContext(OrderContext)
   const giftCardValue = {
     ...state,
     addGiftCardRecipient: (values): void =>
       addGiftCardRecipient(values, config, dispatch),
     addGiftCard: (values): void =>
-      addGiftCard({ ...values, orderId }, config, dispatch),
+      addGiftCard(
+        { ...values, orderId },
+        { config, dispatch, getOrder, createOrder }
+      ),
     addGiftCardError: (errors): void => addGiftCardError(errors, dispatch),
     addGiftCardLoading: (loading): void =>
       addGiftCardLoading(loading, dispatch),

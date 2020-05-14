@@ -9,6 +9,7 @@ import { getLocalOrder } from '../utils/localStorage'
 import orderReducer, {
   orderInitialState,
   AddToCartValues,
+  createOrder,
 } from '../reducers/OrderReducer'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import OrderContext from '../context/OrderContext'
@@ -50,6 +51,14 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
   }, [config.accessToken])
   const orderValue = {
     ...state,
+    createOrder: async (): Promise<string> =>
+      await createOrder({
+        persistKey,
+        dispatch,
+        config,
+        state,
+        orderMetadata: metadata,
+      }),
     addToCart: (values: AddToCartValues): void =>
       addToCart({
         ...values,

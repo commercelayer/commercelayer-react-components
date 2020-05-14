@@ -11,7 +11,7 @@ const BaseSelect: FunctionComponent<BaseSelectProps> = (props) => {
   const {
     options = [],
     children,
-    placeholder = { label: 'select an option', value: '' },
+    placeholder = { label: 'Select a currency', value: '' },
     value = '',
     ...p
   } = props
@@ -34,7 +34,7 @@ const BaseSelect: FunctionComponent<BaseSelectProps> = (props) => {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <select value={value} {...p}>
+    <select defaultValue={value} {...p}>
       {Options}
     </select>
   )
@@ -45,7 +45,7 @@ BaseSelect.defaultProps = {
   value: '',
   options: [],
   placeholder: {
-    label: 'select an option',
+    label: 'Select a currency',
     value: '',
   },
 }
