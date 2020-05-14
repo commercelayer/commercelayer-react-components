@@ -17,20 +17,20 @@ import itemReducer, {
   CustomLineItems,
   CustomLineItem,
 } from '../reducers/ItemReducer'
-import { BFSetStateContainer } from '../@types/index'
 import { ItemPrices } from '../reducers/ItemReducer'
 import components from '../config/components'
+import { BFSetStateContainer } from '../@types'
 
 const propTypes = components.ItemContainer.propTypes
 const displayName = components.ItemContainer.displayName
 
 type ItemContainerProps = {
   children: ReactNode
-  skuCode?: string
+  skuCode?: string | null
   lineItem?: {
     name: string
-    imageUrl?: string
-  }
+    imageUrl?: string | null
+  } | null
 }
 
 const ItemContainer: FunctionComponent<ItemContainerProps> = (props) => {

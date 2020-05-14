@@ -7,10 +7,12 @@ const propTypes = components.SubmitButton.propTypes
 const defaultProps = components.SubmitButton.defaultProps
 const displayName = components.SubmitButton.displayName
 
-type SubmitButtonChildrenProps = Omit<SubmitButtonProps, 'children'>
+type SubmitButtonChildrenProps = FunctionChildren<
+  Omit<SubmitButtonProps, 'children'>
+>
 
 type SubmitButtonProps = {
-  children?: FunctionChildren<SubmitButtonChildrenProps>
+  children?: SubmitButtonChildrenProps
   label?: string
 } & JSX.IntrinsicElements['button']
 

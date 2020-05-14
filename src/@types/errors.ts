@@ -1,6 +1,4 @@
 import PropTypes from 'prop-types'
-import { ReactNode } from 'react'
-import { type } from 'os'
 import { FunctionChildren } from './index'
 
 export type CodeErrorType =
@@ -115,11 +113,13 @@ export const ErrorPropTypes = {
   messages: PropTypes.arrayOf(BaseErrorObject.isRequired),
 }
 
-type ErrorChildrenComponentProps = Omit<ErrorComponentProps, 'children'>
+type ErrorChildrenComponentProps = FunctionChildren<
+  Omit<ErrorComponentProps, 'children'>
+>
 
 export interface ErrorComponentProps {
   resource: ResourceErrorType
-  children?: FunctionChildren<ErrorChildrenComponentProps>
+  children?: ErrorChildrenComponentProps
   field?: string
   messages?: {
     code: CodeErrorType

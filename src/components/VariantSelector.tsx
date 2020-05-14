@@ -24,17 +24,19 @@ type VariantOptions = {
   lineItem?: {
     name: string
     imageUrl?: string
-  }
-}
+  } | null
+}[]
 
-type VariantSelectorChildrenProps = Omit<VariantSelectorProps, 'children'> & {
-  variants: VariantsObject
-  handleSelect: SetSkuCode
-}
+type VariantSelectorChildrenProps = FunctionChildren<
+  Omit<VariantSelectorProps, 'children'> & {
+    variants: VariantsObject
+    handleSelect: SetSkuCode
+  }
+>
 
 type VariantSelectorProps = {
-  children?: FunctionChildren<VariantSelectorChildrenProps>
-  options: VariantOptions[]
+  children?: VariantSelectorChildrenProps
+  options: VariantOptions
   type?: BaseSelectorType
   loader?: ReactNode
   placeholder?: string
@@ -76,7 +78,6 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = (props) => {
   const parentProps = {
     variants,
     loading,
-    options,
     handleSelect: setSkuCode,
     skuCode: sCode,
     ...props,

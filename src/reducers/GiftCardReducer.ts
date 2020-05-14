@@ -10,7 +10,6 @@ import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import _ from 'lodash'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import { BaseError } from '../@types/errors'
-import { CreateOrder } from './OrderReducer'
 
 export type GiftCardActionType =
   | 'setAvailability'

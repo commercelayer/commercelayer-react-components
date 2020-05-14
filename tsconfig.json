@@ -22,10 +22,5 @@
     "pretty": true
   },
   "exclude": ["node_modules", "specs"],
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "specs/LineItemQuantity.spectsx"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }

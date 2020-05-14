@@ -14,12 +14,14 @@ import { FunctionChildren } from '../@types/index'
 const propTypes = components.LineItemsCount.propTypes
 const displayName = components.LineItemsCount.displayName
 
-type LineItemsCountChildrenProps = Omit<LineItemsCountProps, 'children'> & {
-  qunatity: number
-}
+type LineItemsCountChildrenProps = FunctionChildren<
+  Omit<LineItemsCountProps, 'children'> & {
+    qunatity: number
+  }
+>
 
 type LineItemsCountProps = {
-  children?: FunctionChildren<LineItemsCountChildrenProps>
+  children?: LineItemsCountChildrenProps
 } & JSX.IntrinsicElements['span']
 
 const LineItemsCount: FunctionComponent<LineItemsCountProps> = (props) => {

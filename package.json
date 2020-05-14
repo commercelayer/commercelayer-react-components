@@ -15,7 +15,7 @@
     "test:cypress:clear": "cypress cache clear",
     "test:jest": "jest",
     "test:jest:watch": "jest --watch",
-    "build": "tsdx build --tsconfig tsconfig.production.json",
+    "build": "tsdx build --tsconfig tsconfig.production.json --transpileOnly",
     "dev": "next",
     "start": "next start",
     "version:patch": "npm version patch",

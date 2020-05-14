@@ -11,17 +11,16 @@ const defaultProps = components.AvailabilityTemplate
   .defaultProps as AvailabilityTemplateProps
 const displayName = components.AvailabilityTemplate.displayName
 
-type AvailabilityTemplateChildrenProps = Omit<
-  AvailabilityTemplateProps,
-  'children'
-> & {
-  min: LeadTimes
-  max: LeadTimes
-  shippingMethod: ShippingMethod
-}
+type AvailabilityTemplateChildrenProps = FunctionChildren<
+  Omit<AvailabilityTemplateProps, 'children'> & {
+    min: LeadTimes
+    max: LeadTimes
+    shippingMethod: ShippingMethod
+  }
+>
 
 type AvailabilityTemplateProps = {
-  children?: FunctionChildren<AvailabilityTemplateChildrenProps>
+  children?: AvailabilityTemplateChildrenProps
   timeFormat?: TimeFormat
   showShippingMethodName?: boolean
 } & JSX.IntrinsicElements['p']

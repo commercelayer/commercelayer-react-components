@@ -8,12 +8,14 @@ const propTypes = components.CheckoutLink.propTypes
 const defaultProps = components.CheckoutLink.defaultProps
 const displayName = components.CheckoutLink.displayName
 
-type CheckoutLinkChildrenProps = Omit<CheckoutLinkProps, 'children'> & {
-  checkoutUrl: string
-}
+type CheckoutLinkChildrenProps = FunctionChildren<
+  Omit<CheckoutLinkProps, 'children'> & {
+    checkoutUrl: string
+  }
+>
 
 type CheckoutLinkProps = {
-  children?: FunctionChildren<CheckoutLinkChildrenProps>
+  children?: CheckoutLinkChildrenProps
   label?: string
 } & JSX.IntrinsicElements['a']
 

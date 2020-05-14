@@ -7,7 +7,7 @@ import React, {
 import LineItemContext from '../context/LineItemContext'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import components from '../config/components'
-import { LineItemType } from '../../dist/@types'
+import { LineItemType } from '../@types'
 
 const propTypes = components.LineItem.propTypes
 const displayName = components.LineItem.displayName

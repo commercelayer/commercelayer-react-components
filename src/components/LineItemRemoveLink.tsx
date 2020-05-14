@@ -9,13 +9,13 @@ const propTypes = components.LineItemRemoveLink.propTypes
 const defaultProps = components.LineItemRemoveLink.defaultProps
 const displayName = components.LineItemRemoveLink.displayName
 
-type ChildrenLineItemRemoveLinkProps = {
+type ChildrenLineItemRemoveLinkProps = FunctionChildren<{
   handleRemove: (event: React.MouseEvent<HTMLAnchorElement>) => void
   label?: string
-}
+}>
 
 type LineItemRemoveLinkProps = {
-  children?: FunctionChildren<ChildrenLineItemRemoveLinkProps>
+  children?: ChildrenLineItemRemoveLinkProps
   label?: string
 } & PropsWithoutRef<JSX.IntrinsicElements['a']>
 

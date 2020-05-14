@@ -15,13 +15,15 @@ const propTypes = components.QuantitySelector.propTypes
 const defaultProps = components.QuantitySelector.defaultProps
 const displayName = components.QuantitySelector.displayName
 
-type QuantitySelectorChildrenProps = Omit<QuantitySelectorProps, 'children'> & {
-  handleChange: (event: React.MouseEvent<HTMLInputElement>) => void
-  handleBlur: (event: React.MouseEvent<HTMLInputElement>) => void
-}
+type QuantitySelectorChildrenProps = FunctionChildren<
+  Omit<QuantitySelectorProps, 'children'> & {
+    handleChange: (event: React.MouseEvent<HTMLInputElement>) => void
+    handleBlur: (event: React.MouseEvent<HTMLInputElement>) => void
+  }
+>
 
 type QuantitySelectorProps = {
-  children?: FunctionChildren<QuantitySelectorChildrenProps>
+  children?: QuantitySelectorChildrenProps
   disabled?: boolean
   min?: number
   max?: number

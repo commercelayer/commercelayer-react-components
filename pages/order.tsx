@@ -28,8 +28,6 @@ import AvailabilityContainer from '../src/components/AvailabilityContainer'
 import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 import ItemContainer from '../src/components/ItemContainer'
 import Errors from '../src/components/Errors'
-import LineItemOptions from '../src/components/LineItemOptions'
-import LineItemOption from '../src/components/LineItemOption'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 

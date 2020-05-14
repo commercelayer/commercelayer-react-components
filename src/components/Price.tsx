@@ -17,13 +17,15 @@ const propTypes = components.Price.propTypes
 const defaultProps = components.Price.defaultProps
 const displayName = components.Price.displayName
 
-type PriceChildrenProps = Omit<PriceProps, 'children'> & {
-  loading: boolean
-  loader: LoaderType
-}
+type PriceChildrenProps = FunctionChildren<
+  {
+    loading: boolean
+    loader: LoaderType
+  } & Omit<PriceProps, 'children'>
+>
 
 type PriceProps = {
-  children?: FunctionChildren<PriceChildrenProps>
+  children?: PriceChildrenProps
   compareClassName?: string
   showCompare?: boolean
   skuCode?: string

@@ -9,13 +9,15 @@ const propTypes = components.LineItemQuantity.propTypes
 const defaultProps = components.LineItemQuantity.defaultProps
 const displayName = components.LineItemQuantity.displayName
 
-type LineItemQuantityChildrenProps = Omit<LineItemQuantityProps, 'children'> & {
-  quantity: number
-  handleChange: (event: React.MouseEvent<HTMLSelectElement>) => void
-}
+type LineItemQuantityChildrenProps = FunctionChildren<
+  Omit<LineItemQuantityProps, 'children'> & {
+    quantity: number
+    handleChange: (event: React.MouseEvent<HTMLSelectElement>) => void
+  }
+>
 
 type LineItemQuantityProps = {
-  children?: FunctionChildren<LineItemQuantityChildrenProps>
+  children?: LineItemQuantityChildrenProps
   max?: number
   disabled?: boolean
 } & JSX.IntrinsicElements['select']

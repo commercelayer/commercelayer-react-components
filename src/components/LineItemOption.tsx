@@ -2,7 +2,6 @@ import React, {
   FunctionComponent,
   useContext,
   Fragment,
-  ReactNode,
   CSSProperties,
 } from 'react'
 import LineItemOptionChildrenContext from '../context/LineItemOptionChildrenContext'
@@ -15,12 +14,14 @@ import { FunctionChildren } from '../@types/index'
 const propTypes = components.LineItemOption.propTypes
 const displayName = components.LineItemOption.displayName
 
-type LineItemOptionChildrenProps = Omit<LineItemOptionProps, 'children'> & {
-  lineItemOption: LineItemOptionCollection
-}
+type LineItemOptionChildrenProps = FunctionChildren<
+  Omit<LineItemOptionProps, 'children'> & {
+    lineItemOption: LineItemOptionCollection
+  }
+>
 
 type LineItemOptionProps = {
-  children?: FunctionChildren<LineItemOptionChildrenProps>
+  children?: LineItemOptionChildrenProps
   name: string
   valueClassName?: string
   keyClassName?: string
