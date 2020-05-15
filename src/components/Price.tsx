@@ -24,12 +24,12 @@ type PriceChildrenProps = FunctionChildren<
   } & Omit<PriceProps, 'children'>
 >
 
-type PriceProps = {
+export interface PriceProps extends Partial<JSX.IntrinsicElements['span']> {
   children?: PriceChildrenProps
   compareClassName?: string
   showCompare?: boolean
   skuCode?: string
-} & JSX.IntrinsicElements['span']
+}
 
 const Price: FunctionComponent<PriceProps> = (props) => {
   const { children, skuCode = '' } = props

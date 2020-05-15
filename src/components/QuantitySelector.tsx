@@ -59,7 +59,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
       setValue(min)
     }
   }, [item])
-  const handleChange = (e): void => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const qty = Number(e.target.value)
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
     setValue(qty)
@@ -67,7 +67,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
       setQuantity && setQuantity({ ...quantity, [`${sCode}`]: Number(qty) })
     }
   }
-  const handleBlur = (e): void => {
+  const handleBlur = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const qty = e.target.value
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
     if (!valid) {

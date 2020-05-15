@@ -31,7 +31,7 @@ const ERROR_CODES: CodeErrorType[] = [
   'NOT_ACCEPTABLE',
   'UNSUPPORTED_MEDIA_TYPE',
   'LOCKED',
-  'INTERNAL_SERVER_ERROR'
+  'INTERNAL_SERVER_ERROR',
 ]
 
 export interface GetErrorsByCollection {
@@ -45,12 +45,12 @@ export interface TransformCode {
   (code: string): CodeErrorType
 }
 
-const trasformCode: TransformCode = code => {
+const trasformCode: TransformCode = (code) => {
   let newCode = '' as CodeErrorType
-  ERROR_CODES.map(c => {
+  ERROR_CODES.map((c) => {
     const checkCode: string[] = []
     const words = c.split('_')
-    words.map(w => {
+    words.map((w) => {
       const rgx = new RegExp(`(?:s|${w})`, 'g')
       const m = code.match(rgx)
       if (m && m?.length > 0) {
@@ -70,7 +70,8 @@ const getErrorsByCollection: GetErrorsByCollection = (
 ) => {
   const errors: BaseError[] = []
   if (collection.errors) {
-    collection.errors().each((field, error) => {
+    // @ts-ignore
+    collection.errors().each((field: any, error: any) => {
       // TODO Add function to correct different field
       if (error.field === 'recipientEmail') error.field = 'email'
       error.code = trasformCode(error.code)

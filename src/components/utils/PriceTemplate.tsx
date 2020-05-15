@@ -1,5 +1,5 @@
 import React, { Fragment, FunctionComponent } from 'react'
-import { PPropsType } from '../Price'
+import { PriceProps } from '../Price'
 import PropTypes from 'prop-types'
 
 const propTypes = {
@@ -14,8 +14,7 @@ const defaultProps = {
 export type PTemplateProps = {
   formattedAmount?: string
   formattedCompare?: string
-} & PPropsType &
-  JSX.IntrinsicElements['span']
+} & Omit<PriceProps, 'children'>
 
 const PriceTemplate: FunctionComponent<PTemplateProps> = (props) => {
   return (

@@ -25,7 +25,7 @@ const checkChildrenTypes: CheckChildrenTypes = (
     error = new Error(
       `The prop '${propName}' is marked as required in '${cpName}', but its value is '${children}'.`
     )
-  Children.map(children, c => {
+  Children.map(children, (c): any => {
     if (error) return error
     const type = c.type
     const itemTypes = components[cpName].permittedChildren

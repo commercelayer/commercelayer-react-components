@@ -18,14 +18,14 @@ const propTypes = components.VariantSelector.propTypes
 const defaultProps = components.VariantSelector.defaultProps
 const displayName = components.VariantSelector.displayName
 
-type VariantOptions = {
+export interface VariantOptions {
   label: string
   code: string
   lineItem?: {
     name: string
-    imageUrl?: string
+    imageUrl?: string | null
   } | null
-}[]
+}
 
 type VariantSelectorChildrenProps = FunctionChildren<
   Omit<VariantSelectorProps, 'children'> & {
@@ -36,7 +36,7 @@ type VariantSelectorChildrenProps = FunctionChildren<
 
 type VariantSelectorProps = {
   children?: VariantSelectorChildrenProps
-  options: VariantOptions
+  options: VariantOptions[]
   type?: BaseSelectorType
   loader?: ReactNode
   placeholder?: string

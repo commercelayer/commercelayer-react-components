@@ -47,7 +47,7 @@ export interface BaseSelectComponentProps {
   options: {
     label: string
     value: string | number
-    selected?: boolean
+    selected?: boolean | null
   }[]
   placeholder?: SelectPlaceholder
   value?: string

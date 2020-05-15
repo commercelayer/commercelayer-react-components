@@ -30,15 +30,15 @@ const GiftCardContainer: FunctionComponent<GiftCardContainer> = (props) => {
   const { orderId, getOrder, createOrder } = useContext(OrderContext)
   const giftCardValue = {
     ...state,
-    addGiftCardRecipient: (values): void =>
+    addGiftCardRecipient: (values: any): void =>
       addGiftCardRecipient(values, config, dispatch),
-    addGiftCard: (values): void =>
+    addGiftCard: (values: any): void =>
       addGiftCard(
         { ...values, orderId },
         { config, dispatch, getOrder, createOrder }
       ),
-    addGiftCardError: (errors): void => addGiftCardError(errors, dispatch),
-    addGiftCardLoading: (loading): void =>
+    addGiftCardError: (errors: any): void => addGiftCardError(errors, dispatch),
+    addGiftCardLoading: (loading: boolean): void =>
       addGiftCardLoading(loading, dispatch),
   }
   return (

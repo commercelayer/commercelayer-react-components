@@ -130,7 +130,7 @@ export interface ItemState {
   setOption?: (option: ItemOptions) => void
   setPrices?: (prices: ItemPrices) => void
   setSkuCode?: (skuCode: string) => void
-  setCustomLineItems?: SetCustomLineItems
+  setCustomLineItems: SetCustomLineItems
   setCustomLineItem?: SetCustomLineItem
 }
 
@@ -157,10 +157,10 @@ const actionType: ItemActionType[] = [
 
 export interface ItemAction {
   type: ItemActionType
-  payload: ItemState
+  payload: Partial<ItemState>
 }
 
-export const itemInitialState: ItemState = {
+export const itemInitialState: Partial<ItemState> = {
   items: {},
   item: {},
   quantity: {},
@@ -171,8 +171,11 @@ export const itemInitialState: ItemState = {
   skuCode: '',
 }
 
-const itemReducer = (state: ItemState, reducer: ItemAction): ItemState =>
-  baseReducer<ItemState, ItemAction, ItemActionType[]>(
+const itemReducer = (
+  state: Partial<ItemState>,
+  reducer: ItemAction
+): Partial<ItemState> =>
+  baseReducer<Partial<ItemState>, ItemAction, ItemActionType[]>(
     state,
     reducer,
     actionType

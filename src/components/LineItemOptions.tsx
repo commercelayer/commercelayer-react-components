@@ -8,6 +8,7 @@ import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import LineItemOptionChildrenContext from '../context/LineItemOptionChildrenContext'
 import _ from 'lodash'
 import components from '../config/components'
+import { LineItemOptionCollection } from '@commercelayer/js-sdk'
 
 const propTypes = components.LineItemOptions.propTypes
 const defaultProps = components.LineItemOptions.defaultProps
@@ -23,11 +24,12 @@ export type LineItemOptionsProps = {
 const LineItemOptions: FunctionComponent<LineItemOptionsProps> = (props) => {
   const { skuOptionId, title, children, showName = true, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
-  const lineItemOptions = !_.isEmpty(lineItem)
+  const lineItemOptions: LineItemOptionCollection[] = !_.isEmpty(lineItem)
     ? lineItem['lineItemOptions']().toArray()
     : []
   const options = lineItemOptions
     .filter((o) => {
+      // @ts-ignore
       return o.skuOption().id === skuOptionId
     })
     .map((o, k) => {

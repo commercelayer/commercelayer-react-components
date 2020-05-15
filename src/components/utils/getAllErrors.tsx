@@ -6,7 +6,7 @@ import { BaseError } from '../../@types/errors'
 export type AllErrorsParams = {
   allErrors: BaseError[]
   messages: BaseError[]
-  field: string
+  field: string | null
   props: JSX.IntrinsicElements['span']
   lineItem?: LineItemCollection | {}
 }
@@ -17,7 +17,7 @@ export interface GetAllErrors {
 
 const getAllErrors: GetAllErrors = (params) => {
   const { allErrors, messages, field, props, lineItem } = params
-  return allErrors.map((v, k) => {
+  return allErrors.map((v, k): any => {
     const objMsg = customMessages(messages, v)
     if (field) {
       if (v.resourceKey === 'lineItem') {

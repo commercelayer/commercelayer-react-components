@@ -29,7 +29,7 @@ const GiftCard: FunctionComponent<GiftCardProps> = (props) => {
   const name = 'giftCardForm'
   const ref: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null)
   const { addGiftCard, addGiftCardError } = useContext(GiftCardContext)
-  const handleSubmit = (e): void => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
     const currentForm = ref.current
     const elements = currentForm?.elements as HTMLFormControlsCollection

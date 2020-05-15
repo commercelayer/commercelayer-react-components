@@ -71,7 +71,7 @@ export const getLineItems: GetLineItems = (params) => {
       .where(filters)
       .includes('lineItemOptions.skuOption')
       .all()
-      .then(async (res) => {
+      .then(async (res: any) => {
         dispatch({
           type: 'setLoading',
           payload: {
@@ -102,7 +102,7 @@ export const getLineItems: GetLineItems = (params) => {
           }
         }
       })
-      .catch((c) => {
+      .catch((c: any) => {
         const errors = getErrorsByCollection(c, 'lineItem')
         dispatch({
           type: 'setErrors',

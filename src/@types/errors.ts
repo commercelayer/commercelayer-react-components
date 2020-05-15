@@ -77,7 +77,7 @@ const CEType: CodeErrorType[] = [
 export interface BaseError {
   code: CodeErrorType
   message: string
-  resourceKey?: ResourceErrorType
+  resourceKey?: ResourceErrorType | null
   field?: string
   id?: string
 }
@@ -110,7 +110,7 @@ export const ErrorPropTypes = {
   ]).isRequired,
   children: PropTypes.func,
   field: PropTypes.string,
-  messages: PropTypes.arrayOf(BaseErrorObject.isRequired),
+  // messages: PropTypes.arrayOf(BaseErrorObject.isRequired),
 }
 
 type ErrorChildrenComponentProps = FunctionChildren<

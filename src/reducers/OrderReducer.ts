@@ -46,7 +46,7 @@ export interface AddToCart {
 }
 
 export interface UnsetOrderState {
-  (dispatch: Dispatch<OrderActions>)
+  (dispatch: Dispatch<OrderActions>): void
 }
 
 export interface OrderPayload {

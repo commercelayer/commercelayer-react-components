@@ -8,7 +8,7 @@ import baseReducer from '../utils/baseReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import getSkus from '../utils/getSkus'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
-import { Items, CustomLineItem, SetCustomLineItem } from './ItemReducer'
+import { Items, CustomLineItem, SetCustomLineItems } from './ItemReducer'
 import { BaseError } from '../@types/errors'
 import _ from 'lodash'
 
@@ -27,7 +27,7 @@ export interface SetSkuCodeVariant {
 type SetVariantSkuCodesParams = {
   skuCodes: VariantOptions[]
   dispatch: Dispatch<VariantAction>
-  setCustomLineItems?: SetCustomLineItem
+  setCustomLineItems?: SetCustomLineItems
 }
 
 export interface SetVariantSkuCodes {

@@ -34,8 +34,8 @@ const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = (props) => {
       </option>
     )
   }
-  const handleChange = (e): void => {
-    const quantity = e.target.value
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+    const quantity = Number(e.target.value)
     updateLineItem && updateLineItem(lineItem['id'], quantity)
   }
   const parentProps = {

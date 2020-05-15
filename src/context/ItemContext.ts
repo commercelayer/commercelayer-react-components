@@ -8,7 +8,7 @@ import {
   CustomLineItems,
 } from '../reducers/ItemReducer'
 
-export interface InitItemContext extends ItemState {
+export interface InitItemContext extends Partial<ItemState> {
   item: Items
   items: Items
   quantity: ItemQuantity
