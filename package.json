@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
-    "@commercelayer/js-sdk": "^2.9.5",
+    "@commercelayer/js-sdk": "^2.9.6",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
