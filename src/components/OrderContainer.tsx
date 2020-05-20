@@ -66,6 +66,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
         dispatch,
         state,
         config,
+        errors: state.errors,
         orderMetadata: metadata || {},
       }),
     getOrder: (id: string): void => getApiOrder({ id, dispatch, config }),

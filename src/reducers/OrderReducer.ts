@@ -39,6 +39,7 @@ export interface AddToCartParams {
   option?: ItemOption
   lineItem?: CustomLineItem
   orderMetadata?: BaseMetadataObject
+  errors?: BaseError[]
 }
 
 export interface AddToCart {
@@ -149,6 +150,7 @@ export const addToCart: AddToCart = async (params) => {
     config,
     dispatch,
     lineItem,
+    errors,
   } = params
   try {
     const id = await createOrder(params)
@@ -170,7 +172,6 @@ export const addToCart: AddToCart = async (params) => {
       config
     ).create(attrs)
     if (!_.isEmpty(option)) {
-      console.log('option', option)
       let c = 0
       _.map(option, async (opt) => {
         const { options, skuOptionId } = opt
@@ -188,6 +189,14 @@ export const addToCart: AddToCart = async (params) => {
       })
     } else {
       await getApiOrder({ id, ...params })
+    }
+    if (!_.isEmpty(errors)) {
+      dispatch({
+        type: 'setErrors',
+        payload: {
+          errors: [],
+        },
+      })
     }
   } catch (col) {
     const errors = getErrorsByCollection(col, 'order')

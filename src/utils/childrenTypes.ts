@@ -64,5 +64,5 @@ childrenTypes['isRequired'] = (
     propFullName
   )
 
-// TODO to change in the future (now is general for typescript)
+// NOTE change in the future (now is general for typescript)
 export default childrenTypes as Requireable<ReactNode>

@@ -125,7 +125,6 @@ export const addGiftCardRecipient: AddGiftCardRecipient = async (
 }
 
 export const addGiftCardLoading: AddGiftCardLoading = (loading, dispatch) => {
-  console.log('setLoading', loading)
   dispatch({
     type: 'setGiftCardLoading',
     payload: {
@@ -152,10 +151,9 @@ export const addGiftCard: AddGiftCard = async (
     if (firstName) recipientValues['firstName'] = firstName
     if (lastName) recipientValues['lastName'] = lastName
     if (!_.isEmpty(recipientValues)) {
-      await giftCard
-        .withCredentials(config)
-        .giftCardRecipient()
-        .update(recipientValues)
+      await (await giftCard.withCredentials(config).giftCardRecipient()).update(
+        recipientValues
+      )
     }
     if (createOrder && getOrder) {
       const id = orderId || (await createOrder())

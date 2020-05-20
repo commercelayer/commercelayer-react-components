@@ -66,12 +66,10 @@ export const getLineItems: GetLineItems = (params) => {
     order
       .withCredentials(config)
       .lineItems()
-      // TODO add interface to SDK
-      // @ts-ignore
       .where(filters)
       .includes('lineItemOptions.skuOption')
       .all()
-      .then(async (res: any) => {
+      .then(async (res) => {
         dispatch({
           type: 'setLoading',
           payload: {
@@ -141,7 +139,7 @@ export const updateLineItem: UpdateLineItem = async (params) => {
       })
     }
   } catch (c) {
-    const errors = getErrorsByCollection(c, 'lineItem')
+    const errors = getErrorsByCollection<LineItemCollection>(c, 'lineItem')
     dispatch({
       type: 'setErrors',
       payload: {

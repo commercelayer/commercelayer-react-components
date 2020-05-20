@@ -11,7 +11,7 @@ const customMessages: CustomMessages = (messages = [], v) => {
       if (m.field === v.field) {
         return m.code === v.code
       }
-      if (m.resourceKey === v.resourceKey) {
+      if (m.resource === v.resource) {
         return m.code === v.code
       }
       return m.code === v.code

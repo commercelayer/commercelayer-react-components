@@ -1,5 +1,5 @@
-import { Collection } from '@commercelayer/js-sdk'
 import { CodeErrorType, ResourceErrorType, BaseError } from '../@types/errors'
+import BaseClass from '@commercelayer/js-sdk/dist/utils/BaseClass'
 
 const ERROR_CODES: CodeErrorType[] = [
   'RECORD_NOT_FOUND',
@@ -34,18 +34,16 @@ const ERROR_CODES: CodeErrorType[] = [
   'INTERNAL_SERVER_ERROR',
 ]
 
-export interface GetErrorsByCollection {
-  <C extends Collection<C>>(
-    collection: C,
-    resourceType: ResourceErrorType
-  ): BaseError[]
-}
+export type GetErrorsByCollection = <C extends BaseClass>(
+  collection: C,
+  resourceType: ResourceErrorType
+) => BaseError[]
 
 export interface TransformCode {
   (code: string): CodeErrorType
 }
 
-const trasformCode: TransformCode = (code) => {
+const transformCode: TransformCode = (code) => {
   let newCode = '' as CodeErrorType
   ERROR_CODES.map((c) => {
     const checkCode: string[] = []
@@ -69,18 +67,21 @@ const getErrorsByCollection: GetErrorsByCollection = (
   resourceType
 ) => {
   const errors: BaseError[] = []
-  if (collection.errors) {
-    // @ts-ignore
-    collection.errors().each((field: any, error: any) => {
-      // TODO Add function to correct different field
-      if (error.field === 'recipientEmail') error.field = 'email'
-      error.code = trasformCode(error.code)
-      error['resourceKey'] = resourceType
-      // NOTE Add type to SDK
-      // @ts-ignore
-      error['id'] = collection.id
-      errors.push(error)
-    })
+  if (!collection.errors().empty()) {
+    collection
+      .errors()
+      .toArray()
+      .map((error) => {
+        // TODO Add function to correct different field
+        if (error['field'] === 'recipientEmail') error['field'] = 'email'
+        errors.push({
+          id: collection['id'],
+          code: transformCode(error['code']),
+          field: error['field'] === 'recipientEmail' ? 'email' : error['field'],
+          resource: resourceType,
+          message: error['message'],
+        })
+      })
   }
   return errors
 }

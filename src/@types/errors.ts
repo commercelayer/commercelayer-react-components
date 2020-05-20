@@ -77,7 +77,7 @@ const CEType: CodeErrorType[] = [
 export interface BaseError {
   code: CodeErrorType
   message: string
-  resourceKey?: ResourceErrorType | null
+  resource?: ResourceErrorType | null
   field?: string
   id?: string
 }

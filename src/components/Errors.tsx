@@ -34,7 +34,8 @@ const Errors: FunctionComponent<ErrorsProps> = (props) => {
     field,
     messages: msg,
     props: p,
-    lineItem: lineItem,
+    lineItem,
+    resource,
   })
   return children ? (
     <Parent {...parentProps}>{children}</Parent>

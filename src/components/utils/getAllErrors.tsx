@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import customMessages from '../../utils/customMessages'
 import { LineItemCollection } from '@commercelayer/js-sdk'
-import { BaseError } from '../../@types/errors'
+import { BaseError, ResourceErrorType } from '../../@types/errors'
 
 export type AllErrorsParams = {
   allErrors: BaseError[]
@@ -9,6 +9,7 @@ export type AllErrorsParams = {
   field: string | null
   props: JSX.IntrinsicElements['span']
   lineItem?: LineItemCollection | {}
+  resource?: ResourceErrorType
 }
 
 export interface GetAllErrors {
@@ -16,11 +17,11 @@ export interface GetAllErrors {
 }
 
 const getAllErrors: GetAllErrors = (params) => {
-  const { allErrors, messages, field, props, lineItem } = params
-  return allErrors.map((v, k): any => {
+  const { allErrors, messages, field, props, lineItem, resource } = params
+  return allErrors.map((v, k): ReactNode | void => {
     const objMsg = customMessages(messages, v)
     if (field) {
-      if (v.resourceKey === 'lineItem') {
+      if (v.resource === 'lineItem') {
         return (
           lineItem &&
           v.id === lineItem['id'] && (
@@ -30,13 +31,13 @@ const getAllErrors: GetAllErrors = (params) => {
           )
         )
       }
-      return (
-        field === v.field && (
+      if (field === v.field && resource === v.resource) {
+        return (
           <span key={k} {...props}>
             {objMsg?.message || v.message}
           </span>
         )
-      )
+      }
     }
   })
 }
