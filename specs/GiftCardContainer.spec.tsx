@@ -44,7 +44,7 @@ test('<GiftCardContainer check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][0]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: Invalid prop 'children' supplied to GiftCardContainer. Only components GiftCard, ReactNode are allowed.`
+      `Warning: Failed prop type: Invalid prop 'children' supplied to GiftCardContainer. Only components GiftCard, Errors, ReactNode are allowed.`
     )
   )
 })

@@ -2,7 +2,7 @@
 /// <reference path="../support/index.d.ts" />
 
 describe('Gift Card', () => {
-  const filename = 'giftcard'
+  const filename = 'giftCard'
 
   before(() => {
     cy.server()

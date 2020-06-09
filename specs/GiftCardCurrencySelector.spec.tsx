@@ -32,8 +32,8 @@ test('<GiftCardCurrencySelector check children />', () => {
   expect(rendered.props.name).toStrictEqual('currencyCode')
   expect(rendered.props.required).toBeTruthy()
   expect(rendered.props.placeholder).toStrictEqual({
-    label: 'select an option',
-    value: ''
+    label: 'Select a currency',
+    value: '',
   })
   expect(childrenRendered.type).toStrictEqual('select')
 })
