@@ -33,8 +33,11 @@ const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
 const CustomAddToCart = (props) => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
-  const myClick = () => {
-    props.handleClick()
+  const myClick = async () => {
+    const { success } = await props.handleClick()
+    if (success) {
+      // NOTE: dispatch your callback or animation
+    }
   }
   return (
     <button
