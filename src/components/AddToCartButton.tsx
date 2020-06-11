@@ -6,6 +6,7 @@ import ItemContext from '../context/ItemContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import components from '../config/components'
 import { FunctionChildren } from '../@types/index'
+import { AddToCartReturn } from 'reducers/OrderReducer'
 
 const propTypes = components.AddToCartButton.propTypes
 const defaultProps = components.AddToCartButton.defaultProps
@@ -13,7 +14,7 @@ const displayName = components.AddToCartButton.displayName
 
 type AddToCartButtonChildrenProps = FunctionChildren<
   {
-    handleClick: () => void
+    handleClick: () => AddToCartReturn
   } & Omit<AddToCartButtonProps, 'children'> &
     PropsWithoutRef<JSX.IntrinsicElements['button']>
 >
@@ -42,18 +43,17 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     !_.isEmpty(items) && skuCode
       ? items[skuCode]?.code
       : skuCode || getCurrentItemKey(item) || (itemSkuCode as string)
-  const handleClick = (): void => {
+  const handleClick = () => {
     const qty = quantity[sCode]
     const opt = option[sCode]
     const customLineItem = !_.isEmpty(lineItem) ? lineItem : lineItems[sCode]
-    if (addToCart)
-      addToCart({
-        skuCode: sCode,
-        skuId: item[sCode]?.id,
-        quantity: qty,
-        option: opt,
-        lineItem: customLineItem,
-      })
+    return addToCart({
+      skuCode: sCode,
+      skuId: item[sCode]?.id,
+      quantity: qty,
+      option: opt,
+      lineItem: customLineItem,
+    })
   }
   const autoDisabled = disabled || !prices[sCode] || !sCode
   const parentProps = {

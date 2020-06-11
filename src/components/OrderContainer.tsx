@@ -59,7 +59,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
         state,
         orderMetadata: metadata,
       }),
-    addToCart: (values: AddToCartValues): void =>
+    addToCart: (values: AddToCartValues): Promise<{ success: boolean }> =>
       addToCart({
         ...values,
         persistKey,

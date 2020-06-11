@@ -33,7 +33,7 @@ export interface AddToCartParams {
   persistKey: string
   config: CommerceLayerConfig
   dispatch: Dispatch<OrderActions>
-  state: OrderState
+  state: Partial<OrderState>
   skuId?: string
   quantity?: number
   option?: ItemOption
@@ -42,8 +42,12 @@ export interface AddToCartParams {
   errors?: BaseError[]
 }
 
+export type AddToCartReturn = Promise<{
+  success: boolean
+}>
+
 export interface AddToCart {
-  (params: AddToCartParams): void
+  (params: AddToCartParams): AddToCartReturn
 }
 
 export interface UnsetOrderState {
@@ -73,7 +77,7 @@ export interface OrderState extends OrderPayload {
   order: OrderCollection | null
   getOrder?: getOrderContext
   createOrder?: () => Promise<string>
-  addToCart?: (values: AddToCartValues) => void
+  addToCart: (values: AddToCartValues) => AddToCartReturn
 }
 
 export interface OrderActions {
@@ -198,6 +202,7 @@ export const addToCart: AddToCart = async (params) => {
         },
       })
     }
+    return { success: true }
   } catch (col) {
     const errors = getErrorsByCollection(col, 'order')
     dispatch({
@@ -206,6 +211,7 @@ export const addToCart: AddToCart = async (params) => {
         errors,
       },
     })
+    return { success: false }
   }
 }
 
@@ -224,15 +230,18 @@ export const unsetOrderState: UnsetOrderState = (dispatch) => {
   })
 }
 
-export const orderInitialState: OrderState = {
+export const orderInitialState: Partial<OrderState> = {
   loading: false,
   orderId: '',
   order: null,
   errors: [],
 }
 
-const orderReducer = (state: OrderState, reducer: OrderActions): OrderState =>
-  baseReducer<OrderState, OrderActions, OrderActionType[]>(
+const orderReducer = (
+  state: Partial<OrderState>,
+  reducer: OrderActions
+): Partial<OrderState> =>
+  baseReducer<Partial<OrderState>, OrderActions, OrderActionType[]>(
     state,
     reducer,
     actionType
