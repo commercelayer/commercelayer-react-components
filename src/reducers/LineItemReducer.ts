@@ -35,7 +35,7 @@ export type GetLineItemsParams = {
   dispatch: Dispatch<LineItemAction>
   config: CommerceLayerConfig
   order: OrderCollection | null
-  filters: object
+  filters: Record<string, any>
 }
 
 export interface GetLineItems {

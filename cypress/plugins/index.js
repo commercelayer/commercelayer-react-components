@@ -14,6 +14,7 @@
 const fs = require('fs')
 
 module.exports = (on, config) => {
+  require('@cypress/code-coverage/task')(on, config)
   on('task', {
     readFileMaybe(filename) {
       if (fs.existsSync(filename)) {
@@ -31,4 +32,5 @@ module.exports = (on, config) => {
     //   return null
     // },
   })
+  return config
 }

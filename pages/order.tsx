@@ -51,6 +51,21 @@ const CustomAddToCart = (props) => {
   )
 }
 
+const CustomQuantity = (props: any) => {
+  console.log('props', props)
+  const myIncrease = (event: any) => {
+    event.target.value = props.value + 1
+    props.handleChange(event)
+  }
+  return (
+    <Fragment>
+      <button>-</button>
+      <input value={props.value} disabled={true} />
+      <button onClick={myIncrease}>+</button>
+    </Fragment>
+  )
+}
+
 export default function Order() {
   const [token, setToken] = useState('')
   useEffect(() => {
@@ -131,7 +146,9 @@ export default function Order() {
                       max={12}
                       id="quantity-selector"
                       className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    />
+                    >
+                      {CustomQuantity}
+                    </QuantitySelector>
                   </div>
                   <div className="m-2">
                     <AddToCartButton className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded">

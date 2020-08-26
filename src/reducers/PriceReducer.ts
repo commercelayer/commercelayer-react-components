@@ -50,7 +50,7 @@ export interface GetSkusPrice {
       setPrices: ((item: ItemPrices) => void) | undefined
       prices: ItemPrices
       perPage: number
-      filters: object
+      filters: Record<string, any>
     }
   ): void
 }
