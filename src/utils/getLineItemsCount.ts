@@ -8,9 +8,12 @@ const getLineItemsCount: GetLineItemsCountInterface = (
   lineItems,
   quantity = 0
 ) => {
-  lineItems.map(l => {
-    quantity += l.quantity
-  })
+  const typeAccept = ['skus', 'gift_cards']
+  lineItems
+    .filter((l) => typeAccept.includes(l.itemType))
+    .map((l) => {
+      quantity += l.quantity
+    })
   return quantity
 }
 

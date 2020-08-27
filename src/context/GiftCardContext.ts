@@ -3,9 +3,9 @@ import {
   giftCardInitialState,
   GiftCardState,
   GiftCardRecipientI,
-  GiftCardI
+  GiftCardI,
 } from '../reducers/GiftCardReducer'
-import { BaseError } from '../@types/errors'
+import { BaseError } from '../typings/errors'
 
 export interface GCContext extends GiftCardState {
   addGiftCardRecipient: (values: GiftCardRecipientI & object) => void

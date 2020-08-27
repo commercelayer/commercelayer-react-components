@@ -1,5 +1,5 @@
 import baseReducer from '../utils/baseReducer'
-import { BaseError } from '../@types/errors'
+import { BaseError } from '../typings/errors'
 
 export interface LeadTimes {
   hours: number

@@ -11,7 +11,7 @@ import PricesContext from '../context/PricesContext'
 import { getPricesComponent } from '../utils/getPrices'
 import { PriceCollection } from '@commercelayer/js-sdk'
 import components from '../config/components'
-import { FunctionChildren, LoaderType } from '../@types/index'
+import { FunctionChildren, LoaderType } from '../typings/index'
 
 const propTypes = components.Price.propTypes
 const defaultProps = components.Price.defaultProps

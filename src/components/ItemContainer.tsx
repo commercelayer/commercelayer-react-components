@@ -19,7 +19,7 @@ import itemReducer, {
 } from '../reducers/ItemReducer'
 import { ItemPrices } from '../reducers/ItemReducer'
 import components from '../config/components'
-import { BFSetStateContainer } from '../@types'
+import { BFSetStateContainer } from '../typings'
 
 const propTypes = components.ItemContainer.propTypes
 const displayName = components.ItemContainer.displayName

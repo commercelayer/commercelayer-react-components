@@ -10,7 +10,7 @@ import MetadataInput from '../src/components/MetadataInput'
 import Errors from '../src/components/Errors'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
-import { BaseError } from '../src/@types/errors'
+import { BaseError } from '../src/typings/errors'
 import {
   LineItemsContainer,
   LineItemsCount,

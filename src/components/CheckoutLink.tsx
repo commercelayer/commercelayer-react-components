@@ -2,7 +2,7 @@ import React, { FunctionComponent, useContext } from 'react'
 import OrderContext from '../context/OrderContext'
 import components from '../config/components'
 import Parent from './utils/Parent'
-import { FunctionChildren } from '../@types/index'
+import { FunctionChildren } from '../typings/index'
 
 const propTypes = components.CheckoutLink.propTypes
 const defaultProps = components.CheckoutLink.defaultProps

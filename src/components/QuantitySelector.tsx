@@ -9,7 +9,8 @@ import _ from 'lodash'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
 import components from '../config/components'
-import { FunctionChildren } from '../@types/index'
+import { FunctionChildren } from '../typings/index'
+import SkuListsContext from '../context/SkuListsContext'
 
 const propTypes = components.QuantitySelector.propTypes
 const defaultProps = components.QuantitySelector.defaultProps
@@ -29,10 +30,11 @@ type QuantitySelectorProps = {
   max?: number
   value?: string
   skuCode?: string
+  skuListId?: string
 } & JSX.IntrinsicElements['input']
 
 const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
-  const { skuCode, children, min = 1, max, ...p } = props
+  const { skuCode, skuListId, children, min = 1, max, ...p } = props
   const {
     item,
     setQuantity,
@@ -41,16 +43,23 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
     prices,
     skuCode: itemSkuCode,
   } = useContext(ItemContext)
+  const { skuLists, listIds } = useContext(SkuListsContext)
   const [value, setValue] = useState(min)
+  const [disabled, setDisabled] = useState(p.disabled)
   const sCode =
     !_.isEmpty(items) && skuCode
       ? items[skuCode]?.code
       : skuCode || getCurrentItemKey(item) || (itemSkuCode as string)
-  const disabled = p.disabled || !prices[sCode] || !sCode
+
   const inventory = _.isEmpty(item) ? 50 : item[sCode]?.inventory?.quantity
   const maxInv = max || inventory
+  console.log('skuLists', skuLists)
   useEffect(() => {
     setValue(min)
+    if (p.disabled || !prices[sCode] || !sCode) {
+      setDisabled(true)
+    }
+    skuListId && setDisabled(false)
     if (sCode) {
       const qty = Number(min)
       setQuantity && setQuantity({ ...quantity, [`${sCode}`]: qty })
@@ -58,12 +67,14 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
     return (): void => {
       setValue(min)
     }
-  }, [item])
+  }, [item, listIds])
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const qty = Number(e.target.value)
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
     setValue(qty)
-    if (sCode && valid) {
+    if (!_.isEmpty(skuLists) && skuListId && valid) {
+      setQuantity && setQuantity({ ...quantity, [`${skuListId}`]: Number(qty) })
+    } else if (sCode && valid) {
       setQuantity && setQuantity({ ...quantity, [`${sCode}`]: Number(qty) })
     }
   }
@@ -73,8 +84,13 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
     if (!valid) {
       const resetVal = Number(qty) < Number(min) ? min : maxInv
       setValue(resetVal)
-      setQuantity &&
-        setQuantity({ ...quantity, [`${sCode}`]: Number(resetVal) })
+      if (!_.isEmpty(skuLists) && skuListId) {
+        setQuantity &&
+          setQuantity({ ...quantity, [`${skuListId}`]: Number(resetVal) })
+      } else {
+        setQuantity &&
+          setQuantity({ ...quantity, [`${sCode}`]: Number(resetVal) })
+      }
     }
   }
   const parentProps = {

@@ -8,7 +8,7 @@ import React, {
   useContext,
 } from 'react'
 import { PropsType } from '../../utils/PropsType'
-import { baseOrderPricePropTypes } from '../../@types'
+import { baseOrderPricePropTypes } from '../../typings'
 import _ from 'lodash'
 
 export type BaseOrderPriceProps = PropsType<typeof baseOrderPricePropTypes> &

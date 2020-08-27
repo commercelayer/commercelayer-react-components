@@ -17,7 +17,7 @@ import PricesContext, { PricesContextValue } from '../context/PricesContext'
 import getCurrentItemKey from '../utils/getCurrentItemKey'
 import ItemContext from '../context/ItemContext'
 import components from '../config/components'
-import { LoaderType } from '../@types'
+import { LoaderType } from '../typings'
 
 const propTypes = components.PricesContainer.propTypes
 const defaultProps = components.PricesContainer.defaultProps

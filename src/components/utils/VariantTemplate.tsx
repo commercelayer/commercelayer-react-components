@@ -1,7 +1,7 @@
 import React, { Fragment, FunctionComponent, ReactNode } from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { BaseSelectorType } from '../../@types'
+import { BaseSelectorType } from '../../typings'
 import { VariantsObject, SetSkuCode } from '../../reducers/VariantReducer'
 import { VariantOptions } from '../VariantSelector'
 

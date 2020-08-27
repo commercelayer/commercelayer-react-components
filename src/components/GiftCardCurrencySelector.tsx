@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react'
 import BaseSelect from './utils/BaseSelect'
 import currencyOptions from '../config/currency.json'
 import components from '../config/components'
-import { BaseSelectComponentProps } from '../@types'
+import { BaseSelectComponentProps } from '../typings'
 
 const propTypes = components.GiftCardCurrencySelector.propTypes
 const defaultProps = components.GiftCardCurrencySelector.defaultProps

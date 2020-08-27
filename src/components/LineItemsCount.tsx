@@ -9,7 +9,7 @@ import getLineItemsCount from '../utils/getLineItemsCount'
 import _ from 'lodash'
 import LineItemContext from '../context/LineItemContext'
 import components from '../config/components'
-import { FunctionChildren } from '../@types/index'
+import { FunctionChildren } from '../typings/index'
 
 const propTypes = components.LineItemsCount.propTypes
 const displayName = components.LineItemsCount.displayName

@@ -11,7 +11,7 @@ import _ from 'lodash'
 import GiftCardContext from '../context/GiftCardContext'
 import { GiftCardI } from '../reducers/GiftCardReducer'
 import components from '../config/components'
-import { BaseState } from '../@types/index'
+import { BaseState } from '../typings/index'
 
 type RequiredFields = 'currencyCode' | 'balanceCents'
 

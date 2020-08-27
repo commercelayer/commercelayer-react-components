@@ -10,8 +10,8 @@ import VariantTemplate from './utils/VariantTemplate'
 import Parent from './utils/Parent'
 import VariantsContext from '../context/VariantsContext'
 import components from '../config/components'
-import { BaseSelectorType } from '../@types'
-import { FunctionChildren } from '../@types/index'
+import { BaseSelectorType } from '../typings'
+import { FunctionChildren } from '../typings/index'
 import { VariantsObject, SetSkuCode } from '../reducers/VariantReducer'
 
 const propTypes = components.VariantSelector.propTypes

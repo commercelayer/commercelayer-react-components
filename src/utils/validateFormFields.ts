@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import { BaseState } from '../@types/index'
-import { ResourceErrorType, BaseError } from '../@types/errors'
+import { BaseState } from '../typings/index'
+import { ResourceErrorType, BaseError } from '../typings/errors'
 
 const EMAIL_PATTERN = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/
 

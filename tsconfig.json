@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "incremental": true,
     "outDir": "dist",
     "target": "es5",
     "module": "esnext",
@@ -8,7 +7,7 @@
     "sourceMap": true,
     "importHelpers": true,
     "declaration": true,
-    "rootDir": "src",
+    // "rootDir": "src",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -28,6 +27,6 @@
     "noEmit": true,
     "isolatedModules": true
   },
-  "exclude": ["node_modules", "specs"],
+  "exclude": ["node_modules", "specs", "cypress"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }

@@ -8,8 +8,8 @@ import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import _ from 'lodash'
-import { LoaderType } from '../@types'
-import { BaseError } from '../@types/errors'
+import { LoaderType } from '../typings'
+import { BaseError } from '../typings/errors'
 
 export type UpdateLineItemParams = {
   lineItemId: string

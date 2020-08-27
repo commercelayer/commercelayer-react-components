@@ -3,7 +3,7 @@ import Parent from './Parent'
 import {
   BaseSelectComponentPropTypes,
   BaseSelectComponentProps,
-} from '../../@types'
+} from '../../typings'
 
 export type BaseSelectProps = BaseSelectComponentProps
 
