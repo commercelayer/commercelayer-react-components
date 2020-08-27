@@ -1,0 +1,46 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run dev and cypress in RECORD mode",
+      "type": "shell",
+      "group": "test",
+      "command": "npm run dev & npm run test:cypress:record",
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "dev",
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "test:cypress:record",
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "test:cypress:open",
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "build",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "test:jest",
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "test:jest:watch",
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
+}

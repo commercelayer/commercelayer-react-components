@@ -6,8 +6,8 @@ import baseReducer from '../utils/baseReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
 import { ItemOption, CustomLineItem } from './ItemReducer'
 import _ from 'lodash'
-import { BaseMetadataObject } from '../@types/index'
-import { BaseError } from '../@types/errors'
+import { BaseMetadataObject } from '../typings/index'
+import { BaseError } from '../typings/errors'
 
 export interface GetOrderParams {
   id: string

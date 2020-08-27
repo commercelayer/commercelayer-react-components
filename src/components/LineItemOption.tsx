@@ -9,7 +9,7 @@ import _ from 'lodash'
 import Parent from './utils/Parent'
 import components from '../config/components'
 import { LineItemOptionCollection } from '@commercelayer/js-sdk'
-import { FunctionChildren } from '../@types/index'
+import { FunctionChildren } from '../typings/index'
 
 const propTypes = components.LineItemOption.propTypes
 const displayName = components.LineItemOption.displayName

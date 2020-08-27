@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react'
 import {
   BaseInputComponentPropTypes,
   BaseInputComponentProps,
-} from '../../@types/index'
+} from '../../typings/index'
 import Parent from './Parent'
 
 export type BaseInputProps = BaseInputComponentProps &

@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react'
 import Parent from './utils/Parent'
 import components from '../config/components'
-import { FunctionChildren } from '../@types/index'
+import { FunctionChildren } from '../typings/index'
 
 const propTypes = components.SubmitButton.propTypes
 const defaultProps = components.SubmitButton.defaultProps

@@ -11,9 +11,10 @@ import {
   PTLoader,
   BMObject,
   BaseSelectorType,
-} from '../@types'
-import { ErrorPropTypes } from '../@types/errors'
-import { BaseInputComponentPropTypes } from '../@types/index'
+} from '../typings'
+import { ErrorPropTypes } from '../typings/errors'
+import { BaseInputComponentPropTypes } from '../typings/index'
+import SkuList from '../components/SkuList'
 
 const components = {
   AddToCartButton: {
@@ -167,6 +168,7 @@ const components = {
       'QuantitySelector',
       'AddToCartButton',
       'AvailabilityContainer',
+      'SkuListsContainer',
       'ReactNode',
     ],
     displayName: 'ItemContainer',
@@ -371,6 +373,21 @@ const components = {
   ShippingAmount: {
     displayName: 'ShippingAmount',
     propTypes: baseOrderComponentPricePropTypes,
+  },
+  SkuList: {
+    permittedChildren: ['AddToCartButton', 'QuantitySelector', 'ReactNode'],
+    displayName: 'SkuList',
+    propTypes: {
+      children: childrenTypes.isRequired,
+      id: PropTypes.string.isRequired,
+    },
+  },
+  SkuListsContainer: {
+    permittedChildren: ['SkuList', 'ReactNode'],
+    displayName: 'SkuListsContainer',
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
   },
   SkuOption: {
     permittedChildren: ['SkuOptionInput', 'ReactNode'],

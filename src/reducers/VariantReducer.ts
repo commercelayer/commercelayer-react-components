@@ -9,7 +9,7 @@ import getErrorsByCollection from '../utils/getErrorsByCollection'
 import getSkus from '../utils/getSkus'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import { Items, CustomLineItem, SetCustomLineItems } from './ItemReducer'
-import { BaseError } from '../@types/errors'
+import { BaseError } from '../typings/errors'
 import _ from 'lodash'
 
 type SetSkuCodeVariantParams = {

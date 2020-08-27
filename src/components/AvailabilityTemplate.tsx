@@ -3,7 +3,7 @@ import AvailabilityContext from '../context/AvailabilityContext'
 import Parent from './utils/Parent'
 import _ from 'lodash'
 import components from '../config/components'
-import { TimeFormat, FunctionChildren } from '../@types/index'
+import { TimeFormat, FunctionChildren } from '../typings/index'
 import { LeadTimes, ShippingMethod } from '../reducers/AvailabilityReducer'
 
 const propTypes = components.AvailabilityTemplate.propTypes

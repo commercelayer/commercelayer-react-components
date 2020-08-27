@@ -1,6 +1,6 @@
 import baseReducer from '../utils/baseReducer'
 import { CustomerCollection } from '@commercelayer/js-sdk'
-import { BaseMetadata } from '../@types'
+import { BaseMetadata } from '../typings'
 import CLayer, {
   MarketCollection,
   GiftCardRecipientCollection,
@@ -9,7 +9,7 @@ import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import _ from 'lodash'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
-import { BaseError } from '../@types/errors'
+import { BaseError } from '../typings/errors'
 
 export type GiftCardActionType =
   | 'setAvailability'

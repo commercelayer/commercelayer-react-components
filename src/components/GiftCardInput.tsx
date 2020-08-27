@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react'
 import BaseInput from './utils/BaseInput'
 import components from '../config/components'
-import { BaseInputComponentProps, GiftCardInputName } from '../@types'
+import { BaseInputComponentProps, GiftCardInputName } from '../typings'
 
 const propTypes = components.GiftCardInput.propTypes
 const displayName = components.GiftCardInput.displayName

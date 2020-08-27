@@ -6,7 +6,7 @@ import getAllErrors from './utils/getAllErrors'
 import LineItemContext from '../context/LineItemContext'
 import LineItemChildrenContext from '../context/LineItemChildrenContext'
 import _ from 'lodash'
-import { BaseError, ErrorComponentProps } from '../@types/errors'
+import { BaseError, ErrorComponentProps } from '../typings/errors'
 import components from '../config/components'
 
 const propTypes = components.Errors.propTypes

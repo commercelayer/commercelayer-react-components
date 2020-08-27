@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { BaseError } from '../@types/errors'
+import { BaseError } from '../typings/errors'
 
 export interface CustomMessages {
   (messages: BaseError[], v: BaseError): { message?: string } | undefined

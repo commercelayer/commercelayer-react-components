@@ -16,7 +16,7 @@ import OrderContext from '../context/OrderContext'
 import { getApiOrder, addToCart, OrderState } from '../reducers/OrderReducer'
 import { unsetOrderState } from '../reducers/OrderReducer'
 import components from '../config/components'
-import { BaseMetadataObject } from '../@types'
+import { BaseMetadataObject } from '../typings'
 
 const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps

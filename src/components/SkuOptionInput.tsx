@@ -5,7 +5,7 @@ import SkuOptionChildrenContext from '../context/SkuOptionChildrenContext'
 import _ from 'lodash'
 import { ItemOptions } from '../reducers/ItemReducer'
 import components from '../config/components'
-import { BaseInputComponentProps } from '../@types'
+import { BaseInputComponentProps } from '../typings'
 
 const propTypes = components.SkuOptionInput.propTypes
 const displayName = components.SkuOptionInput.displayName
