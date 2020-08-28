@@ -53,7 +53,6 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
 
   const inventory = _.isEmpty(item) ? 50 : item[sCode]?.inventory?.quantity
   const maxInv = max || inventory
-  console.log('skuLists', skuLists)
   useEffect(() => {
     setValue(min)
     if (p.disabled || !prices[sCode] || !sCode) {

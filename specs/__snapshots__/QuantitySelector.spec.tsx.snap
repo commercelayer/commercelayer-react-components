@@ -16,7 +16,6 @@ exports[`<QuantitySelector with custom children /> 1`] = `<span />`;
 
 exports[`<QuantitySelector/> 1`] = `
 <input
-  disabled={true}
   max={50}
   min={1}
   name="firstName"
