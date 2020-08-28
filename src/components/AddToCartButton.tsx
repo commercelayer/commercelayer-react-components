@@ -77,10 +77,10 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
       lineItem: customLineItem,
     })
   }
-  console.log('skuLists button', skuLists)
-  const autoDisabled = !_.isEmpty(skuLists)
-    ? false
-    : disabled || !prices[sCode] || !sCode
+  const autoDisabled =
+    !_.isEmpty(skuLists) || skuListId
+      ? false
+      : disabled || !prices[sCode] || !sCode
   const parentProps = {
     handleClick,
     disabled: disabled || autoDisabled,

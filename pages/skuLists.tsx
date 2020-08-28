@@ -45,7 +45,7 @@ export default function Order() {
       <Nav links={['/']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
-          <OrderContainer persistKey="orderUS">
+          <OrderContainer persistKey="orderEU">
             <ItemContainer>
               <div className="flex flex-row justify-around">
                 <SkuListsContainer>
