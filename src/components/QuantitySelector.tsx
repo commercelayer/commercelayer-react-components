@@ -45,7 +45,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
   } = useContext(ItemContext)
   const { skuLists, listIds } = useContext(SkuListsContext)
   const [value, setValue] = useState(min)
-  const [disabled, setDisabled] = useState(p.disabled)
+  const [disabled, setDisabled] = useState(!!p.disabled)
   const sCode =
     !_.isEmpty(items) && skuCode
       ? items[skuCode]?.code
@@ -55,13 +55,14 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
   const maxInv = max || inventory
   useEffect(() => {
     setValue(min)
-    if (p.disabled || !prices[sCode] || !sCode) {
+    if (!prices[sCode] || !sCode) {
       setDisabled(true)
     }
     skuListId && setDisabled(false)
     if (sCode) {
       const qty = Number(min)
       setQuantity && setQuantity({ ...quantity, [`${sCode}`]: qty })
+      if (!_.isEmpty(prices) && _.has(prices, sCode)) setDisabled(false)
     }
     return (): void => {
       setValue(min)
