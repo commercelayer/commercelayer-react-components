@@ -63,16 +63,15 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
       if (_.has(skuLists, skuListId)) {
         return Promise.all(
           skuLists[skuListId].map(async (skuCode) => {
-            setTimeout(async () => {
+            return setTimeout(async () => {
               await new Promise((resolve) => setTimeout(resolve, offset))
-              if (skuCode) {
-                await addToCart({
-                  skuCode,
-                  quantity: slQty,
-                })
-              }
+              const added = await addToCart({
+                skuCode,
+                quantity: slQty,
+              })
+              offset += 300
+              return added
             }, offset)
-            offset += 300
           })
         )
       }

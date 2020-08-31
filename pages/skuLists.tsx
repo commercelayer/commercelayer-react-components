@@ -26,6 +26,24 @@ import QuantitySelector from '../src/components/QuantitySelector'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
+const AddToCartCustom = (props: any) => {
+  const { className, label, disabled, handleClick } = props
+  const customHandleClick = async (e: any) => {
+    // e.preventDefault()
+    const res = await handleClick(e)
+    console.log('res', res)
+  }
+  return (
+    <button
+      disabled={disabled}
+      className={className}
+      onClick={customHandleClick}
+    >
+      {label}
+    </button>
+  )
+}
+
 export default function Order() {
   const [token, setToken] = useState('')
   useEffect(() => {
@@ -69,7 +87,9 @@ export default function Order() {
                         <AddToCartButton
                           skuListId="aOJOreIXyk"
                           className="inline-flex items-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-red-500 hover:bg-red-400 focus:outline-none focus:border-red-600 focus:shadow-outline-blue active:bg-red-600 transition ease-in-out duration-150"
-                        />
+                        >
+                          {AddToCartCustom}
+                        </AddToCartButton>
                       </div>
                     </div>
                   </SkuList>
