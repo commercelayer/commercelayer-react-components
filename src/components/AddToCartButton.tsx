@@ -60,21 +60,22 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     const customLineItem = !_.isEmpty(lineItem) ? lineItem : lineItems[sCode]
     if (!_.isEmpty(skuLists) && skuListId) {
       const slQty = quantity[skuListId]
-      let offset = 300
+      let offset = 1000
       if (_.has(skuLists, skuListId)) {
-        return Promise.all(
-          skuLists[skuListId].map(async (skuCode) => {
-            return setTimeout(async () => {
-              await new Promise((resolve) => setTimeout(resolve, offset))
-              const added = await addToCart({
+        // return Promise.all(
+        return skuLists[skuListId].map(async (skuCode) => {
+          return setTimeout(async () => {
+            new Promise((resolve) => setTimeout(resolve, offset)).then(() => {
+              addToCart({
                 skuCode,
                 quantity: slQty,
               })
-              offset += 300
-              return added
-            }, offset)
-          })
-        )
+            })
+            offset += 1000
+            return { success: true }
+          }, offset)
+        })
+        // )
       }
     }
     return addToCart({
