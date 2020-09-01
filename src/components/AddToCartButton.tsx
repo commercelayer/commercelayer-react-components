@@ -26,6 +26,7 @@ type AddToCartButtonProps = {
   skuCode?: string
   disabled?: boolean
   skuListId?: string
+  timeout?: number
 } & PropsWithoutRef<JSX.IntrinsicElements['button']>
 
 const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
@@ -35,6 +36,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     skuCode,
     disabled,
     skuListId,
+    timeout = 1000,
     ...p
   } = props
   const { addToCart } = useContext(OrderContext)
@@ -60,7 +62,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     const customLineItem = !_.isEmpty(lineItem) ? lineItem : lineItems[sCode]
     if (!_.isEmpty(skuLists) && skuListId) {
       const slQty = quantity[skuListId]
-      let offset = 1000
+      let offset = timeout
       if (_.has(skuLists, skuListId)) {
         // return Promise.all(
         return skuLists[skuListId].map(async (skuCode) => {
@@ -71,7 +73,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
                 quantity: slQty,
               })
             })
-            offset += 1000
+            offset += timeout
             return { success: true }
           }, offset)
         })
