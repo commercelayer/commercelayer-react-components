@@ -13,3 +13,11 @@ export interface SetLocalOrderInterface {
 export const setLocalOrder: SetLocalOrderInterface = (key, value) => {
   localStorage.setItem(key, value)
 }
+
+export interface DeleteLocalOrderInterface {
+  (key: string): void
+}
+
+export const deleteLocalOrder: DeleteLocalOrderInterface = (key) => {
+  localStorage.removeItem(key)
+}

@@ -25,25 +25,38 @@ const displayName = components.OrderContainer.displayName
 type OrderContainerProps = {
   children: ReactNode
   persistKey: string
+  clearWhenPlaced?: boolean
   metadata?: BaseMetadataObject
 }
 
 const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
-  const { children, persistKey, metadata } = props
+  const { children, persistKey, metadata, clearWhenPlaced } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     if (config.accessToken) {
       const localOrder = getLocalOrder(persistKey)
       if (localOrder) {
-        dispatch({
-          type: 'setOrderId',
-          payload: {
-            orderId: localOrder,
-          },
-        })
-        if (!state.order) {
-          getApiOrder({ id: localOrder, dispatch, config })
+        if (clearWhenPlaced) {
+          // TODO Clear order from the session
+          debugger
+          getApiOrder({
+            id: localOrder,
+            dispatch,
+            config,
+            clearWhenPlaced,
+            persistKey,
+          })
+        } else {
+          dispatch({
+            type: 'setOrderId',
+            payload: {
+              orderId: localOrder,
+            },
+          })
+          if (!state.order) {
+            getApiOrder({ id: localOrder, dispatch, config })
+          }
         }
       }
     }
