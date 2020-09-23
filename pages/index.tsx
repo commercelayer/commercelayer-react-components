@@ -15,7 +15,7 @@ export const Nav = ({ links }) => (
       <nav className="flex flex-row items-center">
         <div className="flex items-center mr-10">
           <a href="/" className="w-48">
-            <img src="//commercelayer.io/assets/img/commercelayer_logo_white.svg?v=2" />
+            <img src="//commercelayer.io/assets/img/logos/commercelayer-logo-white.svg" />
           </a>
         </div>
         <div className="flex w-full justify-end">
