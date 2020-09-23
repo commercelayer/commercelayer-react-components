@@ -19,6 +19,7 @@ test('<OrderContainer/>', () => {
   expect(proptypes.children).toBe(propTypes.children)
   expect(proptypes.persistKey).toBe(propTypes.persistKey)
   expect(proptypes.metadata).toBe(propTypes.metadata)
+  expect(proptypes.clearWhenPlaced).toBe(propTypes.clearWhenPlaced)
 })
 
 test('<OrderContainer proptypes required />', () => {
