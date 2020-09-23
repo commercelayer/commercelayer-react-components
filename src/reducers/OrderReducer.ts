@@ -1,6 +1,6 @@
 import CLayer, { OrderCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
-import { setLocalOrder } from '../utils/localStorage'
+import { setLocalOrder, deleteLocalOrder } from '../utils/localStorage'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import baseReducer from '../utils/baseReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
@@ -13,6 +13,8 @@ export interface GetOrderParams {
   id: string
   dispatch: Dispatch<OrderActions>
   config: CommerceLayerConfig
+  clearWhenPlaced?: boolean
+  persistKey?: string
 }
 
 export interface GetOrder {
@@ -134,15 +136,25 @@ export const createOrder: CreateOrder = async (params) => {
 }
 
 export const getApiOrder: GetOrder = async (params) => {
-  const { id, dispatch, config } = params
+  const { id, dispatch, config, clearWhenPlaced, persistKey } = params
   const o = await CLayer.Order.withCredentials(config).find(id)
   if (o)
-    dispatch({
-      type: 'setOrder',
-      payload: {
-        order: o,
-      },
-    })
+    if (clearWhenPlaced && o.status === 'placed' && persistKey) {
+      deleteLocalOrder(persistKey)
+      dispatch({
+        type: 'setOrder',
+        payload: {
+          order: null,
+        },
+      })
+    } else {
+      dispatch({
+        type: 'setOrder',
+        payload: {
+          order: o,
+        },
+      })
+    }
 }
 
 export const addToCart: AddToCart = async (params) => {

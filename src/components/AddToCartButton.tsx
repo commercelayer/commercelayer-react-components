@@ -56,7 +56,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
       ? items[skuCode]?.code
       : skuCode || getCurrentItemKey(item) || (itemSkuCode as string)
   const handleClick = (e: any) => {
-    e.preventDefault()
+    // e.preventDefault()
     const qty = quantity[sCode]
     const opt = option[sCode]
     const customLineItem = !_.isEmpty(lineItem) ? lineItem : lineItems[sCode]
