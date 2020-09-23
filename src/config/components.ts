@@ -14,7 +14,6 @@ import {
 } from '../typings'
 import { ErrorPropTypes } from '../typings/errors'
 import { BaseInputComponentPropTypes } from '../typings/index'
-import SkuList from '../components/SkuList'
 
 const components = {
   AddToCartButton: {
@@ -321,6 +320,7 @@ const components = {
     propTypes: {
       children: childrenTypes.isRequired,
       persistKey: PropTypes.string.isRequired,
+      clearWhenPlaced: PropTypes.bool,
       metadata: BMObject,
     },
     defaultProps: {
