@@ -200,7 +200,7 @@ import {
 // your code [...]
 
 <CommerceLayer accessToken="your-access-token" endpoint="https://your-domain.commercelayer.io">
-  <OrderContainer persistKey="your-persist-key">
+  <OrderContainer persistKey="your-persist-key" clearWhenPlaced="true">
     <LineItemsContainer>
       <p className="your-custom-class">
         Your shopping cart contains <LineItemsCount /> items
@@ -222,6 +222,8 @@ import {
 
 The `Errors` component lets you show the error (if present) returned by our API on a single attribute of a specific resource. You can customize the error message as you like by passing the `messages` prop to the component.
 
+If you want to remove the item associated with the `persistKey` from the Local Storage once the related order has been placed, just set the `clearWhenPlaced` prop to `true` (default is `false`).
+
 ## Cart summary
 
 This example shows how to use Commerce Layer React Components to show a sample order summary with all the order line items (including discounts, shipping costs, taxes, and gift cards — if present) and totals:
@@ -242,7 +244,7 @@ import {
 // your code [...]
 
 <CommerceLayer accessToken="your-access-token" endpoint="https://your-domain.commercelayer.io">
-  <OrderContainer persistKey="your-persist-key">
+  <OrderContainer persistKey="your-persist-key" clearWhenPlaced="true">
     <SubTotalAmount />
     <DiscountAmount />
     <ShippingAmount />
