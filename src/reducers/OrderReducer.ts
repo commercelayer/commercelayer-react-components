@@ -23,7 +23,12 @@ export interface GetOrder {
 
 type CreateOrderParams = Pick<
   AddToCartParams,
-  'config' | 'dispatch' | 'persistKey' | 'state' | 'orderMetadata'
+  | 'config'
+  | 'dispatch'
+  | 'persistKey'
+  | 'state'
+  | 'orderMetadata'
+  | 'orderAttributes'
 >
 
 export interface CreateOrder {
@@ -41,6 +46,7 @@ export interface AddToCartParams {
   option?: ItemOption
   lineItem?: CustomLineItem
   orderMetadata?: BaseMetadataObject
+  orderAttributes?: Record<string, any>
   errors?: BaseError[]
 }
 
@@ -115,9 +121,13 @@ export const createOrder: CreateOrder = async (params) => {
     dispatch,
     config,
     orderMetadata: metadata,
+    orderAttributes = {},
   } = params
   if (state.orderId) return state.orderId
-  const o = await CLayer.Order.withCredentials(config).create({ metadata })
+  const o = await CLayer.Order.withCredentials(config).create({
+    metadata,
+    ...orderAttributes,
+  })
   if (!o.id) return ''
   dispatch({
     type: 'setOrderId',
