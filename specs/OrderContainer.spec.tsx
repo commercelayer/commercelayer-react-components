@@ -6,7 +6,7 @@ import components from '../src/config/components'
 const propTypes = components.OrderContainer.propTypes
 
 test('<OrderContainer/>', () => {
-  expect.assertions(4)
+  expect.assertions(6)
   const component = renderer.create(
     <OrderContainer persistKey="unit-test">
       <div>test</div>
@@ -20,6 +20,7 @@ test('<OrderContainer/>', () => {
   expect(proptypes.persistKey).toBe(propTypes.persistKey)
   expect(proptypes.metadata).toBe(propTypes.metadata)
   expect(proptypes.clearWhenPlaced).toBe(propTypes.clearWhenPlaced)
+  expect(proptypes.attributes).toBe(propTypes.attributes)
 })
 
 test('<OrderContainer proptypes required />', () => {
