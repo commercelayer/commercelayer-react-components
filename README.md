@@ -80,7 +80,7 @@ import {
 
 // your code [...]
 
-<CommerceLayer accessToken="your-access-token" endpoint="https://your-domain.commercelayer.io">
+<CommerceLayer accessToken="your-access-token" endpoint="https://yourdomain.commercelayer.io">
   <PricesContainer>
     <Price
       skuCode="BABYONBU000000E63E7412MX"
@@ -128,8 +128,14 @@ import {
 
 // your code [...]
 
-<CommerceLayer accessToken="your-access-token" endpoint="https://your-domain.commercelayer.io">
-  <OrderContainer persistKey="your-persist-key">
+<CommerceLayer accessToken="your-access-token" endpoint="https://yourdomain.commercelayer.io">
+  <OrderContainer
+    persistKey="your-persist-key"
+    attributes={{
+      cart_url: 'https://yourdomain.com/cart',
+      return_url: 'https://yourdomain.com/return',
+      privacy_url: 'https://yourdomain.com/privacy'
+    }}>
     <ItemContainer>
       <PricesContainer>
         <Price skuCode="BABYONBU000000E63E746MXX" />
@@ -178,6 +184,8 @@ When you add a product to your shopping cart:
 
 > A common best practice — especially for multi-country ecommerce — is to use as `persistKey` a key containing the country code, so that you have a different shopping cart for each country.
 
+If you need to set some of the [order object](https://docs.commercelayer.io/api/resources/orders/create_order) attributes at the moment of the order creation, pass to the the optional prop `attributes` to the `OrderContainer` component.
+
 ## Shopping cart
 
 This example shows how to use Commerce Layer React Components to build a shopping cart UI, containing the items that are going to be purchased with all their information (image, name, quantity, price) and the option to possibly remove some of them:
@@ -199,7 +207,7 @@ import {
 
 // your code [...]
 
-<CommerceLayer accessToken="your-access-token" endpoint="https://your-domain.commercelayer.io">
+<CommerceLayer accessToken="your-access-token" endpoint="https://yourdomain.commercelayer.io">
   <OrderContainer persistKey="your-persist-key" clearWhenPlaced="true">
     <LineItemsContainer>
       <p className="your-custom-class">
@@ -243,7 +251,7 @@ import {
 
 // your code [...]
 
-<CommerceLayer accessToken="your-access-token" endpoint="https://your-domain.commercelayer.io">
+<CommerceLayer accessToken="your-access-token" endpoint="https://yourdomain.commercelayer.io">
   <OrderContainer persistKey="your-persist-key" clearWhenPlaced="true">
     <SubTotalAmount />
     <DiscountAmount />
@@ -298,7 +306,7 @@ For each component, the table below shows its props and the list of the permitte
 | `LineItemsContainer`       | `filters`<br />`loader`                                                          | `LineItem`<br />`LineItemsCount`                                                                                                                                                                                     |
 | `LineItemsCount`           | `className`<br />`id`<br />`name`<br />`style`                                   |
 | `MetadataInput`            | `name`<br />`onChange`<br />`placeholder`<br />`type`                            |
-| `OrderContainer`           | `metadata`<br />`persistKey`<br />`clearWhenPlaced`<br />`attributes`            | `CheckoutLink`<br />`DiscountAmount`<br />`GiftCardAmount`<br />`GiftCardContainer`<br />`ItemContainer`<br />`LineItemsContainer`<br />`ShippingAmount`<br />`SubTotalAmount`<br />`TaxesAmount`<br />`TotalAmount` |
+| `OrderContainer`           | `attributes`<br />`clearWhenPlaced`<br />`metadata`<br />`persistKey`            | `CheckoutLink`<br />`DiscountAmount`<br />`GiftCardAmount`<br />`GiftCardContainer`<br />`ItemContainer`<br />`LineItemsContainer`<br />`ShippingAmount`<br />`SubTotalAmount`<br />`TaxesAmount`<br />`TotalAmount` |
 | `Price`                    | `compareClassName`<br />`showCompare`<br />`skuCode`                             |
 | `PricesContainer`          | `filters`<br />`loader`<br />`perPage`<br />`skuCode`                            | `Price`                                                                                                                                                                                                              |
 | `QuantitySelector`         | `disabled`<br />`max`<br />`min`<br />`skuCode`<br />`value`                     |
