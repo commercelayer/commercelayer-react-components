@@ -27,10 +27,11 @@ type OrderContainerProps = {
   persistKey: string
   clearWhenPlaced?: boolean
   metadata?: BaseMetadataObject
+  attributes?: Record<string, any>
 }
 
 const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
-  const { children, persistKey, metadata, clearWhenPlaced } = props
+  const { children, persistKey, metadata, clearWhenPlaced, attributes } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
@@ -38,8 +39,6 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
       const localOrder = getLocalOrder(persistKey)
       if (localOrder) {
         if (clearWhenPlaced) {
-          // TODO Clear order from the session
-          debugger
           getApiOrder({
             id: localOrder,
             dispatch,
@@ -71,6 +70,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
         config,
         state,
         orderMetadata: metadata,
+        orderAttributes: attributes,
       }),
     addToCart: (values: AddToCartValues): Promise<{ success: boolean }> =>
       addToCart({
@@ -81,6 +81,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
         config,
         errors: state.errors,
         orderMetadata: metadata || {},
+        orderAttributes: attributes,
       }),
     getOrder: (id: string): void => getApiOrder({ id, dispatch, config }),
   }

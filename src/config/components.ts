@@ -322,6 +322,7 @@ const components = {
       persistKey: PropTypes.string.isRequired,
       clearWhenPlaced: PropTypes.bool,
       metadata: BMObject,
+      attributes: PropTypes.object,
     },
     defaultProps: {
       metadata: {},
