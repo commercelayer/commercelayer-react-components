@@ -1,6 +1,6 @@
 const config = {
   presets: ['next/babel'],
-  plugins: ['istanbul'],
+  // plugins: ['istanbul'],
 }
 if (
   process.env.npm_lifecycle_script &&

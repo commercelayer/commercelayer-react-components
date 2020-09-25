@@ -52,7 +52,7 @@ const CustomAddToCart = (props) => {
 }
 
 const CustomQuantity = (props: any) => {
-  console.log('props', props)
+  // console.log('props', props)
   const myIncrease = (event: any) => {
     event.target.value = props.value + 1
     props.handleChange(event)
@@ -94,7 +94,10 @@ export default function Order() {
       <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
-          <OrderContainer persistKey="orderUS">
+          <OrderContainer
+            persistKey="orderUS"
+            attributes={{ returnUrl: 'https://test.co' }}
+          >
             <ItemContainer>
               <div className="md:flex">
                 <div className="md:flex-shrink-0">
