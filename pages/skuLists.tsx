@@ -23,6 +23,7 @@ import SkuListsContainer from '../src/components/SkuListsContainer'
 import SkuList from '../src/components/SkuList'
 import AddToCartButton from '../src/components/AddToCartButton'
 import QuantitySelector from '../src/components/QuantitySelector'
+import ExternalFunction from 'components/ExternalFunction'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -84,12 +85,14 @@ export default function Order() {
                           skuListId="aOJOreIXyk"
                           className="form-input block w-full sm:text-sm sm:leading-5 mb-5"
                         />
-                        <AddToCartButton
-                          skuListId="aOJOreIXyk"
-                          className="inline-flex items-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-red-500 hover:bg-red-400 focus:outline-none focus:border-red-600 focus:shadow-outline-blue active:bg-red-600 transition ease-in-out duration-150"
-                        >
-                          {AddToCartCustom}
-                        </AddToCartButton>
+                        <ExternalFunction url="//localhost:3000/api/import-line-items">
+                          <AddToCartButton
+                            skuListId="aOJOreIXyk"
+                            className="inline-flex items-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-red-500 hover:bg-red-400 focus:outline-none focus:border-red-600 focus:shadow-outline-blue active:bg-red-600 transition ease-in-out duration-150"
+                          >
+                            {AddToCartCustom}
+                          </AddToCartButton>
+                        </ExternalFunction>
                       </div>
                     </div>
                   </SkuList>

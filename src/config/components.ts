@@ -87,6 +87,14 @@ const components = {
       field: 'base',
     },
   },
+  ExternalFunction: {
+    displayName: 'ExternalFunction',
+    permittedChildren: ['AddToCartButton', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
+      url: PropTypes.string.isRequired,
+    },
+  },
   GiftCard: {
     permittedChildren: [
       'GiftCardCurrencySelector',

@@ -21,6 +21,12 @@ export interface GetOrder {
   (params: GetOrderParams): void
 }
 
+export interface SetOrderErrors {
+  (params: { dispatch: Dispatch<OrderActions>; collection: any }): {
+    success: boolean
+  }
+}
+
 type CreateOrderParams = Pick<
   AddToCartParams,
   | 'config'
@@ -86,6 +92,7 @@ export interface OrderState extends OrderPayload {
   getOrder?: getOrderContext
   createOrder?: () => Promise<string>
   addToCart: (values: AddToCartValues) => AddToCartReturn
+  setOrderErrors: (collection: any) => { success: boolean }
 }
 
 export interface OrderActions {
@@ -250,6 +257,17 @@ export const unsetOrderState: UnsetOrderState = (dispatch) => {
       order: null,
     },
   })
+}
+
+export const setOrderErrors: SetOrderErrors = ({ dispatch, collection }) => {
+  const errors = getErrorsByCollection(collection, 'order')
+  dispatch({
+    type: 'setErrors',
+    payload: {
+      errors,
+    },
+  })
+  return { success: false }
 }
 
 export const orderInitialState: Partial<OrderState> = {

@@ -83,6 +83,16 @@ const getErrorsByCollection: GetErrorsByCollection = (
           message: error['message'],
         })
       })
+  } else if (_.isArray(collection)) {
+    collection.map((error) => {
+      errors.push({
+        // id: collection['id'],
+        code: transformCode(error['code']),
+        field: error['field'] === 'recipientEmail' ? 'email' : error['field'],
+        resource: resourceType,
+        message: error['message'],
+      })
+    })
   }
   return errors
 }
