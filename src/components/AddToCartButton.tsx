@@ -8,6 +8,7 @@ import components from '../config/components'
 import { FunctionChildren } from '../typings/index'
 import { AddToCartReturn } from 'reducers/OrderReducer'
 import SkuListsContext from '../context/SkuListsContext'
+import ExternalFunctionContext from '../context/ExternalFunctionContext'
 
 const propTypes = components.AddToCartButton.propTypes
 const defaultProps = components.AddToCartButton.defaultProps
@@ -26,7 +27,6 @@ type AddToCartButtonProps = {
   skuCode?: string
   disabled?: boolean
   skuListId?: string
-  timeout?: number
 } & PropsWithoutRef<JSX.IntrinsicElements['button']>
 
 const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
@@ -36,10 +36,12 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     skuCode,
     disabled,
     skuListId,
-    timeout = 1000,
     ...p
   } = props
-  const { addToCart } = useContext(OrderContext)
+  const { addToCart, orderId, getOrder, setOrderErrors } = useContext(
+    OrderContext
+  )
+  const { url, callExternalFunction } = useContext(ExternalFunctionContext)
   const {
     item,
     items,
@@ -55,38 +57,68 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     !_.isEmpty(items) && skuCode
       ? items[skuCode]?.code
       : skuCode || getCurrentItemKey(item) || (itemSkuCode as string)
-  const handleClick = (e: any) => {
-    // e.preventDefault()
+  const handleClick = () => {
     const qty = quantity[sCode]
     const opt = option[sCode]
     const customLineItem = !_.isEmpty(lineItem) ? lineItem : lineItems[sCode]
-    if (!_.isEmpty(skuLists) && skuListId) {
-      const slQty = quantity[skuListId]
-      let offset = timeout
+    if (!_.isEmpty(skuLists) && skuListId && url) {
+      const slQty = quantity[skuListId] || 1
       if (_.has(skuLists, skuListId)) {
-        // return Promise.all(
-        return skuLists[skuListId].map(async (skuCode) => {
-          return setTimeout(async () => {
-            new Promise((resolve) => setTimeout(resolve, offset)).then(() => {
-              addToCart({
-                skuCode,
-                quantity: slQty,
-              })
-            })
-            offset += timeout
-            return { success: true }
-          }, offset)
+        const lineItems = skuLists[skuListId].map((skuCode) => {
+          return {
+            skuCode,
+            quantity: slQty,
+            _update_quantity: 1,
+          }
         })
-        // )
+        return callExternalFunction({
+          url,
+          data: {
+            resourceType: 'orders',
+            inputs: [
+              {
+                id: orderId,
+                lineItems,
+              },
+            ],
+          },
+        })
+          .then((res) => {
+            getOrder && getOrder(orderId)
+            return res
+          })
+          .catch(({ response }) => {
+            setOrderErrors(response['data'])
+            return response
+          })
       }
     }
-    return addToCart({
-      skuCode: sCode,
-      skuId: item[sCode]?.id,
-      quantity: qty,
-      option: opt,
-      lineItem: customLineItem,
-    })
+    return !url
+      ? addToCart({
+          skuCode: sCode,
+          skuId: item[sCode]?.id,
+          quantity: qty,
+          option: opt,
+          lineItem: customLineItem,
+        })
+      : callExternalFunction({
+          url,
+          data: {
+            skuCode: sCode,
+            skuId: item[sCode]?.id,
+            quantity: qty,
+            option: opt,
+            lineItem: customLineItem,
+          },
+        })
+          .then((res) => {
+            getOrder && getOrder(orderId)
+            return res
+          })
+          .catch(({ response }) => {
+            setOrderErrors(response['data'])
+            return response
+          })
   }
   const autoDisabled =
     !_.isEmpty(skuLists) || skuListId

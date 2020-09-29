@@ -13,7 +13,12 @@ import orderReducer, {
 } from '../reducers/OrderReducer'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import OrderContext from '../context/OrderContext'
-import { getApiOrder, addToCart, OrderState } from '../reducers/OrderReducer'
+import {
+  getApiOrder,
+  addToCart,
+  OrderState,
+  setOrderErrors,
+} from '../reducers/OrderReducer'
 import { unsetOrderState } from '../reducers/OrderReducer'
 import components from '../config/components'
 import { BaseMetadataObject } from '../typings'
@@ -84,6 +89,8 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
         orderAttributes: attributes,
       }),
     getOrder: (id: string): void => getApiOrder({ id, dispatch, config }),
+    setOrderErrors: (collection: any) =>
+      setOrderErrors({ dispatch, collection }),
   }
   return (
     <OrderContext.Provider value={orderValue as OrderState}>
