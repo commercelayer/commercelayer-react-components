@@ -97,6 +97,7 @@ export default function Order() {
           <OrderContainer
             persistKey="orderUS"
             attributes={{ returnUrl: 'https://test.co' }}
+            clearWhenPlaced
           >
             <ItemContainer>
               <div className="md:flex">
