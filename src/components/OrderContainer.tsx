@@ -43,24 +43,20 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
     if (config.accessToken) {
       const localOrder = getLocalOrder(persistKey)
       if (localOrder) {
-        if (clearWhenPlaced) {
+        dispatch({
+          type: 'setOrderId',
+          payload: {
+            orderId: localOrder,
+          },
+        })
+        if (!state.order) {
           getApiOrder({
             id: localOrder,
             dispatch,
             config,
-            clearWhenPlaced,
             persistKey,
+            clearWhenPlaced,
           })
-        } else {
-          dispatch({
-            type: 'setOrderId',
-            payload: {
-              orderId: localOrder,
-            },
-          })
-          if (!state.order) {
-            getApiOrder({ id: localOrder, dispatch, config })
-          }
         }
       }
     }
