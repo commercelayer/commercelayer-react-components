@@ -29,25 +29,33 @@ const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = (
   props
 ) => {
   const { timeFormat, showShippingMethodName, children, ...p } = props
-  const { min, max, shippingMethod } = useContext(AvailabilityContext)
+  const { min, max, shippingMethod, quantity } = useContext(AvailabilityContext)
   const mn = !_.isEmpty(min) ? min[`${timeFormat}`] : ''
   const mx = !_.isEmpty(max) ? max[`${timeFormat}`] : ''
+  const text: string[] = []
   const name =
     showShippingMethodName && shippingMethod
       ? `with ${shippingMethod.name}`
       : ''
-  const text =
-    mn && mx ? `Available in ${mn} - ${mx} ${timeFormat} ${name}` : ''
+  if (quantity && quantity > 0) {
+    text.push('Available')
+    if (mn && mx) {
+      text.push(`in ${mn} - ${mx} ${timeFormat} ${name}`)
+    }
+  } else if (quantity === 0) {
+    text.push('Out of stock')
+  }
   const parentProps = {
     min,
     max,
     shippingMethod,
+    quantity,
     ...props,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <p {...p}>{text}</p>
+    <p {...p}>{text.join(' ')}</p>
   )
 }
 
