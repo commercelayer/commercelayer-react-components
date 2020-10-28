@@ -26,7 +26,7 @@ const displayName = components.VariantsContainer.displayName
 
 type VariantsContainerProps = {
   children: ReactNode
-  filters?: object
+  filters?: Record<string, string>
   skuCode?: string
 }
 
