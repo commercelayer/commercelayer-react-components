@@ -91,7 +91,7 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
         unsetPriceState(dispatch)
       }
     }
-  }, [config.accessToken, currentItem])
+  }, [config.accessToken, currentItem, sCode])
   const priceValue: PricesContextValue = {
     ...state,
     skuCode: sCode,
