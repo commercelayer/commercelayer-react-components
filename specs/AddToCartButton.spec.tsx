@@ -7,7 +7,7 @@ test('<AddToCartButton/>', () => {
   expect.assertions(7)
   const component = renderer.create(<AddToCartButton />)
   const tree = component.toJSON()
-  const root = component.toTree()
+  const root: any = component.toTree()
   const rendered = root.rendered
   const proptypes = root.type['propTypes']
   expect(tree).toMatchSnapshot()
@@ -16,7 +16,12 @@ test('<AddToCartButton/>', () => {
   expect(proptypes.label).toBe(PropTypes.string)
   expect(proptypes.skuCode).toBe(PropTypes.string)
   expect(proptypes.disabled).toBe(PropTypes.bool)
-
+  expect(proptypes.lineItem).toBe(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      imageUrl: PropTypes.string,
+    })
+  )
   expect(rendered.props.children).toBe('Add to cart')
   expect(rendered.props.disabled).toBe(true)
 })
@@ -27,7 +32,7 @@ test('<AddToCartButton with props />', () => {
     <AddToCartButton label="Add to basket" skuCode="SKUCODE12345" />
   )
   const tree = component.toJSON()
-  const root = component.toTree()
+  const root: any = component.toTree()
   const rendered = root.rendered
   expect(tree).toMatchSnapshot()
   expect(rendered.props.children).toBe('Add to basket')
@@ -47,7 +52,7 @@ test('<AddToCartButton with custom children />', () => {
     </AddToCartButton>
   )
   const tree = component.toJSON()
-  const root = component.toTree()
+  const root: any = component.toTree()
   const rendered = root.rendered
   const childRendered = root.rendered.rendered
   expect(tree).toMatchSnapshot()
@@ -70,7 +75,7 @@ test('<AddToCartButton with ItemContainer skuCode />', () => {
     </ItemContainer>
   )
   const tree = component.toJSON()
-  const root = component.toTree()
+  const root: any = component.toTree()
   const childRendered = root.rendered.rendered
   expect(tree).toMatchSnapshot()
   expect(childRendered.props.disabled).toBeTruthy()
