@@ -127,6 +127,11 @@ export default function Order() {
                       <AddToCart
                         skuCode="LSLEEVMMFFFFFF000000LXXX"
                         className="w-2/3 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        lineItem={{
+                          name: 'Darth Vader Sleeve',
+                          imageUrl:
+                            'https://i.pinimg.com/736x/a5/32/de/a532de337eff9b1c1c4bfb8df73acea4--darth-vader-stencil-darth-vader-head.jpg?b=t',
+                        }}
                       />
                     </div>
                     <div className="pt-2">

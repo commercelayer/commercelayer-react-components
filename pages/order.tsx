@@ -127,15 +127,15 @@ export default function Order() {
                           {
                             label: '6 months',
                             code: 'BABYONBU000000E63E746MXX',
+                          },
+                          {
+                            label: '12 months',
+                            code: 'BABYONBU000000E63E7412MX',
                             lineItem: {
                               name: 'Darth Vader (12 Months)',
                               imageUrl:
                                 'https://i.pinimg.com/736x/a5/32/de/a532de337eff9b1c1c4bfb8df73acea4--darth-vader-stencil-darth-vader-head.jpg?b=t',
                             },
-                          },
-                          {
-                            label: '12 months',
-                            code: 'BABYONBU000000E63E7412MX',
                           },
                           {
                             label: '24 months',
