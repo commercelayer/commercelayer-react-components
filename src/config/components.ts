@@ -23,6 +23,10 @@ const components = {
       label: PropTypes.string,
       skuCode: PropTypes.string,
       disabled: PropTypes.bool,
+      lineItem: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        imageUrl: PropTypes.string,
+      }),
     },
     defaultProps: {
       label: 'Add to cart',
