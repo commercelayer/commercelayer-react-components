@@ -9,6 +9,7 @@ import { FunctionChildren } from '../typings/index'
 import { AddToCartReturn } from 'reducers/OrderReducer'
 import SkuListsContext from '../context/SkuListsContext'
 import ExternalFunctionContext from '../context/ExternalFunctionContext'
+import { VariantOptions } from '../../dist/components/VariantSelector'
 
 const propTypes = components.AddToCartButton.propTypes
 const defaultProps = components.AddToCartButton.defaultProps
@@ -27,6 +28,7 @@ type AddToCartButtonProps = {
   skuCode?: string
   disabled?: boolean
   skuListId?: string
+  lineItem?: VariantOptions['lineItem']
 } & PropsWithoutRef<JSX.IntrinsicElements['button']>
 
 const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
@@ -36,6 +38,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     skuCode,
     disabled,
     skuListId,
+    lineItem,
     ...p
   } = props
   const { addToCart, orderId, getOrder, setOrderErrors } = useContext(
@@ -49,7 +52,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     option,
     prices,
     lineItems,
-    lineItem,
+    lineItem: lineItemContext,
     skuCode: itemSkuCode,
   } = useContext(ItemContext)
   const { skuLists } = useContext(SkuListsContext)
@@ -60,7 +63,10 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
   const handleClick = () => {
     const qty = quantity[sCode]
     const opt = option[sCode]
-    const customLineItem = !_.isEmpty(lineItem) ? lineItem : lineItems[sCode]
+    const customLineItem = !_.isEmpty(lineItem || lineItemContext)
+      ? lineItem || lineItemContext
+      : lineItems[sCode]
+    debugger
     if (!_.isEmpty(skuLists) && skuListId && url) {
       const slQty = quantity[skuListId] || 1
       if (_.has(skuLists, skuListId)) {
