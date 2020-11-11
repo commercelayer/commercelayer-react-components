@@ -282,7 +282,7 @@ For each component, the table below shows its props and the list of the permitte
 
 | Name                       | Props                                                                            | Children                                                                                                                                                                                                             |
 | -------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AddToCartButton`          | `disabled`<br />`label`<br />`skuCode`                                           |
+| `AddToCartButton`          | `disabled`<br />`label`<br />`skuCode`<br />`lineItem`                           |
 | `AvailabilityContainer`    | `skuCode`                                                                        | `AvailabilityTemplate`                                                                                                                                                                                               |
 | `AvailabilityTemplate`     | `showShippingMethodName`<br />`timeFormat`                                       |
 | `CheckoutLink`             | `label`                                                                          |
