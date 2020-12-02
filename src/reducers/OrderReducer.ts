@@ -154,24 +154,39 @@ export const createOrder: CreateOrder = async (params) => {
 
 export const getApiOrder: GetOrder = async (params) => {
   const { id, dispatch, config, clearWhenPlaced, persistKey } = params
-  const o = await CLayer.Order.withCredentials(config).find(id)
-  if (o)
-    if (clearWhenPlaced && o.status === 'placed' && persistKey) {
-      deleteLocalOrder(persistKey)
-      dispatch({
-        type: 'setOrder',
-        payload: {
-          order: null,
-        },
-      })
-    } else {
-      dispatch({
-        type: 'setOrder',
-        payload: {
-          order: o,
-        },
-      })
-    }
+  try {
+    const o = await CLayer.Order.withCredentials(config).find(id)
+    if (o)
+      if (
+        (clearWhenPlaced && o.status === 'placed') ||
+        o.status === 'approved' ||
+        (o.status === 'cancelled' && persistKey)
+      ) {
+        deleteLocalOrder(persistKey as string)
+        dispatch({
+          type: 'setOrder',
+          payload: {
+            order: null,
+          },
+        })
+      } else {
+        dispatch({
+          type: 'setOrder',
+          payload: {
+            order: o,
+          },
+        })
+      }
+  } catch (col) {
+    // NOTE: Delete orderId if its status is approved
+    deleteLocalOrder(persistKey as string)
+    dispatch({
+      type: 'setOrder',
+      payload: {
+        order: null,
+      },
+    })
+  }
 }
 
 export const addToCart: AddToCart = async (params) => {

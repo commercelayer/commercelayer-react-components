@@ -34,7 +34,6 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
     availabilityReducer,
     availabilityInitialState
   )
-  console.log('AVAILABILITY state', state)
   useEffect(() => {
     const sCode = skuCode || getCurrentItemKey(item) || itemSkuCode
     if (sCode) {

@@ -74,7 +74,6 @@ const ItemContainer: FunctionComponent<ItemContainerProps> = (props) => {
     setPrices,
     setCustomLineItems,
   } as InitItemContext
-  console.log('itemValue', itemValue)
   return (
     <ItemContext.Provider value={itemValue}>{children}</ItemContext.Provider>
   )

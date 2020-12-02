@@ -36,7 +36,13 @@ type OrderContainerProps = {
 }
 
 const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
-  const { children, persistKey, metadata, clearWhenPlaced, attributes } = props
+  const {
+    children,
+    persistKey,
+    metadata,
+    clearWhenPlaced = true,
+    attributes,
+  } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
