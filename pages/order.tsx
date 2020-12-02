@@ -1,5 +1,8 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import { getIntegrationToken } from '@commercelayer/js-auth'
+import {
+  getIntegrationToken,
+  getSalesChannelToken,
+} from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
@@ -29,7 +32,7 @@ import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 import ItemContainer from '../src/components/ItemContainer'
 import Errors from '../src/components/Errors'
 
-const endpoint = 'https://the-blue-brand-2.commercelayer.co'
+const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 
 const CustomAddToCart = (props) => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
@@ -71,20 +74,20 @@ export default function Order() {
   useEffect(() => {
     const getToken = async () => {
       // @ts-ignore
-      // const { accessToken } = await getSalesChannelToken({
-      //   clientId:
-      //     '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
-      //   endpoint,
-      //   scope: 'market:48'
-      // })
-      const token = await getIntegrationToken({
+      const token = await getSalesChannelToken({
         clientId:
-          'b1aa32826ce12ba2f74c59a555e3ed98a7db4ec710b14575b7e97f0a49fb9a4d',
-        clientSecret:
-          '8fed019759490ba13c482cc2541ef77c6b8d0b3df04db80807110784fbfec021',
+          '48ee4802f8227b04951645a9b7c8af1e3943efec7edd1dcfd04b5661bf1da5db',
         endpoint,
-        scope: 'market:48',
+        scope: 'market:58',
       })
+      // const token = await getIntegrationToken({
+      //   clientId:
+      //     'b1aa32826ce12ba2f74c59a555e3ed98a7db4ec710b14575b7e97f0a49fb9a4d',
+      //   clientSecret:
+      //     '8fed019759490ba13c482cc2541ef77c6b8d0b3df04db80807110784fbfec021',
+      //   endpoint,
+      //   scope: 'market:58',
+      // })
       if (token) setToken(token.accessToken)
     }
     getToken()
