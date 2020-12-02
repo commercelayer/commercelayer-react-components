@@ -1,6 +1,11 @@
 module.exports = {
-  variants: {
-    opacity: ['responsive', 'hover', 'focus', 'disabled'],
+  purge: [],
+  darkMode: false, // or 'media' or 'class'
+  theme: {
+    extend: {},
   },
-  plugins: [require('@tailwindcss/ui')],
+  variants: {
+    extend: {},
+  },
+  plugins: [],
 }
