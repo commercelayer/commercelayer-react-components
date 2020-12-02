@@ -66,7 +66,6 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     const customLineItem = !_.isEmpty(lineItem || lineItemContext)
       ? lineItem || lineItemContext
       : lineItems[sCode]
-    debugger
     if (!_.isEmpty(skuLists) && skuListId && url) {
       const slQty = quantity[skuListId] || 1
       if (_.has(skuLists, skuListId)) {
