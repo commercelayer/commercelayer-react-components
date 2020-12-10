@@ -26,9 +26,9 @@ test('<LineItemOption proptypes required />', () => {
   const component = renderer.create(<LineItemOption />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: The prop `name` is marked as required in `LineItemOption`, but its value is `undefined`.'
+      'The prop `name` is marked as required in `LineItemOption`, but its value is `undefined`.'
     )
   )
 })

@@ -26,14 +26,14 @@ test('<SkuOption proptypes required />', () => {
   const component = renderer.create(<SkuOption />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: The prop 'children' is marked as required in 'SkuOption', but its value is 'undefined'.`
+      `The prop 'children' is marked as required in 'SkuOption', but its value is 'undefined'.`
     )
   )
-  expect(console.error.mock.calls[1][0]).toEqual(
+  expect(console.error.mock.calls[1][2]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: The prop `id` is marked as required in `SkuOption`, but its value is `undefined`.'
+      'The prop `id` is marked as required in `SkuOption`, but its value is `undefined`.'
     )
   )
 })
@@ -48,9 +48,9 @@ test('<SkuOption check children />', () => {
   )
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: Invalid prop 'children' supplied to SkuOption. Only components SkuOptionInput, ReactNode are allowed.`
+      `Invalid prop 'children' supplied to SkuOption. Only components SkuOptionInput, ReactNode are allowed.`
     )
   )
 })

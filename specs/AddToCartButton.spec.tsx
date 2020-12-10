@@ -16,12 +16,6 @@ test('<AddToCartButton/>', () => {
   expect(proptypes.label).toBe(PropTypes.string)
   expect(proptypes.skuCode).toBe(PropTypes.string)
   expect(proptypes.disabled).toBe(PropTypes.bool)
-  expect(proptypes.lineItem).toBe(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      imageUrl: PropTypes.string,
-    })
-  )
   expect(rendered.props.children).toBe('Add to cart')
   expect(rendered.props.disabled).toBe(true)
 })

@@ -28,14 +28,14 @@ test('<GiftCardInput check type required />', () => {
   const component = renderer.create(<GiftCardInput />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: The prop `type` is marked as required in `GiftCardInput`, but its value is `undefined`'
+      'The prop `type` is marked as required in `GiftCardInput`, but its value is `undefined`'
     )
   )
-  expect(console.error.mock.calls[1][0]).toEqual(
+  expect(console.error.mock.calls[1][2]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: The prop `name` is marked as required in `GiftCardInput`, but its value is `undefined`'
+      'The prop `name` is marked as required in `GiftCardInput`, but its value is `undefined`'
     )
   )
 })
@@ -73,7 +73,7 @@ test('<GiftCardInput check children type date />', () => {
 
 test('<GiftCardInput with custom children />', () => {
   expect.assertions(4)
-  const CustomComponent = props => <span>{props.label}</span>
+  const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
     <GiftCardInput>{CustomComponent}</GiftCardInput>
   )

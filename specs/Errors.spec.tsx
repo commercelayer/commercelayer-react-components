@@ -24,9 +24,9 @@ test('<Errors proptypes required />', () => {
   const component = renderer.create(<Errors />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: The prop `resource` is marked as required in `Errors`, but its value is `undefined`'
+      'The prop `resource` is marked as required in `Errors`, but its value is `undefined`'
     )
   )
 })
@@ -38,9 +38,9 @@ test('<Errors proptypes validation />', () => {
   const component = renderer.create(<Errors resource="test" />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: Invalid prop `resource` of value `test` supplied to `Errors`, expected one of ["order","giftCard","lineItem","variant","price","skuOption"]'
+      'Invalid prop `resource` of value `test` supplied to `Errors`, expected one of ["order","giftCard","lineItem","variant","price","skuOption"]'
     )
   )
 })

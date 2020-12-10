@@ -160,9 +160,9 @@ export const getApiOrder: GetOrder = async (params) => {
       if (
         (clearWhenPlaced && o.status === 'placed') ||
         o.status === 'approved' ||
-        (o.status === 'cancelled' && persistKey)
+        o.status === 'cancelled'
       ) {
-        deleteLocalOrder(persistKey as string)
+        persistKey && deleteLocalOrder(persistKey)
         dispatch({
           type: 'setOrder',
           payload: {
@@ -179,7 +179,7 @@ export const getApiOrder: GetOrder = async (params) => {
       }
   } catch (col) {
     // NOTE: Delete orderId if its status is approved
-    deleteLocalOrder(persistKey as string)
+    persistKey && deleteLocalOrder(persistKey)
     dispatch({
       type: 'setOrder',
       payload: {

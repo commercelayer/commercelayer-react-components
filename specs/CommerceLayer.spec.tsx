@@ -38,9 +38,9 @@ test('<CommerceLayer children error />', () => {
 
   expect(tree).toMatchSnapshot()
 
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: Invalid prop 'children' supplied to CommerceLayer. Only components OrderContainer, PricesContainer, GiftCardContainer, ReactNode are allowed`
+      `Invalid prop 'children' supplied to CommerceLayer. Only components OrderContainer, PricesContainer, GiftCardContainer, ReactNode are allowed`
     )
   )
 })
@@ -55,9 +55,9 @@ test('<CommerceLayer children required />', () => {
 
   expect(tree).toMatchSnapshot()
 
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: The prop 'children' is marked as required in 'CommerceLayer', but its value is 'undefined'.`
+      `The prop 'children' is marked as required in 'CommerceLayer', but its value is 'undefined'.`
     )
   )
 })
