@@ -27,9 +27,9 @@ test('<LineItemsContainer proptypes required />', () => {
   const component = renderer.create(<LineItemsContainer />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: The prop 'children' is marked as required in 'LineItemsContainer', but its value is 'undefined'.`
+      `The prop 'children' is marked as required in 'LineItemsContainer', but its value is 'undefined'.`
     )
   )
 })
@@ -44,9 +44,9 @@ test('<LineItemsContainer check children />', () => {
   )
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: Invalid prop 'children' supplied to LineItemsContainer. Only components LineItemsCount, LineItem, ReactNode are allowed.`
+      `Invalid prop 'children' supplied to LineItemsContainer. Only components LineItemsCount, LineItem, ReactNode are allowed.`
     )
   )
 })

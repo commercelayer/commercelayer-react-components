@@ -6,7 +6,7 @@ import components from '../src/config/components'
 const propTypes = components.OrderContainer.propTypes
 
 test('<OrderContainer/>', () => {
-  expect.assertions(6)
+  expect.assertions(7)
   const component = renderer.create(
     <OrderContainer persistKey="unit-test">
       <div>test</div>
@@ -21,6 +21,7 @@ test('<OrderContainer/>', () => {
   expect(proptypes.metadata).toBe(propTypes.metadata)
   expect(proptypes.clearWhenPlaced).toBe(propTypes.clearWhenPlaced)
   expect(proptypes.attributes).toBe(propTypes.attributes)
+  expect(proptypes.orderId).toBe(propTypes.orderId)
 })
 
 test('<OrderContainer proptypes required />', () => {
@@ -29,14 +30,14 @@ test('<OrderContainer proptypes required />', () => {
   const component = renderer.create(<OrderContainer />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: The prop 'children' is marked as required in 'OrderContainer', but its value is 'undefined'.`
+      `The prop 'children' is marked as required in 'OrderContainer', but its value is 'undefined'.`
     )
   )
-  expect(console.error.mock.calls[1][0]).toEqual(
+  expect(console.error.mock.calls[1][2]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: The prop `persistKey` is marked as required in `OrderContainer`, but its value is `undefined`.'
+      'The prop `persistKey` is marked as required in `OrderContainer`, but its value is `undefined`.'
     )
   )
 })
@@ -51,9 +52,9 @@ test('<OrderContainer check children />', () => {
   )
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: Invalid prop 'children' supplied to OrderContainer. Only components ItemContainer, LineItemsContainer, SubTotalAmount, DiscountAmount, ShippingAmount, TaxesAmount, GiftCardAmount, TotalAmount, CheckoutLink, GiftCardContainer, ReactNode are allowed.`
+      `Invalid prop 'children' supplied to OrderContainer. Only components ItemContainer, LineItemsContainer, SubTotalAmount, DiscountAmount, ShippingAmount, TaxesAmount, GiftCardAmount, TotalAmount, CheckoutLink, GiftCardContainer, ReactNode are allowed.`
     )
   )
 })

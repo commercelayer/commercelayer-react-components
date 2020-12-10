@@ -27,14 +27,14 @@ test('<LineItemOptions proptypes required />', () => {
   const component = renderer.create(<LineItemOptions />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      "Warning: Failed prop type: The prop 'children' is marked as required in 'LineItemOptions', but its value is 'undefined'"
+      "The prop 'children' is marked as required in 'LineItemOptions', but its value is 'undefined'"
     )
   )
-  expect(console.error.mock.calls[1][0]).toEqual(
+  expect(console.error.mock.calls[1][2]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: The prop `skuOptionId` is marked as required in `LineItemOptions`, but its value is `undefined`'
+      'The prop `skuOptionId` is marked as required in `LineItemOptions`, but its value is `undefined`'
     )
   )
 })
@@ -49,9 +49,9 @@ test('<LineItemOptions check children />', () => {
   )
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: Invalid prop 'children' supplied to LineItemOptions. Only components LineItemOption, ReactNode are allowed.`
+      `Invalid prop 'children' supplied to LineItemOptions. Only components LineItemOption, ReactNode are allowed.`
     )
   )
 })

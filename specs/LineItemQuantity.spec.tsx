@@ -7,7 +7,7 @@ import Parent from '../src/components/utils/Parent'
 const propTypes = components.LineItemQuantity.propTypes
 
 test('<LineItemQuantity/>', () => {
-  expect.assertions(4)
+  expect.assertions(5)
   const component = renderer.create(<LineItemQuantity />)
   const tree = component.toJSON()
   const root = component.toTree()
@@ -16,6 +16,7 @@ test('<LineItemQuantity/>', () => {
   expect(proptypes.children).toBe(propTypes.children)
   expect(proptypes.max).toBe(propTypes.max)
   expect(proptypes.disabled).toBe(propTypes.disabled)
+  expect(proptypes.readonly).toBe(propTypes.readonly)
 })
 
 test('<LineItemQuantity check children format />', () => {

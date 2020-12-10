@@ -272,6 +272,7 @@ const components = {
       children: PropTypes.func,
       max: PropTypes.number,
       disabled: PropTypes.bool,
+      readonly: PropTypes.bool,
     },
     defaultProps: {
       max: 50,
@@ -332,6 +333,7 @@ const components = {
     propTypes: {
       children: childrenTypes.isRequired,
       persistKey: PropTypes.string.isRequired,
+      orderId: PropTypes.string,
       clearWhenPlaced: PropTypes.bool,
       metadata: BMObject,
       attributes: PropTypes.object,

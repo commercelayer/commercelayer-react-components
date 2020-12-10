@@ -27,16 +27,22 @@ const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps
 const displayName = components.OrderContainer.displayName
 
-type OrderContainerProps = {
+type Props = {
   children: ReactNode
-  persistKey: string
   clearWhenPlaced?: boolean
   metadata?: BaseMetadataObject
   attributes?: Record<string, any>
 }
 
+type OrderContainerProps = Props &
+  (
+    | { persistKey?: never; orderId: string }
+    | { persistKey: string; orderId?: never }
+  )
+
 const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
   const {
+    orderId,
     children,
     persistKey,
     metadata,
@@ -47,7 +53,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     if (config.accessToken) {
-      const localOrder = getLocalOrder(persistKey)
+      const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
       if (localOrder) {
         dispatch({
           type: 'setOrderId',
@@ -70,7 +76,12 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
   }, [config.accessToken])
   const orderValue = {
     ...state,
-    createOrder: async (): Promise<string> =>
+    getOrder: (id: string): void => getApiOrder({ id, dispatch, config }),
+    setOrderErrors: (collection: any) =>
+      setOrderErrors({ dispatch, collection }),
+  }
+  if (persistKey) {
+    orderValue.createOrder = async (): Promise<string> =>
       await createOrder({
         persistKey,
         dispatch,
@@ -78,8 +89,10 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
         state,
         orderMetadata: metadata,
         orderAttributes: attributes,
-      }),
-    addToCart: (values: AddToCartValues): Promise<{ success: boolean }> =>
+      })
+    orderValue.addToCart = (
+      values: AddToCartValues
+    ): Promise<{ success: boolean }> =>
       addToCart({
         ...values,
         persistKey,
@@ -89,10 +102,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
         errors: state.errors,
         orderMetadata: metadata || {},
         orderAttributes: attributes,
-      }),
-    getOrder: (id: string): void => getApiOrder({ id, dispatch, config }),
-    setOrderErrors: (collection: any) =>
-      setOrderErrors({ dispatch, collection }),
+      })
   }
   return (
     <OrderContext.Provider value={orderValue as OrderState}>

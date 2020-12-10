@@ -26,14 +26,14 @@ test('<ExternalFunction check type required />', () => {
   const component = renderer.create(<ExternalFunction />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: The prop 'children' is marked as required in 'ExternalFunction', but its value is 'undefined'`
+      `The prop 'children' is marked as required in 'ExternalFunction', but its value is 'undefined'`
     )
   )
-  expect(console.error.mock.calls[1][0]).toEqual(
+  expect(console.error.mock.calls[1][2]).toEqual(
     expect.stringContaining(
-      'Warning: Failed prop type: The prop `url` is marked as required in `ExternalFunction`, but its value is `undefined`'
+      'The prop `url` is marked as required in `ExternalFunction`, but its value is `undefined`'
     )
   )
 })
@@ -50,9 +50,9 @@ test('<ExternalFunction permitted children error />', () => {
 
   expect(tree).toMatchSnapshot()
 
-  expect(console.error.mock.calls[0][0]).toEqual(
+  expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Warning: Failed prop type: Invalid prop 'children' supplied to ExternalFunction. Only components AddToCartButton, ReactNode are allowed`
+      `Invalid prop 'children' supplied to ExternalFunction. Only components AddToCartButton, ReactNode are allowed`
     )
   )
 })
