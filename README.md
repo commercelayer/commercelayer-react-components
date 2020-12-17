@@ -115,6 +115,7 @@ This example shows how to use Commerce Layer React Components to implement the "
 import {
   CommerceLayer,
   OrderContainer,
+  OrderStorage,
   ItemContainer,
   PricesContainer,
   Price,
@@ -129,47 +130,48 @@ import {
 // your code [...]
 
 <CommerceLayer accessToken="your-access-token" endpoint="https://yourdomain.commercelayer.io">
-  <OrderContainer
-    persistKey="your-persist-key"
-    attributes={{
-      cart_url: 'https://yourdomain.com/cart',
-      return_url: 'https://yourdomain.com/return',
-      privacy_url: 'https://yourdomain.com/privacy'
-    }}>
-    <ItemContainer>
-      <PricesContainer>
-        <Price skuCode="BABYONBU000000E63E746MXX" />
-      </PricesContainer>
-      <VariantsContainer>
-        <VariantSelector
-          placeholder="Select a size"
-          options={[
-            {
-              label: '6 months',
-              code: 'BABYONBU000000E63E746MXX',
-              lineItem: {
-                name: 'your-item-name',
-                imageUrl: 'https://img.yourdomain.com/your-item-image.png'
+  <OrderStorage persistKey="your-persist-key">
+    <OrderContainer
+      attributes={{
+        cart_url: 'https://yourdomain.com/cart',
+        return_url: 'https://yourdomain.com/return',
+        privacy_url: 'https://yourdomain.com/privacy'
+      }}>
+      <ItemContainer>
+        <PricesContainer>
+          <Price skuCode="BABYONBU000000E63E746MXX" />
+        </PricesContainer>
+        <VariantsContainer>
+          <VariantSelector
+            placeholder="Select a size"
+            options={[
+              {
+                label: '6 months',
+                code: 'BABYONBU000000E63E746MXX',
+                lineItem: {
+                  name: 'your-item-name',
+                  imageUrl: 'https://img.yourdomain.com/your-item-image.png'
+                }
+              },
+              {
+                label: '12 months',
+                code: 'BABYONBU000000E63E7412MX',
+                lineItem: {
+                  name: 'your-item-name',
+                  imageUrl: 'https://img.yourdomain.com/your-item-image.png'
+                }
               }
-            },
-            {
-              label: '12 months',
-              code: 'BABYONBU000000E63E7412MX',
-              lineItem: {
-                name: 'your-item-name',
-                imageUrl: 'https://img.yourdomain.com/your-item-image.png'
-              }
-            }
-          ]}
-        />
-      </VariantsContainer>
-      <QuantitySelector />
-      <AddToCartButton />
-      <AvailabilityContainer>
-        <AvailabilityTemplate />
-      </AvailabilityContainer>
-    </ItemContainer>
-  </OrderContainer>
+            ]}
+          />
+        </VariantsContainer>
+        <QuantitySelector />
+        <AddToCartButton />
+        <AvailabilityContainer>
+          <AvailabilityTemplate />
+        </AvailabilityContainer>
+      </ItemContainer>
+    </OrderContainer>
+  </OrderStorage>
 </CommerceLayer>
 
 // your code [...]
@@ -194,6 +196,7 @@ This example shows how to use Commerce Layer React Components to build a shoppin
 import {
   CommerceLayer,
   OrderContainer,
+  OrderStorage,
   LineItemsContainer,
   LineItemsCount,
   LineItem,
@@ -208,21 +211,23 @@ import {
 // your code [...]
 
 <CommerceLayer accessToken="your-access-token" endpoint="https://yourdomain.commercelayer.io">
-  <OrderContainer persistKey="your-persist-key">
-    <LineItemsContainer>
-      <p className="your-custom-class">
-        Your shopping cart contains <LineItemsCount /> items
-      </p>
-      <LineItem>
-        <LineItemImage width={50} />
-        <LineItemName />
-        <LineItemQuantity max={10} />
-        <Errors resource="lineItem" field="quantity" />
-        <LineItemAmount />
-        <LineItemRemoveLink />
-      </LineItem>
-    </LineItemsContainer>
-  </OrderContainer>
+  <OrderStorage persistKey="your-persist-key">
+      <OrderContainer>
+        <LineItemsContainer>
+          <p className="your-custom-class">
+            Your shopping cart contains <LineItemsCount /> items
+          </p>
+          <LineItem>
+            <LineItemImage width={50} />
+            <LineItemName />
+            <LineItemQuantity max={10} />
+            <Errors resource="lineItem" field="quantity" />
+            <LineItemAmount />
+            <LineItemRemoveLink />
+          </LineItem>
+        </LineItemsContainer>
+      </OrderContainer>
+  </OrderStorage>
 </CommerceLayer>
 
 // your code [...]
@@ -238,6 +243,7 @@ This example shows how to use Commerce Layer React Components to show a sample o
 import {
   CommerceLayer,
   OrderContainer,
+  OrderStorage,
   SubTotalAmount,
   DiscountAmount,
   ShippingAmount,
@@ -250,15 +256,17 @@ import {
 // your code [...]
 
 <CommerceLayer accessToken="your-access-token" endpoint="https://yourdomain.commercelayer.io">
-  <OrderContainer persistKey="your-persist-key">
-    <SubTotalAmount />
-    <DiscountAmount />
-    <ShippingAmount />
-    <TaxesAmount />
-    <GiftCardAmount />
-    <TotalAmount />
-    <CheckoutLink />
-  </OrderContainer>
+  <OrderStorage persistKey="your-persist-key">
+    <OrderContainer>
+      <SubTotalAmount />
+      <DiscountAmount />
+      <ShippingAmount />
+      <TaxesAmount />
+      <GiftCardAmount />
+      <TotalAmount />
+      <CheckoutLink />
+    </OrderContainer>
+  </OrderStorage>
 </CommerceLayer>
 
 // your code [...]
@@ -305,7 +313,8 @@ For each component, the table below shows its props and the list of the permitte
 | `LineItemsContainer`       | `filters`<br />`loader`                                                          | `LineItem`<br />`LineItemsCount`                                                                                                                                                                                     |
 | `LineItemsCount`           | `className`<br />`id`<br />`name`<br />`style`                                   |
 | `MetadataInput`            | `name`<br />`onChange`<br />`placeholder`<br />`type`                            |
-| `OrderContainer`           | `attributes`<br />`clearWhenPlaced`<br />`metadata`<br />`persistKey`            | `CheckoutLink`<br />`DiscountAmount`<br />`GiftCardAmount`<br />`GiftCardContainer`<br />`ItemContainer`<br />`LineItemsContainer`<br />`ShippingAmount`<br />`SubTotalAmount`<br />`TaxesAmount`<br />`TotalAmount` |
+| `OrderContainer`           | `attributes`<br />`metadata`<br />`orderId`                                      | `CheckoutLink`<br />`DiscountAmount`<br />`GiftCardAmount`<br />`GiftCardContainer`<br />`ItemContainer`<br />`LineItemsContainer`<br />`ShippingAmount`<br />`SubTotalAmount`<br />`TaxesAmount`<br />`TotalAmount` |
+| `OrderStore`               | `clearWhenPlaced`<br />`persistKey`                                              | `OrderContainer`                                                                                                                                                                                                     |
 | `Price`                    | `compareClassName`<br />`showCompare`<br />`skuCode`                             |
 | `PricesContainer`          | `filters`<br />`loader`<br />`perPage`<br />`skuCode`                            | `Price`                                                                                                                                                                                                              |
 | `QuantitySelector`         | `disabled`<br />`max`<br />`min`<br />`skuCode`<br />`value`                     |

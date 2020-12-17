@@ -30,7 +30,7 @@ export interface ItemOptions {
 
 export type CustomLineItem = {
   name?: string
-  imageUrl?: string
+  imageUrl?: string | null
 }
 
 export interface CustomLineItems {

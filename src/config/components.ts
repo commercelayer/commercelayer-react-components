@@ -332,14 +332,21 @@ const components = {
     displayName: 'OrderContainer',
     propTypes: {
       children: childrenTypes.isRequired,
-      persistKey: PropTypes.string.isRequired,
       orderId: PropTypes.string,
-      clearWhenPlaced: PropTypes.bool,
       metadata: BMObject,
       attributes: PropTypes.object,
     },
     defaultProps: {
       metadata: {},
+    },
+  },
+  OrderStorage: {
+    permittedChildren: ['OrderContainer', 'ReactNode'],
+    displayName: 'OrderStorage',
+    propTypes: {
+      children: childrenTypes.isRequired,
+      clearWhenPlaced: PropTypes.bool,
+      persistKey: PropTypes.string.isRequired,
     },
   },
   Price: {

@@ -1,6 +1,6 @@
 import CLayer, { OrderCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
-import { setLocalOrder, deleteLocalOrder } from '../utils/localStorage'
+import { SetLocalOrder, DeleteLocalOrder } from '../utils/localStorage'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import baseReducer from '../utils/baseReducer'
 import getErrorsByCollection from '../utils/getErrorsByCollection'
@@ -10,10 +10,11 @@ import { BaseMetadataObject } from '../typings/index'
 import { BaseError } from '../typings/errors'
 
 export interface GetOrderParams {
-  id: string
-  dispatch: Dispatch<OrderActions>
-  config: CommerceLayerConfig
   clearWhenPlaced?: boolean
+  config: CommerceLayerConfig
+  deleteLocalOrder?: DeleteLocalOrder
+  dispatch: Dispatch<OrderActions>
+  id: string
   persistKey?: string
 }
 
@@ -35,6 +36,7 @@ type CreateOrderParams = Pick<
   | 'state'
   | 'orderMetadata'
   | 'orderAttributes'
+  | 'setLocalOrder'
 >
 
 export interface CreateOrder {
@@ -54,6 +56,7 @@ export interface AddToCartParams {
   orderMetadata?: BaseMetadataObject
   orderAttributes?: Record<string, any>
   errors?: BaseError[]
+  setLocalOrder?: SetLocalOrder
 }
 
 export type AddToCartReturn = Promise<{
@@ -129,6 +132,7 @@ export const createOrder: CreateOrder = async (params) => {
     config,
     orderMetadata: metadata,
     orderAttributes = {},
+    setLocalOrder,
   } = params
   if (state.orderId) return state.orderId
   const o = await CLayer.Order.withCredentials(config).create({
@@ -148,12 +152,19 @@ export const createOrder: CreateOrder = async (params) => {
       order: o,
     },
   })
-  setLocalOrder(persistKey, o.id)
+  persistKey && setLocalOrder && setLocalOrder(persistKey, o.id)
   return o.id
 }
 
 export const getApiOrder: GetOrder = async (params) => {
-  const { id, dispatch, config, clearWhenPlaced, persistKey } = params
+  const {
+    id,
+    dispatch,
+    config,
+    clearWhenPlaced,
+    persistKey,
+    deleteLocalOrder,
+  } = params
   try {
     const o = await CLayer.Order.withCredentials(config).find(id)
     if (o)
@@ -162,11 +173,12 @@ export const getApiOrder: GetOrder = async (params) => {
         o.status === 'approved' ||
         o.status === 'cancelled'
       ) {
-        persistKey && deleteLocalOrder(persistKey)
+        persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
         dispatch({
           type: 'setOrder',
           payload: {
             order: null,
+            orderId: '',
           },
         })
       } else {
@@ -178,12 +190,12 @@ export const getApiOrder: GetOrder = async (params) => {
         })
       }
   } catch (col) {
-    // NOTE: Delete orderId if its status is approved
-    persistKey && deleteLocalOrder(persistKey)
+    persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
     dispatch({
       type: 'setOrder',
       payload: {
         order: null,
+        orderId: '',
       },
     })
   }
