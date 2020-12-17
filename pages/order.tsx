@@ -31,6 +31,7 @@ import AvailabilityContainer from '../src/components/AvailabilityContainer'
 import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 import ItemContainer from '../src/components/ItemContainer'
 import Errors from '../src/components/Errors'
+import OrderStorage from 'components/OrderStorage'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 
@@ -97,185 +98,184 @@ export default function Order() {
       <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
-          <OrderContainer
-            persistKey="orderUS"
-            attributes={{ returnUrl: 'https://test.co' }}
-            clearWhenPlaced
-          >
-            <ItemContainer>
-              <div className="md:flex">
-                <div className="md:flex-shrink-0">
-                  <img
-                    className="rounded-lg md:w-56"
-                    src="https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90"
-                  />
-                </div>
-                <div className="mt-4 md:mt-0 md:ml-6">
-                  <h1 className="text-4xl">Tutina da Bambino</h1>
-                  <div className="w-auto m-2">
-                    <PricesContainer skuCode="BABYONBU000000E63E746MXX">
-                      <Price
-                        className="text-green-600 text-2xl m-1"
-                        compareClassName="text-gray-500 text-2xl m-1 line-through"
-                      />
-                    </PricesContainer>
+          <OrderStorage persistKey="orderUS">
+            <OrderContainer attributes={{ returnUrl: 'https://test.co' }}>
+              <ItemContainer>
+                <div className="md:flex">
+                  <div className="md:flex-shrink-0">
+                    <img
+                      className="rounded-lg md:w-56"
+                      src="https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90"
+                    />
                   </div>
-                  <VariantsContainer>
-                    <div className="m-2">
-                      <VariantSelector
-                        id="variant-selector"
-                        className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        name="variant1"
-                        options={[
-                          {
-                            label: '6 months',
-                            code: 'BABYONBU000000E63E746MXX',
-                          },
-                          {
-                            label: '12 months',
-                            code: 'BABYONBU000000E63E7412MX',
-                            lineItem: {
-                              name: 'Darth Vader (12 Months)',
-                              imageUrl:
-                                'https://i.pinimg.com/736x/a5/32/de/a532de337eff9b1c1c4bfb8df73acea4--darth-vader-stencil-darth-vader-head.jpg?b=t',
+                  <div className="mt-4 md:mt-0 md:ml-6">
+                    <h1 className="text-4xl">Tutina da Bambino</h1>
+                    <div className="w-auto m-2">
+                      <PricesContainer skuCode="BABYONBU000000E63E746MXX">
+                        <Price
+                          className="text-green-600 text-2xl m-1"
+                          compareClassName="text-gray-500 text-2xl m-1 line-through"
+                        />
+                      </PricesContainer>
+                    </div>
+                    <VariantsContainer>
+                      <div className="m-2">
+                        <VariantSelector
+                          id="variant-selector"
+                          className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                          name="variant1"
+                          options={[
+                            {
+                              label: '6 months',
+                              code: 'BABYONBU000000E63E746MXX',
                             },
-                          },
-                          {
-                            label: '24 months',
-                            code: 'BABYONBU000000E63E746MXXFAKE',
-                          },
-                        ]}
+                            {
+                              label: '12 months',
+                              code: 'BABYONBU000000E63E7412MX',
+                              lineItem: {
+                                name: 'Darth Vader (12 Months)',
+                                imageUrl:
+                                  'https://i.pinimg.com/736x/a5/32/de/a532de337eff9b1c1c4bfb8df73acea4--darth-vader-stencil-darth-vader-head.jpg?b=t',
+                              },
+                            },
+                            {
+                              label: '24 months',
+                              code: 'BABYONBU000000E63E746MXXFAKE',
+                            },
+                          ]}
+                        />
+                      </div>
+                    </VariantsContainer>
+                    <div className="m-2">
+                      <QuantitySelector
+                        max={12}
+                        id="quantity-selector"
+                        className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                      >
+                        {CustomQuantity}
+                      </QuantitySelector>
+                    </div>
+                    <div className="m-2">
+                      <AddToCartButton className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        {CustomAddToCart}
+                      </AddToCartButton>
+                    </div>
+                    <div className="m-2">
+                      <AvailabilityContainer>
+                        <AvailabilityTemplate showShippingMethodName />
+                      </AvailabilityContainer>
+                    </div>
+                  </div>
+                </div>
+              </ItemContainer>
+              <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
+              <LineItemsContainer>
+                <p className="text-sm m-2">
+                  Your shopping bag contains{' '}
+                  <LineItemsCount id="items-count" className="font-bold" />{' '}
+                  items
+                </p>
+                <div className="flex flex-col p-2">
+                  <LineItem>
+                    <div className="flex justify-around items-center border-b p-5">
+                      <LineItemImage className="p-2" width={80} />
+                      <LineItemName id="line-item-name" className="p-2" />
+                      <LineItemQuantity
+                        id="line-item-quantity"
+                        max={100}
+                        className="p-2"
+                      />
+                      <Errors
+                        className="text-red-700 p-2"
+                        resource="lineItem"
+                        field="quantity"
+                      />
+                      <LineItemAmount id="line-item-total" className="p-2" />
+                      <LineItemRemoveLink
+                        id="line-item-remove"
+                        className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                       />
                     </div>
-                  </VariantsContainer>
-                  <div className="m-2">
-                    <QuantitySelector
-                      max={12}
-                      id="quantity-selector"
-                      className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    >
-                      {CustomQuantity}
-                    </QuantitySelector>
+                  </LineItem>
+                  <LineItem type="gift_cards">
+                    <div className="flex justify-between items-center border-b p-5">
+                      <LineItemImage className="p-2" width={40} />
+                      <LineItemName id="line-item-name" className="p-2" />
+                      <LineItemQuantity
+                        id="line-item-quantity"
+                        max={10}
+                        className="p-2"
+                        disabled
+                      />
+                      <LineItemAmount id="line-item-total" className="p-2" />
+                      <LineItemRemoveLink
+                        id="line-item-remove"
+                        className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                      />
+                    </div>
+                  </LineItem>
+                </div>
+              </LineItemsContainer>
+              <div className="flex flex-col w-1/2 m-auto">
+                <div className="flex items-center p-2 justify-around font-medium text-left">
+                  <div className="w-full">
+                    <p className="text-lg">Subtotal </p>
                   </div>
-                  <div className="m-2">
-                    <AddToCartButton className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                      {CustomAddToCart}
-                    </AddToCartButton>
-                  </div>
-                  <div className="m-2">
-                    <AvailabilityContainer>
-                      <AvailabilityTemplate showShippingMethodName />
-                    </AvailabilityContainer>
+                  <div className="text-right">
+                    <SubTotalAmount />
                   </div>
                 </div>
-              </div>
-            </ItemContainer>
-            <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
-            <LineItemsContainer>
-              <p className="text-sm m-2">
-                Your shopping bag contains{' '}
-                <LineItemsCount id="items-count" className="font-bold" /> items
-              </p>
-              <div className="flex flex-col p-2">
-                <LineItem>
-                  <div className="flex justify-around items-center border-b p-5">
-                    <LineItemImage className="p-2" width={80} />
-                    <LineItemName id="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      id="line-item-quantity"
-                      max={100}
-                      className="p-2"
-                    />
-                    <Errors
-                      className="text-red-700 p-2"
-                      resource="lineItem"
-                      field="quantity"
-                    />
-                    <LineItemAmount id="line-item-total" className="p-2" />
-                    <LineItemRemoveLink
-                      id="line-item-remove"
-                      className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                    />
+                <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                  <div className="w-full">
+                    <p className="text-lg">Discount </p>
                   </div>
-                </LineItem>
-                <LineItem type="gift_cards">
-                  <div className="flex justify-between items-center border-b p-5">
-                    <LineItemImage className="p-2" width={40} />
-                    <LineItemName id="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      id="line-item-quantity"
-                      max={10}
-                      className="p-2"
-                      disabled
-                    />
-                    <LineItemAmount id="line-item-total" className="p-2" />
-                    <LineItemRemoveLink
-                      id="line-item-remove"
-                      className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                    />
+                  <div className="text-right">
+                    <DiscountAmount />
                   </div>
-                </LineItem>
-              </div>
-            </LineItemsContainer>
-            <div className="flex flex-col w-1/2 m-auto">
-              <div className="flex items-center p-2 justify-around font-medium text-left">
-                <div className="w-full">
-                  <p className="text-lg">Subtotal </p>
                 </div>
-                <div className="text-right">
-                  <SubTotalAmount />
+                <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                  <div className="w-full">
+                    <p className="text-lg">Shipping </p>
+                  </div>
+                  <div className="text-right">
+                    <ShippingAmount />
+                  </div>
                 </div>
-              </div>
-              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
-                <div className="w-full">
-                  <p className="text-lg">Discount </p>
+                <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                  <div className="w-full">
+                    <p className="text-lg">
+                      Taxes <span className="text-sm font-tin">(included)</span>
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <TaxesAmount />
+                  </div>
                 </div>
-                <div className="text-right">
-                  <DiscountAmount />
+                <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                  <div className="w-full">
+                    <p className="text-lg">Gift card </p>
+                  </div>
+                  <div className="text-right">
+                    <GiftCardAmount />
+                  </div>
                 </div>
-              </div>
-              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
-                <div className="w-full">
-                  <p className="text-lg">Shipping </p>
-                </div>
-                <div className="text-right">
-                  <ShippingAmount />
-                </div>
-              </div>
-              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
-                <div className="w-full">
-                  <p className="text-lg">
-                    Taxes <span className="text-sm font-tin">(included)</span>
-                  </p>
-                </div>
-                <div className="text-right">
-                  <TaxesAmount />
+                <div className=" flex items-center p-2 justify-around font-bold text-left">
+                  <div className="w-full">
+                    <p className="text-lg mr-2">Total </p>
+                  </div>
+                  <div className="text-right">
+                    <TotalAmount id="total-amount" />
+                  </div>
                 </div>
               </div>
-              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
-                <div className="w-full">
-                  <p className="text-lg">Gift card </p>
-                </div>
-                <div className="text-right">
-                  <GiftCardAmount />
-                </div>
+              <div className="flex justify-center p-2">
+                <CheckoutLink
+                  className="mt-2 primary font-bold py-2 px-4 rounded"
+                  label="Checkout"
+                />
               </div>
-              <div className=" flex items-center p-2 justify-around font-bold text-left">
-                <div className="w-full">
-                  <p className="text-lg mr-2">Total </p>
-                </div>
-                <div className="text-right">
-                  <TotalAmount id="total-amount" />
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-center p-2">
-              <CheckoutLink
-                className="mt-2 primary font-bold py-2 px-4 rounded"
-                label="Checkout"
-              />
-            </div>
-          </OrderContainer>
+            </OrderContainer>
+          </OrderStorage>
         </div>
       </CommerceLayer>
     </Fragment>

@@ -6,9 +6,9 @@ import components from '../src/config/components'
 const propTypes = components.OrderContainer.propTypes
 
 test('<OrderContainer/>', () => {
-  expect.assertions(7)
+  expect.assertions(5)
   const component = renderer.create(
-    <OrderContainer persistKey="unit-test">
+    <OrderContainer>
       <div>test</div>
     </OrderContainer>
   )
@@ -17,15 +17,13 @@ test('<OrderContainer/>', () => {
   const proptypes = root.type['propTypes']
   expect(tree).toMatchSnapshot()
   expect(proptypes.children).toBe(propTypes.children)
-  expect(proptypes.persistKey).toBe(propTypes.persistKey)
   expect(proptypes.metadata).toBe(propTypes.metadata)
-  expect(proptypes.clearWhenPlaced).toBe(propTypes.clearWhenPlaced)
   expect(proptypes.attributes).toBe(propTypes.attributes)
   expect(proptypes.orderId).toBe(propTypes.orderId)
 })
 
 test('<OrderContainer proptypes required />', () => {
-  // expect.assertions(3)
+  expect.assertions(2)
   console.error = jest.fn()
   const component = renderer.create(<OrderContainer />)
   const tree = component.toJSON()
@@ -33,11 +31,6 @@ test('<OrderContainer proptypes required />', () => {
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
       `The prop 'children' is marked as required in 'OrderContainer', but its value is 'undefined'.`
-    )
-  )
-  expect(console.error.mock.calls[1][2]).toEqual(
-    expect.stringContaining(
-      'The prop `persistKey` is marked as required in `OrderContainer`, but its value is `undefined`.'
     )
   )
 })
