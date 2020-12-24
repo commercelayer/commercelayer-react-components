@@ -186,7 +186,7 @@ When you add a product to your shopping cart:
 
 > A common best practice — especially for multi-country ecommerce — is to use as `persistKey` a key containing the country code, so that you have a different shopping cart for each country.
 
-If you need to set some of the [order object](https://docs.commercelayer.io/api/resources/orders/create_order) attributes at the moment of the order creation, pass to the the optional prop `attributes` to the `OrderContainer` component.
+If you need to set some of the [order object](https://docs.commercelayer.io/api/resources/orders/create_order) attributes at the moment of the order creation, pass to the optional prop `attributes` to the `OrderContainer` component.
 
 ## Shopping cart
 
