@@ -8,7 +8,7 @@ export type AllErrorsParams = {
   messages: BaseError[]
   field: string | null
   props: JSX.IntrinsicElements['span']
-  lineItem?: LineItemCollection | {}
+  lineItem?: LineItemCollection | Record<string, any>
   resource?: ResourceErrorType
 }
 

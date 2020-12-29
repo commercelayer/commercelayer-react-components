@@ -24,7 +24,7 @@ type LineItemQuantityProps = {
 } & (JSX.IntrinsicElements['select'] & JSX.IntrinsicElements['span'])
 
 const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = (props) => {
-  const { max = 50, readonly = false } = props
+  const { max = 50, readonly = false, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const { updateLineItem } = useContext(LineItemContext)
   const options: ReactNode[] = []
@@ -48,9 +48,9 @@ const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = (props) => {
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : readonly ? (
-    <span {...props}>{quantity}</span>
+    <span {...p}>{quantity}</span>
   ) : (
-    <select value={quantity} onChange={handleChange} {...props}>
+    <select value={quantity} onChange={handleChange} {...p}>
       {options}
     </select>
   )

@@ -1,6 +1,11 @@
 import _ from 'lodash'
 import { BaseState } from '../typings/index'
 import { ResourceErrorType, BaseError } from '../typings/errors'
+import {
+  AddressField,
+  addressFields,
+  AddressSchema,
+} from '../reducers/AddressReducer'
 
 const EMAIL_PATTERN = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/
 
@@ -28,7 +33,7 @@ export interface ValidateValue {
     name: N,
     type: T,
     resourceType: B
-  ): BaseError | object
+  ): BaseError | Record<string, any>
 }
 
 export const validateValue: ValidateValue = (val, name, type, resourceType) => {
@@ -80,6 +85,20 @@ const validateFormFields: ValidateFormFields = (
     }
   })
   return { errors, values }
+}
+
+export interface FieldsExist {
+  (values: AddressSchema, schema?: AddressField[]): boolean
+}
+
+export const fieldsExist: FieldsExist = (values, schema = addressFields) => {
+  if (!values['business']) {
+    const required = _.without(schema, 'line_2', 'company')
+    return required.length > _.keys(values).length
+  } else {
+    const required = _.without(schema, 'first_name', 'last_name')
+    return required.length > _.keys(values).length
+  }
 }
 
 export default validateFormFields
