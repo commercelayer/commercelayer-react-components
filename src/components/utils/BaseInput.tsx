@@ -1,21 +1,29 @@
-import React, { FunctionComponent } from 'react'
-import {
-  BaseInputComponentPropTypes,
-  BaseInputComponentProps,
-} from '../../typings/index'
+import React, { ForwardRefRenderFunction } from 'react'
+import { BaseInputComponentProps } from '../../typings/index'
 import Parent from './Parent'
 
 export type BaseInputProps = BaseInputComponentProps &
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
 
-const BaseInput: FunctionComponent<BaseInputProps> = (props) => {
+const BaseInput: ForwardRefRenderFunction<any, BaseInputProps> = (
+  props,
+  ref
+) => {
   const { children, ...p } = props
   const input =
-    props.type === 'textarea' ? <textarea {...p} /> : <input {...p} />
-  return children ? <Parent {...p}>{children}</Parent> : input
+    props.type === 'textarea' ? (
+      <textarea ref={ref} {...p} />
+    ) : (
+      <input ref={ref} {...p} />
+    )
+  return children ? (
+    <Parent ref={ref} {...p}>
+      {children}
+    </Parent>
+  ) : (
+    input
+  )
 }
 
-BaseInput.propTypes = BaseInputComponentPropTypes
-
-export default BaseInput
+export default React.forwardRef(BaseInput)

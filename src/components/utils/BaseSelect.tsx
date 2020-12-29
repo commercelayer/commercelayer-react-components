@@ -1,53 +1,46 @@
-import React, { FunctionComponent, useEffect } from 'react'
+import React, { ForwardRefRenderFunction, useEffect } from 'react'
 import Parent from './Parent'
-import {
-  BaseSelectComponentPropTypes,
-  BaseSelectComponentProps,
-} from '../../typings'
+import { BaseSelectComponentProps } from '../../typings'
+import _ from 'lodash'
 
 export type BaseSelectProps = BaseSelectComponentProps
 
-const BaseSelect: FunctionComponent<BaseSelectProps> = (props) => {
+const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (
+  props,
+  ref
+) => {
   const {
     options = [],
     children,
-    placeholder = { label: 'Select a currency', value: '' },
+    placeholder = { label: 'Select an option', value: '' },
     value = '',
     ...p
   } = props
-  useEffect(() => {
-    if (options.indexOf(placeholder) === -1) {
-      options.unshift(placeholder)
-    }
-  }, [])
+  if (_.findIndex(options, placeholder) === -1) {
+    options.unshift(placeholder)
+  } else {
+    options[0] = placeholder
+  }
   const Options = options.map((o, k) => {
+    const { label, ...option } = o
     return (
-      <option key={k} value={o.value}>
-        {o.label}
+      <option key={k} {...option}>
+        {label}
       </option>
     )
   })
   const parentProps = {
     options,
+    ref,
     ...p,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <select defaultValue={value} {...p}>
+    <select ref={ref} defaultValue={value} {...p}>
       {Options}
     </select>
   )
 }
 
-BaseSelect.propTypes = BaseSelectComponentPropTypes
-BaseSelect.defaultProps = {
-  value: '',
-  options: [],
-  placeholder: {
-    label: 'Select a currency',
-    value: '',
-  },
-}
-
-export default BaseSelect
+export default React.forwardRef(BaseSelect)

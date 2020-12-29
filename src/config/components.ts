@@ -11,11 +11,89 @@ import {
   PTLoader,
   BMObject,
   BaseSelectorType,
+  AddressInputName,
+  AddressCountrySelectName,
 } from '../typings'
 import { ErrorPropTypes } from '../typings/errors'
 import { BaseInputComponentPropTypes } from '../typings/index'
 
 const components = {
+  AddressButton: {
+    displayName: 'AddressButton',
+    propTypes: {
+      children: PropTypes.func,
+      label: PropTypes.string,
+    },
+    defaultProps: {
+      label: 'Continue to delivery',
+    },
+  },
+  AddressCountrySelector: {
+    displayName: 'AddressCountrySelector',
+    propTypes: {
+      children: PropTypes.func,
+      placeholder: PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+          .isRequired,
+        selected: PropTypes.bool,
+        disabled: PropTypes.bool,
+      }),
+      value: PropTypes.string,
+      name: PropTypes.oneOf<AddressCountrySelectName>([
+        'billing_address_country_code',
+        'shipping_address_country_code',
+      ]).isRequired,
+      required: PropTypes.bool,
+    },
+    defaultProps: {
+      required: true,
+    },
+  },
+  AddressInput: {
+    displayName: 'AddressInput',
+    propTypes: {
+      children: PropTypes.func,
+      name: PropTypes.oneOf<AddressInputName>([
+        'billing_address_city',
+        'billing_address_company',
+        'customer_email',
+        'billing_address_email',
+        'billing_address_first_name',
+        'billing_address_last_name',
+        'billing_address_line_1',
+        'billing_address_line_2',
+        'billing_address_phone',
+        'billing_address_state_code',
+        'billing_address_zip_code',
+        'shipping_address_city',
+        'shipping_address_company',
+        'shipping_address_email',
+        'shipping_address_first_name',
+        'shipping_address_last_name',
+        'shipping_address_line_1',
+        'shipping_address_line_2',
+        'shipping_address_phone',
+        'shipping_address_state_code',
+        'shipping_address_zip_code',
+      ]).isRequired,
+      type: PropTypes.oneOf<BaseInputType>([
+        'checkbox',
+        'date',
+        'email',
+        'number',
+        'tel',
+        'text',
+        'textarea',
+      ]).isRequired,
+      placeholder: PropTypes.string,
+      disabled: PropTypes.bool,
+      required: PropTypes.bool,
+    },
+    defaultProps: {
+      required: true,
+    },
+  },
   AddToCartButton: {
     displayName: 'AddToCartButton',
     propTypes: {
@@ -30,6 +108,19 @@ const components = {
     },
     defaultProps: {
       label: 'Add to cart',
+    },
+  },
+  AddressesContainer: {
+    displayName: 'AddressesContainer',
+    permittedChildren: [
+      'BillingAddress',
+      'ShippingAddress',
+      'AddressButton',
+      'ReactNode',
+    ],
+    propTypes: {
+      children: childrenTypes.isRequired,
+      shipToDifferentAddress: PropTypes.bool,
     },
   },
   AvailabilityContainer: {

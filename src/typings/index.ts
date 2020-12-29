@@ -1,4 +1,4 @@
-import { Dispatch, ReactNode } from 'react'
+import { Dispatch, ReactNode, RefObject } from 'react'
 import PropTypes, { InferProps, ReactElementLike } from 'prop-types'
 import { BaseError } from './errors'
 
@@ -32,24 +32,24 @@ export const BaseSelectComponentPropTypes = {
   name: PropTypes.string.isRequired,
 }
 
-export interface SelectPlaceholder {
-  label: string
-  value: string | number
-}
+export type SelectPlaceholder = Option
 
 type BaseSelectChildrenComponentProps = Omit<
   BaseSelectComponentProps,
   'children'
 >
 
+type Option = {
+  label: string
+  value: string | number
+  selected?: boolean
+  disabled?: boolean
+}
+
 export interface BaseSelectComponentProps {
   children?: (props: BaseSelectChildrenComponentProps) => ReactNode
-  options: {
-    label: string
-    value: string | number
-    selected?: boolean | null
-  }[]
-  placeholder?: SelectPlaceholder
+  options: Option[]
+  placeholder?: Option
   value?: string
   name: string
 }
@@ -79,6 +79,7 @@ type BaseInputChildrenComponentProps = Omit<
 }
 
 export interface BaseInputComponentProps {
+  ref?: RefObject<any>
   children?: (props: BaseInputChildrenComponentProps) => ReactNode
   name: string
   type: BaseInputType
@@ -89,11 +90,11 @@ export interface BaseInputComponentProps {
 }
 
 export type LineItemType =
-  | 'skus'
   | 'gift_cards'
-  | 'shipments'
   | 'paymentMethods'
   | 'promotions'
+  | 'shipments'
+  | 'skus'
 
 export type GiftCardInputName =
   | 'balanceCents'
@@ -108,12 +109,40 @@ export type GiftCardInputName =
   | 'lastName'
   | 'reference'
 
+export type AddressInputName =
+  | 'billing_address_city'
+  | 'billing_address_company'
+  | 'customer_email'
+  | 'billing_address_first_name'
+  | 'billing_address_email'
+  | 'billing_address_last_name'
+  | 'billing_address_line_1'
+  | 'billing_address_line_2'
+  | 'billing_address_phone'
+  | 'billing_address_state_code'
+  | 'billing_address_zip_code'
+  | 'shipping_address_city'
+  | 'shipping_address_company'
+  | 'shipping_address_email'
+  | 'shipping_address_first_name'
+  | 'shipping_address_last_name'
+  | 'shipping_address_line_1'
+  | 'shipping_address_line_2'
+  | 'shipping_address_phone'
+  | 'shipping_address_state_code'
+  | 'shipping_address_zip_code'
+
+export type AddressCountrySelectName =
+  | 'billing_address_country_code'
+  | 'shipping_address_country_code'
+
 export type BaseInputType =
-  | 'text'
+  | 'checkbox'
+  | 'date'
   | 'email'
   | 'number'
-  | 'date'
-  | 'checkbox'
+  | 'tel'
+  | 'text'
   | 'textarea'
 
 export type LoaderType = string | ReactElementLike
@@ -129,7 +158,7 @@ export type BaseComponent = InferProps<typeof BC>
 
 export interface BaseAction<A = string> {
   type: A
-  payload: object
+  payload: Record<string, any>
 }
 
 export interface BaseState {
@@ -186,6 +215,6 @@ export interface BaseAmountComponent
   format?: BaseFormatPrice
 }
 
-export interface FunctionChildren<P = {}> {
+export interface FunctionChildren<P = Record<string, any>> {
   (props: P): ReactNode
 }
