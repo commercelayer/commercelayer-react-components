@@ -1,6 +1,10 @@
 const config = {
   presets: ['next/babel'],
-  // plugins: ['istanbul'],
+  env: {
+    test: {
+      plugins: ['istanbul'],
+    },
+  },
 }
 if (
   process.env.npm_lifecycle_script &&
@@ -9,4 +13,5 @@ if (
   config.presets = ['@babel/preset-env', '@babel/preset-react']
   console.log('build config 🚀', config)
 }
+
 module.exports = config
