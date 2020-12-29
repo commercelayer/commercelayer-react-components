@@ -9,7 +9,6 @@ import LineItemImage from '../src/components/LineItemImage'
 import LineItemName from '../src/components/LineItemName'
 import LineItemQuantity from '../src/components/LineItemQuantity'
 import LineItemAmount from '../src/components/LineItemAmount'
-import CheckoutLink from '../src/components/CheckoutLink'
 import SubTotalAmount from '../src/components/SubTotalAmount'
 import LineItemsCount from '../src/components/LineItemsCount'
 import TotalAmount from '../src/components/TotalAmount'
@@ -17,7 +16,7 @@ import DiscountAmount from '../src/components/DiscountAmount'
 import ShippingAmount from '../src/components/ShippingAmount'
 import TaxesAmount from '../src/components/TaxesAmount'
 import GiftCardAmount from '../src/components/GiftCardAmount'
-
+import Head from 'next/head'
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 
 export default function Order() {
@@ -31,25 +30,20 @@ export default function Order() {
         endpoint,
         scope: 'market:58',
       })
-      // const token = await getIntegrationToken({
-      //   clientId:
-      //     'b1aa32826ce12ba2f74c59a555e3ed98a7db4ec710b14575b7e97f0a49fb9a4d',
-      //   clientSecret:
-      //     '8fed019759490ba13c482cc2541ef77c6b8d0b3df04db80807110784fbfec021',
-      //   endpoint,
-      //   scope: 'market:58',
-      // })
       if (token) setToken(token.accessToken)
     }
     getToken()
   }, [])
   return (
     <Fragment>
+      <Head>
+        <script src="http://localhost:8097"></script>
+      </Head>
       <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId="JwXQehvvyP">
-            <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
+            <h1 className="text-4xl border-b-2 my-5">Order Summary</h1>
             <LineItemsContainer>
               <p className="text-sm m-2">
                 Your shopping bag contains{' '}
@@ -135,12 +129,6 @@ export default function Order() {
                   <TotalAmount id="total-amount" />
                 </div>
               </div>
-            </div>
-            <div className="flex justify-center p-2">
-              <CheckoutLink
-                className="mt-2 primary font-bold py-2 px-4 rounded"
-                label="Checkout"
-              />
             </div>
           </OrderContainer>
         </div>

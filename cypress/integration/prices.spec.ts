@@ -5,7 +5,6 @@ describe('Prices', () => {
   const filename = 'prices'
 
   before(() => {
-    cy.server()
     cy.setRoutes({
       endpoint: Cypress.env('apiEndpoint'),
       routes: Cypress.env('requests'),

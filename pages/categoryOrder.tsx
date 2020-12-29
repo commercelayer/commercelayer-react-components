@@ -47,7 +47,7 @@ export default function Order() {
       <Nav links={['/']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
-          <OrderContainer persistKey="orderUS">
+          <OrderContainer>
             <ItemContainer>
               <PriceContainer>
                 <div className="w-full md:flex md:flex-row justify-between">
@@ -68,14 +68,20 @@ export default function Order() {
                         BABYONBU000000E63E746MXX
                       </p>
                     </div>
-                    <div className="pt-2 text-center">
+                    <div
+                      data-cy="price-BABYONBU000000E63E746MXX"
+                      className="pt-2 text-center"
+                    >
                       <Price
                         skuCode="BABYONBU000000E63E746MXX"
                         className="text-green-600 text-xl m-1"
                         compareClassName="text-gray-600 text-xl m-1 line-through font-light"
                       />
                     </div>
-                    <div className="pt-2">
+                    <div
+                      data-cy="quantity-selector-BABYONBU000000E63E746MXX"
+                      className="pt-2"
+                    >
                       <QuantitySelector
                         className="w-2/3 mx-auto block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         skuCode="BABYONBU000000E63E746MXX"
@@ -119,6 +125,7 @@ export default function Order() {
                     </div>
                     <div className="pt-2">
                       <QuantitySelector
+                        data-cy="quantity-selector-LSLEEVMMFFFFFF000000LXXX"
                         className="w-2/3 mx-auto block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         skuCode="LSLEEVMMFFFFFF000000LXXX"
                       />
