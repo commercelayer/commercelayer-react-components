@@ -1,7 +1,7 @@
 const config = {
   presets: ['next/babel'],
   env: {
-    test: {
+    testCypress: {
       plugins: ['istanbul'],
     },
   },

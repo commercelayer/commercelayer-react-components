@@ -10,7 +10,7 @@ import ShippingAddressContext from '../context/ShippingAddressContext'
 import _ from 'lodash'
 import { BaseError, CodeErrorType } from '../typings/errors'
 import { AddressField } from 'reducers/AddressReducer'
-import { AddressInputName } from 'typings'
+import { AddressCountrySelectName, AddressInputName } from 'typings'
 
 type ShippingAddressProps = {
   children: ReactNode
@@ -48,7 +48,10 @@ const ShippingAddress: FunctionComponent<ShippingAddressProps> = (props) => {
       setAddress({ values, resource: 'shippingAddress' })
     }
   }, [values, errors])
-  const setValue = (name: AddressField | AddressInputName, value: any) => {
+  const setValue = (
+    name: AddressField | AddressInputName | AddressCountrySelectName,
+    value: any
+  ) => {
     const field: any = {
       [name.replace('shipping_address_', '')]: value,
     }

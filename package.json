@@ -10,8 +10,8 @@
     "README.md"
   ],
   "scripts": {
-    "test:cypress:open": "NODE_ENV='test' npm run dev & cypress open",
-    "test:cypress:record": "NODE_ENV='test' npm run dev & cypress open --env RECORD=1",
+    "test:cypress:open": "NODE_ENV='testCypress' npm run dev & cypress open",
+    "test:cypress:record": "NODE_ENV='testCypress' npm run dev & cypress open --env RECORD=1",
     "test:cypress:clear": "cypress cache clear",
     "test:coverage": "tsdx test --coverage",
     "test:watch": "tsdx test --watch",

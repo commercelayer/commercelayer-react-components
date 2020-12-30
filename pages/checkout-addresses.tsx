@@ -67,7 +67,6 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      value="ale"
                       data-cy="input_customer_email"
                       name="customer_email"
                       type="email"

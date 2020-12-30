@@ -10,7 +10,7 @@ import BillingAddressContext from '../context/BillingAddressContext'
 import _ from 'lodash'
 import { BaseError, CodeErrorType } from '../typings/errors'
 import { AddressField } from '../reducers/AddressReducer'
-import { AddressInputName } from 'typings'
+import { AddressCountrySelectName, AddressInputName } from 'typings'
 
 type BillingAddressProps = {
   children: ReactNode
@@ -35,7 +35,6 @@ const BillingAddress: FunctionComponent<BillingAddressProps> = (props) => {
       }
       !_.isEmpty(formErrors) && setAddressErrors(formErrors)
     } else if (!_.isEmpty(values)) {
-      debugger
       setAddressErrors([])
       for (const name in values) {
         const field = values[name]
@@ -47,7 +46,10 @@ const BillingAddress: FunctionComponent<BillingAddressProps> = (props) => {
       setAddress({ values, resource: 'billingAddress' })
     }
   }, [errors, values])
-  const setValue = (name: AddressField | AddressInputName, value: any) => {
+  const setValue = (
+    name: AddressField | AddressInputName | AddressCountrySelectName,
+    value: any
+  ) => {
     const field: any = {
       [name.replace('billing_address_', '')]: value,
     }
