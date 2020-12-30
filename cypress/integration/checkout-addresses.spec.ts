@@ -22,8 +22,6 @@ describe('Customer Addresses', () => {
   })
 
   beforeEach(() => {
-    cy.get('[data-cy="input_customer_email"]').as('customerEmail')
-
     // Billing Address fields
     cy.get('[data-cy="input_billing_address_first_name"]').as(
       'billingFirstName'
@@ -69,7 +67,6 @@ describe('Customer Addresses', () => {
   })
   it('Checking default fields', () => {
     cy.wait(['@token', '@getOrders'])
-    cy.get('@customerEmail').should('contain.value', '')
     cy.get('@billingFirstName').should('contain.value', '')
     cy.get('@billingLastName').should('contain.value', '')
     cy.get('@billingLine1').should('contain.value', '')
@@ -87,19 +84,6 @@ describe('Customer Addresses', () => {
   })
 
   it('Filling fields', () => {
-    cy.get('@customerEmail').type('a')
-    cy.get('[data-cy="error_customer_email"]').should(
-      'contain.text',
-      'Must be valid email'
-    )
-    cy.get('@customerEmail').type('{backspace}')
-    cy.get('[data-cy="error_customer_email"]').should(
-      'contain.text',
-      `Can't be blank`
-    )
-    cy.get('@customerEmail')
-      .type(euAddress.customer_email)
-      .should('have.value', euAddress.customer_email)
     cy.get('@billingFirstName').type('a').type('{backspace}')
     cy.get('[data-cy="error_billing_address_first_name"]').should(
       'contain.text',

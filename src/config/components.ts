@@ -18,11 +18,12 @@ import { ErrorPropTypes } from '../typings/errors'
 import { BaseInputComponentPropTypes } from '../typings/index'
 
 const components = {
-  AddressButton: {
-    displayName: 'AddressButton',
+  SaveAddressesButton: {
+    displayName: 'SaveAddressesButton',
     propTypes: {
       children: PropTypes.func,
       label: PropTypes.string,
+      onClick: PropTypes.func,
     },
     defaultProps: {
       label: 'Continue to delivery',
@@ -115,7 +116,7 @@ const components = {
     permittedChildren: [
       'BillingAddress',
       'ShippingAddress',
-      'AddressButton',
+      'SaveAddressesButton',
       'ReactNode',
     ],
     propTypes: {

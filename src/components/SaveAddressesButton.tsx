@@ -5,23 +5,24 @@ import { FunctionChildren } from '../typings/index'
 import AddressContext from '../context/AddressContext'
 import _ from 'lodash'
 import { fieldsExist } from '../utils/validateFormFields'
-import { addressFields } from '../reducers/AddressReducer'
 
-const propTypes = components.AddressButton.propTypes
-const defaultProps = components.AddressButton.defaultProps
-const displayName = components.AddressButton.displayName
+const propTypes = components.SaveAddressesButton.propTypes
+const defaultProps = components.SaveAddressesButton.defaultProps
+const displayName = components.SaveAddressesButton.displayName
 
-type AddressButtonChildrenProps = FunctionChildren<
-  Omit<AddressButtonProps, 'children'>
+type SaveAddressesButtonChildrenProps = FunctionChildren<
+  Omit<SaveAddressesButtonProps, 'children'>
 >
 
-type AddressButtonProps = {
-  children?: AddressButtonChildrenProps
+type SaveAddressesButtonProps = {
+  children?: SaveAddressesButtonChildrenProps
   label?: string
   onClick?: () => void
 } & JSX.IntrinsicElements['button']
 
-const AddressButton: FunctionComponent<AddressButtonProps> = (props) => {
+const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
+  props
+) => {
   const {
     children,
     label = 'Continue to delivery',
@@ -45,18 +46,12 @@ const AddressButton: FunctionComponent<AddressButtonProps> = (props) => {
   if (_.isEmpty(errors) && !_.isEmpty(billingAddress)) {
     disable = billingAddress && fieldsExist(billingAddress)
   }
-  if (
-    _.isEmpty(errors) &&
-    shipToDifferentAddress
-    // !_.isEmpty(shippingAddress)
-  ) {
-    disable =
-      shippingAddress &&
-      fieldsExist(shippingAddress, _.without(addressFields, 'customer_email'))
+  if (_.isEmpty(errors) && shipToDifferentAddress) {
+    disable = shippingAddress ? fieldsExist(shippingAddress) : true
   }
-  const handleClick = () => {
+  const handleClick = async () => {
     if (_.isEmpty(errors) && !disable) {
-      saveAddresses()
+      await saveAddresses()
       onClick && onClick()
     }
   }
@@ -76,8 +71,8 @@ const AddressButton: FunctionComponent<AddressButtonProps> = (props) => {
   )
 }
 
-AddressButton.propTypes = propTypes
-AddressButton.defaultProps = defaultProps
-AddressButton.displayName = displayName
+SaveAddressesButton.propTypes = propTypes
+SaveAddressesButton.defaultProps = defaultProps
+SaveAddressesButton.displayName = displayName
 
-export default AddressButton
+export default SaveAddressesButton

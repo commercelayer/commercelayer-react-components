@@ -166,7 +166,9 @@ export const getApiOrder: GetOrder = async (params) => {
     deleteLocalOrder,
   } = params
   try {
-    const o = await CLayer.Order.withCredentials(config).find(id)
+    const o = await CLayer.Order.withCredentials(config)
+      .includes('billingAddress', 'shippingAddress')
+      .find(id)
     if (o)
       if (
         (clearWhenPlaced && o.status === 'placed') ||
