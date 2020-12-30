@@ -3,8 +3,6 @@ import AddressesContext, {
 } from '../context/AddressContext'
 import React, {
   FunctionComponent,
-  // useReducer,
-  // useContext,
   ReactNode,
   useContext,
   useEffect,
@@ -14,16 +12,15 @@ import addressReducer, {
   addressInitialState,
   AddressSchema,
   SetAddressParams,
-} from 'reducers/AddressReducer'
-// import OrderContext from '../context/OrderContext'
-// import components from '../config/components'
+} from '../reducers/AddressReducer'
 import { BaseError } from '../typings/errors'
 import OrderContext from '../context/OrderContext'
 import CommerceLayerContext from '../context/CommerceLayerContext'
 import { saveAddresses } from '../reducers/AddressReducer'
+import components from '../config/components'
 
-// const propTypes = components.AddressesContainer.propTypes
-// const displayName = components.AddressesContainer.displayName
+const propTypes = components.AddressesContainer.propTypes
+const displayName = components.AddressesContainer.displayName
 
 export type AddressesContainer = {
   children: ReactNode
@@ -34,7 +31,6 @@ const AddressesContainer: FunctionComponent<AddressesContainer> = (props) => {
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
   const { order, orderId, getOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
-  // TODO Save attribute shipToDifferentAddress on state
   useEffect(() => {
     dispatch({
       type: 'setShipToDifferentAddress',
@@ -66,7 +62,7 @@ const AddressesContainer: FunctionComponent<AddressesContainer> = (props) => {
   )
 }
 
-// AddressesContainer.propTypes = propTypes
-// AddressesContainer.displayName = displayName
+AddressesContainer.propTypes = propTypes
+AddressesContainer.displayName = displayName
 
 export default AddressesContainer

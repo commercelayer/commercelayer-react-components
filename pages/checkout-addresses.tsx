@@ -60,10 +60,22 @@ export default function Main() {
         setBillingAddress({
           firstName: billing.firstName,
           lastName: billing.lastName,
+          line1: billing.line1,
+          city: billing.city,
+          countryCode: billing.countryCode,
+          stateCode: billing.stateCode,
+          zipCode: billing.zipCode,
+          phone: billing.phone,
         })
         setShippingAddress({
           firstName: shipping.firstName,
           lastName: shipping.lastName,
+          line1: shipping.line1,
+          city: shipping.city,
+          countryCode: shipping.countryCode,
+          stateCode: shipping.stateCode,
+          zipCode: shipping.zipCode,
+          phone: shipping.phone,
         })
       } catch (error) {
         console.error(error)
@@ -526,12 +538,12 @@ export default function Main() {
                 />
               </div>
             </AddressesContainer>
-            <pre>{`Current billing address: ${JSON.stringify(
+            <pre data-cy="current-billing-address">{`Current billing address: ${JSON.stringify(
               billingAddress,
               null,
               2
             )}`}</pre>
-            <pre>{`Current shipping address: ${JSON.stringify(
+            <pre data-cy="current-billing-address">{`Current shipping address: ${JSON.stringify(
               shippingAddress,
               null,
               2
