@@ -112,7 +112,6 @@ export type GiftCardInputName =
 export type AddressInputName =
   | 'billing_address_city'
   | 'billing_address_company'
-  | 'customer_email'
   | 'billing_address_first_name'
   | 'billing_address_email'
   | 'billing_address_last_name'

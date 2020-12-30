@@ -9,14 +9,18 @@ import AddressInput from 'components/AddressInput'
 import Head from 'next/head'
 import Errors from 'components/Errors'
 import AddressCountrySelector from 'components/AddressCountrySelector'
-import AddressButton from 'components/AddressButton'
+import SaveAddressesButton from 'components/SaveAddressesButton'
 import ShippingAddress from 'components/ShippingAddress'
+import { Order } from '@commercelayer/js-sdk'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
+const orderId = 'JwXQehvvyP'
 
 export default function Main() {
   const [token, setToken] = useState('')
   const [shipToDifferentAddress, setShipToDifferentAddress] = useState(false)
+  const [billingAddress, setBillingAddress] = useState({})
+  const [shippingAddress, setShippingAddress] = useState({})
   useEffect(() => {
     const getToken = async () => {
       // @ts-ignore
@@ -44,6 +48,28 @@ export default function Main() {
       message: `Must be valid email`,
     },
   ]
+  const handleClick = async () => {
+    if (token) {
+      const config = { accessToken: token, endpoint }
+      try {
+        const order = await Order.withCredentials(config)
+          .includes('billingAddress', 'shippingAddress')
+          .find(orderId)
+        const billing: any = order.billingAddress()
+        const shipping: any = order.shippingAddress()
+        setBillingAddress({
+          firstName: billing.firstName,
+          lastName: billing.lastName,
+        })
+        setShippingAddress({
+          firstName: shipping.firstName,
+          lastName: shipping.lastName,
+        })
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  }
   return (
     <Fragment>
       <Head>
@@ -52,37 +78,12 @@ export default function Main() {
       <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
-          <OrderContainer orderId="JwXQehvvyP">
+          <OrderContainer orderId={orderId}>
             <AddressesContainer shipToDifferentAddress={shipToDifferentAddress}>
               <h3 className="text-lg font-medium leading-6 text-gray-900 bg-gray-50 p-2 mb-3 shadow rounded-sm">
                 Billing Address
               </h3>
               <BillingAddress autoComplete="on" className="p-2">
-                <div>
-                  <label
-                    htmlFor="customer_email"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Email
-                  </label>
-                  <div className="mt-1">
-                    <AddressInput
-                      data-cy="input_customer_email"
-                      name="customer_email"
-                      type="email"
-                      className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
-                    <Errors
-                      data-cy="error_customer_email"
-                      resource="billingAddress"
-                      field="customer_email"
-                      messages={messages}
-                    />
-                  </p>
-                </div>
                 <div>
                   <label
                     htmlFor="billing_address_first_name"
@@ -500,7 +501,6 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      value="38974329"
                       data-cy="input_shipping_address_phone"
                       name="shipping_address_phone"
                       type="tel"
@@ -519,12 +519,23 @@ export default function Main() {
                 </div>
               </ShippingAddress>
               <div className="mt-5 p-2">
-                <AddressButton
+                <SaveAddressesButton
                   data-cy="save-addresses-button"
                   className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                  onClick={handleClick}
                 />
               </div>
             </AddressesContainer>
+            <pre>{`Current billing address: ${JSON.stringify(
+              billingAddress,
+              null,
+              2
+            )}`}</pre>
+            <pre>{`Current shipping address: ${JSON.stringify(
+              shippingAddress,
+              null,
+              2
+            )}`}</pre>
           </OrderContainer>
         </div>
       </CommerceLayer>

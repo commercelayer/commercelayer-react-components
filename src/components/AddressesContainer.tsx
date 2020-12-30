@@ -7,6 +7,7 @@ import React, {
   // useContext,
   ReactNode,
   useContext,
+  useEffect,
   useReducer,
 } from 'react'
 import addressReducer, {
@@ -33,15 +34,23 @@ const AddressesContainer: FunctionComponent<AddressesContainer> = (props) => {
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
   const { order, orderId, getOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
+  // TODO Save attribute shipToDifferentAddress on state
+  useEffect(() => {
+    dispatch({
+      type: 'setShipToDifferentAddress',
+      payload: {
+        shipToDifferentAddress,
+      },
+    })
+  }, [shipToDifferentAddress])
   const contextValue = {
     ...state,
-    shipToDifferentAddress,
     setAddressErrors: (errors: BaseError[]) =>
       defaultAddressContext['setAddressErrors'](errors, state, dispatch),
     setAddress: (params: SetAddressParams<AddressSchema>) =>
       defaultAddressContext['setAddress']({ ...params, dispatch }),
-    saveAddresses: (): void =>
-      saveAddresses({
+    saveAddresses: async (): Promise<void> =>
+      await saveAddresses({
         config,
         dispatch,
         getOrder,

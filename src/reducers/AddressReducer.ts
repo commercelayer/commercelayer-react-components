@@ -4,13 +4,15 @@ import { BaseError } from '../typings/errors'
 import { CommerceLayerConfig } from '../context/CommerceLayerContext'
 import { Address, Order, OrderCollection } from '@commercelayer/js-sdk'
 
-export type AddressActionType = 'setErrors' | 'setAddress'
+export type AddressActionType =
+  | 'setErrors'
+  | 'setAddress'
+  | 'setShipToDifferentAddress'
 
 export type AddressField =
   | 'city'
   | 'company'
   | 'country_code'
-  | 'customer_email'
   | 'first_name'
   | 'last_name'
   | 'line_1'
@@ -23,7 +25,6 @@ export const addressFields: AddressField[] = [
   'city',
   'company',
   'country_code',
-  'customer_email',
   'first_name',
   'last_name',
   'line_1',
@@ -41,11 +42,10 @@ export interface AddressActionPayload {
   errors: BaseError[]
   billingAddress: AddressSchema
   shippingAddress: AddressSchema
+  shipToDifferentAddress: boolean
 }
 
-export type AddressState = Partial<AddressActionPayload> & {
-  shipToDifferentAddress?: boolean
-}
+export type AddressState = Partial<AddressActionPayload>
 
 export interface AddressAction {
   type: AddressActionType
@@ -82,7 +82,7 @@ export interface SaveAddresses {
     config: CommerceLayerConfig
     state: AddressState
     dispatch: Dispatch<AddressAction>
-  }): void
+  }): Promise<void>
 }
 
 export const setAddressErrors: SetAddressErrors = (errors, state, dispatch) => {
@@ -116,24 +116,22 @@ export const saveAddresses: SaveAddresses = async ({
   const { shipToDifferentAddress, billingAddress, shippingAddress } = state
   try {
     if (billingAddress) {
-      const { customer_email: customerEmail, ...billingFields } = billingAddress
       const billing =
         billingAddress &&
-        (await Address.withCredentials(config).create(billingFields))
+        (await Address.withCredentials(config).create(billingAddress))
       const o =
         order ||
         (orderId && (await Order.withCredentials(config).find(orderId)))
-      const updateObj = {
+      const updateObj: any = {
         billingAddress: billing,
         _shippingAddressSameAsBilling: true,
-        customerEmail,
       }
       if (shipToDifferentAddress) {
         const shipping =
           shippingAddress &&
           (await Address.withCredentials(config).create(shippingAddress))
         updateObj['shippingAddress'] = shipping
-        updateObj._shippingAddressSameAsBilling = false
+        delete updateObj._shippingAddressSameAsBilling
       }
       if (o && getOrder) {
         const patchOrder = await o.withCredentials(config).update(updateObj)
@@ -145,7 +143,11 @@ export const saveAddresses: SaveAddresses = async ({
   }
 }
 
-const type: AddressActionType[] = ['setErrors', 'setAddress']
+const type: AddressActionType[] = [
+  'setErrors',
+  'setAddress',
+  'setShipToDifferentAddress',
+]
 
 const addressReducer = (
   state: AddressState,

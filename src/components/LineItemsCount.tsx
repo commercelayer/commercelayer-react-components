@@ -16,7 +16,7 @@ const displayName = components.LineItemsCount.displayName
 
 type LineItemsCountChildrenProps = FunctionChildren<
   Omit<LineItemsCountProps, 'children'> & {
-    qunatity: number
+    quantity: number
   }
 >
 

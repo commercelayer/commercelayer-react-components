@@ -40,7 +40,7 @@ const BillingAddress: FunctionComponent<BillingAddressProps> = (props) => {
         const field = values[name]
         if (field?.value) {
           values[name.replace('billing_address_', '')] = field.value
-          name !== 'customer_email' && delete values[name]
+          delete values[name]
         }
       }
       setAddress({ values, resource: 'billingAddress' })
