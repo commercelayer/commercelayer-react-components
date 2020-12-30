@@ -9,7 +9,7 @@ import React, {
 import ShippingAddressContext from '../context/ShippingAddressContext'
 import _ from 'lodash'
 import { BaseError, CodeErrorType } from '../typings/errors'
-import { AddressField } from 'reducers/AddressReducer'
+import { AddressField } from '../reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from 'typings'
 
 type ShippingAddressProps = {
