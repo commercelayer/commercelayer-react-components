@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import childrenTypes from '../utils/childrenTypes'
+import childrenTypes from '@utils/childrenTypes'
 import {
   TimeFormat,
   BaseInputType,
@@ -13,22 +13,11 @@ import {
   BaseSelectorType,
   AddressInputName,
   AddressCountrySelectName,
-} from '../typings'
-import { ErrorPropTypes } from '../typings/errors'
-import { BaseInputComponentPropTypes } from '../typings/index'
+} from '@typings'
+import { ErrorPropTypes } from '@typings/errors'
+import { BaseInputComponentPropTypes } from '@typings/index'
 
 const components = {
-  SaveAddressesButton: {
-    displayName: 'SaveAddressesButton',
-    propTypes: {
-      children: PropTypes.func,
-      label: PropTypes.string,
-      onClick: PropTypes.func,
-    },
-    defaultProps: {
-      label: 'Continue to delivery',
-    },
-  },
   AddressCountrySelector: {
     displayName: 'AddressCountrySelector',
     propTypes: {
@@ -37,8 +26,6 @@ const components = {
         label: PropTypes.string.isRequired,
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
           .isRequired,
-        selected: PropTypes.bool,
-        disabled: PropTypes.bool,
       }),
       value: PropTypes.string,
       name: PropTypes.oneOf<AddressCountrySelectName>([
@@ -58,7 +45,6 @@ const components = {
       name: PropTypes.oneOf<AddressInputName>([
         'billing_address_city',
         'billing_address_company',
-        'customer_email',
         'billing_address_email',
         'billing_address_first_name',
         'billing_address_last_name',
@@ -409,6 +395,7 @@ const components = {
   },
   OrderContainer: {
     permittedChildren: [
+      'AddressesContainer',
       'ItemContainer',
       'LineItemsContainer',
       'SubTotalAmount',
@@ -482,6 +469,17 @@ const components = {
     },
     defaultProps: {
       min: 1,
+    },
+  },
+  SaveAddressesButton: {
+    displayName: 'SaveAddressesButton',
+    propTypes: {
+      children: PropTypes.func,
+      label: PropTypes.string,
+      onClick: PropTypes.func,
+    },
+    defaultProps: {
+      label: 'Continue to delivery',
     },
   },
   ShippingAmount: {

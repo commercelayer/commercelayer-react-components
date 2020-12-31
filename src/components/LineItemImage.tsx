@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useContext, ReactNode } from 'react'
 import Parent from './utils/Parent'
-import LineItemChildrenContext from '../context/LineItemChildrenContext'
-import components from '../config/components'
+import LineItemChildrenContext from '@context/LineItemChildrenContext'
+import components from '@config/components'
 
 const propTypes = components.LineItemImage.propTypes
 const displayName = components.LineItemImage.displayName

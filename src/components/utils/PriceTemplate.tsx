@@ -1,5 +1,5 @@
 import React, { Fragment, FunctionComponent } from 'react'
-import { PriceProps } from '../Price'
+import { PriceProps } from '@Price'
 import PropTypes from 'prop-types'
 
 const propTypes = {

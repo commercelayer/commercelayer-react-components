@@ -2,7 +2,7 @@
 // import PropTypes from 'prop-types'
 // import { FunctionComponent } from 'react'
 // import BaseInput from './utils/BaseInput'
-// import { BaseComponent } from '../typings/index'
+// import { BaseComponent } from '@typings/index'
 
 // type NameType =
 //   | 'email'

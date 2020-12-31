@@ -4,9 +4,9 @@ import React, {
   useContext,
   ReactNode,
 } from 'react'
-import SkuOptionChildrenContext from '../context/SkuOptionChildrenContext'
-import SkuOptionsContext from '../context/SkuOptionsContext'
-import components from '../config/components'
+import SkuOptionChildrenContext from '@context/SkuOptionChildrenContext'
+import SkuOptionsContext from '@context/SkuOptionsContext'
+import components from '@config/components'
 
 const propTypes = components.SkuOption.propTypes
 const displayName = components.SkuOption.displayName

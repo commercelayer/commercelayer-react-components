@@ -1,6 +1,6 @@
 import React, { FunctionComponent, ReactNode } from 'react'
-import CommerceLayerContext from '../context/CommerceLayerContext'
-import components from '../config/components'
+import CommerceLayerContext from '@context/CommerceLayerContext'
+import components from '@config/components'
 
 const propTypes = components.CommerceLayer.propTypes
 

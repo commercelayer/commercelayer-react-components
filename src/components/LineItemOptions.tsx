@@ -4,10 +4,10 @@ import React, {
   Fragment,
   ReactNode,
 } from 'react'
-import LineItemChildrenContext from '../context/LineItemChildrenContext'
-import LineItemOptionChildrenContext from '../context/LineItemOptionChildrenContext'
+import LineItemChildrenContext from '@context/LineItemChildrenContext'
+import LineItemOptionChildrenContext from '@context/LineItemOptionChildrenContext'
 import _ from 'lodash'
-import components from '../config/components'
+import components from '@config/components'
 import { LineItemOptionCollection } from '@commercelayer/js-sdk'
 
 const propTypes = components.LineItemOptions.propTypes

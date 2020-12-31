@@ -7,7 +7,7 @@ import React, {
 import ItemContext, {
   initialItemContext,
   InitItemContext,
-} from '../context/ItemContext'
+} from '@context/ItemContext'
 import itemReducer, {
   itemInitialState,
   setItemState,
@@ -16,10 +16,10 @@ import itemReducer, {
   ItemOptions,
   CustomLineItems,
   CustomLineItem,
-} from '../reducers/ItemReducer'
-import { ItemPrices } from '../reducers/ItemReducer'
-import components from '../config/components'
-import { BFSetStateContainer } from '../typings'
+} from '@reducers/ItemReducer'
+import { ItemPrices } from '@reducers/ItemReducer'
+import components from '@config/components'
+import { BFSetStateContainer } from '@typings'
 
 const propTypes = components.ItemContainer.propTypes
 const displayName = components.ItemContainer.displayName

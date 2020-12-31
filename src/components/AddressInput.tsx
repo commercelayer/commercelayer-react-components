@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useContext, useEffect } from 'react'
 import BaseInput from './utils/BaseInput'
-import components from '../config/components'
-import { BaseInputComponentProps, AddressInputName } from '../typings'
-import BillingAddressContext from '../context/BillingAddressContext'
-import ShippingAddressContext from '../context/ShippingAddressContext'
+import components from '@config/components'
+import { BaseInputComponentProps, AddressInputName } from '@typings'
+import BillingAddressContext from '@context/BillingAddressContext'
+import ShippingAddressContext from '@context/ShippingAddressContext'
 
 const propTypes = components.AddressInput.propTypes
 const displayName = components.AddressInput.displayName

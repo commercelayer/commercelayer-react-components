@@ -4,11 +4,11 @@ import React, {
   useEffect,
   useContext,
 } from 'react'
-import getAmount from '../utils/getAmount'
-import LineItemChildrenContext from '../context/LineItemChildrenContext'
+import getAmount from '@utils/getAmount'
+import LineItemChildrenContext from '@context/LineItemChildrenContext'
 import Parent from './utils/Parent'
-import components from '../config/components'
-import { BaseAmountComponent, BasePriceType } from '../typings/index'
+import components from '@config/components'
+import { BaseAmountComponent, BasePriceType } from '@typings/index'
 
 const propTypes = components.LineItemAmount.propTypes
 const defaultProps = components.LineItemAmount

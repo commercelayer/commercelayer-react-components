@@ -1,15 +1,15 @@
 import React, { FunctionComponent, useContext, PropsWithoutRef } from 'react'
 import Parent from './utils/Parent'
-import OrderContext from '../context/OrderContext'
+import OrderContext from '@context/OrderContext'
 import _ from 'lodash'
-import ItemContext from '../context/ItemContext'
-import getCurrentItemKey from '../utils/getCurrentItemKey'
-import components from '../config/components'
-import { FunctionChildren } from '../typings/index'
-import { AddToCartReturn } from 'reducers/OrderReducer'
-import SkuListsContext from '../context/SkuListsContext'
-import ExternalFunctionContext from '../context/ExternalFunctionContext'
-import { VariantOptions } from '../../dist/components/VariantSelector'
+import ItemContext from '@context/ItemContext'
+import getCurrentItemKey from '@utils/getCurrentItemKey'
+import components from '@config/components'
+import { FunctionChildren } from '@typings/index'
+import { AddToCartReturn } from '@reducers/OrderReducer'
+import SkuListsContext from '@context/SkuListsContext'
+import ExternalFunctionContext from '@context/ExternalFunctionContext'
+import { VariantOptions } from '@components/VariantSelector'
 
 const propTypes = components.AddToCartButton.propTypes
 const defaultProps = components.AddToCartButton.defaultProps
@@ -89,23 +89,24 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
           },
         })
           .then((res) => {
-            getOrder && getOrder(orderId)
+            getOrder && orderId && getOrder(orderId)
             return res
           })
           .catch(({ response }) => {
-            setOrderErrors(response['data'])
+            setOrderErrors && setOrderErrors(response['data'])
             return response
           })
       }
     }
     return !url
-      ? addToCart({
-          skuCode: sCode,
-          skuId: item[sCode]?.id,
-          quantity: qty,
-          option: opt,
-          lineItem: customLineItem,
-        })
+      ? addToCart &&
+          addToCart({
+            skuCode: sCode,
+            skuId: item[sCode]?.id,
+            quantity: qty,
+            option: opt,
+            lineItem: customLineItem,
+          })
       : callExternalFunction({
           url,
           data: {
@@ -117,11 +118,11 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
           },
         })
           .then((res) => {
-            getOrder && getOrder(orderId)
+            getOrder && orderId && getOrder(orderId)
             return res
           })
           .catch(({ response }) => {
-            setOrderErrors(response['data'])
+            setOrderErrors && setOrderErrors(response['data'])
             return response
           })
   }

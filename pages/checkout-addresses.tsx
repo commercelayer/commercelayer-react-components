@@ -1,16 +1,18 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getSalesChannelToken } from '@commercelayer/js-auth'
-import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
-import OrderContainer from '../src/components/OrderContainer'
-import AddressesContainer from 'components/AddressesContainer'
-import BillingAddress from 'components/BillingAddress'
-import AddressInput from 'components/AddressInput'
 import Head from 'next/head'
-import Errors from 'components/Errors'
-import AddressCountrySelector from 'components/AddressCountrySelector'
-import SaveAddressesButton from 'components/SaveAddressesButton'
-import ShippingAddress from 'components/ShippingAddress'
+import {
+  CommerceLayer,
+  OrderContainer,
+  Errors,
+  AddressesContainer,
+  BillingAddress,
+  AddressInput,
+  AddressCountrySelector,
+  SaveAddressesButton,
+  ShippingAddress,
+} from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
@@ -207,6 +209,7 @@ export default function Main() {
                     <AddressCountrySelector
                       data-cy="input_billing_address_country_code"
                       name="billing_address_country_code"
+                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                       value="IT"
                       placeholder={{
                         value: '',
@@ -308,7 +311,7 @@ export default function Main() {
                   aria-pressed="false"
                   className={`${
                     shipToDifferentAddress ? 'bg-blue-500' : 'bg-gray-200'
-                  } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                  } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                   onClick={() =>
                     setShipToDifferentAddress(!shipToDifferentAddress)
                   }
@@ -438,6 +441,7 @@ export default function Main() {
                     <AddressCountrySelector
                       data-cy="input_shipping_address_country_code"
                       name="shipping_address_country_code"
+                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                       placeholder={{
                         value: '',
                         label: 'Country',
@@ -538,16 +542,18 @@ export default function Main() {
                 />
               </div>
             </AddressesContainer>
-            <pre data-cy="current-billing-address">{`Current billing address: ${JSON.stringify(
-              billingAddress,
-              null,
-              2
-            )}`}</pre>
-            <pre data-cy="current-billing-address">{`Current shipping address: ${JSON.stringify(
-              shippingAddress,
-              null,
-              2
-            )}`}</pre>
+            <div className="mt-5">
+              <pre data-cy="current-billing-address">{`Current billing address: ${JSON.stringify(
+                billingAddress,
+                null,
+                2
+              )}`}</pre>
+              <pre data-cy="current-shipping-address">{`Current shipping address: ${JSON.stringify(
+                shippingAddress,
+                null,
+                2
+              )}`}</pre>
+            </div>
           </OrderContainer>
         </div>
       </CommerceLayer>

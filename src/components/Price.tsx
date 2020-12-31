@@ -7,11 +7,11 @@ import React, {
 } from 'react'
 import _ from 'lodash'
 import Parent from './utils/Parent'
-import PricesContext from '../context/PricesContext'
-import { getPricesComponent } from '../utils/getPrices'
+import PricesContext from '@context/PricesContext'
+import { getPricesComponent } from '@utils/getPrices'
 import { PriceCollection } from '@commercelayer/js-sdk'
-import components from '../config/components'
-import { FunctionChildren, LoaderType } from '../typings/index'
+import components from '@config/components'
+import { FunctionChildren, LoaderType } from '@typings/index'
 
 const propTypes = components.Price.propTypes
 const defaultProps = components.Price.defaultProps

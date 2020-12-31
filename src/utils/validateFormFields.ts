@@ -1,11 +1,11 @@
 import _ from 'lodash'
-import { BaseState } from '../typings/index'
-import { ResourceErrorType, BaseError } from '../typings/errors'
+import { BaseState } from '@typings/index'
+import { ResourceErrorType, BaseError } from '@typings/errors'
 import {
   AddressField,
   addressFields,
   AddressSchema,
-} from '../reducers/AddressReducer'
+} from '@reducers/AddressReducer'
 
 const EMAIL_PATTERN = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/
 

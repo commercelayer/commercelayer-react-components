@@ -1,10 +1,10 @@
 import React, { useContext, FunctionComponent } from 'react'
-import AvailabilityContext from '../context/AvailabilityContext'
+import AvailabilityContext from '@context/AvailabilityContext'
 import Parent from './utils/Parent'
 import _ from 'lodash'
-import components from '../config/components'
-import { TimeFormat, FunctionChildren } from '../typings/index'
-import { LeadTimes, ShippingMethod } from '../reducers/AvailabilityReducer'
+import components from '@config/components'
+import { TimeFormat, FunctionChildren } from '@typings/index'
+import { LeadTimes, ShippingMethod } from '@reducers/AvailabilityReducer'
 
 const propTypes = components.AvailabilityTemplate.propTypes
 const defaultProps = components.AvailabilityTemplate

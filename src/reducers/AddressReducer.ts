@@ -1,7 +1,7 @@
-import baseReducer from '../utils/baseReducer'
+import baseReducer from '@utils/baseReducer'
 import { Dispatch } from 'react'
-import { BaseError } from '../typings/errors'
-import { CommerceLayerConfig } from '../context/CommerceLayerContext'
+import { BaseError } from '@typings/errors'
+import { CommerceLayerConfig } from '@context/CommerceLayerContext'
 import { Address, Order, OrderCollection } from '@commercelayer/js-sdk'
 
 export type AddressActionType =

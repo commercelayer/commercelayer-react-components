@@ -5,19 +5,19 @@ import React, {
   useReducer,
   ReactNode,
 } from 'react'
-import getPrices from '../utils/getPrices'
+import getPrices from '@utils/getPrices'
 import _ from 'lodash'
-import CommerceLayerContext from '../context/CommerceLayerContext'
+import CommerceLayerContext from '@context/CommerceLayerContext'
 import priceReducer, {
   SetSkuCodesPrice,
   unsetPriceState,
-} from '../reducers/PriceReducer'
-import { priceInitialState, getSkusPrice } from '../reducers/PriceReducer'
-import PricesContext, { PricesContextValue } from '../context/PricesContext'
-import getCurrentItemKey from '../utils/getCurrentItemKey'
-import ItemContext from '../context/ItemContext'
-import components from '../config/components'
-import { LoaderType } from '../typings'
+} from '@reducers/PriceReducer'
+import { priceInitialState, getSkusPrice } from '@reducers/PriceReducer'
+import PricesContext, { PricesContextValue } from '@context/PricesContext'
+import getCurrentItemKey from '@utils/getCurrentItemKey'
+import ItemContext from '@context/ItemContext'
+import components from '@config/components'
+import { LoaderType } from '@typings'
 
 const propTypes = components.PricesContainer.propTypes
 const defaultProps = components.PricesContainer.defaultProps

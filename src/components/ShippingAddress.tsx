@@ -1,4 +1,4 @@
-import AddressesContext from '../context/AddressContext'
+import AddressesContext from '@context/AddressContext'
 import useRapidForm from 'rapid-form'
 import React, {
   FunctionComponent,
@@ -6,11 +6,11 @@ import React, {
   useContext,
   useEffect,
 } from 'react'
-import ShippingAddressContext from '../context/ShippingAddressContext'
+import ShippingAddressContext from '@context/ShippingAddressContext'
 import _ from 'lodash'
-import { BaseError, CodeErrorType } from '../typings/errors'
-import { AddressField } from '../reducers/AddressReducer'
-import { AddressCountrySelectName, AddressInputName } from 'typings'
+import { BaseError, CodeErrorType } from '@typings/errors'
+import { AddressField } from '@reducers/AddressReducer'
+import { AddressCountrySelectName, AddressInputName } from '@typings'
 
 type ShippingAddressProps = {
   children: ReactNode

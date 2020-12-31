@@ -1,13 +1,13 @@
 import React, { FunctionComponent, useContext, Fragment } from 'react'
 import Parent from './utils/Parent'
-import GiftCardContext from '../context/GiftCardContext'
-import OrderContext from '../context/OrderContext'
-import AddressContext from '../context/AddressContext'
+import GiftCardContext from '@context/GiftCardContext'
+import OrderContext from '@context/OrderContext'
+import AddressContext from '@context/AddressContext'
 import getAllErrors from './utils/getAllErrors'
-import LineItemContext from '../context/LineItemContext'
-import LineItemChildrenContext from '../context/LineItemChildrenContext'
-import { ErrorComponentProps } from '../typings/errors'
-import components from '../config/components'
+import LineItemContext from '@context/LineItemContext'
+import LineItemChildrenContext from '@context/LineItemChildrenContext'
+import { ErrorComponentProps } from '@typings/errors'
+import components from '@config/components'
 
 const propTypes = components.Errors.propTypes
 const defaultProps = components.Errors.defaultProps

@@ -5,7 +5,7 @@ import {
   SetAddressErrors,
   setAddress,
   setAddressErrors,
-} from '../reducers/AddressReducer'
+} from '@reducers/AddressReducer'
 
 type DefaultContext = {
   saveAddresses: () => void

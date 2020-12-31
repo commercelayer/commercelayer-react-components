@@ -1,9 +1,9 @@
 import React, { Fragment, FunctionComponent, ReactNode } from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import { BaseSelectorType } from '../../typings'
-import { VariantsObject, SetSkuCode } from '../../reducers/VariantReducer'
-import { VariantOptions } from '../VariantSelector'
+import { BaseSelectorType } from '@typings'
+import { VariantsObject, SetSkuCode } from '@reducers/VariantReducer'
+import { VariantOptions } from '@components/VariantSelector'
 
 export const propTypes = {
   variants: PropTypes.any.isRequired,
@@ -27,7 +27,7 @@ export const propTypes = {
 }
 
 export type VariantTemplateProps = {
-  variants: VariantsObject | object
+  variants: VariantsObject | Record<string, any>
   handleChange?: SetSkuCode
   options: VariantOptions[]
   type?: BaseSelectorType

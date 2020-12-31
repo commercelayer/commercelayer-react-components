@@ -5,8 +5,8 @@ import React, {
   Fragment,
   ReactNode,
 } from 'react'
-import SkuListsContext from '../context/SkuListsContext'
-import components from '../config/components'
+import SkuListsContext from '@context/SkuListsContext'
+import components from '@config/components'
 
 const propTypes = components.SkuList.propTypes
 const displayName = components.SkuList.displayName

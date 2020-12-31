@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
-import customMessages from '../../utils/customMessages'
+import customMessages from '@utils/customMessages'
 import { LineItemCollection } from '@commercelayer/js-sdk'
-import { BaseError, ResourceErrorType } from '../../typings/errors'
+import { BaseError, ResourceErrorType } from '@typings/errors'
 
 export type AllErrorsParams = {
   allErrors: BaseError[]

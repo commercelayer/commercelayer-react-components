@@ -1,6 +1,6 @@
 import AddressesContext, {
   defaultAddressContext,
-} from '../context/AddressContext'
+} from '@context/AddressContext'
 import React, {
   FunctionComponent,
   ReactNode,
@@ -12,12 +12,12 @@ import addressReducer, {
   addressInitialState,
   AddressSchema,
   SetAddressParams,
-} from '../reducers/AddressReducer'
-import { BaseError } from '../typings/errors'
-import OrderContext from '../context/OrderContext'
-import CommerceLayerContext from '../context/CommerceLayerContext'
-import { saveAddresses } from '../reducers/AddressReducer'
-import components from '../config/components'
+} from '@reducers/AddressReducer'
+import { BaseError } from '@typings/errors'
+import OrderContext from '@context/OrderContext'
+import CommerceLayerContext from '@context/CommerceLayerContext'
+import { saveAddresses } from '@reducers/AddressReducer'
+import components from '@config/components'
 
 const propTypes = components.AddressesContainer.propTypes
 const displayName = components.AddressesContainer.displayName

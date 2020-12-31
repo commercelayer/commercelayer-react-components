@@ -42,7 +42,6 @@ type BaseSelectChildrenComponentProps = Omit<
 type Option = {
   label: string
   value: string | number
-  selected?: boolean
   disabled?: boolean
 }
 

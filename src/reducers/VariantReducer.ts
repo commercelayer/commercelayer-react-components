@@ -2,14 +2,14 @@ import CLayer, {
   SkuCollection,
   InventoryCollection,
 } from '@commercelayer/js-sdk'
-import { VariantOptions } from '../components/VariantSelector'
+import { VariantOptions } from '@components/VariantSelector'
 import { Dispatch } from 'react'
-import baseReducer from '../utils/baseReducer'
-import getErrorsByCollection from '../utils/getErrorsByCollection'
-import getSkus from '../utils/getSkus'
-import { CommerceLayerConfig } from '../context/CommerceLayerContext'
+import baseReducer from '@utils/baseReducer'
+import getErrorsByCollection from '@utils/getErrorsByCollection'
+import getSkus from '@utils/getSkus'
+import { CommerceLayerConfig } from '@context/CommerceLayerContext'
 import { Items, CustomLineItem, SetCustomLineItems } from './ItemReducer'
-import { BaseError } from '../typings/errors'
+import { BaseError } from '@typings/errors'
 import _ from 'lodash'
 
 type SetSkuCodeVariantParams = {

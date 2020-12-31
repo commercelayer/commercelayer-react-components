@@ -8,13 +8,13 @@ import React, {
 import availabilityReducer, {
   availabilityInitialState,
   getAvailability,
-} from '../reducers/AvailabilityReducer'
-import AvailabilityContext from '../context/AvailabilityContext'
+} from '@reducers/AvailabilityReducer'
+import AvailabilityContext from '@context/AvailabilityContext'
 import _ from 'lodash'
-import ItemContext from '../context/ItemContext'
-import getCurrentItemKey from '../utils/getCurrentItemKey'
-import components from '../config/components'
-import CommerceLayerContext from '../context/CommerceLayerContext'
+import ItemContext from '@context/ItemContext'
+import getCurrentItemKey from '@utils/getCurrentItemKey'
+import components from '@config/components'
+import CommerceLayerContext from '@context/CommerceLayerContext'
 
 const propTypes = components.AvailabilityContainer.propTypes
 const displayName = components.AvailabilityContainer.displayName

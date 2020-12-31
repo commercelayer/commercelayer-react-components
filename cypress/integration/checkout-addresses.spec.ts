@@ -6,6 +6,7 @@ describe('Customer Addresses', () => {
   const filename = 'checkout-addresses'
 
   before(() => {
+    // @ts-ignore
     cy.setRoutes({
       endpoint: 'https://the-blue-brand-3.commercelayer.co',
       routes: Cypress.env('requests'),
@@ -17,6 +18,7 @@ describe('Customer Addresses', () => {
 
   after(() => {
     if (Cypress.env('RECORD')) {
+      // @ts-ignore
       cy.saveRequests(filename)
     }
   })
@@ -64,6 +66,10 @@ describe('Customer Addresses', () => {
     )
     // Save Addresses button
     cy.get('[data-cy="save-addresses-button"]').as('saveAddressesButton')
+
+    // Current addresses
+    cy.get('[data-cy="current-billing-address"]').as('currentBillingAddress')
+    cy.get('[data-cy="current-shipping-address"]').as('currentShippingAddress')
   })
   it('Checking default fields', () => {
     cy.wait(['@token', '@getOrders'])
@@ -121,6 +127,49 @@ describe('Customer Addresses', () => {
     )
   })
 
+  it('Saving billing address', () => {
+    cy.get('@currentBillingAddress').should('contain.text', '{}')
+    cy.get('@currentShippingAddress').should('contain.text', '{}')
+    cy.get('@saveAddressesButton').click()
+    cy.get('@currentBillingAddress').should(
+      'contain.text',
+      euAddress.first_name
+    )
+    cy.get('@currentBillingAddress').should('contain.text', euAddress.last_name)
+    cy.get('@currentBillingAddress').should('contain.text', euAddress.line_1)
+    cy.get('@currentBillingAddress').should('contain.text', euAddress.city)
+    cy.get('@currentBillingAddress').should(
+      'contain.text',
+      euAddress.country_code
+    )
+    cy.get('@currentBillingAddress').should(
+      'contain.text',
+      euAddress.state_code
+    )
+    cy.get('@currentBillingAddress').should('contain.text', euAddress.zip_code)
+    cy.get('@currentBillingAddress').should('contain.text', euAddress.phone)
+    cy.get('@currentShippingAddress').should(
+      'contain.text',
+      euAddress.first_name
+    )
+    cy.get('@currentShippingAddress').should(
+      'contain.text',
+      euAddress.last_name
+    )
+    cy.get('@currentShippingAddress').should('contain.text', euAddress.line_1)
+    cy.get('@currentShippingAddress').should('contain.text', euAddress.city)
+    cy.get('@currentShippingAddress').should(
+      'contain.text',
+      euAddress.country_code
+    )
+    cy.get('@currentShippingAddress').should(
+      'contain.text',
+      euAddress.state_code
+    )
+    cy.get('@currentShippingAddress').should('contain.text', euAddress.zip_code)
+    cy.get('@currentShippingAddress').should('contain.text', euAddress.phone)
+  })
+
   it('Ship to different address', () => {
     cy.get('@buttonDifferentAddress')
       .click()
@@ -156,5 +205,46 @@ describe('Customer Addresses', () => {
       'disabled',
       'disabled'
     )
+  })
+
+  it('Saving different shipping address', () => {
+    cy.get('@saveAddressesButton').click()
+    cy.get('@currentBillingAddress').should(
+      'contain.text',
+      euAddress.first_name
+    )
+    cy.get('@currentBillingAddress').should('contain.text', euAddress.last_name)
+    cy.get('@currentBillingAddress').should('contain.text', euAddress.line_1)
+    cy.get('@currentBillingAddress').should('contain.text', euAddress.city)
+    cy.get('@currentBillingAddress').should(
+      'contain.text',
+      euAddress.country_code
+    )
+    cy.get('@currentBillingAddress').should(
+      'contain.text',
+      euAddress.state_code
+    )
+    cy.get('@currentBillingAddress').should('contain.text', euAddress.zip_code)
+    cy.get('@currentBillingAddress').should('contain.text', euAddress.phone)
+    cy.get('@currentShippingAddress').should(
+      'contain.text',
+      usAddress.first_name
+    )
+    cy.get('@currentShippingAddress').should(
+      'contain.text',
+      usAddress.last_name
+    )
+    cy.get('@currentShippingAddress').should('contain.text', usAddress.line_1)
+    cy.get('@currentShippingAddress').should('contain.text', usAddress.city)
+    cy.get('@currentShippingAddress').should(
+      'contain.text',
+      usAddress.country_code
+    )
+    cy.get('@currentShippingAddress').should(
+      'contain.text',
+      usAddress.state_code
+    )
+    cy.get('@currentShippingAddress').should('contain.text', usAddress.zip_code)
+    cy.get('@currentShippingAddress').should('contain.text', usAddress.phone)
   })
 })

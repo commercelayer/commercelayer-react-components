@@ -1,7 +1,7 @@
 import { isValidElement, Children, ReactNode } from 'react'
 import _ from 'lodash'
 import { Requireable } from 'prop-types'
-import components from '../config/components'
+import components from '@config/components'
 
 export interface CheckChildrenTypes {
   (

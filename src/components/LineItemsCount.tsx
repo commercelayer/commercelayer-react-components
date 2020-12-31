@@ -5,11 +5,11 @@ import React, {
   useEffect,
 } from 'react'
 import Parent from './utils/Parent'
-import getLineItemsCount from '../utils/getLineItemsCount'
+import getLineItemsCount from '@utils/getLineItemsCount'
 import _ from 'lodash'
-import LineItemContext from '../context/LineItemContext'
-import components from '../config/components'
-import { FunctionChildren } from '../typings/index'
+import LineItemContext from '@context/LineItemContext'
+import components from '@config/components'
+import { FunctionChildren } from '@typings/index'
 
 const propTypes = components.LineItemsCount.propTypes
 const displayName = components.LineItemsCount.displayName

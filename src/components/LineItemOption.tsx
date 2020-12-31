@@ -4,12 +4,12 @@ import React, {
   Fragment,
   CSSProperties,
 } from 'react'
-import LineItemOptionChildrenContext from '../context/LineItemOptionChildrenContext'
+import LineItemOptionChildrenContext from '@context/LineItemOptionChildrenContext'
 import _ from 'lodash'
 import Parent from './utils/Parent'
-import components from '../config/components'
+import components from '@config/components'
 import { LineItemOptionCollection } from '@commercelayer/js-sdk'
-import { FunctionChildren } from '../typings/index'
+import { FunctionChildren } from '@typings/index'
 
 const propTypes = components.LineItemOption.propTypes
 const displayName = components.LineItemOption.displayName

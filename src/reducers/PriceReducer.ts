@@ -1,12 +1,12 @@
-import { BaseAction, LoaderType } from '../typings'
+import { BaseAction, LoaderType } from '@typings'
 import CLayer, { PriceCollection } from '@commercelayer/js-sdk'
-import getPrices from '../utils/getPrices'
-import { CommerceLayerConfig } from '../context/CommerceLayerContext'
+import getPrices from '@utils/getPrices'
+import { CommerceLayerConfig } from '@context/CommerceLayerContext'
 import { Dispatch } from 'react'
 import { ItemPrices } from './ItemReducer'
-import baseReducer from '../utils/baseReducer'
-import getErrorsByCollection from '../utils/getErrorsByCollection'
-import { BaseError } from '../typings/errors'
+import baseReducer from '@utils/baseReducer'
+import getErrorsByCollection from '@utils/getErrorsByCollection'
+import { BaseError } from '@typings/errors'
 
 export type SkuPrices = PriceCollection[]
 
