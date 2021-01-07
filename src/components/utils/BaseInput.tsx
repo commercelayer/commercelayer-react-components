@@ -17,13 +17,7 @@ const BaseInput: ForwardRefRenderFunction<any, BaseInputProps> = (
     ) : (
       <input ref={ref} {...p} />
     )
-  return children ? (
-    <Parent ref={ref} {...p}>
-      {children}
-    </Parent>
-  ) : (
-    input
-  )
+  return children ? <Parent {...p}>{children}</Parent> : input
 }
 
 export default React.forwardRef(BaseInput)

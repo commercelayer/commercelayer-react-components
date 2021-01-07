@@ -11,10 +11,12 @@ import _ from 'lodash'
 import { BaseError, CodeErrorType } from '@typings/errors'
 import { AddressField } from '@reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '@typings'
+import components from '@config/components'
+
+const propTypes = components.ShippingAddress.propTypes
 
 type ShippingAddressProps = {
   children: ReactNode
-  autoComplete?: 'on' | 'off'
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 const ShippingAddress: FunctionComponent<ShippingAddressProps> = (props) => {
@@ -65,5 +67,7 @@ const ShippingAddress: FunctionComponent<ShippingAddressProps> = (props) => {
     </ShippingAddressContext.Provider>
   )
 }
+
+ShippingAddress.propTypes = propTypes
 
 export default ShippingAddress

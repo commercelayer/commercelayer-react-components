@@ -27,7 +27,7 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     children,
     label = 'Continue to delivery',
     resource,
-    disabled,
+    disabled = false,
     onClick,
     ...p
   } = props

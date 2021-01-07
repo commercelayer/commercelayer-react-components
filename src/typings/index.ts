@@ -81,7 +81,6 @@ export interface BaseInputComponentProps {
   ref?: RefObject<any>
   children?: (props: BaseInputChildrenComponentProps) => ReactNode
   name: string
-  type: BaseInputType
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void
