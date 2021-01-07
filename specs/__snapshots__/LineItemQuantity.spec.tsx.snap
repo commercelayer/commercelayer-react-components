@@ -3,7 +3,6 @@
 exports[`<LineItemQuantity check children format /> 1`] = `
 <select
   disabled={true}
-  max={20}
   onChange={[Function]}
 >
   <option
@@ -113,7 +112,6 @@ exports[`<LineItemQuantity with custom children /> 1`] = `<span />`;
 
 exports[`<LineItemQuantity/> 1`] = `
 <select
-  max={50}
   onChange={[Function]}
 >
   <option

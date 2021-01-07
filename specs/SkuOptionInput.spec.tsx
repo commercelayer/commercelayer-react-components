@@ -48,15 +48,14 @@ test('<SkuOptionInput check children type textarea />', () => {
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
-  const childRendered = rendered.rendered
   expect(tree).toMatchSnapshot()
-  expect(rendered.type).toBe(BaseInput)
-  expect(childRendered.type).toBe('textarea')
-  expect(childRendered.props.name).toBe('reference')
+  expect(rendered.type).toBe('textarea')
+  expect(root.props.type).toBe('textarea')
+  expect(root.props.name).toBe('reference')
 })
 
 test('<SkuOptionInput check children type date />', () => {
-  expect.assertions(5)
+  expect.assertions(4)
   const component = renderer.create(
     <SkuOptionInput type="date" name="expiresAt" />
   )
@@ -65,10 +64,9 @@ test('<SkuOptionInput check children type date />', () => {
   const rendered = root.rendered
   const childRendered = rendered.rendered
   expect(tree).toMatchSnapshot()
-  expect(rendered.type).toBe(BaseInput)
-  expect(childRendered.type).toBe('input')
-  expect(childRendered.props.name).toBe('expiresAt')
-  expect(childRendered.props.type).toBe('date')
+  expect(rendered.type).toBe('input')
+  expect(root.props.name).toBe('expiresAt')
+  expect(root.props.type).toBe('date')
 })
 
 test('<SkuOptionInput with custom children />', () => {
@@ -84,5 +82,5 @@ test('<SkuOptionInput with custom children />', () => {
   expect(tree).toMatchSnapshot()
   expect(rendered.props.children).toBe(CustomComponent)
   expect(childRendered.nodeType).toBe('component')
-  expect(childRendered.type).toBe(Parent)
+  expect(childRendered.type).toBe(CustomComponent)
 })

@@ -5,6 +5,7 @@ describe('Order with different category', () => {
   const filename = 'categoryOrder'
 
   before(() => {
+    // @ts-ignore
     cy.setRoutes({
       endpoint: Cypress.env('apiEndpoint'),
       routes: [Cypress.env('requests')[0]],
@@ -15,6 +16,7 @@ describe('Order with different category', () => {
   })
 
   beforeEach(() => {
+    // @ts-ignore
     cy.setRoutes({
       endpoint: Cypress.env('apiEndpoint'),
       routes: Cypress.env('requests'),
@@ -25,20 +27,24 @@ describe('Order with different category', () => {
 
   after(() => {
     if (Cypress.env('RECORD')) {
+      // @ts-ignore
       cy.saveRequests(filename)
     }
   })
 
   it('Check categories', () => {
-    cy.wait(['@token', '@prices'])
+    cy.wait('@token')
+    cy.wait('@prices')
     cy.get('[data-cy="price-BABYONBU000000E63E746MXX"]').should(
       'contain.text',
       '€20,00'
     )
-    cy.get('[data-cy="price-BABYONBU000000E63E746MXX"]').should(
+    cy.get('[data-cy="BABYONBU000000E63E746MXX-button"]').should(
       'not.be.disabled'
     )
-    cy.get(':nth-child(1) > .pt-2.w-full > button').should('not.be.disabled')
+    cy.get('[data-cy="BABYONBU000000E63E746MXX-quantity-selector"]').should(
+      'not.be.disabled'
+    )
     cy.get(':nth-child(2) > :nth-child(4) > .text-green-600').should(
       'contain.text',
       '€49,00'

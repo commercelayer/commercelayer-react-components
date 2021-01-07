@@ -78,17 +78,16 @@ export default function Order() {
                         compareClassName="text-gray-600 text-xl m-1 line-through font-light"
                       />
                     </div>
-                    <div
-                      data-cy="quantity-selector-BABYONBU000000E63E746MXX"
-                      className="pt-2"
-                    >
+                    <div className="pt-2">
                       <QuantitySelector
+                        data-cy="BABYONBU000000E63E746MXX-quantity-selector"
                         className="w-2/3 mx-auto block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         skuCode="BABYONBU000000E63E746MXX"
                       />
                     </div>
                     <div className="pt-2 w-full text-center">
                       <AddToCart
+                        data-cy="BABYONBU000000E63E746MXX-button"
                         skuCode="BABYONBU000000E63E746MXX"
                         className="w-2/3 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                       />
@@ -118,6 +117,7 @@ export default function Order() {
                     </div>
                     <div className="pt-2 text-center">
                       <Price
+                        data-cy="LSLEEVMMFFFFFF000000LXXX-price"
                         skuCode="LSLEEVMMFFFFFF000000LXXX"
                         className="text-green-600 text-xl m-1"
                         compareClassName="text-gray-600 text-xl m-1 line-through font-light"
@@ -125,13 +125,14 @@ export default function Order() {
                     </div>
                     <div className="pt-2">
                       <QuantitySelector
-                        data-cy="quantity-selector-LSLEEVMMFFFFFF000000LXXX"
+                        data-cy="LSLEEVMMFFFFFF000000LXXX-quantity-selector"
                         className="w-2/3 mx-auto block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         skuCode="LSLEEVMMFFFFFF000000LXXX"
                       />
                     </div>
                     <div className="pt-2 w-full text-center">
                       <AddToCart
+                        data-cy="LSLEEVMMFFFFFF000000LXXX-add-to-cart"
                         skuCode="LSLEEVMMFFFFFF000000LXXX"
                         className="w-2/3 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                         lineItem={{

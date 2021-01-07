@@ -5,7 +5,6 @@ describe('Multi App', () => {
   const filename = 'multiOrder'
 
   before(() => {
-    cy.server()
     cy.setRoutes({
       endpoint: Cypress.env('apiEndpoint'),
       routes: [Cypress.env('requests')[0]],
@@ -16,7 +15,6 @@ describe('Multi App', () => {
   })
 
   beforeEach(() => {
-    cy.server()
     cy.setRoutes({
       endpoint: Cypress.env('apiEndpoint'),
       routes: Cypress.env('requests'),
@@ -138,7 +136,8 @@ describe('Multi App', () => {
     // }
 
     cy.get('button[name="add-it"]').click()
-    cy.wait(['@insertLineItems', '@getOrders', '@retrieveLineItems'])
+    cy.wait(['@insertLineItems', '@getOrders'])
+    // cy.wait('@retrieveLineItems')
     cy.get('span[name="count-it"]').should('contain.text', '6')
     cy.get('.bg-gray-900 > .m-auto > .font-medium > .text-right > span').should(
       'have.text',
@@ -151,12 +150,8 @@ describe('Multi App', () => {
     // NOTE cypress does not dispatch getOrders request after deleting the lineItem (only in STUB mode 🤷🏻‍♂️)
     it('Remove the second lineItem from OrderBlueBrand', () => {
       cy.get(':nth-child(2) > .flex-col.p-2 > .flex > .bg-red-500').click()
-      cy.wait([
-        '@lineItems',
-        '@deleteLineItems',
-        '@getOrders',
-        '@retrieveLineItems',
-      ])
+      cy.wait(['@lineItems', '@deleteLineItems', '@getOrders'])
+      // cy.wait('@retrieveLineItems')
       cy.get('span[name="count-us"]').should('have.text', '0')
       cy.get(
         ':nth-child(2) > .m-auto > .font-medium > .text-right > span'

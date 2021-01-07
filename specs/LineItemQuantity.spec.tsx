@@ -27,14 +27,14 @@ test('<LineItemQuantity check children format />', () => {
   const rendered = root.rendered
   const childRendered = rendered.rendered
   expect(tree).toMatchSnapshot()
-  expect(rendered.type).toBe('select')
-  expect(rendered.props.max).toBe(20)
-  expect(rendered.props.disabled).toBe(true)
+  expect(root.type).toBe(LineItemQuantity)
+  expect(root.props.max).toBe(20)
+  expect(root.props.disabled).toBe(true)
   expect(childRendered).toHaveLength(20)
 })
 
 test('<LineItemQuantity with custom children />', () => {
-  expect.assertions(10)
+  expect.assertions(9)
   const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
     <LineItemQuantity>{CustomComponent}</LineItemQuantity>
@@ -45,9 +45,8 @@ test('<LineItemQuantity with custom children />', () => {
   const childRendered = root.rendered.rendered
   expect(tree).toMatchSnapshot()
   expect(rendered.type).toBe(Parent)
-  expect(rendered.props.max).toBe(50)
-  expect(rendered.props.handleChange).toBeDefined()
-  expect(rendered.props.quantity).toBeUndefined()
+  expect(root.props.max).toBe(50)
+  expect(root.props.quantity).toBeUndefined()
   expect(childRendered.nodeType).toBe('component')
   expect(childRendered.type).toBe(CustomComponent)
   expect(childRendered.props.max).toBe(50)

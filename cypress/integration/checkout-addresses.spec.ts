@@ -24,44 +24,38 @@ describe('Customer Addresses', () => {
   })
 
   beforeEach(() => {
-    // Billing Address fields
-    cy.get('[data-cy="input_billing_address_first_name"]').as(
-      'billingFirstName'
-    )
-    cy.get('[data-cy="input_billing_address_last_name"]').as('billingLastName')
-    cy.get('[data-cy="input_billing_address_line_1"]').as('billingLine1')
-    cy.get('[data-cy="input_billing_address_city"]').as('billingCity')
-    cy.get('[data-cy="input_billing_address_country_code"]').as(
-      'billingCountryCode'
-    )
-    cy.get('[data-cy="input_billing_address_state_code"]').as(
-      'billingStateCode'
-    )
-    cy.get('[data-cy="input_billing_address_zip_code"]').as('billingZipCode')
-    cy.get('[data-cy="input_billing_address_phone"]').as('billingPhone')
+    // Customer Email
+    cy.get('[data-cy="save-on-blur-button"]').as('saveOnBlurButton')
+    cy.get('[data-cy="customer_email"]').as('customerEmail')
+    cy.get('[data-cy="save-customer-button"]').as('saveCustomerButton')
+    cy.get('[data-cy="current-customer-email"]').as('currentCustomerEmail')
 
-    cy.get('[data-cy="button-ship-to-different-address"]').as(
+    // Billing Address fields
+    cy.get('[data-cy="billing_address_first_name"]').as('billingFirstName')
+    cy.get('[data-cy="billing_address_last_name"]').as('billingLastName')
+    cy.get('[data-cy="billing_address_line_1"]').as('billingLine1')
+    cy.get('[data-cy="billing_address_city"]').as('billingCity')
+    cy.get('[data-cy="billing_address_country_code"]').as('billingCountryCode')
+    cy.get('[data-cy="billing_address_state_code"]').as('billingStateCode')
+    cy.get('[data-cy="billing_address_zip_code"]').as('billingZipCode')
+    cy.get('[data-cy="billing_address_phone"]').as('billingPhone')
+
+    cy.get('[data-cy="ship-to-different-address-button"]').as(
       'buttonDifferentAddress'
     )
 
     // Shipping Address fields
-    cy.get('[data-cy="input_shipping_address_first_name"]').as(
-      'shippingFirstName'
-    )
-    cy.get('[data-cy="input_shipping_address_last_name"]').as(
-      'shippingLastName'
-    )
-    cy.get('[data-cy="input_shipping_address_line_1"]').as('shippingLine1')
-    cy.get('[data-cy="input_shipping_address_city"]').as('shippingCity')
-    cy.get('[data-cy="input_shipping_address_country_code"]').as(
+    cy.get('[data-cy="shipping_address_first_name"]').as('shippingFirstName')
+    cy.get('[data-cy="shipping_address_last_name"]').as('shippingLastName')
+    cy.get('[data-cy="shipping_address_line_1"]').as('shippingLine1')
+    cy.get('[data-cy="shipping_address_city"]').as('shippingCity')
+    cy.get('[data-cy="shipping_address_country_code"]').as(
       'shippingCountryCode'
     )
-    cy.get('[data-cy="input_shipping_address_state_code"]').as(
-      'shippingStateCode'
-    )
-    cy.get('[data-cy="input_shipping_address_zip_code"]').as('shippingZipCode')
-    cy.get('[data-cy="input_shipping_address_phone"]').as('shippingPhone')
-    cy.get('[data-cy="button-ship-to-different-address"]').as(
+    cy.get('[data-cy="shipping_address_state_code"]').as('shippingStateCode')
+    cy.get('[data-cy="shipping_address_zip_code"]').as('shippingZipCode')
+    cy.get('[data-cy="shipping_address_phone"]').as('shippingPhone')
+    cy.get('[data-cy="ship-to-different-address-button"]').as(
       'buttonDifferentAddress'
     )
     // Save Addresses button
@@ -73,6 +67,9 @@ describe('Customer Addresses', () => {
   })
   it('Checking default fields', () => {
     cy.wait(['@token', '@getOrders'])
+    cy.get('@customerEmail').should('contain.value', '')
+    cy.get('@saveOnBlurButton').should('have.attr', 'data-status', 'false')
+    cy.get('@saveCustomerButton').should('have.attr', 'disabled', 'disabled')
     cy.get('@billingFirstName').should('contain.value', '')
     cy.get('@billingLastName').should('contain.value', '')
     cy.get('@billingLine1').should('contain.value', '')
@@ -89,9 +86,47 @@ describe('Customer Addresses', () => {
     cy.get('@saveAddressesButton').should('have.attr', 'disabled', 'disabled')
   })
 
+  it('Save Customer User with the save button', () => {
+    cy.get('@currentCustomerEmail').should('contain.text', '""')
+    cy.get('@customerEmail').type('a')
+    cy.get('[data-cy="customer_email_error"]').should(
+      'contain.text',
+      `Must be valid email`
+    )
+    cy.get('@customerEmail').type('{backspace}')
+    cy.get('[data-cy="customer_email_error"]').should(
+      'contain.text',
+      `Can't be blank`
+    )
+    cy.get('@customerEmail').type(euAddress.customer_email)
+    cy.get('@saveCustomerButton').should(
+      'not.have.attr',
+      'disabled',
+      'disabled'
+    )
+    cy.get('@saveCustomerButton').click()
+    cy.get('@currentCustomerEmail').should(
+      'contain.text',
+      `"${euAddress.customer_email}"`
+    )
+  })
+
+  it('Save Customer User with onBlur input', () => {
+    cy.get('@saveOnBlurButton')
+      .click()
+      .should('have.attr', 'data-status', 'true')
+    cy.get('@customerEmail')
+      .type(`{selectall}{backspace}${usAddress.customer_email}`)
+      .blur()
+    cy.get('@currentCustomerEmail').should(
+      'contain.text',
+      `"${usAddress.customer_email}"`
+    )
+  })
+
   it('Filling fields', () => {
     cy.get('@billingFirstName').type('a').type('{backspace}')
-    cy.get('[data-cy="error_billing_address_first_name"]').should(
+    cy.get('[data-cy="billing_address_first_name_error"]').should(
       'contain.text',
       `Can't be blank`
     )
