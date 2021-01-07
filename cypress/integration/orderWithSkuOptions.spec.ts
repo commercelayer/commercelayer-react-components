@@ -46,9 +46,9 @@ describe('Order with SkuOptions', () => {
   })
 
   it('Select an SKU with SkuOptions', () => {
-    if (!Cypress.env('RECORD')) {
-      cy.newStubData(['prices1', 'retrieveSku1'])
-    }
+    // if (!Cypress.env('RECORD')) {
+    //   cy.newStubData(['prices1', 'retrieveSku1'])
+    // }
     cy.get('#variant-selector').select('12 months')
 
     // cy.wait(['@retrieveSku'])
@@ -81,10 +81,10 @@ describe('Order with SkuOptions', () => {
     cy.wait([
       '@orders',
       '@insertLineItems',
-      '@retrieveLineItems',
+      // '@retrieveLineItems',
       '@getOrders',
       '@insertLineItemOptions',
-      '@retrieveLineItems',
+      // '@retrieveLineItems',
     ])
 
     // cy.wait(['@getOrders'])

@@ -23,7 +23,7 @@ import SkuListsContainer from '../src/components/SkuListsContainer'
 import SkuList from '../src/components/SkuList'
 import AddToCartButton from '../src/components/AddToCartButton'
 import QuantitySelector from '../src/components/QuantitySelector'
-import ExternalFunction from 'components/ExternalFunction'
+import ExternalFunction from '@components/ExternalFunction'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 
@@ -64,7 +64,7 @@ export default function Order() {
       <Nav links={['/']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
-          <OrderContainer persistKey="orderEU">
+          <OrderContainer>
             <ItemContainer>
               <div className="flex flex-row justify-around">
                 <SkuListsContainer>

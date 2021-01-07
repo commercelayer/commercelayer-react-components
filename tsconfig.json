@@ -30,6 +30,6 @@
       "@config/*": ["src/config/*"]
     }
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "specs", "cypress"],
   "include": ["**/*.ts", "**/*.tsx"]
 }

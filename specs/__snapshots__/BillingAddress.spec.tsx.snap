@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<BillingAddress check children /> 1`] = `
+<form
+  autoComplete="on"
+/>
+`;
+
+exports[`<BillingAddress proptypes required /> 1`] = `
+<form
+  autoComplete="on"
+/>
+`;
+
+exports[`<BillingAddress/> 1`] = `
+<form
+  autoComplete="on"
+>
+  <div>
+    test
+  </div>
+</form>
+`;

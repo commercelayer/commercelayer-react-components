@@ -12,6 +12,9 @@ import {
   AddressCountrySelector,
   SaveAddressesButton,
   ShippingAddress,
+  CustomerContainer,
+  CustomerInput,
+  SaveCustomerButton,
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 
@@ -20,7 +23,9 @@ const orderId = 'JwXQehvvyP'
 
 export default function Main() {
   const [token, setToken] = useState('')
+  const [customerEmail, setCustomerEmail] = useState('')
   const [shipToDifferentAddress, setShipToDifferentAddress] = useState(false)
+  const [saveOnBlur, setSaveOnBlur] = useState(false)
   const [billingAddress, setBillingAddress] = useState({})
   const [shippingAddress, setShippingAddress] = useState({})
   useEffect(() => {
@@ -50,6 +55,19 @@ export default function Main() {
       message: `Must be valid email`,
     },
   ]
+  const handleOnSave = async () => {
+    if (token) {
+      const config = { accessToken: token, endpoint }
+      try {
+        const order = await Order.withCredentials(config)
+          .select('customerEmail')
+          .find(orderId)
+        setCustomerEmail(order.customerEmail)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  }
   const handleClick = async () => {
     if (token) {
       const config = { accessToken: token, endpoint }
@@ -93,8 +111,71 @@ export default function Main() {
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId={orderId}>
+            <div className="flex p-2">
+              <button
+                data-cy="save-on-blur-button"
+                data-status={saveOnBlur}
+                type="button"
+                aria-pressed="false"
+                className={`${
+                  saveOnBlur ? 'bg-blue-500' : 'bg-gray-200'
+                } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                onClick={() => setSaveOnBlur(!saveOnBlur)}
+              >
+                <span className="sr-only">Use setting</span>
+                <span
+                  aria-hidden="true"
+                  className={`${
+                    saveOnBlur ? 'translate-x-5' : 'translate-x-0'
+                  } inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
+                ></span>
+              </button>
+              <p className="ml-5">Save onBlur</p>
+            </div>
+            <CustomerContainer saveOnBlur={saveOnBlur} onSave={handleOnSave}>
+              <div>
+                <label
+                  htmlFor="customer_email"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Customer email
+                </label>
+                <div className="mt-1">
+                  <CustomerInput
+                    data-cy="customer_email"
+                    className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    placeholder="Email"
+                  />
+                </div>
+                <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <Errors
+                    data-cy="customer_email_error"
+                    resource="order"
+                    field="customer_email"
+                    messages={messages}
+                  />
+                </p>
+              </div>
+              <div className={saveOnBlur ? 'hidden' : ''}>
+                <div className="mt-1">
+                  <SaveCustomerButton
+                    data-cy="save-customer-button"
+                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="mt-1">
+                  <pre data-cy="current-customer-email">{`Current customer email: ${JSON.stringify(
+                    customerEmail,
+                    null,
+                    2
+                  )}`}</pre>
+                </div>
+              </div>
+            </CustomerContainer>
             <AddressesContainer shipToDifferentAddress={shipToDifferentAddress}>
-              <h3 className="text-lg font-medium leading-6 text-gray-900 bg-gray-50 p-2 mb-3 shadow rounded-sm">
+              <h3 className="text-lg font-medium leading-6 text-gray-900 bg-gray-50 p-2 my-3 shadow rounded-sm">
                 Billing Address
               </h3>
               <BillingAddress autoComplete="on" className="p-2">
@@ -107,7 +188,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_billing_address_first_name"
+                      data-cy="billing_address_first_name"
                       name="billing_address_first_name"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -116,7 +197,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_billing_address_first_name"
+                      data-cy="billing_address_first_name_error"
                       resource="billingAddress"
                       field="billing_address_first_name"
                       messages={messages}
@@ -132,7 +213,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_billing_address_last_name"
+                      data-cy="billing_address_last_name"
                       name="billing_address_last_name"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -141,7 +222,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_billing_address_last_name"
+                      data-cy="billing_address_last_name_error"
                       resource="billingAddress"
                       field="billing_address_last_name"
                       messages={messages}
@@ -157,7 +238,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_billing_address_line_1"
+                      data-cy="billing_address_line_1"
                       name="billing_address_line_1"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -166,7 +247,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_billing_address_line_1"
+                      data-cy="billing_address_line_1_error"
                       resource="billingAddress"
                       field="billing_address_line_1"
                       messages={messages}
@@ -182,7 +263,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_billing_address_city"
+                      data-cy="billing_address_city"
                       name="billing_address_city"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -191,7 +272,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_billing_address_city"
+                      data-cy="billing_address_city_error"
                       resource="billingAddress"
                       field="billing_address_city"
                       messages={messages}
@@ -207,7 +288,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressCountrySelector
-                      data-cy="input_billing_address_country_code"
+                      data-cy="billing_address_country_code"
                       name="billing_address_country_code"
                       className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                       value="IT"
@@ -220,7 +301,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_billing_address_country_code"
+                      data-cy="billing_address_country_code_error"
                       resource="billingAddress"
                       field="billing_address_country_code"
                       messages={messages}
@@ -236,7 +317,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_billing_address_state_code"
+                      data-cy="billing_address_state_code"
                       name="billing_address_state_code"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -245,7 +326,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_billing_address_state_code"
+                      data-cy="billing_address_state_code_error"
                       resource="billingAddress"
                       field="billing_address_state_code"
                       messages={messages}
@@ -261,7 +342,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_billing_address_zip_code"
+                      data-cy="billing_address_zip_code"
                       name="billing_address_zip_code"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -270,7 +351,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_billing_address_zip_code"
+                      data-cy="billing_address_zip_code_error"
                       resource="billingAddress"
                       field="billing_address_zip_code"
                       messages={messages}
@@ -286,7 +367,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_billing_address_phone"
+                      data-cy="billing_address_phone"
                       name="billing_address_phone"
                       type="tel"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -295,7 +376,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_billing_address_phone"
+                      data-cy="billing_address_phone_error"
                       resource="billingAddress"
                       field="billing_address_phone"
                       messages={messages}
@@ -305,7 +386,7 @@ export default function Main() {
               </BillingAddress>
               <div className="flex p-2">
                 <button
-                  data-cy="button-ship-to-different-address"
+                  data-cy="ship-to-different-address-button"
                   data-status={shipToDifferentAddress}
                   type="button"
                   aria-pressed="false"
@@ -339,7 +420,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_shipping_address_first_name"
+                      data-cy="shipping_address_first_name"
                       name="shipping_address_first_name"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -348,7 +429,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_shipping_address_first_name"
+                      data-cy="shipping_address_first_name_error"
                       resource="shippingAddress"
                       field="shipping_address_first_name"
                       messages={messages}
@@ -364,7 +445,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_shipping_address_last_name"
+                      data-cy="shipping_address_last_name"
                       name="shipping_address_last_name"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -373,7 +454,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_shipping_address_last_name"
+                      data-cy="shipping_address_last_name_error"
                       resource="shippingAddress"
                       field="shipping_address_last_name"
                       messages={messages}
@@ -389,7 +470,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_shipping_address_line_1"
+                      data-cy="shipping_address_line_1"
                       name="shipping_address_line_1"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -398,7 +479,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_shipping_address_line_1"
+                      data-cy="shipping_address_line_1_error"
                       resource="shippingAddress"
                       field="shipping_address_line_1"
                       messages={messages}
@@ -414,7 +495,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_shipping_address_city"
+                      data-cy="shipping_address_city"
                       name="shipping_address_city"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -423,7 +504,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="input_shipping_address_city"
+                      data-cy="shipping_address_city_error"
                       resource="shippingAddress"
                       field="shipping_address_city"
                       messages={messages}
@@ -439,7 +520,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressCountrySelector
-                      data-cy="input_shipping_address_country_code"
+                      data-cy="shipping_address_country_code"
                       name="shipping_address_country_code"
                       className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                       placeholder={{
@@ -451,7 +532,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_shipping_address_country_code"
+                      data-cy="shipping_address_country_code_error"
                       resource="shippingAddress"
                       field="shipping_address_country_code"
                       messages={messages}
@@ -467,7 +548,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_shipping_address_state_code"
+                      data-cy="shipping_address_state_code"
                       name="shipping_address_state_code"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -476,7 +557,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_shipping_address_state_code"
+                      data-cy="shipping_address_state_code_error"
                       resource="shippingAddress"
                       field="shipping_address_state_code"
                       messages={messages}
@@ -492,7 +573,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_shipping_address_zip_code"
+                      data-cy="shipping_address_zip_code"
                       name="shipping_address_zip_code"
                       type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -501,7 +582,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_shipping_address_zip_code"
+                      data-cy="shipping_address_zip_code_error"
                       resource="shippingAddress"
                       field="shipping_address_zip_code"
                       messages={messages}
@@ -517,7 +598,7 @@ export default function Main() {
                   </label>
                   <div className="mt-1">
                     <AddressInput
-                      data-cy="input_shipping_address_phone"
+                      data-cy="shipping_address_phone"
                       name="shipping_address_phone"
                       type="tel"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
@@ -526,7 +607,7 @@ export default function Main() {
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
-                      data-cy="error_shipping_address_phone"
+                      data-cy="shipping_address_phone_error"
                       resource="shippingAddress"
                       field="shipping_address_phone"
                       messages={messages}

@@ -31,7 +31,7 @@ import AvailabilityContainer from '../src/components/AvailabilityContainer'
 import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 import ItemContainer from '../src/components/ItemContainer'
 import Errors from '../src/components/Errors'
-import OrderStorage from 'components/OrderStorage'
+import OrderStorage from '@components/OrderStorage'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 
@@ -45,30 +45,30 @@ const CustomAddToCart = (props) => {
   }
   return (
     <button
-      id="add-to-bag"
       className={`${classes} ${props.className}`}
       onClick={myClick}
       disabled={props.disabled}
+      data-cy={props['data-cy']}
     >
       Custom add to cart
     </button>
   )
 }
 
-const CustomQuantity = (props: any) => {
-  // console.log('props', props)
-  const myIncrease = (event: any) => {
-    event.target.value = props.value + 1
-    props.handleChange(event)
-  }
-  return (
-    <Fragment>
-      <button>-</button>
-      <input value={props.value} disabled={true} />
-      <button onClick={myIncrease}>+</button>
-    </Fragment>
-  )
-}
+// const CustomQuantity = (props: any) => {
+//   // console.log('props', props)
+//   const myIncrease = (event: any) => {
+//     event.target.value = props.value + 1
+//     props.handleChange(event)
+//   }
+//   return (
+//     <Fragment>
+//       <button>-</button>
+//       <input value={props.value} disabled={true} />
+//       <button onClick={myIncrease}>+</button>
+//     </Fragment>
+//   )
+// }
 
 export default function Order() {
   const [token, setToken] = useState('')
@@ -121,7 +121,7 @@ export default function Order() {
                     <VariantsContainer>
                       <div className="m-2">
                         <VariantSelector
-                          id="variant-selector"
+                          data-cy="variant-selector"
                           className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                           name="variant1"
                           options={[
@@ -149,14 +149,15 @@ export default function Order() {
                     <div className="m-2">
                       <QuantitySelector
                         max={12}
-                        id="quantity-selector"
-                        className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                      >
-                        {CustomQuantity}
-                      </QuantitySelector>
+                        data-cy="quantity-selector"
+                        className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                      />
                     </div>
                     <div className="m-2">
-                      <AddToCartButton className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                      <AddToCartButton
+                        data-cy="add-to-cart"
+                        className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      >
                         {CustomAddToCart}
                       </AddToCartButton>
                     </div>
@@ -172,16 +173,16 @@ export default function Order() {
               <LineItemsContainer>
                 <p className="text-sm m-2">
                   Your shopping bag contains{' '}
-                  <LineItemsCount id="items-count" className="font-bold" />{' '}
+                  <LineItemsCount data-cy="items-count" className="font-bold" />{' '}
                   items
                 </p>
                 <div className="flex flex-col p-2">
                   <LineItem>
                     <div className="flex justify-around items-center border-b p-5">
                       <LineItemImage className="p-2" width={80} />
-                      <LineItemName id="line-item-name" className="p-2" />
+                      <LineItemName data-cy="line-item-name" className="p-2" />
                       <LineItemQuantity
-                        id="line-item-quantity"
+                        data-cy="line-item-quantity"
                         max={100}
                         className="p-2"
                       />
@@ -190,9 +191,12 @@ export default function Order() {
                         resource="lineItem"
                         field="quantity"
                       />
-                      <LineItemAmount id="line-item-total" className="p-2" />
+                      <LineItemAmount
+                        data-cy="line-item-total"
+                        className="p-2"
+                      />
                       <LineItemRemoveLink
-                        id="line-item-remove"
+                        data-cy="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                       />
                     </div>
@@ -200,16 +204,19 @@ export default function Order() {
                   <LineItem type="gift_cards">
                     <div className="flex justify-between items-center border-b p-5">
                       <LineItemImage className="p-2" width={40} />
-                      <LineItemName id="line-item-name" className="p-2" />
+                      <LineItemName data-cy="line-item-name" className="p-2" />
                       <LineItemQuantity
-                        id="line-item-quantity"
+                        data-cy="line-item-quantity"
                         max={10}
                         className="p-2"
                         disabled
                       />
-                      <LineItemAmount id="line-item-total" className="p-2" />
+                      <LineItemAmount
+                        data-cy="line-item-total"
+                        className="p-2"
+                      />
                       <LineItemRemoveLink
-                        id="line-item-remove"
+                        data-cy="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                       />
                     </div>
@@ -264,7 +271,7 @@ export default function Order() {
                     <p className="text-lg mr-2">Total </p>
                   </div>
                   <div className="text-right">
-                    <TotalAmount id="total-amount" />
+                    <TotalAmount data-cy="total-amount" />
                   </div>
                 </div>
               </div>

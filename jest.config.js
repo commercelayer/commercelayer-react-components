@@ -1,3 +1,6 @@
+const tsconfig = require('./tsconfig.json')
+const moduleNameMapper = require('tsconfig-paths-jest')(tsconfig)
+
 module.exports = {
   // collectCoverageFrom: [
   //   '**/*.{js,jsx,ts,tsx}',
@@ -10,4 +13,5 @@ module.exports = {
     '^.+\\.(ts|tsx)$': '<rootDir>/node_modules/babel-jest',
   },
   transformIgnorePatterns: ['/node_modules/'],
+  moduleNameMapper,
 }

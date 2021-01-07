@@ -91,35 +91,15 @@ describe('Order with radio variants', () => {
 
     cy.get('#add-to-bag').click()
 
-    cy.get('#items-count').should('contain.text', '4')
+    cy.get('#items-count').should('contain.text', '3')
 
-    cy.get('.font-medium > .text-right > span').should(
-      'contain.text',
-      '€107,00'
-    )
-    cy.get('#total-amount').should('contain.text', '€107,00')
+    cy.get('.font-medium > .text-right > span').should('contain.text', '€87,00')
+    cy.get('#total-amount').should('contain.text', '€87,00')
   })
 
   if (Cypress.env('RECORD')) {
     // NOTE cypress does not dispatch getOrders request after deleting the lineItem (only in STUB mode 🤷🏻‍♂️)
-    it('Remove the second lineItem', () => {
-      cy.get(':nth-child(2) > #line-item-remove').click()
-
-      cy.wait([
-        '@lineItems',
-        '@deleteLineItems',
-        '@getOrders',
-        '@retrieveLineItems',
-      ])
-
-      cy.get('#items-count').should('contain.text', '1')
-      cy.get('.font-medium > .text-right > span').should(
-        'contain.text',
-        '€20,00'
-      )
-      cy.get('#total-amount').should('contain.text', '€20,00')
-    })
-    it('Remove the first lineItem', () => {
+    it('Remove line items', () => {
       cy.get('#line-item-remove').click()
 
       cy.get('#items-count').should('contain.text', '0')

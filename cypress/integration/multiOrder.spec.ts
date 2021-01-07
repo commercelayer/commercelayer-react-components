@@ -138,7 +138,8 @@ describe('Multi order', () => {
     // }
 
     cy.get('button[name="add-it"]').click()
-    cy.wait(['@insertLineItems', '@getOrders', '@retrieveLineItems'])
+    cy.wait(['@insertLineItems', '@getOrders'])
+    // cy.wait(['@insertLineItems', '@getOrders', '@retrieveLineItems'])
     cy.get('span[name="count-it"]').should('contain.text', '6')
     cy.get('.bg-gray-900 > .m-auto > .font-medium > .text-right > span').should(
       'have.text',
@@ -155,7 +156,7 @@ describe('Multi order', () => {
         '@lineItems',
         '@deleteLineItems',
         '@getOrders',
-        '@retrieveLineItems',
+        // '@retrieveLineItems',
       ])
       cy.get('span[name="count-us"]').should('have.text', '0')
       cy.get(

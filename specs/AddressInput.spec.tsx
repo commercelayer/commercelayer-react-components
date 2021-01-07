@@ -1,16 +1,14 @@
 import React from 'react'
-import { GiftCardInput } from '../src'
+import { AddressInput } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
-import BaseInput from '../src/components/utils/BaseInput'
-import Parent from '../src/components/utils/Parent'
 
-const propTypes = components.GiftCardInput.propTypes
+const propTypes = components.AddressInput.propTypes
 
-test('<GiftCardInput/>', () => {
+test('<AddressInput/>', () => {
   expect.assertions(5)
   const component = renderer.create(
-    <GiftCardInput type="text" name="firstName" />
+    <AddressInput type="text" name="billing_address_first_name" />
   )
   const tree = component.toJSON()
   const root = component.toTree()
@@ -22,57 +20,45 @@ test('<GiftCardInput/>', () => {
   expect(proptypes.placeholder).toBe(propTypes.placeholder)
 })
 
-test('<GiftCardInput check type required />', () => {
+test('<AddressInput check type required />', () => {
   expect.assertions(3)
   console.error = jest.fn()
-  const component = renderer.create(<GiftCardInput />)
+  const component = renderer.create(<AddressInput />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      'The prop `type` is marked as required in `GiftCardInput`, but its value is `undefined`'
+      'The prop `name` is marked as required in `AddressInput`, but its value is `undefined`'
     )
   )
   expect(console.error.mock.calls[1][2]).toEqual(
     expect.stringContaining(
-      'The prop `name` is marked as required in `GiftCardInput`, but its value is `undefined`'
+      'The prop `type` is marked as required in `AddressInput`, but its value is `undefined`'
     )
   )
 })
 
-test('<GiftCardInput check children type textarea />', () => {
+test('<AddressInput check Shipping Address name />', () => {
   expect.assertions(4)
   const component = renderer.create(
-    <GiftCardInput type="textarea" name="reference" />
+    <AddressInput type="text" name="shipping_address_first_name" />
   )
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
   expect(tree).toMatchSnapshot()
-  expect(rendered.type).toBe('textarea')
-  expect(root.props.type).toBe('textarea')
-  expect(root.props.name).toBe('reference')
-})
-
-test('<GiftCardInput check children type date />', () => {
-  expect.assertions(4)
-  const component = renderer.create(
-    <GiftCardInput type="date" name="expiresAt" />
-  )
-  const tree = component.toJSON()
-  const root = component.toTree()
-  const rendered = root.rendered
-  expect(tree).toMatchSnapshot()
+  expect(tree.props.name).toBe('shipping_address_first_name')
+  expect(tree.props.type).toBe('text')
   expect(rendered.type).toBe('input')
-  expect(root.props.name).toBe('expiresAt')
-  expect(root.props.type).toBe('date')
 })
 
-test('<GiftCardInput with custom children />', () => {
+test('<AddressInput with custom children />', () => {
   expect.assertions(4)
   const CustomComponent = (props) => <span>{props.label}</span>
   const component = renderer.create(
-    <GiftCardInput>{CustomComponent}</GiftCardInput>
+    <AddressInput type="text" name="shipping_address_first_name">
+      {CustomComponent}
+    </AddressInput>
   )
   const tree = component.toJSON()
   const root = component.toTree()

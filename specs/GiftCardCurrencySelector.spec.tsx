@@ -20,20 +20,26 @@ test('<GiftCardCurrencySelector/>', () => {
 })
 
 test('<GiftCardCurrencySelector check children />', () => {
-  expect.assertions(6)
   const component = renderer.create(<GiftCardCurrencySelector />)
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
   const options = [...currencyOptions]
   const childrenRendered = rendered.rendered
-  expect(tree).toMatchSnapshot()
-  expect(rendered.props.options).toStrictEqual(options)
-  expect(rendered.props.name).toStrictEqual('currencyCode')
-  expect(rendered.props.required).toBeTruthy()
-  expect(rendered.props.placeholder).toStrictEqual({
-    label: 'Select a currency',
-    value: '',
+  options.map(({ value, label }) => {
+    const option = [
+      {
+        instance: null,
+        nodeType: 'host',
+        props: { value: value, children: label },
+        rendered: [label],
+        type: 'option',
+      },
+    ]
+    expect(childrenRendered).toEqual(expect.arrayContaining(option))
   })
-  expect(childrenRendered.type).toStrictEqual('select')
+  expect(tree).toMatchSnapshot()
+  expect(rendered.props.name).toBe('currencyCode')
+  expect(rendered.props.required).toBeTruthy()
+  expect(rendered.type).toStrictEqual('select')
 })

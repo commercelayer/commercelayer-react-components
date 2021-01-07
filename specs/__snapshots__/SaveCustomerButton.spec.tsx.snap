@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SaveCustomerButton with custom children /> 1`] = `
+<span>
+  Continue
+</span>
+`;
+
+exports[`<SaveCustomerButton with props /> 1`] = `
+<button
+  disabled={true}
+  onClick={[Function]}
+  type="button"
+>
+  Continue
+</button>
+`;
+
+exports[`<SaveCustomerButton/> 1`] = `
+<button
+  disabled={true}
+  onClick={[Function]}
+  type="button"
+>
+  Save
+</button>
+`;

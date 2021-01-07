@@ -47,7 +47,7 @@ test('<OrderContainer check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to OrderContainer. Only components ItemContainer, LineItemsContainer, SubTotalAmount, DiscountAmount, ShippingAmount, TaxesAmount, GiftCardAmount, TotalAmount, CheckoutLink, GiftCardContainer, ReactNode are allowed.`
+      `Invalid prop 'children' supplied to OrderContainer. Only components AddressesContainer, CustomerContainer, ItemContainer, LineItemsContainer, SubTotalAmount, DiscountAmount, ShippingAmount, TaxesAmount, GiftCardAmount, TotalAmount, CheckoutLink, GiftCardContainer, ReactNode are allowed.`
     )
   )
 })

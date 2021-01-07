@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<AddressesContainer check children /> 1`] = `
+<a>
+  Checkout
+</a>
+`;
+
+exports[`<AddressesContainer children required /> 1`] = `null`;
+
+exports[`<AddressesContainer/> 1`] = `
+<div>
+  test
+</div>
+`;

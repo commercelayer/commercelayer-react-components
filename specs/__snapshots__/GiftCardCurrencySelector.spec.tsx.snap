@@ -9,7 +9,7 @@ exports[`<GiftCardCurrencySelector check children /> 1`] = `
   <option
     value=""
   >
-    Select a currency
+    Select an option
   </option>
   <option
     value="AED"
@@ -960,6 +960,11 @@ exports[`<GiftCardCurrencySelector/> 1`] = `
   name="currencyCode"
   required={true}
 >
+  <option
+    value=""
+  >
+    Select an option
+  </option>
   <option
     value="AED"
   >

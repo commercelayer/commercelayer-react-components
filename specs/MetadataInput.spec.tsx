@@ -41,34 +41,29 @@ test('<MetadataInput check type required />', () => {
 })
 
 test('<MetadataInput check children type textarea />', () => {
-  expect.assertions(4)
+  expect.assertions(3)
   const component = renderer.create(
     <MetadataInput type="textarea" name="reference" />
   )
   const tree = component.toJSON()
   const root = component.toTree()
-  const rendered = root.rendered
-  const childRendered = rendered.rendered
   expect(tree).toMatchSnapshot()
-  expect(rendered.type).toBe(BaseInput)
-  expect(childRendered.type).toBe('textarea')
-  expect(childRendered.props.name).toBe('reference')
+  expect(root.props.type).toBe('textarea')
+  expect(root.props.name).toBe('reference')
 })
 
 test('<MetadataInput check children type date />', () => {
-  expect.assertions(5)
+  expect.assertions(4)
   const component = renderer.create(
     <MetadataInput type="date" name="expiresAt" />
   )
   const tree = component.toJSON()
   const root = component.toTree()
   const rendered = root.rendered
-  const childRendered = rendered.rendered
   expect(tree).toMatchSnapshot()
-  expect(rendered.type).toBe(BaseInput)
-  expect(childRendered.type).toBe('input')
-  expect(childRendered.props.name).toBe('expiresAt')
-  expect(childRendered.props.type).toBe('date')
+  expect(rendered.type).toBe('input')
+  expect(root.props.name).toBe('expiresAt')
+  expect(root.props.type).toBe('date')
 })
 
 test('<MetadataInput with custom children />', () => {
@@ -84,5 +79,5 @@ test('<MetadataInput with custom children />', () => {
   expect(tree).toMatchSnapshot()
   expect(rendered.props.children).toBe(CustomComponent)
   expect(childRendered.nodeType).toBe('component')
-  expect(childRendered.type).toBe(Parent)
+  expect(childRendered.type).toBe(CustomComponent)
 })

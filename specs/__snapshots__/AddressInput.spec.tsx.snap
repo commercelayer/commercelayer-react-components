@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<AddressInput check Shipping Address name /> 1`] = `
+<input
+  name="shipping_address_first_name"
+  placeholder=""
+  required={true}
+  type="text"
+/>
+`;
+
+exports[`<AddressInput check type required /> 1`] = `
+<input
+  placeholder=""
+  required={true}
+/>
+`;
+
+exports[`<AddressInput with custom children /> 1`] = `<span />`;
+
+exports[`<AddressInput/> 1`] = `
+<input
+  name="billing_address_first_name"
+  placeholder=""
+  required={true}
+  type="text"
+/>
+`;

@@ -40,7 +40,7 @@ test('<Errors proptypes validation />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      'Invalid prop `resource` of value `test` supplied to `Errors`, expected one of ["order","giftCard","lineItem","variant","price","skuOption"]'
+      'Invalid prop `resource` of value `test` supplied to `Errors`, expected one of ["order","giftCard","lineItem","variant","price","skuOption","billingAddress","shippingAddress"]'
     )
   )
 })
