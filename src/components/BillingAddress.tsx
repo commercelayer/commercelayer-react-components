@@ -11,10 +11,12 @@ import _ from 'lodash'
 import { BaseError, CodeErrorType } from '@typings/errors'
 import { AddressField } from '@reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '@typings'
+import components from '@config/components'
+
+const propTypes = components.BillingAddress.propTypes
 
 type BillingAddressProps = {
   children: ReactNode
-  autoComplete?: 'on' | 'off'
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 const BillingAddress: FunctionComponent<BillingAddressProps> = (props) => {
@@ -63,5 +65,7 @@ const BillingAddress: FunctionComponent<BillingAddressProps> = (props) => {
     </BillingAddressContext.Provider>
   )
 }
+
+BillingAddress.propTypes = propTypes
 
 export default BillingAddress

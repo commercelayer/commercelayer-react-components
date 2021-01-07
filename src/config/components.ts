@@ -130,6 +130,12 @@ const components = {
       showShippingMethodName: false,
     },
   },
+  BillingAddress: {
+    permittedChildren: ['AddressInput', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
   CheckoutLink: {
     displayName: 'CheckoutLink',
     propTypes: {
@@ -145,13 +151,35 @@ const components = {
       'OrderContainer',
       'PricesContainer',
       'GiftCardContainer',
-      // 'AvailabilityContainer',
       'ReactNode',
     ],
     propTypes: {
       children: childrenTypes.isRequired,
       accessToken: PropTypes.string.isRequired,
       endpoint: PropTypes.string.isRequired,
+    },
+  },
+  CustomerContainer: {
+    displayName: 'CustomerContainer',
+    permittedChildren: ['CustomerInput', 'SaveCustomerButton', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
+      saveOnBlur: PropTypes.bool,
+      onSave: PropTypes.func,
+    },
+  },
+  CustomerInput: {
+    displayName: 'CustomerInput',
+    propTypes: {
+      children: PropTypes.func,
+      name: PropTypes.oneOf(['customerEmail']),
+      type: PropTypes.oneOf(['email']),
+      placeholder: PropTypes.string,
+      disabled: PropTypes.bool,
+      required: PropTypes.bool,
+    },
+    defaultProps: {
+      required: true,
     },
   },
   DiscountAmount: {
@@ -396,6 +424,7 @@ const components = {
   OrderContainer: {
     permittedChildren: [
       'AddressesContainer',
+      'CustomerContainer',
       'ItemContainer',
       'LineItemsContainer',
       'SubTotalAmount',
@@ -477,9 +506,27 @@ const components = {
       children: PropTypes.func,
       label: PropTypes.string,
       onClick: PropTypes.func,
+      disabled: PropTypes.bool,
     },
     defaultProps: {
       label: 'Continue to delivery',
+    },
+  },
+  SaveCustomerButton: {
+    displayName: 'SaveCustomerButton',
+    propTypes: {
+      children: PropTypes.func,
+      label: PropTypes.string,
+      onClick: PropTypes.func,
+    },
+    defaultProps: {
+      label: 'Save',
+    },
+  },
+  ShippingAddress: {
+    permittedChildren: ['AddressInput', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
     },
   },
   ShippingAmount: {

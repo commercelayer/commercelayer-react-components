@@ -67,7 +67,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
     return (): void => {
       setValue(min)
     }
-  }, [item, listIds])
+  }, [item, listIds, prices])
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const qty = Number(e.target.value)
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)

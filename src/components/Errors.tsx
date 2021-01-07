@@ -8,6 +8,7 @@ import LineItemContext from '@context/LineItemContext'
 import LineItemChildrenContext from '@context/LineItemChildrenContext'
 import { ErrorComponentProps } from '@typings/errors'
 import components from '@config/components'
+import CustomerContext from '@context/CustomerContext'
 
 const propTypes = components.Errors.propTypes
 const defaultProps = components.Errors.defaultProps
@@ -21,6 +22,7 @@ const Errors: FunctionComponent<ErrorsProps> = (props) => {
   const { errors: giftCardErrors } = useContext(GiftCardContext)
   const { errors: lineItemErrors } = useContext(LineItemContext)
   const { errors: addressErrors } = useContext(AddressContext)
+  const { errors: customerErrors } = useContext(CustomerContext)
   const { lineItem } = useContext(LineItemChildrenContext)
   // TODO add other errors
   const allErrors = [
@@ -28,6 +30,7 @@ const Errors: FunctionComponent<ErrorsProps> = (props) => {
     ...(orderErrors || []),
     ...(lineItemErrors || []),
     ...(addressErrors || []),
+    ...(customerErrors || []),
   ]
   const parentProps = { messages, resource, field, ...p }
   const msgErrors = getAllErrors({
