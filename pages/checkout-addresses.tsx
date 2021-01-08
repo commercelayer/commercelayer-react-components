@@ -7,11 +7,11 @@ import {
   OrderContainer,
   Errors,
   AddressesContainer,
-  BillingAddress,
+  BillingAddressForm,
   AddressInput,
   AddressCountrySelector,
   SaveAddressesButton,
-  ShippingAddress,
+  ShippingAddressForm,
   CustomerContainer,
   CustomerInput,
   SaveCustomerButton,
@@ -178,7 +178,7 @@ export default function Main() {
               <h3 className="text-lg font-medium leading-6 text-gray-900 bg-gray-50 p-2 my-3 shadow rounded-sm">
                 Billing Address
               </h3>
-              <BillingAddress autoComplete="on" className="p-2">
+              <BillingAddressForm autoComplete="on" className="p-2">
                 <div>
                   <label
                     htmlFor="billing_address_first_name"
@@ -383,7 +383,7 @@ export default function Main() {
                     />
                   </p>
                 </div>
-              </BillingAddress>
+              </BillingAddressForm>
               <div className="flex p-2">
                 <button
                   data-cy="ship-to-different-address-button"
@@ -407,7 +407,7 @@ export default function Main() {
                 </button>
                 <p className="ml-5">Ship to different address</p>
               </div>
-              <ShippingAddress
+              <ShippingAddressForm
                 autoComplete="on"
                 className={shipToDifferentAddress ? `block p-2` : `hidden`}
               >
@@ -614,7 +614,7 @@ export default function Main() {
                     />
                   </p>
                 </div>
-              </ShippingAddress>
+              </ShippingAddressForm>
               <div className="mt-5 p-2">
                 <SaveAddressesButton
                   data-cy="save-addresses-button"

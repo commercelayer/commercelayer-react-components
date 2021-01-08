@@ -100,8 +100,8 @@ const components = {
   AddressesContainer: {
     displayName: 'AddressesContainer',
     permittedChildren: [
-      'BillingAddress',
-      'ShippingAddress',
+      'BillingAddressForm',
+      'ShippingAddressForm',
       'SaveAddressesButton',
       'ReactNode',
     ],
@@ -130,7 +130,7 @@ const components = {
       showShippingMethodName: false,
     },
   },
-  BillingAddress: {
+  BillingAddressForm: {
     permittedChildren: ['AddressInput', 'ReactNode'],
     propTypes: {
       children: childrenTypes.isRequired,
@@ -523,7 +523,7 @@ const components = {
       label: 'Save',
     },
   },
-  ShippingAddress: {
+  ShippingAddressForm: {
     permittedChildren: ['AddressInput', 'ReactNode'],
     propTypes: {
       children: childrenTypes.isRequired,

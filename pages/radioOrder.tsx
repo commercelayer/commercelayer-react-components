@@ -78,7 +78,7 @@ export default function Order() {
       <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
-          <OrderContainer persistKey="orderUS">
+          <OrderContainer>
             <ItemContainer>
               <div className="md:flex">
                 <div className="md:flex-shrink-0">
@@ -125,7 +125,7 @@ export default function Order() {
                     <QuantitySelector
                       max={12}
                       id="quantity-selector"
-                      className="w-full block w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                      className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     />
                   </div>
                   <div className="m-2">
@@ -152,30 +152,6 @@ export default function Order() {
                   <div className="flex justify-around items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
-                    <div>
-                      <LineItemOptions name="Embossing" className="font-bold">
-                        <div className="flex flex-col justify-between text-sm">
-                          <LineItemOption
-                            keyClassName="font-medium capitalize underline"
-                            name="message"
-                          />
-                          <LineItemOption
-                            name="size"
-                            keyClassName="font-medium capitalize underline"
-                          />
-                        </div>
-                      </LineItemOptions>
-                    </div>
-                    <div>
-                      <LineItemOptions name="Color" className="font-bold">
-                        <div className="flex flex-col justify-between text-sm">
-                          <LineItemOption
-                            name="back"
-                            keyClassName="font-medium capitalize underline"
-                          />
-                        </div>
-                      </LineItemOptions>
-                    </div>
                     <LineItemQuantity
                       id="line-item-quantity"
                       max={100}
@@ -195,11 +171,7 @@ export default function Order() {
                 </LineItem>
                 <LineItem type="gift_cards">
                   <div className="flex justify-between items-center border-b p-5">
-                    <LineItemImage
-                      className="p-2"
-                      width={40}
-                      src="//contentful-gatsby-demo-it.netlify.com/icons/icon-48x48.png?v=c6e799c5132154cb5f3634994be3f8aa"
-                    />
+                    <LineItemImage className="p-2" width={40} />
                     <LineItemName id="line-item-name" className="p-2" />
                     <LineItemQuantity
                       id="line-item-quantity"

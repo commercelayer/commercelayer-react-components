@@ -6,23 +6,27 @@ import React, {
   useContext,
   useEffect,
 } from 'react'
-import BillingAddressContext from '@context/BillingAddressContext'
+import ShippingAddressContext from '@context/ShippingAddressContext'
 import _ from 'lodash'
 import { BaseError, CodeErrorType } from '@typings/errors'
 import { AddressField } from '@reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '@typings'
 import components from '@config/components'
 
-const propTypes = components.BillingAddress.propTypes
+const propTypes = components.ShippingAddressForm.propTypes
 
-type BillingAddressProps = {
+type ShippingAddressFormProps = {
   children: ReactNode
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
-const BillingAddress: FunctionComponent<BillingAddressProps> = (props) => {
+const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
+  props
+) => {
   const { children, autoComplete = 'on', ...p } = props
   const { validation, values, errors } = useRapidForm()
-  const { setAddressErrors, setAddress } = useContext(AddressesContext)
+  const { setAddressErrors, setAddress, shipToDifferentAddress } = useContext(
+    AddressesContext
+  )
   useEffect(() => {
     if (!_.isEmpty(errors)) {
       const formErrors: BaseError[] = []
@@ -31,41 +35,41 @@ const BillingAddress: FunctionComponent<BillingAddressProps> = (props) => {
         formErrors.push({
           code: code as CodeErrorType,
           message,
-          resource: 'billingAddress',
+          resource: 'shippingAddress',
           field: fieldName,
         })
       }
       !_.isEmpty(formErrors) && setAddressErrors(formErrors)
-    } else if (!_.isEmpty(values)) {
+    } else if (!_.isEmpty(values) && shipToDifferentAddress) {
       setAddressErrors([])
       for (const name in values) {
         const field = values[name]
         if (field?.value) {
-          values[name.replace('billing_address_', '')] = field.value
+          values[name.replace('shipping_address_', '')] = field.value
           delete values[name]
         }
       }
-      setAddress({ values, resource: 'billingAddress' })
+      setAddress({ values, resource: 'shippingAddress' })
     }
-  }, [errors, values])
+  }, [values, errors])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any
   ) => {
     const field: any = {
-      [name.replace('billing_address_', '')]: value,
+      [name.replace('shipping_address_', '')]: value,
     }
-    setAddress({ values: { ...values, ...field }, resource: 'billingAddress' })
+    setAddress({ values: { ...values, ...field }, resource: 'shippingAddress' })
   }
   return (
-    <BillingAddressContext.Provider value={{ validation, setValue }}>
+    <ShippingAddressContext.Provider value={{ validation, setValue }}>
       <form autoComplete={autoComplete} {...p}>
         {children}
       </form>
-    </BillingAddressContext.Provider>
+    </ShippingAddressContext.Provider>
   )
 }
 
-BillingAddress.propTypes = propTypes
+ShippingAddressForm.propTypes = propTypes
 
-export default BillingAddress
+export default ShippingAddressForm
