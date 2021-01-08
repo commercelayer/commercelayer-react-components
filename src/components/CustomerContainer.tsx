@@ -2,7 +2,6 @@ import React, {
   FunctionComponent,
   ReactNode,
   useContext,
-  useEffect,
   useReducer,
 } from 'react'
 import customerReducer, {
@@ -22,25 +21,14 @@ const displayName = components.CustomerContainer.displayName
 
 export type CustomerContainer = {
   children: ReactNode
-  saveOnBlur?: boolean
-  onSave?: () => void
 }
 const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
-  const { children, onSave, saveOnBlur = false } = props
+  const { children } = props
   const [state, dispatch] = useReducer(customerReducer, customerInitialState)
   const { order, getOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
-  useEffect(() => {
-    dispatch({
-      type: 'setSaveOnBlur',
-      payload: {
-        saveOnBlur,
-      },
-    })
-  }, [saveOnBlur])
   const contextValue = {
     ...state,
-    saveOnBlur,
     saveCustomerUser: async (customerEmail: string) => {
       await saveCustomerUser({
         config,
@@ -49,7 +37,6 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
         getOrder: getOrder as getOrderContext,
         order,
       })
-      if (onSave) onSave()
     },
     setCustomerErrors: (errors: BaseError[]) =>
       defaultCustomerContext['setCustomerErrors'](errors, dispatch),

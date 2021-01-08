@@ -23,13 +23,12 @@ const SaveCustomerButton: FunctionComponent<SaveCustomerButtonProps> = (
   props
 ) => {
   const { children, label = 'Save', resource, disabled, onClick, ...p } = props
-  const { errors, saveCustomerUser, customerEmail, saveOnBlur } = useContext(
+  const { errors, saveCustomerUser, customerEmail } = useContext(
     CustomerContext
   )
-  const disable =
-    disabled || saveOnBlur || !_.isEmpty(errors) || _.isEmpty(customerEmail)
+  const disable = disabled || !_.isEmpty(errors) || _.isEmpty(customerEmail)
   const handleClick = async () => {
-    if (_.isEmpty(errors) && !disable && !saveOnBlur) {
+    if (_.isEmpty(errors) && !disable) {
       await saveCustomerUser(customerEmail as string)
       onClick && onClick()
     }

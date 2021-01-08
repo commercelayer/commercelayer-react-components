@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import { getSalesChannelToken } from '@commercelayer/js-auth'
+import { getCustomerToken } from '@commercelayer/js-auth'
 import { Nav } from '.'
 import Head from 'next/head'
 import {
@@ -31,12 +31,18 @@ export default function Main() {
   useEffect(() => {
     const getToken = async () => {
       // @ts-ignore
-      const token = await getSalesChannelToken({
-        clientId:
-          '48ee4802f8227b04951645a9b7c8af1e3943efec7edd1dcfd04b5661bf1da5db',
-        endpoint,
-        scope: 'market:58',
-      })
+      const token = await getCustomerToken(
+        {
+          clientId:
+            '48ee4802f8227b04951645a9b7c8af1e3943efec7edd1dcfd04b5661bf1da5db',
+          endpoint,
+          scope: 'market:58',
+        },
+        {
+          username: 'bruce@wayne.com',
+          password: '123456',
+        }
+      )
       if (token) setToken(token.accessToken)
     }
     getToken()
@@ -132,7 +138,7 @@ export default function Main() {
               </button>
               <p className="ml-5">Save onBlur</p>
             </div>
-            <CustomerContainer>
+            <CustomerContainer saveOnBlur={saveOnBlur} onSave={handleOnSave}>
               <div>
                 <label
                   htmlFor="customer_email"
@@ -145,8 +151,6 @@ export default function Main() {
                     data-cy="customer_email"
                     className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                     placeholder="Email"
-                    saveOnBlur={saveOnBlur}
-                    onBlur={handleOnSave}
                   />
                 </div>
                 <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -163,7 +167,6 @@ export default function Main() {
                   <SaveCustomerButton
                     data-cy="save-customer-button"
                     className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                    onClick={handleOnSave}
                   />
                 </div>
               </div>
