@@ -1,16 +1,16 @@
 import React from 'react'
-import { ShippingAddress, Price } from '../src'
+import { ShippingAddressForm, Price } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 
-const propTypes = components.ShippingAddress.propTypes
+const propTypes = components.ShippingAddressForm.propTypes
 
-test('<ShippingAddress/>', () => {
+test('<ShippingAddressForm/>', () => {
   expect.assertions(2)
   const component = renderer.create(
-    <ShippingAddress>
+    <ShippingAddressForm>
       <div>test</div>
-    </ShippingAddress>
+    </ShippingAddressForm>
   )
   const tree = component.toJSON()
   const root = component.toTree()
@@ -19,32 +19,32 @@ test('<ShippingAddress/>', () => {
   expect(proptypes.children).toBe(propTypes.children)
 })
 
-test('<ShippingAddress proptypes required />', () => {
+test('<ShippingAddressForm proptypes required />', () => {
   expect.assertions(2)
   console.error = jest.fn()
-  const component = renderer.create(<ShippingAddress />)
+  const component = renderer.create(<ShippingAddressForm />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `The prop 'children' is marked as required in 'ShippingAddress', but its value is 'undefined'.`
+      `The prop 'children' is marked as required in 'ShippingAddressForm', but its value is 'undefined'.`
     )
   )
 })
 
-test('<ShippingAddress check children />', () => {
+test('<ShippingAddressForm check children />', () => {
   expect.assertions(2)
   console.error = jest.fn()
   const component = renderer.create(
-    <ShippingAddress>
+    <ShippingAddressForm>
       <Price />
-    </ShippingAddress>
+    </ShippingAddressForm>
   )
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to ShippingAddress. Only components AddressInput, ReactNode are allowed.`
+      `Invalid prop 'children' supplied to ShippingAddressForm. Only components AddressInput, ReactNode are allowed.`
     )
   )
 })

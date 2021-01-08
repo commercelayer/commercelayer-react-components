@@ -1,16 +1,16 @@
 import React from 'react'
-import { BillingAddress, Price } from '../src'
+import { BillingAddressForm, Price } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 
-const propTypes = components.BillingAddress.propTypes
+const propTypes = components.BillingAddressForm.propTypes
 
-test('<BillingAddress/>', () => {
+test('<BillingAddressForm/>', () => {
   expect.assertions(2)
   const component = renderer.create(
-    <BillingAddress>
+    <BillingAddressForm>
       <div>test</div>
-    </BillingAddress>
+    </BillingAddressForm>
   )
   const tree = component.toJSON()
   const root = component.toTree()
@@ -19,32 +19,32 @@ test('<BillingAddress/>', () => {
   expect(proptypes.children).toBe(propTypes.children)
 })
 
-test('<BillingAddress proptypes required />', () => {
+test('<BillingAddressForm proptypes required />', () => {
   expect.assertions(2)
   console.error = jest.fn()
-  const component = renderer.create(<BillingAddress />)
+  const component = renderer.create(<BillingAddressForm />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `The prop 'children' is marked as required in 'BillingAddress', but its value is 'undefined'.`
+      `The prop 'children' is marked as required in 'BillingAddressForm', but its value is 'undefined'.`
     )
   )
 })
 
-test('<BillingAddress check children />', () => {
+test('<BillingAddressForm check children />', () => {
   expect.assertions(2)
   console.error = jest.fn()
   const component = renderer.create(
-    <BillingAddress>
+    <BillingAddressForm>
       <Price />
-    </BillingAddress>
+    </BillingAddressForm>
   )
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to BillingAddress. Only components AddressInput, ReactNode are allowed.`
+      `Invalid prop 'children' supplied to BillingAddressForm. Only components AddressInput, ReactNode are allowed.`
     )
   )
 })
