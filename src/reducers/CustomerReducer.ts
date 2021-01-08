@@ -5,14 +5,10 @@ import { OrderCollection } from '@commercelayer/js-sdk'
 import { CommerceLayerConfig } from '@context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
 
-export type CustomerActionType =
-  | 'setErrors'
-  | 'setSaveOnBlur'
-  | 'setCustomerEmail'
+export type CustomerActionType = 'setErrors' | 'setCustomerEmail'
 
 export interface CustomerActionPayload {
   errors: BaseError[]
-  saveOnBlur: boolean
   customerEmail: string
 }
 
@@ -27,13 +23,6 @@ export type SetSaveOnBlur = (args: {
   saveOnBlur: boolean
   dispatch: Dispatch<CustomerAction>
 }) => void
-
-export const setSaveOnBlur: SetSaveOnBlur = ({ saveOnBlur, dispatch }) => {
-  dispatch({
-    type: 'setSaveOnBlur',
-    payload: { saveOnBlur },
-  })
-}
 
 export type SaveCustomerUser = (args: {
   config: CommerceLayerConfig
@@ -98,11 +87,7 @@ export const customerInitialState: CustomerState = {
   errors: [],
 }
 
-const type: CustomerActionType[] = [
-  'setErrors',
-  'setSaveOnBlur',
-  'setCustomerEmail',
-]
+const type: CustomerActionType[] = ['setErrors', 'setCustomerEmail']
 
 const customerReducer = (
   state: CustomerState,

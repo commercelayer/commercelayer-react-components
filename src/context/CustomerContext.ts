@@ -11,7 +11,6 @@ type DefaultContext = {
   customerEmail?: string
   errors?: BaseError[]
   saveCustomerUser: (customerEmail: string) => Promise<void>
-  saveOnBlur: boolean
   setCustomerErrors: SetCustomerErrors
   setCustomerEmail: SetCustomerEmail
 }
@@ -20,7 +19,6 @@ export const defaultCustomerContext = {
   saveCustomerUser: async (): Promise<void> => {
     return
   },
-  saveOnBlur: false,
   setCustomerErrors,
   setCustomerEmail,
 }

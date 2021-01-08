@@ -13,29 +13,31 @@ const displayName = components.CustomerInput.displayName
 type CustomerInputProps = {
   name?: 'customer_email' | string
   type?: 'email' | string
-} & Omit<BaseInputComponentProps, 'name' | 'type'> &
+  saveOnBlur?: boolean
+  onBlur?: () => void
+} & Omit<BaseInputComponentProps, 'name' | 'type' | 'onBlur'> &
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
 
 const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
   const {
+    name = 'customer_email',
     placeholder = '',
     required = true,
-    value,
-    name = 'customer_email',
+    saveOnBlur = false,
     type = 'email',
+    value,
+    onBlur,
     ...p
   } = props
   const { validation, values, errors } = useRapidForm()
-  const {
-    saveOnBlur,
-    saveCustomerUser,
-    setCustomerErrors,
-    setCustomerEmail,
-  } = useContext(CustomerContext)
-  const handleOnBlur = () => {
+  const { saveCustomerUser, setCustomerErrors, setCustomerEmail } = useContext(
+    CustomerContext
+  )
+  const handleOnBlur = async () => {
     if (saveOnBlur && _.isEmpty(errors) && !_.isEmpty(values)) {
-      saveCustomerUser(values[name].value)
+      await saveCustomerUser(values[name].value)
+      onBlur && onBlur()
     }
   }
   useEffect(() => {

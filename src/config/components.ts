@@ -161,11 +161,14 @@ const components = {
   },
   CustomerContainer: {
     displayName: 'CustomerContainer',
-    permittedChildren: ['CustomerInput', 'SaveCustomerButton', 'ReactNode'],
+    permittedChildren: [
+      'CustomerInput',
+      'SaveCustomerButton',
+      'AddressesContainer',
+      'ReactNode',
+    ],
     propTypes: {
       children: childrenTypes.isRequired,
-      saveOnBlur: PropTypes.bool,
-      onSave: PropTypes.func,
     },
   },
   CustomerInput: {
@@ -177,6 +180,7 @@ const components = {
       placeholder: PropTypes.string,
       disabled: PropTypes.bool,
       required: PropTypes.bool,
+      saveOnBlur: PropTypes.bool,
     },
     defaultProps: {
       required: true,

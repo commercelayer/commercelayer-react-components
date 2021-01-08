@@ -16,6 +16,8 @@ test('<CustomerInput/>', () => {
   expect(proptypes.type).toBe(propTypes.type)
   expect(proptypes.name).toBe(propTypes.name)
   expect(proptypes.placeholder).toBe(propTypes.placeholder)
+  expect(proptypes.disabled).toBe(propTypes.disabled)
+  expect(proptypes.saveOnBlur).toBe(propTypes.saveOnBlur)
 })
 
 test('<CustomerInput check default props />', () => {
