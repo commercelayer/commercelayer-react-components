@@ -43,6 +43,7 @@ export type ResourceErrorType =
   | 'skuOption'
   | 'billingAddress'
   | 'shippingAddress'
+  | 'address'
 
 const CEType: CodeErrorType[] = [
   'EMPTY_ERROR',

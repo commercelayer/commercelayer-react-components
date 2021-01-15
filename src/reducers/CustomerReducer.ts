@@ -1,15 +1,24 @@
 import baseReducer from '@utils/baseReducer'
 import { Dispatch } from 'react'
 import { BaseError } from '@typings/errors'
-import { OrderCollection } from '@commercelayer/js-sdk'
+import {
+  AddressCollection,
+  CustomerAddress,
+  OrderCollection,
+} from '@commercelayer/js-sdk'
 import { CommerceLayerConfig } from '@context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
+import getErrorsByCollection from '@utils/getErrorsByCollection'
 
-export type CustomerActionType = 'setErrors' | 'setCustomerEmail'
+export type CustomerActionType =
+  | 'setErrors'
+  | 'setCustomerEmail'
+  | 'setAddresses'
 
 export interface CustomerActionPayload {
-  errors: BaseError[]
+  addresses: AddressCollection[]
   customerEmail: string
+  errors: BaseError[]
 }
 
 export type CustomerState = Partial<CustomerActionPayload>
@@ -83,11 +92,47 @@ export const setCustomerEmail: SetCustomerEmail = (customerEmail, dispatch) => {
     })
 }
 
-export const customerInitialState: CustomerState = {
-  errors: [],
+export type GetCustomerAddresses = (params: {
+  config: CommerceLayerConfig
+  dispatch: Dispatch<CustomerAction>
+}) => Promise<void>
+
+export const getCustomerAddresses: GetCustomerAddresses = async ({
+  config,
+  dispatch,
+}) => {
+  try {
+    const customerAddresses = await CustomerAddress.withCredentials(config)
+      .includes('address')
+      .all()
+    const addresses = customerAddresses
+      .toArray()
+      .map((customerAddress) => customerAddress.address() as any)
+    dispatch({
+      type: 'setAddresses',
+      payload: { addresses },
+    })
+  } catch (col) {
+    const errors = getErrorsByCollection(col, 'address')
+    dispatch({
+      type: 'setErrors',
+      payload: {
+        errors,
+      },
+    })
+  }
 }
 
-const type: CustomerActionType[] = ['setErrors', 'setCustomerEmail']
+export const customerInitialState: CustomerState = {
+  errors: [],
+  addresses: [],
+}
+
+const type: CustomerActionType[] = [
+  'setErrors',
+  'setCustomerEmail',
+  'setAddresses',
+]
 
 const customerReducer = (
   state: CustomerState,

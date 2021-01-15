@@ -12,6 +12,7 @@ import addressReducer, {
   addressInitialState,
   AddressSchema,
   SetAddressParams,
+  setCloneAddress,
 } from '@reducers/AddressReducer'
 import { BaseError } from '@typings/errors'
 import OrderContext from '@context/OrderContext'
@@ -54,6 +55,10 @@ const AddressesContainer: FunctionComponent<AddressesContainer> = (props) => {
         orderId,
         state,
       }),
+    setCloneAddress: (
+      id: string,
+      resource: 'billingAddress' | 'shippingAddress'
+    ): void => setCloneAddress(id, resource, dispatch),
   }
   return (
     <AddressesContext.Provider value={contextValue}>

@@ -118,6 +118,7 @@ export type AddressInputName =
   | 'billing_address_phone'
   | 'billing_address_state_code'
   | 'billing_address_zip_code'
+  | 'billing_address_save_to_customer_book'
   | 'shipping_address_city'
   | 'shipping_address_company'
   | 'shipping_address_email'
@@ -128,6 +129,7 @@ export type AddressInputName =
   | 'shipping_address_phone'
   | 'shipping_address_state_code'
   | 'shipping_address_zip_code'
+  | 'shipping_address_save_to_customer_book'
 
 export type AddressCountrySelectName =
   | 'billing_address_country_code'

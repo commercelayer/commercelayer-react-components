@@ -37,18 +37,35 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     shipToDifferentAddress,
     shippingAddress,
     saveAddresses,
+    billingAddressId,
+    shippingAddressId,
   } = useContext(AddressContext)
   let disable =
     disabled ||
     !_.isEmpty(errors) ||
     _.isEmpty(billingAddress) ||
     (shipToDifferentAddress && _.isEmpty(shippingAddress))
+  if (!_.isEmpty(billingAddressId) && _.isEmpty(billingAddress)) {
+    disable = shipToDifferentAddress ? true : false
+  }
+  if (
+    !_.isEmpty(shippingAddressId) &&
+    shipToDifferentAddress &&
+    _.isEmpty(shippingAddress)
+  ) {
+    disable = false
+  }
   if (_.isEmpty(errors) && !_.isEmpty(billingAddress)) {
     disable = billingAddress && fieldsExist(billingAddress)
   }
-  if (_.isEmpty(errors) && shipToDifferentAddress) {
+  if (
+    _.isEmpty(errors) &&
+    shipToDifferentAddress &&
+    !_.isEmpty(shippingAddress)
+  ) {
     disable = shippingAddress ? fieldsExist(shippingAddress) : true
   }
+
   const handleClick = async () => {
     if (_.isEmpty(errors) && !disable) {
       await saveAddresses()

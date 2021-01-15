@@ -9,6 +9,7 @@ import orderReducer, {
   orderInitialState,
   AddToCartValues,
   createOrder,
+  cloneAddress,
 } from '@reducers/OrderReducer'
 import CommerceLayerContext from '@context/CommerceLayerContext'
 import OrderContext from '@context/OrderContext'
@@ -22,6 +23,7 @@ import { unsetOrderState } from '@reducers/OrderReducer'
 import components from '@config/components'
 import { BaseMetadataObject } from '@typings'
 import OrderStorageContext from '@context/OrderStorageContext'
+import { saveAddressToCustomerBook } from '../reducers/OrderReducer'
 
 const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps
@@ -95,6 +97,10 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
         orderAttributes: attributes,
         setLocalOrder,
       }),
+    saveAddressToCustomerBook: (
+      type: 'BillingAddress' | 'ShippingAddress',
+      value: boolean
+    ) => saveAddressToCustomerBook({ type, value, dispatch }),
   }
   return (
     <OrderContext.Provider value={orderValue as OrderState}>

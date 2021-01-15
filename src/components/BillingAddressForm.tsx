@@ -6,12 +6,13 @@ import React, {
   useContext,
   useEffect,
 } from 'react'
-import BillingAddressContext from '@context/BillingAddressContext'
+import BillingAddressFormContext from '@context/BillingAddressFormContext'
 import _ from 'lodash'
 import { BaseError, CodeErrorType } from '@typings/errors'
 import { AddressField } from '@reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '@typings'
 import components from '@config/components'
+import OrderContext from '@context/OrderContext'
 
 const propTypes = components.BillingAddressForm.propTypes
 
@@ -25,6 +26,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
   const { children, autoComplete = 'on', ...p } = props
   const { validation, values, errors } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
+  const { saveAddressToCustomerBook } = useContext(OrderContext)
   useEffect(() => {
     if (!_.isEmpty(errors)) {
       const formErrors: BaseError[] = []
@@ -46,6 +48,10 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
           values[name.replace('billing_address_', '')] = field.value
           delete values[name]
         }
+        if (field?.type === 'checkbox') {
+          delete values[name]
+          saveAddressToCustomerBook('BillingAddress', field.checked)
+        }
       }
       setAddress({ values, resource: 'billingAddress' })
     }
@@ -60,11 +66,11 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     setAddress({ values: { ...values, ...field }, resource: 'billingAddress' })
   }
   return (
-    <BillingAddressContext.Provider value={{ validation, setValue }}>
+    <BillingAddressFormContext.Provider value={{ validation, setValue }}>
       <form autoComplete={autoComplete} {...p}>
         {children}
       </form>
-    </BillingAddressContext.Provider>
+    </BillingAddressFormContext.Provider>
   )
 }
 

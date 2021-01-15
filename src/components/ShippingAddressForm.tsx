@@ -5,13 +5,15 @@ import React, {
   ReactNode,
   useContext,
   useEffect,
+  useRef,
 } from 'react'
-import ShippingAddressContext from '@context/ShippingAddressContext'
+import ShippingAddressFormContext from '@context/ShippingAddressFormContext'
 import _ from 'lodash'
 import { BaseError, CodeErrorType } from '@typings/errors'
 import { AddressField } from '@reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '@typings'
 import components from '@config/components'
+import OrderContext from '@context/OrderContext'
 
 const propTypes = components.ShippingAddressForm.propTypes
 
@@ -27,6 +29,8 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
   const { setAddressErrors, setAddress, shipToDifferentAddress } = useContext(
     AddressesContext
   )
+  const { saveAddressToCustomerBook } = useContext(OrderContext)
+  const ref = useRef(null)
   useEffect(() => {
     if (!_.isEmpty(errors)) {
       const formErrors: BaseError[] = []
@@ -39,7 +43,9 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
           field: fieldName,
         })
       }
-      !_.isEmpty(formErrors) && setAddressErrors(formErrors)
+      !_.isEmpty(formErrors) &&
+        shipToDifferentAddress &&
+        setAddressErrors(formErrors)
     } else if (!_.isEmpty(values) && shipToDifferentAddress) {
       setAddressErrors([])
       for (const name in values) {
@@ -48,10 +54,24 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
           values[name.replace('shipping_address_', '')] = field.value
           delete values[name]
         }
+        if (field?.type === 'checkbox') {
+          delete values[name]
+          saveAddressToCustomerBook('ShippingAddress', field.checked)
+        }
       }
       setAddress({ values, resource: 'shippingAddress' })
     }
-  }, [values, errors])
+    if (!shipToDifferentAddress) {
+      saveAddressToCustomerBook &&
+        saveAddressToCustomerBook('ShippingAddress', false)
+      if (ref) {
+        // @ts-ignore
+        ref.current?.reset()
+        setAddressErrors([])
+        setAddress({ values: {}, resource: 'shippingAddress' })
+      }
+    }
+  }, [values, errors, shipToDifferentAddress])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any
@@ -62,11 +82,11 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     setAddress({ values: { ...values, ...field }, resource: 'shippingAddress' })
   }
   return (
-    <ShippingAddressContext.Provider value={{ validation, setValue }}>
-      <form autoComplete={autoComplete} {...p}>
+    <ShippingAddressFormContext.Provider value={{ validation, setValue }}>
+      <form ref={ref} autoComplete={autoComplete} {...p}>
         {children}
       </form>
-    </ShippingAddressContext.Provider>
+    </ShippingAddressFormContext.Provider>
   )
 }
 
