@@ -1,6 +1,6 @@
 import { createContext, RefObject } from 'react'
-import { AddressCountrySelectName, AddressInputName } from '@typings'
-import { AddressField } from '@reducers/AddressReducer'
+import { AddressCountrySelectName, AddressInputName } from '#typings'
+import { AddressField } from '#reducers/AddressReducer'
 
 type DefaultContext = {
   validation?: () => RefObject<any>

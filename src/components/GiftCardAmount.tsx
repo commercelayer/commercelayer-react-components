@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react'
 import BaseOrderPrice from './utils/BaseOrderPrice'
-import components from '@config/components'
-import { BaseAmountComponent } from '@typings'
+import components from '#config/components'
+import { BaseAmountComponent } from '#typings'
 
 const propTypes = components.GiftCardAmount.propTypes
 const displayName = components.GiftCardAmount.displayName

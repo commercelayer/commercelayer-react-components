@@ -1,5 +1,5 @@
-import OrderContext from '@context/OrderContext'
-import getAmount from '@utils/getAmount'
+import OrderContext from '#context/OrderContext'
+import getAmount from '#utils/getAmount'
 import Parent from './Parent'
 import React, {
   FunctionComponent,
@@ -7,8 +7,8 @@ import React, {
   useEffect,
   useContext,
 } from 'react'
-import { PropsType } from '@utils/PropsType'
-import { baseOrderPricePropTypes } from '@typings'
+import { PropsType } from '#utils/PropsType'
+import { baseOrderPricePropTypes } from '#typings'
 import _ from 'lodash'
 
 export type BaseOrderPriceProps = PropsType<typeof baseOrderPricePropTypes> &

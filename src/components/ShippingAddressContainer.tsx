@@ -1,6 +1,6 @@
 import ShippingAddressContext, {
   defaultShippingAddressContext,
-} from '@context/ShippingAddressContext'
+} from '#context/ShippingAddressContext'
 import React, {
   FunctionComponent,
   ReactNode,
@@ -9,11 +9,11 @@ import React, {
 } from 'react'
 import shippingAddressReducer, {
   shippingAddressInitialState,
-} from '@reducers/ShippingAddressReducer'
-import CommerceLayerContext from '@context/CommerceLayerContext'
-import components from '@config/components'
-import OrderContext from '@context/OrderContext'
-import AddressContext from '@context/AddressContext'
+} from '#reducers/ShippingAddressReducer'
+import CommerceLayerContext from '#context/CommerceLayerContext'
+import components from '#config/components'
+import OrderContext from '#context/OrderContext'
+import AddressContext from '#context/AddressContext'
 
 const propTypes = components.ShippingAddressContainer.propTypes
 

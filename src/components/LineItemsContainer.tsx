@@ -10,12 +10,12 @@ import lineItemReducer, {
   updateLineItem,
   deleteLineItem,
   getLineItems,
-} from '@reducers/LineItemReducer'
-import OrderContext from '@context/OrderContext'
-import LineItemContext, { LineItemContextValue } from '@context/LineItemContext'
-import CommerceLayerContext from '@context/CommerceLayerContext'
+} from '#reducers/LineItemReducer'
+import OrderContext from '#context/OrderContext'
+import LineItemContext, { LineItemContextValue } from '#context/LineItemContext'
+import CommerceLayerContext from '#context/CommerceLayerContext'
 import _ from 'lodash'
-import components from '@config/components'
+import components from '#config/components'
 
 const propTypes = components.LineItemsContainer.propTypes
 const defaultProps = components.LineItemsContainer.defaultProps

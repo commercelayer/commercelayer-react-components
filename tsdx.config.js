@@ -5,18 +5,18 @@ const alias = require('@rollup/plugin-alias')
 
 module.exports = {
   rollup(config, options) {
-    //Replace "@/" with "src/" as the root directory
+    //Replace "#/" with "src/" as the root directory
     config.plugins.push({
       plugins: [
         alias({
           entries: [
-            { find: '@components/*', replacement: 'src/components/*' },
-            { find: '@context/*', replacement: 'src/context/*' },
-            { find: '@typings/*', replacement: 'src/typings/*' },
-            { find: '@utils/*', replacement: 'src/utils/*' },
-            { find: '@reducers/*', replacement: 'src/reducers/*' },
-            { find: '@config/*', replacement: 'src/config/*' },
-            // { find: /@/, replacement: /.\// }
+            { find: '#components/*', replacement: 'src/components/*' },
+            { find: '#context/*', replacement: 'src/context/*' },
+            { find: '#typings/*', replacement: 'src/typings/*' },
+            { find: '#utils/*', replacement: 'src/utils/*' },
+            { find: '#reducers/*', replacement: 'src/reducers/*' },
+            { find: '#config/*', replacement: 'src/config/*' },
+            // { find: /#/, replacement: /.\// }
           ],
         }),
       ],
@@ -24,7 +24,7 @@ module.exports = {
     //Do not treat absolute paths as external modules
     return {
       ...config,
-      external: (id) => !id.startsWith('@/') && config.external(id),
+      external: (id) => !id.startsWith('#') && config.external(id),
     }
   },
 }

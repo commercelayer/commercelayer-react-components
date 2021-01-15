@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import childrenTypes from '@utils/childrenTypes'
+import childrenTypes from '#utils/childrenTypes'
 import {
   TimeFormat,
   BaseInputType,
@@ -13,9 +13,9 @@ import {
   BaseSelectorType,
   AddressInputName,
   AddressCountrySelectName,
-} from '@typings'
-import { ErrorPropTypes } from '@typings/errors'
-import { BaseInputComponentPropTypes } from '@typings/index'
+} from '#typings'
+import { ErrorPropTypes } from '#typings/errors'
+import { BaseInputComponentPropTypes } from '#typings/index'
 
 const components = {
   Address: {

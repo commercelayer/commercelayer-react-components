@@ -4,10 +4,10 @@ import React, {
   useContext,
   ReactNode,
 } from 'react'
-import LineItemContext from '@context/LineItemContext'
-import LineItemChildrenContext from '@context/LineItemChildrenContext'
-import components from '@config/components'
-import { LineItemType } from '@typings'
+import LineItemContext from '#context/LineItemContext'
+import LineItemChildrenContext from '#context/LineItemChildrenContext'
+import components from '#config/components'
+import { LineItemType } from '#typings'
 
 const propTypes = components.LineItem.propTypes
 const displayName = components.LineItem.displayName

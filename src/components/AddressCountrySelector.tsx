@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useContext, useEffect } from 'react'
 import BaseSelect from './utils/BaseSelect'
-import countriesOptions from '@config/countries.json'
-import components from '@config/components'
-import { AddressCountrySelectName, BaseSelectComponentProps } from '@typings'
-import BillingAddressFormContext from '@context/BillingAddressFormContext'
-import ShippingAddressFormContext from '@context/ShippingAddressFormContext'
+import countriesOptions from '#config/countries.json'
+import components from '#config/components'
+import { AddressCountrySelectName, BaseSelectComponentProps } from '#typings'
+import BillingAddressFormContext from '#context/BillingAddressFormContext'
+import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 
 const propTypes = components.AddressCountrySelector.propTypes
 const defaultProps = components.AddressCountrySelector.defaultProps

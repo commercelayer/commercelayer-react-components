@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useContext } from 'react'
 import Parent from './utils/Parent'
-import components from '@config/components'
-import { FunctionChildren } from '@typings/index'
+import components from '#config/components'
+import { FunctionChildren } from '#typings/index'
 import _ from 'lodash'
-import CustomerContext from '@context/CustomerContext'
+import CustomerContext from '#context/CustomerContext'
 
 const propTypes = components.SaveCustomerButton.propTypes
 const defaultProps = components.SaveCustomerButton.defaultProps

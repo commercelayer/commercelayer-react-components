@@ -5,11 +5,11 @@ import React, {
   ReactNode,
   useState,
 } from 'react'
-import AddressChildrenContext from '@context/AddressChildrenContext'
-import components from '@config/components'
-import CustomerContext from '@context/CustomerContext'
-import BillingAddressContext from '@context/BillingAddressContext'
-import ShippingAddressContext from '@context/ShippingAddressContext'
+import AddressChildrenContext from '#context/AddressChildrenContext'
+import components from '#config/components'
+import CustomerContext from '#context/CustomerContext'
+import BillingAddressContext from '#context/BillingAddressContext'
+import ShippingAddressContext from '#context/ShippingAddressContext'
 import { AddressCollection } from '@commercelayer/js-sdk'
 import _ from 'lodash'
 

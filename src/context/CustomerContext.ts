@@ -4,8 +4,8 @@ import {
   setCustomerErrors,
   SetCustomerErrors,
   setCustomerEmail,
-} from '@reducers/CustomerReducer'
-import { BaseError } from '@typings/errors'
+} from '#reducers/CustomerReducer'
+import { BaseError } from '#typings/errors'
 import { createContext } from 'react'
 
 type DefaultContext = {

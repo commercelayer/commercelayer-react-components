@@ -1,4 +1,4 @@
-import { CodeErrorType, ResourceErrorType, BaseError } from '@typings/errors'
+import { CodeErrorType, ResourceErrorType, BaseError } from '#typings/errors'
 import BaseClass from '@commercelayer/js-sdk/dist/utils/BaseClass'
 import _ from 'lodash'
 

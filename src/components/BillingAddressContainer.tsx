@@ -1,6 +1,6 @@
 import BillingAddressContext, {
   defaultBillingAddressContext,
-} from '@context/BillingAddressContext'
+} from '#context/BillingAddressContext'
 import React, {
   FunctionComponent,
   ReactNode,
@@ -9,11 +9,11 @@ import React, {
 } from 'react'
 import billingAddressReducer, {
   billingAddressInitialState,
-} from '@reducers/BillingAddressReducer'
-import CommerceLayerContext from '@context/CommerceLayerContext'
-import components from '@config/components'
-import OrderContext from '@context/OrderContext'
-import AddressContext from '@context/AddressContext'
+} from '#reducers/BillingAddressReducer'
+import CommerceLayerContext from '#context/CommerceLayerContext'
+import components from '#config/components'
+import OrderContext from '#context/OrderContext'
+import AddressContext from '#context/AddressContext'
 
 const propTypes = components.BillingAddressContainer.propTypes
 

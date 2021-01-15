@@ -6,12 +6,12 @@ import React, {
   RefObject,
   ReactNode,
 } from 'react'
-import validateFormFields from '@utils/validateFormFields'
+import validateFormFields from '#utils/validateFormFields'
 import _ from 'lodash'
-import GiftCardContext from '@context/GiftCardContext'
-import { GiftCardI } from '@reducers/GiftCardReducer'
-import components from '@config/components'
-import { BaseState } from '@typings/index'
+import GiftCardContext from '#context/GiftCardContext'
+import { GiftCardI } from '#reducers/GiftCardReducer'
+import components from '#config/components'
+import { BaseState } from '#typings/index'
 
 type RequiredFields = 'currencyCode' | 'balanceCents'
 

@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { availabilityInitialState } from '@reducers/AvailabilityReducer'
+import { availabilityInitialState } from '#reducers/AvailabilityReducer'
 
 const AvailabilityContext = createContext(availabilityInitialState)
 

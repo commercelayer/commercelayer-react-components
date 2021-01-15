@@ -1,15 +1,12 @@
-import CLayer, {
-  SkuCollection,
-  InventoryCollection,
-} from '@commercelayer/js-sdk'
-import { VariantOptions } from '@components/VariantSelector'
+import CLayer, { SkuCollection } from '@commercelayer/js-sdk'
+import { VariantOptions } from '#components/VariantSelector'
 import { Dispatch } from 'react'
-import baseReducer from '@utils/baseReducer'
-import getErrorsByCollection from '@utils/getErrorsByCollection'
-import getSkus from '@utils/getSkus'
-import { CommerceLayerConfig } from '@context/CommerceLayerContext'
+import baseReducer from '#utils/baseReducer'
+import getErrorsByCollection from '#utils/getErrorsByCollection'
+import getSkus from '#utils/getSkus'
+import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Items, CustomLineItem, SetCustomLineItems } from './ItemReducer'
-import { BaseError } from '@typings/errors'
+import { BaseError } from '#typings/errors'
 import _ from 'lodash'
 
 type SetSkuCodeVariantParams = {
@@ -46,12 +43,12 @@ export type SetSkuCode = (
 
 export interface VariantPayload {
   loading?: boolean
-  variants?: VariantsObject | object
+  variants?: VariantsObject | Record<string, any>
   skuCodes?: string[]
   skuCode?: string
   errors?: BaseError[]
   currentSkuId?: string
-  currentSkuInventory?: InventoryCollection
+  currentSkuInventory?: any
   currentQuantity?: number
   currentPrices?: SkuCollection[]
   setSkuCode?: SetSkuCode
@@ -60,7 +57,7 @@ export interface VariantPayload {
 
 export interface VariantState extends VariantPayload {
   skuCodes: string[]
-  variants: VariantsObject | object
+  variants: VariantsObject | Record<string, any>
 }
 
 export interface VariantAction {
@@ -73,7 +70,7 @@ export const setVariantSkuCodes: SetVariantSkuCodes = ({
   dispatch,
   setCustomLineItems,
 }) => {
-  const lineItems = {}
+  const lineItems: any = {}
   const sCodes = skuCodes.map((s) => {
     if (_.has(s, 'lineItem')) {
       lineItems[s.code] = s.lineItem
@@ -122,7 +119,7 @@ type GetVariantsParams = {
   state: VariantState
   skuCode: string
   dispatch: Dispatch<VariantAction>
-  filters: object
+  filters: Record<string, any>
   setItem: ((item: Items) => void) | undefined
 }
 

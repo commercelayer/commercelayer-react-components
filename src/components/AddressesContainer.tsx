@@ -1,6 +1,6 @@
 import AddressesContext, {
   defaultAddressContext,
-} from '@context/AddressContext'
+} from '#context/AddressContext'
 import React, {
   FunctionComponent,
   ReactNode,
@@ -13,12 +13,12 @@ import addressReducer, {
   AddressSchema,
   SetAddressParams,
   setCloneAddress,
-} from '@reducers/AddressReducer'
-import { BaseError } from '@typings/errors'
-import OrderContext from '@context/OrderContext'
-import CommerceLayerContext from '@context/CommerceLayerContext'
-import { saveAddresses } from '@reducers/AddressReducer'
-import components from '@config/components'
+} from '#reducers/AddressReducer'
+import { BaseError } from '#typings/errors'
+import OrderContext from '#context/OrderContext'
+import CommerceLayerContext from '#context/CommerceLayerContext'
+import { saveAddresses } from '#reducers/AddressReducer'
+import components from '#config/components'
 
 const propTypes = components.AddressesContainer.propTypes
 const displayName = components.AddressesContainer.displayName
@@ -43,7 +43,7 @@ const AddressesContainer: FunctionComponent<AddressesContainer> = (props) => {
   const contextValue = {
     ...state,
     setAddressErrors: (errors: BaseError[]) =>
-      defaultAddressContext['setAddressErrors'](errors, state, dispatch),
+      defaultAddressContext['setAddressErrors'](errors, dispatch),
     setAddress: (params: SetAddressParams<AddressSchema>) =>
       defaultAddressContext['setAddress']({ ...params, dispatch }),
     saveAddresses: async (): Promise<void> =>

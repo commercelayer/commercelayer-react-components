@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useContext, ReactNode } from 'react'
-import LineItemChildrenContext from '@context/LineItemChildrenContext'
-import LineItemContext from '@context/LineItemContext'
+import LineItemChildrenContext from '#context/LineItemChildrenContext'
+import LineItemContext from '#context/LineItemContext'
 import Parent from './utils/Parent'
-import components from '@config/components'
-import { FunctionChildren } from '@typings'
+import components from '#config/components'
+import { FunctionChildren } from '#typings'
 
 const propTypes = components.LineItemQuantity.propTypes
 const defaultProps = components.LineItemQuantity.defaultProps

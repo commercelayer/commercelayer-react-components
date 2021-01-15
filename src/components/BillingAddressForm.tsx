@@ -1,4 +1,4 @@
-import AddressesContext from '@context/AddressContext'
+import AddressesContext from '#context/AddressContext'
 import useRapidForm from 'rapid-form'
 import React, {
   FunctionComponent,
@@ -6,13 +6,13 @@ import React, {
   useContext,
   useEffect,
 } from 'react'
-import BillingAddressFormContext from '@context/BillingAddressFormContext'
+import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import _ from 'lodash'
-import { BaseError, CodeErrorType } from '@typings/errors'
-import { AddressField } from '@reducers/AddressReducer'
-import { AddressCountrySelectName, AddressInputName } from '@typings'
-import components from '@config/components'
-import OrderContext from '@context/OrderContext'
+import { BaseError, CodeErrorType } from '#typings/errors'
+import { AddressField } from '#reducers/AddressReducer'
+import { AddressCountrySelectName, AddressInputName } from '#typings'
+import components from '#config/components'
+import OrderContext from '#context/OrderContext'
 
 const propTypes = components.BillingAddressForm.propTypes
 

@@ -1,6 +1,6 @@
 import React, { ForwardRefRenderFunction } from 'react'
 import Parent from './Parent'
-import { BaseSelectComponentProps } from '@typings'
+import { BaseSelectComponentProps } from '#typings'
 import _ from 'lodash'
 
 export type BaseSelectProps = BaseSelectComponentProps

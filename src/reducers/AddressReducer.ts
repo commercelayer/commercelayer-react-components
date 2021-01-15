@@ -1,7 +1,7 @@
-import baseReducer from '@utils/baseReducer'
+import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
-import { BaseError } from '@typings/errors'
-import { CommerceLayerConfig } from '@context/CommerceLayerContext'
+import { BaseError } from '#typings/errors'
+import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Address, Order, OrderCollection } from '@commercelayer/js-sdk'
 import _ from 'lodash'
 
@@ -63,11 +63,7 @@ export const addressInitialState: AddressState = {
 }
 
 export interface SetAddressErrors {
-  <V extends BaseError[]>(
-    errors: V,
-    state?: AddressState,
-    dispatch?: Dispatch<AddressAction>
-  ): void
+  <V extends BaseError[]>(errors: V, dispatch?: Dispatch<AddressAction>): void
 }
 
 export type SetAddressParams<V extends AddressSchema> = {
@@ -93,7 +89,7 @@ export interface SaveAddresses {
   }): Promise<void>
 }
 
-export const setAddressErrors: SetAddressErrors = (errors, state, dispatch) => {
+export const setAddressErrors: SetAddressErrors = (errors, dispatch) => {
   dispatch &&
     dispatch({
       type: 'setErrors',

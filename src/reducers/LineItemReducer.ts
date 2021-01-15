@@ -2,14 +2,14 @@ import CLayer, {
   LineItemCollection,
   OrderCollection,
 } from '@commercelayer/js-sdk'
-import baseReducer from '@utils/baseReducer'
+import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
-import { CommerceLayerConfig } from '@context/CommerceLayerContext'
+import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
-import getErrorsByCollection from '@utils/getErrorsByCollection'
+import getErrorsByCollection from '#utils/getErrorsByCollection'
 import _ from 'lodash'
-import { LoaderType } from '@typings'
-import { BaseError } from '@typings/errors'
+import { LoaderType } from '#typings'
+import { BaseError } from '#typings/errors'
 
 export type UpdateLineItemParams = {
   lineItemId: string
@@ -25,7 +25,7 @@ export interface UpdateLineItem {
   (params: UpdateLineItemParams): void
 }
 
-export type DeleteLineItemParam = {} & UpdateLineItemParams
+export type DeleteLineItemParam = Record<string, any> & UpdateLineItemParams
 
 export interface DeleteLineItem {
   (params: DeleteLineItemParam): void
@@ -63,6 +63,7 @@ export const getLineItems: GetLineItems = (params) => {
   const { order, dispatch, config, filters } = params
   let allLineItems: LineItemCollection[] = []
   order &&
+    // @ts-ignore
     order
       .withCredentials(config)
       .lineItems()

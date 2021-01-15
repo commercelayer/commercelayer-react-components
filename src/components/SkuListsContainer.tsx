@@ -5,14 +5,14 @@ import React, {
   ReactNode,
   useEffect,
 } from 'react'
-import SkuListsContext from '@context/SkuListsContext'
-import CommerceLayerContext from '@context/CommerceLayerContext'
+import SkuListsContext from '#context/SkuListsContext'
+import CommerceLayerContext from '#context/CommerceLayerContext'
 import skuListsReducer, {
   skuListsInitialState,
   getSkuList,
-} from '@reducers/SkuListsReducer'
+} from '#reducers/SkuListsReducer'
 
-import components from '@config/components'
+import components from '#config/components'
 
 const propTypes = components.SkuListsContainer.propTypes
 const displayName = components.SkuListsContainer.displayName

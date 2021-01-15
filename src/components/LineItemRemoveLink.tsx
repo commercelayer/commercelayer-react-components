@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useContext, PropsWithoutRef } from 'react'
-import LineItemChildrenContext from '@context/LineItemChildrenContext'
-import LineItemContext from '@context/LineItemContext'
+import LineItemChildrenContext from '#context/LineItemChildrenContext'
+import LineItemContext from '#context/LineItemContext'
 import Parent from './utils/Parent'
-import components from '@config/components'
-import { FunctionChildren } from '@typings/index'
+import components from '#config/components'
+import { FunctionChildren } from '#typings/index'
 
 const propTypes = components.LineItemRemoveLink.propTypes
 const defaultProps = components.LineItemRemoveLink.defaultProps

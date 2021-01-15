@@ -1,8 +1,8 @@
 import React, { useContext, FunctionComponent, ReactNode } from 'react'
-import AddressChildrenContext from '@context/AddressChildrenContext'
+import AddressChildrenContext from '#context/AddressChildrenContext'
 import Parent from './utils/Parent'
-import components from '@config/components'
-import { AddressFieldView } from '@reducers/AddressReducer'
+import components from '#config/components'
+import { AddressFieldView } from '#reducers/AddressReducer'
 import _ from 'lodash'
 
 const propTypes = components.AddressField.propTypes

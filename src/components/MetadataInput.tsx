@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react'
 import BaseInput from './utils/BaseInput'
-import components from '@config/components'
-import { BaseInputComponentProps } from '@typings'
+import components from '#config/components'
+import { BaseInputComponentProps } from '#typings'
 
 const propTypes = components.MetadataInput.propTypes
 const displayName = components.MetadataInput.displayName

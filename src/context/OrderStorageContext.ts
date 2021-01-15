@@ -3,7 +3,7 @@ import {
   getLocalOrder,
   setLocalOrder,
   deleteLocalOrder,
-} from '@utils/localStorage'
+} from '#utils/localStorage'
 
 export interface OrderStorageConfig {
   persistKey: string

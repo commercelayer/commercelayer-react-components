@@ -5,16 +5,16 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react'
-import SkuOptionsContext from '@context/SkuOptionsContext'
+import SkuOptionsContext from '#context/SkuOptionsContext'
 import skuOptionsReducer, {
   skuOptionsInitialState,
-} from '@reducers/SkuOptionsReducer'
-import CommerceLayerContext from '@context/CommerceLayerContext'
+} from '#reducers/SkuOptionsReducer'
+import CommerceLayerContext from '#context/CommerceLayerContext'
 import _ from 'lodash'
-import getCurrentItemKey from '@utils/getCurrentItemKey'
-import ItemContext from '@context/ItemContext'
-import { getSkuOptions } from '@reducers/SkuOptionsReducer'
-import components from '@config/components'
+import getCurrentItemKey from '#utils/getCurrentItemKey'
+import ItemContext from '#context/ItemContext'
+import { getSkuOptions } from '#reducers/SkuOptionsReducer'
+import components from '#config/components'
 
 const propTypes = components.SkuOptionsContainer.propTypes
 const displayName = components.SkuOptionsContainer.displayName

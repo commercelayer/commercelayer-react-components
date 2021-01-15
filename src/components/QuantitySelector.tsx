@@ -6,11 +6,11 @@ import React, {
 } from 'react'
 import Parent from './utils/Parent'
 import _ from 'lodash'
-import getCurrentItemKey from '@utils/getCurrentItemKey'
-import ItemContext from '@context/ItemContext'
-import components from '@config/components'
-import { FunctionChildren } from '@typings/index'
-import SkuListsContext from '@context/SkuListsContext'
+import getCurrentItemKey from '#utils/getCurrentItemKey'
+import ItemContext from '#context/ItemContext'
+import components from '#config/components'
+import { FunctionChildren } from '#typings/index'
+import SkuListsContext from '#context/SkuListsContext'
 
 const propTypes = components.QuantitySelector.propTypes
 const defaultProps = components.QuantitySelector.defaultProps

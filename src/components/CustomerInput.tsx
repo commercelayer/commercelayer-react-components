@@ -1,11 +1,11 @@
 import React, { FunctionComponent, useContext, useEffect } from 'react'
 import BaseInput from './utils/BaseInput'
-import components from '@config/components'
-import { BaseInputComponentProps } from '@typings'
+import components from '#config/components'
+import { BaseInputComponentProps } from '#typings'
 import useRapidForm from 'rapid-form'
-import CustomerContext from '@context/CustomerContext'
+import CustomerContext from '#context/CustomerContext'
 import _ from 'lodash'
-import { BaseError, CodeErrorType } from '@typings/errors'
+import { BaseError, CodeErrorType } from '#typings/errors'
 
 const propTypes = components.CustomerInput.propTypes
 const displayName = components.CustomerInput.displayName

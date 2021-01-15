@@ -1,13 +1,13 @@
 import CLayer, { OrderCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
-import { SetLocalOrder, DeleteLocalOrder } from '@utils/localStorage'
-import { CommerceLayerConfig } from '@context/CommerceLayerContext'
-import baseReducer from '@utils/baseReducer'
-import getErrorsByCollection from '@utils/getErrorsByCollection'
+import { SetLocalOrder, DeleteLocalOrder } from '#utils/localStorage'
+import { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import baseReducer from '#utils/baseReducer'
+import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { ItemOption, CustomLineItem } from './ItemReducer'
 import _ from 'lodash'
-import { BaseMetadataObject } from '@typings/index'
-import { BaseError } from '@typings/errors'
+import { BaseMetadataObject } from '#typings/index'
+import { BaseError } from '#typings/errors'
 
 export interface GetOrderParams {
   clearWhenPlaced?: boolean

@@ -1,8 +1,8 @@
-import baseReducer from '@utils/baseReducer'
+import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
-import { CommerceLayerConfig } from '@context/CommerceLayerContext'
+import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { OrderCollection } from '@commercelayer/js-sdk'
-import { getOrderContext } from '@reducers/OrderReducer'
+import { getOrderContext } from '#reducers/OrderReducer'
 
 export type BillingAddressActionType = 'setBillingAddress'
 

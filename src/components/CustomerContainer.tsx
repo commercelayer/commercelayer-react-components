@@ -8,15 +8,15 @@ import React, {
 import customerReducer, {
   customerInitialState,
   getCustomerAddresses,
-} from '@reducers/CustomerReducer'
-import OrderContext from '@context/OrderContext'
-import CommerceLayerContext from '@context/CommerceLayerContext'
-import components from '@config/components'
-import { saveCustomerUser } from '@reducers/CustomerReducer'
-import { getOrderContext } from '@reducers/OrderReducer'
-import CustomerContext from '@context/CustomerContext'
+} from '#reducers/CustomerReducer'
+import OrderContext from '#context/OrderContext'
+import CommerceLayerContext from '#context/CommerceLayerContext'
+import components from '#config/components'
+import { saveCustomerUser } from '#reducers/CustomerReducer'
+import { getOrderContext } from '#reducers/OrderReducer'
+import CustomerContext from '#context/CustomerContext'
 import { defaultCustomerContext } from '../context/CustomerContext'
-import { BaseError } from '@typings/errors'
+import { BaseError } from '#typings/errors'
 import _ from 'lodash'
 
 const propTypes = components.CustomerContainer.propTypes

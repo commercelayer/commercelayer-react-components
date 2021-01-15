@@ -21,13 +21,13 @@
     "baseUrl": ".",
     "paths": {
       "@commercelayer/react-components": ["src/index"],
-      "@components/*": ["src/components/*"],
-      "@reducers/*": ["src/reducers/*"],
-      "@context/*": ["src/context/*"],
-      "@typings/*": ["src/typings/*"],
-      "@typings": ["src/typings/index"],
-      "@utils/*": ["src/utils/*"],
-      "@config/*": ["src/config/*"]
+      "#components/*": ["src/components/*"],
+      "#reducers/*": ["src/reducers/*"],
+      "#context/*": ["src/context/*"],
+      "#typings/*": ["src/typings/*"],
+      "#typings": ["src/typings/index"],
+      "#utils/*": ["src/utils/*"],
+      "#config/*": ["src/config/*"]
     }
   },
   "exclude": ["node_modules", "specs", "cypress"],

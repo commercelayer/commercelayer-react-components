@@ -1,8 +1,8 @@
-import baseReducer from '@utils/baseReducer'
-import { BaseError } from '@typings/errors'
+import baseReducer from '#utils/baseReducer'
+import { BaseError } from '#typings/errors'
 import { Sku } from '@commercelayer/js-sdk'
 import _ from 'lodash'
-import { CommerceLayerConfig } from '@context/CommerceLayerContext'
+import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Dispatch } from 'react'
 
 export interface LeadTimes {

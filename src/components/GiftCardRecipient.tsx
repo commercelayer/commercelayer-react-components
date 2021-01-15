@@ -6,10 +6,10 @@
 //   useContext
 // } from 'react'
 // import PropTypes from 'prop-types'
-// import validateFormFields from '@utils/validateFormFields'
+// import validateFormFields from '#utils/validateFormFields'
 // import _ from 'lodash'
-// import GiftCardContext from '@context/GiftCardContext'
-// import { GiftCardRecipientI } from '@reducers/GiftCardReducer'
+// import GiftCardContext from '#context/GiftCardContext'
+// import { GiftCardRecipientI } from '#reducers/GiftCardReducer'
 
 // type RequiredFields = 'email'
 

@@ -10,15 +10,15 @@ import variantReducer, {
   unsetVariantState,
   setSkuCode,
   getVariants,
-} from '@reducers/VariantReducer'
-import CommerceLayerContext from '@context/CommerceLayerContext'
-import VariantsContext from '@context/VariantsContext'
-import { VariantState } from '@reducers/VariantReducer'
-import { setVariantSkuCodes } from '@reducers/VariantReducer'
+} from '#reducers/VariantReducer'
+import CommerceLayerContext from '#context/CommerceLayerContext'
+import VariantsContext from '#context/VariantsContext'
+import { VariantState } from '#reducers/VariantReducer'
+import { setVariantSkuCodes } from '#reducers/VariantReducer'
 import _ from 'lodash'
-import getCurrentItemKey from '@utils/getCurrentItemKey'
-import ItemContext from '@context/ItemContext'
-import components from '@config/components'
+import getCurrentItemKey from '#utils/getCurrentItemKey'
+import ItemContext from '#context/ItemContext'
+import components from '#config/components'
 
 const propTypes = components.VariantsContainer.propTypes
 const defaultProps = components.VariantsContainer.defaultProps

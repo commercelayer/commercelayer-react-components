@@ -1,14 +1,14 @@
-import baseReducer from '@utils/baseReducer'
+import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
-import { BaseError } from '@typings/errors'
+import { BaseError } from '#typings/errors'
 import {
   AddressCollection,
   CustomerAddress,
   OrderCollection,
 } from '@commercelayer/js-sdk'
-import { CommerceLayerConfig } from '@context/CommerceLayerContext'
+import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
-import getErrorsByCollection from '@utils/getErrorsByCollection'
+import getErrorsByCollection from '#utils/getErrorsByCollection'
 
 export type CustomerActionType =
   | 'setErrors'

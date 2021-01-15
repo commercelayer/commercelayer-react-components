@@ -1,4 +1,4 @@
-import { BaseReducer } from '@typings'
+import { BaseReducer } from '#typings'
 
 const baseReducer: BaseReducer = (state, action, actionTypes) => {
   const actions = actionTypes

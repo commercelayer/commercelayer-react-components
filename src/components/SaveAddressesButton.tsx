@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useContext } from 'react'
 import Parent from './utils/Parent'
-import components from '@config/components'
-import { FunctionChildren } from '@typings/index'
-import AddressContext from '@context/AddressContext'
+import components from '#config/components'
+import { FunctionChildren } from '#typings/index'
+import AddressContext from '#context/AddressContext'
 import _ from 'lodash'
-import { fieldsExist } from '@utils/validateFormFields'
+import { fieldsExist } from '#utils/validateFormFields'
 
 const propTypes = components.SaveAddressesButton.propTypes
 const defaultProps = components.SaveAddressesButton.defaultProps

@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { priceInitialState, PriceState } from '@reducers/PriceReducer'
+import { priceInitialState, PriceState } from '#reducers/PriceReducer'
 
 export interface PricesContextValue extends PriceState {
   skuCode: PriceState['skuCode']
