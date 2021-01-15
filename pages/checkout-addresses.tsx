@@ -386,8 +386,25 @@ export default function Main() {
                     />
                   </p>
                 </div>
+                <div className="flex flex-row-reverse justify-end">
+                  <label
+                    htmlFor="billing_address_save_to_customer_book"
+                    className="block text-sm font-medium text-gray-700 ml-3 self-end"
+                  >
+                    Save address on your book
+                  </label>
+                  <div className="mt-1">
+                    <AddressInput
+                      data-cy="billing_address_save_to_customer_book"
+                      name="billing_address_save_to_customer_book"
+                      type="checkbox"
+                      className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
+                      required={false}
+                    />
+                  </div>
+                </div>
               </BillingAddressForm>
-              <div className="flex p-2">
+              <div className="mt-5 flex p-2">
                 <button
                   data-cy="ship-to-different-address-button"
                   data-status={shipToDifferentAddress}
@@ -616,6 +633,23 @@ export default function Main() {
                       messages={messages}
                     />
                   </p>
+                </div>
+                <div className="flex flex-row-reverse justify-end">
+                  <label
+                    htmlFor="shipping_address_save_to_customer_book"
+                    className="block text-sm font-medium text-gray-700 ml-3 self-end"
+                  >
+                    Save address on your book
+                  </label>
+                  <div className="mt-1">
+                    <AddressInput
+                      data-cy="shipping_address_save_to_customer_book"
+                      name="shipping_address_save_to_customer_book"
+                      type="checkbox"
+                      className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
+                      required={false}
+                    />
+                  </div>
                 </div>
               </ShippingAddressForm>
               <div className="mt-5 p-2">
