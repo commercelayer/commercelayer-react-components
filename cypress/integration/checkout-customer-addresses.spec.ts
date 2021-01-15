@@ -2,17 +2,17 @@
 /// <reference path="../support/index.d.ts" />
 import { euAddress, usAddress } from '../support/utils'
 
-describe('Guest Addresses', () => {
-  const filename = 'checkout-addresses'
+describe('Customer Addresses', () => {
+  const filename = 'checkout-customer-addresses'
 
   before(() => {
     // @ts-ignore
-    cy.setRoutes({
-      endpoint: 'https://the-blue-brand-3.commercelayer.co',
-      routes: Cypress.env('requests'),
-      record: Cypress.env('RECORD'),
-      filename,
-    })
+    // cy.setRoutes({
+    //   endpoint: 'https://the-blue-brand-3.commercelayer.co',
+    //   routes: Cypress.env('requests'),
+    //   record: Cypress.env('RECORD'),
+    //   filename,
+    // })
     cy.visit(`/${filename}`)
   })
 
@@ -24,11 +24,22 @@ describe('Guest Addresses', () => {
   })
 
   beforeEach(() => {
-    // Customer Email
-    cy.get('[data-cy="save-on-blur-button"]').as('saveOnBlurButton')
-    cy.get('[data-cy="customer_email"]').as('customerEmail')
-    cy.get('[data-cy="save-customer-button"]').as('saveCustomerButton')
-    cy.get('[data-cy="current-customer-email"]').as('currentCustomerEmail')
+    // @ts-ignore
+    cy.setRoutes({
+      endpoint: '',
+      routes: Cypress.env('requests'),
+      record: Cypress.env('RECORD'),
+      filename,
+    })
+    // Customer Address
+    cy.get('[data-cy="customer-billing-address"]').each((e, i) => {
+      cy.wrap(e).as(`customerBillingAddress${i}`)
+    })
+    cy.get('[data-cy="customer-shipping-address"]').each((e, i) => {
+      cy.wrap(e).as(`customerShippingAddress${i}`)
+    })
+    cy.get('[data-cy="add-new-billing-address"]').as('addNewBillingAddress')
+    cy.get('[data-cy="add-new-shipping-address"]').as('addNewShippingAddress')
 
     // Billing Address fields
     cy.get('[data-cy="billing_address_first_name"]').as('billingFirstName')
@@ -39,11 +50,10 @@ describe('Guest Addresses', () => {
     cy.get('[data-cy="billing_address_state_code"]').as('billingStateCode')
     cy.get('[data-cy="billing_address_zip_code"]').as('billingZipCode')
     cy.get('[data-cy="billing_address_phone"]').as('billingPhone')
-
+    // Ship to different address
     cy.get('[data-cy="ship-to-different-address-button"]').as(
       'buttonDifferentAddress'
     )
-
     // Shipping Address fields
     cy.get('[data-cy="shipping_address_first_name"]').as('shippingFirstName')
     cy.get('[data-cy="shipping_address_last_name"]').as('shippingLastName')
@@ -55,76 +65,35 @@ describe('Guest Addresses', () => {
     cy.get('[data-cy="shipping_address_state_code"]').as('shippingStateCode')
     cy.get('[data-cy="shipping_address_zip_code"]').as('shippingZipCode')
     cy.get('[data-cy="shipping_address_phone"]').as('shippingPhone')
-    cy.get('[data-cy="ship-to-different-address-button"]').as(
-      'buttonDifferentAddress'
-    )
     // Save Addresses button
     cy.get('[data-cy="save-addresses-button"]').as('saveAddressesButton')
-
     // Current addresses
     cy.get('[data-cy="current-billing-address"]').as('currentBillingAddress')
     cy.get('[data-cy="current-shipping-address"]').as('currentShippingAddress')
   })
-  it('Checking default fields', () => {
+
+  it('Selecting first billing address', () => {
+    // cy.wait('@token')
+    cy.wait(['@getCustomerAddresses', '@getOrders'])
+    cy.get('@saveAddressesButton').should('have.attr', 'disabled')
+    cy.get('@customerBillingAddress0').click()
+    cy.get('@customerBillingAddress0').should('have.class', 'border-blue-500')
+    cy.get('@saveAddressesButton').should('not.have.attr', 'disabled')
+    cy.get('@saveAddressesButton').click()
+    cy.wait('@updateOrder')
+    cy.wait('@getOrders')
+    cy.get('@currentBillingAddress').should('not.contain', '{}')
+    cy.get('@currentShippingAddress').should('not.contain', '{}')
+  })
+
+  it('Adding new billing address', () => {
+    cy.reload()
     cy.wait(['@token', '@getOrders'])
-    cy.get('@customerEmail').should('contain.value', '')
-    cy.get('@saveOnBlurButton').should('have.attr', 'data-status', 'false')
-    cy.get('@saveCustomerButton').should('have.attr', 'disabled', 'disabled')
-    cy.get('@billingFirstName').should('contain.value', '')
-    cy.get('@billingLastName').should('contain.value', '')
-    cy.get('@billingLine1').should('contain.value', '')
-    cy.get('@billingCity').should('contain.value', '')
-    cy.get('@billingCountryCode').should('contain.text', 'Country')
-    cy.get('@billingStateCode').should('contain.value', '')
-    cy.get('@billingZipCode').should('contain.value', '')
-    cy.get('@billingPhone').should('contain.value', '')
-    cy.get('@buttonDifferentAddress').should(
-      'have.attr',
-      'data-status',
-      'false'
-    )
-    cy.get('@saveAddressesButton').should('have.attr', 'disabled', 'disabled')
+    cy.get('@saveAddressesButton').should('have.attr', 'disabled')
+    cy.get('@addNewBillingAddress').click()
   })
 
-  it('Save Customer User with the save button', () => {
-    cy.get('@currentCustomerEmail').should('contain.text', '""')
-    cy.get('@customerEmail').type('a')
-    cy.get('[data-cy="customer_email_error"]').should(
-      'contain.text',
-      `Must be valid email`
-    )
-    cy.get('@customerEmail').type('{backspace}')
-    cy.get('[data-cy="customer_email_error"]').should(
-      'contain.text',
-      `Can't be blank`
-    )
-    cy.get('@customerEmail').type(euAddress.customer_email)
-    cy.get('@saveCustomerButton').should(
-      'not.have.attr',
-      'disabled',
-      'disabled'
-    )
-    cy.get('@saveCustomerButton').click()
-    cy.get('@currentCustomerEmail').should(
-      'contain.text',
-      `"${euAddress.customer_email}"`
-    )
-  })
-
-  it('Save Customer User with onBlur input', () => {
-    cy.get('@saveOnBlurButton')
-      .click()
-      .should('have.attr', 'data-status', 'true')
-    cy.get('@customerEmail')
-      .type(`{selectall}{backspace}${usAddress.customer_email}`)
-      .blur()
-    cy.get('@currentCustomerEmail').should(
-      'contain.text',
-      `"${usAddress.customer_email}"`
-    )
-  })
-
-  it('Filling fields', () => {
+  it('Filling new billing address form', () => {
     cy.get('@billingFirstName').type('a').type('{backspace}')
     cy.get('[data-cy="billing_address_first_name_error"]').should(
       'contain.text',
@@ -162,10 +131,12 @@ describe('Guest Addresses', () => {
     )
   })
 
-  it('Saving billing address', () => {
+  it('Saving new billing address', () => {
     cy.get('@currentBillingAddress').should('contain.text', '{}')
     cy.get('@currentShippingAddress').should('contain.text', '{}')
     cy.get('@saveAddressesButton').click()
+    cy.wait('@updateOrder')
+    cy.wait('@getOrders')
     cy.get('@currentBillingAddress').should(
       'contain.text',
       euAddress.first_name
@@ -205,11 +176,29 @@ describe('Guest Addresses', () => {
     cy.get('@currentShippingAddress').should('contain.text', euAddress.phone)
   })
 
-  it('Ship to different address', () => {
+  it('Reload page', () => {
+    cy.reload()
+    cy.wait(['@token', '@getCustomerAddresses', '@getOrders'])
+  })
+  it('Selecting shipping address', () => {
+    cy.get('@saveAddressesButton').should('have.attr', 'disabled')
+    cy.get('@customerBillingAddress0').click()
     cy.get('@buttonDifferentAddress')
       .click()
       .should('have.attr', 'data-status', 'true')
-    cy.get('@saveAddressesButton').should('have.attr', 'disabled', 'disabled')
+    cy.wait('@updateOrder')
+    cy.wait('@getOrders')
+    cy.get('@customerShippingAddress1').click()
+    cy.get('@customerShippingAddress1').should('have.class', 'border-blue-500')
+    cy.wait('@updateOrder')
+    cy.wait('@getOrders')
+    cy.wait('@getOrders')
+    cy.get('@currentShippingAddress').should('contain.text', 'Alessandro')
+    cy.get('@currentShippingAddress').should('contain.text', 'Casazza')
+  })
+
+  it('Adding new shipping address', () => {
+    cy.get('@addNewShippingAddress').click()
     cy.get('@shippingFirstName')
       .type(usAddress.first_name)
       .should('have.value', usAddress.first_name)
@@ -244,23 +233,12 @@ describe('Guest Addresses', () => {
 
   it('Saving different shipping address', () => {
     cy.get('@saveAddressesButton').click()
-    cy.get('@currentBillingAddress').should(
-      'contain.text',
-      euAddress.first_name
-    )
-    cy.get('@currentBillingAddress').should('contain.text', euAddress.last_name)
-    cy.get('@currentBillingAddress').should('contain.text', euAddress.line_1)
-    cy.get('@currentBillingAddress').should('contain.text', euAddress.city)
-    cy.get('@currentBillingAddress').should(
-      'contain.text',
-      euAddress.country_code
-    )
-    cy.get('@currentBillingAddress').should(
-      'contain.text',
-      euAddress.state_code
-    )
-    cy.get('@currentBillingAddress').should('contain.text', euAddress.zip_code)
-    cy.get('@currentBillingAddress').should('contain.text', euAddress.phone)
+    cy.wait('@createAddress')
+    cy.wait('@updateOrder')
+    cy.wait('@getOrders')
+    cy.wait('@getOrders')
+    cy.get('@currentBillingAddress').should('contain.text', 'Bruce')
+    cy.get('@currentBillingAddress').should('contain.text', 'Wayne')
     cy.get('@currentShippingAddress').should(
       'contain.text',
       usAddress.first_name

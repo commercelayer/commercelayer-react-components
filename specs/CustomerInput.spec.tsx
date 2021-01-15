@@ -6,7 +6,7 @@ import components from '../src/config/components'
 const propTypes = components.CustomerInput.propTypes
 
 test('<CustomerInput/>', () => {
-  expect.assertions(5)
+  expect.assertions(7)
   const component = renderer.create(<CustomerInput />)
   const tree = component.toJSON()
   const root = component.toTree()
