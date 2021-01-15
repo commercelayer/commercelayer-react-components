@@ -9,12 +9,19 @@ import {
 
 type DefaultContext = {
   saveAddresses: () => void
+  setCloneAddress: (
+    id: string,
+    resource: 'billingAddress' | 'shippingAddress'
+  ) => void
   setAddress: SetAddress
   setAddressErrors: SetAddressErrors
 } & AddressState
 
 export const defaultAddressContext = {
   saveAddresses: (): void => {
+    return
+  },
+  setCloneAddress: (): void => {
     return
   },
   setAddress,

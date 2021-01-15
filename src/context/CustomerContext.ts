@@ -1,3 +1,4 @@
+import { AddressCollection } from '@commercelayer/js-sdk'
 import {
   SetCustomerEmail,
   setCustomerErrors,
@@ -13,6 +14,7 @@ type DefaultContext = {
   saveCustomerUser: (customerEmail: string) => Promise<void>
   setCustomerErrors: SetCustomerErrors
   setCustomerEmail: SetCustomerEmail
+  addresses?: AddressCollection[]
 }
 
 export const defaultCustomerContext = {

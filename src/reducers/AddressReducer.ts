@@ -3,11 +3,13 @@ import { Dispatch } from 'react'
 import { BaseError } from '@typings/errors'
 import { CommerceLayerConfig } from '@context/CommerceLayerContext'
 import { Address, Order, OrderCollection } from '@commercelayer/js-sdk'
+import _ from 'lodash'
 
 export type AddressActionType =
   | 'setErrors'
   | 'setAddress'
   | 'setShipToDifferentAddress'
+  | 'setCloneAddress'
 
 export type AddressField =
   | 'city'
@@ -20,6 +22,8 @@ export type AddressField =
   | 'phone'
   | 'state_code'
   | 'zip_code'
+
+export type AddressFieldView = AddressField | 'full_address'
 
 export const addressFields: AddressField[] = [
   'city',
@@ -43,6 +47,8 @@ export interface AddressActionPayload {
   billingAddress: AddressSchema
   shippingAddress: AddressSchema
   shipToDifferentAddress: boolean
+  billingAddressId: string
+  shippingAddressId: string
 }
 
 export type AddressState = Partial<AddressActionPayload>
@@ -71,7 +77,9 @@ export type SetAddressParams<V extends AddressSchema> = {
 }
 
 export interface SetAddress {
-  <V extends AddressSchema>(params: SetAddressParams<V>): void
+  <V extends AddressSchema | Record<string, any>>(
+    params: SetAddressParams<V>
+  ): void
 }
 
 export interface SaveAddresses {
@@ -105,6 +113,21 @@ export const setAddress: SetAddress = ({ values, resource, dispatch }) => {
     })
 }
 
+type SetCloneAddress = (
+  id: string,
+  resource: 'billingAddress' | 'shippingAddress',
+  dispatch: Dispatch<AddressAction>
+) => void
+
+export const setCloneAddress: SetCloneAddress = (id, resource, dispatch) => {
+  dispatch({
+    type: 'setCloneAddress',
+    payload: {
+      [`${resource}Id`]: id,
+    },
+  })
+}
+
 export const saveAddresses: SaveAddresses = async ({
   config,
   // dispatch,
@@ -113,27 +136,40 @@ export const saveAddresses: SaveAddresses = async ({
   orderId,
   state,
 }) => {
-  const { shipToDifferentAddress, billingAddress, shippingAddress } = state
+  const {
+    shipToDifferentAddress,
+    billingAddress,
+    shippingAddress,
+    billingAddressId,
+    shippingAddressId,
+  } = state
   try {
-    if (billingAddress) {
-      const billing =
-        billingAddress &&
-        (await Address.withCredentials(config).create(billingAddress))
+    if (
+      !_.isEmpty(billingAddress) ||
+      (billingAddressId && !shippingAddressId) ||
+      !_.isEmpty(shippingAddress)
+    ) {
       const o =
         order ||
         (orderId && (await Order.withCredentials(config).find(orderId)))
-      const updateObj: any = {
-        billingAddress: billing,
-        _shippingAddressSameAsBilling: true,
+      const updateObj: Partial<Record<string, any>> = {}
+      if (billingAddress) {
+        const billing =
+          billingAddress &&
+          (await Address.withCredentials(config).create(billingAddress))
+        if (billing) {
+          updateObj['billingAddress'] = billing
+          updateObj['_shippingAddressSameAsBilling'] = true
+        }
       }
       if (shipToDifferentAddress) {
         const shipping =
           shippingAddress &&
           (await Address.withCredentials(config).create(shippingAddress))
-        updateObj['shippingAddress'] = shipping
+        if (shipping) updateObj['shippingAddress'] = shipping
         delete updateObj._shippingAddressSameAsBilling
       }
-      if (o && getOrder) {
+      if (o && getOrder && !_.isEmpty(updateObj)) {
         const patchOrder = await o.withCredentials(config).update(updateObj)
         getOrder(patchOrder.id)
       }
@@ -147,6 +183,7 @@ const type: AddressActionType[] = [
   'setErrors',
   'setAddress',
   'setShipToDifferentAddress',
+  'setCloneAddress',
 ]
 
 const addressReducer = (

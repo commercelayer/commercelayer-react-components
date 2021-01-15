@@ -18,6 +18,13 @@ import { ErrorPropTypes } from '@typings/errors'
 import { BaseInputComponentPropTypes } from '@typings/index'
 
 const components = {
+  Address: {
+    permittedChildren: ['AddressField', 'ReactNode'],
+    displayName: 'Address',
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
   AddressCountrySelector: {
     displayName: 'AddressCountrySelector',
     propTypes: {
@@ -38,6 +45,12 @@ const components = {
       required: true,
     },
   },
+  AddressField: {
+    displayName: 'AddressField',
+    propTypes: {
+      children: PropTypes.func,
+    },
+  },
   AddressInput: {
     displayName: 'AddressInput',
     propTypes: {
@@ -53,6 +66,7 @@ const components = {
         'billing_address_phone',
         'billing_address_state_code',
         'billing_address_zip_code',
+        'billing_address_save_to_customer_book',
         'shipping_address_city',
         'shipping_address_company',
         'shipping_address_email',
@@ -63,6 +77,7 @@ const components = {
         'shipping_address_phone',
         'shipping_address_state_code',
         'shipping_address_zip_code',
+        'shipping_address_save_to_customer_book',
       ]).isRequired,
       type: PropTypes.oneOf<BaseInputType>([
         'checkbox',
@@ -101,7 +116,9 @@ const components = {
     displayName: 'AddressesContainer',
     permittedChildren: [
       'BillingAddressForm',
+      'BillingAddressContainer',
       'ShippingAddressForm',
+      'ShippingAddressContainer',
       'SaveAddressesButton',
       'ReactNode',
     ],
@@ -128,6 +145,12 @@ const components = {
     defaultProps: {
       timeFormat: 'days',
       showShippingMethodName: false,
+    },
+  },
+  BillingAddressContainer: {
+    permittedChildren: ['Address', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
     },
   },
   BillingAddressForm: {
@@ -514,6 +537,12 @@ const components = {
     },
     defaultProps: {
       label: 'Continue to delivery',
+    },
+  },
+  ShippingAddressContainer: {
+    permittedChildren: ['Address', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
     },
   },
   SaveCustomerButton: {

@@ -2,8 +2,8 @@ import React, { FunctionComponent, useContext, useEffect } from 'react'
 import BaseInput from './utils/BaseInput'
 import components from '@config/components'
 import { BaseInputComponentProps, AddressInputName } from '@typings'
-import BillingAddressContext from '@context/BillingAddressContext'
-import ShippingAddressContext from '@context/ShippingAddressContext'
+import BillingAddressFormContext from '@context/BillingAddressFormContext'
+import ShippingAddressFormContext from '@context/ShippingAddressFormContext'
 
 const propTypes = components.AddressInput.propTypes
 const displayName = components.AddressInput.displayName
@@ -15,9 +15,9 @@ export type AddressInputProps = {
   JSX.IntrinsicElements['textarea']
 
 const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
-  const { placeholder = '', required = true, value, ...p } = props
-  const billingAddress = useContext(BillingAddressContext)
-  const shippingAddress = useContext(ShippingAddressContext)
+  const { placeholder = '', required, value, ...p } = props
+  const billingAddress = useContext(BillingAddressFormContext)
+  const shippingAddress = useContext(ShippingAddressFormContext)
   useEffect(() => {
     if (value && billingAddress?.setValue) {
       billingAddress.setValue(p.name, value)
@@ -29,7 +29,7 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
   return (
     <BaseInput
       ref={billingAddress?.validation || shippingAddress?.validation}
-      required={required}
+      required={required !== undefined ? required : true}
       placeholder={placeholder}
       defaultValue={value}
       {...p}

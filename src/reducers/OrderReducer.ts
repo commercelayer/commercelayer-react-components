@@ -92,10 +92,16 @@ export interface OrderState extends OrderPayload {
   loading: boolean
   orderId: string
   order: OrderCollection | null
+  saveBillingAddressToCustomerBook: boolean
+  saveShippingAddressToCustomerBook: boolean
   getOrder?: getOrderContext
   createOrder?: () => Promise<string>
   addToCart: (values: AddToCartValues) => AddToCartReturn
   setOrderErrors: (collection: any) => { success: boolean }
+  saveAddressToCustomerBook: (
+    type: 'BillingAddress' | 'ShippingAddress',
+    value: boolean
+  ) => void
 }
 
 export interface OrderActions {
@@ -112,6 +118,7 @@ export type OrderActionType =
   | 'setCurrentSkuPrices'
   | 'setCurrentItem'
   | 'setErrors'
+  | 'setSaveAddressToCustomerBook'
 
 const actionType: OrderActionType[] = [
   'setLoading',
@@ -122,6 +129,7 @@ const actionType: OrderActionType[] = [
   'setCurrentSkuPrices',
   'setErrors',
   'setCurrentItem',
+  'setSaveAddressToCustomerBook',
 ]
 
 export const createOrder: CreateOrder = async (params) => {
@@ -297,6 +305,25 @@ export const setOrderErrors: SetOrderErrors = ({ dispatch, collection }) => {
     },
   })
   return { success: false }
+}
+
+type SaveAddressToCustomerBook = (params: {
+  dispatch: Dispatch<OrderActions>
+  type: 'BillingAddress' | 'ShippingAddress'
+  value: boolean
+}) => void
+
+export const saveAddressToCustomerBook: SaveAddressToCustomerBook = ({
+  type,
+  value,
+  dispatch,
+}) => {
+  dispatch({
+    type: 'setSaveAddressToCustomerBook',
+    payload: {
+      [`save${type}ToCustomerBook`]: value,
+    },
+  })
 }
 
 export const orderInitialState: Partial<OrderState> = {
