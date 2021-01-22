@@ -1,13 +1,16 @@
 import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { OrderCollection } from '@commercelayer/js-sdk'
+import { Address, OrderCollection } from '@commercelayer/js-sdk'
 import { getOrderContext } from '#reducers/OrderReducer'
 
-export type ShippingAddressActionType = 'setShippingAddress'
+export type ShippingAddressActionType =
+  | 'setShippingAddress'
+  | 'setShippingCustomerAddressId'
 
 export interface ShippingAddressActionPayload {
   _shippingAddressCloneId: string
+  shippingCustomerAddressId: string
 }
 
 export type ShippingAddressState = Partial<ShippingAddressActionPayload>
@@ -28,12 +31,21 @@ export type SetShippingAddress = (
     dispatch: Dispatch<ShippingAddressAction>
     order?: OrderCollection | null
     getOrder?: getOrderContext
+    customerAddressId?: string
   }
 ) => Promise<void>
 
 export const setShippingAddress: SetShippingAddress = async (id, options) => {
   try {
     if (options?.order) {
+      if (options.customerAddressId) {
+        const address = await Address.withCredentials(options.config).find(id)
+        if (address.reference !== options.customerAddressId) {
+          await address.withCredentials(options.config).update({
+            reference: options.customerAddressId,
+          })
+        }
+      }
       const orderId = options?.order.id
       await options?.order.withCredentials(options.config).update({
         _shippingAddressCloneId: id,
@@ -51,7 +63,25 @@ export const setShippingAddress: SetShippingAddress = async (id, options) => {
   }
 }
 
-const type: ShippingAddressActionType[] = ['setShippingAddress']
+type SetShippingCustomerAddressId = (args: {
+  customerAddressId: string
+  dispatch: Dispatch<ShippingAddressAction>
+}) => void
+
+export const setShippingCustomerAddressId: SetShippingCustomerAddressId = ({
+  customerAddressId,
+  dispatch,
+}) => {
+  dispatch({
+    type: 'setShippingCustomerAddressId',
+    payload: { shippingCustomerAddressId: customerAddressId },
+  })
+}
+
+const type: ShippingAddressActionType[] = [
+  'setShippingAddress',
+  'setShippingCustomerAddressId',
+]
 
 const shippingAddressReducer = (
   state: ShippingAddressState,

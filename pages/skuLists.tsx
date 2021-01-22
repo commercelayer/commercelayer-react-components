@@ -23,7 +23,7 @@ import SkuListsContainer from '../src/components/SkuListsContainer'
 import SkuList from '../src/components/SkuList'
 import AddToCartButton from '../src/components/AddToCartButton'
 import QuantitySelector from '../src/components/QuantitySelector'
-import ExternalFunction from '@components/ExternalFunction'
+import ExternalFunction from '#components/ExternalFunction'
 
 const endpoint = 'https://the-blue-brand-2.commercelayer.co'
 

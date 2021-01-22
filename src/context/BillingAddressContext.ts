@@ -1,16 +1,19 @@
 import { createContext } from 'react'
-import {
-  SetBillingAddress,
-  setBillingAddress,
-  BillingAddressState,
-} from '#reducers/BillingAddressReducer'
+import { BillingAddressState } from '#reducers/BillingAddressReducer'
 
 type DefaultContext = {
-  setBillingAddress: SetBillingAddress
+  setBillingAddress?: (
+    id: string,
+    options?: {
+      customerAddressId: string
+    }
+  ) => void
 } & BillingAddressState
 
 export const defaultBillingAddressContext = {
-  setBillingAddress,
+  setBillingAddress: (): void => {
+    return
+  },
 }
 
 const BillingAddressContext = createContext<DefaultContext>(

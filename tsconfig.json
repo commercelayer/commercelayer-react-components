@@ -18,6 +18,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "esnext",
+    "sourceMap": true,
     "baseUrl": ".",
     "paths": {
       "@commercelayer/react-components": ["src/index"],

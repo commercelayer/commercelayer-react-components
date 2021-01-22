@@ -14,13 +14,12 @@ import {
   SaveAddressesButton,
   ShippingAddressForm,
   CustomerContainer,
-  CustomerInput,
-  SaveCustomerButton,
   Address,
   AddressField,
   ShippingAddressContainer,
 } from '@commercelayer/react-components'
-import { Order } from '@commercelayer/js-sdk'
+import { Order, Address as AddressResource } from '@commercelayer/js-sdk'
+import { Router, useRouter } from 'next/router'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 const orderId = 'JwXQehvvyP'
@@ -32,6 +31,7 @@ export default function Main() {
   const [showShippingAddressForm, setShowShippingAddressForm] = useState(false)
   const [billingAddress, setBillingAddress] = useState({})
   const [shippingAddress, setShippingAddress] = useState({})
+  const { query, pathname, push } = useRouter()
   useEffect(() => {
     const getToken = async () => {
       // @ts-ignore
@@ -49,8 +49,31 @@ export default function Main() {
       )
       if (token) setToken(token.accessToken)
     }
+    const cleanAddresses = async () => {
+      const config = { accessToken: token, endpoint }
+      const order = await Order.withCredentials(config)
+        .includes('billingAddress', 'shippingAddress')
+        .find(orderId)
+      const billingAddress: any = order.billingAddress()
+      const shippingAddress: any = order.shippingAddress()
+      const billing = await AddressResource.withCredentials(config).find(
+        billingAddress.id
+      )
+      const shipping = await AddressResource.withCredentials(config).find(
+        shippingAddress.id
+      )
+      await billing.withCredentials(config).update({ reference: '' })
+      await shipping.withCredentials(config).update({ reference: '' })
+      push(pathname)
+    }
     if (!token) {
       getToken()
+    }
+    if (!!query?.cleanAddresses && token) {
+      const clean = !!query?.cleanAddresses
+      if (clean) {
+        cleanAddresses()
+      }
     }
   }, [token])
   const messages: any = [

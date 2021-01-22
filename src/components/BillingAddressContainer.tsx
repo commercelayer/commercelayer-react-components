@@ -1,14 +1,15 @@
-import BillingAddressContext, {
-  defaultBillingAddressContext,
-} from '#context/BillingAddressContext'
+import BillingAddressContext from '#context/BillingAddressContext'
 import React, {
   FunctionComponent,
   ReactNode,
   useContext,
+  useEffect,
   useReducer,
 } from 'react'
 import billingAddressReducer, {
   billingAddressInitialState,
+  setBillingAddress,
+  setBillingCustomerAddressId,
 } from '#reducers/BillingAddressReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
@@ -29,15 +30,30 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
   const config = useContext(CommerceLayerContext)
   const { order, getOrder } = useContext(OrderContext)
   const { shipToDifferentAddress, setCloneAddress } = useContext(AddressContext)
+  useEffect(() => {
+    if (order && !state.billingCustomerAddressId) {
+      // @ts-ignore
+      const customerAddressId = order.billingAddress().reference
+      setBillingCustomerAddressId({
+        customerAddressId,
+        dispatch,
+      })
+      setCloneAddress(customerAddressId, 'billingAddress')
+    }
+  }, [order])
   const contextValue = {
     ...state,
-    setBillingAddress: async (id: string) => {
-      await defaultBillingAddressContext['setBillingAddress'](id, {
+    setBillingAddress: async (
+      id: string,
+      options?: { customerAddressId: string }
+    ) => {
+      await setBillingAddress(id, {
         config,
         dispatch,
         order,
         getOrder,
         shipToDifferentAddress,
+        customerAddressId: options?.customerAddressId,
       })
       setCloneAddress(id, 'billingAddress')
     },

@@ -1,4 +1,4 @@
-import CLayer, { OrderCollection } from '@commercelayer/js-sdk'
+import CLayer, { Order, OrderCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import { SetLocalOrder, DeleteLocalOrder } from '#utils/localStorage'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
@@ -74,7 +74,7 @@ export interface UnsetOrderState {
 export interface OrderPayload {
   loading?: boolean
   orderId?: string
-  order?: OrderCollection | null
+  order?: OrderCollection
   errors?: BaseError[]
 }
 
@@ -91,7 +91,7 @@ export type getOrderContext = (id: string) => void
 export interface OrderState extends OrderPayload {
   loading: boolean
   orderId: string
-  order: OrderCollection | null
+  order: OrderCollection | undefined
   saveBillingAddressToCustomerBook: boolean
   saveShippingAddressToCustomerBook: boolean
   getOrder?: getOrderContext
@@ -174,7 +174,7 @@ export const getApiOrder: GetOrder = async (params) => {
     deleteLocalOrder,
   } = params
   try {
-    const o = await CLayer.Order.withCredentials(config)
+    const o = await Order.withCredentials(config)
       .includes('billingAddress', 'shippingAddress')
       .find(id)
     if (o)
@@ -187,7 +187,7 @@ export const getApiOrder: GetOrder = async (params) => {
         dispatch({
           type: 'setOrder',
           payload: {
-            order: null,
+            order: undefined,
             orderId: '',
           },
         })
@@ -204,7 +204,7 @@ export const getApiOrder: GetOrder = async (params) => {
     dispatch({
       type: 'setOrder',
       payload: {
-        order: null,
+        order: undefined,
         orderId: '',
       },
     })
@@ -291,7 +291,7 @@ export const unsetOrderState: UnsetOrderState = (dispatch) => {
   dispatch({
     type: 'setOrder',
     payload: {
-      order: null,
+      order: undefined,
     },
   })
 }
@@ -329,7 +329,7 @@ export const saveAddressToCustomerBook: SaveAddressToCustomerBook = ({
 export const orderInitialState: Partial<OrderState> = {
   loading: false,
   orderId: '',
-  order: null,
+  order: undefined,
   errors: [],
 }
 

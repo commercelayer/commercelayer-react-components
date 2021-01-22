@@ -59,9 +59,10 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     disable = billingAddress && fieldsExist(billingAddress)
   }
   if (
-    _.isEmpty(errors) &&
-    shipToDifferentAddress &&
-    !_.isEmpty(shippingAddress)
+    (_.isEmpty(errors) &&
+      shipToDifferentAddress &&
+      _.isEmpty(shippingAddressId)) ||
+    (!_.isEmpty(shippingAddress) && _.isEmpty(errors) && shipToDifferentAddress)
   ) {
     disable = shippingAddress ? fieldsExist(shippingAddress) : true
   }

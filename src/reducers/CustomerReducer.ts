@@ -16,7 +16,7 @@ export type CustomerActionType =
   | 'setAddresses'
 
 export interface CustomerActionPayload {
-  addresses: AddressCollection[]
+  addresses: (AddressCollection | Promise<AddressCollection> | null)[]
   customerEmail: string
   errors: BaseError[]
 }
@@ -37,7 +37,7 @@ export type SaveCustomerUser = (args: {
   config: CommerceLayerConfig
   customerEmail: string
   dispatch: Dispatch<CustomerAction>
-  order: OrderCollection | null
+  order?: OrderCollection
   getOrder: getOrderContext
 }) => Promise<void>
 
@@ -50,9 +50,8 @@ export const saveCustomerUser: SaveCustomerUser = async ({
 }) => {
   try {
     if (order) {
-      const orderId = order.id
-      await order.withCredentials(config).update({ customerEmail })
-      getOrder(orderId)
+      const o = await order.withCredentials(config).update({ customerEmail })
+      getOrder(o.id)
       dispatch({
         type: 'setCustomerEmail',
         payload: { customerEmail },
@@ -107,7 +106,7 @@ export const getCustomerAddresses: GetCustomerAddresses = async ({
       .all()
     const addresses = customerAddresses
       .toArray()
-      .map((customerAddress) => customerAddress.address() as any)
+      .map((customerAddress) => customerAddress.address())
     dispatch({
       type: 'setAddresses',
       payload: { addresses },

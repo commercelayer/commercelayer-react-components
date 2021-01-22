@@ -15,7 +15,7 @@ import components from '#config/components'
 import { saveCustomerUser } from '#reducers/CustomerReducer'
 import { getOrderContext } from '#reducers/OrderReducer'
 import CustomerContext from '#context/CustomerContext'
-import { defaultCustomerContext } from '../context/CustomerContext'
+import { defaultCustomerContext } from '#context/CustomerContext'
 import { BaseError } from '#typings/errors'
 import _ from 'lodash'
 
@@ -31,10 +31,10 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
   const { order, getOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
-    if (config.accessToken && _.isEmpty(state.addresses)) {
-      getCustomerAddresses({ config, dispatch })
+    if (config.accessToken && _.isEmpty(state.addresses) && order) {
+      getCustomerAddresses({ config, dispatch, order })
     }
-  }, [config.accessToken])
+  }, [config.accessToken, order])
   const contextValue = {
     ...state,
     saveCustomerUser: async (customerEmail: string) => {

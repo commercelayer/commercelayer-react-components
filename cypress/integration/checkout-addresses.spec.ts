@@ -24,6 +24,12 @@ describe('Guest Addresses', () => {
   })
 
   beforeEach(() => {
+    cy.setRoutes({
+      endpoint: 'https://the-blue-brand-3.commercelayer.co',
+      routes: Cypress.env('requests'),
+      record: Cypress.env('RECORD'),
+      filename,
+    })
     // Customer Email
     cy.get('[data-cy="save-on-blur-button"]').as('saveOnBlurButton')
     cy.get('[data-cy="customer_email"]').as('customerEmail')

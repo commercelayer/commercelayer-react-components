@@ -13,7 +13,7 @@ describe('Customer Addresses', () => {
     //   record: Cypress.env('RECORD'),
     //   filename,
     // })
-    cy.visit(`/${filename}`)
+    cy.visit(`/${filename}?cleanAddresses=true`)
   })
 
   after(() => {
@@ -87,8 +87,9 @@ describe('Customer Addresses', () => {
   })
 
   it('Adding new billing address', () => {
-    cy.reload()
+    cy.visit(`/${filename}?cleanAddresses=true`)
     cy.wait(['@token', '@getOrders'])
+    cy.reload()
     cy.get('@saveAddressesButton').should('have.attr', 'disabled')
     cy.get('@addNewBillingAddress').click()
   })
@@ -177,11 +178,10 @@ describe('Customer Addresses', () => {
   })
 
   it('Reload page', () => {
-    cy.reload()
+    cy.visit(`/${filename}?cleanAddresses=true`)
     cy.wait(['@token', '@getCustomerAddresses', '@getOrders'])
   })
   it('Selecting shipping address', () => {
-    cy.get('@saveAddressesButton').should('have.attr', 'disabled')
     cy.get('@customerBillingAddress0').click()
     cy.get('@buttonDifferentAddress')
       .click()
@@ -259,5 +259,18 @@ describe('Customer Addresses', () => {
     )
     cy.get('@currentShippingAddress').should('contain.text', usAddress.zip_code)
     cy.get('@currentShippingAddress').should('contain.text', usAddress.phone)
+  })
+
+  it('Reload page', () => {
+    cy.visit(`/${filename}?cleanAddresses=true`)
+    cy.wait(['@token', '@getCustomerAddresses', '@getOrders'])
+  })
+
+  it('Selecting second billing address', () => {
+    cy.get('@customerBillingAddress1').click()
+    cy.wait('@updateOrder')
+    cy.wait('@getOrders')
+    cy.get('@currentBillingAddress').should('contain.text', 'Alessandro')
+    cy.get('@currentBillingAddress').should('contain.text', 'Casazza')
   })
 })

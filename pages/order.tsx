@@ -1,8 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import {
-  getIntegrationToken,
-  getSalesChannelToken,
-} from '@commercelayer/js-auth'
+import { getSalesChannelToken } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
@@ -31,7 +28,7 @@ import AvailabilityContainer from '../src/components/AvailabilityContainer'
 import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 import ItemContainer from '../src/components/ItemContainer'
 import Errors from '../src/components/Errors'
-import OrderStorage from '@components/OrderStorage'
+import OrderStorage from '#components/OrderStorage'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 
