@@ -104,7 +104,7 @@ export const getCustomerAddresses: GetCustomerAddresses = async ({
     const customerAddresses = await CustomerAddress.withCredentials(config)
       .includes('address')
       .all()
-    const addresses = customerAddresses
+    const addresses: any = customerAddresses
       .toArray()
       .map((customerAddress) => customerAddress.address())
     dispatch({
