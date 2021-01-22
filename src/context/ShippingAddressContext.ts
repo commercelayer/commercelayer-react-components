@@ -1,16 +1,19 @@
 import { createContext } from 'react'
-import {
-  SetShippingAddress,
-  setShippingAddress,
-  ShippingAddressState,
-} from '#reducers/ShippingAddressReducer'
+import { ShippingAddressState } from '#reducers/ShippingAddressReducer'
 
 type DefaultContext = {
-  setShippingAddress: SetShippingAddress
+  setShippingAddress?: (
+    id: string,
+    options?: {
+      customerAddressId: string
+    }
+  ) => void
 } & ShippingAddressState
 
 export const defaultShippingAddressContext = {
-  setShippingAddress,
+  setShippingAddress: (): void => {
+    return
+  },
 }
 
 const ShippingAddressContext = createContext<DefaultContext>(

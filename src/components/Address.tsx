@@ -32,20 +32,24 @@ const Address: FunctionComponent<Props> = (props) => {
     ...p
   } = props
   const { addresses: addressesContext } = useContext(CustomerContext)
-  const { setBillingAddress } = useContext(BillingAddressContext)
-  const { setShippingAddress } = useContext(ShippingAddressContext)
+  const { setBillingAddress, billingCustomerAddressId } = useContext(
+    BillingAddressContext
+  )
+  const { setShippingAddress, shippingCustomerAddressId } = useContext(
+    ShippingAddressContext
+  )
   const [selected, setSelected] = useState<null | number>(null)
-  const handleSelect = async (k: number, addressId: string) => {
+  const handleSelect = async (
+    k: number,
+    addressId: string,
+    customerAddressId: string
+  ) => {
     if (k !== selected) {
       setSelected(k)
-      setBillingAddress && (await setBillingAddress(addressId))
-      setShippingAddress && (await setShippingAddress(addressId))
-      onSelect && onSelect()
-    }
-    if (k === selected) {
-      setSelected(null)
-      setBillingAddress && (await setBillingAddress(''))
-      setShippingAddress && (await setShippingAddress(''))
+      setBillingAddress &&
+        (await setBillingAddress(addressId, { customerAddressId }))
+      setShippingAddress &&
+        (await setShippingAddress(addressId, { customerAddressId }))
       onSelect && onSelect()
     }
   }
@@ -53,16 +57,35 @@ const Address: FunctionComponent<Props> = (props) => {
     ? addresses
     : (addressesContext && addressesContext) || []
   const components = items.map((address, k) => {
+    let preselected = false
+    if (billingCustomerAddressId) {
+      preselected =
+        selected === null &&
+        // @ts-ignore
+        address.customerAddressId === billingCustomerAddressId
+    }
+    if (shippingCustomerAddressId) {
+      preselected =
+        selected === null &&
+        // @ts-ignore
+        address.customerAddressId === shippingCustomerAddressId
+    }
+
     const addressProps = {
       address,
     }
     const addressSelectedClass =
-      selected === k ? `${className} ${selectedClassName}` : className
+      selected === k || preselected
+        ? `${className} ${selectedClassName}`
+        : className
+    // NOTE: Remove ts-ignore to next SDK release
+    // @ts-ignore
+    const customerAddressId = address.customerAddressId
     return (
       <AddressChildrenContext.Provider key={k} value={addressProps}>
         <div
           className={addressSelectedClass}
-          onClick={() => handleSelect(k, address.id)}
+          onClick={() => handleSelect(k, address.id, customerAddressId)}
           {...p}
         >
           {children}

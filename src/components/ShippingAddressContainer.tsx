@@ -1,14 +1,15 @@
-import ShippingAddressContext, {
-  defaultShippingAddressContext,
-} from '#context/ShippingAddressContext'
+import ShippingAddressContext from '#context/ShippingAddressContext'
 import React, {
   FunctionComponent,
   ReactNode,
   useContext,
+  useEffect,
   useReducer,
 } from 'react'
 import shippingAddressReducer, {
+  setShippingAddress,
   shippingAddressInitialState,
+  setShippingCustomerAddressId,
 } from '#reducers/ShippingAddressReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
@@ -29,14 +30,29 @@ const ShippingAddressContainer: FunctionComponent<Props> = (props) => {
   const config = useContext(CommerceLayerContext)
   const { order, getOrder } = useContext(OrderContext)
   const { setCloneAddress } = useContext(AddressContext)
+  useEffect(() => {
+    if (order && !state.shippingCustomerAddressId) {
+      // @ts-ignore
+      const customerAddressId = order.shippingAddress().reference
+      setShippingCustomerAddressId({
+        customerAddressId,
+        dispatch,
+      })
+      setCloneAddress(customerAddressId, 'shippingAddress')
+    }
+  }, [order])
   const contextValue = {
     ...state,
-    setShippingAddress: async (id: string) => {
-      await defaultShippingAddressContext['setShippingAddress'](id, {
+    setShippingAddress: async (
+      id: string,
+      options?: { customerAddressId: string }
+    ) => {
+      await setShippingAddress(id, {
         config,
         dispatch,
         order,
         getOrder,
+        customerAddressId: options?.customerAddressId,
       })
       setCloneAddress(id, 'shippingAddress')
     },
