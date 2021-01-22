@@ -16,7 +16,7 @@ export type CustomerActionType =
   | 'setAddresses'
 
 export interface CustomerActionPayload {
-  addresses: (AddressCollection | Promise<AddressCollection> | null)[]
+  addresses: AddressCollection[]
   customerEmail: string
   errors: BaseError[]
 }
