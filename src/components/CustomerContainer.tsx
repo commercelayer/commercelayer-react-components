@@ -31,10 +31,10 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
   const { order, getOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
-    if (config.accessToken && _.isEmpty(state.addresses) && order) {
-      getCustomerAddresses({ config, dispatch, order })
+    if (config.accessToken && _.isEmpty(state.addresses)) {
+      getCustomerAddresses({ config, dispatch })
     }
-  }, [config.accessToken, order])
+  }, [config.accessToken])
   const contextValue = {
     ...state,
     saveCustomerUser: async (customerEmail: string) => {
