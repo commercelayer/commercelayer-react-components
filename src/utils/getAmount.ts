@@ -1,12 +1,7 @@
 import _ from 'lodash'
 
 export interface GetAmountInterface {
-  (
-    base: string,
-    type: string,
-    format: string,
-    obj: Record<string, string>
-  ): string
+  (base: string, type: string, format: string, obj: Record<string, any>): string
 }
 
 const getAmount: GetAmountInterface = (base, type, format, obj) => {
