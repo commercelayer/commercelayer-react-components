@@ -227,7 +227,7 @@ export const addToCart: AddToCart = async (params) => {
     const order = CLayer.Order.build({ id })
     const name = lineItem?.name
     const imageUrl = lineItem?.imageUrl
-    const attrs: any = {
+    const attrs: Record<string, any> = {
       order,
       skuCode,
       name,

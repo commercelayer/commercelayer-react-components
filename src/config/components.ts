@@ -192,6 +192,7 @@ const components = {
     ],
     propTypes: {
       children: childrenTypes.isRequired,
+      isGuest: PropTypes.bool,
     },
   },
   CustomerInput: {
@@ -335,6 +336,7 @@ const components = {
       'LineItemRemoveLink',
       'Errors',
       'ReactNode',
+      'StockTransfer',
     ],
     displayName: 'LineItem',
     propTypes: {
@@ -462,6 +464,7 @@ const components = {
       'TotalAmount',
       'CheckoutLink',
       'GiftCardContainer',
+      'ShipmentsContainer',
       'ReactNode',
     ],
     displayName: 'OrderContainer',
@@ -539,6 +542,25 @@ const components = {
       label: 'Continue to delivery',
     },
   },
+  Shipment: {
+    permittedChildren: [
+      'LineItemsContainer',
+      'LineItem',
+      'ShippingMethod',
+      'ReactNode',
+    ],
+    displayName: 'Shipment',
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
+  ShipmentsContainer: {
+    displayName: 'ShipmentsContainer',
+    permittedChildren: ['Shipment', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
   ShippingAddressContainer: {
     permittedChildren: ['Address', 'ReactNode'],
     propTypes: {
@@ -565,6 +587,41 @@ const components = {
   ShippingAmount: {
     displayName: 'ShippingAmount',
     propTypes: baseOrderComponentPricePropTypes,
+  },
+  ShippingMethod: {
+    permittedChildren: [
+      'ShippingMethodName',
+      'ShippingMethodPrice',
+      'ShippingMethodRadioButton',
+      'ReactNode',
+    ],
+    displayName: 'ShippingMethod',
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
+  ShippingMethodName: {
+    displayName: 'ShippingMethodName',
+    propTypes: {
+      children: PropTypes.func,
+    },
+  },
+  ShippingMethodRadioButton: {
+    displayName: 'ShippingMethodRadioButton',
+    propTypes: {
+      children: PropTypes.func,
+    },
+  },
+  ShippingMethodPrice: {
+    displayName: 'ShippingMethodPrice',
+    propTypes: {
+      ...baseOrderComponentPricePropTypes,
+      type: PropTypes.oneOf<'amount'>(['amount']),
+    },
+    defaultProps: {
+      format: 'formatted',
+      type: 'amount',
+    },
   },
   SkuList: {
     permittedChildren: ['AddToCartButton', 'QuantitySelector', 'ReactNode'],
@@ -599,6 +656,19 @@ const components = {
     propTypes: {
       children: childrenTypes.isRequired,
       skuCode: PropTypes.string,
+    },
+  },
+  StockTransfer: {
+    permittedChildren: ['StockTransferField', 'ReactNode'],
+    displayName: 'StockTransfer',
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
+  StockTransferField: {
+    displayName: 'StockTransferField',
+    propTypes: {
+      children: PropTypes.func,
     },
   },
   SubmitButton: {

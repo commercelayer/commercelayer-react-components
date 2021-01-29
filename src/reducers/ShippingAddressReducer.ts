@@ -46,11 +46,6 @@ export const setShippingAddress: SetShippingAddress = async (id, options) => {
           })
         }
       }
-      const orderId = options?.order.id
-      await options?.order.withCredentials(options.config).update({
-        _shippingAddressCloneId: id,
-      })
-      options?.getOrder && (await options?.getOrder(orderId))
       options.dispatch({
         type: 'setShippingAddress',
         payload: {

@@ -132,7 +132,7 @@ export default function Main() {
               </button>
               <p className="ml-5">Save onBlur</p>
             </div>
-            <CustomerContainer>
+            <CustomerContainer isGuest>
               <div>
                 <label
                   htmlFor="customer_email"

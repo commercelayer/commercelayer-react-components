@@ -47,18 +47,6 @@ export const setBillingAddress: SetBillingAddress = async (id, options) => {
           })
         }
       }
-      const updateObj: Partial<Record<string, any>> = {
-        _billingAddressCloneId: id,
-        _shippingAddressCloneId: id,
-      }
-      if (options?.shipToDifferentAddress) {
-        delete updateObj._shippingAddressCloneId
-      }
-      const o = await options?.order
-        .withCredentials(options.config)
-        .update(updateObj)
-      const orderId = o.id
-      options?.getOrder && (await options?.getOrder(orderId))
       options.dispatch({
         type: 'setBillingAddress',
         payload: {

@@ -140,36 +140,66 @@ export const saveAddresses: SaveAddresses = async ({
     shippingAddressId,
   } = state
   try {
-    if (
-      !_.isEmpty(billingAddress) ||
-      (billingAddressId && !shippingAddressId) ||
-      !_.isEmpty(shippingAddress)
-    ) {
+    const orderAttributes: Partial<Record<string, any>> = {
+      _billingAddressCloneId: billingAddressId,
+      _shippingAddressCloneId: billingAddressId,
+      _shippingAddressSameAsBilling: false,
+    }
+    if (!_.isEmpty(billingAddress) && billingAddress) {
+      delete orderAttributes._billingAddressCloneId
+      delete orderAttributes._shippingAddressCloneId
+      orderAttributes._shippingAddressSameAsBilling = true
+      orderAttributes.billingAddress = await Address.withCredentials(
+        config
+      ).create(billingAddress)
+    }
+    if (shipToDifferentAddress) {
+      delete orderAttributes._shippingAddressSameAsBilling
+      if (shippingAddressId)
+        orderAttributes._shippingAddressCloneId = shippingAddressId
+      if (!_.isEmpty(shippingAddress) && shippingAddress) {
+        orderAttributes.shippingAddress = await Address.withCredentials(
+          config
+        ).create(shippingAddress)
+      }
+    }
+    if (order && getOrder && !_.isEmpty(orderAttributes)) {
       const o =
         order ||
         (orderId && (await Order.withCredentials(config).find(orderId)))
-      const updateObj: Partial<Record<string, any>> = {}
-      if (billingAddress) {
-        const billing =
-          billingAddress &&
-          (await Address.withCredentials(config).create(billingAddress))
-        if (billing) {
-          updateObj['billingAddress'] = billing
-          updateObj['_shippingAddressSameAsBilling'] = true
-        }
-      }
-      if (shipToDifferentAddress) {
-        const shipping =
-          shippingAddress &&
-          (await Address.withCredentials(config).create(shippingAddress))
-        if (shipping) updateObj['shippingAddress'] = shipping
-        delete updateObj._shippingAddressSameAsBilling
-      }
-      if (o && getOrder && !_.isEmpty(updateObj)) {
-        const patchOrder = await o.withCredentials(config).update(updateObj)
-        getOrder(patchOrder.id)
-      }
+      const patchOrder = await o.withCredentials(config).update(orderAttributes)
+      getOrder(patchOrder.id)
     }
+    // if (
+    //   !_.isEmpty(billingAddress) ||
+    //   (billingAddressId && !shippingAddressId) ||
+    //   !_.isEmpty(shippingAddress)
+    // ) {
+    //   const o =
+    //     order ||
+    //     (orderId && (await Order.withCredentials(config).find(orderId)))
+    //   const updateObj: Partial<Record<string, any>> = {}
+    //   if (billingAddress) {
+    //     const billing =
+    //       billingAddress &&
+    //       (await Address.withCredentials(config).create(billingAddress))
+    //     if (billing) {
+    //       updateObj['billingAddress'] = billing
+    //       updateObj['_shippingAddressSameAsBilling'] = true
+    //     }
+    //   }
+    //   if (shipToDifferentAddress) {
+    //     const shipping =
+    //       shippingAddress &&
+    //       (await Address.withCredentials(config).create(shippingAddress))
+    //     if (shipping) updateObj['shippingAddress'] = shipping
+    //     delete updateObj._shippingAddressSameAsBilling
+    //   }
+    //   if (o && getOrder && !_.isEmpty(updateObj)) {
+    //     const patchOrder = await o.withCredentials(config).update(updateObj)
+    //     getOrder(patchOrder.id)
+    //   }
+    // }
   } catch (error) {
     console.error(error)
   }
