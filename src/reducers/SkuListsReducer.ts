@@ -37,7 +37,7 @@ export const getSkuList: GetSkuList = async ({
   dispatch,
   // state,
 }) => {
-  const skuLists: SkuList = {}
+  const skuLists: Record<string, any> = {}
   try {
     listIds.map(async (id) => {
       const skuList = await SkuList.withCredentials(config)
@@ -46,7 +46,7 @@ export const getSkuList: GetSkuList = async ({
         .find(id)
       const skuCodes = skuList
         .skus()
-        .toArray()
+        ?.toArray()
         .map((sku) => sku.code)
       skuLists[id] = skuCodes
     })

@@ -12,7 +12,7 @@ export interface SkuOptionsState {
 
 interface GetSkuOptionsParams {
   dispatch: Dispatch<SkuOptionsAction>
-  skuOptions: SkuOptionCollection[]
+  skuOptions?: SkuOptionCollection[]
 }
 
 export interface GetSkuOptions {

@@ -45,7 +45,7 @@ export interface GetPrices {
 }
 
 const getPrices: GetPrices = (prices) => {
-  const obj = {}
+  const obj: Record<string, any> = {}
   if (_.isArray(prices)) {
     prices.map((p) => {
       if (_.has(obj, p.skuCode)) {
@@ -56,7 +56,7 @@ const getPrices: GetPrices = (prices) => {
     })
   } else {
     _.forEach(prices, (item) => {
-      const prices = item.prices().toArray()
+      const prices = item.prices()?.toArray()
       obj[item.code] = prices
     })
   }
