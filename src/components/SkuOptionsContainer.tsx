@@ -42,7 +42,7 @@ const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = (
   useEffect(() => {
     if (sCode && item[sCode].skuOptions) {
       getSkuOptions({
-        skuOptions: item[sCode].skuOptions().toArray(),
+        skuOptions: item[sCode].skuOptions()?.toArray(),
         dispatch,
       })
     }
