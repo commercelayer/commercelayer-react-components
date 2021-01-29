@@ -19,7 +19,7 @@ import {
   ShippingAddressContainer,
 } from '@commercelayer/react-components'
 import { Order, Address as AddressResource } from '@commercelayer/js-sdk'
-import { Router, useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 const orderId = 'JwXQehvvyP'
@@ -147,7 +147,6 @@ export default function Main() {
                     <Address
                       className="w-1/2 p-2 border cursor-pointer rounded hover:border-blue-500 m-2 shadow-sm"
                       selectedClassName="border-blue-500"
-                      onSelect={handleClick}
                       data-cy="customer-billing-address"
                     >
                       <div className="flex font-bold">
@@ -439,7 +438,6 @@ export default function Main() {
                         data-cy="customer-shipping-address"
                         className="w-1/2 p-2 border cursor-pointer rounded hover:border-blue-500 m-2 shadow-sm"
                         selectedClassName="border-blue-500"
-                        onSelect={handleClick}
                       >
                         <div className="flex font-bold">
                           <AddressField name="first_name" />
