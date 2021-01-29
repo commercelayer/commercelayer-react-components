@@ -61,13 +61,11 @@ const Address: FunctionComponent<Props> = (props) => {
     if (billingCustomerAddressId) {
       preselected =
         selected === null &&
-        // @ts-ignore
         address.customerAddressId === billingCustomerAddressId
     }
     if (shippingCustomerAddressId) {
       preselected =
         selected === null &&
-        // @ts-ignore
         address.customerAddressId === shippingCustomerAddressId
     }
 
@@ -78,9 +76,7 @@ const Address: FunctionComponent<Props> = (props) => {
       selected === k || preselected
         ? `${className} ${selectedClassName}`
         : className
-    // NOTE: Remove ts-ignore to next SDK release
-    // @ts-ignore
-    const customerAddressId = address.customerAddressId
+    const customerAddressId: string = address?.customerAddressId || ''
     return (
       <AddressChildrenContext.Provider key={k} value={addressProps}>
         <div

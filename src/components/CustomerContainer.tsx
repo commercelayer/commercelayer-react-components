@@ -24,14 +24,15 @@ const displayName = components.CustomerContainer.displayName
 
 export type CustomerContainer = {
   children: ReactNode
+  isGuest?: boolean
 }
 const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
-  const { children } = props
+  const { children, isGuest = false } = props
   const [state, dispatch] = useReducer(customerReducer, customerInitialState)
   const { order, getOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
-    if (config.accessToken && _.isEmpty(state.addresses)) {
+    if (config.accessToken && _.isEmpty(state.addresses) && !isGuest) {
       getCustomerAddresses({ config, dispatch })
     }
   }, [config.accessToken])

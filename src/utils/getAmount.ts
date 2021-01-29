@@ -1,12 +1,17 @@
 import _ from 'lodash'
 
 export interface GetAmountInterface {
-  (base: string, type: string, format: string, obj: object): string
+  (
+    base: string,
+    type: string,
+    format: string,
+    obj: Record<string, string>
+  ): string
 }
 
 const getAmount: GetAmountInterface = (base, type, format, obj) => {
   let v = ''
-  _.keys(obj).map(k => {
+  _.keys(obj).map((k) => {
     const key = k.toLowerCase()
     const typeOne = `${format}${type}${base}`.toLowerCase()
     const typeTwo = `${type}${base}${format}`.toLowerCase()
