@@ -1,51 +1,50 @@
 import React from 'react'
-import { LineItem, Price } from '../src'
+import { StockTransfer, Price } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 
-const propTypes = components.LineItem.propTypes
+const propTypes = components.StockTransfer.propTypes
 
-test('<LineItem/>', () => {
-  expect.assertions(3)
+test('<StockTransfer/>', () => {
+  expect.assertions(2)
   const component = renderer.create(
-    <LineItem>
+    <StockTransfer>
       <div>test</div>
-    </LineItem>
+    </StockTransfer>
   )
   const tree = component.toJSON()
   const root = component.toTree()
   const proptypes = root.type['propTypes']
   expect(tree).toMatchSnapshot()
   expect(proptypes.children).toBe(propTypes.children)
-  expect(proptypes.type).toBe(propTypes.type)
 })
 
-test('<LineItem proptypes required />', () => {
+test('<StockTransfer proptypes required />', () => {
   expect.assertions(2)
   console.error = jest.fn()
-  const component = renderer.create(<LineItem />)
+  const component = renderer.create(<StockTransfer />)
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `The prop 'children' is marked as required in 'LineItem', but its value is 'undefined'.`
+      `The prop 'children' is marked as required in 'StockTransfer', but its value is 'undefined'.`
     )
   )
 })
 
-test('<LineItem check children />', () => {
+test('<StockTransfer check children />', () => {
   expect.assertions(2)
   console.error = jest.fn()
   const component = renderer.create(
-    <LineItem>
+    <StockTransfer>
       <Price />
-    </LineItem>
+    </StockTransfer>
   )
   const tree = component.toJSON()
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to LineItem. Only components LineItemImage, LineItemName, LineItemOptions, LineItemQuantity, LineItemAmount, LineItemRemoveLink, StockTransfer, Errors, ReactNode are allowed.`
+      `Invalid prop 'children' supplied to StockTransfer. Only components StockTransferField, ReactNode are allowed.`
     )
   )
 })

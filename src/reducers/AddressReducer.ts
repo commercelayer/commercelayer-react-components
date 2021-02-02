@@ -170,36 +170,6 @@ export const saveAddresses: SaveAddresses = async ({
       const patchOrder = await o.withCredentials(config).update(orderAttributes)
       getOrder(patchOrder.id)
     }
-    // if (
-    //   !_.isEmpty(billingAddress) ||
-    //   (billingAddressId && !shippingAddressId) ||
-    //   !_.isEmpty(shippingAddress)
-    // ) {
-    //   const o =
-    //     order ||
-    //     (orderId && (await Order.withCredentials(config).find(orderId)))
-    //   const updateObj: Partial<Record<string, any>> = {}
-    //   if (billingAddress) {
-    //     const billing =
-    //       billingAddress &&
-    //       (await Address.withCredentials(config).create(billingAddress))
-    //     if (billing) {
-    //       updateObj['billingAddress'] = billing
-    //       updateObj['_shippingAddressSameAsBilling'] = true
-    //     }
-    //   }
-    //   if (shipToDifferentAddress) {
-    //     const shipping =
-    //       shippingAddress &&
-    //       (await Address.withCredentials(config).create(shippingAddress))
-    //     if (shipping) updateObj['shippingAddress'] = shipping
-    //     delete updateObj._shippingAddressSameAsBilling
-    //   }
-    //   if (o && getOrder && !_.isEmpty(updateObj)) {
-    //     const patchOrder = await o.withCredentials(config).update(updateObj)
-    //     getOrder(patchOrder.id)
-    //   }
-    // }
   } catch (error) {
     console.error(error)
   }

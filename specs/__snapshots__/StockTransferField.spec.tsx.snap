@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<StockTransferField check children format /> 1`] = `
+<p
+  type="quantity"
+/>
+`;
+
+exports[`<StockTransferField with custom children /> 1`] = `<span />`;
+
+exports[`<StockTransferField/> 1`] = `<p />`;

@@ -5,7 +5,6 @@ describe('Multi order', () => {
   const filename = 'multiOrder'
 
   before(() => {
-    cy.server()
     cy.setRoutes({
       endpoint: Cypress.env('apiEndpoint'),
       routes: [Cypress.env('requests')[0]],
@@ -16,7 +15,6 @@ describe('Multi order', () => {
   })
 
   beforeEach(() => {
-    cy.server()
     cy.setRoutes({
       endpoint: Cypress.env('apiEndpoint'),
       routes: Cypress.env('requests'),
