@@ -16,6 +16,8 @@ import {
 } from '#typings'
 import { ErrorPropTypes } from '#typings/errors'
 import { BaseInputComponentPropTypes } from '#typings/index'
+import { DeliveryLeadTimeField } from '../components/DeliveryLeadTime'
+import { StockTransferFieldType } from '#components/StockTransferField'
 
 const components = {
   Address: {
@@ -210,6 +212,18 @@ const components = {
       required: true,
     },
   },
+  DeliveryLeadTime: {
+    displayName: 'DeliveryLeadTime',
+    propTypes: {
+      type: PropTypes.oneOf<DeliveryLeadTimeField>([
+        'maxDays',
+        'maxHours',
+        'minDays',
+        'minHours',
+      ]).isRequired,
+      children: PropTypes.func,
+    },
+  },
   DiscountAmount: {
     displayName: 'DiscountAmount',
     propTypes: baseOrderComponentPricePropTypes,
@@ -334,9 +348,9 @@ const components = {
       'LineItemQuantity',
       'LineItemAmount',
       'LineItemRemoveLink',
+      'StockTransfer',
       'Errors',
       'ReactNode',
-      'StockTransfer',
     ],
     displayName: 'LineItem',
     propTypes: {
@@ -593,6 +607,7 @@ const components = {
       'ShippingMethodName',
       'ShippingMethodPrice',
       'ShippingMethodRadioButton',
+      'DeliveryLeadTime',
       'ReactNode',
     ],
     displayName: 'ShippingMethod',
@@ -669,6 +684,8 @@ const components = {
     displayName: 'StockTransferField',
     propTypes: {
       children: PropTypes.func,
+      type: PropTypes.oneOf<StockTransferFieldType>(['quantity', 'skuCode'])
+        .isRequired,
     },
   },
   SubmitButton: {

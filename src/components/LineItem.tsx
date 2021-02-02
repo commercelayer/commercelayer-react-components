@@ -8,6 +8,8 @@ import LineItemContext from '#context/LineItemContext'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import components from '#config/components'
 import { LineItemType } from '#typings'
+import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
+import _ from 'lodash'
 
 const propTypes = components.LineItem.propTypes
 const displayName = components.LineItem.displayName
@@ -18,11 +20,13 @@ type LineItemProps = {
 }
 
 const LineItem: FunctionComponent<LineItemProps> = (props) => {
-  const { type = 'skus' } = props
+  const { type = 'skus', children } = props
   const { lineItems } = useContext(LineItemContext)
+  const { lineItems: shipmentLineItems } = useContext(ShipmentChildrenContext)
+  const items = _.isEmpty(shipmentLineItems) ? lineItems : shipmentLineItems
   const components =
-    lineItems &&
-    lineItems
+    items &&
+    items
       .filter((l) => l.itemType === type)
       .map((lineItem, k) => {
         const lineProps = {
@@ -30,7 +34,7 @@ const LineItem: FunctionComponent<LineItemProps> = (props) => {
         }
         return (
           <LineItemChildrenContext.Provider key={k} value={lineProps}>
-            {props.children}
+            {children}
           </LineItemChildrenContext.Provider>
         )
       })

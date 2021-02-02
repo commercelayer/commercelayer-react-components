@@ -11,6 +11,7 @@ import React, {
 import shipmentReducer, {
   shipmentInitialState,
   getShipments,
+  setShippingMethod,
 } from '#reducers/ShipmentReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
@@ -38,6 +39,14 @@ const ShipmentsContainer: FunctionComponent<ShipmentsContainer> = (props) => {
     ...state,
     setShipmentErrors: (errors: BaseError[]) =>
       defaultShipmentContext['setShipmentErrors'](errors, dispatch),
+    setShippingMethod: async (shipmentId: string, shippingMethodId: string) =>
+      await setShippingMethod({
+        shippingMethodId,
+        shipmentId,
+        dispatch,
+        config,
+        state,
+      }),
   }
   return (
     <ShipmentContext.Provider value={contextValue}>
