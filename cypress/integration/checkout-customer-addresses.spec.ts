@@ -103,6 +103,10 @@ describe('Customer Addresses', () => {
     cy.get('@billingFirstName')
       .type(euAddress.first_name)
       .should('have.value', euAddress.first_name)
+    cy.get('@customerBillingAddress0').should(
+      'not.have.class',
+      'border-blue-500'
+    )
     cy.get('@billingLastName')
       .type(euAddress.last_name)
       .should('have.value', euAddress.last_name)
@@ -203,6 +207,10 @@ describe('Customer Addresses', () => {
     cy.get('@shippingFirstName')
       .type(usAddress.first_name)
       .should('have.value', usAddress.first_name)
+    cy.get('@customerShippingAddress1').should(
+      'not.have.class',
+      'border-blue-500'
+    )
     cy.get('@shippingLastName')
       .type(usAddress.last_name)
       .should('have.value', usAddress.last_name)

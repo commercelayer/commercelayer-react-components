@@ -5,6 +5,7 @@ import React, {
   ReactNode,
   useContext,
   useEffect,
+  useRef,
 } from 'react'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import _ from 'lodash'
@@ -18,15 +19,17 @@ const propTypes = components.BillingAddressForm.propTypes
 
 type BillingAddressFormProps = {
   children: ReactNode
+  reset?: boolean
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
   props
 ) => {
-  const { children, autoComplete = 'on', ...p } = props
+  const { children, autoComplete = 'on', reset = false, ...p } = props
   const { validation, values, errors } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
   const { saveAddressToCustomerBook } = useContext(OrderContext)
+  const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
     if (!_.isEmpty(errors)) {
       const formErrors: BaseError[] = []
@@ -55,7 +58,16 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
       }
       setAddress({ values, resource: 'billingAddress' })
     }
-  }, [errors, values])
+    if (reset) {
+      saveAddressToCustomerBook &&
+        saveAddressToCustomerBook('BillingAddress', false)
+      if (ref) {
+        ref.current?.reset()
+        setAddressErrors([])
+        setAddress({ values: {}, resource: 'billingAddress' })
+      }
+    }
+  }, [errors, values, reset])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any
@@ -67,7 +79,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
   }
   return (
     <BillingAddressFormContext.Provider value={{ validation, setValue }}>
-      <form autoComplete={autoComplete} {...p}>
+      <form ref={ref} autoComplete={autoComplete} {...p}>
         {children}
       </form>
     </BillingAddressFormContext.Provider>

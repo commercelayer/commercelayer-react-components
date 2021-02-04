@@ -158,6 +158,7 @@ export const saveAddresses: SaveAddresses = async ({
       if (shippingAddressId)
         orderAttributes._shippingAddressCloneId = shippingAddressId
       if (!_.isEmpty(shippingAddress) && shippingAddress) {
+        delete orderAttributes._shippingAddressCloneId
         orderAttributes.shippingAddress = await Address.withCredentials(
           config
         ).create(shippingAddress)

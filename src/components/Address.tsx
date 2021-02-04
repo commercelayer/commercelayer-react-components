@@ -4,6 +4,7 @@ import React, {
   useContext,
   ReactNode,
   useState,
+  useEffect,
 } from 'react'
 import AddressChildrenContext from '#context/AddressChildrenContext'
 import components from '#config/components'
@@ -12,6 +13,7 @@ import BillingAddressContext from '#context/BillingAddressContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
 import { AddressCollection } from '@commercelayer/js-sdk'
 import _ from 'lodash'
+import AddressContext from '#context/AddressContext'
 
 const propTypes = components.Address.propTypes
 
@@ -38,7 +40,49 @@ const Address: FunctionComponent<Props> = (props) => {
   const { setShippingAddress, shippingCustomerAddressId } = useContext(
     ShippingAddressContext
   )
+  const {
+    billingAddress,
+    shippingAddress,
+    shipToDifferentAddress,
+  } = useContext(AddressContext)
   const [selected, setSelected] = useState<null | number>(null)
+  const items = !_.isEmpty(addresses)
+    ? addresses
+    : (addressesContext && addressesContext) || []
+  useEffect(() => {
+    if (items) {
+      items.map((address, k) => {
+        if (
+          billingCustomerAddressId ||
+          shippingCustomerAddressId === undefined
+        ) {
+          const preselected =
+            address.customerAddressId === billingCustomerAddressId
+          if (preselected && selected === null && _.isEmpty(billingAddress))
+            setSelected(k)
+          else if (
+            (preselected || selected !== null) &&
+            !_.isEmpty(billingAddress)
+          )
+            setSelected(null)
+        }
+        if (
+          (shipToDifferentAddress && shippingCustomerAddressId) ||
+          billingCustomerAddressId === undefined
+        ) {
+          const preselected =
+            address.customerAddressId === shippingCustomerAddressId
+          if (preselected && selected === null && _.isEmpty(shippingAddress))
+            setSelected(k)
+          else if (
+            (preselected || selected !== null) &&
+            !_.isEmpty(shippingAddress)
+          )
+            setSelected(null)
+        }
+      })
+    }
+  }, [billingAddress, shippingAddress, addresses])
   const handleSelect = async (
     k: number,
     addressId: string,
@@ -53,29 +97,12 @@ const Address: FunctionComponent<Props> = (props) => {
       onSelect && onSelect()
     }
   }
-  const items = !_.isEmpty(addresses)
-    ? addresses
-    : (addressesContext && addressesContext) || []
   const components = items.map((address, k) => {
-    let preselected = false
-    if (billingCustomerAddressId) {
-      preselected =
-        selected === null &&
-        address.customerAddressId === billingCustomerAddressId
-    }
-    if (shippingCustomerAddressId) {
-      preselected =
-        selected === null &&
-        address.customerAddressId === shippingCustomerAddressId
-    }
-
     const addressProps = {
       address,
     }
     const addressSelectedClass =
-      selected === k || preselected
-        ? `${className} ${selectedClassName}`
-        : className
+      selected === k ? `${className} ${selectedClassName}` : className
     const customerAddressId: string = address?.customerAddressId || ''
     return (
       <AddressChildrenContext.Provider key={k} value={addressProps}>

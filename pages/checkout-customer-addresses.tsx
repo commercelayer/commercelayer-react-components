@@ -180,7 +180,11 @@ export default function Main() {
                   </button>
                 </div>
                 <div className={`${showBillingAddressForm ? '' : 'hidden'}`}>
-                  <BillingAddressForm autoComplete="on" className="p-2">
+                  <BillingAddressForm
+                    autoComplete="on"
+                    className="p-2"
+                    reset={!showBillingAddressForm}
+                  >
                     <div>
                       <label
                         htmlFor="billing_address_first_name"
@@ -437,7 +441,7 @@ export default function Main() {
                       <Address
                         data-cy="customer-shipping-address"
                         className="w-1/2 p-2 border cursor-pointer rounded hover:border-blue-500 m-2 shadow-sm"
-                        selectedClassName="border-blue-500"
+                        selectedClassName={'border-blue-500'}
                       >
                         <div className="flex font-bold">
                           <AddressField name="first_name" />
@@ -477,6 +481,7 @@ export default function Main() {
                       className={
                         shipToDifferentAddress ? `block p-2` : `hidden`
                       }
+                      reset={!showShippingAddressForm}
                     >
                       <div>
                         <label

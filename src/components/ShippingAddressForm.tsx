@@ -19,18 +19,19 @@ const propTypes = components.ShippingAddressForm.propTypes
 
 type ShippingAddressFormProps = {
   children: ReactNode
+  reset?: boolean
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
   props
 ) => {
-  const { children, autoComplete = 'on', ...p } = props
+  const { children, autoComplete = 'on', reset = false, ...p } = props
   const { validation, values, errors } = useRapidForm()
   const { setAddressErrors, setAddress, shipToDifferentAddress } = useContext(
     AddressesContext
   )
   const { saveAddressToCustomerBook } = useContext(OrderContext)
-  const ref = useRef(null)
+  const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
     if (!_.isEmpty(errors)) {
       const formErrors: BaseError[] = []
@@ -61,17 +62,16 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
       }
       setAddress({ values, resource: 'shippingAddress' })
     }
-    if (!shipToDifferentAddress) {
+    if (reset || !shipToDifferentAddress) {
       saveAddressToCustomerBook &&
         saveAddressToCustomerBook('ShippingAddress', false)
       if (ref) {
-        // @ts-ignore
         ref.current?.reset()
         setAddressErrors([])
         setAddress({ values: {}, resource: 'shippingAddress' })
       }
     }
-  }, [values, errors, shipToDifferentAddress])
+  }, [values, errors, shipToDifferentAddress, reset])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any
