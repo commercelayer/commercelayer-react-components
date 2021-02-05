@@ -8,6 +8,7 @@ import {
   ShippingMethod,
 } from '@commercelayer/js-sdk'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import { getOrderContext } from './OrderReducer'
 
 export type ShipmentActionType =
   | 'setErrors'
@@ -68,6 +69,7 @@ export const getShipments: GetShipments = async ({
         'shippingMethod'
       )
       .load()
+    console.log('shipments', shipments)
     dispatch({
       type: 'setShipments',
       payload: { shipments: shipments?.toArray() },
@@ -79,18 +81,18 @@ export const getShipments: GetShipments = async ({
 
 type SetShippingMethod = (args: {
   config: CommerceLayerConfig
-  dispatch: Dispatch<ShipmentAction>
-  state: ShipmentState
   shipmentId: string
   shippingMethodId: string
+  order?: OrderCollection
+  getOrder?: getOrderContext
 }) => Promise<void>
 
 export const setShippingMethod: SetShippingMethod = async ({
   config,
-  dispatch,
-  state,
   shipmentId,
   shippingMethodId,
+  getOrder,
+  order,
 }) => {
   try {
     if (shippingMethodId) {
@@ -105,21 +107,8 @@ export const setShippingMethod: SetShippingMethod = async ({
         )
         .find(shipmentId)
       const shippingMethod = ShippingMethod.build({ id: shippingMethodId })
-      const newShipment = await shipment
-        .withCredentials(config)
-        .update({ shippingMethod })
-      if (state.shipments) {
-        const shipments = state.shipments.map((shipment) => {
-          if (shipment.id === shipmentId) {
-            return newShipment
-          }
-          return shipment
-        })
-        dispatch({
-          type: 'setShipments',
-          payload: { shipments },
-        })
-      }
+      await shipment.withCredentials(config).update({ shippingMethod })
+      getOrder && order && getOrder(order.id)
     }
   } catch (error) {
     console.error(error)

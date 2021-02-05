@@ -3,6 +3,8 @@ import React, {
   Fragment,
   useContext,
   ReactNode,
+  useEffect,
+  useState,
 } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import components from '#config/components'
@@ -14,7 +16,8 @@ const displayName = components.ShippingMethod.displayName
 
 type ShippingMethodProps = {
   children: ReactNode
-  id?: string
+  id?: string[]
+  readonly?: boolean
   emptyText?: string
 }
 
@@ -22,19 +25,19 @@ const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
   const {
     children,
     id,
+    readonly,
     emptyText = `There are not any shipping method available`,
   } = props
   const { shippingMethods, currentShippingMethodId } = useContext(
     ShipmentChildrenContext
   )
-  const components =
-    (!_.isEmpty(shippingMethods) &&
+  const [items, setItems] = useState<JSX.Element[]>([])
+  useEffect(() => {
+    const methods =
       shippingMethods &&
       shippingMethods
         .filter((s) => {
-          if (id) {
-            return s.id === id
-          }
+          if (readonly) return s.id === currentShippingMethodId
           return true
         })
         .map((shippingMethod, k) => {
@@ -54,8 +57,10 @@ const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
               {children}
             </ShippingMethodChildrenContext.Provider>
           )
-        })) ||
-    emptyText
+        })
+    if (methods) setItems(methods)
+  }, [currentShippingMethodId])
+  const components = (!_.isEmpty(items) && items) || emptyText
   return <Fragment>{components}</Fragment>
 }
 

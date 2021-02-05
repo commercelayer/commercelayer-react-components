@@ -165,9 +165,7 @@ export const saveAddresses: SaveAddresses = async ({
       }
     }
     if (order && getOrder && !_.isEmpty(orderAttributes)) {
-      const o =
-        order ||
-        (orderId && (await Order.withCredentials(config).find(orderId)))
+      const o = await Order.withCredentials(config).find(order.id)
       const patchOrder = await o.withCredentials(config).update(orderAttributes)
       getOrder(patchOrder.id)
     }

@@ -27,7 +27,7 @@ export type ShipmentsContainer = {
 const ShipmentsContainer: FunctionComponent<ShipmentsContainer> = (props) => {
   const { children } = props
   const [state, dispatch] = useReducer(shipmentReducer, shipmentInitialState)
-  const { order } = useContext(OrderContext)
+  const { order, getOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     // TODO: Get shipments
@@ -43,9 +43,9 @@ const ShipmentsContainer: FunctionComponent<ShipmentsContainer> = (props) => {
       await setShippingMethod({
         shippingMethodId,
         shipmentId,
-        dispatch,
         config,
-        state,
+        getOrder,
+        order,
       }),
   }
   return (

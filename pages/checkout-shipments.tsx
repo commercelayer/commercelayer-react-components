@@ -29,7 +29,7 @@ const orderId = 'JwXQehvvyP'
 export default function Main() {
   const [token, setToken] = useState('')
   const [shippingMethodName, setShippingMethodName] = useState('')
-  const [shippingMethodId, setShippingMethodId] = useState('')
+  const [shippingMethodId, setShippingMethodId] = useState<string>('')
   const getOrder = async () => {
     const config = { accessToken: token, endpoint }
     const order = await Order.withCredentials(config).find(orderId)
@@ -40,10 +40,10 @@ export default function Main() {
       .load()
     if (!_.isEmpty(shipments) && shipments) {
       const name = shipments.first()?.shippingMethod()?.name
-      const id = shipments.first()?.shippingMethod()?.id
+      const id = shipments.first()?.shippingMethod()?.id as string
       console.log('shipping method name', name)
       setShippingMethodName(name as string)
-      setShippingMethodId(id as string)
+      setShippingMethodId(id)
     }
   }
   useEffect(() => {
@@ -133,12 +133,12 @@ export default function Main() {
                 </ShippingMethod>
               </Shipment>
             </ShipmentsContainer>
-            <ShipmentsContainer>
-              <Shipment>
-                <div className="mt-10">Shipments Recap</div>
-                {shippingMethodId && (
-                  <ShippingMethod id={shippingMethodId}>
-                    <div className="flex justify-around w-2/3 items-center p-5">
+            <div className="mt-10">
+              <ShipmentsContainer>
+                <div>Shipments Recap</div>
+                <Shipment>
+                  <ShippingMethod readonly>
+                    <div className="flex flex-col justify-around w-2/3 items-center p-5">
                       <ShippingMethodName data-cy="shipping-method-name-recap" />
                       <ShippingMethodPrice />
                       <div className="flex">
@@ -148,9 +148,9 @@ export default function Main() {
                       </div>
                     </div>
                   </ShippingMethod>
-                )}
-              </Shipment>
-            </ShipmentsContainer>
+                </Shipment>
+              </ShipmentsContainer>
+            </div>
           </OrderContainer>
           <div className="mt-5">
             <pre data-cy="current-shipping-method">{`Current shipping method: ${JSON.stringify(
