@@ -26,7 +26,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
   props
 ) => {
   const { children, autoComplete = 'on', reset = false, ...p } = props
-  const { validation, values, errors } = useRapidForm()
+  const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
   const { saveAddressToCustomerBook } = useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
@@ -58,11 +58,13 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
       }
       setAddress({ values, resource: 'billingAddress' })
     }
-    if (reset) {
+    if (reset && (!_.isEmpty(values) || !_.isEmpty(errors))) {
       saveAddressToCustomerBook &&
         saveAddressToCustomerBook('BillingAddress', false)
       if (ref) {
+        // debugger
         ref.current?.reset()
+        resetForm({ target: ref.current } as any)
         setAddressErrors([])
         setAddress({ values: {}, resource: 'billingAddress' })
       }

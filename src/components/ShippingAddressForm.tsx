@@ -26,7 +26,7 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
   props
 ) => {
   const { children, autoComplete = 'on', reset = false, ...p } = props
-  const { validation, values, errors } = useRapidForm()
+  const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress, shipToDifferentAddress } = useContext(
     AddressesContext
   )
@@ -62,11 +62,12 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
       }
       setAddress({ values, resource: 'shippingAddress' })
     }
-    if (reset || !shipToDifferentAddress) {
+    if (reset && (!_.isEmpty(values) || !_.isEmpty(errors))) {
       saveAddressToCustomerBook &&
         saveAddressToCustomerBook('ShippingAddress', false)
       if (ref) {
         ref.current?.reset()
+        resetForm({ target: ref.current } as any)
         setAddressErrors([])
         setAddress({ values: {}, resource: 'shippingAddress' })
       }

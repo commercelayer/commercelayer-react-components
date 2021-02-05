@@ -46,6 +46,9 @@ describe('Checkout Shipments', () => {
     cy.get('[data-cy="shipping-method-name"]').each((e, i) => {
       cy.wrap(e).as(`shippingMethodName${i}`)
     })
+    cy.get('[data-cy="shipping-method-name-recap"]').as(
+      'shippingMethodNameRecap'
+    )
     cy.get('[data-cy="shipping-method-price"]').each((e, i) => {
       cy.wrap(e).as(`shippingMethodPrice${i}`)
     })
@@ -86,10 +89,18 @@ describe('Checkout Shipments', () => {
   it('Choosing Standard Shipping', () => {
     cy.get('@shippingMethodButton0').click()
     cy.get('@currentShippingMethod').should('contain.text', 'Standard Shipping')
+    cy.get('@shippingMethodNameRecap').should(
+      'contain.text',
+      'Standard Shipping'
+    )
   })
 
   it('Choosing Express Delivery', () => {
     cy.get('@shippingMethodButton1').click()
     cy.get('@currentShippingMethod').should('contain.text', 'Express Delivery')
+    cy.get('@shippingMethodNameRecap').should(
+      'contain.text',
+      'Express Delivery'
+    )
   })
 })

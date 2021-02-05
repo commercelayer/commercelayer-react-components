@@ -73,10 +73,10 @@ describe('Customer Addresses', () => {
   })
 
   it('Selecting first billing address', () => {
-    // cy.wait('@token')
-    cy.wait(['@getCustomerAddresses', '@getOrders'])
+    cy.reload()
+    cy.wait(['@token', '@getCustomerAddresses', '@getOrders'])
     cy.get('@saveAddressesButton').should('have.attr', 'disabled')
-    cy.get('@customerBillingAddress0').click()
+    cy.get('@customerBillingAddress0').should('be.visible').click()
     cy.get('@customerBillingAddress0').should('have.class', 'border-blue-500')
     cy.get('@saveAddressesButton').should('not.have.attr', 'disabled')
     cy.get('@saveAddressesButton').click()
@@ -84,12 +84,12 @@ describe('Customer Addresses', () => {
     cy.wait('@getOrders')
     cy.get('@currentBillingAddress').should('not.contain', '{}')
     cy.get('@currentShippingAddress').should('not.contain', '{}')
+    cy.visit(`/${filename}?cleanAddresses=true`)
   })
 
   it('Adding new billing address', () => {
-    cy.visit(`/${filename}?cleanAddresses=true`)
-    cy.wait(['@token', '@getOrders'])
     cy.reload()
+    cy.wait(['@token', '@getCustomerAddresses', '@getOrders'])
     cy.get('@saveAddressesButton').should('have.attr', 'disabled')
     cy.get('@addNewBillingAddress').click()
   })
@@ -282,5 +282,32 @@ describe('Customer Addresses', () => {
     cy.wait('@getOrders')
     cy.get('@currentBillingAddress').should('contain.text', 'Alessandro')
     cy.get('@currentBillingAddress').should('contain.text', 'Casazza')
+  })
+
+  it('Checking unselect customer billing addresses', () => {
+    cy.get('@addNewBillingAddress').click()
+    cy.get('@customerBillingAddress0').should(
+      'not.have.class',
+      'border-blue-500'
+    )
+    cy.get('@customerBillingAddress1').should(
+      'not.have.class',
+      'border-blue-500'
+    )
+    cy.get('@saveAddressesButton').should('have.attr', 'disabled', 'disabled')
+  })
+
+  it('Checking unselect customer shipping addresses', () => {
+    cy.get('@buttonDifferentAddress')
+      .click()
+      .should('have.attr', 'data-status', 'true')
+    cy.get('@customerShippingAddress1').should('be.visible').click()
+    cy.get('@customerShippingAddress1').should('have.class', 'border-blue-500')
+    cy.get('@saveAddressesButton').should('have.attr', 'disabled', 'disabled')
+    cy.get('@addNewShippingAddress').click()
+    cy.get('@customerShippingAddress1').should(
+      'not.have.class',
+      'border-blue-500'
+    )
   })
 })

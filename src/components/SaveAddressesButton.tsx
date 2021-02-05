@@ -40,33 +40,29 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     billingAddressId,
     shippingAddressId,
   } = useContext(AddressContext)
-  let disable =
-    disabled ||
-    !_.isEmpty(errors) ||
-    _.isEmpty(billingAddress) ||
-    (shipToDifferentAddress && _.isEmpty(shippingAddress))
-  if (!_.isEmpty(billingAddressId) && _.isEmpty(billingAddress)) {
-    disable = shipToDifferentAddress ? true : false
+  let billingDisable = !_.isEmpty(errors) || _.isEmpty(billingAddress)
+  if (_.isEmpty(errors) && !_.isEmpty(billingAddress)) {
+    billingDisable = !!(billingAddress && fieldsExist(billingAddress))
   }
   if (
+    billingDisable &&
+    !_.isEmpty(billingAddressId) &&
+    _.isEmpty(billingAddress)
+  ) {
+    billingDisable = false
+  }
+  let shippingDisable = !!(!billingDisable && shipToDifferentAddress)
+  if (shippingDisable && _.isEmpty(errors) && !_.isEmpty(shippingAddress)) {
+    shippingDisable = !!(shippingAddress && fieldsExist(shippingAddress))
+  }
+  if (
+    shippingDisable &&
     !_.isEmpty(shippingAddressId) &&
-    shipToDifferentAddress &&
     _.isEmpty(shippingAddress)
   ) {
-    disable = false
+    shippingDisable = false
   }
-  if (_.isEmpty(errors) && !_.isEmpty(billingAddress)) {
-    disable = billingAddress && fieldsExist(billingAddress)
-  }
-  if (
-    (_.isEmpty(errors) &&
-      shipToDifferentAddress &&
-      _.isEmpty(shippingAddressId)) ||
-    (!_.isEmpty(shippingAddress) && _.isEmpty(errors) && shipToDifferentAddress)
-  ) {
-    disable = shippingAddress ? fieldsExist(shippingAddress) : true
-  }
-
+  const disable = disabled || billingDisable || shippingDisable
   const handleClick = async () => {
     if (_.isEmpty(errors) && !disable) {
       await saveAddresses()

@@ -148,6 +148,11 @@ export default function Main() {
                       className="w-1/2 p-2 border cursor-pointer rounded hover:border-blue-500 m-2 shadow-sm"
                       selectedClassName="border-blue-500"
                       data-cy="customer-billing-address"
+                      deselect={showBillingAddressForm}
+                      onSelect={() =>
+                        showBillingAddressForm &&
+                        setShowBillingAddressForm(false)
+                      }
                     >
                       <div className="flex font-bold">
                         <AddressField name="first_name" />
@@ -442,6 +447,11 @@ export default function Main() {
                         data-cy="customer-shipping-address"
                         className="w-1/2 p-2 border cursor-pointer rounded hover:border-blue-500 m-2 shadow-sm"
                         selectedClassName={'border-blue-500'}
+                        deselect={showShippingAddressForm}
+                        onSelect={() =>
+                          showShippingAddressForm &&
+                          setShowShippingAddressForm(false)
+                        }
                       >
                         <div className="flex font-bold">
                           <AddressField name="first_name" />

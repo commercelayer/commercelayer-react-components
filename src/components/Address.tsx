@@ -13,7 +13,7 @@ import BillingAddressContext from '#context/BillingAddressContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
 import { AddressCollection } from '@commercelayer/js-sdk'
 import _ from 'lodash'
-import AddressContext from '#context/AddressContext'
+// import AddressContext from '#context/AddressContext'
 
 const propTypes = components.Address.propTypes
 
@@ -22,6 +22,7 @@ type Props = {
   selectedClassName?: string
   onSelect?: () => void
   addresses?: AddressCollection[]
+  deselect?: boolean
 } & JSX.IntrinsicElements['div']
 
 const Address: FunctionComponent<Props> = (props) => {
@@ -31,6 +32,7 @@ const Address: FunctionComponent<Props> = (props) => {
     selectedClassName,
     onSelect,
     addresses = [],
+    deselect = false,
     ...p
   } = props
   const { addresses: addressesContext } = useContext(CustomerContext)
@@ -40,62 +42,55 @@ const Address: FunctionComponent<Props> = (props) => {
   const { setShippingAddress, shippingCustomerAddressId } = useContext(
     ShippingAddressContext
   )
-  const {
-    billingAddress,
-    shippingAddress,
-    shipToDifferentAddress,
-  } = useContext(AddressContext)
-  const [selected, setSelected] = useState<null | number>(null)
+  // const {
+  //   billingAddress,
+  //   shippingAddress,
+  //   shipToDifferentAddress,
+  // } = useContext(AddressContext)
+  const [selected, setSelected] = useState<null | number | undefined>(null)
   const items = !_.isEmpty(addresses)
     ? addresses
     : (addressesContext && addressesContext) || []
   useEffect(() => {
-    if (items) {
+    if (items && !deselect && selected === null) {
       items.map((address, k) => {
-        if (
-          billingCustomerAddressId ||
-          shippingCustomerAddressId === undefined
-        ) {
+        if (billingCustomerAddressId) {
           const preselected =
             address.customerAddressId === billingCustomerAddressId
-          if (preselected && selected === null && _.isEmpty(billingAddress))
-            setSelected(k)
-          else if (
-            (preselected || selected !== null) &&
-            !_.isEmpty(billingAddress)
-          )
-            setSelected(null)
+          preselected && setSelected(k)
         }
-        if (
-          (shipToDifferentAddress && shippingCustomerAddressId) ||
-          billingCustomerAddressId === undefined
-        ) {
+        if (shippingCustomerAddressId) {
           const preselected =
             address.customerAddressId === shippingCustomerAddressId
-          if (preselected && selected === null && _.isEmpty(shippingAddress))
-            setSelected(k)
-          else if (
-            (preselected || selected !== null) &&
-            !_.isEmpty(shippingAddress)
-          )
-            setSelected(null)
+          preselected && setSelected(k)
         }
       })
     }
-  }, [billingAddress, shippingAddress, addresses])
+    if (selected !== null && deselect) {
+      setSelected(undefined)
+      const disabledSaveButton = async () => {
+        setBillingAddress && (await setBillingAddress(''))
+        setShippingAddress && (await setShippingAddress(''))
+      }
+      disabledSaveButton()
+    }
+  }, [
+    deselect,
+    billingCustomerAddressId,
+    shippingCustomerAddressId,
+    addressesContext,
+  ])
   const handleSelect = async (
     k: number,
     addressId: string,
     customerAddressId: string
   ) => {
-    if (k !== selected) {
-      setSelected(k)
-      setBillingAddress &&
-        (await setBillingAddress(addressId, { customerAddressId }))
-      setShippingAddress &&
-        (await setShippingAddress(addressId, { customerAddressId }))
-      onSelect && onSelect()
-    }
+    setSelected(k)
+    setBillingAddress &&
+      (await setBillingAddress(addressId, { customerAddressId }))
+    setShippingAddress &&
+      (await setShippingAddress(addressId, { customerAddressId }))
+    onSelect && onSelect()
   }
   const components = items.map((address, k) => {
     const addressProps = {
