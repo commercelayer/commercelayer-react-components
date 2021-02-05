@@ -613,6 +613,7 @@ const components = {
     displayName: 'ShippingMethod',
     propTypes: {
       children: childrenTypes.isRequired,
+      readonly: PropTypes.bool,
     },
   },
   ShippingMethodName: {

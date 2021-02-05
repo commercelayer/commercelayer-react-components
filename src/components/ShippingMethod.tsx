@@ -16,7 +16,6 @@ const displayName = components.ShippingMethod.displayName
 
 type ShippingMethodProps = {
   children: ReactNode
-  id?: string[]
   readonly?: boolean
   emptyText?: string
 }
@@ -24,7 +23,6 @@ type ShippingMethodProps = {
 const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
   const {
     children,
-    id,
     readonly,
     emptyText = `There are not any shipping method available`,
   } = props

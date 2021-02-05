@@ -126,10 +126,8 @@ export const setCloneAddress: SetCloneAddress = (id, resource, dispatch) => {
 
 export const saveAddresses: SaveAddresses = async ({
   config,
-  // dispatch,
   getOrder,
   order,
-  orderId,
   state,
 }) => {
   const {
