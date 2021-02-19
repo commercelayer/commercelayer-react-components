@@ -1,4 +1,4 @@
-import CLayer, { Import, Order, OrderCollection } from '@commercelayer/js-sdk'
+import CLayer, { Order, OrderCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import { SetLocalOrder, DeleteLocalOrder } from '#utils/localStorage'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'

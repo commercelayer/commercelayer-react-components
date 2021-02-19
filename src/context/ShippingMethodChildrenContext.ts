@@ -9,6 +9,7 @@ export interface InitialShippingMethodContext {
   deliveryLeadTimeForShipment:
     | DeliveryLeadTimeCollection
     | Record<string, string>
+    | null
   currentShippingMethodId?: string
 }
 

@@ -19,7 +19,12 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
   const { order } = useContext(OrderContext)
   const [price, setPrice] = useState('')
   useEffect(() => {
-    const p = getAmount(base, type, format || 'formatted', order || {})
+    const p = getAmount(
+      base,
+      type,
+      format || 'formatted',
+      order || {}
+    ) as string
     setPrice(p)
     return (): void => {
       if (_.isEmpty(order)) {

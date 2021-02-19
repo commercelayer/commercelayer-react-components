@@ -31,7 +31,7 @@ const DeliveryLeadTime: FunctionComponent<ShippingMethodPriceProps> = (
   const { deliveryLeadTimeForShipment } = useContext(
     ShippingMethodChildrenContext
   )
-  const text = deliveryLeadTimeForShipment[type]
+  const text = deliveryLeadTimeForShipment && deliveryLeadTimeForShipment[type]
   const parentProps = {
     text,
     ...p,

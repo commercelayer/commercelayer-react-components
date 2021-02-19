@@ -29,7 +29,7 @@ const LineItemAmount: FunctionComponent<LineItemAmountProps> = (props) => {
       type,
       format,
       lineItem as Record<string, string>
-    )
+    ) as string
     setPrice(p)
     return (): void => {
       setPrice('')
