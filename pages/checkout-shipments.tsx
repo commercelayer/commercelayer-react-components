@@ -137,17 +137,19 @@ export default function Main() {
               <ShipmentsContainer>
                 <div>Shipments Recap</div>
                 <Shipment>
-                  <ShippingMethod readonly>
-                    <div className="flex flex-col justify-around w-2/3 items-center p-5">
-                      <ShippingMethodName data-cy="shipping-method-name-recap" />
-                      <ShippingMethodPrice />
-                      <div className="flex">
-                        <DeliveryLeadTime type="minDays" /> -{' '}
-                        <DeliveryLeadTime type="maxDays" className="mr-1" />
-                        days
+                  <div>
+                    <ShippingMethod readonly>
+                      <div className="flex justify-around w-2/3 items-center p-5">
+                        <ShippingMethodName data-cy="shipping-method-name-recap" />
+                        <ShippingMethodPrice />
+                        <div className="flex">
+                          <DeliveryLeadTime type="minDays" /> -{' '}
+                          <DeliveryLeadTime type="maxDays" className="mr-1" />
+                          days
+                        </div>
                       </div>
-                    </div>
-                  </ShippingMethod>
+                    </ShippingMethod>
+                  </div>
                 </Shipment>
               </ShipmentsContainer>
             </div>

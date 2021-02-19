@@ -10,11 +10,7 @@ type DefaultContext = {
   ) => void
 } & ShippingAddressState
 
-export const defaultShippingAddressContext = {
-  setShippingAddress: (): void => {
-    return
-  },
-}
+export const defaultShippingAddressContext = {}
 
 const ShippingAddressContext = createContext<DefaultContext>(
   defaultShippingAddressContext

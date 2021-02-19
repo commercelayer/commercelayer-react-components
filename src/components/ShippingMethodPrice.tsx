@@ -14,25 +14,49 @@ const propTypes = components.ShippingMethodPrice.propTypes
 const displayName = components.ShippingMethodPrice.displayName
 
 export type ShippingMethodPriceProps = BaseAmountComponent & {
-  type?: 'amount'
-}
+  labelFreeOver?: string
+} & (
+    | {
+        type?: 'amount'
+        base?: 'freeOver'
+      }
+    | {
+        type?: 'amount' | 'amountForShipment'
+        base?: 'price'
+      }
+  )
 
 const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
   props
 ) => {
-  const { format = 'formatted', type = 'amount', ...p } = props
+  const {
+    format = 'formatted',
+    type = 'amountForShipment',
+    base = 'price',
+    labelFreeOver = 'Free',
+    ...p
+  } = props
   const { shippingMethod } = useContext(ShippingMethodChildrenContext)
   const [price, setPrice] = useState('')
+  const [priceCent, setPriceCent] = useState(0)
   useEffect(() => {
     const p = getAmount(
-      'price',
+      base,
       type,
       format,
       shippingMethod as Record<string, string>
-    )
+    ) as string
     setPrice(p)
+    const c = getAmount(
+      base,
+      type,
+      'cents',
+      shippingMethod as Record<string, string>
+    ) as number
+    setPriceCent(c)
     return (): void => {
       setPrice('')
+      setPriceCent(0)
     }
   }, [shippingMethod])
   const parentProps = {
@@ -42,7 +66,7 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <span {...p}>{price}</span>
+    <span {...p}>{priceCent === 0 ? labelFreeOver : price}</span>
   )
 }
 

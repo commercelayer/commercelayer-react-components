@@ -13,13 +13,15 @@ import BillingAddressContext from '#context/BillingAddressContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
 import { AddressCollection } from '@commercelayer/js-sdk'
 import _ from 'lodash'
-// import AddressContext from '#context/AddressContext'
+import AddressContext from '#context/AddressContext'
+import OrderContext from '#context/OrderContext'
 
 const propTypes = components.Address.propTypes
 
 type Props = {
   children: ReactNode
   selectedClassName?: string
+  disabledClassName?: string
   onSelect?: () => void
   addresses?: AddressCollection[]
   deselect?: boolean
@@ -29,7 +31,8 @@ const Address: FunctionComponent<Props> = (props) => {
   const {
     children,
     className,
-    selectedClassName,
+    selectedClassName = '',
+    disabledClassName = '',
     onSelect,
     addresses = [],
     deselect = false,
@@ -42,32 +45,46 @@ const Address: FunctionComponent<Props> = (props) => {
   const { setShippingAddress, shippingCustomerAddressId } = useContext(
     ShippingAddressContext
   )
-  // const {
-  //   billingAddress,
-  //   shippingAddress,
-  //   shipToDifferentAddress,
-  // } = useContext(AddressContext)
+  const {
+    shipToDifferentAddress,
+    billingAddressId,
+    shippingAddressId,
+    // setCloneAddress,
+    // setShippingCustomerAddressId,
+  } = useContext(AddressContext)
+  const { order } = useContext(OrderContext)
   const [selected, setSelected] = useState<null | number | undefined>(null)
   const items = !_.isEmpty(addresses)
     ? addresses
     : (addressesContext && addressesContext) || []
   useEffect(() => {
-    if (items && !deselect && selected === null) {
+    if (items && !deselect) {
       items.map((address, k) => {
         if (billingCustomerAddressId) {
-          const preselected =
-            address.customerAddressId === billingCustomerAddressId
-          preselected && setSelected(k)
+          const preselected = address.reference === billingCustomerAddressId
+          if (preselected && selected === null) {
+            setSelected(k)
+          }
+        }
+        if (!billingAddressId && k === selected) {
+          setBillingAddress &&
+            setBillingAddress(address.id, {
+              customerAddressId: address.customerAddressId as string,
+            })
         }
         if (shippingCustomerAddressId) {
-          const preselected =
-            address.customerAddressId === shippingCustomerAddressId
-          preselected && setSelected(k)
+          const preselected = address.reference === shippingCustomerAddressId
+          preselected && selected === null && setSelected(k)
+        }
+        if (!shippingAddressId && k === selected) {
+          setShippingAddress &&
+            setShippingAddress(address.id, {
+              customerAddressId: address.customerAddressId as string,
+            })
         }
       })
     }
-    if (selected !== null && deselect) {
-      setSelected(undefined)
+    if (deselect) {
       const disabledSaveButton = async () => {
         setBillingAddress && (await setBillingAddress(''))
         setShippingAddress && (await setShippingAddress(''))
@@ -79,16 +96,19 @@ const Address: FunctionComponent<Props> = (props) => {
     billingCustomerAddressId,
     shippingCustomerAddressId,
     addressesContext,
+    shipToDifferentAddress,
   ])
   const handleSelect = async (
     k: number,
     addressId: string,
-    customerAddressId: string
+    customerAddressId: string,
+    disabled: boolean
   ) => {
-    setSelected(k)
+    !disabled && setSelected(k)
     setBillingAddress &&
       (await setBillingAddress(addressId, { customerAddressId }))
-    setShippingAddress &&
+    !disabled &&
+      setShippingAddress &&
       (await setShippingAddress(addressId, { customerAddressId }))
     onSelect && onSelect()
   }
@@ -96,14 +116,27 @@ const Address: FunctionComponent<Props> = (props) => {
     const addressProps = {
       address,
     }
+    const countryLock = order?.shippingCountryCodeLock
+    const disabled =
+      (setShippingAddress &&
+        countryLock &&
+        countryLock !== address.countryCode) ||
+      false
+    const selectedClass = deselect ? '' : selectedClassName
     const addressSelectedClass =
-      selected === k ? `${className} ${selectedClassName}` : className
+      selected === k ? `${className} ${selectedClass}` : className
     const customerAddressId: string = address?.customerAddressId || ''
+    const finalClassName = disabled
+      ? `${className} ${disabledClassName}`
+      : addressSelectedClass
     return (
       <AddressChildrenContext.Provider key={k} value={addressProps}>
         <div
-          className={addressSelectedClass}
-          onClick={() => handleSelect(k, address.id, customerAddressId)}
+          className={finalClassName}
+          onClick={() =>
+            handleSelect(k, address.id, customerAddressId, disabled)
+          }
+          data-disabled={disabled}
           {...p}
         >
           {children}

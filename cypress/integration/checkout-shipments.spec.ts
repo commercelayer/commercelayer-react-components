@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
 /// <reference path="../support/index.d.ts" />
-import { euAddress, usAddress } from '../support/utils'
 
 describe('Checkout Shipments', () => {
   const filename = 'checkout-shipments'
@@ -38,7 +37,7 @@ describe('Checkout Shipments', () => {
       cy.wrap(e).as(`lineItemQuantity${i}`)
     })
     // Stock Transfer
-    cy.get('[data-cy="stock-transfer"]').as('stockTransfer')
+    // cy.get('[data-cy="stock-transfer"]').as('stockTransfer')
     // Shipping Method
     cy.get('[data-cy="shipping-method-button"]').each((e, i) => {
       cy.wrap(e).as(`shippingMethodButton${i}`)
@@ -46,9 +45,9 @@ describe('Checkout Shipments', () => {
     cy.get('[data-cy="shipping-method-name"]').each((e, i) => {
       cy.wrap(e).as(`shippingMethodName${i}`)
     })
-    cy.get('[data-cy="shipping-method-name-recap"]').as(
-      'shippingMethodNameRecap'
-    )
+    cy.get('[data-cy="shipping-method-name-recap"]').each((e, i) => {
+      cy.wrap(e).as(`shippingMethodNameRecap${i}`)
+    })
     cy.get('[data-cy="shipping-method-price"]').each((e, i) => {
       cy.wrap(e).as(`shippingMethodPrice${i}`)
     })
@@ -81,15 +80,15 @@ describe('Checkout Shipments', () => {
     cy.get('@shippingMethodPrice1').should('have.text', '€12,00')
     cy.get('@deliveryLeadTimeMinDays0').should('contain.html', '3')
     cy.get('@deliveryLeadTimeMaxDays0').should('contain.text', '5')
-    cy.get('@deliveryLeadTimeMinDays1').should('contain.html', '2')
-    cy.get('@deliveryLeadTimeMaxDays1').should('contain.text', '3')
+    cy.get('@deliveryLeadTimeMinDays1').should('contain.html', '3')
+    cy.get('@deliveryLeadTimeMaxDays1').should('contain.text', '4')
     cy.get('@currentShippingMethod').should('contain.text', '')
   })
 
   it('Choosing Standard Shipping', () => {
     cy.get('@shippingMethodButton0').click()
     cy.get('@currentShippingMethod').should('contain.text', 'Standard Shipping')
-    cy.get('@shippingMethodNameRecap').should(
+    cy.get('@shippingMethodNameRecap0').should(
       'contain.text',
       'Standard Shipping'
     )
@@ -98,7 +97,7 @@ describe('Checkout Shipments', () => {
   it('Choosing Express Delivery', () => {
     cy.get('@shippingMethodButton1').click()
     cy.get('@currentShippingMethod').should('contain.text', 'Express Delivery')
-    cy.get('@shippingMethodNameRecap').should(
+    cy.get('@shippingMethodNameRecap0').should(
       'contain.text',
       'Express Delivery'
     )

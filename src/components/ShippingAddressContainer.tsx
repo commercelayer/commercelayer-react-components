@@ -33,7 +33,6 @@ const ShippingAddressContainer: FunctionComponent<Props> = (props) => {
   useEffect(() => {
     if (order) {
       const customerAddressId = order.shippingAddress()?.reference || ''
-      console.log('customerAddressId', customerAddressId)
       setShippingCustomerAddressId({
         customerAddressId,
         dispatch,

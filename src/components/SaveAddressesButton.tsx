@@ -4,7 +4,13 @@ import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import AddressContext from '#context/AddressContext'
 import _ from 'lodash'
-import { fieldsExist } from '#utils/validateFormFields'
+import {
+  billingAddressController,
+  shippingAddressController,
+  countryLockController,
+} from '#utils/addressesManager'
+import OrderContext from '#context/OrderContext'
+import CustomerContext from '#context/CustomerContext'
 
 const propTypes = components.SaveAddressesButton.propTypes
 const defaultProps = components.SaveAddressesButton.defaultProps
@@ -40,29 +46,31 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     billingAddressId,
     shippingAddressId,
   } = useContext(AddressContext)
-  let billingDisable = !_.isEmpty(errors) || _.isEmpty(billingAddress)
-  if (_.isEmpty(errors) && !_.isEmpty(billingAddress)) {
-    billingDisable = !!(billingAddress && fieldsExist(billingAddress))
-  }
-  if (
-    billingDisable &&
-    !_.isEmpty(billingAddressId) &&
-    _.isEmpty(billingAddress)
-  ) {
-    billingDisable = false
-  }
-  let shippingDisable = !!(!billingDisable && shipToDifferentAddress)
-  if (shippingDisable && _.isEmpty(errors) && !_.isEmpty(shippingAddress)) {
-    shippingDisable = !!(shippingAddress && fieldsExist(shippingAddress))
-  }
-  if (
-    shippingDisable &&
-    !_.isEmpty(shippingAddressId) &&
-    _.isEmpty(shippingAddress)
-  ) {
-    shippingDisable = false
-  }
-  const disable = disabled || billingDisable || shippingDisable
+  const { order } = useContext(OrderContext)
+  const { addresses } = useContext(CustomerContext)
+  const billingDisable = billingAddressController({
+    billingAddress,
+    errors,
+    billingAddressId,
+  })
+  const shippingDisable = shippingAddressController({
+    billingDisable,
+    errors,
+    shipToDifferentAddress,
+    shippingAddress,
+    shippingAddressId,
+  })
+  const countryLockDisable = countryLockController({
+    countryCodeLock: order?.shippingCountryCodeLock,
+    addresses,
+    shipToDifferentAddress,
+    billingAddressId,
+    billingAddress,
+    shippingAddress,
+    shippingAddressId,
+  })
+  const disable =
+    disabled || billingDisable || shippingDisable || countryLockDisable
   const handleClick = async () => {
     if (_.isEmpty(errors) && !disable) {
       await saveAddresses()

@@ -138,10 +138,14 @@ export const saveAddresses: SaveAddresses = async ({
     shippingAddressId,
   } = state
   try {
+    const currentBillingAddressRef = order?.billingAddress()?.reference
     const orderAttributes: Partial<Record<string, any>> = {
       _billingAddressCloneId: billingAddressId,
       _shippingAddressCloneId: billingAddressId,
-      _shippingAddressSameAsBilling: false,
+    }
+    if (currentBillingAddressRef === billingAddressId) {
+      orderAttributes._billingAddressCloneId = order?.billingAddress()?.id
+      orderAttributes._shippingAddressCloneId = order?.billingAddress()?.id
     }
     if (!_.isEmpty(billingAddress) && billingAddress) {
       delete orderAttributes._billingAddressCloneId
@@ -164,8 +168,8 @@ export const saveAddresses: SaveAddresses = async ({
     }
     if (order && getOrder && !_.isEmpty(orderAttributes)) {
       const o = await Order.withCredentials(config).find(order.id)
-      const patchOrder = await o.withCredentials(config).update(orderAttributes)
-      getOrder(patchOrder.id)
+      await o.withCredentials(config).update(orderAttributes)
+      await getOrder(order.id)
     }
   } catch (error) {
     console.error(error)

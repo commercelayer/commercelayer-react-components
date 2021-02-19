@@ -1,4 +1,4 @@
-import CLayer, { Order, OrderCollection } from '@commercelayer/js-sdk'
+import CLayer, { Import, Order, OrderCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import { SetLocalOrder, DeleteLocalOrder } from '#utils/localStorage'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
@@ -59,12 +59,24 @@ export interface AddToCartParams {
   setLocalOrder?: SetLocalOrder
 }
 
+export interface AddToCartImportParams
+  extends Omit<
+    AddToCartParams,
+    'skuCode' | 'skuId' | 'quantity' | 'option' | 'lineItem'
+  > {
+  lineItems: CustomLineItem[]
+}
+
 export type AddToCartReturn = Promise<{
   success: boolean
 }>
 
 export interface AddToCart {
   (params: AddToCartParams): AddToCartReturn
+}
+
+export interface AddToCartImport {
+  (params: AddToCartImportParams): AddToCartReturn
 }
 
 export interface UnsetOrderState {
@@ -85,6 +97,8 @@ export type AddToCartValues = {
   option?: ItemOption
   lineItem?: CustomLineItem
 }
+
+export type AddToCartImportValues = Pick<AddToCartImportParams, 'lineItems'>
 
 export type getOrderContext = (id: string) => void
 
