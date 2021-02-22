@@ -45,9 +45,6 @@ describe('Checkout Shipments', () => {
     cy.get('[data-cy="shipping-method-name"]').each((e, i) => {
       cy.wrap(e).as(`shippingMethodName${i}`)
     })
-    cy.get('[data-cy="shipping-method-name-recap"]').each((e, i) => {
-      cy.wrap(e).as(`shippingMethodNameRecap${i}`)
-    })
     cy.get('[data-cy="shipping-method-price"]').each((e, i) => {
       cy.wrap(e).as(`shippingMethodPrice${i}`)
     })
@@ -66,14 +63,14 @@ describe('Checkout Shipments', () => {
     cy.wait(['@token', '@getOrders'])
     cy.get('@lineItemName0').should(
       'have.text',
-      'Black Long Sleeve T-shirt with White Logo (M)'
+      'White Baseball Cap with Black Logo'
     )
-    cy.get('@lineItemQuantity0').should('have.text', '9')
+    cy.get('@lineItemQuantity0').should('have.text', '3')
     cy.get('@lineItemName1').should(
       'have.text',
-      'Black Baby Onesie Short Sleeve with White Logo (New born)'
+      'Black Long Sleeve T-shirt with White Logo (M)'
     )
-    cy.get('@lineItemQuantity1').should('have.text', '3')
+    cy.get('@lineItemQuantity1').should('have.text', '2')
     cy.get('@shippingMethodName0').should('have.text', 'Standard Shipping')
     cy.get('@shippingMethodPrice0').should('have.text', '€7,00')
     cy.get('@shippingMethodName1').should('have.text', 'Express Delivery')
@@ -88,6 +85,9 @@ describe('Checkout Shipments', () => {
   it('Choosing Standard Shipping', () => {
     cy.get('@shippingMethodButton0').click()
     cy.get('@currentShippingMethod').should('contain.text', 'Standard Shipping')
+    cy.get('[data-cy="shipping-method-name-recap"]').each((e, i) => {
+      cy.wrap(e).as(`shippingMethodNameRecap${i}`)
+    })
     cy.get('@shippingMethodNameRecap0').should(
       'contain.text',
       'Standard Shipping'
@@ -97,6 +97,9 @@ describe('Checkout Shipments', () => {
   it('Choosing Express Delivery', () => {
     cy.get('@shippingMethodButton1').click()
     cy.get('@currentShippingMethod').should('contain.text', 'Express Delivery')
+    cy.get('[data-cy="shipping-method-name-recap"]').each((e, i) => {
+      cy.wrap(e).as(`shippingMethodNameRecap${i}`)
+    })
     cy.get('@shippingMethodNameRecap0').should(
       'contain.text',
       'Express Delivery'

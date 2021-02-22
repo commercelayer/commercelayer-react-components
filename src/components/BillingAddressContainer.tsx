@@ -32,12 +32,11 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
   const { shipToDifferentAddress, setCloneAddress } = useContext(AddressContext)
   useEffect(() => {
     if (order) {
-      const customerAddressId = order.billingAddress()?.reference || ''
       setBillingCustomerAddressId({
-        customerAddressId,
         dispatch,
+        order,
+        setCloneAddress,
       })
-      setCloneAddress(customerAddressId, 'billingAddress')
     }
   }, [order])
   const contextValue = {

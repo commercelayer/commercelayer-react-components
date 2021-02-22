@@ -19,7 +19,7 @@ import {
 import { Order } from '@commercelayer/js-sdk'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
-const orderId = 'JwXQehvvyP'
+const orderId = 'BwAezhrrOw'
 
 export default function Main() {
   const [token, setToken] = useState('')

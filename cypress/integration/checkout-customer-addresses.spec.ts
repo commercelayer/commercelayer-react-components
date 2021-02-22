@@ -32,9 +32,12 @@ describe('Customer Addresses', () => {
       filename,
     })
     // Customer Address
-    cy.get('[data-cy="customer-billing-address"]').each((e, i) => {
-      cy.wrap(e).as(`customerBillingAddress${i}`)
-    })
+    cy.get('[data-cy="customer-billing-address"]')
+      .first()
+      .as(`customerBillingAddress0`)
+    cy.get('[data-cy="customer-billing-address"]')
+      .last()
+      .as(`customerBillingAddress1`)
     cy.get('[data-cy="customer-shipping-address"]').each((e, i) => {
       cy.wrap(e).as(`customerShippingAddress${i}`)
     })

@@ -189,7 +189,7 @@ export const getApiOrder: GetOrder = async (params) => {
   } = params
   try {
     const o = await Order.withCredentials(config)
-      .includes('billingAddress', 'shippingAddress')
+      // .includes('billingAddress', 'shippingAddress')
       .find(id)
     if (o)
       if (
@@ -223,6 +223,18 @@ export const getApiOrder: GetOrder = async (params) => {
       },
     })
   }
+}
+
+export const setOrder = (
+  order: OrderCollection,
+  dispatch: Dispatch<OrderActions>
+): void => {
+  dispatch({
+    type: 'setOrder',
+    payload: {
+      order,
+    },
+  })
 }
 
 export const addToCart: AddToCart = async (params) => {

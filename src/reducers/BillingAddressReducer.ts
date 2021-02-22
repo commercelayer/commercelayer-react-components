@@ -60,18 +60,36 @@ export const setBillingAddress: SetBillingAddress = async (id, options) => {
 }
 
 type SetBillingCustomerAddressId = (args: {
-  customerAddressId: string
   dispatch: Dispatch<BillingAddressAction>
+  order: OrderCollection
+  setCloneAddress: (
+    id: string,
+    resource: 'billingAddress' | 'shippingAddress'
+  ) => void
 }) => void
 
-export const setBillingCustomerAddressId: SetBillingCustomerAddressId = ({
-  customerAddressId,
+export const setBillingCustomerAddressId: SetBillingCustomerAddressId = async ({
   dispatch,
+  order,
+  setCloneAddress,
 }) => {
-  dispatch({
-    type: 'setBillingCustomerAddressId',
-    payload: { billingCustomerAddressId: customerAddressId },
-  })
+  let customerAddressId = order?.billingAddress()?.customerAddressId
+  try {
+    if (!customerAddressId) {
+      // @ts-ignore
+      const address = await order.loadBillingAddress()
+      customerAddressId = address.reference
+    }
+    if (customerAddressId) {
+      dispatch({
+        type: 'setBillingCustomerAddressId',
+        payload: { billingCustomerAddressId: customerAddressId },
+      })
+      setCloneAddress(customerAddressId, 'billingAddress')
+    }
+  } catch (error) {
+    console.error('error', error)
+  }
 }
 
 const type: BillingAddressActionType[] = [

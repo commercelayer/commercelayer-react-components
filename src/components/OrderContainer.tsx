@@ -17,12 +17,14 @@ import {
   addToCart,
   OrderState,
   setOrderErrors,
+  saveAddressToCustomerBook,
+  setOrder,
 } from '#reducers/OrderReducer'
 import { unsetOrderState } from '#reducers/OrderReducer'
 import components from '#config/components'
 import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
-import { saveAddressToCustomerBook } from '../reducers/OrderReducer'
+import { OrderCollection } from '@commercelayer/js-sdk'
 
 const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps
@@ -72,6 +74,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
   }, [config.accessToken])
   const orderValue = {
     ...state,
+    setOrder: (order: OrderCollection) => setOrder(order, dispatch),
     getOrder: (id: string): void => getApiOrder({ id, dispatch, config }),
     setOrderErrors: (collection: any) =>
       setOrderErrors({ dispatch, collection }),
