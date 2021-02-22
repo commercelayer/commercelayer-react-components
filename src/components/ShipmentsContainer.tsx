@@ -21,10 +21,12 @@ import { BaseError } from '#typings/errors'
 const propTypes = components.ShipmentsContainer.propTypes
 const displayName = components.ShipmentsContainer.displayName
 
-export type ShipmentsContainer = {
+type ShipmentsContainerProps = {
   children: ReactNode
 }
-const ShipmentsContainer: FunctionComponent<ShipmentsContainer> = (props) => {
+const ShipmentsContainer: FunctionComponent<ShipmentsContainerProps> = (
+  props
+) => {
   const { children } = props
   const [state, dispatch] = useReducer(shipmentReducer, shipmentInitialState)
   const { order, getOrder } = useContext(OrderContext)

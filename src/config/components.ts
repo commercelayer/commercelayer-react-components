@@ -479,6 +479,7 @@ const components = {
       'CheckoutLink',
       'GiftCardContainer',
       'ShipmentsContainer',
+      'PaymentMethodsContainer',
       'ReactNode',
     ],
     displayName: 'OrderContainer',
@@ -499,6 +500,26 @@ const components = {
       children: childrenTypes.isRequired,
       clearWhenPlaced: PropTypes.bool,
       persistKey: PropTypes.string.isRequired,
+    },
+  },
+  PaymentMethod: {
+    permittedChildren: ['ReactNode'],
+    displayName: 'PaymentMethod',
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
+  PaymentMethodName: {
+    displayName: 'PaymentMethodName',
+    propTypes: {
+      children: PropTypes.func,
+    },
+  },
+  PaymentMethodsContainer: {
+    displayName: 'PaymentMethodsContainer',
+    permittedChildren: ['PaymentMethod', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
     },
   },
   Price: {
