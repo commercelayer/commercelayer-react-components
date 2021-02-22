@@ -49,8 +49,6 @@ const Address: FunctionComponent<Props> = (props) => {
     shipToDifferentAddress,
     billingAddressId,
     shippingAddressId,
-    // setCloneAddress,
-    // setShippingCustomerAddressId,
   } = useContext(AddressContext)
   const { order } = useContext(OrderContext)
   const [selected, setSelected] = useState<null | number | undefined>(null)
