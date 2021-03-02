@@ -3,21 +3,22 @@ import {
   PaymentMethodState,
   SetPaymentMethodErrors,
   setPaymentMethodErrors,
+  SetPaymentSource,
+  setPaymentSource,
+  SetPaymentMethod,
+  setPaymentMethod,
 } from '#reducers/PaymentMethodReducer'
 
 type DefaultContext = {
   setPaymentMethodErrors: SetPaymentMethodErrors
-  // setShippingMethod: (
-  //   shipmentId: string,
-  //   shippingMethodId: string
-  // ) => Promise<void>
+  setPaymentMethod: SetPaymentMethod
+  setPaymentSource: SetPaymentSource
 } & PaymentMethodState
 
 export const defaultPaymentMethodContext = {
   setPaymentMethodErrors,
-  // setShippingMethod: async (): Promise<void> => {
-  //   return
-  // },
+  setPaymentMethod,
+  setPaymentSource,
 }
 
 const PaymentMethodContext = createContext<DefaultContext>(

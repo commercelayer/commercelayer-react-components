@@ -11,46 +11,61 @@ import React, {
 import paymentMethodReducer, {
   paymentMethodInitialState,
   getPaymentMethods,
-  // setShippingMethod,
+  setPaymentMethod,
+  PaymentMethodConfig,
+  setPaymentSource,
 } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
 import { BaseError } from '#typings/errors'
+import _ from 'lodash'
+import { setPaymentMethodConfig } from '../reducers/PaymentMethodReducer'
 
 const propTypes = components.PaymentMethodsContainer.propTypes
 const displayName = components.PaymentMethodsContainer.displayName
 
 type PaymentMethodsContainerProps = {
   children: ReactNode
+  config?: PaymentMethodConfig
 }
 const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> = (
   props
 ) => {
-  const { children } = props
+  const { children, config } = props
   const [state, dispatch] = useReducer(
     paymentMethodReducer,
     paymentMethodInitialState
   )
-  const { order } = useContext(OrderContext)
-  const config = useContext(CommerceLayerContext)
+  const { order, getOrder } = useContext(OrderContext)
+  const credentials = useContext(CommerceLayerContext)
   useEffect(() => {
+    if (config && _.isEmpty(state.config))
+      setPaymentMethodConfig(config, dispatch)
     if (order) {
-      getPaymentMethods({ order, dispatch, config })
+      getPaymentMethods({ order, dispatch, config: credentials, state })
     }
   }, [order])
   const contextValue = {
     ...state,
     setPaymentMethodErrors: (errors: BaseError[]) =>
       defaultPaymentMethodContext['setPaymentMethodErrors'](errors, dispatch),
-    // setShippingMethod: async (shipmentId: string, shippingMethodId: string) =>
-    //   await setShippingMethod({
-    //     shippingMethodId,
-    //     shipmentId,
-    //     config,
-    //     getOrder,
-    //     order,
-    //   }),
+    setPaymentMethod: async (args: any) =>
+      await setPaymentMethod({
+        ...args,
+        config: credentials,
+        getOrder,
+        order,
+        dispatch,
+      }),
+    setPaymentSource: async (args: any) =>
+      setPaymentSource({
+        ...args,
+        config: credentials,
+        dispatch,
+        getOrder,
+        order,
+      }),
   }
   return (
     <PaymentMethodContext.Provider value={contextValue}>

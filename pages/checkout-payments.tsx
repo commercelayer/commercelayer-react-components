@@ -7,21 +7,28 @@ import {
   OrderContainer,
   PaymentMethod,
   PaymentMethodName,
+  PaymentMethodPrice,
+  PaymentMethodRadioButton,
   PaymentMethodsContainer,
+  PaymentSource,
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 import _ from 'lodash'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
-const orderId = 'JwXQehvvyP'
+const orderId = 'AqQgYhvvkw'
 
 export default function Main() {
   const [token, setToken] = useState('')
-  // const [shippingMethodName, setShippingMethodName] = useState('')
+  const [paymentSource, setPaymentSource] = useState<any>(null)
   // const [shippingMethodId, setShippingMethodId] = useState<string>('')
   const getOrder = async () => {
     const config = { accessToken: token, endpoint }
-    const order = await Order.withCredentials(config).find(orderId)
+    const order = await Order.withCredentials(config)
+      .includes('paymentSource')
+      .find(orderId)
+    // @ts-ignore
+    if (order.paymentSource()) setPaymentSource(order.paymentSource()?.options)
     // const shipments = await order
     //   .withCredentials(config)
     //   .shipments()
@@ -55,10 +62,9 @@ export default function Main() {
     if (!token) getToken()
     if (token) getOrder()
   }, [token])
-  // const handleChange = (shippingMethod: any) => {
-  //   setShippingMethodName(shippingMethod.name)
-  //   setShippingMethodId(shippingMethod.id)
-  // }
+  const handleSubmit = (response: any) => {
+    setPaymentSource(response.paymentSource.options)
+  }
   return (
     <Fragment>
       <Head>
@@ -68,24 +74,32 @@ export default function Main() {
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId={orderId}>
-            <PaymentMethodsContainer>
+            <PaymentMethodsContainer
+              config={{
+                stripePayment: {
+                  publishableKey: 'pk_test_UArgJuzBMSppFkvAkATXTNT5',
+                  handleSubmit: handleSubmit,
+                  submitLabel: 'Set payment method',
+                  submitClassName:
+                    'mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
+                },
+              }}
+            >
               <PaymentMethod>
+                <PaymentMethodRadioButton />
                 <PaymentMethodName />
+                <PaymentMethodPrice />
+                <PaymentSource className="p-5 my-2 bg-gray-50" />
               </PaymentMethod>
             </PaymentMethodsContainer>
           </OrderContainer>
-          {/* <div className="mt-5">
-            <pre data-cy="current-shipping-method">{`Current shipping method: ${JSON.stringify(
-              shippingMethodName,
+          <div className="mt-5">
+            <pre data-cy="current-shipping-method">{`Current payment source options: ${JSON.stringify(
+              paymentSource,
               null,
               2
             )}`}</pre>
-            <pre data-cy="current-shipping-method-id">{`Current shipping method ID: ${JSON.stringify(
-              shippingMethodId,
-              null,
-              2
-            )}`}</pre>
-          </div> */}
+          </div>
         </div>
       </CommerceLayer>
     </Fragment>
