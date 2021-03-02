@@ -174,6 +174,7 @@ const components = {
   CommerceLayer: {
     permittedChildren: [
       'OrderContainer',
+      'OrderStorage',
       'PricesContainer',
       'GiftCardContainer',
       'ReactNode',
@@ -503,7 +504,13 @@ const components = {
     },
   },
   PaymentMethod: {
-    permittedChildren: ['ReactNode'],
+    permittedChildren: [
+      'PaymentMethodName',
+      'PaymentMethodRadioButton',
+      'PaymentMethodPrice',
+      'PaymentSource',
+      'ReactNode',
+    ],
     displayName: 'PaymentMethod',
     propTypes: {
       children: childrenTypes.isRequired,
@@ -515,11 +522,30 @@ const components = {
       children: PropTypes.func,
     },
   },
+  PaymentMethodPrice: {
+    displayName: 'PaymentMethodPrice',
+    propTypes: {
+      ...baseOrderComponentPricePropTypes,
+      type: PropTypes.oneOf<'amount'>(['amount']),
+    },
+  },
+  PaymentMethodRadioButton: {
+    displayName: 'PaymentMethodRadioButton',
+    propTypes: {
+      children: PropTypes.func,
+    },
+  },
   PaymentMethodsContainer: {
     displayName: 'PaymentMethodsContainer',
     permittedChildren: ['PaymentMethod', 'ReactNode'],
     propTypes: {
       children: childrenTypes.isRequired,
+    },
+  },
+  PaymentSource: {
+    displayName: 'PaymentSource',
+    propTypes: {
+      children: PropTypes.func,
     },
   },
   Price: {
