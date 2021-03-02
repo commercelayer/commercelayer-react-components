@@ -78,7 +78,7 @@ export const setBillingCustomerAddressId: SetBillingCustomerAddressId = async ({
     if (!customerAddressId) {
       // @ts-ignore
       const address = await order.loadBillingAddress()
-      customerAddressId = address.reference
+      customerAddressId = address?.reference
     }
     if (customerAddressId) {
       dispatch({

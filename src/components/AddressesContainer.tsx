@@ -23,11 +23,13 @@ import components from '#config/components'
 const propTypes = components.AddressesContainer.propTypes
 const displayName = components.AddressesContainer.displayName
 
-export type AddressesContainer = {
+export type AddressesContainerProps = {
   children: ReactNode
   shipToDifferentAddress?: boolean
 }
-const AddressesContainer: FunctionComponent<AddressesContainer> = (props) => {
+const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
+  props
+) => {
   const { children, shipToDifferentAddress = false } = props
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
   const { order, orderId, getOrder } = useContext(OrderContext)
