@@ -40,7 +40,7 @@ export const addressFields: AddressField[] = [
 
 export type AddressResource = 'billingAddress' | 'shippingAddress'
 
-export type AddressSchema = Record<AddressField, string>
+export type AddressSchema = Record<AddressField | string, string>
 
 export interface AddressActionPayload {
   errors: BaseError[]
@@ -73,9 +73,7 @@ export type SetAddressParams<V extends AddressSchema> = {
 }
 
 export interface SetAddress {
-  <V extends AddressSchema | Record<string, any>>(
-    params: SetAddressParams<V>
-  ): void
+  <V extends AddressSchema>(params: SetAddressParams<V>): void
 }
 
 export interface SaveAddresses {

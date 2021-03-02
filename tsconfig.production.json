@@ -35,6 +35,7 @@
     "resolveJsonModule": true,
     "plugins": [
       {
+        "name": "ts-transform-paths",
         "transform": "@zerollup/ts-transform-paths",
         "exclude": ["*"]
       }
