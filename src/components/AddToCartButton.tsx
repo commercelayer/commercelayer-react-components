@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useContext, PropsWithoutRef } from 'react'
 import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
-import _ from 'lodash'
+import { isEmpty, has } from 'lodash'
 import ItemContext from '#context/ItemContext'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import components from '#config/components'
@@ -57,18 +57,18 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
   } = useContext(ItemContext)
   const { skuLists } = useContext(SkuListsContext)
   const sCode =
-    !_.isEmpty(items) && skuCode
+    !isEmpty(items) && skuCode
       ? items[skuCode]?.code
       : skuCode || getCurrentItemKey(item) || (itemSkuCode as string)
   const handleClick = () => {
     const qty = quantity[sCode]
     const opt = option[sCode]
-    const customLineItem = !_.isEmpty(lineItem || lineItemContext)
+    const customLineItem = !isEmpty(lineItem || lineItemContext)
       ? lineItem || lineItemContext
       : lineItems[sCode]
-    if (!_.isEmpty(skuLists) && skuListId && url) {
+    if (!isEmpty(skuLists) && skuListId && url) {
       const slQty = quantity[skuListId] || 1
-      if (_.has(skuLists, skuListId)) {
+      if (has(skuLists, skuListId)) {
         const lineItems = skuLists[skuListId].map((skuCode) => {
           return {
             skuCode,
@@ -127,7 +127,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
           })
   }
   const autoDisabled =
-    !_.isEmpty(skuLists) || skuListId
+    !isEmpty(skuLists) || skuListId
       ? false
       : disabled || !prices[sCode] || !sCode
   const parentProps = {

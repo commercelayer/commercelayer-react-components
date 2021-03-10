@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { first } from 'lodash'
 import { BaseError } from '#typings/errors'
 
 export interface CustomMessages {
@@ -6,7 +6,7 @@ export interface CustomMessages {
 }
 
 const customMessages: CustomMessages = (messages = [], v) => {
-  return _.first(
+  return first(
     messages.filter((m) => {
       if (m.field === v.field) {
         return m.code === v.code

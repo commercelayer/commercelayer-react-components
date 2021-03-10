@@ -14,7 +14,6 @@ import {
   PaymentResource,
 } from '#reducers/PaymentMethodReducer'
 import StripePayment from './StripePayment'
-import _ from 'lodash'
 
 const propTypes = components.PaymentSource.propTypes
 const displayName = components.PaymentSource.displayName

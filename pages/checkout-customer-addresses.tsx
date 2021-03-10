@@ -22,7 +22,7 @@ import { Order, Address as AddressResource } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
-const orderId = 'BwAezhrrOw'
+const orderId = 'AqQgYhvvkw'
 
 const NestedInput = ({ value }: any) => {
   return (

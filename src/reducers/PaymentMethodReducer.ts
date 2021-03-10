@@ -12,7 +12,7 @@ import CLayer, {
 } from '@commercelayer/js-sdk'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext } from '#reducers/OrderReducer'
-import _ from 'lodash'
+import { isEmpty, camelCase } from 'lodash'
 import { StripeCardElementOptions } from '@stripe/stripe-js'
 
 export type PaymentMethodActionType =
@@ -75,11 +75,11 @@ export const getPaymentMethods: GetPaymentMethods = async ({
 }) => {
   try {
     const payload: PaymentMethodState = {}
-    if (_.isEmpty(state.paymentMethods)) {
+    if (isEmpty(state.paymentMethods)) {
       const paymentMethods = await order
         .withCredentials(config)
-        .availablePaymentMethods()
-        ?.load()
+        // @ts-ignore
+        .loadAvailablePaymentMethods()
       payload.paymentMethods = paymentMethods?.toArray()
     }
     const paymentMethod = await order
@@ -149,10 +149,11 @@ export const setPaymentMethod: SetPaymentMethod = async ({
         id: order.id,
         paymentMethod,
       })
+      debugger
       // @ts-ignore
       await patchOrder.withCredentials(config).save()
       // await order.withCredentials(config).update({ paymentMethod })
-      // const resource = _.startCase(paymentResource)
+      // const resource = startCase(paymentResource)
       //   .replace('Payments', 'Payment')
       //   .replace('Transfers', 'Transfer')
       //   .replace(' ', '') as SDKResource
@@ -190,11 +191,14 @@ export const setPaymentSource: SetPaymentSource = async ({
 }) => {
   try {
     if (config && order) {
+      const resourceSdk = CLayer[paymentResource]
+      resourceSdk.assignQueryParams({})
+      const o = Order.build({ id: order.id })
       const paymentSource = await CLayer[paymentResource]
         .withCredentials(config)
         .create({
           options,
-          order,
+          order: o,
         })
       if (order?.billingAddress() === null)
         await order.withCredentials(config).loadBillingAddress()
@@ -249,7 +253,7 @@ export const getPaymentConfig = (
   paymentResource: PaymentResource,
   config: PaymentMethodConfig
 ) => {
-  const resource = _.camelCase(paymentResource)
+  const resource = camelCase(paymentResource)
     .replace('Payments', 'Payment')
     .replace('Transfers', 'Transfer') as PaymentResourceKey
   return config[resource]

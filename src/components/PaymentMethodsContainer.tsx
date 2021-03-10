@@ -19,7 +19,7 @@ import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
 import { BaseError } from '#typings/errors'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import { setPaymentMethodConfig } from '../reducers/PaymentMethodReducer'
 
 const propTypes = components.PaymentMethodsContainer.propTypes
@@ -40,7 +40,7 @@ const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> =
   const { order, getOrder } = useContext(OrderContext)
   const credentials = useContext(CommerceLayerContext)
   useEffect(() => {
-    if (config && _.isEmpty(state.config))
+    if (config && isEmpty(state.config))
       setPaymentMethodConfig(config, dispatch)
     if (order) {
       getPaymentMethods({ order, dispatch, config: credentials, state })

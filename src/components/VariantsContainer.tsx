@@ -15,7 +15,8 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 import VariantsContext from '#context/VariantsContext'
 import { VariantState } from '#reducers/VariantReducer'
 import { setVariantSkuCodes } from '#reducers/VariantReducer'
-import _ from 'lodash'
+import { isEmpty, isEqual } from 'lodash'
+
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
 import components from '#config/components'
@@ -51,8 +52,8 @@ const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
     itemSkuCode ||
     ''
   useEffect(() => {
-    if (!_.isEmpty(items) && !_.isEmpty(state.variants)) {
-      if (!_.isEqual(items, state.variants)) {
+    if (!isEmpty(items) && !isEmpty(state.variants)) {
+      if (!isEqual(items, state.variants)) {
         const mergeItems = { ...items, ...state.variants }
         setItems && setItems(mergeItems)
       }
@@ -77,7 +78,7 @@ const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
     ...state,
     skuCode: sCode,
     setSkuCode: (code, id, lineItem = {}) => {
-      if (!_.isEmpty(lineItem)) {
+      if (!isEmpty(lineItem)) {
         setCustomLineItems && setCustomLineItems({ [code]: lineItem })
       }
       setSkuCode({

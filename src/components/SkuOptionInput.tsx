@@ -2,7 +2,7 @@ import React, { FunctionComponent, useContext } from 'react'
 import BaseInput from './utils/BaseInput'
 import ItemContext from '#context/ItemContext'
 import SkuOptionChildrenContext from '#context/SkuOptionChildrenContext'
-import _ from 'lodash'
+import { has } from 'lodash'
 import { ItemOptions } from '#reducers/ItemReducer'
 import components from '#config/components'
 import { BaseInputComponentProps } from '#typings'
@@ -20,7 +20,7 @@ const SkuOptionInput: FunctionComponent<SkuOptionInputProps> = (props) => {
   const { skuOption, skuCode } = useContext(SkuOptionChildrenContext)
   const handleChange: BaseInputComponentProps['onChange'] = (event) => {
     const val = event.target.value
-    const options = _.has(option, `${skuCode}.${skuOption?.id}`)
+    const options = has(option, `${skuCode}.${skuOption?.id}`)
       ? option[skuCode][`${skuOption?.id}`]['options']
       : {}
     const o = {

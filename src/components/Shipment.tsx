@@ -24,6 +24,10 @@ const Shipment: FunctionComponent<ShipmentProps> = ({ children }) => {
       const lineItems = shipmentLineItems?.map((shipmentLineItem) =>
         shipmentLineItem.lineItem()
       )
+      // @ts-ignore
+      const deliveryLeadTime = shipment?.deliveryLeadTime
+        ? shipment?.deliveryLeadTime()
+        : null
       const shippingMethods = shipment.availableShippingMethods()?.toArray()
       const currentShippingMethodId = shipment.shippingMethod()?.id
       const stockTransfers = shipment.stockTransfers()?.toArray()
@@ -32,6 +36,7 @@ const Shipment: FunctionComponent<ShipmentProps> = ({ children }) => {
         shippingMethods,
         currentShippingMethodId,
         stockTransfers,
+        deliveryLeadTime,
       }
       return (
         <ShipmentChildrenContext.Provider key={k} value={shipmentProps}>

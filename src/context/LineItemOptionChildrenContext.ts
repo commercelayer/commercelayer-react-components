@@ -2,7 +2,7 @@ import { createContext } from 'react'
 import { LineItemOptionCollection } from '@commercelayer/js-sdk'
 
 export interface InitialLineItemContext {
-  lineItemOption: LineItemOptionCollection | {}
+  lineItemOption: Partial<LineItemOptionCollection>
 }
 
 const initial: InitialLineItemContext = {

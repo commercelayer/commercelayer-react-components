@@ -1,7 +1,7 @@
 import React, { useContext, FunctionComponent } from 'react'
 import AvailabilityContext from '#context/AvailabilityContext'
 import Parent from './utils/Parent'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import components from '#config/components'
 import { TimeFormat, FunctionChildren } from '#typings/index'
 import { LeadTimes, ShippingMethod } from '#reducers/AvailabilityReducer'
@@ -30,8 +30,8 @@ const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = (
 ) => {
   const { timeFormat, showShippingMethodName, children, ...p } = props
   const { min, max, shippingMethod, quantity } = useContext(AvailabilityContext)
-  const mn = !_.isEmpty(min) ? min[`${timeFormat}`] : ''
-  const mx = !_.isEmpty(max) ? max[`${timeFormat}`] : ''
+  const mn = !isEmpty(min) && timeFormat ? min[timeFormat] : ''
+  const mx = !isEmpty(max) && timeFormat ? max[timeFormat] : ''
   const text: string[] = []
   const name =
     showShippingMethodName && shippingMethod

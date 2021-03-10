@@ -1,7 +1,7 @@
 import baseReducer from '#utils/baseReducer'
 import { BaseError } from '#typings/errors'
 import { Sku } from '@commercelayer/js-sdk'
-import _ from 'lodash'
+import { first } from 'lodash'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Dispatch } from 'react'
 
@@ -68,8 +68,8 @@ export const getAvailability: GetAvailability = async ({
   const inventorySku = await Sku.withCredentials(config)
     .select('inventory')
     .find(sku.id)
-  const firstLevel = _.first(inventorySku?.inventory?.levels)
-  const firstDelivery = _.first(firstLevel?.deliveryLeadTimes)
+  const firstLevel = first(inventorySku?.inventory?.levels)
+  const firstDelivery = first(firstLevel?.deliveryLeadTimes)
   dispatch({
     type: 'setAvailability',
     payload: { ...firstDelivery, quantity: firstLevel?.quantity },

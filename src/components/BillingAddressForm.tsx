@@ -8,7 +8,7 @@ import React, {
   useRef,
 } from 'react'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import { BaseError, CodeErrorType } from '#typings/errors'
 import { AddressField } from '#reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '#typings'
@@ -31,7 +31,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
   const { saveAddressToCustomerBook } = useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
-    if (!_.isEmpty(errors)) {
+    if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
         const { code, message } = errors[fieldName]
@@ -42,8 +42,8 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
           field: fieldName,
         })
       }
-      !_.isEmpty(formErrors) && setAddressErrors(formErrors)
-    } else if (!_.isEmpty(values)) {
+      !isEmpty(formErrors) && setAddressErrors(formErrors)
+    } else if (!isEmpty(values)) {
       setAddressErrors([])
       for (const name in values) {
         const field = values[name]
@@ -58,7 +58,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
       }
       setAddress({ values, resource: 'billingAddress' })
     }
-    if (reset && (!_.isEmpty(values) || !_.isEmpty(errors))) {
+    if (reset && (!isEmpty(values) || !isEmpty(errors))) {
       saveAddressToCustomerBook &&
         saveAddressToCustomerBook('BillingAddress', false)
       if (ref) {

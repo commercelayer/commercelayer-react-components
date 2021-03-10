@@ -4,7 +4,7 @@ import components from '#config/components'
 import { BaseInputComponentProps } from '#typings'
 import useRapidForm from 'rapid-form'
 import CustomerContext from '#context/CustomerContext'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import { BaseError, CodeErrorType } from '#typings/errors'
 
 const propTypes = components.CustomerInput.propTypes
@@ -35,13 +35,13 @@ const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
     CustomerContext
   )
   const handleOnBlur = async () => {
-    if (saveOnBlur && _.isEmpty(errors) && !_.isEmpty(values)) {
+    if (saveOnBlur && isEmpty(errors) && !isEmpty(values)) {
       await saveCustomerUser(values[name].value)
       onBlur && onBlur()
     }
   }
   useEffect(() => {
-    if (!_.isEmpty(errors)) {
+    if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
         const { code, message } = errors[fieldName]
@@ -52,8 +52,8 @@ const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
           field: fieldName,
         })
       }
-      !_.isEmpty(formErrors) && setCustomerErrors(formErrors)
-    } else if (!_.isEmpty(values)) {
+      !isEmpty(formErrors) && setCustomerErrors(formErrors)
+    } else if (!isEmpty(values)) {
       setCustomerErrors([])
       setCustomerEmail(values[name].value)
     }

@@ -5,7 +5,7 @@ import React, {
   CSSProperties,
 } from 'react'
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
-import _ from 'lodash'
+import { has, get } from 'lodash'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { LineItemOptionCollection } from '@commercelayer/js-sdk'
@@ -48,13 +48,13 @@ const LineItemOption: FunctionComponent<LineItemOptionProps> = (props) => {
   }
   return children ? (
     <Parent {...parentProps}>{props.children}</Parent>
-  ) : _.has(lineItemOption, `options.${name}`) ? (
+  ) : has(lineItemOption, `options.${name}`) ? (
     <Fragment>
       <span id={keyId} style={keyStyle} className={keyClassName} {...p}>
         {`${name}:`}
       </span>
       <span id={id} style={style} className={valueClassName} {...p}>
-        {`${lineItemOption['options'][name]}`}
+        {`${get(lineItemOption, `options.${name}`)}`}
       </span>
     </Fragment>
   ) : null

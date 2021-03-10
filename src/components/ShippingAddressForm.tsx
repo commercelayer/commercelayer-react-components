@@ -8,7 +8,7 @@ import React, {
   useRef,
 } from 'react'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import { BaseError, CodeErrorType } from '#typings/errors'
 import { AddressField } from '#reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '#typings'
@@ -33,7 +33,7 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
   const { saveAddressToCustomerBook } = useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
-    if (!_.isEmpty(errors)) {
+    if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
         const { code, message } = errors[fieldName]
@@ -44,10 +44,10 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
           field: fieldName,
         })
       }
-      !_.isEmpty(formErrors) &&
+      !isEmpty(formErrors) &&
         shipToDifferentAddress &&
         setAddressErrors(formErrors)
-    } else if (!_.isEmpty(values) && shipToDifferentAddress) {
+    } else if (!isEmpty(values) && shipToDifferentAddress) {
       setAddressErrors([])
       for (const name in values) {
         const field = values[name]
@@ -62,7 +62,7 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
       }
       setAddress({ values, resource: 'shippingAddress' })
     }
-    if (reset && (!_.isEmpty(values) || !_.isEmpty(errors))) {
+    if (reset && (!isEmpty(values) || !isEmpty(errors))) {
       saveAddressToCustomerBook &&
         saveAddressToCustomerBook('ShippingAddress', false)
       if (ref) {

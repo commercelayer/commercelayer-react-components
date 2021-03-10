@@ -11,9 +11,10 @@ import {
   PaymentMethodRadioButton,
   PaymentMethodsContainer,
   PaymentSource,
+  PlaceOrderButton,
+  PlaceOrderContainer,
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
-import _ from 'lodash'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 const orderId = 'AqQgYhvvkw'
@@ -92,6 +93,25 @@ export default function Main() {
                 <PaymentSource className="p-5 my-2 bg-gray-50" />
               </PaymentMethod>
             </PaymentMethodsContainer>
+            <PlaceOrderContainer
+              options={{
+                stripePayment: {
+                  publishableKey: 'pk_test_UArgJuzBMSppFkvAkATXTNT5',
+                },
+                saveShippingAddressToCustomerBook: true,
+                saveBillingAddressToCustomerBook: true,
+              }}
+            >
+              <div>
+                <PlaceOrderButton
+                  onClick={(res: any) => {
+                    console.log('res', res)
+                    debugger
+                  }}
+                  className="mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                />
+              </div>
+            </PlaceOrderContainer>
           </OrderContainer>
           <div className="mt-5">
             <pre data-cy="current-shipping-method">{`Current payment source options: ${JSON.stringify(

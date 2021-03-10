@@ -1,5 +1,6 @@
 import { createContext } from 'react'
 import {
+  DeliveryLeadTimeCollection,
   LineItemCollection,
   ShippingMethodCollection,
   StockTransferCollection,
@@ -11,6 +12,7 @@ export interface InitialShipmentContext {
   shippingMethods?: ShippingMethodCollection[]
   currentShippingMethodId?: string
   stockTransfers?: StockTransferCollection[]
+  deliveryLeadTime?: DeliveryLeadTimeCollection | null
 }
 
 const initial: InitialShipmentContext = {

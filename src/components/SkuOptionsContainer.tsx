@@ -10,7 +10,7 @@ import skuOptionsReducer, {
   skuOptionsInitialState,
 } from '#reducers/SkuOptionsReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
 import { getSkuOptions } from '#reducers/SkuOptionsReducer'
@@ -35,7 +35,7 @@ const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = (
   const config = useContext(CommerceLayerContext)
   const { item, items } = useContext(ItemContext)
   const sCode =
-    !_.isEmpty(items) && skuCode
+    !isEmpty(items) && skuCode
       ? items[skuCode]?.code
       : skuCode || getCurrentItemKey(item)
   const skuOptionsValue = { ...state, skuCode: sCode }
@@ -47,7 +47,7 @@ const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = (
       })
     }
     return (): void => {
-      if (_.isEmpty(sCode)) {
+      if (isEmpty(sCode)) {
         dispatch({
           type: 'setSkuOptions',
           payload: {

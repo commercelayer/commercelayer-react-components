@@ -7,7 +7,7 @@ import getSkus from '#utils/getSkus'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Items, CustomLineItem, SetCustomLineItems } from './ItemReducer'
 import { BaseError } from '#typings/errors'
-import _ from 'lodash'
+import { isEmpty, has } from 'lodash'
 
 type SetSkuCodeVariantParams = {
   code: string
@@ -72,12 +72,12 @@ export const setVariantSkuCodes: SetVariantSkuCodes = ({
 }) => {
   const lineItems: any = {}
   const sCodes = skuCodes.map((s) => {
-    if (_.has(s, 'lineItem')) {
+    if (has(s, 'lineItem')) {
       lineItems[s.code] = s.lineItem
     }
     return s.code
   })
-  if (!_.isEmpty(lineItems)) {
+  if (!isEmpty(lineItems)) {
     setCustomLineItems && setCustomLineItems(lineItems)
   }
   dispatch({
