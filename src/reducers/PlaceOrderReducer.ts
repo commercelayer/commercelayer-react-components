@@ -1,7 +1,7 @@
 import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
-import { CommerceLayerConfig } from '../../dist/context/CommerceLayerContext'
+import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Order, OrderCollection } from '@commercelayer/js-sdk'
 import { isEmpty } from 'lodash'
 import { shipmentsFilled } from '../utils/shipments'
@@ -73,13 +73,13 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
   if (order && config) {
     const billingAddress =
       order.billingAddress() ||
+      // @ts-ignore
       (await order.withCredentials(config).loadBillingAddress())
     const shippingAddress =
       order.shippingAddress() ||
       (await order.withCredentials(config).loadShippingAddress())
-    const shipments = (
-      await order.withCredentials(config).loadShipments()
-    )?.toArray()
+    const shipments = // @ts-ignore
+    (await order.withCredentials(config).loadShipments())?.toArray()
     const shipment = shipments && (await shipmentsFilled(shipments, config))
     const paymentMethod =
       order.paymentMethod() ||
