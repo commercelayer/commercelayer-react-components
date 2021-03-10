@@ -84,6 +84,7 @@ export const getPaymentMethods: GetPaymentMethods = async ({
     }
     const paymentMethod = await order
       ?.withCredentials(config)
+      // @ts-ignore
       .loadPaymentMethod()
     dispatch({
       type: 'setPaymentMethods',
@@ -201,6 +202,7 @@ export const setPaymentSource: SetPaymentSource = async ({
           order: o,
         })
       if (order?.billingAddress() === null)
+        // @ts-ignore
         await order.withCredentials(config).loadBillingAddress()
       if (order?.paymentSource() === null)
         // @ts-ignore

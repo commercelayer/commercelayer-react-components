@@ -26,7 +26,8 @@ const Shipment: FunctionComponent<ShipmentProps> = ({ children }) => {
       )
       // @ts-ignore
       const deliveryLeadTime = shipment?.deliveryLeadTime
-        ? shipment?.deliveryLeadTime()
+        ? // @ts-ignore
+          shipment?.deliveryLeadTime()
         : null
       const shippingMethods = shipment.availableShippingMethods()?.toArray()
       const currentShippingMethodId = shipment.shippingMethod()?.id
