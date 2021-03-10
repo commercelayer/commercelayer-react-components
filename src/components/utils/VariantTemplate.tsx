@@ -1,5 +1,6 @@
 import React, { Fragment, FunctionComponent, ReactNode } from 'react'
-import _ from 'lodash'
+import { keys } from 'lodash'
+
 import PropTypes from 'prop-types'
 import { BaseSelectorType } from '#typings'
 import { VariantsObject, SetSkuCode } from '#reducers/VariantReducer'
@@ -48,7 +49,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
     handleChange,
     ...prs
   } = props
-  const vars = _.keys(variants).map((v, k) => {
+  const vars = keys(variants).map((v, k) => {
     const checked = skuCode === v
     return type === 'select' ? (
       <option

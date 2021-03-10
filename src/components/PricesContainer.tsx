@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from 'react'
 import getPrices from '#utils/getPrices'
-import _ from 'lodash'
+import { isEmpty, indexOf, has } from 'lodash'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import priceReducer, {
   SetSkuCodesPrice,
@@ -48,7 +48,7 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
     item: currentItem,
     skuCode: itemSkuCode,
   } = useContext(ItemContext)
-  if (_.indexOf(state.skuCodes, skuCode) === -1 && skuCode)
+  if (indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
   const sCode = getCurrentItemKey(currentItem) || skuCode || itemSkuCode || ''
   const setSkuCodes: SetSkuCodesPrice = (skuCodes) => {
@@ -58,13 +58,13 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
     })
   }
   useEffect(() => {
-    if (currentItem && _.has(prices, sCode)) {
+    if (currentItem && has(prices, sCode)) {
       dispatch({
         type: 'setPrices',
         payload: { prices: prices },
       })
     }
-    if (!_.isEmpty(items) && _.isEmpty(currentItem)) {
+    if (!isEmpty(items) && isEmpty(currentItem)) {
       const p = getPrices(items)
       dispatch({
         type: 'setPrices',
@@ -72,8 +72,8 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
       })
     }
     if (
-      (config.accessToken && _.isEmpty(currentItem)) ||
-      (config.accessToken && !_.has(prices, sCode))
+      (config.accessToken && isEmpty(currentItem)) ||
+      (config.accessToken && !has(prices, sCode))
     ) {
       if (state.skuCodes.length > 0 || skuCode) {
         getSkusPrice((sCode && [sCode]) || state.skuCodes, {
@@ -87,7 +87,7 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
       }
     }
     return (): void => {
-      if (_.isEmpty(currentItem)) {
+      if (isEmpty(currentItem)) {
         unsetPriceState(dispatch)
       }
     }

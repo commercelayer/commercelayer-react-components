@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import '@commercelayer/cypress-vcr'
 // ***********************************************
 // This example commands.js shows you how to

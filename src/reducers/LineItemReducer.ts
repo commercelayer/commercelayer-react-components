@@ -7,7 +7,7 @@ import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import { LoaderType } from '#typings'
 import { BaseError } from '#typings/errors'
 
@@ -131,7 +131,7 @@ export const updateLineItem: UpdateLineItem = async (params) => {
       throw update
     }
     getOrder && (await getOrder(orderId))
-    if (!_.isEmpty(errors)) {
+    if (!isEmpty(errors)) {
       dispatch({
         type: 'setErrors',
         payload: {
@@ -161,7 +161,7 @@ export const deleteLineItem: DeleteLineItem = async (params) => {
       throw destroyLineItem
     }
     getOrder && (await getOrder(orderId))
-    if (!_.isEmpty(errors)) {
+    if (!isEmpty(errors)) {
       dispatch({
         type: 'setErrors',
         payload: {

@@ -12,7 +12,7 @@ import CustomerContext from '#context/CustomerContext'
 import BillingAddressContext from '#context/BillingAddressContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
 import { AddressCollection } from '@commercelayer/js-sdk'
-import _ from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import AddressContext from '#context/AddressContext'
 import OrderContext from '#context/OrderContext'
 
@@ -52,7 +52,7 @@ const Address: FunctionComponent<Props> = (props) => {
   } = useContext(AddressContext)
   const { order } = useContext(OrderContext)
   const [selected, setSelected] = useState<null | number | undefined>(null)
-  const items = !_.isEmpty(addresses)
+  const items = !isEmpty(addresses)
     ? addresses
     : (addressesContext && addressesContext) || []
   useEffect(() => {

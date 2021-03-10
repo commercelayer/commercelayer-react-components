@@ -14,7 +14,7 @@ import lineItemReducer, {
 import OrderContext from '#context/OrderContext'
 import LineItemContext, { LineItemContextValue } from '#context/LineItemContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import components from '#config/components'
 
 const propTypes = components.LineItemsContainer.propTypes
@@ -33,7 +33,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
   const config = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(lineItemReducer, lineItemInitialState)
   useEffect(() => {
-    if (!_.isEmpty(order)) {
+    if (!isEmpty(order)) {
       order &&
         getLineItems({
           order,
@@ -43,7 +43,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
         })
     }
     return (): void => {
-      if (_.isEmpty(order)) {
+      if (isEmpty(order)) {
         dispatch({
           type: 'setLineItems',
           payload: { lineItems: [] },

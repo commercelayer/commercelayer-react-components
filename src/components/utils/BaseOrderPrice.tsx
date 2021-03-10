@@ -9,7 +9,7 @@ import React, {
 } from 'react'
 import { PropsType } from '#utils/PropsType'
 import { baseOrderPricePropTypes } from '#typings'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 
 export type BaseOrderPriceProps = PropsType<typeof baseOrderPricePropTypes> &
   JSX.IntrinsicElements['span']
@@ -27,7 +27,7 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
     ) as string
     setPrice(p)
     return (): void => {
-      if (_.isEmpty(order)) {
+      if (isEmpty(order)) {
         setPrice('')
       }
     }

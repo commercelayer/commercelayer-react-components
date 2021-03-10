@@ -9,7 +9,7 @@ import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import components from '#config/components'
 import { LineItemType } from '#typings'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import { LineItemCollection } from '@commercelayer/js-sdk'
 
 const propTypes = components.LineItem.propTypes
@@ -24,7 +24,7 @@ const LineItem: FunctionComponent<LineItemProps> = (props) => {
   const { type = 'skus', children } = props
   const { lineItems } = useContext(LineItemContext)
   const { lineItems: shipmentLineItems } = useContext(ShipmentChildrenContext)
-  const items = _.isEmpty(shipmentLineItems)
+  const items = isEmpty(shipmentLineItems)
     ? (lineItems as LineItemCollection[])
     : (shipmentLineItems as LineItemCollection[])
   const components =

@@ -1,6 +1,6 @@
 import { CodeErrorType, ResourceErrorType, BaseError } from '#typings/errors'
 import BaseClass from '@commercelayer/js-sdk/dist/utils/BaseClass'
-import _ from 'lodash'
+import { get, has, isArray } from 'lodash'
 
 const ERROR_CODES: CodeErrorType[] = [
   'RECORD_NOT_FOUND',
@@ -68,7 +68,7 @@ const getErrorsByCollection: GetErrorsByCollection = (
   resourceType
 ) => {
   const errors: BaseError[] = []
-  if (_.has(collection, 'errors') && !collection.errors().empty()) {
+  if (has(collection, 'errors') && !collection.errors().empty()) {
     collection
       .errors()
       .toArray()
@@ -76,14 +76,14 @@ const getErrorsByCollection: GetErrorsByCollection = (
         // TODO Add function to correct different field
         if (error['field'] === 'recipientEmail') error['field'] = 'email'
         errors.push({
-          id: collection['id'],
+          id: get(collection, 'id'),
           code: transformCode(error['code']),
           field: error['field'] === 'recipientEmail' ? 'email' : error['field'],
           resource: resourceType,
           message: error['message'],
         })
       })
-  } else if (_.isArray(collection)) {
+  } else if (isArray(collection)) {
     collection.map((error) => {
       errors.push({
         // id: collection['id'],

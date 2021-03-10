@@ -3,7 +3,7 @@ import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import AddressContext from '#context/AddressContext'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import {
   billingAddressController,
   shippingAddressController,
@@ -72,7 +72,7 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
   const disable =
     disabled || billingDisable || shippingDisable || countryLockDisable
   const handleClick = async () => {
-    if (_.isEmpty(errors) && !disable) {
+    if (isEmpty(errors) && !disable) {
       await saveAddresses()
       onClick && onClick()
     }

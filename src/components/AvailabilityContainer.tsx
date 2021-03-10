@@ -10,7 +10,7 @@ import availabilityReducer, {
   getAvailability,
 } from '#reducers/AvailabilityReducer'
 import AvailabilityContext from '#context/AvailabilityContext'
-import _ from 'lodash'
+import { isEmpty, first } from 'lodash'
 import ItemContext from '#context/ItemContext'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import components from '#config/components'
@@ -37,12 +37,12 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
   useEffect(() => {
     const sCode = skuCode || getCurrentItemKey(item) || itemSkuCode
     if (sCode) {
-      const firstLevel = _.first(item[sCode]?.inventory?.levels) || {
+      const firstLevel = first(item[sCode]?.inventory?.levels) || {
         quantity: null,
         deliveryLeadTimes: [],
       }
-      if (!_.isEmpty(firstLevel) && firstLevel.deliveryLeadTimes.length > 0) {
-        const firstDelivery = _.first(firstLevel.deliveryLeadTimes)
+      if (!isEmpty(firstLevel) && firstLevel.deliveryLeadTimes.length > 0) {
+        const firstDelivery = first(firstLevel.deliveryLeadTimes)
         dispatch({
           type: 'setAvailability',
           payload: { ...firstDelivery, quantity: firstLevel?.quantity },

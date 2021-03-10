@@ -1,7 +1,7 @@
 import React, { ForwardRefRenderFunction } from 'react'
 import Parent from './Parent'
 import { BaseSelectComponentProps } from '#typings'
-import _ from 'lodash'
+import { findIndex } from 'lodash'
 
 export type BaseSelectProps = BaseSelectComponentProps
 
@@ -16,7 +16,7 @@ const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (
     value = '',
     ...p
   } = props
-  if (_.findIndex(options, placeholder) === -1) {
+  if (findIndex(options, placeholder) === -1) {
     options.unshift(placeholder)
   } else {
     options[0] = placeholder

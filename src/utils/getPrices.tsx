@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isEmpty, first, isArray, has, forEach } from 'lodash'
 import { PriceCollection } from '@commercelayer/js-sdk'
 import { Prices, SkuPrices } from '#reducers/PriceReducer'
 import { Items } from '#reducers/ItemReducer'
@@ -11,8 +11,8 @@ export interface GetPriceByCode {
 
 export const getPriceByCode: GetPriceByCode = (skuPrices, code = '') => {
   return code
-    ? _.first(skuPrices.filter((p) => p.currencyCode === code))
-    : _.first(skuPrices)
+    ? first(skuPrices.filter((p) => p.currencyCode === code))
+    : first(skuPrices)
 }
 
 export interface GetPricesComponent {
@@ -20,7 +20,7 @@ export interface GetPricesComponent {
 }
 
 export const getPricesComponent: GetPricesComponent = (skuPrices, props) => {
-  if (_.isEmpty(skuPrices)) {
+  if (isEmpty(skuPrices)) {
     return <PriceTemplate {...props} />
   }
   return skuPrices.map((p, k) => {
@@ -46,16 +46,16 @@ export interface GetPrices {
 
 const getPrices: GetPrices = (prices) => {
   const obj: Record<string, any> = {}
-  if (_.isArray(prices)) {
+  if (isArray(prices)) {
     prices.map((p) => {
-      if (_.has(obj, p.skuCode)) {
+      if (has(obj, p.skuCode)) {
         obj[p.skuCode].push(p)
       } else {
         obj[p.skuCode] = [p]
       }
     })
   } else {
-    _.forEach(prices, (item) => {
+    forEach(prices, (item) => {
       const prices = item.prices()?.toArray()
       obj[item.code] = prices
     })

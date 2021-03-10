@@ -21,10 +21,10 @@ import {
   DeliveryLeadTime,
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
-const orderId = 'JwXQehvvyP'
+const orderId = 'AqQgYhvvkw'
 
 export default function Main() {
   const [token, setToken] = useState('')
@@ -38,7 +38,7 @@ export default function Main() {
       .shipments()
       ?.includes('shippingMethod')
       .load()
-    if (!_.isEmpty(shipments) && shipments) {
+    if (!isEmpty(shipments) && shipments) {
       const name = shipments.first()?.shippingMethod()?.name
       const id = shipments.first()?.shippingMethod()?.id as string
       console.log('shipping method name', name)

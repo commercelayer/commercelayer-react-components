@@ -1,5 +1,5 @@
 import { isValidElement, Children, ReactNode } from 'react'
-import _ from 'lodash'
+import { isEmpty, isFunction, has, get } from 'lodash'
 import { Requireable } from 'prop-types'
 import components from '#config/components'
 
@@ -21,19 +21,19 @@ const checkChildrenTypes: CheckChildrenTypes = (
   let error: Error | null = null
   const children = props[propName]
   const cpName = componentName.replace('CL', '')
-  if (_.isEmpty(children) && props['isRequired'])
+  if (isEmpty(children) && props['isRequired'])
     error = new Error(
       `The prop '${propName}' is marked as required in '${cpName}', but its value is '${children}'.`
     )
   Children.map(children, (c): any => {
     if (error) return error
     const type = c.type
-    const itemTypes = components[cpName].permittedChildren
+    const itemTypes = get(components, `${cpName}.permittedChildren`)
     const errorMsg = `Invalid prop '${propName}' supplied to ${cpName}. Only components ${itemTypes.join(
       ', '
     )} are allowed.`
-    if (_.isFunction(type) && _.has(type, 'displayName')) {
-      const displayName: string = type['displayName']
+    if (isFunction(type) && has(type, 'displayName')) {
+      const displayName: string = get(type, 'displayName')
       const childComponentName = type.name
       if (displayName && displayName === `${childComponentName}`) {
         if (!itemTypes.includes(childComponentName)) {
@@ -48,7 +48,7 @@ const checkChildrenTypes: CheckChildrenTypes = (
   return error
 }
 
-const childrenTypes = checkChildrenTypes
+const childrenTypes: any = checkChildrenTypes
 childrenTypes['isRequired'] = (
   props: { [key: string]: any },
   propName: string,

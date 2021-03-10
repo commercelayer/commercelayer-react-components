@@ -5,7 +5,7 @@ import React, {
   useContext,
   FunctionComponent,
 } from 'react'
-import _ from 'lodash'
+import { isEmpty, has, indexOf } from 'lodash'
 import Parent from './utils/Parent'
 import PricesContext from '#context/PricesContext'
 import { getPricesComponent } from '#utils/getPrices'
@@ -44,10 +44,10 @@ const Price: FunctionComponent<PriceProps> = (props) => {
   const [skuPrices, setSkuPrices] = useState<PriceCollection[]>([])
   const sCode = pricesSkuCode || skuCode
   useEffect(() => {
-    if (!_.isEmpty(prices) && _.has(prices, `${sCode}`)) {
+    if (!isEmpty(prices) && has(prices, `${sCode}`)) {
       setSkuPrices(prices[sCode])
     } else {
-      if (sCode && _.indexOf(skuCodes, sCode) === -1) {
+      if (sCode && indexOf(skuCodes, sCode) === -1) {
         skuCodes.push(sCode)
         setSkuCodes && setSkuCodes(skuCodes)
       }
@@ -62,14 +62,14 @@ const Price: FunctionComponent<PriceProps> = (props) => {
     ...props,
   }
   const pricesComponent =
-    _.isEmpty(prices) || _.isEmpty(skuPrices)
+    isEmpty(prices) || isEmpty(skuPrices)
       ? null
       : getPricesComponent(skuPrices, props)
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <Fragment>
-      {loading || _.isEmpty(pricesComponent) ? loader : pricesComponent}
+      {loading || isEmpty(pricesComponent) ? loader : pricesComponent}
     </Fragment>
   )
 }

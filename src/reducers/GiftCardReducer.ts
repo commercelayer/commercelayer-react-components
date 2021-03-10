@@ -7,7 +7,7 @@ import CLayer, {
 } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { BaseError } from '#typings/errors'
 
@@ -152,7 +152,7 @@ export const addGiftCard: AddGiftCard = async (
     )
     if (firstName) recipientValues['firstName'] = firstName
     if (lastName) recipientValues['lastName'] = lastName
-    if (!_.isEmpty(recipientValues)) {
+    if (!isEmpty(recipientValues)) {
       await (
         await giftCard.withCredentials(config).giftCardRecipient()
       )?.update(recipientValues)

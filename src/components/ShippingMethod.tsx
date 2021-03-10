@@ -9,7 +9,7 @@ import React, {
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import components from '#config/components'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 
 const propTypes = components.ShippingMethod.propTypes
 const displayName = components.ShippingMethod.displayName
@@ -26,9 +26,11 @@ const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
     readonly,
     emptyText = `There are not any shipping method available`,
   } = props
-  const { shippingMethods, currentShippingMethodId } = useContext(
-    ShipmentChildrenContext
-  )
+  const {
+    shippingMethods,
+    currentShippingMethodId,
+    deliveryLeadTime,
+  } = useContext(ShipmentChildrenContext)
   const [items, setItems] = useState<JSX.Element[]>([])
   useEffect(() => {
     const methods =
@@ -39,9 +41,18 @@ const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
           return true
         })
         .map((shippingMethod, k) => {
-          // NOTE: Remove with new SDK version
-          // @ts-ignore
-          const deliveryLeadTimeForShipment = shippingMethod.deliveryLeadTimeForShipment()
+          const deliveryLeadTimeForShipment =
+            !isEmpty(deliveryLeadTime) &&
+            deliveryLeadTime &&
+            currentShippingMethodId === shippingMethod.id
+              ? deliveryLeadTime
+              : shippingMethod.deliveryLeadTimeForShipment()
+          console.log(
+            'object',
+            deliveryLeadTimeForShipment,
+            shippingMethod.id,
+            currentShippingMethodId
+          )
           const shippingProps = {
             shippingMethod,
             currentShippingMethodId,
@@ -57,8 +68,8 @@ const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
           )
         })
     if (methods) setItems(methods)
-  }, [currentShippingMethodId])
-  const components = (!_.isEmpty(items) && items) || emptyText
+  }, [currentShippingMethodId, deliveryLeadTime, shippingMethods])
+  const components = (!isEmpty(items) && items) || emptyText
   return <Fragment>{components}</Fragment>
 }
 

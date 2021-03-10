@@ -481,6 +481,7 @@ const components = {
       'GiftCardContainer',
       'ShipmentsContainer',
       'PaymentMethodsContainer',
+      'PlaceOrderContainer',
       'ReactNode',
     ],
     displayName: 'OrderContainer',
@@ -546,6 +547,23 @@ const components = {
     displayName: 'PaymentSource',
     propTypes: {
       children: PropTypes.func,
+    },
+  },
+  PlaceOrderButton: {
+    displayName: 'PlaceOrderButton',
+    propTypes: {
+      children: PropTypes.func,
+      label: PropTypes.string,
+    },
+    defaultProps: {
+      label: 'Place order',
+    },
+  },
+  PlaceOrderContainer: {
+    displayName: 'PlaceOrderContainer',
+    permittedChildren: ['PlaceOrderButton', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
     },
   },
   Price: {

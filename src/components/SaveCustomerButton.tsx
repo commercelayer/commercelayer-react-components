@@ -2,7 +2,7 @@ import React, { FunctionComponent, useContext } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import CustomerContext from '#context/CustomerContext'
 
 const propTypes = components.SaveCustomerButton.propTypes
@@ -26,9 +26,9 @@ const SaveCustomerButton: FunctionComponent<SaveCustomerButtonProps> = (
   const { errors, saveCustomerUser, customerEmail } = useContext(
     CustomerContext
   )
-  const disable = disabled || !_.isEmpty(errors) || _.isEmpty(customerEmail)
+  const disable = disabled || !isEmpty(errors) || isEmpty(customerEmail)
   const handleClick = async () => {
-    if (_.isEmpty(errors) && !disable) {
+    if (isEmpty(errors) && !disable) {
       await saveCustomerUser(customerEmail as string)
       onClick && onClick()
     }

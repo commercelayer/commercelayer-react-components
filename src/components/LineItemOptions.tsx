@@ -6,7 +6,7 @@ import React, {
 } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import components from '#config/components'
 import { LineItemOptionCollection } from '@commercelayer/js-sdk'
 
@@ -24,7 +24,7 @@ export type LineItemOptionsProps = {
 const LineItemOptions: FunctionComponent<LineItemOptionsProps> = (props) => {
   const { skuOptionId, title, children, showName = true, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
-  const lineItemOptions: LineItemOptionCollection[] = !_.isEmpty(lineItem)
+  const lineItemOptions: LineItemOptionCollection[] = !isEmpty(lineItem)
     ? lineItem['lineItemOptions']().toArray()
     : []
   const options = lineItemOptions

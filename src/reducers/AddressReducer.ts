@@ -3,7 +3,7 @@ import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Address, Order, OrderCollection } from '@commercelayer/js-sdk'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 
 export type AddressActionType =
   | 'setErrors'
@@ -145,7 +145,7 @@ export const saveAddresses: SaveAddresses = async ({
       orderAttributes._billingAddressCloneId = order?.billingAddress()?.id
       orderAttributes._shippingAddressCloneId = order?.billingAddress()?.id
     }
-    if (!_.isEmpty(billingAddress) && billingAddress) {
+    if (!isEmpty(billingAddress) && billingAddress) {
       delete orderAttributes._billingAddressCloneId
       delete orderAttributes._shippingAddressCloneId
       orderAttributes._shippingAddressSameAsBilling = true
@@ -157,14 +157,14 @@ export const saveAddresses: SaveAddresses = async ({
       delete orderAttributes._shippingAddressSameAsBilling
       if (shippingAddressId)
         orderAttributes._shippingAddressCloneId = shippingAddressId
-      if (!_.isEmpty(shippingAddress) && shippingAddress) {
+      if (!isEmpty(shippingAddress) && shippingAddress) {
         delete orderAttributes._shippingAddressCloneId
         orderAttributes.shippingAddress = await Address.withCredentials(
           config
         ).create(shippingAddress)
       }
     }
-    if (order && getOrder && !_.isEmpty(orderAttributes)) {
+    if (order && getOrder && !isEmpty(orderAttributes)) {
       const o = await Order.withCredentials(config).find(order.id)
       await o.withCredentials(config).update(orderAttributes)
       await getOrder(order.id)

@@ -7,7 +7,7 @@ import React, {
   ReactNode,
 } from 'react'
 import validateFormFields from '#utils/validateFormFields'
-import _ from 'lodash'
+import { isEmpty } from 'lodash'
 import GiftCardContext from '#context/GiftCardContext'
 import { GiftCardI } from '#reducers/GiftCardReducer'
 import components from '#config/components'
@@ -38,7 +38,7 @@ const GiftCard: FunctionComponent<GiftCardProps> = (props) => {
       ['currencyCode', 'balanceCents'],
       'giftCard'
     )
-    if (_.isEmpty(errors)) {
+    if (isEmpty(errors)) {
       addGiftCard(values as GiftCardI)
       currentForm?.reset()
       if (onSubmit) {

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isEmpty, isString, without, keys, map, get } from 'lodash'
 import { BaseState } from '#typings/index'
 import { ResourceErrorType, BaseError } from '#typings/errors'
 import {
@@ -45,7 +45,7 @@ export const validateValue: ValidateValue = (val, name, type, resourceType) => {
       resourceType,
     }
   }
-  if (type === 'email' && _.isString(val) && !val.match(EMAIL_PATTERN)) {
+  if (type === 'email' && isString(val) && !val.match(EMAIL_PATTERN)) {
     return {
       field: name,
       code: 'VALIDATION_ERROR',
@@ -63,13 +63,13 @@ const validateFormFields: ValidateFormFields = (
 ) => {
   const errors: BaseError[] = []
   let values = { metadata: {} }
-  _.map(fields, (v: FormField) => {
-    const isTick = !!v['checked']
+  map(fields, (v: FormField) => {
+    const isTick = !!get(v, 'checked')
     const val = isTick ? isTick : v.value === 'on' ? false : v.value
     const attrName = v.getAttribute('name')
     if ((attrName && required.indexOf(attrName) !== -1) || v.required) {
       const error = validateValue(val, v.name, v.type, resourceType)
-      if (!_.isEmpty(error)) {
+      if (!isEmpty(error)) {
         errors.push(error as BaseError)
       }
       values = { ...values, [`${v.name}`]: val }
@@ -93,11 +93,11 @@ export interface FieldsExist {
 
 export const fieldsExist: FieldsExist = (values, schema = addressFields) => {
   if (!values['business']) {
-    const required = _.without(schema, 'line_2', 'company')
-    return required.length > _.keys(values).length
+    const required = without(schema, 'line_2', 'company')
+    return required.length > keys(values).length
   } else {
-    const required = _.without(schema, 'first_name', 'last_name')
-    return required.length > _.keys(values).length
+    const required = without(schema, 'first_name', 'last_name')
+    return required.length > keys(values).length
   }
 }
 

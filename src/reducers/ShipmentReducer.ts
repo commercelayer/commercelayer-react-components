@@ -65,11 +65,11 @@ export const getShipments: GetShipments = async ({
         'availableShippingMethods.deliveryLeadTimeForShipment',
         'shipmentLineItems',
         'shipmentLineItems.lineItem',
+        'deliveryLeadTime',
         'stockTransfers',
         'shippingMethod'
       )
       .load()
-    console.log('shipments', shipments)
     dispatch({
       type: 'setShipments',
       payload: { shipments: shipments?.toArray() },

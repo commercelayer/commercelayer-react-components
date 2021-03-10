@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { first, keys } from 'lodash'
 import { Items } from '#reducers/ItemReducer'
 
 export interface GetCurrentItemKey {
@@ -6,7 +6,7 @@ export interface GetCurrentItemKey {
 }
 
 const getCurrentItemKey: GetCurrentItemKey = (item) => {
-  return _.first(_.keys(item)) || ''
+  return first(keys(item)) || ''
 }
 
 export default getCurrentItemKey

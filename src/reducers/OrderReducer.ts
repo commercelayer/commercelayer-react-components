@@ -5,7 +5,7 @@ import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import baseReducer from '#utils/baseReducer'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { ItemOption, CustomLineItem } from './ItemReducer'
-import _ from 'lodash'
+import { isEmpty, size, map } from 'lodash'
 import { BaseMetadataObject } from '#typings/index'
 import { BaseError } from '#typings/errors'
 
@@ -267,9 +267,9 @@ export const addToCart: AddToCart = async (params) => {
     const lineItemResource = await CLayer.LineItem.withCredentials(
       config
     ).create(attrs)
-    if (!_.isEmpty(option)) {
+    if (!isEmpty(option)) {
       let c = 0
-      _.map(option, async (opt) => {
+      map(option, async (opt) => {
         const { options, skuOptionId } = opt
         const skuOption = CLayer.SkuOption.build({ id: skuOptionId })
         await CLayer.LineItemOption.withCredentials(config).create({
@@ -279,14 +279,14 @@ export const addToCart: AddToCart = async (params) => {
           skuOption,
         })
         c += 1
-        if (c === _.size(option)) {
+        if (c === size(option)) {
           await getApiOrder({ id, ...params })
         }
       })
     } else {
       await getApiOrder({ id, ...params })
     }
-    if (!_.isEmpty(errors)) {
+    if (!isEmpty(errors)) {
       dispatch({
         type: 'setErrors',
         payload: {

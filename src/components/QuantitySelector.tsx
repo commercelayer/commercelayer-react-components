@@ -5,7 +5,7 @@ import React, {
   useEffect,
 } from 'react'
 import Parent from './utils/Parent'
-import _ from 'lodash'
+import { isEmpty, has } from 'lodash'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
 import components from '#config/components'
@@ -47,11 +47,11 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
   const [value, setValue] = useState(min)
   const [disabled, setDisabled] = useState(!!p.disabled)
   const sCode =
-    !_.isEmpty(items) && skuCode
+    !isEmpty(items) && skuCode
       ? items[skuCode]?.code
       : skuCode || getCurrentItemKey(item) || (itemSkuCode as string)
 
-  const inventory = _.isEmpty(item) ? 50 : item[sCode]?.inventory?.quantity
+  const inventory = isEmpty(item) ? 50 : item[sCode]?.inventory?.quantity
   const maxInv = max || inventory
   useEffect(() => {
     setValue(min)
@@ -62,7 +62,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
     if (sCode) {
       const qty = Number(min)
       setQuantity && setQuantity({ ...quantity, [`${sCode}`]: qty })
-      if (!_.isEmpty(prices) && _.has(prices, sCode)) setDisabled(false)
+      if (!isEmpty(prices) && has(prices, sCode)) setDisabled(false)
     }
     return (): void => {
       setValue(min)
@@ -72,7 +72,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
     const qty = Number(e.target.value)
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
     setValue(qty)
-    if (!_.isEmpty(skuLists) && skuListId && valid) {
+    if (!isEmpty(skuLists) && skuListId && valid) {
       setQuantity && setQuantity({ ...quantity, [`${skuListId}`]: Number(qty) })
     } else if (sCode && valid) {
       setQuantity && setQuantity({ ...quantity, [`${sCode}`]: Number(qty) })
@@ -84,7 +84,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
     if (!valid) {
       const resetVal = Number(qty) < Number(min) ? min : maxInv
       setValue(resetVal)
-      if (!_.isEmpty(skuLists) && skuListId) {
+      if (!isEmpty(skuLists) && skuListId) {
         setQuantity &&
           setQuantity({ ...quantity, [`${skuListId}`]: Number(resetVal) })
       } else {

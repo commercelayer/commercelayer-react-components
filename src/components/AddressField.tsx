@@ -3,7 +3,7 @@ import AddressChildrenContext from '#context/AddressChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { AddressFieldView } from '#reducers/AddressReducer'
-import _ from 'lodash'
+import { camelCase, get } from 'lodash'
 
 const propTypes = components.AddressField.propTypes
 const displayName = components.AddressField.displayName
@@ -18,8 +18,8 @@ type AddressFieldProps = {
 const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
   const { name } = props
   const { address } = useContext(AddressChildrenContext)
-  const key = _.camelCase(name)
-  const text = _.get(address, key)
+  const key = camelCase(name)
+  const text = get(address, key)
   const parentProps = {
     ...props,
   }

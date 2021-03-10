@@ -17,7 +17,6 @@ import {
   StripeElements,
 } from '@stripe/stripe-js'
 import { SetPaymentSourceResponse } from '#reducers/PaymentMethodReducer'
-import _ from 'lodash'
 
 type StripePaymentFormProps = {
   stripe: Stripe | null
@@ -94,12 +93,12 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
         }
       }
       // const billing_details = {
-      //   name: billinInfo?.fullName,
+      //   name: billingInfo?.fullName,
       //   address: {
-      //     city: billinInfo?.city,
-      //     country: billinInfo?.countryCode,
-      //     line1: billinInfo?.line1,
-      //     postal_code: billinInfo?.zipCode,
+      //     city: billingInfo?.city,
+      //     country: billingInfo?.countryCode,
+      //     line1: billingInfo?.line1,
+      //     postal_code: billingInfo?.zipCode,
       //   },
       // }
     }
