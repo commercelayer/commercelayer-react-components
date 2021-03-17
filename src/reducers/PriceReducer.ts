@@ -79,7 +79,7 @@ export const getSkusPrice: GetSkusPrice = (
         payload: { loading: false },
       })
       const meta = r.getMetaInfo()
-      let col = r
+      let col: any = r
       if (col.hasNextPage() && meta.pageCount) {
         for (let key = 1; key < meta.pageCount; key++) {
           col = await col.withCredentials(config).nextPage()

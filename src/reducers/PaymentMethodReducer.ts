@@ -6,7 +6,6 @@ import CLayer, {
   OrderCollection,
   PaymentMethod,
   PaymentMethodCollection,
-  PaymentSourceCollection,
   StripePaymentCollection,
   WireTransferCollection,
 } from '@commercelayer/js-sdk'
@@ -24,9 +23,10 @@ export type PaymentMethodActionType =
 export interface PaymentMethodActionPayload {
   errors: BaseError[]
   paymentMethods: PaymentMethodCollection[]
+  currentPaymentMethodType: PaymentResource
   currentPaymentMethodId: string
   config: PaymentMethodConfig
-  paymentSource: PaymentSourceCollection
+  paymentSource: PaymentSourceTypes
 }
 
 export type PaymentMethodState = Partial<PaymentMethodActionPayload>
@@ -86,11 +86,16 @@ export const getPaymentMethods: GetPaymentMethods = async ({
       ?.withCredentials(config)
       // @ts-ignore
       .loadPaymentMethod()
+    const paymentSource: any = await Order.withCredentials(config)
+      .includes('paymentSource')
+      .find(order.id)
     dispatch({
       type: 'setPaymentMethods',
       payload: {
         ...payload,
         currentPaymentMethodId: paymentMethod?.id,
+        currentPaymentMethodType: paymentMethod?.paymentSourceType as PaymentResource,
+        paymentSource: paymentSource.paymentSource(),
       },
     })
   } catch (error) {
@@ -136,7 +141,6 @@ export const setPaymentMethod: SetPaymentMethod = async ({
   dispatch,
   order,
   paymentMethodId,
-  // paymentResource,
 }) => {
   try {
     if (config && order) {
@@ -150,28 +154,21 @@ export const setPaymentMethod: SetPaymentMethod = async ({
         id: order.id,
         paymentMethod,
       })
-      debugger
       // @ts-ignore
       await patchOrder.withCredentials(config).save()
-      // await order.withCredentials(config).update({ paymentMethod })
-      // const resource = startCase(paymentResource)
-      //   .replace('Payments', 'Payment')
-      //   .replace('Transfers', 'Transfer')
-      //   .replace(' ', '') as SDKResource
-      // const payment = await CLayer[resource].withCredentials(config).create({
-      //   order,
-      // })
-      // console.log('payment', payment)
-      // getOrder && (await getOrder(order?.id))
     }
   } catch (error) {
     console.error(error)
   }
 }
 
+type PaymentSourceTypes =
+  | (StripePaymentCollection & WireTransferCollection)
+  | (StripePaymentCollection | WireTransferCollection)
+
 export type SetPaymentSourceResponse = {
   order: OrderCollection
-  paymentSource: StripePaymentCollection | WireTransferCollection
+  paymentSource: PaymentSourceTypes
 } | null
 
 export type SetPaymentSource = (args: {
@@ -189,6 +186,7 @@ export const setPaymentSource: SetPaymentSource = async ({
   order,
   options = {},
   paymentResource,
+  getOrder,
 }) => {
   try {
     if (config && order) {
@@ -202,12 +200,11 @@ export const setPaymentSource: SetPaymentSource = async ({
           order: o,
         })
       if (order?.billingAddress() === null)
-        // @ts-ignore
         await order.withCredentials(config).loadBillingAddress()
       if (order?.paymentSource() === null)
         // @ts-ignore
         await order.withCredentials(config).loadPaymentSource()
-      // getOrder && (await getOrder(order?.id))
+      if (getOrder) order = (await getOrder(order?.id)) as OrderCollection
       dispatch &&
         dispatch({
           type: 'setPaymentSource',

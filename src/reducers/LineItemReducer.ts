@@ -85,7 +85,7 @@ export const getLineItems: GetLineItems = (params) => {
             lineItems: allLineItems,
           },
         })
-        let colResp = res
+        let colResp: any = res
         const pageCount = res.pageCount()
         if (colResp.hasNextPage() && pageCount) {
           for (let index = 1; index < pageCount; index++) {

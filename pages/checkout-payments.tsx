@@ -11,13 +11,16 @@ import {
   PaymentMethodRadioButton,
   PaymentMethodsContainer,
   PaymentSource,
+  PaymentSourceBrandIcon,
+  PaymentSourceBrandName,
+  PaymentSourceDetail,
   PlaceOrderButton,
   PlaceOrderContainer,
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
-const orderId = 'AqQgYhvvkw'
+const orderId = 'PDerhJplRp'
 
 export default function Main() {
   const [token, setToken] = useState('')
@@ -112,6 +115,22 @@ export default function Main() {
                 />
               </div>
             </PlaceOrderContainer>
+            <PaymentMethodsContainer>
+              <PaymentSource readonly>
+                <div className="flex flex-row items-center bg-gray-100 p-5 my-10">
+                  <div className="flex flex-row items-center w-1/2">
+                    <PaymentSourceBrandIcon className="mr-3" />
+                    <PaymentSourceBrandName className="mr-1" />
+                    ending in
+                    <PaymentSourceDetail className="ml-1" type="last4" />
+                  </div>
+                  <div className="text-gray-500">
+                    <PaymentSourceDetail type="expMonth" />/
+                    <PaymentSourceDetail type="expYear" />
+                  </div>
+                </div>
+              </PaymentSource>
+            </PaymentMethodsContainer>
           </OrderContainer>
           <div className="mt-5">
             <pre data-cy="current-shipping-method">{`Current payment source options: ${JSON.stringify(

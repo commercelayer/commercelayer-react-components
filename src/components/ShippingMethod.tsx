@@ -47,12 +47,6 @@ const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
             currentShippingMethodId === shippingMethod.id
               ? deliveryLeadTime
               : shippingMethod.deliveryLeadTimeForShipment()
-          console.log(
-            'object',
-            deliveryLeadTimeForShipment,
-            shippingMethod.id,
-            currentShippingMethodId
-          )
           const shippingProps = {
             shippingMethod,
             currentShippingMethodId,

@@ -19,7 +19,7 @@ export interface GetOrderParams {
 }
 
 export interface GetOrder {
-  (params: GetOrderParams): void
+  (params: GetOrderParams): Promise<void | OrderCollection>
 }
 
 export interface SetOrderErrors {
@@ -100,7 +100,9 @@ export type AddToCartValues = {
 
 export type AddToCartImportValues = Pick<AddToCartImportParams, 'lineItems'>
 
-export type getOrderContext = (id: string) => void
+export type getOrderContext = (
+  id: string
+) => Promise<undefined | OrderCollection>
 
 export interface OrderState extends OrderPayload {
   loading: boolean
@@ -188,9 +190,7 @@ export const getApiOrder: GetOrder = async (params) => {
     deleteLocalOrder,
   } = params
   try {
-    const o = await Order.withCredentials(config)
-      // .includes('billingAddress', 'shippingAddress')
-      .find(id)
+    const o = await Order.withCredentials(config).find(id)
     if (o)
       if (
         (clearWhenPlaced && o.status === 'placed') ||
@@ -213,6 +213,7 @@ export const getApiOrder: GetOrder = async (params) => {
           },
         })
       }
+    return o
   } catch (col) {
     persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
     dispatch({
@@ -222,6 +223,7 @@ export const getApiOrder: GetOrder = async (params) => {
         orderId: '',
       },
     })
+    return
   }
 }
 

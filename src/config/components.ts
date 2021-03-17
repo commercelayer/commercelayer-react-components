@@ -18,6 +18,7 @@ import { ErrorPropTypes } from '#typings/errors'
 import { BaseInputComponentPropTypes } from '#typings/index'
 import { DeliveryLeadTimeField } from '../components/DeliveryLeadTime'
 import { StockTransferFieldType } from '#components/StockTransferField'
+import { PaymentSourceDetailType } from '#components/PaymentSourceDetail'
 
 const components = {
   Address: {
@@ -538,7 +539,7 @@ const components = {
   },
   PaymentMethodsContainer: {
     displayName: 'PaymentMethodsContainer',
-    permittedChildren: ['PaymentMethod', 'ReactNode'],
+    permittedChildren: ['PaymentMethod', 'PaymentSource', 'ReactNode'],
     propTypes: {
       children: childrenTypes.isRequired,
     },
@@ -546,7 +547,21 @@ const components = {
   PaymentSource: {
     displayName: 'PaymentSource',
     propTypes: {
-      children: PropTypes.func,
+      children: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
+      readonly: PropTypes.bool,
+    },
+  },
+  PaymentSourceBrandIcon: {
+    displayName: 'PaymentSourceBrandIcon',
+  },
+  PaymentSourceDetail: {
+    displayName: 'PaymentSourceDetail',
+    propTypes: {
+      type: PropTypes.oneOf<PaymentSourceDetailType>([
+        'last4',
+        'expYear',
+        'expMonth',
+      ]).isRequired,
     },
   },
   PlaceOrderButton: {

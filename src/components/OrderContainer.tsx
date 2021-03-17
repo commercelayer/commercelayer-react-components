@@ -75,7 +75,8 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
   const orderValue = {
     ...state,
     setOrder: (order: OrderCollection) => setOrder(order, dispatch),
-    getOrder: (id: string): void => getApiOrder({ id, dispatch, config }),
+    getOrder: (id: string): Promise<void | OrderCollection> =>
+      getApiOrder({ id, dispatch, config }),
     setOrderErrors: (collection: any) =>
       setOrderErrors({ dispatch, collection }),
     createOrder: async (): Promise<string> =>
