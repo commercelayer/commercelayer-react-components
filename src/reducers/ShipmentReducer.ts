@@ -2,6 +2,7 @@ import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
 import {
+  DeliveryLeadTimeCollection,
   OrderCollection,
   Shipment,
   ShipmentCollection,
@@ -18,6 +19,7 @@ export type ShipmentActionType =
 export interface ShipmentActionPayload {
   errors: BaseError[]
   shipments: ShipmentCollection[]
+  deliveryLeadTimes: DeliveryLeadTimeCollection[]
 }
 
 export type ShipmentState = Partial<ShipmentActionPayload>
@@ -61,7 +63,6 @@ export const getShipments: GetShipments = async ({
       .withCredentials(config)
       .shipments()
       ?.includes(
-        'availableShippingMethods',
         'availableShippingMethods.deliveryLeadTimeForShipment',
         'shipmentLineItems',
         'shipmentLineItems.lineItem',
@@ -99,11 +100,12 @@ export const setShippingMethod: SetShippingMethod = async ({
       const shipment = await Shipment.withCredentials(config)
         .includes(
           'availableShippingMethods',
-          'availableShippingMethods.deliveryLeadTimeForShipment',
+          'availableShippingMethods',
           'shipmentLineItems',
           'shipmentLineItems.lineItem',
           'stockTransfers',
-          'shippingMethod'
+          'shippingMethod',
+          'deliveryLeadTime'
         )
         .find(shipmentId)
       const shippingMethod = ShippingMethod.build({ id: shippingMethodId })

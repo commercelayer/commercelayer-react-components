@@ -14,25 +14,35 @@ import {
   PaymentResource,
 } from '#reducers/PaymentMethodReducer'
 import StripePayment from './StripePayment'
+import PaymentSourceContext from '#context/PaymentSourceContext'
 
 const propTypes = components.PaymentSource.propTypes
 const displayName = components.PaymentSource.displayName
 
 type PaymentMethodNameChildrenProps = Omit<PaymentMethodNameProps, 'children'>
 
+type CustomComponent = (props: PaymentMethodNameChildrenProps) => ReactNode
+
 type PaymentMethodNameProps = {
-  children?: (props: PaymentMethodNameChildrenProps) => ReactNode
+  children?: CustomComponent | ReactNode
+  readonly?: boolean
 } & JSX.IntrinsicElements['div']
 
 const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
-  const { children, ...p } = props
+  const { children, readonly = false, ...p } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
-  const { currentPaymentMethodId, config } = useContext(PaymentMethodContext)
+  const {
+    currentPaymentMethodId,
+    config,
+    paymentSource,
+    currentPaymentMethodType,
+  } = useContext(PaymentMethodContext)
   const [show, setShow] = useState(false)
   const parentProps = {
     currentPaymentMethodId,
     payment,
     config,
+    readonly,
     ...props,
   }
   useEffect(() => {
@@ -41,9 +51,21 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
     return () => setShow(false)
   }, [currentPaymentMethodId])
   const PaymentGateway = () => {
-    const paymentResource = payment?.paymentSourceType as PaymentResource
+    const paymentResource = readonly
+      ? currentPaymentMethodType
+      : (payment?.paymentSourceType as PaymentResource)
     switch (paymentResource) {
       case 'stripe_payments':
+        if (readonly) {
+          // @ts-ignore
+          const card = paymentSource?.options?.card as Record<string, any>
+          const value = { ...card }
+          return (
+            <PaymentSourceContext.Provider value={value}>
+              {children}
+            </PaymentSourceContext.Provider>
+          )
+        }
         const stripeConfig = config
           ? getPaymentConfig(paymentResource, config)
           : null
@@ -54,8 +76,8 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
         return null
     }
   }
-  return children ? (
-    <Parent {...parentProps}>{children}</Parent>
+  return children && !readonly ? (
+    <Parent {...parentProps}>{children as CustomComponent}</Parent>
   ) : (
     <PaymentGateway />
   )

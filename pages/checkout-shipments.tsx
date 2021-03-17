@@ -20,11 +20,11 @@ import {
   StockTransferField,
   DeliveryLeadTime,
 } from '@commercelayer/react-components'
-import { Order } from '@commercelayer/js-sdk'
+import { Customer, Order } from '@commercelayer/js-sdk'
 import { isEmpty } from 'lodash'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
-const orderId = 'AqQgYhvvkw'
+const orderId = 'PDerhJplRp'
 
 export default function Main() {
   const [token, setToken] = useState('')
@@ -41,7 +41,6 @@ export default function Main() {
     if (!isEmpty(shipments) && shipments) {
       const name = shipments.first()?.shippingMethod()?.name
       const id = shipments.first()?.shippingMethod()?.id as string
-      console.log('shipping method name', name)
       setShippingMethodName(name as string)
       setShippingMethodId(id)
     }
@@ -133,7 +132,7 @@ export default function Main() {
                 </ShippingMethod>
               </Shipment>
             </ShipmentsContainer>
-            <div className="mt-10">
+            {/* <div className="mt-10">
               <ShipmentsContainer>
                 <div>Shipments Recap</div>
                 <Shipment>
@@ -152,7 +151,7 @@ export default function Main() {
                   </div>
                 </Shipment>
               </ShipmentsContainer>
-            </div>
+            </div> */}
           </OrderContainer>
           <div className="mt-5">
             <pre data-cy="current-shipping-method">{`Current shipping method: ${JSON.stringify(
