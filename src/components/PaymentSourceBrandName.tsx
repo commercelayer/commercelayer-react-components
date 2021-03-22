@@ -3,6 +3,10 @@ import { capitalize } from 'lodash'
 import React, { FunctionComponent, useContext } from 'react'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings'
+import components from '#config/components'
+
+const propTypes = components.PaymentSourceBrandName.propTypes
+const displayName = components.PaymentSourceBrandName.displayName
 
 type CustomComponent = FunctionChildren<
   Omit<Props & { brand: iconBrand }, 'children'>
@@ -10,21 +14,27 @@ type CustomComponent = FunctionChildren<
 
 type Props = {
   children?: CustomComponent
+  label?: string
 } & JSX.IntrinsicElements['span']
-const PaymentSourceBrandIcon: FunctionComponent<Props> = ({
+const PaymentSourceBrandName: FunctionComponent<Props> = ({
   children,
+  label,
   ...props
 }) => {
   const { brand } = useContext(PaymentSourceContext)
   const parentProps = {
     brand,
+    label,
     ...props,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <span {...props}>{capitalize(brand)}</span>
+    <span {...props}>{label || capitalize(brand)}</span>
   )
 }
 
-export default PaymentSourceBrandIcon
+PaymentSourceBrandName.propTypes = propTypes
+PaymentSourceBrandName.displayName = displayName
+
+export default PaymentSourceBrandName

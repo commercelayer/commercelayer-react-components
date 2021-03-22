@@ -482,6 +482,7 @@ const components = {
       'GiftCardContainer',
       'ShipmentsContainer',
       'PaymentMethodsContainer',
+      'PaymentMethodAmount',
       'PlaceOrderContainer',
       'ReactNode',
     ],
@@ -518,6 +519,13 @@ const components = {
       children: childrenTypes.isRequired,
     },
   },
+  PaymentMethodAmount: {
+    displayName: 'PaymentMethodAmount',
+    propTypes: baseOrderComponentPricePropTypes,
+    defaultProps: {
+      format: 'formatted' as BaseFormatPrice,
+    },
+  },
   PaymentMethodName: {
     displayName: 'PaymentMethodName',
     propTypes: {
@@ -546,13 +554,41 @@ const components = {
   },
   PaymentSource: {
     displayName: 'PaymentSource',
+    permittedChildren: [
+      'PaymentSourceBrandIcon',
+      'PaymentSourceBrandName',
+      'PaymentSourceEditButton',
+      'PaymentSourceDetail',
+      'ReactNode',
+    ],
     propTypes: {
-      children: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
+      children: childrenTypes,
       readonly: PropTypes.bool,
     },
   },
   PaymentSourceBrandIcon: {
     displayName: 'PaymentSourceBrandIcon',
+    propTypes: {
+      children: PropTypes.func,
+      width: PropTypes.number,
+      height: PropTypes.number,
+      src: PropTypes.string,
+      className: PropTypes.string,
+    },
+  },
+  PaymentSourceBrandName: {
+    displayName: 'PaymentSourceBrandName',
+    propTypes: {
+      children: PropTypes.func,
+      label: PropTypes.string,
+    },
+  },
+  PaymentSourceEditButton: {
+    displayName: 'PaymentSourceEditButton',
+    propTypes: {
+      children: PropTypes.func,
+      label: PropTypes.string,
+    },
   },
   PaymentSourceDetail: {
     displayName: 'PaymentSourceDetail',
