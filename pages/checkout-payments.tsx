@@ -6,6 +6,7 @@ import {
   CommerceLayer,
   OrderContainer,
   PaymentMethod,
+  PaymentMethodAmount,
   PaymentMethodName,
   PaymentMethodPrice,
   PaymentMethodRadioButton,
@@ -14,6 +15,7 @@ import {
   PaymentSourceBrandIcon,
   PaymentSourceBrandName,
   PaymentSourceDetail,
+  PaymentSourceEditButton,
   PlaceOrderButton,
   PlaceOrderContainer,
 } from '@commercelayer/react-components'
@@ -93,7 +95,23 @@ export default function Main() {
                 <PaymentMethodRadioButton />
                 <PaymentMethodName />
                 <PaymentMethodPrice />
-                <PaymentSource className="p-5 my-2 bg-gray-50" />
+                <PaymentSource className="p-5 my-2 bg-gray-50">
+                  <div className="flex flex-row items-center justify-start bg-gray-100 p-5 my-10">
+                    <div className="flex flex-row items-center">
+                      <PaymentSourceBrandIcon className="mr-3" />
+                      <PaymentSourceBrandName className="mr-1" />
+                      ending in
+                      <PaymentSourceDetail className="ml-1" type="last4" />
+                    </div>
+                    <div className="text-gray-500 ml-5">
+                      <PaymentSourceDetail type="expMonth" />/
+                      <PaymentSourceDetail type="expYear" />
+                    </div>
+                    <div className="ml-5">
+                      <PaymentSourceEditButton className="text-blue-500 hover:underline hover:text-blue-600" />
+                    </div>
+                  </div>
+                </PaymentSource>
               </PaymentMethod>
             </PaymentMethodsContainer>
             <PlaceOrderContainer
@@ -117,20 +135,24 @@ export default function Main() {
             </PlaceOrderContainer>
             <PaymentMethodsContainer>
               <PaymentSource readonly>
-                <div className="flex flex-row items-center bg-gray-100 p-5 my-10">
-                  <div className="flex flex-row items-center w-1/2">
+                <div className="flex flex-row items-center bg-gray-100 p-5 my-10 w-full">
+                  <div className="flex flex-row items-center w-full">
                     <PaymentSourceBrandIcon className="mr-3" />
                     <PaymentSourceBrandName className="mr-1" />
                     ending in
                     <PaymentSourceDetail className="ml-1" type="last4" />
                   </div>
-                  <div className="text-gray-500">
+                  <div className="text-gray-500 w-full self-end">
                     <PaymentSourceDetail type="expMonth" />/
                     <PaymentSourceDetail type="expYear" />
+                  </div>
+                  <div>
+                    <PaymentSourceEditButton />
                   </div>
                 </div>
               </PaymentSource>
             </PaymentMethodsContainer>
+            <PaymentMethodAmount />
           </OrderContainer>
           <div className="mt-5">
             <pre data-cy="current-shipping-method">{`Current payment source options: ${JSON.stringify(

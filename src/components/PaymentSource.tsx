@@ -6,7 +6,6 @@ import React, {
   useEffect,
 } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
-import Parent from './utils/Parent'
 import components from '#config/components'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import {
@@ -15,16 +14,13 @@ import {
 } from '#reducers/PaymentMethodReducer'
 import StripePayment from './StripePayment'
 import PaymentSourceContext from '#context/PaymentSourceContext'
+import { isEmpty } from 'lodash'
 
 const propTypes = components.PaymentSource.propTypes
 const displayName = components.PaymentSource.displayName
 
-type PaymentMethodNameChildrenProps = Omit<PaymentMethodNameProps, 'children'>
-
-type CustomComponent = (props: PaymentMethodNameChildrenProps) => ReactNode
-
 type PaymentMethodNameProps = {
-  children?: CustomComponent | ReactNode
+  children?: ReactNode
   readonly?: boolean
 } & JSX.IntrinsicElements['div']
 
@@ -38,28 +34,27 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
     currentPaymentMethodType,
   } = useContext(PaymentMethodContext)
   const [show, setShow] = useState(false)
-  const parentProps = {
-    currentPaymentMethodId,
-    payment,
-    config,
-    readonly,
-    ...props,
-  }
+  const [showCard, setShowCard] = useState(false)
   useEffect(() => {
     if (payment?.id === currentPaymentMethodId) setShow(true)
     else setShow(false)
-    return () => setShow(false)
-  }, [currentPaymentMethodId])
+    if (!isEmpty(paymentSource)) setShowCard(true)
+    return () => {
+      setShow(false)
+      setShowCard(false)
+    }
+  }, [currentPaymentMethodId, paymentSource])
+  const handleEditClick = () => setShowCard(!showCard)
   const PaymentGateway = () => {
     const paymentResource = readonly
       ? currentPaymentMethodType
       : (payment?.paymentSourceType as PaymentResource)
     switch (paymentResource) {
       case 'stripe_payments':
-        if (readonly) {
+        if (readonly || showCard) {
           // @ts-ignore
           const card = paymentSource?.options?.card as Record<string, any>
-          const value = { ...card }
+          const value = { ...card, showCard, handleEditClick, readonly }
           return (
             <PaymentSourceContext.Provider value={value}>
               {children}
@@ -76,11 +71,7 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
         return null
     }
   }
-  return children && !readonly ? (
-    <Parent {...parentProps}>{children as CustomComponent}</Parent>
-  ) : (
-    <PaymentGateway />
-  )
+  return <PaymentGateway />
 }
 
 PaymentSource.propTypes = propTypes

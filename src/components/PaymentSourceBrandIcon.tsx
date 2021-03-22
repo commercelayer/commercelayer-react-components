@@ -2,6 +2,10 @@ import PaymentSourceContext, { iconBrand } from '#context/PaymentSourceContext'
 import React, { FunctionComponent, useContext, useRef } from 'react'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings'
+import components from '#config/components'
+
+const propTypes = components.PaymentSourceBrandIcon.propTypes
+const displayName = components.PaymentSourceBrandIcon.displayName
 
 type CustomComponent = FunctionChildren<
   Omit<
@@ -44,5 +48,8 @@ const PaymentSourceBrandIcon: FunctionComponent<Props> = ({
     <img ref={ref} src={url} onError={handleError} width={width} {...p} />
   )
 }
+
+PaymentSourceBrandIcon.propTypes = propTypes
+PaymentSourceBrandIcon.displayName = displayName
 
 export default PaymentSourceBrandIcon

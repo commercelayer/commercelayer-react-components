@@ -16,6 +16,9 @@ type DefaultContext = {
   expMonth?: number
   expYear?: number
   last4?: string
+  showCard?: boolean
+  readonly?: boolean
+  handleEditClick?: () => void
 }
 
 export const defaultPaymentSourceContext = {}
