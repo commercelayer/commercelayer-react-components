@@ -12,7 +12,7 @@ export interface InitialShipmentContext {
   shippingMethods?: ShippingMethodCollection[]
   currentShippingMethodId?: string
   stockTransfers?: StockTransferCollection[]
-  deliveryLeadTime?: DeliveryLeadTimeCollection | null
+  deliveryLeadTimes?: DeliveryLeadTimeCollection[] | null
   shipment?: ShipmentCollection
 }
 

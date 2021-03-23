@@ -17,7 +17,7 @@ type ShipmentProps = {
 }
 
 const Shipment: FunctionComponent<ShipmentProps> = ({ children }) => {
-  const { shipments } = useContext(ShipmentContext)
+  const { shipments, deliveryLeadTimes } = useContext(ShipmentContext)
   const components =
     shipments &&
     shipments.map((shipment, k) => {
@@ -27,19 +27,18 @@ const Shipment: FunctionComponent<ShipmentProps> = ({ children }) => {
         if (l) l.quantity = shipmentLineItem.quantity
         return l
       })
-      const deliveryLeadTime = shipment?.deliveryLeadTime
-        ? shipment?.deliveryLeadTime()
-        : null
       const shippingMethods = shipment.availableShippingMethods()?.toArray()
-      console.log(`shippingMethods`, shippingMethods)
       const currentShippingMethodId = shipment.shippingMethod()?.id
       const stockTransfers = shipment.stockTransfers()?.toArray()
+      const times = deliveryLeadTimes?.filter(
+        (time) => time.stockLocation()?.id === shipment.stockLocation()?.id
+      )
       const shipmentProps = {
         lineItems,
         shippingMethods,
         currentShippingMethodId,
         stockTransfers,
-        deliveryLeadTime,
+        deliveryLeadTimes: times,
         shipment,
       }
       return (

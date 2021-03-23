@@ -9,7 +9,7 @@ import React, {
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import components from '#config/components'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
-import { isEmpty } from 'lodash'
+import { first, isEmpty } from 'lodash'
 
 const propTypes = components.ShippingMethod.propTypes
 const displayName = components.ShippingMethod.displayName
@@ -29,7 +29,7 @@ const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
   const {
     shippingMethods,
     currentShippingMethodId,
-    deliveryLeadTime,
+    deliveryLeadTimes,
   } = useContext(ShipmentChildrenContext)
   const [items, setItems] = useState<JSX.Element[]>([])
   useEffect(() => {
@@ -42,11 +42,13 @@ const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
         })
         .map((shippingMethod, k) => {
           const deliveryLeadTimeForShipment =
-            !isEmpty(deliveryLeadTime) &&
-            deliveryLeadTime &&
-            currentShippingMethodId === shippingMethod.id
-              ? deliveryLeadTime
-              : shippingMethod.deliveryLeadTimeForShipment()
+            deliveryLeadTimes &&
+            first(
+              deliveryLeadTimes.filter((delivery) => {
+                const deliveryShippingMethodId = delivery.shippingMethod()?.id
+                return shippingMethod.id === deliveryShippingMethodId
+              })
+            )
           const shippingProps = {
             shippingMethod,
             currentShippingMethodId,
@@ -62,7 +64,7 @@ const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
           )
         })
     if (methods) setItems(methods)
-  }, [currentShippingMethodId, deliveryLeadTime, shippingMethods])
+  }, [currentShippingMethodId, deliveryLeadTimes, shippingMethods])
   const components = (!isEmpty(items) && items) || emptyText
   return <Fragment>{components}</Fragment>
 }
