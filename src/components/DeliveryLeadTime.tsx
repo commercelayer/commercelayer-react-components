@@ -1,4 +1,10 @@
-import React, { FunctionComponent, useContext, ReactNode } from 'react'
+import React, {
+  FunctionComponent,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
@@ -28,10 +34,17 @@ const DeliveryLeadTime: FunctionComponent<ShippingMethodPriceProps> = (
   props
 ) => {
   const { type, ...p } = props
+  const [text, setText] = useState<string | number>()
   const { deliveryLeadTimeForShipment } = useContext(
     ShippingMethodChildrenContext
   )
-  const text = deliveryLeadTimeForShipment && deliveryLeadTimeForShipment[type]
+  useEffect(() => {
+    if (deliveryLeadTimeForShipment && deliveryLeadTimeForShipment[type])
+      setText(deliveryLeadTimeForShipment[type])
+    return () => {
+      setText('')
+    }
+  }, [deliveryLeadTimeForShipment])
   const parentProps = {
     text,
     ...p,

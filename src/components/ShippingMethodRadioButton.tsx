@@ -33,7 +33,6 @@ const ShippingMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProp
   const name = `shipment-${shipmentId}`
   const checked = shippingMethod.id === currentShippingMethodId
   const handleOnChange = async () => {
-    console.log('shippingMethodId', shippingMethodId)
     await setShippingMethod(shipmentId, shippingMethodId)
     onChange && onChange(shippingMethod)
   }

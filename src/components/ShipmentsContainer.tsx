@@ -17,6 +17,7 @@ import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
 import { BaseError } from '#typings/errors'
+import { isEmpty } from 'lodash'
 
 const propTypes = components.ShipmentsContainer.propTypes
 const displayName = components.ShipmentsContainer.displayName
@@ -33,7 +34,7 @@ const ShipmentsContainer: FunctionComponent<ShipmentsContainerProps> = (
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     // TODO: Get shipments
-    if (order) {
+    if (order && !isEmpty(config)) {
       getShipments({ order, dispatch, config })
     }
   }, [order])

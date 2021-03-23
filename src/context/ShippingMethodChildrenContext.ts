@@ -6,7 +6,7 @@ import {
 
 export interface InitialShippingMethodContext {
   shippingMethod: ShippingMethodCollection | Record<string, string>
-  deliveryLeadTimeForShipment:
+  deliveryLeadTimeForShipment?:
     | DeliveryLeadTimeCollection
     | Record<string, string>
     | null

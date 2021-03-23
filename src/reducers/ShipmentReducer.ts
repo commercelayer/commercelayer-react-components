@@ -2,6 +2,7 @@ import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
 import {
+  DeliveryLeadTime,
   DeliveryLeadTimeCollection,
   OrderCollection,
   Shipment,
@@ -59,21 +60,28 @@ export const getShipments: GetShipments = async ({
   config,
 }) => {
   try {
-    const shipments = await order
-      .withCredentials(config)
-      .shipments()
-      ?.includes(
-        'availableShippingMethods.deliveryLeadTimeForShipment',
-        'shipmentLineItems',
-        'shipmentLineItems.lineItem',
-        'deliveryLeadTime',
-        'stockTransfers',
-        'shippingMethod'
-      )
-      .load()
+    const shipments = (
+      await order
+        .withCredentials(config)
+        .shipments()
+        ?.includes(
+          'availableShippingMethods',
+          'shipmentLineItems',
+          'shipmentLineItems.lineItem',
+          'stockTransfers',
+          'shippingMethod',
+          'stockLocation'
+        )
+        .load()
+    )?.toArray()
+    const deliveryLeadTimes = (
+      await DeliveryLeadTime.withCredentials(config)
+        .includes('shippingMethod', 'stockLocation')
+        .all()
+    ).toArray()
     dispatch({
       type: 'setShipments',
-      payload: { shipments: shipments?.toArray() },
+      payload: { shipments, deliveryLeadTimes },
     })
   } catch (error) {
     console.error(error)
