@@ -107,13 +107,15 @@ export type getOrderContext = (
 export interface OrderState extends OrderPayload {
   loading: boolean
   orderId: string
-  order: OrderCollection | undefined
+  order?: OrderCollection
   saveBillingAddressToCustomerBook: boolean
   saveShippingAddressToCustomerBook: boolean
   getOrder?: getOrderContext
   createOrder?: () => Promise<string>
   addToCart: (values: AddToCartValues) => AddToCartReturn
   setOrderErrors: (collection: any) => { success: boolean }
+  setGiftCardOrCouponCode: SetGiftCardOrCouponCode
+  removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode
   saveAddressToCustomerBook: (
     type: 'BillingAddress' | 'ShippingAddress',
     value: boolean
@@ -135,6 +137,7 @@ export type OrderActionType =
   | 'setCurrentItem'
   | 'setErrors'
   | 'setSaveAddressToCustomerBook'
+  | 'setGiftCardOrCouponCode'
 
 const actionType: OrderActionType[] = [
   'setLoading',
@@ -352,6 +355,79 @@ export const saveAddressToCustomerBook: SaveAddressToCustomerBook = ({
       [`save${type}ToCustomerBook`]: value,
     },
   })
+}
+
+type SetGiftCardOrCouponCode = (args: {
+  code: string
+  dispatch?: Dispatch<OrderActions>
+  config?: CommerceLayerConfig
+  order?: OrderCollection
+}) => Promise<{ success: boolean }>
+
+export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
+  code,
+  dispatch,
+  config,
+  order,
+}) => {
+  try {
+    if (config && order && code && dispatch) {
+      const o = await order.withCredentials(config).update({
+        giftCardOrCouponCode: code,
+      })
+      if (!o.errors().empty()) throw o
+      dispatch({
+        type: 'setErrors',
+        payload: {
+          errors: [],
+        },
+      })
+      getApiOrder({ id: order.id, config, dispatch })
+      return { success: true }
+    }
+    return { success: false }
+  } catch (e) {
+    dispatch && setOrderErrors({ collection: e, dispatch })
+    return { success: false }
+  }
+}
+
+export type CodeType = 'coupon' | 'giftCard'
+export type OrderCodeType = `${CodeType}Code`
+
+type RemoveGiftCardOrCouponCode = (args: {
+  codeType: OrderCodeType
+  dispatch?: Dispatch<OrderActions>
+  config?: CommerceLayerConfig
+  order?: OrderCollection
+}) => Promise<{ success: boolean }>
+
+export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
+  codeType,
+  dispatch,
+  config,
+  order,
+}) => {
+  try {
+    if (config && order && dispatch) {
+      const o = await order.withCredentials(config).update({
+        [codeType]: '',
+      })
+      if (!o.errors().empty()) throw o
+      dispatch({
+        type: 'setErrors',
+        payload: {
+          errors: [],
+        },
+      })
+      getApiOrder({ id: order.id, config, dispatch })
+      return { success: true }
+    }
+    return { success: false }
+  } catch (e) {
+    dispatch && setOrderErrors({ collection: e, dispatch })
+    return { success: false }
+  }
 }
 
 export const orderInitialState: Partial<OrderState> = {

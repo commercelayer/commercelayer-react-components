@@ -44,6 +44,7 @@ export type ResourceErrorType =
   | 'billingAddress'
   | 'shippingAddress'
   | 'address'
+  | 'giftCardOrCouponCode'
 
 const CEType: CodeErrorType[] = [
   'EMPTY_ERROR',

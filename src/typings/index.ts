@@ -78,7 +78,7 @@ type BaseInputChildrenComponentProps = Omit<
 }
 
 export interface BaseInputComponentProps {
-  ref?: RefObject<any>
+  ref?: () => RefObject<any>
   children?: (props: BaseInputChildrenComponentProps) => ReactNode
   name: string
   onChange?: (

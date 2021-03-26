@@ -9,6 +9,7 @@ import orderReducer, {
   orderInitialState,
   AddToCartValues,
   createOrder,
+  removeGiftCardOrCouponCode,
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext from '#context/OrderContext'
@@ -25,6 +26,10 @@ import components from '#config/components'
 import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
 import { OrderCollection } from '@commercelayer/js-sdk'
+import {
+  setGiftCardOrCouponCode,
+  OrderCodeType,
+} from '../reducers/OrderReducer'
 
 const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps
@@ -104,6 +109,15 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
       type: 'BillingAddress' | 'ShippingAddress',
       value: boolean
     ) => saveAddressToCustomerBook({ type, value, dispatch }),
+    setGiftCardOrCouponCode: ({ code }: { code: string }) =>
+      setGiftCardOrCouponCode({ code, dispatch, order: state.order, config }),
+    removeGiftCardOrCouponCode: ({ codeType }: { codeType: OrderCodeType }) =>
+      removeGiftCardOrCouponCode({
+        codeType,
+        dispatch,
+        order: state.order,
+        config,
+      }),
   }
   return (
     <OrderContext.Provider value={orderValue as OrderState}>
