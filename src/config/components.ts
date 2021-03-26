@@ -19,6 +19,7 @@ import { BaseInputComponentPropTypes } from '#typings/index'
 import { DeliveryLeadTimeField } from '../components/DeliveryLeadTime'
 import { StockTransferFieldType } from '#components/StockTransferField'
 import { PaymentSourceDetailType } from '#components/PaymentSourceDetail'
+import { CodeType } from '#reducers/OrderReducer'
 
 const components = {
   Address: {
@@ -321,6 +322,47 @@ const components = {
       placeholder: PropTypes.string,
     },
   },
+  GiftCardOrCouponForm: {
+    permittedChildren: [
+      'GiftCardOrCouponInput',
+      'GiftCardOrCouponSubmit',
+      'ReactNode',
+    ],
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
+  GiftCardOrCouponInput: {
+    displayName: 'GiftCardOrCouponInput',
+    propTypes: {
+      children: PropTypes.func,
+      placeholder: PropTypes.string,
+      disabled: PropTypes.bool,
+      required: PropTypes.bool,
+    },
+  },
+  GiftCardOrCouponSubmit: {
+    displayName: 'GiftCardOrCouponSubmit',
+    propTypes: {
+      children: PropTypes.func,
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    },
+  },
+  GiftCardOrCouponCode: {
+    displayName: 'GiftCardOrCouponCode',
+    propTypes: {
+      children: PropTypes.func,
+      type: PropTypes.oneOf<CodeType>(['coupon', 'giftCard']).isRequired,
+    },
+  },
+  GiftCardOrCouponRemoveButton: {
+    displayName: 'GiftCardOrCouponRemoveButton',
+    propTypes: {
+      children: PropTypes.func,
+      type: PropTypes.oneOf<CodeType>(['coupon', 'giftCard']).isRequired,
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    },
+  },
   ItemContainer: {
     permittedChildren: [
       'PricesContainer',
@@ -484,6 +526,10 @@ const components = {
       'PaymentMethodsContainer',
       'PaymentMethodAmount',
       'PlaceOrderContainer',
+      'GiftCardOrCouponForm',
+      'GiftCardOrCouponCode',
+      'GiftCardOrCouponRemoveButton',
+      'Errors',
       'ReactNode',
     ],
     displayName: 'OrderContainer',
