@@ -16,6 +16,7 @@ export type PlaceOrderOptions = {
   }
   saveBillingAddressToCustomerBook?: boolean
   saveShippingAddressToCustomerBook?: boolean
+  savePaymentSourceToCustomerWallet?: boolean
 }
 
 export interface PlaceOrderActionPayload {
@@ -145,11 +146,14 @@ export const setPlaceOrder: SetPlaceOrder = async ({
                 _place: true,
               }
               if (options?.saveBillingAddressToCustomerBook)
-                updateAttributes._save_billing_address_to_customer_address_book =
+                updateAttributes._saveBillingAddressToCustomerAddressBook =
                   options?.saveBillingAddressToCustomerBook
               if (options?.saveShippingAddressToCustomerBook)
-                updateAttributes._save_shipping_address_to_customer_address_book =
+                updateAttributes._saveShippingAddressToCustomerAddressBook =
                   options?.saveShippingAddressToCustomerBook
+              if (options?.savePaymentSourceToCustomerWallet)
+                updateAttributes._savePaymentSourceToCustomerWallet =
+                  options?.savePaymentSourceToCustomerWallet
               const o = await Order.withCredentials(config).find(order.id)
               await o.withCredentials(config).update(updateAttributes)
               return {

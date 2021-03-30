@@ -124,10 +124,12 @@ export default function Main() {
                     </div>
                     {/* <input type="text" name="email" id="email"  placeholder="John Doe"> */}
                     <GiftCardOrCouponInput
+                      data-cy="code-input"
                       className={`${classError} focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md pl-10 sm:text-sm border-gray-300`}
                     />
                   </div>
                   <GiftCardOrCouponSubmit
+                    data-cy="code-submit"
                     label={labelButton}
                     className={`${classError} -ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500`}
                   />
@@ -135,6 +137,7 @@ export default function Main() {
               </div>
             </GiftCardOrCouponForm>
             <Errors
+              data-cy="code-error"
               className={classError}
               resource="order"
               field="giftCardOrCouponCode"
@@ -151,9 +154,10 @@ export default function Main() {
                   const { hide, code, ...p } = props
                   return hide ? null : (
                     <Fragment>
-                      <span {...p}>
+                      <span data-cy="code-label" {...p}>
                         {code}
                         <GiftCardOrCouponRemoveButton
+                          data-cy="code-remove"
                           type="coupon"
                           className="flex-shrink-0 ml-0.5 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none focus:bg-indigo-500 focus:text-white"
                           label={removeIcon}
