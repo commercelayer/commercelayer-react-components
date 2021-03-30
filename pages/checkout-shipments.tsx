@@ -22,14 +22,19 @@ import {
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 import { isEmpty } from 'lodash'
+import { useRouter } from 'next/router'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
-const orderId = 'PDerhJplRp'
+let orderId = 'PDerhJplRp'
 
 export default function Main() {
   const [token, setToken] = useState('')
   const [shippingMethodName, setShippingMethodName] = useState('')
   const [shippingMethodId, setShippingMethodId] = useState<string>('')
+  const { query } = useRouter()
+  if (query.orderId) {
+    orderId = query.orderId as string
+  }
   const getOrder = async () => {
     const config = { accessToken: token, endpoint }
     const order = await Order.withCredentials(config).find(orderId)

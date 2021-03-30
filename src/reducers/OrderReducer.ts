@@ -372,9 +372,11 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
 }) => {
   try {
     if (config && order && code && dispatch) {
-      const o = await order.withCredentials(config).update({
-        giftCardOrCouponCode: code,
-      })
+      const o = await (await Order.withCredentials(config).find(order.id))
+        .withCredentials(config)
+        .update({
+          giftCardOrCouponCode: code,
+        })
       if (!o.errors().empty()) throw o
       dispatch({
         type: 'setErrors',
@@ -410,9 +412,11 @@ export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
 }) => {
   try {
     if (config && order && dispatch) {
-      const o = await order.withCredentials(config).update({
-        [codeType]: '',
-      })
+      const o = await (await Order.withCredentials(config).find(order.id))
+        .withCredentials(config)
+        .update({
+          [codeType]: '',
+        })
       if (!o.errors().empty()) throw o
       dispatch({
         type: 'setErrors',

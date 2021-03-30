@@ -22,7 +22,7 @@ import { Order, Address as AddressResource } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
-const orderId = 'PDerhJplRp'
+let orderId = 'PDerhJplRp'
 
 const NestedInput = ({ value }: any) => {
   return (
@@ -46,6 +46,9 @@ export default function Main() {
   const [billingAddress, setBillingAddress] = useState({})
   const [shippingAddress, setShippingAddress] = useState({})
   const { query, pathname, push } = useRouter()
+  if (query.orderId) {
+    orderId = query.orderId as string
+  }
   useEffect(() => {
     const getToken = async () => {
       // @ts-ignore
