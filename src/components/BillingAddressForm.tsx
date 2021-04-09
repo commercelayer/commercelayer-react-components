@@ -14,6 +14,7 @@ import { AddressField } from '#reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
+import OrderStorageContext from '#context/OrderStorageContext'
 
 const propTypes = components.BillingAddressForm.propTypes
 
@@ -28,7 +29,8 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
   const { children, autoComplete = 'on', reset = false, ...p } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
-  const { saveAddressToCustomerBook } = useContext(OrderContext)
+  const { saveAddressToCustomerAddressBook } = useContext(OrderContext)
+  const { setLocalOrder } = useContext(OrderStorageContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
     if (!isEmpty(errors)) {
@@ -53,14 +55,18 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
         }
         if (field?.type === 'checkbox') {
           delete values[name]
-          saveAddressToCustomerBook('BillingAddress', field.checked)
+          saveAddressToCustomerAddressBook('BillingAddress', field.checked)
+          setLocalOrder(
+            'saveBillingAddressToCustomerAddressBook',
+            field.checked
+          )
         }
       }
       setAddress({ values, resource: 'billingAddress' })
     }
     if (reset && (!isEmpty(values) || !isEmpty(errors))) {
-      saveAddressToCustomerBook &&
-        saveAddressToCustomerBook('BillingAddress', false)
+      saveAddressToCustomerAddressBook &&
+        saveAddressToCustomerAddressBook('BillingAddress', false)
       if (ref) {
         // debugger
         ref.current?.reset()

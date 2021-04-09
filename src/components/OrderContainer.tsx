@@ -18,7 +18,7 @@ import {
   addToCart,
   OrderState,
   setOrderErrors,
-  saveAddressToCustomerBook,
+  saveAddressToCustomerAddressBook,
   setOrder,
 } from '#reducers/OrderReducer'
 import { unsetOrderState } from '#reducers/OrderReducer'
@@ -105,10 +105,10 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
         orderAttributes: attributes,
         setLocalOrder,
       }),
-    saveAddressToCustomerBook: (
+    saveAddressToCustomerAddressBook: (
       type: 'BillingAddress' | 'ShippingAddress',
       value: boolean
-    ) => saveAddressToCustomerBook({ type, value, dispatch }),
+    ) => saveAddressToCustomerAddressBook({ type, value, dispatch }),
     setGiftCardOrCouponCode: ({ code }: { code: string }) =>
       setGiftCardOrCouponCode({ code, dispatch, order: state.order, config }),
     removeGiftCardOrCouponCode: ({ codeType }: { codeType: OrderCodeType }) =>

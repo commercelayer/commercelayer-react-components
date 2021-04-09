@@ -5,6 +5,7 @@ import components from '#config/components'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { PaymentMethodCollection } from '@commercelayer/js-sdk'
 import { PaymentResource } from '../reducers/PaymentMethodReducer'
+import OrderContext from '#context/OrderContext'
 
 const propTypes = components.PaymentMethodRadioButton.propTypes
 const displayName = components.PaymentMethodRadioButton.displayName
@@ -24,11 +25,11 @@ const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps
 ) => {
   const { onChange, ...p } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
+  const { order } = useContext(OrderContext)
   const { setPaymentMethod, currentPaymentMethodId } = useContext(
     PaymentMethodContext
   )
-  // @ts-ignore
-  const orderId = payment.orderId || ''
+  const orderId = order?.id || ''
   const paymentResource = payment?.paymentSourceType as PaymentResource
   const paymentMethodId = payment?.id as string
   const name = `payment-${orderId}`

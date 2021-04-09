@@ -4,6 +4,7 @@ import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import OrderContext from '#context/OrderContext'
 import { CodeType, OrderCodeType } from '#reducers/OrderReducer'
+import { has, isEmpty } from 'lodash'
 
 const propTypes = components.GiftCardOrCouponRemoveButton.propTypes
 const displayName = components.GiftCardOrCouponRemoveButton.displayName
@@ -17,7 +18,7 @@ type GiftCardOrCouponRemoveButtonChildrenProps = FunctionChildren<
 >
 
 type GiftCardOrCouponRemoveButtonProps = {
-  type: CodeType
+  type?: CodeType
   children?: GiftCardOrCouponRemoveButtonChildrenProps
   label?: string | ReactNode
 } & Omit<JSX.IntrinsicElements['button'], 'type'>
@@ -27,8 +28,12 @@ const GiftCardOrCouponRemoveButton: FunctionComponent<GiftCardOrCouponRemoveButt
 ) => {
   const { children, label = 'Remove', onClick, type, ...p } = props
   const { order, removeGiftCardOrCouponCode } = useContext(OrderContext)
-  const codeType = `${type}Code` as OrderCodeType
-  const hide = order && order[codeType] ? false : true
+  let codeType = `${type}Code` as OrderCodeType
+  if (!type && order && has(order, 'couponCode') && !isEmpty(order.couponCode))
+    codeType = 'couponCode'
+  else if (!type) codeType = 'giftCardCode'
+  const code = order && codeType ? order[codeType] : ''
+  const hide = order && code ? false : true
   const handleClick = () => {
     removeGiftCardOrCouponCode && removeGiftCardOrCouponCode({ codeType })
   }

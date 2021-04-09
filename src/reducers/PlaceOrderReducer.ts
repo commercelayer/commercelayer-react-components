@@ -7,6 +7,7 @@ import { isEmpty } from 'lodash'
 import { shipmentsFilled } from '../utils/shipments'
 import { PaymentResource } from './PaymentMethodReducer'
 import { loadStripe } from '@stripe/stripe-js'
+import { getLocalOrder } from '../utils/localStorage'
 
 export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted'
 
@@ -14,8 +15,8 @@ export type PlaceOrderOptions = {
   stripePayment?: {
     publishableKey: string
   }
-  saveBillingAddressToCustomerBook?: boolean
-  saveShippingAddressToCustomerBook?: boolean
+  saveBillingAddressToCustomerAddressBook?: boolean
+  saveShippingAddressToCustomerAddressBook?: boolean
   savePaymentSourceToCustomerWallet?: boolean
 }
 
@@ -145,15 +146,27 @@ export const setPlaceOrder: SetPlaceOrder = async ({
               const updateAttributes: Record<string, any> = {
                 _place: true,
               }
-              if (options?.saveBillingAddressToCustomerBook)
+              if (
+                options?.saveBillingAddressToCustomerAddressBook ||
+                getLocalOrder('saveBillingAddressToCustomerAddressBook')
+              )
                 updateAttributes._saveBillingAddressToCustomerAddressBook =
-                  options?.saveBillingAddressToCustomerBook
-              if (options?.saveShippingAddressToCustomerBook)
+                  options?.saveBillingAddressToCustomerAddressBook ||
+                  getLocalOrder('saveBillingAddressToCustomerAddressBook')
+              if (
+                options?.saveShippingAddressToCustomerAddressBook ||
+                getLocalOrder('saveShippingAddressToCustomerAddressBook')
+              )
                 updateAttributes._saveShippingAddressToCustomerAddressBook =
-                  options?.saveShippingAddressToCustomerBook
-              if (options?.savePaymentSourceToCustomerWallet)
-                updateAttributes._savePaymentSourceToCustomerWallet =
-                  options?.savePaymentSourceToCustomerWallet
+                  options?.saveShippingAddressToCustomerAddressBook ||
+                  getLocalOrder('saveShippingAddressToCustomerAddressBook')
+              // if (
+              //   options?.savePaymentSourceToCustomerWallet ||
+              //   getLocalOrder('savePaymentSourceToCustomerWallet')
+              // )
+              //   updateAttributes._savePaymentSourceToCustomerWallet =
+              //     options?.savePaymentSourceToCustomerWallet ||
+              //     getLocalOrder('savePaymentSourceToCustomerWallet')
               const o = await Order.withCredentials(config).find(order.id)
               await o.withCredentials(config).update(updateAttributes)
               return {

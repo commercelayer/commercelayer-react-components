@@ -4,19 +4,23 @@ import { BaseError } from '#typings/errors'
 import {
   AddressCollection,
   CustomerAddress,
+  CustomerPaymentSourceCollection,
   OrderCollection,
 } from '@commercelayer/js-sdk'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
+import { isEmpty } from 'lodash'
 
 export type CustomerActionType =
   | 'setErrors'
   | 'setCustomerEmail'
   | 'setAddresses'
+  | 'setPayments'
 
 export interface CustomerActionPayload {
   addresses: AddressCollection[]
+  payments: CustomerPaymentSourceCollection[]
   customerEmail: string
   errors: BaseError[]
 }
@@ -122,15 +126,54 @@ export const getCustomerAddresses: GetCustomerAddresses = async ({
   }
 }
 
+export type GetCustomerPaymentSources = (params: {
+  config: CommerceLayerConfig
+  dispatch: Dispatch<CustomerAction>
+  order?: OrderCollection
+}) => Promise<void>
+
+export const getCustomerPaymentSources: GetCustomerPaymentSources = async ({
+  config,
+  dispatch,
+  order,
+}) => {
+  try {
+    if (config && order) {
+      const payments: CustomerPaymentSourceCollection[] | undefined = (
+        await order
+          .availableCustomerPaymentSources()
+          ?.includes('paymentSource')
+          ?.load()
+      )?.toArray()
+      if (!isEmpty(payments) && payments) {
+        dispatch({
+          type: 'setPayments',
+          payload: { payments },
+        })
+      }
+    }
+  } catch (col) {
+    const errors = getErrorsByCollection(col, 'address')
+    dispatch({
+      type: 'setErrors',
+      payload: {
+        errors,
+      },
+    })
+  }
+}
+
 export const customerInitialState: CustomerState = {
   errors: [],
   addresses: [],
+  payments: [],
 }
 
 const type: CustomerActionType[] = [
   'setErrors',
   'setCustomerEmail',
   'setAddresses',
+  'setPayments',
 ]
 
 const customerReducer = (

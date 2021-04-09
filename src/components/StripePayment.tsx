@@ -1,5 +1,6 @@
 import React, {
   FunctionComponent,
+  SyntheticEvent,
   useContext,
   useEffect,
   useState,
@@ -16,7 +17,14 @@ import {
   StripeCardElementOptions,
   StripeElements,
 } from '@stripe/stripe-js'
-import { SetPaymentSourceResponse } from '#reducers/PaymentMethodReducer'
+import {
+  PaymentMethodConfig,
+  SetPaymentSourceResponse,
+} from '#reducers/PaymentMethodReducer'
+import { PaymentMethodNameProps } from './PaymentSource'
+import Parent from './utils/Parent'
+import OrderStorageContext from '#context/OrderStorageContext'
+import OrderContext from '#context/OrderContext'
 
 type StripePaymentFormProps = {
   stripe: Stripe | null
@@ -25,6 +33,7 @@ type StripePaymentFormProps = {
   submitClassName?: string
   submitLabel?: string
   handleSubmit?: (response: SetPaymentSourceResponse) => void
+  templateCustomerSaveToWallet?: PaymentMethodNameProps['templateCustomerSaveToWallet']
 }
 
 const defaultOptions = {
@@ -50,9 +59,12 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
   submitClassName,
   submitLabel = 'Add payment',
   handleSubmit,
+  templateCustomerSaveToWallet,
 }) => {
   const { setPaymentSource } = useContext(PaymentMethodContext)
-  const onSubmit = async (event: any) => {
+  const { setLocalOrder } = useContext(OrderStorageContext)
+  const { order } = useContext(OrderContext)
+  const onSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     // Block native form submission.
     event.preventDefault()
 
@@ -61,15 +73,36 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
       // form submission until Stripe.js has loaded.
       return
     }
-
+    const savePaymentSourceToCustomerWallet =
+      // @ts-ignore
+      event.target.elements['save_payment_source_to_customer_wallet'].checked
+    setLocalOrder(
+      'savePaymentSourceToCustomerWallet',
+      savePaymentSourceToCustomerWallet
+    )
     // Get a reference to a mounted CardElement. Elements knows how
     // to find your CardElement because there can only ever be one of
     // each type of element.
     const cardElement = elements && elements.getElement(CardElement)
     if (cardElement) {
+      const billingInfo = order?.billingAddress()
+      const email = order?.customerEmail
+      const billing_details = {
+        name: billingInfo?.fullName,
+        email,
+        phone: billingInfo?.phone,
+        address: {
+          city: billingInfo?.city,
+          country: billingInfo?.countryCode,
+          line1: billingInfo?.line1,
+          postal_code: billingInfo?.zipCode,
+          state: billingInfo?.stateCode,
+        },
+      }
       const { error, paymentMethod } = await stripe.createPaymentMethod({
         type: 'card',
         card: cardElement,
+        billing_details,
       })
 
       if (error) {
@@ -80,32 +113,24 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
           const source = await setPaymentSource({
             paymentResource: 'StripePayment',
             options: {
-              id: paymentMethod.id,
-              card: {
-                brand: paymentMethod.card?.brand,
-                last4: paymentMethod.card?.last4,
-                expMonth: paymentMethod.card?.exp_month,
-                expYear: paymentMethod.card?.exp_year,
-              },
+              ...(paymentMethod as Record<string, any>),
+              setup_future_usage: 'off_session',
             },
+            savePaymentSourceToCustomerWallet,
           })
           handleSubmit && handleSubmit(source)
         }
       }
-      // const billing_details = {
-      //   name: billingInfo?.fullName,
-      //   address: {
-      //     city: billingInfo?.city,
-      //     country: billingInfo?.countryCode,
-      //     line1: billingInfo?.line1,
-      //     postal_code: billingInfo?.zipCode,
-      //   },
-      // }
     }
   }
   return (
     <form onSubmit={onSubmit}>
       <CardElement options={options} />
+      {templateCustomerSaveToWallet && (
+        <Parent {...{ name: 'save_payment_source_to_customer_wallet' }}>
+          {templateCustomerSaveToWallet}
+        </Parent>
+      )}
       <button className={submitClassName} type="submit" disabled={!stripe}>
         {submitLabel}
       </button>
@@ -113,14 +138,11 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
   )
 }
 
-type StripePaymentProps = {
-  publishableKey?: string
-  show: boolean
-  options?: StripeCardElementOptions
-  submitClassName?: string
-  submitLabel?: string
-  handleSubmit?: (response?: SetPaymentSourceResponse) => void
-} & JSX.IntrinsicElements['div']
+type StripePaymentProps = PaymentMethodConfig['stripePayment'] &
+  JSX.IntrinsicElements['div'] &
+  Partial<PaymentMethodNameProps['templateCustomerSaveToWallet']> & {
+    show?: boolean
+  }
 
 const StripePayment: FunctionComponent<StripePaymentProps> = ({
   publishableKey,
@@ -129,7 +151,14 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
   ...p
 }) => {
   const [stripe, setStripe] = useState<Stripe | null>(null)
-  const { submitClassName, submitLabel, handleSubmit, ...divProps } = p
+  const {
+    submitClassName,
+    submitLabel,
+    handleSubmit,
+    containerClassName,
+    templateCustomerSaveToWallet,
+    ...divProps
+  } = p
   useEffect(() => {
     const loadingStripe = async () => {
       const stripePromise = publishableKey && (await loadStripe(publishableKey))
@@ -139,7 +168,7 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     return () => setStripe(null)
   }, [show])
   return !show ? null : (
-    <div {...divProps}>
+    <div className={containerClassName} {...divProps}>
       <Elements stripe={stripe}>
         <ElementsConsumer>
           {({ elements, stripe }) => (
@@ -150,6 +179,7 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
               submitClassName={submitClassName}
               submitLabel={submitLabel}
               handleSubmit={handleSubmit}
+              templateCustomerSaveToWallet={templateCustomerSaveToWallet}
             />
           )}
         </ElementsConsumer>

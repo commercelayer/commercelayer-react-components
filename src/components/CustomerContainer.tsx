@@ -8,6 +8,7 @@ import React, {
 import customerReducer, {
   customerInitialState,
   getCustomerAddresses,
+  getCustomerPaymentSources,
 } from '#reducers/CustomerReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
@@ -35,7 +36,10 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
     if (config.accessToken && isEmpty(state.addresses) && !isGuest) {
       getCustomerAddresses({ config, dispatch })
     }
-  }, [config.accessToken])
+    if (config.accessToken && order && isEmpty(state.payments) && !isGuest) {
+      getCustomerPaymentSources({ config, dispatch, order })
+    }
+  }, [config.accessToken, order])
   const contextValue = {
     ...state,
     saveCustomerUser: async (customerEmail: string) => {
