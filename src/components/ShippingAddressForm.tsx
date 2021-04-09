@@ -14,6 +14,7 @@ import { AddressField } from '#reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
+import OrderStorageContext from '#context/OrderStorageContext'
 
 const propTypes = components.ShippingAddressForm.propTypes
 
@@ -30,7 +31,8 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
   const { setAddressErrors, setAddress, shipToDifferentAddress } = useContext(
     AddressesContext
   )
-  const { saveAddressToCustomerBook } = useContext(OrderContext)
+  const { saveAddressToCustomerAddressBook } = useContext(OrderContext)
+  const { setLocalOrder } = useContext(OrderStorageContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
     if (!isEmpty(errors)) {
@@ -57,14 +59,18 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
         }
         if (field?.type === 'checkbox') {
           delete values[name]
-          saveAddressToCustomerBook('ShippingAddress', field.checked)
+          saveAddressToCustomerAddressBook('ShippingAddress', field.checked)
+          setLocalOrder(
+            'saveShippingAddressToCustomerAddressBook',
+            field.checked
+          )
         }
       }
       setAddress({ values, resource: 'shippingAddress' })
     }
     if (reset && (!isEmpty(values) || !isEmpty(errors))) {
-      saveAddressToCustomerBook &&
-        saveAddressToCustomerBook('ShippingAddress', false)
+      saveAddressToCustomerAddressBook &&
+        saveAddressToCustomerAddressBook('ShippingAddress', false)
       if (ref) {
         ref.current?.reset()
         resetForm({ target: ref.current } as any)

@@ -86,16 +86,18 @@ export const getPaymentMethods: GetPaymentMethods = async ({
       ?.withCredentials(config)
       // @ts-ignore
       .loadPaymentMethod()
-    const paymentSource: any = await Order.withCredentials(config)
-      .includes('paymentSource')
-      .find(order.id)
+    const paymentSource: any = (
+      await Order.withCredentials(config)
+        .includes('paymentSource')
+        .find(order.id)
+    ).paymentSource()
     dispatch({
       type: 'setPaymentMethods',
       payload: {
         ...payload,
         currentPaymentMethodId: paymentMethod?.id,
         currentPaymentMethodType: paymentMethod?.paymentSourceType as PaymentResource,
-        paymentSource: paymentSource.paymentSource(),
+        paymentSource,
       },
     })
   } catch (error) {
@@ -175,34 +177,48 @@ export type SetPaymentSource = (args: {
   config?: CommerceLayerConfig
   dispatch?: Dispatch<PaymentMethodAction>
   getOrder?: getOrderContext
+  options?: Record<string, string | Record<string, string | number | undefined>>
   order?: OrderCollection
   paymentResource: SDKPaymentResource
-  options?: Record<string, string | Record<string, string | number | undefined>>
+  customerPaymentSourceId?: string
+  savePaymentSourceToCustomerWallet?: boolean
 }) => Promise<SetPaymentSourceResponse>
 
 export const setPaymentSource: SetPaymentSource = async ({
   config,
   dispatch,
-  order,
-  options = {},
-  paymentResource,
   getOrder,
+  options = {},
+  order,
+  paymentResource,
+  customerPaymentSourceId,
+  // savePaymentSourceToCustomerWallet,
 }) => {
   try {
     if (config && order) {
       const resourceSdk = CLayer[paymentResource]
-      resourceSdk.assignQueryParams({})
       const o = Order.build({ id: order.id })
-      const paymentSource = await CLayer[paymentResource]
-        .withCredentials(config)
-        .create({
-          options,
-          order: o,
-        })
+      const paymentSource = !customerPaymentSourceId
+        ? await resourceSdk.withCredentials(config).create({
+            options,
+            order: o,
+          })
+        : (
+            await (
+              await Order.withCredentials(config)
+                .includes('paymentSource')
+                .find(order.id)
+            ).update({
+              _customerPaymentSourceId: customerPaymentSourceId,
+            })
+          ).paymentSource()
+      // if (savePaymentSourceToCustomerWallet && !customerPaymentSourceId)
+      //   await o.withCredentials(config).update({
+      //     _savePaymentSourceToCustomerWallet: savePaymentSourceToCustomerWallet,
+      //   })
       if (order?.billingAddress() === null)
         await order.withCredentials(config).loadBillingAddress()
       if (order?.paymentSource() === null)
-        // @ts-ignore
         await order.withCredentials(config).loadPaymentSource()
       if (getOrder) order = (await getOrder(order?.id)) as OrderCollection
       dispatch &&
@@ -223,13 +239,15 @@ export const setPaymentSource: SetPaymentSource = async ({
 
 export type PaymentMethodConfig = {
   stripePayment: {
-    publishableKey: string
+    containerClassName?: string
     hintLabel?: string
     name?: string
     options?: StripeCardElementOptions
+    publishableKey: string
     submitClassName?: string
     submitLabel?: string
     handleSubmit?: (response?: SetPaymentSourceResponse) => void
+    [key: string]: any
   }
 }
 

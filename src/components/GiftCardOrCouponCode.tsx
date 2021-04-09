@@ -4,6 +4,7 @@ import { FunctionChildren } from '#typings'
 import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
 import { CodeType, OrderCodeType } from '#reducers/OrderReducer'
+import { has, isEmpty } from 'lodash'
 
 const propTypes = components.GiftCardOrCouponCode.propTypes
 const displayName = components.GiftCardOrCouponCode.displayName
@@ -16,7 +17,7 @@ type GiftCardOrCouponCodeChildrenProps = FunctionChildren<
 >
 
 type GiftCardOrCouponCodeProps = {
-  type: CodeType
+  type?: CodeType
   children?: GiftCardOrCouponCodeChildrenProps
 } & JSX.IntrinsicElements['span']
 
@@ -26,9 +27,12 @@ const GiftCardOrCouponCode: FunctionComponent<GiftCardOrCouponCodeProps> = ({
   ...props
 }) => {
   const { order } = useContext(OrderContext)
-  const codeType = `${type}Code` as OrderCodeType
-  const code = order ? order[codeType] : ''
-  const hide = order && order[codeType] ? false : true
+  let codeType = type && (`${type}Code` as OrderCodeType)
+  if (!type && order && has(order, 'couponCode') && !isEmpty(order.couponCode))
+    codeType = 'couponCode'
+  else if (!type) codeType = 'giftCardCode'
+  const code = order && codeType ? order[codeType] : ''
+  const hide = order && code ? false : true
   const parentProps = {
     ...props,
     code,

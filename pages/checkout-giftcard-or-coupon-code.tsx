@@ -13,14 +13,19 @@ import {
   GiftCardOrCouponCode,
   GiftCardOrCouponRemoveButton,
 } from '@commercelayer/react-components'
+import { useRouter } from 'next/router'
 // import { Order } from '@commercelayer/js-sdk'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
-const orderId = 'PDerhJplRp'
+let orderId = 'PDerhJplRp'
 
 export default function Main() {
   const [token, setToken] = useState('')
   const [codeError, setCodeError] = useState(false)
+  const { query } = useRouter()
+  if (query.orderId) {
+    orderId = query.orderId as string
+  }
   const classError = codeError
     ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500'
     : ''
@@ -146,10 +151,7 @@ export default function Main() {
               Discount <DiscountAmount />
             </p>
             <div>
-              <GiftCardOrCouponCode
-                type="coupon"
-                className="inline-flex rounded-full items-center py-0.5 pl-2.5 pr-1 text-sm font-medium bg-indigo-100 text-indigo-700"
-              >
+              <GiftCardOrCouponCode className="inline-flex rounded-full items-center py-0.5 pl-2.5 pr-1 text-sm font-medium bg-indigo-100 text-indigo-700">
                 {(props) => {
                   const { hide, code, ...p } = props
                   return hide ? null : (
@@ -158,7 +160,6 @@ export default function Main() {
                         {code}
                         <GiftCardOrCouponRemoveButton
                           data-cy="code-remove"
-                          type="coupon"
                           className="flex-shrink-0 ml-0.5 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none focus:bg-indigo-500 focus:text-white"
                           label={removeIcon}
                         />

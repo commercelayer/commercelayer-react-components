@@ -108,15 +108,15 @@ export interface OrderState extends OrderPayload {
   loading: boolean
   orderId: string
   order?: OrderCollection
-  saveBillingAddressToCustomerBook: boolean
-  saveShippingAddressToCustomerBook: boolean
+  saveBillingAddressToCustomerAddressBook: boolean
+  saveShippingAddressToCustomerAddressBook: boolean
   getOrder?: getOrderContext
   createOrder?: () => Promise<string>
   addToCart: (values: AddToCartValues) => AddToCartReturn
   setOrderErrors: (collection: any) => { success: boolean }
   setGiftCardOrCouponCode: SetGiftCardOrCouponCode
   removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode
-  saveAddressToCustomerBook: (
+  saveAddressToCustomerAddressBook: (
     type: 'BillingAddress' | 'ShippingAddress',
     value: boolean
   ) => void
@@ -136,7 +136,7 @@ export type OrderActionType =
   | 'setCurrentSkuPrices'
   | 'setCurrentItem'
   | 'setErrors'
-  | 'setSaveAddressToCustomerBook'
+  | 'setSaveAddressToCustomerAddressBook'
   | 'setGiftCardOrCouponCode'
 
 const actionType: OrderActionType[] = [
@@ -148,7 +148,7 @@ const actionType: OrderActionType[] = [
   'setCurrentSkuPrices',
   'setErrors',
   'setCurrentItem',
-  'setSaveAddressToCustomerBook',
+  'setSaveAddressToCustomerAddressBook',
 ]
 
 export const createOrder: CreateOrder = async (params) => {
@@ -338,19 +338,19 @@ export const setOrderErrors: SetOrderErrors = ({ dispatch, collection }) => {
   return { success: false }
 }
 
-type SaveAddressToCustomerBook = (params: {
+type SaveAddressToCustomerAddressBook = (params: {
   dispatch: Dispatch<OrderActions>
   type: 'BillingAddress' | 'ShippingAddress'
   value: boolean
 }) => void
 
-export const saveAddressToCustomerBook: SaveAddressToCustomerBook = ({
+export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook = ({
   type,
   value,
   dispatch,
 }) => {
   dispatch({
-    type: 'setSaveAddressToCustomerBook',
+    type: 'setSaveAddressToCustomerAddressBook',
     payload: {
       [`save${type}ToCustomerBook`]: value,
     },

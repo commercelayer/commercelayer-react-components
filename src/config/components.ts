@@ -193,6 +193,7 @@ const components = {
       'CustomerInput',
       'SaveCustomerButton',
       'AddressesContainer',
+      'PaymentMethodsContainer',
       'ReactNode',
     ],
     propTypes: {
@@ -352,14 +353,14 @@ const components = {
     displayName: 'GiftCardOrCouponCode',
     propTypes: {
       children: PropTypes.func,
-      type: PropTypes.oneOf<CodeType>(['coupon', 'giftCard']).isRequired,
+      type: PropTypes.oneOf<CodeType>(['coupon', 'giftCard']),
     },
   },
   GiftCardOrCouponRemoveButton: {
     displayName: 'GiftCardOrCouponRemoveButton',
     propTypes: {
       children: PropTypes.func,
-      type: PropTypes.oneOf<CodeType>(['coupon', 'giftCard']).isRequired,
+      type: PropTypes.oneOf<CodeType>(['coupon', 'giftCard']),
       label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     },
   },

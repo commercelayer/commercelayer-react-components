@@ -1,21 +1,17 @@
-import { AddressCollection } from '@commercelayer/js-sdk'
 import {
   SetCustomerEmail,
   setCustomerErrors,
   SetCustomerErrors,
   setCustomerEmail,
+  CustomerState,
 } from '#reducers/CustomerReducer'
-import { BaseError } from '#typings/errors'
 import { createContext } from 'react'
 
 type DefaultContext = {
-  customerEmail?: string
-  errors?: BaseError[]
   saveCustomerUser: (customerEmail: string) => Promise<void>
   setCustomerErrors: SetCustomerErrors
   setCustomerEmail: SetCustomerEmail
-  addresses?: AddressCollection[]
-}
+} & Partial<CustomerState>
 
 export const defaultCustomerContext = {
   saveCustomerUser: async (): Promise<void> => {

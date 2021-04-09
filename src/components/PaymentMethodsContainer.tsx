@@ -42,7 +42,7 @@ const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> =
   useEffect(() => {
     if (config && isEmpty(state.config))
       setPaymentMethodConfig(config, dispatch)
-    if (order) {
+    if (config && order) {
       getPaymentMethods({ order, dispatch, config: credentials, state })
     }
   }, [order])

@@ -33,8 +33,8 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
   )
   const {
     order,
-    saveBillingAddressToCustomerBook,
-    saveShippingAddressToCustomerBook,
+    saveBillingAddressToCustomerAddressBook,
+    saveShippingAddressToCustomerAddressBook,
   } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
@@ -44,8 +44,8 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
         dispatch,
         config,
         options: {
-          saveBillingAddressToCustomerBook,
-          saveShippingAddressToCustomerBook,
+          saveBillingAddressToCustomerAddressBook,
+          saveShippingAddressToCustomerAddressBook,
           ...options,
         },
       })
