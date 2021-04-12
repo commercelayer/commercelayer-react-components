@@ -46,7 +46,7 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
     ...p
   } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
-  const { payments } = useContext(CustomerContext)
+  const { payments, isGuest } = useContext(CustomerContext)
   const {
     currentPaymentMethodId,
     config,
@@ -66,7 +66,7 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
       setShow(false)
       setShowCard(false)
     }
-  }, [currentPaymentMethodId, paymentSource, payments])
+  }, [currentPaymentMethodId, paymentSource, payments, payment])
   const handleEditClick = () => setShowCard(!showCard)
   const PaymentGateway = () => {
     const paymentResource = readonly
@@ -94,7 +94,7 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
             </PaymentSourceContext.Provider>
           )
         }
-        if (!isEmpty(customerPayments) && templateCustomerCards) {
+        if (!isGuest && templateCustomerCards) {
           const customerPaymentsCards = customerPayments.map(
             (customerPayment, i) => {
               // @ts-ignore
@@ -122,7 +122,9 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
           )
           return stripeConfig ? (
             <Fragment>
-              <div className={p.className}>{customerPaymentsCards}</div>
+              {isEmpty(customerPaymentsCards) ? null : (
+                <div className={p.className}>{customerPaymentsCards}</div>
+              )}
               <StripePayment
                 show={show}
                 {...stripeConfig}
