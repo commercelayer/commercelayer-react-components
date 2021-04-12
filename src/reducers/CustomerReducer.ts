@@ -23,6 +23,7 @@ export interface CustomerActionPayload {
   payments: CustomerPaymentSourceCollection[]
   customerEmail: string
   errors: BaseError[]
+  isGuest: boolean
 }
 
 export type CustomerState = Partial<CustomerActionPayload>

@@ -39,8 +39,9 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
     if (config.accessToken && order && isEmpty(state.payments) && !isGuest) {
       getCustomerPaymentSources({ config, dispatch, order })
     }
-  }, [config.accessToken, order])
+  }, [config.accessToken, order, isGuest])
   const contextValue = {
+    isGuest,
     ...state,
     saveCustomerUser: async (customerEmail: string) => {
       await saveCustomerUser({

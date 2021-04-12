@@ -75,7 +75,8 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
     }
     const savePaymentSourceToCustomerWallet =
       // @ts-ignore
-      event.target.elements['save_payment_source_to_customer_wallet'].checked
+      event?.target?.elements?.['save_payment_source_to_customer_wallet']
+        ?.checked
     setLocalOrder(
       'savePaymentSourceToCustomerWallet',
       savePaymentSourceToCustomerWallet
