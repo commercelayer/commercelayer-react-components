@@ -80,8 +80,9 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
     const shippingAddress =
       order.shippingAddress() ||
       (await order.withCredentials(config).loadShippingAddress())
-    const shipments = // @ts-ignore
-    (await order.withCredentials(config).loadShipments())?.toArray()
+    const shipments = (
+      await order.withCredentials(config).loadShipments()
+    )?.toArray()
     const shipment = shipments && (await shipmentsFilled(shipments, config))
     const paymentMethod =
       order.paymentMethod() ||
@@ -94,8 +95,8 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
       !isEmpty(billingAddress) &&
       !isEmpty(shippingAddress) &&
       shipment &&
-      !isEmpty(paymentMethod) &&
-      !isEmpty(paymentSource.paymentSourceId)
+      ((!isEmpty(paymentMethod) && !isEmpty(paymentSource.paymentSourceId)) ||
+        order.totalAmountWithTaxesCents === 0)
     ) {
       dispatch({
         type: 'setPlaceOrderPermitted',
@@ -160,15 +161,47 @@ export const setPlaceOrder: SetPlaceOrder = async ({
                 updateAttributes._saveShippingAddressToCustomerAddressBook =
                   options?.saveShippingAddressToCustomerAddressBook ||
                   getLocalOrder('saveShippingAddressToCustomerAddressBook')
-              // if (
-              //   options?.savePaymentSourceToCustomerWallet ||
-              //   getLocalOrder('savePaymentSourceToCustomerWallet')
-              // )
-              //   updateAttributes._savePaymentSourceToCustomerWallet =
-              //     options?.savePaymentSourceToCustomerWallet ||
-              //     getLocalOrder('savePaymentSourceToCustomerWallet')
-              const o = await Order.withCredentials(config).find(order.id)
-              await o.withCredentials(config).update(updateAttributes)
+              const o = await Order.withCredentials(config)
+                .includes('paymentSource')
+                .find(order.id)
+              if (
+                options?.savePaymentSourceToCustomerWallet ||
+                getLocalOrder('savePaymentSourceToCustomerWallet')
+              ) {
+                const _savePaymentSourceToCustomerWallet =
+                  options?.savePaymentSourceToCustomerWallet ||
+                  getLocalOrder('savePaymentSourceToCustomerWallet')
+                let ps = o.paymentSource()
+                console.log(`ps`, ps)
+                if (
+                  // @ts-ignore
+                  ps?.paymentMethod?.id &&
+                  _savePaymentSourceToCustomerWallet
+                ) {
+                  updateAttributes._savePaymentSourceToCustomerWallet = !!_savePaymentSourceToCustomerWallet
+                } else {
+                  for (let index = 0; index < 5; index++) {
+                    const newOrder = await Order.withCredentials(config)
+                      .includes('paymentSource')
+                      .find(order.id)
+                    ps = newOrder.paymentSource()
+                    // @ts-ignore
+                    if (ps?.paymentMethod?.id) index = 5
+                    if (
+                      // @ts-ignore
+                      ps?.paymentMethod?.id &&
+                      _savePaymentSourceToCustomerWallet
+                    ) {
+                      updateAttributes._savePaymentSourceToCustomerWallet = !!_savePaymentSourceToCustomerWallet
+                      // newOrder.withCredentials(config).update({
+                      //   _savePaymentSourceToCustomerWallet,
+                      // })
+                    }
+                  }
+                }
+              }
+              console.log(`updateAttributes`, updateAttributes)
+              // await o.withCredentials(config).update(updateAttributes)
               return {
                 placed: true,
               }
