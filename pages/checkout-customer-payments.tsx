@@ -178,7 +178,7 @@ export default function Main() {
                 // saveShippingAddressToCustomerBook: true,
                 // saveBillingAddressToCustomerBook: true,
                 // @ts-ignore
-                savePaymentSourceToCustomerWallet: 1,
+                // savePaymentSourceToCustomerWallet: 1,
               }}
             >
               <div>

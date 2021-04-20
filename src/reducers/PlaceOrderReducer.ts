@@ -131,6 +131,32 @@ export const setPlaceOrder: SetPlaceOrder = async ({
   try {
     if (state && order && config) {
       const { options, paymentType, paymentSecret, paymentId } = state
+      const updateAttributes: Record<string, any> = {
+        _place: true,
+      }
+      if (
+        options?.saveBillingAddressToCustomerAddressBook ||
+        getLocalOrder('saveBillingAddressToCustomerAddressBook')
+      )
+        updateAttributes._saveBillingAddressToCustomerAddressBook =
+          options?.saveBillingAddressToCustomerAddressBook ||
+          getLocalOrder('saveBillingAddressToCustomerAddressBook')
+      if (
+        options?.saveShippingAddressToCustomerAddressBook ||
+        getLocalOrder('saveShippingAddressToCustomerAddressBook')
+      )
+        updateAttributes._saveShippingAddressToCustomerAddressBook =
+          options?.saveShippingAddressToCustomerAddressBook ||
+          getLocalOrder('saveShippingAddressToCustomerAddressBook')
+      if (
+        options?.savePaymentSourceToCustomerWallet ||
+        getLocalOrder('savePaymentSourceToCustomerWallet')
+      ) {
+        const _savePaymentSourceToCustomerWallet =
+          options?.savePaymentSourceToCustomerWallet ||
+          getLocalOrder('savePaymentSourceToCustomerWallet')
+        updateAttributes._savePaymentSourceToCustomerWallet = !!_savePaymentSourceToCustomerWallet
+      }
       switch (paymentType) {
         case 'stripe_payments':
           const stripe = await loadStripe(
@@ -144,32 +170,6 @@ export const setPlaceOrder: SetPlaceOrder = async ({
               }
             )
             if (paymentIntent) {
-              const updateAttributes: Record<string, any> = {
-                _place: true,
-              }
-              if (
-                options?.saveBillingAddressToCustomerAddressBook ||
-                getLocalOrder('saveBillingAddressToCustomerAddressBook')
-              )
-                updateAttributes._saveBillingAddressToCustomerAddressBook =
-                  options?.saveBillingAddressToCustomerAddressBook ||
-                  getLocalOrder('saveBillingAddressToCustomerAddressBook')
-              if (
-                options?.saveShippingAddressToCustomerAddressBook ||
-                getLocalOrder('saveShippingAddressToCustomerAddressBook')
-              )
-                updateAttributes._saveShippingAddressToCustomerAddressBook =
-                  options?.saveShippingAddressToCustomerAddressBook ||
-                  getLocalOrder('saveShippingAddressToCustomerAddressBook')
-              if (
-                options?.savePaymentSourceToCustomerWallet ||
-                getLocalOrder('savePaymentSourceToCustomerWallet')
-              ) {
-                const _savePaymentSourceToCustomerWallet =
-                  options?.savePaymentSourceToCustomerWallet ||
-                  getLocalOrder('savePaymentSourceToCustomerWallet')
-                updateAttributes._savePaymentSourceToCustomerWallet = !!_savePaymentSourceToCustomerWallet
-              }
               const o = await Order.withCredentials(config).find(order.id)
               await o.withCredentials(config).update(updateAttributes)
               return {
@@ -180,7 +180,11 @@ export const setPlaceOrder: SetPlaceOrder = async ({
           }
           throw new Error('Stripe and payment secret are not available')
         default:
-          return response
+          const o = await Order.withCredentials(config).find(order.id)
+          await o.withCredentials(config).update(updateAttributes)
+          return {
+            placed: true,
+          }
       }
     }
     return response
