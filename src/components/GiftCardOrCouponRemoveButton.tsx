@@ -21,6 +21,7 @@ type GiftCardOrCouponRemoveButtonProps = {
   type?: CodeType
   children?: GiftCardOrCouponRemoveButtonChildrenProps
   label?: string | ReactNode
+  onClick?: () => void
 } & Omit<JSX.IntrinsicElements['button'], 'type'>
 
 const GiftCardOrCouponRemoveButton: FunctionComponent<GiftCardOrCouponRemoveButtonProps> = (
@@ -36,6 +37,7 @@ const GiftCardOrCouponRemoveButton: FunctionComponent<GiftCardOrCouponRemoveButt
   const hide = order && code ? false : true
   const handleClick = () => {
     removeGiftCardOrCouponCode && removeGiftCardOrCouponCode({ codeType })
+    onClick && onClick()
   }
   const parentProps = {
     ...p,
