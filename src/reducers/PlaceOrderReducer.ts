@@ -4,10 +4,10 @@ import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Order, OrderCollection } from '@commercelayer/js-sdk'
 import { isEmpty } from 'lodash'
-import { shipmentsFilled } from '../utils/shipments'
+import { shipmentsFilled } from '#utils/shipments'
 import { PaymentResource } from './PaymentMethodReducer'
 import { loadStripe } from '@stripe/stripe-js'
-import { getLocalOrder } from '../utils/localStorage'
+import { getLocalOrder } from '#utils/localStorage'
 
 export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted'
 
@@ -161,9 +161,6 @@ export const setPlaceOrder: SetPlaceOrder = async ({
                 updateAttributes._saveShippingAddressToCustomerAddressBook =
                   options?.saveShippingAddressToCustomerAddressBook ||
                   getLocalOrder('saveShippingAddressToCustomerAddressBook')
-              const o = await Order.withCredentials(config)
-                .includes('paymentSource')
-                .find(order.id)
               if (
                 options?.savePaymentSourceToCustomerWallet ||
                 getLocalOrder('savePaymentSourceToCustomerWallet')
@@ -171,37 +168,10 @@ export const setPlaceOrder: SetPlaceOrder = async ({
                 const _savePaymentSourceToCustomerWallet =
                   options?.savePaymentSourceToCustomerWallet ||
                   getLocalOrder('savePaymentSourceToCustomerWallet')
-                let ps = o.paymentSource()
-                console.log(`ps`, ps)
-                if (
-                  // @ts-ignore
-                  ps?.paymentMethod?.id &&
-                  _savePaymentSourceToCustomerWallet
-                ) {
-                  updateAttributes._savePaymentSourceToCustomerWallet = !!_savePaymentSourceToCustomerWallet
-                } else {
-                  for (let index = 0; index < 5; index++) {
-                    const newOrder = await Order.withCredentials(config)
-                      .includes('paymentSource')
-                      .find(order.id)
-                    ps = newOrder.paymentSource()
-                    // @ts-ignore
-                    if (ps?.paymentMethod?.id) index = 5
-                    if (
-                      // @ts-ignore
-                      ps?.paymentMethod?.id &&
-                      _savePaymentSourceToCustomerWallet
-                    ) {
-                      updateAttributes._savePaymentSourceToCustomerWallet = !!_savePaymentSourceToCustomerWallet
-                      // newOrder.withCredentials(config).update({
-                      //   _savePaymentSourceToCustomerWallet,
-                      // })
-                    }
-                  }
-                }
+                updateAttributes._savePaymentSourceToCustomerWallet = !!_savePaymentSourceToCustomerWallet
               }
-              console.log(`updateAttributes`, updateAttributes)
-              // await o.withCredentials(config).update(updateAttributes)
+              const o = await Order.withCredentials(config).find(order.id)
+              await o.withCredentials(config).update(updateAttributes)
               return {
                 placed: true,
               }

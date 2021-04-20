@@ -78,13 +78,11 @@ export const getPaymentMethods: GetPaymentMethods = async ({
     if (isEmpty(state.paymentMethods)) {
       const paymentMethods = await order
         .withCredentials(config)
-        // @ts-ignore
         .loadAvailablePaymentMethods()
       payload.paymentMethods = paymentMethods?.toArray()
     }
     const paymentMethod = await order
       ?.withCredentials(config)
-      // @ts-ignore
       .loadPaymentMethod()
     const paymentSource: any = (
       await Order.withCredentials(config)
