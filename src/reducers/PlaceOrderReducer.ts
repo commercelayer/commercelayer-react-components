@@ -73,17 +73,20 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
   options,
 }) => {
   if (order && config) {
+    let isPermitted = true
     const billingAddress =
       order.billingAddress() ||
-      // @ts-ignore
       (await order.withCredentials(config).loadBillingAddress())
+    if (isEmpty(billingAddress)) isPermitted = false
     const shippingAddress =
       order.shippingAddress() ||
       (await order.withCredentials(config).loadShippingAddress())
+    if (isEmpty(shippingAddress)) isPermitted = false
     const shipments = (
       await order.withCredentials(config).loadShipments()
     )?.toArray()
     const shipment = shipments && (await shipmentsFilled(shipments, config))
+    if (!isEmpty(shipments) && !shipment) isPermitted = false
     const paymentMethod =
       order.paymentMethod() ||
       (await order.withCredentials(config).paymentMethod())
@@ -92,23 +95,21 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
       .includes('paymentSource')
       .find(order.id)
     if (
-      !isEmpty(billingAddress) &&
-      !isEmpty(shippingAddress) &&
-      shipment &&
-      ((!isEmpty(paymentMethod) && !isEmpty(paymentSource.paymentSourceId)) ||
-        order.totalAmountWithTaxesCents === 0)
-    ) {
-      dispatch({
-        type: 'setPlaceOrderPermitted',
-        payload: {
-          isPermitted: true,
-          paymentType: paymentMethod?.paymentSourceType as PaymentResource,
-          paymentSecret: paymentSource?.paymentSource()?.clientSecret,
-          paymentId: paymentSource?.paymentSource()?.options.id,
-          options,
-        },
-      })
-    }
+      isEmpty(paymentMethod) &&
+      isEmpty(paymentSource.paymentSourceId) &&
+      order.totalAmountCents !== 0
+    )
+      isPermitted = false
+    dispatch({
+      type: 'setPlaceOrderPermitted',
+      payload: {
+        isPermitted,
+        paymentType: paymentMethod?.paymentSourceType as PaymentResource,
+        paymentSecret: paymentSource?.paymentSource()?.clientSecret,
+        paymentId: paymentSource?.paymentSource()?.options.id,
+        options,
+      },
+    })
   }
 }
 
