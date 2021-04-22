@@ -9,6 +9,8 @@ import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContex
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { BaseAmountComponent } from '#typings/index'
+import OrderContext from '#context/OrderContext'
+import { isNumber } from 'lodash'
 
 const propTypes = components.ShippingMethodPrice.propTypes
 const displayName = components.ShippingMethodPrice.displayName
@@ -31,32 +33,35 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
 ) => {
   const {
     format = 'formatted',
-    type = 'amountForShipment',
+    type = 'amount',
     base = 'price',
     labelFreeOver = 'Free',
     ...p
   } = props
   const { shippingMethod } = useContext(ShippingMethodChildrenContext)
+  const { order } = useContext(OrderContext)
   const [price, setPrice] = useState('')
-  const [priceCent, setPriceCent] = useState(0)
+  const [freeOverAmountCents, setFreeOverAmountCents] = useState(0)
   useEffect(() => {
-    const p = getAmount(
-      base,
-      type,
-      format,
-      shippingMethod as Record<string, string>
-    ) as string
-    setPrice(p)
-    const c = getAmount(
-      base,
-      type,
-      'cents',
-      shippingMethod as Record<string, string>
-    ) as number
-    setPriceCent(c)
+    if (shippingMethod) {
+      const p = getAmount(
+        base,
+        type,
+        format,
+        shippingMethod as Record<string, string>
+      ) as string
+      setPrice(p)
+      const c = getAmount(
+        'freeOver',
+        type,
+        'cents',
+        shippingMethod as Record<string, string>
+      ) as number
+      setFreeOverAmountCents(c)
+    }
     return (): void => {
       setPrice('')
-      setPriceCent(0)
+      setFreeOverAmountCents(0)
     }
   }, [shippingMethod])
   const parentProps = {
@@ -66,7 +71,13 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <span {...p}>{priceCent === 0 ? labelFreeOver : price}</span>
+    <span {...p}>
+      {order &&
+      isNumber(freeOverAmountCents) &&
+      freeOverAmountCents < order?.totalAmountCents
+        ? labelFreeOver
+        : price}
+    </span>
   )
 }
 
