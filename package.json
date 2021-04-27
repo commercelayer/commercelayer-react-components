@@ -68,6 +68,7 @@
     "@commercelayer/js-sdk": "^3.9.2",
     "@stripe/react-stripe-js": "^1.4.0",
     "@stripe/stripe-js": "^1.14.0",
+    "braintree-web": "^3.76.2",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "rapid-form": "^1.4.1"
@@ -87,6 +88,7 @@
     "@tailwindcss/forms": "^0.3.2",
     "@tailwindcss/typography": "^0.4.0",
     "@types/jest": "^26.0.23",
+    "@types/braintree-web": "^3.75.0",
     "@types/lodash": "^4.14.168",
     "@types/node": "^15.0.2",
     "@types/prop-types": "^15.7.3",
