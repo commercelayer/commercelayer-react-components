@@ -17,9 +17,10 @@ import {
   SaveCustomerButton,
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
+import { useRouter } from 'next/router'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
-const orderId = 'BwAezhrrOw'
+let orderId = 'BwAezhrrOw'
 
 export default function Main() {
   const [token, setToken] = useState('')
@@ -28,6 +29,10 @@ export default function Main() {
   const [saveOnBlur, setSaveOnBlur] = useState(false)
   const [billingAddress, setBillingAddress] = useState({})
   const [shippingAddress, setShippingAddress] = useState({})
+  const { query } = useRouter()
+  if (query.orderId) {
+    orderId = query.orderId as string
+  }
   useEffect(() => {
     const getToken = async () => {
       // @ts-ignore
