@@ -67,7 +67,7 @@ export const getAvailability: GetAvailability = async ({
     .first()
   const inventorySku = await Sku.withCredentials(config)
     .select('inventory')
-    .find(sku.id)
+    .find(sku.id as string)
   const firstLevel = first(inventorySku?.inventory?.levels)
   const firstDelivery = first(firstLevel?.deliveryLeadTimes)
   dispatch({
