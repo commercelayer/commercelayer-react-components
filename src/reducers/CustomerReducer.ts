@@ -5,6 +5,7 @@ import {
   AddressCollection,
   CustomerAddress,
   CustomerPaymentSourceCollection,
+  Order,
   OrderCollection,
 } from '@commercelayer/js-sdk'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
@@ -55,8 +56,10 @@ export const saveCustomerUser: SaveCustomerUser = async ({
 }) => {
   try {
     if (order) {
-      const o = await order.withCredentials(config).update({ customerEmail })
-      getOrder(o.id)
+      // const o = await order.withCredentials(config).update({ customerEmail })
+      const o = await Order.build({ id: order.id })
+      await o.withCredentials(config).update({ customerEmail })
+      getOrder(order.id)
       dispatch({
         type: 'setCustomerEmail',
         payload: { customerEmail },
