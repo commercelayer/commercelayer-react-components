@@ -15,8 +15,10 @@ import {
   CustomFontSource,
   StripeCardElementOptions,
 } from '@stripe/stripe-js'
-import { camelCase, isEmpty } from 'lodash'
+import camelCase from 'lodash/camelCase'
+import isEmpty from 'lodash/isEmpty'
 import { Dispatch, ReactNode } from 'react'
+import dynamicNaming from '#utils/dynamicNaming'
 
 export type PaymentMethodActionType =
   | 'setErrors'
@@ -145,14 +147,15 @@ export const setPaymentMethod: SetPaymentMethod = async ({
   dispatch,
   order,
   paymentMethodId,
+  paymentResource,
 }) => {
   try {
-    if (config && order) {
-      dispatch &&
-        dispatch({
-          type: 'setPaymentMethods',
-          payload: { currentPaymentMethodId: paymentMethodId },
-        })
+    if (config && order && dispatch) {
+      dispatch({
+        type: 'setPaymentMethods',
+        payload: { currentPaymentMethodId: paymentMethodId },
+      })
+      const resource = dynamicNaming(paymentResource)
       const paymentMethod = PaymentMethod.build({ id: paymentMethodId })
       const patchOrder = Order.build({
         id: order.id,
@@ -160,6 +163,18 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       })
       // @ts-ignore
       await patchOrder.withCredentials(config).save()
+      if (resource) {
+        const o = Order.build({ id: order.id, resource: resource })
+        const ps = await resource.withCredentials(config).create({
+          order: o,
+        })
+        dispatch({
+          type: 'setPaymentSource',
+          payload: {
+            paymentSource: ps,
+          },
+        })
+      }
     }
   } catch (error) {
     console.error(error)
@@ -182,8 +197,8 @@ export type SetPaymentSource = (args: {
   options?: Record<string, string | Record<string, string | number | undefined>>
   order?: OrderCollection
   paymentResource: SDKPaymentResource
+  paymentSourceId?: string
   customerPaymentSourceId?: string
-  savePaymentSourceToCustomerWallet?: boolean
 }) => Promise<SetPaymentSourceResponse>
 
 export const setPaymentSource: SetPaymentSource = async ({
@@ -194,27 +209,37 @@ export const setPaymentSource: SetPaymentSource = async ({
   order,
   paymentResource,
   customerPaymentSourceId,
+  paymentSourceId,
 }) => {
   try {
     if (config && order) {
+      let paymentSource = null
       const resourceSdk = CLayer[paymentResource]
       const o = Order.build({ id: order.id })
-      const paymentSource = !customerPaymentSourceId
-        ? await resourceSdk.withCredentials(config).create({
+      if (!customerPaymentSourceId) {
+        if (!paymentSourceId) {
+          paymentSource = await resourceSdk.withCredentials(config).create({
             options,
             order: o,
           })
-        : (
-            await (
-              await Order.withCredentials(config)
-                .includes('paymentSource')
-                .find(order.id)
-            )
-              .withCredentials(config)
-              .update({
-                _customerPaymentSourceId: customerPaymentSourceId,
-              })
-          ).paymentSource()
+        } else {
+          paymentSource = await (
+            await resourceSdk.withCredentials(config).find(paymentSourceId)
+          ).update({ options })
+        }
+      } else {
+        paymentSource = (
+          await (
+            await Order.withCredentials(config)
+              .includes('paymentSource')
+              .find(order.id)
+          )
+            .withCredentials(config)
+            .update({
+              _customerPaymentSourceId: customerPaymentSourceId,
+            })
+        ).paymentSource()
+      }
       if (order?.billingAddress() === null)
         await order.withCredentials(config).loadBillingAddress()
       if (order?.paymentSource() === null)
@@ -237,18 +262,36 @@ export const setPaymentSource: SetPaymentSource = async ({
 }
 
 export type PaymentMethodConfig = {
-  stripePayment: {
-    [key: string]: any
+  stripePayment?: {
     containerClassName?: string
     fonts?: (CssFontSource | CustomFontSource)[]
     handleSubmit?: (response?: SetPaymentSourceResponse) => void
     hintLabel?: string
     name?: string
     options?: StripeCardElementOptions
-    publishableKey: string
+    publishableKey?: string
     submitClassName?: string
     submitContainerClassName?: string
     submitLabel?: string | ReactNode
+  }
+  braintreePayment?: {
+    styles?: {
+      [key: string]: Record<string, string>
+    }
+    fields?: {
+      number?: {
+        selector: string
+        placeholder: string
+      }
+      cvv?: {
+        selector: string
+        placeholder: string
+      }
+      expirationDate?: {
+        selector: string
+        placeholder: string
+      }
+    }
   }
 }
 

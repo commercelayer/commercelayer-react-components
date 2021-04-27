@@ -18,7 +18,7 @@ import {
   PaymentMethodConfig,
   SetPaymentSourceResponse,
 } from '#reducers/PaymentMethodReducer'
-import { PaymentMethodNameProps } from './PaymentSource'
+import { PaymentSourceProps } from './PaymentSource'
 import Parent from './utils/Parent'
 import OrderStorageContext from '#context/OrderStorageContext'
 import OrderContext from '#context/OrderContext'
@@ -30,7 +30,7 @@ type StripePaymentFormProps = {
   submitContainerClassName?: string
   submitLabel?: string | ReactNode
   handleSubmit?: (response: SetPaymentSourceResponse) => void
-  templateCustomerSaveToWallet?: PaymentMethodNameProps['templateCustomerSaveToWallet']
+  templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
 }
 
 const defaultOptions = {
@@ -109,13 +109,13 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
       } else {
         console.log('[PaymentMethod]', paymentMethod)
         if (paymentMethod) {
+          // TODO: Update payment source by id
           const source = await setPaymentSource({
             paymentResource: 'StripePayment',
             options: {
               ...(paymentMethod as Record<string, any>),
               setup_future_usage: 'off_session',
             },
-            savePaymentSourceToCustomerWallet,
           })
           handleSubmit && handleSubmit(source)
         }
@@ -141,7 +141,7 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
 
 type StripePaymentProps = PaymentMethodConfig['stripePayment'] &
   JSX.IntrinsicElements['div'] &
-  Partial<PaymentMethodNameProps['templateCustomerSaveToWallet']> & {
+  Partial<PaymentSourceProps['templateCustomerSaveToWallet']> & {
     show?: boolean
   }
 

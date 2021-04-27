@@ -23,8 +23,8 @@ type DefaultContext = {
 
 export const defaultPaymentSourceContext = {}
 
-const PaymentMethodContext = createContext<DefaultContext>(
+const PaymentSourceContext = createContext<DefaultContext>(
   defaultPaymentSourceContext
 )
 
-export default PaymentMethodContext
+export default PaymentSourceContext
