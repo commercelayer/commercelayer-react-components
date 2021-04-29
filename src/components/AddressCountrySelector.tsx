@@ -16,6 +16,7 @@ type AddressCountrySelectorProps = Omit<
 > & {
   name: AddressCountrySelectName
   required?: boolean
+  disabled?: boolean
 } & Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'>
 
 const AddressCountrySelector: FunctionComponent<AddressCountrySelectorProps> = (

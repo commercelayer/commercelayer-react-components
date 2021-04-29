@@ -23,7 +23,7 @@ export type AddressField =
   | 'state_code'
   | 'zip_code'
 
-export type AddressFieldView = AddressField | 'full_address'
+export type AddressFieldView = AddressField | 'full_address' | 'full_name'
 
 export const addressFields: AddressField[] = [
   'city',
