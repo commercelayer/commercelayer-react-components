@@ -372,7 +372,7 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
 }) => {
   try {
     if (config && order && code && dispatch) {
-      const o = await (await Order.withCredentials(config).find(order.id))
+      const o = await Order.build({ id: order.id })
         .withCredentials(config)
         .update({
           giftCardOrCouponCode: code,
@@ -412,7 +412,7 @@ export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
 }) => {
   try {
     if (config && order && dispatch) {
-      const o = await (await Order.withCredentials(config).find(order.id))
+      const o = await Order.build({ id: order.id })
         .withCredentials(config)
         .update({
           [codeType]: '',

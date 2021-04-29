@@ -24,6 +24,18 @@ import OrderStorageContext from '#context/OrderStorageContext'
 import OrderContext from '#context/OrderContext'
 import isFunction from 'lodash/isFunction'
 
+export type StripeConfig = {
+  containerClassName?: string
+  hintLabel?: string
+  name?: string
+  options?: StripeCardElementOptions
+  publishableKey?: string
+  submitClassName?: string
+  submitLabel?: string
+  handleSubmit?: (response?: SetPaymentSourceResponse) => void
+  [key: string]: any
+}
+
 type StripePaymentFormProps = {
   options?: StripeCardElementOptions
   submitClassName?: string
@@ -57,7 +69,7 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
   handleSubmit,
   templateCustomerSaveToWallet,
 }) => {
-  const { setPaymentSource } = useContext(PaymentMethodContext)
+  const { setPaymentSource, paymentSource } = useContext(PaymentMethodContext)
   const { setLocalOrder } = useContext(OrderStorageContext)
   const { order } = useContext(OrderContext)
   const stripe = useStripe()
@@ -108,13 +120,15 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
         console.log('[error]', error)
       } else {
         console.log('[PaymentMethod]', paymentMethod)
-        if (paymentMethod) {
-          // TODO: Update payment source by id
+        if (paymentMethod && paymentSource) {
           const source = await setPaymentSource({
+            paymentSourceId: paymentSource.id,
             paymentResource: 'StripePayment',
-            options: {
-              ...(paymentMethod as Record<string, any>),
-              setup_future_usage: 'off_session',
+            attributes: {
+              options: {
+                ...(paymentMethod as Record<string, any>),
+                setup_future_usage: 'off_session',
+              },
             },
           })
           handleSubmit && handleSubmit(source)

@@ -56,7 +56,6 @@ export const saveCustomerUser: SaveCustomerUser = async ({
 }) => {
   try {
     if (order) {
-      // const o = await order.withCredentials(config).update({ customerEmail })
       const o = await Order.build({ id: order.id })
       await o.withCredentials(config).update({ customerEmail })
       getOrder(order.id)

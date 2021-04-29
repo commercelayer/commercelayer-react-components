@@ -123,9 +123,9 @@ export const updateLineItem: UpdateLineItem = async (params) => {
     errors,
   } = params
   try {
-    const lineItem = await CLayer.LineItem.withCredentials(config).find(
-      lineItemId
-    )
+    const lineItem = await CLayer.LineItem.build({
+      id: lineItemId,
+    })
     const update = await lineItem.withCredentials(config).update({ quantity })
     if (!update.errors().empty()) {
       throw update

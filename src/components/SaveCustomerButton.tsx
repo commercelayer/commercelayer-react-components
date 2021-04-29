@@ -9,8 +9,12 @@ const propTypes = components.SaveCustomerButton.propTypes
 const defaultProps = components.SaveCustomerButton.defaultProps
 const displayName = components.SaveCustomerButton.displayName
 
+type ParentProps = {
+  handleClick: () => any
+}
+
 type SaveAddressesButtonChildrenProps = FunctionChildren<
-  Omit<SaveCustomerButtonProps, 'children'>
+  Omit<SaveCustomerButtonProps & ParentProps, 'children'>
 >
 
 type SaveCustomerButtonProps = {
