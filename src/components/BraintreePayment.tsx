@@ -1,15 +1,100 @@
-import React, { FunctionComponent, useEffect } from 'react'
+import React, {
+  FormEvent,
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import braintree from 'braintree-web'
+import { HostedFieldFieldOptions } from 'braintree-web/modules/hosted-fields'
+import PaymentMethodContext from '#context/PaymentMethodContext'
+
+type BraintreeHostedFields<Type> = {
+  [Property in keyof Type]: {
+    label?: string
+  } & Type[Property]
+}
+
+export type BraintreeConfig = {
+  styles?: {
+    [key: string]: Record<string, string>
+  }
+  fields?: BraintreeHostedFields<HostedFieldFieldOptions>
+}
 
 type BraintreePaymentProps = {
   authorization: string
+  config?: BraintreeConfig
+}
+
+const defaultConfig: BraintreeConfig = {
+  styles: {
+    input: {
+      'font-size': '14px',
+    },
+    'input.invalid': {
+      color: 'red',
+    },
+    'input.valid': {
+      color: 'green',
+    },
+  },
+  fields: {
+    number: {
+      label: 'Card Number',
+      selector: '#card-number',
+      placeholder: '4111 1111 1111 1111',
+    },
+    cvv: {
+      label: 'CVV',
+      selector: '#cvv',
+      placeholder: '123',
+    },
+    expirationDate: {
+      label: 'Expiration Date',
+      selector: '#expiration-date',
+      placeholder: '10/2022',
+    },
+  },
 }
 
 const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
   authorization,
+  config = defaultConfig,
 }) => {
+  const { fields, styles } = config
+  const [loadBraintree, setloadBraintree] = useState(false)
+  const [buttonDisabled, setButtonDisabled] = useState(true)
+  const [hostedFieldsInstance, setHostedFieldsInstance] = useState<any>()
+  const { setPaymentSource, paymentSource } = useContext(PaymentMethodContext)
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (hostedFieldsInstance) {
+      hostedFieldsInstance.tokenize((tokenizeErr: any, payload: any) => {
+        if (tokenizeErr) {
+          console.error(tokenizeErr)
+          return
+        }
+        if (paymentSource) {
+          setPaymentSource({
+            paymentSourceId: paymentSource.id,
+            paymentResource: 'BraintreePayment',
+            attributes: {
+              paymentMethodNonce: payload.nonce,
+              options: {
+                last4: payload.details.lastFour,
+                expYear: payload.details.expirationYear,
+                expMonth: payload.details.expirationMonth,
+                brand: payload.details.cardType,
+              },
+            },
+          })
+        }
+      })
+    }
+  }
   useEffect(() => {
-    if (authorization) {
+    if (authorization && !loadBraintree) {
       braintree.client.create(
         { authorization },
         (clientErr, clientInstance) => {
@@ -20,59 +105,39 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
           braintree.hostedFields.create(
             {
               client: clientInstance,
-              styles: {
-                input: {
-                  'font-size': '14px',
-                },
-                'input.invalid': {
-                  color: 'red',
-                },
-                'input.valid': {
-                  color: 'green',
-                },
-              },
-              fields: {
-                number: {
-                  selector: '#card-number',
-                  placeholder: '4111 1111 1111 1111',
-                },
-                cvv: {
-                  selector: '#cvv',
-                  placeholder: '123',
-                },
-                expirationDate: {
-                  selector: '#expiration-date',
-                  placeholder: '10/2022',
-                },
-              },
+              fields: fields as HostedFieldFieldOptions,
+              styles: styles,
             },
             (hostedFieldsErr, hostedFieldsInstance) => {
               if (hostedFieldsErr) {
                 console.error(hostedFieldsErr)
                 return
               }
+              setloadBraintree(true)
+              setButtonDisabled(false)
+              setHostedFieldsInstance(hostedFieldsInstance)
             }
           )
         }
       )
     }
-    // return () => {
-    //   cleanup
-    // }
+    return () => {
+      setloadBraintree(false)
+    }
   }, [authorization])
-  return !authorization ? null : (
+  return !authorization && !loadBraintree ? null : (
     <div>
-      <form action="/" id="my-sample-form" method="post">
-        <label htmlFor="card-number">Card Number</label>
+      <form id="braintree-form" onSubmit={handleSubmit}>
+        <label htmlFor="card-number">{fields?.number.label}</label>
         <div id="card-number"></div>
 
-        <label htmlFor="cvv">CVV</label>
+        <label htmlFor="cvv">{fields?.cvv.label}</label>
         <div id="cvv"></div>
 
-        <label htmlFor="expiration-date">Expiration Date</label>
+        <label htmlFor="expiration-date">{fields?.expirationDate?.label}</label>
         <div id="expiration-date"></div>
 
-        <input type="submit" value="Pay" disabled />
+        <input type="submit" value="Pay" disabled={buttonDisabled} />
       </form>
     </div>
   )

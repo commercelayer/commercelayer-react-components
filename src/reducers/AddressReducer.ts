@@ -166,7 +166,7 @@ export const saveAddresses: SaveAddresses = async ({
       }
     }
     if (order && getOrder && !isEmpty(orderAttributes)) {
-      const o = await Order.withCredentials(config).find(order.id)
+      const o = await Order.build({ id: order.id })
       await o.withCredentials(config).update(orderAttributes)
       await getOrder(order.id)
     }

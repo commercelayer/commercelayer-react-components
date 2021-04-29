@@ -46,7 +46,8 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
       setShowCard(true)
     } else if (payment?.id === currentPaymentMethodId) {
       setShow(true)
-      if (!isEmpty(paymentSource)) setShowCard(true)
+      // @ts-ignore
+      if (!isEmpty(paymentSource?.options?.id)) setShowCard(true)
     } else setShow(false)
     return () => {
       setShow(false)

@@ -45,7 +45,7 @@ export default function Main() {
       if (token) setToken(token.accessToken)
     }
     getToken()
-  }, [])
+  }, [query?.orderId])
   const messages: any = [
     {
       code: 'EMPTY_ERROR',
@@ -82,26 +82,30 @@ export default function Main() {
           .find(orderId)
         const billing: any = order.billingAddress()
         const shipping: any = order.shippingAddress()
-        setBillingAddress({
-          firstName: billing.firstName,
-          lastName: billing.lastName,
-          line1: billing.line1,
-          city: billing.city,
-          countryCode: billing.countryCode,
-          stateCode: billing.stateCode,
-          zipCode: billing.zipCode,
-          phone: billing.phone,
-        })
-        setShippingAddress({
-          firstName: shipping.firstName,
-          lastName: shipping.lastName,
-          line1: shipping.line1,
-          city: shipping.city,
-          countryCode: shipping.countryCode,
-          stateCode: shipping.stateCode,
-          zipCode: shipping.zipCode,
-          phone: shipping.phone,
-        })
+        if (billing) {
+          setBillingAddress({
+            firstName: billing.firstName,
+            lastName: billing.lastName,
+            line1: billing.line1,
+            city: billing.city,
+            countryCode: billing.countryCode,
+            stateCode: billing.stateCode,
+            zipCode: billing.zipCode,
+            phone: billing.phone,
+          })
+        }
+        if (shipping) {
+          setShippingAddress({
+            firstName: shipping.firstName,
+            lastName: shipping.lastName,
+            line1: shipping.line1,
+            city: shipping.city,
+            countryCode: shipping.countryCode,
+            stateCode: shipping.stateCode,
+            zipCode: shipping.zipCode,
+            phone: shipping.phone,
+          })
+        }
       } catch (error) {
         console.error(error)
       }
