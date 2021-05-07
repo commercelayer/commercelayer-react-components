@@ -54,7 +54,6 @@ const components = {
     displayName: 'AddressField',
     propTypes: {
       children: PropTypes.func,
-      name: PropTypes.string.isRequired,
     },
   },
   AddressInput: {
