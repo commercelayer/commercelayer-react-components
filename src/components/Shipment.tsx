@@ -40,6 +40,7 @@ const Shipment: FunctionComponent<ShipmentProps> = ({ children }) => {
         stockTransfers,
         deliveryLeadTimes: times,
         shipment,
+        keyNumber: k + 1,
       }
       return (
         <ShipmentChildrenContext.Provider key={k} value={shipmentProps}>

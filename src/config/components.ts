@@ -744,6 +744,7 @@ const components = {
         'formattedCostAmount',
         'number',
         'status',
+        'keyNumber',
       ]).isRequired,
     },
   },

@@ -88,7 +88,7 @@ export default function Main() {
               <Shipment>
                 <div className="flex">
                   Shipments N:
-                  <ShipmentField className="font-bold pl-1" name="" />
+                  <ShipmentField className="font-bold pl-1" name="keyNumber" />
                 </div>
                 <LineItemsContainer>
                   <LineItem>

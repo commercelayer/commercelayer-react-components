@@ -14,12 +14,14 @@ export interface InitialShipmentContext {
   stockTransfers?: StockTransferCollection[]
   deliveryLeadTimes?: DeliveryLeadTimeCollection[] | null
   shipment?: ShipmentCollection
+  keyNumber: number
 }
 
 const initial: InitialShipmentContext = {
   lineItems: [],
   shippingMethods: [],
   stockTransfers: [],
+  keyNumber: 0,
 }
 
 const ShipmentChildrenContext = createContext<InitialShipmentContext>(initial)
