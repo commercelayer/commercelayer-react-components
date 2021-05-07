@@ -25,11 +25,11 @@
     "size-limit:why": "npm run build && size-limit --why",
     "size-limit": "npm run build && size-limit",
     "version:fix": "npm version patch",
-    "version:minor": "npm version minor",
-    "version:major": "npm version major",
-    "publish:patch": "npm run build && npm run version:fix && git push --follow-tags && npm publish --access public",
-    "publish:minor": "npm run build && npm run version:minor && git push --follow-tags && npm publish --access public",
-    "publish:major": "npm run build && npm run version:major && git push --follow-tags && npm publish --access public"
+    "version:feat": "npm version minor",
+    "version:perf": "npm version major",
+    "publish:fix": "npm run build && npm run version:fix && git push --follow-tags && npm publish --access public",
+    "publish:feat": "npm run build && npm run version:feat && git push --follow-tags && npm publish --access public",
+    "publish:perf": "npm run build && npm run version:perf && git push --follow-tags && npm publish --access public"
   },
   "repository": {
     "type": "git",
