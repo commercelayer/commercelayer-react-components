@@ -4,11 +4,14 @@ import Parent from './utils/Parent'
 import components from '#config/components'
 import { AddressFieldView } from '#reducers/AddressReducer'
 import { camelCase, get } from 'lodash'
+import { AddressCollection } from '@commercelayer/js-sdk'
 
 const propTypes = components.AddressField.propTypes
 const displayName = components.AddressField.displayName
 
-type AddressFieldChildrenProps = Omit<AddressFieldProps, 'children'>
+type AddressFieldChildrenProps = Omit<AddressFieldProps, 'children'> & {
+  address: AddressCollection
+}
 
 type AddressFieldProps = {
   children?: (props: AddressFieldChildrenProps) => ReactNode
@@ -21,6 +24,7 @@ const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
   const key = camelCase(name)
   const text = get(address, key)
   const parentProps = {
+    address,
     ...props,
   }
   return props.children ? (

@@ -19,6 +19,7 @@ import {
   StockTransfer,
   StockTransferField,
   DeliveryLeadTime,
+  ShipmentField,
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 import { isEmpty } from 'lodash'
@@ -85,7 +86,10 @@ export default function Main() {
           <OrderContainer orderId={orderId}>
             <ShipmentsContainer>
               <Shipment>
-                <div>Shipments</div>
+                <div className="flex">
+                  Shipments N:
+                  <ShipmentField className="font-bold pl-1" name="" />
+                </div>
                 <LineItemsContainer>
                   <LineItem>
                     <div className="flex justify-between items-center border-b p-5">

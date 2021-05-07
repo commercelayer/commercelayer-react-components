@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext } from 'react'
+import React, { FunctionComponent, useContext, useState } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
@@ -48,6 +48,7 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
   } = useContext(AddressContext)
   const { order } = useContext(OrderContext)
   const { addresses } = useContext(CustomerContext)
+  const [forceDisable, setForceDisable] = useState(disabled)
   const billingDisable = billingAddressController({
     billingAddress,
     errors,
@@ -73,7 +74,9 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     disabled || billingDisable || shippingDisable || countryLockDisable
   const handleClick = async () => {
     if (isEmpty(errors) && !disable) {
+      setForceDisable(true)
       await saveAddresses()
+      setForceDisable(false)
       onClick && onClick()
     }
   }
@@ -87,7 +90,12 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <button type="button" disabled={disable} onClick={handleClick} {...p}>
+    <button
+      type="button"
+      disabled={disable || forceDisable}
+      onClick={handleClick}
+      {...p}
+    >
       {label}
     </button>
   )
