@@ -20,6 +20,7 @@ import { DeliveryLeadTimeField } from '../components/DeliveryLeadTime'
 import { StockTransferFieldType } from '#components/StockTransferField'
 import { PaymentSourceDetailType } from '#components/PaymentSourceDetail'
 import { CodeType } from '#reducers/OrderReducer'
+import { ShipmentAttribute } from '#components/ShipmentField'
 
 const components = {
   Address: {
@@ -53,6 +54,7 @@ const components = {
     displayName: 'AddressField',
     propTypes: {
       children: PropTypes.func,
+      name: PropTypes.string.isRequired,
     },
   },
   AddressInput: {
@@ -729,6 +731,20 @@ const components = {
     displayName: 'Shipment',
     propTypes: {
       children: childrenTypes.isRequired,
+    },
+  },
+  ShipmentField: {
+    displayName: 'ShipmentField',
+    propTypes: {
+      children: PropTypes.func,
+      name: PropTypes.oneOf<ShipmentAttribute>([
+        'costAmountCents',
+        'costAmountFloat',
+        'currencyCode',
+        'formattedCostAmount',
+        'number',
+        'status',
+      ]).isRequired,
     },
   },
   ShipmentsContainer: {

@@ -27,6 +27,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
   const { children, label = 'Place order', disabled, onClick, ...p } = props
   const { isPermitted, setPlaceOrder } = useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
+  const [forceDisable, setForceDisable] = useState(disabled)
   useEffect(() => {
     if (isPermitted) {
       setNotPermitted(false)
@@ -36,7 +37,9 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     }
   }, [isPermitted])
   const handleClick = async () => {
+    setForceDisable(true)
     const placed = setPlaceOrder && (await setPlaceOrder())
+    setForceDisable(false)
     onClick && placed && onClick(placed)
   }
   const disabledButton = disabled !== undefined ? disabled : notPermitted
@@ -51,7 +54,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
   ) : (
     <button
       type="button"
-      disabled={disabledButton}
+      disabled={disabledButton || forceDisable}
       onClick={handleClick}
       {...p}
     >
