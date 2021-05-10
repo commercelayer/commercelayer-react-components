@@ -38,6 +38,7 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
         setCloneAddress,
       })
     }
+    return () => {}
   }, [order])
   const contextValue = {
     ...state,
