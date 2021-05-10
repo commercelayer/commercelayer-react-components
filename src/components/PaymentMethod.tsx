@@ -13,23 +13,34 @@ const displayName = components.PaymentMethod.displayName
 
 type PaymentMethodProps = {
   children: ReactNode
-}
+  activeClass?: string
+} & JSX.IntrinsicElements['div']
 
-const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({ children }) => {
-  const { paymentMethods } = useContext(PaymentMethodContext)
+const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
+  children,
+  className,
+  activeClass,
+  ...p
+}) => {
+  const { paymentMethods, currentPaymentMethodId } = useContext(
+    PaymentMethodContext
+  )
   const components =
     paymentMethods &&
     paymentMethods.map((payment, k) => {
+      const isActive = currentPaymentMethodId === payment?.id
       const paymentMethodProps = {
         payment,
       }
       return (
-        <PaymentMethodChildrenContext.Provider
-          key={k}
-          value={paymentMethodProps}
-        >
-          {children}
-        </PaymentMethodChildrenContext.Provider>
+        <div className={`${className} ${isActive ? activeClass : ''}`} {...p}>
+          <PaymentMethodChildrenContext.Provider
+            key={k}
+            value={paymentMethodProps}
+          >
+            {children}
+          </PaymentMethodChildrenContext.Provider>
+        </div>
       )
     })
   return <Fragment>{components}</Fragment>
