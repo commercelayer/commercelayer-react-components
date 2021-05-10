@@ -96,14 +96,14 @@ export default function Main() {
                 },
               }}
             >
-              <PaymentMethod>
+              <PaymentMethod
+                className="p-2 my-1 flex items-center justify-items-center bg-gray-300"
+                activeClass="bg-opacity-25"
+              >
                 <PaymentMethodRadioButton data-cy="payment-radio-button" />
-                <PaymentMethodName />
-                <PaymentMethodPrice />
-                <PaymentSource
-                  data-cy="payment-source"
-                  className="p-5 my-2 bg-gray-50"
-                >
+                <PaymentMethodName className="pl-3" />
+                <PaymentMethodPrice className="pl-3" />
+                <PaymentSource data-cy="payment-source" className="p-5 my-2">
                   <div className="flex flex-row items-center justify-start bg-gray-100 p-5 my-10">
                     <div className="flex flex-row items-center">
                       <PaymentSourceBrandIcon className="mr-3" />
