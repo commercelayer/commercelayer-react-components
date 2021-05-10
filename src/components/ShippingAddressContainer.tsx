@@ -38,6 +38,7 @@ const ShippingAddressContainer: FunctionComponent<Props> = (props) => {
         setCloneAddress,
       })
     }
+    return () => {}
   }, [order])
   const contextValue = {
     ...state,
