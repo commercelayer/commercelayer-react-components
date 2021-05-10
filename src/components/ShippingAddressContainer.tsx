@@ -31,15 +31,18 @@ const ShippingAddressContainer: FunctionComponent<Props> = (props) => {
   const { order, getOrder } = useContext(OrderContext)
   const { setCloneAddress } = useContext(AddressContext)
   useEffect(() => {
-    if (order) {
+    let isMounted = true
+    if (order && config && isMounted) {
       setShippingCustomerAddressId({
         dispatch,
         order,
         setCloneAddress,
       })
     }
-    return () => {}
-  }, [order])
+    return () => {
+      isMounted = false
+    }
+  }, [order, config])
   const contextValue = {
     ...state,
     setShippingAddress: async (

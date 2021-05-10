@@ -31,6 +31,7 @@ type StripePaymentFormProps = {
   elements: StripeElements | null
   options?: StripeCardElementOptions
   submitClassName?: string
+  submitContainerClassName?: string
   submitLabel?: string
   handleSubmit?: (response: SetPaymentSourceResponse) => void
   templateCustomerSaveToWallet?: PaymentMethodNameProps['templateCustomerSaveToWallet']
@@ -57,6 +58,7 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
   elements,
   options = defaultOptions,
   submitClassName,
+  submitContainerClassName,
   submitLabel = 'Add payment',
   handleSubmit,
   templateCustomerSaveToWallet,
@@ -132,9 +134,11 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
           {templateCustomerSaveToWallet}
         </Parent>
       )}
-      <button className={submitClassName} type="submit" disabled={!stripe}>
-        {submitLabel}
-      </button>
+      <div className={submitContainerClassName}>
+        <button className={submitClassName} type="submit" disabled={!stripe}>
+          {submitLabel}
+        </button>
+      </div>
     </form>
   )
 }
@@ -156,6 +160,7 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     submitClassName,
     submitLabel,
     handleSubmit,
+    submitContainerClassName,
     containerClassName,
     templateCustomerSaveToWallet,
     ...divProps
@@ -179,6 +184,7 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
               options={options}
               submitClassName={submitClassName}
               submitLabel={submitLabel}
+              submitContainerClassName={submitContainerClassName}
               handleSubmit={handleSubmit}
               templateCustomerSaveToWallet={templateCustomerSaveToWallet}
             />

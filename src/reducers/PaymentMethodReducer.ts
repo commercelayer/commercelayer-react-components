@@ -243,6 +243,7 @@ export type PaymentMethodConfig = {
     options?: StripeCardElementOptions
     publishableKey: string
     submitClassName?: string
+    submitContainerClassName?: string
     submitLabel?: string
     handleSubmit?: (response?: SetPaymentSourceResponse) => void
     [key: string]: any

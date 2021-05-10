@@ -31,14 +31,17 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
   const { order, getOrder } = useContext(OrderContext)
   const { shipToDifferentAddress, setCloneAddress } = useContext(AddressContext)
   useEffect(() => {
-    if (order) {
+    let isMounted = true
+    if (order && isMounted) {
       setBillingCustomerAddressId({
         dispatch,
         order,
         setCloneAddress,
       })
     }
-    return () => {}
+    return () => {
+      isMounted = false
+    }
   }, [order])
   const contextValue = {
     ...state,

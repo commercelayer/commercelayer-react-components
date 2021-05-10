@@ -33,11 +33,12 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
         payment,
       }
       return (
-        <div className={`${className} ${isActive ? activeClass : ''}`} {...p}>
-          <PaymentMethodChildrenContext.Provider
-            key={k}
-            value={paymentMethodProps}
-          >
+        <div
+          key={k}
+          className={`${className} ${isActive ? activeClass : ''}`}
+          {...p}
+        >
+          <PaymentMethodChildrenContext.Provider value={paymentMethodProps}>
             {children}
           </PaymentMethodChildrenContext.Provider>
         </div>
