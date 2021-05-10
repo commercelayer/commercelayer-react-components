@@ -1,6 +1,6 @@
 {
   "name": "@commercelayer/react-components",
-  "version": "2.14.0",
+  "version": "2.15.0",
   "description": "The Official Commerce Layer React Components",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
