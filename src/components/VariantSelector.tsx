@@ -31,6 +31,7 @@ type VariantSelectorChildrenProps = FunctionChildren<
   Omit<VariantSelectorProps, 'children'> & {
     variants: VariantsObject
     handleSelect: SetSkuCode
+    loading: boolean
   }
 >
 
@@ -77,7 +78,7 @@ const VariantSelector: FunctionComponent<VariantSelectorProps> = (props) => {
     )
   const parentProps = {
     variants,
-    loading,
+    loading: !!loading,
     handleSelect: setSkuCode,
     skuCode: sCode,
     ...props,

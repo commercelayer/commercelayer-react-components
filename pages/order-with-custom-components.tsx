@@ -150,6 +150,7 @@ export default function Order() {
                               handleSelect,
                               placeholder,
                               id,
+                              loading,
                               ...p
                             } = props
                             const selectOptions = keys(variants).map((v, k) => {
@@ -165,7 +166,9 @@ export default function Order() {
                                 </option>
                               )
                             })
-                            return (
+                            return loading ? (
+                              'Loading...'
+                            ) : (
                               <select
                                 id={id}
                                 onChange={(e): void => {
