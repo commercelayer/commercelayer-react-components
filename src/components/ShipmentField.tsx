@@ -24,7 +24,7 @@ export type ShipmentAttribute =
 type ShipmentFieldProps = {
   children?: (props: ShipmentFieldChildrenProps) => ReactNode
   name: ShipmentAttribute
-} & JSX.IntrinsicElements['p']
+} & JSX.IntrinsicElements['span']
 
 const ShipmentField: FunctionComponent<ShipmentFieldProps> = (props) => {
   const { name } = props
@@ -38,7 +38,7 @@ const ShipmentField: FunctionComponent<ShipmentFieldProps> = (props) => {
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <p {...props}>{text}</p>
+    <span {...props}>{text}</span>
   )
 }
 
