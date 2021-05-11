@@ -1,5 +1,6 @@
 import React, {
   FunctionComponent,
+  ReactNode,
   SyntheticEvent,
   useContext,
   useEffect,
@@ -25,6 +26,7 @@ import { PaymentMethodNameProps } from './PaymentSource'
 import Parent from './utils/Parent'
 import OrderStorageContext from '#context/OrderStorageContext'
 import OrderContext from '#context/OrderContext'
+import isFunction from 'lodash/isFunction'
 
 type StripePaymentFormProps = {
   stripe: Stripe | null
@@ -32,7 +34,7 @@ type StripePaymentFormProps = {
   options?: StripeCardElementOptions
   submitClassName?: string
   submitContainerClassName?: string
-  submitLabel?: string
+  submitLabel?: string | ReactNode
   handleSubmit?: (response: SetPaymentSourceResponse) => void
   templateCustomerSaveToWallet?: PaymentMethodNameProps['templateCustomerSaveToWallet']
 }
@@ -136,7 +138,7 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
       )}
       <div className={submitContainerClassName}>
         <button className={submitClassName} type="submit" disabled={!stripe}>
-          {submitLabel}
+          {isFunction(submitLabel) ? submitLabel() : submitLabel}
         </button>
       </div>
     </form>
