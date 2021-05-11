@@ -31,8 +31,7 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
   const { order, getOrder } = useContext(OrderContext)
   const { shipToDifferentAddress, setCloneAddress } = useContext(AddressContext)
   useEffect(() => {
-    let isMounted = true
-    if (order && isMounted) {
+    if (order && config) {
       setBillingCustomerAddressId({
         dispatch,
         order,
@@ -40,7 +39,12 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
       })
     }
     return () => {
-      isMounted = false
+      order &&
+        setBillingCustomerAddressId({
+          dispatch,
+          order,
+          setCloneAddress,
+        })
     }
   }, [order])
   const contextValue = {

@@ -139,7 +139,7 @@ export default function Main() {
               >
                 <div className="flex flex-col">
                   <PaymentMethod
-                    className="p-2 my-1 flex items-center justify-items-center bg-gray-300"
+                    className="p-2 my-1 flex flex-wrap w-1/2 items-center justify-items-center bg-gray-300"
                     activeClass="bg-opacity-25"
                   >
                     <PaymentMethodRadioButton />
