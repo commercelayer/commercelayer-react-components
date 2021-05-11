@@ -10,10 +10,11 @@ type LineItemNameChildrenProps = Omit<LineItemNameProps, 'children'>
 
 type LineItemNameProps = {
   children?: (props: LineItemNameChildrenProps) => ReactNode
-} & JSX.IntrinsicElements['p']
+} & JSX.IntrinsicElements['label']
 
 const ShippingMethodName: FunctionComponent<LineItemNameProps> = (props) => {
   const { shippingMethod } = useContext(ShippingMethodChildrenContext)
+  const htmlFor = shippingMethod.id || ''
   const labelName = shippingMethod['name']
   const parentProps = {
     ...props,
@@ -21,7 +22,9 @@ const ShippingMethodName: FunctionComponent<LineItemNameProps> = (props) => {
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <p {...props}>{labelName}</p>
+    <label htmlFor={htmlFor} {...props}>
+      {labelName}
+    </label>
   )
 }
 

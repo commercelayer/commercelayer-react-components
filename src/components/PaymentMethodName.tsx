@@ -10,20 +10,25 @@ type PaymentMethodNameChildrenProps = Omit<PaymentMethodNameProps, 'children'>
 
 type PaymentMethodNameProps = {
   children?: (props: PaymentMethodNameChildrenProps) => ReactNode
-} & JSX.IntrinsicElements['p']
+} & JSX.IntrinsicElements['label']
 
 const PaymentMethodName: FunctionComponent<PaymentMethodNameProps> = (
   props
 ) => {
   const { payment } = useContext(PaymentMethodChildrenContext)
   const labelName = payment?.['name']
+  const htmlFor = payment?.paymentSourceType
   const parentProps = {
+    htmlFor,
+    labelName,
     ...props,
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <p {...props}>{labelName}</p>
+    <label htmlFor={htmlFor} {...props}>
+      {labelName}
+    </label>
   )
 }
 

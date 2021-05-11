@@ -38,6 +38,8 @@ const ShippingMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProp
   }
   const parentProps = {
     handleOnChange,
+    name,
+    id: shippingMethodId,
     ...props,
   }
   return props.children ? (
@@ -46,6 +48,7 @@ const ShippingMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProp
     <input
       type="radio"
       name={name}
+      id={shippingMethodId}
       onChange={handleOnChange}
       defaultChecked={checked}
       {...p}

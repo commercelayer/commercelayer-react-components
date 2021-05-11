@@ -38,8 +38,12 @@ const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps
     await setPaymentMethod({ paymentResource, paymentMethodId })
     onChange && onChange(payment)
   }
+  const id = payment?.paymentSourceType
   const parentProps = {
     handleOnChange,
+    checked,
+    id,
+    name,
     ...props,
   }
   return props.children ? (
@@ -48,6 +52,7 @@ const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps
     <input
       type="radio"
       name={name}
+      id={id}
       onChange={handleOnChange}
       defaultChecked={checked}
       {...p}
