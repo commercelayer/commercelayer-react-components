@@ -58,7 +58,10 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
   const [showCard, setShowCard] = useState(false)
 
   useEffect(() => {
-    if (payment?.id === currentPaymentMethodId) {
+    if (readonly) {
+      setShow(true)
+      setShowCard(true)
+    } else if (payment?.id === currentPaymentMethodId) {
       setShow(true)
       if (!isEmpty(paymentSource)) setShowCard(true)
     } else setShow(false)
@@ -66,7 +69,7 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
       setShow(false)
       setShowCard(false)
     }
-  }, [currentPaymentMethodId, paymentSource, payments, payment])
+  }, [currentPaymentMethodId, paymentSource, payments, payment, readonly])
   const handleEditClick = () => setShowCard(!showCard)
   const PaymentGateway = () => {
     const paymentResource = readonly
@@ -74,7 +77,7 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
       : (payment?.paymentSourceType as PaymentResource)
     switch (paymentResource) {
       case 'stripe_payments':
-        if (payment?.id !== currentPaymentMethodId) return null
+        if (!show) return null
         const stripeConfig = config
           ? getPaymentConfig(paymentResource, config)
           : null
@@ -88,11 +91,11 @@ const PaymentSource: FunctionComponent<PaymentMethodNameProps> = (props) => {
           // @ts-ignore
           const card = paymentSource?.options?.card as Record<string, any>
           const value = { ...card, showCard, handleEditClick, readonly }
-          return (
+          return card ? (
             <PaymentSourceContext.Provider value={value}>
               {children}
             </PaymentSourceContext.Provider>
-          )
+          ) : null
         }
         if (!isGuest && templateCustomerCards) {
           const customerPaymentsCards = customerPayments.map(

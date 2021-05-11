@@ -1,6 +1,7 @@
-import baseReducer from '#utils/baseReducer'
-import { Dispatch } from 'react'
+import { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import { getOrderContext } from '#reducers/OrderReducer'
 import { BaseError } from '#typings/errors'
+import baseReducer from '#utils/baseReducer'
 import CLayer, {
   Order,
   OrderCollection,
@@ -9,10 +10,9 @@ import CLayer, {
   StripePaymentCollection,
   WireTransferCollection,
 } from '@commercelayer/js-sdk'
-import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { getOrderContext } from '#reducers/OrderReducer'
-import { isEmpty, camelCase } from 'lodash'
 import { StripeCardElementOptions } from '@stripe/stripe-js'
+import { camelCase, isEmpty } from 'lodash'
+import { Dispatch, ReactNode } from 'react'
 
 export type PaymentMethodActionType =
   | 'setErrors'
@@ -244,7 +244,7 @@ export type PaymentMethodConfig = {
     publishableKey: string
     submitClassName?: string
     submitContainerClassName?: string
-    submitLabel?: string
+    submitLabel?: string | ReactNode
     handleSubmit?: (response?: SetPaymentSourceResponse) => void
     [key: string]: any
   }
