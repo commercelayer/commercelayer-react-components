@@ -14,7 +14,8 @@ type LineItemNameProps = {
 
 const ShippingMethodName: FunctionComponent<LineItemNameProps> = (props) => {
   const { shippingMethod } = useContext(ShippingMethodChildrenContext)
-  const htmlFor = shippingMethod.id || ''
+  const htmlFor =
+    `shipment-${shippingMethod.shipmentId}-${shippingMethod.id}` || ''
   const labelName = shippingMethod['name']
   const parentProps = {
     ...props,

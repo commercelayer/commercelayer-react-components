@@ -31,6 +31,7 @@ const ShippingMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProp
   const shipmentId = shippingMethod.shipmentId || ''
   const shippingMethodId = shippingMethod.id
   const name = `shipment-${shipmentId}`
+  const id = `${name}-${shippingMethodId}`
   const checked = shippingMethod.id === currentShippingMethodId
   const handleOnChange = async () => {
     await setShippingMethod(shipmentId, shippingMethodId)
@@ -39,7 +40,7 @@ const ShippingMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProp
   const parentProps = {
     handleOnChange,
     name,
-    id: shippingMethodId,
+    id,
     ...props,
   }
   return props.children ? (
@@ -48,7 +49,7 @@ const ShippingMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProp
     <input
       type="radio"
       name={name}
-      id={shippingMethodId}
+      id={id}
       onChange={handleOnChange}
       defaultChecked={checked}
       {...p}
