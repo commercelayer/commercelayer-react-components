@@ -130,7 +130,7 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
   }
   return (
     <form onSubmit={onSubmit}>
-      <CardElement options={options} />
+      <CardElement options={{ ...defaultOptions, ...options }} />
       {templateCustomerSaveToWallet && (
         <Parent {...{ name: 'save_payment_source_to_customer_wallet' }}>
           {templateCustomerSaveToWallet}
@@ -165,6 +165,8 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     submitContainerClassName,
     containerClassName,
     templateCustomerSaveToWallet,
+    fonts = [],
+    cssSrc = '',
     ...divProps
   } = p
   useEffect(() => {
@@ -175,9 +177,10 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     show && !stripe && loadingStripe()
     return () => setStripe(null)
   }, [show])
+  const cssOptions: any = { fonts, cssSrc }
   return !show ? null : (
     <div className={containerClassName} {...divProps}>
-      <Elements stripe={stripe}>
+      <Elements stripe={stripe} options={cssOptions}>
         <ElementsConsumer>
           {({ elements, stripe }) => (
             <StripePaymentForm

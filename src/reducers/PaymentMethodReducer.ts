@@ -10,7 +10,11 @@ import CLayer, {
   StripePaymentCollection,
   WireTransferCollection,
 } from '@commercelayer/js-sdk'
-import { StripeCardElementOptions } from '@stripe/stripe-js'
+import {
+  CssFontSource,
+  CustomFontSource,
+  StripeCardElementOptions,
+} from '@stripe/stripe-js'
 import { camelCase, isEmpty } from 'lodash'
 import { Dispatch, ReactNode } from 'react'
 
@@ -237,7 +241,11 @@ export const setPaymentSource: SetPaymentSource = async ({
 
 export type PaymentMethodConfig = {
   stripePayment: {
+    [key: string]: any
     containerClassName?: string
+    fonts?: (CssFontSource | CustomFontSource)[]
+    cssSrc?: string
+    handleSubmit?: (response?: SetPaymentSourceResponse) => void
     hintLabel?: string
     name?: string
     options?: StripeCardElementOptions
@@ -245,8 +253,6 @@ export type PaymentMethodConfig = {
     submitClassName?: string
     submitContainerClassName?: string
     submitLabel?: string | ReactNode
-    handleSubmit?: (response?: SetPaymentSourceResponse) => void
-    [key: string]: any
   }
 }
 
