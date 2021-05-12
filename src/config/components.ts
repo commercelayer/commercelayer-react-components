@@ -437,6 +437,12 @@ const components = {
       children: PropTypes.func,
     },
   },
+  LineItemSkuCode: {
+    displayName: 'LineItemSkuCode',
+    propTypes: {
+      children: PropTypes.func,
+    },
+  },
   LineItemOption: {
     displayName: 'LineItemOption',
     propTypes: {
