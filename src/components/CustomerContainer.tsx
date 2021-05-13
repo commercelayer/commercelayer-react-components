@@ -39,8 +39,10 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
     if (config.accessToken && order && isEmpty(state.payments) && !isGuest) {
       getCustomerPaymentSources({ config, dispatch, order })
     }
-    return () => {}
-  }, [config.accessToken, order, isGuest])
+    return () => {
+      dispatch({ type: 'setCustomerEmail', payload: {} })
+    }
+  }, [config.accessToken, isGuest])
   const contextValue = {
     isGuest,
     ...state,

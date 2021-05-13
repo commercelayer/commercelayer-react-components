@@ -7,6 +7,7 @@ import { getOrderContext } from '#reducers/OrderReducer'
 export type BillingAddressActionType =
   | 'setBillingAddress'
   | 'setBillingCustomerAddressId'
+  | 'cleanup'
 
 export interface BillingAddressActionPayload {
   _billingAddressCloneId: string
@@ -95,6 +96,7 @@ export const setBillingCustomerAddressId: SetBillingCustomerAddressId = async ({
 const type: BillingAddressActionType[] = [
   'setBillingAddress',
   'setBillingCustomerAddressId',
+  'cleanup',
 ]
 
 const billingAddressReducer = (

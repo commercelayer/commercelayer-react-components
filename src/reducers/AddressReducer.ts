@@ -10,6 +10,7 @@ export type AddressActionType =
   | 'setAddress'
   | 'setShipToDifferentAddress'
   | 'setCloneAddress'
+  | 'cleanup'
 
 export type AddressField =
   | 'city'
@@ -179,6 +180,7 @@ const type: AddressActionType[] = [
   'setAddress',
   'setShipToDifferentAddress',
   'setCloneAddress',
+  'cleanup',
 ]
 
 const addressReducer = (

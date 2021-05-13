@@ -194,7 +194,6 @@ export const setPaymentSource: SetPaymentSource = async ({
   order,
   paymentResource,
   customerPaymentSourceId,
-  // savePaymentSourceToCustomerWallet,
 }) => {
   try {
     if (config && order) {
@@ -210,14 +209,12 @@ export const setPaymentSource: SetPaymentSource = async ({
               await Order.withCredentials(config)
                 .includes('paymentSource')
                 .find(order.id)
-            ).update({
-              _customerPaymentSourceId: customerPaymentSourceId,
-            })
+            )
+              .withCredentials(config)
+              .update({
+                _customerPaymentSourceId: customerPaymentSourceId,
+              })
           ).paymentSource()
-      // if (savePaymentSourceToCustomerWallet && !customerPaymentSourceId)
-      //   await o.withCredentials(config).update({
-      //     _savePaymentSourceToCustomerWallet: savePaymentSourceToCustomerWallet,
-      //   })
       if (order?.billingAddress() === null)
         await order.withCredentials(config).loadBillingAddress()
       if (order?.paymentSource() === null)
@@ -244,7 +241,6 @@ export type PaymentMethodConfig = {
     [key: string]: any
     containerClassName?: string
     fonts?: (CssFontSource | CustomFontSource)[]
-    cssSrc?: string
     handleSubmit?: (response?: SetPaymentSourceResponse) => void
     hintLabel?: string
     name?: string
