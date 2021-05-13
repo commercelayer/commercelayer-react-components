@@ -13,12 +13,7 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js'
-import {
-  loadStripe,
-  Stripe,
-  StripeCardElementOptions,
-  StripeElements,
-} from '@stripe/stripe-js'
+import { loadStripe, Stripe, StripeCardElementOptions } from '@stripe/stripe-js'
 import {
   PaymentMethodConfig,
   SetPaymentSourceResponse,
