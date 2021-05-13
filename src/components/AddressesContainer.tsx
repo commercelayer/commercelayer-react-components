@@ -41,6 +41,12 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
         shipToDifferentAddress,
       },
     })
+    return () => {
+      dispatch({
+        type: 'cleanup',
+        payload: {},
+      })
+    }
   }, [shipToDifferentAddress])
   const contextValue = {
     ...state,

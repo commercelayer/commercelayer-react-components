@@ -7,6 +7,7 @@ import { getOrderContext } from '#reducers/OrderReducer'
 export type ShippingAddressActionType =
   | 'setShippingAddress'
   | 'setShippingCustomerAddressId'
+  | 'cleanup'
 
 export interface ShippingAddressActionPayload {
   _shippingAddressCloneId: string
@@ -93,6 +94,7 @@ export const setShippingCustomerAddressId: SetShippingCustomerAddressId = async 
 const type: ShippingAddressActionType[] = [
   'setShippingAddress',
   'setShippingCustomerAddressId',
+  'cleanup',
 ]
 
 const shippingAddressReducer = (

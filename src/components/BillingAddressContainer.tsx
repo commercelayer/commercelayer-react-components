@@ -39,12 +39,10 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
       })
     }
     return () => {
-      order &&
-        setBillingCustomerAddressId({
-          dispatch,
-          order,
-          setCloneAddress,
-        })
+      dispatch({
+        type: 'cleanup',
+        payload: {},
+      })
     }
   }, [order])
   const contextValue = {

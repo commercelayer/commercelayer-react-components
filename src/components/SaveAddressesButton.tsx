@@ -1,4 +1,9 @@
-import React, { FunctionComponent, useContext, useState } from 'react'
+import React, {
+  FunctionComponent,
+  ReactNode,
+  useContext,
+  useState,
+} from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
@@ -11,6 +16,7 @@ import {
 } from '#utils/addressesManager'
 import OrderContext from '#context/OrderContext'
 import CustomerContext from '#context/CustomerContext'
+import isFunction from 'lodash/isFunction'
 
 const propTypes = components.SaveAddressesButton.propTypes
 const defaultProps = components.SaveAddressesButton.defaultProps
@@ -22,7 +28,7 @@ type SaveAddressesButtonChildrenProps = FunctionChildren<
 
 type SaveAddressesButtonProps = {
   children?: SaveAddressesButtonChildrenProps
-  label?: string
+  label?: string | ReactNode
   onClick?: () => void
 } & JSX.IntrinsicElements['button']
 
@@ -96,7 +102,7 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
       onClick={handleClick}
       {...p}
     >
-      {label}
+      {isFunction(label) ? label() : label}
     </button>
   )
 }
