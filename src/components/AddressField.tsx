@@ -9,14 +9,24 @@ import { AddressCollection } from '@commercelayer/js-sdk'
 const propTypes = components.AddressField.propTypes
 const displayName = components.AddressField.displayName
 
-type AddressFieldChildrenProps = Omit<AddressFieldProps, 'children'> & {
+type AddressFieldChildrenProps = Omit<
+  AddressFieldProps,
+  'children' | 'name'
+> & {
   address: AddressCollection
 }
 
-type AddressFieldProps = {
-  children?: (props: AddressFieldChildrenProps) => ReactNode
-  name: AddressFieldView
-} & JSX.IntrinsicElements['p']
+type AddressFieldProps = (
+  | {
+      children?: (props: AddressFieldChildrenProps) => ReactNode
+      name: AddressFieldView
+    }
+  | {
+      children: (props: AddressFieldChildrenProps) => ReactNode
+      name?: AddressFieldView
+    }
+) &
+  JSX.IntrinsicElements['p']
 
 const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
   const { name } = props
