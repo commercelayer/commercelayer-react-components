@@ -1,4 +1,9 @@
-import React, { FunctionComponent, useContext, PropsWithoutRef } from 'react'
+import React, {
+  FunctionComponent,
+  useContext,
+  PropsWithoutRef,
+  ReactNode,
+} from 'react'
 import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
 import { isEmpty, has } from 'lodash'
@@ -10,6 +15,7 @@ import { AddToCartReturn } from '#reducers/OrderReducer'
 import SkuListsContext from '#context/SkuListsContext'
 import ExternalFunctionContext from '#context/ExternalFunctionContext'
 import { VariantOptions } from '#components/VariantSelector'
+import isFunction from 'lodash/isFunction'
 
 const propTypes = components.AddToCartButton.propTypes
 const defaultProps = components.AddToCartButton.defaultProps
@@ -24,7 +30,7 @@ type AddToCartButtonChildrenProps = FunctionChildren<
 
 type AddToCartButtonProps = {
   children?: AddToCartButtonChildrenProps
-  label?: string
+  label?: string | ReactNode
   skuCode?: string
   disabled?: boolean
   skuListId?: string
@@ -140,7 +146,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <button disabled={autoDisabled} onClick={handleClick} {...p}>
-      {label}
+      {isFunction(label) ? label() : label}
     </button>
   )
 }
