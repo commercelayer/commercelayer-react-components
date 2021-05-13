@@ -106,6 +106,33 @@ export default function Main() {
             <PaymentMethodsContainer
               config={{
                 stripePayment: {
+                  fonts: [
+                    {
+                      cssSrc:
+                        'https://fonts.googleapis.com/css2?family=Josefin+Slab:ital,wght@0,100;1,100&display=swap',
+                    },
+                  ],
+                  options: {
+                    style: {
+                      base: {
+                        color: '#000',
+                        fontWeight: '400',
+                        fontFamily: 'Josefin Slab',
+                        ':-webkit-autofill': {
+                          color: '#fce883',
+                        },
+                        // '::placeholder': {
+                        //   color: '#e0e0e0',
+                        // },
+                      },
+                      invalid: {
+                        iconColor: '#FFC7EE',
+                        color: '#FFC7EE',
+                      },
+                    },
+                    hideIcon: false,
+                    hidePostalCode: true,
+                  },
                   publishableKey: 'pk_test_UArgJuzBMSppFkvAkATXTNT5',
                   handleSubmit: handleSubmit,
                   submitLabel: submitLabel,
