@@ -8,6 +8,7 @@ import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
+import isFunction from 'lodash/isFunction'
 
 const propTypes = components.PlaceOrderButton.propTypes
 const defaultProps = components.PlaceOrderButton.defaultProps
@@ -19,7 +20,7 @@ type PlaceOrderButtonChildrenProps = FunctionChildren<
 
 type PlaceOrderButtonProps = {
   children?: PlaceOrderButtonChildrenProps
-  label?: string
+  label?: string | ReactNode
   onClick?: (response: { placed: boolean }) => void
 } & JSX.IntrinsicElements['button']
 
@@ -58,7 +59,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       onClick={handleClick}
       {...p}
     >
-      {label}
+      {isFunction(label) ? label() : label}
     </button>
   )
 }

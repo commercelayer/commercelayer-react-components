@@ -10,7 +10,8 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import {
   CardElement,
   Elements,
-  ElementsConsumer,
+  useElements,
+  useStripe,
 } from '@stripe/react-stripe-js'
 import {
   loadStripe,
@@ -29,8 +30,6 @@ import OrderContext from '#context/OrderContext'
 import isFunction from 'lodash/isFunction'
 
 type StripePaymentFormProps = {
-  stripe: Stripe | null
-  elements: StripeElements | null
   options?: StripeCardElementOptions
   submitClassName?: string
   submitContainerClassName?: string
@@ -56,8 +55,6 @@ const defaultOptions = {
 }
 
 const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
-  stripe,
-  elements,
   options = defaultOptions,
   submitClassName,
   submitContainerClassName,
@@ -68,6 +65,8 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
   const { setPaymentSource } = useContext(PaymentMethodContext)
   const { setLocalOrder } = useContext(OrderStorageContext)
   const { order } = useContext(OrderContext)
+  const stripe = useStripe()
+  const elements = useElements()
   const onSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     // Block native form submission.
     event.preventDefault()
@@ -166,7 +165,6 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     containerClassName,
     templateCustomerSaveToWallet,
     fonts = [],
-    cssSrc = '',
     ...divProps
   } = p
   useEffect(() => {
@@ -177,24 +175,17 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     show && !stripe && loadingStripe()
     return () => setStripe(null)
   }, [show])
-  const cssOptions: any = { fonts, cssSrc }
   return !show ? null : (
     <div className={containerClassName} {...divProps}>
-      <Elements stripe={stripe} options={cssOptions}>
-        <ElementsConsumer>
-          {({ elements, stripe }) => (
-            <StripePaymentForm
-              stripe={stripe}
-              elements={elements}
-              options={options}
-              submitClassName={submitClassName}
-              submitLabel={submitLabel}
-              submitContainerClassName={submitContainerClassName}
-              handleSubmit={handleSubmit}
-              templateCustomerSaveToWallet={templateCustomerSaveToWallet}
-            />
-          )}
-        </ElementsConsumer>
+      <Elements stripe={stripe} options={{ fonts }}>
+        <StripePaymentForm
+          options={options}
+          submitClassName={submitClassName}
+          submitLabel={submitLabel}
+          submitContainerClassName={submitContainerClassName}
+          handleSubmit={handleSubmit}
+          templateCustomerSaveToWallet={templateCustomerSaveToWallet}
+        />
       </Elements>
     </div>
   )
