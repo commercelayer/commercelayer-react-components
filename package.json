@@ -19,6 +19,7 @@
     "test:watch": "tsdx test --watch",
     "test": "tsdx test",
     "build": "tsdx build --tsconfig tsconfig.production.json",
+    "build:watch": "tsdx watch --tsconfig tsconfig.production.json",
     "build:transpileOnly": "tsdx build --tsconfig tsconfig.production.json --transpileOnly",
     "dev": "NODE_OPTIONS='--inspect' next dev",
     "start": "next start",
