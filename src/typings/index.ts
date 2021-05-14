@@ -50,6 +50,8 @@ export interface BaseSelectComponentProps {
   options: Option[]
   placeholder?: Option
   value?: string
+  className?: string
+  required?: boolean
   name: string
 }
 

@@ -1,10 +1,15 @@
-import React, { FunctionComponent, useContext, useEffect } from 'react'
+import React, {
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import BaseInput from './utils/BaseInput'
 import components from '#config/components'
 import { BaseInputComponentProps } from '#typings'
 import useRapidForm from 'rapid-form'
 import CustomerContext from '#context/CustomerContext'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import { BaseError, CodeErrorType } from '#typings/errors'
 
 const propTypes = components.CustomerInput.propTypes
@@ -15,6 +20,7 @@ type CustomerInputProps = {
   type?: 'email' | string
   saveOnBlur?: boolean
   onBlur?: () => void
+  errorClassName?: string
 } & Omit<BaseInputComponentProps, 'name' | 'type' | 'onBlur'> &
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
@@ -28,12 +34,15 @@ const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
     type = 'email',
     value,
     onBlur,
+    className,
+    errorClassName,
     ...p
   } = props
   const { validation, values, errors } = useRapidForm()
   const { saveCustomerUser, setCustomerErrors, setCustomerEmail } = useContext(
     CustomerContext
   )
+  const [hasError, setHasError] = useState(false)
   const handleOnBlur = async () => {
     if (saveOnBlur && isEmpty(errors) && !isEmpty(values)) {
       await saveCustomerUser(values[name].value)
@@ -52,12 +61,20 @@ const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
           field: fieldName,
         })
       }
-      !isEmpty(formErrors) && setCustomerErrors(formErrors)
+      if (!isEmpty(formErrors)) {
+        setHasError(true)
+        setCustomerErrors(formErrors)
+      }
     } else if (!isEmpty(values)) {
       setCustomerErrors([])
       setCustomerEmail(values[name].value)
+      setHasError(false)
+    }
+    return () => {
+      setHasError(false)
     }
   }, [errors])
+  const classNameComputed = `${className} ${hasError ? errorClassName : ''}`
   return (
     <BaseInput
       name={name}
@@ -67,6 +84,7 @@ const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
       placeholder={placeholder}
       defaultValue={value}
       onBlur={handleOnBlur}
+      className={classNameComputed}
       {...p}
     />
   )

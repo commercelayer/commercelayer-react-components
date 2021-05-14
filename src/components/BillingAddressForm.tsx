@@ -21,12 +21,19 @@ const propTypes = components.BillingAddressForm.propTypes
 type BillingAddressFormProps = {
   children: ReactNode
   reset?: boolean
+  errorClassName?: string
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
   props
 ) => {
-  const { children, autoComplete = 'on', reset = false, ...p } = props
+  const {
+    children,
+    errorClassName,
+    autoComplete = 'on',
+    reset = false,
+    ...p
+  } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
   const { saveAddressToCustomerAddressBook } = useContext(OrderContext)
@@ -86,7 +93,9 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     setAddress({ values: { ...values, ...field }, resource: 'billingAddress' })
   }
   return (
-    <BillingAddressFormContext.Provider value={{ validation, setValue }}>
+    <BillingAddressFormContext.Provider
+      value={{ validation, setValue, errorClassName, errors: errors as any }}
+    >
       <form ref={ref} autoComplete={autoComplete} {...p}>
         {children}
       </form>
