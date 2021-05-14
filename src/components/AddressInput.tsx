@@ -1,9 +1,15 @@
-import React, { FunctionComponent, useContext, useEffect } from 'react'
+import React, {
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 import BaseInput from './utils/BaseInput'
 import components from '#config/components'
 import { BaseInputComponentProps, AddressInputName } from '#typings'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
+import isEmpty from 'lodash/isEmpty'
 
 const propTypes = components.AddressInput.propTypes
 const displayName = components.AddressInput.displayName
@@ -15,9 +21,10 @@ export type AddressInputProps = {
   JSX.IntrinsicElements['textarea']
 
 const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
-  const { placeholder = '', required, value, ...p } = props
+  const { placeholder = '', required, value, className, ...p } = props
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
+  const [hasError, setHasError] = useState(false)
   useEffect(() => {
     if (value && billingAddress?.setValue) {
       billingAddress.setValue(p.name, value)
@@ -25,10 +32,35 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
     if (value && shippingAddress?.setValue) {
       shippingAddress.setValue(p.name, value)
     }
-  }, [value])
+    if (
+      !isEmpty(billingAddress.errors) &&
+      billingAddress?.errors?.[p.name as any]?.error
+    ) {
+      setHasError(true)
+    }
+    if (isEmpty(billingAddress?.errors?.[p.name as any]) && hasError)
+      setHasError(false)
+
+    if (
+      !isEmpty(shippingAddress.errors) &&
+      shippingAddress?.errors?.[p.name as any]?.error
+    ) {
+      setHasError(true)
+    }
+    if (isEmpty(shippingAddress?.errors?.[p.name as any]) && hasError)
+      setHasError(false)
+
+    return () => {
+      setHasError(false)
+    }
+  }, [value, billingAddress?.errors, shippingAddress?.errors])
+  const errorClassName =
+    billingAddress?.errorClassName || shippingAddress?.errorClassName
+  const classNameComputed = `${className} ${hasError ? errorClassName : ''}`
   return (
     <BaseInput
       ref={billingAddress?.validation || shippingAddress?.validation}
+      className={classNameComputed}
       required={required !== undefined ? required : true}
       placeholder={placeholder}
       defaultValue={value}

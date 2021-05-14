@@ -21,12 +21,19 @@ const propTypes = components.ShippingAddressForm.propTypes
 type ShippingAddressFormProps = {
   children: ReactNode
   reset?: boolean
+  errorClassName?: string
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
   props
 ) => {
-  const { children, autoComplete = 'on', reset = false, ...p } = props
+  const {
+    children,
+    errorClassName,
+    autoComplete = 'on',
+    reset = false,
+    ...p
+  } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress, shipToDifferentAddress } = useContext(
     AddressesContext
@@ -89,7 +96,9 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     setAddress({ values: { ...values, ...field }, resource: 'shippingAddress' })
   }
   return (
-    <ShippingAddressFormContext.Provider value={{ validation, setValue }}>
+    <ShippingAddressFormContext.Provider
+      value={{ validation, setValue, errorClassName, errors: errors as any }}
+    >
       <form ref={ref} autoComplete={autoComplete} {...p}>
         {children}
       </form>

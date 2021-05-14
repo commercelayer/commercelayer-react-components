@@ -152,6 +152,7 @@ export default function Main() {
                     placeholder="Email"
                     saveOnBlur={saveOnBlur}
                     onBlur={handleOnSave}
+                    errorClassName="border-red-600 focus:ring-red-600 focus:border-red-600"
                   />
                 </div>
                 <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -186,7 +187,11 @@ export default function Main() {
               <h3 className="text-lg font-medium leading-6 text-gray-900 bg-gray-50 p-2 my-3 shadow rounded-sm">
                 Billing Address
               </h3>
-              <BillingAddressForm autoComplete="on" className="p-2">
+              <BillingAddressForm
+                errorClassName="border-red-600 focus:ring-red-600 focus:border-red-600"
+                autoComplete="on"
+                className="p-2"
+              >
                 <div>
                   <label
                     htmlFor="billing_address_first_name"
@@ -433,6 +438,7 @@ export default function Main() {
                 <p className="ml-5">Ship to different address</p>
               </div>
               <ShippingAddressForm
+                errorClassName="border-red-600 focus:ring-red-600 focus:border-red-600"
                 autoComplete="on"
                 className={shipToDifferentAddress ? `block p-2` : `hidden`}
               >

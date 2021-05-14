@@ -1,15 +1,6 @@
-import { createContext, RefObject } from 'react'
-import { AddressField } from '#reducers/AddressReducer'
-import { AddressCountrySelectName, AddressInputName } from '#typings'
+import { createContext } from 'react'
+import { DefaultContextAddress } from './BillingAddressFormContext'
 
-type DefaultContext = {
-  validation?: () => RefObject<any>
-  setValue?: (
-    name: AddressField | AddressInputName | AddressCountrySelectName,
-    value: any
-  ) => void
-}
-
-const ShippingAddressFormContext = createContext<DefaultContext>({})
+const ShippingAddressFormContext = createContext<DefaultContextAddress>({})
 
 export default ShippingAddressFormContext
