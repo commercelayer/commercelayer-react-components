@@ -71,6 +71,7 @@ const AddressCountrySelector: FunctionComponent<AddressCountrySelectorProps> = (
       required={required}
       options={countriesOptions}
       name={name}
+      value={value}
       {...p}
     />
   )
