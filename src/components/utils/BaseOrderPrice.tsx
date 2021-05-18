@@ -18,14 +18,22 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
   const { format, base, type, children, ...p } = props
   const { order } = useContext(OrderContext)
   const [price, setPrice] = useState('')
+  const [cents, setCents] = useState(0)
   useEffect(() => {
-    const p = getAmount(
+    const p = getAmount({
       base,
       type,
-      format || 'formatted',
-      order || {}
-    ) as string
+      format: format || 'formatted',
+      obj: order || {},
+    })
+    const c = getAmount<number>({
+      base,
+      type,
+      format: format || 'formatted',
+      obj: order || {},
+    })
     setPrice(p)
+    setCents(c)
     return (): void => {
       if (isEmpty(order)) {
         setPrice('')
@@ -33,6 +41,7 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
     }
   }, [order])
   const parentProps = {
+    priceCents: cents,
     price,
     ...p,
   }

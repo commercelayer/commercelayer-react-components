@@ -24,12 +24,12 @@ const LineItemAmount: FunctionComponent<LineItemAmountProps> = (props) => {
   const { lineItem } = useContext(LineItemChildrenContext)
   const [price, setPrice] = useState('')
   useEffect(() => {
-    const p = getAmount(
-      'amount',
+    const p = getAmount({
+      base: 'amount',
       type,
       format,
-      lineItem as Record<string, string>
-    ) as string
+      obj: lineItem as Record<string, string>,
+    })
     setPrice(p)
     return (): void => {
       setPrice('')

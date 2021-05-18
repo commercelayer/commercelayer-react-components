@@ -11,6 +11,7 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import { isEmpty } from 'lodash'
 import CustomerContext from '#context/CustomerContext'
 import PaymentGateway from './PaymentGateway'
+import { PaymentResource } from '#reducers/PaymentMethodReducer'
 
 const propTypes = components.PaymentSource.propTypes
 const displayName = components.PaymentSource.displayName
@@ -34,9 +35,11 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
   const { readonly } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { payments } = useContext(CustomerContext)
-  const { currentPaymentMethodId, paymentSource } = useContext(
-    PaymentMethodContext
-  )
+  const {
+    currentPaymentMethodId,
+    paymentSource,
+    destroyPaymentSource,
+  } = useContext(PaymentMethodContext)
   const [show, setShow] = useState(false)
   const [showCard, setShowCard] = useState(false)
 
@@ -54,12 +57,16 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
       setShowCard(false)
     }
   }, [currentPaymentMethodId, paymentSource, payments, payment, readonly])
-  const handleEditClick = () => setShowCard(!showCard)
-  return (
-    <PaymentGateway
-      {...{ ...props, show, showCard, handleEditClick, readonly }}
-    />
-  )
+  const handleEditClick = () => {
+    paymentSource &&
+      destroyPaymentSource({
+        paymentSourceId: paymentSource?.id,
+        paymentResource: payment?.paymentSourceType as PaymentResource,
+      })
+    setShowCard(!showCard)
+  }
+  const gatewayProps = { ...props, show, showCard, handleEditClick, readonly }
+  return <PaymentGateway {...gatewayProps} />
 }
 
 PaymentSource.propTypes = propTypes

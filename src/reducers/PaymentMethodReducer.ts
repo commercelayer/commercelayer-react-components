@@ -2,7 +2,7 @@ import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext } from '#reducers/OrderReducer'
 import { BaseError } from '#typings/errors'
 import baseReducer from '#utils/baseReducer'
-import CLayer, {
+import {
   Order,
   OrderCollection,
   PaymentMethod,
@@ -11,10 +11,11 @@ import CLayer, {
   WireTransferCollection,
 } from '@commercelayer/js-sdk'
 import { isEmpty, camelCase } from 'lodash'
-import dynamicNaming from '#utils/dynamicNaming'
 import { StripeConfig } from '#components/StripePayment'
 import { BraintreeConfig } from '#components/BraintreePayment'
 import { Dispatch } from 'react'
+import dynamicNaming from '#utils/dynamicNaming'
+import getErrorsByCollection from '#utils/getErrorsByCollection'
 
 export type PaymentMethodActionType =
   | 'setErrors'
@@ -102,6 +103,8 @@ export const getPaymentMethods: GetPaymentMethods = async ({
     })
   } catch (error) {
     console.error(error)
+    const errors = getErrorsByCollection(error, 'paymentMethod')
+    setPaymentMethodErrors(errors, dispatch)
   }
 }
 
@@ -135,7 +138,7 @@ export type SetPaymentMethod = (args: {
   getOrder?: getOrderContext
   order?: OrderCollection
   paymentMethodId: string
-  paymentResource: PaymentResource
+  paymentResource?: PaymentResource
 }) => Promise<void>
 
 export const setPaymentMethod: SetPaymentMethod = async ({
@@ -143,7 +146,6 @@ export const setPaymentMethod: SetPaymentMethod = async ({
   dispatch,
   order,
   paymentMethodId,
-  paymentResource,
 }) => {
   try {
     if (config && order && dispatch) {
@@ -151,7 +153,6 @@ export const setPaymentMethod: SetPaymentMethod = async ({
         type: 'setPaymentMethods',
         payload: { currentPaymentMethodId: paymentMethodId },
       })
-      const resource = dynamicNaming(paymentResource)
       const paymentMethod = PaymentMethod.build({ id: paymentMethodId })
       const patchOrder = Order.build({
         id: order.id,
@@ -159,21 +160,11 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       })
       // @ts-ignore
       await patchOrder.withCredentials(config).save()
-      if (resource) {
-        const o = Order.build({ id: order.id, resource: resource })
-        const ps = await resource.withCredentials(config).create({
-          order: o,
-        })
-        dispatch({
-          type: 'setPaymentSource',
-          payload: {
-            paymentSource: ps,
-          },
-        })
-      }
     }
   } catch (error) {
     console.error(error)
+    const errors = getErrorsByCollection(error, 'paymentMethod')
+    setPaymentMethodErrors(errors, dispatch)
   }
 }
 
@@ -195,7 +186,7 @@ export type SetPaymentSource = (args: {
     string | Record<string, string | number | undefined>
   >
   order?: OrderCollection
-  paymentResource: SDKPaymentResource
+  paymentResource: PaymentResource
   paymentSourceId?: string
   customerPaymentSourceId?: string
 }) => Promise<SetPaymentSourceResponse>
@@ -212,8 +203,8 @@ export const setPaymentSource: SetPaymentSource = async ({
 }) => {
   try {
     if (config && order) {
-      let paymentSource = null
-      const resourceSdk = CLayer[paymentResource]
+      let paymentSource: any
+      const resourceSdk = dynamicNaming(paymentResource)
       const o = Order.build({ id: order.id })
       if (!customerPaymentSourceId) {
         if (!paymentSourceId) {
@@ -222,7 +213,6 @@ export const setPaymentSource: SetPaymentSource = async ({
             order: o,
           })
         } else {
-          debugger
           paymentSource = await resourceSdk
             .build({ id: paymentSourceId })
             .withCredentials(config)
@@ -230,23 +220,24 @@ export const setPaymentSource: SetPaymentSource = async ({
         }
       } else {
         paymentSource = (
-          await Order.withCredentials(config).build({ id: order.id }).update({
-            _customerPaymentSourceId: customerPaymentSourceId,
-          })
-        )
-          // @ts-ignore
-          .paymentSource()
+          await Order.includes('paymentSource')
+            .build({ id: order.id })
+            .withCredentials(config)
+            .update({
+              _customerPaymentSourceId: customerPaymentSourceId,
+            })
+        ).paymentSource()
       }
       if (order?.billingAddress() === null)
         await order.withCredentials(config).loadBillingAddress()
       if (order?.paymentSource() === null)
         await order.withCredentials(config).loadPaymentSource()
-      if (getOrder) order = (await getOrder(order?.id)) as OrderCollection
       dispatch &&
         dispatch({
           type: 'setPaymentSource',
-          payload: { paymentSource },
+          payload: { paymentSource, errors: [] },
         })
+      if (getOrder) order = (await getOrder(order?.id)) as OrderCollection
       return {
         order,
         paymentSource,
@@ -254,8 +245,44 @@ export const setPaymentSource: SetPaymentSource = async ({
     }
   } catch (error) {
     console.error('error', error)
+    const errors = getErrorsByCollection(error, 'paymentMethod')
+    setPaymentMethodErrors(errors, dispatch)
   }
   return null
+}
+
+export type DestroyPaymentSource = (args: {
+  paymentSourceId: string
+  paymentResource: PaymentResource
+  dispatch?: Dispatch<PaymentMethodAction>
+  config?: CommerceLayerConfig
+}) => Promise<void>
+
+export const destroyPaymentSource: DestroyPaymentSource = async ({
+  paymentSourceId,
+  paymentResource,
+  dispatch,
+  // config,
+}) => {
+  if (paymentSourceId && paymentResource) {
+    try {
+      // const resource = dynamicNaming(paymentResource)
+      // config &&
+      //   (await resource
+      //     .build({ id: paymentSourceId })
+      //     .withCredentials(config)
+      //     .destroy())
+      dispatch &&
+        dispatch({
+          type: 'setPaymentSource',
+          payload: { paymentSource: undefined },
+        })
+    } catch (error) {
+      console.log(`error`, error)
+      const errors = getErrorsByCollection(error, 'paymentMethod')
+      setPaymentMethodErrors(errors, dispatch)
+    }
+  }
 }
 
 export type PaymentMethodConfig = {

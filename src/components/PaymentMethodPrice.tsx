@@ -18,7 +18,7 @@ type Props = {
   labelFree?: string
 }
 
-export type PaymentMethodPriceProps = BaseAmountComponent<Props> & Props
+export type PaymentMethodPriceProps = BaseAmountComponent & Props
 
 const PaymentMethodPrice: FunctionComponent<PaymentMethodPriceProps> = (
   props
@@ -34,9 +34,14 @@ const PaymentMethodPrice: FunctionComponent<PaymentMethodPriceProps> = (
   const [priceCents, setPriceCents] = useState(0)
   useEffect(() => {
     if (payment) {
-      const p = getAmount('price', type, format, payment) as string
+      const p = getAmount({ base: 'price', type, format, obj: payment })
       setPrice(p)
-      const c = getAmount('price', type, 'cents', payment) as number
+      const c = getAmount<number>({
+        base: 'price',
+        type,
+        format: 'cents',
+        obj: payment,
+      })
       setPriceCents(c)
     }
     return (): void => {

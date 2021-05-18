@@ -39,6 +39,13 @@ const getAllErrors: GetAllErrors = (params) => {
         )
       }
     }
+    if (resource === v.resource) {
+      return (
+        <span key={k} {...props}>
+          {objMsg?.message || v.message}
+        </span>
+      )
+    }
   })
 }
 

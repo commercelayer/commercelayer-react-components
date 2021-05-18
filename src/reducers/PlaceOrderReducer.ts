@@ -90,23 +90,21 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
     const paymentMethod =
       order.paymentMethod() ||
       (await order.withCredentials(config).paymentMethod())
-    const paymentSource: any = await Order.withCredentials(config)
-      .select('id')
-      .includes('paymentSource')
-      .find(order.id)
-    if (
-      isEmpty(paymentMethod) &&
-      isEmpty(paymentSource.paymentSourceId) &&
-      order.totalAmountWithTaxesCents !== 0
-    )
+    const paymentSource: any = (
+      await Order.withCredentials(config)
+        .select('id')
+        .includes('paymentSource')
+        .find(order.id)
+    ).paymentSource()
+    if (order.totalAmountWithTaxesCents !== 0 && isEmpty(paymentSource.options))
       isPermitted = false
     dispatch({
       type: 'setPlaceOrderPermitted',
       payload: {
         isPermitted,
         paymentType: paymentMethod?.paymentSourceType as PaymentResource,
-        paymentSecret: paymentSource?.paymentSource()?.clientSecret,
-        paymentId: paymentSource?.paymentSource()?.options.id,
+        paymentSecret: paymentSource?.clientSecret,
+        paymentId: paymentSource?.options.id,
         options,
       },
     })
