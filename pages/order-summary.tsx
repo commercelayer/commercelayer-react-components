@@ -92,7 +92,11 @@ export default function Order() {
                   <p className="text-lg">Discount </p>
                 </div>
                 <div className="text-right">
-                  <DiscountAmount />
+                  <DiscountAmount>
+                    {(props) => {
+                      return null
+                    }}
+                  </DiscountAmount>
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around text-gray-600 text-left">

@@ -1,12 +1,21 @@
 import { keys } from 'lodash'
 
-export interface GetAmountInterface {
-  (base: string, type: string, format: string, obj: Record<string, any>):
-    | string
-    | number
+export interface GetAmountInterface<T = any> {
+  (
+    base: string,
+    type: string,
+    format: string,
+    obj: Record<string, any>
+  ): T extends number ? number : string
 }
 
-const getAmount: GetAmountInterface = (base, type, format, obj) => {
+export default function getAmount<T = string>(args: {
+  base: string
+  type: string
+  format: string
+  obj: Record<string, any>
+}): T extends number ? number : string {
+  const { format, type, obj, base } = args
   let v: any
   keys(obj).map((k) => {
     const key = k.toLowerCase()
@@ -29,5 +38,3 @@ const getAmount: GetAmountInterface = (base, type, format, obj) => {
   })
   return v
 }
-
-export default getAmount
