@@ -4,6 +4,7 @@ import { Nav } from '.'
 import Head from 'next/head'
 import {
   CommerceLayer,
+  Errors,
   OrderContainer,
   PaymentMethod,
   PaymentMethodName,
@@ -106,30 +107,30 @@ export default function Main() {
             <PaymentMethodsContainer
               config={{
                 stripePayment: {
-                  fonts: [
-                    {
-                      cssSrc:
-                        'https://fonts.googleapis.com/css2?family=Josefin+Slab:ital,wght@0,100;1,100&display=swap',
-                    },
-                  ],
+                  // fonts: [
+                  //   {
+                  //     cssSrc:
+                  //       'https://fonts.googleapis.com/css2?family=Josefin+Slab:ital,wght@0,100;1,100&display=swap',
+                  //   },
+                  // ],
                   options: {
-                    style: {
-                      base: {
-                        color: '#000',
-                        fontWeight: '400',
-                        fontFamily: 'Josefin Slab',
-                        ':-webkit-autofill': {
-                          color: '#fce883',
-                        },
-                        // '::placeholder': {
-                        //   color: '#e0e0e0',
-                        // },
-                      },
-                      invalid: {
-                        iconColor: '#FFC7EE',
-                        color: '#FFC7EE',
-                      },
-                    },
+                    // style: {
+                    //   base: {
+                    //     color: '#000',
+                    //     fontWeight: '400',
+                    //     fontFamily: 'Josefin Slab',
+                    //     ':-webkit-autofill': {
+                    //       color: '#fce883',
+                    //     },
+                    //     '::placeholder': {
+                    //       color: '#e0e0e0',
+                    //     },
+                    //   },
+                    //   invalid: {
+                    //     iconColor: '#FFC7EE',
+                    //     color: '#FFC7EE',
+                    //   },
+                    // },
                     hideIcon: false,
                     hidePostalCode: true,
                   },
@@ -181,6 +182,7 @@ export default function Main() {
                     </div>
                   </div>
                 </PaymentSource>
+                <Errors className="text-red-600" resource="paymentMethod" />
               </PaymentMethod>
             </PaymentMethodsContainer>
             <PlaceOrderContainer

@@ -33,6 +33,7 @@ export type CodeErrorType =
   | 'UNAUTHORIZED'
   | 'UNSUPPORTED_MEDIA_TYPE'
   | 'VALIDATION_ERROR'
+  | 'PAYMENT_INTENT_AUTHENTICATION_FAILURE'
 
 export type ResourceErrorType =
   | 'order'
@@ -45,6 +46,7 @@ export type ResourceErrorType =
   | 'shippingAddress'
   | 'address'
   | 'giftCardOrCouponCode'
+  | 'paymentMethod'
 
 const CEType: CodeErrorType[] = [
   'EMPTY_ERROR',
@@ -115,6 +117,7 @@ export const ErrorPropTypes = {
     'skuOption',
     'billingAddress',
     'shippingAddress',
+    'paymentMethod',
   ]).isRequired,
   children: PropTypes.func,
   field: PropTypes.string,

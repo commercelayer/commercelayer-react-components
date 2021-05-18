@@ -210,11 +210,13 @@ export type BaseSelectorType = 'select' | 'radio'
 
 export type BaseAmountComponentChildren = Omit<BaseAmountComponent, 'children'>
 
-export interface BaseAmountComponent<T = any>
-  extends Partial<JSX.IntrinsicElements['span']> {
-  children?: (props: T & BaseAmountComponentChildren) => ReactNode
+export type BaseAmountComponent = {
+  children?: (props: BaseAmountComponentChildren) => ReactNode
   format?: BaseFormatPrice
-}
+  price?: string
+  priceCents?: number
+  labelFree?: string
+} & JSX.IntrinsicElements['span']
 
 export interface FunctionChildren<P = Record<string, any>> {
   (props: P): ReactNode

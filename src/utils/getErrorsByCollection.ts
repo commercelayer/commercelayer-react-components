@@ -1,6 +1,8 @@
 import { CodeErrorType, ResourceErrorType, BaseError } from '#typings/errors'
 import BaseClass from '@commercelayer/js-sdk/dist/utils/BaseClass'
-import { get, isArray } from 'lodash'
+import get from 'lodash/get'
+import has from 'lodash/has'
+import isArray from 'lodash/isArray'
 
 const ERROR_CODES: CodeErrorType[] = [
   'RECORD_NOT_FOUND',
@@ -33,6 +35,7 @@ const ERROR_CODES: CodeErrorType[] = [
   'UNSUPPORTED_MEDIA_TYPE',
   'LOCKED',
   'INTERNAL_SERVER_ERROR',
+  'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
 ]
 
 export type GetErrorsByCollection = <C extends BaseClass>(
@@ -68,7 +71,7 @@ const getErrorsByCollection: GetErrorsByCollection = (
   resourceType
 ) => {
   const errors: BaseError[] = []
-  if (!collection?.errors().empty()) {
+  if (has(collection, 'errors') && !collection?.errors().empty()) {
     collection
       .errors()
       .toArray()

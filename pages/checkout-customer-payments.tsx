@@ -5,6 +5,7 @@ import Head from 'next/head'
 import {
   CommerceLayer,
   CustomerContainer,
+  Errors,
   OrderContainer,
   PaymentMethod,
   PaymentMethodAmount,
@@ -171,6 +172,7 @@ export default function Main() {
                         </div>
                       </div>
                     </PaymentSource>
+                    <Errors className="text-red-600" resource="paymentMethod" />
                   </PaymentMethod>
                 </div>
               </PaymentMethodsContainer>
