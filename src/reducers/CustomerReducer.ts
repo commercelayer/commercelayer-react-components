@@ -148,6 +148,7 @@ export const getCustomerPaymentSources: GetCustomerPaymentSources = async ({
           ?.includes('paymentSource')
           ?.load()
       )?.toArray()
+      console.log(`payments customer reducer`, payments)
       if (!isEmpty(payments) && payments) {
         dispatch({
           type: 'setPayments',
