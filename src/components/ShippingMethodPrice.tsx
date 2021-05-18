@@ -44,19 +44,19 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
   const [freeOverAmountCents, setFreeOverAmountCents] = useState(0)
   useEffect(() => {
     if (shippingMethod) {
-      const p = getAmount(
+      const p = getAmount({
         base,
         type,
         format,
-        shippingMethod as Record<string, string>
-      ) as string
+        obj: shippingMethod as Record<string, string>,
+      })
       setPrice(p)
-      const c = getAmount(
-        'freeOver',
+      const c = getAmount<number>({
+        base: 'freeOver',
         type,
-        'cents',
-        shippingMethod as Record<string, string>
-      ) as number
+        format: 'cents',
+        obj: shippingMethod as Record<string, string>,
+      })
       setFreeOverAmountCents(c)
     }
     return (): void => {

@@ -8,6 +8,7 @@ import React, {
 import braintree from 'braintree-web'
 import { HostedFieldFieldOptions } from 'braintree-web/modules/hosted-fields'
 import PaymentMethodContext from '#context/PaymentMethodContext'
+import isEmpty from 'lodash/isEmpty'
 
 type BraintreeHostedFields<Type> = {
   [Property in keyof Type]: {
@@ -94,7 +95,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
     }
   }
   useEffect(() => {
-    if (authorization && !loadBraintree) {
+    if (authorization && !loadBraintree && !isEmpty(window)) {
       braintree.client.create(
         { authorization },
         (clientErr, clientInstance) => {

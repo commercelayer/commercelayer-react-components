@@ -1,4 +1,5 @@
 import CustomerContext from '#context/CustomerContext'
+import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
@@ -7,8 +8,13 @@ import {
   PaymentResource,
 } from '#reducers/PaymentMethodReducer'
 import isEmpty from 'lodash/isEmpty'
-import React, { Fragment, FunctionComponent, useContext } from 'react'
-import BraintreePayment from './BraintreePayment'
+import React, {
+  Fragment,
+  FunctionComponent,
+  useContext,
+  useEffect,
+} from 'react'
+// import BraintreePayment from './BraintreePayment'
 import { PaymentSourceProps } from './PaymentSource'
 import StripePayment from './StripePayment'
 import Parent from './utils/Parent'
@@ -31,6 +37,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
 }) => {
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { payments, isGuest } = useContext(CustomerContext)
+  const { order } = useContext(OrderContext)
   const {
     currentPaymentMethodId,
     config,
@@ -41,6 +48,21 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   const paymentResource = readonly
     ? currentPaymentMethodType
     : (payment?.paymentSourceType as PaymentResource)
+  useEffect(() => {
+    if (
+      paymentResource &&
+      !paymentSource &&
+      payment?.id === currentPaymentMethodId &&
+      order &&
+      payments
+    ) {
+      setPaymentSource({
+        paymentResource,
+        order,
+      })
+    }
+    return () => {}
+  }, [paymentSource, order])
   switch (paymentResource) {
     case 'stripe_payments':
       if (payment?.id !== currentPaymentMethodId) return null
@@ -71,7 +93,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
               ?.card as Record<string, any>
             const handleClick = async () => {
               await setPaymentSource({
-                paymentResource: 'StripePayment',
+                paymentResource,
                 customerPaymentSourceId: customerPayment.id,
               })
             }
@@ -110,7 +132,8 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       // @ts-ignore
       const authorization = paymentSource?.clientToken
       console.log(`authorization`, authorization)
-      return <BraintreePayment authorization={authorization} />
+      return null
+    // return <BraintreePayment authorization={authorization} />
     default:
       return null
   }

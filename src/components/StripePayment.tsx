@@ -31,19 +31,20 @@ export type StripeConfig = {
   options?: StripeCardElementOptions
   publishableKey?: string
   submitClassName?: string
-  submitLabel?: string
+  submitContainerClassName?: string
+  submitLabel?: string | ReactNode
   handleSubmit?: (response?: SetPaymentSourceResponse) => void
   [key: string]: any
 }
 
 type StripePaymentFormProps = {
   options?: StripeCardElementOptions
-  submitClassName?: string
-  submitContainerClassName?: string
-  submitLabel?: string | ReactNode
   handleSubmit?: (response: SetPaymentSourceResponse) => void
   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
-}
+} & Pick<
+  StripeConfig,
+  'submitClassName' | 'submitLabel' | 'submitContainerClassName'
+>
 
 const defaultOptions = {
   style: {
@@ -69,7 +70,12 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
   handleSubmit,
   templateCustomerSaveToWallet,
 }) => {
-  const { setPaymentSource, paymentSource } = useContext(PaymentMethodContext)
+  const {
+    setPaymentSource,
+    paymentSource,
+    currentPaymentMethodType,
+    setPaymentMethodErrors,
+  } = useContext(PaymentMethodContext)
   const { setLocalOrder } = useContext(OrderStorageContext)
   const { order } = useContext(OrderContext)
   const stripe = useStripe()
@@ -110,20 +116,42 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
           state: billingInfo?.stateCode,
         },
       }
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
+      const { paymentMethod } = await stripe.createPaymentMethod({
         type: 'card',
         card: cardElement,
         billing_details,
       })
+      const { error, paymentIntent } = await stripe.confirmCardPayment(
+        // @ts-ignore
+        paymentSource.clientSecret,
+        {
+          payment_method: {
+            card: cardElement,
+            billing_details,
+          },
+        }
+      )
 
       if (error) {
-        console.log('[error]', error)
+        console.error(error)
+        setPaymentMethodErrors([
+          {
+            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+            resource: 'paymentMethod',
+            field: currentPaymentMethodType,
+            message: error.message as string,
+          },
+        ])
       } else {
-        console.log('[PaymentMethod]', paymentMethod)
-        if (paymentMethod && paymentSource) {
+        if (
+          paymentIntent &&
+          paymentMethod &&
+          paymentSource &&
+          currentPaymentMethodType
+        ) {
           const source = await setPaymentSource({
             paymentSourceId: paymentSource.id,
-            paymentResource: 'StripePayment',
+            paymentResource: currentPaymentMethodType,
             attributes: {
               options: {
                 ...(paymentMethod as Record<string, any>),

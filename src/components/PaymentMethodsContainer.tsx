@@ -11,16 +11,14 @@ import React, {
 import paymentMethodReducer, {
   paymentMethodInitialState,
   getPaymentMethods,
-  setPaymentMethod,
   PaymentMethodConfig,
-  setPaymentSource,
+  setPaymentMethodConfig,
 } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
 import { BaseError } from '#typings/errors'
 import { isEmpty } from 'lodash'
-import { setPaymentMethodConfig } from '../reducers/PaymentMethodReducer'
 
 const propTypes = components.PaymentMethodsContainer.propTypes
 const displayName = components.PaymentMethodsContainer.displayName
@@ -51,7 +49,7 @@ const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> =
     setPaymentMethodErrors: (errors: BaseError[]) =>
       defaultPaymentMethodContext['setPaymentMethodErrors'](errors, dispatch),
     setPaymentMethod: async (args: any) =>
-      await setPaymentMethod({
+      await defaultPaymentMethodContext['setPaymentMethod']({
         ...args,
         config: credentials,
         getOrder,
@@ -59,12 +57,18 @@ const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> =
         dispatch,
       }),
     setPaymentSource: async (args: any) =>
-      setPaymentSource({
+      defaultPaymentMethodContext['setPaymentSource']({
         ...args,
         config: credentials,
         dispatch,
         getOrder,
         order,
+      }),
+    destroyPaymentSource: async (args: any) =>
+      defaultPaymentMethodContext['destroyPaymentSource']({
+        ...args,
+        dispatch,
+        config: credentials,
       }),
   }
   return (

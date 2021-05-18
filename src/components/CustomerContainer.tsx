@@ -42,7 +42,7 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
     return () => {
       dispatch({ type: 'setCustomerEmail', payload: {} })
     }
-  }, [config.accessToken, isGuest])
+  }, [config.accessToken, order, isGuest])
   const contextValue = {
     isGuest,
     ...state,
