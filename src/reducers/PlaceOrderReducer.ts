@@ -157,30 +157,10 @@ export const setPlaceOrder: SetPlaceOrder = async ({
         const _savePaymentSourceToCustomerWallet =
           options?.savePaymentSourceToCustomerWallet ||
           getLocalOrder('savePaymentSourceToCustomerWallet')
-        updateAttributes._savePaymentSourceToCustomerWallet = !!_savePaymentSourceToCustomerWallet
+        if (_savePaymentSourceToCustomerWallet)
+          updateAttributes._savePaymentSourceToCustomerWallet = !!_savePaymentSourceToCustomerWallet
       }
       switch (paymentType) {
-        case 'stripe_payments':
-          const stripe = await loadStripe(
-            options?.stripePayment?.publishableKey as string
-          )
-          if (stripe && paymentSecret) {
-            const { paymentIntent, error } = await stripe.confirmCardPayment(
-              paymentSecret,
-              {
-                payment_method: paymentId,
-              }
-            )
-            if (paymentIntent) {
-              const o = await Order.withCredentials(config).find(order.id)
-              await o.withCredentials(config).update(updateAttributes)
-              return {
-                placed: true,
-              }
-            }
-            throw new Error(error?.message)
-          }
-          throw new Error('Stripe and payment secret are not available')
         default:
           const o = await Order.withCredentials(config).find(order.id)
           await o.withCredentials(config).update(updateAttributes)

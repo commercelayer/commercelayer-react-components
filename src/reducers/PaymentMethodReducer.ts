@@ -278,7 +278,6 @@ export const destroyPaymentSource: DestroyPaymentSource = async ({
           payload: { paymentSource: undefined },
         })
     } catch (error) {
-      console.log(`error`, error)
       const errors = getErrorsByCollection(error, 'paymentMethod')
       setPaymentMethodErrors(errors, dispatch)
     }

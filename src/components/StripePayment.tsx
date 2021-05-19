@@ -93,10 +93,11 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
       // @ts-ignore
       event?.target?.elements?.['save_payment_source_to_customer_wallet']
         ?.checked
-    setLocalOrder(
-      'savePaymentSourceToCustomerWallet',
-      savePaymentSourceToCustomerWallet
-    )
+    if (savePaymentSourceToCustomerWallet)
+      setLocalOrder(
+        'savePaymentSourceToCustomerWallet',
+        savePaymentSourceToCustomerWallet
+      )
     // Get a reference to a mounted CardElement. Elements knows how
     // to find your CardElement because there can only ever be one of
     // each type of element.

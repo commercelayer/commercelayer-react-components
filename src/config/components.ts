@@ -567,6 +567,7 @@ const components = {
       'PaymentMethodPrice',
       'PaymentSource',
       'ReactNode',
+      'Errors',
     ],
     displayName: 'PaymentMethod',
     propTypes: {
