@@ -53,8 +53,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       paymentResource &&
       !paymentSource &&
       payment?.id === currentPaymentMethodId &&
-      order &&
-      payments
+      order
     ) {
       setPaymentSource({
         paymentResource,
@@ -63,6 +62,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
     }
     return () => {}
   }, [paymentSource, order])
+  console.log(`paymentSource`, paymentSource)
   switch (paymentResource) {
     case 'stripe_payments':
       if (payment?.id !== currentPaymentMethodId) return null
