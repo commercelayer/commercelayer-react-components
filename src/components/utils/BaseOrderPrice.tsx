@@ -15,7 +15,7 @@ export type BaseOrderPriceProps = PropsType<typeof baseOrderPricePropTypes> &
   JSX.IntrinsicElements['span']
 
 const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
-  const { format, base, type, children, ...p } = props
+  const { format = 'formatted', base, type, children, ...p } = props
   const { order } = useContext(OrderContext)
   const [price, setPrice] = useState('')
   const [cents, setCents] = useState(0)
@@ -23,13 +23,13 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
     const p = getAmount({
       base,
       type,
-      format: format || 'formatted',
+      format: format as string,
       obj: order || {},
     })
     const c = getAmount<number>({
       base,
       type,
-      format: format || 'formatted',
+      format: 'cents',
       obj: order || {},
     })
     setPrice(p)
@@ -53,8 +53,5 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
 }
 
 BaseOrderPrice.propTypes = baseOrderPricePropTypes
-BaseOrderPrice.defaultProps = {
-  format: 'formatted',
-}
 
 export default BaseOrderPrice
