@@ -96,7 +96,10 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
         .includes('paymentSource')
         .find(order.id)
     ).paymentSource()
-    if (order.totalAmountWithTaxesCents !== 0 && isEmpty(paymentSource.options))
+    if (
+      order.totalAmountWithTaxesCents !== 0 &&
+      isEmpty(paymentSource?.options)
+    )
       isPermitted = false
     dispatch({
       type: 'setPlaceOrderPermitted',
