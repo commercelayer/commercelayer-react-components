@@ -6,7 +6,6 @@ import { Order, OrderCollection } from '@commercelayer/js-sdk'
 import { isEmpty } from 'lodash'
 import { shipmentsFilled } from '#utils/shipments'
 import { PaymentResource } from './PaymentMethodReducer'
-import { loadStripe } from '@stripe/stripe-js'
 import { getLocalOrder } from '#utils/localStorage'
 
 export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted'
@@ -132,7 +131,7 @@ export const setPlaceOrder: SetPlaceOrder = async ({
   }
   try {
     if (state && order && config) {
-      const { options, paymentType, paymentSecret, paymentId } = state
+      const { options, paymentType } = state
       const updateAttributes: Record<string, any> = {
         _place: true,
       }
