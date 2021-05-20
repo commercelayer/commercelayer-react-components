@@ -122,45 +122,47 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
         card: cardElement,
         billing_details,
       })
-      const { error, paymentIntent } = await stripe.confirmCardPayment(
-        // @ts-ignore
-        paymentSource.clientSecret,
-        {
-          payment_method: {
-            card: cardElement,
-            billing_details,
-          },
-        }
-      )
-
-      if (error) {
-        console.error(error)
-        setPaymentMethodErrors([
+      // @ts-ignore
+      if (paymentSource?.clientSecret) {
+        const { error, paymentIntent } = await stripe.confirmCardPayment(
+          // @ts-ignore
+          paymentSource.clientSecret,
           {
-            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-            resource: 'paymentMethod',
-            field: currentPaymentMethodType,
-            message: error.message as string,
-          },
-        ])
-      } else {
-        if (
-          paymentIntent &&
-          paymentMethod &&
-          paymentSource &&
-          currentPaymentMethodType
-        ) {
-          const source = await setPaymentSource({
-            paymentSourceId: paymentSource.id,
-            paymentResource: currentPaymentMethodType,
-            attributes: {
-              options: {
-                ...(paymentMethod as Record<string, any>),
-                setup_future_usage: 'off_session',
-              },
+            payment_method: {
+              card: cardElement,
+              billing_details,
             },
-          })
-          handleSubmit && handleSubmit(source)
+          }
+        )
+        if (error) {
+          console.error(error)
+          setPaymentMethodErrors([
+            {
+              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+              resource: 'paymentMethod',
+              field: currentPaymentMethodType,
+              message: error.message as string,
+            },
+          ])
+        } else {
+          if (
+            paymentIntent &&
+            paymentMethod &&
+            paymentSource &&
+            currentPaymentMethodType
+          ) {
+            const source = await setPaymentSource({
+              paymentSourceId: paymentSource.id,
+              paymentResource: currentPaymentMethodType,
+              attributes: {
+                options: {
+                  ...(paymentMethod as Record<string, any>),
+                  setup_future_usage: 'off_session',
+                },
+              },
+            })
+            handleSubmit && handleSubmit(source)
+          }
         }
       }
     }
