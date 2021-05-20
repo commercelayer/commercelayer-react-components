@@ -13,7 +13,7 @@ const displayName = components.PaymentMethodRadioButton.displayName
 type ShippingMethodRadioButtonChildrenProps = Omit<
   ShippingMethodRadioButtonProps,
   'children'
->
+> & { checked: boolean }
 
 type ShippingMethodRadioButtonProps = {
   children?: (props: ShippingMethodRadioButtonChildrenProps) => ReactNode

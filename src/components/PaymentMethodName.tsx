@@ -6,7 +6,10 @@ import components from '#config/components'
 const propTypes = components.PaymentMethodName.propTypes
 const displayName = components.PaymentMethodName.displayName
 
-type PaymentMethodNameChildrenProps = Omit<PaymentMethodNameProps, 'children'>
+type PaymentMethodNameChildrenProps = Omit<
+  PaymentMethodNameProps,
+  'children'
+> & { labelName: string }
 
 type PaymentMethodNameProps = {
   children?: (props: PaymentMethodNameChildrenProps) => ReactNode
