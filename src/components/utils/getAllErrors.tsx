@@ -39,7 +39,7 @@ const getAllErrors: GetAllErrors = (params) => {
         )
       }
     }
-    if (resource === v.resource) {
+    if (resource === v.resource && !field) {
       return (
         <span key={k} {...props}>
           {objMsg?.message || v.message}
