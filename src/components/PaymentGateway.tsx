@@ -60,11 +60,10 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         order,
       })
     }
-    return () => {}
-  }, [paymentSource, order])
+  }, [paymentSource, order, show, showCard])
   switch (paymentResource) {
     case 'stripe_payments':
-      if (payment?.id !== currentPaymentMethodId) return null
+      if (!readonly && payment?.id !== currentPaymentMethodId) return null
       const stripeConfig = config
         ? getPaymentConfig(paymentResource, config)
         : null
@@ -78,7 +77,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         // @ts-ignore
         const card = paymentSource?.options?.card as Record<string, any>
         const value = { ...card, showCard, handleEditClick, readonly }
-        return (
+        return isEmpty(card) ? null : (
           <PaymentSourceContext.Provider value={value}>
             {children}
           </PaymentSourceContext.Provider>
