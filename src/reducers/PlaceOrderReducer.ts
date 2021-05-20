@@ -117,6 +117,7 @@ export type SetPlaceOrder = (args: {
   config?: CommerceLayerConfig
   order?: OrderCollection
   state?: PlaceOrderState
+  setOrderErrors?: (collection: any) => void
 }) => Promise<{
   placed: boolean
 }>
@@ -125,6 +126,7 @@ export const setPlaceOrder: SetPlaceOrder = async ({
   state,
   order,
   config,
+  setOrderErrors,
 }) => {
   const response = {
     placed: false,
@@ -170,8 +172,11 @@ export const setPlaceOrder: SetPlaceOrder = async ({
     }
     return response
   } catch (error) {
-    console.error('place order', error)
-    return response
+    setOrderErrors && setOrderErrors(error)
+    return {
+      ...response,
+      error,
+    }
   }
 }
 

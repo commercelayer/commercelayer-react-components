@@ -35,14 +35,15 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
     order,
     saveBillingAddressToCustomerAddressBook,
     saveShippingAddressToCustomerAddressBook,
+    setOrderErrors,
   } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     if (order) {
       placeOrderPermitted({
-        order,
-        dispatch,
         config,
+        dispatch,
+        order,
         options: {
           saveBillingAddressToCustomerAddressBook,
           saveShippingAddressToCustomerAddressBook,
@@ -53,7 +54,8 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
   }, [order])
   const contextValue = {
     ...state,
-    setPlaceOrder: () => setPlaceOrder({ config, order, state }),
+    setPlaceOrder: () =>
+      setPlaceOrder({ config, order, state, setOrderErrors }),
   }
   return (
     <PlaceOrderContext.Provider value={contextValue}>

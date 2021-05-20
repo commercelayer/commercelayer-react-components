@@ -105,7 +105,7 @@ const components = {
     displayName: 'AddToCartButton',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.string,
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
       skuCode: PropTypes.string,
       disabled: PropTypes.bool,
       lineItem: PropTypes.shape({
@@ -642,7 +642,7 @@ const components = {
     displayName: 'PaymentSourceEditButton',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.string,
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     },
   },
   PaymentSourceDetail: {
@@ -659,7 +659,7 @@ const components = {
     displayName: 'PlaceOrderButton',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.string,
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     },
     defaultProps: {
       label: 'Place order',
@@ -719,7 +719,7 @@ const components = {
     displayName: 'SaveAddressesButton',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.string,
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
       onClick: PropTypes.func,
       disabled: PropTypes.bool,
     },
@@ -771,7 +771,7 @@ const components = {
     displayName: 'SaveCustomerButton',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.string,
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
       onClick: PropTypes.func,
     },
     defaultProps: {
@@ -879,7 +879,7 @@ const components = {
     displayName: 'SubmitButton',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.string,
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     },
     defaultProps: {
       label: 'Submit',

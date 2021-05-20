@@ -16,6 +16,7 @@ type AvailabilityTemplateChildrenProps = FunctionChildren<
     min: LeadTimes
     max: LeadTimes
     shippingMethod: ShippingMethod
+    quanity: number
   }
 >
 
@@ -33,6 +34,7 @@ const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = (
   const mn = !isEmpty(min) && timeFormat ? min[timeFormat] : ''
   const mx = !isEmpty(max) && timeFormat ? max[timeFormat] : ''
   const text: string[] = []
+  console.log(`quantity`, quantity)
   const name =
     showShippingMethodName && shippingMethod
       ? `with ${shippingMethod.name}`
