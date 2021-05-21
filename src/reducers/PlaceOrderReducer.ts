@@ -3,10 +3,11 @@ import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Order, OrderCollection } from '@commercelayer/js-sdk'
-import { isEmpty } from 'lodash'
+import { isEmpty, isFunction } from 'lodash'
 import { shipmentsFilled } from '#utils/shipments'
 import { PaymentResource } from './PaymentMethodReducer'
 import { getLocalOrder } from '#utils/localStorage'
+import getErrorsByCollection from '#utils/getErrorsByCollection'
 
 export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted'
 
@@ -164,7 +165,9 @@ export const setPlaceOrder: SetPlaceOrder = async ({
       switch (paymentType) {
         default:
           const o = await Order.withCredentials(config).find(order.id)
-          await o.withCredentials(config).update(updateAttributes)
+          const u = await o.withCredentials(config).update(updateAttributes)
+          if (isFunction(u?.errors) && !u?.errors()?.empty()) throw u
+          setOrderErrors && setOrderErrors([])
           return {
             placed: true,
           }
@@ -173,9 +176,10 @@ export const setPlaceOrder: SetPlaceOrder = async ({
     return response
   } catch (error) {
     setOrderErrors && setOrderErrors(error)
+    const errors = getErrorsByCollection(error, 'order')
     return {
       ...response,
-      error,
+      errors,
     }
   }
 }

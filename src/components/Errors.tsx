@@ -13,13 +13,12 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 
 const propTypes = components.Errors.propTypes
-const defaultProps = components.Errors.defaultProps
 const displayName = components.Errors.displayName
 
 export type ErrorsProps = ErrorComponentProps & JSX.IntrinsicElements['span']
 
 const Errors: FunctionComponent<ErrorsProps> = (props) => {
-  const { children, messages = [], resource, field = 'base', ...p } = props
+  const { children, messages = [], resource, field, ...p } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { errors: orderErrors } = useContext(OrderContext)
   const { errors: giftCardErrors } = useContext(GiftCardContext)
@@ -62,7 +61,6 @@ const Errors: FunctionComponent<ErrorsProps> = (props) => {
 }
 
 Errors.propTypes = propTypes
-Errors.defaultProps = defaultProps
 Errors.displayName = displayName
 
 export default Errors

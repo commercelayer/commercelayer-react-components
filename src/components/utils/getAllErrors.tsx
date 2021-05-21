@@ -6,7 +6,7 @@ import { BaseError, ResourceErrorType } from '#typings/errors'
 export type AllErrorsParams = {
   allErrors: BaseError[]
   messages: BaseError[]
-  field: string | null
+  field?: string
   props: JSX.IntrinsicElements['span']
   lineItem?: LineItemCollection | Record<string, any>
   resource?: ResourceErrorType
