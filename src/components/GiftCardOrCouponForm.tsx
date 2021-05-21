@@ -1,9 +1,19 @@
 import useRapidForm from 'rapid-form'
-import React, { FunctionComponent, ReactNode, useContext, useRef } from 'react'
+import React, {
+  FunctionComponent,
+  ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+} from 'react'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import OrderContext from '#context/OrderContext'
-import { has, isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import components from '#config/components'
+import camelCase from 'lodash/camelCase'
+import dropWhile from 'lodash/dropWhile'
+import has from 'lodash/has'
+import { findIndex } from 'lodash'
 
 const propTypes = components.GiftCardOrCouponForm.propTypes
 
@@ -18,13 +28,24 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
 ) => {
   const { children, autoComplete = 'on', reset = false, onSubmit, ...p } = props
   const { validation, values } = useRapidForm()
-  const { setGiftCardOrCouponCode, order } = useContext(OrderContext)
+  const { setGiftCardOrCouponCode, order, errors, setOrderErrors } = useContext(
+    OrderContext
+  )
   const ref = useRef<HTMLFormElement>(null)
+  const inputName = 'gift_card_or_coupon_code'
+  useEffect(() => {
+    if (
+      values[inputName]?.value === '' &&
+      findIndex(errors, { field: camelCase(inputName) }) !== -1
+    ) {
+      const err = dropWhile(errors, (i) => i.field === camelCase(inputName))
+      setOrderErrors(err)
+      onSubmit && onSubmit({ success: true })
+    }
+  }, [values])
   const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const code = has(values, 'gift_card_or_coupon_code')
-      ? values['gift_card_or_coupon_code'].value
-      : undefined
+    const code = has(values, inputName) ? values[inputName].value : undefined
     if (code) {
       const { success } = await setGiftCardOrCouponCode({ code })
       onSubmit && onSubmit({ success })

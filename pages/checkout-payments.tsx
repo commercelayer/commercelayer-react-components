@@ -206,6 +206,9 @@ export default function Main() {
                 />
               </div>
             </PlaceOrderContainer>
+            <div className="flex flex-col text-red-600 mt-5">
+              <Errors resource="order" />
+            </div>
             <PaymentMethodsContainer>
               <PaymentSource readonly>
                 <div className="flex flex-row items-center bg-gray-100 p-5 my-10 w-full">
