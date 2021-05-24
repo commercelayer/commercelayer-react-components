@@ -1,22 +1,14 @@
-import { first } from 'lodash'
+import findIndex from 'lodash/findIndex'
+import pick from 'lodash/pick'
 import { BaseError } from '#typings/errors'
 
 export interface CustomMessages {
-  (messages: BaseError[], v: BaseError): { message?: string } | undefined
+  (messages: BaseError[], v: BaseError): { message?: string } | null
 }
 
 const customMessages: CustomMessages = (messages = [], v) => {
-  return first(
-    messages.filter((m) => {
-      if (m.field === v.field) {
-        return m.code === v.code
-      }
-      if (m.resource === v.resource) {
-        return m.code === v.code
-      }
-      return m.code === v.code
-    })
-  )
+  const i = findIndex(messages, pick(v, ['field', 'code', 'resource']))
+  return i !== -1 ? messages[i] : null
 }
 
 export default customMessages
