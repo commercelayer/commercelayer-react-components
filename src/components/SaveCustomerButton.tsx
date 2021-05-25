@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext } from 'react'
+import React, { FunctionComponent, ReactNode, useContext } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
@@ -19,7 +19,7 @@ type SaveAddressesButtonChildrenProps = FunctionChildren<
 
 type SaveCustomerButtonProps = {
   children?: SaveAddressesButtonChildrenProps
-  label?: string
+  label?: string | ReactNode
   onClick?: () => void
 } & JSX.IntrinsicElements['button']
 
