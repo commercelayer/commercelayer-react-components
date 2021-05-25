@@ -1,5 +1,5 @@
 import PaymentSourceContext from '#context/PaymentSourceContext'
-import React, { FunctionComponent, useContext } from 'react'
+import React, { FunctionComponent, ReactNode, useContext } from 'react'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings'
 import components from '#config/components'
@@ -11,7 +11,7 @@ type CustomComponent = FunctionChildren<Omit<Props, 'children'>>
 
 type Props = {
   children?: CustomComponent
-  label?: string
+  label?: string | ReactNode
 } & Omit<JSX.IntrinsicElements['button'], 'onClick'>
 const PaymentSourceEditButton: FunctionComponent<Props> = ({
   children,
