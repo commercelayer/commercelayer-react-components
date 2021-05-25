@@ -667,7 +667,11 @@ const components = {
   },
   PlaceOrderContainer: {
     displayName: 'PlaceOrderContainer',
-    permittedChildren: ['PlaceOrderButton', 'ReactNode'],
+    permittedChildren: [
+      'PlaceOrderButton',
+      'PrivacyAndTermsCheckbox',
+      'ReactNode',
+    ],
     propTypes: {
       children: childrenTypes.isRequired,
     },
@@ -699,6 +703,12 @@ const components = {
       filters: {},
       loader: 'Loading...',
       skuCode: '',
+    },
+  },
+  PrivacyAndTermsCheckbox: {
+    displayName: 'PrivacyAndTermsCheckbox',
+    propTypes: {
+      children: PropTypes.func,
     },
   },
   QuantitySelector: {

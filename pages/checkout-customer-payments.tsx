@@ -177,17 +177,7 @@ export default function Main() {
                 </div>
               </PaymentMethodsContainer>
             </CustomerContainer>
-            <PlaceOrderContainer
-              options={{
-                stripePayment: {
-                  publishableKey: 'pk_test_UArgJuzBMSppFkvAkATXTNT5',
-                },
-                // saveShippingAddressToCustomerBook: true,
-                // saveBillingAddressToCustomerBook: true,
-                // @ts-ignore
-                // savePaymentSourceToCustomerWallet: 1,
-              }}
-            >
+            <PlaceOrderContainer>
               <div>
                 <PlaceOrderButton
                   onClick={(res: any) => {

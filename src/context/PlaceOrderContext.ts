@@ -8,6 +8,7 @@ import {
 type DefaultContext = {
   setPlaceOrderErrors?: SetPlaceOrderErrors
   setPlaceOrder?: () => Promise<{ placed: boolean }>
+  placeOrderPermitted?: () => void
 } & PlaceOrderState
 
 export const defaultPlaceOrderContext = {
