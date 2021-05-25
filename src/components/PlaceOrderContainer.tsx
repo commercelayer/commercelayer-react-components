@@ -56,6 +56,17 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
     ...state,
     setPlaceOrder: () =>
       setPlaceOrder({ config, order, state, setOrderErrors }),
+    placeOrderPermitted: () =>
+      placeOrderPermitted({
+        config,
+        dispatch,
+        order,
+        options: {
+          saveBillingAddressToCustomerAddressBook,
+          saveShippingAddressToCustomerAddressBook,
+          ...options,
+        },
+      }),
   }
   return (
     <PlaceOrderContext.Provider value={contextValue}>

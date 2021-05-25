@@ -18,12 +18,28 @@ import {
   PaymentSourceEditButton,
   PlaceOrderButton,
   PlaceOrderContainer,
+  PrivacyAndTermsCheckbox,
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 let orderId = 'PDerhJplRp'
+
+const messages: any = [
+  {
+    code: 'VALIDATION_ERROR',
+    resource: 'order',
+    field: 'status',
+    message: 'test 1',
+  },
+  {
+    code: 'VALIDATION_ERROR',
+    resource: 'order',
+    field: 'billingAddress',
+    message: 'test 2',
+  },
+]
 
 export default function Main() {
   const [token, setToken] = useState('')
@@ -185,17 +201,21 @@ export default function Main() {
                 <Errors className="text-red-600" resource="paymentMethod" />
               </PaymentMethod>
             </PaymentMethodsContainer>
-            <PlaceOrderContainer
-              options={{
-                stripePayment: {
-                  publishableKey: 'pk_test_UArgJuzBMSppFkvAkATXTNT5',
-                },
-                // saveShippingAddressToCustomerBook: true,
-                // saveBillingAddressToCustomerBook: true,
-                // @ts-ignore
-                // savePaymentSourceToCustomerWallet: 1,
-              }}
-            >
+            <PlaceOrderContainer>
+              <div className="flex flex-row-reverse justify-end">
+                <label
+                  htmlFor="privacy-terms"
+                  className="block text-sm font-medium text-gray-700 ml-3 self-end"
+                >
+                  Accept privacy and terms
+                </label>
+                <div className="mt-1">
+                  <PrivacyAndTermsCheckbox
+                    id="privacy-terms"
+                    className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded disabled:opacity-50"
+                  />
+                </div>
+              </div>
               <div>
                 <PlaceOrderButton
                   onClick={(res: any) => {
@@ -207,7 +227,7 @@ export default function Main() {
               </div>
             </PlaceOrderContainer>
             <div className="flex flex-col text-red-600 mt-5">
-              <Errors resource="order" />
+              <Errors resource="order" messages={messages} />
             </div>
             <PaymentMethodsContainer>
               <PaymentSource readonly>

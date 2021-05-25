@@ -12,9 +12,6 @@ import getErrorsByCollection from '#utils/getErrorsByCollection'
 export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted'
 
 export type PlaceOrderOptions = {
-  stripePayment?: {
-    publishableKey: string
-  }
   saveBillingAddressToCustomerAddressBook?: boolean
   saveShippingAddressToCustomerAddressBook?: boolean
   savePaymentSourceToCustomerWallet?: boolean
@@ -74,6 +71,9 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
 }) => {
   if (order && config) {
     let isPermitted = true
+    if (order.privacyUrl && order.termsUrl) {
+      isPermitted = localStorage.getItem('privacy-terms') === 'true'
+    }
     const billingAddress =
       order.billingAddress() ||
       (await order.withCredentials(config).loadBillingAddress())
