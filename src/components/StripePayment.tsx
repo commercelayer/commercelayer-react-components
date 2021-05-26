@@ -207,15 +207,21 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     fonts = [],
     ...divProps
   } = p
+  const { paymentSource } = useContext(PaymentMethodContext)
   useEffect(() => {
     const loadingStripe = async () => {
-      const stripePromise = publishableKey && (await loadStripe(publishableKey))
+      const stripePromise =
+        // @ts-ignore
+        paymentSource?.publishableKey &&
+        // @ts-ignore
+        (await loadStripe(paymentSource?.publishableKey))
       stripePromise && setStripe(stripePromise)
     }
-    show && !stripe && loadingStripe()
+    // @ts-ignore
+    show && !stripe && paymentSource?.publishableKey && loadingStripe()
     return () => setStripe(null)
-  }, [show])
-  return !show ? null : (
+  }, [show, paymentSource])
+  return stripe && show ? (
     <div className={containerClassName} {...divProps}>
       <Elements stripe={stripe} options={{ fonts }}>
         <StripePaymentForm
@@ -228,7 +234,7 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
         />
       </Elements>
     </div>
-  )
+  ) : null
 }
 
 export default StripePayment
