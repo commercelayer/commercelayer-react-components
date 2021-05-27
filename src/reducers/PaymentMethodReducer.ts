@@ -10,7 +10,9 @@ import {
   StripePaymentCollection,
   WireTransferCollection,
 } from '@commercelayer/js-sdk'
-import { isEmpty, camelCase } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
+import camelCase from 'lodash/camelCase'
+import has from 'lodash/has'
 import { StripeConfig } from '#components/StripePayment'
 import { BraintreeConfig } from '#components/BraintreePayment'
 import { Dispatch } from 'react'
@@ -255,23 +257,15 @@ export type DestroyPaymentSource = (args: {
   paymentSourceId: string
   paymentResource: PaymentResource
   dispatch?: Dispatch<PaymentMethodAction>
-  config?: CommerceLayerConfig
 }) => Promise<void>
 
 export const destroyPaymentSource: DestroyPaymentSource = async ({
   paymentSourceId,
   paymentResource,
   dispatch,
-  // config,
 }) => {
   if (paymentSourceId && paymentResource) {
     try {
-      // const resource = dynamicNaming(paymentResource)
-      // config &&
-      //   (await resource
-      //     .build({ id: paymentSourceId })
-      //     .withCredentials(config)
-      //     .destroy())
       dispatch &&
         dispatch({
           type: 'setPaymentSource',
@@ -311,7 +305,7 @@ export const getPaymentConfig = (
   const resource = camelCase(paymentResource)
     .replace('Payments', 'Payment')
     .replace('Transfers', 'Transfer') as PaymentResourceKey
-  return config[resource]
+  return !isEmpty(config) && has(config, resource) ? config[resource] : {}
 }
 
 const type: PaymentMethodActionType[] = [

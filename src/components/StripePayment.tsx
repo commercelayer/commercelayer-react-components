@@ -3,8 +3,6 @@ import React, {
   ReactNode,
   SyntheticEvent,
   useContext,
-  useEffect,
-  useState,
 } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import {
@@ -13,7 +11,11 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js'
-import { loadStripe, Stripe, StripeCardElementOptions } from '@stripe/stripe-js'
+import {
+  loadStripe,
+  StripeCardElementOptions,
+  StripeElementLocale,
+} from '@stripe/stripe-js'
 import {
   PaymentMethodConfig,
   SetPaymentSourceResponse,
@@ -29,7 +31,6 @@ export type StripeConfig = {
   hintLabel?: string
   name?: string
   options?: StripeCardElementOptions
-  publishableKey?: string
   submitClassName?: string
   submitContainerClassName?: string
   submitLabel?: string | ReactNode
@@ -188,15 +189,17 @@ type StripePaymentProps = PaymentMethodConfig['stripePayment'] &
   JSX.IntrinsicElements['div'] &
   Partial<PaymentSourceProps['templateCustomerSaveToWallet']> & {
     show?: boolean
+    publishableKey: string
+    locale?: StripeElementLocale
   }
 
 const StripePayment: FunctionComponent<StripePaymentProps> = ({
   publishableKey,
   show,
   options,
+  locale = 'auto',
   ...p
 }) => {
-  const [stripe, setStripe] = useState<Stripe | null>(null)
   const {
     submitClassName,
     submitLabel,
@@ -207,23 +210,14 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     fonts = [],
     ...divProps
   } = p
-  const { paymentSource } = useContext(PaymentMethodContext)
-  useEffect(() => {
-    const loadingStripe = async () => {
-      const stripePromise =
-        // @ts-ignore
-        paymentSource?.publishableKey &&
-        // @ts-ignore
-        (await loadStripe(paymentSource?.publishableKey))
-      stripePromise && setStripe(stripePromise)
-    }
-    // @ts-ignore
-    show && !stripe && paymentSource?.publishableKey && loadingStripe()
-    return () => setStripe(null)
-  }, [show, paymentSource])
-  return stripe && show ? (
+  return show ? (
     <div className={containerClassName} {...divProps}>
-      <Elements stripe={stripe} options={{ fonts }}>
+      <Elements
+        stripe={loadStripe(publishableKey, {
+          locale,
+        })}
+        options={{ fonts }}
+      >
         <StripePaymentForm
           options={options}
           submitClassName={submitClassName}
