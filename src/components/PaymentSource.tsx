@@ -64,6 +64,7 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
         paymentResource: payment?.paymentSourceType as PaymentResource,
       })
     setShowCard(!showCard)
+    setShow(true)
   }
   const gatewayProps = { ...props, show, showCard, handleEditClick, readonly }
   return <PaymentGateway {...gatewayProps} />

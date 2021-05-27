@@ -7,6 +7,7 @@ import {
   getPaymentConfig,
   PaymentResource,
 } from '#reducers/PaymentMethodReducer'
+import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React, {
   Fragment,
@@ -60,13 +61,16 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         order,
       })
     }
-  }, [paymentSource, order, show, showCard])
+  }, [paymentSource, payment])
   switch (paymentResource) {
     case 'stripe_payments':
       if (!readonly && payment?.id !== currentPaymentMethodId) return null
+      const locale = order?.languageCode as StripeElementLocale
+      // @ts-ignore
+      const publishableKey = paymentSource?.publishableKey
       const stripeConfig = config
         ? getPaymentConfig(paymentResource, config)
-        : null
+        : {}
       const customerPayments =
         !isEmpty(payments) && payments
           ? payments.filter((customerPayment) => {
@@ -109,21 +113,28 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
             )
           }
         )
-        return stripeConfig ? (
+        return (
           <Fragment>
             {isEmpty(customerPaymentsCards) ? null : (
               <div className={p.className}>{customerPaymentsCards}</div>
             )}
             <StripePayment
               show={show}
-              {...stripeConfig}
               templateCustomerSaveToWallet={templateCustomerSaveToWallet}
+              publishableKey={publishableKey}
+              locale={locale}
+              {...stripeConfig}
             />
           </Fragment>
-        ) : null
+        )
       }
-      return stripeConfig ? (
-        <StripePayment show={show} {...stripeConfig} />
+      return publishableKey ? (
+        <StripePayment
+          show={show}
+          publishableKey={publishableKey}
+          locale={locale}
+          {...stripeConfig}
+        />
       ) : null
     case 'braintree_payments':
       if (payment?.id !== currentPaymentMethodId) return null

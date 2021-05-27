@@ -150,7 +150,6 @@ export default function Main() {
                     hideIcon: false,
                     hidePostalCode: true,
                   },
-                  publishableKey: 'pk_test_UArgJuzBMSppFkvAkATXTNT5',
                   handleSubmit: handleSubmit,
                   submitLabel: submitLabel,
                   submitClassName:
@@ -229,7 +228,7 @@ export default function Main() {
             <div className="flex flex-col text-red-600 mt-5">
               <Errors resource="order" messages={messages} />
             </div>
-            <PaymentMethodsContainer>
+            {/* <PaymentMethodsContainer>
               <PaymentSource readonly>
                 <div className="flex flex-row items-center bg-gray-100 p-5 my-10 w-full">
                   <div className="flex flex-row items-center w-full">
@@ -247,7 +246,7 @@ export default function Main() {
                   </div>
                 </div>
               </PaymentSource>
-            </PaymentMethodsContainer>
+            </PaymentMethodsContainer> */}
           </OrderContainer>
           <div className="mt-5">
             <pre data-cy="current-shipping-method">{`Current payment source options: ${JSON.stringify(
