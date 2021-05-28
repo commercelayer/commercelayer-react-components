@@ -388,6 +388,7 @@ const components = {
   },
   LineItem: {
     permittedChildren: [
+      'AvailabilityContainer',
       'LineItemImage',
       'LineItemName',
       'LineItemOptions',
