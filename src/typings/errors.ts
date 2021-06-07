@@ -125,7 +125,7 @@ export const ErrorPropTypes = {
 }
 
 type ErrorChildrenComponentProps = FunctionChildren<
-  Omit<ErrorComponentProps, 'children'>
+  Omit<ErrorComponentProps, 'children'> & { errors: string[] }
 >
 
 export interface ErrorComponentProps {

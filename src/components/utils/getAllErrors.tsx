@@ -10,6 +10,7 @@ export type AllErrorsParams = {
   props: JSX.IntrinsicElements['span']
   lineItem?: LineItemCollection | Record<string, any>
   resource?: ResourceErrorType
+  returnHtml?: boolean
 }
 
 export interface GetAllErrors {
@@ -17,33 +18,48 @@ export interface GetAllErrors {
 }
 
 const getAllErrors: GetAllErrors = (params) => {
-  const { allErrors, messages, field, props, lineItem, resource } = params
+  const {
+    allErrors,
+    messages,
+    field,
+    props,
+    lineItem,
+    resource,
+    returnHtml = true,
+  } = params
   return allErrors.map((v, k): ReactNode | void => {
     const objMsg = customMessages(messages, v)
+    const text = objMsg?.message || v.message
+    console.log(`returnHtml`, returnHtml)
     if (field) {
       if (v.resource === 'lineItem') {
-        return (
-          lineItem &&
-          v.id === lineItem['id'] && (
+        if (lineItem && v.id === lineItem['id']) {
+          return returnHtml ? (
             <span key={k} {...props}>
-              {objMsg?.message || v.message}
+              {text}
             </span>
+          ) : (
+            text
           )
-        )
+        }
       }
       if (field === v.field && resource === v.resource) {
-        return (
+        return returnHtml ? (
           <span key={k} {...props}>
-            {objMsg?.message || v.message}
+            {text}
           </span>
+        ) : (
+          text
         )
       }
     }
     if (resource === v.resource && !field) {
-      return (
+      return returnHtml ? (
         <span key={k} {...props}>
-          {objMsg?.message || v.message}
+          {text}
         </span>
+      ) : (
+        text
       )
     }
   })
