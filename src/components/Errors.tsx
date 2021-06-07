@@ -11,7 +11,6 @@ import components from '#config/components'
 import CustomerContext from '#context/CustomerContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
-import isEmpty from 'lodash/isEmpty'
 
 const propTypes = components.Errors.propTypes
 const displayName = components.Errors.displayName
