@@ -15,7 +15,7 @@ import React, {
   useContext,
   useEffect,
 } from 'react'
-// import BraintreePayment from './BraintreePayment'
+import BraintreePayment from './BraintreePayment'
 import { PaymentSourceProps } from './PaymentSource'
 import StripePayment from './StripePayment'
 import Parent from './utils/Parent'
@@ -61,7 +61,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         order,
       })
     }
-  }, [paymentSource, payment])
+  }, [paymentSource, payment, show])
   switch (paymentResource) {
     case 'stripe_payments':
       if (!readonly && payment?.id !== currentPaymentMethodId) return null
@@ -140,9 +140,66 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       if (payment?.id !== currentPaymentMethodId) return null
       // @ts-ignore
       const authorization = paymentSource?.clientToken
-      console.log(`authorization`, authorization)
-      return null
-    // return <BraintreePayment authorization={authorization} />
+      const braintreeCustomerPayments =
+        !isEmpty(payments) && payments
+          ? payments.filter((customerPayment) => {
+              return customerPayment.paymentSourceType === 'BraintreePayment'
+            })
+          : []
+      console.table([braintreeCustomerPayments, showCard])
+      if (readonly || showCard) {
+        // @ts-ignore
+        const card = paymentSource?.options?.card as Record<string, any>
+        const value = { ...card, showCard, handleEditClick, readonly }
+        return isEmpty(card) ? null : (
+          <PaymentSourceContext.Provider value={value}>
+            {children}
+          </PaymentSourceContext.Provider>
+        )
+      }
+      if (!isGuest && templateCustomerCards) {
+        const customerPaymentsCards = braintreeCustomerPayments.map(
+          (customerPayment, i) => {
+            // @ts-ignore
+            const card = customerPayment?.paymentSource()?.options
+              ?.card as Record<string, any>
+            const handleClick = async () => {
+              await setPaymentSource({
+                paymentResource,
+                customerPaymentSourceId: customerPayment.id,
+              })
+            }
+            const value = {
+              ...card,
+              showCard,
+              handleEditClick,
+              readonly,
+              handleClick,
+            }
+            return (
+              <PaymentSourceContext.Provider key={i} value={value}>
+                <Parent {...value}>{templateCustomerCards}</Parent>
+              </PaymentSourceContext.Provider>
+            )
+          }
+        )
+        return !authorization ? null : (
+          <Fragment>
+            {isEmpty(customerPaymentsCards) ? null : (
+              <div className={p.className}>{customerPaymentsCards}</div>
+            )}
+            <BraintreePayment
+              // show={show}
+              templateCustomerSaveToWallet={templateCustomerSaveToWallet}
+              authorization={authorization}
+              // locale={locale}
+            />
+          </Fragment>
+        )
+      }
+      return !authorization ? null : (
+        <BraintreePayment authorization={authorization} />
+      )
     default:
       return null
   }

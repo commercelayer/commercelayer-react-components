@@ -1,7 +1,11 @@
+import { BraintreeConfig } from '#components/BraintreePayment'
+import { StripeConfig } from '#components/StripePayment'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext } from '#reducers/OrderReducer'
 import { BaseError } from '#typings/errors'
 import baseReducer from '#utils/baseReducer'
+import dynamicNaming from '#utils/dynamicNaming'
+import getErrorsByCollection from '#utils/getErrorsByCollection'
 import {
   Order,
   OrderCollection,
@@ -10,14 +14,10 @@ import {
   StripePaymentCollection,
   WireTransferCollection,
 } from '@commercelayer/js-sdk'
-import isEmpty from 'lodash/isEmpty'
 import camelCase from 'lodash/camelCase'
 import has from 'lodash/has'
-import { StripeConfig } from '#components/StripePayment'
-import { BraintreeConfig } from '#components/BraintreePayment'
+import isEmpty from 'lodash/isEmpty'
 import { Dispatch } from 'react'
-import dynamicNaming from '#utils/dynamicNaming'
-import getErrorsByCollection from '#utils/getErrorsByCollection'
 
 export type PaymentMethodActionType =
   | 'setErrors'
@@ -99,7 +99,8 @@ export const getPaymentMethods: GetPaymentMethods = async ({
       payload: {
         ...payload,
         currentPaymentMethodId: paymentMethod?.id,
-        currentPaymentMethodType: paymentMethod?.paymentSourceType as PaymentResource,
+        currentPaymentMethodType:
+          paymentMethod?.paymentSourceType as PaymentResource,
         paymentSource,
       },
     })
@@ -148,6 +149,7 @@ export const setPaymentMethod: SetPaymentMethod = async ({
   dispatch,
   order,
   paymentMethodId,
+  getOrder,
 }) => {
   try {
     if (config && order && dispatch) {
@@ -162,6 +164,7 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       })
       // @ts-ignore
       await patchOrder.withCredentials(config).save()
+      getOrder && (await getOrder(order.id))
     }
   } catch (error) {
     console.error(error)
@@ -185,7 +188,8 @@ export type SetPaymentSource = (args: {
   getOrder?: getOrderContext
   attributes?: Record<
     string,
-    string | Record<string, string | number | undefined>
+    | string
+    | Record<string, string | number | undefined | Record<string, string>>
   >
   order?: OrderCollection
   paymentResource: PaymentResource
