@@ -20,45 +20,43 @@ type ShippingMethodRadioButtonProps = {
   onChange?: (payment?: PaymentMethodCollection | Record<string, any>) => void
 } & JSX.IntrinsicElements['input']
 
-const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps> = (
-  props
-) => {
-  const { onChange, ...p } = props
-  const { payment } = useContext(PaymentMethodChildrenContext)
-  const { order } = useContext(OrderContext)
-  const { setPaymentMethod, currentPaymentMethodId } = useContext(
-    PaymentMethodContext
-  )
-  const orderId = order?.id || ''
-  const paymentResource = payment?.paymentSourceType as PaymentResource
-  const paymentMethodId = payment?.id as string
-  const name = `payment-${orderId}`
-  const checked = currentPaymentMethodId === payment?.id
-  const handleOnChange = async () => {
-    await setPaymentMethod({ paymentResource, paymentMethodId })
-    onChange && onChange(payment)
+const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps> =
+  (props) => {
+    const { onChange, ...p } = props
+    const { payment } = useContext(PaymentMethodChildrenContext)
+    const { order } = useContext(OrderContext)
+    const { setPaymentMethod, currentPaymentMethodId } =
+      useContext(PaymentMethodContext)
+    const orderId = order?.id || ''
+    const paymentResource = payment?.paymentSourceType as PaymentResource
+    const paymentMethodId = payment?.id as string
+    const name = `payment-${orderId}`
+    const checked = currentPaymentMethodId === payment?.id
+    const handleOnChange = async () => {
+      await setPaymentMethod({ paymentResource, paymentMethodId })
+      onChange && onChange(payment)
+    }
+    const id = payment?.paymentSourceType
+    const parentProps = {
+      handleOnChange,
+      checked,
+      id,
+      name,
+      ...props,
+    }
+    return props.children ? (
+      <Parent {...parentProps}>{props.children}</Parent>
+    ) : (
+      <input
+        type="radio"
+        name={name}
+        id={id}
+        onChange={handleOnChange}
+        defaultChecked={checked}
+        {...p}
+      />
+    )
   }
-  const id = payment?.paymentSourceType
-  const parentProps = {
-    handleOnChange,
-    checked,
-    id,
-    name,
-    ...props,
-  }
-  return props.children ? (
-    <Parent {...parentProps}>{props.children}</Parent>
-  ) : (
-    <input
-      type="radio"
-      name={name}
-      id={id}
-      onChange={handleOnChange}
-      defaultChecked={checked}
-      {...p}
-    />
-  )
-}
 
 PaymentMethodRadioButton.propTypes = propTypes
 PaymentMethodRadioButton.displayName = displayName

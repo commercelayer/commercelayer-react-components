@@ -3,6 +3,8 @@ import React, {
   ReactNode,
   SyntheticEvent,
   useContext,
+  useEffect,
+  useState,
 } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import {
@@ -13,6 +15,7 @@ import {
 } from '@stripe/react-stripe-js'
 import {
   loadStripe,
+  Stripe,
   StripeCardElementOptions,
   StripeElementLocale,
 } from '@stripe/stripe-js'
@@ -193,6 +196,8 @@ type StripePaymentProps = PaymentMethodConfig['stripePayment'] &
     locale?: StripeElementLocale
   }
 
+let stripe: Promise<Stripe | null>
+
 const StripePayment: FunctionComponent<StripePaymentProps> = ({
   publishableKey,
   show,
@@ -200,6 +205,7 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
   locale = 'auto',
   ...p
 }) => {
+  const [isLoaded, setIsLoaded] = useState(false)
   const {
     submitClassName,
     submitLabel,
@@ -210,14 +216,21 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     fonts = [],
     ...divProps
   } = p
-  return show ? (
+  useEffect(() => {
+    if (show && publishableKey) {
+      setIsLoaded(true)
+      stripe = loadStripe(publishableKey, {
+        locale,
+      })
+    }
+    return () => {
+      setIsLoaded(false)
+    }
+  }, [show, publishableKey])
+  console.table([show, publishableKey, isLoaded])
+  return isLoaded ? (
     <div className={containerClassName} {...divProps}>
-      <Elements
-        stripe={loadStripe(publishableKey, {
-          locale,
-        })}
-        options={{ fonts }}
-      >
+      <Elements stripe={stripe} options={{ fonts }}>
         <StripePaymentForm
           options={options}
           submitClassName={submitClassName}

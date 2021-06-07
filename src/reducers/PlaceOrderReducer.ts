@@ -107,7 +107,7 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
         isPermitted,
         paymentType: paymentMethod?.paymentSourceType as PaymentResource,
         paymentSecret: paymentSource?.clientSecret,
-        paymentId: paymentSource?.options.id,
+        paymentId: paymentSource?.options?.id,
         options,
       },
     })
@@ -140,27 +140,28 @@ export const setPlaceOrder: SetPlaceOrder = async ({
       }
       if (
         options?.saveBillingAddressToCustomerAddressBook ||
-        getLocalOrder('saveBillingAddressToCustomerAddressBook')
+        getLocalOrder('saveBillingAddressToCustomerAddressBook') === 'true'
       )
         updateAttributes._saveBillingAddressToCustomerAddressBook =
           options?.saveBillingAddressToCustomerAddressBook ||
-          getLocalOrder('saveBillingAddressToCustomerAddressBook')
+          getLocalOrder('saveBillingAddressToCustomerAddressBook') === 'true'
       if (
         options?.saveShippingAddressToCustomerAddressBook ||
-        getLocalOrder('saveShippingAddressToCustomerAddressBook')
+        getLocalOrder('saveShippingAddressToCustomerAddressBook') === 'true'
       )
         updateAttributes._saveShippingAddressToCustomerAddressBook =
           options?.saveShippingAddressToCustomerAddressBook ||
-          getLocalOrder('saveShippingAddressToCustomerAddressBook')
+          getLocalOrder('saveShippingAddressToCustomerAddressBook') === 'true'
       if (
         options?.savePaymentSourceToCustomerWallet ||
-        getLocalOrder('savePaymentSourceToCustomerWallet')
+        getLocalOrder('savePaymentSourceToCustomerWallet') === 'true'
       ) {
         const _savePaymentSourceToCustomerWallet =
           options?.savePaymentSourceToCustomerWallet ||
-          getLocalOrder('savePaymentSourceToCustomerWallet')
+          getLocalOrder('savePaymentSourceToCustomerWallet') === 'true'
         if (_savePaymentSourceToCustomerWallet)
-          updateAttributes._savePaymentSourceToCustomerWallet = !!_savePaymentSourceToCustomerWallet
+          updateAttributes._savePaymentSourceToCustomerWallet =
+            !!_savePaymentSourceToCustomerWallet
       }
       switch (paymentType) {
         default:

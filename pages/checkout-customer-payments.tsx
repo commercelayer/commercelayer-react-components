@@ -129,7 +129,6 @@ export default function Main() {
               <PaymentMethodsContainer
                 config={{
                   stripePayment: {
-                    publishableKey: 'pk_test_UArgJuzBMSppFkvAkATXTNT5',
                     handleSubmit: handleSubmit,
                     submitLabel: 'Set payment method',
                     submitClassName:

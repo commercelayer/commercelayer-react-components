@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useState,
 } from 'react'
-import braintree from 'braintree-web'
+// import braintree from 'braintree-web'
 import { HostedFieldFieldOptions } from 'braintree-web/modules/hosted-fields'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isEmpty from 'lodash/isEmpty'
@@ -59,6 +59,8 @@ const defaultConfig: BraintreeConfig = {
   },
 }
 
+let threeDs: any
+
 const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
   authorization,
   config = defaultConfig,
@@ -79,14 +81,17 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
         if (paymentSource) {
           setPaymentSource({
             paymentSourceId: paymentSource.id,
-            paymentResource: 'BraintreePayment',
+            paymentResource: 'braintree_payments',
             attributes: {
               paymentMethodNonce: payload.nonce,
               options: {
-                last4: payload.details.lastFour,
-                expYear: payload.details.expirationYear,
-                expMonth: payload.details.expirationMonth,
-                brand: payload.details.cardType,
+                id: payload.nonce,
+                card: {
+                  last4: payload.details.lastFour,
+                  expYear: payload.details.expirationYear,
+                  expMonth: payload.details.expirationMonth,
+                  brand: payload.details.cardType.toLowerCase(),
+                },
               },
             },
           })
@@ -96,31 +101,38 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
   }
   useEffect(() => {
     if (authorization && !loadBraintree && !isEmpty(window)) {
-      braintree.client.create(
-        { authorization },
-        (clientErr, clientInstance) => {
-          if (clientErr) {
-            console.error(clientErr)
-            return
-          }
-          braintree.hostedFields.create(
-            {
-              client: clientInstance,
-              fields: fields as HostedFieldFieldOptions,
-              styles: styles,
-            },
-            (hostedFieldsErr, hostedFieldsInstance) => {
-              if (hostedFieldsErr) {
-                console.error(hostedFieldsErr)
-                return
-              }
-              setloadBraintree(true)
-              setButtonDisabled(false)
-              setHostedFieldsInstance(hostedFieldsInstance)
+      const braintreeClient = require('braintree-web/client')
+      const hostedFields = require('braintree-web/hosted-fields')
+      const threeDSecure = require('braintree-web/three-d-secure')
+      threeDSecure.create({
+        authorization,
+        version: 2,
+      }),
+        braintreeClient.create(
+          { authorization },
+          (clientErr: any, clientInstance: any) => {
+            if (clientErr) {
+              console.error(clientErr)
+              return
             }
-          )
-        }
-      )
+            hostedFields.create(
+              {
+                client: clientInstance,
+                fields: fields as HostedFieldFieldOptions,
+                styles: styles,
+              },
+              (hostedFieldsErr: any, hostedFieldsInstance: any) => {
+                if (hostedFieldsErr) {
+                  console.error(hostedFieldsErr)
+                  return
+                }
+                setloadBraintree(true)
+                setButtonDisabled(false)
+                setHostedFieldsInstance(hostedFieldsInstance)
+              }
+            )
+          }
+        )
     }
     return () => {
       setloadBraintree(false)
