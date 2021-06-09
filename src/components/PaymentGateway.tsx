@@ -19,6 +19,7 @@ import BraintreePayment from './BraintreePayment'
 import { PaymentSourceProps } from './PaymentSource'
 import StripePayment from './StripePayment'
 import Parent from './utils/Parent'
+import WireTransferPayment from './WireTransferPayment'
 
 type PaymentGatewayProps = PaymentSourceProps & {
   showCard: boolean
@@ -69,7 +70,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       // @ts-ignore
       const publishableKey = paymentSource?.publishableKey
       const stripeConfig = config
-        ? getPaymentConfig(paymentResource, config)
+        ? getPaymentConfig<'stripePayment'>(paymentResource, config)
         : {}
       const customerPayments =
         !isEmpty(payments) && payments
@@ -190,7 +191,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
             )}
             <BraintreePayment
               // show={show}
-              templateCustomerSaveToWallet={templateCustomerSaveToWallet}
+              // templateCustomerSaveToWallet={templateCustomerSaveToWallet}
               authorization={authorization}
               // locale={locale}
             />
@@ -201,7 +202,14 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         <BraintreePayment authorization={authorization} />
       )
     default:
-      return null
+      if (payment?.id !== currentPaymentMethodId) return null
+      const wireTransferConfig =
+        config && paymentResource
+          ? getPaymentConfig<'wireTransferPayment'>(paymentResource, config)
+          : {}
+      return (
+        <WireTransferPayment infoMessage={wireTransferConfig?.infoMessage} />
+      )
   }
 }
 

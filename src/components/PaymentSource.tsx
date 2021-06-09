@@ -35,20 +35,15 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
   const { readonly } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { payments } = useContext(CustomerContext)
-  const { currentPaymentMethodId, paymentSource, destroyPaymentSource } =
-    useContext(PaymentMethodContext)
+  const {
+    currentPaymentMethodId,
+    paymentSource,
+    destroyPaymentSource,
+  } = useContext(PaymentMethodContext)
   const [show, setShow] = useState(false)
   const [showCard, setShowCard] = useState(false)
 
   useEffect(() => {
-    console.table([
-      show,
-      showCard,
-      payment?.paymentSourceType,
-      paymentSource?.id,
-      currentPaymentMethodId,
-    ])
-    // debugger
     if (readonly) {
       setShow(true)
       setShowCard(true)

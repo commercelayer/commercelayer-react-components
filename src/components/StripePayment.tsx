@@ -227,7 +227,6 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
       setIsLoaded(false)
     }
   }, [show, publishableKey])
-  console.table([show, publishableKey, isLoaded])
   return isLoaded ? (
     <div className={containerClassName} {...divProps}>
       <Elements stripe={stripe} options={{ fonts }}>
