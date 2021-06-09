@@ -1,5 +1,6 @@
 import { BraintreeConfig } from '#components/BraintreePayment'
 import { StripeConfig } from '#components/StripePayment'
+import { WireTransferConfig } from '#components/WireTransferPayment'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext } from '#reducers/OrderReducer'
 import { BaseError } from '#typings/errors'
@@ -99,8 +100,7 @@ export const getPaymentMethods: GetPaymentMethods = async ({
       payload: {
         ...payload,
         currentPaymentMethodId: paymentMethod?.id,
-        currentPaymentMethodType:
-          paymentMethod?.paymentSourceType as PaymentResource,
+        currentPaymentMethodType: paymentMethod?.paymentSourceType as PaymentResource,
         paymentSource,
       },
     })
@@ -120,12 +120,12 @@ export type PaymentResource =
   | 'wire_transfers'
 
 export type PaymentResourceKey =
-  // | 'adyenPayment'
-  // | 'braintreePayment'
-  // | 'externalPayment'
-  // | 'paypalPayment'
-  'stripePayment'
-// | 'wireTransfer'
+  | 'braintreePayment'
+  | 'stripePayment'
+  | 'wireTransferPayment'
+// | 'adyenPayment'
+// | 'externalPayment'
+// | 'paypalPayment'
 
 export type SDKPaymentResource =
   | 'AdyenPayment'
@@ -153,10 +153,6 @@ export const setPaymentMethod: SetPaymentMethod = async ({
 }) => {
   try {
     if (config && order && dispatch) {
-      dispatch({
-        type: 'setPaymentMethods',
-        payload: { currentPaymentMethodId: paymentMethodId },
-      })
       const paymentMethod = PaymentMethod.build({ id: paymentMethodId })
       const patchOrder = Order.build({
         id: order.id,
@@ -165,6 +161,10 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       // @ts-ignore
       await patchOrder.withCredentials(config).save()
       getOrder && (await getOrder(order.id))
+      dispatch({
+        type: 'setPaymentMethods',
+        payload: { currentPaymentMethodId: paymentMethodId },
+      })
     }
   } catch (error) {
     console.error(error)
@@ -285,6 +285,7 @@ export const destroyPaymentSource: DestroyPaymentSource = async ({
 export type PaymentMethodConfig = {
   stripePayment?: StripeConfig
   braintreePayment?: BraintreeConfig
+  wireTransferPayment?: Partial<WireTransferConfig>
 }
 
 type SetPaymentMethodConfig = (
@@ -302,14 +303,16 @@ export const setPaymentMethodConfig: SetPaymentMethodConfig = (
   })
 }
 
-export const getPaymentConfig = (
+export function getPaymentConfig<K extends PaymentResourceKey>(
   paymentResource: PaymentResource,
   config: PaymentMethodConfig
-) => {
+): PaymentMethodConfig[K] {
   const resource = camelCase(paymentResource)
     .replace('Payments', 'Payment')
-    .replace('Transfers', 'Transfer') as PaymentResourceKey
-  return !isEmpty(config) && has(config, resource) ? config[resource] : {}
+    .replace('Transfers', 'Transfer') as K
+  return !isEmpty(config) && has(config, resource)
+    ? config[resource]
+    : undefined
 }
 
 const type: PaymentMethodActionType[] = [
