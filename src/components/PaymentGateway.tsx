@@ -204,13 +204,24 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       return null
     case 'wire_transfers':
       if (payment?.id !== currentPaymentMethodId) return null
+      if (readonly || showCard) {
+        const card =
+          // @ts-ignore
+          paymentSource?.options?.card ||
+          // @ts-ignore
+          (paymentSource?.metadata?.card as Record<string, any>)
+        const value = { ...card, showCard, handleEditClick, readonly }
+        return isEmpty(card) ? null : (
+          <PaymentSourceContext.Provider value={value}>
+            {children}
+          </PaymentSourceContext.Provider>
+        )
+      }
       const wireTransferConfig =
         config && paymentResource
-          ? getPaymentConfig<'wireTransferPayment'>(paymentResource, config)
+          ? getPaymentConfig<'wireTransfer'>(paymentResource, config)
           : {}
-      return (
-        <WireTransferPayment infoMessage={wireTransferConfig?.infoMessage} />
-      )
+      return <WireTransferPayment {...p} {...wireTransferConfig} />
     default:
       return null
   }

@@ -22,15 +22,16 @@ const PaymentSourceBrandName: FunctionComponent<Props> = ({
   ...props
 }) => {
   const { brand } = useContext(PaymentSourceContext)
+  const brandName = brand && capitalize(brand.replace('-', ' '))
   const parentProps = {
-    brand,
+    brand: brandName,
     label,
     ...props,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <span {...props}>{label || capitalize(brand)}</span>
+    <span {...props}>{label || capitalize(brandName)}</span>
   )
 }
 

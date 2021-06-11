@@ -100,7 +100,8 @@ export const getPaymentMethods: GetPaymentMethods = async ({
       payload: {
         ...payload,
         currentPaymentMethodId: paymentMethod?.id,
-        currentPaymentMethodType: paymentMethod?.paymentSourceType as PaymentResource,
+        currentPaymentMethodType:
+          paymentMethod?.paymentSourceType as PaymentResource,
         paymentSource,
       },
     })
@@ -122,7 +123,7 @@ export type PaymentResource =
 export type PaymentResourceKey =
   | 'braintreePayment'
   | 'stripePayment'
-  | 'wireTransferPayment'
+  | 'wireTransfer'
 // | 'adyenPayment'
 // | 'externalPayment'
 // | 'paypalPayment'
@@ -285,7 +286,7 @@ export const destroyPaymentSource: DestroyPaymentSource = async ({
 export type PaymentMethodConfig = {
   stripePayment?: StripeConfig
   braintreePayment?: BraintreeConfig
-  wireTransferPayment?: Partial<WireTransferConfig>
+  wireTransfer?: Partial<WireTransferConfig>
 }
 
 type SetPaymentMethodConfig = (

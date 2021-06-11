@@ -98,7 +98,8 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
     ).paymentSource()
     if (
       order.totalAmountWithTaxesCents !== 0 &&
-      isEmpty(paymentSource?.options)
+      // NOTE: Remove metadata control in the future
+      isEmpty(paymentSource?.options || paymentSource?.metadata?.card)
     )
       isPermitted = false
     dispatch({
