@@ -35,11 +35,8 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
   const { readonly } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { payments } = useContext(CustomerContext)
-  const {
-    currentPaymentMethodId,
-    paymentSource,
-    destroyPaymentSource,
-  } = useContext(PaymentMethodContext)
+  const { currentPaymentMethodId, paymentSource, destroyPaymentSource } =
+    useContext(PaymentMethodContext)
   const [show, setShow] = useState(false)
   const [showCard, setShowCard] = useState(false)
 
@@ -49,8 +46,10 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
       setShowCard(true)
     } else if (payment?.id === currentPaymentMethodId) {
       setShow(true)
+      // NOTE: Remove metadata in the future
       // @ts-ignore
-      if (!isEmpty(paymentSource?.options?.card)) setShowCard(true)
+      const card = paymentSource?.options?.card || paymentSource?.metadata?.card
+      if (!isEmpty(card)) setShowCard(true)
     } else setShow(false)
     return () => {
       setShow(false)
