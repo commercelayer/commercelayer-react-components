@@ -12,6 +12,7 @@ export type WireTransferConfig = {
     label?: string | ReactNode
     onClick?: (response?: SetPaymentSourceResponse) => void
     className?: string
+    containerClassName?: string
   }
 }
 
@@ -52,11 +53,13 @@ const WireTransferPayment: FunctionComponent<Props> = ({
           ? infoMessage?.text()
           : infoMessage?.text || defaultMessage}
       </span>
-      <button className={submitButton?.className} onClick={handleClick}>
-        {isFunction(submitButton?.label)
-          ? submitButton?.label()
-          : submitButton?.label || defaultLabel}
-      </button>
+      <div className={submitButton?.containerClassName}>
+        <button className={submitButton?.className} onClick={handleClick}>
+          {isFunction(submitButton?.label)
+            ? submitButton?.label()
+            : submitButton?.label || defaultLabel}
+        </button>
+      </div>
     </div>
   )
 }
