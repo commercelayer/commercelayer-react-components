@@ -138,7 +138,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         />
       ) : null
     case 'braintree_payments':
-      if (payment?.id !== currentPaymentMethodId) return null
+      if (!readonly && payment?.id !== currentPaymentMethodId) return null
       // @ts-ignore
       // const authorization = paymentSource?.clientToken
       // const braintreeCustomerPayments =
@@ -203,7 +203,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       // )
       return null
     case 'wire_transfers':
-      if (payment?.id !== currentPaymentMethodId) return null
+      if (!readonly && payment?.id !== currentPaymentMethodId) return null
       if (readonly || showCard) {
         const card =
           // @ts-ignore
