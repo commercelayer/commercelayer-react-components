@@ -153,6 +153,7 @@ export default function Main() {
                       templateCustomerSaveToWallet={(props) => (
                         <TemplateSaveToWalletCheckbox {...props} />
                       )}
+                      onClickCustomerCards={() => console.log('clicked')}
                     >
                       <div className="flex flex-row items-center justify-start bg-gray-100 p-3 text-sm border">
                         <div className="flex flex-row items-center">
