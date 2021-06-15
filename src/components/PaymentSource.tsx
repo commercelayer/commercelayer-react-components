@@ -28,6 +28,7 @@ export type PaymentSourceProps = {
   children?: ReactNode
   readonly?: boolean
   templateCustomerCards?: (props: CustomerCardsProps) => ReactNode
+  onClickCustomerCards?: () => void
   templateCustomerSaveToWallet?: (props: CustomerSaveToWalletProps) => ReactNode
 } & JSX.IntrinsicElements['div']
 

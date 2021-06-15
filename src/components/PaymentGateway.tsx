@@ -34,6 +34,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   children,
   templateCustomerCards,
   templateCustomerSaveToWallet,
+  onClickCustomerCards,
   show,
   ...p
 }) => {
@@ -99,6 +100,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
                 paymentResource,
                 customerPaymentSourceId: customerPayment.id,
               })
+              onClickCustomerCards && onClickCustomerCards()
             }
             const value = {
               ...card,
@@ -169,6 +171,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       //           paymentResource,
       //           customerPaymentSourceId: customerPayment.id,
       //         })
+      //         onClickCustomerCards && onClickCustomerCards
       //       }
       //       const value = {
       //         ...card,
