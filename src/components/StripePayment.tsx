@@ -25,9 +25,9 @@ import {
 } from '#reducers/PaymentMethodReducer'
 import { PaymentSourceProps } from './PaymentSource'
 import Parent from './utils/Parent'
-import OrderStorageContext from '#context/OrderStorageContext'
 import OrderContext from '#context/OrderContext'
 import isFunction from 'lodash/isFunction'
+import { setCustomerOrderParam } from '#utils/localStorage'
 
 export type StripeConfig = {
   containerClassName?: string
@@ -80,31 +80,20 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
     currentPaymentMethodType,
     setPaymentMethodErrors,
   } = useContext(PaymentMethodContext)
-  const { setLocalOrder } = useContext(OrderStorageContext)
   const { order } = useContext(OrderContext)
   const stripe = useStripe()
   const elements = useElements()
   const onSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
-    // Block native form submission.
     event.preventDefault()
-
-    if (!stripe) {
-      // Stripe.js has not loaded yet. Make sure to disable
-      // form submission until Stripe.js has loaded.
-      return
-    }
+    if (!stripe) return
     const savePaymentSourceToCustomerWallet =
       // @ts-ignore
       event?.target?.elements?.['save_payment_source_to_customer_wallet']
         ?.checked
-    if (savePaymentSourceToCustomerWallet)
-      setLocalOrder(
-        'savePaymentSourceToCustomerWallet',
-        savePaymentSourceToCustomerWallet
-      )
-    // Get a reference to a mounted CardElement. Elements knows how
-    // to find your CardElement because there can only ever be one of
-    // each type of element.
+    setCustomerOrderParam(
+      'savePaymentSourceToCustomerWallet',
+      savePaymentSourceToCustomerWallet
+    )
     const cardElement = elements && elements.getElement(CardElement)
     if (cardElement) {
       const billingInfo = order?.billingAddress()
@@ -148,25 +137,25 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
               message: error.message as string,
             },
           ])
-        } else {
-          if (
-            paymentIntent &&
-            paymentMethod &&
-            paymentSource &&
-            currentPaymentMethodType
-          ) {
-            const source = await setPaymentSource({
-              paymentSourceId: paymentSource.id,
-              paymentResource: currentPaymentMethodType,
-              attributes: {
-                options: {
-                  ...(paymentMethod as Record<string, any>),
-                  setup_future_usage: 'off_session',
-                },
+          return
+        }
+        if (
+          paymentIntent &&
+          paymentMethod &&
+          paymentSource &&
+          currentPaymentMethodType
+        ) {
+          const source = await setPaymentSource({
+            paymentSourceId: paymentSource.id,
+            paymentResource: currentPaymentMethodType,
+            attributes: {
+              options: {
+                ...(paymentMethod as Record<string, any>),
+                setup_future_usage: 'off_session',
               },
-            })
-            handleSubmit && handleSubmit(source)
-          }
+            },
+          })
+          handleSubmit && handleSubmit(source)
         }
       }
     }
@@ -225,6 +214,7 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     }
     return () => {
       setIsLoaded(false)
+      setCustomerOrderParam('savePaymentSourceToCustomerWallet', 'false')
     }
   }, [show, publishableKey])
   return isLoaded ? (

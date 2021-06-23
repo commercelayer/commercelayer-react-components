@@ -23,6 +23,7 @@ import {
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
+import { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 let orderId = 'PDerhJplRp'
@@ -116,6 +117,22 @@ export default function Main() {
   const handleSubmit = (response: any) => {
     setPaymentSource(response.paymentSource.options)
   }
+  const paymentMethodsConfig: PaymentMethodConfig = {
+    stripePayment: {
+      handleSubmit: handleSubmit,
+      submitLabel: 'Set payment method',
+      submitClassName:
+        'mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
+      containerClassName: 'p-5 my-2',
+    },
+    braintreePayment: {
+      handleSubmit: handleSubmit,
+      submitLabel: 'Set payment method',
+      submitClassName:
+        'mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
+      containerClassName: 'p-5 my-2',
+    },
+  }
   return (
     <Fragment>
       <Head>
@@ -126,17 +143,7 @@ export default function Main() {
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId={orderId}>
             <CustomerContainer>
-              <PaymentMethodsContainer
-                config={{
-                  stripePayment: {
-                    handleSubmit: handleSubmit,
-                    submitLabel: 'Set payment method',
-                    submitClassName:
-                      'mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
-                    containerClassName: 'p-5 my-2',
-                  },
-                }}
-              >
+              <PaymentMethodsContainer config={paymentMethodsConfig}>
                 <div className="flex flex-col">
                   <PaymentMethod
                     className="p-2 my-1 flex flex-wrap w-1/2 items-center justify-items-center bg-gray-300"
