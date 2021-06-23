@@ -8,6 +8,11 @@ import { shipmentsFilled } from '#utils/shipments'
 import { PaymentResource } from './PaymentMethodReducer'
 import { getLocalOrder } from '#utils/localStorage'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
+import {
+  saveBillingAddress,
+  saveShippingAddress,
+  saveToWallet,
+} from '#utils/customerOrderOptions'
 
 export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted'
 
@@ -150,36 +155,22 @@ export const setPlaceOrder: SetPlaceOrder = async ({
       const updateAttributes: Record<string, any> = {
         _place: true,
       }
-      if (
-        options?.saveBillingAddressToCustomerAddressBook ||
-        getLocalOrder('saveBillingAddressToCustomerAddressBook') === 'true'
-      )
-        updateAttributes._saveBillingAddressToCustomerAddressBook =
-          options?.saveBillingAddressToCustomerAddressBook ||
-          getLocalOrder('saveBillingAddressToCustomerAddressBook') === 'true'
-      if (
-        options?.saveShippingAddressToCustomerAddressBook ||
-        getLocalOrder('saveShippingAddressToCustomerAddressBook') === 'true'
-      )
-        updateAttributes._saveShippingAddressToCustomerAddressBook =
-          options?.saveShippingAddressToCustomerAddressBook ||
-          getLocalOrder('saveShippingAddressToCustomerAddressBook') === 'true'
-      if (
-        options?.savePaymentSourceToCustomerWallet ||
-        getLocalOrder('savePaymentSourceToCustomerWallet') === 'true'
-      ) {
-        const _savePaymentSourceToCustomerWallet =
-          options?.savePaymentSourceToCustomerWallet ||
-          getLocalOrder('savePaymentSourceToCustomerWallet') === 'true'
-        if (_savePaymentSourceToCustomerWallet)
-          updateAttributes._savePaymentSourceToCustomerWallet =
-            !!_savePaymentSourceToCustomerWallet
+      if (options && saveBillingAddress(options)) {
+        updateAttributes._saveBillingAddressToCustomerAddressBook = true
+      }
+      if (options && saveShippingAddress(options)) {
+        updateAttributes._saveShippingAddressToCustomerAddressBook = true
       }
       switch (paymentType) {
         default:
           const o = await Order.withCredentials(config).find(order.id)
           const u = await o.withCredentials(config).update(updateAttributes)
           if (isFunction(u?.errors) && !u?.errors()?.empty()) throw u
+          if (options && saveToWallet(options)) {
+            await o.withCredentials(config).update({
+              _savePaymentSourceToCustomerWallet: true,
+            })
+          }
           setOrderErrors && setOrderErrors([])
           return {
             placed: true,
