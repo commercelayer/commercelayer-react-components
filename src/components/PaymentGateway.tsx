@@ -18,7 +18,7 @@ import React, {
   useEffect,
   useState,
 } from 'react'
-// import BraintreePayment from './BraintreePayment'
+import BraintreePayment from './BraintreePayment'
 import { PaymentSourceProps } from './PaymentSource'
 import PaypalPayment from './PaypalPayment'
 import StripePayment from './StripePayment'
@@ -60,6 +60,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   const paymentResource = readonly
     ? currentPaymentMethodType
     : (payment?.paymentSourceType as PaymentResource)
+  const locale = order?.languageCode as StripeElementLocale
   useEffect(() => {
     if (
       paymentResource &&
@@ -85,7 +86,6 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   switch (paymentResource) {
     case 'stripe_payments':
       if (!readonly && payment?.id !== currentPaymentMethodId) return null
-      const locale = order?.languageCode as StripeElementLocale
       // @ts-ignore
       const publishableKey = paymentSource?.publishableKey
       const stripeConfig = config
@@ -162,68 +162,71 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
     case 'braintree_payments':
       if (!readonly && payment?.id !== currentPaymentMethodId) return null
       // @ts-ignore
-      // const authorization = paymentSource?.clientToken
-      // const braintreeCustomerPayments =
-      //   !isEmpty(payments) && payments
-      //     ? payments.filter((customerPayment) => {
-      //         return customerPayment.paymentSourceType === 'BraintreePayment'
-      //       })
-      //     : []
-      // console.table([braintreeCustomerPayments, showCard])
-      // if (readonly || showCard) {
-      //   // @ts-ignore
-      //   const card = paymentSource?.options?.card as Record<string, any>
-      //   const value = { ...card, showCard, handleEditClick, readonly }
-      //   return isEmpty(card) ? null : (
-      //     <PaymentSourceContext.Provider value={value}>
-      //       {children}
-      //     </PaymentSourceContext.Provider>
-      //   )
-      // }
-      // if (!isGuest && templateCustomerCards) {
-      //   const customerPaymentsCards = braintreeCustomerPayments.map(
-      //     (customerPayment, i) => {
-      //       // @ts-ignore
-      //       const card = customerPayment?.paymentSource()?.options
-      //         ?.card as Record<string, any>
-      //       const handleClick = async () => {
-      //         await setPaymentSource({
-      //           paymentResource,
-      //           customerPaymentSourceId: customerPayment.id,
-      //         })
-      //         onClickCustomerCards && onClickCustomerCards
-      //       }
-      //       const value = {
-      //         ...card,
-      //         showCard,
-      //         handleEditClick,
-      //         readonly,
-      //         handleClick,
-      //       }
-      //       return (
-      //         <PaymentSourceContext.Provider key={i} value={value}>
-      //           <Parent {...value}>{templateCustomerCards}</Parent>
-      //         </PaymentSourceContext.Provider>
-      //       )
-      //     }
-      //   )
-      //   return !authorization ? null : (
-      //     <Fragment>
-      //       {isEmpty(customerPaymentsCards) ? null : (
-      //         <div className={p.className}>{customerPaymentsCards}</div>
-      //       )}
-      //       <BraintreePayment
-      //         // show={show}
-      //         // templateCustomerSaveToWallet={templateCustomerSaveToWallet}
-      //         authorization={authorization}
-      //         // locale={locale}
-      //       />
-      //     </Fragment>
-      //   )
-      // }
-      // return !authorization ? null : (
-      //   <BraintreePayment authorization={authorization} />
-      // )
+      const authorization = paymentSource?.clientToken
+      const btreeConfig = config
+        ? getPaymentConfig<'braintreePayment'>(paymentResource, config)
+        : {}
+      const braintreeCustomerPayments =
+        !isEmpty(payments) && payments
+          ? payments.filter((customerPayment) => {
+              return customerPayment.paymentSourceType === 'BraintreePayment'
+            })
+          : []
+      if (readonly || showCard) {
+        // @ts-ignore
+        const card = paymentSource?.options?.card as Record<string, any>
+        const value = { ...card, showCard, handleEditClick, readonly }
+        return isEmpty(card) ? null : (
+          <PaymentSourceContext.Provider value={value}>
+            {children}
+          </PaymentSourceContext.Provider>
+        )
+      }
+      if (!isGuest && templateCustomerCards) {
+        const customerPaymentsCards = braintreeCustomerPayments.map(
+          (customerPayment, i) => {
+            // @ts-ignore
+            const card = customerPayment?.paymentSource()?.options
+              ?.card as Record<string, any>
+            const handleClick = async () => {
+              await setPaymentSource({
+                paymentResource,
+                customerPaymentSourceId: customerPayment.id,
+              })
+              onClickCustomerCards && onClickCustomerCards
+            }
+            const value = {
+              ...card,
+              showCard,
+              handleEditClick,
+              readonly,
+              handleClick,
+            }
+            return (
+              <PaymentSourceContext.Provider key={i} value={value}>
+                <Parent {...value}>{templateCustomerCards}</Parent>
+              </PaymentSourceContext.Provider>
+            )
+          }
+        )
+        return !authorization ? null : (
+          <Fragment>
+            {isEmpty(customerPaymentsCards) ? null : (
+              <div className={p.className}>{customerPaymentsCards}</div>
+            )}
+            <BraintreePayment
+              // show={show}
+              templateCustomerSaveToWallet={templateCustomerSaveToWallet}
+              authorization={authorization}
+              locale={locale}
+              config={btreeConfig}
+            />
+          </Fragment>
+        )
+      }
+      return !authorization ? null : (
+        <BraintreePayment authorization={authorization} />
+      )
       return null
     case 'wire_transfers':
       if (!readonly && payment?.id !== currentPaymentMethodId) return null

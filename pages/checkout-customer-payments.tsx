@@ -23,6 +23,7 @@ import {
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
+import { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 let orderId = 'PDerhJplRp'
