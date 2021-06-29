@@ -7,6 +7,7 @@ import {
   getPaymentConfig,
   PaymentResource,
 } from '#reducers/PaymentMethodReducer'
+import getPaypalConfig from '#utils/paypalPayment'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React, {
@@ -17,6 +18,7 @@ import React, {
 } from 'react'
 // import BraintreePayment from './BraintreePayment'
 import { PaymentSourceProps } from './PaymentSource'
+import PaypalPayment from './PaypalPayment'
 import StripePayment from './StripePayment'
 import Parent from './utils/Parent'
 import WireTransferPayment from './WireTransferPayment'
@@ -58,9 +60,14 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       payment?.id === currentPaymentMethodId &&
       order
     ) {
+      const attributes =
+        config && paymentResource === 'paypal_payments'
+          ? getPaypalConfig(paymentResource, config)
+          : {}
       setPaymentSource({
         paymentResource,
         order,
+        attributes,
       })
     }
   }, [paymentSource, payment, show])
@@ -225,6 +232,30 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
           ? getPaymentConfig<'wireTransfer'>(paymentResource, config)
           : {}
       return <WireTransferPayment {...p} {...wireTransferConfig} />
+    case 'paypal_payments':
+      if (!readonly && payment?.id !== currentPaymentMethodId) return null
+      if (readonly || showCard) {
+        const card =
+          // @ts-ignore
+          paymentSource?.options?.card ||
+          // @ts-ignore
+          (paymentSource?.metadata?.card as Record<string, any>)
+        const value = { ...card, showCard, handleEditClick, readonly }
+        return isEmpty(card) ? null : (
+          <PaymentSourceContext.Provider value={value}>
+            {children}
+          </PaymentSourceContext.Provider>
+        )
+      }
+      const paypalConfig =
+        config && getPaymentConfig<'paypalPayment'>(paymentResource, config)
+      return (
+        <PaypalPayment
+          {...p}
+          infoMessage={paypalConfig?.infoMessage}
+          submitButton={paypalConfig?.submitButton}
+        />
+      )
     default:
       return null
   }

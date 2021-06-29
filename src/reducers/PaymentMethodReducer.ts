@@ -1,4 +1,5 @@
 import { BraintreeConfig } from '#components/BraintreePayment'
+import { PaypalConfig } from '#components/PaypalPayment'
 import { StripeConfig } from '#components/StripePayment'
 import { WireTransferConfig } from '#components/WireTransferPayment'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
@@ -124,9 +125,10 @@ export type PaymentResourceKey =
   | 'braintreePayment'
   | 'stripePayment'
   | 'wireTransfer'
+  | 'paypalPayment'
 // | 'adyenPayment'
 // | 'externalPayment'
-// | 'paypalPayment'
+// | 'checkoutPayment'
 
 export type SDKPaymentResource =
   | 'AdyenPayment'
@@ -287,6 +289,7 @@ export type PaymentMethodConfig = {
   stripePayment?: StripeConfig
   braintreePayment?: BraintreeConfig
   wireTransfer?: Partial<WireTransferConfig>
+  paypalPayment?: PaypalConfig
 }
 
 type SetPaymentMethodConfig = (

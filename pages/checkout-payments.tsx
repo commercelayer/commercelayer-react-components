@@ -25,6 +25,8 @@ import { useRouter } from 'next/router'
 
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 let orderId = 'PDerhJplRp'
+let paypalPayerId = ''
+let paypalReturnUrl = ''
 
 const messages: any = [
   {
@@ -47,6 +49,12 @@ export default function Main() {
   const { query } = useRouter()
   if (query.orderId) {
     orderId = query.orderId as string
+  }
+  if (query.PayerID) {
+    paypalPayerId = query.PayerID as string
+  }
+  if (typeof window !== 'undefined') {
+    paypalReturnUrl = window.location.href
   }
   // const [shippingMethodId, setShippingMethodId] = useState<string>('')
   const getOrder = async () => {
@@ -162,6 +170,10 @@ export default function Main() {
                       'mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
                   },
                 },
+                paypalPayment: {
+                  cancelUrl: paypalReturnUrl,
+                  returnUrl: paypalReturnUrl,
+                },
               }}
             >
               <PaymentMethod
@@ -207,7 +219,7 @@ export default function Main() {
                 <Errors className="text-red-600" resource="paymentMethod" />
               </PaymentMethod>
             </PaymentMethodsContainer>
-            <PlaceOrderContainer>
+            <PlaceOrderContainer options={{ paypalPayerId }}>
               <div className="flex flex-row-reverse justify-end">
                 <label
                   htmlFor="privacy-terms"

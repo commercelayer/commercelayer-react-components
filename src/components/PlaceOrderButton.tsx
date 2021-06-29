@@ -27,17 +27,20 @@ type PlaceOrderButtonProps = {
 
 const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
   const { children, label = 'Place order', disabled, onClick, ...p } = props
-  const { isPermitted, setPlaceOrder } = useContext(PlaceOrderContext)
+  const { isPermitted, setPlaceOrder, options } = useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
   useEffect(() => {
     if (isPermitted) {
       setNotPermitted(false)
     } else setNotPermitted(true)
+    if (options?.paypalPayerId) {
+      handleClick()
+    }
     return () => {
       setNotPermitted(true)
     }
-  }, [isPermitted])
+  }, [isPermitted, options?.paypalPayerId])
   const handleClick = async () => {
     setForceDisable(true)
     const placed = setPlaceOrder && (await setPlaceOrder())
