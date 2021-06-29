@@ -2,7 +2,7 @@ import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { Order, OrderCollection } from '@commercelayer/js-sdk'
+import { Order, OrderCollection, PaypalPayment } from '@commercelayer/js-sdk'
 import { isEmpty, isFunction } from 'lodash'
 import { shipmentsFilled } from '#utils/shipments'
 import { PaymentResource } from './PaymentMethodReducer'
@@ -15,6 +15,7 @@ export type PlaceOrderOptions = {
   saveBillingAddressToCustomerAddressBook?: boolean
   saveShippingAddressToCustomerAddressBook?: boolean
   savePaymentSourceToCustomerWallet?: boolean
+  paypalPayerId?: string
 }
 
 export interface PlaceOrderActionPayload {
@@ -23,6 +24,7 @@ export interface PlaceOrderActionPayload {
   paymentType: PaymentResource
   paymentSecret: string
   paymentId: string
+  paymentSource: Record<string, string>
   options?: PlaceOrderOptions
 }
 
@@ -109,6 +111,7 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
         paymentType: paymentMethod?.paymentSourceType as PaymentResource,
         paymentSecret: paymentSource?.clientSecret,
         paymentId: paymentSource?.options?.id,
+        paymentSource: paymentSource?.attributes(),
         options,
       },
     })
@@ -135,7 +138,17 @@ export const setPlaceOrder: SetPlaceOrder = async ({
   }
   try {
     if (state && order && config) {
-      const { options, paymentType } = state
+      const { options, paymentType, paymentSource } = state
+      if (paymentType === 'paypal_payments') {
+        if (!options?.paypalPayerId) {
+          window.location.href = paymentSource?.approvalUrl as string
+          return response
+        }
+        const paypalPayment = PaypalPayment.build({ id: paymentSource?.id })
+        await paypalPayment
+          .withCredentials(config)
+          .update({ paypalPayerId: options?.paypalPayerId })
+      }
       const updateAttributes: Record<string, any> = {
         _place: true,
       }
