@@ -539,6 +539,7 @@ const components = {
       'GiftCardOrCouponCode',
       'GiftCardOrCouponRemoveButton',
       'Errors',
+      'OrderNumber',
       'ReactNode',
     ],
     displayName: 'OrderContainer',
@@ -550,6 +551,15 @@ const components = {
     },
     defaultProps: {
       metadata: {},
+    },
+  },
+  OrderNumber: {
+    displayName: 'OrderNumber',
+    propTypes: {
+      className: PropTypes.string,
+    },
+    defaultProps: {
+      format: 'formatted' as BaseFormatPrice,
     },
   },
   OrderStorage: {

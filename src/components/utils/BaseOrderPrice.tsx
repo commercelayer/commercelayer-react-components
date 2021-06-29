@@ -45,7 +45,7 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
     price,
     ...p,
   }
-  return props.children ? (
+  return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <span {...p}>{price}</span>
