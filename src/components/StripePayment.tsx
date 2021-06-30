@@ -14,7 +14,6 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js'
 import {
-  loadStripe,
   Stripe,
   StripeCardElementOptions,
   StripeElementLocale,
@@ -218,6 +217,7 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
   } = p
   useEffect(() => {
     if (show && publishableKey) {
+      const { loadStripe } = require('@stripe/stripe-js')
       setIsLoaded(true)
       stripe = loadStripe(publishableKey, {
         locale,
