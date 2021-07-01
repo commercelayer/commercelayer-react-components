@@ -5,42 +5,47 @@ import get from 'lodash/get'
 import isArray from 'lodash/isArray'
 
 const ERROR_CODES: CodeErrorType[] = [
-  'RECORD_NOT_FOUND',
-  'UNAUTHORIZED',
-  'INVALID_TOKEN',
-  'VALIDATION_ERROR',
-  'INVALID_RESOURCE',
   'FILTER_NOT_ALLOWED',
-  'INVALID_FIELD_VALUE',
+  'FORBIDDEN',
+  'INTERNAL_SERVER_ERROR',
+  'INVALID_DATA_FORMAT',
   'INVALID_FIELD',
-  'PARAM_NOT_ALLOWED',
-  'PARAM_MISSING',
+  'INVALID_FIELD_FORMAT',
+  'INVALID_FIELD_VALUE',
+  'INVALID_FILTERS_SYNTAX',
   'INVALID_FILTER_VALUE',
-  'KEY_ORDER_MISMATCH',
-  'KEY_NOT_INCLUDED_IN_URL',
   'INVALID_INCLUDE',
-  'RELATION_EXISTS',
-  'INVALID_SORT_CRITERIA',
   'INVALID_LINKS_OBJECT',
-  'TYPE_MISMATCH',
   'INVALID_PAGE_OBJECT',
   'INVALID_PAGE_VALUE',
-  'INVALID_FIELD_FORMAT',
-  'INVALID_FILTERS_SYNTAX',
-  'SAVE_FAILED',
-  'INVALID_DATA_FORMAT',
-  'FORBIDDEN',
-  'RECORD_NOT_FOUND',
-  'NOT_ACCEPTABLE',
-  'UNSUPPORTED_MEDIA_TYPE',
+  'INVALID_RESOURCE',
+  'INVALID_RESOURCE_ID',
+  'INVALID_SORT_CRITERIA',
+  'INVALID_TOKEN',
+  'KEY_NOT_INCLUDED_IN_URL',
+  'KEY_ORDER_MISMATCH',
   'LOCKED',
-  'INTERNAL_SERVER_ERROR',
+  'NOT_ACCEPTABLE',
+  'PARAM_MISSING',
+  'PARAM_NOT_ALLOWED',
   'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+  'RECORD_NOT_FOUND',
+  'RECORD_NOT_FOUND',
+  'RELATION_EXISTS',
+  'SAVE_FAILED',
+  'TYPE_MISMATCH',
+  'UNAUTHORIZED',
+  'UNSUPPORTED_MEDIA_TYPE',
+  'VALIDATION_ERROR',
 ]
 
 export type GetErrorsByCollection = <C extends BaseClass>(
   collection: C,
-  resourceType: ResourceErrorType
+  resourceType: ResourceErrorType,
+  options?: {
+    field?: string
+    id?: string
+  }
 ) => BaseError[]
 
 export interface TransformCode {
@@ -66,9 +71,23 @@ const transformCode: TransformCode = (code) => {
   return newCode
 }
 
+function getErrorCodeByString<C extends string>(
+  text: string,
+  codes: C[]
+): C | undefined {
+  let code: C | undefined
+  codes?.map((c) => {
+    if (text.search(c) !== -1) {
+      code = c
+    }
+  })
+  return code
+}
+
 const getErrorsByCollection: GetErrorsByCollection = (
   collection,
-  resourceType
+  resourceType,
+  options
 ) => {
   const errors: BaseError[] = []
   if (isFunction(collection?.errors) && !collection?.errors().empty()) {
@@ -78,19 +97,27 @@ const getErrorsByCollection: GetErrorsByCollection = (
       .map((error) => {
         // TODO Add function to correct different field
         if (error['field'] === 'recipientEmail') error['field'] = 'email'
-        errors.push({
-          id: get(collection, 'id'),
-          code: transformCode(error['code']),
-          field: error['field'] === 'recipientEmail' ? 'email' : error['field'],
+        const e = {
+          id: options?.id || get(collection, 'id'),
+          code:
+            getErrorCodeByString(error['message'], ERROR_CODES) ||
+            transformCode(error['code']),
+          field:
+            error['field'] === 'recipientEmail'
+              ? 'email'
+              : options?.field || error['field'],
           resource: resourceType,
           message: error['message'],
-        })
+        }
+        errors.push(e)
       })
   } else if (isArray(collection)) {
     collection.map((error) => {
       errors.push({
         // id: collection['id'],
-        code: transformCode(error['code']),
+        code:
+          getErrorCodeByString(error['message'], ERROR_CODES) ||
+          transformCode(error['code']),
         field: error['field'] === 'recipientEmail' ? 'email' : error['field'],
         resource: resourceType,
         message: error['message'],

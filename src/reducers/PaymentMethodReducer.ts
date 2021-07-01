@@ -166,12 +166,12 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       getOrder && (await getOrder(order.id))
       dispatch({
         type: 'setPaymentMethods',
-        payload: { currentPaymentMethodId: paymentMethodId },
+        payload: { currentPaymentMethodId: paymentMethodId, errors: [] },
       })
     }
   } catch (error) {
-    console.error(error)
     const errors = getErrorsByCollection(error, 'paymentMethod')
+    console.error('Set payment method', errors)
     setPaymentMethodErrors(errors, dispatch)
   }
 }
@@ -185,20 +185,22 @@ export type SetPaymentSourceResponse = {
   paymentSource: PaymentSourceTypes
 } | null
 
-export type SetPaymentSource = (args: {
-  config?: CommerceLayerConfig
-  dispatch?: Dispatch<PaymentMethodAction>
-  getOrder?: getOrderContext
-  attributes?: Record<
-    string,
-    | string
-    | Record<string, string | number | undefined | Record<string, string>>
-  >
-  order?: OrderCollection
-  paymentResource: PaymentResource
-  paymentSourceId?: string
-  customerPaymentSourceId?: string
-}) => Promise<SetPaymentSourceResponse>
+export type SetPaymentSource = (
+  args: {
+    config?: CommerceLayerConfig
+    dispatch?: Dispatch<PaymentMethodAction>
+    getOrder?: getOrderContext
+    attributes?: Record<
+      string,
+      | string
+      | Record<string, string | number | undefined | Record<string, string>>
+    >
+    order?: OrderCollection
+    paymentResource: PaymentResource
+    paymentSourceId?: string
+    customerPaymentSourceId?: string
+  } & PaymentMethodState
+) => Promise<SetPaymentSourceResponse>
 
 export const setPaymentSource: SetPaymentSource = async ({
   config,
@@ -209,6 +211,8 @@ export const setPaymentSource: SetPaymentSource = async ({
   paymentResource,
   customerPaymentSourceId,
   paymentSourceId,
+  currentPaymentMethodId,
+  currentPaymentMethodType,
 }) => {
   try {
     if (config && order) {
@@ -253,8 +257,11 @@ export const setPaymentSource: SetPaymentSource = async ({
       }
     }
   } catch (error) {
-    console.error('error', error)
-    const errors = getErrorsByCollection(error, 'paymentMethod')
+    const errors = getErrorsByCollection(error, 'paymentMethod', {
+      id: currentPaymentMethodId,
+      field: currentPaymentMethodType,
+    })
+    console.error('Set payment source:', errors)
     setPaymentMethodErrors(errors, dispatch)
   }
   return null

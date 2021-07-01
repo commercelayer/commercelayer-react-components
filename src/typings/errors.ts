@@ -17,6 +17,7 @@ export type CodeErrorType =
   | 'INVALID_PAGE_OBJECT'
   | 'INVALID_PAGE_VALUE'
   | 'INVALID_RESOURCE'
+  | 'INVALID_RESOURCE_ID'
   | 'INVALID_SORT_CRITERIA'
   | 'INVALID_TOKEN'
   | 'KEY_NOT_INCLUDED_IN_URL'
@@ -25,6 +26,7 @@ export type CodeErrorType =
   | 'NOT_ACCEPTABLE'
   | 'PARAM_MISSING'
   | 'PARAM_NOT_ALLOWED'
+  | 'PAYMENT_INTENT_AUTHENTICATION_FAILURE'
   | 'RECORD_NOT_FOUND'
   | 'RECORD_NOT_FOUND'
   | 'RELATION_EXISTS'
@@ -33,20 +35,19 @@ export type CodeErrorType =
   | 'UNAUTHORIZED'
   | 'UNSUPPORTED_MEDIA_TYPE'
   | 'VALIDATION_ERROR'
-  | 'PAYMENT_INTENT_AUTHENTICATION_FAILURE'
 
 export type ResourceErrorType =
-  | 'order'
-  | 'giftCard'
-  | 'lineItem'
-  | 'variant'
-  | 'price'
-  | 'skuOption'
-  | 'billingAddress'
-  | 'shippingAddress'
   | 'address'
+  | 'billingAddress'
+  | 'giftCard'
   | 'giftCardOrCouponCode'
+  | 'lineItem'
+  | 'order'
   | 'paymentMethod'
+  | 'price'
+  | 'shippingAddress'
+  | 'skuOption'
+  | 'variant'
 
 const CEType: CodeErrorType[] = [
   'EMPTY_ERROR',
@@ -64,6 +65,7 @@ const CEType: CodeErrorType[] = [
   'INVALID_PAGE_OBJECT',
   'INVALID_PAGE_VALUE',
   'INVALID_RESOURCE',
+  'INVALID_RESOURCE_ID',
   'INVALID_SORT_CRITERIA',
   'INVALID_TOKEN',
   'KEY_NOT_INCLUDED_IN_URL',
@@ -91,12 +93,12 @@ export interface BaseError {
 }
 
 export const REType: ResourceErrorType[] = [
-  'order',
   'giftCard',
   'lineItem',
-  'variant',
+  'order',
   'price',
   'skuOption',
+  'variant',
 ]
 
 export const BaseErrorObject = PropTypes.shape({
@@ -109,15 +111,15 @@ export const BaseErrorObject = PropTypes.shape({
 
 export const ErrorPropTypes = {
   resource: PropTypes.oneOf<ResourceErrorType>([
-    'order',
+    'billingAddress',
     'giftCard',
     'lineItem',
-    'variant',
-    'price',
-    'skuOption',
-    'billingAddress',
-    'shippingAddress',
+    'order',
     'paymentMethod',
+    'price',
+    'shippingAddress',
+    'skuOption',
+    'variant',
   ]).isRequired,
   children: PropTypes.func,
   field: PropTypes.string,
