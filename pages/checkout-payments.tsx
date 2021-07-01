@@ -47,6 +47,12 @@ const messages: any = [
     field: 'base',
     message: 'Paypal error',
   },
+  {
+    code: 'PAYMENT_NOT_APPROVED_FOR_EXECUTION',
+    resource: 'order',
+    field: 'base',
+    message: 'Paypal payment not approved for execution',
+  },
 ]
 
 export default function Main() {
