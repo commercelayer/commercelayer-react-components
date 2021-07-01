@@ -34,7 +34,7 @@ const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> =
       paymentMethodReducer,
       paymentMethodInitialState
     )
-    const { order, getOrder } = useContext(OrderContext)
+    const { order, getOrder, setOrderErrors } = useContext(OrderContext)
     const credentials = useContext(CommerceLayerContext)
     useEffect(() => {
       if (config && isEmpty(state.config))
@@ -54,6 +54,7 @@ const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> =
           getOrder,
           order,
           dispatch,
+          setOrderErrors,
         }),
       setPaymentSource: async (args: any) =>
         defaultPaymentMethodContext['setPaymentSource']({

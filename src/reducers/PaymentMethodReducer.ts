@@ -3,7 +3,7 @@ import { PaypalConfig } from '#components/PaypalPayment'
 import { StripeConfig } from '#components/StripePayment'
 import { WireTransferConfig } from '#components/WireTransferPayment'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { getOrderContext } from '#reducers/OrderReducer'
+import { getOrderContext, SetOrderErrors } from '#reducers/OrderReducer'
 import { BaseError } from '#typings/errors'
 import baseReducer from '#utils/baseReducer'
 import dynamicNaming from '#utils/dynamicNaming'
@@ -142,6 +142,7 @@ export type SetPaymentMethod = (args: {
   config?: CommerceLayerConfig
   dispatch?: Dispatch<PaymentMethodAction>
   getOrder?: getOrderContext
+  setOrderErrors?: (collection: any) => { success: boolean }
   order?: OrderCollection
   paymentMethodId: string
   paymentResource?: PaymentResource
@@ -153,6 +154,7 @@ export const setPaymentMethod: SetPaymentMethod = async ({
   order,
   paymentMethodId,
   getOrder,
+  setOrderErrors,
 }) => {
   try {
     if (config && order && dispatch) {
@@ -168,6 +170,7 @@ export const setPaymentMethod: SetPaymentMethod = async ({
         type: 'setPaymentMethods',
         payload: { currentPaymentMethodId: paymentMethodId, errors: [] },
       })
+      setOrderErrors && setOrderErrors([])
     }
   } catch (error) {
     const errors = getErrorsByCollection(error, 'paymentMethod')
