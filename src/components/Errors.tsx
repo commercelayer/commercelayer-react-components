@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext, Fragment } from 'react'
+import React, { FunctionComponent, useContext, Fragment, useMemo } from 'react'
 import Parent from './utils/Parent'
 import GiftCardContext from '#context/GiftCardContext'
 import OrderContext from '#context/OrderContext'
@@ -31,19 +31,28 @@ const Errors: FunctionComponent<ErrorsProps> = (props) => {
     currentPaymentMethodId,
   } = useContext(PaymentMethodContext)
   const { lineItem } = useContext(LineItemChildrenContext)
-  // TODO add other errors
-  const allErrors = [
-    ...(giftCardErrors || []),
-    ...(orderErrors || []),
-    ...(lineItemErrors || []),
-    ...(addressErrors || []),
-    ...(customerErrors || []),
-    ...(paymentMethodErrors?.filter(
-      (v) =>
-        v.field === currentPaymentMethodType &&
-        payment?.id === currentPaymentMethodId
-    ) || []),
-  ]
+  const allErrors = useMemo(
+    () => [
+      ...(giftCardErrors || []),
+      ...(orderErrors || []),
+      ...(lineItemErrors || []),
+      ...(addressErrors || []),
+      ...(customerErrors || []),
+      ...(paymentMethodErrors?.filter(
+        (v) =>
+          v.field === currentPaymentMethodType &&
+          payment?.id === currentPaymentMethodId
+      ) || []),
+    ],
+    [
+      giftCardErrors,
+      orderErrors,
+      lineItemErrors,
+      addressErrors,
+      customerErrors,
+      paymentMethodErrors,
+    ]
+  )
   const msgErrors = getAllErrors({
     allErrors,
     field,
