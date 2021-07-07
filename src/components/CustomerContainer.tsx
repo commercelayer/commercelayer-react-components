@@ -4,10 +4,12 @@ import React, {
   useContext,
   useEffect,
   useReducer,
+  useMemo,
 } from 'react'
 import customerReducer, {
   customerInitialState,
   getCustomerAddresses,
+  getCustomerOrders,
   getCustomerPaymentSources,
 } from '#reducers/CustomerReducer'
 import OrderContext from '#context/OrderContext'
@@ -33,33 +35,42 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
   const { order, getOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
-    if (config.accessToken && isEmpty(state.addresses) && !isGuest) {
-      getCustomerAddresses({ config, dispatch })
+    if (config.accessToken) {
+      if (isEmpty(state.addresses) && !isGuest) {
+        getCustomerAddresses({ config, dispatch })
+      }
+      if (order && isEmpty(state.payments) && !isGuest) {
+        getCustomerPaymentSources({ config, dispatch, order })
+      }
+      if (isEmpty(order) && isEmpty(state.orders)) {
+        getCustomerOrders({ config, dispatch })
+      }
     }
-    if (config.accessToken && order && isEmpty(state.payments) && !isGuest) {
-      getCustomerPaymentSources({ config, dispatch, order })
-    }
+
     return () => {
       dispatch({ type: 'setCustomerEmail', payload: {} })
     }
   }, [config.accessToken, order, isGuest])
-  const contextValue = {
-    isGuest,
-    ...state,
-    saveCustomerUser: async (customerEmail: string) => {
-      await saveCustomerUser({
-        config,
-        customerEmail,
-        dispatch,
-        getOrder: getOrder as getOrderContext,
-        order,
-      })
-    },
-    setCustomerErrors: (errors: BaseError[]) =>
-      defaultCustomerContext['setCustomerErrors'](errors, dispatch),
-    setCustomerEmail: (customerEmail: string) =>
-      defaultCustomerContext['setCustomerEmail'](customerEmail, dispatch),
-  }
+  const contextValue = useMemo(
+    () => ({
+      isGuest,
+      ...state,
+      saveCustomerUser: async (customerEmail: string) => {
+        await saveCustomerUser({
+          config,
+          customerEmail,
+          dispatch,
+          getOrder: getOrder as getOrderContext,
+          order,
+        })
+      },
+      setCustomerErrors: (errors: BaseError[]) =>
+        defaultCustomerContext['setCustomerErrors'](errors, dispatch),
+      setCustomerEmail: (customerEmail: string) =>
+        defaultCustomerContext['setCustomerEmail'](customerEmail, dispatch),
+    }),
+    [state]
+  )
   return (
     <CustomerContext.Provider value={contextValue}>
       {children}
