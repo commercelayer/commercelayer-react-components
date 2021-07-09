@@ -15,6 +15,7 @@ import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { isEmpty, map } from 'lodash'
 import jwtDecode from 'jwt-decode'
 import { Jwt } from '#typings'
+import OrderAttributes from '#typings/order'
 
 export type CustomerActionType =
   | 'setErrors'
@@ -28,7 +29,7 @@ export interface CustomerActionPayload {
   payments: CustomerPaymentSourceCollection[]
   customerEmail: string
   errors: BaseError[]
-  orders: Record<string, string | number>[]
+  orders: OrderAttributes[]
   isGuest: boolean
   getCustomerPaymentSources: () => Promise<void>
 }
