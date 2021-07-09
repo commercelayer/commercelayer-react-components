@@ -9,38 +9,87 @@ import React, {
 } from 'react'
 import components from '#config/components'
 import CustomerContext from '#context/CustomerContext'
-import OrderListChildrenContext from '#context/OrderListChildrenContext'
-import { Column, HeaderGroup, useTable } from 'react-table'
+import OrderListChildrenContext, {
+  InitialOrderListContext,
+} from '#context/OrderListChildrenContext'
+import {
+  Column,
+  HeaderGroup,
+  useTable,
+  useSortBy,
+  UseSortByColumnProps,
+} from 'react-table'
+import OrderAttributes from '#typings/order'
 
 const propTypes = components.OrderList.propTypes
 const displayName = components.OrderList.displayName
+const sortDescIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={20}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"
+    />
+  </svg>
+)
+
+const sortAscIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={20}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"
+    />
+  </svg>
+)
 
 type OrderListProps = {
   children: ReactNode
   columns: (Column & { className?: string })[]
   loadingElement?: ReactElement
+  actionsComponent?: InitialOrderListContext['actionsComponent']
+  actionsContainerClassName?: string
+  showActions?: boolean
 } & JSX.IntrinsicElements['table']
 
-type HeaderColumn = HeaderGroup & {
+interface HeaderColumn
+  extends HeaderGroup<OrderAttributes>,
+    Partial<UseSortByColumnProps<OrderAttributes>> {
   className?: string
+  titleClassName?: string
 }
 
 const OrderList: FunctionComponent<OrderListProps> = ({
   children,
   columns,
   loadingElement,
+  showActions = false,
+  actionsComponent,
+  actionsContainerClassName,
   ...p
 }) => {
   const [loading, setLoading] = useState(true)
   const { orders } = useContext(CustomerContext)
-  const data = useMemo(() => orders, [orders]) as Record<
-    string,
-    string | number
-  >[]
-  const cols = useMemo(() => columns, [columns]) as Column<
-    Record<string, string | number>
-  >[]
-  const table = useTable({ data, columns: cols })
+  const data = useMemo<OrderAttributes[]>(
+    () => orders as OrderAttributes[],
+    [orders]
+  )
+  const cols = useMemo(() => columns, [columns]) as Column<OrderAttributes>[]
+  const table = useTable<OrderAttributes>({ data, columns: cols }, useSortBy)
   useEffect(() => {
     orders && orders.length > 0 && setLoading(false)
     return () => {
@@ -51,8 +100,20 @@ const OrderList: FunctionComponent<OrderListProps> = ({
   const headerComponent = table.headerGroups.map((headerGroup) => {
     const columns = headerGroup.headers.map((column: HeaderColumn) => {
       return (
-        <th {...column.getHeaderProps()} className={column?.className}>
-          {column.render('Header')}
+        <th
+          className={column?.className}
+          {...column.getHeaderProps(
+            column?.getSortByToggleProps && column?.getSortByToggleProps()
+          )}
+        >
+          <span className={column?.titleClassName}>
+            {column.render('Header')}
+            {column.isSorted
+              ? column.isSortedDesc
+                ? sortDescIcon
+                : sortAscIcon
+              : ''}
+          </span>
         </th>
       )
     })
@@ -61,8 +122,11 @@ const OrderList: FunctionComponent<OrderListProps> = ({
   const components = table.rows.map((row, i) => {
     table.prepareRow(row)
     const childProps = {
-      order: orders?.[i] || {},
+      order: orders?.[i] as OrderAttributes,
       row,
+      showActions,
+      actionsComponent,
+      actionsContainerClassName,
     }
     return (
       <tr {...row.getRowProps()}>

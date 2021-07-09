@@ -24,7 +24,7 @@ export interface CustomerActionPayload {
   payments: CustomerPaymentSource[]
   customerEmail: string
   errors: BaseError[]
-  orders: Record<string, string | number>[]
+  orders: OrderAttributes[]
   isGuest: boolean
   getCustomerPaymentSources: () => Promise<void>
 }
