@@ -23,7 +23,7 @@ import {
 } from 'react-table'
 import OrderAttributes from '#typings/order'
 import { FixedSizeList } from 'react-window'
-import scrollbarWidth from '#utils/scrollBarWidth'
+import scrollbarWidth from '#utils/scrollbarWidth'
 import { sortDescIcon, sortAscIcon } from '#utils/icons'
 
 const propTypes = components.OrderList.propTypes
