@@ -166,7 +166,7 @@ export const getCustomerOrders: GetCustomerOrders = async ({
       return {
         id: order.id,
         ...order.attributes,
-      }
+      } as OrderAttributes
     })
     dispatch({
       type: 'setOrders',
