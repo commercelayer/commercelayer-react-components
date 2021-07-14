@@ -1,8 +1,8 @@
 import { createContext } from 'react'
-// import { LineItemOptionCollection } from '@commercelayer/js-sdk'
+import { LineItemOptionCollection } from '@commercelayer/js-sdk'
 
 export interface InitialLineItemContext {
-  lineItemOption: Record<string, object>
+  lineItemOption: Partial<LineItemOptionCollection>
   showAll?: boolean
 }
 
