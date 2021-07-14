@@ -12,7 +12,7 @@ import {
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
-import { isEmpty, map } from 'lodash'
+import { isEmpty } from 'lodash'
 import jwtDecode from 'jwt-decode'
 import { Jwt } from '#typings'
 import OrderAttributes from '#typings/order'
@@ -192,7 +192,7 @@ export const getCustomerOrders: GetCustomerOrders = async ({
       return {
         id: order.id,
         ...order.attributes,
-      }
+      } as OrderAttributes
     })
     dispatch({
       type: 'setOrders',
