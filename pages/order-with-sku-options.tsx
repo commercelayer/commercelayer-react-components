@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import { getIntegrationToken } from '@commercelayer/js-auth'
+import { getSalesChannelToken } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
@@ -34,7 +34,7 @@ import SkuOptionInput from '../src/components/SkuOptionInput'
 import LineItemOptions from '../src/components/LineItemOptions'
 import LineItemOption from '../src/components/LineItemOption'
 
-const endpoint = 'https://the-blue-brand-2.commercelayer.co'
+const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 
 const CustomAddToCart = (props) => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
@@ -58,21 +58,21 @@ export default function Order() {
   useEffect(() => {
     const getToken = async () => {
       // @ts-ignore
-      // const { accessToken } = await getSalesChannelToken({
-      //   clientId:
-      //     '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
-      //   endpoint,
-      //   scope: 'market:48'
-      // })
-      const token = await getIntegrationToken({
+      const { accessToken } = await getSalesChannelToken({
         clientId:
-          'b1aa32826ce12ba2f74c59a555e3ed98a7db4ec710b14575b7e97f0a49fb9a4d',
-        clientSecret:
-          '8fed019759490ba13c482cc2541ef77c6b8d0b3df04db80807110784fbfec021',
+          '48ee4802f8227b04951645a9b7c8af1e3943efec7edd1dcfd04b5661bf1da5db',
         endpoint,
-        scope: 'market:48',
+        scope: 'market:58',
       })
-      if (token) setToken(token.accessToken)
+      // const token = await getIntegrationToken({
+      //   clientId:
+      //     'b1aa32826ce12ba2f74c59a555e3ed98a7db4ec710b14575b7e97f0a49fb9a4d',
+      //   clientSecret:
+      //     '8fed019759490ba13c482cc2541ef77c6b8d0b3df04db80807110784fbfec021',
+      //   endpoint,
+      //   scope: 'market:48',
+      // })
+      if (accessToken) setToken(accessToken)
     }
     getToken()
   }, [])
@@ -81,7 +81,7 @@ export default function Order() {
       <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
-          <OrderContainer persistKey="orderUS">
+          <OrderContainer>
             <ItemContainer>
               <div className="md:flex">
                 <div className="md:flex-shrink-0">
@@ -125,7 +125,7 @@ export default function Order() {
                   </VariantsContainer>
                   <div className="m-2">
                     <SkuOptionsContainer>
-                      <SkuOption id="gNjjvsExNq">
+                      <SkuOption id="mNJEgsJwBn">
                         <SkuOptionInput
                           name="message"
                           type="text"
@@ -181,23 +181,13 @@ export default function Order() {
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
                     <div>
-                      <LineItemOptions
-                        skuOptionId="gNjjvsExNq"
-                        className="font-bold"
-                      >
+                      <LineItemOptions className="font-bold" showAll>
                         <div className="flex flex-col justify-between text-sm">
-                          <LineItemOption
-                            keyClassName="font-medium capitalize underline"
-                            name="message"
-                          />
-                          <LineItemOption
-                            name="size"
-                            keyClassName="font-medium capitalize underline"
-                          />
+                          <LineItemOption keyClassName="font-medium capitalize underline" />
                         </div>
                       </LineItemOptions>
                     </div>
-                    <div>
+                    {/* <div>
                       <LineItemOptions
                         skuOptionId="gNlGlsAOBk"
                         className="font-bold"
@@ -209,7 +199,7 @@ export default function Order() {
                           />
                         </div>
                       </LineItemOptions>
-                    </div>
+                    </div> */}
                     <LineItemQuantity
                       id="line-item-quantity"
                       max={100}

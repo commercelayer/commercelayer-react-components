@@ -14,21 +14,30 @@ const propTypes = components.LineItemOptions.propTypes
 const defaultProps = components.LineItemOptions.defaultProps
 const displayName = components.LineItemOptions.displayName
 
-export type LineItemOptionsProps = {
+export type LineItemOptionsProps = JSX.IntrinsicElements['span'] & {
   children: ReactNode
-  skuOptionId: string
   title?: string
   showName?: boolean
-} & JSX.IntrinsicElements['span']
+} & (
+    | {
+        skuOptionId: string
+        showAll?: never
+      }
+    | {
+        skuOptionId?: never
+        showAll: true
+      }
+  )
 
 const LineItemOptions: FunctionComponent<LineItemOptionsProps> = (props) => {
-  const { skuOptionId, title, children, showName = true, ...p } = props
+  const { skuOptionId, title, children, showName = true, showAll, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const lineItemOptions: LineItemOptionCollection[] = !isEmpty(lineItem)
     ? lineItem['lineItemOptions']().toArray()
     : []
   const options = lineItemOptions
     .filter((o) => {
+      if (showAll) return true
       // @ts-ignore
       return o.skuOption().id === skuOptionId
     })
@@ -36,6 +45,7 @@ const LineItemOptions: FunctionComponent<LineItemOptionsProps> = (props) => {
       const showTitle = showName ? <span {...p}>{title || o.name}</span> : null
       const valueProps = {
         lineItemOption: o,
+        showAll,
       }
       return (
         <Fragment key={k}>

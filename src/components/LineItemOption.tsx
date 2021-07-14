@@ -5,7 +5,9 @@ import React, {
   CSSProperties,
 } from 'react'
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
-import { has, get } from 'lodash'
+import get from 'lodash/get'
+import has from 'lodash/has'
+import map from 'lodash/map'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { LineItemOptionCollection } from '@commercelayer/js-sdk'
@@ -22,7 +24,7 @@ type LineItemOptionChildrenProps = FunctionChildren<
 
 type LineItemOptionProps = {
   children?: LineItemOptionChildrenProps
-  name: string
+  name?: string
   valueClassName?: string
   keyClassName?: string
   keyId?: string
@@ -41,13 +43,25 @@ const LineItemOption: FunctionComponent<LineItemOptionProps> = (props) => {
     style,
     ...p
   } = props
-  const { lineItemOption } = useContext(LineItemOptionChildrenContext)
+  const { lineItemOption, showAll } = useContext(LineItemOptionChildrenContext)
   const parentProps = {
     ...props,
     lineItemOption,
   }
-  return children ? (
-    <Parent {...parentProps}>{props.children}</Parent>
+
+  const components = showAll ? (
+    map(lineItemOption?.options, (value, key) => {
+      return (
+        <Fragment>
+          <span id={keyId} style={keyStyle} className={keyClassName} {...p}>
+            {`${key}:`}
+          </span>
+          <span id={id} style={style} className={valueClassName} {...p}>
+            {`${value}`}
+          </span>
+        </Fragment>
+      )
+    })
   ) : has(lineItemOption, `options.${name}`) ? (
     <Fragment>
       <span id={keyId} style={keyStyle} className={keyClassName} {...p}>
@@ -58,6 +72,11 @@ const LineItemOption: FunctionComponent<LineItemOptionProps> = (props) => {
       </span>
     </Fragment>
   ) : null
+  return children ? (
+    <Parent {...parentProps}>{props.children}</Parent>
+  ) : (
+    <>{components}</>
+  )
 }
 
 LineItemOption.propTypes = propTypes
