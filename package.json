@@ -28,6 +28,8 @@
     "version:fix": "npm version patch",
     "version:feat": "npm version minor",
     "version:perf": "npm version major",
+    "version": "npm run build && npm version",
+    "publish:beta": "npm publish --public --tag beta",
     "publish:fix": "npm run build && npm run version:fix && git push --follow-tags && npm publish --access public",
     "publish:feat": "npm run build && npm run version:feat && git push --follow-tags && npm publish --access public",
     "publish:perf": "npm run build && npm run version:perf && git push --follow-tags && npm publish --access public"
