@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  Fragment,
-  CSSProperties,
-} from 'react'
+import React, { FunctionComponent, useContext, CSSProperties } from 'react'
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
 import get from 'lodash/get'
 import has from 'lodash/has'
