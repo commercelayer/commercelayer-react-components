@@ -447,12 +447,12 @@ const components = {
   LineItemOption: {
     displayName: 'LineItemOption',
     propTypes: {
-      name: PropTypes.string.isRequired,
+      name: PropTypes.string,
       children: PropTypes.func,
       valueClassName: PropTypes.string,
-      keyClassName: PropTypes.string,
-      keyId: PropTypes.string,
-      keyStyle: PropTypes.object,
+      className: PropTypes.string,
+      id: PropTypes.string,
+      style: PropTypes.object,
     },
   },
   LineItemOptions: {
@@ -462,10 +462,7 @@ const components = {
       children: childrenTypes.isRequired,
       title: PropTypes.string,
       showName: PropTypes.bool,
-      skuOptionId: PropTypes.string.isRequired,
-    },
-    defaultProps: {
-      showName: true,
+      skuOptionId: PropTypes.string,
     },
   },
   LineItemQuantity: {

@@ -3,21 +3,36 @@ import React, {
   Fragment,
   useContext,
   ReactNode,
+  useState,
+  useEffect,
 } from 'react'
 import ShipmentContext from '#context/ShipmentContext'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import components from '#config/components'
 import { LineItemCollection } from '@commercelayer/js-sdk'
+import { LoaderType } from '#typings'
+import getLoaderComponent from '#utils/getLoaderComponent'
 
 const propTypes = components.Shipment.propTypes
 const displayName = components.Shipment.displayName
 
 type ShipmentProps = {
   children: ReactNode
+  loader?: LoaderType
 }
 
-const Shipment: FunctionComponent<ShipmentProps> = ({ children }) => {
+const Shipment: FunctionComponent<ShipmentProps> = ({
+  children,
+  loader = 'Loading...',
+}) => {
+  const [loading, setLoading] = useState(true)
   const { shipments, deliveryLeadTimes } = useContext(ShipmentContext)
+  useEffect(() => {
+    if (shipments) setLoading(false)
+    return () => {
+      setLoading(true)
+    }
+  }, [shipments])
   const components =
     shipments &&
     shipments.map((shipment, k) => {
@@ -48,7 +63,11 @@ const Shipment: FunctionComponent<ShipmentProps> = ({ children }) => {
         </ShipmentChildrenContext.Provider>
       )
     })
-  return <Fragment>{components}</Fragment>
+  return !loading ? (
+    <Fragment>{components}</Fragment>
+  ) : (
+    getLoaderComponent(loader)
+  )
 }
 
 Shipment.propTypes = propTypes
