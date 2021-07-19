@@ -85,7 +85,7 @@ export default function Main() {
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId={orderId}>
             <ShipmentsContainer>
-              <Shipment>
+              <Shipment loader={<>Caricamento...</>}>
                 <div className="flex">
                   Shipments N:
                   <ShipmentField className="font-bold pl-1" name="keyNumber" />

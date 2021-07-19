@@ -183,7 +183,11 @@ export default function Main() {
                 <PaymentMethodRadioButton data-cy="payment-radio-button" />
                 <PaymentMethodName className="pl-3" />
                 <PaymentMethodPrice className="pl-3" />
-                <PaymentSource data-cy="payment-source" className="p-5 my-2">
+                <PaymentSource
+                  data-cy="payment-source"
+                  className="p-5 my-2"
+                  loader={'Caricamento...'}
+                >
                   <div className="flex flex-row items-center justify-start bg-gray-100 p-5 my-10">
                     <div className="flex flex-row items-center">
                       <PaymentSourceBrandIcon className="mr-3" />
