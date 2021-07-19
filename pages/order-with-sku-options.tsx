@@ -182,9 +182,10 @@ export default function Order() {
                     <LineItemName id="line-item-name" className="p-2" />
                     <div>
                       <LineItemOptions className="font-bold" showAll>
-                        <div className="flex flex-col justify-between text-sm">
-                          <LineItemOption keyClassName="font-medium capitalize underline" />
-                        </div>
+                        <LineItemOption
+                          className="font-bold capitalize"
+                          valueClassName="ml-2 font-normal"
+                        />
                       </LineItemOptions>
                     </div>
                     {/* <div>

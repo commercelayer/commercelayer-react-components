@@ -10,8 +10,6 @@ import { isEmpty } from 'lodash'
 import components from '#config/components'
 import { LineItemOptionCollection } from '@commercelayer/js-sdk'
 
-const propTypes = components.LineItemOptions.propTypes
-const defaultProps = components.LineItemOptions.defaultProps
 const displayName = components.LineItemOptions.displayName
 
 export type LineItemOptionsProps = JSX.IntrinsicElements['span'] & {
@@ -59,8 +57,6 @@ const LineItemOptions: FunctionComponent<LineItemOptionsProps> = (props) => {
   return <Fragment>{options}</Fragment>
 }
 
-LineItemOptions.propTypes = propTypes
-LineItemOptions.defaultProps = defaultProps
 LineItemOptions.displayName = displayName
 
 export default LineItemOptions
