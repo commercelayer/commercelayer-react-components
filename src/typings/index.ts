@@ -1,5 +1,5 @@
 import { Dispatch, ReactNode, RefObject } from 'react'
-import PropTypes, { InferProps, ReactElementLike } from 'prop-types'
+import PropTypes, { InferProps } from 'prop-types'
 import { BaseError } from './errors'
 
 export const BC = {
@@ -146,7 +146,7 @@ export type BaseInputType =
   | 'text'
   | 'textarea'
 
-export type LoaderType = string | ReactElementLike
+export type LoaderType = string | ReactNode
 
 export const BMObject = PropTypes.objectOf(PropTypes.string)
 export type BaseMetadataObject = {

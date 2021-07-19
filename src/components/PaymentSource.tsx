@@ -12,6 +12,7 @@ import { isEmpty } from 'lodash'
 import CustomerContext from '#context/CustomerContext'
 import PaymentGateway from './PaymentGateway'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
+import { LoaderType } from '#typings/index'
 
 const propTypes = components.PaymentSource.propTypes
 const displayName = components.PaymentSource.displayName
@@ -30,6 +31,7 @@ export type PaymentSourceProps = {
   templateCustomerCards?: (props: CustomerCardsProps) => ReactNode
   onClickCustomerCards?: () => void
   templateCustomerSaveToWallet?: (props: CustomerSaveToWalletProps) => ReactNode
+  loader?: LoaderType
 } & JSX.IntrinsicElements['div']
 
 const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {

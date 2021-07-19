@@ -7,6 +7,7 @@ import {
   getPaymentConfig,
   PaymentResource,
 } from '#reducers/PaymentMethodReducer'
+import { LoaderType } from '#typings'
 import getPaypalConfig from '#utils/paypalPayment'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
@@ -15,6 +16,7 @@ import React, {
   FunctionComponent,
   useContext,
   useEffect,
+  useState,
 } from 'react'
 // import BraintreePayment from './BraintreePayment'
 import { PaymentSourceProps } from './PaymentSource'
@@ -22,11 +24,13 @@ import PaypalPayment from './PaypalPayment'
 import StripePayment from './StripePayment'
 import Parent from './utils/Parent'
 import WireTransferPayment from './WireTransferPayment'
+import getLoaderComponent from '#utils/getLoaderComponent'
 
 type PaymentGatewayProps = PaymentSourceProps & {
   showCard: boolean
   handleEditClick: () => void
   show: boolean
+  loader?: LoaderType
 }
 
 const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
@@ -38,8 +42,11 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   templateCustomerSaveToWallet,
   onClickCustomerCards,
   show,
+  loader = 'Loading...',
   ...p
 }) => {
+  const loaderComponent = getLoaderComponent(loader)
+  const [loading, setLoading] = useState(true)
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { payments, isGuest } = useContext(CustomerContext)
   const { order } = useContext(OrderContext)
@@ -69,6 +76,10 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         order,
         attributes,
       })
+    }
+    if (paymentSource) setLoading(false)
+    return () => {
+      setLoading(true)
     }
   }, [paymentSource, payment, show])
   switch (paymentResource) {
@@ -138,14 +149,16 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
           </Fragment>
         )
       }
-      return publishableKey ? (
+      return publishableKey && !loading ? (
         <StripePayment
           show={show}
           publishableKey={publishableKey}
           locale={locale}
           {...stripeConfig}
         />
-      ) : null
+      ) : (
+        loaderComponent
+      )
     case 'braintree_payments':
       if (!readonly && payment?.id !== currentPaymentMethodId) return null
       // @ts-ignore
