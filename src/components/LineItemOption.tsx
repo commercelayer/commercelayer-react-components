@@ -12,6 +12,7 @@ import Parent from './utils/Parent'
 import components from '#config/components'
 import { LineItemOptionCollection } from '@commercelayer/js-sdk'
 import { FunctionChildren } from '#typings/index'
+import isJSON from '#utils/isJSON'
 
 const propTypes = components.LineItemOption.propTypes
 const displayName = components.LineItemOption.displayName
@@ -23,24 +24,26 @@ type LineItemOptionChildrenProps = FunctionChildren<
 >
 
 type LineItemOptionProps = {
+  id?: string
+  className?: string
+  key?: string
+  style?: CSSProperties
   children?: LineItemOptionChildrenProps
   name?: string
   valueClassName?: string
-  keyClassName?: string
-  keyId?: string
-  keyStyle?: CSSProperties
-} & JSX.IntrinsicElements['span']
+  tagElement?: keyof JSX.IntrinsicElements
+  tagContainer?: keyof JSX.IntrinsicElements
+}
 
 const LineItemOption: FunctionComponent<LineItemOptionProps> = (props) => {
   const {
     name,
     children,
-    keyClassName,
-    keyId,
-    keyStyle,
     valueClassName,
     id,
-    style,
+    key,
+    tagElement = 'li',
+    tagContainer = 'ul',
     ...p
   } = props
   const { lineItemOption, showAll } = useContext(LineItemOptionChildrenContext)
@@ -48,34 +51,32 @@ const LineItemOption: FunctionComponent<LineItemOptionProps> = (props) => {
     ...props,
     lineItemOption,
   }
-
-  const components = showAll ? (
-    map(lineItemOption?.options, (value, key) => {
-      return (
-        <Fragment>
-          <span id={keyId} style={keyStyle} className={keyClassName} {...p}>
+  const TagElement = tagElement as any
+  const TagContainer = tagContainer
+  const components =
+    showAll && isJSON(JSON.stringify(lineItemOption?.options)) ? (
+      map(lineItemOption?.options, (value, key) => {
+        return (
+          <TagElement id={key} {...p}>
             {`${key}:`}
-          </span>
-          <span id={id} style={style} className={valueClassName} {...p}>
-            {`${value}`}
-          </span>
-        </Fragment>
-      )
-    })
-  ) : has(lineItemOption, `options.${name}`) ? (
-    <Fragment>
-      <span id={keyId} style={keyStyle} className={keyClassName} {...p}>
+            <span id={id} className={valueClassName}>
+              {`${value}`}
+            </span>
+          </TagElement>
+        )
+      })
+    ) : has(lineItemOption, `options.${name}`) ? (
+      <TagElement id={key} {...p}>
         {`${name}:`}
-      </span>
-      <span id={id} style={style} className={valueClassName} {...p}>
-        {`${get(lineItemOption, `options.${name}`)}`}
-      </span>
-    </Fragment>
-  ) : null
+        <span id={id} className={valueClassName} {...p}>
+          {`${get(lineItemOption, `options.${name}`)}`}
+        </span>
+      </TagElement>
+    ) : null
   return children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <>{components}</>
+    <TagContainer>{components}</TagContainer>
   )
 }
 
