@@ -400,6 +400,31 @@ export default function Main() {
                     />
                   </p>
                 </div>
+                <div>
+                  <label
+                    htmlFor="billing_address_billing_info"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Billing info
+                  </label>
+                  <div className="mt-1">
+                    <AddressInput
+                      data-cy="billing_address_billing_info"
+                      name="billing_address_billing_info"
+                      type="text"
+                      className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      placeholder="Billing info"
+                    />
+                  </div>
+                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                    <Errors
+                      data-cy="billing_address_billing_info"
+                      resource="billingAddress"
+                      field="billing_address_billing_info"
+                      messages={messages}
+                    />
+                  </p>
+                </div>
                 <div className="flex flex-row-reverse justify-end">
                   <label
                     htmlFor="billing_address_save_to_customer_book"

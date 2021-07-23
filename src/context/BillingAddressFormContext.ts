@@ -10,6 +10,7 @@ export type DefaultContextAddress = {
   ) => void
   errors?: Record<string, { code: string; message: string; error: boolean }>[]
   errorClassName?: string
+  requiresBillingInfo?: boolean
 }
 
 const BillingAddressFormContext = createContext<DefaultContextAddress>({})

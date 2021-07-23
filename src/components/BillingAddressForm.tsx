@@ -36,7 +36,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
   } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
-  const { saveAddressToCustomerAddressBook } = useContext(OrderContext)
+  const { saveAddressToCustomerAddressBook, order } = useContext(OrderContext)
   const { setLocalOrder } = useContext(OrderStorageContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
@@ -94,7 +94,14 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
   }
   return (
     <BillingAddressFormContext.Provider
-      value={{ validation, setValue, errorClassName, errors: errors as any }}
+      value={{
+        validation,
+        setValue,
+        errorClassName,
+        // @ts-ignore
+        requiresBillingInfo: order?.requiresBillingInfo || false,
+        errors: errors as any,
+      }}
     >
       <form ref={ref} autoComplete={autoComplete} {...p}>
         {children}
