@@ -45,11 +45,8 @@ const Address: FunctionComponent<Props> = (props) => {
   const { setShippingAddress, shippingCustomerAddressId } = useContext(
     ShippingAddressContext
   )
-  const {
-    shipToDifferentAddress,
-    billingAddressId,
-    shippingAddressId,
-  } = useContext(AddressContext)
+  const { shipToDifferentAddress, billingAddressId, shippingAddressId } =
+    useContext(AddressContext)
   const { order } = useContext(OrderContext)
   const [selected, setSelected] = useState<null | number | undefined>(null)
   const items = !isEmpty(addresses)

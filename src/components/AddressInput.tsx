@@ -57,6 +57,11 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
   const errorClassName =
     billingAddress?.errorClassName || shippingAddress?.errorClassName
   const classNameComputed = `${className} ${hasError ? errorClassName : ''}`
+  if (
+    p.name === 'billing_address_billing_info' &&
+    !billingAddress.requiresBillingInfo
+  )
+    return null
   return (
     <BaseInput
       ref={billingAddress?.validation || shippingAddress?.validation}

@@ -23,6 +23,7 @@ export type AddressField =
   | 'phone'
   | 'state_code'
   | 'zip_code'
+  | 'billing_info'
 
 export type AddressFieldView = AddressField | 'full_address' | 'full_name'
 
@@ -37,6 +38,7 @@ export const addressFields: AddressField[] = [
   'phone',
   'state_code',
   'zip_code',
+  'billing_info',
 ]
 
 export type AddressResource = 'billingAddress' | 'shippingAddress'
