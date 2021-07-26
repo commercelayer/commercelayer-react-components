@@ -18,10 +18,7 @@ import {
   StripeCardElementOptions,
   StripeElementLocale,
 } from '@stripe/stripe-js'
-import {
-  PaymentMethodConfig,
-  SetPaymentSourceResponse,
-} from '#reducers/PaymentMethodReducer'
+import { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
 import { PaymentSourceProps } from './PaymentSource'
 import Parent from './utils/Parent'
 import OrderStorageContext from '#context/OrderStorageContext'
