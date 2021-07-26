@@ -27,6 +27,9 @@ import { useRouter } from 'next/router'
 const endpoint = 'https://the-blue-brand-3.commercelayer.co'
 let orderId = 'PDerhJplRp'
 
+let paypalPayerId = ''
+let paypalReturnUrl = ''
+
 const TemplateCustomerCards = ({ handleClick }: any) => (
   <div
     onClick={handleClick}
@@ -72,6 +75,12 @@ export default function Main() {
   if (query.orderId) {
     orderId = query.orderId as string
   }
+  if (query.PayerID) {
+    paypalPayerId = query.PayerID as string
+  }
+  if (typeof window !== 'undefined') {
+    paypalReturnUrl = window.location.href
+  }
   // const [shippingMethodId, setShippingMethodId] = useState<string>('')
   const getOrder = async () => {
     const config = { accessToken: token, endpoint }
@@ -113,9 +122,6 @@ export default function Main() {
     if (!token) getToken()
     if (token) getOrder()
   }, [token])
-  const handleSubmit = (response: any) => {
-    setPaymentSource(response.paymentSource.options)
-  }
   return (
     <Fragment>
       <Head>
@@ -129,11 +135,11 @@ export default function Main() {
               <PaymentMethodsContainer
                 config={{
                   stripePayment: {
-                    handleSubmit: handleSubmit,
-                    submitLabel: 'Set payment method',
-                    submitClassName:
-                      'mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
                     containerClassName: 'p-5 my-2',
+                  },
+                  paypalPayment: {
+                    cancelUrl: paypalReturnUrl,
+                    returnUrl: paypalReturnUrl,
                   },
                 }}
               >
@@ -175,19 +181,19 @@ export default function Main() {
                     <Errors className="text-red-600" resource="paymentMethod" />
                   </PaymentMethod>
                 </div>
+                <PlaceOrderContainer>
+                  <div>
+                    <PlaceOrderButton
+                      onClick={(res: any) => {
+                        console.log('res', res)
+                        debugger
+                      }}
+                      className="mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                    />
+                  </div>
+                </PlaceOrderContainer>
               </PaymentMethodsContainer>
             </CustomerContainer>
-            <PlaceOrderContainer>
-              <div>
-                <PlaceOrderButton
-                  onClick={(res: any) => {
-                    console.log('res', res)
-                    debugger
-                  }}
-                  className="mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-                />
-              </div>
-            </PlaceOrderContainer>
             <PaymentMethodAmount />
           </OrderContainer>
           <div className="mt-5">

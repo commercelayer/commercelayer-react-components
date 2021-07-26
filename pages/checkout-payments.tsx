@@ -97,28 +97,6 @@ export default function Main() {
     if (!token) getToken()
     if (token) getOrder()
   }, [token])
-  const handleSubmit = (response: any) => {
-    setPaymentSource(response.paymentSource.options)
-  }
-  const submitLabel = (
-    <Fragment>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-        />
-      </svg>
-      <span className="ml-1">Set payment method</span>
-    </Fragment>
-  )
   return (
     <Fragment>
       <Head>
@@ -158,17 +136,7 @@ export default function Main() {
                     hideIcon: false,
                     hidePostalCode: true,
                   },
-                  handleSubmit: handleSubmit,
-                  submitLabel: submitLabel,
-                  submitClassName:
-                    'mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
-                },
-                wireTransfer: {
-                  submitButton: {
-                    label: submitLabel,
-                    className:
-                      'mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
-                  },
+                  containerClassName: 'w-1/2 px-3',
                 },
                 paypalPayment: {
                   cancelUrl: paypalReturnUrl,
@@ -225,31 +193,31 @@ export default function Main() {
                   resource="paymentMethod"
                 />
               </PaymentMethod>
-            </PaymentMethodsContainer>
-            <PlaceOrderContainer options={{ paypalPayerId }}>
-              <div className="flex flex-row-reverse justify-end">
-                <label
-                  htmlFor="privacy-terms"
-                  className="block text-sm font-medium text-gray-700 ml-3 self-end"
-                >
-                  Accept privacy and terms
-                </label>
-                <div className="mt-1">
-                  <PrivacyAndTermsCheckbox
-                    id="privacy-terms"
-                    className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded disabled:opacity-50"
+              <PlaceOrderContainer options={{ paypalPayerId }}>
+                <div className="flex flex-row-reverse justify-end">
+                  <label
+                    htmlFor="privacy-terms"
+                    className="block text-sm font-medium text-gray-700 ml-3 self-end"
+                  >
+                    Accept privacy and terms
+                  </label>
+                  <div className="mt-1">
+                    <PrivacyAndTermsCheckbox
+                      id="privacy-terms"
+                      className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <PlaceOrderButton
+                    onClick={(res: any) => {
+                      console.log('res', res)
+                    }}
+                    className="mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                   />
                 </div>
-              </div>
-              <div>
-                <PlaceOrderButton
-                  onClick={(res: any) => {
-                    console.log('res', res)
-                  }}
-                  className="mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-                />
-              </div>
-            </PlaceOrderContainer>
+              </PlaceOrderContainer>
+            </PaymentMethodsContainer>
             <div className="flex flex-col text-red-600 mt-5">
               <Errors resource="order" messages={messages} />
             </div>
