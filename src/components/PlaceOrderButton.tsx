@@ -10,6 +10,7 @@ import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import isFunction from 'lodash/isFunction'
+import PaymentMethodContext from '#context/PaymentMethodContext'
 
 const propTypes = components.PlaceOrderButton.propTypes
 const defaultProps = components.PlaceOrderButton.defaultProps
@@ -31,6 +32,8 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
+  const { currentPaymentMethodRef, paymentSource } =
+    useContext(PaymentMethodContext)
   useEffect(() => {
     if (isPermitted) {
       setNotPermitted(false)
@@ -38,13 +41,30 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     if (paymentType === 'paypal_payments' && options?.paypalPayerId) {
       handleClick()
     }
+    // @ts-ignore
+    if (!currentPaymentMethodRef?.current && !paymentSource?.options?.id) {
+      setNotPermitted(true)
+    }
     return () => {
       setNotPermitted(true)
     }
-  }, [isPermitted, options?.paypalPayerId, paymentType])
+  }, [
+    isPermitted,
+    options?.paypalPayerId,
+    paymentType,
+    currentPaymentMethodRef,
+    paymentSource,
+  ])
   const handleClick = async () => {
+    let isValid = true
     setForceDisable(true)
-    const placed = setPlaceOrder && (await setPlaceOrder())
+    if (currentPaymentMethodRef?.current && !options?.paypalPayerId) {
+      isValid = (await currentPaymentMethodRef.current?.submit()) as any
+      // @ts-ignore
+    } else if (paymentSource?.options?.id) {
+      isValid = true
+    }
+    const placed = isValid && setPlaceOrder && (await setPlaceOrder())
     setForceDisable(false)
     onClick && placed && onClick(placed)
   }
