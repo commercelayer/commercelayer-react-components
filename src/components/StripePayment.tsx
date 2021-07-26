@@ -1,9 +1,9 @@
 import React, {
   FunctionComponent,
-  ReactNode,
   SyntheticEvent,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
@@ -26,28 +26,19 @@ import { PaymentSourceProps } from './PaymentSource'
 import Parent from './utils/Parent'
 import OrderStorageContext from '#context/OrderStorageContext'
 import OrderContext from '#context/OrderContext'
-import isFunction from 'lodash/isFunction'
 
 export type StripeConfig = {
   containerClassName?: string
   hintLabel?: string
   name?: string
   options?: StripeCardElementOptions
-  submitClassName?: string
-  submitContainerClassName?: string
-  submitLabel?: string | ReactNode
-  handleSubmit?: (response?: SetPaymentSourceResponse) => void
   [key: string]: any
 }
 
 type StripePaymentFormProps = {
   options?: StripeCardElementOptions
-  handleSubmit?: (response: SetPaymentSourceResponse) => void
   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
-} & Pick<
-  StripeConfig,
-  'submitClassName' | 'submitLabel' | 'submitContainerClassName'
->
+}
 
 const defaultOptions = {
   style: {
@@ -67,43 +58,42 @@ const defaultOptions = {
 
 const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
   options = defaultOptions,
-  submitClassName,
-  submitContainerClassName,
-  submitLabel = 'Add payment',
-  handleSubmit,
   templateCustomerSaveToWallet,
 }) => {
+  const ref = useRef<null | HTMLFormElement>(null)
   const {
     setPaymentSource,
     paymentSource,
     currentPaymentMethodType,
     setPaymentMethodErrors,
+    setPaymentRef,
   } = useContext(PaymentMethodContext)
   const { setLocalOrder } = useContext(OrderStorageContext)
   const { order } = useContext(OrderContext)
   const stripe = useStripe()
   const elements = useElements()
-  const onSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
-    // Block native form submission.
-    event.preventDefault()
-
-    if (!stripe) {
-      // Stripe.js has not loaded yet. Make sure to disable
-      // form submission until Stripe.js has loaded.
-      return
+  useEffect(() => {
+    if (ref.current && stripe && elements) {
+      ref.current.submit = () => onSubmit(ref.current as any, stripe, elements)
+      setPaymentRef({ ref })
     }
+  }, [ref, stripe, elements])
+  const onSubmit = async (
+    event: SyntheticEvent<HTMLFormElement>,
+    stripe: any,
+    elements: any
+  ): Promise<boolean> => {
+    if (!stripe) return false
+
     const savePaymentSourceToCustomerWallet =
       // @ts-ignore
-      event?.target?.elements?.['save_payment_source_to_customer_wallet']
-        ?.checked
+      event?.elements?.['save_payment_source_to_customer_wallet']?.checked
     if (savePaymentSourceToCustomerWallet)
       setLocalOrder(
         'savePaymentSourceToCustomerWallet',
         savePaymentSourceToCustomerWallet
       )
-    // Get a reference to a mounted CardElement. Elements knows how
-    // to find your CardElement because there can only ever be one of
-    // each type of element.
+
     const cardElement = elements && elements.getElement(CardElement)
     if (cardElement) {
       const billingInfo = order?.billingAddress()
@@ -154,35 +144,36 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
             paymentSource &&
             currentPaymentMethodType
           ) {
-            const source = await setPaymentSource({
-              paymentSourceId: paymentSource.id,
-              paymentResource: currentPaymentMethodType,
-              attributes: {
-                options: {
-                  ...(paymentMethod as Record<string, any>),
-                  setup_future_usage: 'off_session',
+            try {
+              await setPaymentSource({
+                paymentSourceId: paymentSource.id,
+                paymentResource: currentPaymentMethodType,
+                attributes: {
+                  options: {
+                    ...(paymentMethod as Record<string, any>),
+                    setup_future_usage: 'off_session',
+                  },
                 },
-              },
-            })
-            handleSubmit && handleSubmit(source)
+              })
+              return true
+            } catch (e) {
+              return false
+            }
           }
         }
       }
     }
+    return false
   }
+
   return (
-    <form onSubmit={onSubmit}>
+    <form ref={ref} onSubmit={(e) => onSubmit(e, stripe, elements)}>
       <CardElement options={{ ...defaultOptions, ...options }} />
       {templateCustomerSaveToWallet && (
         <Parent {...{ name: 'save_payment_source_to_customer_wallet' }}>
           {templateCustomerSaveToWallet}
         </Parent>
       )}
-      <div className={submitContainerClassName}>
-        <button className={submitClassName} type="submit" disabled={!stripe}>
-          {isFunction(submitLabel) ? submitLabel() : submitLabel}
-        </button>
-      </div>
     </form>
   )
 }
@@ -206,10 +197,6 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
 }) => {
   const [isLoaded, setIsLoaded] = useState(false)
   const {
-    submitClassName,
-    submitLabel,
-    handleSubmit,
-    submitContainerClassName,
     containerClassName,
     templateCustomerSaveToWallet,
     fonts = [],
@@ -227,15 +214,11 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
       setIsLoaded(false)
     }
   }, [show, publishableKey])
-  return isLoaded ? (
+  return isLoaded && stripe ? (
     <div className={containerClassName} {...divProps}>
       <Elements stripe={stripe} options={{ fonts }}>
         <StripePaymentForm
           options={options}
-          submitClassName={submitClassName}
-          submitLabel={submitLabel}
-          submitContainerClassName={submitContainerClassName}
-          handleSubmit={handleSubmit}
           templateCustomerSaveToWallet={templateCustomerSaveToWallet}
         />
       </Elements>

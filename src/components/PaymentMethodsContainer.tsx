@@ -13,12 +13,14 @@ import paymentMethodReducer, {
   getPaymentMethods,
   PaymentMethodConfig,
   setPaymentMethodConfig,
+  PaymentRef,
 } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
 import { BaseError } from '#typings/errors'
 import { isEmpty } from 'lodash'
+import { setPaymentRef } from '../reducers/PaymentMethodReducer'
 
 const propTypes = components.PaymentMethodsContainer.propTypes
 const displayName = components.PaymentMethodsContainer.displayName
@@ -45,6 +47,8 @@ const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> =
     }, [order, credentials])
     const contextValue = {
       ...state,
+      setPaymentRef: ({ ref }: { ref: PaymentRef }) =>
+        setPaymentRef({ ref, dispatch }),
       setPaymentMethodErrors: (errors: BaseError[]) =>
         defaultPaymentMethodContext['setPaymentMethodErrors'](errors, dispatch),
       setPaymentMethod: async (args: any) =>

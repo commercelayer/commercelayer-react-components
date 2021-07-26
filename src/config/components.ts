@@ -71,6 +71,7 @@ const components = {
         'billing_address_phone',
         'billing_address_state_code',
         'billing_address_zip_code',
+        'billing_address_billing_info',
         'billing_address_save_to_customer_book',
         'shipping_address_city',
         'shipping_address_company',
@@ -531,7 +532,6 @@ const components = {
       'ShipmentsContainer',
       'PaymentMethodsContainer',
       'PaymentMethodAmount',
-      'PlaceOrderContainer',
       'GiftCardOrCouponForm',
       'GiftCardOrCouponCode',
       'GiftCardOrCouponRemoveButton',
@@ -610,7 +610,12 @@ const components = {
   },
   PaymentMethodsContainer: {
     displayName: 'PaymentMethodsContainer',
-    permittedChildren: ['PaymentMethod', 'PaymentSource', 'ReactNode'],
+    permittedChildren: [
+      'PaymentMethod',
+      'PaymentSource',
+      'ReactNode',
+      'PlaceOrderContainer',
+    ],
     propTypes: {
       children: childrenTypes.isRequired,
     },

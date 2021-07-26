@@ -19,21 +19,41 @@ import {
 import camelCase from 'lodash/camelCase'
 import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
-import { Dispatch } from 'react'
+import { Dispatch, MutableRefObject } from 'react'
 
 export type PaymentMethodActionType =
   | 'setErrors'
   | 'setPaymentMethods'
   | 'setPaymentMethodConfig'
   | 'setPaymentSource'
+  | 'setPaymentRef'
+
+export type PaymentRef = MutableRefObject<null | HTMLFormElement>
 
 export interface PaymentMethodActionPayload {
   errors: BaseError[]
   paymentMethods: PaymentMethodCollection[]
   currentPaymentMethodType: PaymentResource
   currentPaymentMethodId: string
+  currentPaymentMethodRef: PaymentRef
   config: PaymentMethodConfig
   paymentSource: PaymentSourceTypes
+}
+
+export type SetPaymentRef = (args: {
+  ref: PaymentRef
+  dispatch?: Dispatch<PaymentMethodAction>
+}) => void
+
+export const setPaymentRef: SetPaymentRef = ({ ref, dispatch }) => {
+  if (ref && dispatch) {
+    dispatch({
+      type: 'setPaymentRef',
+      payload: {
+        currentPaymentMethodRef: ref,
+      },
+    })
+  }
 }
 
 export type PaymentMethodState = Partial<PaymentMethodActionPayload>
@@ -334,6 +354,7 @@ const type: PaymentMethodActionType[] = [
   'setPaymentMethodConfig',
   'setPaymentMethods',
   'setPaymentSource',
+  'setPaymentRef',
 ]
 
 const paymentMethodReducer = (
