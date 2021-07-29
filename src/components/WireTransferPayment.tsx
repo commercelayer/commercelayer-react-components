@@ -35,7 +35,7 @@ const WireTransferPayment: FunctionComponent<Props> = ({
       ref.current.submit = () => handleClick()
       setPaymentRef({ ref })
     }
-  }, [ref])
+  }, [ref, paymentSource, currentPaymentMethodType])
   const handleClick = async () => {
     if (paymentSource && currentPaymentMethodType) {
       try {
