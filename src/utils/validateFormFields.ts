@@ -1,4 +1,9 @@
-import { isEmpty, isString, without, keys, map, get } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
+import isString from 'lodash/isString'
+import without from 'lodash/without'
+import keys from 'lodash/keys'
+import map from 'lodash/map'
+import get from 'lodash/get'
 import { BaseState } from '#typings/index'
 import { ResourceErrorType, BaseError } from '#typings/errors'
 import {

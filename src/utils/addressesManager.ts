@@ -1,21 +1,28 @@
 import { isEmpty } from 'lodash'
 import { fieldsExist } from '#utils/validateFormFields'
 import { BaseError } from '#typings/errors'
+import { addressFields } from '#reducers/AddressReducer'
 
 type BillingAddressController = (params: {
   billingAddress?: Record<string, any>
   billingAddressId?: string
   errors?: BaseError[]
+  requiresBillingInfo?: boolean
 }) => boolean
 
 export const billingAddressController: BillingAddressController = ({
   billingAddress,
   billingAddressId,
   errors,
+  requiresBillingInfo,
 }) => {
   let billingDisable = !isEmpty(errors) || isEmpty(billingAddress)
   if (isEmpty(errors) && !isEmpty(billingAddress)) {
-    billingDisable = !!(billingAddress && fieldsExist(billingAddress))
+    let billingInfo = [...addressFields]
+    if (requiresBillingInfo) billingInfo = [...billingInfo, 'billing_info']
+    billingDisable = !!(
+      billingAddress && fieldsExist(billingAddress, billingInfo)
+    )
   }
   if (billingDisable && !isEmpty(billingAddressId) && isEmpty(billingAddress)) {
     billingDisable = false

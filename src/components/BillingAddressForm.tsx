@@ -75,7 +75,6 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
       saveAddressToCustomerAddressBook &&
         saveAddressToCustomerAddressBook('BillingAddress', false)
       if (ref) {
-        // debugger
         ref.current?.reset()
         resetForm({ target: ref.current } as any)
         setAddressErrors([])
@@ -92,17 +91,16 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     }
     setAddress({ values: { ...values, ...field }, resource: 'billingAddress' })
   }
+  const providerValues = {
+    validation,
+    setValue,
+    errorClassName,
+    // @ts-ignore
+    requiresBillingInfo: order?.requiresBillingInfo || false,
+    errors: errors as any,
+  }
   return (
-    <BillingAddressFormContext.Provider
-      value={{
-        validation,
-        setValue,
-        errorClassName,
-        // @ts-ignore
-        requiresBillingInfo: order?.requiresBillingInfo || false,
-        errors: errors as any,
-      }}
-    >
+    <BillingAddressFormContext.Provider value={providerValues}>
       <form ref={ref} autoComplete={autoComplete} {...p}>
         {children}
       </form>

@@ -59,6 +59,8 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     billingAddress,
     errors,
     billingAddressId,
+    // @ts-ignore
+    requiresBillingInfo: order?.requiresBillingInfo,
   })
   const shippingDisable = shippingAddressController({
     billingDisable,

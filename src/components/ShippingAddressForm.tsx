@@ -35,9 +35,8 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     ...p
   } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
-  const { setAddressErrors, setAddress, shipToDifferentAddress } = useContext(
-    AddressesContext
-  )
+  const { setAddressErrors, setAddress, shipToDifferentAddress } =
+    useContext(AddressesContext)
   const { saveAddressToCustomerAddressBook } = useContext(OrderContext)
   const { setLocalOrder } = useContext(OrderStorageContext)
   const ref = useRef<HTMLFormElement>(null)
@@ -95,10 +94,14 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     }
     setAddress({ values: { ...values, ...field }, resource: 'shippingAddress' })
   }
+  const providerValues = {
+    validation,
+    setValue,
+    errorClassName,
+    errors: errors as any,
+  }
   return (
-    <ShippingAddressFormContext.Provider
-      value={{ validation, setValue, errorClassName, errors: errors as any }}
-    >
+    <ShippingAddressFormContext.Provider value={providerValues}>
       <form ref={ref} autoComplete={autoComplete} {...p}>
         {children}
       </form>

@@ -30,7 +30,6 @@ const getAllErrors: GetAllErrors = (params) => {
   return allErrors.map((v, k): ReactNode | void => {
     const objMsg = customMessages(messages, v)
     const text = objMsg?.message || v.message
-    console.log(`returnHtml`, returnHtml)
     if (field) {
       if (v.resource === 'lineItem') {
         if (lineItem && v.id === lineItem['id']) {
