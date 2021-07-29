@@ -38,7 +38,6 @@ export const addressFields: AddressField[] = [
   'phone',
   'state_code',
   'zip_code',
-  'billing_info',
 ]
 
 export type AddressResource = 'billingAddress' | 'shippingAddress'
