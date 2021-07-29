@@ -37,7 +37,8 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
   useEffect(() => {
     if (isPermitted) {
       setNotPermitted(false)
-    } else if (
+    }
+    if (
       !currentPaymentMethodRef?.current &&
       // @ts-ignore
       !paymentSource?.options?.id
