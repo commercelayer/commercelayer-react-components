@@ -1,4 +1,10 @@
-import React, { useContext, FunctionComponent, ReactNode } from 'react'
+import React, {
+  useContext,
+  FunctionComponent,
+  ReactNode,
+  useState,
+  useEffect,
+} from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
@@ -27,11 +33,18 @@ const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps
     const { order } = useContext(OrderContext)
     const { setPaymentMethod, currentPaymentMethodId } =
       useContext(PaymentMethodContext)
+    const [checked, setChecked] = useState(false)
     const orderId = order?.id || ''
     const paymentResource = payment?.paymentSourceType as PaymentResource
     const paymentMethodId = payment?.id as string
     const name = `payment-${orderId}`
-    const checked = currentPaymentMethodId === payment?.id
+    useEffect(() => {
+      if (currentPaymentMethodId === payment?.id && !checked) setChecked(true)
+      else setChecked(false)
+      return () => {
+        setChecked(false)
+      }
+    }, [currentPaymentMethodId, payment])
     const handleOnChange = async () => {
       await setPaymentMethod({ paymentResource, paymentMethodId })
       onChange && onChange(payment)
@@ -52,7 +65,7 @@ const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps
         name={name}
         id={id}
         onChange={handleOnChange}
-        defaultChecked={checked}
+        checked={checked}
         {...p}
       />
     )
