@@ -35,6 +35,9 @@ const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
       ref.current.submit = () => handleClick()
       setPaymentRef({ ref })
     }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
   }, [ref, paymentSource, currentPaymentMethodType])
   const handleClick = async () => {
     if (paymentSource && currentPaymentMethodType) {
