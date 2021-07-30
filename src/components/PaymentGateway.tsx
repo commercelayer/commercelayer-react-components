@@ -262,13 +262,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       }
       const paypalConfig =
         config && getPaymentConfig<'paypalPayment'>(paymentResource, config)
-      return (
-        <PaypalPayment
-          {...p}
-          infoMessage={paypalConfig?.infoMessage}
-          submitButton={paypalConfig?.submitButton}
-        />
-      )
+      return <PaypalPayment {...p} infoMessage={paypalConfig?.infoMessage} />
     default:
       return null
   }
