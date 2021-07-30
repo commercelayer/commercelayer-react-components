@@ -74,6 +74,9 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
       ref.current.submit = () => onSubmit(ref.current as any, stripe, elements)
       setPaymentRef({ ref })
     }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
   }, [ref, stripe, elements])
   const onSubmit = async (
     event: SyntheticEvent<HTMLFormElement>,
