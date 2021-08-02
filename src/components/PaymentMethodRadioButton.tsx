@@ -31,7 +31,7 @@ const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps
     const { onChange, ...p } = props
     const { payment } = useContext(PaymentMethodChildrenContext)
     const { order } = useContext(OrderContext)
-    const { setPaymentMethod, currentPaymentMethodId } =
+    const { setPaymentMethod, currentPaymentMethodId, setLoading } =
       useContext(PaymentMethodContext)
     const [checked, setChecked] = useState(false)
     const orderId = order?.id || ''
@@ -39,13 +39,14 @@ const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps
     const paymentMethodId = payment?.id as string
     const name = `payment-${orderId}`
     useEffect(() => {
-      if (currentPaymentMethodId === payment?.id && !checked) setChecked(true)
+      if (currentPaymentMethodId === payment?.id) setChecked(true)
       else setChecked(false)
       return () => {
         setChecked(false)
       }
     }, [currentPaymentMethodId, payment])
     const handleOnChange = async () => {
+      setLoading({ loading: true })
       await setPaymentMethod({ paymentResource, paymentMethodId })
       onChange && onChange(payment)
     }

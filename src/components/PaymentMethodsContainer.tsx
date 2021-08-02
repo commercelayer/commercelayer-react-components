@@ -47,6 +47,8 @@ const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> =
     }, [order, credentials])
     const contextValue = {
       ...state,
+      setLoading: ({ loading }: { loading: boolean }) =>
+        defaultPaymentMethodContext['setLoading']({ loading, dispatch }),
       setPaymentRef: ({ ref }: { ref: PaymentRef }) =>
         setPaymentRef({ ref, dispatch }),
       setPaymentMethodErrors: (errors: BaseError[]) =>
