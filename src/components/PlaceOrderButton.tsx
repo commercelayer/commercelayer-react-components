@@ -32,18 +32,20 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
-  const { currentPaymentMethodRef, paymentSource } =
+  const { currentPaymentMethodRef, paymentSource, loading } =
     useContext(PaymentMethodContext)
   useEffect(() => {
-    if (isPermitted) {
-      setNotPermitted(false)
-    }
-    if (
-      !currentPaymentMethodRef?.current &&
-      // @ts-ignore
-      !paymentSource?.options?.id
-    ) {
-      setNotPermitted(true)
+    if (loading) setNotPermitted(loading)
+    else {
+      if (isPermitted) {
+        setNotPermitted(false)
+      } else if (
+        !currentPaymentMethodRef?.current &&
+        // @ts-ignore
+        !paymentSource?.id
+      ) {
+        setNotPermitted(true)
+      }
     }
     if (paymentType === 'paypal_payments' && options?.paypalPayerId) {
       handleClick()
@@ -57,6 +59,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     paymentType,
     currentPaymentMethodRef,
     paymentSource,
+    loading,
   ])
   const handleClick = async () => {
     let isValid = true

@@ -11,6 +11,7 @@ import {
   DestroyPaymentSource,
   SetPaymentRef,
   setPaymentRef,
+  setLoading,
 } from '#reducers/PaymentMethodReducer'
 
 type DefaultContext = {
@@ -19,6 +20,7 @@ type DefaultContext = {
   setPaymentSource: SetPaymentSource
   setPaymentRef: SetPaymentRef
   destroyPaymentSource: DestroyPaymentSource
+  setLoading: typeof setLoading
 } & PaymentMethodState
 
 export const defaultPaymentMethodContext = {
@@ -27,6 +29,7 @@ export const defaultPaymentMethodContext = {
   setPaymentSource,
   setPaymentRef,
   destroyPaymentSource,
+  setLoading,
 }
 
 const PaymentMethodContext = createContext<DefaultContext>(

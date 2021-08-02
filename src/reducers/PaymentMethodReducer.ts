@@ -27,6 +27,7 @@ export type PaymentMethodActionType =
   | 'setPaymentMethodConfig'
   | 'setPaymentSource'
   | 'setPaymentRef'
+  | 'setLoading'
 
 export type PaymentRef = MutableRefObject<null | HTMLFormElement>
 
@@ -38,6 +39,21 @@ export interface PaymentMethodActionPayload {
   currentPaymentMethodRef: PaymentRef
   config: PaymentMethodConfig
   paymentSource: PaymentSourceTypes
+  loading: boolean
+}
+
+export function setLoading({
+  loading,
+  dispatch,
+}: {
+  loading: boolean
+  dispatch?: Dispatch<PaymentMethodAction>
+}) {
+  dispatch &&
+    dispatch({
+      type: 'setLoading',
+      payload: { loading },
+    })
 }
 
 export type SetPaymentRef = (args: {
@@ -188,7 +204,11 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       getOrder && (await getOrder(order.id))
       dispatch({
         type: 'setPaymentMethods',
-        payload: { currentPaymentMethodId: paymentMethodId, errors: [] },
+        payload: {
+          currentPaymentMethodId: paymentMethodId,
+          errors: [],
+          loading: false,
+        },
       })
       setOrderErrors && setOrderErrors([])
     }
@@ -355,6 +375,7 @@ const type: PaymentMethodActionType[] = [
   'setPaymentMethods',
   'setPaymentSource',
   'setPaymentRef',
+  'setLoading',
 ]
 
 const paymentMethodReducer = (
