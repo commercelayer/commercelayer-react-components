@@ -45,8 +45,13 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
   ...p
 }) => {
   const [loading, setLoading] = useState(true)
-  const { paymentMethods, currentPaymentMethodId, setPaymentMethod } =
-    useContext(PaymentMethodContext)
+  const [paymentSelected, setPaymentSelected] = useState('')
+  const {
+    paymentMethods,
+    currentPaymentMethodId,
+    setPaymentMethod,
+    setLoading: setLoadinPlaceOrder,
+  } = useContext(PaymentMethodContext)
   useEffect(() => {
     if (paymentMethods) setLoading(false)
     return () => {
@@ -59,15 +64,20 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
       const isActive = currentPaymentMethodId === payment?.id
       const paymentMethodProps = {
         payment,
+        clickableContainer,
+        paymentSelected,
       }
       const onClickable = !clickableContainer
         ? undefined
         : async () => {
+            setLoadinPlaceOrder({ loading: true })
+            setPaymentSelected(payment.id)
             const paymentResource =
               payment?.paymentSourceType as PaymentResource
             const paymentMethodId = payment?.id as string
             await setPaymentMethod({ paymentResource, paymentMethodId })
             onClick && onClick(payment)
+            setLoadinPlaceOrder({ loading: false })
           }
       return (
         <div

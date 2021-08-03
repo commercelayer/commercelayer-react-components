@@ -3,6 +3,7 @@ import React, {
   FunctionComponent,
   ReactNode,
   useState,
+  useEffect,
 } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from './utils/Parent'
@@ -28,7 +29,9 @@ type ShippingMethodRadioButtonProps = {
 const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps> =
   (props) => {
     const { onChange, ...p } = props
-    const { payment } = useContext(PaymentMethodChildrenContext)
+    const { payment, clickableContainer, paymentSelected } = useContext(
+      PaymentMethodChildrenContext
+    )
     const { order } = useContext(OrderContext)
     const { setPaymentMethod, currentPaymentMethodId, setLoading } =
       useContext(PaymentMethodContext)
@@ -36,9 +39,18 @@ const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps
     const paymentResource = payment?.paymentSourceType as PaymentResource
     const paymentMethodId = payment?.id as string
     const name = `payment-${orderId}`
-    const [checked, setChecked] = useState(
-      currentPaymentMethodId === payment?.id
-    )
+    const isChecked = currentPaymentMethodId === payment?.id
+    const [checked, setChecked] = useState(isChecked)
+    useEffect(() => {
+      clickableContainer &&
+        (paymentSelected === payment?.id ||
+        currentPaymentMethodId === payment?.id
+          ? setChecked(true)
+          : setChecked(false))
+      return () => {
+        setChecked(checked)
+      }
+    }, [paymentSelected, currentPaymentMethodId])
     const handleOnChange = async () => {
       setChecked(true)
       setLoading({ loading: true })
@@ -62,7 +74,7 @@ const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps
         name={name}
         id={id}
         onChange={handleOnChange}
-        defaultChecked={checked}
+        checked={checked}
         {...p}
       />
     )
