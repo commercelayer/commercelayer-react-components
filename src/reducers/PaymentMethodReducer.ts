@@ -207,7 +207,6 @@ export const setPaymentMethod: SetPaymentMethod = async ({
         payload: {
           currentPaymentMethodId: paymentMethodId,
           errors: [],
-          loading: false,
         },
       })
       setOrderErrors && setOrderErrors([])
