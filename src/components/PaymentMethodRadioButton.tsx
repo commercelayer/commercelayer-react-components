@@ -3,7 +3,6 @@ import React, {
   FunctionComponent,
   ReactNode,
   useState,
-  useEffect,
 } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from './utils/Parent'
