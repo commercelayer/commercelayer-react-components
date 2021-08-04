@@ -191,9 +191,11 @@ export const setPaymentMethod: SetPaymentMethod = async ({
   paymentMethodId,
   getOrder,
   setOrderErrors,
+  paymentResource,
 }) => {
   try {
     if (config && order && dispatch) {
+      localStorage.removeItem('savePaymentSourceToCustomerWallet')
       const paymentMethod = PaymentMethod.build({ id: paymentMethodId })
       const patchOrder = Order.build({
         id: order.id,
@@ -206,6 +208,7 @@ export const setPaymentMethod: SetPaymentMethod = async ({
         type: 'setPaymentMethods',
         payload: {
           currentPaymentMethodId: paymentMethodId,
+          currentPaymentMethodType: paymentResource,
           errors: [],
         },
       })
