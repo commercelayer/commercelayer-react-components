@@ -72,6 +72,8 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
   useEffect(() => {
     if (ref.current && stripe && elements) {
       ref.current.submit = () => onSubmit(ref.current as any, stripe, elements)
+      ref.current.onsubmit = () =>
+        onSubmit(ref.current as any, stripe, elements)
       setPaymentRef({ ref })
     }
     return () => {

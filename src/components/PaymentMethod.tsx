@@ -54,10 +54,11 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
   } = useContext(PaymentMethodContext)
   useEffect(() => {
     if (paymentMethods) setLoading(false)
+    if (currentPaymentMethodId) setPaymentSelected(currentPaymentMethodId)
     return () => {
       setLoading(true)
     }
-  }, [paymentMethods])
+  }, [paymentMethods, currentPaymentMethodId])
   const components =
     paymentMethods &&
     paymentMethods.map((payment, k) => {
@@ -66,6 +67,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
         payment,
         clickableContainer,
         paymentSelected,
+        setPaymentSelected,
       }
       const onClickable = !clickableContainer
         ? undefined

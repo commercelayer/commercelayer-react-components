@@ -41,12 +41,15 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
   useEffect(() => {
     if (loading) setNotPermitted(loading)
     else {
-      if (
-        isPermitted &&
-        paymentType === currentPaymentMethodType &&
-        currentPaymentMethodRef?.current?.submit
-      ) {
-        setNotPermitted(false)
+      if (isPermitted && paymentType === currentPaymentMethodType) {
+        if (
+          currentPaymentMethodRef?.current?.onsubmit ||
+          // @ts-ignore
+          paymentSource?.metadata?.card?.id ||
+          // @ts-ignore
+          paymentSource?.options?.id
+        )
+          setNotPermitted(false)
       } else {
         setNotPermitted(true)
       }
