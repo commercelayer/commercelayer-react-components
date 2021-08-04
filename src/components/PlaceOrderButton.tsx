@@ -32,18 +32,22 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
-  const { currentPaymentMethodRef, paymentSource, loading } =
-    useContext(PaymentMethodContext)
+  const {
+    currentPaymentMethodRef,
+    paymentSource,
+    loading,
+    currentPaymentMethodType,
+  } = useContext(PaymentMethodContext)
   useEffect(() => {
     if (loading) setNotPermitted(loading)
     else {
-      if (isPermitted) {
-        setNotPermitted(false)
-      } else if (
-        !currentPaymentMethodRef?.current &&
-        // @ts-ignore
-        !paymentSource?.id
+      if (
+        isPermitted &&
+        paymentType === currentPaymentMethodType &&
+        currentPaymentMethodRef?.current?.submit
       ) {
+        setNotPermitted(false)
+      } else {
         setNotPermitted(true)
       }
     }
@@ -60,6 +64,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     currentPaymentMethodRef,
     paymentSource,
     loading,
+    currentPaymentMethodType,
   ])
   const handleClick = async () => {
     let isValid = true

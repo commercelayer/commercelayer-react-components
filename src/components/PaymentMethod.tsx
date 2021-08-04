@@ -50,7 +50,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
     paymentMethods,
     currentPaymentMethodId,
     setPaymentMethod,
-    setLoading: setLoadinPlaceOrder,
+    setLoading: setLoadingPlaceOrder,
   } = useContext(PaymentMethodContext)
   useEffect(() => {
     if (paymentMethods) setLoading(false)
@@ -70,14 +70,14 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
       const onClickable = !clickableContainer
         ? undefined
         : async () => {
-            setLoadinPlaceOrder({ loading: true })
+            setLoadingPlaceOrder({ loading: true })
             setPaymentSelected(payment.id)
             const paymentResource =
               payment?.paymentSourceType as PaymentResource
             const paymentMethodId = payment?.id as string
             await setPaymentMethod({ paymentResource, paymentMethodId })
             onClick && onClick(payment)
-            setLoadinPlaceOrder({ loading: false })
+            setLoadingPlaceOrder({ loading: false })
           }
       return (
         <div
