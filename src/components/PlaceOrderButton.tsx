@@ -45,12 +45,12 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     else {
       if (paymentType === currentPaymentMethodType) {
         if (
-          (currentPaymentMethodRef?.current?.onsubmit ||
+          (order?.totalAmountWithTaxesCents === 0 ||
+            currentPaymentMethodRef?.current?.onsubmit ||
             // @ts-ignore
             paymentSource?.metadata?.card?.id ||
             // @ts-ignore
-            paymentSource?.options?.id ||
-            order?.totalAmountWithTaxesCents === 0) &&
+            paymentSource?.options?.id) &&
           isPermitted
         ) {
           setNotPermitted(false)
@@ -73,6 +73,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     paymentSource,
     loading,
     currentPaymentMethodType,
+    order,
   ])
   const handleClick = async () => {
     let isValid = true
