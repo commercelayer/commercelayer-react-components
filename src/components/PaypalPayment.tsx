@@ -31,8 +31,13 @@ const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
     setPaymentRef,
   } = useContext(PaymentMethodContext)
   useEffect(() => {
-    if (ref.current && paymentSource && currentPaymentMethodType) {
-      ref.current.submit = () => handleClick()
+    if (
+      ref.current &&
+      paymentSource &&
+      currentPaymentMethodType &&
+      // @ts-ignore
+      paymentSource?.approvalUrl
+    ) {
       ref.current.onsubmit = () => handleClick()
       setPaymentRef({ ref })
     }

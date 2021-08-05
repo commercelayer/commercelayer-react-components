@@ -54,8 +54,12 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
   }, [order])
   const contextValue = {
     ...state,
-    setPlaceOrder: () =>
-      setPlaceOrder({ config, order, state, setOrderErrors }),
+    setPlaceOrder: ({
+      paymentSource,
+    }: {
+      paymentSource: Record<string, string>
+    }) =>
+      setPlaceOrder({ config, order, state, setOrderErrors, paymentSource }),
     placeOrderPermitted: () =>
       placeOrderPermitted({
         config,

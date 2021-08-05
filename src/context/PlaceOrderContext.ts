@@ -7,7 +7,11 @@ import {
 
 type DefaultContext = {
   setPlaceOrderErrors?: SetPlaceOrderErrors
-  setPlaceOrder?: () => Promise<{ placed: boolean }>
+  setPlaceOrder?: ({
+    paymentSource,
+  }: {
+    paymentSource: Record<string, string>
+  }) => Promise<{ placed: boolean }>
   placeOrderPermitted?: () => void
 } & PlaceOrderState
 

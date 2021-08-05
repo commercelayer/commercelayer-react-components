@@ -48,7 +48,6 @@ const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps
       name,
       ...props,
     }
-    console.log(`checked`, checked)
     return props.children ? (
       <Parent {...parentProps}>{props.children}</Parent>
     ) : (
