@@ -41,15 +41,17 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
   useEffect(() => {
     if (loading) setNotPermitted(loading)
     else {
-      if (isPermitted && paymentType === currentPaymentMethodType) {
+      if (paymentType === currentPaymentMethodType) {
         if (
-          currentPaymentMethodRef?.current?.onsubmit ||
-          // @ts-ignore
-          paymentSource?.metadata?.card?.id ||
-          // @ts-ignore
-          paymentSource?.options?.id
-        )
+          (currentPaymentMethodRef?.current?.onsubmit ||
+            // @ts-ignore
+            paymentSource?.metadata?.card?.id ||
+            // @ts-ignore
+            paymentSource?.options?.id) &&
+          isPermitted
+        ) {
           setNotPermitted(false)
+        }
       } else {
         setNotPermitted(true)
       }
@@ -64,7 +66,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     isPermitted,
     options?.paypalPayerId,
     paymentType,
-    currentPaymentMethodRef,
+    currentPaymentMethodRef?.current?.onsubmit,
     paymentSource,
     loading,
     currentPaymentMethodType,
@@ -72,13 +74,17 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
   const handleClick = async () => {
     let isValid = true
     setForceDisable(true)
-    if (currentPaymentMethodRef?.current && !options?.paypalPayerId) {
-      isValid = (await currentPaymentMethodRef.current?.submit()) as any
+    if (currentPaymentMethodRef?.current?.onsubmit && !options?.paypalPayerId) {
+      // @ts-ignore
+      isValid = (await currentPaymentMethodRef.current?.onsubmit()) as any
       // @ts-ignore
     } else if (paymentSource?.options?.id) {
       isValid = true
     }
-    const placed = isValid && setPlaceOrder && (await setPlaceOrder())
+    const placed =
+      isValid &&
+      setPlaceOrder &&
+      (await setPlaceOrder({ paymentSource: paymentSource as any }))
     setForceDisable(false)
     onClick && placed && onClick(placed)
   }

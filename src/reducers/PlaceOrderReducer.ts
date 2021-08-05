@@ -119,6 +119,7 @@ export type SetPlaceOrder = (args: {
   order?: OrderCollection
   state?: PlaceOrderState
   setOrderErrors?: (collection: any) => void
+  paymentSource?: Record<string, string>
 }) => Promise<{
   placed: boolean
 }>
@@ -128,15 +129,16 @@ export const setPlaceOrder: SetPlaceOrder = async ({
   order,
   config,
   setOrderErrors,
+  paymentSource,
 }) => {
   const response = {
     placed: false,
   }
   try {
     if (state && order && config) {
-      const { options, paymentType, paymentSource } = state
+      const { options, paymentType } = state
       if (paymentType === 'paypal_payments') {
-        if (!options?.paypalPayerId) {
+        if (!options?.paypalPayerId && paymentSource?.approvalUrl) {
           window.location.href = paymentSource?.approvalUrl as string
           return response
         }
