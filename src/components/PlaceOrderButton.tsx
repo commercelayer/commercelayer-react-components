@@ -11,6 +11,7 @@ import { FunctionChildren } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import isFunction from 'lodash/isFunction'
 import PaymentMethodContext from '#context/PaymentMethodContext'
+import OrderContext from '#context/OrderContext'
 
 const propTypes = components.PlaceOrderButton.propTypes
 const defaultProps = components.PlaceOrderButton.defaultProps
@@ -38,6 +39,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     loading,
     currentPaymentMethodType,
   } = useContext(PaymentMethodContext)
+  const { order } = useContext(OrderContext)
   useEffect(() => {
     if (loading) setNotPermitted(loading)
     else {
@@ -47,7 +49,8 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
             // @ts-ignore
             paymentSource?.metadata?.card?.id ||
             // @ts-ignore
-            paymentSource?.options?.id) &&
+            paymentSource?.options?.id ||
+            order?.totalAmountWithTaxesCents === 0) &&
           isPermitted
         ) {
           setNotPermitted(false)

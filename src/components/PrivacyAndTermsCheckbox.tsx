@@ -28,6 +28,7 @@ const PrivacyAndTermsCheckbox: FunctionComponent<Partial<BaseInputProps>> = (
     if (order?.privacyUrl && order?.termsUrl) setForceDisabled(false)
     return () => {
       setForceDisabled(true)
+      localStorage.removeItem(fieldName)
     }
   }, [order?.privacyUrl, order?.termsUrl])
   return (
