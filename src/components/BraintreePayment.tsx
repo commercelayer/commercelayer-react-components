@@ -1,9 +1,9 @@
 import React, {
   FormEvent,
   FunctionComponent,
-  ReactNode,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react'
 import { HostedFieldFieldOptions } from 'braintree-web/modules/hosted-fields'
@@ -12,10 +12,8 @@ import isEmpty from 'lodash/isEmpty'
 import OrderContext from '#context/OrderContext'
 import Parent from './utils/Parent'
 import { PaymentSourceProps } from './PaymentSource'
-import { SetPaymentSourceResponse } from '#reducers/PaymentMethodReducer'
-import isFunction from 'lodash/isFunction'
-import { setCustomerOrderParam, setLocalOrder } from '#utils/localStorage'
-
+import { setLocalOrder } from '#utils/localStorage'
+import promisify from '#utils/promisify'
 type BraintreeHostedFields<Type> = {
   [Property in keyof Type]: {
     label?: string
@@ -25,10 +23,6 @@ type BraintreeHostedFields<Type> = {
 export type BraintreeConfig = {
   containerClassName?: string
   fields?: BraintreeHostedFields<HostedFieldFieldOptions>
-  handleSubmit?: (response?: SetPaymentSourceResponse) => void
-  submitClassName?: string
-  submitContainerClassName?: string
-  submitLabel?: string | ReactNode
   styles?: {
     [key: string]: Record<string, string>
   }
@@ -69,6 +63,7 @@ const defaultConfig: BraintreeConfig = {
     // Media queries
     // Note that these apply to the iframe, not the root window.
     '@media screen and (max-width: 700px)': {
+      // @ts-ignore
       input: {
         'font-size': '14px',
       },
@@ -99,103 +94,97 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
   config,
   templateCustomerSaveToWallet,
 }) => {
-  const {
-    fields,
-    styles,
-    containerClassName,
-    handleSubmit,
-    submitContainerClassName,
-    submitClassName,
-    submitLabel,
-  } = { ...defaultConfig, ...config }
+  const { fields, styles, containerClassName } = { ...defaultConfig, ...config }
   const [loadBraintree, setloadBraintree] = useState(false)
-  const [buttonDisabled, setButtonDisabled] = useState(true)
-  const [hostedFieldsInstance, setHostedFieldsInstance] = useState<any>()
-  const [threeDSInstance, setThreeDSInstance] = useState<any>()
+  // const [hostedFieldsInstance, setHostedFieldsInstance] = useState<any>()
+  // const [threeDSInstance, setThreeDSInstance] = useState<any>()
   const {
     setPaymentSource,
     paymentSource,
     setPaymentMethodErrors,
     currentPaymentMethodType,
+    setPaymentRef,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
-
-  const handleSubmitForm = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const ref = useRef<null | HTMLFormElement>(null)
+  const handleSubmitForm = async (
+    event?: FormEvent<HTMLFormElement>,
+    hostedFieldsInstance?: any,
+    threeDSInstance?: any
+  ) => {
     const savePaymentSourceToCustomerWallet =
       // @ts-ignore
-      event?.target?.elements?.['save_payment_source_to_customer_wallet']
-        ?.checked
-    setCustomerOrderParam(
-      'savePaymentSourceToCustomerWallet',
-      savePaymentSourceToCustomerWallet
-    )
+      event?.elements?.['save_payment_source_to_customer_wallet']?.checked
+    if (savePaymentSourceToCustomerWallet)
+      setLocalOrder(
+        'savePaymentSourceToCustomerWallet',
+        savePaymentSourceToCustomerWallet
+      )
     if (hostedFieldsInstance) {
-      hostedFieldsInstance.tokenize((tokenizeErr: any, payload: any) => {
-        if (tokenizeErr) {
-          console.error(tokenizeErr)
-          return
+      try {
+        const payload = await promisify(hostedFieldsInstance).then(
+          (payload) => payload
+        )
+        const billingAddress = order?.billingAddress()
+        const verifyCardOptions = {
+          nonce: payload.nonce,
+          bin: payload.details.bin,
+          amount: order?.totalAmountWithTaxesFloat as number,
+          email: order?.customerEmail,
+          billingAddress: {
+            givenName: billingAddress?.firstName,
+            surname: billingAddress?.lastName,
+            phoneNumber: billingAddress?.phone,
+            streetAddress: billingAddress?.line1,
+            countryCodeAlpha2: billingAddress?.countryCode,
+            postalCode: billingAddress?.zipCode,
+            region: billingAddress?.stateCode,
+            locality: billingAddress?.city,
+          },
+          onLookupComplete: (_data: any, next: any) => {
+            next()
+          },
         }
-        if (paymentSource && threeDSInstance) {
-          const billingAddress = order?.billingAddress()
-          const verifyCardOptions = {
-            nonce: payload.nonce,
-            bin: payload.details.bin,
-            amount: order?.totalAmountWithTaxesFloat as number,
-            email: order?.customerEmail,
-            billingAddress: {
-              givenName: billingAddress?.firstName,
-              surname: billingAddress?.lastName,
-              phoneNumber: billingAddress?.phone,
-              streetAddress: billingAddress?.line1,
-              countryCodeAlpha2: billingAddress?.countryCode,
-              postalCode: billingAddress?.zipCode,
-              region: billingAddress?.stateCode,
-              locality: billingAddress?.city,
-            },
-            onLookupComplete: (_data: any, next: any) => {
-              next()
-            },
-          }
-          threeDSInstance.verifyCard(
-            verifyCardOptions,
-            async (error: any, response: any) => {
-              if (error) {
-                console.error(error)
-                setPaymentMethodErrors([
-                  {
-                    code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-                    resource: 'paymentMethod',
-                    field: currentPaymentMethodType,
-                    message: error.message as string,
-                  },
-                ])
-                return
-              }
-              const source = await setPaymentSource({
-                paymentSourceId: paymentSource.id,
-                paymentResource: 'braintree_payments',
-                attributes: {
-                  paymentMethodNonce: response.nonce,
-                  options: {
-                    id: response.nonce,
-                    card: {
-                      last4: response.details.lastFour,
-                      expYear: response.details.expirationYear,
-                      expMonth: response.details.expirationMonth,
-                      brand: response.details.cardType.toLowerCase(),
-                    },
+        const response = await threeDSInstance.verifyCard(verifyCardOptions)
+        if (response && paymentSource) {
+          paymentSource &&
+            (await setPaymentSource({
+              paymentSourceId: paymentSource.id,
+              paymentResource: 'braintree_payments',
+              attributes: {
+                paymentMethodNonce: response.nonce,
+                options: {
+                  id: response.nonce,
+                  card: {
+                    last4: response.details.lastFour,
+                    expYear: response.details.expirationYear,
+                    expMonth: response.details.expirationMonth,
+                    brand: response.details.cardType.toLowerCase(),
                   },
                 },
-              })
-              handleSubmit && handleSubmit(source)
-            }
-          )
+              },
+            }))
+          return true
         }
-      })
+        return false
+      } catch (error) {
+        console.error(error)
+        setPaymentMethodErrors([
+          {
+            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+            resource: 'paymentMethod',
+            field: currentPaymentMethodType,
+            message: error.message as string,
+          },
+        ])
+        return false
+      }
     }
+    return false
   }
   useEffect(() => {
+    if (!ref && authorization)
+      setLocalOrder('savePaymentSourceToCustomerWallet', 'false')
     if (authorization && !loadBraintree && !isEmpty(window)) {
       const braintreeClient = require('braintree-web/client')
       const hostedFields = require('braintree-web/hosted-fields')
@@ -219,8 +208,6 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
                 return
               }
               setloadBraintree(true)
-              setButtonDisabled(false)
-              setHostedFieldsInstance(hostedFieldsInstance)
               threeDSecure.create(
                 {
                   authorization,
@@ -232,7 +219,15 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
                     console.error('3DSecure error', threeDSecureErr)
                     return
                   }
-                  setThreeDSInstance(threeDSecureInstance)
+                  if (ref.current) {
+                    ref.current.onsubmit = () =>
+                      handleSubmitForm(
+                        ref.current as any,
+                        hostedFieldsInstance,
+                        threeDSecureInstance
+                      )
+                    setPaymentRef({ ref })
+                  }
                 }
               )
             }
@@ -241,13 +236,13 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
       )
     }
     return () => {
+      setPaymentRef({ ref: { current: null } })
       setloadBraintree(false)
-      setCustomerOrderParam('savePaymentSourceToCustomerWallet', 'false')
     }
-  }, [authorization])
+  }, [authorization, ref])
   return !authorization && !loadBraintree ? null : (
     <div className={containerClassName}>
-      <form id="braintree-form" onSubmit={handleSubmitForm}>
+      <form ref={ref} id="braintree-form" onSubmit={handleSubmitForm}>
         <label htmlFor="card-number">{fields?.number.label}</label>
         <div id="card-number"></div>
 
@@ -261,7 +256,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
             {templateCustomerSaveToWallet}
           </Parent>
         )}
-        <div className={submitContainerClassName}>
+        {/* <div className={submitContainerClassName}>
           <button
             className={submitClassName}
             type="submit"
@@ -269,7 +264,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
           >
             {isFunction(submitLabel) ? submitLabel() : submitLabel}
           </button>
-        </div>
+        </div> */}
       </form>
     </div>
   )
