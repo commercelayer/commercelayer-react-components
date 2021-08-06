@@ -209,7 +209,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
             )
           }
         )
-        return !authorization ? null : (
+        return authorization && !loading ? (
           <Fragment>
             {isEmpty(customerPaymentsCards) ? null : (
               <div className={p.className}>{customerPaymentsCards}</div>
@@ -222,12 +222,15 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
               config={btreeConfig}
             />
           </Fragment>
+        ) : (
+          loaderComponent
         )
       }
-      return !authorization ? null : (
+      return authorization && !loading ? (
         <BraintreePayment authorization={authorization} />
+      ) : (
+        loaderComponent
       )
-      return null
     case 'wire_transfers':
       if (!readonly && payment?.id !== currentPaymentMethodId) return null
       if (readonly || showCard) {

@@ -22,11 +22,7 @@ import { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
 import { PaymentSourceProps } from './PaymentSource'
 import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
-<<<<<<< HEAD
-=======
-import isFunction from 'lodash/isFunction'
 import { setCustomerOrderParam } from '#utils/localStorage'
->>>>>>> 80c771b (feat: Add 3D Secure for Braintree)
 
 export type StripeConfig = {
   containerClassName?: string
@@ -93,7 +89,7 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
       // @ts-ignore
       event?.elements?.['save_payment_source_to_customer_wallet']?.checked
     if (savePaymentSourceToCustomerWallet)
-      setLocalOrder(
+      setCustomerOrderParam(
         'savePaymentSourceToCustomerWallet',
         savePaymentSourceToCustomerWallet
       )
