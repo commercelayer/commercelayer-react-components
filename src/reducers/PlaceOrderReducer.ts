@@ -167,9 +167,11 @@ export const setPlaceOrder: SetPlaceOrder = async ({
           const u = await o.withCredentials(config).update(updateAttributes)
           if (isFunction(u?.errors) && !u?.errors()?.empty()) throw u
           if (options && saveToWallet(options)) {
-            await o.withCredentials(config).update({
-              _savePaymentSourceToCustomerWallet: true,
+            await Order.build({
+              id: order.id,
             })
+              .withCredentials(config)
+              .update({ _savePaymentSourceToCustomerWallet: true })
           }
           setOrderErrors && setOrderErrors([])
           return {
