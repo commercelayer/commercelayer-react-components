@@ -6,7 +6,6 @@ import { Order, OrderCollection, PaypalPayment } from '@commercelayer/js-sdk'
 import { isEmpty, isFunction } from 'lodash'
 import { shipmentsFilled } from '#utils/shipments'
 import { PaymentResource } from './PaymentMethodReducer'
-import { getLocalOrder } from '#utils/localStorage'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
 import {
   saveBillingAddress,

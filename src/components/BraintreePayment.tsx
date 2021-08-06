@@ -95,7 +95,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
   templateCustomerSaveToWallet,
 }) => {
   const { fields, styles, containerClassName } = { ...defaultConfig, ...config }
-  const [loadBraintree, setloadBraintree] = useState(false)
+  const [loadBraintree, setLoadBraintree] = useState(false)
   // const [hostedFieldsInstance, setHostedFieldsInstance] = useState<any>()
   // const [threeDSInstance, setThreeDSInstance] = useState<any>()
   const {
@@ -207,7 +207,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
                 console.error(hostedFieldsErr)
                 return
               }
-              setloadBraintree(true)
+              setLoadBraintree(true)
               threeDSecure.create(
                 {
                   authorization,
@@ -237,7 +237,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
     }
     return () => {
       setPaymentRef({ ref: { current: null } })
-      setloadBraintree(false)
+      setLoadBraintree(false)
     }
   }, [authorization, ref])
   return !authorization && !loadBraintree ? null : (
