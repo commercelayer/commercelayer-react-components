@@ -344,18 +344,18 @@ type SaveAddressToCustomerAddressBook = (params: {
   value: boolean
 }) => void
 
-export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook = ({
-  type,
-  value,
-  dispatch,
-}) => {
-  dispatch({
-    type: 'setSaveAddressToCustomerAddressBook',
-    payload: {
-      [`save${type}ToCustomerBook`]: value,
-    },
-  })
-}
+export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook =
+  ({ type, value, dispatch }) => {
+    const k = `save${type}ToCustomerBook`
+    const v = `${value}`
+    localStorage.setItem(k, v)
+    dispatch({
+      type: 'setSaveAddressToCustomerAddressBook',
+      payload: {
+        [k]: v,
+      },
+    })
+  }
 
 type SetGiftCardOrCouponCode = (args: {
   code: string
