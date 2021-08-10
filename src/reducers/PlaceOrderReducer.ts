@@ -161,10 +161,36 @@ export const setPlaceOrder: SetPlaceOrder = async ({
         updateAttributes._saveShippingAddressToCustomerAddressBook = true
       }
       switch (paymentType) {
+        case 'braintree_payments':
+          if (options && saveToWallet(options)) {
+            await Order.build({
+              id: order.id,
+            })
+              .withCredentials(config)
+              .update({ _savePaymentSourceToCustomerWallet: true })
+          }
+          const brOrder = await Order.build({
+            id: order.id,
+          })
+            .withCredentials(config)
+            .update(updateAttributes)
+          if (isFunction(brOrder?.errors) && !brOrder?.errors()?.empty())
+            throw brOrder
+          setOrderErrors && setOrderErrors([])
+          return {
+            placed: true,
+          }
         default:
-          const o = await Order.withCredentials(config).find(order.id)
-          const u = await o.withCredentials(config).update(updateAttributes)
-          if (isFunction(u?.errors) && !u?.errors()?.empty()) throw u
+          const defaultOrder = await Order.build({
+            id: order.id,
+          })
+            .withCredentials(config)
+            .update(updateAttributes)
+          if (
+            isFunction(defaultOrder?.errors) &&
+            !defaultOrder?.errors()?.empty()
+          )
+            throw defaultOrder
           if (options && saveToWallet(options)) {
             await Order.build({
               id: order.id,
