@@ -18,14 +18,17 @@ const PrivacyAndTermsCheckbox: FunctionComponent<Partial<BaseInputProps>> = (
   const { order } = useContext(OrderContext)
   const { placeOrderPermitted } = useContext(PlaceOrderContext)
   const [forceDisabled, setForceDisabled] = useState(true)
+  const [checked, setChecked] = useState(false)
   const fieldName = 'privacy-terms'
   const handleChange: any = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const v = e.target?.checked
+    setChecked(v)
     localStorage.setItem(fieldName, `${v}`)
     placeOrderPermitted && placeOrderPermitted()
   }
   useEffect(() => {
     if (order?.privacyUrl && order?.termsUrl) setForceDisabled(false)
+    if (!checked) localStorage.setItem(fieldName, `${checked}`)
     return () => {
       setForceDisabled(true)
       localStorage.removeItem(fieldName)
@@ -37,6 +40,7 @@ const PrivacyAndTermsCheckbox: FunctionComponent<Partial<BaseInputProps>> = (
       name={fieldName}
       disabled={forceDisabled}
       onChange={handleChange}
+      checked={checked}
       {...props}
     />
   )
