@@ -1,6 +1,6 @@
 {
   "name": "@commercelayer/react-components",
-  "version": "3.0.0-beta.5",
+  "version": "3.0.0-beta.6",
   "description": "The Official Commerce Layer React Components",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,7 +28,6 @@
     "version:fix": "npm version patch",
     "version:feat": "npm version minor",
     "version:perf": "npm version major",
-    "version": "npm run build && npm version",
     "publish:beta": "npm publish --public --tag beta",
     "publish:fix": "npm run build && npm run version:fix && git push --follow-tags && npm publish --access public",
     "publish:feat": "npm run build && npm run version:feat && git push --follow-tags && npm publish --access public",
