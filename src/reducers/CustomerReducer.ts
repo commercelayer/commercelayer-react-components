@@ -187,17 +187,21 @@ export const getCustomerOrders: GetCustomerOrders = async ({
 }) => {
   const { owner } = jwtDecode<Jwt>(config.accessToken)
   if (owner?.id) {
-    // TODO: Change with customers/customer_id/orders with new SDK
+    // TODO: Change with customers/customer_id/orders with new SDK and filter them directly.
     const getOrders = await Customer.withCredentials(config)
       .includes('orders')
       .find(owner?.id, { rawResponse: true })
     const attributes = { email: getOrders.data.attributes.email }
-    const orders = getOrders?.included?.map((order) => {
-      return {
-        id: order.id,
-        ...order.attributes,
-      } as OrderAttributes
-    })
+    const orders = getOrders?.included
+      ?.filter(
+        (order) => !['pending', 'draft'].includes(order.attributes.status)
+      )
+      .map((order) => {
+        return {
+          id: order.id,
+          ...order.attributes,
+        } as OrderAttributes
+      })
     dispatch({
       type: 'setOrders',
       payload: { orders, attributes },
