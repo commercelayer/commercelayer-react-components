@@ -6,33 +6,59 @@ import React, {
 } from 'react'
 import BaseSelect from './utils/BaseSelect'
 import components from '#config/components'
-import { AddressCountrySelectName, BaseSelectComponentProps } from '#typings'
+import { AddressStateSelectName, BaseSelectComponentProps } from '#typings'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'
-import { getCountries } from '#utils/countryStateCity'
+import { getStateOfCountry } from '#utils/countryStateCity'
 
-const propTypes = components.AddressCountrySelector.propTypes
-const defaultProps = components.AddressCountrySelector.defaultProps
-const displayName = components.AddressCountrySelector.displayName
+const propTypes = components.AddressStateSelector.propTypes
+const defaultProps = components.AddressStateSelector.defaultProps
+const displayName = components.AddressStateSelector.displayName
 
-type AddressCountrySelectorProps = Omit<
+type AddressStateSelectorProps = Omit<
   BaseSelectComponentProps,
   'options' | 'name'
 > & {
-  name: AddressCountrySelectName
+  name: AddressStateSelectName
   required?: boolean
   disabled?: boolean
 } & Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'>
 
-const AddressCountrySelector: FunctionComponent<AddressCountrySelectorProps> = (
+const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
   props
 ) => {
   const { required = true, value, name, className, ...p } = props
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
   const [hasError, setHasError] = useState(false)
+  const [countryCode, setCountryCode] = useState('')
+  const [val, setVal] = useState(value)
   useEffect(() => {
+    const billingCountryCode =
+      billingAddress?.values?.['billing_address_country_code']?.value
+    const shippingCountryCode =
+      shippingAddress?.values?.['shipping_address_country_code']?.value
+    const changeBillingCountry = [
+      !isEmpty(billingAddress),
+      billingCountryCode,
+      countryCode !== billingCountryCode,
+    ].every(Boolean)
+    if (changeBillingCountry) {
+      setCountryCode(billingCountryCode)
+      billingAddress.resetField && billingAddress.resetField(name)
+      setVal('')
+    }
+    const changeShippingCountry = [
+      !isEmpty(shippingAddress),
+      shippingCountryCode,
+      countryCode !== shippingCountryCode,
+    ].every(Boolean)
+    if (changeShippingCountry) {
+      setCountryCode(shippingCountryCode)
+      shippingAddress.resetField && shippingAddress.resetField(name)
+      setVal('')
+    }
     if (value && billingAddress?.setValue) {
       billingAddress.setValue(name, value)
     }
@@ -60,7 +86,13 @@ const AddressCountrySelector: FunctionComponent<AddressCountrySelectorProps> = (
     return () => {
       setHasError(false)
     }
-  }, [value, billingAddress?.errors, shippingAddress?.errors])
+  }, [
+    value,
+    billingAddress?.errors,
+    shippingAddress?.errors,
+    billingAddress?.values,
+    shippingAddress?.values,
+  ])
   const errorClassName =
     billingAddress?.errorClassName || shippingAddress?.errorClassName
   const classNameComputed = `${className} ${hasError ? errorClassName : ''}`
@@ -69,16 +101,16 @@ const AddressCountrySelector: FunctionComponent<AddressCountrySelectorProps> = (
       className={classNameComputed}
       ref={billingAddress?.validation || shippingAddress?.validation}
       required={required}
-      options={getCountries()}
+      options={getStateOfCountry(countryCode)}
       name={name}
-      value={value}
+      value={val}
       {...p}
     />
   )
 }
 
-AddressCountrySelector.propTypes = propTypes
-AddressCountrySelector.defaultProps = defaultProps
-AddressCountrySelector.displayName = displayName
+AddressStateSelector.propTypes = propTypes
+AddressStateSelector.defaultProps = defaultProps
+AddressStateSelector.displayName = displayName
 
-export default AddressCountrySelector
+export default AddressStateSelector

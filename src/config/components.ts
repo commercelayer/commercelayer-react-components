@@ -13,6 +13,7 @@ import {
   BaseSelectorType,
   AddressInputName,
   AddressCountrySelectName,
+  AddressStateSelectName,
 } from '#typings'
 import { ErrorPropTypes } from '#typings/errors'
 import { BaseInputComponentPropTypes } from '#typings/index'
@@ -43,6 +44,26 @@ const components = {
       name: PropTypes.oneOf<AddressCountrySelectName>([
         'billing_address_country_code',
         'shipping_address_country_code',
+      ]).isRequired,
+      required: PropTypes.bool,
+    },
+    defaultProps: {
+      required: true,
+    },
+  },
+  AddressStateSelector: {
+    displayName: 'AddressStateSelector',
+    propTypes: {
+      children: PropTypes.func,
+      placeholder: PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+          .isRequired,
+      }),
+      value: PropTypes.string,
+      name: PropTypes.oneOf<AddressStateSelectName>([
+        'billing_address_state_code',
+        'shipping_address_state_code',
       ]).isRequired,
       required: PropTypes.bool,
     },
