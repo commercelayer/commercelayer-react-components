@@ -95,10 +95,13 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     setAddress({ values: { ...values, ...field }, resource: 'shippingAddress' })
   }
   const providerValues = {
+    values,
     validation,
     setValue,
     errorClassName,
     errors: errors as any,
+    resetField: (name: string) =>
+      resetForm({ currentTarget: ref.current } as any, name),
   }
   return (
     <ShippingAddressFormContext.Provider value={providerValues}>

@@ -92,12 +92,15 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     setAddress({ values: { ...values, ...field }, resource: 'billingAddress' })
   }
   const providerValues = {
+    values,
     validation,
     setValue,
     errorClassName,
     // @ts-ignore
     requiresBillingInfo: order?.requiresBillingInfo || false,
     errors: errors as any,
+    resetField: (name: string) =>
+      resetForm({ currentTarget: ref.current } as any, name),
   }
   return (
     <BillingAddressFormContext.Provider value={providerValues}>

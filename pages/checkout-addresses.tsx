@@ -15,6 +15,7 @@ import {
   CustomerContainer,
   CustomerInput,
   SaveCustomerButton,
+  AddressStateSelector,
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
@@ -333,12 +334,15 @@ export default function Main() {
                     State
                   </label>
                   <div className="mt-1">
-                    <AddressInput
+                    <AddressStateSelector
                       data-cy="billing_address_state_code"
                       name="billing_address_state_code"
-                      type="text"
-                      className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      placeholder="State"
+                      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                      placeholder={{
+                        value: '',
+                        label: 'Select a state',
+                        // disabled: true,
+                      }}
                     />
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -607,12 +611,15 @@ export default function Main() {
                     State
                   </label>
                   <div className="mt-1">
-                    <AddressInput
+                    <AddressStateSelector
                       data-cy="shipping_address_state_code"
                       name="shipping_address_state_code"
-                      type="text"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      placeholder="State"
+                      placeholder={{
+                        value: '',
+                        label: 'Select a state',
+                        disabled: true,
+                      }}
                     />
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">

@@ -1,4 +1,4 @@
-import React, { ForwardRefRenderFunction } from 'react'
+import React, { ForwardRefRenderFunction, useEffect } from 'react'
 import Parent from './Parent'
 import { BaseSelectComponentProps } from '#typings'
 import { findIndex } from 'lodash'
@@ -21,6 +21,7 @@ const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (
   } else {
     options[0] = placeholder
   }
+  useEffect(() => {}, [value])
   const Options = options.map((o, k) => {
     const { label, ...option } = o
     return (
