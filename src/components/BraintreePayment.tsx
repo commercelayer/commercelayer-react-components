@@ -96,8 +96,6 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
 }) => {
   const { fields, styles, containerClassName } = { ...defaultConfig, ...config }
   const [loadBraintree, setLoadBraintree] = useState(false)
-  // const [hostedFieldsInstance, setHostedFieldsInstance] = useState<any>()
-  // const [threeDSInstance, setThreeDSInstance] = useState<any>()
   const {
     setPaymentSource,
     paymentSource,
@@ -217,7 +215,14 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
                   if (threeDSecureErr) {
                     // Handle error in 3D Secure component creation
                     console.error('3DSecure error', threeDSecureErr)
-                    return
+                    setPaymentMethodErrors([
+                      {
+                        code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+                        resource: 'paymentMethod',
+                        field: currentPaymentMethodType,
+                        message: threeDSecureErr.message as string,
+                      },
+                    ])
                   }
                   if (ref.current) {
                     ref.current.onsubmit = () =>
@@ -246,7 +251,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
         <label htmlFor="card-number">{fields?.number.label}</label>
         <div id="card-number"></div>
 
-        <label htmlFor="cvv">{fields?.cvv.label}</label>
+        <label htmlFor="cvv">{fields?.cvv?.label}</label>
         <div id="cvv"></div>
 
         <label htmlFor="expiration-date">{fields?.expirationDate?.label}</label>
@@ -256,15 +261,6 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
             {templateCustomerSaveToWallet}
           </Parent>
         )}
-        {/* <div className={submitContainerClassName}>
-          <button
-            className={submitClassName}
-            type="submit"
-            disabled={buttonDisabled}
-          >
-            {isFunction(submitLabel) ? submitLabel() : submitLabel}
-          </button>
-        </div> */}
       </form>
     </div>
   )
