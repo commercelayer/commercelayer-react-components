@@ -73,7 +73,7 @@
     "deps": "^1.0.0",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
-    "rapid-form": "^1.5.2"
+    "rapid-form": "^1.5.3"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.14.5",
@@ -96,8 +96,8 @@
     "@types/prop-types": "^15.7.4",
     "@types/react": "^17.0.19",
     "@types/react-test-renderer": "^17.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.29.2",
-    "@typescript-eslint/parser": "^4.29.2",
+    "@typescript-eslint/eslint-plugin": "^4.29.3",
+    "@typescript-eslint/parser": "^4.29.3",
     "@zeit/next-css": "^1.0.1",
     "@zerollup/ts-transform-paths": "^1.7.18",
     "autoprefixer": "^10.3.2",

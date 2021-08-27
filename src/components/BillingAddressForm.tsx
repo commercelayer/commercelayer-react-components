@@ -15,6 +15,7 @@ import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import OrderStorageContext from '#context/OrderStorageContext'
+import isEmptyStates from '#utils/isEmptyStates'
 
 const propTypes = components.BillingAddressForm.propTypes
 
@@ -34,7 +35,13 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     reset = false,
     ...p
   } = props
-  const { validation, values, errors, reset: resetForm } = useRapidForm()
+  const {
+    validation,
+    values,
+    errors,
+    reset: resetForm,
+    setError,
+  } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
   const { saveAddressToCustomerAddressBook, order } = useContext(OrderContext)
   const { setLocalOrder } = useContext(OrderStorageContext)
@@ -44,16 +51,35 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
         const { code, message } = errors[fieldName]
-        formErrors.push({
-          code: code as CodeErrorType,
-          message,
-          resource: 'billingAddress',
-          field: fieldName,
-        })
+        if (['billing_address_state_code'].includes(fieldName)) {
+          const countryCode =
+            values['billing_address_country_code']?.value ||
+            values['country_code']
+          console.log(`countryCode`, countryCode, isEmptyStates(countryCode))
+          if (isEmptyStates(countryCode)) {
+            const k = formErrors.findIndex(({ field }) => field === fieldName)
+            k !== -1 && formErrors.splice(k, 0)
+            delete errors[fieldName]
+          } else {
+            formErrors.push({
+              code: code as CodeErrorType,
+              message,
+              resource: 'billingAddress',
+              field: fieldName,
+            })
+          }
+        } else {
+          formErrors.push({
+            code: code as CodeErrorType,
+            message,
+            resource: 'billingAddress',
+            field: fieldName,
+          })
+        }
       }
-      !isEmpty(formErrors) && setAddressErrors(formErrors)
+      setAddressErrors(formErrors, 'billingAddress')
     } else if (!isEmpty(values)) {
-      setAddressErrors([])
+      setAddressErrors([], 'billingAddress')
       for (const name in values) {
         const field = values[name]
         if (field?.value) {
@@ -68,6 +94,18 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
             field.checked
           )
         }
+        if (['billing_address_state_code'].includes(name)) {
+          const countryCode =
+            values['billing_address_country_code']?.value ||
+            values['country_code']
+          if (!isEmptyStates(countryCode) && !field.value) {
+            setError({
+              code: 'EMPTY_ERROR',
+              name: 'billing_address_state_code',
+              message: 'billing_address_state_code is required',
+            })
+          }
+        }
       }
       setAddress({ values, resource: 'billingAddress' })
     }
@@ -77,7 +115,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
       if (ref) {
         ref.current?.reset()
         resetForm({ target: ref.current } as any)
-        setAddressErrors([])
+        setAddressErrors([], 'billingAddress')
         setAddress({ values: {}, resource: 'billingAddress' })
       }
     }
