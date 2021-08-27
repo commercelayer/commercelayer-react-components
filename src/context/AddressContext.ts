@@ -1,11 +1,6 @@
 import { createContext } from 'react'
-import {
-  AddressState,
-  SetAddress,
-  SetAddressErrors,
-  setAddress,
-  setAddressErrors,
-} from '#reducers/AddressReducer'
+import { AddressState, SetAddress, setAddress } from '#reducers/AddressReducer'
+import { BaseError } from '#typings/errors'
 
 type DefaultContext = {
   saveAddresses: () => void
@@ -14,7 +9,10 @@ type DefaultContext = {
     resource: 'billingAddress' | 'shippingAddress'
   ) => void
   setAddress: SetAddress
-  setAddressErrors: SetAddressErrors
+  setAddressErrors: (
+    errors: BaseError[],
+    resource: 'billingAddress' | 'shippingAddress'
+  ) => void
 } & AddressState
 
 export const defaultAddressContext = {
@@ -25,7 +23,9 @@ export const defaultAddressContext = {
     return
   },
   setAddress,
-  setAddressErrors,
+  setAddressErrors: () => {
+    return
+  },
 }
 
 const AddressesContext = createContext<DefaultContext>(defaultAddressContext)

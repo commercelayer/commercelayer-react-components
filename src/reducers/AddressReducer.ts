@@ -3,7 +3,8 @@ import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Address, Order, OrderCollection } from '@commercelayer/js-sdk'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
+import merge from 'lodash/merge'
 
 export type AddressActionType =
   | 'setErrors'
@@ -65,7 +66,12 @@ export const addressInitialState: AddressState = {
 }
 
 export interface SetAddressErrors {
-  <V extends BaseError[]>(errors: V, dispatch?: Dispatch<AddressAction>): void
+  <V extends BaseError[]>(args: {
+    errors: V
+    resource: 'billingAddress' | 'shippingAddress'
+    dispatch?: Dispatch<AddressAction>
+    currentErrors?: V
+  }): void
 }
 
 export type SetAddressParams<V extends AddressSchema> = {
@@ -89,12 +95,32 @@ export interface SaveAddresses {
   }): Promise<void>
 }
 
-export const setAddressErrors: SetAddressErrors = (errors, dispatch) => {
+export const setAddressErrors: SetAddressErrors = ({
+  errors,
+  dispatch,
+  currentErrors = [],
+  resource,
+}) => {
+  const billingErrors =
+    isEmpty(errors) && resource === 'billingAddress'
+      ? []
+      : merge(
+          currentErrors.filter((e) => e.resource === 'billingAddress'),
+          errors.filter((e) => e.resource === 'billingAddress')
+        )
+  const shippingErrors =
+    isEmpty(errors) && resource === 'shippingAddress'
+      ? []
+      : merge(
+          currentErrors.filter((e) => e.resource === 'shippingAddress'),
+          errors.filter((e) => e.resource === 'shippingAddress')
+        )
+  const finalErrors = [...billingErrors, ...shippingErrors]
   dispatch &&
     dispatch({
       type: 'setErrors',
       payload: {
-        errors,
+        errors: finalErrors,
       },
     })
 }

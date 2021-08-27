@@ -15,6 +15,7 @@ import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import OrderStorageContext from '#context/OrderStorageContext'
+import isEmptyStates from '#utils/isEmptyStates'
 
 const propTypes = components.ShippingAddressForm.propTypes
 
@@ -34,7 +35,13 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     reset = false,
     ...p
   } = props
-  const { validation, values, errors, reset: resetForm } = useRapidForm()
+  const {
+    validation,
+    values,
+    errors,
+    reset: resetForm,
+    setError,
+  } = useRapidForm()
   const { setAddressErrors, setAddress, shipToDifferentAddress } =
     useContext(AddressesContext)
   const { saveAddressToCustomerAddressBook } = useContext(OrderContext)
@@ -45,18 +52,35 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
         const { code, message } = errors[fieldName]
-        formErrors.push({
-          code: code as CodeErrorType,
-          message,
-          resource: 'shippingAddress',
-          field: fieldName,
-        })
+        if (['shipping_address_state_code'].includes(fieldName)) {
+          const countryCode =
+            values['shipping_address_country_code']?.value ||
+            values['country_code']
+          console.log(`countryCode`, countryCode, isEmptyStates(countryCode))
+          if (isEmptyStates(countryCode)) {
+            const k = formErrors.findIndex(({ field }) => field === fieldName)
+            k !== -1 && formErrors.splice(k, 0)
+            delete errors[fieldName]
+          } else {
+            formErrors.push({
+              code: code as CodeErrorType,
+              message,
+              resource: 'shippingAddress',
+              field: fieldName,
+            })
+          }
+        } else {
+          formErrors.push({
+            code: code as CodeErrorType,
+            message,
+            resource: 'shippingAddress',
+            field: fieldName,
+          })
+        }
       }
-      !isEmpty(formErrors) &&
-        shipToDifferentAddress &&
-        setAddressErrors(formErrors)
+      shipToDifferentAddress && setAddressErrors(formErrors, 'shippingAddress')
     } else if (!isEmpty(values) && shipToDifferentAddress) {
-      setAddressErrors([])
+      setAddressErrors([], 'shippingAddress')
       for (const name in values) {
         const field = values[name]
         if (field?.value) {
@@ -71,6 +95,18 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
             field.checked
           )
         }
+        if (['shipping_address_state_code'].includes(name)) {
+          const countryCode =
+            values['shipping_address_country_code']?.value ||
+            values['country_code']
+          if (!isEmptyStates(countryCode) && !field.value) {
+            setError({
+              code: 'EMPTY_ERROR',
+              name: 'shipping_address_state_code',
+              message: 'shipping_address_state_code is required',
+            })
+          }
+        }
       }
       setAddress({ values, resource: 'shippingAddress' })
     }
@@ -80,7 +116,7 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
       if (ref) {
         ref.current?.reset()
         resetForm({ target: ref.current } as any)
-        setAddressErrors([])
+        setAddressErrors([], 'shippingAddress')
         setAddress({ values: {}, resource: 'shippingAddress' })
       }
     }

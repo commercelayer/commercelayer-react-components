@@ -21,7 +21,7 @@ const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (
   } else {
     options[0] = placeholder
   }
-  useEffect(() => {}, [value])
+  // useEffect(() => {}, [value])
   const Options = options.map((o, k) => {
     const { label, ...option } = o
     return (

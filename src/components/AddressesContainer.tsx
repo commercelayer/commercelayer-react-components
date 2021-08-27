@@ -11,6 +11,7 @@ import React, {
 import addressReducer, {
   addressInitialState,
   AddressSchema,
+  setAddressErrors,
   SetAddressParams,
   setCloneAddress,
 } from '#reducers/AddressReducer'
@@ -50,8 +51,16 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
   }, [shipToDifferentAddress])
   const contextValue = {
     ...state,
-    setAddressErrors: (errors: BaseError[]) =>
-      defaultAddressContext['setAddressErrors'](errors, dispatch),
+    setAddressErrors: (
+      errors: BaseError[],
+      resource: 'billingAddress' | 'shippingAddress'
+    ) =>
+      setAddressErrors({
+        errors,
+        resource,
+        dispatch,
+        currentErrors: state.errors,
+      }),
     setAddress: (params: SetAddressParams<AddressSchema>) =>
       defaultAddressContext['setAddress']({ ...params, dispatch }),
     saveAddresses: async (): Promise<void> =>
