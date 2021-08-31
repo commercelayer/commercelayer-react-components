@@ -24,6 +24,8 @@ export type BraintreeConfig = {
   containerClassName?: string
   cardFieldsContainerClassName?: string
   fieldContainerClassName?: string
+  fieldLabelClassName?: string
+  inputWrapperClassName?: string
   fields?: BraintreeHostedFields<HostedFieldFieldOptions>
   styles?: {
     [key: string]: Record<string, string>
@@ -102,6 +104,8 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
     containerClassName,
     cardFieldsContainerClassName,
     fieldContainerClassName,
+    fieldLabelClassName,
+    inputWrapperClassName,
   } = { ...defaultConfig, ...config }
   const [loadBraintree, setLoadBraintree] = useState(false)
   const {
@@ -261,20 +265,24 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
       <form ref={ref} id="braintree-form" onSubmit={handleSubmitForm}>
         <div className={cardFieldsContainerClassName}>
           <div className={fieldContainerClassName}>
-            <label htmlFor="card-number">{fields?.number.label}</label>
-            <div id="card-number"></div>
+            <label className={fieldLabelClassName} htmlFor="card-number">
+              {fields?.number.label}
+            </label>
+            <div className={inputWrapperClassName} id="card-number"></div>
           </div>
         </div>
         <div className={cardFieldsContainerClassName}>
           <div className={fieldContainerClassName}>
-            <label htmlFor="cvv">{fields?.cvv?.label}</label>
-            <div id="cvv"></div>
+            <label className={fieldLabelClassName} htmlFor="cvv">
+              {fields?.cvv?.label}
+            </label>
+            <div className={inputWrapperClassName} id="cvv"></div>
           </div>
-          <div>
-            <label htmlFor="expiration-date">
+          <div className={fieldContainerClassName}>
+            <label className={fieldLabelClassName} htmlFor="expiration-date">
               {fields?.expirationDate?.label}
             </label>
-            <div id="expiration-date"></div>
+            <div className={inputWrapperClassName} id="expiration-date"></div>
           </div>
         </div>
         <div className={cardFieldsContainerClassName}>
