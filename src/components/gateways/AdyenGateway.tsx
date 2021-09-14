@@ -1,5 +1,4 @@
 import { GatewayBaseType } from '#components/PaymentGateway'
-import StripePayment from '#components/StripePayment'
 import Parent from '#components/utils/Parent'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
@@ -13,6 +12,7 @@ import {
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React, { Fragment, useContext } from 'react'
+import AdyenPayment from '../AdyenPayment'
 
 type AdyenGateway = GatewayBaseType
 
@@ -41,7 +41,9 @@ export default function AdyenGateway(props: AdyenGateway) {
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
 
   // @ts-ignore
-  const publishableKey = paymentSource?.publishableKey
+  const clientKey =
+    paymentSource?.publicKey ||
+    'pub.v2.8216287005010266.aHR0cDovL2xvY2FsaG9zdDozMDAw.sXlUbjw_mJsSMpq58JkAFU0sLCTnLkD6fuiOd-c1pSc' // TODO: remove conditional check
   const adyenConfig = config
     ? getPaymentConfig<'stripePayment'>(paymentResource, config)
     : {}
@@ -97,10 +99,9 @@ export default function AdyenGateway(props: AdyenGateway) {
         {isEmpty(customerPaymentsCards) ? null : (
           <div className={p.className}>{customerPaymentsCards}</div>
         )}
-        <StripePayment
-          show={show}
+        <AdyenPayment
           templateCustomerSaveToWallet={templateCustomerSaveToWallet}
-          publishableKey={publishableKey}
+          clientKey={clientKey}
           locale={locale}
           {...adyenConfig}
         />
@@ -108,13 +109,8 @@ export default function AdyenGateway(props: AdyenGateway) {
     )
   }
 
-  return publishableKey && !loading ? (
-    <StripePayment
-      show={show}
-      publishableKey={publishableKey}
-      locale={locale}
-      {...adyenConfig}
-    />
+  return clientKey && !loading ? (
+    <AdyenPayment clientKey={clientKey} locale={locale} {...adyenConfig} />
   ) : (
     loaderComponent
   )
