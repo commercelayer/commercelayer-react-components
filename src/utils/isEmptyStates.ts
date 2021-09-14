@@ -1,5 +1,8 @@
-import { getStateOfCountry } from './countryStateCity'
+// import { getStateOfCountry } from './countryStateCity'
+
+const countryLock = ['IT', 'US', 'GB']
 
 export default function isEmptyStates(countryCode: string): boolean {
-  return getStateOfCountry(countryCode).length === 0
+  return !countryLock.includes(countryCode)
+  // return getStateOfCountry(countryCode).length === 0
 }
