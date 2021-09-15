@@ -1,5 +1,4 @@
 import { Country, State } from 'country-state-city'
-import isNumber from 'lodash/isNumber'
 
 export function getCountries() {
   return Country.getAllCountries().map(({ name, isoCode }) => ({
