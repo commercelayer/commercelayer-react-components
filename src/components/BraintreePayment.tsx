@@ -22,8 +22,10 @@ type BraintreeHostedFields<Type> = {
 
 export type BraintreeConfig = {
   containerClassName?: string
-  cardFieldsContainerClassName?: string
-  fieldContainerClassName?: string
+  cardContainerClassName?: string
+  expDateContainerClassName?: string
+  fieldsContainerClassName?: string
+  cvvContainerClassName?: string
   fieldLabelClassName?: string
   inputWrapperClassName?: string
   fields?: BraintreeHostedFields<HostedFieldFieldOptions>
@@ -102,9 +104,11 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
     fields,
     styles,
     containerClassName,
-    cardFieldsContainerClassName,
-    fieldContainerClassName,
+    cardContainerClassName,
+    fieldsContainerClassName,
+    expDateContainerClassName,
     fieldLabelClassName,
+    cvvContainerClassName,
     inputWrapperClassName,
   } = { ...defaultConfig, ...config }
   const [loadBraintree, setLoadBraintree] = useState(false)
@@ -262,30 +266,33 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
   }, [authorization, ref])
   return !authorization && !loadBraintree ? null : (
     <div className={containerClassName}>
-      <form ref={ref} id="braintree-form" onSubmit={handleSubmitForm}>
-        <div className={cardFieldsContainerClassName}>
-          <div className={fieldContainerClassName}>
+      <form
+        ref={ref}
+        id="braintree-form"
+        onSubmit={handleSubmitForm}
+        className={containerClassName}
+      >
+        <div className={fieldsContainerClassName}>
+          <div className={cardContainerClassName}>
             <label className={fieldLabelClassName} htmlFor="card-number">
               {fields?.number.label}
             </label>
             <div className={inputWrapperClassName} id="card-number"></div>
           </div>
-        </div>
-        <div className={cardFieldsContainerClassName}>
-          <div className={fieldContainerClassName}>
-            <label className={fieldLabelClassName} htmlFor="cvv">
-              {fields?.cvv?.label}
-            </label>
-            <div className={inputWrapperClassName} id="cvv"></div>
-          </div>
-          <div className={fieldContainerClassName}>
+          <div className={expDateContainerClassName}>
             <label className={fieldLabelClassName} htmlFor="expiration-date">
               {fields?.expirationDate?.label}
             </label>
             <div className={inputWrapperClassName} id="expiration-date"></div>
           </div>
+          <div className={cvvContainerClassName}>
+            <label className={fieldLabelClassName} htmlFor="cvv">
+              {fields?.cvv?.label}
+            </label>
+            <div className={inputWrapperClassName} id="cvv"></div>
+          </div>
         </div>
-        <div className={cardFieldsContainerClassName}>
+        <div className={fieldsContainerClassName}>
           {templateCustomerSaveToWallet && (
             <Parent {...{ name: 'save_payment_source_to_customer_wallet' }}>
               {templateCustomerSaveToWallet}
