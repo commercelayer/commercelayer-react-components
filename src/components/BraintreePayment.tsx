@@ -26,6 +26,7 @@ export type BraintreeConfig = {
   expDateContainerClassName?: string
   fieldsContainerClassName?: string
   cvvContainerClassName?: string
+  cardDetailsContainerClassName?: string
   fieldLabelClassName?: string
   inputWrapperClassName?: string
   fields?: BraintreeHostedFields<HostedFieldFieldOptions>
@@ -110,6 +111,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
     fieldLabelClassName,
     cvvContainerClassName,
     inputWrapperClassName,
+    cardDetailsContainerClassName,
   } = { ...defaultConfig, ...config }
   const [loadBraintree, setLoadBraintree] = useState(false)
   const {
@@ -279,17 +281,19 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
             </label>
             <div className={inputWrapperClassName} id="card-number"></div>
           </div>
-          <div className={expDateContainerClassName}>
-            <label className={fieldLabelClassName} htmlFor="expiration-date">
-              {fields?.expirationDate?.label}
-            </label>
-            <div className={inputWrapperClassName} id="expiration-date"></div>
-          </div>
-          <div className={cvvContainerClassName}>
-            <label className={fieldLabelClassName} htmlFor="cvv">
-              {fields?.cvv?.label}
-            </label>
-            <div className={inputWrapperClassName} id="cvv"></div>
+          <div className={cardDetailsContainerClassName}>
+            <div className={expDateContainerClassName}>
+              <label className={fieldLabelClassName} htmlFor="expiration-date">
+                {fields?.expirationDate?.label}
+              </label>
+              <div className={inputWrapperClassName} id="expiration-date"></div>
+            </div>
+            <div className={cvvContainerClassName}>
+              <label className={fieldLabelClassName} htmlFor="cvv">
+                {fields?.cvv?.label}
+              </label>
+              <div className={inputWrapperClassName} id="cvv"></div>
+            </div>
           </div>
         </div>
         <div className={fieldsContainerClassName}>
