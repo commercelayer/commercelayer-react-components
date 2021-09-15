@@ -227,7 +227,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         )
       }
       return authorization && !loading ? (
-        <BraintreePayment authorization={authorization} />
+        <BraintreePayment authorization={authorization} config={btreeConfig} />
       ) : (
         loaderComponent
       )
