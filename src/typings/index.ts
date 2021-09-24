@@ -226,3 +226,29 @@ export type BaseAmountComponent = {
 export interface FunctionChildren<P = Record<string, any>> {
   (props: P): ReactNode
 }
+
+export type Jwt = {
+  organization: {
+    id: string
+    slug: string
+  }
+  application: {
+    id: string
+    kind: string
+    public: boolean
+  }
+  test: boolean
+  owner?: {
+    id: string
+    type: string
+  }
+  exp: number
+  market: {
+    id: string[]
+    price_list_id: string
+    stock_location_ids: string[]
+    geocoder_id: null
+    allows_external_prices: boolean
+  }
+  rand: number
+}
