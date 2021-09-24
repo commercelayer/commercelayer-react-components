@@ -205,7 +205,7 @@ export const setPlaceOrder: SetPlaceOrder = async ({
       }
     }
     return response
-  } catch (error) {
+  } catch (error: any) {
     setOrderErrors && setOrderErrors(error)
     const errors = getErrorsByCollection(error, 'order')
     return {

@@ -177,7 +177,7 @@ export const addGiftCard: AddGiftCard = async (
       },
     })
     addGiftCardLoading(false, dispatch)
-  } catch (r) {
+  } catch (r: any) {
     const errors = getErrorsByCollection(r, 'giftCard')
     dispatch({
       type: 'setGiftCardErrors',
