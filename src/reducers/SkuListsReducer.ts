@@ -46,7 +46,7 @@ export const getSkuList: GetSkuList = async ({ listIds, config, dispatch }) => {
       },
       type: 'getSkuList',
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
   }
 }
