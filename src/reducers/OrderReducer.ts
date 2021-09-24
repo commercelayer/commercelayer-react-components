@@ -217,7 +217,7 @@ export const getApiOrder: GetOrder = async (params) => {
         })
       }
     return o
-  } catch (col) {
+  } catch (col: any) {
     persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
     dispatch({
       type: 'setOrder',
