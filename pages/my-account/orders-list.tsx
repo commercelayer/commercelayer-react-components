@@ -67,6 +67,8 @@ const OrdersList = () => {
           showActions
           actionsComponent={() => <ActionsMenu />}
           actionsContainerClassName="align-top py-5 border-b"
+          theadClassName="thead-class"
+          rowTrClassName="row-tr-class"
         >
           <OrderListRow field="number">
             {({ cell, order, ...p }) => {

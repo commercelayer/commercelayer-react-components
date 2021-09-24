@@ -36,6 +36,8 @@ type OrderListProps = {
   actionsComponent?: InitialOrderListContext['actionsComponent']
   actionsContainerClassName?: string
   showActions?: boolean
+  theadClassName?: string
+  rowTrClassName?: string
 } & JSX.IntrinsicElements['table'] &
   (
     | {
@@ -69,6 +71,8 @@ const OrderList: FunctionComponent<OrderListProps> = ({
   actionsContainerClassName,
   infiniteScroll,
   windowOptions,
+  theadClassName,
+  rowTrClassName,
   ...p
 }) => {
   const [loading, setLoading] = useState(true)
@@ -141,7 +145,7 @@ const OrderList: FunctionComponent<OrderListProps> = ({
           actionsContainerClassName,
         }
         return (
-          <TrHtmlElement {...row.getRowProps()}>
+          <TrHtmlElement {...row.getRowProps()} className={rowTrClassName}>
             <OrderListChildrenContext.Provider value={childProps}>
               {children}
             </OrderListChildrenContext.Provider>
@@ -160,7 +164,10 @@ const OrderList: FunctionComponent<OrderListProps> = ({
             actionsContainerClassName,
           }
           return (
-            <TrHtmlElement {...row.getRowProps({ style })}>
+            <TrHtmlElement
+              {...row.getRowProps({ style })}
+              className={rowTrClassName}
+            >
               <OrderListChildrenContext.Provider value={childProps}>
                 {children}
               </OrderListChildrenContext.Provider>
@@ -173,7 +180,9 @@ const OrderList: FunctionComponent<OrderListProps> = ({
     LoadingComponent
   ) : (
     <TableHtmlElement {...p} {...table.getTableProps()}>
-      <TheadHtmlElement>{headerComponent}</TheadHtmlElement>
+      <TheadHtmlElement className={theadClassName}>
+        {headerComponent}
+      </TheadHtmlElement>
       <TbodyHtmlElement {...table.getTableBodyProps()}>
         {!infiniteScroll ? (
           components
