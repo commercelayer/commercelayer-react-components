@@ -300,7 +300,7 @@ export const addToCart: AddToCart = async (params) => {
       })
     }
     return { success: true }
-  } catch (col) {
+  } catch (col: any) {
     const errors = getErrorsByCollection(col, 'order')
     dispatch({
       type: 'setErrors',

@@ -113,15 +113,8 @@ export const getLineItems: GetLineItems = (params) => {
 }
 
 export const updateLineItem: UpdateLineItem = async (params) => {
-  const {
-    config,
-    lineItemId,
-    quantity,
-    getOrder,
-    orderId,
-    dispatch,
-    errors,
-  } = params
+  const { config, lineItemId, quantity, getOrder, orderId, dispatch, errors } =
+    params
   try {
     const lineItem = await CLayer.LineItem.build({
       id: lineItemId,
@@ -139,7 +132,7 @@ export const updateLineItem: UpdateLineItem = async (params) => {
         },
       })
     }
-  } catch (c) {
+  } catch (c: any) {
     const errors = getErrorsByCollection<LineItemCollection>(c, 'lineItem')
     dispatch({
       type: 'setErrors',
@@ -169,7 +162,7 @@ export const deleteLineItem: DeleteLineItem = async (params) => {
         },
       })
     }
-  } catch (c) {
+  } catch (c: any) {
     const errors = getErrorsByCollection(c, 'lineItem')
     dispatch({
       type: 'setErrors',
