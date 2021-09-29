@@ -142,7 +142,7 @@ export const getPaymentMethods: GetPaymentMethods = async ({
         paymentSource,
       },
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
     const errors = getErrorsByCollection(error, 'paymentMethod')
     setPaymentMethodErrors(errors, dispatch)
@@ -214,7 +214,7 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       })
       setOrderErrors && setOrderErrors([])
     }
-  } catch (error) {
+  } catch (error: any) {
     const errors = getErrorsByCollection(error, 'paymentMethod')
     console.error('Set payment method', errors)
     setPaymentMethodErrors(errors, dispatch)
@@ -301,7 +301,7 @@ export const setPaymentSource: SetPaymentSource = async ({
         paymentSource,
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     const errors = getErrorsByCollection(error, 'paymentMethod', {
       id: currentPaymentMethodId,
       field: currentPaymentMethodType,
@@ -330,7 +330,7 @@ export const destroyPaymentSource: DestroyPaymentSource = async ({
           type: 'setPaymentSource',
           payload: { paymentSource: undefined },
         })
-    } catch (error) {
+    } catch (error: any) {
       const errors = getErrorsByCollection(error, 'paymentMethod')
       setPaymentMethodErrors(errors, dispatch)
     }

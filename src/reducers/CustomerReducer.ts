@@ -118,7 +118,7 @@ export const getCustomerAddresses: GetCustomerAddresses = async ({
       type: 'setAddresses',
       payload: { addresses },
     })
-  } catch (col) {
+  } catch (col: any) {
     const errors = getErrorsByCollection(col, 'address')
     dispatch({
       type: 'setErrors',
@@ -155,7 +155,7 @@ export const getCustomerPaymentSources: GetCustomerPaymentSources = async ({
         })
       }
     }
-  } catch (col) {
+  } catch (col: any) {
     const errors = getErrorsByCollection(col, 'address')
     dispatch({
       type: 'setErrors',
