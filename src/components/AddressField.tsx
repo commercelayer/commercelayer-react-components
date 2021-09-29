@@ -18,29 +18,48 @@ type AddressFieldChildrenProps = Omit<
 
 type AddressFieldProps = (
   | {
+      type?: 'field'
+      label?: never
+      onClick?: never
       children?: (props: AddressFieldChildrenProps) => ReactNode
       name: AddressFieldView
     }
   | {
-      children: (props: AddressFieldChildrenProps) => ReactNode
+      type?: 'edit'
+      label: string
+      onClick: (addressId: string) => void
+      children?: (props: AddressFieldChildrenProps) => ReactNode
       name?: AddressFieldView
     }
+  | {
+      type?: 'edit' | 'field'
+      label?: never
+      onClick?: never
+      children: (props: AddressFieldChildrenProps) => ReactNode
+      name?: never
+    }
 ) &
-  JSX.IntrinsicElements['p']
+  Omit<JSX.IntrinsicElements['p'], 'onClick'>
 
 const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
-  const { name } = props
+  const { name, type = 'field', label, onClick, ...p } = props
   const { address } = useContext(AddressChildrenContext)
   const key = camelCase(name)
   const text = get(address, key)
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    onClick && onClick(address.id)
+  }
   const parentProps = {
     address,
     ...props,
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
+  ) : type === 'field' ? (
+    <p {...{ ...p, name }}>{text}</p>
   ) : (
-    <p {...props}>{text}</p>
+    <a onClick={handleClick}>{label}</a>
   )
 }
 
