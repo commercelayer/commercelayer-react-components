@@ -154,15 +154,23 @@ export const setPlaceOrder: SetPlaceOrder = async ({
       const updateAttributes: Record<string, any> = {
         _place: true,
       }
-      if (options && saveBillingAddress(options)) {
-        updateAttributes._saveBillingAddressToCustomerAddressBook = true
+      if (saveBillingAddress(options)) {
+        await Order.build({
+          id: order.id,
+        })
+          .withCredentials(config)
+          .update({ _saveBillingAddressToCustomerAddressBook: true })
       }
-      if (options && saveShippingAddress(options)) {
-        updateAttributes._saveShippingAddressToCustomerAddressBook = true
+      if (saveShippingAddress(options)) {
+        await Order.build({
+          id: order.id,
+        })
+          .withCredentials(config)
+          .update({ _saveShippingAddressToCustomerAddressBook: true })
       }
       switch (paymentType) {
         case 'braintree_payments':
-          if (options && saveToWallet(options)) {
+          if (saveToWallet(options)) {
             await Order.build({
               id: order.id,
             })
@@ -191,7 +199,7 @@ export const setPlaceOrder: SetPlaceOrder = async ({
             !defaultOrder?.errors()?.empty()
           )
             throw defaultOrder
-          if (options && saveToWallet(options)) {
+          if (saveToWallet(options)) {
             await Order.build({
               id: order.id,
             })
@@ -205,7 +213,7 @@ export const setPlaceOrder: SetPlaceOrder = async ({
       }
     }
     return response
-  } catch (error) {
+  } catch (error: any) {
     setOrderErrors && setOrderErrors(error)
     const errors = getErrorsByCollection(error, 'order')
     return {
