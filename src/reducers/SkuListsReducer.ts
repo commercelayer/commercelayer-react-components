@@ -58,7 +58,6 @@ export const getSkuList: GetSkuList = async ({
     })
   } catch (error) {
     console.error(error)
-    return error
   }
 }
 
