@@ -5,21 +5,21 @@ import {
   getSaveShippingAddressToAddressBook,
 } from './localStorage'
 
-export function saveToWallet(options: PlaceOrderOptions): boolean {
+export function saveToWallet(options?: PlaceOrderOptions): boolean {
   return (
     getSavePaymentSourceToCustomerWallet() ||
-    'savePaymentSourceToCustomerWallet' in options
+    !!options?.savePaymentSourceToCustomerWallet
   )
 }
-export function saveBillingAddress(options: PlaceOrderOptions): boolean {
+export function saveBillingAddress(options?: PlaceOrderOptions): boolean {
   return (
     getSaveBillingAddressToAddressBook() ||
-    'saveBillingAddressToCustomerAddressBook' in options
+    !!options?.saveBillingAddressToCustomerAddressBook
   )
 }
-export function saveShippingAddress(options: PlaceOrderOptions): boolean {
+export function saveShippingAddress(options?: PlaceOrderOptions): boolean {
   return (
     getSaveShippingAddressToAddressBook() ||
-    'saveShippingAddressToCustomerAddressBook' in options
+    !!options?.saveShippingAddressToCustomerAddressBook
   )
 }
