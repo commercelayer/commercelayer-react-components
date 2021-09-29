@@ -25,7 +25,11 @@ export type AddressField =
   | 'zip_code'
   | 'billing_info'
 
-export type AddressFieldView = AddressField | 'full_address' | 'full_name'
+export type AddressFieldView =
+  | AddressField
+  | 'full_address'
+  | 'full_name'
+  | 'edit_address'
 
 export const addressFields: AddressField[] = [
   'city',
