@@ -69,7 +69,7 @@
     "@stripe/react-stripe-js": "^1.4.1",
     "@stripe/stripe-js": "^1.17.1",
     "braintree-web": "^3.81.0",
-    "country-state-city": "^3.0.1",
+    "countries-states-cities-service": "^1.0.1",
     "deps": "^1.0.0",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
