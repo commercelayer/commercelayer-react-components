@@ -56,7 +56,6 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
           const countryCode =
             values['shipping_address_country_code']?.value ||
             values['country_code']
-          console.log(`countryCode`, countryCode, isEmptyStates(countryCode))
           if (isEmptyStates(countryCode)) {
             const k = formErrors.findIndex(({ field }) => field === fieldName)
             k !== -1 && formErrors.splice(k, 0)

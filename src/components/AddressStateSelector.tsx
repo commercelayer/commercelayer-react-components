@@ -83,11 +83,6 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
   const errorClassName =
     billingAddress?.errorClassName || shippingAddress?.errorClassName
   const classNameComputed = `${className} ${hasError ? errorClassName : ''}`
-  console.log(
-    `!isEmptyStates(countryCode) || isValidState(countryCode, val)`,
-    !isEmptyStates(countryCode),
-    isValidState(countryCode, val)
-  )
   return !isEmptyStates(countryCode) ? (
     <BaseSelect
       className={classNameComputed}
