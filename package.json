@@ -70,6 +70,7 @@
     "@stripe/react-stripe-js": "^1.5.0",
     "@stripe/stripe-js": "^1.18.0",
     "braintree-web": "^3.81.1",
+    "countries-states-cities-service": "^1.0.1",
     "country-state-city": "^3.0.1",
     "deps": "^1.0.0",
     "jwt-decode": "^3.1.2",
