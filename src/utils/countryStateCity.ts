@@ -1,23 +1,30 @@
-import { Country, State } from 'country-state-city'
+import { Countries, States } from 'countries-states-cities-service'
 
 export function getCountries() {
-  return Country.getAllCountries().map(({ name, isoCode }) => ({
+  return Countries.getCountries().map(({ name, iso2 }) => ({
     label: name,
-    value: isoCode,
+    value: iso2,
   }))
 }
 
-export function getStateOfCountry(countryCode: string) {
-  return State.getStatesOfCountry(countryCode)
-    .filter(
-      ({ isoCode }) => isNaN(isoCode as any) && isoCode.search('-') === -1
-    )
-    .map(({ name, isoCode }) => ({
-      label: name,
-      value: isoCode,
-    }))
+export function getStateOfCountry(country_code: string) {
+  const filters: { country_code: string; is_region?: boolean } = {
+    country_code,
+  }
+  if (country_code === 'IT') filters.is_region = false
+  return States.getStates({ filters }).map(({ name, state_code }) => ({
+    label: name,
+    value: state_code,
+  }))
 }
 
-export function isValidState(stateCode: string, countryCode: string): boolean {
-  return State.getStateByCodeAndCountry(stateCode, countryCode) !== undefined
+export function isValidState(
+  state_code: string,
+  country_code: string
+): boolean {
+  console.log(
+    `valid state`,
+    States.getStates({ filters: { state_code, country_code } })
+  )
+  return States.getStates({ filters: { state_code, country_code } }).length > 0
 }
