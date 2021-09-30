@@ -22,9 +22,5 @@ export function isValidState(
   state_code: string,
   country_code: string
 ): boolean {
-  console.log(
-    `valid state`,
-    States.getStates({ filters: { state_code, country_code } })
-  )
   return States.getStates({ filters: { state_code, country_code } }).length > 0
 }

@@ -7,7 +7,12 @@ import Price from '../src/components/Price'
 import PricesContainer from '../src/components/PricesContainer'
 import CommerceLayer from '../src/components/CommerceLayer'
 
-const endpoint = 'https://the-blue-brand-2.commercelayer.co'
+const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
+const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
+const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
+const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
+// const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
+// const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 
 export const Nav = ({ links }) => (
   <header className="dark p-6">
@@ -342,20 +347,11 @@ const Home = () => {
   const [token, setToken] = useState('')
   useEffect(() => {
     const getToken = async () => {
-      // const { accessToken } = await getSalesChannelToken({
-      //   clientId:
-      //     '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
-      //   endpoint,
-      //   scope: 'market:48'
-      // })
-      // @ts-ignore
       const { accessToken } = await getIntegrationToken({
-        clientId:
-          'b1aa32826ce12ba2f74c59a555e3ed98a7db4ec710b14575b7e97f0a49fb9a4d',
-        clientSecret:
-          '8fed019759490ba13c482cc2541ef77c6b8d0b3df04db80807110784fbfec021',
+        clientId,
+        clientSecret,
         endpoint,
-        scope: 'market:48',
+        scope,
       })
       setToken(accessToken)
     }
