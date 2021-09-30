@@ -205,6 +205,7 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
   useEffect(() => {
     if (show && publishableKey) {
       const { loadStripe } = require('@stripe/stripe-js')
+      setCustomerOrderParam('savePaymentSourceToCustomerWallet', 'false')
       setIsLoaded(true)
       stripe = loadStripe(publishableKey, {
         locale,
@@ -212,7 +213,7 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     }
     return () => {
       setIsLoaded(false)
-      setCustomerOrderParam('savePaymentSourceToCustomerWallet', 'false')
+      // setCustomerOrderParam('savePaymentSourceToCustomerWallet', 'false')
     }
   }, [show, publishableKey])
   return isLoaded && stripe ? (
