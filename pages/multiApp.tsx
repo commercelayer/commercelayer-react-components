@@ -26,7 +26,11 @@ import TaxesAmount from '../src/components/TaxesAmount'
 import GiftCardAmount from '../src/components/GiftCardAmount'
 import ItemContainer from '../src/components/ItemContainer'
 
-const endpoint = 'https://the-blue-brand-2.commercelayer.co'
+const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
+const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
+const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
+const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
+
 const endpoint1 = 'https://the-lime-brand-2.commercelayer.co'
 
 const CustomAddToCart = (props) => {
@@ -49,10 +53,9 @@ export default function Order() {
   useEffect(() => {
     const getToken = async () => {
       const salesChannel = await getSalesChannelToken({
-        clientId:
-          '4769bcf1998d700d5e159a89b24233a1ecec7e1524505fb8b7652c3e10139d78',
+        clientId,
         endpoint,
-        scope: 'market:48',
+        scope,
       })
       setToken(salesChannel?.accessToken as string)
     }

@@ -34,7 +34,10 @@ import SkuOptionInput from '../src/components/SkuOptionInput'
 import LineItemOptions from '../src/components/LineItemOptions'
 import LineItemOption from '../src/components/LineItemOption'
 
-const endpoint = 'https://the-blue-brand-3.commercelayer.co'
+const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
+const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
+const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
+const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
 const CustomAddToCart = (props) => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
@@ -59,19 +62,10 @@ export default function Order() {
     const getToken = async () => {
       // @ts-ignore
       const { accessToken } = await getSalesChannelToken({
-        clientId:
-          '48ee4802f8227b04951645a9b7c8af1e3943efec7edd1dcfd04b5661bf1da5db',
+        clientId,
         endpoint,
-        scope: 'market:58',
+        scope,
       })
-      // const token = await getIntegrationToken({
-      //   clientId:
-      //     'b1aa32826ce12ba2f74c59a555e3ed98a7db4ec710b14575b7e97f0a49fb9a4d',
-      //   clientSecret:
-      //     '8fed019759490ba13c482cc2541ef77c6b8d0b3df04db80807110784fbfec021',
-      //   endpoint,
-      //   scope: 'market:48',
-      // })
       if (accessToken) setToken(accessToken)
     }
     getToken()

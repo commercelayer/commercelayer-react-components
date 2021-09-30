@@ -200,6 +200,7 @@ export const setPlaceOrder: SetPlaceOrder = async ({
           )
             throw defaultOrder
           if (saveToWallet(options)) {
+            debugger
             await Order.build({
               id: order.id,
             })

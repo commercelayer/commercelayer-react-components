@@ -80,14 +80,6 @@ export default function Order() {
         endpoint,
         scope,
       })
-      // const token = await getIntegrationToken({
-      //   clientId:
-      //     'b1aa32826ce12ba2f74c59a555e3ed98a7db4ec710b14575b7e97f0a49fb9a4d',
-      //   clientSecret:
-      //     '8fed019759490ba13c482cc2541ef77c6b8d0b3df04db80807110784fbfec021',
-      //   endpoint,
-      //   scope: 'market:58',
-      // })
       if (token) setToken(token.accessToken)
     }
     getToken()

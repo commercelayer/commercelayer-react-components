@@ -30,7 +30,11 @@ import {
   OrderStorage,
 } from '../src'
 
-const endpoint = 'https://the-blue-brand-3.commercelayer.co'
+const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
+const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
+const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
+// const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
+// const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 
 const messages = [
   {
@@ -58,10 +62,9 @@ const Home = () => {
   useEffect(() => {
     const getToken = async () => {
       const token = await getSalesChannelToken({
-        clientId:
-          '48ee4802f8227b04951645a9b7c8af1e3943efec7edd1dcfd04b5661bf1da5db',
+        clientId,
         endpoint,
-        scope: 'market:58',
+        scope,
       })
       setToken(token?.accessToken as string)
     }

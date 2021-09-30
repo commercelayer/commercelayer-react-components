@@ -20,7 +20,12 @@ import Head from 'next/head'
 import { OrderNumber } from '@commercelayer/react-components'
 import { OrderStorage } from 'dist'
 import { useRouter } from 'next/router'
-const endpoint = 'https://the-blue-brand-3.commercelayer.co'
+
+const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
+const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
+const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
+const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
+
 let orderId = 'qaMAhJzGnx'
 
 export default function Order() {
@@ -33,10 +38,9 @@ export default function Order() {
     const getToken = async () => {
       // @ts-ignore
       const token = await getSalesChannelToken({
-        clientId:
-          '48ee4802f8227b04951645a9b7c8af1e3943efec7edd1dcfd04b5661bf1da5db',
+        clientId,
         endpoint,
-        scope: 'market:58',
+        scope,
       })
       if (token) setToken(token.accessToken)
     }
