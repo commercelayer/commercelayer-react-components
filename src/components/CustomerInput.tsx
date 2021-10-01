@@ -38,10 +38,9 @@ const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
     errorClassName,
     ...p
   } = props
-  const { validation, values, errors } = useRapidForm()
-  const { saveCustomerUser, setCustomerErrors, setCustomerEmail } = useContext(
-    CustomerContext
-  )
+  const { validation, values, errors } = useRapidForm({ fieldEvent: 'blur' })
+  const { saveCustomerUser, setCustomerErrors, setCustomerEmail } =
+    useContext(CustomerContext)
   const [hasError, setHasError] = useState(false)
   const handleOnBlur = async () => {
     if (saveOnBlur && isEmpty(errors) && !isEmpty(values)) {
