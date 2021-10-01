@@ -13,7 +13,7 @@ export function getStateOfCountry(country_code: string) {
   }
   if (country_code === 'IT') filters.is_region = false
   return States.getStates({ filters }).map(({ name, state_code }) => ({
-    label: name,
+    label: name.replace('Province of', ''),
     value: state_code,
   }))
 }
