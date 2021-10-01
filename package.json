@@ -71,9 +71,11 @@
     "braintree-web": "^3.82.0",
     "countries-states-cities-service": "^1.1.0",
     "deps": "^1.0.0",
+    "rapid-form": "^1.5.3",
+    "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
-    "rapid-form": "^1.6.0"
+    "react-table": "^7.7.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.14.5",
@@ -94,7 +96,8 @@
     "@types/lodash": "^4.14.175",
     "@types/node": "^16.10.2",
     "@types/prop-types": "^15.7.4",
-    "@types/react": "^17.0.26",
+    "@types/react": "^17.0.19",
+    "@types/react-table": "^7.7.1",
     "@types/react-test-renderer": "^17.0.1",
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "@typescript-eslint/parser": "^4.32.0",
