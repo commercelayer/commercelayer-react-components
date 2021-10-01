@@ -75,7 +75,9 @@
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
-    "react-table": "^7.7.0"
+    "rapid-form": "^1.4.1",
+    "react-table": "^7.7.0",
+    "react-window": "^1.8.6"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.14.5",
@@ -99,8 +101,19 @@
     "@types/react": "^17.0.19",
     "@types/react-table": "^7.7.1",
     "@types/react-test-renderer": "^17.0.1",
+<<<<<<< HEAD
     "@typescript-eslint/eslint-plugin": "^4.32.0",
     "@typescript-eslint/parser": "^4.32.0",
+=======
+<<<<<<< HEAD
+    "@typescript-eslint/eslint-plugin": "^4.29.3",
+    "@typescript-eslint/parser": "^4.29.3",
+=======
+    "@types/react-window": "^1.8.4",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+>>>>>>> 5903ebd (feat: Add infinite scroll to OrderList)
+>>>>>>> 1b55ea9 (feat: Add infinite scroll to OrderList)
     "@zeit/next-css": "^1.0.1",
     "@zerollup/ts-transform-paths": "^1.7.18",
     "autoprefixer": "^10.3.6",
