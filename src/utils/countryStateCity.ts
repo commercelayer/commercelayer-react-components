@@ -12,7 +12,10 @@ export function getStateOfCountry(country_code: string) {
     country_code,
   }
   if (country_code === 'IT') filters.is_region = false
-  return States.getStates({ filters }).map(({ name, state_code }) => ({
+  return States.getStates({
+    filters,
+    sort: { mode: 'alphabetical', key: 'name' },
+  }).map(({ name, state_code }) => ({
     label: name.replace('Province of', ''),
     value: state_code,
   }))
