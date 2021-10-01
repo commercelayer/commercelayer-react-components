@@ -68,6 +68,17 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
         defaultCustomerContext['setCustomerErrors'](errors, dispatch),
       setCustomerEmail: (customerEmail: string) =>
         defaultCustomerContext['setCustomerEmail'](customerEmail, dispatch),
+      deleteCustomerAddress: ({
+        customerAddressId,
+      }: {
+        customerAddressId: string
+      }) =>
+        defaultCustomerContext['deleteCustomerAddress']({
+          addresses: state?.addresses,
+          dispatch,
+          config,
+          customerAddressId,
+        }),
     }),
     [state]
   )

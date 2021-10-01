@@ -16,22 +16,37 @@ const OrdersList = () => {
     <CommerceLayer {...config}>
       <CustomerContainer>
         <AddressesContainer>
-          <Address className="w-1/2 p-2 border rounded m-2 shadow-sm">
-            <div className="flex font-bold">
-              <AddressField name="first_name" />
-              <AddressField name="last_name" className="ml-1" />
-            </div>
-            <div>
-              <AddressField name="full_address" />
-            </div>
-            <div>
-              <AddressField
-                type="edit"
-                label="Edit"
-                onClick={(id) => setAddressId(id)}
-              />
-            </div>
-          </Address>
+          <div className="flex flex-wrap mx-auto w-full">
+            <Address className="w-1/3 p-2 border hover:border-blue-500 rounded m-2 shadow-sm">
+              <div className="flex flex-col justify-between h-full">
+                <div className="flex font-bold">
+                  <AddressField name="first_name" />
+                  <AddressField name="last_name" className="ml-1" />
+                </div>
+                <div>
+                  <AddressField className="w-2/3" name="full_address" />
+                </div>
+                <div className="flex justify-between">
+                  <div>
+                    <AddressField
+                      className="cursor-pointer"
+                      type="edit"
+                      label="Edit"
+                      onClick={(id) => setAddressId(id)}
+                    />
+                  </div>
+                  <div>
+                    <AddressField
+                      className="cursor-pointer"
+                      type="delete"
+                      label="Delete"
+                      onClick={() => {}}
+                    />
+                  </div>
+                </div>
+              </div>
+            </Address>
+          </div>
         </AddressesContainer>
       </CustomerContainer>
     </CommerceLayer>
