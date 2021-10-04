@@ -26,7 +26,7 @@ const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 // const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
 // const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 
-let orderId = 'BwAezhrrOw'
+let orderId = ''
 
 export default function Main() {
   const [token, setToken] = useState('')
@@ -49,8 +49,10 @@ export default function Main() {
       })
       if (token) setToken(token.accessToken)
     }
-    getToken()
-  }, [query?.orderId])
+    if (!token) {
+      getToken()
+    }
+  }, [token])
   const messages: any = [
     {
       code: 'EMPTY_ERROR',
