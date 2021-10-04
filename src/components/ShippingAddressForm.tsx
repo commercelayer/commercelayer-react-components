@@ -35,13 +35,7 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     reset = false,
     ...p
   } = props
-  const {
-    validation,
-    values,
-    errors,
-    reset: resetForm,
-    setError,
-  } = useRapidForm()
+  const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress, shipToDifferentAddress } =
     useContext(AddressesContext)
   const { saveAddressToCustomerAddressBook } = useContext(OrderContext)

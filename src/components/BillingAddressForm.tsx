@@ -35,13 +35,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     reset = false,
     ...p
   } = props
-  const {
-    validation,
-    values,
-    errors,
-    reset: resetForm,
-    setError,
-  } = useRapidForm()
+  const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
   const { saveAddressToCustomerAddressBook, order } = useContext(OrderContext)
   const { setLocalOrder } = useContext(OrderStorageContext)
