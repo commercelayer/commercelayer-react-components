@@ -53,7 +53,7 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     shippingAddressId,
   } = useContext(AddressContext)
   const { order } = useContext(OrderContext)
-  const { addresses } = useContext(CustomerContext)
+  const { addresses, isGuest } = useContext(CustomerContext)
   const [forceDisable, setForceDisable] = useState(disabled)
   const billingDisable = billingAddressController({
     billingAddress,
@@ -78,9 +78,16 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     shippingAddress,
     shippingAddressId,
   })
-
+  const customerEmail = !!(
+    !!(isGuest === true || typeof isGuest === 'undefined') &&
+    !order?.customerEmail
+  )
   const disable =
-    disabled || billingDisable || shippingDisable || countryLockDisable
+    disabled ||
+    customerEmail ||
+    billingDisable ||
+    shippingDisable ||
+    countryLockDisable
   const handleClick = async () => {
     if (isEmpty(errors) && !disable) {
       setForceDisable(true)
