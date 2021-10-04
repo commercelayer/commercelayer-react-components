@@ -11,7 +11,7 @@ type DefaultContext = {
   setAddress: SetAddress
   setAddressErrors: (
     errors: BaseError[],
-    resource: 'billingAddress' | 'shippingAddress'
+    resource: 'billingAddress' | 'shippingAddress' | 'customerAddress'
   ) => void
 } & AddressState
 

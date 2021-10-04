@@ -44,7 +44,10 @@ export const addressFields: AddressField[] = [
   'zip_code',
 ]
 
-export type AddressResource = 'billingAddress' | 'shippingAddress'
+export type AddressResource =
+  | 'billingAddress'
+  | 'shippingAddress'
+  | 'customerAddress'
 
 export type AddressSchema = Record<AddressField | string, string>
 

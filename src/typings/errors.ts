@@ -40,6 +40,7 @@ export type CodeErrorType =
 export type ResourceErrorType =
   | 'address'
   | 'billingAddress'
+  | 'customerAddress'
   | 'giftCard'
   | 'giftCardOrCouponCode'
   | 'lineItem'
