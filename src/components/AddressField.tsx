@@ -6,6 +6,7 @@ import { AddressFieldView } from '#reducers/AddressReducer'
 import { camelCase, get } from 'lodash'
 import { AddressCollection } from '@commercelayer/js-sdk'
 import CustomerContext from '#context/CustomerContext'
+import isFunction from 'lodash/isFunction'
 
 const propTypes = components.AddressField.propTypes
 const displayName = components.AddressField.displayName
@@ -28,7 +29,7 @@ type AddressFieldProps =
     }
   | {
       type?: 'edit'
-      label: string
+      label: string | ReactNode
       onClick: (addressId: string) => void
       children?: (props: AddressFieldChildrenProps) => ReactNode
       name?: AddressFieldView
@@ -74,7 +75,7 @@ const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
     <p {...{ ...p, name }}>{text}</p>
   ) : (
     <a {...p} onClick={handleClick}>
-      {label}
+      {isFunction(label) ? label() : label}
     </a>
   )
 }

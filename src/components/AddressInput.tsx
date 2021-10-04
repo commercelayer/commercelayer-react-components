@@ -10,6 +10,7 @@ import { BaseInputComponentProps, AddressInputName } from '#typings'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'
+import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
 
 const propTypes = components.AddressInput.propTypes
 const displayName = components.AddressInput.displayName
@@ -24,6 +25,7 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
   const { placeholder = '', required, value, className, ...p } = props
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
+  const customerAddress = useContext(CustomerAddressFormContext)
   const [hasError, setHasError] = useState(false)
   useEffect(() => {
     if (value && billingAddress?.setValue) {
@@ -32,6 +34,10 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
     if (value && shippingAddress?.setValue) {
       shippingAddress.setValue(p.name, value)
     }
+    if (value && customerAddress?.setValue) {
+      customerAddress.setValue(p.name, value)
+    }
+
     if (
       !isEmpty(billingAddress.errors) &&
       billingAddress?.errors?.[p.name as any]?.error
@@ -43,6 +49,15 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
       isEmpty(billingAddress?.errors?.[p.name as any]) &&
       hasError
     )
+      setHasError(false)
+
+    if (
+      !isEmpty(customerAddress.errors) &&
+      customerAddress?.errors?.[p.name as any]?.error
+    ) {
+      setHasError(true)
+    }
+    if (isEmpty(customerAddress?.errors?.[p.name as any]) && hasError)
       setHasError(false)
 
     if (
