@@ -93,16 +93,16 @@ const validateFormFields: ValidateFormFields = (
 }
 
 export interface FieldsExist {
-  (values: AddressSchema, schema?: AddressField[]): boolean
+  (address: AddressSchema, schema?: AddressField[]): boolean
 }
 
-export const fieldsExist: FieldsExist = (values, schema = addressFields) => {
-  if (!values['business']) {
+export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
+  if (!address['business']) {
     const required = without(schema, 'line_2', 'company')
-    return required.length > keys(values).length
+    return required.length > keys(address).length
   } else {
     const required = without(schema, 'first_name', 'last_name')
-    return required.length > keys(values).length
+    return required.length > keys(address).length
   }
 }
 
