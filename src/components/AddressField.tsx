@@ -27,7 +27,7 @@ type AddressFieldProps =
     }
   | {
       type?: 'edit'
-      label: string
+      label: string | ReactNode
       onClick: (addressId: string) => void
       children?: (props: AddressFieldChildrenProps) => ReactNode
       name?: AddressFieldView
@@ -64,7 +64,7 @@ const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
     <p {...{ ...p, name }}>{text}</p>
   ) : (
     <a {...p} onClick={handleClick}>
-      {label}
+      {isFunction(label) ? label() : label}
     </a>
   )
 }

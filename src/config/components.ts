@@ -195,6 +195,12 @@ const components = {
       children: childrenTypes.isRequired,
     },
   },
+  CustomerAddressForm: {
+    permittedChildren: ['AddressInput', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
   CheckoutLink: {
     displayName: 'CheckoutLink',
     propTypes: {
