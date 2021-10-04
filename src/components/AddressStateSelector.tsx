@@ -26,12 +26,20 @@ type AddressStateSelectorProps = Omit<
   name: AddressStateSelectName
   required?: boolean
   disabled?: boolean
+  inputClassName?: string
 } & Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'>
 
 const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
   props
 ) => {
-  const { required = true, value, name, className, ...p } = props
+  const {
+    required = true,
+    value,
+    name,
+    className,
+    inputClassName,
+    ...p
+  } = props
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
   const { errors: addressErrors } = useContext(AddressesContext)
@@ -82,7 +90,9 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
   }, [value, billingAddress, shippingAddress, addressErrors])
   const errorClassName =
     billingAddress?.errorClassName || shippingAddress?.errorClassName
-  const classNameComputed = `${className} ${hasError ? errorClassName : ''}`
+  const classNameComputed = !isEmptyStates(countryCode)
+    ? `${className} ${hasError ? errorClassName : ''}`
+    : `${inputClassName} ${hasError ? errorClassName : ''}`
   return !isEmptyStates(countryCode) ? (
     <BaseSelect
       className={classNameComputed}
