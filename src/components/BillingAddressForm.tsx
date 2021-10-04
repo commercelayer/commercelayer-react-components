@@ -98,11 +98,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
             values['billing_address_country_code']?.value ||
             values['country_code']
           if (!isEmptyStates(countryCode) && !field.value) {
-            setError({
-              code: 'EMPTY_ERROR',
-              name: 'billing_address_state_code',
-              message: 'billing_address_state_code is required',
-            })
+            delete values['billing_address_state_code']
           }
         }
       }

@@ -1,7 +1,12 @@
 import { Countries, States } from 'countries-states-cities-service'
 
 export function getCountries() {
-  return Countries.getCountries().map(({ name, iso2 }) => ({
+  return Countries.getCountries({
+    sort: {
+      mode: 'alphabetical',
+      key: 'name',
+    },
+  }).map(({ name, iso2 }) => ({
     label: name,
     value: iso2,
   }))
