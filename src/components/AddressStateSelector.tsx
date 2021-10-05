@@ -95,13 +95,13 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
     : `${inputClassName} ${hasError ? errorClassName : ''}`
   return !isEmptyStates(countryCode) ? (
     <BaseSelect
+      {...p}
       className={classNameComputed}
       ref={billingAddress?.validation || shippingAddress?.validation}
       required={required}
       options={getStateOfCountry(countryCode)}
       name={name}
       value={val}
-      {...p}
     />
   ) : (
     <BaseInput
@@ -109,8 +109,8 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
       name={name}
       ref={billingAddress?.validation || shippingAddress?.validation}
       className={classNameComputed}
-      required={false}
-      placeholder={p.placeholder?.label}
+      required={required}
+      placeholder={p.placeholder?.label || ''}
       defaultValue={val}
       type="text"
     />
