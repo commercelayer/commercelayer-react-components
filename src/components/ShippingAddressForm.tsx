@@ -15,7 +15,6 @@ import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import OrderStorageContext from '#context/OrderStorageContext'
-import isEmptyStates from '#utils/isEmptyStates'
 
 const propTypes = components.ShippingAddressForm.propTypes
 
@@ -84,14 +83,6 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
             'saveShippingAddressToCustomerAddressBook',
             field.checked
           )
-        }
-        if (['shipping_address_state_code'].includes(name)) {
-          const countryCode =
-            values['shipping_address_country_code']?.value ||
-            values['country_code']
-          if (!isEmptyStates(countryCode) && !field.value) {
-            delete values['shipping_address_state_code']
-          }
         }
       }
       setAddress({ values, resource: 'shippingAddress' })

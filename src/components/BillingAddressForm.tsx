@@ -15,7 +15,6 @@ import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import OrderStorageContext from '#context/OrderStorageContext'
-import isEmptyStates from '#utils/isEmptyStates'
 
 const propTypes = components.BillingAddressForm.propTypes
 
@@ -83,15 +82,6 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
             'saveBillingAddressToCustomerAddressBook',
             field.checked
           )
-        }
-        if (['billing_address_state_code'].includes(name)) {
-          // const countryCode =
-          //   values['billing_address_country_code']?.value ||
-          //   values['country_code']
-          // debugger
-          if (!field.value) {
-            delete values['billing_address_state_code']
-          }
         }
       }
       setAddress({ values, resource: 'billingAddress' })
