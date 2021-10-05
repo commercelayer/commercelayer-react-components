@@ -343,11 +343,12 @@ export default function Main() {
                       data-cy="billing_address_state_code"
                       name="billing_address_state_code"
                       className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                      // placeholder={{
-                      //   value: '',
-                      //   label: 'Select a state',
-                      //   // disabled: true,
-                      // }}
+                      inputClassName="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                      placeholder={{
+                        value: '',
+                        label: 'Select a state',
+                        disabled: true,
+                      }}
                     />
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">

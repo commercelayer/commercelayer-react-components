@@ -38,7 +38,11 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
     ) {
       setHasError(true)
     }
-    if (isEmpty(billingAddress?.errors?.[p.name as any]) && hasError)
+    if (
+      !isEmpty(billingAddress) &&
+      isEmpty(billingAddress?.errors?.[p.name as any]) &&
+      hasError
+    )
       setHasError(false)
 
     if (
@@ -47,7 +51,11 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
     ) {
       setHasError(true)
     }
-    if (isEmpty(shippingAddress?.errors?.[p.name as any]) && hasError)
+    if (
+      !isEmpty(shippingAddress) &&
+      isEmpty(shippingAddress?.errors?.[p.name as any]) &&
+      hasError
+    )
       setHasError(false)
 
     return () => {
