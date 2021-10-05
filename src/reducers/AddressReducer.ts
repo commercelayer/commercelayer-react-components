@@ -4,7 +4,6 @@ import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Address, Order, OrderCollection } from '@commercelayer/js-sdk'
 import isEmpty from 'lodash/isEmpty'
-import merge from 'lodash/merge'
 
 export type AddressActionType =
   | 'setErrors'
@@ -102,19 +101,13 @@ export const setAddressErrors: SetAddressErrors = ({
   resource,
 }) => {
   const billingErrors =
-    isEmpty(errors) && resource === 'billingAddress'
-      ? []
-      : merge(
-          currentErrors.filter((e) => e.resource === 'billingAddress'),
-          errors.filter((e) => e.resource === 'billingAddress')
-        )
+    resource === 'billingAddress'
+      ? errors.filter((e) => e.resource === 'billingAddress')
+      : currentErrors.filter((e) => e.resource === 'billingAddress')
   const shippingErrors =
-    isEmpty(errors) && resource === 'shippingAddress'
-      ? []
-      : merge(
-          currentErrors.filter((e) => e.resource === 'shippingAddress'),
-          errors.filter((e) => e.resource === 'shippingAddress')
-        )
+    resource === 'shippingAddress'
+      ? errors.filter((e) => e.resource === 'shippingAddress')
+      : currentErrors.filter((e) => e.resource === 'shippingAddress')
   const finalErrors = [...billingErrors, ...shippingErrors]
   dispatch &&
     dispatch({

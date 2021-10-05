@@ -47,8 +47,8 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
         const { code, message } = errors[fieldName]
         if (['shipping_address_state_code'].includes(fieldName)) {
           if (isEmpty(values['state_code'])) {
-            const k = formErrors.findIndex(({ field }) => field === fieldName)
-            k !== -1 && formErrors.splice(k, 0)
+            // const k = formErrors.findIndex(({ field }) => field === fieldName)
+            // k !== -1 && formErrors.splice(k, 0)
             delete errors[fieldName]
           } else {
             formErrors.push({
