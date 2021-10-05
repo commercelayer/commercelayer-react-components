@@ -99,10 +99,16 @@ export interface FieldsExist {
 export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
   if (!address['business']) {
     const required = without(schema, 'line_2', 'company')
-    return required.length > keys(address).length
+    const validAddress = keys(address).filter((k) =>
+      required.includes(k as any)
+    )
+    return required.length > validAddress.length
   } else {
     const required = without(schema, 'first_name', 'last_name')
-    return required.length > keys(address).length
+    const validAddress = keys(address).filter((k) =>
+      required.includes(k as any)
+    )
+    return required.length > validAddress.length
   }
 }
 

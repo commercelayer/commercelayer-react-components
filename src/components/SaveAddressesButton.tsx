@@ -55,6 +55,10 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
   const { order } = useContext(OrderContext)
   const { addresses, isGuest } = useContext(CustomerContext)
   const [forceDisable, setForceDisable] = useState(disabled)
+  const customerEmail = !!(
+    !!(isGuest === true || typeof isGuest === 'undefined') &&
+    !order?.customerEmail
+  )
   const billingDisable = billingAddressController({
     billingAddress,
     errors,
@@ -78,10 +82,6 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     shippingAddress,
     shippingAddressId,
   })
-  const customerEmail = !!(
-    !!(isGuest === true || typeof isGuest === 'undefined') &&
-    !order?.customerEmail
-  )
   const disable =
     disabled ||
     customerEmail ||
