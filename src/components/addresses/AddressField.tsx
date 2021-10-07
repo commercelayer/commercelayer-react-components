@@ -1,19 +1,22 @@
-import { useContext, ReactNode } from 'react'
+import { useContext, FunctionComponent, ReactNode } from 'react'
 import AddressChildrenContext from '#context/AddressChildrenContext'
-import Parent from '#components-utils/Parent'
+import Parent from './utils/Parent'
 import components from '#config/components'
 import { AddressFieldView } from '#reducers/AddressReducer'
-import type { Address } from '@commercelayer/sdk'
-import CustomerContext from '#context/CustomerContext'
+import get from 'lodash/get'
+import { Address } from '@commercelayer/sdk'
 
 const propTypes = components.AddressField.propTypes
 const displayName = components.AddressField.displayName
 
-type AddressFieldChildrenProps = Omit<Props, 'children' | 'name'> & {
+type AddressFieldChildrenProps = Omit<
+  AddressFieldProps,
+  'children' | 'name'
+> & {
   address: Address
 }
 
-type Props =
+type AddressFieldProps =
   | {
       type?: 'field'
       label?: never
@@ -25,7 +28,7 @@ type Props =
   | {
       type?: 'edit'
       label: string | ReactNode
-      onClick: (address: Address) => void
+      onClick: (address: Record<string, string>) => void
       children?: (props: AddressFieldChildrenProps) => ReactNode
       name?: AddressFieldView
       className?: string
@@ -47,19 +50,10 @@ type Props =
       className?: string
     }
 
-export function AddressField(props: Props) {
+const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
   const { name, type = 'field', label, onClick, ...p } = props
   const { address } = useContext(AddressChildrenContext)
-  const text = name && address ? address?.[name] : ''
-  const { deleteCustomerAddress } = useContext(CustomerContext)
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.stopPropagation()
-    e.preventDefault()
-    if (type === 'delete' && deleteCustomerAddress && address?.reference) {
-      void deleteCustomerAddress({ customerAddressId: address?.reference })
-    }
-    address && onClick && onClick(address)
-  }
+  const text = get(address, name as AddressFieldView)
   const parentProps = {
     address,
     ...props,
@@ -70,7 +64,7 @@ export function AddressField(props: Props) {
     <p {...{ ...p, name }}>{text}</p>
   ) : (
     <a {...p} onClick={handleClick}>
-      {typeof label === 'function' ? label() : label}
+      {isFunction(label) ? label() : label}
     </a>
   )
 }
