@@ -15,7 +15,7 @@ export const billingAddressController: BillingAddressController = ({
   billing_address,
   billingAddressId,
   errors,
-  requiresBillingInfo,
+  requiresBillingInfo = false,
 }) => {
   let billingDisable = !isEmpty(errors) || isEmpty(billing_address)
   if (isEmpty(errors) && !isEmpty(billing_address)) {
@@ -32,11 +32,11 @@ export const billingAddressController: BillingAddressController = ({
   ) {
     billingDisable = false
   }
-  return billingDisable
+  return addressDisable
 }
 
 type ShippingAddressController = (params: {
-  billingDisable: boolean
+  billingDisable?: boolean
   errors?: BaseError[]
   shipToDifferentAddress?: boolean
   shipping_address?: AddressCreate

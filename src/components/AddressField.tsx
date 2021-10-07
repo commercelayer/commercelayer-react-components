@@ -28,7 +28,7 @@ type AddressFieldProps =
   | {
       type?: 'edit'
       label: string | ReactNode
-      onClick: (addressId: string) => void
+      onClick: (address: Record<string, string>) => void
       children?: (props: AddressFieldChildrenProps) => ReactNode
       name?: AddressFieldView
       className?: string

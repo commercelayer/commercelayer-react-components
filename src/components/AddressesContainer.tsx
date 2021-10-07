@@ -10,6 +10,7 @@ import {
 } from 'react'
 import addressReducer, {
   addressInitialState,
+  AddressResource,
   AddressSchema,
   setAddressErrors,
   SetAddressParams,
@@ -63,14 +64,16 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
       }),
     setAddress: (params: SetAddressParams<AddressSchema>) =>
       defaultAddressContext['setAddress']({ ...params, dispatch }),
-    saveAddresses: async (): Promise<void> =>
+    saveAddresses: async (addressId?: string): Promise<void> =>
       await saveAddresses({
         config,
         dispatch,
         updateOrder,
         order,
         orderId,
+        addressId,
         state,
+        getCustomerAddresses,
       }),
     setCloneAddress: (id: string, resource: AddressResource): void =>
       setCloneAddress(id, resource, dispatch),

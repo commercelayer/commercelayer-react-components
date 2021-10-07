@@ -152,10 +152,12 @@ export type AddressInputName =
 export type AddressCountrySelectName =
   | 'billing_address_country_code'
   | 'shipping_address_country_code'
+  | 'customer_address_country_code'
 
 export type AddressStateSelectName =
   | 'billing_address_state_code'
   | 'shipping_address_state_code'
+  | 'customer_address_state_code'
 
 export type BaseInputType =
   | 'checkbox'

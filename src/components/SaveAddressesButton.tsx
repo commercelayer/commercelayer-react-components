@@ -3,9 +3,9 @@ import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import AddressContext from '#context/AddressContext'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import {
-  billingAddressController,
+  addressController,
   shippingAddressController,
   countryLockController,
 } from '#utils/addressesManager'
@@ -25,6 +25,7 @@ type SaveAddressesButtonProps = {
   children?: SaveAddressesButtonChildrenProps
   label?: string | ReactNode
   onClick?: () => void
+  addressId?: string
 } & JSX.IntrinsicElements['button']
 
 const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
@@ -35,6 +36,7 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     label = 'Continue to delivery',
     resource,
     disabled = false,
+    addressId,
     onClick,
     ...p
   } = props
@@ -83,11 +85,12 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     customerEmail ||
     billingDisable ||
     shippingDisable ||
+    customerDisable ||
     countryLockDisable
   const handleClick = async () => {
     if (isEmpty(errors) && !disable) {
       setForceDisable(true)
-      await saveAddresses()
+      await saveAddresses(addressId)
       setForceDisable(false)
       onClick && onClick()
     }
