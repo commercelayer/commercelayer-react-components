@@ -87,7 +87,11 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
     return null
   return (
     <BaseInput
-      ref={billingAddress?.validation || shippingAddress?.validation}
+      ref={
+        billingAddress?.validation ||
+        shippingAddress?.validation ||
+        customerAddress?.validation
+      }
       className={classNameComputed}
       required={required !== undefined ? required : true}
       placeholder={placeholder}

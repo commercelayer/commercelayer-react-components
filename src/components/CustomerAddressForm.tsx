@@ -14,7 +14,6 @@ import { AddressField } from '#reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
-import OrderStorageContext from '#context/OrderStorageContext'
 import isEmptyStates from '#utils/isEmptyStates'
 
 const propTypes = components.CustomerAddressForm.propTypes
@@ -37,8 +36,7 @@ const CustomerAddressForm: FunctionComponent<CustomerAddressFormProps> = (
   } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
-  const { saveAddressToCustomerAddressBook, order } = useContext(OrderContext)
-  const { setLocalOrder } = useContext(OrderStorageContext)
+  const { order } = useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
     if (!isEmpty(errors)) {
@@ -46,12 +44,7 @@ const CustomerAddressForm: FunctionComponent<CustomerAddressFormProps> = (
       for (const fieldName in errors) {
         const { code, message } = errors[fieldName]
         if (['customer_address_state_code'].includes(fieldName)) {
-          const countryCode =
-            values['customer_address_country_code']?.value ||
-            values['country_code']
-          if (isEmptyStates(countryCode)) {
-            const k = formErrors.findIndex(({ field }) => field === fieldName)
-            k !== -1 && formErrors.splice(k, 0)
+          if (isEmpty(values['state_code'])) {
             delete errors[fieldName]
           } else {
             formErrors.push({
@@ -91,8 +84,6 @@ const CustomerAddressForm: FunctionComponent<CustomerAddressFormProps> = (
       setAddress({ values, resource: 'customerAddress' })
     }
     if (reset && (!isEmpty(values) || !isEmpty(errors))) {
-      saveAddressToCustomerAddressBook &&
-        saveAddressToCustomerAddressBook('BillingAddress', false)
       if (ref) {
         ref.current?.reset()
         resetForm({ target: ref.current } as any)

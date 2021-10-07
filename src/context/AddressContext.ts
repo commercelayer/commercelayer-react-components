@@ -1,18 +1,17 @@
 import { createContext } from 'react'
-import { AddressState, SetAddress, setAddress } from '#reducers/AddressReducer'
+import {
+  AddressResource,
+  AddressState,
+  SetAddress,
+  setAddress,
+} from '#reducers/AddressReducer'
 import { BaseError } from '#typings/errors'
 
 type DefaultContext = {
-  saveAddresses: () => void
-  setCloneAddress: (
-    id: string,
-    resource: 'billingAddress' | 'shippingAddress'
-  ) => void
+  saveAddresses: (addressId?: string) => void
+  setCloneAddress: (id: string, resource: AddressResource) => void
   setAddress: SetAddress
-  setAddressErrors: (
-    errors: BaseError[],
-    resource: 'billingAddress' | 'shippingAddress' | 'customerAddress'
-  ) => void
+  setAddressErrors: (errors: BaseError[], resource: AddressResource) => void
 } & AddressState
 
 export const defaultAddressContext = {

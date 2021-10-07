@@ -3,35 +3,33 @@ import { fieldsExist } from '#utils/validateFormFields'
 import { BaseError } from '#typings/errors'
 import { addressFields } from '#reducers/AddressReducer'
 
-type BillingAddressController = (params: {
-  billingAddress?: Record<string, any>
-  billingAddressId?: string
+type AddressController = (params: {
+  address?: Record<string, any>
+  addressId?: string
   errors?: BaseError[]
   requiresBillingInfo?: boolean
 }) => boolean
 
-export const billingAddressController: BillingAddressController = ({
-  billingAddress,
-  billingAddressId,
+export const addressController: AddressController = ({
+  address,
+  addressId,
   errors,
-  requiresBillingInfo,
+  requiresBillingInfo = false,
 }) => {
-  let billingDisable = !isEmpty(errors) || isEmpty(billingAddress)
-  if (isEmpty(errors) && !isEmpty(billingAddress)) {
+  let addressDisable = !isEmpty(errors) || isEmpty(address)
+  if (isEmpty(errors) && !isEmpty(address)) {
     let billingInfo = [...addressFields]
     if (requiresBillingInfo) billingInfo = [...billingInfo, 'billing_info']
-    billingDisable = !!(
-      billingAddress && fieldsExist(billingAddress, billingInfo)
-    )
+    addressDisable = !!(address && fieldsExist(address, billingInfo))
   }
-  if (billingDisable && !isEmpty(billingAddressId) && isEmpty(billingAddress)) {
-    billingDisable = false
+  if (addressDisable && !isEmpty(addressId) && isEmpty(address)) {
+    addressDisable = false
   }
-  return billingDisable
+  return addressDisable
 }
 
 type ShippingAddressController = (params: {
-  billingDisable: boolean
+  billingDisable?: boolean
   errors?: BaseError[]
   shipToDifferentAddress?: boolean
   shippingAddress?: Record<string, any>

@@ -14,6 +14,7 @@ import { getStateOfCountry, isValidState } from '#utils/countryStateCity'
 import isEmptyStates from '#utils/isEmptyStates'
 import AddressesContext from '#context/AddressContext'
 import BaseInput from './utils/BaseInput'
+import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
 
 const propTypes = components.AddressStateSelector.propTypes
 const defaultProps = components.AddressStateSelector.defaultProps
@@ -44,6 +45,7 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
   } = props
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
+  const customerAddress = useContext(CustomerAddressFormContext)
   const { errors: addressErrors } = useContext(AddressesContext)
   const [hasError, setHasError] = useState(false)
   const [countryCode, setCountryCode] = useState('')
@@ -54,6 +56,11 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
       billingAddress?.values?.['country_code']
     if (!isEmpty(billingCountryCode) && billingCountryCode !== countryCode)
       setCountryCode(billingCountryCode)
+    const customerCountryCode =
+      customerAddress?.values?.['customer_address_country_code']?.value ||
+      customerAddress?.values?.['country_code']
+    if (!isEmpty(customerCountryCode) && customerCountryCode !== countryCode)
+      setCountryCode(customerCountryCode)
     const shippingCountryCode =
       shippingAddress?.values?.['shipping_address_country_code']?.value
     if (!isEmpty(shippingCountryCode) && shippingCountryCode !== countryCode)
@@ -65,6 +72,15 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
     ].every(Boolean)
     if (changeBillingCountry && !isValidState(val, billingCountryCode)) {
       billingAddress.resetField && billingAddress.resetField(name)
+      setVal('')
+    }
+    const changeCustomerCountry = [
+      !isEmpty(customerAddress),
+      customerCountryCode,
+      countryCode !== customerCountryCode,
+    ].every(Boolean)
+    if (changeCustomerCountry && !isValidState(val, customerCountryCode)) {
+      customerAddress.resetField && customerAddress.resetField(name)
       setVal('')
     }
     const changeShippingCountry = [
@@ -81,6 +97,11 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
       if (!fieldError) setHasError(false)
       else setHasError(true)
     }
+    if (!isEmpty(customerAddress)) {
+      const fieldError = customerAddress?.errors?.[name as any]?.error
+      if (!fieldError) setHasError(false)
+      else setHasError(true)
+    }
     if (!isEmpty(shippingAddress)) {
       const fieldError = shippingAddress?.errors?.[name as any]?.error
       if (!fieldError) setHasError(false)
@@ -89,9 +110,11 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
     return () => {
       setHasError(false)
     }
-  }, [value, billingAddress, shippingAddress, addressErrors])
+  }, [value, billingAddress, shippingAddress, addressErrors, customerAddress])
   const errorClassName =
-    billingAddress?.errorClassName || shippingAddress?.errorClassName
+    billingAddress?.errorClassName ||
+    shippingAddress?.errorClassName ||
+    customerAddress?.errorClassName
   const classNameComputed = !isEmptyStates(countryCode)
     ? `${className} ${selectClassName} ${hasError ? errorClassName : ''}`
     : `${className} ${inputClassName} ${hasError ? errorClassName : ''}`
@@ -99,7 +122,11 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
     <BaseSelect
       {...p}
       className={classNameComputed}
-      ref={billingAddress?.validation || shippingAddress?.validation}
+      ref={
+        billingAddress?.validation ||
+        shippingAddress?.validation ||
+        customerAddress?.validation
+      }
       required={required}
       options={getStateOfCountry(countryCode)}
       name={name}
@@ -109,7 +136,11 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
     <BaseInput
       {...(p as any)}
       name={name}
-      ref={billingAddress?.validation || shippingAddress?.validation}
+      ref={
+        billingAddress?.validation ||
+        shippingAddress?.validation ||
+        customerAddress?.validation
+      }
       className={classNameComputed}
       required={required}
       placeholder={p.placeholder?.label || ''}
