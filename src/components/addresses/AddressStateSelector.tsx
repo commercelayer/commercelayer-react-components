@@ -44,6 +44,11 @@ export function AddressStateSelector(props: Props) {
         : billingAddress?.values?.['billing_address_country_code']?.['value']
     if (billingCountryCode && billingCountryCode !== countryCode)
       setCountryCode(billingCountryCode)
+    const customerCountryCode =
+      customerAddress?.values?.['customer_address_country_code']?.value ||
+      customerAddress?.values?.['country_code']
+    if (!isEmpty(customerCountryCode) && customerCountryCode !== countryCode)
+      setCountryCode(customerCountryCode)
     const shippingCountryCode =
       typeof shippingAddress?.values?.['shipping_address_country_code'] ===
       'string'
@@ -63,6 +68,15 @@ export function AddressStateSelector(props: Props) {
       !isEmptyStates(billingCountryCode)
     ) {
       billingAddress.resetField && billingAddress.resetField(name)
+      setVal('')
+    }
+    const changeCustomerCountry = [
+      !isEmpty(customerAddress),
+      customerCountryCode,
+      countryCode !== customerCountryCode,
+    ].every(Boolean)
+    if (changeCustomerCountry && !isValidState(val, customerCountryCode)) {
+      customerAddress.resetField && customerAddress.resetField(name)
       setVal('')
     }
     const changeShippingCountry = [
@@ -86,6 +100,11 @@ export function AddressStateSelector(props: Props) {
     }
     if (!isEmpty(customerAddress)) {
       const fieldError = customerAddress?.errors?.[name]?.error
+      if (!fieldError) setHasError(false)
+      else setHasError(true)
+    }
+    if (!isEmpty(customerAddress)) {
+      const fieldError = customerAddress?.errors?.[name as any]?.error
       if (!fieldError) setHasError(false)
       else setHasError(true)
     }
