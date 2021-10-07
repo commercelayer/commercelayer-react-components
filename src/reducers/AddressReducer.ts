@@ -102,7 +102,7 @@ export interface SaveAddresses {
     config: CommerceLayerConfig
     state: AddressState
     dispatch: Dispatch<AddressAction>
-    getCustomerAddresses?: () => Promise<void>
+    getCustomerAddresses?: any
   }): Promise<void>
 }
 
