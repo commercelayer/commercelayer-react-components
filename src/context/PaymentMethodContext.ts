@@ -1,5 +1,9 @@
 import { createContext } from 'react'
 import {
+  UpdatePaymentSource,
+  updatePaymentSource,
+} from '../reducers/PaymentMethodReducer'
+import {
   PaymentMethodState,
   SetPaymentMethodErrors,
   setPaymentMethodErrors,
@@ -20,6 +24,7 @@ type DefaultContext = {
   setPaymentSource: SetPaymentSource
   setPaymentRef: SetPaymentRef
   destroyPaymentSource: DestroyPaymentSource
+  updatePaymentSource: UpdatePaymentSource
   setLoading: typeof setLoading
 } & PaymentMethodState
 
@@ -29,6 +34,7 @@ export const defaultPaymentMethodContext = {
   setPaymentSource,
   setPaymentRef,
   destroyPaymentSource,
+  updatePaymentSource,
   setLoading,
 }
 

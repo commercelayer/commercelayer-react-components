@@ -62,7 +62,6 @@ export default function StripeGateway(props: StripeGateway) {
       </PaymentSourceContext.Provider>
     )
   }
-
   if (!isGuest && templateCustomerCards) {
     const customerPaymentsCards = customerPayments.map((customerPayment, i) => {
       // @ts-ignore
@@ -70,6 +69,7 @@ export default function StripeGateway(props: StripeGateway) {
         string,
         any
       >
+      debugger
       const handleClick = async () => {
         await setPaymentSource({
           paymentResource,

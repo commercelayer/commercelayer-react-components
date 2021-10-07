@@ -23,7 +23,7 @@ const PaymentSourceDetail: FunctionComponent<Props> = ({
   ...p
 }) => {
   const card = useContext(PaymentSourceContext)
-  const text = has(card, type) ? card[type] || '****' : ''
+  const text = has(card, type) ? card[type] : type === 'last4' ? '****' : '**'
   const parentProps = {
     type,
     text,

@@ -71,6 +71,12 @@ const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> =
           getOrder,
           order,
         }),
+      updatePaymentSource: async (args: any) =>
+        defaultPaymentMethodContext['updatePaymentSource']({
+          ...args,
+          config: credentials,
+          dispatch,
+        }),
       destroyPaymentSource: async (args: any) =>
         defaultPaymentMethodContext['destroyPaymentSource']({
           ...args,

@@ -40,8 +40,8 @@ export default function AdyenGateway(props: AdyenGateway) {
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
 
-  // @ts-ignore
   const clientKey =
+    // @ts-ignore
     paymentSource?.publicKey ||
     'pub.v2.8216287005010266.aHR0cDovL2xvY2FsaG9zdDozMDAw.sXlUbjw_mJsSMpq58JkAFU0sLCTnLkD6fuiOd-c1pSc' // TODO: remove conditional check
   const adyenConfig = config
@@ -50,13 +50,16 @@ export default function AdyenGateway(props: AdyenGateway) {
   const adyenCustomerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {
-          return customerPayment.paymentSourceType === 'StripePayment'
+          return customerPayment.paymentSourceType === 'AdyenPayment'
         })
       : []
 
   if (readonly || showCard) {
     // @ts-ignore
-    const card = paymentSource?.options?.card as Record<string, any>
+    const card = paymentSource?.paymentRequestData?.paymentMethod as Record<
+      string,
+      any
+    >
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (
       <PaymentSourceContext.Provider value={value}>
@@ -68,16 +71,29 @@ export default function AdyenGateway(props: AdyenGateway) {
   if (!isGuest && templateCustomerCards) {
     const customerPaymentsCards = adyenCustomerPayments.map(
       (customerPayment, i) => {
-        // @ts-ignore
-        const card = customerPayment?.paymentSource()?.options?.card as Record<
-          string,
-          any
-        >
+        const card =
+          // @ts-ignore
+          customerPayment?.paymentSource()?.paymentRequestData?.paymentMethod ||
+          // @ts-ignore
+          (customerPayment?.paymentSource()?.metadata?.card as Record<
+            string,
+            any
+          >)
+        const attributes: any = {
+          _authorize: 1,
+        }
         const handleClick = async () => {
-          await setPaymentSource({
+          const p = await setPaymentSource({
             paymentResource,
             customerPaymentSourceId: customerPayment.id,
+            attributes,
           })
+          const pSource = await setPaymentSource({
+            paymentResource,
+            attributes,
+            paymentSourceId: p?.paymentSource.id,
+          })
+          debugger
           onClickCustomerCards && onClickCustomerCards()
         }
         const value = {
@@ -94,7 +110,8 @@ export default function AdyenGateway(props: AdyenGateway) {
         )
       }
     )
-    return (
+    // @ts-ignore
+    return clientKey && !loading && paymentSource?.paymentMethods ? (
       <Fragment>
         {isEmpty(customerPaymentsCards) ? null : (
           <div className={p.className}>{customerPaymentsCards}</div>
@@ -106,10 +123,12 @@ export default function AdyenGateway(props: AdyenGateway) {
           {...adyenConfig}
         />
       </Fragment>
+    ) : (
+      loaderComponent
     )
   }
-
-  return clientKey && !loading ? (
+  // @ts-ignore
+  return clientKey && !loading && paymentSource?.paymentMethods ? (
     <AdyenPayment clientKey={clientKey} locale={locale} {...adyenConfig} />
   ) : (
     loaderComponent
