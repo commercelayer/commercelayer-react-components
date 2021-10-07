@@ -6,6 +6,8 @@ import {
   CustomerState,
   DeleteCustomerAddress,
   deleteCustomerAddress,
+  GetCustomerAddresses,
+  getCustomerAddresses,
 } from '#reducers/CustomerReducer'
 import { createContext } from 'react'
 
@@ -14,6 +16,7 @@ type DefaultContext = {
   setCustomerErrors: SetCustomerErrors
   setCustomerEmail: SetCustomerEmail
   deleteCustomerAddress: DeleteCustomerAddress
+  getCustomerAddresses: GetCustomerAddresses
 } & Partial<CustomerState>
 
 export const defaultCustomerContext = {
@@ -23,6 +26,7 @@ export const defaultCustomerContext = {
   setCustomerErrors,
   setCustomerEmail,
   deleteCustomerAddress,
+  getCustomerAddresses,
 }
 
 const CustomerContext = createContext<DefaultContext>(defaultCustomerContext)

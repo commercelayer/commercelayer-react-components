@@ -2,7 +2,12 @@ import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { Address, Order, OrderCollection } from '@commercelayer/js-sdk'
+import {
+  Address,
+  CustomerAddress,
+  Order,
+  OrderCollection,
+} from '@commercelayer/js-sdk'
 import isEmpty from 'lodash/isEmpty'
 
 export type AddressActionType =
@@ -55,9 +60,11 @@ export interface AddressActionPayload {
   errors: BaseError[]
   billingAddress: AddressSchema
   shippingAddress: AddressSchema
+  customerAddress: AddressSchema
   shipToDifferentAddress: boolean
   billingAddressId: string
   shippingAddressId: string
+  customerAddressId: string
 }
 
 export type AddressState = Partial<AddressActionPayload>
@@ -74,7 +81,7 @@ export const addressInitialState: AddressState = {
 export interface SetAddressErrors {
   <V extends BaseError[]>(args: {
     errors: V
-    resource: 'billingAddress' | 'shippingAddress'
+    resource: AddressResource
     dispatch?: Dispatch<AddressAction>
     currentErrors?: V
   }): void
@@ -95,9 +102,11 @@ export interface SaveAddresses {
     orderId?: string
     order?: OrderCollection | null
     getOrder?: (orderId: string) => void
+    addressId?: string
     config: CommerceLayerConfig
     state: AddressState
     dispatch: Dispatch<AddressAction>
+    getCustomerAddresses?: () => Promise<void>
   }): Promise<void>
 }
 
@@ -115,7 +124,11 @@ export const setAddressErrors: SetAddressErrors = ({
     resource === 'shippingAddress'
       ? errors.filter((e) => e.resource === 'shippingAddress')
       : currentErrors.filter((e) => e.resource === 'shippingAddress')
-  const finalErrors = [...billingErrors, ...shippingErrors]
+  const customerErrors =
+    resource === 'customerAddress'
+      ? errors.filter((e) => e.resource === 'customerAddress')
+      : currentErrors.filter((e) => e.resource === 'customerAddress')
+  const finalErrors = [...billingErrors, ...shippingErrors, ...customerErrors]
   dispatch &&
     dispatch({
       type: 'setErrors',
@@ -137,7 +150,7 @@ export const setAddress: SetAddress = ({ values, resource, dispatch }) => {
 
 type SetCloneAddress = (
   id: string,
-  resource: 'billingAddress' | 'shippingAddress',
+  resource: AddressResource,
   dispatch: Dispatch<AddressAction>
 ) => void
 
@@ -155,6 +168,8 @@ export const saveAddresses: SaveAddresses = async ({
   getOrder,
   order,
   state,
+  addressId,
+  getCustomerAddresses,
 }) => {
   const {
     shipToDifferentAddress,
@@ -162,6 +177,7 @@ export const saveAddresses: SaveAddresses = async ({
     shippingAddress,
     billingAddressId,
     shippingAddressId,
+    customerAddress,
   } = state
   try {
     const currentBillingAddressRef = order?.billingAddress()?.reference
@@ -196,6 +212,27 @@ export const saveAddresses: SaveAddresses = async ({
       const o = await Order.build({ id: order.id })
       await o.withCredentials(config).update(orderAttributes)
       await getOrder(order.id)
+    }
+    if (!isEmpty(customerAddress)) {
+      if (addressId) {
+        await Address.withCredentials(config)
+          .build({ id: addressId })
+          .update(
+            {
+              ...customerAddress,
+            },
+            null,
+            // @ts-ignore
+            { rawResponse: true }
+          )
+        getCustomerAddresses && (await getCustomerAddresses())
+      } else {
+        const address = await Address.withCredentials(config).create({
+          ...customerAddress,
+        })
+        await CustomerAddress.withCredentials(config).create({ address })
+        getCustomerAddresses && (await getCustomerAddresses())
+      }
     }
   } catch (error) {
     console.error(error)

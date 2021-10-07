@@ -55,6 +55,8 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
     () => ({
       isGuest,
       ...state,
+      getCustomerAddresses: () =>
+        defaultCustomerContext['getCustomerAddresses']({ config, dispatch }),
       saveCustomerUser: async (customerEmail: string) => {
         await saveCustomerUser({
           config,

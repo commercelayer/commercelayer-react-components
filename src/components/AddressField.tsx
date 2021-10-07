@@ -30,7 +30,7 @@ type AddressFieldProps =
   | {
       type?: 'edit'
       label: string | ReactNode
-      onClick: (addressId: string) => void
+      onClick: (address: Record<string, string>) => void
       children?: (props: AddressFieldChildrenProps) => ReactNode
       name?: AddressFieldView
       className?: string
@@ -63,7 +63,7 @@ const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
     if (type === 'delete') {
       deleteCustomerAddress({ customerAddressId: address.customerAddressId })
     }
-    onClick && onClick(address.id)
+    onClick && onClick({ id: address.id, ...address.attributes() })
   }
   const parentProps = {
     address,

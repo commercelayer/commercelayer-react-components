@@ -8,9 +8,9 @@ import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import AddressContext from '#context/AddressContext'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import {
-  billingAddressController,
+  addressController,
   shippingAddressController,
   countryLockController,
 } from '#utils/addressesManager'
@@ -30,6 +30,7 @@ type SaveAddressesButtonProps = {
   children?: SaveAddressesButtonChildrenProps
   label?: string | ReactNode
   onClick?: () => void
+  addressId?: string
 } & JSX.IntrinsicElements['button']
 
 const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
@@ -40,6 +41,7 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     label = 'Continue to delivery',
     resource,
     disabled = false,
+    addressId,
     onClick,
     ...p
   } = props
@@ -51,28 +53,44 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     saveAddresses,
     billingAddressId,
     shippingAddressId,
+    customerAddress,
   } = useContext(AddressContext)
   const { order } = useContext(OrderContext)
   const { addresses, isGuest } = useContext(CustomerContext)
   const [forceDisable, setForceDisable] = useState(disabled)
-  const customerEmail = !!(
-    !!(isGuest === true || typeof isGuest === 'undefined') &&
-    !order?.customerEmail
-  )
-  const billingDisable = billingAddressController({
-    billingAddress,
-    errors,
-    billingAddressId,
-    // @ts-ignore
-    requiresBillingInfo: order?.requiresBillingInfo,
-  })
-  const shippingDisable = shippingAddressController({
-    billingDisable,
-    errors,
-    shipToDifferentAddress,
-    shippingAddress,
-    shippingAddressId,
-  })
+  const customerEmail =
+    !isEmpty(order) &&
+    !!(
+      !!(isGuest === true || typeof isGuest === 'undefined') &&
+      !order?.customerEmail
+    )
+  const billingDisable =
+    billingAddress &&
+    addressController({
+      address: billingAddress,
+      errors,
+      addressId: billingAddressId,
+      // @ts-ignore
+      requiresBillingInfo: order?.requiresBillingInfo,
+    })
+  const customerDisable =
+    customerAddress &&
+    addressController({
+      address: customerAddress,
+      errors,
+      addressId: addressId,
+      // @ts-ignore
+      // requiresBillingInfo: order?.requiresBillingInfo,
+    })
+  const shippingDisable =
+    shippingAddress &&
+    shippingAddressController({
+      billingDisable,
+      errors,
+      shipToDifferentAddress,
+      shippingAddress,
+      shippingAddressId,
+    })
   const countryLockDisable = countryLockController({
     countryCodeLock: order?.shippingCountryCodeLock,
     addresses,
@@ -87,11 +105,12 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     customerEmail ||
     billingDisable ||
     shippingDisable ||
+    customerDisable ||
     countryLockDisable
   const handleClick = async () => {
     if (isEmpty(errors) && !disable) {
       setForceDisable(true)
-      await saveAddresses()
+      await saveAddresses(addressId)
       setForceDisable(false)
       onClick && onClick()
     }
