@@ -29,7 +29,7 @@ const messages: any = [
   },
 ]
 
-const OrdersList = () => {
+const CustomerAddresses = () => {
   const config = useGetToken({ userMode: true })
   const [address, setAddress] = useState<any>({})
   const [showForm, setShowForm] = useState(false)
@@ -372,4 +372,4 @@ const OrdersList = () => {
   )
 }
 
-export default OrdersList
+export default CustomerAddresses
