@@ -50,7 +50,9 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
             // @ts-ignore
             paymentSource?.metadata?.card?.id ||
             // @ts-ignore
-            paymentSource?.options?.id) &&
+            paymentSource?.options?.id ||
+            // @ts-ignore
+            paymentSource?.paymentResponse?.resultCode === 'Authorised') &&
           isPermitted
         ) {
           setNotPermitted(false)
@@ -81,6 +83,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     if (currentPaymentMethodRef?.current?.onsubmit && !options?.paypalPayerId) {
       // @ts-ignore
       isValid = (await currentPaymentMethodRef.current?.onsubmit()) as any
+      debugger
       // @ts-ignore
     } else if (paymentSource?.options?.id) {
       isValid = true

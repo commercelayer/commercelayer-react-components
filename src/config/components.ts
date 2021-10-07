@@ -631,12 +631,7 @@ const components = {
   },
   PaymentMethodsContainer: {
     displayName: 'PaymentMethodsContainer',
-    permittedChildren: [
-      'PaymentMethod',
-      'PaymentSource',
-      'ReactNode',
-      'PlaceOrderContainer',
-    ],
+    permittedChildren: ['PaymentSource', 'ReactNode', 'PlaceOrderContainer'],
     propTypes: {
       children: childrenTypes.isRequired,
     },
@@ -702,6 +697,7 @@ const components = {
   PlaceOrderContainer: {
     displayName: 'PlaceOrderContainer',
     permittedChildren: [
+      'PaymentMethod',
       'PlaceOrderButton',
       'PrivacyAndTermsCheckbox',
       'ReactNode',

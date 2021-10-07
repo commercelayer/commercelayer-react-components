@@ -147,45 +147,52 @@ export default function Main() {
                   },
                 }}
               >
-                <div className="flex flex-col">
-                  <PaymentMethod
-                    className="p-2 my-1 flex flex-wrap w-1/2 items-center justify-items-center bg-gray-300"
-                    activeClass="bg-opacity-25"
-                  >
-                    <PaymentMethodRadioButton />
-                    <PaymentMethodName className="pl-3" />
-                    <PaymentMethodPrice className="pl-3 text-xs text-gray-500" />
-                    <PaymentSource
-                      className="py-2 my-2 flex flex-row"
-                      templateCustomerCards={(props) => (
-                        <TemplateCustomerCards {...props} />
-                      )}
-                      templateCustomerSaveToWallet={(props) => (
-                        <TemplateSaveToWalletCheckbox {...props} />
-                      )}
-                      onClickCustomerCards={() => console.log('clicked')}
-                    >
-                      <div className="flex flex-row items-center justify-start bg-gray-100 p-3 text-sm border">
-                        <div className="flex flex-row items-center">
-                          <PaymentSourceBrandIcon className="mr-2" />
-                          <PaymentSourceBrandName className="mr-1" />
-                          ending in
-                          <PaymentSourceDetail className="ml-1" type="last4" />
-                        </div>
-                        <div className="text-gray-500 ml-3">
-                          <PaymentSourceDetail type="expMonth" />
-                          /
-                          <PaymentSourceDetail type="expYear" />
-                        </div>
-                        <div className="ml-3">
-                          <PaymentSourceEditButton className="text-blue-500 hover:underline hover:text-blue-600" />
-                        </div>
-                      </div>
-                    </PaymentSource>
-                    <Errors className="text-red-600" resource="paymentMethod" />
-                  </PaymentMethod>
-                </div>
                 <PlaceOrderContainer>
+                  <div className="flex flex-col">
+                    <PaymentMethod
+                      className="p-2 my-1 flex flex-wrap w-1/2 items-center justify-items-center bg-gray-300"
+                      activeClass="bg-opacity-25"
+                    >
+                      <PaymentMethodRadioButton />
+                      <PaymentMethodName className="pl-3" />
+                      <PaymentMethodPrice className="pl-3 text-xs text-gray-500" />
+                      <PaymentSource
+                        className="py-2 my-2 flex flex-row"
+                        templateCustomerCards={(props) => (
+                          <TemplateCustomerCards {...props} />
+                        )}
+                        templateCustomerSaveToWallet={(props) => (
+                          <TemplateSaveToWalletCheckbox {...props} />
+                        )}
+                        onClickCustomerCards={() => console.log('clicked')}
+                      >
+                        <div className="flex flex-row items-center justify-start bg-gray-100 p-3 text-sm border">
+                          <div className="flex flex-row items-center">
+                            <PaymentSourceBrandIcon className="mr-2" />
+                            <PaymentSourceBrandName className="mr-1" />
+                            ending in
+                            <PaymentSourceDetail
+                              className="ml-1"
+                              type="last4"
+                            />
+                          </div>
+                          <div className="text-gray-500 ml-3">
+                            <PaymentSourceDetail type="expMonth" />
+                            /
+                            <PaymentSourceDetail type="expYear" />
+                          </div>
+                          <div className="ml-3">
+                            <PaymentSourceEditButton className="text-blue-500 hover:underline hover:text-blue-600" />
+                          </div>
+                        </div>
+                      </PaymentSource>
+                      <Errors
+                        className="text-red-600"
+                        resource="paymentMethod"
+                      />
+                    </PaymentMethod>
+                  </div>
+
                   <div>
                     <PlaceOrderButton
                       onClick={(res: any) => {

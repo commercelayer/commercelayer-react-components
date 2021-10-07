@@ -9,6 +9,7 @@ import baseReducer from '#utils/baseReducer'
 import dynamicNaming from '#utils/dynamicNaming'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
 import {
+  AdyenPayment,
   Order,
   OrderCollection,
   PaymentMethod,
@@ -244,6 +245,7 @@ export type SetPaymentSource = (
     paymentResource: PaymentResource
     paymentSourceId?: string
     customerPaymentSourceId?: string
+    rawResponse?: boolean
   } & PaymentMethodState
 ) => Promise<SetPaymentSourceResponse>
 
@@ -258,6 +260,7 @@ export const setPaymentSource: SetPaymentSource = async ({
   paymentSourceId,
   currentPaymentMethodId,
   currentPaymentMethodType,
+  rawResponse,
 }) => {
   try {
     if (config && order) {
@@ -271,10 +274,20 @@ export const setPaymentSource: SetPaymentSource = async ({
             order: o,
           })
         } else {
-          paymentSource = await resourceSdk
-            .build({ id: paymentSourceId })
-            .withCredentials(config)
-            .update({ ...attributes })
+          paymentSource = !rawResponse
+            ? await resourceSdk
+                .build({ id: paymentSourceId })
+                .withCredentials(config)
+                .update({ ...attributes })
+            : await resourceSdk
+                .build({ id: paymentSourceId })
+                .withCredentials(config)
+                // @ts-ignore
+                .update({ ...attributes }, null, { rawResponse })
+          if (rawResponse)
+            paymentSource = await resourceSdk
+              .withCredentials(config)
+              .find(paymentSource.data.id)
         }
       } else {
         paymentSource = (
@@ -310,6 +323,39 @@ export const setPaymentSource: SetPaymentSource = async ({
     setPaymentMethodErrors(errors, dispatch)
   }
   return null
+}
+
+export type UpdatePaymentSource = (args: {
+  id: string
+  attributes: Record<string, any>
+  paymentResource: PaymentResource
+  config?: CommerceLayerConfig
+  dispatch?: Dispatch<PaymentMethodAction>
+}) => Promise<void>
+
+export const updatePaymentSource: UpdatePaymentSource = async ({
+  id,
+  attributes,
+  config,
+  dispatch,
+  paymentResource,
+}) => {
+  if (config) {
+    try {
+      const resourceSdk = dynamicNaming(paymentResource)
+      const paymentSource = await resourceSdk
+        .build({ id })
+        .withCredentials(config)
+        .update(attributes)
+      dispatch &&
+        dispatch({
+          type: 'setPaymentSource',
+          payload: { paymentSource },
+        })
+    } catch (err) {
+      console.error('Update payment source:', err)
+    }
+  }
 }
 
 export type DestroyPaymentSource = (args: {

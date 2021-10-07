@@ -148,57 +148,58 @@ export default function Main() {
                 },
               }}
             >
-              <PaymentMethod
-                className="p-2 my-1 flex items-center justify-items-center bg-gray-300 cursor-pointer"
-                activeClass="bg-opacity-25"
-                clickableContainer
-              >
-                <PaymentMethodRadioButton data-cy="payment-radio-button" />
-                <PaymentMethodName className="pl-3" />
-                <PaymentMethodPrice className="pl-3" />
-                <PaymentSource
-                  data-cy="payment-source"
-                  className="p-5 my-2"
-                  loader={'Caricamento...'}
-                >
-                  <div className="flex flex-row items-center justify-start bg-gray-100 p-5 my-10">
-                    <div className="flex flex-row items-center">
-                      <PaymentSourceBrandIcon className="mr-3" />
-                      <PaymentSourceBrandName
-                        className="mr-1"
-                        data-cy="payment-brand-name-card"
-                      />
-                      ending in
-                      <PaymentSourceDetail
-                        data-cy="payment-last4"
-                        className="ml-1"
-                        type="last4"
-                      />
-                    </div>
-                    <div className="text-gray-500 ml-5">
-                      <PaymentSourceDetail
-                        data-cy="payment-exp-month"
-                        type="expMonth"
-                      />
-                      <PaymentSourceDetail
-                        data-cy="payment-exp-year"
-                        type="expYear"
-                      />
-                    </div>
-                    <div className="ml-5">
-                      <PaymentSourceEditButton
-                        data-cy="payment-edit-button"
-                        className="text-blue-500 hover:underline hover:text-blue-600"
-                      />
-                    </div>
-                  </div>
-                </PaymentSource>
-                <Errors
-                  className="text-red-600 block"
-                  resource="paymentMethod"
-                />
-              </PaymentMethod>
               <PlaceOrderContainer options={{ paypalPayerId }}>
+                <PaymentMethod
+                  className="p-2 my-1 flex items-center justify-items-center bg-gray-300 cursor-pointer"
+                  activeClass="bg-opacity-25"
+                  clickableContainer
+                >
+                  <PaymentMethodRadioButton data-cy="payment-radio-button" />
+                  <PaymentMethodName className="pl-3" />
+                  <PaymentMethodPrice className="pl-3" />
+                  <PaymentSource
+                    data-cy="payment-source"
+                    className="p-5 my-2"
+                    loader={'Caricamento...'}
+                  >
+                    <div className="flex flex-row items-center justify-start bg-gray-100 p-5 my-10">
+                      <div className="flex flex-row items-center">
+                        <PaymentSourceBrandIcon className="mr-3" />
+                        <PaymentSourceBrandName
+                          className="mr-1"
+                          data-cy="payment-brand-name-card"
+                        />
+                        ending in
+                        <PaymentSourceDetail
+                          data-cy="payment-last4"
+                          className="ml-1"
+                          type="last4"
+                        />
+                      </div>
+                      <div className="text-gray-500 ml-5">
+                        <PaymentSourceDetail
+                          data-cy="payment-exp-month"
+                          type="expMonth"
+                        />
+                        <PaymentSourceDetail
+                          data-cy="payment-exp-year"
+                          type="expYear"
+                        />
+                      </div>
+                      <div className="ml-5">
+                        <PaymentSourceEditButton
+                          data-cy="payment-edit-button"
+                          className="text-blue-500 hover:underline hover:text-blue-600"
+                        />
+                      </div>
+                    </div>
+                  </PaymentSource>
+                  <Errors
+                    className="text-red-600 block"
+                    resource="paymentMethod"
+                  />
+                </PaymentMethod>
+
                 <div className="flex flex-row-reverse justify-end">
                   <label
                     htmlFor="privacy-terms"
