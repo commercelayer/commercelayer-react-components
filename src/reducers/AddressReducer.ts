@@ -104,6 +104,7 @@ export interface SaveAddresses {
     config: CommerceLayerConfig
     state: AddressState
     dispatch: Dispatch<AddressAction>
+    getCustomerAddresses?: () => Promise<void>
   }): Promise<void>
 }
 
@@ -161,6 +162,8 @@ export const saveAddresses: SaveAddresses = async ({
   updateOrder,
   order,
   state,
+  addressId,
+  getCustomerAddresses,
 }) => {
   const {
     shipToDifferentAddress,
@@ -168,6 +171,7 @@ export const saveAddresses: SaveAddresses = async ({
     shipping_address,
     billingAddressId,
     shippingAddressId,
+    customerAddress,
   } = state
   try {
     const sdk = getSdk(config)
@@ -203,6 +207,27 @@ export const saveAddresses: SaveAddresses = async ({
       }
       if (!isEmpty(orderAttributes) && updateOrder) {
         await updateOrder({ id: order.id, attributes: orderAttributes })
+      }
+    }
+    if (!isEmpty(customerAddress)) {
+      if (addressId) {
+        await Address.withCredentials(config)
+          .build({ id: addressId })
+          .update(
+            {
+              ...customerAddress,
+            },
+            null,
+            // @ts-ignore
+            { rawResponse: true }
+          )
+        getCustomerAddresses && (await getCustomerAddresses())
+      } else {
+        const address = await Address.withCredentials(config).create({
+          ...customerAddress,
+        })
+        await CustomerAddress.withCredentials(config).create({ address })
+        getCustomerAddresses && (await getCustomerAddresses())
       }
     }
   } catch (error) {
