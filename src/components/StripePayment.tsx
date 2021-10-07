@@ -14,7 +14,6 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js'
 import {
-  Stripe,
   StripeCardElementOptions,
   StripeElementLocale,
 } from '@stripe/stripe-js'
@@ -186,8 +185,6 @@ type StripePaymentProps = PaymentMethodConfig['stripePayment'] &
     locale?: StripeElementLocale
   }
 
-let stripe: Promise<Stripe | null>
-
 const StripePayment: FunctionComponent<StripePaymentProps> = ({
   publishableKey,
   show,
@@ -196,6 +193,7 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
   ...p
 }) => {
   const [isLoaded, setIsLoaded] = useState(false)
+  const [stripe, setStripe] = useState(null)
   const {
     containerClassName,
     templateCustomerSaveToWallet,
@@ -205,11 +203,14 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
   useEffect(() => {
     if (show && publishableKey) {
       const { loadStripe } = require('@stripe/stripe-js')
-      setCustomerOrderParam('savePaymentSourceToCustomerWallet', 'false')
-      setIsLoaded(true)
-      stripe = loadStripe(publishableKey, {
-        locale,
-      })
+      const getStripe = async () => {
+        const res = await loadStripe(publishableKey, {
+          locale,
+        })
+        setStripe(res)
+        setIsLoaded(true)
+      }
+      getStripe()
     }
     return () => {
       setIsLoaded(false)
