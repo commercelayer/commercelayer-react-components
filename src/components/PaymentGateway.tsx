@@ -1,32 +1,30 @@
-import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import PaymentSourceContext from '#context/PaymentSourceContext'
-import {
-  getPaymentConfig,
-  PaymentResource,
-} from '#reducers/PaymentMethodReducer'
+import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { LoaderType } from '#typings'
 import getPaypalConfig from '#utils/paypalPayment'
-import { StripeElementLocale } from '@stripe/stripe-js'
-import isEmpty from 'lodash/isEmpty'
 import React, {
-  Fragment,
   FunctionComponent,
   useContext,
   useEffect,
   useState,
 } from 'react'
-import BraintreePayment from './BraintreePayment'
 import { PaymentSourceProps } from './PaymentSource'
-import PaypalPayment from './PaypalPayment'
-import StripePayment from './StripePayment'
-import Parent from './utils/Parent'
-import WireTransferPayment from './WireTransferPayment'
 import getLoaderComponent from '#utils/getLoaderComponent'
+import AdyenGateway from './gateways/AdyenGateway'
+import StripeGateway from './gateways/StripeGateway'
+import BraintreeGateway from './gateways/BraintreeGateway'
+import PaypalGateway from './gateways/PaypalGateway'
+import WireTransferGateway from './gateways/WireTransferGateway'
 
-type PaymentGatewayProps = PaymentSourceProps & {
+export type GatewayBaseType = PaymentGatewayProps & {
+  show: boolean
+  loading: boolean
+  loaderComponent: JSX.Element
+}
+
+export type PaymentGatewayProps = PaymentSourceProps & {
   showCard: boolean
   handleEditClick: () => void
   show: boolean
@@ -48,7 +46,6 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   const loaderComponent = getLoaderComponent(loader)
   const [loading, setLoading] = useState(true)
   const { payment } = useContext(PaymentMethodChildrenContext)
-  const { payments, isGuest } = useContext(CustomerContext)
   const { order } = useContext(OrderContext)
   const {
     currentPaymentMethodId,
@@ -60,7 +57,6 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   const paymentResource = readonly
     ? currentPaymentMethodType
     : (payment?.paymentSourceType as PaymentResource)
-  const locale = order?.languageCode as StripeElementLocale
   useEffect(() => {
     if (
       paymentResource &&
@@ -83,192 +79,32 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       setLoading(true)
     }
   }, [paymentSource, payment, show])
+  const gatewayConfig = {
+    readonly,
+    showCard,
+    handleEditClick,
+    children,
+    templateCustomerCards,
+    show,
+    loading,
+    onClickCustomerCards,
+    loaderComponent,
+    templateCustomerSaveToWallet,
+    ...p,
+  }
   switch (paymentResource) {
     case 'stripe_payments':
-      if (!readonly && payment?.id !== currentPaymentMethodId) return null
-      // @ts-ignore
-      const publishableKey = paymentSource?.publishableKey
-      const stripeConfig = config
-        ? getPaymentConfig<'stripePayment'>(paymentResource, config)
-        : {}
-      const customerPayments =
-        !isEmpty(payments) && payments
-          ? payments.filter((customerPayment) => {
-              return customerPayment.paymentSourceType === 'StripePayment'
-            })
-          : []
-      if (readonly || showCard) {
-        // @ts-ignore
-        const card = paymentSource?.options?.card as Record<string, any>
-        const value = { ...card, showCard, handleEditClick, readonly }
-        return isEmpty(card) ? null : (
-          <PaymentSourceContext.Provider value={value}>
-            {children}
-          </PaymentSourceContext.Provider>
-        )
-      }
-      if (!isGuest && templateCustomerCards) {
-        const customerPaymentsCards = customerPayments.map(
-          (customerPayment, i) => {
-            // @ts-ignore
-            const card = customerPayment?.paymentSource()?.options
-              ?.card as Record<string, any>
-            const handleClick = async () => {
-              await setPaymentSource({
-                paymentResource,
-                customerPaymentSourceId: customerPayment.id,
-              })
-              onClickCustomerCards && onClickCustomerCards()
-            }
-            const value = {
-              ...card,
-              showCard,
-              handleEditClick,
-              readonly,
-              handleClick,
-            }
-            return (
-              <PaymentSourceContext.Provider key={i} value={value}>
-                <Parent {...value}>{templateCustomerCards}</Parent>
-              </PaymentSourceContext.Provider>
-            )
-          }
-        )
-        return (
-          <Fragment>
-            {isEmpty(customerPaymentsCards) ? null : (
-              <div className={p.className}>{customerPaymentsCards}</div>
-            )}
-            <StripePayment
-              show={show}
-              templateCustomerSaveToWallet={templateCustomerSaveToWallet}
-              publishableKey={publishableKey}
-              locale={locale}
-              {...stripeConfig}
-            />
-          </Fragment>
-        )
-      }
-      return publishableKey && !loading ? (
-        <StripePayment
-          show={show}
-          publishableKey={publishableKey}
-          locale={locale}
-          {...stripeConfig}
-        />
-      ) : (
-        loaderComponent
-      )
+      return <StripeGateway {...gatewayConfig}>{children}</StripeGateway>
+    case 'adyen_payments':
+      return <AdyenGateway {...gatewayConfig}>{children}</AdyenGateway>
     case 'braintree_payments':
-      if (!readonly && payment?.id !== currentPaymentMethodId) return null
-      // @ts-ignore
-      const authorization = paymentSource?.clientToken
-      const btreeConfig = config
-        ? getPaymentConfig<'braintreePayment'>(paymentResource, config)
-        : {}
-      const braintreeCustomerPayments =
-        !isEmpty(payments) && payments
-          ? payments.filter((customerPayment) => {
-              return customerPayment.paymentSourceType === 'BraintreePayment'
-            })
-          : []
-      if (readonly || showCard) {
-        // @ts-ignore
-        const card = paymentSource?.options?.card as Record<string, any>
-        const value = { ...card, showCard, handleEditClick, readonly }
-        return isEmpty(card) ? null : (
-          <PaymentSourceContext.Provider value={value}>
-            {children}
-          </PaymentSourceContext.Provider>
-        )
-      }
-      if (!isGuest && templateCustomerCards) {
-        const customerPaymentsCards = braintreeCustomerPayments.map(
-          (customerPayment, i) => {
-            // @ts-ignore
-            const card = customerPayment?.paymentSource()?.options
-              ?.card as Record<string, any>
-            const handleClick = async () => {
-              await setPaymentSource({
-                paymentResource,
-                customerPaymentSourceId: customerPayment.id,
-              })
-              onClickCustomerCards && onClickCustomerCards
-            }
-            const value = {
-              ...card,
-              showCard,
-              handleEditClick,
-              readonly,
-              handleClick,
-            }
-            return (
-              <PaymentSourceContext.Provider key={i} value={value}>
-                <Parent {...value}>{templateCustomerCards}</Parent>
-              </PaymentSourceContext.Provider>
-            )
-          }
-        )
-        return authorization && !loading ? (
-          <Fragment>
-            {isEmpty(customerPaymentsCards) ? null : (
-              <div className={p.className}>{customerPaymentsCards}</div>
-            )}
-            <BraintreePayment
-              // show={show}
-              templateCustomerSaveToWallet={templateCustomerSaveToWallet}
-              authorization={authorization}
-              locale={locale}
-              config={btreeConfig}
-            />
-          </Fragment>
-        ) : (
-          loaderComponent
-        )
-      }
-      return authorization && !loading ? (
-        <BraintreePayment authorization={authorization} config={btreeConfig} />
-      ) : (
-        loaderComponent
-      )
+      return <BraintreeGateway {...gatewayConfig}>{children}</BraintreeGateway>
     case 'wire_transfers':
-      if (!readonly && payment?.id !== currentPaymentMethodId) return null
-      if (readonly || showCard) {
-        const card =
-          // @ts-ignore
-          paymentSource?.options?.card ||
-          // @ts-ignore
-          (paymentSource?.metadata?.card as Record<string, any>)
-        const value = { ...card, showCard, handleEditClick, readonly }
-        return isEmpty(card) ? null : (
-          <PaymentSourceContext.Provider value={value}>
-            {children}
-          </PaymentSourceContext.Provider>
-        )
-      }
-      const wireTransferConfig =
-        config && paymentResource
-          ? getPaymentConfig<'wireTransfer'>(paymentResource, config)
-          : {}
-      return <WireTransferPayment {...p} {...wireTransferConfig} />
+      return (
+        <WireTransferGateway {...gatewayConfig}>{children}</WireTransferGateway>
+      )
     case 'paypal_payments':
-      if (!readonly && payment?.id !== currentPaymentMethodId) return null
-      if (readonly || showCard) {
-        const card =
-          // @ts-ignore
-          paymentSource?.options?.card ||
-          // @ts-ignore
-          (paymentSource?.metadata?.card as Record<string, any>)
-        const value = { ...card, showCard, handleEditClick, readonly }
-        return isEmpty(card) ? null : (
-          <PaymentSourceContext.Provider value={value}>
-            {children}
-          </PaymentSourceContext.Provider>
-        )
-      }
-      const paypalConfig =
-        config && getPaymentConfig<'paypalPayment'>(paymentResource, config)
-      return <PaypalPayment {...p} infoMessage={paypalConfig?.infoMessage} />
+      return <PaypalGateway {...gatewayConfig}>{children}</PaypalGateway>
     default:
       return null
   }
