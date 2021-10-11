@@ -36,6 +36,7 @@ type AdyenPaymentProps = {
   config?: AdyenConfig
   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
   locale?: string
+  environment?: string
 }
 
 const defaultConfig: AdyenConfig = {}
@@ -44,6 +45,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
   clientKey,
   config,
   templateCustomerSaveToWallet,
+  environment = 'test',
   locale = 'en_US',
 }) => {
   const {
@@ -95,6 +97,17 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
           .createFromAction(adyenAction, threeDSConfiguration)
           .mount('#adyen-action')
       } else if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
+        const brand =
+          // @ts-ignore
+          pSource?.paymentSource?.paymentRequestData?.paymentMethod?.brand
+        if (brand) {
+          const attributes = { metadata: { card: { brand } } }
+          await setPaymentSource({
+            paymentSourceId: pSource?.paymentSource.id,
+            paymentResource: 'adyen_payments',
+            attributes,
+          })
+        }
         return true
       }
       return false
@@ -192,7 +205,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
   useEffect(() => {
     const options: CoreOptions = {
       locale, // The shopper's locale. For a list of supported locales, see https://docs.adyen.com/online-payments/components-web/localization-components.
-      environment: 'test', // When you're ready to accept live payments, change the value to one of our live environments https://docs.adyen.com/online-payments/components-web#testing-your-integration.
+      environment, // When you're ready to accept live payments, change the value to one of our live environments https://docs.adyen.com/online-payments/components-web#testing-your-integration.
       clientKey, // Your client key. To find out how to generate one, see https://docs.adyen.com/development-resources/client-side-authentication. Web Components versions before 3.10.1 use originKey instead of clientKey.
       paymentMethodsResponse:
         // @ts-ignore

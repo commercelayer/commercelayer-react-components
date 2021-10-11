@@ -214,7 +214,6 @@ const StripePayment: FunctionComponent<StripePaymentProps> = ({
     }
     return () => {
       setIsLoaded(false)
-      // setCustomerOrderParam('savePaymentSourceToCustomerWallet', 'false')
     }
   }, [show, publishableKey])
   return isLoaded && stripe ? (

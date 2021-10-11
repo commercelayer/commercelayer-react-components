@@ -17,6 +17,7 @@ import StripeGateway from './gateways/StripeGateway'
 import BraintreeGateway from './gateways/BraintreeGateway'
 import PaypalGateway from './gateways/PaypalGateway'
 import WireTransferGateway from './gateways/WireTransferGateway'
+import CustomerContext from '#context/CustomerContext'
 
 export type GatewayBaseType = PaymentGatewayProps & {
   show: boolean
@@ -47,6 +48,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   const [loading, setLoading] = useState(true)
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
+  const { getCustomerPaymentSources } = useContext(CustomerContext)
   const {
     currentPaymentMethodId,
     config,
@@ -73,6 +75,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         order,
         attributes,
       })
+      getCustomerPaymentSources && getCustomerPaymentSources()
     }
     if (paymentSource) setLoading(false)
     return () => {

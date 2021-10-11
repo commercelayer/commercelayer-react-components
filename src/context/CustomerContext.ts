@@ -11,12 +11,14 @@ type DefaultContext = {
   saveCustomerUser: (customerEmail: string) => Promise<void>
   setCustomerErrors: SetCustomerErrors
   setCustomerEmail: SetCustomerEmail
+  getCustomerPaymentSources: () => Promise<void>
 } & Partial<CustomerState>
 
 export const defaultCustomerContext = {
   saveCustomerUser: async (): Promise<void> => {
     return
   },
+  getCustomerPaymentSources: async (): Promise<void> => {},
   setCustomerErrors,
   setCustomerEmail,
 }

@@ -9,7 +9,6 @@ import baseReducer from '#utils/baseReducer'
 import dynamicNaming from '#utils/dynamicNaming'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
 import {
-  AdyenPayment,
   Order,
   OrderCollection,
   PaymentMethod,

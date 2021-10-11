@@ -25,6 +25,7 @@ export interface CustomerActionPayload {
   customerEmail: string
   errors: BaseError[]
   isGuest: boolean
+  getCustomerPaymentSources: () => Promise<void>
 }
 
 export type CustomerState = Partial<CustomerActionPayload>

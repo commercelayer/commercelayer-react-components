@@ -50,8 +50,17 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
     } else if (payment?.id === currentPaymentMethodId) {
       setShow(true)
       // NOTE: Remove metadata in the future
-      // @ts-ignore
-      const card = paymentSource?.options?.card || paymentSource?.metadata?.card
+      const card =
+        // @ts-ignore
+        paymentSource?.options?.card ||
+        // @ts-ignore
+        paymentSource?.metadata?.card ||
+        // @ts-ignore
+        (paymentSource?.paymentRequestData?.paymentMethod?.brand && {
+          // @ts-ignore
+          brand: paymentSource?.paymentRequestData?.paymentMethod?.brand,
+        })
+      // debugger
       if (!isEmpty(card)) setShowCard(true)
     } else setShow(false)
     return () => {

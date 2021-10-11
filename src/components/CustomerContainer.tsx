@@ -59,6 +59,8 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
       defaultCustomerContext['setCustomerErrors'](errors, dispatch),
     setCustomerEmail: (customerEmail: string) =>
       defaultCustomerContext['setCustomerEmail'](customerEmail, dispatch),
+    getCustomerPaymentSources: () =>
+      getCustomerPaymentSources({ config, dispatch, order }),
   }
   return (
     <CustomerContext.Provider value={contextValue}>
