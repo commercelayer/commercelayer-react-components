@@ -42,8 +42,9 @@ export default function AdyenGateway(props: AdyenGateway) {
 
   const clientKey =
     // @ts-ignore
-    paymentSource?.publicKey ||
-    'pub.v2.8216287005010266.aHR0cDovL2xvY2FsaG9zdDozMDAw.sXlUbjw_mJsSMpq58JkAFU0sLCTnLkD6fuiOd-c1pSc' // TODO: remove conditional check
+    paymentSource?.publicKey
+  // TODO: Check
+  const environment = 'test'
   const adyenConfig = config
     ? getPaymentConfig<'stripePayment'>(paymentResource, config)
     : {}
@@ -79,22 +80,23 @@ export default function AdyenGateway(props: AdyenGateway) {
             string,
             any
           >)
-        const attributes: any = {
-          _authorize: 1,
-        }
         const handleClick = async () => {
           const p = await setPaymentSource({
             paymentResource,
             customerPaymentSourceId: customerPayment.id,
-            attributes,
           })
+          const attributes: any = {
+            _authorize: 1,
+          }
           const pSource = await setPaymentSource({
             paymentResource,
             attributes,
             paymentSourceId: p?.paymentSource.id,
           })
-          debugger
-          onClickCustomerCards && onClickCustomerCards()
+          const resultCode =
+            // @ts-ignore
+            pSource?.paymentSource?.paymentResponse?.resultCode === 'Authorised'
+          if (resultCode) onClickCustomerCards && onClickCustomerCards()
         }
         const value = {
           ...card,
@@ -120,6 +122,7 @@ export default function AdyenGateway(props: AdyenGateway) {
           templateCustomerSaveToWallet={templateCustomerSaveToWallet}
           clientKey={clientKey}
           locale={locale}
+          environment={environment}
           {...adyenConfig}
         />
       </Fragment>

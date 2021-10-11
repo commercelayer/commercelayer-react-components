@@ -69,7 +69,6 @@ export default function StripeGateway(props: StripeGateway) {
         string,
         any
       >
-      debugger
       const handleClick = async () => {
         await setPaymentSource({
           paymentResource,
