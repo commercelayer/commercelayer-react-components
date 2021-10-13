@@ -1,3 +1,4 @@
+import { AdyenPaymentConfig } from '#components/AdyenPayment'
 import { BraintreeConfig } from '#components/BraintreePayment'
 import { PaypalConfig } from '#components/PaypalPayment'
 import { StripeConfig } from '#components/StripePayment'
@@ -387,6 +388,7 @@ export type PaymentMethodConfig = {
   braintreePayment?: BraintreeConfig
   wireTransfer?: Partial<WireTransferConfig>
   paypalPayment?: PaypalConfig
+  adyenPayment?: AdyenPaymentConfig
 }
 
 type SetPaymentMethodConfig = (

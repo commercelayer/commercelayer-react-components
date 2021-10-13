@@ -24,7 +24,7 @@ const threeDSConfiguration = {
   // '05': ['100%', '100%']
 }
 
-export type AdyenConfig = {
+export type AdyenPaymentConfig = {
   cardContainerClassName?: string
   threeDSecureContainerClassName?: string
   placeOrderCallback?: (response: { placed: boolean }) => void
@@ -32,13 +32,13 @@ export type AdyenConfig = {
 
 type AdyenPaymentProps = {
   clientKey?: string
-  config?: AdyenConfig
+  config?: AdyenPaymentConfig
   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
   locale?: string
   environment?: string
 }
 
-const defaultConfig: AdyenConfig = {}
+const defaultConfig: AdyenPaymentConfig = {}
 
 const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
   clientKey,
