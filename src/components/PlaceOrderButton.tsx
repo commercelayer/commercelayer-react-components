@@ -83,7 +83,6 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     if (currentPaymentMethodRef?.current?.onsubmit && !options?.paypalPayerId) {
       // @ts-ignore
       isValid = (await currentPaymentMethodRef.current?.onsubmit()) as any
-      debugger
       // @ts-ignore
     } else if (paymentSource?.options?.id) {
       isValid = true
