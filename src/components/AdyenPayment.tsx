@@ -109,6 +109,16 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
         }
         return true
       }
+      // @ts-ignore
+      const message = pSource?.paymentSource?.paymentResponse?.refusalReason
+      setPaymentMethodErrors([
+        {
+          code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+          resource: 'paymentMethod',
+          field: currentPaymentMethodType,
+          message,
+        },
+      ])
       return false
     } catch (error: any) {
       setPaymentMethodErrors([

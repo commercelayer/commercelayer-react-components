@@ -45,7 +45,6 @@ export default function AdyenGateway(props: AdyenGateway) {
     paymentSource?.publicKey
   // TODO: Check
   const environment = paymentSource?.mode()
-  console.log(`enviroment`, environment)
   const adyenConfig = config
     ? getPaymentConfig<'stripePayment'>(paymentResource, config)
     : {}
