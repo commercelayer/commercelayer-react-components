@@ -220,10 +220,18 @@ const components = {
       'PaymentMethodsContainer',
       'OrderList',
       'ReactNode',
+      'CustomerField',
     ],
     propTypes: {
       children: childrenTypes.isRequired,
       isGuest: PropTypes.bool,
+    },
+  },
+  CustomerField: {
+    displayName: 'CustomerField',
+    propTypes: {
+      children: PropTypes.func,
+      name: PropTypes.oneOf<'email'>(['email']).isRequired,
     },
   },
   CustomerInput: {
