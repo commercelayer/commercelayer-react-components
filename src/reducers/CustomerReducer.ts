@@ -27,6 +27,9 @@ export interface CustomerActionPayload {
   orders: OrderAttributes[]
   isGuest: boolean
   getCustomerPaymentSources: () => Promise<void>
+  attributes: {
+    email: string
+  }
 }
 
 export type CustomerState = Partial<CustomerActionPayload>
@@ -158,10 +161,11 @@ export const getCustomerOrders: GetCustomerOrders = async ({
 }) => {
   const { owner } = jwtDecode<Jwt>(config.accessToken)
   if (owner?.id) {
-    // TODO: Change with customers/customer_id/orders
+    // TODO: Change with customers/customer_id/orders with new SDK
     const getOrders = await Customer.withCredentials(config)
       .includes('orders')
       .find(owner?.id, { rawResponse: true })
+    const attributes = { email: getOrders.data.attributes.email }
     const orders = getOrders?.included?.map((order) => {
       return {
         id: order.id,
@@ -170,7 +174,7 @@ export const getCustomerOrders: GetCustomerOrders = async ({
     })
     dispatch({
       type: 'setOrders',
-      payload: { orders },
+      payload: { orders, attributes },
     })
   }
 }
