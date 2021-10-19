@@ -139,6 +139,39 @@ export const getCustomerAddresses: GetCustomerAddresses = async ({
   }
 }
 
+export type DeleteCustomerAddress = (args: {
+  config?: CommerceLayerConfig
+  dispatch?: Dispatch<CustomerAction>
+  customerAddressId: string
+  addresses?: AddressCollection[]
+}) => void
+
+export const deleteCustomerAddress: DeleteCustomerAddress = async ({
+  config,
+  dispatch,
+  customerAddressId,
+  addresses,
+}) => {
+  if (config && addresses && dispatch && config) {
+    try {
+      await CustomerAddress.build({ id: customerAddressId })
+        .withCredentials(config)
+        .destroy()
+      const newAddresses = addresses.filter(
+        ({ customerAddressId: customerId }) => customerId !== customerAddressId
+      )
+      dispatch({
+        type: 'setAddresses',
+        payload: {
+          addresses: newAddresses,
+        },
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+}
+
 export type GetCustomerPaymentSources = (params: {
   config: CommerceLayerConfig
   dispatch: Dispatch<CustomerAction>

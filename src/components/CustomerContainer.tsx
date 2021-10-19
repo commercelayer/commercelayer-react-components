@@ -51,25 +51,39 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
       dispatch({ type: 'setCustomerEmail', payload: {} })
     }
   }, [config.accessToken, order, isGuest])
-  const contextValue = {
-    isGuest,
-    ...state,
-    saveCustomerUser: async (customerEmail: string) => {
-      await saveCustomerUser({
-        config,
-        customerEmail,
-        dispatch,
-        getOrder: getOrder as getOrderContext,
-        order,
-      })
-    },
-    setCustomerErrors: (errors: BaseError[]) =>
-      defaultCustomerContext['setCustomerErrors'](errors, dispatch),
-    setCustomerEmail: (customerEmail: string) =>
-      defaultCustomerContext['setCustomerEmail'](customerEmail, dispatch),
-    getCustomerPaymentSources: () =>
-      getCustomerPaymentSources({ config, dispatch, order }),
-  }
+  const contextValue = useMemo(
+    () => ({
+      isGuest,
+      ...state,
+      saveCustomerUser: async (customerEmail: string) => {
+        await saveCustomerUser({
+          config,
+          customerEmail,
+          dispatch,
+          getOrder: getOrder as getOrderContext,
+          order,
+        })
+      },
+      setCustomerErrors: (errors: BaseError[]) =>
+        defaultCustomerContext['setCustomerErrors'](errors, dispatch),
+      setCustomerEmail: (customerEmail: string) =>
+        defaultCustomerContext['setCustomerEmail'](customerEmail, dispatch),
+      getCustomerPaymentSources: () =>
+        getCustomerPaymentSources({ config, dispatch, order }),
+      deleteCustomerAddress: ({
+        customerAddressId,
+      }: {
+        customerAddressId: string
+      }) =>
+        defaultCustomerContext['deleteCustomerAddress']({
+          addresses: state?.addresses,
+          dispatch,
+          config,
+          customerAddressId,
+        }),
+    }),
+    [state]
+  )
   return (
     <CustomerContext.Provider value={contextValue}>
       {children}
