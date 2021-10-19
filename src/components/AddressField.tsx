@@ -16,13 +16,14 @@ type AddressFieldChildrenProps = Omit<
   address: Address
 }
 
-type AddressFieldProps = (
+type AddressFieldProps =
   | {
       type?: 'field'
       label?: never
       onClick?: never
       children?: (props: AddressFieldChildrenProps) => ReactNode
       name: AddressFieldView
+      className?: string
     }
   | {
       type?: 'edit'
@@ -30,16 +31,24 @@ type AddressFieldProps = (
       onClick: (addressId: string) => void
       children?: (props: AddressFieldChildrenProps) => ReactNode
       name?: AddressFieldView
+      className?: string
     }
   | {
-      type?: 'edit' | 'field'
+      type?: 'delete'
+      label: string
+      onClick: () => void
+      children?: (props: AddressFieldChildrenProps) => ReactNode
+      name?: AddressFieldView
+      className?: string
+    }
+  | {
+      type?: 'edit' | 'field' | 'delete'
       label?: never
       onClick?: never
       children: (props: AddressFieldChildrenProps) => ReactNode
       name?: never
+      className?: string
     }
-) &
-  Omit<JSX.IntrinsicElements['p'], 'onClick'>
 
 const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
   const { name, type = 'field', label, onClick, ...p } = props
@@ -54,7 +63,9 @@ const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
   ) : type === 'field' ? (
     <p {...{ ...p, name }}>{text}</p>
   ) : (
-    <a onClick={handleClick}>{label}</a>
+    <a {...p} onClick={handleClick}>
+      {label}
+    </a>
   )
 }
 
