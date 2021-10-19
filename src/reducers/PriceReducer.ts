@@ -1,5 +1,4 @@
 import { BaseAction, LoaderType } from '#typings'
-import CLayer, { PriceCollection } from '@commercelayer/js-sdk'
 import Sdk, { Price } from '@commercelayer/sdk'
 import getPrices from '#utils/getPrices'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
