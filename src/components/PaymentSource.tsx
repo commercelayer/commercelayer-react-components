@@ -55,12 +55,14 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
         paymentSource?.options?.card ||
         // @ts-ignore
         paymentSource?.metadata?.card ||
+        // NOTE: Adyen payment
         // @ts-ignore
-        (paymentSource?.paymentRequestData?.paymentMethod?.brand && {
+        (paymentSource?.paymentRequestData?.paymentMethod?.brand &&
           // @ts-ignore
-          brand: paymentSource?.paymentRequestData?.paymentMethod?.brand,
-        })
-      // debugger
+          paymentSource?.paymentResponse?.resultCode === 'Authorised' && {
+            // @ts-ignore
+            brand: paymentSource?.paymentRequestData?.paymentMethod?.brand,
+          })
       if (!isEmpty(card)) setShowCard(true)
     } else setShow(false)
     return () => {
