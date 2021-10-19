@@ -71,14 +71,15 @@
     "@stripe/react-stripe-js": "^1.6.0",
     "@stripe/stripe-js": "^1.20.3",
     "braintree-web": "^3.82.0",
-    "countries-states-cities-service": "^1.2.0",
+    "countries-states-cities-service": "^1.2.1",
     "deps": "^1.0.0",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "rapid-form": "^1.5.3",
     "react-table": "^7.7.0",
-    "react-window": "^1.8.6"
+    "react-window": "^1.8.6",
+    "react-windows": "^1.0.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.14.5",
