@@ -212,13 +212,20 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
     }
   }
   useEffect(() => {
+    // @ts-ignore
+    const paymentMethodsResponse = !isEmpty(paymentSource?.paymentMethods)
+      ? // @ts-ignore
+        paymentSource?.paymentMethods
+      : {}
+    if (isEmpty(paymentMethodsResponse))
+      console.error(
+        'Payment methods are not available. Please, check your Adyen configuration.'
+      )
     const options: CoreOptions = {
-      locale, // The shopper's locale. For a list of supported locales, see https://docs.adyen.com/online-payments/components-web/localization-components.
-      environment, // When you're ready to accept live payments, change the value to one of our live environments https://docs.adyen.com/online-payments/components-web#testing-your-integration.
-      clientKey, // Your client key. To find out how to generate one, see https://docs.adyen.com/development-resources/client-side-authentication. Web Components versions before 3.10.1 use originKey instead of clientKey.
-      paymentMethodsResponse:
-        // @ts-ignore
-        paymentSource && paymentSource?.paymentMethods,
+      locale,
+      environment,
+      clientKey,
+      paymentMethodsResponse,
     }
     options.onChange = (s: any, c: any) =>
       handleChange(s, c, options, paymentSource)
