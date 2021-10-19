@@ -3,6 +3,7 @@ import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
 import {
   AddressCollection,
+  Customer,
   CustomerAddress,
   CustomerPaymentSourceCollection,
   Order,
@@ -11,19 +12,23 @@ import {
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
-import { isEmpty } from 'lodash'
+import { isEmpty, map } from 'lodash'
+import jwtDecode from 'jwt-decode'
+import { Jwt } from '#typings'
 
 export type CustomerActionType =
   | 'setErrors'
   | 'setCustomerEmail'
   | 'setAddresses'
   | 'setPayments'
+  | 'setOrders'
 
 export interface CustomerActionPayload {
   addresses: AddressCollection[]
   payments: CustomerPaymentSourceCollection[]
   customerEmail: string
   errors: BaseError[]
+  orders: Record<string, string | number>[]
   isGuest: boolean
   getCustomerPaymentSources: () => Promise<void>
 }
@@ -167,10 +172,39 @@ export const getCustomerPaymentSources: GetCustomerPaymentSources = async ({
   }
 }
 
+export type GetCustomerOrders = (params: {
+  config: CommerceLayerConfig
+  dispatch: Dispatch<CustomerAction>
+}) => Promise<void>
+
+export const getCustomerOrders: GetCustomerOrders = async ({
+  config,
+  dispatch,
+}) => {
+  const { owner } = jwtDecode<Jwt>(config.accessToken)
+  if (owner?.id) {
+    // TODO: Change with customers/customer_id/orders
+    const getOrders = await Customer.withCredentials(config)
+      .includes('orders')
+      .find(owner?.id, { rawResponse: true })
+    const orders = getOrders?.included?.map((order) => {
+      return {
+        id: order.id,
+        ...order.attributes,
+      }
+    })
+    dispatch({
+      type: 'setOrders',
+      payload: { orders },
+    })
+  }
+}
+
 export const customerInitialState: CustomerState = {
   errors: [],
   addresses: [],
   payments: [],
+  orders: [],
 }
 
 const type: CustomerActionType[] = [
@@ -178,6 +212,7 @@ const type: CustomerActionType[] = [
   'setCustomerEmail',
   'setAddresses',
   'setPayments',
+  'setOrders',
 ]
 
 const customerReducer = (
