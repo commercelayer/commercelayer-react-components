@@ -4,10 +4,12 @@ import {
   useContext,
   useEffect,
   useReducer,
+  useMemo,
 } from 'react'
 import customerReducer, {
   customerInitialState,
   getCustomerAddresses,
+  getCustomerOrders,
   getCustomerPaymentSources,
 } from '#reducers/CustomerReducer'
 import OrderContext from '#context/OrderContext'

@@ -211,6 +211,7 @@ const components = {
       'OrderStorage',
       'PricesContainer',
       'GiftCardContainer',
+      'CustomerContainer',
       'ReactNode',
     ],
     propTypes: {
@@ -598,6 +599,18 @@ const components = {
     },
     defaultProps: {
       metadata: {},
+    },
+  },
+  OrderList: {
+    permittedChildren: [
+      'OrderListHeader',
+      'OrderListRow',
+      'OrderListRowActions',
+      'ReactNode',
+    ],
+    displayName: 'OrderList',
+    propTypes: {
+      children: childrenTypes.isRequired,
     },
   },
   OrderNumber: {
