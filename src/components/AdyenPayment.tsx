@@ -13,6 +13,7 @@ import { CoreOptions } from '@adyen/adyen-web/dist/types/core/types'
 import Parent from '#components/utils/Parent'
 import getBrowserInfo from '../utils/browserInfo'
 import PlaceOrderContext from '#context/PlaceOrderContext'
+import AdyenCheckout from '@adyen/adyen-web'
 
 const threeDSConfiguration = {
   challengeWindowSize: '05',
@@ -234,10 +235,13 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
     if (!ref && clientKey)
       setLocalOrder('savePaymentSourceToCustomerWallet', 'false')
     if (clientKey && !loadAdyen && !isEmpty(window)) {
-      const AdyenCheckout = require('@adyen/adyen-web')
-      const adyenCheckout = new AdyenCheckout(options)
-      const card = adyenCheckout.create('card').mount('#adyen-card')
-      card && setCheckout(adyenCheckout) && setLoadAdyen(true)
+      AdyenCheckout(options).then((adyenCheckout) => {
+        const card = adyenCheckout.create('card').mount('#adyen-card')
+        if (card) {
+          setCheckout(adyenCheckout)
+          setLoadAdyen(true)
+        }
+      })
     }
     return () => {
       setPaymentRef({ ref: { current: null } })
