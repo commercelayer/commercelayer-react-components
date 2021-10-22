@@ -277,7 +277,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
         <div className={fieldsContainerClassName}>
           <div className={cardContainerClassName}>
             <label className={fieldLabelClassName} htmlFor="card-number">
-              {fields?.number.label}
+              {fields?.number?.label}
             </label>
             <div className={inputWrapperClassName} id="card-number"></div>
           </div>
