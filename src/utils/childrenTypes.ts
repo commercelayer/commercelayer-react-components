@@ -21,10 +21,15 @@ const checkChildrenTypes: CheckChildrenTypes = (
   let error: Error | null = null
   const children = props[propName]
   const cpName = componentName.replace('CL', '')
-  if (isEmpty(children) && props['isRequired'])
+  if (
+    ((isEmpty(children) && typeof children !== 'function') ||
+      (typeof children === 'function' && !children)) &&
+    props['isRequired']
+  ) {
     error = new Error(
       `The prop '${propName}' is marked as required in '${cpName}', but its value is '${children}'.`
     )
+  }
   Children.map(children, (c): any => {
     if (error) return error
     const type = c.type
