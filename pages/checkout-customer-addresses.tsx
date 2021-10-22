@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getCustomerToken } from '@commercelayer/js-auth'
+import { Swiper, SwiperSlide } from 'swiper/react'
 import { Nav } from '.'
 import Head from 'next/head'
 import {
@@ -20,6 +21,10 @@ import {
 } from '@commercelayer/react-components'
 import { Order, Address as AddressResource } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
+import SwiperCore, { Pagination } from 'swiper'
+
+// install Swiper modules
+SwiperCore.use([Pagination])
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -27,6 +32,8 @@ const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
 const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 let orderId = 'PDerhJplRp'
+import 'swiper/css'
+import 'swiper/css/pagination'
 
 const NestedInput = ({ value }: any) => {
   return (
@@ -164,7 +171,7 @@ export default function Main() {
                 shipToDifferentAddress={shipToDifferentAddress}
               >
                 <h2 className="p-2 font-semibold text-2xl">Billing Address</h2>
-                <div className="flex">
+                <div>
                   <BillingAddressContainer>
                     <Address
                       className="w-1/2 p-2 border cursor-pointer rounded hover:border-blue-500 m-2 shadow-sm"
@@ -176,13 +183,71 @@ export default function Main() {
                         setShowBillingAddressForm(false)
                       }
                     >
-                      <div className="flex font-bold">
-                        <AddressField name="first_name" />
+                      {(props) => {
+                        const {
+                          addresses,
+                          deselect,
+                          selectedClassName,
+                          selected,
+                          className,
+                          countryLock,
+                          disabledClassName,
+                          handleSelect,
+                        } = props
+                        return (
+                          <Swiper
+                            slidesPerView={4}
+                            spaceBetween={30}
+                            centeredSlides={true}
+                            pagination={{
+                              clickable: true,
+                            }}
+                          >
+                            {addresses.map((address, k) => {
+                              const disabled =
+                                (countryLock &&
+                                  countryLock !== address.countryCode) ||
+                                false
+                              const selectedClass = deselect
+                                ? ''
+                                : selectedClassName
+                              const addressSelectedClass =
+                                selected === k
+                                  ? `${className} ${selectedClass}`
+                                  : className
+                              const customerAddressId: string =
+                                address?.customerAddressId || ''
+                              const finalClassName = disabled
+                                ? `${className} ${disabledClassName}`
+                                : addressSelectedClass
+                              return (
+                                <SwiperSlide
+                                  key={k}
+                                  className={finalClassName}
+                                  onClick={() =>
+                                    handleSelect(
+                                      k,
+                                      address.id,
+                                      customerAddressId,
+                                      disabled
+                                    )
+                                  }
+                                >
+                                  <div>{address.firstName}</div>
+                                  <div>{address.fullAddress}</div>
+                                </SwiperSlide>
+                              )
+                            })}
+                          </Swiper>
+                        )
+                      }}
+                      {/* <AddressField name="first_name" /> */}
+                      {/* <div className="font-bold">
                         <AddressField name="last_name" className="ml-1" />
                       </div>
                       <div>
                         <AddressField name="full_address" />
-                      </div>
+                      </div> */}
                     </Address>
                   </BillingAddressContainer>
                 </div>
