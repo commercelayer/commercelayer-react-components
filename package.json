@@ -66,12 +66,12 @@
   ],
   "dependencies": {
     "@adyen/adyen-web": "^5.0.0",
+    "@commercelayer/js-auth": "^2.0.8",
     "@commercelayer/js-sdk": "^3.9.2",
     "@stripe/react-stripe-js": "^1.6.0",
     "@stripe/stripe-js": "^1.20.3",
     "braintree-web": "^3.82.0",
     "countries-states-cities-service": "^1.2.1",
-    "deps": "^1.0.0",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "rapid-form": "^1.6.0"
@@ -82,7 +82,6 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.15.0",
     "@commercelayer/cypress-vcr": "^1.1.0",
-    "@commercelayer/js-auth": "^2.0.8",
     "@cypress/code-coverage": "^3.9.11",
     "@cypress/webpack-preprocessor": "^5.9.1",
     "@rollup/plugin-alias": "^3.1.6",

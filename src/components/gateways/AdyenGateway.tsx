@@ -1,5 +1,4 @@
 import { GatewayBaseType } from '#components/PaymentGateway'
-import Parent from '#components/utils/Parent'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
@@ -13,6 +12,7 @@ import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React, { Fragment, useContext } from 'react'
 import AdyenPayment from '../AdyenPayment'
+import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
 type AdyenGateway = GatewayBaseType
 
@@ -33,7 +33,7 @@ export default function AdyenGateway(props: AdyenGateway) {
   const { order } = useContext(OrderContext)
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { payments, isGuest } = useContext(CustomerContext)
-  const { currentPaymentMethodId, config, paymentSource, setPaymentSource } =
+  const { currentPaymentMethodId, config, paymentSource } =
     useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = 'adyen_payments'
   const locale = order?.languageCode as StripeElementLocale
@@ -48,7 +48,7 @@ export default function AdyenGateway(props: AdyenGateway) {
   const adyenConfig = config
     ? getPaymentConfig<'stripePayment'>(paymentResource, config)
     : {}
-  const adyenCustomerPayments =
+  const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {
           return customerPayment.paymentSourceType === 'AdyenPayment'
@@ -70,53 +70,15 @@ export default function AdyenGateway(props: AdyenGateway) {
   }
 
   if (!isGuest && templateCustomerCards) {
-    const customerPaymentsCards = adyenCustomerPayments.map(
-      (customerPayment, i) => {
-        const card =
-          // @ts-ignore
-          customerPayment?.paymentSource()?.paymentRequestData?.paymentMethod ||
-          // @ts-ignore
-          (customerPayment?.paymentSource()?.metadata?.card as Record<
-            string,
-            any
-          >)
-        const handleClick = async () => {
-          const p = await setPaymentSource({
-            paymentResource,
-            customerPaymentSourceId: customerPayment.id,
-          })
-          const attributes: any = {
-            _authorize: 1,
-          }
-          const pSource = await setPaymentSource({
-            paymentResource,
-            attributes,
-            paymentSourceId: p?.paymentSource.id,
-          })
-          const resultCode =
-            // @ts-ignore
-            pSource?.paymentSource?.paymentResponse?.resultCode === 'Authorised'
-          if (resultCode) onClickCustomerCards && onClickCustomerCards()
-        }
-        const value = {
-          ...card,
-          showCard,
-          handleEditClick,
-          readonly,
-          handleClick,
-        }
-        return (
-          <PaymentSourceContext.Provider key={i} value={value}>
-            <Parent {...value}>{templateCustomerCards}</Parent>
-          </PaymentSourceContext.Provider>
-        )
-      }
-    )
     // @ts-ignore
     return clientKey && !loading && paymentSource?.paymentMethods ? (
       <Fragment>
-        {isEmpty(customerPaymentsCards) ? null : (
-          <div className={p.className}>{customerPaymentsCards}</div>
+        {isEmpty(customerPayments) ? null : (
+          <div className={p.className}>
+            <PaymentCardsTemplate {...{ paymentResource, customerPayments }}>
+              {templateCustomerCards}
+            </PaymentCardsTemplate>
+          </div>
         )}
         <AdyenPayment
           templateCustomerSaveToWallet={templateCustomerSaveToWallet}
