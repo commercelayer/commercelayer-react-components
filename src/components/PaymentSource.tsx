@@ -13,6 +13,7 @@ import CustomerContext from '#context/CustomerContext'
 import PaymentGateway from './PaymentGateway'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { LoaderType } from '#typings/index'
+import { CustomerCardsTemplateChildren } from './utils/PaymentCardsTemplate'
 
 const propTypes = components.PaymentSource.propTypes
 const displayName = components.PaymentSource.displayName
@@ -28,7 +29,7 @@ export type CustomerSaveToWalletProps = {
 export type PaymentSourceProps = {
   children?: ReactNode
   readonly?: boolean
-  templateCustomerCards?: (props: CustomerCardsProps) => ReactNode
+  templateCustomerCards?: CustomerCardsTemplateChildren
   onClickCustomerCards?: () => void
   templateCustomerSaveToWallet?: (props: CustomerSaveToWalletProps) => ReactNode
   loader?: LoaderType

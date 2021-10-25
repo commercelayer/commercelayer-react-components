@@ -48,6 +48,42 @@ const NestedInput = ({ value }: any) => {
   )
 }
 
+const CustomAddressCards = (props: any) => {
+  const { customerAddresses, AddressProvider } = props
+  return (
+    <Swiper
+      slidesPerView={4}
+      spaceBetween={30}
+      centeredSlides={true}
+      pagination={{
+        clickable: true,
+      }}
+    >
+      {customerAddresses.map((address, k) => {
+        return (
+          <SwiperSlide
+            key={k}
+            className={address.className}
+            onClick={address.onClick}
+          >
+            <AddressProvider value={{ address }}>
+              <div>
+                <AddressField name="first_name" />
+              </div>
+              <div className="font-bold">
+                <AddressField name="last_name" />
+              </div>
+              <div>
+                <AddressField name="full_address" />
+              </div>
+            </AddressProvider>
+          </SwiperSlide>
+        )
+      })}
+    </Swiper>
+  )
+}
+
 export default function Main() {
   const [token, setToken] = useState('')
   const [shipToDifferentAddress, setShipToDifferentAddress] = useState(false)
@@ -183,64 +219,7 @@ export default function Main() {
                         setShowBillingAddressForm(false)
                       }
                     >
-                      {(props) => {
-                        const {
-                          addresses,
-                          deselect,
-                          selectedClassName,
-                          selected,
-                          className,
-                          countryLock,
-                          disabledClassName,
-                          handleSelect,
-                        } = props
-                        return (
-                          <Swiper
-                            slidesPerView={4}
-                            spaceBetween={30}
-                            centeredSlides={true}
-                            pagination={{
-                              clickable: true,
-                            }}
-                          >
-                            {addresses.map((address, k) => {
-                              const disabled =
-                                (countryLock &&
-                                  countryLock !== address.countryCode) ||
-                                false
-                              const selectedClass = deselect
-                                ? ''
-                                : selectedClassName
-                              const addressSelectedClass =
-                                selected === k
-                                  ? `${className} ${selectedClass}`
-                                  : className
-                              const customerAddressId: string =
-                                address?.customerAddressId || ''
-                              const finalClassName = disabled
-                                ? `${className} ${disabledClassName}`
-                                : addressSelectedClass
-                              return (
-                                <SwiperSlide
-                                  key={k}
-                                  className={finalClassName}
-                                  onClick={() =>
-                                    handleSelect(
-                                      k,
-                                      address.id,
-                                      customerAddressId,
-                                      disabled
-                                    )
-                                  }
-                                >
-                                  <div>{address.firstName}</div>
-                                  <div>{address.fullAddress}</div>
-                                </SwiperSlide>
-                              )
-                            })}
-                          </Swiper>
-                        )
-                      }}
+                      {(props) => <CustomAddressCards {...props} />}
                       {/* <AddressField name="first_name" /> */}
                       {/* <div className="font-bold">
                         <AddressField name="last_name" className="ml-1" />

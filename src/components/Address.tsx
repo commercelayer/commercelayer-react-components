@@ -11,34 +11,18 @@ import components from '#config/components'
 import CustomerContext from '#context/CustomerContext'
 import BillingAddressContext from '#context/BillingAddressContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
-import {
-  AddressCollection,
-  CustomerAddressCollection,
-} from '@commercelayer/js-sdk'
+import { AddressCollection } from '@commercelayer/js-sdk'
 import isEmpty from 'lodash/isEmpty'
 import AddressContext from '#context/AddressContext'
 import OrderContext from '#context/OrderContext'
-import { FunctionChildren } from '#typings'
-import Parent from '#components/utils/Parent'
+import AddressCardsTemplate, {
+  AddressCardsTemplateChildren,
+} from './utils/AddressCardsTemplate'
 
 const propTypes = components.Address.propTypes
 
-type CustomChildren = FunctionChildren<
-  Omit<Props, 'children'> & {
-    addresses: CustomerAddressCollection[]
-    selected?: number | null
-    countryLock?: string
-    handleSelect: (
-      key: number,
-      addressId: string,
-      customerAddressId: string,
-      disabled: boolean
-    ) => void
-  }
->
-
 type Props = {
-  children: ReactNode | CustomChildren
+  children: ReactNode | AddressCardsTemplateChildren
   selectedClassName?: string
   disabledClassName?: string
   onSelect?: () => void
@@ -162,14 +146,16 @@ const Address: FunctionComponent<Props> = (props) => {
           )
         })
   const parentProps = {
-    addresses: items,
+    customerAddresses: items,
     selected,
     handleSelect,
     countryLock,
     ...props,
   }
   return typeof children === 'function' ? (
-    <Parent {...parentProps}>{children as CustomChildren}</Parent>
+    <AddressCardsTemplate {...parentProps}>
+      {children as AddressCardsTemplateChildren}
+    </AddressCardsTemplate>
   ) : (
     <Fragment>{components}</Fragment>
   )
