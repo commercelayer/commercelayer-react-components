@@ -163,7 +163,7 @@ export type PaymentResourceKey =
   | 'stripePayment'
   | 'wireTransfer'
   | 'paypalPayment'
-// | 'adyenPayment'
+  | 'adyenPayment'
 // | 'externalPayment'
 // | 'checkoutPayment'
 
