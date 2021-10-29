@@ -1,4 +1,5 @@
 import React, {
+  CSSProperties,
   FunctionComponent,
   useContext,
   useEffect,
@@ -24,10 +25,18 @@ const threeDSConfiguration = {
   // '05': ['100%', '100%']
 }
 
+type Styles = Partial<{
+  base: CSSProperties
+  error: CSSProperties
+  placeholder: CSSProperties
+  validated: CSSProperties
+}>
+
 export type AdyenPaymentConfig = {
   cardContainerClassName?: string
   threeDSecureContainerClassName?: string
   placeOrderCallback?: (response: { placed: boolean }) => void
+  styles?: Styles
 }
 
 type AdyenPaymentProps = {
@@ -51,6 +60,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
     cardContainerClassName,
     threeDSecureContainerClassName,
     placeOrderCallback,
+    styles,
   } = {
     ...defaultConfig,
     ...config,
@@ -236,7 +246,9 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
     if (clientKey && !loadAdyen && !isEmpty(window)) {
       const AdyenCheckout = require('@adyen/adyen-web')
       AdyenCheckout(options).then((adyenCheckout: any) => {
-        const card = adyenCheckout.create('card').mount('#adyen-card')
+        const card = adyenCheckout
+          .create('card', { styles })
+          .mount('#adyen-card')
         if (card) {
           setCheckout(adyenCheckout)
           setLoadAdyen(true)
