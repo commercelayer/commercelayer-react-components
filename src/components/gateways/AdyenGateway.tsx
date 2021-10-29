@@ -46,7 +46,7 @@ export default function AdyenGateway(props: AdyenGateway) {
   // TODO: Check
   const environment = paymentSource?.mode()
   const adyenConfig = config
-    ? getPaymentConfig<'stripePayment'>(paymentResource, config)
+    ? getPaymentConfig<'adyenPayment'>(paymentResource, config)
     : {}
   const customerPayments =
     !isEmpty(payments) && payments
@@ -85,7 +85,7 @@ export default function AdyenGateway(props: AdyenGateway) {
           clientKey={clientKey}
           locale={locale}
           environment={environment}
-          {...adyenConfig}
+          config={adyenConfig}
         />
       </Fragment>
     ) : (
@@ -94,7 +94,7 @@ export default function AdyenGateway(props: AdyenGateway) {
   }
   // @ts-ignore
   return clientKey && !loading && paymentSource?.paymentMethods ? (
-    <AdyenPayment clientKey={clientKey} locale={locale} {...adyenConfig} />
+    <AdyenPayment clientKey={clientKey} locale={locale} config={adyenConfig} />
   ) : (
     loaderComponent
   )
