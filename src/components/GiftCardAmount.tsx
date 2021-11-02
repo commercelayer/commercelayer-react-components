@@ -7,7 +7,7 @@ const propTypes = components.GiftCardAmount.propTypes
 const displayName = components.GiftCardAmount.displayName
 
 const GiftCardAmount: FunctionComponent<BaseAmountComponent> = (props) => {
-  return <BaseOrderPrice base="amount" type="giftcard" {...props} />
+  return <BaseOrderPrice base="amount" type="gift_card" {...props} />
 }
 
 GiftCardAmount.propTypes = propTypes

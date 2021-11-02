@@ -19,10 +19,10 @@ export default function getAmount<T = string>(args: {
   let v: any
   keys(obj).map((k) => {
     const key = k.toLowerCase()
-    const typeOne = `${format}${type}${base}`.toLowerCase()
-    const typeTwo = `${type}${base}${format}`.toLowerCase()
-    const typeThree = `${format}${base}${type}`.toLowerCase()
-    const typeFourth = `${base}${type}${format}`.toLowerCase()
+    const typeOne = `${format}_${type}_${base}`.toLowerCase()
+    const typeTwo = `${type}_${base}_${format}`.toLowerCase()
+    const typeThree = `${format}_${base}_${type}`.toLowerCase()
+    const typeFourth = `${base}_${type}_${format}`.toLowerCase()
     if (key === typeOne) {
       v = obj[k]
     }

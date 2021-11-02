@@ -1,13 +1,20 @@
-import CLayer, { Order, OrderCollection } from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import { SetLocalOrder, DeleteLocalOrder } from '#utils/localStorage'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import baseReducer from '#utils/baseReducer'
-import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { ItemOption, CustomLineItem } from './ItemReducer'
 import { isEmpty, size, map } from 'lodash'
+import differenceBy from 'lodash/differenceBy'
 import { BaseMetadataObject } from '#typings/index'
 import { BaseError } from '#typings/errors'
+import getSdk from '#utils/getSdk'
+import getErrors from '../utils/getErrors'
+import {
+  Order,
+  LineItemCreate,
+  LineItemOptionCreate,
+  OrderUpdate,
+} from '@commercelayer/sdk'
 
 export interface GetOrderParams {
   clearWhenPlaced?: boolean
@@ -19,13 +26,7 @@ export interface GetOrderParams {
 }
 
 export interface GetOrder {
-  (params: GetOrderParams): Promise<void | OrderCollection>
-}
-
-export interface SetOrderErrors {
-  (params: { dispatch: Dispatch<OrderActions>; collection: any }): {
-    success: boolean
-  }
+  (params: GetOrderParams): Promise<void | Order>
 }
 
 type CreateOrderParams = Pick<
@@ -86,7 +87,7 @@ export interface UnsetOrderState {
 export interface OrderPayload {
   loading?: boolean
   orderId?: string
-  order?: OrderCollection
+  order?: Order
   errors?: BaseError[]
 }
 
@@ -100,14 +101,12 @@ export type AddToCartValues = {
 
 export type AddToCartImportValues = Pick<AddToCartImportParams, 'lineItems'>
 
-export type getOrderContext = (
-  id: string
-) => Promise<undefined | OrderCollection>
+export type getOrderContext = (id: string) => Promise<undefined | Order>
 
 export interface OrderState extends OrderPayload {
   loading: boolean
   orderId: string
-  order?: OrderCollection
+  order?: Order
   saveBillingAddressToCustomerAddressBook: boolean
   saveShippingAddressToCustomerAddressBook: boolean
   getOrder?: getOrderContext
@@ -162,25 +161,29 @@ export const createOrder: CreateOrder = async (params) => {
     setLocalOrder,
   } = params
   if (state.orderId) return state.orderId
-  const o = await CLayer.Order.withCredentials(config).create({
-    metadata,
-    ...orderAttributes,
-  })
-  if (!o.id) return ''
-  dispatch({
-    type: 'setOrderId',
-    payload: {
-      orderId: o.id,
-    },
-  })
-  dispatch({
-    type: 'setOrder',
-    payload: {
-      order: o,
-    },
-  })
-  persistKey && setLocalOrder && setLocalOrder(persistKey, o.id)
-  return o.id
+  const sdk = getSdk(config)
+  try {
+    const o = await sdk.orders.create({ metadata, ...orderAttributes })
+    dispatch({
+      type: 'setOrderId',
+      payload: {
+        orderId: o.id,
+      },
+    })
+    persistKey && setLocalOrder && setLocalOrder(persistKey, o.id)
+    return o.id
+  } catch (error: any) {
+    const errors = getErrors(error, 'orders')
+    // TODO: Make function to merge errors as below
+    console.error('Create order', errors)
+    const errorsDifference = differenceBy(state?.errors, errors, 'code')
+    const mergeErrors = state?.errors?.length === 0 ? errors : errorsDifference
+    setOrderErrors({
+      errors: [...(state?.errors || []), ...mergeErrors],
+      dispatch,
+    })
+    return ''
+  }
 }
 
 export const getApiOrder: GetOrder = async (params) => {
@@ -192,13 +195,14 @@ export const getApiOrder: GetOrder = async (params) => {
     persistKey,
     deleteLocalOrder,
   } = params
+  const sdk = getSdk(config)
   try {
-    const o = await Order.withCredentials(config).find(id)
-    if (o)
+    const order = await sdk.orders.retrieve(id)
+    if (order)
       if (
-        (clearWhenPlaced && o.status === 'placed') ||
-        o.status === 'approved' ||
-        o.status === 'cancelled'
+        (clearWhenPlaced && order.status === 'placed') ||
+        order.status === 'approved' ||
+        order.status === 'cancelled'
       ) {
         persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
         dispatch({
@@ -212,13 +216,16 @@ export const getApiOrder: GetOrder = async (params) => {
         dispatch({
           type: 'setOrder',
           payload: {
-            order: o,
+            order: order,
           },
         })
       }
-    return o
-  } catch (col: any) {
+    return order
+  } catch (error: any) {
+    const errors = getErrors(error, 'orders')
+    console.error('Get order', errors)
     persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
+    setOrderErrors({ errors, dispatch })
     dispatch({
       type: 'setOrder',
       payload: {
@@ -231,7 +238,7 @@ export const getApiOrder: GetOrder = async (params) => {
 }
 
 export const setOrder = (
-  order: OrderCollection,
+  order: Order,
   dispatch: Dispatch<OrderActions>
 ): void => {
   dispatch({
@@ -251,63 +258,63 @@ export const addToCart: AddToCart = async (params) => {
     config,
     dispatch,
     lineItem,
-    errors,
+    errors = [],
   } = params
   try {
+    const sdk = getSdk(config)
     const id = await createOrder(params)
-    const order = CLayer.Order.build({ id })
-    const name = lineItem?.name
-    const imageUrl = lineItem?.imageUrl
-    const attrs: Record<string, any> = {
-      order,
-      skuCode,
-      name,
-      imageUrl,
-      quantity: quantity || 1,
-      _updateQuantity: 1,
-    }
-    if (skuId) {
-      attrs['item'] = CLayer.Sku.build({ id: skuId })
-    }
-    const lineItemResource = await CLayer.LineItem.withCredentials(
-      config
-    ).create(attrs)
-    if (!isEmpty(option)) {
-      let c = 0
-      map(option, async (opt) => {
-        const { options, skuOptionId } = opt
-        const skuOption = CLayer.SkuOption.build({ id: skuOptionId })
-        await CLayer.LineItemOption.withCredentials(config).create({
-          quantity: 1,
-          options,
-          lineItem: lineItemResource,
-          skuOption,
+    if (id) {
+      const order = sdk.orders.relationship(id)
+      const name = lineItem?.name
+      const imageUrl = lineItem?.imageUrl as string
+      const attrs: LineItemCreate = {
+        order,
+        sku_code: skuCode,
+        name,
+        image_url: imageUrl,
+        quantity: quantity || 1,
+        _update_quantity: true,
+      }
+      if (skuId) {
+        attrs['item'] = sdk.skus.relationship(skuId)
+      }
+      const newLineItem = await sdk.line_items.create(attrs)
+      if (!isEmpty(option)) {
+        let c = 0
+        map(option, async (opt) => {
+          const { options, skuOptionId } = opt
+          const skuOption = sdk.sku_options.relationship(skuOptionId)
+          const lineItemRel = sdk.line_items.relationship(newLineItem.id)
+          const lineItemOptionsAttributes: LineItemOptionCreate = {
+            quantity: 1,
+            options,
+            sku_option: skuOption,
+            line_item: lineItemRel,
+          }
+          await sdk.line_item_options.create(lineItemOptionsAttributes)
+          c += 1
+          if (c === size(option)) {
+            await getApiOrder({ id, ...params })
+          }
         })
-        c += 1
-        if (c === size(option)) {
-          await getApiOrder({ id, ...params })
-        }
-      })
-    } else {
-      await getApiOrder({ id, ...params })
+      } else {
+        await getApiOrder({ id, ...params })
+      }
+      if (!isEmpty(errors)) {
+        dispatch({
+          type: 'setErrors',
+          payload: {
+            errors: [],
+          },
+        })
+      }
+      return { success: true }
     }
-    if (!isEmpty(errors)) {
-      dispatch({
-        type: 'setErrors',
-        payload: {
-          errors: [],
-        },
-      })
-    }
-    return { success: true }
-  } catch (col: any) {
-    const errors = getErrorsByCollection(col, 'order')
-    dispatch({
-      type: 'setErrors',
-      payload: {
-        errors,
-      },
-    })
+    return { success: false }
+  } catch (error: any) {
+    const errs = getErrors(error, 'orders')
+    console.error('Create line item', errs, errors, [...errors, ...errs])
+    setOrderErrors({ errors: [...errors, ...errs], dispatch })
     return { success: false }
   }
 }
@@ -327,8 +334,12 @@ export const unsetOrderState: UnsetOrderState = (dispatch) => {
   })
 }
 
-export const setOrderErrors: SetOrderErrors = ({ dispatch, collection }) => {
-  const errors = getErrorsByCollection(collection, 'order')
+type OrderErrors = {
+  dispatch: Dispatch<OrderActions>
+  errors: any
+}
+
+export function setOrderErrors({ dispatch, errors }: OrderErrors) {
   dispatch({
     type: 'setErrors',
     payload: {
@@ -361,7 +372,7 @@ type SetGiftCardOrCouponCode = (args: {
   code: string
   dispatch?: Dispatch<OrderActions>
   config?: CommerceLayerConfig
-  order?: OrderCollection
+  order?: Order
 }) => Promise<{ success: boolean }>
 
 export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
@@ -372,36 +383,37 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
 }) => {
   try {
     if (config && order && code && dispatch) {
-      const o = await Order.build({ id: order.id })
-        .withCredentials(config)
-        .update({
-          giftCardOrCouponCode: code,
-        })
-      if (!o.errors().empty()) throw o
+      const sdk = getSdk(config)
+      const attributes: OrderUpdate = {
+        id: order.id,
+        gift_card_or_coupon_code: code,
+      }
+      const orderUpdated = await sdk.orders.update(attributes)
       dispatch({
         type: 'setErrors',
         payload: {
           errors: [],
+          order: orderUpdated,
         },
       })
-      getApiOrder({ id: order.id, config, dispatch })
       return { success: true }
     }
     return { success: false }
-  } catch (e) {
-    dispatch && setOrderErrors({ collection: e, dispatch })
+  } catch (error: any) {
+    const errors = getErrors(error, 'gift_card_or_coupon_code')
+    dispatch && setOrderErrors({ errors, dispatch })
     return { success: false }
   }
 }
 
-export type CodeType = 'coupon' | 'giftCard'
-export type OrderCodeType = `${CodeType}Code`
+export type CodeType = 'coupon' | 'gift_card'
+export type OrderCodeType = `${CodeType}_code`
 
 type RemoveGiftCardOrCouponCode = (args: {
   codeType: OrderCodeType
   dispatch?: Dispatch<OrderActions>
   config?: CommerceLayerConfig
-  order?: OrderCollection
+  order?: Order
 }) => Promise<{ success: boolean }>
 
 export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
@@ -412,24 +424,26 @@ export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
 }) => {
   try {
     if (config && order && dispatch) {
-      const o = await Order.build({ id: order.id })
-        .withCredentials(config)
-        .update({
-          [codeType]: '',
-        })
-      if (!o.errors().empty()) throw o
+      const sdk = getSdk(config)
+      const attributes: OrderUpdate = {
+        id: order.id,
+        [codeType]: '',
+      }
+      const orderUpdated = await sdk.orders.update(attributes)
       dispatch({
         type: 'setErrors',
         payload: {
           errors: [],
+          order: orderUpdated,
         },
       })
-      getApiOrder({ id: order.id, config, dispatch })
       return { success: true }
     }
     return { success: false }
-  } catch (e) {
-    dispatch && setOrderErrors({ collection: e, dispatch })
+  } catch (error: any) {
+    const errors = getErrors(error, 'gift_card_or_coupon_code')
+    console.error('Remove gift card o coupon code', errors)
+    dispatch && setOrderErrors({ errors, dispatch })
     return { success: false }
   }
 }
