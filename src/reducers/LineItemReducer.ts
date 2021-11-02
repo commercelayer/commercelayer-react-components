@@ -1,7 +1,3 @@
-import CLayer, {
-  LineItemCollection,
-  OrderCollection,
-} from '@commercelayer/js-sdk'
 import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
@@ -10,6 +6,7 @@ import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { isEmpty } from 'lodash'
 import { LoaderType } from '#typings'
 import { BaseError } from '#typings/errors'
+import { Order, LineItem } from '@commercelayer/sdk'
 
 export type UpdateLineItemParams = {
   lineItemId: string
@@ -34,7 +31,7 @@ export interface DeleteLineItem {
 export type GetLineItemsParams = {
   dispatch: Dispatch<LineItemAction>
   config: CommerceLayerConfig
-  order: OrderCollection | null
+  order: Order | null
   filters: Record<string, any>
 }
 
@@ -45,7 +42,7 @@ export interface GetLineItems {
 export interface LineItemPayload {
   loading?: boolean
   loader?: LoaderType
-  lineItems?: LineItemCollection[]
+  lineItems?: LineItem[]
   errors?: BaseError[]
 }
 
@@ -61,7 +58,7 @@ export interface LineItemAction {
 
 export const getLineItems: GetLineItems = (params) => {
   const { order, dispatch, config, filters } = params
-  let allLineItems: LineItemCollection[] = []
+  let allLineItems: LineItem[] = []
   order &&
     // @ts-ignore
     order
@@ -133,7 +130,7 @@ export const updateLineItem: UpdateLineItem = async (params) => {
       })
     }
   } catch (c: any) {
-    const errors = getErrorsByCollection<LineItemCollection>(c, 'lineItem')
+    const errors = getErrorsByCollection<LineItem>(c, 'lineItem')
     dispatch({
       type: 'setErrors',
       payload: {

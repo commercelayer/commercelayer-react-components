@@ -38,16 +38,16 @@ export type CodeErrorType =
   | 'VALIDATION_ERROR'
 
 export type ResourceErrorType =
-  | 'address'
-  | 'billingAddress'
-  | 'giftCard'
-  | 'giftCardOrCouponCode'
-  | 'lineItem'
-  | 'order'
-  | 'paymentMethod'
-  | 'price'
-  | 'shippingAddress'
-  | 'skuOption'
+  | 'addresses'
+  | 'billing_address'
+  | 'gift_cards'
+  | 'gift_card_or_coupon_code'
+  | 'line_items'
+  | 'orders'
+  | 'payment_methods'
+  | 'prices'
+  | 'shipping_address'
+  | 'sku_options'
   | 'variant'
 
 const CEType: CodeErrorType[] = [
@@ -91,14 +91,16 @@ export interface BaseError {
   resource?: ResourceErrorType | null
   field?: string
   id?: string
+  title?: string
+  detail?: string
 }
 
 export const REType: ResourceErrorType[] = [
-  'giftCard',
-  'lineItem',
-  'order',
-  'price',
-  'skuOption',
+  'gift_cards',
+  'line_items',
+  'orders',
+  'prices',
+  'sku_options',
   'variant',
 ]
 
@@ -112,14 +114,14 @@ export const BaseErrorObject = PropTypes.shape({
 
 export const ErrorPropTypes = {
   resource: PropTypes.oneOf<ResourceErrorType>([
-    'billingAddress',
-    'giftCard',
-    'lineItem',
-    'order',
-    'paymentMethod',
-    'price',
-    'shippingAddress',
-    'skuOption',
+    'billing_address',
+    'gift_cards',
+    'line_items',
+    'orders',
+    'payment_methods',
+    'prices',
+    'shipping_address',
+    'sku_options',
     'variant',
   ]).isRequired,
   children: PropTypes.func,

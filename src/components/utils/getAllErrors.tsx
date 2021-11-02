@@ -29,9 +29,9 @@ const getAllErrors: GetAllErrors = (params) => {
   } = params
   return allErrors.map((v, k): ReactNode | void => {
     const objMsg = customMessages(messages, v)
-    const text = objMsg?.message || v.message
+    const text = objMsg?.message || `${v.title} - ${v.detail}`
     if (field) {
-      if (v.resource === 'lineItem') {
+      if (v.resource === 'line_items') {
         if (lineItem && v.id === lineItem['id']) {
           return returnHtml ? (
             <span key={k} {...props}>

@@ -25,11 +25,11 @@ import { unsetOrderState } from '#reducers/OrderReducer'
 import components from '#config/components'
 import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
-import { OrderCollection } from '@commercelayer/js-sdk'
 import {
   setGiftCardOrCouponCode,
   OrderCodeType,
 } from '../reducers/OrderReducer'
+import { OrderCreate, Order } from '@commercelayer/sdk'
 
 const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps
@@ -79,11 +79,10 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
   }, [config.accessToken])
   const orderValue = {
     ...state,
-    setOrder: (order: OrderCollection) => setOrder(order, dispatch),
-    getOrder: (id: string): Promise<void | OrderCollection> =>
+    setOrder: (order: Order) => setOrder(order, dispatch),
+    getOrder: (id: string): Promise<void | Order> =>
       getApiOrder({ id, dispatch, config }),
-    setOrderErrors: (collection: any) =>
-      setOrderErrors({ dispatch, collection }),
+    setOrderErrors: (errors: any) => setOrderErrors({ dispatch, errors }),
     createOrder: async (): Promise<string> =>
       await createOrder({
         persistKey,
