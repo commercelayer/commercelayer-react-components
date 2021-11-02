@@ -66,6 +66,7 @@ const Errors: React.FunctionComponent<ErrorsProps> = (props) => {
     resource,
     returnHtml: !children,
   })
+  console.log(`Errors`, msgErrors)
   const parentProps = { messages, resource, field, errors: msgErrors, ...p }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
