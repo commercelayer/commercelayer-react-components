@@ -8,7 +8,7 @@ const defaultProps = components.TotalAmount.defaultProps
 const displayName = components.TotalAmount.displayName
 
 const TotalAmount: FunctionComponent<BaseAmountComponent> = (props) => {
-  return <BaseOrderPrice base="totalAmount" type="withTaxes" {...props} />
+  return <BaseOrderPrice base="total_amount" type="with_taxes" {...props} />
 }
 
 TotalAmount.propTypes = propTypes
