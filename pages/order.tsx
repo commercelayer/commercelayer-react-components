@@ -196,7 +196,7 @@ export default function Order() {
               </ItemContainer>
               <Errors resource="orders" />
               <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
-              <LineItemsContainer>
+              {/* <LineItemsContainer>
                 <p className="text-sm m-2">
                   Your shopping bag contains{' '}
                   <LineItemsCount
@@ -302,7 +302,7 @@ export default function Order() {
                     </div>
                   </LineItem>
                 </div>
-              </LineItemsContainer>
+              </LineItemsContainer> */}
               <div className="flex flex-col w-1/2 m-auto">
                 <div className="flex items-center p-2 justify-around font-medium text-left">
                   <div className="w-full">
