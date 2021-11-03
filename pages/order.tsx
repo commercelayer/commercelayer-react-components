@@ -48,6 +48,7 @@ const CustomAddToCart = (props: any) => {
       onClick={myClick}
       disabled={props.disabled}
       data-cy={props['data-cy']}
+      {...props}
     >
       Custom add to cart
     </button>
@@ -88,7 +89,7 @@ export default function Order() {
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderStorage persistKey="orderUS">
-            <OrderContainer attributes={{ returnUrl: 'https://test.co' }}>
+            <OrderContainer attributes={{ return_url: 'https://test.co' }}>
               <ItemContainer>
                 <div className="md:flex">
                   <div className="md:flex-shrink-0">
