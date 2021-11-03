@@ -3,6 +3,9 @@ cypress/fixtures/*
 cypress/videos/*
 cypress/screenshots/*
 
+# Playwright
+specs/e2e/screenshots
+
 # Logs
 logs
 *.log

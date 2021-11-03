@@ -32,13 +32,14 @@ test('Order', async ({ page, browser }) => {
   )
   await Promise.all([
     await page.click('[data-test=add-to-cart-button]'),
+    await page.waitForResponse(waitForResponse('api/orders')),
     await page.waitForResponse(waitForResponse('api/line_items')),
     await page.waitForResponse(waitForResponse('api/orders')),
   ])
   const subTotalAmount = await await page.textContent(
     '[data-test=subtotal-amount]'
   )
-  expect(subTotalAmount).toBe('')
+  expect(subTotalAmount).toBe('€29,00')
   // await page.pause()
   // const filterdPrice = await page.textContent('data-test=price-filter-0')
   // const compareFilteredPrice = await page.textContent(
