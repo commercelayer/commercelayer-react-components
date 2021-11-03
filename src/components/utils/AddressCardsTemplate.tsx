@@ -6,14 +6,17 @@ import ShippingAddressContext from '#context/ShippingAddressContext'
 import { FunctionChildren } from '#typings'
 
 type ChildrenProps = Pick<Props, 'customerAddresses' | 'className'> & {
-  onClick: () => void
+  AddressProvider: typeof AddressChildrenContext.Provider
 }
 
-type CustomerAddress = AddressCollection & {
+export type CustomerAddress = AddressCollection & {
+  onClick: () => void
   handleSelect?: () => void
 }
 
 export type AddressCardsTemplateChildren = FunctionChildren<ChildrenProps>
+
+export type AddressCardsTemplate = ChildrenProps
 
 type HandleSelect = (
   k: number,

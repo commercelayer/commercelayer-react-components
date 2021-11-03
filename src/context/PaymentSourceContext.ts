@@ -18,7 +18,7 @@ type DefaultContext = {
   last4?: string
   showCard?: boolean
   readonly?: boolean
-  handleEditClick?: () => void
+  handleEditClick?: (e: MouseEvent) => void
 }
 
 export const defaultPaymentSourceContext = {}

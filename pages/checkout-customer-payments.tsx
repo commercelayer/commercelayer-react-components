@@ -20,6 +20,7 @@ import {
   PaymentSourceEditButton,
   PlaceOrderButton,
   PlaceOrderContainer,
+  CustomerCardsTemplate,
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
@@ -42,7 +43,7 @@ let paypalReturnUrl = ''
 const TemplateCustomerCards = ({
   customerPayments,
   PaymentSourceProvider,
-}: any) => {
+}: CustomerCardsTemplate) => {
   const components = customerPayments.map((p, k) => {
     return (
       <SwiperSlide
@@ -196,6 +197,10 @@ export default function Main() {
                     <PaymentMethod
                       className="p-2 my-1 flex flex-wrap w-1/2 items-center justify-items-center bg-gray-300"
                       activeClass="bg-opacity-25"
+                      onClick={() => {
+                        console.log('custom click payment method')
+                      }}
+                      clickableContainer
                     >
                       <PaymentMethodRadioButton />
                       <PaymentMethodName className="pl-3" />

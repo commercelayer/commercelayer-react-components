@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "removeComments": true,
+    "importHelpers": true,
     "allowJs": true,
     "alwaysStrict": true,
     "esModuleInterop": true,
@@ -29,7 +31,8 @@
       "#typings": ["src/typings/index"],
       "#utils/*": ["src/utils/*"],
       "#config/*": ["src/config/*"]
-    }
+    },
+    "incremental": true
   },
   "exclude": ["node_modules", "specs", "cypress"],
   "include": ["**/*.ts", "**/*.tsx"]
