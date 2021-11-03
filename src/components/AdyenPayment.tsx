@@ -151,7 +151,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
     if (state.isValid) {
       if (ref.current) {
         const AdyenCheckout = require('@adyen/adyen-web')
-        const adyenCheckout = new AdyenCheckout(config)
+        const adyenCheckout = await AdyenCheckout(config)
         ref.current.onsubmit = () =>
           handleSubmit(ref.current as any, adyenCheckout)
         setPaymentRef({ ref })
@@ -204,7 +204,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
       const resultCode = pSource?.paymentSource?.paymentResponse?.resultCode
       const AdyenCheckout = require('@adyen/adyen-web')
       if (adyenAction) {
-        const adyenCheckout = new AdyenCheckout(config)
+        const adyenCheckout = await AdyenCheckout(config)
         adyenCheckout
           .createFromAction(adyenAction, threeDSConfiguration)
           .mount('#adyen-action')
