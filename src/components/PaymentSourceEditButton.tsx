@@ -18,9 +18,8 @@ const PaymentSourceEditButton: FunctionComponent<Props> = ({
   label = 'Edit',
   ...props
 }) => {
-  const { showCard, handleEditClick, readonly } = useContext(
-    PaymentSourceContext
-  )
+  const { showCard, handleEditClick, readonly } =
+    useContext(PaymentSourceContext)
   const parentProps = {
     showCard,
     label,
@@ -30,7 +29,7 @@ const PaymentSourceEditButton: FunctionComponent<Props> = ({
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : !readonly ? (
-    <button {...props} onClick={handleEditClick}>
+    <button {...props} onClick={handleEditClick as any}>
       {label}
     </button>
   ) : null

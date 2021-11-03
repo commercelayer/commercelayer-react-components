@@ -29,7 +29,7 @@ export default function PaypalGateway(props: PaypalGateway) {
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { currentPaymentMethodId, config, paymentSource } =
     useContext(PaymentMethodContext)
-  const paymentResource: PaymentResource = 'stripe_payments'
+  const paymentResource: PaymentResource = 'paypal_payments'
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
   if (readonly || showCard) {

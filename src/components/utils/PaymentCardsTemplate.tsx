@@ -3,14 +3,16 @@ import React, { useContext } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { CustomerPaymentSourceCollection } from '@commercelayer/js-sdk'
-import PaymentSourceContext from '#context/PaymentSourceContext'
+import PaymentSourceContext, { iconBrand } from '#context/PaymentSourceContext'
 import { FunctionChildren } from '#typings'
 
-type ChildrenProps = Pick<Props, 'customerPayments'>
+type ChildrenProps = Pick<Props, 'customerPayments'> & {
+  PaymentSourceProvider: typeof PaymentSourceContext.Provider
+}
 
 type CustomerPayment = CustomerPaymentSourceCollection & {
   card?: {
-    brand?: string
+    brand?: iconBrand
     last4?: string
   }
   handleClick?: () => void
@@ -18,18 +20,18 @@ type CustomerPayment = CustomerPaymentSourceCollection & {
 
 export type CustomerCardsTemplateChildren = FunctionChildren<ChildrenProps>
 
+export type CustomerCardsTemplate = ChildrenProps
+
 type Props = {
   customerPayments: CustomerPayment[]
   children: CustomerCardsTemplateChildren
   paymentResource: PaymentResource
-  onClick?: () => void
 }
 
 export default function PaymentCardsTemplate({
   customerPayments,
   children,
   paymentResource,
-  onClick,
 }: Props) {
   const { setPaymentSource } = useContext(PaymentMethodContext)
   const payments = customerPayments.map((customerPayment) => {
@@ -44,12 +46,12 @@ export default function PaymentCardsTemplate({
       customerPayment?.paymentSource()?.paymentRequestData?.paymentMethod ||
       // @ts-ignore
       (customerPayment?.paymentSource()?.metadata?.card as Record<string, any>)
-    const handleClick = async () => {
+    const handleClick = async (e: MouseEvent) => {
+      e.stopPropagation()
       await setPaymentSource({
         paymentResource,
         customerPaymentSourceId: customerPayment.id,
       })
-      onClick && onClick()
     }
     return { ...attributes, card, handleClick }
   })

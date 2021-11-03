@@ -17,6 +17,7 @@ import AddressContext from '#context/AddressContext'
 import OrderContext from '#context/OrderContext'
 import AddressCardsTemplate, {
   AddressCardsTemplateChildren,
+  CustomerAddress,
 } from './utils/AddressCardsTemplate'
 
 const propTypes = components.Address.propTypes
@@ -146,7 +147,7 @@ const Address: FunctionComponent<Props> = (props) => {
           )
         })
   const parentProps = {
-    customerAddresses: items,
+    customerAddresses: items as CustomerAddress[],
     selected,
     handleSelect,
     countryLock,
