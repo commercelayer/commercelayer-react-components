@@ -27,7 +27,7 @@ export type GatewayBaseType = PaymentGatewayProps & {
 
 export type PaymentGatewayProps = PaymentSourceProps & {
   showCard: boolean
-  handleEditClick: () => void
+  handleEditClick: (e: MouseEvent) => void
   show: boolean
   loader?: LoaderType
 }

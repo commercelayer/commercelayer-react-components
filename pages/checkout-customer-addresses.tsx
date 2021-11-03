@@ -18,6 +18,7 @@ import {
   Address,
   AddressField,
   ShippingAddressContainer,
+  AddressCardsTemplate,
 } from '@commercelayer/react-components'
 import { Order, Address as AddressResource } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
@@ -48,7 +49,7 @@ const NestedInput = ({ value }: any) => {
   )
 }
 
-const CustomAddressCards = (props: any) => {
+const CustomAddressCards = (props: AddressCardsTemplate) => {
   const { customerAddresses, AddressProvider } = props
   return (
     <Swiper
