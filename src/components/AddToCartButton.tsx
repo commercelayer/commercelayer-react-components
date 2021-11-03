@@ -21,12 +21,14 @@ const propTypes = components.AddToCartButton.propTypes
 const defaultProps = components.AddToCartButton.defaultProps
 const displayName = components.AddToCartButton.displayName
 
-type AddToCartButtonChildrenProps = FunctionChildren<
-  {
-    handleClick: () => AddToCartReturn
-  } & Omit<AddToCartButtonProps, 'children'> &
-    PropsWithoutRef<JSX.IntrinsicElements['button']>
->
+type ChildrenProps = {
+  handleClick: () => AddToCartReturn
+} & Omit<AddToCartButtonProps, 'children'> &
+  PropsWithoutRef<JSX.IntrinsicElements['button']>
+
+type AddToCartButtonChildrenProps = FunctionChildren<ChildrenProps>
+
+export type AddToCartButtonTemplate = ChildrenProps
 
 type AddToCartButtonProps = {
   children?: AddToCartButtonChildrenProps
@@ -145,7 +147,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <button disabled={autoDisabled} onClick={handleClick} {...p}>
+    <button {...p} disabled={autoDisabled} onClick={handleClick}>
       {isFunction(label) ? label() : label}
     </button>
   )

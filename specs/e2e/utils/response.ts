@@ -1,3 +1,4 @@
 export const waitForResponse = (s) => (resp) => {
-  return resp.url().includes(s) && resp.status() === 200
+  console.log(`url`, resp.url())
+  return resp.url().includes(s) && [200, 201].includes(resp.status())
 }
