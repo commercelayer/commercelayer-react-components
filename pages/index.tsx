@@ -1,7 +1,4 @@
-import {
-  // getSalesChannelToken,
-  getIntegrationToken,
-} from '@commercelayer/js-auth'
+import { getIntegrationToken } from '@commercelayer/js-auth'
 import React, { useEffect, useState } from 'react'
 import Price from '../src/components/Price'
 import PricesContainer from '../src/components/PricesContainer'
@@ -11,10 +8,8 @@ const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
 const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
-// const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
-// const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 
-export const Nav = ({ links }) => (
+export const Nav = ({ links }: any) => (
   <header className="dark p-6">
     <div className="container mx-auto">
       <nav className="flex flex-row items-center">
@@ -43,11 +38,11 @@ export const Nav = ({ links }) => (
   </header>
 )
 
-export const Title = ({ title }) => (
+export const Title = ({ title }: any) => (
   <div className="font-bold text-2xl mb-2 bg-green-300">{title}</div>
 )
 
-export const Type = ({ text }) => (
+export const Type = ({ text }: any) => (
   <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
     #{text}
   </span>
@@ -375,6 +370,7 @@ const Home = () => {
                     />
                     <div className="flex flex-row flex-wrap justify-center">
                       <Price
+                        data-test={`price-${k}`}
                         skuCode={s}
                         className="text-green-600 text-2xl m-1"
                         compareClassName="text-gray-500 text-2xl m-1 line-through"
@@ -393,92 +389,6 @@ const Home = () => {
               })}
             </PricesContainer>
           </div>
-          {/* <br />
-        <br />
-        <Title title="Preselect Prices by skuCode" />
-        <PricesContainer>
-          <Price
-            skuCode="BABYONBU000000E63E746MXX"
-            amountClassName="font-bold"
-            compareClassName="line-through"
-          />
-        </PricesContainer>
-        <br />
-        <br />
-        <Title title="Variant" />
-        <VariantContainer>
-          <Type text="select type" />
-          <VariantSelector
-            name="variant1"
-            skuCodes={[
-              { label: '6 months', code: 'BABYONBU000000E63E746MXX' },
-              {
-                label: '12 months',
-                code: 'BABYONBU000000E63E7412MX'
-              },
-              {
-                label: '24 months',
-                code: 'BABYONBU000000E63E746MXXFAKE'
-              }
-            ]}
-          />
-          <br />
-          <br />
-          <Type text="radio type" />
-          <VariantSelector
-            name="variant"
-            type="radio"
-            skuCodes={[
-              { label: '6 months', code: 'BABYONBU000000E63E746MXX' },
-              {
-                label: '12 months',
-                code: 'BABYONBU000000E63E7412MX'
-              },
-              {
-                label: '24 months',
-                code: 'BABYONBU000000E63E746MXXFAKE'
-              }
-            ]}
-          />
-        </VariantContainer>
-        <br />
-        <br />
-        <Title title="Preselect Variant by skuCode" />
-        <VariantContainer skuCode="BABYONBU000000E63E746MXX">
-          <Type text="select type" />
-          <VariantSelector
-            name="variant1"
-            skuCodes={[
-              { label: '6 months', code: 'BABYONBU000000E63E746MXX' },
-              {
-                label: '12 months',
-                code: 'BABYONBU000000E63E7412MX'
-              },
-              {
-                label: '24 months',
-                code: 'BABYONBU000000E63E746MXXFAKE'
-              }
-            ]}
-          />
-          <br />
-          <br />
-          <Type text="radio type" />
-          <VariantSelector
-            name="variant1"
-            type="radio"
-            skuCodes={[
-              { label: '6 months', code: 'BABYONBU000000E63E746MXX' },
-              {
-                label: '12 months',
-                code: 'BABYONBU000000E63E7412MX'
-              },
-              {
-                label: '24 months',
-                code: 'BABYONBU000000E63E746MXXFAKE'
-              }
-            ]}
-          />
-        </VariantContainer> */}
         </CommerceLayer>
       </div>
     </section>

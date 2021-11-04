@@ -1,5 +1,6 @@
 import { BaseAction, LoaderType } from '#typings'
 import CLayer, { PriceCollection } from '@commercelayer/js-sdk'
+import Sdk, { Price } from '@commercelayer/sdk'
 import getPrices from '#utils/getPrices'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Dispatch } from 'react'
@@ -7,11 +8,10 @@ import { ItemPrices } from './ItemReducer'
 import baseReducer from '#utils/baseReducer'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { BaseError } from '#typings/errors'
-
-export type SkuPrices = PriceCollection[]
+import getOrganizationSlug from '#utils/organization'
 
 export interface Prices {
-  [key: string]: SkuPrices
+  [key: string]: Price | Price[]
 }
 
 type SkuCodesPrice = string[]
@@ -60,12 +60,19 @@ export const getSkusPrice: GetSkusPrice = (
   { config, dispatch, setPrices, prices, perPage, filters }
 ) => {
   let allPrices = {}
-  CLayer.Price.withCredentials(config)
-    .where({ skuCodeIn: skuCodes.join(','), ...filters })
-    .perPage(perPage)
-    .all()
-    .then(async (r) => {
-      const pricesObj = getPrices(r.toArray())
+  const org = getOrganizationSlug(config.endpoint)
+  const sdk = Sdk({
+    accessToken: config.accessToken,
+    ...org,
+  })
+  sdk.prices
+    .list({
+      filters: { sku_code_in: skuCodes.join(','), ...filters },
+      pageSize: perPage,
+    })
+    .then(async (response) => {
+      console.log(`response`, response)
+      const pricesObj = getPrices(response)
       allPrices = { ...allPrices, ...prices, ...pricesObj }
       if (setPrices) {
         setPrices(allPrices)
@@ -78,12 +85,19 @@ export const getSkusPrice: GetSkusPrice = (
         type: 'setLoading',
         payload: { loading: false },
       })
-      const meta = r.getMetaInfo()
-      let col: any = r
-      if (col.hasNextPage() && meta.pageCount) {
-        for (let key = 1; key < meta.pageCount; key++) {
-          col = await col.withCredentials(config).nextPage()
-          const pricesObj = getPrices(col.toArray())
+      const meta = response.meta
+      if (meta.pageCount > 1) {
+        for (
+          let pageNumber = meta.currentPage + 1;
+          pageNumber <= meta.pageCount;
+          pageNumber++
+        ) {
+          const pageResponse = await sdk.prices.list({
+            filters: { sku_code_in: skuCodes.join(','), ...filters },
+            pageSize: perPage,
+            pageNumber,
+          })
+          const pricesObj = getPrices(pageResponse)
           allPrices = { ...allPrices, ...pricesObj }
           if (setPrices) {
             setPrices(allPrices)
@@ -95,8 +109,8 @@ export const getSkusPrice: GetSkusPrice = (
         }
       }
     })
-    .catch((c) => {
-      const errors = getErrorsByCollection(c, 'price')
+    .catch((error) => {
+      const errors = getErrorsByCollection(error, 'price')
       dispatch({
         type: 'setErrors',
         payload: {
