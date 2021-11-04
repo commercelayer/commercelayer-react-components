@@ -33,8 +33,6 @@ import OrderStorage from '#components/OrderStorage'
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
-// const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
-// const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 
 const CustomAddToCart = (props: any) => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
@@ -101,18 +99,19 @@ export default function Order() {
                   </div>
                   <div className="mt-4 md:mt-0 md:ml-6">
                     <h1 className="text-4xl">Tutina da Bambino</h1>
-                    <div className="w-auto m-2">
+                    <div className="w-auto m-2" data-test="price-container">
                       <PricesContainer skuCode="BABYONBU000000E63E746MXX">
                         <Price
+                          data-test="price"
                           className="text-green-600 text-2xl m-1"
                           compareClassName="text-gray-500 text-2xl m-1 line-through"
                         />
                       </PricesContainer>
                     </div>
                     <VariantsContainer>
-                      <div className="m-2">
+                      <div className="m-2" data-test="variant-container">
                         <VariantSelector
-                          data-cy="variant-selector"
+                          data-test="variant-selector"
                           className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                           name="variant1"
                           options={[
