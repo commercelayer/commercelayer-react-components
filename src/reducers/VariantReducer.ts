@@ -8,6 +8,7 @@ import { Items, CustomLineItem, SetCustomLineItems } from './ItemReducer'
 import { BaseError } from '#typings/errors'
 import { isEmpty, has } from 'lodash'
 import getSdk from '#utils/getSdk'
+import { SkuInventory } from './AvailabilityReducer'
 
 type SetSkuCodeVariantParams = {
   code: string
@@ -99,7 +100,7 @@ export const setSkuCode: SetSkuCodeVariant = (params) => {
       .then((sku) => {
         setItem &&
           setItem({
-            [`${code}`]: sku,
+            [`${code}`]: sku as SkuInventory,
           })
       })
       .catch((errors) => {
@@ -162,7 +163,6 @@ export const getVariants: GetVariants = (params) => {
       })
     })
     .catch((errors) => {
-      debugger
       dispatch({
         type: 'setErrors',
         payload: {
