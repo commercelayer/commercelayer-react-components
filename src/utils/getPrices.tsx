@@ -1,22 +1,22 @@
-import { isEmpty, first, isArray, has, forEach } from 'lodash'
-import { PriceCollection } from '@commercelayer/js-sdk'
-import { Prices, SkuPrices } from '#reducers/PriceReducer'
+import { isEmpty, first, isArray, has } from 'lodash'
+import { Price } from '@commercelayer/sdk'
+import { Prices } from '#reducers/PriceReducer'
 import { Items } from '#reducers/ItemReducer'
 import React, { ReactNode } from 'react'
 import PriceTemplate, { PTemplateProps } from '#components/utils/PriceTemplate'
 
 export interface GetPriceByCode {
-  (skuPrices: SkuPrices, code: string): PriceCollection | undefined
+  (skuPrices: Price[], code: string): Price | undefined
 }
 
 export const getPriceByCode: GetPriceByCode = (skuPrices, code = '') => {
   return code
-    ? first(skuPrices.filter((p) => p.currencyCode === code))
+    ? first(skuPrices.filter((p) => p.currency_code === code))
     : first(skuPrices)
 }
 
 export interface GetPricesComponent {
-  (skuPrices: PriceCollection[], props: PTemplateProps): ReactNode
+  (skuPrices: Price[], props: PTemplateProps): ReactNode
 }
 
 export const getPricesComponent: GetPricesComponent = (skuPrices, props) => {
@@ -26,41 +26,42 @@ export const getPricesComponent: GetPricesComponent = (skuPrices, props) => {
   return skuPrices.map((p, k) => {
     const showCompare =
       (typeof props.showCompare === 'undefined' &&
-        p.compareAtAmountCents > p.amountCents) ||
+        (p?.compare_at_amount_cents as number) > (p?.amount_cents as number)) ||
       props.showCompare
     return (
       <PriceTemplate
-        key={k}
         {...props}
+        key={k}
         showCompare={showCompare}
-        formattedAmount={p.formattedAmount}
-        formattedCompare={p.formattedCompareAtAmount}
+        formattedAmount={p.formatted_amount}
+        formattedCompare={p.formatted_compare_at_amount}
       />
     )
   })
 }
 
 export interface GetPrices {
-  (prices: PriceCollection[] | Items): Prices
+  (prices: Price[] | Items): Prices
 }
 
-const getPrices: GetPrices = (prices) => {
+export default function getPrices<P extends Price>(prices: P[]) {
   const obj: Record<string, any> = {}
   if (isArray(prices)) {
-    prices.map((p) => {
-      if (has(obj, p.skuCode)) {
-        obj[p.skuCode].push(p)
+    prices.forEach((p) => {
+      const sku = p.sku_code as string
+      if (has(obj, sku)) {
+        obj[sku].push(p)
       } else {
-        obj[p.skuCode] = [p]
+        obj[sku] = [p]
       }
     })
-  } else {
-    forEach(prices, (item) => {
-      const prices = item.prices()?.toArray()
-      obj[item.code] = prices
-    })
   }
+  // else {
+  //   debugger
+  //   // forEach(prices, (item) => {
+  //   //   const prices = item.prices()?.toArray()
+  //   //   obj[item.code] = prices
+  //   // })
+  // }
   return obj
 }
-
-export default getPrices

@@ -1,7 +1,4 @@
-import {
-  // getSalesChannelToken,
-  getIntegrationToken,
-} from '@commercelayer/js-auth'
+import { getIntegrationToken } from '@commercelayer/js-auth'
 import React, { useEffect, useState } from 'react'
 import Price from '../src/components/Price'
 import PricesContainer from '../src/components/PricesContainer'
@@ -12,7 +9,7 @@ const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
-export const Nav = ({ links }) => (
+export const Nav = ({ links }: any) => (
   <header className="dark p-6">
     <div className="container mx-auto">
       <nav className="flex flex-row items-center">
@@ -41,11 +38,11 @@ export const Nav = ({ links }) => (
   </header>
 )
 
-export const Title = ({ title }) => (
+export const Title = ({ title }: any) => (
   <div className="font-bold text-2xl mb-2 bg-green-300">{title}</div>
 )
 
-export const Type = ({ text }) => (
+export const Type = ({ text }: any) => (
   <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
     #{text}
   </span>
@@ -97,7 +94,7 @@ const Home = () => {
             <PricesContainer
               perPage={5}
               loader={<Loading />}
-              filters={{ priceListCurrencyCodeEq: 'EUR' }}
+              filters={{ price_list_currency_code_eq: 'EUR' }}
             >
               {skus.map((s, k) => {
                 const lImg = s.substring(0, s.length - 4)
@@ -113,6 +110,7 @@ const Home = () => {
                     />
                     <div className="flex flex-row flex-wrap justify-center">
                       <Price
+                        data-test={`price-filter-${k}`}
                         skuCode={s}
                         className="text-green-600 text-2xl m-1"
                         compareClassName="text-gray-500 text-2xl m-1 line-through"
@@ -150,6 +148,7 @@ const Home = () => {
                     />
                     <div className="flex flex-row flex-wrap justify-center">
                       <Price
+                        data-test={`price-${k}`}
                         skuCode={s}
                         className="text-green-600 text-2xl m-1"
                         compareClassName="text-gray-500 text-2xl m-1 line-through"
