@@ -1,4 +1,4 @@
-import Sdk, { Sku } from '@commercelayer/sdk'
+import { Sku } from '@commercelayer/sdk'
 import { VariantOptions } from '#components/VariantSelector'
 import { Dispatch } from 'react'
 import baseReducer from '#utils/baseReducer'
@@ -7,7 +7,7 @@ import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Items, CustomLineItem, SetCustomLineItems } from './ItemReducer'
 import { BaseError } from '#typings/errors'
 import { isEmpty, has } from 'lodash'
-import getOrganizationSlug from '#utils/organization'
+import getSdk from '#utils/getSdk'
 
 type SetSkuCodeVariantParams = {
   code: string
@@ -93,11 +93,7 @@ export interface UnsetVariantState {
 export const setSkuCode: SetSkuCodeVariant = (params) => {
   const { id, code, config, setItem, dispatch } = params
   if (id) {
-    const org = getOrganizationSlug(config.endpoint)
-    const sdk = Sdk({
-      accessToken: config.accessToken,
-      ...org,
-    })
+    const sdk = getSdk(config)
     sdk.skus
       .retrieve(id, { include: ['sku_options'] })
       .then((sku) => {
@@ -115,24 +111,6 @@ export const setSkuCode: SetSkuCodeVariant = (params) => {
           },
         })
       })
-    // CLayer.Sku.withCredentials(config)
-    //   .includes('skuOptions')
-    //   .find(id)
-    //   .then((s) => {
-    //     setItem &&
-    //       setItem({
-    //         [`${code}`]: s,
-    //       })
-    //   })
-    //   .catch((c) => {
-    //     const errors = getErrorsByCollection(c, 'variant')
-    //     dispatch({
-    //       type: 'setErrors',
-    //       payload: {
-    //         errors,
-    //       },
-    //     })
-    //   })
   }
 }
 
@@ -151,11 +129,7 @@ export interface GetVariants {
 
 export const getVariants: GetVariants = (params) => {
   const { config, state, skuCode, dispatch, setItem, filters } = params
-  const org = getOrganizationSlug(config.endpoint)
-  const sdk = Sdk({
-    accessToken: config.accessToken,
-    ...org,
-  })
+  const sdk = getSdk(config)
   sdk.skus
     .list({
       filters: {
@@ -196,42 +170,6 @@ export const getVariants: GetVariants = (params) => {
         },
       })
     })
-  // CLayer.Sku.withCredentials(config)
-  //   .where({ codeIn: state.skuCodes.join(','), ...filters })
-  //   .all()
-  //   .then((r) => {
-  //     const skusObj = getSkus(r.toArray())
-  //     if (skuCode) {
-  //       setSkuCode({
-  //         code: skusObj[skuCode].code,
-  //         id: skusObj[skuCode].id,
-  //         config,
-  //         dispatch,
-  //         setItem,
-  //       })
-  //     }
-  //     dispatch({
-  //       type: 'setVariants',
-  //       payload: {
-  //         variants: skusObj,
-  //       },
-  //     })
-  //     dispatch({
-  //       type: 'setLoading',
-  //       payload: {
-  //         loading: false,
-  //       },
-  //     })
-  //   })
-  //   .catch((c) => {
-  //     const errors = getErrorsByCollection(c, 'variant')
-  //     dispatch({
-  //       type: 'setErrors',
-  //       payload: {
-  //         errors,
-  //       },
-  //     })
-  //   })
 }
 
 export const unsetVariantState: UnsetVariantState = (dispatch) => {

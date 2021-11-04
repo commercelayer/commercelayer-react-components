@@ -47,9 +47,8 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     lineItem,
     ...p
   } = props
-  const { addToCart, orderId, getOrder, setOrderErrors } = useContext(
-    OrderContext
-  )
+  const { addToCart, orderId, getOrder, setOrderErrors } =
+    useContext(OrderContext)
   const { url, callExternalFunction } = useContext(ExternalFunctionContext)
   const {
     item,
@@ -62,10 +61,11 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     skuCode: itemSkuCode,
   } = useContext(ItemContext)
   const { skuLists } = useContext(SkuListsContext)
-  const sCode =
+  const sCode = (
     !isEmpty(items) && skuCode
       ? items[skuCode]?.code
-      : skuCode || getCurrentItemKey(item) || (itemSkuCode as string)
+      : skuCode || getCurrentItemKey(item) || itemSkuCode
+  ) as string
   const handleClick = () => {
     const qty = quantity[sCode]
     const opt = option[sCode]

@@ -10,7 +10,7 @@ import availabilityReducer, {
   getAvailability,
 } from '#reducers/AvailabilityReducer'
 import AvailabilityContext from '#context/AvailabilityContext'
-import { isEmpty, first } from 'lodash'
+import { isEmpty } from 'lodash'
 import ItemContext from '#context/ItemContext'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import components from '#config/components'
@@ -40,15 +40,15 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
     const sCode =
       skuCode || getCurrentItemKey(item) || itemSkuCode || lineItem?.skuCode
     if (sCode) {
-      const firstLevel = first(item[sCode]?.inventory?.levels) || {
+      const [level] = item[sCode]?.inventory?.levels || {
         quantity: null,
-        deliveryLeadTimes: [],
+        delivery_lead_times: [],
       }
-      if (!isEmpty(firstLevel) && firstLevel.deliveryLeadTimes.length > 0) {
-        const firstDelivery = first(firstLevel.deliveryLeadTimes)
+      if (!isEmpty(level) && level?.delivery_lead_times?.length > 0) {
+        const [delivery] = level?.delivery_lead_times
         dispatch({
           type: 'setAvailability',
-          payload: { ...firstDelivery, quantity: firstLevel?.quantity },
+          payload: { ...delivery, quantity: level?.quantity },
         })
       } else if (config.accessToken) {
         getAvailability({ skuCode: sCode, config, dispatch })

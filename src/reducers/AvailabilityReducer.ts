@@ -1,34 +1,49 @@
 import baseReducer from '#utils/baseReducer'
 import { BaseError } from '#typings/errors'
-import { Sku } from '@commercelayer/js-sdk'
-import { first } from 'lodash'
+import { Sku } from '@commercelayer/sdk'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Dispatch } from 'react'
+import getSdk from '#utils/getSdk'
 
-export interface LeadTimes {
+export type DeliveryLeadTime = {
+  shipping_method: {
+    name: string
+    reference: string
+    price_amount_cents: number
+    free_over_amount_cents: number
+    formatted_price_amount: string
+    formatted_free_over_amount: string
+  }
+  min: LeadTimes
+  max: LeadTimes
+}
+
+type Level = {
+  delivery_lead_times: Partial<DeliveryLeadTime>[]
+  quantity: number
+}
+
+type Inventory = {
+  inventory: {
+    available: boolean
+    quantity: number
+    levels: Level[]
+  }
+}
+
+export type SkuInventory = Sku & Inventory
+
+export type LeadTimes = {
   hours: number
   days: number
 }
 
-export interface ShippingMethod {
-  name: string
-  reference: null | string
-  priceAmountCents: number
-  freeOverAmountCents: null | number
-  formattedPriceAmount: string
-  formattedFreeOverAmount: null | string
-}
-
-export interface AvailabilityPayload {
+export type AvailabilityPayload = {
   quantity?: number | null
-  shippingMethod?: ShippingMethod
   errors?: BaseError[]
-}
+} & Partial<DeliveryLeadTime>
 
-export interface AvailabilityState extends AvailabilityPayload {
-  min: LeadTimes
-  max: LeadTimes
-}
+export type AvailabilityState = AvailabilityPayload
 
 export interface AvailabilityAction {
   type: AvailabilityActionType
@@ -61,19 +76,24 @@ export const getAvailability: GetAvailability = async ({
   dispatch,
   config,
 }) => {
-  const sku = await Sku.withCredentials(config)
-    .select('id')
-    .where({ codeIn: skuCode })
-    .first()
-  const inventorySku = await Sku.withCredentials(config)
-    .select('inventory')
-    .find(sku.id as string)
-  const firstLevel = first(inventorySku?.inventory?.levels)
-  const firstDelivery = first(firstLevel?.deliveryLeadTimes)
-  dispatch({
-    type: 'setAvailability',
-    payload: { ...firstDelivery, quantity: firstLevel?.quantity },
-  })
+  const sdk = getSdk(config)
+  try {
+    const [sku] = await sdk.skus.list({
+      fields: { skus: ['id'] },
+      filters: { code_in: skuCode },
+    })
+    const skuInventory = (await sdk.skus.retrieve(sku.id, {
+      fields: { skus: ['inventory'] },
+    })) as SkuInventory
+    const [level] = skuInventory.inventory?.levels
+    const [delivery] = level?.delivery_lead_times
+    dispatch({
+      type: 'setAvailability',
+      payload: { ...delivery, quantity: level?.quantity },
+    })
+  } catch (error) {
+    console.error('Get SKU availability', error)
+  }
 }
 
 export type AvailabilityActionType = 'setAvailability' | 'setErrors'
