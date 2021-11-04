@@ -46,10 +46,11 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
   const { skuLists, listIds } = useContext(SkuListsContext)
   const [value, setValue] = useState(min)
   const [disabled, setDisabled] = useState(!!p.disabled)
-  const sCode =
+  const sCode = (
     !isEmpty(items) && skuCode
       ? items[skuCode]?.code
-      : skuCode || getCurrentItemKey(item) || (itemSkuCode as string)
+      : skuCode || getCurrentItemKey(item) || itemSkuCode
+  ) as string
 
   const inventory = isEmpty(item) ? 50 : item[sCode]?.inventory?.quantity
   const maxInv = max || inventory
