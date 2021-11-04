@@ -17,12 +17,23 @@ export type PTemplateProps = {
 } & Omit<PriceProps, 'children'>
 
 const PriceTemplate: FunctionComponent<PTemplateProps> = (props) => {
+  const {
+    showCompare,
+    formattedCompare,
+    compareClassName,
+    className,
+    formattedAmount,
+    skuCode,
+    ...p
+  } = props
   return (
     <Fragment>
-      <span className={props.className}>{props.formattedAmount}</span>
-      {props.showCompare && (
-        <span className={props.compareClassName || ''}>
-          {props.formattedCompare}
+      <span className={className} {...p}>
+        {formattedAmount}
+      </span>
+      {showCompare && (
+        <span className={compareClassName || ''} {...p}>
+          {formattedCompare}
         </span>
       )}
     </Fragment>

@@ -8,21 +8,17 @@ type CommerceLayerProps = {
   children: ReactNode
   accessToken: string
   endpoint: string
-  cache?: boolean
 }
 
 const CommerceLayer: FunctionComponent<CommerceLayerProps> = (props) => {
-  const { children, cache = false, ...p } = props
+  const { children, ...p } = props
   return (
-    <CommerceLayerContext.Provider value={{ ...p, cache }}>
+    <CommerceLayerContext.Provider value={{ ...p }}>
       {children}
     </CommerceLayerContext.Provider>
   )
 }
 
 CommerceLayer.propTypes = propTypes
-CommerceLayer.defaultProps = {
-  cache: false,
-}
 
 export default CommerceLayer

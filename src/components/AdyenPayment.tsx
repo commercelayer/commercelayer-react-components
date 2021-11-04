@@ -100,7 +100,6 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
       const adyenAction = pSource?.paymentSource?.paymentResponse?.action
       // @ts-ignore
       const resultCode = pSource?.paymentSource?.paymentResponse?.resultCode
-      // @ts-ignore
       if (adyenAction && resultCode === 'IdentifyShopper') {
         checkout
           .createFromAction(adyenAction, threeDSConfiguration)
