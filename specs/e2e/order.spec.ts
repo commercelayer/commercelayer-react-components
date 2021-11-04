@@ -17,6 +17,17 @@ test('Order', async ({ page, browser }) => {
   )
   expect(priceItem).toBe('€29,00')
   expect(comparePriceItem).toBe('€37,70')
+  const variantSelector = await page.selectOption(
+    '[data-test=variant-selector]',
+    { label: '6 months' }
+  )
+  const availability = await await page.textContent(
+    '[data-test=availability-template]'
+  )
+  expect(availability).toBe(
+    'Available in 7 - 10 days with Standard Shipping EU'
+  )
+  // await page.pause()
   // const filterdPrice = await page.textContent('data-test=price-filter-0')
   // const compareFilteredPrice = await page.textContent(
   //   ':right-of(:nth-match([data-test="price-filter-0"], 1))'

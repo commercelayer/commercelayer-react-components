@@ -1,10 +1,11 @@
 import { BaseUnsetState } from '#typings/index'
-import { Sku, Price } from '@commercelayer/sdk'
+import { Price } from '@commercelayer/sdk'
 import { Dispatch } from 'react'
 import baseReducer from '#utils/baseReducer'
+import { SkuInventory } from './AvailabilityReducer'
 
 export interface Items {
-  [skuCode: string]: Sku
+  [skuCode: string]: SkuInventory
 }
 
 export interface ItemPrices {

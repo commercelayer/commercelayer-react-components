@@ -1,5 +1,5 @@
 import { BaseAction, LoaderType } from '#typings'
-import Sdk, { Price } from '@commercelayer/sdk'
+import { Price } from '@commercelayer/sdk'
 import getPrices from '#utils/getPrices'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Dispatch } from 'react'
@@ -7,7 +7,7 @@ import { ItemPrices } from './ItemReducer'
 import baseReducer from '#utils/baseReducer'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { BaseError } from '#typings/errors'
-import getOrganizationSlug from '#utils/organization'
+import getSdk from '#utils/getSdk'
 
 export interface Prices {
   [key: string]: Price | Price[]
@@ -59,11 +59,7 @@ export const getSkusPrice: GetSkusPrice = (
   { config, dispatch, setPrices, prices, perPage, filters }
 ) => {
   let allPrices = {}
-  const org = getOrganizationSlug(config.endpoint)
-  const sdk = Sdk({
-    accessToken: config.accessToken,
-    ...org,
-  })
+  const sdk = getSdk(config)
   sdk.prices
     .list({
       filters: { sku_code_in: skuCodes.join(','), ...filters },

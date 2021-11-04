@@ -4,7 +4,7 @@ import Parent from './utils/Parent'
 import { isEmpty } from 'lodash'
 import components from '#config/components'
 import { TimeFormat, FunctionChildren } from '#typings/index'
-import { LeadTimes, ShippingMethod } from '#reducers/AvailabilityReducer'
+import { DeliveryLeadTime } from '#reducers/AvailabilityReducer'
 
 const propTypes = components.AvailabilityTemplate.propTypes
 const defaultProps = components.AvailabilityTemplate
@@ -12,12 +12,7 @@ const defaultProps = components.AvailabilityTemplate
 const displayName = components.AvailabilityTemplate.displayName
 
 type AvailabilityTemplateChildrenProps = FunctionChildren<
-  Omit<AvailabilityTemplateProps, 'children'> & {
-    min: LeadTimes
-    max: LeadTimes
-    shippingMethod: ShippingMethod
-    quanity: number
-  }
+  Omit<AvailabilityTemplateProps, 'children'> & DeliveryLeadTime
 >
 
 type AvailabilityTemplateProps = {
@@ -30,13 +25,14 @@ const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = (
   props
 ) => {
   const { timeFormat, showShippingMethodName, children, ...p } = props
-  const { min, max, shippingMethod, quantity } = useContext(AvailabilityContext)
-  const mn = !isEmpty(min) && timeFormat ? min[timeFormat] : ''
-  const mx = !isEmpty(max) && timeFormat ? max[timeFormat] : ''
+  const { min, max, shipping_method, quantity } =
+    useContext(AvailabilityContext)
+  const mn = !isEmpty(min) && timeFormat ? min?.[timeFormat] : ''
+  const mx = !isEmpty(max) && timeFormat ? max?.[timeFormat] : ''
   const text: string[] = []
   const name =
-    showShippingMethodName && shippingMethod
-      ? `with ${shippingMethod.name}`
+    showShippingMethodName && shipping_method
+      ? `with ${shipping_method.name}`
       : ''
   if (quantity && quantity > 0) {
     text.push('Available')
@@ -49,7 +45,7 @@ const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = (
   const parentProps = {
     min,
     max,
-    shippingMethod,
+    shipping_method,
     quantity,
     ...props,
   }
