@@ -38,7 +38,7 @@ const displayName = components.OrderContainer.displayName
 type OrderContainerProps = {
   children: ReactNode
   metadata?: BaseMetadataObject
-  attributes?: Record<string, any>
+  attributes?: OrderCreate
   orderId?: string
 }
 
