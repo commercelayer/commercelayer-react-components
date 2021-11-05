@@ -140,6 +140,7 @@ export const getVariants: GetVariants = (params) => {
     })
     .then((skus) => {
       const skusObj = getSkus(skus)
+      console.log(`skuObj`, skusObj)
       if (skuCode) {
         setSkuCode({
           code: skusObj[skuCode].code,

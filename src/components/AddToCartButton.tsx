@@ -23,8 +23,7 @@ const displayName = components.AddToCartButton.displayName
 
 type ChildrenProps = {
   handleClick: () => AddToCartReturn
-} & Omit<AddToCartButtonProps, 'children'> &
-  PropsWithoutRef<JSX.IntrinsicElements['button']>
+} & Omit<AddToCartButtonProps, 'children'>
 
 type AddToCartButtonChildrenProps = FunctionChildren<ChildrenProps>
 

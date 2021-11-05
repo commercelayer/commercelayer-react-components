@@ -4,31 +4,24 @@ import React, {
   useReducer,
   useContext,
   ReactNode,
+  useMemo,
 } from 'react'
 import orderReducer, {
-  orderInitialState,
   AddToCartValues,
   createOrder,
-  removeGiftCardOrCouponCode,
+  getApiOrder,
+  setOrderErrors,
+  setOrder,
+  OrderCodeType,
+  AddResourceToInclude,
+  orderInitialState,
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import OrderContext from '#context/OrderContext'
-import {
-  getApiOrder,
-  addToCart,
-  OrderState,
-  setOrderErrors,
-  saveAddressToCustomerAddressBook,
-  setOrder,
-} from '#reducers/OrderReducer'
+import OrderContext, { defaultOrderContext } from '#context/OrderContext'
 import { unsetOrderState } from '#reducers/OrderReducer'
 import components from '#config/components'
 import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
-import {
-  setGiftCardOrCouponCode,
-  OrderCodeType,
-} from '../reducers/OrderReducer'
 import { OrderCreate, Order } from '@commercelayer/sdk'
 
 const propTypes = components.OrderContainer.propTypes
@@ -71,57 +64,70 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
             persistKey,
             clearWhenPlaced,
             deleteLocalOrder,
+            state,
           })
         }
       }
     }
     return (): void => unsetOrderState(dispatch)
   }, [config.accessToken])
-  const orderValue = {
-    ...state,
-    setOrder: (order: Order) => setOrder(order, dispatch),
-    getOrder: (id: string): Promise<void | Order> =>
-      getApiOrder({ id, dispatch, config }),
-    setOrderErrors: (errors: any) => setOrderErrors({ dispatch, errors }),
-    createOrder: async (): Promise<string> =>
-      await createOrder({
-        persistKey,
-        dispatch,
-        config,
-        state,
-        orderMetadata: metadata,
-        orderAttributes: attributes,
-      }),
-    addToCart: (values: AddToCartValues): Promise<{ success: boolean }> =>
-      addToCart({
-        ...values,
-        persistKey,
-        dispatch,
-        state,
-        config,
-        errors: state.errors,
-        orderMetadata: metadata || {},
-        orderAttributes: attributes,
-        setLocalOrder,
-      }),
-    saveAddressToCustomerAddressBook: (
-      type: 'BillingAddress' | 'ShippingAddress',
-      value: boolean
-    ) => saveAddressToCustomerAddressBook({ type, value, dispatch }),
-    setGiftCardOrCouponCode: ({ code }: { code: string }) =>
-      setGiftCardOrCouponCode({ code, dispatch, order: state.order, config }),
-    removeGiftCardOrCouponCode: ({ codeType }: { codeType: OrderCodeType }) =>
-      removeGiftCardOrCouponCode({
-        codeType,
-        dispatch,
-        order: state.order,
-        config,
-      }),
-  }
+  const orderValue = useMemo(() => {
+    return {
+      ...state,
+      setOrder: (order: Order) => setOrder(order, dispatch),
+      getOrder: (id: string): Promise<void | Order> =>
+        getApiOrder({ id, dispatch, config, state }),
+      setOrderErrors: (errors: any) => setOrderErrors({ dispatch, errors }),
+      createOrder: async (): Promise<string> =>
+        await createOrder({
+          persistKey,
+          dispatch,
+          config,
+          state,
+          orderMetadata: metadata,
+          orderAttributes: attributes,
+        }),
+      addToCart: (values: AddToCartValues): Promise<{ success: boolean }> =>
+        defaultOrderContext['addToCart']({
+          ...values,
+          persistKey,
+          dispatch,
+          state,
+          config,
+          errors: state.errors,
+          orderMetadata: metadata || {},
+          orderAttributes: attributes,
+          setLocalOrder,
+        }),
+      saveAddressToCustomerAddressBook: (args: any) =>
+        defaultOrderContext['saveAddressToCustomerAddressBook']({
+          ...args,
+          dispatch,
+        }),
+      setGiftCardOrCouponCode: ({ code }: { code: string }) =>
+        defaultOrderContext['setGiftCardOrCouponCode']({
+          code,
+          dispatch,
+          order: state.order,
+          config,
+        }),
+      removeGiftCardOrCouponCode: ({ codeType }: { codeType: OrderCodeType }) =>
+        defaultOrderContext['removeGiftCardOrCouponCode']({
+          codeType,
+          dispatch,
+          order: state.order,
+          config,
+        }),
+      addResourceToInclude: (args: AddResourceToInclude) =>
+        defaultOrderContext['addResourceToInclude']({
+          ...args,
+          dispatch,
+          resourcesIncluded: state.include,
+        }),
+    }
+  }, [state])
   return (
-    <OrderContext.Provider value={orderValue as OrderState}>
-      {children}
-    </OrderContext.Provider>
+    <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
   )
 }
 

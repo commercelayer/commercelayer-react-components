@@ -39,7 +39,13 @@ test('Order', async ({ page, browser }) => {
   const subTotalAmount = await await page.textContent(
     '[data-test=subtotal-amount]'
   )
+  const discoutAmount = await await page.textContent(
+    '[data-test=discount-amount]'
+  )
+  const totalAmount = await await page.textContent('[data-test=total-amount]')
   expect(subTotalAmount).toBe('€29,00')
+  expect(discoutAmount).toBe('€0,00')
+  expect(totalAmount).toBe('€29,00')
   // await page.pause()
   // const filterdPrice = await page.textContent('data-test=price-filter-0')
   // const compareFilteredPrice = await page.textContent(
