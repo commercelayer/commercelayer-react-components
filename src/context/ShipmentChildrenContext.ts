@@ -1,19 +1,19 @@
 import { createContext } from 'react'
 import {
-  DeliveryLeadTimeCollection,
-  LineItemCollection,
-  ShipmentCollection,
-  ShippingMethodCollection,
-  StockTransferCollection,
-} from '@commercelayer/js-sdk'
+  DeliveryLeadTime,
+  LineItem,
+  Shipment,
+  ShippingMethod,
+  StockTransfer,
+} from '@commercelayer/sdk'
 
 export interface InitialShipmentContext {
-  lineItems?: LineItemCollection[]
-  shippingMethods?: ShippingMethodCollection[]
+  lineItems?: LineItem[]
+  shippingMethods?: ShippingMethod[]
   currentShippingMethodId?: string
-  stockTransfers?: StockTransferCollection[]
-  deliveryLeadTimes?: DeliveryLeadTimeCollection[] | null
-  shipment?: ShipmentCollection
+  stockTransfers?: StockTransfer[]
+  deliveryLeadTimes?: DeliveryLeadTime[] | null
+  shipment?: Shipment
   keyNumber: number
 }
 

@@ -1,7 +1,7 @@
-import { LineItemCollection } from '@commercelayer/js-sdk'
+import { LineItem } from '@commercelayer/sdk'
 
 export interface GetLineItemsCountInterface {
-  (lineItems: LineItemCollection[], quantity?: number): number
+  (lineItems: LineItem[], quantity?: number): number
 }
 
 const getLineItemsCount: GetLineItemsCountInterface = (
@@ -10,9 +10,9 @@ const getLineItemsCount: GetLineItemsCountInterface = (
 ) => {
   const typeAccept = ['skus', 'gift_cards']
   lineItems
-    .filter((l) => typeAccept.includes(l.itemType))
-    .map((l) => {
-      quantity += l.quantity
+    .filter((l) => l.item_type && typeAccept.includes(l.item_type))
+    .forEach((l) => {
+      if (l.quantity) quantity += l.quantity
     })
   return quantity
 }

@@ -17,7 +17,7 @@ type LineItemImageProps = {
 
 const LineItemImage: FunctionComponent<LineItemImageProps> = (props) => {
   const { lineItem } = useContext(LineItemChildrenContext)
-  const src = lineItem['imageUrl']
+  const src = lineItem.image_url
   const parenProps = {
     src,
     ...props,
@@ -25,7 +25,7 @@ const LineItemImage: FunctionComponent<LineItemImageProps> = (props) => {
   return props.children ? (
     <Parent {...parenProps}>{props.children}</Parent>
   ) : (
-    <img src={src} {...props} />
+    <img alt="" src={src} {...props} />
   )
 }
 

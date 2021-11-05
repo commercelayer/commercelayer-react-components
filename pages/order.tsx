@@ -1,5 +1,8 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import { getSalesChannelToken } from '@commercelayer/js-auth'
+import {
+  getIntegrationToken,
+  getSalesChannelToken,
+} from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
@@ -29,26 +32,27 @@ import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
 import ItemContainer from '../src/components/ItemContainer'
 import Errors from '../src/components/Errors'
 import OrderStorage from '#components/OrderStorage'
+import { AddToCartButtonTemplate } from '@commercelayer/react-components'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
-const CustomAddToCart = (props: any) => {
-  const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
+const CustomAddToCart = (props: AddToCartButtonTemplate) => {
+  const { handleClick, disabled, className, ...p } = props
+  const classes = disabled ? 'opacity-50 cursor-not-allowed' : ''
   const myClick = async () => {
-    const { success } = await props.handleClick()
+    const { success } = await handleClick()
     if (success) {
       // NOTE: dispatch your callback or animation
     }
   }
   return (
     <button
-      className={`${classes} ${props.className}`}
+      className={`${classes} ${className}`}
       onClick={myClick}
-      disabled={props.disabled}
-      data-cy={props['data-cy']}
-      {...props}
+      disabled={disabled}
+      {...p}
     >
       Custom add to cart
     </button>
@@ -94,6 +98,7 @@ export default function Order() {
                 <div className="md:flex">
                   <div className="md:flex-shrink-0">
                     <img
+                      title="Tuta da bambino"
                       className="rounded-lg md:w-56"
                       src="https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90"
                     />
@@ -165,7 +170,7 @@ export default function Order() {
               </ItemContainer>
               <Errors resource="orders" />
               <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
-              {/* <LineItemsContainer>
+              <LineItemsContainer>
                 <p className="text-sm m-2">
                   Your shopping bag contains{' '}
                   <LineItemsCount data-cy="items-count" className="font-bold" />{' '}
@@ -183,7 +188,7 @@ export default function Order() {
                       />
                       <Errors
                         className="text-red-700 p-2"
-                        resource="lineItem"
+                        resource="line_items"
                         field="quantity"
                       />
                       <LineItemAmount
@@ -217,7 +222,7 @@ export default function Order() {
                     </div>
                   </LineItem>
                 </div>
-              </LineItemsContainer> */}
+              </LineItemsContainer>
               <div className="flex flex-col w-1/2 m-auto">
                 <div className="flex items-center p-2 justify-around font-medium text-left">
                   <div className="w-full">
