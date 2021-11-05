@@ -29,18 +29,28 @@ type LineItemsContainer = {
 
 const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
   const { children, filters = {}, loader = 'Loading...' } = props
-  const { order, getOrder, orderId } = useContext(OrderContext)
+  const { order, addResourceToInclude, include, orderId, getOrder } =
+    useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(lineItemReducer, lineItemInitialState)
   useEffect(() => {
-    if (!isEmpty(order)) {
-      order &&
-        getLineItems({
-          order,
-          dispatch,
-          config,
-          filters,
-        })
+    if (!include?.includes('line_items.line_item_options.sku_option')) {
+      addResourceToInclude({
+        newResource: 'line_items.line_item_options.sku_option',
+      })
+    }
+    if (!isEmpty(order) && order?.line_items) {
+      dispatch({
+        type: 'setLineItems',
+        payload: { lineItems: order.line_items },
+      })
+      // order &&
+      //   getLineItems({
+      //     order,
+      //     dispatch,
+      //     config,
+      //     filters,
+      //   })
     }
     return (): void => {
       if (isEmpty(order)) {

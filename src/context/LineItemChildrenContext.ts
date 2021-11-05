@@ -1,8 +1,8 @@
 import { createContext } from 'react'
-import { LineItemCollection } from '@commercelayer/js-sdk'
+import { LineItem } from '@commercelayer/sdk'
 
 export interface InitialLineItemContext {
-  lineItem: LineItemCollection | Record<string, any>
+  lineItem: LineItem | Record<string, any>
 }
 
 const initial: InitialLineItemContext = {

@@ -6,7 +6,9 @@ import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { isEmpty } from 'lodash'
 import { LoaderType } from '#typings'
 import { BaseError } from '#typings/errors'
-import { Order, LineItem } from '@commercelayer/sdk'
+import Sdk, { Order, LineItem } from '@commercelayer/sdk'
+import getSdk from '#utils/getSdk'
+import getErrors from '#utils/getErrors'
 
 export type UpdateLineItemParams = {
   lineItemId: string
@@ -57,24 +59,25 @@ export interface LineItemAction {
 }
 
 export const getLineItems: GetLineItems = (params) => {
-  const { order, dispatch, config, filters } = params
+  const { order, dispatch, config } = params
+  const sdk = getSdk(config)
   let allLineItems: LineItem[] = []
   order &&
-    // @ts-ignore
-    order
-      .withCredentials(config)
-      .lineItems()
-      .where(filters)
-      .includes('lineItemOptions.skuOption')
-      .all()
-      .then(async (res) => {
+    sdk.orders
+      .retrieve(order?.id, {
+        include: ['line_items', 'line_items.line_item_options.sku_option'],
+        fields: {
+          orders: ['line_items'],
+        },
+      })
+      .then((response) => {
         dispatch({
           type: 'setLoading',
           payload: {
             loading: false,
           },
         })
-        const items = res.toArray()
+        const items = response.line_items || []
         allLineItems = [...allLineItems, ...items]
         dispatch({
           type: 'setLineItems',
@@ -82,24 +85,9 @@ export const getLineItems: GetLineItems = (params) => {
             lineItems: allLineItems,
           },
         })
-        let colResp: any = res
-        const pageCount = res.pageCount()
-        if (colResp.hasNextPage() && pageCount) {
-          for (let index = 1; index < pageCount; index++) {
-            colResp = await colResp.withCredentials(config).nextPage()
-            const nextItems = colResp.toArray()
-            allLineItems = [...allLineItems, ...nextItems]
-            dispatch({
-              type: 'setLineItems',
-              payload: {
-                lineItems: allLineItems,
-              },
-            })
-          }
-        }
       })
-      .catch((c: any) => {
-        const errors = getErrorsByCollection(c, 'lineItem')
+      .catch((error) => {
+        const errors = getErrors(error, 'line_items')
         dispatch({
           type: 'setErrors',
           payload: {
@@ -110,27 +98,19 @@ export const getLineItems: GetLineItems = (params) => {
 }
 
 export const updateLineItem: UpdateLineItem = async (params) => {
-  const { config, lineItemId, quantity, getOrder, orderId, dispatch, errors } =
-    params
+  const { config, lineItemId, quantity, getOrder, orderId, dispatch } = params
+  const sdk = getSdk(config)
   try {
-    const lineItem = await CLayer.LineItem.build({
-      id: lineItemId,
-    })
-    const update = await lineItem.withCredentials(config).update({ quantity })
-    if (!update.errors().empty()) {
-      throw update
-    }
+    await sdk.line_items.update({ id: lineItemId, quantity })
     getOrder && (await getOrder(orderId))
-    if (!isEmpty(errors)) {
-      dispatch({
-        type: 'setErrors',
-        payload: {
-          errors: [],
-        },
-      })
-    }
-  } catch (c: any) {
-    const errors = getErrorsByCollection<LineItem>(c, 'lineItem')
+    dispatch({
+      type: 'setErrors',
+      payload: {
+        errors: [],
+      },
+    })
+  } catch (error) {
+    const errors = getErrors(error, 'line_items')
     dispatch({
       type: 'setErrors',
       payload: {
@@ -141,26 +121,19 @@ export const updateLineItem: UpdateLineItem = async (params) => {
 }
 
 export const deleteLineItem: DeleteLineItem = async (params) => {
-  const { config, lineItemId, getOrder, orderId, dispatch, errors } = params
+  const { config, lineItemId, getOrder, orderId, dispatch } = params
+  const sdk = getSdk(config)
   try {
-    const lineItem = await CLayer.LineItem.withCredentials(config).find(
-      lineItemId
-    )
-    const destroyLineItem = await lineItem.withCredentials(config).destroy()
-    if (!destroyLineItem.errors().empty()) {
-      throw destroyLineItem
-    }
+    await sdk.line_items.delete(lineItemId)
     getOrder && (await getOrder(orderId))
-    if (!isEmpty(errors)) {
-      dispatch({
-        type: 'setErrors',
-        payload: {
-          errors: [],
-        },
-      })
-    }
-  } catch (c: any) {
-    const errors = getErrorsByCollection(c, 'lineItem')
+    dispatch({
+      type: 'setErrors',
+      payload: {
+        errors: [],
+      },
+    })
+  } catch (error) {
+    const errors = getErrors(error, 'line_items')
     dispatch({
       type: 'setErrors',
       payload: {

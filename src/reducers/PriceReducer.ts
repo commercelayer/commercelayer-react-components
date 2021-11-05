@@ -5,9 +5,9 @@ import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Dispatch } from 'react'
 import { ItemPrices } from './ItemReducer'
 import baseReducer from '#utils/baseReducer'
-import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { BaseError } from '#typings/errors'
 import getSdk from '#utils/getSdk'
+import getErrors from '#utils/getErrors'
 
 export interface Prices {
   [key: string]: Price | Price[]
@@ -66,7 +66,6 @@ export const getSkusPrice: GetSkusPrice = (
       pageSize: perPage,
     })
     .then(async (response) => {
-      console.log(`response`, response)
       const pricesObj = getPrices(response)
       allPrices = { ...allPrices, ...prices, ...pricesObj }
       if (setPrices) {
@@ -105,7 +104,7 @@ export const getSkusPrice: GetSkusPrice = (
       }
     })
     .catch((error) => {
-      const errors = getErrorsByCollection(error, 'price')
+      const errors = getErrors(error, 'prices')
       dispatch({
         type: 'setErrors',
         payload: {
