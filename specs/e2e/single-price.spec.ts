@@ -1,11 +1,10 @@
 import { test, expect } from './baseFixtures'
 import path from 'path'
-import './config/dotenv-config'
-const endpointURL = `${process.env.__ENDPOINT__}/`
+const endpoint = `/`
 
 test('Prices page', async ({ page, browser }) => {
   await page.coverage.startJSCoverage()
-  await page.goto(endpointURL)
+  await page.goto(endpoint)
   const loading = await page.waitForSelector('text=Caricamento...')
   expect(await loading.textContent()).toBe('Caricamento...')
   const firstPrice = await page.textContent('data-test=price-0')
