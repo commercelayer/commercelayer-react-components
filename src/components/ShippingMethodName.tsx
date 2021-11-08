@@ -2,11 +2,15 @@ import React, { useContext, FunctionComponent, ReactNode } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
+import { ShippingMethodCollection } from '@commercelayer/js-sdk'
 
 const propTypes = components.ShippingMethodName.propTypes
 const displayName = components.ShippingMethodName.displayName
 
-type LineItemNameChildrenProps = Omit<LineItemNameProps, 'children'>
+type LineItemNameChildrenProps = Omit<LineItemNameProps, 'children'> & {
+  label: string
+  shippingMethod: ShippingMethodCollection
+}
 
 type LineItemNameProps = {
   children?: (props: LineItemNameChildrenProps) => ReactNode
@@ -18,6 +22,8 @@ const ShippingMethodName: FunctionComponent<LineItemNameProps> = (props) => {
     `shipment-${shippingMethod.shipmentId}-${shippingMethod.id}` || ''
   const labelName = shippingMethod['name']
   const parentProps = {
+    shippingMethod,
+    label: labelName,
     ...props,
   }
   return props.children ? (
