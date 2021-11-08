@@ -173,16 +173,22 @@ export default function Order() {
               <LineItemsContainer>
                 <p className="text-sm m-2">
                   Your shopping bag contains{' '}
-                  <LineItemsCount data-cy="items-count" className="font-bold" />{' '}
+                  <LineItemsCount
+                    data-test="items-count"
+                    className="font-bold"
+                  />{' '}
                   items
                 </p>
                 <div className="flex flex-col p-2">
                   <LineItem>
                     <div className="flex justify-around items-center border-b p-5">
                       <LineItemImage className="p-2" width={80} />
-                      <LineItemName data-cy="line-item-name" className="p-2" />
+                      <LineItemName
+                        data-test="line-item-name"
+                        className="p-2"
+                      />
                       <LineItemQuantity
-                        data-cy="line-item-quantity"
+                        data-test="line-item-quantity"
                         max={100}
                         className="p-2"
                       />
@@ -192,11 +198,11 @@ export default function Order() {
                         field="quantity"
                       />
                       <LineItemAmount
-                        data-cy="line-item-total"
+                        data-test="line-item-total"
                         className="p-2"
                       />
                       <LineItemRemoveLink
-                        data-cy="line-item-remove"
+                        data-test="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                       />
                     </div>
@@ -204,19 +210,22 @@ export default function Order() {
                   <LineItem type="gift_cards">
                     <div className="flex justify-between items-center border-b p-5">
                       <LineItemImage className="p-2" width={40} />
-                      <LineItemName data-cy="line-item-name" className="p-2" />
+                      <LineItemName
+                        data-test="line-item-name"
+                        className="p-2"
+                      />
                       <LineItemQuantity
-                        data-cy="line-item-quantity"
+                        data-test="line-item-quantity"
                         max={10}
                         className="p-2"
                         disabled
                       />
                       <LineItemAmount
-                        data-cy="line-item-total"
+                        data-test="line-item-total"
                         className="p-2"
                       />
                       <LineItemRemoveLink
-                        data-cy="line-item-remove"
+                        data-test="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                       />
                     </div>
