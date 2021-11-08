@@ -11,7 +11,6 @@ const config: PlaywrightTestConfig = {
     // Context options
     viewport: { width: 1280, height: 720 },
     ignoreHTTPSErrors: true,
-
     // Artifacts
     screenshot: 'only-on-failure',
     video: 'retry-with-video',
@@ -23,7 +22,11 @@ const config: PlaywrightTestConfig = {
         // Configure the browser to use.
         browserName: 'chromium',
         // Any Chromium-specific options.
-        viewport: { width: 600, height: 800 },
+        viewport: { width: 1200, height: 800 },
+        baseURL: 'http://localhost:3000',
+        launchOptions: {
+          devtools: true,
+        },
       },
     },
     // {
