@@ -83,7 +83,11 @@ export default function BraintreeGateway(props: BraintreeGateway) {
     )
   }
   return authorization && !loading ? (
-    <BraintreePayment authorization={authorization} />
+    <BraintreePayment
+      locale={locale}
+      authorization={authorization}
+      config={braintreeConfig}
+    />
   ) : (
     loaderComponent
   )
