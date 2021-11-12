@@ -1,8 +1,8 @@
 import { createContext } from 'react'
-import { SkuOptionCollection } from '@commercelayer/js-sdk'
+import { SkuOption } from '@commercelayer/sdk'
 
 export interface SkuOptionChildrenInitalState {
-  skuOption?: SkuOptionCollection | null
+  skuOption?: SkuOption | null
   skuCode: string
 }
 
@@ -10,8 +10,7 @@ const initial: SkuOptionChildrenInitalState = {
   skuCode: '',
 }
 
-const SkuOptionChildrenContext = createContext<SkuOptionChildrenInitalState>(
-  initial
-)
+const SkuOptionChildrenContext =
+  createContext<SkuOptionChildrenInitalState>(initial)
 
 export default SkuOptionChildrenContext

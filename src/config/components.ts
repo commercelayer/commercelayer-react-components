@@ -428,8 +428,10 @@ const components = {
         'skus',
         'gift_cards',
         'shipments',
-        'paymentMethods',
+        'payment_methods',
         'promotions',
+        'adjustments',
+        'bundles',
       ]),
     },
     defaultProps: {
@@ -460,8 +462,8 @@ const components = {
       children: PropTypes.func,
     },
   },
-  LineItemSkuCode: {
-    displayName: 'LineItemSkuCode',
+  LineItemCode: {
+    displayName: 'LineItemCode',
     propTypes: {
       children: PropTypes.func,
     },

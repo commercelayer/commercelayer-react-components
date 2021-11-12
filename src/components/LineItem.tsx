@@ -43,8 +43,5 @@ const LineItem: FunctionComponent<LineItemProps> = (props) => {
 
 LineItem.propTypes = propTypes
 LineItem.displayName = displayName
-LineItem.defaultProps = {
-  type: 'skus',
-}
 
 export default LineItem

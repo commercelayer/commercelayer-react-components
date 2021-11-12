@@ -50,7 +50,12 @@ const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = (props) => {
   ) : readonly ? (
     <span {...p}>{quantity}</span>
   ) : (
-    <select value={quantity} onChange={handleChange} {...p}>
+    <select
+      title={lineItem.name}
+      value={quantity}
+      onChange={handleChange}
+      {...p}
+    >
       {options}
     </select>
   )

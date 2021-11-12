@@ -14,6 +14,7 @@ import {
   saveAddressToCustomerAddressBook,
   addResourceToInclude,
 } from '#reducers/OrderReducer'
+import { Order } from '@commercelayer/sdk'
 
 type DefaultContext = {
   createOrder: CreateOrder
@@ -23,6 +24,7 @@ type DefaultContext = {
   removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode
   saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook
   addResourceToInclude: typeof addResourceToInclude
+  getOrder: (id: string) => Promise<void | Order>
 } & OrderState
 
 export const defaultOrderContext = {
@@ -33,6 +35,7 @@ export const defaultOrderContext = {
   removeGiftCardOrCouponCode,
   saveAddressToCustomerAddressBook,
   addResourceToInclude,
+  getOrder: async () => {},
 }
 
 const OrderContext = createContext<DefaultContext>(defaultOrderContext)

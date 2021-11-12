@@ -6,7 +6,9 @@ import components from '#config/components'
 const propTypes = components.LineItemName.propTypes
 const displayName = components.LineItemName.displayName
 
-type LineItemNameChildrenProps = Omit<LineItemNameProps, 'children'>
+type LineItemNameChildrenProps = Omit<LineItemNameProps, 'children'> & {
+  label: string
+}
 
 type LineItemNameProps = {
   children?: (props: LineItemNameChildrenProps) => ReactNode
@@ -14,14 +16,15 @@ type LineItemNameProps = {
 
 const LineItemName: FunctionComponent<LineItemNameProps> = (props) => {
   const { lineItem } = useContext(LineItemChildrenContext)
-  const labelName = lineItem['name']
+  const label = lineItem['name']
   const parentProps = {
+    label,
     ...props,
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <p {...props}>{labelName}</p>
+    <p {...props}>{label}</p>
   )
 }
 
