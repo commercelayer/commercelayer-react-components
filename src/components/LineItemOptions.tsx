@@ -31,7 +31,7 @@ const LineItemOptions: FunctionComponent<LineItemOptionsProps> = (props) => {
   const { skuOptionId, title, children, showName = true, showAll, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const lineItemOptions: LineItemOptionCollection[] = !isEmpty(lineItem)
-    ? lineItem['lineItemOptions']().toArray()
+    ? lineItem['line_item_options']
     : []
   const options = lineItemOptions
     .filter((o) => {

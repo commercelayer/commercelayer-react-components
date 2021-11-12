@@ -9,7 +9,7 @@ import lineItemReducer, {
   lineItemInitialState,
   updateLineItem,
   deleteLineItem,
-  getLineItems,
+  // getLineItems,
 } from '#reducers/LineItemReducer'
 import OrderContext from '#context/OrderContext'
 import LineItemContext, { LineItemContextValue } from '#context/LineItemContext'
@@ -28,7 +28,7 @@ type LineItemsContainer = {
 }
 
 const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
-  const { children, filters = {}, loader = 'Loading...' } = props
+  const { children, loader = 'Loading...' } = props
   const { order, addResourceToInclude, include, orderId, getOrder } =
     useContext(OrderContext)
   const config = useContext(CommerceLayerContext)

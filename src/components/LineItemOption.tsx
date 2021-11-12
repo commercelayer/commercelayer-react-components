@@ -52,18 +52,16 @@ const LineItemOption: FunctionComponent<LineItemOptionProps> = (props) => {
     showAll && isJSON(JSON.stringify(lineItemOption?.options)) ? (
       map(lineItemOption?.options, (value, key) => {
         return (
-          <TagElement id={key} {...p}>
+          <TagElement key={key} {...p}>
             {`${key}:`}
-            <span id={id} className={valueClassName}>
-              {`${value}`}
-            </span>
+            <span className={valueClassName}>{`${value}`}</span>
           </TagElement>
         )
       })
     ) : has(lineItemOption, `options.${name}`) ? (
-      <TagElement id={key} {...p}>
+      <TagElement key={key} {...p}>
         {`${name}:`}
-        <span id={id} className={valueClassName} {...p}>
+        <span className={valueClassName} {...p}>
           {`${get(lineItemOption, `options.${name}`)}`}
         </span>
       </TagElement>

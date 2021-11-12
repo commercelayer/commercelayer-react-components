@@ -1,18 +1,18 @@
 import { Dispatch } from 'react'
 import baseReducer from '#utils/baseReducer'
-import { SkuOptionCollection } from '@commercelayer/js-sdk'
+import { SkuOption } from '@commercelayer/sdk'
 import { BaseUnsetState } from '#typings/index'
 import { BaseError } from '#typings/errors'
 
 export interface SkuOptionsState {
   skuCode?: string
-  skuOptions?: SkuOptionCollection[]
+  skuOptions?: SkuOption[]
   errors?: BaseError[]
 }
 
 interface GetSkuOptionsParams {
   dispatch: Dispatch<SkuOptionsAction>
-  skuOptions?: SkuOptionCollection[]
+  skuOptions?: SkuOption[]
 }
 
 export interface GetSkuOptions {

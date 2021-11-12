@@ -91,10 +91,12 @@ export interface BaseInputComponentProps {
 
 export type LineItemType =
   | 'gift_cards'
-  | 'paymentMethods'
+  | 'payment_methods'
   | 'promotions'
   | 'shipments'
   | 'skus'
+  | 'bundles'
+  | 'adjustments'
 
 export type GiftCardInputName =
   | 'balanceCents'
