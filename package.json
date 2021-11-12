@@ -68,7 +68,7 @@
     "@adyen/adyen-web": "^5.2.0",
     "@commercelayer/js-auth": "^2.1.0",
     "@commercelayer/js-sdk": "^3.9.2",
-    "@commercelayer/sdk": "^2.3.2",
+    "@commercelayer/sdk": "^2.3.5",
     "@stripe/react-stripe-js": "^1.6.0",
     "@stripe/stripe-js": "^1.21.1",
     "braintree-web": "^3.83.0",
