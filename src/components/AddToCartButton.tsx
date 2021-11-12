@@ -33,6 +33,7 @@ type AddToCartButtonProps = {
   children?: AddToCartButtonChildrenProps
   label?: string | ReactNode
   skuCode?: string
+  bundleCode?: string
   disabled?: boolean
   skuListId?: string
   lineItem?: VariantOptions['lineItem']
@@ -43,6 +44,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     label = 'Add to cart',
     children,
     skuCode,
+    bundleCode,
     disabled,
     skuListId,
     lineItem,
@@ -108,6 +110,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     return !url
       ? addToCart &&
           addToCart({
+            bundleCode,
             skuCode: sCode,
             skuId: item[sCode]?.id,
             quantity: qty,
@@ -117,6 +120,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
       : callExternalFunction({
           url,
           data: {
+            bundleCode,
             skuCode: sCode,
             skuId: item[sCode]?.id,
             quantity: qty,
