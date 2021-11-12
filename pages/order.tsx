@@ -1,8 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import {
-  getIntegrationToken,
-  getSalesChannelToken,
-} from '@commercelayer/js-auth'
+import { getSalesChannelToken, clientCredentials } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
@@ -219,6 +216,50 @@ export default function Order() {
                         max={10}
                         className="p-2"
                         disabled
+                      />
+                      <LineItemAmount
+                        data-test="line-item-total"
+                        className="p-2"
+                      />
+                      <LineItemRemoveLink
+                        data-test="line-item-remove"
+                        className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                      />
+                    </div>
+                  </LineItem>
+                  <LineItem type="bundles">
+                    <div className="flex justify-between items-center border-b p-5">
+                      <LineItemImage className="p-2" width={40} />
+                      <LineItemName
+                        data-test="line-item-name"
+                        className="p-2"
+                      />
+                      <LineItemQuantity
+                        data-test="line-item-quantity"
+                        max={10}
+                        className="p-2"
+                      />
+                      <LineItemAmount
+                        data-test="line-item-total"
+                        className="p-2"
+                      />
+                      <LineItemRemoveLink
+                        data-test="line-item-remove"
+                        className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                      />
+                    </div>
+                  </LineItem>
+                  <LineItem type="adjustments">
+                    <div className="flex justify-between items-center border-b p-5">
+                      <LineItemImage className="p-2" width={40} />
+                      <LineItemName
+                        data-test="line-item-name"
+                        className="p-2"
+                      />
+                      <LineItemQuantity
+                        data-test="line-item-quantity"
+                        max={10}
+                        className="p-2"
                       />
                       <LineItemAmount
                         data-test="line-item-total"
