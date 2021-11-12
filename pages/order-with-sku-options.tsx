@@ -7,7 +7,9 @@ import VariantsContainer from '../src/components/VariantsContainer'
 import VariantSelector from '../src/components/VariantSelector'
 import PricesContainer from '../src/components/PricesContainer'
 import Price from '../src/components/Price'
-import AddToCartButton from '../src/components/AddToCartButton'
+import AddToCartButton, {
+  AddToCartButtonTemplate,
+} from '../src/components/AddToCartButton'
 import LineItemsContainer from '../src/components/LineItemsContainer'
 import LineItem from '../src/components/LineItem'
 import LineItemImage from '../src/components/LineItemImage'
@@ -34,12 +36,11 @@ import SkuOptionInput from '../src/components/SkuOptionInput'
 import LineItemOptions from '../src/components/LineItemOptions'
 import LineItemOption from '../src/components/LineItemOption'
 
-const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
-const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
+const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
-const CustomAddToCart = (props) => {
+const CustomAddToCart = (props: AddToCartButtonTemplate) => {
   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
   const myClick = () => {
     props.handleClick()
@@ -80,6 +81,7 @@ export default function Order() {
               <div className="md:flex">
                 <div className="md:flex-shrink-0">
                   <img
+                    alt=""
                     className="rounded-lg md:w-56"
                     src="https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90"
                   />
@@ -182,19 +184,6 @@ export default function Order() {
                         />
                       </LineItemOptions>
                     </div>
-                    {/* <div>
-                      <LineItemOptions
-                        skuOptionId="gNlGlsAOBk"
-                        className="font-bold"
-                      >
-                        <div className="flex flex-col justify-between text-sm">
-                          <LineItemOption
-                            name="back"
-                            keyClassName="font-medium capitalize underline"
-                          />
-                        </div>
-                      </LineItemOptions>
-                    </div> */}
                     <LineItemQuantity
                       id="line-item-quantity"
                       max={100}
@@ -202,7 +191,7 @@ export default function Order() {
                     />
                     <Errors
                       className="text-red-700 p-2"
-                      resource="lineItem"
+                      resource="line_items"
                       field="quantity"
                     />
                     <LineItemAmount id="line-item-total" className="p-2" />
