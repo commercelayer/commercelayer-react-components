@@ -28,9 +28,13 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
     billingAddressInitialState
   )
   const config = useContext(CommerceLayerContext)
-  const { order, getOrder } = useContext(OrderContext)
+  const { order, getOrder, include, addResourceToInclude } =
+    useContext(OrderContext)
   const { shipToDifferentAddress, setCloneAddress } = useContext(AddressContext)
   useEffect(() => {
+    if (!include?.includes('billing_address')) {
+      addResourceToInclude({ newResource: 'billing_address' })
+    }
     if (order && config) {
       setBillingCustomerAddressId({
         dispatch,
@@ -55,7 +59,6 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
         config,
         dispatch,
         order,
-        getOrder,
         shipToDifferentAddress,
         customerAddressId: options?.customerAddressId,
       })

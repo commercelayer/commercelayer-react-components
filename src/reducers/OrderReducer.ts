@@ -4,11 +4,10 @@ import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import baseReducer from '#utils/baseReducer'
 import { ItemOption, CustomLineItem } from './ItemReducer'
 import { isEmpty, size, map } from 'lodash'
-import differenceBy from 'lodash/differenceBy'
 import { BaseMetadataObject } from '#typings/index'
 import { BaseError } from '#typings/errors'
 import getSdk from '#utils/getSdk'
-import getErrors from '../utils/getErrors'
+import getErrors, { setErrors } from '../utils/getErrors'
 import {
   Order,
   LineItemCreate,
@@ -89,6 +88,7 @@ export interface UnsetOrderState {
 type resourceIncluded =
   | 'billing_address'
   | 'line_items.line_item_options.sku_option'
+  | 'available_customer_payment_sources'
 
 export interface OrderPayload {
   loading?: boolean
@@ -165,13 +165,11 @@ export const createOrder: CreateOrder = async (params) => {
     return o.id
   } catch (error: any) {
     const errors = getErrors(error, 'orders')
-    // TODO: Make function to merge errors as below
     console.error('Create order', errors)
-    const errorsDifference = differenceBy(state?.errors, errors, 'code')
-    const mergeErrors = state?.errors?.length === 0 ? errors : errorsDifference
-    dispatch &&
-      setOrderErrors({
-        errors: [...(state?.errors || []), ...mergeErrors],
+    if (dispatch)
+      setErrors({
+        currentErrors: state?.errors,
+        newErrors: errors,
         dispatch,
       })
     return ''
@@ -220,7 +218,40 @@ export const getApiOrder: GetOrder = async (params) => {
     return order
   } catch (error: any) {
     const errors = getErrors(error, 'orders')
-    persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
+    console.error('Retrieve order', errors)
+    // persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
+    if (dispatch)
+      setErrors({
+        currentErrors: state?.errors,
+        newErrors: errors,
+        dispatch,
+      })
+    return
+  }
+}
+
+export type UpdateOrderArgs = {
+  id: string
+  attributes: OrderUpdate
+  dispatch?: Dispatch<OrderActions>
+  include?: string[]
+  config?: CommerceLayerConfig
+}
+
+export async function updateOrder({
+  id,
+  attributes,
+  dispatch,
+  config,
+  include,
+}: UpdateOrderArgs) {
+  const sdk = getSdk(config as CommerceLayerConfig)
+  try {
+    const resource = { ...attributes, id }
+    const order = await sdk.orders.update(resource, { include })
+    dispatch && dispatch({ type: 'setOrder', payload: { order } })
+  } catch (error) {
+    const errors = getErrors(error, 'orders')
     if (dispatch) {
       setOrderErrors({ errors, dispatch })
       dispatch({
@@ -231,7 +262,6 @@ export const getApiOrder: GetOrder = async (params) => {
         },
       })
     }
-    return
   }
 }
 
@@ -334,9 +364,14 @@ export const addToCart: AddToCart = async (params) => {
     }
     return { success: false }
   } catch (error: any) {
-    const errs = getErrors(error, 'orders')
-    console.error('Create line item', errs, errors, [...errors, ...errs])
-    dispatch && setOrderErrors({ errors: [...errors, ...errs], dispatch })
+    const errors = getErrors(error, 'orders')
+    console.error('Add to cart', errors)
+    if (dispatch)
+      setErrors({
+        currentErrors: state?.errors,
+        newErrors: errors,
+        dispatch,
+      })
     return { success: false }
   }
 }

@@ -33,7 +33,7 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
 ) => {
   const { children, shipToDifferentAddress = false } = props
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
-  const { order, orderId, getOrder } = useContext(OrderContext)
+  const { order, orderId, getOrder, updateOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     dispatch({

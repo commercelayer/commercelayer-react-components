@@ -15,6 +15,7 @@ import orderReducer, {
   OrderCodeType,
   AddResourceToInclude,
   orderInitialState,
+  UpdateOrderArgs,
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext, { defaultOrderContext } from '#context/OrderContext'
@@ -123,6 +124,13 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
           ...args,
           dispatch,
           resourcesIncluded: state.include,
+        }),
+      updateOrder: async (args: UpdateOrderArgs) =>
+        await defaultOrderContext['updateOrder']({
+          ...args,
+          dispatch,
+          config,
+          include: state.include,
         }),
     }
   }, [state])
