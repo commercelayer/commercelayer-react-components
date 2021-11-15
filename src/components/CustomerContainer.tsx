@@ -16,7 +16,6 @@ import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
 import { saveCustomerUser } from '#reducers/CustomerReducer'
-import { getOrderContext } from '#reducers/OrderReducer'
 import CustomerContext from '#context/CustomerContext'
 import { defaultCustomerContext } from '#context/CustomerContext'
 import { BaseError } from '#typings/errors'
@@ -32,60 +31,49 @@ export type CustomerContainer = {
 const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
   const { children, isGuest = false } = props
   const [state, dispatch] = useReducer(customerReducer, customerInitialState)
-  const { order, getOrder } = useContext(OrderContext)
+  const { order, addResourceToInclude, include, updateOrder } =
+    useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
-    if (config.accessToken) {
-      if (isEmpty(state.addresses) && !isGuest) {
-        getCustomerAddresses({ config, dispatch })
-      }
-      if (order && isEmpty(state.payments) && !isGuest) {
-        getCustomerPaymentSources({ config, dispatch, order })
-      }
-      if (isEmpty(order) && isEmpty(state.orders)) {
-        getCustomerOrders({ config, dispatch })
-      }
+    if (!include?.includes('available_customer_payment_sources') && !isGuest) {
+      addResourceToInclude({
+        newResource: 'available_customer_payment_sources',
+      })
+    }
+    if (config.accessToken && isEmpty(state.addresses) && !isGuest) {
+      getCustomerAddresses({ config, dispatch })
+    }
+    if (
+      order &&
+      include?.includes('available_customer_payment_sources') &&
+      !isGuest
+    ) {
+      getCustomerPaymentSources({ dispatch, order })
     }
 
     return () => {
       dispatch({ type: 'setCustomerEmail', payload: {} })
     }
   }, [config.accessToken, order, isGuest])
-  const contextValue = useMemo(
-    () => ({
-      isGuest,
-      ...state,
-      getCustomerAddresses: () =>
-        defaultCustomerContext['getCustomerAddresses']({ config, dispatch }),
-      saveCustomerUser: async (customerEmail: string) => {
-        await saveCustomerUser({
-          config,
-          customerEmail,
-          dispatch,
-          getOrder: getOrder as getOrderContext,
-          order,
-        })
-      },
-      setCustomerErrors: (errors: BaseError[]) =>
-        defaultCustomerContext['setCustomerErrors'](errors, dispatch),
-      setCustomerEmail: (customerEmail: string) =>
-        defaultCustomerContext['setCustomerEmail'](customerEmail, dispatch),
-      getCustomerPaymentSources: () =>
-        getCustomerPaymentSources({ config, dispatch, order }),
-      deleteCustomerAddress: ({
-        customerAddressId,
-      }: {
-        customerAddressId: string
-      }) =>
-        defaultCustomerContext['deleteCustomerAddress']({
-          addresses: state?.addresses,
-          dispatch,
-          config,
-          customerAddressId,
-        }),
-    }),
-    [state]
-  )
+  const contextValue = {
+    isGuest,
+    ...state,
+    saveCustomerUser: async (customerEmail: string) => {
+      await saveCustomerUser({
+        config,
+        customerEmail,
+        dispatch,
+        updateOrder,
+        order,
+      })
+    },
+    setCustomerErrors: (errors: BaseError[]) =>
+      defaultCustomerContext['setCustomerErrors'](errors, dispatch),
+    setCustomerEmail: (customerEmail: string) =>
+      defaultCustomerContext['setCustomerEmail'](customerEmail, dispatch),
+    getCustomerPaymentSources: () =>
+      getCustomerPaymentSources({ config, dispatch, order }),
+  }
   return (
     <CustomerContext.Provider value={contextValue}>
       {children}

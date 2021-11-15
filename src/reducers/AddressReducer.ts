@@ -1,14 +1,11 @@
 import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
-import { BaseError } from '#typings/errors'
+import { BaseError, ResourceErrorType } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import {
-  Address,
-  CustomerAddress,
-  Order,
-  OrderCollection,
-} from '@commercelayer/js-sdk'
+import { Address, AddressCreate, Order, OrderUpdate } from '@commercelayer/sdk'
 import isEmpty from 'lodash/isEmpty'
+import getSdk from '#utils/getSdk'
+import { updateOrder } from './OrderReducer'
 
 export type AddressActionType =
   | 'setErrors'
@@ -49,18 +46,17 @@ export const addressFields: AddressField[] = [
   'zip_code',
 ]
 
-export type AddressResource =
-  | 'billingAddress'
-  | 'shippingAddress'
-  | 'customerAddress'
+export type AddressResource = Extract<
+  ResourceErrorType,
+  'billing_address' | 'shipping_address'
+>
 
-export type AddressSchema = Record<AddressField | string, string>
+export type AddressSchema = Address
 
 export interface AddressActionPayload {
   errors: BaseError[]
-  billingAddress: AddressSchema
-  shippingAddress: AddressSchema
-  customerAddress: AddressSchema
+  billingAddress: AddressCreate
+  shippingAddress: AddressCreate
   shipToDifferentAddress: boolean
   billingAddressId: string
   shippingAddressId: string
@@ -81,7 +77,7 @@ export const addressInitialState: AddressState = {
 export interface SetAddressErrors {
   <V extends BaseError[]>(args: {
     errors: V
-    resource: AddressResource
+    resource: Extract<ResourceErrorType, 'billing_address' | 'shipping_address'>
     dispatch?: Dispatch<AddressAction>
     currentErrors?: V
   }): void
@@ -100,9 +96,8 @@ export interface SetAddress {
 export interface SaveAddresses {
   (params: {
     orderId?: string
-    order?: OrderCollection | null
-    getOrder?: (orderId: string) => void
-    addressId?: string
+    order?: Order | null
+    updateOrder?: typeof updateOrder
     config: CommerceLayerConfig
     state: AddressState
     dispatch: Dispatch<AddressAction>
@@ -117,18 +112,14 @@ export const setAddressErrors: SetAddressErrors = ({
   resource,
 }) => {
   const billingErrors =
-    resource === 'billingAddress'
-      ? errors.filter((e) => e.resource === 'billingAddress')
-      : currentErrors.filter((e) => e.resource === 'billingAddress')
+    resource === 'billing_address'
+      ? errors.filter((e) => e.resource === resource)
+      : currentErrors.filter((e) => e.resource === resource)
   const shippingErrors =
-    resource === 'shippingAddress'
-      ? errors.filter((e) => e.resource === 'shippingAddress')
-      : currentErrors.filter((e) => e.resource === 'shippingAddress')
-  const customerErrors =
-    resource === 'customerAddress'
-      ? errors.filter((e) => e.resource === 'customerAddress')
-      : currentErrors.filter((e) => e.resource === 'customerAddress')
-  const finalErrors = [...billingErrors, ...shippingErrors, ...customerErrors]
+    resource === 'shipping_address'
+      ? errors.filter((e) => e.resource === resource)
+      : currentErrors.filter((e) => e.resource === resource)
+  const finalErrors = [...billingErrors, ...shippingErrors]
   dispatch &&
     dispatch({
       type: 'setErrors',
@@ -158,14 +149,14 @@ export const setCloneAddress: SetCloneAddress = (id, resource, dispatch) => {
   dispatch({
     type: 'setCloneAddress',
     payload: {
-      [`${resource}Id`]: id,
+      [`${resource}_id`]: id,
     },
   })
 }
 
 export const saveAddresses: SaveAddresses = async ({
   config,
-  getOrder,
+  updateOrder,
   order,
   state,
   addressId,
@@ -180,38 +171,41 @@ export const saveAddresses: SaveAddresses = async ({
     customerAddress,
   } = state
   try {
-    const currentBillingAddressRef = order?.billingAddress()?.reference
-    const orderAttributes: Partial<Record<string, any>> = {
-      _billingAddressCloneId: billingAddressId,
-      _shippingAddressCloneId: billingAddressId,
-    }
-    if (currentBillingAddressRef === billingAddressId) {
-      orderAttributes._billingAddressCloneId = order?.billingAddress()?.id
-      orderAttributes._shippingAddressCloneId = order?.billingAddress()?.id
-    }
-    if (!isEmpty(billingAddress) && billingAddress) {
-      delete orderAttributes._billingAddressCloneId
-      delete orderAttributes._shippingAddressCloneId
-      orderAttributes._shippingAddressSameAsBilling = true
-      orderAttributes.billingAddress = await Address.withCredentials(
-        config
-      ).create(billingAddress)
-    }
-    if (shipToDifferentAddress) {
-      delete orderAttributes._shippingAddressSameAsBilling
-      if (shippingAddressId)
-        orderAttributes._shippingAddressCloneId = shippingAddressId
-      if (!isEmpty(shippingAddress) && shippingAddress) {
-        delete orderAttributes._shippingAddressCloneId
-        orderAttributes.shippingAddress = await Address.withCredentials(
-          config
-        ).create(shippingAddress)
+    // const currentBillingAddressRef = order?.billingAddress()?.reference
+    const sdk = getSdk(config)
+    if (order) {
+      const currentBillingAddressRef = order?.billing_address?.reference
+      const orderAttributes: OrderUpdate = {
+        id: order?.id,
+        _billing_address_clone_id: billingAddressId,
+        _shipping_address_clone_id: billingAddressId,
       }
-    }
-    if (order && getOrder && !isEmpty(orderAttributes)) {
-      const o = await Order.build({ id: order.id })
-      await o.withCredentials(config).update(orderAttributes)
-      await getOrder(order.id)
+      if (currentBillingAddressRef === billingAddressId) {
+        orderAttributes._billing_address_clone_id = order?.billing_address?.id
+        orderAttributes._shipping_address_clone_id = order?.shipping_address?.id
+      }
+      if (!isEmpty(billingAddress) && billingAddress) {
+        delete orderAttributes._billing_address_clone_id
+        delete orderAttributes._shipping_address_clone_id
+        orderAttributes._shipping_address_same_as_billing = true
+        const address = await sdk.addresses.create(billingAddress)
+        orderAttributes.billing_address = sdk.addresses.relationship(address.id)
+      }
+      if (shipToDifferentAddress) {
+        delete orderAttributes._shipping_address_same_as_billing
+        if (shippingAddressId)
+          orderAttributes._shipping_address_clone_id = shippingAddressId
+        if (!isEmpty(shippingAddress) && shippingAddress) {
+          delete orderAttributes._shipping_address_clone_id
+          const address = await sdk.addresses.create(shippingAddress)
+          orderAttributes.shipping_address = sdk.addresses.relationship(
+            address.id
+          )
+        }
+      }
+      if (!isEmpty(orderAttributes) && updateOrder) {
+        await updateOrder({ id: order.id, attributes: orderAttributes })
+      }
     }
     if (!isEmpty(customerAddress)) {
       if (addressId) {

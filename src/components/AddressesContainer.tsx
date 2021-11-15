@@ -10,7 +10,6 @@ import React, {
 } from 'react'
 import addressReducer, {
   addressInitialState,
-  AddressResource,
   AddressSchema,
   setAddressErrors,
   SetAddressParams,
@@ -21,7 +20,6 @@ import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { saveAddresses } from '#reducers/AddressReducer'
 import components from '#config/components'
-import CustomerContext from '#context/CustomerContext'
 
 const propTypes = components.AddressesContainer.propTypes
 const displayName = components.AddressesContainer.displayName
@@ -35,8 +33,7 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
 ) => {
   const { children, shipToDifferentAddress = false } = props
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
-  const { order, orderId, getOrder } = useContext(OrderContext)
-  const { getCustomerAddresses } = useContext(CustomerContext)
+  const { order, orderId, getOrder, updateOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     dispatch({
@@ -54,7 +51,10 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
   }, [shipToDifferentAddress])
   const contextValue = {
     ...state,
-    setAddressErrors: (errors: BaseError[], resource: AddressResource) =>
+    setAddressErrors: (
+      errors: BaseError[],
+      resource: 'billingAddress' | 'shippingAddress'
+    ) =>
       setAddressErrors({
         errors,
         resource,
@@ -63,19 +63,19 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
       }),
     setAddress: (params: SetAddressParams<AddressSchema>) =>
       defaultAddressContext['setAddress']({ ...params, dispatch }),
-    saveAddresses: async (addressId?: string): Promise<void> =>
+    saveAddresses: async (): Promise<void> =>
       await saveAddresses({
         config,
         dispatch,
         getOrder,
         order,
         orderId,
-        addressId,
         state,
-        getCustomerAddresses,
       }),
-    setCloneAddress: (id: string, resource: AddressResource): void =>
-      setCloneAddress(id, resource, dispatch),
+    setCloneAddress: (
+      id: string,
+      resource: 'billingAddress' | 'shippingAddress'
+    ): void => setCloneAddress(id, resource, dispatch),
   }
   return (
     <AddressesContext.Provider value={contextValue}>
