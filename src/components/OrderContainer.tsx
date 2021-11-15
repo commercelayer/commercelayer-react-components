@@ -214,6 +214,13 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
           include: state.include,
           state,
         }),
+      updateOrder: async (args: UpdateOrderArgs) =>
+        await defaultOrderContext['updateOrder']({
+          ...args,
+          dispatch,
+          config,
+          include: state.include,
+        }),
     }
   }, [state, config.accessToken])
   return (
