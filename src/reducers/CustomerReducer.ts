@@ -2,16 +2,15 @@ import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
 import {
-  AddressCollection,
-  CustomerAddress,
-  CustomerPaymentSourceCollection,
+  Address,
+  CustomerPaymentSource,
   Order,
-  OrderCollection,
-} from '@commercelayer/js-sdk'
+  OrderUpdate,
+} from '@commercelayer/sdk'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { getOrderContext } from './OrderReducer'
-import getErrorsByCollection from '#utils/getErrorsByCollection'
-import { isEmpty } from 'lodash'
+import { updateOrder } from './OrderReducer'
+import getSdk from '#utils/getSdk'
+import getErrors from '#utils/getErrors'
 
 export type CustomerActionType =
   | 'setErrors'
@@ -20,8 +19,8 @@ export type CustomerActionType =
   | 'setPayments'
 
 export interface CustomerActionPayload {
-  addresses: AddressCollection[]
-  payments: CustomerPaymentSourceCollection[]
+  addresses: Address[]
+  payments: CustomerPaymentSource[]
   customerEmail: string
   errors: BaseError[]
   isGuest: boolean
@@ -44,29 +43,21 @@ export type SaveCustomerUser = (args: {
   config: CommerceLayerConfig
   customerEmail: string
   dispatch: Dispatch<CustomerAction>
-  order?: OrderCollection
-  getOrder: getOrderContext
-}) => Promise<void>
+  order?: Order
+  updateOrder: typeof updateOrder
+}) => void
 
 export const saveCustomerUser: SaveCustomerUser = async ({
-  config,
   customerEmail,
-  dispatch,
   order,
-  getOrder,
+  updateOrder,
 }) => {
-  try {
-    if (order) {
-      const o = await Order.build({ id: order.id })
-      await o.withCredentials(config).update({ customerEmail })
-      getOrder(order.id)
-      dispatch({
-        type: 'setCustomerEmail',
-        payload: { customerEmail },
-      })
+  if (order) {
+    const attributes: OrderUpdate = {
+      customer_email: customerEmail,
+      id: order.id,
     }
-  } catch (error) {
-    console.error(error)
+    await updateOrder({ id: order.id, attributes })
   }
 }
 
@@ -109,18 +100,19 @@ export const getCustomerAddresses: GetCustomerAddresses = async ({
   dispatch,
 }) => {
   try {
-    const customerAddresses = await CustomerAddress.withCredentials(config)
-      .includes('address')
-      .all()
-    const addresses: any = customerAddresses
-      .toArray()
-      .map((customerAddress) => customerAddress.address())
+    const sdk = getSdk(config)
+    const customerAddresses = await sdk.customer_addresses.list({
+      include: ['address'],
+    })
+    const addresses = customerAddresses.map(
+      (customerAddress) => customerAddress.address as Address
+    )
     dispatch({
       type: 'setAddresses',
       payload: { addresses },
     })
-  } catch (col: any) {
-    const errors = getErrorsByCollection(col, 'address')
+  } catch (error) {
+    const errors = getErrors(error, 'addresses')
     dispatch({
       type: 'setErrors',
       payload: {
@@ -131,38 +123,18 @@ export const getCustomerAddresses: GetCustomerAddresses = async ({
 }
 
 export type GetCustomerPaymentSources = (params: {
-  config: CommerceLayerConfig
   dispatch: Dispatch<CustomerAction>
-  order?: OrderCollection
+  order: Order
 }) => Promise<void>
 
 export const getCustomerPaymentSources: GetCustomerPaymentSources = async ({
-  config,
   dispatch,
   order,
 }) => {
-  try {
-    if (config && order) {
-      const payments: CustomerPaymentSourceCollection[] | undefined = (
-        await order
-          .availableCustomerPaymentSources()
-          ?.includes('paymentSource')
-          ?.load()
-      )?.toArray()
-      if (!isEmpty(payments) && payments) {
-        dispatch({
-          type: 'setPayments',
-          payload: { payments },
-        })
-      }
-    }
-  } catch (col: any) {
-    const errors = getErrorsByCollection(col, 'address')
+  if (order?.available_customer_payment_sources) {
     dispatch({
-      type: 'setErrors',
-      payload: {
-        errors,
-      },
+      type: 'setPayments',
+      payload: { payments: order.available_customer_payment_sources },
     })
   }
 }

@@ -1,8 +1,9 @@
 import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { Address, OrderCollection } from '@commercelayer/js-sdk'
+import { AddressUpdate, Order } from '@commercelayer/sdk'
 import { getOrderContext } from '#reducers/OrderReducer'
+import getSdk from '#utils/getSdk'
 
 export type BillingAddressActionType =
   | 'setBillingAddress'
@@ -30,8 +31,7 @@ export type SetBillingAddress = (
   options?: {
     config: CommerceLayerConfig
     dispatch: Dispatch<BillingAddressAction>
-    order?: OrderCollection
-    getOrder?: getOrderContext
+    order?: Order
     shipToDifferentAddress?: boolean
     customerAddressId?: string
   }
@@ -41,12 +41,12 @@ export const setBillingAddress: SetBillingAddress = async (id, options) => {
   try {
     if (options?.order) {
       if (options.customerAddressId) {
-        const address = await Address.withCredentials(options.config).find(id)
-        if (address.reference !== options.customerAddressId) {
-          await address.withCredentials(options.config).update({
-            reference: options.customerAddressId,
-          })
+        const sdk = getSdk(options.config)
+        const attributes: AddressUpdate = {
+          id,
+          reference: options.customerAddressId,
         }
+        await sdk.addresses.update(attributes)
       }
       options.dispatch({
         type: 'setBillingAddress',
@@ -56,13 +56,13 @@ export const setBillingAddress: SetBillingAddress = async (id, options) => {
       })
     }
   } catch (error) {
-    console.error(error)
+    console.error('Set billing address', error)
   }
 }
 
 type SetBillingCustomerAddressId = (args: {
   dispatch: Dispatch<BillingAddressAction>
-  order: OrderCollection
+  order: Order
   setCloneAddress: (
     id: string,
     resource: 'billingAddress' | 'shippingAddress'
@@ -74,13 +74,8 @@ export const setBillingCustomerAddressId: SetBillingCustomerAddressId = async ({
   order,
   setCloneAddress,
 }) => {
-  let customerAddressId = order?.billingAddress()?.customerAddressId
+  const customerAddressId = order?.billing_address?.reference
   try {
-    if (!customerAddressId) {
-      // @ts-ignore
-      const address = await order.loadBillingAddress()
-      customerAddressId = address?.reference
-    }
     if (customerAddressId) {
       dispatch({
         type: 'setBillingCustomerAddressId',
