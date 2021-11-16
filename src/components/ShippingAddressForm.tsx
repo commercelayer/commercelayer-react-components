@@ -14,7 +14,7 @@ import { AddressField } from '#reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
-import OrderStorageContext from '#context/OrderStorageContext'
+import { Address } from '@commercelayer/sdk'
 
 const propTypes = components.ShippingAddressForm.propTypes
 
@@ -37,24 +37,25 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress, shipToDifferentAddress } =
     useContext(AddressesContext)
-  const { saveAddressToCustomerAddressBook } = useContext(OrderContext)
-  const { setLocalOrder } = useContext(OrderStorageContext)
+  const { saveAddressToCustomerAddressBook, include, addResourceToInclude } =
+    useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
+    if (!include?.includes('shipping_address')) {
+      addResourceToInclude({ newResource: 'shipping_address' })
+    }
     if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
         const { code, message } = errors[fieldName]
         if (['shipping_address_state_code'].includes(fieldName)) {
           if (isEmpty(values['state_code'])) {
-            // const k = formErrors.findIndex(({ field }) => field === fieldName)
-            // k !== -1 && formErrors.splice(k, 0)
             delete errors[fieldName]
           } else {
             formErrors.push({
               code: code as CodeErrorType,
               message,
-              resource: 'shippingAddress',
+              resource: 'shipping_address',
               field: fieldName,
             })
           }
@@ -62,14 +63,14 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
           formErrors.push({
             code: code as CodeErrorType,
             message,
-            resource: 'shippingAddress',
+            resource: 'shipping_address',
             field: fieldName,
           })
         }
       }
-      shipToDifferentAddress && setAddressErrors(formErrors, 'shippingAddress')
+      shipToDifferentAddress && setAddressErrors(formErrors, 'shipping_address')
     } else if (!isEmpty(values) && shipToDifferentAddress) {
-      setAddressErrors([], 'shippingAddress')
+      setAddressErrors([], 'shipping_address')
       for (const name in values) {
         const field = values[name]
         if (field?.value) {
@@ -78,26 +79,28 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
         }
         if (field?.type === 'checkbox') {
           delete values[name]
-          saveAddressToCustomerAddressBook('ShippingAddress', field.checked)
-          setLocalOrder(
-            'saveShippingAddressToCustomerAddressBook',
-            field.checked
-          )
+          saveAddressToCustomerAddressBook({
+            type: 'shipping_address',
+            value: field.checked,
+          })
         }
       }
-      setAddress({ values, resource: 'shippingAddress' })
+      setAddress({ values: values as Address, resource: 'shipping_address' })
     }
     if (reset && (!isEmpty(values) || !isEmpty(errors))) {
       saveAddressToCustomerAddressBook &&
-        saveAddressToCustomerAddressBook('ShippingAddress', false)
+        saveAddressToCustomerAddressBook({
+          type: 'shipping_address',
+          value: false,
+        })
       if (ref) {
         ref.current?.reset()
         resetForm({ target: ref.current } as any)
-        setAddressErrors([], 'shippingAddress')
-        setAddress({ values: {}, resource: 'shippingAddress' })
+        setAddressErrors([], 'shipping_address')
+        setAddress({ values: {} as Address, resource: 'shipping_address' })
       }
     }
-  }, [values, errors, shipToDifferentAddress, reset])
+  }, [values, errors, shipToDifferentAddress, reset, include])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any
@@ -105,7 +108,10 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     const field: any = {
       [name.replace('shipping_address_', '')]: value,
     }
-    setAddress({ values: { ...values, ...field }, resource: 'shippingAddress' })
+    setAddress({
+      values: { ...values, ...field },
+      resource: 'shipping_address',
+    })
   }
   const providerValues = {
     values,

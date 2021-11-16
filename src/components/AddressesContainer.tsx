@@ -20,6 +20,7 @@ import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { saveAddresses } from '#reducers/AddressReducer'
 import components from '#config/components'
+import { AddressResource } from '../reducers/AddressReducer'
 
 const propTypes = components.AddressesContainer.propTypes
 const displayName = components.AddressesContainer.displayName
@@ -33,7 +34,7 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
 ) => {
   const { children, shipToDifferentAddress = false } = props
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
-  const { order, orderId, getOrder, updateOrder } = useContext(OrderContext)
+  const { order, orderId, updateOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     dispatch({
@@ -51,10 +52,7 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
   }, [shipToDifferentAddress])
   const contextValue = {
     ...state,
-    setAddressErrors: (
-      errors: BaseError[],
-      resource: 'billingAddress' | 'shippingAddress'
-    ) =>
+    setAddressErrors: (errors: BaseError[], resource: AddressResource) =>
       setAddressErrors({
         errors,
         resource,
@@ -67,15 +65,13 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
       await saveAddresses({
         config,
         dispatch,
-        getOrder,
+        updateOrder,
         order,
         orderId,
         state,
       }),
-    setCloneAddress: (
-      id: string,
-      resource: 'billingAddress' | 'shippingAddress'
-    ): void => setCloneAddress(id, resource, dispatch),
+    setCloneAddress: (id: string, resource: AddressResource): void =>
+      setCloneAddress(id, resource, dispatch),
   }
   return (
     <AddressesContext.Provider value={contextValue}>

@@ -2,8 +2,8 @@ import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { AddressUpdate, Order } from '@commercelayer/sdk'
-import { getOrderContext } from '#reducers/OrderReducer'
 import getSdk from '#utils/getSdk'
+import { AddressResource } from './AddressReducer'
 
 export type BillingAddressActionType =
   | 'setBillingAddress'
@@ -11,7 +11,7 @@ export type BillingAddressActionType =
   | 'cleanup'
 
 export interface BillingAddressActionPayload {
-  _billingAddressCloneId: string
+  _billing_address_clone_id: string
   billingCustomerAddressId: string
 }
 
@@ -23,7 +23,7 @@ export interface BillingAddressAction {
 }
 
 export const billingAddressInitialState: BillingAddressState = {
-  _billingAddressCloneId: '',
+  _billing_address_clone_id: '',
 }
 
 export type SetBillingAddress = (
@@ -51,7 +51,7 @@ export const setBillingAddress: SetBillingAddress = async (id, options) => {
       options.dispatch({
         type: 'setBillingAddress',
         payload: {
-          _billingAddressCloneId: id,
+          _billing_address_clone_id: id,
         },
       })
     }
@@ -63,10 +63,7 @@ export const setBillingAddress: SetBillingAddress = async (id, options) => {
 type SetBillingCustomerAddressId = (args: {
   dispatch: Dispatch<BillingAddressAction>
   order: Order
-  setCloneAddress: (
-    id: string,
-    resource: 'billingAddress' | 'shippingAddress'
-  ) => void
+  setCloneAddress: (id: string, resource: AddressResource) => void
 }) => void
 
 export const setBillingCustomerAddressId: SetBillingCustomerAddressId = async ({
@@ -81,7 +78,7 @@ export const setBillingCustomerAddressId: SetBillingCustomerAddressId = async ({
         type: 'setBillingCustomerAddressId',
         payload: { billingCustomerAddressId: customerAddressId },
       })
-      setCloneAddress(customerAddressId, 'billingAddress')
+      setCloneAddress(customerAddressId, 'billing_address')
     }
   } catch (error) {
     console.error('error', error)

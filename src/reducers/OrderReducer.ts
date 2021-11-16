@@ -8,11 +8,13 @@ import { BaseMetadataObject } from '#typings/index'
 import { BaseError } from '#typings/errors'
 import getSdk from '#utils/getSdk'
 import getErrors, { setErrors } from '../utils/getErrors'
+import { AddressResource } from './AddressReducer'
 import {
   Order,
   LineItemCreate,
   LineItemOptionCreate,
   OrderUpdate,
+  QueryParamsRetrieve,
 } from '@commercelayer/sdk'
 
 export type GetOrderParams = Partial<{
@@ -87,6 +89,7 @@ export interface UnsetOrderState {
 
 type resourceIncluded =
   | 'billing_address'
+  | 'shipping_address'
   | 'line_items.line_item_options.sku_option'
   | 'available_customer_payment_sources'
 
@@ -188,38 +191,39 @@ export const getApiOrder: GetOrder = async (params) => {
   } = params
   const sdk = getSdk(config as CommerceLayerConfig)
   try {
-    const order = await sdk.orders.retrieve(id as string, {
-      include: state?.include || [],
-    })
-    if (order)
-      if (
-        (clearWhenPlaced && order.status === 'placed') ||
-        order.status === 'approved' ||
-        order.status === 'cancelled'
-      ) {
-        persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
-        dispatch &&
-          dispatch({
-            type: 'setOrder',
-            payload: {
-              order: undefined,
-              orderId: '',
-            },
-          })
-      } else {
-        dispatch &&
-          dispatch({
-            type: 'setOrder',
-            payload: {
-              order: order,
-            },
-          })
-      }
+    const options: QueryParamsRetrieve = {}
+    if (state?.include && state.include.length > 0) {
+      options.include = state.include
+    }
+    const order = await sdk.orders.retrieve(id as string, options)
+    if (
+      (clearWhenPlaced && order.status === 'placed') ||
+      order.status === 'approved' ||
+      order.status === 'cancelled'
+    ) {
+      persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
+      dispatch &&
+        dispatch({
+          type: 'setOrder',
+          payload: {
+            order: undefined,
+            orderId: '',
+          },
+        })
+    } else {
+      dispatch &&
+        dispatch({
+          type: 'setOrder',
+          payload: {
+            order: order,
+            orderId: order.id,
+          },
+        })
+    }
     return order
   } catch (error: any) {
     const errors = getErrors(error, 'orders')
     console.error('Retrieve order', errors)
-    // persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
     if (dispatch)
       setErrors({
         currentErrors: state?.errors,
@@ -255,10 +259,9 @@ export async function updateOrder({
     if (dispatch) {
       setOrderErrors({ errors, dispatch })
       dispatch({
-        type: 'setOrder',
+        type: 'setErrors',
         payload: {
-          order: undefined,
-          orderId: '',
+          errors,
         },
       })
     }
@@ -289,11 +292,12 @@ export function addResourceToInclude({
   dispatch,
   newResource,
 }: AddResourceToInclude) {
+  const include = [...resourcesIncluded, newResource]
   dispatch &&
     dispatch({
       type: 'setIncludesResource',
       payload: {
-        include: [...resourcesIncluded, newResource],
+        include,
       },
     })
 }
@@ -408,13 +412,13 @@ export function setOrderErrors({ dispatch, errors }: OrderErrors) {
 
 export type SaveAddressToCustomerAddressBook = (params: {
   dispatch?: Dispatch<OrderActions>
-  type: 'BillingAddress' | 'ShippingAddress'
+  type: AddressResource
   value: boolean
 }) => void
 
 export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook =
   ({ type, value, dispatch }) => {
-    const k = `save${type}ToCustomerBook`
+    const k = `save_${type}_to_customer_book`
     const v = `${value}`
     localStorage.setItem(k, v)
     dispatch &&

@@ -16,6 +16,7 @@ import orderReducer, {
   AddResourceToInclude,
   orderInitialState,
   UpdateOrderArgs,
+  SaveAddressToCustomerAddressBook,
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext, { defaultOrderContext } from '#context/OrderContext'
@@ -71,7 +72,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
       }
     }
     return (): void => unsetOrderState(dispatch)
-  }, [config.accessToken])
+  }, [config.accessToken, orderId])
   const orderValue = useMemo(() => {
     return {
       ...state,
@@ -100,7 +101,9 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
           orderAttributes: attributes,
           setLocalOrder,
         }),
-      saveAddressToCustomerAddressBook: (args: any) =>
+      saveAddressToCustomerAddressBook: (
+        args: Parameters<SaveAddressToCustomerAddressBook>[0]
+      ) =>
         defaultOrderContext['saveAddressToCustomerAddressBook']({
           ...args,
           dispatch,

@@ -11,7 +11,7 @@ import components from '#config/components'
 import CustomerContext from '#context/CustomerContext'
 import BillingAddressContext from '#context/BillingAddressContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
-import { AddressCollection } from '@commercelayer/js-sdk'
+import { Address as AddressType } from '@commercelayer/sdk'
 import isEmpty from 'lodash/isEmpty'
 import AddressContext from '#context/AddressContext'
 import OrderContext from '#context/OrderContext'
@@ -27,7 +27,7 @@ type Props = {
   selectedClassName?: string
   disabledClassName?: string
   onSelect?: () => void
-  addresses?: AddressCollection[]
+  addresses?: AddressType[]
   deselect?: boolean
 } & JSX.IntrinsicElements['div']
 
@@ -56,6 +56,7 @@ const Address: FunctionComponent<Props> = (props) => {
   const items = !isEmpty(addresses)
     ? addresses
     : (addressesContext && addressesContext) || []
+  console.log(`items`, items)
   useEffect(() => {
     if (items && !deselect) {
       items.map((address, k) => {
@@ -68,7 +69,7 @@ const Address: FunctionComponent<Props> = (props) => {
         if (!billingAddressId && k === selected) {
           setBillingAddress &&
             setBillingAddress(address.id, {
-              customerAddressId: address.customerAddressId as string,
+              customerAddressId: address.reference as string,
             })
         }
         if (shippingCustomerAddressId) {
@@ -78,7 +79,7 @@ const Address: FunctionComponent<Props> = (props) => {
         if (!shippingAddressId && k === selected) {
           setShippingAddress &&
             setShippingAddress(address.id, {
-              customerAddressId: address.customerAddressId as string,
+              customerAddressId: address.reference as string,
             })
         }
       })
@@ -111,7 +112,7 @@ const Address: FunctionComponent<Props> = (props) => {
       (await setShippingAddress(addressId, { customerAddressId }))
     onSelect && onSelect()
   }
-  const countryLock = order?.shippingCountryCodeLock
+  const countryLock = order?.shipping_country_code_lock
   const components =
     typeof children === 'function'
       ? []
@@ -122,12 +123,12 @@ const Address: FunctionComponent<Props> = (props) => {
           const disabled =
             (setShippingAddress &&
               countryLock &&
-              countryLock !== address.countryCode) ||
+              countryLock !== address.country_code) ||
             false
           const selectedClass = deselect ? '' : selectedClassName
           const addressSelectedClass =
             selected === k ? `${className} ${selectedClass}` : className
-          const customerAddressId: string = address?.customerAddressId || ''
+          const customerAddressId: string = address?.reference || ''
           const finalClassName = disabled
             ? `${className} ${disabledClassName}`
             : addressSelectedClass

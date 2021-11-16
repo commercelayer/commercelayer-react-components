@@ -14,7 +14,7 @@ import { AddressField } from '#reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
-import OrderStorageContext from '#context/OrderStorageContext'
+import { Address } from '@commercelayer/sdk'
 
 const propTypes = components.BillingAddressForm.propTypes
 
@@ -36,24 +36,29 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
   } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
-  const { saveAddressToCustomerAddressBook, order } = useContext(OrderContext)
-  const { setLocalOrder } = useContext(OrderStorageContext)
+  const {
+    saveAddressToCustomerAddressBook,
+    order,
+    include,
+    addResourceToInclude,
+  } = useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
+    if (!include?.includes('billing_address')) {
+      addResourceToInclude({ newResource: 'billing_address' })
+    }
     if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
         const { code, message } = errors[fieldName]
         if (['billing_address_state_code'].includes(fieldName)) {
           if (isEmpty(values['state_code'])) {
-            // const k = formErrors.findIndex(({ field }) => field === fieldName)
-            // k !== -1 && formErrors.splice(k, 0)
             delete errors[fieldName]
           } else {
             formErrors.push({
               code: code as CodeErrorType,
               message,
-              resource: 'billingAddress',
+              resource: 'billing_address',
               field: fieldName,
             })
           }
@@ -61,14 +66,14 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
           formErrors.push({
             code: code as CodeErrorType,
             message,
-            resource: 'billingAddress',
+            resource: 'billing_address',
             field: fieldName,
           })
         }
       }
-      setAddressErrors(formErrors, 'billingAddress')
+      setAddressErrors(formErrors, 'billing_address')
     } else if (!isEmpty(values)) {
-      setAddressErrors([], 'billingAddress')
+      setAddressErrors([], 'billing_address')
       for (const name in values) {
         const field = values[name]
         if (field?.value) {
@@ -77,26 +82,28 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
         }
         if (field?.type === 'checkbox') {
           delete values[name]
-          saveAddressToCustomerAddressBook('BillingAddress', field.checked)
-          setLocalOrder(
-            'saveBillingAddressToCustomerAddressBook',
-            field.checked
-          )
+          saveAddressToCustomerAddressBook({
+            type: 'billing_address',
+            value: field.checked,
+          })
         }
       }
-      setAddress({ values, resource: 'billingAddress' })
+      setAddress({ values: values as Address, resource: 'billing_address' })
     }
     if (reset && (!isEmpty(values) || !isEmpty(errors))) {
       saveAddressToCustomerAddressBook &&
-        saveAddressToCustomerAddressBook('BillingAddress', false)
+        saveAddressToCustomerAddressBook({
+          type: 'billing_address',
+          value: false,
+        })
       if (ref) {
         ref.current?.reset()
         resetForm({ target: ref.current } as any)
-        setAddressErrors([], 'billingAddress')
-        setAddress({ values: {}, resource: 'billingAddress' })
+        setAddressErrors([], 'billing_address')
+        setAddress({ values: {} as Address, resource: 'billing_address' })
       }
     }
-  }, [errors, values, reset])
+  }, [errors, values, reset, include])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any
@@ -104,15 +111,14 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     const field: any = {
       [name.replace('billing_address_', '')]: value,
     }
-    setAddress({ values: { ...values, ...field }, resource: 'billingAddress' })
+    setAddress({ values: { ...values, ...field }, resource: 'billing_address' })
   }
   const providerValues = {
     values,
     validation,
     setValue,
     errorClassName,
-    // @ts-ignore
-    requiresBillingInfo: order?.requiresBillingInfo || false,
+    requiresBillingInfo: order?.requires_billing_info || false,
     errors: errors as any,
     resetField: (name: string) =>
       resetForm({ currentTarget: ref.current } as any, name),
