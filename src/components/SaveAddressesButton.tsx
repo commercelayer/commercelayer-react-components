@@ -45,9 +45,9 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
   } = props
   const {
     errors,
-    billingAddress,
+    billing_address,
     shipToDifferentAddress,
-    shippingAddress,
+    shipping_address,
     saveAddresses,
     billingAddressId,
     shippingAddressId,
@@ -57,29 +57,28 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
   const [forceDisable, setForceDisable] = useState(disabled)
   const customerEmail = !!(
     !!(isGuest === true || typeof isGuest === 'undefined') &&
-    !order?.customerEmail
+    !order?.customer_email
   )
   const billingDisable = billingAddressController({
-    billingAddress,
+    billing_address,
     errors,
     billingAddressId,
-    // @ts-ignore
-    requiresBillingInfo: order?.requiresBillingInfo,
+    requiresBillingInfo: order?.requires_billing_info,
   })
   const shippingDisable = shippingAddressController({
     billingDisable,
     errors,
     shipToDifferentAddress,
-    shippingAddress,
+    shipping_address,
     shippingAddressId,
   })
   const countryLockDisable = countryLockController({
-    countryCodeLock: order?.shippingCountryCodeLock,
+    countryCodeLock: order?.shipping_country_code_lock,
     addresses,
     shipToDifferentAddress,
     billingAddressId,
-    billingAddress,
-    shippingAddress,
+    billing_address,
+    shipping_address,
     shippingAddressId,
   })
   const disable =

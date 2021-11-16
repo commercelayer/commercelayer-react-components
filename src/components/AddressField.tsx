@@ -31,8 +31,8 @@ type AddressFieldProps = (
 const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
   const { name } = props
   const { address } = useContext(AddressChildrenContext)
-  const key = camelCase(name)
-  const text = get(address, key)
+  console.log(`address`, address)
+  const text = get(address, name as AddressFieldView)
   const parentProps = {
     address,
     ...props,

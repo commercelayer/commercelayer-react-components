@@ -51,8 +51,8 @@ export type AddressSchema = Address
 
 export interface AddressActionPayload {
   errors: BaseError[]
-  billingAddress: AddressCreate
-  shippingAddress: AddressCreate
+  billing_address: AddressCreate
+  shipping_address: AddressCreate
   shipToDifferentAddress: boolean
   billingAddressId: string
   shippingAddressId: string
@@ -108,11 +108,11 @@ export const setAddressErrors: SetAddressErrors = ({
   const billingErrors =
     resource === 'billing_address'
       ? errors.filter((e) => e.resource === resource)
-      : currentErrors.filter((e) => e.resource === resource)
+      : currentErrors.filter((e) => e.resource === 'billing_address')
   const shippingErrors =
     resource === 'shipping_address'
       ? errors.filter((e) => e.resource === resource)
-      : currentErrors.filter((e) => e.resource === resource)
+      : currentErrors.filter((e) => e.resource === 'shipping_address')
   const finalErrors = [...billingErrors, ...shippingErrors]
   dispatch &&
     dispatch({
@@ -156,13 +156,12 @@ export const saveAddresses: SaveAddresses = async ({
 }) => {
   const {
     shipToDifferentAddress,
-    billingAddress,
-    shippingAddress,
+    billing_address,
+    shipping_address,
     billingAddressId,
     shippingAddressId,
   } = state
   try {
-    // const currentBillingAddressRef = order?.billingAddress()?.reference
     const sdk = getSdk(config)
     if (order) {
       const currentBillingAddressRef = order?.billing_address?.reference
@@ -175,20 +174,20 @@ export const saveAddresses: SaveAddresses = async ({
         orderAttributes._billing_address_clone_id = order?.billing_address?.id
         orderAttributes._shipping_address_clone_id = order?.shipping_address?.id
       }
-      if (!isEmpty(billingAddress) && billingAddress) {
+      if (!isEmpty(billing_address) && billing_address) {
         delete orderAttributes._billing_address_clone_id
         delete orderAttributes._shipping_address_clone_id
         orderAttributes._shipping_address_same_as_billing = true
-        const address = await sdk.addresses.create(billingAddress)
+        const address = await sdk.addresses.create(billing_address)
         orderAttributes.billing_address = sdk.addresses.relationship(address.id)
       }
       if (shipToDifferentAddress) {
         delete orderAttributes._shipping_address_same_as_billing
         if (shippingAddressId)
           orderAttributes._shipping_address_clone_id = shippingAddressId
-        if (!isEmpty(shippingAddress) && shippingAddress) {
+        if (!isEmpty(shipping_address) && shipping_address) {
           delete orderAttributes._shipping_address_clone_id
-          const address = await sdk.addresses.create(shippingAddress)
+          const address = await sdk.addresses.create(shipping_address)
           orderAttributes.shipping_address = sdk.addresses.relationship(
             address.id
           )

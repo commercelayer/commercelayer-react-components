@@ -167,7 +167,7 @@ export default function Main() {
                 <p className="mt-2 text-sm text-red-600" id="email-error">
                   <Errors
                     data-cy="customer_email_error"
-                    resource="order"
+                    resource="orders"
                     field="customer_email"
                     messages={messages}
                   />
@@ -220,7 +220,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="billing_address_first_name_error"
-                      resource="billingAddress"
+                      resource="billing_address"
                       field="billing_address_first_name"
                       messages={messages}
                     />
@@ -245,7 +245,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="billing_address_last_name_error"
-                      resource="billingAddress"
+                      resource="billing_address"
                       field="billing_address_last_name"
                       messages={messages}
                     />
@@ -270,7 +270,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="billing_address_line_1_error"
-                      resource="billingAddress"
+                      resource="billing_address"
                       field="billing_address_line_1"
                       messages={messages}
                     />
@@ -295,7 +295,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="billing_address_city_error"
-                      resource="billingAddress"
+                      resource="billing_address"
                       field="billing_address_city"
                       messages={messages}
                     />
@@ -323,7 +323,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="billing_address_country_code_error"
-                      resource="billingAddress"
+                      resource="billing_address"
                       field="billing_address_country_code"
                       messages={messages}
                     />
@@ -352,7 +352,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="billing_address_state_code_error"
-                      resource="billingAddress"
+                      resource="billing_address"
                       field="billing_address_state_code"
                       messages={messages}
                     />
@@ -377,7 +377,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="billing_address_zip_code_error"
-                      resource="billingAddress"
+                      resource="billing_address"
                       field="billing_address_zip_code"
                       messages={messages}
                     />
@@ -402,7 +402,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="billing_address_phone_error"
-                      resource="billingAddress"
+                      resource="billing_address"
                       field="billing_address_phone"
                       messages={messages}
                     />
@@ -427,7 +427,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="billing_address_billing_info"
-                      resource="billingAddress"
+                      resource="billing_address"
                       field="billing_address_billing_info"
                       messages={messages}
                     />
@@ -498,7 +498,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="shipping_address_first_name_error"
-                      resource="shippingAddress"
+                      resource="shipping_address"
                       field="shipping_address_first_name"
                       messages={messages}
                     />
@@ -523,7 +523,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="shipping_address_last_name_error"
-                      resource="shippingAddress"
+                      resource="shipping_address"
                       field="shipping_address_last_name"
                       messages={messages}
                     />
@@ -548,7 +548,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="shipping_address_line_1_error"
-                      resource="shippingAddress"
+                      resource="shipping_address"
                       field="shipping_address_line_1"
                       messages={messages}
                     />
@@ -573,7 +573,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="shipping_address_city_error"
-                      resource="shippingAddress"
+                      resource="shipping_address"
                       field="shipping_address_city"
                       messages={messages}
                     />
@@ -601,7 +601,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="shipping_address_country_code_error"
-                      resource="shippingAddress"
+                      resource="shipping_address"
                       field="shipping_address_country_code"
                       messages={messages}
                     />
@@ -629,7 +629,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="shipping_address_state_code_error"
-                      resource="shippingAddress"
+                      resource="shipping_address"
                       field="shipping_address_state_code"
                       messages={messages}
                     />
@@ -654,7 +654,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="shipping_address_zip_code_error"
-                      resource="shippingAddress"
+                      resource="shipping_address"
                       field="shipping_address_zip_code"
                       messages={messages}
                     />
@@ -679,7 +679,7 @@ export default function Main() {
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     <Errors
                       data-cy="shipping_address_phone_error"
-                      resource="shippingAddress"
+                      resource="shipping_address"
                       field="shipping_address_phone"
                       messages={messages}
                     />

@@ -2,29 +2,34 @@ import { isEmpty } from 'lodash'
 import { fieldsExist } from '#utils/validateFormFields'
 import { BaseError } from '#typings/errors'
 import { addressFields } from '#reducers/AddressReducer'
+import { AddressCreate } from '@commercelayer/sdk'
 
 type BillingAddressController = (params: {
-  billingAddress?: Record<string, any>
+  billing_address?: AddressCreate
   billingAddressId?: string
   errors?: BaseError[]
   requiresBillingInfo?: boolean
 }) => boolean
 
 export const billingAddressController: BillingAddressController = ({
-  billingAddress,
+  billing_address,
   billingAddressId,
   errors,
   requiresBillingInfo,
 }) => {
-  let billingDisable = !isEmpty(errors) || isEmpty(billingAddress)
-  if (isEmpty(errors) && !isEmpty(billingAddress)) {
+  let billingDisable = !isEmpty(errors) || isEmpty(billing_address)
+  if (isEmpty(errors) && !isEmpty(billing_address)) {
     let billingInfo = [...addressFields]
     if (requiresBillingInfo) billingInfo = [...billingInfo, 'billing_info']
     billingDisable = !!(
-      billingAddress && fieldsExist(billingAddress, billingInfo)
+      billing_address && fieldsExist(billing_address, billingInfo)
     )
   }
-  if (billingDisable && !isEmpty(billingAddressId) && isEmpty(billingAddress)) {
+  if (
+    billingDisable &&
+    !isEmpty(billingAddressId) &&
+    isEmpty(billing_address)
+  ) {
     billingDisable = false
   }
   return billingDisable
@@ -34,7 +39,7 @@ type ShippingAddressController = (params: {
   billingDisable: boolean
   errors?: BaseError[]
   shipToDifferentAddress?: boolean
-  shippingAddress?: Record<string, any>
+  shipping_address?: AddressCreate
   shippingAddressId?: string
 }) => boolean
 
@@ -42,17 +47,17 @@ export const shippingAddressController: ShippingAddressController = ({
   billingDisable,
   errors,
   shipToDifferentAddress,
-  shippingAddress,
+  shipping_address,
   shippingAddressId,
 }) => {
   let shippingDisable = !!(!billingDisable && shipToDifferentAddress)
-  if (shippingDisable && isEmpty(errors) && !isEmpty(shippingAddress)) {
-    shippingDisable = !!(shippingAddress && fieldsExist(shippingAddress))
+  if (shippingDisable && isEmpty(errors) && !isEmpty(shipping_address)) {
+    shippingDisable = !!(shipping_address && fieldsExist(shipping_address))
   }
   if (
     shippingDisable &&
     !isEmpty(shippingAddressId) &&
-    isEmpty(shippingAddress)
+    isEmpty(shipping_address)
   ) {
     shippingDisable = false
   }
@@ -61,21 +66,21 @@ export const shippingAddressController: ShippingAddressController = ({
 
 type CountryLockController = (params: {
   addresses?: Record<string, any>[]
-  billingAddress?: Record<string, any>
+  billing_address?: Record<string, any>
   billingAddressId?: string
   countryCodeLock?: string
   shipToDifferentAddress?: boolean
-  shippingAddress?: Record<string, any>
+  shipping_address?: Record<string, any>
   shippingAddressId?: string
 }) => boolean
 
 export const countryLockController: CountryLockController = ({
   addresses,
-  billingAddress,
+  billing_address,
   billingAddressId,
   countryCodeLock,
   shipToDifferentAddress,
-  shippingAddress,
+  shipping_address,
   shippingAddressId,
 }) => {
   if (
@@ -91,11 +96,11 @@ export const countryLockController: CountryLockController = ({
     )
     if (!isEmpty(addressLocked)) return true
   }
-  if (countryCodeLock && !isEmpty(billingAddress) && !shipToDifferentAddress) {
-    return billingAddress?.['country_code'] !== countryCodeLock
+  if (countryCodeLock && !isEmpty(billing_address) && !shipToDifferentAddress) {
+    return billing_address?.['country_code'] !== countryCodeLock
   }
-  if (countryCodeLock && !isEmpty(shippingAddress) && shipToDifferentAddress) {
-    return shippingAddress?.['country_code'] !== countryCodeLock
+  if (countryCodeLock && !isEmpty(shipping_address) && shipToDifferentAddress) {
+    return shipping_address?.['country_code'] !== countryCodeLock
   }
   if (
     countryCodeLock &&

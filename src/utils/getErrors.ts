@@ -6,6 +6,7 @@ export default function getErrors(
   error: any,
   resource: ResourceErrorType
 ): BaseError[] {
+  debugger
   return error.errors.map((e: any) => {
     return { ...e, resource }
   })
@@ -14,20 +15,26 @@ export default function getErrors(
 type SetErrorsArgs<D> = {
   currentErrors?: BaseError[]
   newErrors?: BaseError[]
-  dispatch: D
+  dispatch?: D
+  filterBy?: string
 }
 
 export function setErrors<D extends Dispatch<any>>({
   currentErrors = [],
   newErrors = [],
   dispatch,
-}: SetErrorsArgs<D>) {
-  const errorsDifference = differenceBy(currentErrors, newErrors, 'code')
+  filterBy = 'code',
+}: SetErrorsArgs<D>): BaseError[] | void {
+  const errorsDifference = differenceBy(currentErrors, newErrors, filterBy)
   const mergeErrors = currentErrors?.length === 0 ? newErrors : errorsDifference
+  const errors = [...(currentErrors || []), ...mergeErrors]
+  if (!dispatch) {
+    return errors
+  }
   dispatch({
     type: 'setErrors',
     payload: {
-      errors: [...(currentErrors || []), ...mergeErrors],
+      errors,
     },
   })
 }

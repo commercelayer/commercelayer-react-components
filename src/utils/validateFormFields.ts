@@ -6,11 +6,8 @@ import map from 'lodash/map'
 import get from 'lodash/get'
 import { BaseState } from '#typings/index'
 import { ResourceErrorType, BaseError } from '#typings/errors'
-import {
-  AddressField,
-  addressFields,
-  AddressSchema,
-} from '#reducers/AddressReducer'
+import { AddressField, addressFields } from '#reducers/AddressReducer'
+import { AddressCreate } from '@commercelayer/sdk'
 
 const EMAIL_PATTERN = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/
 
@@ -93,7 +90,7 @@ const validateFormFields: ValidateFormFields = (
 }
 
 export interface FieldsExist {
-  (address: AddressSchema, schema?: AddressField[]): boolean
+  (address: AddressCreate, schema?: AddressField[]): boolean
 }
 
 export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
