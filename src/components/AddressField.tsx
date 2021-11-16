@@ -55,6 +55,8 @@ type AddressFieldProps =
 const AddressField: FunctionComponent<AddressFieldProps> = (props) => {
   const { name, type = 'field', label, onClick, ...p } = props
   const { address } = useContext(AddressChildrenContext)
+  console.log(`address`, address)
+  const text = get(address, name as AddressFieldView)
   const { deleteCustomerAddress } = useContext(CustomerContext)
   const key = camelCase(name)
   const text = get(address, key)

@@ -28,8 +28,7 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
     billingAddressInitialState
   )
   const config = useContext(CommerceLayerContext)
-  const { order, getOrder, include, addResourceToInclude } =
-    useContext(OrderContext)
+  const { order, include, addResourceToInclude } = useContext(OrderContext)
   const { shipToDifferentAddress, setCloneAddress } = useContext(AddressContext)
   useEffect(() => {
     if (!include?.includes('billing_address')) {
@@ -62,7 +61,7 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
         shipToDifferentAddress,
         customerAddressId: options?.customerAddressId,
       })
-      setCloneAddress(id, 'billingAddress')
+      setCloneAddress(id, 'billing_address')
     },
   }
   return (

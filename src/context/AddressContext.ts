@@ -1,13 +1,14 @@
 import { createContext } from 'react'
 import {
-  AddressResource,
   AddressState,
   SetAddress,
   setAddress,
+  AddressResource,
 } from '#reducers/AddressReducer'
 import { BaseError } from '#typings/errors'
 
 type DefaultContext = {
+  saveAddresses: () => void
   saveAddresses: (addressId?: string) => void
   setCloneAddress: (id: string, resource: AddressResource) => void
   setAddress: SetAddress

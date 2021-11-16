@@ -47,9 +47,9 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
   } = props
   const {
     errors,
-    billingAddress,
+    billing_address,
     shipToDifferentAddress,
-    shippingAddress,
+    shipping_address,
     saveAddresses,
     billingAddressId,
     shippingAddressId,
@@ -58,46 +58,30 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
   const { order } = useContext(OrderContext)
   const { addresses, isGuest } = useContext(CustomerContext)
   const [forceDisable, setForceDisable] = useState(disabled)
-  const customerEmail =
-    !isEmpty(order) &&
-    !!(
-      !!(isGuest === true || typeof isGuest === 'undefined') &&
-      !order?.customerEmail
-    )
-  const billingDisable =
-    billingAddress &&
-    addressController({
-      address: billingAddress,
-      errors,
-      addressId: billingAddressId,
-      // @ts-ignore
-      requiresBillingInfo: order?.requiresBillingInfo,
-    })
-  const customerDisable =
-    customerAddress &&
-    addressController({
-      address: customerAddress,
-      errors,
-      addressId: addressId,
-      // @ts-ignore
-      // requiresBillingInfo: order?.requiresBillingInfo,
-    })
-  const shippingDisable =
-    shippingAddress &&
-    shippingAddressController({
-      billingDisable,
-      errors,
-      shipToDifferentAddress,
-      shippingAddress,
-      shippingAddressId,
-    })
+  const customerEmail = !!(
+    !!(isGuest === true || typeof isGuest === 'undefined') &&
+    !order?.customer_email
+  )
+  const billingDisable = billingAddressController({
+    billing_address,
+    errors,
+    billingAddressId,
+    requiresBillingInfo: order?.requires_billing_info,
+  })
+  const shippingDisable = shippingAddressController({
+    billingDisable,
+    errors,
+    shipToDifferentAddress,
+    shipping_address,
+    shippingAddressId,
+  })
   const countryLockDisable = countryLockController({
-    countryCodeLock: order?.shippingCountryCodeLock,
+    countryCodeLock: order?.shipping_country_code_lock,
     addresses,
     shipToDifferentAddress,
     billingAddressId,
-    billingAddress,
-    shippingAddress,
+    billing_address,
+    shipping_address,
     shippingAddressId,
   })
   const disable =

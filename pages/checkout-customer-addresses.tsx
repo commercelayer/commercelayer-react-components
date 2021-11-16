@@ -1,6 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getCustomerToken } from '@commercelayer/js-auth'
-import { Swiper, SwiperSlide } from 'swiper/react'
 import { Nav } from '.'
 import Head from 'next/head'
 import {
@@ -22,10 +21,6 @@ import {
 } from '@commercelayer/react-components'
 import { Order, Address as AddressResource } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
-import SwiperCore, { Pagination } from 'swiper'
-
-// install Swiper modules
-SwiperCore.use([Pagination])
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -33,8 +28,6 @@ const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
 const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 let orderId = 'PDerhJplRp'
-import 'swiper/css'
-import 'swiper/css/pagination'
 
 const NestedInput = ({ value }: any) => {
   return (
@@ -51,38 +44,21 @@ const NestedInput = ({ value }: any) => {
 
 const CustomAddressCards = (props: AddressCardsTemplate) => {
   const { customerAddresses, AddressProvider } = props
-  return (
-    <Swiper
-      slidesPerView={4}
-      spaceBetween={30}
-      centeredSlides={true}
-      pagination={{
-        clickable: true,
-      }}
-    >
-      {customerAddresses.map((address, k) => {
-        return (
-          <SwiperSlide
-            key={k}
-            className={address.className}
-            onClick={address.onClick}
-          >
-            <AddressProvider value={{ address }}>
-              <div>
-                <AddressField name="first_name" />
-              </div>
-              <div className="font-bold">
-                <AddressField name="last_name" />
-              </div>
-              <div>
-                <AddressField name="full_address" />
-              </div>
-            </AddressProvider>
-          </SwiperSlide>
-        )
-      })}
-    </Swiper>
-  )
+  return customerAddresses.map((address, k) => {
+    return (
+      <AddressProvider value={{ address }}>
+        <div>
+          <AddressField name="first_name" />
+        </div>
+        <div className="font-bold">
+          <AddressField name="last_name" />
+        </div>
+        <div>
+          <AddressField name="full_address" />
+        </div>
+      </AddressProvider>
+    )
+  })
 }
 
 export default function Main() {
@@ -220,14 +196,14 @@ export default function Main() {
                         setShowBillingAddressForm(false)
                       }
                     >
-                      {(props) => <CustomAddressCards {...props} />}
-                      {/* <AddressField name="first_name" /> */}
-                      {/* <div className="font-bold">
+                      {/* {(props) => <CustomAddressCards {...props} />} */}
+                      <AddressField name="first_name" />
+                      <div className="font-bold">
                         <AddressField name="last_name" className="ml-1" />
                       </div>
                       <div>
                         <AddressField name="full_address" />
-                      </div> */}
+                      </div>
                     </Address>
                   </BillingAddressContainer>
                 </div>
@@ -278,7 +254,7 @@ export default function Main() {
                       <p className="mt-2 text-sm text-red-600" id="email-error">
                         <Errors
                           data-cy="billing_address_first_name_error"
-                          resource="billingAddress"
+                          resource="billing_address"
                           field="billing_address_first_name"
                           messages={messages}
                         />
@@ -303,7 +279,7 @@ export default function Main() {
                       <p className="mt-2 text-sm text-red-600" id="email-error">
                         <Errors
                           data-cy="billing_address_last_name_error"
-                          resource="billingAddress"
+                          resource="billing_address"
                           field="billing_address_last_name"
                           messages={messages}
                         />
@@ -328,7 +304,7 @@ export default function Main() {
                       <p className="mt-2 text-sm text-red-600" id="email-error">
                         <Errors
                           data-cy="billing_address_line_1_error"
-                          resource="billingAddress"
+                          resource="billing_address"
                           field="billing_address_line_1"
                           messages={messages}
                         />
@@ -353,7 +329,7 @@ export default function Main() {
                       <p className="mt-2 text-sm text-red-600" id="email-error">
                         <Errors
                           data-cy="billing_address_city_error"
-                          resource="billingAddress"
+                          resource="billing_address"
                           field="billing_address_city"
                           messages={messages}
                         />
@@ -381,7 +357,7 @@ export default function Main() {
                       <p className="mt-2 text-sm text-red-600" id="email-error">
                         <Errors
                           data-cy="billing_address_country_code_error"
-                          resource="billingAddress"
+                          resource="billing_address"
                           field="billing_address_country_code"
                           messages={messages}
                         />
@@ -406,7 +382,7 @@ export default function Main() {
                       <p className="mt-2 text-sm text-red-600" id="email-error">
                         <Errors
                           data-cy="billing_address_state_code_error"
-                          resource="billingAddress"
+                          resource="billing_address"
                           field="billing_address_state_code"
                           messages={messages}
                         />
@@ -431,7 +407,7 @@ export default function Main() {
                       <p className="mt-2 text-sm text-red-600" id="email-error">
                         <Errors
                           data-cy="billing_address_zip_code_error"
-                          resource="billingAddress"
+                          resource="billing_address"
                           field="billing_address_zip_code"
                           messages={messages}
                         />
@@ -456,7 +432,7 @@ export default function Main() {
                       <p className="mt-2 text-sm text-red-600" id="email-error">
                         <Errors
                           data-cy="billing_address_phone_error"
-                          resource="billingAddress"
+                          resource="billing_address"
                           field="billing_address_phone"
                           messages={messages}
                         />
@@ -481,7 +457,7 @@ export default function Main() {
                       <p className="mt-2 text-sm text-red-600" id="email-error">
                         <Errors
                           data-cy="billing_address_billing_info_error"
-                          resource="billingAddress"
+                          resource="billing_address"
                           field="billing_address_billing_info"
                           messages={messages}
                         />
@@ -610,7 +586,7 @@ export default function Main() {
                         >
                           <Errors
                             data-cy="shipping_address_first_name_error"
-                            resource="shippingAddress"
+                            resource="shipping_address"
                             field="shipping_address_first_name"
                             messages={messages}
                           />
@@ -638,7 +614,7 @@ export default function Main() {
                         >
                           <Errors
                             data-cy="shipping_address_last_name_error"
-                            resource="shippingAddress"
+                            resource="shipping_address"
                             field="shipping_address_last_name"
                             messages={messages}
                           />
@@ -666,7 +642,7 @@ export default function Main() {
                         >
                           <Errors
                             data-cy="shipping_address_line_1_error"
-                            resource="shippingAddress"
+                            resource="shipping_address"
                             field="shipping_address_line_1"
                             messages={messages}
                           />
@@ -694,7 +670,7 @@ export default function Main() {
                         >
                           <Errors
                             data-cy="shipping_address_city_error"
-                            resource="shippingAddress"
+                            resource="shipping_address"
                             field="shipping_address_city"
                             messages={messages}
                           />
@@ -725,7 +701,7 @@ export default function Main() {
                         >
                           <Errors
                             data-cy="shipping_address_country_code_error"
-                            resource="shippingAddress"
+                            resource="shipping_address"
                             field="shipping_address_country_code"
                             messages={messages}
                           />
@@ -753,7 +729,7 @@ export default function Main() {
                         >
                           <Errors
                             data-cy="shipping_address_state_code_error"
-                            resource="shippingAddress"
+                            resource="shipping_address"
                             field="shipping_address_state_code"
                             messages={messages}
                           />
@@ -781,7 +757,7 @@ export default function Main() {
                         >
                           <Errors
                             data-cy="shipping_address_zip_code_error"
-                            resource="shippingAddress"
+                            resource="shipping_address"
                             field="shipping_address_zip_code"
                             messages={messages}
                           />
@@ -809,7 +785,7 @@ export default function Main() {
                         >
                           <Errors
                             data-cy="shipping_address_phone_error"
-                            resource="shippingAddress"
+                            resource="shipping_address"
                             field="shipping_address_phone"
                             messages={messages}
                           />

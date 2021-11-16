@@ -105,13 +105,14 @@ export const getCustomerAddresses: GetCustomerAddresses = async ({
   dispatch,
 }) => {
   try {
+    const addresses = [] as Address[]
     const sdk = getSdk(config)
     const customerAddresses = await sdk.customer_addresses.list({
       include: ['address'],
     })
-    const addresses = customerAddresses.map(
-      (customerAddress) => customerAddress.address as Address
-    )
+    customerAddresses.forEach((customerAddress) => {
+      if (customerAddress.address) addresses.push(customerAddress.address)
+    })
     dispatch({
       type: 'setAddresses',
       payload: { addresses },
