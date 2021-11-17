@@ -56,7 +56,6 @@ const Address: FunctionComponent<Props> = (props) => {
   const items = !isEmpty(addresses)
     ? addresses
     : (addressesContext && addressesContext) || []
-  console.log(`items`, items)
   useEffect(() => {
     if (items && !deselect) {
       items.map((address, k) => {
