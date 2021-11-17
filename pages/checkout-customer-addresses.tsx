@@ -17,7 +17,7 @@ import {
   Address,
   AddressField,
   ShippingAddressContainer,
-  AddressCardsTemplate,
+  // AddressCardsTemplate,
 } from '@commercelayer/react-components'
 import { Order, Address as AddressResource } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
@@ -42,24 +42,24 @@ const NestedInput = ({ value }: any) => {
   )
 }
 
-const CustomAddressCards = (props: AddressCardsTemplate) => {
-  const { customerAddresses, AddressProvider } = props
-  return customerAddresses.map((address, k) => {
-    return (
-      <AddressProvider value={{ address }}>
-        <div>
-          <AddressField name="first_name" />
-        </div>
-        <div className="font-bold">
-          <AddressField name="last_name" />
-        </div>
-        <div>
-          <AddressField name="full_address" />
-        </div>
-      </AddressProvider>
-    )
-  })
-}
+// const CustomAddressCards = (props: AddressCardsTemplate) => {
+//   const { customerAddresses, AddressProvider } = props
+//   return customerAddresses.map((address, k) => {
+//     return (
+//       <AddressProvider value={{ address }}>
+//         <div>
+//           <AddressField name="first_name" />
+//         </div>
+//         <div className="font-bold">
+//           <AddressField name="last_name" />
+//         </div>
+//         <div>
+//           <AddressField name="full_address" />
+//         </div>
+//       </AddressProvider>
+//     )
+//   })
+// }
 
 export default function Main() {
   const [token, setToken] = useState('')
@@ -140,23 +140,23 @@ export default function Main() {
         const billing: any = order.billingAddress()
         const shipping: any = order.shippingAddress()
         setBillingAddress({
-          firstName: billing.firstName,
-          lastName: billing.lastName,
-          line1: billing.line1,
+          first_name: billing.firstName,
+          last_name: billing.lastName,
+          line_1: billing.line1,
           city: billing.city,
-          countryCode: billing.countryCode,
-          stateCode: billing.stateCode,
-          zipCode: billing.zipCode,
+          country_code: billing.countryCode,
+          state_code: billing.stateCode,
+          zip_code: billing.zipCode,
           phone: billing.phone,
         })
         setShippingAddress({
-          firstName: shipping.firstName,
-          lastName: shipping.lastName,
-          line1: shipping.line1,
+          first_name: shipping.firstName,
+          last_name: shipping.lastName,
+          line_1: shipping.line1,
           city: shipping.city,
-          countryCode: shipping.countryCode,
-          stateCode: shipping.stateCode,
-          zipCode: shipping.zipCode,
+          country_code: shipping.countryCode,
+          state_code: shipping.stateCode,
+          zip_code: shipping.zipCode,
           phone: shipping.phone,
         })
       } catch (error) {

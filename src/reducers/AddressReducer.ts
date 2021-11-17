@@ -6,6 +6,7 @@ import { Address, AddressCreate, Order, OrderUpdate } from '@commercelayer/sdk'
 import isEmpty from 'lodash/isEmpty'
 import getSdk from '#utils/getSdk'
 import { updateOrder } from './OrderReducer'
+import camelCase from 'lodash/camelCase'
 
 export type AddressActionType =
   | 'setErrors'
@@ -149,7 +150,7 @@ export const setCloneAddress: SetCloneAddress = (id, resource, dispatch) => {
   dispatch({
     type: 'setCloneAddress',
     payload: {
-      [`${resource}_id`]: id,
+      [`${camelCase(resource)}Id`]: id,
     },
   })
 }
@@ -159,8 +160,7 @@ export const saveAddresses: SaveAddresses = async ({
   updateOrder,
   order,
   state,
-  addressId,
-  getCustomerAddresses,
+  dispatch,
 }) => {
   const {
     shipToDifferentAddress,
