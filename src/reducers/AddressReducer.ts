@@ -160,8 +160,7 @@ export const saveAddresses: SaveAddresses = async ({
   updateOrder,
   order,
   state,
-  addressId,
-  getCustomerAddresses,
+  dispatch,
 }) => {
   const {
     shipToDifferentAddress,
