@@ -30,9 +30,21 @@ const ShipmentsContainer: FunctionComponent<ShipmentsContainerProps> = (
 ) => {
   const { children } = props
   const [state, dispatch] = useReducer(shipmentReducer, shipmentInitialState)
-  const { order, getOrder } = useContext(OrderContext)
+  const { order, getOrder, include, addResourceToInclude } =
+    useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
+    if (!include?.includes('shipments.available_shipping_methods')) {
+      addResourceToInclude({
+        newResource: [
+          'shipments.available_shipping_methods',
+          'shipments.shipment_line_items.line_item',
+          'shipments.shipping_method',
+          'shipments.stock_transfers',
+          'shipments.stock_location',
+        ],
+      })
+    }
     // TODO: Get shipments
     if (order && !isEmpty(config)) {
       getShipments({ order, dispatch, config })

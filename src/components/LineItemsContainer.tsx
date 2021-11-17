@@ -44,13 +44,6 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
         type: 'setLineItems',
         payload: { lineItems: order.line_items },
       })
-      // order &&
-      //   getLineItems({
-      //     order,
-      //     dispatch,
-      //     config,
-      //     filters,
-      //   })
     }
     return (): void => {
       if (isEmpty(order)) {
@@ -71,7 +64,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
         dispatch,
         config,
         getOrder,
-        orderId,
+        orderId: orderId as string,
         errors: state.errors,
       }),
     deleteLineItem: (lineItemId) =>
@@ -80,7 +73,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
         dispatch,
         config,
         getOrder,
-        orderId,
+        orderId: orderId as string,
         errors: state.errors,
       }),
   } as LineItemContextValue

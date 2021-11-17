@@ -92,6 +92,11 @@ type resourceIncluded =
   | 'shipping_address'
   | 'line_items.line_item_options.sku_option'
   | 'available_customer_payment_sources'
+  | 'shipments.available_shipping_methods'
+  | 'shipments.stock_transfers'
+  | 'shipments.shipment_line_items.line_item'
+  | 'shipments.shipping_method'
+  | 'shipments.stock_location'
 
 export interface OrderPayload {
   loading?: boolean
@@ -108,7 +113,7 @@ export type AddToCartValues = Pick<
 
 export type AddToCartImportValues = Pick<AddToCartImportParams, 'lineItems'>
 
-export type getOrderContext = (id: string) => Promise<undefined | Order>
+export type getOrderContext = (id: string) => Promise<void | Order>
 
 export type OrderState = Partial<OrderPayload>
 
@@ -284,7 +289,7 @@ export const setOrder = (
 export type AddResourceToInclude = {
   resourcesIncluded?: resourceIncluded[]
   dispatch?: Dispatch<OrderActions>
-  newResource: resourceIncluded
+  newResource: resourceIncluded | resourceIncluded[]
 }
 
 export function addResourceToInclude({
@@ -292,7 +297,10 @@ export function addResourceToInclude({
   dispatch,
   newResource,
 }: AddResourceToInclude) {
-  const include = [...resourcesIncluded, newResource]
+  const include = [
+    ...resourcesIncluded,
+    ...(typeof newResource === 'string' ? [newResource] : newResource),
+  ]
   dispatch &&
     dispatch({
       type: 'setIncludesResource',

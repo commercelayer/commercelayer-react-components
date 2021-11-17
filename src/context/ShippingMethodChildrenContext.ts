@@ -1,25 +1,16 @@
 import { createContext } from 'react'
-import {
-  DeliveryLeadTimeCollection,
-  ShippingMethodCollection,
-} from '@commercelayer/js-sdk'
+import { DeliveryLeadTime, ShippingMethod } from '@commercelayer/sdk'
 
 export interface InitialShippingMethodContext {
-  shippingMethod: ShippingMethodCollection | Record<string, string>
-  deliveryLeadTimeForShipment?:
-    | DeliveryLeadTimeCollection
-    | Record<string, string>
-    | null
+  shippingMethod?: ShippingMethod
+  deliveryLeadTimeForShipment?: DeliveryLeadTime
   currentShippingMethodId?: string
+  shipmentId?: string
 }
 
-const initial: InitialShippingMethodContext = {
-  shippingMethod: {},
-  deliveryLeadTimeForShipment: {},
-}
+const initial: InitialShippingMethodContext = {}
 
-const ShippingMethodChildrenContext = createContext<InitialShippingMethodContext>(
-  initial
-)
+const ShippingMethodChildrenContext =
+  createContext<InitialShippingMethodContext>(initial)
 
 export default ShippingMethodChildrenContext

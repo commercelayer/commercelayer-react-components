@@ -14,12 +14,12 @@ type ShipmentFieldChildrenProps = Omit<ShipmentFieldProps, 'children'> & {
 
 export type ShipmentAttribute =
   | 'number'
-  | 'currencyCode'
+  | 'currency_code'
   | 'status'
-  | 'costAmountCents'
-  | 'costAmountFloat'
-  | 'formattedCostAmount'
-  | 'keyNumber'
+  | 'cost_amount_cents'
+  | 'cost_amount_float'
+  | 'formatted_cost_amount'
+  | 'key_number'
 
 type ShipmentFieldProps = {
   children?: (props: ShipmentFieldChildrenProps) => ReactNode
@@ -29,8 +29,8 @@ type ShipmentFieldProps = {
 const ShipmentField: FunctionComponent<ShipmentFieldProps> = (props) => {
   const { name } = props
   const { shipment, keyNumber } = useContext(ShipmentChildrenContext)
-  const key = camelCase(name)
-  const text = key !== 'keyNumber' ? get(shipment, key) : keyNumber
+  const key = name
+  const text = key !== 'key_number' ? get(shipment, key) : keyNumber
   const parentProps = {
     shipment,
     ...props,

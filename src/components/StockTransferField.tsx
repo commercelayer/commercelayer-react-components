@@ -8,7 +8,7 @@ const displayName = components.StockTransferField.displayName
 
 type StockTransferFieldChildrenProps = Omit<StockTransferFieldProps, 'children'>
 
-export type StockTransferFieldType = 'quantity' | 'skuCode'
+export type StockTransferFieldType = 'quantity' | 'sku_code'
 
 type StockTransferFieldProps = {
   children?: (props: StockTransferFieldChildrenProps) => ReactNode

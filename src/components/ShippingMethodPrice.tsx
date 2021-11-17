@@ -48,14 +48,14 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
         base,
         type,
         format,
-        obj: shippingMethod as Record<string, string>,
+        obj: shippingMethod,
       })
       setPrice(p)
       const c = getAmount<number>({
         base: 'freeOver',
         type,
         format: 'cents',
-        obj: shippingMethod as Record<string, string>,
+        obj: shippingMethod,
       })
       setFreeOverAmountCents(c)
     }
@@ -72,9 +72,9 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
     <span {...p}>
-      {order &&
+      {order?.total_amount_cents &&
       isNumber(freeOverAmountCents) &&
-      freeOverAmountCents < order?.totalAmountCents
+      freeOverAmountCents < order.total_amount_cents
         ? labelFreeOver
         : price}
     </span>
