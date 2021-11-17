@@ -9,7 +9,8 @@ import React, {
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import components from '#config/components'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
-import { first, isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
+import { DeliveryLeadTime } from '@commercelayer/sdk'
 
 const propTypes = components.ShippingMethod.propTypes
 const displayName = components.ShippingMethod.displayName
@@ -30,6 +31,7 @@ const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
     shippingMethods,
     currentShippingMethodId,
     deliveryLeadTimes,
+    shipment,
   } = useContext(ShipmentChildrenContext)
   const [items, setItems] = useState<JSX.Element[]>([])
   useEffect(() => {
@@ -41,15 +43,14 @@ const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
           return true
         })
         .map((shippingMethod, k) => {
-          const deliveryLeadTimeForShipment =
-            deliveryLeadTimes &&
-            first(
-              deliveryLeadTimes.filter((delivery) => {
-                const deliveryShippingMethodId = delivery.shippingMethod()?.id
-                return shippingMethod.id === deliveryShippingMethodId
-              })
-            )
+          const [deliveryLeadTimeForShipment] = deliveryLeadTimes?.filter(
+            (delivery) => {
+              const deliveryShippingMethodId = delivery.shipping_method?.id
+              return shippingMethod.id === deliveryShippingMethodId
+            }
+          ) as DeliveryLeadTime[]
           const shippingProps = {
+            shipmentId: shipment?.id,
             shippingMethod,
             currentShippingMethodId,
             deliveryLeadTimeForShipment,

@@ -9,9 +9,9 @@ import React, {
 import ShipmentContext from '#context/ShipmentContext'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import components from '#config/components'
-import { LineItemCollection } from '@commercelayer/js-sdk'
 import { LoaderType } from '#typings'
 import getLoaderComponent from '#utils/getLoaderComponent'
+import { ShipmentLineItem } from '#reducers/ShipmentReducer'
 
 const propTypes = components.Shipment.propTypes
 const displayName = components.Shipment.displayName
@@ -36,17 +36,18 @@ const Shipment: FunctionComponent<ShipmentProps> = ({
   const components =
     shipments &&
     shipments.map((shipment, k) => {
-      const shipmentLineItems = shipment.shipmentLineItems()?.toArray()
+      const shipmentLineItems =
+        shipment.shipment_line_items as ShipmentLineItem[]
       const lineItems = shipmentLineItems?.map((shipmentLineItem) => {
-        const l = shipmentLineItem.lineItem() as LineItemCollection
+        const l = shipmentLineItem.line_item
         if (l) l.quantity = shipmentLineItem.quantity
         return l
       })
-      const shippingMethods = shipment.availableShippingMethods()?.toArray()
-      const currentShippingMethodId = shipment.shippingMethod()?.id
-      const stockTransfers = shipment.stockTransfers()?.toArray()
+      const shippingMethods = shipment.available_shipping_methods
+      const currentShippingMethodId = shipment.shipping_method?.id
+      const stockTransfers = shipment.stock_transfers
       const times = deliveryLeadTimes?.filter(
-        (time) => time.stockLocation()?.id === shipment.stockLocation()?.id
+        (time) => time.stock_location?.id === shipment.stock_location?.id
       )
       const shipmentProps = {
         lineItems,

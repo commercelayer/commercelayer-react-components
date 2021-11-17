@@ -6,7 +6,6 @@ export default function getErrors(
   error: any,
   resource: ResourceErrorType
 ): BaseError[] {
-  debugger
   return error.errors.map((e: any) => {
     return { ...e, resource }
   })
