@@ -17,12 +17,15 @@ type LineItemNameProps = {
 } & JSX.IntrinsicElements['label']
 
 const ShippingMethodName: FunctionComponent<LineItemNameProps> = (props) => {
-  const { shippingMethod } = useContext(ShippingMethodChildrenContext)
+  const { shippingMethod, deliveryLeadTimeForShipment } = useContext(
+    ShippingMethodChildrenContext
+  )
   const htmlFor =
     `shipment-${shippingMethod.shipmentId}-${shippingMethod.id}` || ''
   const labelName = shippingMethod['name']
   const parentProps = {
     shippingMethod,
+    deliveryLeadTimeForShipment,
     label: labelName,
     ...props,
   }
