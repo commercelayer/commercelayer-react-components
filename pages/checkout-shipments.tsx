@@ -91,7 +91,7 @@ export default function Main() {
               <Shipment loader={<>Caricamento...</>}>
                 <div className="flex">
                   Shipments N:
-                  <ShipmentField className="font-bold pl-1" name="keyNumber" />
+                  <ShipmentField className="font-bold pl-1" name="key_number" />
                 </div>
                 <LineItemsContainer>
                   <LineItem>
@@ -129,12 +129,12 @@ export default function Main() {
                     <ShippingMethodPrice data-cy="shipping-method-price" />
                     <div className="flex">
                       <DeliveryLeadTime
-                        type="minDays"
+                        type="min_days"
                         data-cy="delivery-lead-time-min-days"
                       />{' '}
                       -{' '}
                       <DeliveryLeadTime
-                        type="maxDays"
+                        type="max_days"
                         data-cy="delivery-lead-time-max-days"
                         className="mr-1"
                       />
@@ -154,8 +154,8 @@ export default function Main() {
                         <ShippingMethodName data-cy="shipping-method-name-recap" />
                         <ShippingMethodPrice />
                         <div className="flex">
-                          <DeliveryLeadTime type="minDays" /> -{' '}
-                          <DeliveryLeadTime type="maxDays" className="mr-1" />
+                          <DeliveryLeadTime type="min_days" /> -{' '}
+                          <DeliveryLeadTime type="max_days" className="mr-1" />
                           days
                         </div>
                       </div>

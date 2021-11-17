@@ -1,16 +1,13 @@
 import { createContext } from 'react'
-import { StockTransferCollection } from '@commercelayer/js-sdk'
+import { StockTransfer } from '@commercelayer/sdk'
 
 export interface InitialStockTransferContext {
-  stockTransfer: StockTransferCollection | Record<string, string>
+  stockTransfer?: StockTransfer
 }
 
-const initial: InitialStockTransferContext = {
-  stockTransfer: {},
-}
+const initial: InitialStockTransferContext = {}
 
-const StockTransferChildrenContext = createContext<InitialStockTransferContext>(
-  initial
-)
+const StockTransferChildrenContext =
+  createContext<InitialStockTransferContext>(initial)
 
 export default StockTransferChildrenContext

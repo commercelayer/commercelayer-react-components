@@ -13,10 +13,10 @@ const propTypes = components.DeliveryLeadTime.propTypes
 const displayName = components.DeliveryLeadTime.displayName
 
 export type DeliveryLeadTimeField =
-  | 'minHours'
-  | 'maxHours'
-  | 'minDays'
-  | 'maxDays'
+  | 'min_hours'
+  | 'max_hours'
+  | 'min_days'
+  | 'max_days'
 
 export type DeliveryLeadTimeComponentChildren = Omit<
   ShippingMethodPriceProps,

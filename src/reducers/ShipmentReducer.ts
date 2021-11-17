@@ -1,26 +1,22 @@
 import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
-import {
-  DeliveryLeadTime,
-  DeliveryLeadTimeCollection,
-  OrderCollection,
-  Shipment,
-  ShipmentCollection,
-  ShippingMethod,
-} from '@commercelayer/js-sdk'
+import { DeliveryLeadTime, LineItem, Order, Shipment } from '@commercelayer/sdk'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext } from './OrderReducer'
+import getSdk from '#utils/getSdk'
 
 export type ShipmentActionType =
   | 'setErrors'
   | 'setShipments'
   | 'setShippingMethod'
 
+export type ShipmentLineItem = LineItem & { line_item: LineItem }
+
 export interface ShipmentActionPayload {
   errors: BaseError[]
-  shipments: ShipmentCollection[]
-  deliveryLeadTimes: DeliveryLeadTimeCollection[]
+  shipments: Shipment[]
+  deliveryLeadTimes: DeliveryLeadTime[]
 }
 
 export type ShipmentState = Partial<ShipmentActionPayload>
@@ -49,7 +45,7 @@ export const setShipmentErrors: SetShipmentErrors = (errors, dispatch) => {
 }
 
 type GetShipments = (args: {
-  order: OrderCollection
+  order: Order
   dispatch: Dispatch<ShipmentAction>
   config: CommerceLayerConfig
 }) => Promise<void>
@@ -60,28 +56,17 @@ export const getShipments: GetShipments = async ({
   config,
 }) => {
   try {
-    const shipments = (
-      await order
-        .withCredentials(config)
-        .shipments()
-        ?.includes(
-          'availableShippingMethods',
-          'shipmentLineItems',
-          'shipmentLineItems.lineItem',
-          'stockTransfers',
-          'shippingMethod',
-          'stockLocation'
-        )
-        .load()
-    )?.toArray()
-    const deliveryLeadTimes = (
-      await DeliveryLeadTime.withCredentials(config)
-        .includes('shippingMethod', 'stockLocation')
-        .all()
-    ).toArray()
+    const sdk = getSdk(config)
+    const shipments = order.shipments
+    const deliveryLeadTimes = await sdk.delivery_lead_times.list({
+      include: ['shipping_method', 'stock_location'],
+    })
     dispatch({
       type: 'setShipments',
-      payload: { shipments, deliveryLeadTimes },
+      payload: {
+        shipments,
+        deliveryLeadTimes,
+      },
     })
   } catch (error) {
     console.error(error)
@@ -92,7 +77,7 @@ type SetShippingMethod = (args: {
   config: CommerceLayerConfig
   shipmentId: string
   shippingMethodId: string
-  order?: OrderCollection
+  order?: Order
   getOrder?: getOrderContext
 }) => Promise<void>
 
@@ -105,20 +90,12 @@ export const setShippingMethod: SetShippingMethod = async ({
 }) => {
   try {
     if (shippingMethodId) {
-      const shipment = await Shipment.withCredentials(config)
-        .includes(
-          'availableShippingMethods',
-          'availableShippingMethods',
-          'shipmentLineItems',
-          'shipmentLineItems.lineItem',
-          'stockTransfers',
-          'shippingMethod',
-          'deliveryLeadTime'
-        )
-        .find(shipmentId)
-      const shippingMethod = ShippingMethod.build({ id: shippingMethodId })
-      await shipment.withCredentials(config).update({ shippingMethod })
-      getOrder && order && getOrder(order.id)
+      const sdk = getSdk(config)
+      await sdk.shipments.update({
+        id: shipmentId,
+        shipping_method: sdk.shipping_methods.relationship(shippingMethodId),
+      })
+      if (getOrder && order) getOrder(order.id)
     }
   } catch (error) {
     console.error(error)
