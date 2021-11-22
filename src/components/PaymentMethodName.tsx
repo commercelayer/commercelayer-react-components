@@ -20,7 +20,7 @@ const PaymentMethodName: FunctionComponent<PaymentMethodNameProps> = (
 ) => {
   const { payment } = useContext(PaymentMethodChildrenContext)
   const labelName = payment?.['name']
-  const htmlFor = payment?.paymentSourceType
+  const htmlFor = payment?.payment_source_type
   const parentProps = {
     htmlFor,
     labelName,

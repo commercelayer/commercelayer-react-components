@@ -5,6 +5,7 @@ import React, {
   ReactNode,
   useState,
   useEffect,
+  MouseEvent,
 } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
@@ -71,11 +72,12 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
       }
       const onClickable = !clickableContainer
         ? undefined
-        : async () => {
+        : async (e: MouseEvent<HTMLDivElement>) => {
+            e.stopPropagation()
             setLoadingPlaceOrder({ loading: true })
             setPaymentSelected(payment.id)
             const paymentResource =
-              payment?.paymentSourceType as PaymentResource
+              payment?.payment_source_type as PaymentResource
             const paymentMethodId = payment?.id as string
             await setPaymentMethod({ paymentResource, paymentMethodId })
             onClick && onClick(payment)

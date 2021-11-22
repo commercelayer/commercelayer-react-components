@@ -23,25 +23,29 @@ export const deleteLocalOrder: DeleteLocalOrder = (key) => {
 }
 
 export const getSavePaymentSourceToCustomerWallet = (): boolean => {
-  return localStorage.getItem('savePaymentSourceToCustomerWallet') === 'true'
+  return (
+    localStorage.getItem('_save_payment_source_to_customer_wallet') === 'true'
+  )
 }
 
 export const getSaveBillingAddressToAddressBook = (): boolean => {
   return (
-    localStorage.getItem('saveBillingAddressToCustomerAddressBook') === 'true'
+    localStorage.getItem('_save_billing_address_to_customer_address_book') ===
+    'true'
   )
 }
 
 export const getSaveShippingAddressToAddressBook = (): boolean => {
   return (
-    localStorage.getItem('saveShippingAddressToCustomerAddressBook') === 'true'
+    localStorage.getItem('_save_shipping_address_to_customer_address_book') ===
+    'true'
   )
 }
 
 type CustomerOrderParams =
-  | 'savePaymentSourceToCustomerWallet'
-  | 'saveBillingAddressToCustomerAddressBook'
-  | 'saveShippingAddressToCustomerAddressBook'
+  | '_save_payment_source_to_customer_wallet'
+  | '_save_billing_address_to_customer_address_book'
+  | '_save_shipping_address_to_customer_address_book'
 
 export function setCustomerOrderParam<T extends CustomerOrderParams>(
   key: T,

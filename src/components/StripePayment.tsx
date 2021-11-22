@@ -89,24 +89,24 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
       event?.elements?.['save_payment_source_to_customer_wallet']?.checked
     if (savePaymentSourceToCustomerWallet)
       setCustomerOrderParam(
-        'savePaymentSourceToCustomerWallet',
+        '_save_payment_source_to_customer_wallet',
         savePaymentSourceToCustomerWallet
       )
 
     const cardElement = elements && elements.getElement(CardElement)
     if (cardElement) {
-      const billingInfo = order?.billingAddress()
-      const email = order?.customerEmail
+      const billingInfo = order?.billing_address
+      const email = order?.customer_email
       const billing_details = {
-        name: billingInfo?.fullName,
+        name: billingInfo?.full_name,
         email,
         phone: billingInfo?.phone,
         address: {
           city: billingInfo?.city,
-          country: billingInfo?.countryCode,
-          line1: billingInfo?.line1,
-          postal_code: billingInfo?.zipCode,
-          state: billingInfo?.stateCode,
+          country: billingInfo?.country_code,
+          line1: billingInfo?.line_1,
+          postal_code: billingInfo?.zip_code,
+          state: billingInfo?.state_code,
         },
       }
       const { paymentMethod } = await stripe.createPaymentMethod({
@@ -115,10 +115,10 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
         billing_details,
       })
       // @ts-ignore
-      if (paymentSource?.clientSecret) {
+      if (paymentSource?.client_secret) {
         const { error, paymentIntent } = await stripe.confirmCardPayment(
           // @ts-ignore
-          paymentSource.clientSecret,
+          paymentSource.client_secret,
           {
             payment_method: {
               card: cardElement,
@@ -131,7 +131,7 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
           setPaymentMethodErrors([
             {
               code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-              resource: 'paymentMethod',
+              resource: 'payment_methods',
               field: currentPaymentMethodType,
               message: error.message as string,
             },

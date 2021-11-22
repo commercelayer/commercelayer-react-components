@@ -12,7 +12,7 @@ import isEmpty from 'lodash/isEmpty'
 import OrderContext from '#context/OrderContext'
 import Parent from './utils/Parent'
 import { PaymentSourceProps } from './PaymentSource'
-import { setLocalOrder } from '#utils/localStorage'
+import { setCustomerOrderParam } from '#utils/localStorage'
 import promisify from '#utils/promisify'
 type BraintreeHostedFields<Type> = {
   [Property in keyof Type]: {
@@ -132,8 +132,8 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
       // @ts-ignore
       event?.elements?.['save_payment_source_to_customer_wallet']?.checked
     if (savePaymentSourceToCustomerWallet)
-      setLocalOrder(
-        'savePaymentSourceToCustomerWallet',
+      setCustomerOrderParam(
+        '_save_payment_source_to_customer_wallet',
         savePaymentSourceToCustomerWallet
       )
     if (hostedFieldsInstance) {
@@ -141,20 +141,20 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
         const payload = await promisify(hostedFieldsInstance).then(
           (payload) => payload
         )
-        const billingAddress = order?.billingAddress()
+        const billingAddress = order?.billing_address
         const verifyCardOptions = {
           nonce: payload.nonce,
           bin: payload.details.bin,
-          amount: order?.totalAmountWithTaxesFloat as number,
-          email: order?.customerEmail,
+          amount: order?.total_amount_with_taxes_float,
+          email: order?.customer_email,
           billingAddress: {
-            givenName: billingAddress?.firstName,
-            surname: billingAddress?.lastName,
+            givenName: billingAddress?.first_name,
+            surname: billingAddress?.last_name,
             phoneNumber: billingAddress?.phone,
-            streetAddress: billingAddress?.line1,
-            countryCodeAlpha2: billingAddress?.countryCode,
-            postalCode: billingAddress?.zipCode,
-            region: billingAddress?.stateCode,
+            streetAddress: billingAddress?.line_1,
+            countryCodeAlpha2: billingAddress?.country_code,
+            postalCode: billingAddress?.zip_code,
+            region: billingAddress?.state_code,
             locality: billingAddress?.city,
           },
           onLookupComplete: (_data: any, next: any) => {
@@ -191,7 +191,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
         setPaymentMethodErrors([
           {
             code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-            resource: 'paymentMethod',
+            resource: 'payment_methods',
             field: currentPaymentMethodType,
             message: error.message as string,
           },
@@ -203,7 +203,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
   }
   useEffect(() => {
     if (!ref && authorization)
-      setLocalOrder('savePaymentSourceToCustomerWallet', 'false')
+      setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'false')
     if (authorization && !loadBraintree && !isEmpty(window)) {
       const braintreeClient = require('braintree-web/client')
       const hostedFields = require('braintree-web/hosted-fields')
@@ -239,7 +239,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
                     setPaymentMethodErrors([
                       {
                         code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-                        resource: 'paymentMethod',
+                        resource: 'payment_methods',
                         field: currentPaymentMethodType,
                         message: threeDSecureErr.message as string,
                       },

@@ -1,8 +1,8 @@
 import { createContext } from 'react'
-import { PaymentMethodCollection } from '@commercelayer/js-sdk'
+import { PaymentMethod } from '@commercelayer/sdk'
 
 export interface InitialPaymentMethodChildrenContext {
-  payment?: PaymentMethodCollection
+  payment?: PaymentMethod
   clickableContainer?: boolean
   paymentSelected?: string
   setPaymentSelected?: (paymentId: string) => void

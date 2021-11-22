@@ -31,27 +31,30 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
     placeOrderReducer,
     placeOrderInitialState
   )
-  const {
-    order,
-    saveBillingAddressToCustomerAddressBook,
-    saveShippingAddressToCustomerAddressBook,
-    setOrderErrors,
-  } = useContext(OrderContext)
+  const { order, setOrderErrors, include, addResourceToInclude } =
+    useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
+    if (!include?.includes('shipments.shipping_method')) {
+      addResourceToInclude({ newResource: 'shipments.shipping_method' })
+    }
+    if (!include?.includes('billing_address')) {
+      addResourceToInclude({ newResource: 'billing_address' })
+    }
+    if (!include?.includes('shipping_address')) {
+      addResourceToInclude({ newResource: 'shipping_address' })
+    }
     if (order) {
       placeOrderPermitted({
         config,
         dispatch,
         order,
         options: {
-          saveBillingAddressToCustomerAddressBook,
-          saveShippingAddressToCustomerAddressBook,
           ...options,
         },
       })
     }
-  }, [order])
+  }, [order, include])
   const contextValue = {
     ...state,
     setPlaceOrder: ({
@@ -66,8 +69,6 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
         dispatch,
         order,
         options: {
-          saveBillingAddressToCustomerAddressBook,
-          saveShippingAddressToCustomerAddressBook,
           ...options,
         },
       }),
