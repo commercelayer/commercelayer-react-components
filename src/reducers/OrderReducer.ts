@@ -91,12 +91,15 @@ type resourceIncluded =
   | 'billing_address'
   | 'shipping_address'
   | 'line_items.line_item_options.sku_option'
-  | 'available_customer_payment_sources'
+  | 'available_customer_payment_sources.payment_source'
   | 'shipments.available_shipping_methods'
   | 'shipments.stock_transfers'
   | 'shipments.shipment_line_items.line_item'
   | 'shipments.shipping_method'
   | 'shipments.stock_location'
+  | 'payment_source'
+  | 'available_payment_methods'
+  | 'payment_method'
 
 export interface OrderPayload {
   loading?: boolean
@@ -241,7 +244,7 @@ export const getApiOrder: GetOrder = async (params) => {
 
 export type UpdateOrderArgs = {
   id: string
-  attributes: OrderUpdate
+  attributes: Omit<OrderUpdate, 'id'>
   dispatch?: Dispatch<OrderActions>
   include?: string[]
   config?: CommerceLayerConfig

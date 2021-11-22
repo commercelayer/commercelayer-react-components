@@ -9,8 +9,8 @@ import React, {
 } from 'react'
 
 export type PaypalConfig = {
-  returnUrl: string
-  cancelUrl: string
+  return_url: string
+  cancel_url: string
   infoMessage?: {
     text?: string | ReactNode
     className?: string
@@ -20,7 +20,7 @@ export type PaypalConfig = {
 const defaultMessage =
   'by placing the order, you will be redirected to the PayPal website to sign in and authorize the payment'
 
-type Props = Omit<PaypalConfig, 'returnUrl' | 'cancelUrl'> &
+type Props = Omit<PaypalConfig, 'return_url' | 'cancel_url'> &
   JSX.IntrinsicElements['div']
 const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
   const ref = useRef<null | HTMLFormElement>(null)

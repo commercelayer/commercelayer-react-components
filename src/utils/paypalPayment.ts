@@ -9,7 +9,7 @@ import pick from 'lodash/pick'
 export default function getPaypalConfig(
   paymentResource: PaymentResource,
   config: PaymentMethodConfig
-): Pick<PaypalConfig, 'returnUrl' | 'cancelUrl'> | undefined {
+): Pick<PaypalConfig, 'return_url' | 'cancel_url'> | undefined {
   const attributes = getPaymentConfig<'paypalPayment'>(paymentResource, config)
-  return attributes && pick(attributes, ['returnUrl', 'cancelUrl'])
+  return attributes && pick(attributes, ['return_url', 'cancel_url'])
 }

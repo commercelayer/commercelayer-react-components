@@ -1,25 +1,15 @@
-import { PlaceOrderOptions } from '#reducers/PlaceOrderReducer'
 import {
   getSaveBillingAddressToAddressBook,
   getSavePaymentSourceToCustomerWallet,
   getSaveShippingAddressToAddressBook,
 } from './localStorage'
 
-export function saveToWallet(options?: PlaceOrderOptions): boolean {
-  return (
-    getSavePaymentSourceToCustomerWallet() ||
-    !!options?.savePaymentSourceToCustomerWallet
-  )
+export function saveToWallet(): boolean {
+  return getSavePaymentSourceToCustomerWallet()
 }
-export function saveBillingAddress(options?: PlaceOrderOptions): boolean {
-  return (
-    getSaveBillingAddressToAddressBook() ||
-    !!options?.saveBillingAddressToCustomerAddressBook
-  )
+export function saveBillingAddress(): boolean {
+  return getSaveBillingAddressToAddressBook()
 }
-export function saveShippingAddress(options?: PlaceOrderOptions): boolean {
-  return (
-    getSaveShippingAddressToAddressBook() ||
-    !!options?.saveShippingAddressToCustomerAddressBook
-  )
+export function saveShippingAddress(): boolean {
+  return getSaveShippingAddressToAddressBook()
 }

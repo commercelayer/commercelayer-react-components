@@ -25,7 +25,6 @@ import {
 import { Order } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
 import '@adyen/adyen-web/dist/adyen.css'
-import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import 'swiper/css/pagination'
 
@@ -46,7 +45,7 @@ const TemplateCustomerCards = ({
 }: CustomerCardsTemplate) => {
   const components = customerPayments.map((p, k) => {
     return (
-      <SwiperSlide
+      <div
         key={k}
         onClick={p.handleClick}
         className="bg-red-100 p-3 text-sm border ml-2 hover:border-blue-500 cursor-pointer"
@@ -64,21 +63,11 @@ const TemplateCustomerCards = ({
             <PaymentSourceDetail type="expYear" />
           </div>
         </PaymentSourceProvider>
-      </SwiperSlide>
+      </div>
     )
   })
 
-  return (
-    <Swiper
-      slidesPerView={2}
-      spaceBetween={30}
-      pagination={{
-        clickable: true,
-      }}
-    >
-      {components}
-    </Swiper>
-  )
+  return <>{components}</>
   //   (
   // <div
   //   onClick={handleClick}
@@ -187,8 +176,8 @@ export default function Main() {
                     containerClassName: 'p-5 my-2',
                   },
                   paypalPayment: {
-                    cancelUrl: paypalReturnUrl,
-                    returnUrl: paypalReturnUrl,
+                    cancel_url: paypalReturnUrl,
+                    return_url: paypalReturnUrl,
                   },
                 }}
               >
@@ -237,7 +226,7 @@ export default function Main() {
                       </PaymentSource>
                       <Errors
                         className="text-red-600"
-                        resource="paymentMethod"
+                        resource="payment_methods"
                       />
                     </PaymentMethod>
                   </div>

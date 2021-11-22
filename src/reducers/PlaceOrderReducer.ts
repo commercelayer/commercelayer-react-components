@@ -2,23 +2,24 @@ import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { Order, OrderCollection, PaypalPayment } from '@commercelayer/js-sdk'
+import { Order, OrderUpdate } from '@commercelayer/sdk'
 import { isEmpty, isFunction } from 'lodash'
 import { shipmentsFilled } from '#utils/shipments'
 import { PaymentResource } from './PaymentMethodReducer'
 import getErrorsByCollection from '#utils/getErrorsByCollection'
+import { PaymentSourceType } from './PaymentMethodReducer'
 import {
   saveBillingAddress,
   saveShippingAddress,
   saveToWallet,
 } from '#utils/customerOrderOptions'
+import getSdk from '#utils/getSdk'
+import { updateOrder } from './OrderReducer'
+import getErrors from '#utils/getErrors'
 
 export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted'
 
 export type PlaceOrderOptions = {
-  saveBillingAddressToCustomerAddressBook?: boolean
-  saveShippingAddressToCustomerAddressBook?: boolean
-  savePaymentSourceToCustomerWallet?: boolean
   paypalPayerId?: string
 }
 
@@ -28,7 +29,7 @@ export interface PlaceOrderActionPayload {
   paymentType: PaymentResource
   paymentSecret: string
   paymentId: string
-  paymentSource: Record<string, string>
+  paymentSource: PaymentSourceType
   options?: PlaceOrderOptions
 }
 
@@ -64,7 +65,7 @@ export const setPlaceOrderErrors: SetPlaceOrderErrors = (errors, dispatch) => {
 type PlaceOrderPermitted = (args: {
   config?: CommerceLayerConfig
   dispatch: Dispatch<PlaceOrderAction>
-  order?: OrderCollection
+  order?: Order
   // TODO: Remove it soon
   options?: PlaceOrderOptions
 }) => void
@@ -77,41 +78,31 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
 }) => {
   if (order && config) {
     let isPermitted = true
-    if (order.privacyUrl && order.termsUrl) {
+    if (order.privacy_url && order.terms_url) {
       isPermitted = localStorage.getItem('privacy-terms') === 'true'
     }
-    const billingAddress =
-      order.billingAddress() ||
-      (await order.withCredentials(config).loadBillingAddress())
+    const billingAddress = order.billing_address
     if (isEmpty(billingAddress)) isPermitted = false
-    const shippingAddress =
-      order.shippingAddress() ||
-      (await order.withCredentials(config).loadShippingAddress())
+    const shippingAddress = order.shipping_address
     if (isEmpty(shippingAddress)) isPermitted = false
-    const shipments = (
-      await order.withCredentials(config).loadShipments()
-    )?.toArray()
-    const shipment = shipments && (await shipmentsFilled(shipments, config))
+    const shipments = order.shipments
+    const shipment = shipments && shipmentsFilled(shipments)
     if (!isEmpty(shipments) && !shipment) isPermitted = false
-    const paymentMethod =
-      order.paymentMethod() ||
-      (await order.withCredentials(config).paymentMethod())
-    const paymentSource: any = (
-      await Order.withCredentials(config)
-        .select('id')
-        .includes('paymentSource')
-        .find(order.id)
-    ).paymentSource()
-    if (order.totalAmountWithTaxesCents !== 0 && isEmpty(paymentMethod?.id))
+    const paymentMethod = order.payment_method
+    const paymentSource = order.payment_source
+    if (order.total_amount_with_taxes_cents !== 0 && isEmpty(paymentMethod?.id))
       isPermitted = false
+    console.log(paymentSource)
     dispatch({
       type: 'setPlaceOrderPermitted',
       payload: {
         isPermitted,
-        paymentType: paymentMethod?.paymentSourceType as PaymentResource,
-        paymentSecret: paymentSource?.clientSecret,
+        paymentType: paymentMethod?.payment_source_type as PaymentResource,
+        // @ts-ignore
+        paymentSecret: paymentSource?.client_secret,
+        // @ts-ignore
         paymentId: paymentSource?.options?.id,
-        paymentSource: paymentSource?.attributes(),
+        paymentSource,
         options,
       },
     })
@@ -120,7 +111,7 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
 
 export type SetPlaceOrder = (args: {
   config?: CommerceLayerConfig
-  order?: OrderCollection
+  order?: Order
   state?: PlaceOrderState
   setOrderErrors?: (collection: any) => void
   paymentSource?: Record<string, string>
@@ -139,73 +130,58 @@ export const setPlaceOrder: SetPlaceOrder = async ({
     placed: false,
   }
   try {
-    if (state && order && config) {
+    debugger
+    if (state && order && config && paymentSource) {
+      const sdk = getSdk(config)
       const { options, paymentType } = state
       if (paymentType === 'paypal_payments') {
-        if (!options?.paypalPayerId && paymentSource?.approvalUrl) {
-          window.location.href = paymentSource?.approvalUrl as string
+        if (!options?.paypalPayerId && paymentSource?.approval_url) {
+          window.location.href = paymentSource?.approval_url as string
           return response
         }
-        const paypalPayment = PaypalPayment.build({ id: paymentSource?.id })
-        await paypalPayment
-          .withCredentials(config)
-          .update({ paypalPayerId: options?.paypalPayerId })
+        await sdk.paypal_payments.update({
+          id: paymentSource.id,
+          paypal_payer_id: options?.paypalPayerId,
+        })
       }
-      const updateAttributes: Record<string, any> = {
+      const updateAttributes: OrderUpdate = {
+        id: order.id,
         _place: true,
       }
-      if (saveBillingAddress(options)) {
-        await Order.build({
+      if (saveBillingAddress()) {
+        await sdk.orders.update({
           id: order.id,
+          _save_billing_address_to_customer_address_book: true,
         })
-          .withCredentials(config)
-          .update({ _saveBillingAddressToCustomerAddressBook: true })
       }
-      if (saveShippingAddress(options)) {
-        await Order.build({
+      if (saveShippingAddress()) {
+        await sdk.orders.update({
           id: order.id,
+          _save_shipping_address_to_customer_address_book: true,
         })
-          .withCredentials(config)
-          .update({ _saveShippingAddressToCustomerAddressBook: true })
       }
       switch (paymentType) {
         case 'braintree_payments':
-          if (saveToWallet(options)) {
-            await Order.build({
+          if (saveToWallet()) {
+            await sdk.orders.update({
               id: order.id,
+              _save_payment_source_to_customer_wallet: true,
             })
-              .withCredentials(config)
-              .update({ _savePaymentSourceToCustomerWallet: true })
           }
-          const brOrder = await Order.build({
-            id: order.id,
-          })
-            .withCredentials(config)
-            .update(updateAttributes)
-          if (isFunction(brOrder?.errors) && !brOrder?.errors()?.empty())
-            throw brOrder
+          await sdk.orders.update(updateAttributes)
           setOrderErrors && setOrderErrors([])
           return {
             placed: true,
           }
         default:
-          const defaultOrder = await Order.build({
-            id: order.id,
-          })
-            .withCredentials(config)
-            .update(updateAttributes)
-          if (
-            isFunction(defaultOrder?.errors) &&
-            !defaultOrder?.errors()?.empty()
-          )
-            throw defaultOrder
-          if (saveToWallet(options)) {
-            await Order.build({
+          // await sdk.orders.
+          if (saveToWallet()) {
+            await sdk.orders.update({
               id: order.id,
+              _save_payment_source_to_customer_wallet: true,
             })
-              .withCredentials(config)
-              .update({ _savePaymentSourceToCustomerWallet: true })
           }
+          await sdk.orders.update(updateAttributes)
           setOrderErrors && setOrderErrors([])
           return {
             placed: true,
@@ -213,9 +189,10 @@ export const setPlaceOrder: SetPlaceOrder = async ({
       }
     }
     return response
-  } catch (error: any) {
-    setOrderErrors && setOrderErrors(error)
-    const errors = getErrorsByCollection(error, 'order')
+  } catch (error) {
+    // const errors = getErrorsByCollection(error, 'order')
+    const errors = getErrors(error, 'orders')
+    setOrderErrors && setOrderErrors(errors)
     return {
       ...response,
       errors,
