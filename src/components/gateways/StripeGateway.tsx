@@ -36,19 +36,19 @@ export default function StripeGateway(props: StripeGateway) {
   const { currentPaymentMethodId, config, paymentSource } =
     useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = 'stripe_payments'
-  const locale = order?.languageCode as StripeElementLocale
+  const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
 
   // @ts-ignore
-  const publishableKey = paymentSource?.publishableKey
+  const publishableKey = paymentSource?.publishable_key
   const stripeConfig = config
     ? getPaymentConfig<'stripePayment'>(paymentResource, config)
     : {}
   const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {
-          return customerPayment.paymentSourceType === 'StripePayment'
+          return customerPayment.payment_source?.type === 'stripe_payments'
         })
       : []
 

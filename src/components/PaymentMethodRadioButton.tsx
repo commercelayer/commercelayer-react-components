@@ -1,4 +1,9 @@
-import React, { useContext, FunctionComponent, ReactNode } from 'react'
+import React, {
+  useContext,
+  FunctionComponent,
+  ReactNode,
+  ChangeEvent,
+} from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
@@ -23,24 +28,25 @@ type ShippingMethodRadioButtonProps = {
 const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps> =
   (props) => {
     const { onChange, ...p } = props
-    const { payment, paymentSelected, setPaymentSelected } = useContext(
-      PaymentMethodChildrenContext
-    )
+    const { payment, paymentSelected, setPaymentSelected, clickableContainer } =
+      useContext(PaymentMethodChildrenContext)
     const { order } = useContext(OrderContext)
     const { setPaymentMethod, setLoading } = useContext(PaymentMethodContext)
     const orderId = order?.id || ''
-    const paymentResource = payment?.paymentSourceType as PaymentResource
+    const paymentResource = payment?.payment_source_type as PaymentResource
     const paymentMethodId = payment?.id as string
     const name = `payment-${orderId}`
     const checked = paymentSelected === payment?.id
-    const handleOnChange = async () => {
+    const handleOnChange = async (e: ChangeEvent<HTMLInputElement>) => {
+      e.stopPropagation()
       setPaymentSelected && setPaymentSelected(paymentMethodId)
       setLoading({ loading: true })
-      await setPaymentMethod({ paymentResource, paymentMethodId })
+      !clickableContainer &&
+        (await setPaymentMethod({ paymentResource, paymentMethodId }))
       onChange && onChange(payment)
       setLoading({ loading: false })
     }
-    const id = payment?.paymentSourceType
+    const id = payment?.payment_source_type
     const parentProps = {
       handleOnChange,
       checked,

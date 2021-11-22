@@ -163,7 +163,7 @@ export const deleteCustomerAddress: DeleteCustomerAddress = async ({
 
 export type GetCustomerPaymentSources = (params: {
   dispatch: Dispatch<CustomerAction>
-  order: Order
+  order?: Order
 }) => Promise<void>
 
 export const getCustomerPaymentSources: GetCustomerPaymentSources = async ({

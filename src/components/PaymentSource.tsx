@@ -8,7 +8,7 @@ import React, {
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import components from '#config/components'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import CustomerContext from '#context/CustomerContext'
 import PaymentGateway from './PaymentGateway'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
@@ -51,6 +51,7 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
     } else if (payment?.id === currentPaymentMethodId) {
       setShow(true)
       // NOTE: Remove metadata in the future
+      console.log(`paymentSource`, paymentSource)
       const card =
         // @ts-ignore
         paymentSource?.options?.card ||
@@ -76,7 +77,7 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
     paymentSource &&
       destroyPaymentSource({
         paymentSourceId: paymentSource?.id,
-        paymentResource: payment?.paymentSourceType as PaymentResource,
+        paymentResource: payment?.payment_source_type as PaymentResource,
       })
     setShowCard(!showCard)
     setShow(true)

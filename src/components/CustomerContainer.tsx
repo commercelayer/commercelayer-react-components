@@ -35,9 +35,12 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
     useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
-    if (!include?.includes('available_customer_payment_sources') && !isGuest) {
+    if (
+      !include?.includes('available_customer_payment_sources.payment_source') &&
+      !isGuest
+    ) {
       addResourceToInclude({
-        newResource: 'available_customer_payment_sources',
+        newResource: 'available_customer_payment_sources.payment_source',
       })
     }
     if (config.accessToken && isEmpty(state.addresses) && !isGuest) {
@@ -45,7 +48,7 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
     }
     if (
       order &&
-      include?.includes('available_customer_payment_sources') &&
+      include?.includes('available_customer_payment_sources.payment_source') &&
       !isGuest
     ) {
       getCustomerPaymentSources({ dispatch, order })
@@ -72,7 +75,7 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
     setCustomerEmail: (customerEmail: string) =>
       defaultCustomerContext['setCustomerEmail'](customerEmail, dispatch),
     getCustomerPaymentSources: () =>
-      getCustomerPaymentSources({ config, dispatch, order }),
+      getCustomerPaymentSources({ dispatch, order }),
   }
   return (
     <CustomerContext.Provider value={contextValue}>

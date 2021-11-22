@@ -58,30 +58,31 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   } = useContext(PaymentMethodContext)
   const paymentResource = readonly
     ? currentPaymentMethodType
-    : (payment?.paymentSourceType as PaymentResource)
+    : (payment?.payment_source_type as PaymentResource)
   useEffect(() => {
     if (
-      paymentResource &&
-      !paymentSource &&
       payment?.id === currentPaymentMethodId &&
-      order
+      paymentResource &&
+      order?.payment_method?.payment_source_type === paymentResource
     ) {
       const attributes =
         config && paymentResource === 'paypal_payments'
           ? getPaypalConfig(paymentResource, config)
           : {}
-      setPaymentSource({
-        paymentResource,
-        order,
-        attributes,
-      })
-      getCustomerPaymentSources && getCustomerPaymentSources()
+      if (!paymentSource || paymentSource.type !== paymentResource) {
+        setPaymentSource({
+          paymentResource,
+          order,
+          attributes,
+        })
+        getCustomerPaymentSources && getCustomerPaymentSources()
+      }
+      setLoading(false)
     }
-    if (paymentSource) setLoading(false)
     return () => {
       setLoading(true)
     }
-  }, [paymentSource, payment, show])
+  }, [order?.payment_method?.payment_source_type, show, paymentSource])
   const gatewayConfig = {
     readonly,
     showCard,

@@ -9,7 +9,7 @@ import React, {
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isEmpty from 'lodash/isEmpty'
 import { PaymentSourceProps } from './PaymentSource'
-import { setLocalOrder } from '#utils/localStorage'
+import { setCustomerOrderParam } from '#utils/localStorage'
 import { CoreOptions } from '@adyen/adyen-web/dist/types/core/types'
 import Parent from '#components/utils/Parent'
 import getBrowserInfo from '../utils/browserInfo'
@@ -81,8 +81,8 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
       // @ts-ignore
       e?.elements?.['save_payment_source_to_customer_wallet']?.checked
     if (savePaymentSourceToCustomerWallet)
-      setLocalOrder(
-        'savePaymentSourceToCustomerWallet',
+      setCustomerOrderParam(
+        '_save_payment_source_to_customer_wallet',
         savePaymentSourceToCustomerWallet
       )
     const attributes: any = {
@@ -96,10 +96,11 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
           paymentResource: 'adyen_payments',
           attributes,
         }))
+      debugger
       // @ts-ignore
-      const adyenAction = pSource?.paymentSource?.paymentResponse?.action
+      const adyenAction = pSource?.payment_response?.action
       // @ts-ignore
-      const resultCode = pSource?.paymentSource?.paymentResponse?.resultCode
+      const resultCode = pSource?.payment_response?.resultCode
       if (adyenAction && resultCode === 'IdentifyShopper') {
         checkout
           .createFromAction(adyenAction, threeDSConfiguration)
@@ -107,11 +108,11 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
       } else if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
         const brand =
           // @ts-ignore
-          pSource?.paymentSource?.paymentRequestData?.paymentMethod?.brand
+          pSource?.payment_request_data?.payment_method?.brand
         if (brand) {
           const attributes = { metadata: { card: { brand } } }
           await setPaymentSource({
-            paymentSourceId: pSource?.paymentSource.id,
+            paymentSourceId: pSource?.id,
             paymentResource: 'adyen_payments',
             attributes,
           })
@@ -119,11 +120,11 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
         return true
       }
       // @ts-ignore
-      const message = pSource?.paymentSource?.paymentResponse?.refusalReason
+      const message = pSource?.payment_response?.refusalReason
       setPaymentMethodErrors([
         {
           code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-          resource: 'paymentMethod',
+          resource: 'payment_methods',
           field: currentPaymentMethodType,
           message,
         },
@@ -133,7 +134,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
       setPaymentMethodErrors([
         {
           code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-          resource: 'paymentMethod',
+          resource: 'payment_methods',
           field: currentPaymentMethodType,
           message: error.message as string,
         },
@@ -175,7 +176,6 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
           paymentSourceId: paySource.id,
           paymentResource: 'adyen_payments',
           attributes,
-          rawResponse: true,
         }))
     }
   }
@@ -195,12 +195,11 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
           paymentSourceId: paymentSource.id,
           paymentResource: 'adyen_payments',
           attributes,
-          rawResponse: true,
         }))
       // @ts-ignore
-      const adyenAction = pSource?.paymentSource?.paymentResponse?.action
+      const adyenAction = pSource?.payment_response?.action
       // @ts-ignore
-      const resultCode = pSource?.paymentSource?.paymentResponse?.resultCode
+      const resultCode = pSource?.payment_response?.resultCode
       const AdyenCheckout = require('@adyen/adyen-web')
       if (adyenAction) {
         const adyenCheckout = await AdyenCheckout(config)
@@ -212,7 +211,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
         const { placed } = (setPlaceOrder &&
           (await setPlaceOrder({
             // @ts-ignore
-            paymentSource: pSource?.paymentSource as any,
+            paymentSource: pSource,
           }))) || { placed: false }
         placed && placeOrderCallback && placeOrderCallback({ placed })
       }
@@ -222,9 +221,9 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
   }
   useEffect(() => {
     // @ts-ignore
-    const paymentMethodsResponse = !isEmpty(paymentSource?.paymentMethods)
+    const paymentMethodsResponse = !isEmpty(paymentSource?.payment_methods)
       ? // @ts-ignore
-        paymentSource?.paymentMethods
+        paymentSource?.payment_methods
       : {}
     if (isEmpty(paymentMethodsResponse))
       console.error(
@@ -241,7 +240,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
     options.onAdditionalDetails = (s: any, c: any) =>
       handleOnAdditionalDetails(s, c, options)
     if (!ref && clientKey)
-      setLocalOrder('savePaymentSourceToCustomerWallet', 'false')
+      setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'false')
     if (clientKey && !loadAdyen && !isEmpty(window)) {
       const AdyenCheckout = require('@adyen/adyen-web')
       AdyenCheckout(options).then((adyenCheckout: any) => {

@@ -144,8 +144,8 @@ export default function Main() {
                   containerClassName: 'w-1/2 px-3',
                 },
                 paypalPayment: {
-                  cancelUrl: paypalReturnUrl,
-                  returnUrl: paypalReturnUrl,
+                  cancel_url: paypalReturnUrl,
+                  return_url: paypalReturnUrl,
                 },
               }}
             >
@@ -197,7 +197,7 @@ export default function Main() {
                   </PaymentSource>
                   <Errors
                     className="text-red-600 block"
-                    resource="paymentMethod"
+                    resource="payment_methods"
                   />
                 </PaymentMethod>
 
@@ -226,7 +226,7 @@ export default function Main() {
               </PlaceOrderContainer>
             </PaymentMethodsContainer>
             <div className="flex flex-col text-red-600 mt-5">
-              <Errors resource="order" messages={messages} />
+              <Errors resource="orders" messages={messages} />
             </div>
             {/* <PaymentMethodsContainer>
               <PaymentSource readonly>
