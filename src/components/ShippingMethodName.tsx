@@ -2,14 +2,14 @@ import React, { useContext, FunctionComponent, ReactNode } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
-import { ShippingMethodCollection } from '@commercelayer/js-sdk'
+import { ShippingMethod } from '@commercelayer/sdk'
 
 const propTypes = components.ShippingMethodName.propTypes
 const displayName = components.ShippingMethodName.displayName
 
 type LineItemNameChildrenProps = Omit<LineItemNameProps, 'children'> & {
   label: string
-  shippingMethod: ShippingMethodCollection
+  shippingMethod: ShippingMethod
 }
 
 type LineItemNameProps = {

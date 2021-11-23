@@ -1,8 +1,8 @@
 import { createContext } from 'react'
-import { AddressCollection } from '@commercelayer/js-sdk'
+import { Address } from '@commercelayer/sdk'
 
 export interface InitialAddressContext {
-  address: AddressCollection | Record<string, any>
+  address: Address | Record<string, any>
 }
 
 const initial: InitialAddressContext = {

@@ -78,13 +78,15 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     if (!isEmpty(skuLists) && skuListId && url) {
       const slQty = quantity[skuListId] || 1
       if (has(skuLists, skuListId)) {
-        const lineItems = skuLists[skuListId].map((skuCode) => {
-          return {
-            skuCode,
-            quantity: slQty,
-            _update_quantity: 1,
-          }
-        })
+        const lineItems =
+          skuLists &&
+          skuLists[skuListId].map((skuCode: any) => {
+            return {
+              skuCode,
+              quantity: slQty,
+              _update_quantity: 1,
+            }
+          })
         return callExternalFunction({
           url,
           data: {

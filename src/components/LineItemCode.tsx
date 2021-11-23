@@ -19,7 +19,7 @@ const LineItemCode: FunctionComponent<LineItemNameProps> = ({
   ...p
 }) => {
   const { lineItem } = useContext(LineItemChildrenContext)
-  const labelName = lineItem[type]
+  const labelName = lineItem?.[type]
   const parentProps = {
     ...p,
   }

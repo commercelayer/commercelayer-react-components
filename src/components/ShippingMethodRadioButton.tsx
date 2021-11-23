@@ -3,7 +3,7 @@ import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContex
 import Parent from './utils/Parent'
 import components from '#config/components'
 import ShipmentContext from '#context/ShipmentContext'
-import { ShippingMethodCollection } from '@commercelayer/js-sdk'
+import { ShippingMethod } from '@commercelayer/sdk'
 
 const propTypes = components.ShippingMethodRadioButton.propTypes
 const displayName = components.ShippingMethodRadioButton.displayName
@@ -15,9 +15,7 @@ type ShippingMethodRadioButtonChildrenProps = Omit<
 
 type ShippingMethodRadioButtonProps = {
   children?: (props: ShippingMethodRadioButtonChildrenProps) => ReactNode
-  onChange?: (
-    shippingMethod: ShippingMethodCollection | Record<string, any>
-  ) => void
+  onChange?: (shippingMethod: ShippingMethod) => void
 } & JSX.IntrinsicElements['input']
 
 const ShippingMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps> =

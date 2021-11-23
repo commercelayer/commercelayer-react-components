@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import customMessages from '#utils/customMessages'
-import { LineItemCollection } from '@commercelayer/js-sdk'
+import { LineItem } from '@commercelayer/sdk'
 import { BaseError, ResourceErrorType } from '#typings/errors'
 
 export type AllErrorsParams = {
@@ -8,7 +8,7 @@ export type AllErrorsParams = {
   messages: BaseError[]
   field?: string
   props: JSX.IntrinsicElements['span']
-  lineItem?: LineItemCollection | Record<string, any>
+  lineItem?: LineItem
   resource?: ResourceErrorType
   returnHtml?: boolean
 }

@@ -18,6 +18,7 @@ import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
 import components from '#config/components'
 import { LoaderType } from '#typings'
+import { Price } from '@commercelayer/sdk'
 
 const propTypes = components.PricesContainer.propTypes
 const defaultProps = components.PricesContainer.defaultProps
@@ -65,7 +66,8 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
       })
     }
     if (!isEmpty(items) && isEmpty(currentItem)) {
-      const p = getPrices(items)
+      // TODO: Remove any type
+      const p = getPrices(items as any)
       dispatch({
         type: 'setPrices',
         payload: { prices: p },
