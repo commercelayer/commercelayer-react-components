@@ -17,7 +17,7 @@ type LineItemImageProps = {
 
 const LineItemImage: FunctionComponent<LineItemImageProps> = (props) => {
   const { lineItem } = useContext(LineItemChildrenContext)
-  const src = lineItem.image_url
+  const src = lineItem?.image_url
   const parenProps = {
     src,
     ...props,

@@ -28,9 +28,9 @@ const GiftCardOrCouponCode: FunctionComponent<GiftCardOrCouponCodeProps> = ({
 }) => {
   const { order } = useContext(OrderContext)
   let codeType = type && (`${type}Code` as OrderCodeType)
-  if (!type && order && has(order, 'couponCode') && !isEmpty(order.couponCode))
-    codeType = 'couponCode'
-  else if (!type) codeType = 'giftCardCode'
+  if (!type && order && has(order, 'couponCode') && !isEmpty(order.coupon_code))
+    codeType = 'coupon_code'
+  else if (!type) codeType = 'gift_card_code'
   const code = order && codeType ? order[codeType] : ''
   const hide = order && code ? false : true
   const parentProps = {

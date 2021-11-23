@@ -55,7 +55,6 @@ const ShippingAddressContainer: FunctionComponent<Props> = (props) => {
         config,
         dispatch,
         order,
-        updateOrder,
         customerAddressId: options?.customerAddressId,
       })
       setCloneAddress(id, 'shipping_address')

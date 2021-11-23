@@ -7,9 +7,7 @@ import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext, updateOrder } from '#reducers/OrderReducer'
 import { BaseError } from '#typings/errors'
 import baseReducer from '#utils/baseReducer'
-// import dynamicNaming from '#utils/dynamicNaming'
 import getErrors, { setErrors } from '#utils/getErrors'
-// import getErrorsByCollection from '#utils/getErrorsByCollection'
 import getSdk from '#utils/getSdk'
 import {
   Order,

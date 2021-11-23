@@ -1,20 +1,19 @@
 import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { SkuList } from '@commercelayer/js-sdk'
+import getSdk from '#utils/getSdk'
 
 type SkuListsActionType = 'getSkuList' | 'setSkuList'
 
 const actionType: SkuListsActionType[] = ['getSkuList', 'setSkuList']
 
-export interface SkuListsState {
+export type SkuListsState = Partial<{
   listIds: string[]
-  skuLists: SkuList
-}
+  skuLists: Record<string, any>
+}>
 
 export const skuListsInitialState: SkuListsState = {
   listIds: [],
-  skuLists: {},
 }
 
 export interface SkuListsAction {
@@ -29,25 +28,16 @@ export type GetSkuList = (params: {
   state: SkuListsState
 }) => Promise<void>
 
-export type SkuList = Record<string, string[]>
-
-export const getSkuList: GetSkuList = async ({
-  listIds,
-  config,
-  dispatch,
-  // state,
-}) => {
+export const getSkuList: GetSkuList = async ({ listIds, config, dispatch }) => {
   const skuLists: Record<string, any> = {}
   try {
-    listIds.map(async (id) => {
-      const skuList = await SkuList.withCredentials(config)
-        .includes('skus')
-        .select({ skus: ['code'] })
-        .find(id)
-      const skuCodes = skuList
-        .skus()
-        ?.toArray()
-        .map((sku) => sku.code)
+    const sdk = getSdk(config)
+    listIds.forEach(async (id) => {
+      const skuList = await sdk.sku_lists.retrieve(id, {
+        include: ['skus'],
+        fields: { skus: ['code'] },
+      })
+      const skuCodes = skuList.skus
       skuLists[id] = skuCodes
     })
     dispatch({

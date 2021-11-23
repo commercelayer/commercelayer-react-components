@@ -8,7 +8,7 @@ import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
 import { isEmpty } from 'lodash'
 import components from '#config/components'
-import { LineItemOptionCollection } from '@commercelayer/js-sdk'
+import { LineItemOption } from '@commercelayer/sdk'
 
 const displayName = components.LineItemOptions.displayName
 
@@ -30,8 +30,8 @@ export type LineItemOptionsProps = JSX.IntrinsicElements['span'] & {
 const LineItemOptions: FunctionComponent<LineItemOptionsProps> = (props) => {
   const { skuOptionId, title, children, showName = true, showAll, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
-  const lineItemOptions: LineItemOptionCollection[] = !isEmpty(lineItem)
-    ? lineItem['line_item_options']
+  const lineItemOptions: LineItemOption[] = !isEmpty(lineItem)
+    ? lineItem?.['line_item_options'] || []
     : []
   const options = lineItemOptions
     .filter((o) => {

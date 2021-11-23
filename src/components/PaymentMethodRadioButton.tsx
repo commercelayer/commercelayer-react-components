@@ -8,7 +8,7 @@ import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import { PaymentMethodCollection } from '@commercelayer/js-sdk'
+import { PaymentMethod } from '@commercelayer/sdk'
 import { PaymentResource } from '../reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 
@@ -22,7 +22,7 @@ type ShippingMethodRadioButtonChildrenProps = Omit<
 
 type ShippingMethodRadioButtonProps = {
   children?: (props: ShippingMethodRadioButtonChildrenProps) => ReactNode
-  onChange?: (payment?: PaymentMethodCollection | Record<string, any>) => void
+  onChange?: (payment?: PaymentMethod | Record<string, any>) => void
 } & JSX.IntrinsicElements['input']
 
 const PaymentMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps> =

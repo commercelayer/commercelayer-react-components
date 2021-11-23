@@ -23,14 +23,14 @@ const CheckoutLink: FunctionComponent<CheckoutLinkProps> = (props) => {
   const { label, children, ...p } = props
   const { order } = useContext(OrderContext)
   const parentProps = {
-    checkoutUrl: order?.checkoutUrl,
+    checkoutUrl: order?.checkout_url,
     label,
     ...p,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a href={order?.checkoutUrl} {...p}>
+    <a href={order?.checkout_url} {...p}>
       {label}
     </a>
   )

@@ -5,7 +5,7 @@ import has from 'lodash/has'
 import map from 'lodash/map'
 import Parent from './utils/Parent'
 import components from '#config/components'
-import { LineItemOptionCollection } from '@commercelayer/js-sdk'
+import { LineItemOption as LineItemOptionType } from '@commercelayer/sdk'
 import { FunctionChildren } from '#typings/index'
 import isJSON from '#utils/isJSON'
 
@@ -14,7 +14,7 @@ const displayName = components.LineItemOption.displayName
 
 type LineItemOptionChildrenProps = FunctionChildren<
   Omit<LineItemOptionProps, 'children'> & {
-    lineItemOption: LineItemOptionCollection
+    lineItemOption: LineItemOptionType
   }
 >
 

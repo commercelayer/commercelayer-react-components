@@ -20,7 +20,7 @@ const SkuList: FunctionComponent<SkuListProp> = (props) => {
   const { id, children } = props
   const { listIds } = useContext(SkuListsContext)
   useEffect(() => {
-    if (!listIds.includes(id)) {
+    if (listIds && !listIds.includes(id)) {
       listIds.push(id)
     }
   }, [])

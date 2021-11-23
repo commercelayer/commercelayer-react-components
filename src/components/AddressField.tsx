@@ -3,8 +3,8 @@ import AddressChildrenContext from '#context/AddressChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { AddressFieldView } from '#reducers/AddressReducer'
-import { camelCase, get } from 'lodash'
-import { AddressCollection } from '@commercelayer/js-sdk'
+import get from 'lodash/get'
+import { Address } from '@commercelayer/sdk'
 
 const propTypes = components.AddressField.propTypes
 const displayName = components.AddressField.displayName
@@ -13,7 +13,7 @@ type AddressFieldChildrenProps = Omit<
   AddressFieldProps,
   'children' | 'name'
 > & {
-  address: AddressCollection
+  address: Address
 }
 
 type AddressFieldProps = (

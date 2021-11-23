@@ -36,7 +36,7 @@ const GiftCard: FunctionComponent<GiftCardProps> = (props) => {
     const { errors, values } = validateFormFields<RequiredFields[]>(
       elements,
       ['currencyCode', 'balanceCents'],
-      'giftCard'
+      'gift_cards'
     )
     if (isEmpty(errors)) {
       addGiftCard(values as GiftCardI)

@@ -1,13 +1,11 @@
 import { createContext } from 'react'
 import { LineItem } from '@commercelayer/sdk'
 
-export interface InitialLineItemContext {
-  lineItem: LineItem | Record<string, any>
-}
+export type InitialLineItemContext = Partial<{
+  lineItem: LineItem
+}>
 
-const initial: InitialLineItemContext = {
-  lineItem: {},
-}
+const initial: InitialLineItemContext = {}
 
 const LineItemChildrenContext = createContext<InitialLineItemContext>(initial)
 

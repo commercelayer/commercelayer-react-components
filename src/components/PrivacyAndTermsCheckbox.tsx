@@ -27,13 +27,13 @@ const PrivacyAndTermsCheckbox: FunctionComponent<Partial<BaseInputProps>> = (
     placeOrderPermitted && placeOrderPermitted()
   }
   useEffect(() => {
-    if (order?.privacyUrl && order?.termsUrl) setForceDisabled(false)
+    if (order?.privacy_url && order?.terms_url) setForceDisabled(false)
     if (!checked) localStorage.setItem(fieldName, `${checked}`)
     return () => {
       setForceDisabled(true)
       localStorage.removeItem(fieldName)
     }
-  }, [order?.privacyUrl, order?.termsUrl])
+  }, [order?.privacy_url, order?.terms_url])
   return (
     <BaseInput
       type="checkbox"

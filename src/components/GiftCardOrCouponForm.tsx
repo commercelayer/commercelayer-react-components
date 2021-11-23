@@ -14,6 +14,7 @@ import camelCase from 'lodash/camelCase'
 import dropWhile from 'lodash/dropWhile'
 import has from 'lodash/has'
 import { findIndex } from 'lodash'
+import { BaseError } from '#typings/errors'
 
 const propTypes = components.GiftCardOrCouponForm.propTypes
 
@@ -28,9 +29,8 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
 ) => {
   const { children, autoComplete = 'on', reset = false, onSubmit, ...p } = props
   const { validation, values } = useRapidForm()
-  const { setGiftCardOrCouponCode, order, errors, setOrderErrors } = useContext(
-    OrderContext
-  )
+  const { setGiftCardOrCouponCode, order, errors, setOrderErrors } =
+    useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
   const inputName = 'gift_card_or_coupon_code'
   useEffect(() => {
@@ -38,8 +38,11 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
       values[inputName]?.value === '' &&
       findIndex(errors, { field: camelCase(inputName) }) !== -1
     ) {
-      const err = dropWhile(errors, (i) => i.field === camelCase(inputName))
-      setOrderErrors(err)
+      const err = dropWhile(
+        errors,
+        (i) => i.field === camelCase(inputName)
+      ) as BaseError[]
+      setOrderErrors({ errors: err })
       onSubmit && onSubmit({ success: true })
     }
   }, [values])
@@ -52,7 +55,7 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
       success && e.target.reset()
     }
   }
-  return order?.giftCardOrCouponCode || isEmpty(order) ? null : (
+  return order?.gift_card_or_coupon_code || isEmpty(order) ? null : (
     <CouponAndGiftCardFormContext.Provider value={{ validation }}>
       <form
         ref={ref}
