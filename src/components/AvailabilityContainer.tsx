@@ -38,7 +38,7 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
   )
   useEffect(() => {
     const sCode =
-      skuCode || getCurrentItemKey(item) || itemSkuCode || lineItem?.skuCode
+      skuCode || getCurrentItemKey(item) || itemSkuCode || lineItem?.sku_code
     if (sCode) {
       const [level] = item[sCode]?.inventory?.levels || {
         quantity: null,

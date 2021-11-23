@@ -37,9 +37,9 @@ const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = (props) => {
   }
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const quantity = Number(e.target.value)
-    updateLineItem && updateLineItem(lineItem['id'], quantity)
+    updateLineItem && lineItem && updateLineItem(lineItem['id'], quantity)
   }
-  const quantity = lineItem['quantity']
+  const quantity = lineItem?.['quantity']
   const parentProps = {
     handleChange,
     quantity,
@@ -51,7 +51,7 @@ const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = (props) => {
     <span {...p}>{quantity}</span>
   ) : (
     <select
-      title={lineItem.name}
+      title={lineItem?.name}
       value={quantity}
       onChange={handleChange}
       {...p}

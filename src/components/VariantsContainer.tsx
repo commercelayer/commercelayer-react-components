@@ -20,6 +20,7 @@ import { isEmpty, isEqual } from 'lodash'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
 import components from '#config/components'
+import { Items } from '#reducers/ItemReducer'
 
 const propTypes = components.VariantsContainer.propTypes
 const defaultProps = components.VariantsContainer.defaultProps
@@ -54,7 +55,7 @@ const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
   useEffect(() => {
     if (!isEmpty(items) && !isEmpty(state.variants)) {
       if (!isEqual(items, state.variants)) {
-        const mergeItems = { ...items, ...state.variants }
+        const mergeItems = { ...items, ...state.variants } as Items
         setItems && setItems(mergeItems)
       }
     }

@@ -43,7 +43,7 @@ type CreateOrderParams = Pick<
 >
 
 export interface CreateOrder {
-  (params: CreateOrderParams): Promise<string>
+  (params?: CreateOrderParams): Promise<string>
 }
 
 export type AddToCartParams = Partial<{
@@ -152,39 +152,41 @@ const actionType: OrderActionType[] = [
 ]
 
 export const createOrder: CreateOrder = async (params) => {
-  const {
-    persistKey,
-    state,
-    dispatch,
-    config,
-    orderMetadata: metadata,
-    orderAttributes = {},
-    setLocalOrder,
-  } = params
-  if (state?.orderId) return state.orderId
-  const sdk = getSdk(config as CommerceLayerConfig)
-  try {
-    const o = await sdk?.orders.create({ metadata, ...orderAttributes })
-    dispatch &&
-      dispatch({
-        type: 'setOrderId',
-        payload: {
-          orderId: o?.id,
-        },
-      })
-    persistKey && setLocalOrder && setLocalOrder(persistKey, o.id)
-    return o.id
-  } catch (error: any) {
-    const errors = getErrors(error, 'orders')
-    console.error('Create order', errors)
-    if (dispatch)
-      setErrors({
-        currentErrors: state?.errors,
-        newErrors: errors,
-        dispatch,
-      })
-    return ''
+  if (params) {
+    const {
+      persistKey,
+      state,
+      dispatch,
+      config,
+      orderMetadata: metadata,
+      orderAttributes = {},
+      setLocalOrder,
+    } = params
+    if (state?.orderId) return state.orderId
+    const sdk = getSdk(config as CommerceLayerConfig)
+    try {
+      const o = await sdk?.orders.create({ metadata, ...orderAttributes })
+      dispatch &&
+        dispatch({
+          type: 'setOrderId',
+          payload: {
+            orderId: o?.id,
+          },
+        })
+      persistKey && setLocalOrder && setLocalOrder(persistKey, o.id)
+      return o.id
+    } catch (error: any) {
+      const errors = getErrors(error, 'orders')
+      console.error('Create order', errors)
+      if (dispatch)
+        setErrors({
+          currentErrors: state?.errors,
+          newErrors: errors,
+          dispatch,
+        })
+    }
   }
+  return ''
 }
 
 export const getApiOrder: GetOrder = async (params) => {
@@ -407,17 +409,18 @@ export const unsetOrderState: UnsetOrderState = (dispatch) => {
 }
 
 type OrderErrors = {
-  dispatch: Dispatch<OrderActions>
+  dispatch?: Dispatch<OrderActions>
   errors: any
 }
 
 export function setOrderErrors({ dispatch, errors }: OrderErrors) {
-  dispatch({
-    type: 'setErrors',
-    payload: {
-      errors,
-    },
-  })
+  dispatch &&
+    dispatch({
+      type: 'setErrors',
+      payload: {
+        errors,
+      },
+    })
   return { success: false }
 }
 

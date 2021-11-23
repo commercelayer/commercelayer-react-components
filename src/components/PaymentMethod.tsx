@@ -12,7 +12,7 @@ import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import components from '#config/components'
 import { LoaderType } from '#typings'
 import getLoaderComponent from '../utils/getLoaderComponent'
-import { PaymentMethodCollection } from '@commercelayer/js-sdk'
+import { PaymentMethod as PaymentMethodType } from '@commercelayer/sdk'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 
 const propTypes = components.PaymentMethod.propTypes
@@ -26,9 +26,7 @@ type PaymentMethodProps = {
   (
     | {
         clickableContainer: true
-        onClick?: (
-          payment?: PaymentMethodCollection | Record<string, any>
-        ) => void
+        onClick?: (payment?: PaymentMethodType | Record<string, any>) => void
       }
     | {
         clickableContainer?: never

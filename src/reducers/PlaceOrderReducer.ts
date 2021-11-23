@@ -3,10 +3,9 @@ import { Dispatch } from 'react'
 import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Order, OrderUpdate } from '@commercelayer/sdk'
-import { isEmpty, isFunction } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import { shipmentsFilled } from '#utils/shipments'
 import { PaymentResource } from './PaymentMethodReducer'
-import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { PaymentSourceType } from './PaymentMethodReducer'
 import {
   saveBillingAddress,
@@ -14,7 +13,6 @@ import {
   saveToWallet,
 } from '#utils/customerOrderOptions'
 import getSdk from '#utils/getSdk'
-import { updateOrder } from './OrderReducer'
 import getErrors from '#utils/getErrors'
 
 export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted'

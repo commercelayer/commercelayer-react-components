@@ -26,7 +26,7 @@ const SkuListsContainer: FunctionComponent<SkuListsContainerProp> = (props) => {
   const [state, dispatch] = useReducer(skuListsReducer, skuListsInitialState)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
-    if (state.listIds.length > 0 && config.accessToken) {
+    if (state.listIds && state.listIds.length > 0 && config.accessToken) {
       getSkuList({ listIds: state.listIds, dispatch, config, state })
     }
   }, [config.accessToken])

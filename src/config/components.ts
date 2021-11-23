@@ -243,10 +243,10 @@ const components = {
     displayName: 'DeliveryLeadTime',
     propTypes: {
       type: PropTypes.oneOf<DeliveryLeadTimeField>([
-        'maxDays',
-        'maxHours',
-        'minDays',
-        'minHours',
+        'max_days',
+        'max_hours',
+        'min_days',
+        'min_hours',
       ]).isRequired,
       children: PropTypes.func,
     },
@@ -376,14 +376,14 @@ const components = {
     displayName: 'GiftCardOrCouponCode',
     propTypes: {
       children: PropTypes.func,
-      type: PropTypes.oneOf<CodeType>(['coupon', 'giftCard']),
+      type: PropTypes.oneOf<CodeType>(['coupon', 'gift_card']),
     },
   },
   GiftCardOrCouponRemoveButton: {
     displayName: 'GiftCardOrCouponRemoveButton',
     propTypes: {
       children: PropTypes.func,
-      type: PropTypes.oneOf<CodeType>(['coupon', 'giftCard']),
+      type: PropTypes.oneOf<CodeType>(['coupon', 'gift_card']),
       label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     },
   },
@@ -786,13 +786,13 @@ const components = {
     propTypes: {
       children: PropTypes.func,
       name: PropTypes.oneOf<ShipmentAttribute>([
-        'costAmountCents',
-        'costAmountFloat',
-        'currencyCode',
-        'formattedCostAmount',
+        'cost_amount_cents',
+        'cost_amount_float',
+        'currency_code',
+        'formatted_cost_amount',
         'number',
         'status',
-        'keyNumber',
+        'key_number',
       ]).isRequired,
     },
   },
@@ -913,7 +913,7 @@ const components = {
     displayName: 'StockTransferField',
     propTypes: {
       children: PropTypes.func,
-      type: PropTypes.oneOf<StockTransferFieldType>(['quantity', 'skuCode'])
+      type: PropTypes.oneOf<StockTransferFieldType>(['quantity', 'sku_code'])
         .isRequired,
     },
   },

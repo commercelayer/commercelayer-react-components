@@ -1,15 +1,21 @@
 import baseReducer from '#utils/baseReducer'
-import { CustomerCollection } from '@commercelayer/js-sdk'
+import {
+  Customer,
+  Market,
+  GiftCardRecipient,
+  // GiftCardCreate,
+  GiftCardRecipientCreate,
+  Order,
+  GiftCardRecipientUpdate,
+} from '@commercelayer/sdk'
 import { BaseMetadata } from '#typings'
-import CLayer, {
-  MarketCollection,
-  GiftCardRecipientCollection,
-} from '@commercelayer/js-sdk'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { isEmpty } from 'lodash'
-import getErrorsByCollection from '#utils/getErrorsByCollection'
 import { BaseError } from '#typings/errors'
+import getErrors from '#utils/getErrors'
+import getSdk from '#utils/getSdk'
+import { CreateOrder } from './OrderReducer'
 
 export type GiftCardActionType =
   | 'setAvailability'
@@ -24,7 +30,7 @@ export interface GiftCardRecipientI {
   referenceOrigin?: string
   reference?: string
   metadata?: BaseMetadata
-  customer?: CustomerCollection
+  customer?: Customer
 }
 
 export interface GiftCardI {
@@ -46,8 +52,8 @@ export interface GiftCardI {
 }
 
 export interface GiftCardActionPayload extends GiftCardI {
-  market?: MarketCollection
-  giftCardRecipient?: GiftCardRecipientCollection
+  market?: Market
+  giftCardRecipient?: GiftCardRecipient
   errors?: BaseError[]
   loading?: boolean
 }
@@ -79,7 +85,7 @@ export const giftCardInitialState: GiftCardState = {
 }
 
 export interface AddGiftCardRecipient {
-  <V extends GiftCardRecipientI>(
+  <V extends GiftCardRecipientCreate>(
     values: V,
     config: CommerceLayerConfig,
     dispatch: Dispatch<GiftCardAction>
@@ -91,9 +97,10 @@ export interface AddGiftCard {
     values: V,
     configParameters: {
       getOrder?: (id: string) => void
-      createOrder?: () => Promise<string>
+      createOrder?: CreateOrder
       config: CommerceLayerConfig
       dispatch: Dispatch<GiftCardAction>
+      order?: Order
     }
   ): void
 }
@@ -112,9 +119,8 @@ export const addGiftCardRecipient: AddGiftCardRecipient = async (
   dispatch
 ) => {
   try {
-    const recipient = await CLayer.GiftCardRecipient.withCredentials(
-      config
-    ).create(values)
+    const sdk = getSdk(config)
+    const recipient = await sdk.gift_card_recipients.create(values)
     dispatch({
       type: 'setGiftCardRecipient',
       payload: {
@@ -137,32 +143,34 @@ export const addGiftCardLoading: AddGiftCardLoading = (loading, dispatch) => {
 
 export const addGiftCard: AddGiftCard = async (
   values,
-  { config, dispatch, getOrder, createOrder }
+  { config, dispatch, getOrder, createOrder, order }
 ) => {
   try {
+    const sdk = getSdk(config)
     addGiftCardLoading(true, dispatch)
-    const { firstName, lastName, email, orderId, ...val } = values
-    const giftCardValue = {
-      recipientEmail: email,
+    const { firstName, lastName, email, ...val } = values
+    // TODO: Change any type
+    const giftCardValue: any = {
+      recipient_email: email,
       ...val,
-    } as GiftCardI
-    const recipientValues: any = {}
-    const giftCard = await CLayer.GiftCard.withCredentials(config).create(
-      giftCardValue
-    )
-    if (firstName) recipientValues['firstName'] = firstName
-    if (lastName) recipientValues['lastName'] = lastName
+    }
+    const giftCard = await sdk.gift_cards.create(giftCardValue, {
+      include: ['gift_card_recipient'],
+    })
+    const recipientValues: GiftCardRecipientUpdate = {
+      id: giftCard.gift_card_recipient?.id as string,
+    }
+    if (firstName) recipientValues['first_name'] = firstName
+    if (lastName) recipientValues['last_name'] = lastName
     if (!isEmpty(recipientValues)) {
-      await (
-        await giftCard.withCredentials(config).giftCardRecipient()
-      )?.update(recipientValues)
+      await sdk.gift_card_recipients.update(recipientValues)
     }
     if (createOrder && getOrder) {
-      const id = orderId || (await createOrder())
+      const id = order ? order.id : await createOrder()
       if (id) {
-        const order = CLayer.Order.build({ id })
-        const item = CLayer.GiftCard.build({ id: giftCard.id })
-        await CLayer.LineItem.withCredentials(config).create({
+        const order = sdk.orders.relationship(id)
+        const item = sdk.gift_cards.relationship(giftCard.id)
+        await sdk.line_items.create({
           quantity: 1,
           order,
           item,
@@ -177,8 +185,8 @@ export const addGiftCard: AddGiftCard = async (
       },
     })
     addGiftCardLoading(false, dispatch)
-  } catch (r: any) {
-    const errors = getErrorsByCollection(r, 'giftCard')
+  } catch (error) {
+    const errors = getErrors(error, 'gift_cards')
     dispatch({
       type: 'setGiftCardErrors',
       payload: {

@@ -1,15 +1,15 @@
 import React, { useContext, FunctionComponent, ReactNode } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
-import { camelCase, get } from 'lodash'
-import { ShipmentCollection } from '@commercelayer/js-sdk'
+import get from 'lodash/get'
+import { Shipment } from '@commercelayer/sdk'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 
 const propTypes = components.ShipmentField.propTypes
 const displayName = components.ShipmentField.displayName
 
 type ShipmentFieldChildrenProps = Omit<ShipmentFieldProps, 'children'> & {
-  shipment: ShipmentCollection
+  shipment: Shipment
 }
 
 export type ShipmentAttribute =

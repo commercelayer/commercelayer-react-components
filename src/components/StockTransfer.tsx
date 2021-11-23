@@ -21,7 +21,7 @@ const StockTransfer: FunctionComponent<StockTransferProps> = (props) => {
   const { lineItem } = useContext(LineItemChildrenContext)
   const { stockTransfers } = useContext(ShipmentChildrenContext)
   const components = stockTransfers
-    ?.filter((stock) => stock.sku_code === lineItem.sku_code)
+    ?.filter((stock) => stock.sku_code === lineItem?.sku_code)
     .map((stockTransfer, k) => {
       const stockTransferProps = {
         stockTransfer,

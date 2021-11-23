@@ -56,7 +56,7 @@ const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
         formErrors.push({
           code: code as CodeErrorType,
           message,
-          resource: 'order',
+          resource: 'orders',
           field: fieldName,
         })
       }
