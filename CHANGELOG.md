@@ -1,3 +1,10 @@
+## [2.47.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.47.0...v2.47.1) (2021-11-23)
+
+
+### Bug Fixes
+
+* Currency JSON ([c07fae6](https://github.com/commercelayer/commercelayer-react-components/commit/c07fae694e27c7c9896887cb1f7ec408c8bf61c9))
+
 # [2.47.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.46.7...v2.47.0) (2021-11-23)
 
 
