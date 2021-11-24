@@ -1,3 +1,10 @@
+## [2.48.2](https://github.com/commercelayer/commercelayer-react-components/compare/v2.48.1...v2.48.2) (2021-11-24)
+
+
+### Bug Fixes
+
+* Empty availability ([307cb99](https://github.com/commercelayer/commercelayer-react-components/commit/307cb993e1adb17f849db9dd08fb27f8f19586e1))
+
 ## [2.48.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.48.0...v2.48.1) (2021-11-24)
 
 
