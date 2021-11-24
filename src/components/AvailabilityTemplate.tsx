@@ -12,7 +12,8 @@ const defaultProps = components.AvailabilityTemplate
 const displayName = components.AvailabilityTemplate.displayName
 
 type AvailabilityTemplateChildrenProps = FunctionChildren<
-  Omit<AvailabilityTemplateProps, 'children'> & DeliveryLeadTime
+  Omit<AvailabilityTemplateProps, 'children'> &
+    DeliveryLeadTime & { text: string }
 >
 
 type AvailabilityTemplateProps = {
@@ -47,6 +48,7 @@ const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = (
     max,
     shipping_method,
     quantity,
+    text: text.join(' '),
     ...props,
   }
   return children ? (
