@@ -1,9 +1,11 @@
 import { Sku } from '@commercelayer/sdk'
 
-const getSkus = (skus: Sku[]): Record<string, any> => {
+const getSkus = (skus: Sku[], sortBy: string[]): Record<string, any> => {
   const obj: Record<string, Sku> = {}
-  skus.forEach((sku) => {
-    if (sku?.code) obj[sku.code] = sku
+  sortBy.forEach((sku) => {
+    skus.forEach((o) => {
+      if (o?.code === sku) obj[o.code] = o
+    })
   })
   return obj
 }
