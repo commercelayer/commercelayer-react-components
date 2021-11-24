@@ -1,3 +1,10 @@
+## [2.48.3](https://github.com/commercelayer/commercelayer-react-components/compare/v2.48.2...v2.48.3) (2021-11-24)
+
+
+### Bug Fixes
+
+* Disable AddToCartButton when inventory quantity is zero ([819580f](https://github.com/commercelayer/commercelayer-react-components/commit/819580f03cb9cbbfa7b7a468a81fc217bfbc533c))
+
 ## [2.48.2](https://github.com/commercelayer/commercelayer-react-components/compare/v2.48.1...v2.48.2) (2021-11-24)
 
 
