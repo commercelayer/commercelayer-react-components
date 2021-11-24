@@ -111,17 +111,13 @@ export default function Order() {
                         />
                       </PricesContainer>
                     </div>
-                    <VariantsContainer>
+                    <VariantsContainer skuCode="BABYONBU000000E63E746MXX">
                       <div className="m-2" data-test="variant-container">
                         <VariantSelector
                           data-test="variant-selector"
                           className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                           name="variant1"
                           options={[
-                            {
-                              label: '6 months',
-                              code: 'BABYONBU000000E63E746MXX',
-                            },
                             {
                               label: '12 months',
                               code: 'BABYONBU000000E63E7412MX',
@@ -132,10 +128,17 @@ export default function Order() {
                               },
                             },
                             {
+                              label: '6 months',
+                              code: 'BABYONBU000000E63E746MXX',
+                            },
+                            {
                               label: '24 months',
                               code: 'BABYONBU000000E63E746MXXFAKE',
                             },
                           ]}
+                          handleCallback={(variant) => {
+                            console.log(`variant`, variant)
+                          }}
                         />
                       </div>
                     </VariantsContainer>
