@@ -13,7 +13,7 @@ const displayName = components.AvailabilityTemplate.displayName
 
 type AvailabilityTemplateChildrenProps = FunctionChildren<
   Omit<AvailabilityTemplateProps, 'children'> &
-    DeliveryLeadTime & { text: string }
+    DeliveryLeadTime & { text: string; quantity: number }
 >
 
 type AvailabilityTemplateProps = {
