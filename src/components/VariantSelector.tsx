@@ -6,7 +6,7 @@ import React, {
   ReactElement,
   ReactNode,
 } from 'react'
-import VariantTemplate from './utils/VariantTemplate'
+import VariantTemplate, { VariantHandleCallback } from './utils/VariantTemplate'
 import Parent from './utils/Parent'
 import VariantsContext from '#context/VariantsContext'
 import components from '#config/components'
@@ -18,7 +18,7 @@ const propTypes = components.VariantSelector.propTypes
 const defaultProps = components.VariantSelector.defaultProps
 const displayName = components.VariantSelector.displayName
 
-export interface VariantOptions {
+export interface VariantOption {
   label: string
   code: string
   lineItem?: {
@@ -37,11 +37,12 @@ type VariantSelectorChildrenProps = FunctionChildren<
 
 type VariantSelectorProps = {
   children?: VariantSelectorChildrenProps
-  options: VariantOptions[]
+  options: VariantOption[]
   type?: BaseSelectorType
   loader?: ReactNode
   placeholder?: string
   skuCode?: string
+  handleCallback?: VariantHandleCallback
 } & JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['select']
 
