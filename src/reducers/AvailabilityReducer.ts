@@ -85,8 +85,6 @@ export const getAvailability: GetAvailability = async ({
     const skuInventory = (await sdk.skus.retrieve(sku.id, {
       fields: { skus: ['inventory'] },
     })) as SkuInventory
-    debugger
-
     const [level] = skuInventory.inventory?.levels || []
     const [delivery] = level?.delivery_lead_times || []
     dispatch({
