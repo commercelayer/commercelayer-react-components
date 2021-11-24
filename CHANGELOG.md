@@ -1,3 +1,15 @@
+# [2.48.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.47.1...v2.48.0) (2021-11-24)
+
+
+### Bug Fixes
+
+* Follow right SKUs sort ([2ae74a7](https://github.com/commercelayer/commercelayer-react-components/commit/2ae74a79b80c52032dcb5a137602746d43b71e2c))
+
+
+### Features
+
+* Add handleCallback prop to VariantSelector ([8824427](https://github.com/commercelayer/commercelayer-react-components/commit/88244275d8da0b8567f7cb8382730efca40fa54c))
+
 ## [2.47.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.47.0...v2.47.1) (2021-11-23)
 
 
