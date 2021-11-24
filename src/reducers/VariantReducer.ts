@@ -1,5 +1,5 @@
 import { Sku } from '@commercelayer/sdk'
-import { VariantOptions } from '#components/VariantSelector'
+import { VariantOption } from '#components/VariantSelector'
 import { Dispatch } from 'react'
 import baseReducer from '#utils/baseReducer'
 import getSkus from '#utils/getSkus'
@@ -23,7 +23,7 @@ export interface SetSkuCodeVariant {
 }
 
 type SetVariantSkuCodesParams = {
-  skuCodes: VariantOptions[]
+  skuCodes: VariantOption[]
   dispatch: Dispatch<VariantAction>
   setCustomLineItems?: SetCustomLineItems
 }
@@ -53,7 +53,7 @@ export interface VariantPayload {
   currentQuantity?: number
   currentPrices?: Sku[]
   setSkuCode?: SetSkuCode
-  setSkuCodes?: (skuCodes: VariantOptions[]) => void
+  setSkuCodes?: (skuCodes: VariantOption[]) => void
 }
 
 export interface VariantState extends VariantPayload {
@@ -139,7 +139,7 @@ export const getVariants: GetVariants = (params) => {
       },
     })
     .then((skus) => {
-      const skusObj = getSkus(skus)
+      const skusObj = getSkus(skus, state.skuCodes)
       if (skuCode) {
         setSkuCode({
           code: skusObj[skuCode].code,

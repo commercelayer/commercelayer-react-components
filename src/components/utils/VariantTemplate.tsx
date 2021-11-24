@@ -4,7 +4,7 @@ import { keys } from 'lodash'
 import PropTypes from 'prop-types'
 import { BaseSelectorType } from '#typings'
 import { VariantsObject, SetSkuCode } from '#reducers/VariantReducer'
-import { VariantOptions } from '#components/VariantSelector'
+import { VariantOption } from '#components/VariantSelector'
 
 export const propTypes = {
   variants: PropTypes.any.isRequired,
@@ -27,14 +27,17 @@ export const propTypes = {
   skuCode: PropTypes.string,
 }
 
+export type VariantHandleCallback = (variant: VariantOption) => void
+
 export type VariantTemplateProps = {
   variants: VariantsObject | Record<string, any>
   handleChange?: SetSkuCode
-  options: VariantOptions[]
+  options: VariantOption[]
   type?: BaseSelectorType
   loader?: ReactNode
   placeholder?: string
   skuCode?: string
+  handleCallback?: VariantHandleCallback
 } & JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['select']
 
@@ -47,17 +50,20 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
     options,
     skuCode,
     handleChange,
+    handleCallback,
     ...prs
   } = props
   const vars = keys(variants).map((v, k) => {
     const checked = skuCode === v
+    const label = options.length > 0 ? options[k].label : variants[v].name
     return type === 'select' ? (
       <option
         key={variants[v].id}
         data-sku-id={variants[v].id}
+        data-label={label}
         value={variants[v].code}
       >
-        {options.length > 0 ? options[k].label : variants[v].name}
+        {label}
       </option>
     ) : (
       <Fragment key={variants[v].id}>
@@ -66,12 +72,14 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
           defaultChecked={checked}
           type="radio"
           value={variants[v].code}
-          onChange={(e): void =>
-            handleChange && handleChange(e.target.value, variants[v].id)
-          }
+          onChange={(e): void => {
+            const code = e.target.value
+            handleChange && handleChange(code, variants[v].id)
+            handleCallback && handleCallback({ code, label })
+          }}
           {...prs}
         />
-        {options.length > 0 ? options[k].label : variants[v].name}
+        {label}
       </Fragment>
     )
   })
@@ -79,11 +87,14 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
     return (
       <select
         id={id}
+        title="Variant selector"
         onChange={(e): void => {
           const v = e.target.value
           const i = e.target.selectedIndex
           const id = e.target[i].dataset.skuId as string
+          const label = e.target[i].dataset.label as string
           handleChange && handleChange(v, id)
+          handleCallback && handleCallback({ code: v, label })
         }}
         value={skuCode || ''}
         {...prs}

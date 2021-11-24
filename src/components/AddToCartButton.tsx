@@ -14,7 +14,7 @@ import { FunctionChildren } from '#typings/index'
 import { AddToCartReturn } from '#reducers/OrderReducer'
 import SkuListsContext from '#context/SkuListsContext'
 import ExternalFunctionContext from '#context/ExternalFunctionContext'
-import { VariantOptions } from '#components/VariantSelector'
+import { VariantOption } from '#components/VariantSelector'
 import isFunction from 'lodash/isFunction'
 
 const propTypes = components.AddToCartButton.propTypes
@@ -36,7 +36,7 @@ type AddToCartButtonProps = {
   bundleCode?: string
   disabled?: boolean
   skuListId?: string
-  lineItem?: VariantOptions['lineItem']
+  lineItem?: VariantOption['lineItem']
 } & PropsWithoutRef<JSX.IntrinsicElements['button']>
 
 const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
