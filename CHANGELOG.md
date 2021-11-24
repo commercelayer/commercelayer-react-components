@@ -1,3 +1,10 @@
+## [2.48.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.48.0...v2.48.1) (2021-11-24)
+
+
+### Bug Fixes
+
+* Expose text prop as AvailabilityTemplate children props ([346fc9b](https://github.com/commercelayer/commercelayer-react-components/commit/346fc9bd36d60db33c41cbe51ebcf8f95a874608))
+
 # [2.48.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.47.1...v2.48.0) (2021-11-24)
 
 
