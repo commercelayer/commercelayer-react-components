@@ -18,11 +18,10 @@ import TaxesAmount from '../src/components/TaxesAmount'
 import GiftCardAmount from '../src/components/GiftCardAmount'
 import Head from 'next/head'
 import { OrderNumber } from '@commercelayer/react-components'
-import { OrderStorage } from 'dist'
 import { useRouter } from 'next/router'
+import { OrderStorage } from '@commercelayer/react-components'
 
-const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
-const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
+const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 

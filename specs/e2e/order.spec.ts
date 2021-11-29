@@ -23,12 +23,27 @@ test.describe('Orders', () => {
         label: '6 months',
       }),
       await page.waitForResponse(waitForResponse('/api/skus')),
+      await page.waitForTimeout(timeout),
     ])
-    const availability = await page.textContent(
+    let availability = await page.textContent(
       '[data-test=availability-template]'
     )
+    await expect(availability).toBe('Out of stock')
+    const buttonDisabled = await page.waitForSelector(
+      '[data-test=add-to-cart-button]'
+    )
+    const disabled = await buttonDisabled.isDisabled()
+    await expect(disabled).toBe(true)
+    await Promise.all([
+      await page.selectOption('[data-test=variant-selector]', {
+        label: '12 months',
+      }),
+      await page.waitForResponse(waitForResponse('/api/skus')),
+      await page.waitForTimeout(timeout),
+    ])
+    availability = await page.textContent('[data-test=availability-template]')
     await expect(availability).toBe(
-      'Available in 7 - 10 days with Standard Shipping EU'
+      'Available in 3 - 5 days with Standard Shipping EU (€5,00)'
     )
     await Promise.all([
       await page.click('[data-test=add-to-cart-button]'),
@@ -43,9 +58,9 @@ test.describe('Orders', () => {
     let totalAmount = await page.textContent('[data-test=total-amount]')
     const discountAmount = await page.textContent('[data-test=discount-amount]')
     await expect(itemsCount).toBe('1')
-    await expect(subTotalAmount).toBe('€29,00')
-    await expect(discountAmount).toBe('€0,00')
-    await expect(totalAmount).toBe('€29,00')
+    await expect(subTotalAmount).toBe('€35,00')
+    await expect(discountAmount).toBe('-€7,00')
+    await expect(totalAmount).toBe('€28,00')
     await Promise.all([
       await page.selectOption('[data-test=line-item-quantity]', {
         value: '2',
@@ -59,8 +74,8 @@ test.describe('Orders', () => {
     totalAmount = await page.textContent('[data-test=total-amount]')
     await Promise.all([
       await expect(itemsCount).toBe('2'),
-      await expect(subTotalAmount).toBe('€58,00'),
-      await expect(totalAmount).toBe('€58,00'),
+      await expect(subTotalAmount).toBe('€70,00'),
+      await expect(totalAmount).toBe('€56,00'),
     ])
     await Promise.all([
       await page.click('[data-test=line-item-remove]'),

@@ -30,6 +30,7 @@ import ItemContainer from '../src/components/ItemContainer'
 import Errors from '../src/components/Errors'
 import OrderStorage from '#components/OrderStorage'
 import { AddToCartButtonTemplate } from '@commercelayer/react-components'
+// import getSdk from '#utils/getSdk'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -81,6 +82,22 @@ export default function Order() {
         scope,
       })
       if (token) setToken(token.accessToken)
+      // if (token?.accessToken) {
+      //   const sdk = getSdk({
+      //     accessToken: token?.accessToken,
+      //     endpoint: endpoint,
+      //   })
+      //   const lineItemsCount = (
+      //     await sdk.orders.retrieve('wkykhjznGk', {
+      //       fields: {
+      //         line_items: ['item_type'],
+      //       },
+      //       include: ['line_items'],
+      //     })
+      //   ).line_items?.length
+
+      //   console.log(lineItemsCount)
+      // }
     }
     getToken()
   }, [])
@@ -162,6 +179,7 @@ export default function Order() {
                         <AvailabilityTemplate
                           data-test="availability-template"
                           showShippingMethodName
+                          showShippingMethodPrice
                         />
                       </AvailabilityContainer>
                     </div>
