@@ -1,3 +1,10 @@
+## [2.49.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.0...v2.49.1) (2021-11-29)
+
+
+### Bug Fixes
+
+* Revert minimize-js version ([6448fb8](https://github.com/commercelayer/commercelayer-react-components/commit/6448fb81a0f40b9e9fec3a8a2d8236419a738237))
+
 # [2.49.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.48.3...v2.49.0) (2021-11-29)
 
 
