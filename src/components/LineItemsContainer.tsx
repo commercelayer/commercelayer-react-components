@@ -37,6 +37,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
     if (!include?.includes('line_items.line_item_options.sku_option')) {
       addResourceToInclude({
         newResource: 'line_items.line_item_options.sku_option',
+        resourcesIncluded: include,
       })
     } else if (!isEmpty(order) && order?.line_items) {
       dispatch({
