@@ -92,8 +92,6 @@
     "rapid-form": "^1.6.0"
   },
   "devDependencies": {
-    "tsc-alias": "^1.4.1",
-    "minimize-js": "^1.1.1",
     "@babel/plugin-proposal-class-properties": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-react": "^7.16.0",
@@ -130,6 +128,7 @@
     "eslint-plugin-react": "^7.27.1",
     "eslint-plugin-react-hooks": "^4.3.0",
     "jest": "^27.4.0",
+    "minimize-js": "^1.0.0",
     "next": "^12.0.4",
     "playwright": "^1.16.3",
     "postcss": "^8.4.4",
@@ -144,6 +143,7 @@
     "tailwindcss": "^2.2.19",
     "ts-jest": "^27.0.7",
     "ts-loader": "^9.2.6",
+    "tsc-alias": "^1.4.1",
     "tsconfig-paths-jest": "^0.0.1",
     "ttypescript": "^1.5.13",
     "typescript": "^4.5.2",
