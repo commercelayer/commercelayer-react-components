@@ -45,7 +45,10 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
     if (!include?.includes('billing_address')) {
-      addResourceToInclude({ newResource: 'billing_address' })
+      addResourceToInclude({
+        newResource: 'billing_address',
+        resourcesIncluded: include,
+      })
     }
     if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []

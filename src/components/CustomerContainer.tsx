@@ -41,6 +41,7 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
     ) {
       addResourceToInclude({
         newResource: 'available_customer_payment_sources.payment_source',
+        resourcesIncluded: include,
       })
     }
     if (config.accessToken && isEmpty(state.addresses) && !isGuest) {
@@ -57,7 +58,7 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
     return () => {
       dispatch({ type: 'setCustomerEmail', payload: {} })
     }
-  }, [config.accessToken, order, isGuest])
+  }, [config.accessToken, order, isGuest, include])
   const contextValue = {
     isGuest,
     ...state,
