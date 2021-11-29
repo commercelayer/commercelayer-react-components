@@ -1,3 +1,10 @@
+# [2.49.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.48.3...v2.49.0) (2021-11-29)
+
+
+### Features
+
+* Add new prop showShippingMethodPrice to AvailabilityTemplate and force the include line_items within LineItemsContainer ([128ea63](https://github.com/commercelayer/commercelayer-react-components/commit/128ea6398421fd8c9301aadeab5dc96a198dc539))
+
 ## [2.48.3](https://github.com/commercelayer/commercelayer-react-components/compare/v2.48.2...v2.48.3) (2021-11-24)
 
 
