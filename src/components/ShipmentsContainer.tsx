@@ -43,13 +43,14 @@ const ShipmentsContainer: FunctionComponent<ShipmentsContainerProps> = (
           'shipments.stock_transfers',
           'shipments.stock_location',
         ],
+        resourcesIncluded: include,
       })
     }
     // TODO: Get shipments
     if (order && !isEmpty(config)) {
       getShipments({ order, dispatch, config })
     }
-  }, [order])
+  }, [order, include])
   const contextValue = {
     ...state,
     setShipmentErrors: (errors: BaseError[]) =>

@@ -32,7 +32,10 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
   const { shipToDifferentAddress, setCloneAddress } = useContext(AddressContext)
   useEffect(() => {
     if (!include?.includes('billing_address')) {
-      addResourceToInclude({ newResource: 'billing_address' })
+      addResourceToInclude({
+        newResource: 'billing_address',
+        resourcesIncluded: include,
+      })
     }
     if (order && config) {
       setBillingCustomerAddressId({
@@ -47,7 +50,7 @@ const BillingAddressContainer: FunctionComponent<Props> = (props) => {
         payload: {},
       })
     }
-  }, [order])
+  }, [order, include])
   const contextValue = {
     ...state,
     setBillingAddress: async (

@@ -54,6 +54,7 @@ const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> =
             'payment_source',
             'payment_method',
           ],
+          resourcesIncluded: include,
         })
       }
 
@@ -68,7 +69,7 @@ const PaymentMethodsContainer: FunctionComponent<PaymentMethodsContainerProps> =
           payload: { paymentSource: order?.payment_source },
         })
       }
-    }, [order, credentials])
+    }, [order, credentials, include])
     const contextValue = useMemo(() => {
       return {
         ...state,

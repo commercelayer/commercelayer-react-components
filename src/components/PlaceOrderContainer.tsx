@@ -36,13 +36,22 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     if (!include?.includes('shipments.shipping_method')) {
-      addResourceToInclude({ newResource: 'shipments.shipping_method' })
+      addResourceToInclude({
+        newResource: 'shipments.shipping_method',
+        resourcesIncluded: include,
+      })
     }
     if (!include?.includes('billing_address')) {
-      addResourceToInclude({ newResource: 'billing_address' })
+      addResourceToInclude({
+        newResource: 'billing_address',
+        resourcesIncluded: include,
+      })
     }
     if (!include?.includes('shipping_address')) {
-      addResourceToInclude({ newResource: 'shipping_address' })
+      addResourceToInclude({
+        newResource: 'shipping_address',
+        resourcesIncluded: include,
+      })
     }
     if (order) {
       placeOrderPermitted({
