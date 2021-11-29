@@ -90,7 +90,6 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
     const paymentSource = order.payment_source
     if (order.total_amount_with_taxes_cents !== 0 && isEmpty(paymentMethod?.id))
       isPermitted = false
-    console.log(paymentSource)
     dispatch({
       type: 'setPlaceOrderPermitted',
       payload: {

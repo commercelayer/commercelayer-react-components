@@ -38,8 +38,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
       addResourceToInclude({
         newResource: 'line_items.line_item_options.sku_option',
       })
-    }
-    if (!isEmpty(order) && order?.line_items) {
+    } else if (!isEmpty(order) && order?.line_items) {
       dispatch({
         type: 'setLineItems',
         payload: { lineItems: order.line_items },
@@ -53,7 +52,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
         })
       }
     }
-  }, [order])
+  }, [order, include])
   const lineItemValue = {
     ...state,
     loader,

@@ -20,17 +20,28 @@ type AvailabilityTemplateProps = {
   children?: AvailabilityTemplateChildrenProps
   timeFormat?: TimeFormat
   showShippingMethodName?: boolean
+  showShippingMethodPrice?: boolean
 } & JSX.IntrinsicElements['p']
 
 const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = (
   props
 ) => {
-  const { timeFormat, showShippingMethodName, children, ...p } = props
+  const {
+    timeFormat,
+    showShippingMethodName,
+    showShippingMethodPrice,
+    children,
+    ...p
+  } = props
   const { min, max, shipping_method, quantity } =
     useContext(AvailabilityContext)
   const mn = !isEmpty(min) && timeFormat ? min?.[timeFormat] : ''
   const mx = !isEmpty(max) && timeFormat ? max?.[timeFormat] : ''
   const text: string[] = []
+  const shippingMethodPrice =
+    showShippingMethodPrice && shipping_method?.formatted_price_amount
+      ? `(${shipping_method?.formatted_price_amount})`
+      : ''
   const name =
     showShippingMethodName && shipping_method
       ? `with ${shipping_method.name}`
@@ -38,7 +49,7 @@ const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = (
   if (quantity && quantity > 0) {
     text.push('Available')
     if (mn && mx) {
-      text.push(`in ${mn} - ${mx} ${timeFormat} ${name}`)
+      text.push(`in ${mn} - ${mx} ${timeFormat} ${name} ${shippingMethodPrice}`)
     }
   } else if (quantity === 0) {
     text.push('Out of stock')
