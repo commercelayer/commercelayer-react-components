@@ -1,3 +1,10 @@
+## [2.49.4](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.3...v2.49.4) (2021-11-30)
+
+
+### Bug Fixes
+
+* Include resources to order request ([635d84a](https://github.com/commercelayer/commercelayer-react-components/commit/635d84aed8a64c40e920dd84f2e008f08605ce9d))
+
 ## [2.49.3](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.2...v2.49.3) (2021-11-30)
 
 
