@@ -51,9 +51,8 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
     } else if (payment?.id === currentPaymentMethodId) {
       setShow(true)
       // NOTE: Remove metadata in the future
-      console.log(`paymentSource`, paymentSource)
       const card =
-        // @ts-ignore
+        // @ts-ignorePayment
         paymentSource?.options?.card ||
         // @ts-ignore
         paymentSource?.metadata?.card ||
