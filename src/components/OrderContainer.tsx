@@ -48,7 +48,6 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
     setLocalOrder,
     deleteLocalOrder,
   } = useContext(OrderStorageContext)
-  console.log(`children`, state.include)
   useEffect(() => {
     if (config.accessToken) {
       const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
@@ -73,7 +72,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
       }
     }
     return (): void => unsetOrderState(dispatch)
-  }, [config.accessToken, orderId])
+  }, [config.accessToken, orderId, state.include])
   const orderValue = useMemo(() => {
     return {
       ...state,
