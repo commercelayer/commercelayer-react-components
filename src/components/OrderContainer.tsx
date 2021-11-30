@@ -72,7 +72,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
       }
     }
     return (): void => unsetOrderState(dispatch)
-  }, [config.accessToken, orderId, state.include])
+  }, [config.accessToken, orderId])
   const orderValue = useMemo(() => {
     return {
       ...state,

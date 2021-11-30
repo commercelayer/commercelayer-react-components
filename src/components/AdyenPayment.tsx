@@ -96,7 +96,6 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
           paymentResource: 'adyen_payments',
           attributes,
         }))
-      debugger
       // @ts-ignore
       const adyenAction = pSource?.payment_response?.action
       // @ts-ignore

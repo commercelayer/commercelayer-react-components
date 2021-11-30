@@ -127,7 +127,6 @@ export const setPlaceOrder: SetPlaceOrder = async ({
     placed: false,
   }
   try {
-    debugger
     if (state && order && config && paymentSource) {
       const sdk = getSdk(config)
       const { options, paymentType } = state
