@@ -42,7 +42,7 @@ export const getSaveShippingAddressToAddressBook = (): boolean => {
   )
 }
 
-type CustomerOrderParams =
+export type CustomerOrderParams =
   | '_save_payment_source_to_customer_wallet'
   | '_save_billing_address_to_customer_address_book'
   | '_save_shipping_address_to_customer_address_book'
