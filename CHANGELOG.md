@@ -1,3 +1,11 @@
+## [2.49.5](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.4...v2.49.5) (2021-12-01)
+
+
+### Bug Fixes
+
+* Manage resources to include ([90917d9](https://github.com/commercelayer/commercelayer-react-components/commit/90917d9b5181ca4209449bc445dbdc7e876d88e8))
+* Save customer address book and include order resources ([4854f64](https://github.com/commercelayer/commercelayer-react-components/commit/4854f64ff115c639cc513e284fdf7df947bbb66e))
+
 ## [2.49.4](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.3...v2.49.4) (2021-11-30)
 
 
