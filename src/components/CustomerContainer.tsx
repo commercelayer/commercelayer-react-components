@@ -29,7 +29,7 @@ export type CustomerContainer = {
 const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
   const { children, isGuest = false } = props
   const [state, dispatch] = useReducer(customerReducer, customerInitialState)
-  const { order, addResourceToInclude, include, updateOrder } =
+  const { order, addResourceToInclude, include, updateOrder, includeLoaded } =
     useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
@@ -39,23 +39,27 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
     ) {
       addResourceToInclude({
         newResource: 'available_customer_payment_sources.payment_source',
-        resourcesIncluded: include,
+      })
+    } else if (
+      !includeLoaded?.['available_customer_payment_sources.payment_source'] &&
+      !isGuest
+    ) {
+      addResourceToInclude({
+        newResourceLoaded: {
+          'available_customer_payment_sources.payment_source': true,
+        },
       })
     }
     if (config.accessToken && isEmpty(state.addresses) && !isGuest) {
       getCustomerAddresses({ config, dispatch })
     }
-    if (
-      order &&
-      include?.includes('available_customer_payment_sources.payment_source') &&
-      !isGuest
-    ) {
+    if (order?.available_customer_payment_sources && !isGuest) {
       getCustomerPaymentSources({ dispatch, order })
     }
     return () => {
       dispatch({ type: 'setCustomerEmail', payload: {} })
     }
-  }, [config.accessToken, order, isGuest, include])
+  }, [config.accessToken, order, isGuest, include, includeLoaded])
   const contextValue = {
     isGuest,
     ...state,

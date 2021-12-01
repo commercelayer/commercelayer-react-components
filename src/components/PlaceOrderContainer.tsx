@@ -31,26 +31,53 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
     placeOrderReducer,
     placeOrderInitialState
   )
-  const { order, setOrderErrors, include, addResourceToInclude } =
-    useContext(OrderContext)
+  const {
+    order,
+    setOrderErrors,
+    include,
+    addResourceToInclude,
+    includeLoaded,
+  } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
-    if (!include?.includes('shipments.shipping_method')) {
+    if (!include?.includes('shipments.available_shipping_methods')) {
       addResourceToInclude({
-        newResource: 'shipments.shipping_method',
-        resourcesIncluded: include,
+        newResource: [
+          'shipments.available_shipping_methods',
+          'shipments.shipment_line_items.line_item',
+          'shipments.shipping_method',
+          'shipments.stock_transfers',
+          'shipments.stock_location',
+        ],
+      })
+    } else if (!includeLoaded?.['shipments.available_shipping_methods']) {
+      addResourceToInclude({
+        newResourceLoaded: {
+          'shipments.available_shipping_methods': true,
+          'shipments.shipment_line_items.line_item': true,
+          'shipments.shipping_method': true,
+          'shipments.stock_transfers': true,
+          'shipments.stock_location': true,
+        },
       })
     }
     if (!include?.includes('billing_address')) {
       addResourceToInclude({
         newResource: 'billing_address',
-        resourcesIncluded: include,
+      })
+    } else if (!includeLoaded?.['billing_address']) {
+      addResourceToInclude({
+        newResourceLoaded: { billing_address: true },
       })
     }
     if (!include?.includes('shipping_address')) {
       addResourceToInclude({
         newResource: 'shipping_address',
         resourcesIncluded: include,
+      })
+    } else if (!includeLoaded?.['shipping_address']) {
+      addResourceToInclude({
+        newResourceLoaded: { shipping_address: true },
       })
     }
     if (order) {
@@ -63,7 +90,7 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
         },
       })
     }
-  }, [order, include])
+  }, [order, include, includeLoaded])
   const contextValue = {
     ...state,
     setPlaceOrder: ({
