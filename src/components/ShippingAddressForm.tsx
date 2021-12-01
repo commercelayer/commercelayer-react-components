@@ -37,12 +37,22 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress, shipToDifferentAddress } =
     useContext(AddressesContext)
-  const { saveAddressToCustomerAddressBook, include, addResourceToInclude } =
-    useContext(OrderContext)
+  const {
+    saveAddressToCustomerAddressBook,
+    include,
+    addResourceToInclude,
+    includeLoaded,
+  } = useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
     if (!include?.includes('shipping_address')) {
-      addResourceToInclude({ newResource: 'shipping_address' })
+      addResourceToInclude({
+        newResource: 'shipping_address',
+      })
+    } else if (!includeLoaded?.['shipping_address']) {
+      addResourceToInclude({
+        newResourceLoaded: { shipping_address: true },
+      })
     }
     if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
@@ -100,7 +110,7 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
         setAddress({ values: {} as Address, resource: 'shipping_address' })
       }
     }
-  }, [values, errors, shipToDifferentAddress, reset, include])
+  }, [values, errors, shipToDifferentAddress, reset, include, includeLoaded])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any

@@ -48,7 +48,6 @@ export default function AdyenGateway(props: AdyenGateway) {
   const adyenConfig = config
     ? getPaymentConfig<'adyenPayment'>(paymentResource, config)
     : {}
-  console.log(`payments`, payments)
   const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {
