@@ -41,13 +41,17 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     order,
     include,
     addResourceToInclude,
+    includeLoaded,
   } = useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
     if (!include?.includes('billing_address')) {
       addResourceToInclude({
         newResource: 'billing_address',
-        resourcesIncluded: include,
+      })
+    } else if (!includeLoaded?.['billing_address']) {
+      addResourceToInclude({
+        newResourceLoaded: { billing_address: true },
       })
     }
     if (!isEmpty(errors)) {
@@ -106,7 +110,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
         setAddress({ values: {} as Address, resource: 'billing_address' })
       }
     }
-  }, [errors, values, reset, include])
+  }, [errors, values, reset, include, includeLoaded])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any

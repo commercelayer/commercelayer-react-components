@@ -29,15 +29,24 @@ type LineItemsContainer = {
 
 const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
   const { children, loader = 'Loading...' } = props
-  const { order, addResourceToInclude, include, orderId, getOrder } =
-    useContext(OrderContext)
+  const {
+    order,
+    addResourceToInclude,
+    include,
+    orderId,
+    getOrder,
+    includeLoaded,
+  } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(lineItemReducer, lineItemInitialState)
   useEffect(() => {
     if (!include?.includes('line_items.line_item_options.sku_option')) {
       addResourceToInclude({
         newResource: 'line_items.line_item_options.sku_option',
-        resourcesIncluded: include,
+      })
+    } else if (!includeLoaded?.['line_items.line_item_options.sku_option']) {
+      addResourceToInclude({
+        newResourceLoaded: { 'line_items.line_item_options.sku_option': true },
       })
     }
     if (!isEmpty(order) && order?.line_items) {
@@ -54,7 +63,7 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
         })
       }
     }
-  }, [order, include])
+  }, [order, include, includeLoaded])
   const lineItemValue = {
     ...state,
     loader,

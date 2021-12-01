@@ -30,7 +30,7 @@ const ShipmentsContainer: FunctionComponent<ShipmentsContainerProps> = (
 ) => {
   const { children } = props
   const [state, dispatch] = useReducer(shipmentReducer, shipmentInitialState)
-  const { order, getOrder, include, addResourceToInclude } =
+  const { order, getOrder, include, addResourceToInclude, includeLoaded } =
     useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
@@ -43,14 +43,22 @@ const ShipmentsContainer: FunctionComponent<ShipmentsContainerProps> = (
           'shipments.stock_transfers',
           'shipments.stock_location',
         ],
-        resourcesIncluded: include,
+      })
+    } else if (!includeLoaded?.['shipments.available_shipping_methods']) {
+      addResourceToInclude({
+        newResourceLoaded: {
+          'shipments.available_shipping_methods': true,
+          'shipments.shipment_line_items.line_item': true,
+          'shipments.shipping_method': true,
+          'shipments.stock_transfers': true,
+          'shipments.stock_location': true,
+        },
       })
     }
-    // TODO: Get shipments
-    if (order && !isEmpty(config)) {
+    if (order && !isEmpty(config) && order.shipments) {
       getShipments({ order, dispatch, config })
     }
-  }, [order, include])
+  }, [order, include, includeLoaded])
   const contextValue = {
     ...state,
     setShipmentErrors: (errors: BaseError[]) =>

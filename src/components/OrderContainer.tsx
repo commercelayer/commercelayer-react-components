@@ -20,7 +20,7 @@ import orderReducer, {
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext, { defaultOrderContext } from '#context/OrderContext'
-import { unsetOrderState } from '#reducers/OrderReducer'
+import { unsetOrderState, ResourceIncluded } from '#reducers/OrderReducer'
 import components from '#config/components'
 import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
@@ -49,6 +49,9 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
     deleteLocalOrder,
   } = useContext(OrderStorageContext)
   useEffect(() => {
+    const startRequest = Object.keys(state?.includeLoaded || {}).filter(
+      (key) => state?.includeLoaded?.[key as ResourceIncluded] === true
+    )
     if (config.accessToken) {
       const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
       if (localOrder) {
@@ -58,7 +61,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
             orderId: localOrder,
           },
         })
-        if (!state.order) {
+        if (!state.order && startRequest.length === state.include?.length) {
           getApiOrder({
             id: localOrder,
             dispatch,
@@ -72,7 +75,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
       }
     }
     return (): void => unsetOrderState(dispatch)
-  }, [config.accessToken, orderId])
+  }, [config.accessToken, orderId, state.includeLoaded])
   const orderValue = useMemo(() => {
     return {
       ...state,
@@ -127,6 +130,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
           ...args,
           dispatch,
           resourcesIncluded: state.include,
+          resourceIncludedLoaded: state.includeLoaded,
         }),
       updateOrder: async (args: UpdateOrderArgs) =>
         await defaultOrderContext['updateOrder']({
