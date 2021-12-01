@@ -1,5 +1,10 @@
 import { Dispatch } from 'react'
-import { SetLocalOrder, DeleteLocalOrder } from '#utils/localStorage'
+import {
+  SetLocalOrder,
+  DeleteLocalOrder,
+  setCustomerOrderParam,
+  CustomerOrderParams,
+} from '#utils/localStorage'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import baseReducer from '#utils/baseReducer'
 import { ItemOption, CustomLineItem } from './ItemReducer'
@@ -87,7 +92,7 @@ export interface UnsetOrderState {
   (dispatch: Dispatch<OrderActions>): void
 }
 
-type resourceIncluded =
+export type ResourceIncluded =
   | 'billing_address'
   | 'shipping_address'
   | 'line_items.line_item_options.sku_option'
@@ -101,12 +106,15 @@ type resourceIncluded =
   | 'available_payment_methods'
   | 'payment_method'
 
+type ResourceIncludedLoaded = Partial<Record<ResourceIncluded, boolean>>
+
 export interface OrderPayload {
   loading?: boolean
   orderId?: string
   order?: Order
   errors?: BaseError[]
-  include?: resourceIncluded[]
+  include?: ResourceIncluded[]
+  includeLoaded?: ResourceIncludedLoaded
 }
 
 export type AddToCartValues = Pick<
@@ -292,26 +300,37 @@ export const setOrder = (
 }
 
 export type AddResourceToInclude = {
-  resourcesIncluded?: resourceIncluded[]
+  resourcesIncluded?: ResourceIncluded[]
   dispatch?: Dispatch<OrderActions>
-  newResource: resourceIncluded | resourceIncluded[]
+  newResource?: ResourceIncluded | ResourceIncluded[]
+  resourceIncludedLoaded?: ResourceIncludedLoaded
+  newResourceLoaded?: ResourceIncludedLoaded
 }
 
 export function addResourceToInclude({
   resourcesIncluded = [],
   dispatch,
   newResource,
+  newResourceLoaded,
+  resourceIncludedLoaded,
 }: AddResourceToInclude) {
-  const include = [
-    ...resourcesIncluded,
-    ...(typeof newResource === 'string' ? [newResource] : newResource),
-  ]
+  const payload: any = {
+    include: undefined,
+    includeLoaded: undefined,
+  }
+  if (newResource) {
+    payload.include = [
+      ...resourcesIncluded,
+      ...(typeof newResource === 'string' ? [newResource] : newResource),
+    ]
+  } else {
+    delete payload.include
+  }
+  payload.includeLoaded = { ...resourceIncludedLoaded, ...newResourceLoaded }
   dispatch &&
     dispatch({
       type: 'setIncludesResource',
-      payload: {
-        include,
-      },
+      payload,
     })
 }
 
@@ -432,9 +451,9 @@ export type SaveAddressToCustomerAddressBook = (params: {
 
 export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook =
   ({ type, value, dispatch }) => {
-    const k = `save_${type}_to_customer_book`
+    const k: CustomerOrderParams = `_save_${type}_to_customer_address_book`
     const v = `${value}`
-    localStorage.setItem(k, v)
+    setCustomerOrderParam(k, v)
     dispatch &&
       dispatch({
         type: 'setSaveAddressToCustomerAddressBook',
