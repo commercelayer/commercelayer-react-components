@@ -8,7 +8,7 @@ const defaultProps = components.PaymentMethodAmount.defaultProps
 const displayName = components.PaymentMethodAmount.displayName
 
 const PaymentMethodAmount: FunctionComponent<BaseAmountComponent> = (props) => {
-  return <BaseOrderPrice base="amount" type="paymentMethod" {...props} />
+  return <BaseOrderPrice base="amount" type="payment_method" {...props} />
 }
 
 PaymentMethodAmount.propTypes = propTypes
