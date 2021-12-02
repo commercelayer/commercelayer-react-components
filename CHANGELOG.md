@@ -1,3 +1,12 @@
+## [2.49.7](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.6...v2.49.7) (2021-12-02)
+
+
+### Bug Fixes
+
+* Add RedirectShopper ([c6233b7](https://github.com/commercelayer/commercelayer-react-components/commit/c6233b772980f0c20b9bfcc62f82b13d9359b974))
+* Clean order when it is placed ([67b9387](https://github.com/commercelayer/commercelayer-react-components/commit/67b9387caacde1961c4c82747854a315435bbb65))
+* Expose prices resource within Price custom children props ([40f58b3](https://github.com/commercelayer/commercelayer-react-components/commit/40f58b3ae94c0c5f6c84764a1e2cfefc5bc95a08))
+
 ## [2.49.6](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.5...v2.49.6) (2021-12-02)
 
 
