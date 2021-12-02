@@ -99,6 +99,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
       // @ts-ignore
       const adyenAction = pSource?.payment_response?.action
       // @ts-ignore
+      const resultCode = pSource?.payment_response?.resultCode
       if (
         adyenAction &&
         ['IdentifyShopper', 'RedirectShopper'].includes(resultCode)
