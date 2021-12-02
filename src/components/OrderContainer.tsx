@@ -62,12 +62,13 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
           },
         })
         if (!state.order && startRequest.length === state.include?.length) {
+          const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
           getApiOrder({
             id: localOrder,
             dispatch,
             config,
             persistKey,
-            clearWhenPlaced,
+            clearWhenPlaced: removeOrderPlaced,
             deleteLocalOrder,
             state,
           })
