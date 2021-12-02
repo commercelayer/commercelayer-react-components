@@ -20,7 +20,6 @@ import {
   PlaceOrderContainer,
   PrivacyAndTermsCheckbox,
 } from '@commercelayer/react-components'
-import { Order } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
 import '@adyen/adyen-web/dist/adyen.css'
 
@@ -75,14 +74,14 @@ export default function Main() {
     paypalReturnUrl = window.location.href
   }
   // const [shippingMethodId, setShippingMethodId] = useState<string>('')
-  const getOrder = async () => {
-    const config = { accessToken: token, endpoint }
-    const order = await Order.withCredentials(config)
-      .includes('paymentSource')
-      .find(orderId)
-    // @ts-ignore
-    if (order.paymentSource()) setPaymentSource(order.paymentSource()?.options)
-  }
+  // const getOrder = async () => {
+  //   const config = { accessToken: token, endpoint }
+  //   const order = await Order.withCredentials(config)
+  //     .includes('paymentSource')
+  //     .find(orderId)
+  //   // @ts-ignore
+  //   if (order.paymentSource()) setPaymentSource(order.paymentSource()?.options)
+  // }
   useEffect(() => {
     const getToken = async () => {
       // @ts-ignore
@@ -100,7 +99,7 @@ export default function Main() {
       if (token) setToken(token.accessToken)
     }
     if (!token) getToken()
-    if (token) getOrder()
+    // if (token) getOrder()
   }, [token])
   return (
     <Fragment>

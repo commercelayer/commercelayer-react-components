@@ -22,7 +22,6 @@ import {
   LineItemName,
   LineItemQuantity,
   LineItemAmount,
-  LineItemRemoveLink,
   SubTotalAmount,
   LineItemsCount,
   TotalAmount,
@@ -53,6 +52,7 @@ import {
   PlaceOrderButton,
   PlaceOrderContainer,
   PrivacyAndTermsCheckbox,
+  PaymentMethodAmount,
 } from '@commercelayer/react-components'
 import { useRouter } from 'next/router'
 
@@ -781,6 +781,30 @@ export default function Main() {
                       </StockTransfer>
                     </div>
                   </LineItem>
+                  <LineItem type="bundles">
+                    <div className="flex justify-between items-center border-b p-5">
+                      <LineItemImage className="p-2" width={80} />
+                      <LineItemName data-cy="line-item-name" className="p-2" />
+                      <LineItemQuantity
+                        readonly
+                        data-cy="line-item-quantity"
+                        max={100}
+                        className="p-2"
+                      />
+                    </div>
+                    <div>
+                      <StockTransfer>
+                        <div className="flex flex-row" data-cy="stock-transfer">
+                          <StockTransferField
+                            className="px-1"
+                            type="quantity"
+                          />{' '}
+                          of <LineItemQuantity readonly className="px-1" />
+                          items will undergo a transfer
+                        </div>
+                      </StockTransfer>
+                    </div>
+                  </LineItem>
                 </LineItemsContainer>
                 <ShippingMethod>
                   <div className="flex justify-around w-2/3 items-center p-5">
@@ -932,11 +956,6 @@ export default function Main() {
                   <div className="flex justify-around items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      data-test="line-item-quantity"
-                      max={100}
-                      className="p-2"
-                    />
                     <Errors
                       className="text-red-700 p-2"
                       resource="line_items"
@@ -946,29 +965,15 @@ export default function Main() {
                       data-test="line-item-total"
                       className="p-2"
                     />
-                    <LineItemRemoveLink
-                      data-test="line-item-remove"
-                      className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                    />
                   </div>
                 </LineItem>
                 <LineItem type="gift_cards">
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={40} />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      data-test="line-item-quantity"
-                      max={10}
-                      className="p-2"
-                      disabled
-                    />
                     <LineItemAmount
                       data-test="line-item-total"
                       className="p-2"
-                    />
-                    <LineItemRemoveLink
-                      data-test="line-item-remove"
-                      className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                     />
                   </div>
                 </LineItem>
@@ -976,18 +981,9 @@ export default function Main() {
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={40} />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      data-test="line-item-quantity"
-                      max={10}
-                      className="p-2"
-                    />
                     <LineItemAmount
                       data-test="line-item-total"
                       className="p-2"
-                    />
-                    <LineItemRemoveLink
-                      data-test="line-item-remove"
-                      className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                     />
                   </div>
                 </LineItem>
@@ -995,18 +991,9 @@ export default function Main() {
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={40} />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      data-test="line-item-quantity"
-                      max={10}
-                      className="p-2"
-                    />
                     <LineItemAmount
                       data-test="line-item-total"
                       className="p-2"
-                    />
-                    <LineItemRemoveLink
-                      data-test="line-item-remove"
-                      className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                     />
                   </div>
                 </LineItem>
@@ -1053,6 +1040,14 @@ export default function Main() {
                 </div>
                 <div className="text-right">
                   <GiftCardAmount data-test="gift-card-amount" />
+                </div>
+              </div>
+              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                <div className="w-full">
+                  <p className="text-lg">Payment Method </p>
+                </div>
+                <div className="text-right">
+                  <PaymentMethodAmount data-test="payment-method-amount" />
                 </div>
               </div>
               <div className=" flex items-center p-2 justify-around font-bold text-left">
