@@ -1,3 +1,10 @@
+## [2.49.6](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.5...v2.49.6) (2021-12-02)
+
+
+### Bug Fixes
+
+* Show payment method amount correctly ([b3e5048](https://github.com/commercelayer/commercelayer-react-components/commit/b3e5048e67e530063f877a547e7b659ef0edc713))
+
 ## [2.49.5](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.4...v2.49.5) (2021-12-01)
 
 
