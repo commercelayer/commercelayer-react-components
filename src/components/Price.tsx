@@ -21,6 +21,7 @@ type PriceChildrenProps = FunctionChildren<
   {
     loading: boolean
     loader: LoaderType
+    prices: PriceType[]
   } & Omit<PriceProps, 'children'>
 >
 
@@ -60,6 +61,7 @@ const Price: FunctionComponent<PriceProps> = (props) => {
   const parentProps = {
     loading,
     loader,
+    prices: skuPrices,
     ...props,
   }
   const pricesComponent =
