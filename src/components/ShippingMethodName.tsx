@@ -25,6 +25,7 @@ const ShippingMethodName: FunctionComponent<LineItemNameProps> = (props) => {
     shippingMethod,
     deliveryLeadTimeForShipment,
     label: labelName,
+    htmlFor,
     ...props,
   }
   return props.children ? (
