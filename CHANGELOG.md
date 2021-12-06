@@ -1,3 +1,10 @@
+## [2.49.8](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.7...v2.49.8) (2021-12-06)
+
+
+### Bug Fixes
+
+* Expose htmlFor prop for ShippingMethodName component ([95ffd2a](https://github.com/commercelayer/commercelayer-react-components/commit/95ffd2ac66d91c4cbc7b0fe82c4c00018014c989))
+
 ## [2.49.7](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.6...v2.49.7) (2021-12-02)
 
 
