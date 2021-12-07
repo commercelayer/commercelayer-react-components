@@ -2,14 +2,18 @@ import React, { useContext, FunctionComponent, ReactNode } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
+import { LineItem } from '@commercelayer/sdk'
 
 const propTypes = components.LineItemCode.propTypes
 const displayName = components.LineItemCode.displayName
 
-type LineItemNameChildrenProps = Omit<LineItemNameProps, 'children'>
+export type LineItemCodeType = Omit<LineItemNameProps, 'children'> & {
+  lineItem: LineItem
+  skuCode: string
+}
 
 type LineItemNameProps = {
-  children?: (props: LineItemNameChildrenProps) => ReactNode
+  children?: (props: LineItemCodeType) => ReactNode
   type?: 'sku_code' | 'bundle_code'
 } & JSX.IntrinsicElements['p']
 
@@ -21,6 +25,8 @@ const LineItemCode: FunctionComponent<LineItemNameProps> = ({
   const { lineItem } = useContext(LineItemChildrenContext)
   const labelName = lineItem?.[type]
   const parentProps = {
+    lineItem,
+    skuCode: labelName,
     ...p,
   }
   return children ? (
