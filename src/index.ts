@@ -92,3 +92,7 @@ export { default as VariantsContainer } from '#components/VariantsContainer'
 export type { CustomerCardsTemplate } from '#components/utils/PaymentCardsTemplate'
 export type { AddressCardsTemplate } from '#components/utils/AddressCardsTemplate'
 export type { AddToCartButtonTemplate } from '#components/AddToCartButton'
+export type {
+  ShippingMethodRadioButtonTemplate,
+  ShippingMethodRadioButtonOnChange,
+} from '#components/ShippingMethodRadioButton'
