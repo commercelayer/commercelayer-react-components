@@ -54,6 +54,8 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
       const card =
         // @ts-ignorePayment
         paymentSource?.options?.card ||
+        // @ts-ignorePayment
+        paymentSource?.payment_method?.card ||
         // @ts-ignore
         paymentSource?.metadata?.card ||
         // NOTE: Adyen payment
