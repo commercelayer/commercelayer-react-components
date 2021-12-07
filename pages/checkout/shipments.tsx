@@ -1,6 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getCustomerToken } from '@commercelayer/js-auth'
-import { Nav } from '.'
 import Head from 'next/head'
 import {
   CommerceLayer,
@@ -20,10 +19,11 @@ import {
   StockTransferField,
   DeliveryLeadTime,
   ShipmentField,
+  ShippingMethodRadioButtonOnChange,
 } from '@commercelayer/react-components'
-import { Order } from '@commercelayer/js-sdk'
 import { isEmpty } from 'lodash'
 import { useRouter } from 'next/router'
+import getSdk from '#utils/getSdk'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -42,17 +42,17 @@ export default function Main() {
   }
   const getOrder = async () => {
     const config = { accessToken: token, endpoint }
-    const order = await Order.withCredentials(config).find(orderId)
-    const shipments = await order
-      .withCredentials(config)
-      .shipments()
-      ?.includes('shippingMethod')
-      .load()
+    const sdk = getSdk(config)
+    const order = await sdk.orders.retrieve(orderId, {
+      include: ['shipments.shipping_method'],
+    })
+    const shipments = order.shipments
     if (!isEmpty(shipments) && shipments) {
-      const name = shipments.first()?.shippingMethod()?.name
-      const id = shipments.first()?.shippingMethod()?.id as string
+      const [shipment] = shipments
+      const name = shipment.shipping_method?.name
+      const id = shipment.shipping_method?.id
       setShippingMethodName(name as string)
-      setShippingMethodId(id)
+      setShippingMethodId(id as string)
     }
   }
   useEffect(() => {
@@ -74,16 +74,21 @@ export default function Main() {
     if (!token) getToken()
     if (token) getOrder()
   }, [token])
-  const handleChange = (shippingMethod: any) => {
-    setShippingMethodName(shippingMethod.name)
-    setShippingMethodId(shippingMethod.id)
+  const handleChange: ShippingMethodRadioButtonOnChange = (
+    shippingMethod,
+    shipmentId
+  ) => {
+    console.log(`shippingMethod`, shippingMethod, shipmentId)
+    if (shippingMethod?.name) {
+      setShippingMethodName(shippingMethod.name)
+      setShippingMethodId(shippingMethod.id)
+    }
   }
   return (
     <Fragment>
       <Head>
         <script src="http://localhost:8097"></script>
       </Head>
-      <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId={orderId}>

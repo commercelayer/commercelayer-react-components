@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import {
   getIntegrationToken,
-  getSalesChannelToken,
+  // getSalesChannelToken,
 } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
@@ -74,16 +74,16 @@ export default function Order() {
             <ItemContainer>
               <div className="flex flex-row justify-around">
                 <SkuListsContainer>
-                  <SkuList id="YyDrAILdnL">
+                  <SkuList id="NyrVkIKwyB">
                     <div className="p-10 bg-gray-50 text-center shadow-md">
                       <h2 className="text-3xl mb-5">Bundle 1</h2>
                       <AddToCartButton
                         className="inline-flex items-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-blue-500 hover:bg-blue-400 focus:outline-none focus:border-blue-600 focus:shadow-outline-blue active:bg-blue-600 transition ease-in-out duration-150"
-                        skuListId="YyDrAILdnL"
+                        skuListId="NyrVkIKwyB"
                       />
                     </div>
                   </SkuList>
-                  <SkuList id="aOJOreIXyk">
+                  {/* <SkuList id="aOJOreIXyk">
                     <div className="p-10 bg-gray-50 text-center shadow-md">
                       <h2 className="text-3xl mb-5">Bundle 2</h2>
                       <div className="flex flex-col">
@@ -101,7 +101,7 @@ export default function Order() {
                         </ExternalFunction>
                       </div>
                     </div>
-                  </SkuList>
+                  </SkuList> */}
                 </SkuListsContainer>
               </div>
             </ItemContainer>
