@@ -22,7 +22,7 @@ type CustomerPayment = PaymentSourceType & {
 
 export type CustomerCardsTemplateChildren = FunctionChildren<ChildrenProps>
 
-export type CustomerCardsTemplate = ChildrenProps
+export type CustomerCardsType = ChildrenProps
 
 type Props = {
   customerPayments: CustomerPayment[]

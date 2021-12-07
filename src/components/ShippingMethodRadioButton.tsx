@@ -8,19 +8,19 @@ import { ShippingMethod } from '@commercelayer/sdk'
 const propTypes = components.ShippingMethodRadioButton.propTypes
 const displayName = components.ShippingMethodRadioButton.displayName
 
-export type ShippingMethodRadioButtonTemplate = Omit<
+export type ShippingMethodRadioButtonType = Omit<
   ShippingMethodRadioButtonProps,
   'children'
 > & { shippingMethod: ShippingMethod; shipmentId: string }
 
-export type ShippingMethodRadioButtonOnChange = (
+export type ShippingMethodRadioButtonOnChangeType = (
   shippingMethod: ShippingMethod,
   shipmentId: string
 ) => void
 
 type ShippingMethodRadioButtonProps = {
-  children?: (props: ShippingMethodRadioButtonTemplate) => ReactNode
-  onChange?: ShippingMethodRadioButtonOnChange
+  children?: (props: ShippingMethodRadioButtonType) => ReactNode
+  onChange?: ShippingMethodRadioButtonOnChangeType
 } & Omit<JSX.IntrinsicElements['input'], 'onChange'>
 
 const ShippingMethodRadioButton: FunctionComponent<

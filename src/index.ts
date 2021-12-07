@@ -85,10 +85,13 @@ export { default as TaxesAmount } from '#components/TaxesAmount'
 export { default as TotalAmount } from '#components/TotalAmount'
 export { default as VariantSelector } from '#components/VariantSelector'
 export { default as VariantsContainer } from '#components/VariantsContainer'
-export type { CustomerCardsTemplate } from '#components/utils/PaymentCardsTemplate'
-export type { AddressCardsTemplate } from '#components/utils/AddressCardsTemplate'
-export type { AddToCartButtonTemplate } from '#components/AddToCartButton'
+export type { CustomerCardsType } from '#components/utils/PaymentCardsTemplate'
+export type { AddressCardsType } from '#components/utils/AddressCardsTemplate'
+export type { AddToCartButtonType } from '#components/AddToCartButton'
 export type {
-  ShippingMethodRadioButtonTemplate,
-  ShippingMethodRadioButtonOnChange,
+  ShippingMethodRadioButtonType,
+  ShippingMethodRadioButtonOnChangeType,
 } from '#components/ShippingMethodRadioButton'
+export type { LineItemCodeType } from '#components/LineItemCode'
+export type { LineItemNameType } from '#components/LineItemName'
+export type { LineItemImageType } from '#components/LineItemImage'
