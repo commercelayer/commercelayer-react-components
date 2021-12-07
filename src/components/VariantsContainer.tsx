@@ -4,6 +4,7 @@ import React, {
   useReducer,
   useContext,
   ReactNode,
+  useMemo,
 } from 'react'
 import variantReducer, {
   variantInitialState,
@@ -74,25 +75,27 @@ const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
       })
     }
     return (): void => unsetVariantState(dispatch)
-  }, [config])
-  const variantValue: VariantState = {
-    ...state,
-    skuCode: sCode,
-    setSkuCode: (code, id, lineItem = {}) => {
-      if (!isEmpty(lineItem)) {
-        setCustomLineItems && setCustomLineItems({ [code]: lineItem })
-      }
-      setSkuCode({
-        code,
-        id,
-        config,
-        setItem,
-        dispatch,
-      })
-    },
-    setSkuCodes: (skuCodes) =>
-      setVariantSkuCodes({ skuCodes, dispatch, setCustomLineItems }),
-  }
+  }, [config.accessToken])
+  const variantValue: VariantState = useMemo(() => {
+    return {
+      ...state,
+      skuCode: sCode,
+      setSkuCode: (code, id, lineItem = {}) => {
+        if (!isEmpty(lineItem)) {
+          setCustomLineItems && setCustomLineItems({ [code]: lineItem })
+        }
+        setSkuCode({
+          code,
+          id,
+          config,
+          setItem,
+          dispatch,
+        })
+      },
+      setSkuCodes: (skuCodes) =>
+        setVariantSkuCodes({ skuCodes, dispatch, setCustomLineItems }),
+    }
+  }, [state])
   return (
     <VariantsContext.Provider value={variantValue}>
       {children}
