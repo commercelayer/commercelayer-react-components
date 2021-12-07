@@ -1,3 +1,10 @@
+## [2.50.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.0...v2.50.1) (2021-12-07)
+
+
+### Bug Fixes
+
+* Expose lineItem prop to LineItem components ([5b39f31](https://github.com/commercelayer/commercelayer-react-components/commit/5b39f31212f270cc0317bb3ad3187ae0d5c84cb1))
+
 # [2.50.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.8...v2.50.0) (2021-12-07)
 
 
