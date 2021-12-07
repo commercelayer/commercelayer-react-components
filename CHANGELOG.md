@@ -1,3 +1,15 @@
+# [2.50.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.8...v2.50.0) (2021-12-07)
+
+
+### Bug Fixes
+
+* Read Stripe payment_method attribute if options attribute is not available ([3633657](https://github.com/commercelayer/commercelayer-react-components/commit/36336576c5f2a14d2b22dae6a84f76efc5668080))
+
+
+### Features
+
+* Expose types and add shipmentId to ShippingMethodRadioButton onChange prop ([8d9ca25](https://github.com/commercelayer/commercelayer-react-components/commit/8d9ca25e2dd465bc31d92d615df66ba429ebe808))
+
 ## [2.49.8](https://github.com/commercelayer/commercelayer-react-components/compare/v2.49.7...v2.49.8) (2021-12-06)
 
 
