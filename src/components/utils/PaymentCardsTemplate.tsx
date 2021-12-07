@@ -44,6 +44,11 @@ export default function PaymentCardsTemplate({
       // @ts-ignore
       customerPayment?.payment_source?.payment_request_data?.paymentMethod ||
       // @ts-ignore
+      (customerPayment?.payment_source?.payment_method?.card as Record<
+        string,
+        any
+      >) ||
+      // @ts-ignore
       (customerPayment?.payment_source?.metadata?.card as Record<string, any>)
     const handleClick = async (e: MouseEvent) => {
       e.stopPropagation()
