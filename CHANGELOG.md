@@ -1,3 +1,10 @@
+## [2.50.2](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.1...v2.50.2) (2021-12-07)
+
+
+### Bug Fixes
+
+* Add useMemo and force refresh by accessToken ([45b612b](https://github.com/commercelayer/commercelayer-react-components/commit/45b612bc1cfb5ddf5dd765da304f701dea52cb21))
+
 ## [2.50.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.0...v2.50.1) (2021-12-07)
 
 
