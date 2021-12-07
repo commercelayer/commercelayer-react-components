@@ -27,7 +27,7 @@ type ChildrenProps = {
 
 type AddToCartButtonChildrenProps = FunctionChildren<ChildrenProps>
 
-export type AddToCartButtonTemplate = ChildrenProps
+export type AddToCartButtonType = ChildrenProps
 
 type AddToCartButtonProps = {
   children?: AddToCartButtonChildrenProps

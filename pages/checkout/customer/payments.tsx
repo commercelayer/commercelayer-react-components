@@ -20,7 +20,7 @@ import {
   PaymentSourceEditButton,
   PlaceOrderButton,
   PlaceOrderContainer,
-  CustomerCardsTemplate,
+  CustomerCardsType,
 } from '@commercelayer/react-components'
 import { Order } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
@@ -42,7 +42,7 @@ let paypalReturnUrl = ''
 const TemplateCustomerCards = ({
   customerPayments,
   PaymentSourceProvider,
-}: CustomerCardsTemplate) => {
+}: CustomerCardsType) => {
   const components = customerPayments.map((p, k) => {
     return (
       <div

@@ -16,7 +16,7 @@ export type CustomerAddress = Address & {
 
 export type AddressCardsTemplateChildren = FunctionChildren<ChildrenProps>
 
-export type AddressCardsTemplate = ChildrenProps
+export type AddressCardsType = ChildrenProps
 
 type HandleSelect = (
   k: number,
