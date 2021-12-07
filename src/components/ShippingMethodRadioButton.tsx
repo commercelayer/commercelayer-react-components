@@ -8,51 +8,61 @@ import { ShippingMethod } from '@commercelayer/sdk'
 const propTypes = components.ShippingMethodRadioButton.propTypes
 const displayName = components.ShippingMethodRadioButton.displayName
 
-type ShippingMethodRadioButtonChildrenProps = Omit<
+export type ShippingMethodRadioButtonTemplate = Omit<
   ShippingMethodRadioButtonProps,
   'children'
->
+> & { shippingMethod: ShippingMethod; shipmentId: string }
+
+export type ShippingMethodRadioButtonOnChange = (
+  shippingMethod: ShippingMethod,
+  shipmentId: string
+) => void
 
 type ShippingMethodRadioButtonProps = {
-  children?: (props: ShippingMethodRadioButtonChildrenProps) => ReactNode
-  onChange?: (shippingMethod: ShippingMethod) => void
-} & JSX.IntrinsicElements['input']
+  children?: (props: ShippingMethodRadioButtonTemplate) => ReactNode
+  onChange?: ShippingMethodRadioButtonOnChange
+} & Omit<JSX.IntrinsicElements['input'], 'onChange'>
 
-const ShippingMethodRadioButton: FunctionComponent<ShippingMethodRadioButtonProps> =
-  (props) => {
-    const { onChange, ...p } = props
-    const { shippingMethod, currentShippingMethodId, shipmentId } = useContext(
-      ShippingMethodChildrenContext
-    )
-    const { setShippingMethod } = useContext(ShipmentContext)
-    const shippingMethodId = shippingMethod?.id
-    const name = `shipment-${shipmentId}`
-    const id = `${name}-${shippingMethodId}`
-    const checked = shippingMethodId === currentShippingMethodId
-    const handleOnChange = async () => {
-      if (shipmentId && shippingMethodId)
+const ShippingMethodRadioButton: FunctionComponent<
+  ShippingMethodRadioButtonProps
+> = (props) => {
+  const { onChange, ...p } = props
+  const { shippingMethod, currentShippingMethodId, shipmentId } = useContext(
+    ShippingMethodChildrenContext
+  )
+  const { setShippingMethod } = useContext(ShipmentContext)
+  const shippingMethodId = shippingMethod?.id
+  const name = `shipment-${shipmentId}`
+  const id = `${name}-${shippingMethodId}`
+  const checked = shippingMethodId === currentShippingMethodId
+  const handleOnChange = async () => {
+    if (shipmentId) {
+      if (shippingMethodId)
         await setShippingMethod(shipmentId, shippingMethodId)
-      if (shippingMethod && onChange) onChange(shippingMethod)
+      if (shippingMethod && onChange) onChange(shippingMethod, shipmentId)
     }
-    const parentProps = {
-      handleOnChange,
-      name,
-      id,
-      ...props,
-    }
-    return props.children ? (
-      <Parent {...parentProps}>{props.children}</Parent>
-    ) : (
-      <input
-        type="radio"
-        name={name}
-        id={id}
-        onChange={handleOnChange}
-        defaultChecked={checked}
-        {...p}
-      />
-    )
   }
+  const parentProps = {
+    shippingMethod,
+    shipmentId,
+    handleOnChange,
+    name,
+    id,
+    ...props,
+  }
+  return props.children ? (
+    <Parent {...parentProps}>{props.children}</Parent>
+  ) : (
+    <input
+      type="radio"
+      name={name}
+      id={id}
+      onChange={handleOnChange}
+      defaultChecked={checked}
+      {...p}
+    />
+  )
+}
 
 ShippingMethodRadioButton.propTypes = propTypes
 ShippingMethodRadioButton.displayName = displayName
