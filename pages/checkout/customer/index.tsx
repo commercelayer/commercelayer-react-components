@@ -239,7 +239,7 @@ export default function Main() {
                 </div>
                 <div className={`${showBillingAddressForm ? '' : 'hidden'}`}>
                   <BillingAddressForm
-                    autoComplete="on"
+                    autoComplete="off"
                     className="p-2"
                     reset={!showBillingAddressForm}
                   >
@@ -568,7 +568,7 @@ export default function Main() {
                     className={`${!showShippingAddressForm ? 'hidden' : ''}`}
                   >
                     <ShippingAddressForm
-                      autoComplete="on"
+                      autoComplete="off"
                       className={
                         shipToDifferentAddress ? `block p-2` : `hidden`
                       }
@@ -1041,136 +1041,121 @@ export default function Main() {
                   </div>
                 </PlaceOrderContainer>
               </PaymentMethodsContainer>
-              <LineItemsContainer>
-                <p className="text-sm m-2">
-                  Your shopping bag contains{' '}
-                  <LineItemsCount
-                    data-test="items-count"
-                    className="font-bold"
-                  />{' '}
-                  items
-                </p>
-                <div className="flex flex-col p-2">
-                  <LineItem>
-                    <div className="flex justify-around items-center border-b p-5">
-                      <LineItemImage className="p-2" width={80} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
-                      <Errors
-                        className="text-red-700 p-2"
-                        resource="line_items"
-                        field="quantity"
-                      />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
-                    </div>
-                  </LineItem>
-                  <LineItem type="gift_cards">
-                    <div className="flex justify-between items-center border-b p-5">
-                      <LineItemImage className="p-2" width={40} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
-                    </div>
-                  </LineItem>
-                  <LineItem type="bundles">
-                    <div className="flex justify-between items-center border-b p-5">
-                      <LineItemImage className="p-2" width={40} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
-                    </div>
-                  </LineItem>
-                  <LineItem type="adjustments">
-                    <div className="flex justify-between items-center border-b p-5">
-                      <LineItemImage className="p-2" width={40} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
-                    </div>
-                  </LineItem>
+            </CustomerContainer>
+            <LineItemsContainer>
+              <p className="text-sm m-2">
+                Your shopping bag contains{' '}
+                <LineItemsCount data-test="items-count" className="font-bold" />{' '}
+                items
+              </p>
+              <div className="flex flex-col p-2">
+                <LineItem>
+                  <div className="flex justify-around items-center border-b p-5">
+                    <LineItemImage className="p-2" width={80} />
+                    <LineItemName data-test="line-item-name" className="p-2" />
+                    <Errors
+                      className="text-red-700 p-2"
+                      resource="line_items"
+                      field="quantity"
+                    />
+                    <LineItemAmount
+                      data-test="line-item-total"
+                      className="p-2"
+                    />
+                  </div>
+                </LineItem>
+                <LineItem type="gift_cards">
+                  <div className="flex justify-between items-center border-b p-5">
+                    <LineItemImage className="p-2" width={40} />
+                    <LineItemName data-test="line-item-name" className="p-2" />
+                    <LineItemAmount
+                      data-test="line-item-total"
+                      className="p-2"
+                    />
+                  </div>
+                </LineItem>
+                <LineItem type="bundles">
+                  <div className="flex justify-between items-center border-b p-5">
+                    <LineItemImage className="p-2" width={40} />
+                    <LineItemName data-test="line-item-name" className="p-2" />
+                    <LineItemAmount
+                      data-test="line-item-total"
+                      className="p-2"
+                    />
+                  </div>
+                </LineItem>
+                <LineItem type="adjustments">
+                  <div className="flex justify-between items-center border-b p-5">
+                    <LineItemImage className="p-2" width={40} />
+                    <LineItemName data-test="line-item-name" className="p-2" />
+                    <LineItemAmount
+                      data-test="line-item-total"
+                      className="p-2"
+                    />
+                  </div>
+                </LineItem>
+              </div>
+            </LineItemsContainer>
+            <div className="flex flex-col w-1/2 m-auto">
+              <div className="flex items-center p-2 justify-around font-medium text-left">
+                <div className="w-full">
+                  <p className="text-lg">Subtotal </p>
                 </div>
-              </LineItemsContainer>
-              <div className="flex flex-col w-1/2 m-auto">
-                <div className="flex items-center p-2 justify-around font-medium text-left">
-                  <div className="w-full">
-                    <p className="text-lg">Subtotal </p>
-                  </div>
-                  <div className="text-right">
-                    <SubTotalAmount data-test="subtotal-amount" />
-                  </div>
-                </div>
-                <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
-                  <div className="w-full">
-                    <p className="text-lg">Discount </p>
-                  </div>
-                  <div className="text-right">
-                    <DiscountAmount data-test="discount-amount" />
-                  </div>
-                </div>
-                <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
-                  <div className="w-full">
-                    <p className="text-lg">Shipping </p>
-                  </div>
-                  <div className="text-right">
-                    <ShippingAmount data-test="shipping-amount" />
-                  </div>
-                </div>
-                <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
-                  <div className="w-full">
-                    <p className="text-lg">
-                      Taxes <span className="text-sm font-tin">(included)</span>
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <TaxesAmount data-test="taxes-amount" />
-                  </div>
-                </div>
-                <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
-                  <div className="w-full">
-                    <p className="text-lg">Gift card </p>
-                  </div>
-                  <div className="text-right">
-                    <GiftCardAmount data-test="gift-card-amount" />
-                  </div>
-                </div>
-                <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
-                  <div className="w-full">
-                    <p className="text-lg">Payment Method </p>
-                  </div>
-                  <div className="text-right">
-                    <PaymentMethodAmount data-test="payment-method-amount" />
-                  </div>
-                </div>
-                <div className=" flex items-center p-2 justify-around font-bold text-left">
-                  <div className="w-full">
-                    <p className="text-lg mr-2">Total </p>
-                  </div>
-                  <div className="text-right">
-                    <TotalAmount data-test="total-amount" />
-                  </div>
+                <div className="text-right">
+                  <SubTotalAmount data-test="subtotal-amount" />
                 </div>
               </div>
-            </CustomerContainer>
+              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                <div className="w-full">
+                  <p className="text-lg">Discount </p>
+                </div>
+                <div className="text-right">
+                  <DiscountAmount data-test="discount-amount" />
+                </div>
+              </div>
+              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                <div className="w-full">
+                  <p className="text-lg">Shipping </p>
+                </div>
+                <div className="text-right">
+                  <ShippingAmount data-test="shipping-amount" />
+                </div>
+              </div>
+              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                <div className="w-full">
+                  <p className="text-lg">
+                    Taxes <span className="text-sm font-tin">(included)</span>
+                  </p>
+                </div>
+                <div className="text-right">
+                  <TaxesAmount data-test="taxes-amount" />
+                </div>
+              </div>
+              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                <div className="w-full">
+                  <p className="text-lg">Gift card </p>
+                </div>
+                <div className="text-right">
+                  <GiftCardAmount data-test="gift-card-amount" />
+                </div>
+              </div>
+              <div className=" flex items-center p-2 justify-around text-gray-600 text-left">
+                <div className="w-full">
+                  <p className="text-lg">Payment Method </p>
+                </div>
+                <div className="text-right">
+                  <PaymentMethodAmount data-test="payment-method-amount" />
+                </div>
+              </div>
+              <div className=" flex items-center p-2 justify-around font-bold text-left">
+                <div className="w-full">
+                  <p className="text-lg mr-2">Total </p>
+                </div>
+                <div className="text-right">
+                  <TotalAmount data-test="total-amount" />
+                </div>
+              </div>
+            </div>
           </OrderContainer>
         </div>
       </CommerceLayer>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getCustomerToken } from '@commercelayer/js-auth'
-import { Nav } from '.'
 import Head from 'next/head'
 import {
   CommerceLayer,
@@ -142,7 +141,6 @@ export default function Main() {
       <Head>
         <script src="http://localhost:8097"></script>
       </Head>
-      <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId={orderId}>
