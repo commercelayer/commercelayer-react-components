@@ -1,3 +1,11 @@
+## [2.50.3](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.2...v2.50.3) (2021-12-09)
+
+
+### Bug Fixes
+
+* Duplicate customer addresses ([10d03a7](https://github.com/commercelayer/commercelayer-react-components/commit/10d03a71ed53689647e3fbe3dfbd96952d7c08ff))
+* Hydrate props properly ([89049cd](https://github.com/commercelayer/commercelayer-react-components/commit/89049cdb14ebe8782986aa76b1af71666ccbe2bd))
+
 ## [2.50.2](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.1...v2.50.2) (2021-12-07)
 
 
