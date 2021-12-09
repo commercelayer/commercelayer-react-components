@@ -217,6 +217,7 @@ const components = {
       'SaveCustomerButton',
       'AddressesContainer',
       'PaymentMethodsContainer',
+      'ShipmentsContainer',
       'ReactNode',
     ],
     propTypes: {

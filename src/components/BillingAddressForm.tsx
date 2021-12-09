@@ -15,6 +15,7 @@ import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import { Address } from '@commercelayer/sdk'
+import { getSaveBillingAddressToAddressBook } from '#utils/localStorage'
 
 const propTypes = components.BillingAddressForm.propTypes
 
@@ -97,7 +98,12 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
       }
       setAddress({ values: values as Address, resource: 'billing_address' })
     }
-    if (reset && (!isEmpty(values) || !isEmpty(errors))) {
+    const checkboxChecked =
+      ref.current?.querySelector(
+        '[name="billing_address_save_to_customer_book"]'
+        // @ts-ignore
+      )?.checked || getSaveBillingAddressToAddressBook()
+    if (reset && (!isEmpty(values) || !isEmpty(errors) || checkboxChecked)) {
       saveAddressToCustomerAddressBook &&
         saveAddressToCustomerAddressBook({
           type: 'billing_address',
