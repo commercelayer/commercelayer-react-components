@@ -15,6 +15,7 @@ import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import { Address } from '@commercelayer/sdk'
+import { getSaveShippingAddressToAddressBook } from '#utils/localStorage'
 
 const propTypes = components.ShippingAddressForm.propTypes
 
@@ -97,7 +98,12 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
       }
       setAddress({ values: values as Address, resource: 'shipping_address' })
     }
-    if (reset && (!isEmpty(values) || !isEmpty(errors))) {
+    const checkboxChecked =
+      ref.current?.querySelector(
+        '[name="shipping_address_save_to_customer_book"]'
+        // @ts-ignore
+      )?.checked || getSaveShippingAddressToAddressBook()
+    if (reset && (!isEmpty(values) || !isEmpty(errors) || checkboxChecked)) {
       saveAddressToCustomerAddressBook &&
         saveAddressToCustomerAddressBook({
           type: 'shipping_address',

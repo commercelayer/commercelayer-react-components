@@ -224,6 +224,7 @@ const components = {
       'SaveCustomerButton',
       'AddressesContainer',
       'PaymentMethodsContainer',
+      'ShipmentsContainer',
       'OrderList',
       'ReactNode',
       'CustomerField',
