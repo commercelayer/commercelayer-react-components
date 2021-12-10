@@ -80,7 +80,7 @@
   "dependencies": {
     "@adyen/adyen-web": "^5.3.1",
     "@commercelayer/js-auth": "^2.2.6",
-    "@commercelayer/sdk": "^2.3.10",
+    "@commercelayer/sdk": "^2.3.11",
     "@stripe/react-stripe-js": "^1.6.0",
     "@stripe/stripe-js": "^1.21.2",
     "axios": "^0.24.0",
