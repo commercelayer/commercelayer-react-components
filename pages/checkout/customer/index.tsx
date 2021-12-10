@@ -90,6 +90,12 @@ export default function Main() {
   if (query.orderId) {
     orderId = query.orderId as string
   }
+  if (query.PayerID) {
+    paypalPayerId = query.PayerID as string
+  }
+  if (typeof window !== 'undefined') {
+    paypalReturnUrl = window.location.href
+  }
   useEffect(() => {
     const getToken = async () => {
       const token = await getCustomerToken(
