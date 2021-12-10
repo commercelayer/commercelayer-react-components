@@ -24,39 +24,40 @@ type GiftCardOrCouponRemoveButtonProps = {
   onClick?: () => void
 } & Omit<JSX.IntrinsicElements['button'], 'type'>
 
-const GiftCardOrCouponRemoveButton: FunctionComponent<GiftCardOrCouponRemoveButtonProps> =
-  (props) => {
-    const { children, label = 'Remove', onClick, type, ...p } = props
-    const { order, removeGiftCardOrCouponCode } = useContext(OrderContext)
-    let codeType = `${type}Code` as OrderCodeType
-    if (
-      !type &&
-      order &&
-      has(order, 'couponCode') &&
-      !isEmpty(order.coupon_code)
-    )
-      codeType = 'coupon_code'
-    else if (!type) codeType = 'gift_card_code'
-    const code = order && codeType ? order[codeType] : ''
-    const hide = order && code ? false : true
-    const handleClick = () => {
-      removeGiftCardOrCouponCode && removeGiftCardOrCouponCode({ codeType })
-      onClick && onClick()
-    }
-    const parentProps = {
-      ...p,
-      label,
-      handleClick,
-      codeType,
-    }
-    return children ? (
-      <Parent {...parentProps}>{children}</Parent>
-    ) : hide ? null : (
-      <button type="button" onClick={handleClick} {...p}>
-        {label}
-      </button>
-    )
+const GiftCardOrCouponRemoveButton: FunctionComponent<
+  GiftCardOrCouponRemoveButtonProps
+> = (props) => {
+  const { children, label = 'Remove', onClick, type, ...p } = props
+  const { order, removeGiftCardOrCouponCode } = useContext(OrderContext)
+  let codeType = `${type}_code` as OrderCodeType
+  if (
+    !type &&
+    order &&
+    has(order, 'coupon_code') &&
+    !isEmpty(order.coupon_code)
+  )
+    codeType = 'coupon_code'
+  else if (!type) codeType = 'gift_card_code'
+  const code = order && codeType ? order[codeType] : ''
+  const hide = order && code ? false : true
+  const handleClick = () => {
+    removeGiftCardOrCouponCode && removeGiftCardOrCouponCode({ codeType })
+    onClick && onClick()
   }
+  const parentProps = {
+    ...p,
+    label,
+    handleClick,
+    codeType,
+  }
+  return children ? (
+    <Parent {...parentProps}>{children}</Parent>
+  ) : hide ? null : (
+    <button type="button" onClick={handleClick} {...p}>
+      {label}
+    </button>
+  )
+}
 
 GiftCardOrCouponRemoveButton.propTypes = propTypes
 GiftCardOrCouponRemoveButton.displayName = displayName
