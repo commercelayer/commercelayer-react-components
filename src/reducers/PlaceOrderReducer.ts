@@ -127,10 +127,10 @@ export const setPlaceOrder: SetPlaceOrder = async ({
     placed: false,
   }
   try {
-    if (state && order && config && paymentSource) {
+    if (state && order && config) {
       const sdk = getSdk(config)
       const { options, paymentType } = state
-      if (paymentType === 'paypal_payments') {
+      if (paymentType === 'paypal_payments' && paymentSource) {
         if (!options?.paypalPayerId && paymentSource?.approval_url) {
           window.location.href = paymentSource?.approval_url as string
           return response
@@ -170,7 +170,6 @@ export const setPlaceOrder: SetPlaceOrder = async ({
             placed: true,
           }
         default:
-          // await sdk.orders.
           if (saveToWallet()) {
             await sdk.orders.update({
               id: order.id,
@@ -186,7 +185,6 @@ export const setPlaceOrder: SetPlaceOrder = async ({
     }
     return response
   } catch (error) {
-    // const errors = getErrorsByCollection(error, 'order')
     const errors = getErrors(error, 'orders')
     setOrderErrors && setOrderErrors(errors)
     return {
