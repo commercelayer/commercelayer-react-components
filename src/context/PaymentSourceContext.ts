@@ -13,8 +13,8 @@ export type iconBrand =
 
 type DefaultContext = {
   brand?: iconBrand
-  expMonth?: number
-  expYear?: number
+  exp_month?: number
+  exp_year?: number
   last4?: string
   showCard?: boolean
   readonly?: boolean
