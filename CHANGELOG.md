@@ -1,3 +1,11 @@
+## [2.50.5](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.4...v2.50.5) (2021-12-10)
+
+
+### Bug Fixes
+
+* Remove useMemo ([a66cbf2](https://github.com/commercelayer/commercelayer-react-components/commit/a66cbf2d9ffa3400806bb38e4a09031afb961de7))
+* Show card details and paypal gateway ([1835f13](https://github.com/commercelayer/commercelayer-react-components/commit/1835f139b4762534d76f2025fd1c734a6ce1173a))
+
 ## [2.50.4](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.3...v2.50.4) (2021-12-10)
 
 
