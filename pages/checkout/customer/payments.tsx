@@ -1,6 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getCustomerToken } from '@commercelayer/js-auth'
-import { Nav } from '.'
 import Head from 'next/head'
 import {
   CommerceLayer,
@@ -22,11 +21,9 @@ import {
   PlaceOrderContainer,
   CustomerCardsType,
 } from '@commercelayer/react-components'
-import { Order } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
 import '@adyen/adyen-web/dist/adyen.css'
-import 'swiper/css'
-import 'swiper/css/pagination'
+import getSdk from '#utils/getSdk'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -58,9 +55,9 @@ const TemplateCustomerCards = ({
             <PaymentSourceDetail className="ml-1" type="last4" />
           </div>
           <div className="text-gray-500 ml-3">
-            <PaymentSourceDetail type="expMonth" />
+            <PaymentSourceDetail type="exp_month" />
             /
-            <PaymentSourceDetail type="expYear" />
+            <PaymentSourceDetail type="exp_year" />
           </div>
         </PaymentSourceProvider>
       </div>
@@ -123,11 +120,12 @@ export default function Main() {
   // const [shippingMethodId, setShippingMethodId] = useState<string>('')
   const getOrder = async () => {
     const config = { accessToken: token, endpoint }
-    const order = await Order.withCredentials(config)
-      .includes('paymentSource')
-      .find(orderId)
+    const sdk = getSdk(config)
+    const order = await sdk.orders.retrieve(orderId, {
+      include: ['payment_source'],
+    })
     // @ts-ignore
-    if (order.paymentSource()) setPaymentSource(order.paymentSource()?.options)
+    if (order.payment_source) setPaymentSource(order.payment_source?.options)
     // const shipments = await order
     //   .withCredentials(config)
     //   .shipments()
@@ -165,7 +163,6 @@ export default function Main() {
       <Head>
         <script src="http://localhost:8097"></script>
       </Head>
-      <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId={orderId}>
@@ -215,9 +212,9 @@ export default function Main() {
                             />
                           </div>
                           <div className="text-gray-500 ml-3">
-                            <PaymentSourceDetail type="expMonth" />
+                            <PaymentSourceDetail type="exp_month" />
                             /
-                            <PaymentSourceDetail type="expYear" />
+                            <PaymentSourceDetail type="exp_year" />
                           </div>
                           <div className="ml-3">
                             <PaymentSourceEditButton className="text-blue-500 hover:underline hover:text-blue-600" />
