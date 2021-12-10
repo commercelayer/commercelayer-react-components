@@ -76,26 +76,24 @@ const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
     }
     return (): void => unsetVariantState(dispatch)
   }, [config.accessToken])
-  const variantValue: VariantState = useMemo(() => {
-    return {
-      ...state,
-      skuCode: sCode,
-      setSkuCode: (code, id, lineItem = {}) => {
-        if (!isEmpty(lineItem)) {
-          setCustomLineItems && setCustomLineItems({ [code]: lineItem })
-        }
-        setSkuCode({
-          code,
-          id,
-          config,
-          setItem,
-          dispatch,
-        })
-      },
-      setSkuCodes: (skuCodes) =>
-        setVariantSkuCodes({ skuCodes, dispatch, setCustomLineItems }),
-    }
-  }, [state])
+  const variantValue: VariantState = {
+    ...state,
+    skuCode: sCode,
+    setSkuCode: (code, id, lineItem = {}) => {
+      if (!isEmpty(lineItem)) {
+        setCustomLineItems && setCustomLineItems({ [code]: lineItem })
+      }
+      setSkuCode({
+        code,
+        id,
+        config,
+        setItem,
+        dispatch,
+      })
+    },
+    setSkuCodes: (skuCodes) =>
+      setVariantSkuCodes({ skuCodes, dispatch, setCustomLineItems }),
+  }
   return (
     <VariantsContext.Provider value={variantValue}>
       {children}
