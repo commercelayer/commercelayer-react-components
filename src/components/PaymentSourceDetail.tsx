@@ -7,7 +7,7 @@ import { FunctionChildren } from '#typings'
 const propTypes = components.PaymentSourceDetail.propTypes
 const displayName = components.PaymentSourceDetail.displayName
 
-export type PaymentSourceDetailType = 'last4' | 'expYear' | 'expMonth'
+export type PaymentSourceDetailType = 'last4' | 'exp_year' | 'exp_month'
 
 type CustomComponent = FunctionChildren<
   Omit<Props & { text: string }, 'children'>

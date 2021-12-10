@@ -36,7 +36,7 @@ const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
       paymentSource &&
       currentPaymentMethodType &&
       // @ts-ignore
-      paymentSource?.approvalUrl
+      paymentSource?.approval_url
     ) {
       ref.current.onsubmit = () => handleClick()
       setPaymentRef({ ref })

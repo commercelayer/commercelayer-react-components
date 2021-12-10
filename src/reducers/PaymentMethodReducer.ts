@@ -279,10 +279,11 @@ export const setPaymentSource: SetPaymentSource = async ({
           }
           paymentSource = await sdk[paymentResource].create(attrs)
         } else {
-          paymentSource = await sdk[paymentResource].update({
+          const attrs: any = {
             id: paymentSourceId,
             ...attributes,
-          })
+          }
+          paymentSource = await sdk[paymentResource].update(attrs)
         }
         dispatch &&
           dispatch({

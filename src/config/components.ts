@@ -710,8 +710,8 @@ const components = {
     propTypes: {
       type: PropTypes.oneOf<PaymentSourceDetailType>([
         'last4',
-        'expYear',
-        'expMonth',
+        'exp_year',
+        'exp_month',
       ]).isRequired,
     },
   },
