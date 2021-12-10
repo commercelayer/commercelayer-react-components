@@ -1,3 +1,12 @@
+## [2.50.4](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.3...v2.50.4) (2021-12-10)
+
+
+### Bug Fixes
+
+* Address country lock controller ([faff60a](https://github.com/commercelayer/commercelayer-react-components/commit/faff60a25bc5c4477aafee57c316fe88554d5718))
+* Place an order with total amount equal to zero ([ec72aa6](https://github.com/commercelayer/commercelayer-react-components/commit/ec72aa62d873b12d7f717fb0918ef65b1fb7a5ac))
+* Show GiftCardOrCouponRemoveButton properly ([89e378d](https://github.com/commercelayer/commercelayer-react-components/commit/89e378ddc7edbdd1456accc72c981431c195bca6))
+
 ## [2.50.3](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.2...v2.50.3) (2021-12-09)
 
 
