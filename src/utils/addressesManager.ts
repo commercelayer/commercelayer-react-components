@@ -92,7 +92,7 @@ export const countryLockController: CountryLockController = ({
     const addressLocked = addresses?.find(
       (a) =>
         (a.id === billingAddressId || a.reference === billingAddressId) &&
-        a.countryCode !== countryCodeLock
+        a.country_code !== countryCodeLock
     )
     if (!isEmpty(addressLocked)) return true
   }
@@ -111,7 +111,7 @@ export const countryLockController: CountryLockController = ({
     const addressLocked = addresses?.find(
       (a) =>
         (a.id === shippingAddressId || a.reference === shippingAddressId) &&
-        a.countryCode !== countryCodeLock
+        a.country_code !== countryCodeLock
     )
     if (!isEmpty(addressLocked)) return true
   }
