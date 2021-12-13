@@ -1,3 +1,10 @@
+## [2.50.6](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.5...v2.50.6) (2021-12-13)
+
+
+### Bug Fixes
+
+* Place order by paypal ([4ed3dd2](https://github.com/commercelayer/commercelayer-react-components/commit/4ed3dd29dffeb92b22869f4b65188ac1f0999933))
+
 ## [2.50.5](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.4...v2.50.5) (2021-12-10)
 
 
