@@ -61,15 +61,11 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
         setNotPermitted(true)
       }
     }
-    if (paymentType === 'paypal_payments' && options?.paypalPayerId) {
-      handleClick()
-    }
     return () => {
       setNotPermitted(true)
     }
   }, [
     isPermitted,
-    options?.paypalPayerId,
     paymentType,
     currentPaymentMethodRef?.current?.onsubmit,
     paymentSource,
@@ -77,6 +73,12 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     currentPaymentMethodType,
     order,
   ])
+  useEffect(() => {
+    if (paymentType === 'paypal_payments' && options?.paypalPayerId) {
+      debugger
+      handleClick()
+    }
+  }, [options?.paypalPayerId])
   const handleClick = async () => {
     let isValid = true
     setForceDisable(true)

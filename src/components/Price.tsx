@@ -45,7 +45,6 @@ const Price: FunctionComponent<PriceProps> = (props) => {
   const [skuPrices, setSkuPrices] = useState<PriceType[]>([])
   const sCode = pricesSkuCode || skuCode
   useEffect(() => {
-    // if (props.skuCode === 'LSLEEVMM000000FFFFFFLXXX') debugger
     if (!isEmpty(prices) && has(prices, `${sCode}`)) {
       setSkuPrices(prices[sCode] as PriceType[])
     } else {
