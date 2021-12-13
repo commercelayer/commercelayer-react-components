@@ -178,7 +178,7 @@ export default function Main() {
                   },
                 }}
               >
-                <PlaceOrderContainer>
+                <PlaceOrderContainer options={{ paypalPayerId }}>
                   <div className="flex flex-col">
                     <PaymentMethod
                       className="p-2 my-1 flex flex-wrap w-1/2 items-center justify-items-center bg-gray-300"
