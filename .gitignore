@@ -9,6 +9,7 @@ cypress/screenshots/*
 # Playwright
 specs/e2e/screenshots
 playwright-report
+test-results
 
 # Logs
 logs
