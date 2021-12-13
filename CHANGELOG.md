@@ -1,3 +1,10 @@
+## [2.50.7](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.6...v2.50.7) (2021-12-13)
+
+
+### Bug Fixes
+
+* Cannot read property 'map' ([378d77d](https://github.com/commercelayer/commercelayer-react-components/commit/378d77dc7686906020e313e961ead02ef72ab529))
+
 ## [2.50.6](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.5...v2.50.6) (2021-12-13)
 
 
