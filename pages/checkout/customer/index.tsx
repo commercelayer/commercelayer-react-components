@@ -1002,11 +1002,11 @@ export default function Main() {
                         <div className="text-gray-500 ml-5">
                           <PaymentSourceDetail
                             data-cy="payment-exp-month"
-                            type="expMonth"
+                            type="exp_month"
                           />
                           <PaymentSourceDetail
                             data-cy="payment-exp-year"
-                            type="expYear"
+                            type="exp_year"
                           />
                         </div>
                         <div className="ml-5">
