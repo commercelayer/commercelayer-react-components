@@ -104,7 +104,6 @@ export const setSkuCode: SetSkuCodeVariant = (params) => {
           })
       })
       .catch((errors) => {
-        debugger
         dispatch({
           type: 'setErrors',
           payload: {
