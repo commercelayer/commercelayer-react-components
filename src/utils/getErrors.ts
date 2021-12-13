@@ -6,7 +6,7 @@ export default function getErrors(
   error: any,
   resource: ResourceErrorType
 ): BaseError[] {
-  return error.errors.map((e: any) => {
+  return error?.errors?.map((e: any) => {
     return { ...e, resource }
   })
 }

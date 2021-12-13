@@ -74,8 +74,12 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     order,
   ])
   useEffect(() => {
-    if (paymentType === 'paypal_payments' && options?.paypalPayerId) {
-      debugger
+    if (
+      paymentType === 'paypal_payments' &&
+      options?.paypalPayerId &&
+      order?.status &&
+      ['draft', 'pending'].includes(order?.status)
+    ) {
       handleClick()
     }
   }, [options?.paypalPayerId])
