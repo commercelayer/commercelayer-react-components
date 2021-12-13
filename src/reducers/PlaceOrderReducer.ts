@@ -135,9 +135,6 @@ export const setPlaceOrder: SetPlaceOrder = async ({
           window.location.href = paymentSource?.approval_url as string
           return response
         }
-        console.log(`order`, order)
-        console.log(`paymentSource`, paymentSource)
-        debugger
         await sdk.paypal_payments.update({
           id: paymentSource.id,
           paypal_payer_id: options?.paypalPayerId,
@@ -188,8 +185,6 @@ export const setPlaceOrder: SetPlaceOrder = async ({
     }
     return response
   } catch (error) {
-    console.log(`error`, error)
-    debugger
     const errors = getErrors(error, 'orders')
     setOrderErrors && setOrderErrors(errors)
     return {
