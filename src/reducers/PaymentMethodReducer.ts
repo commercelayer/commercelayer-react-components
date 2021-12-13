@@ -201,7 +201,6 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       // const attrs: any = {
       //   order: sdk.orders.relationship(order.id),
       // }
-      // debugger
       // const paymentSource = await sdk[paymentResource].create(attrs)
       // dispatch({
       //   type: 'setPaymentMethods',

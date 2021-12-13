@@ -57,7 +57,6 @@ export default function getPrices<P extends Price>(prices: P[]) {
     })
   }
   // else {
-  //   debugger
   //   // forEach(prices, (item) => {
   //   //   const prices = item.prices()?.toArray()
   //   //   obj[item.code] = prices
