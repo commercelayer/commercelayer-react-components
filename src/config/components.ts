@@ -513,7 +513,12 @@ const components = {
     },
   },
   LineItemsContainer: {
-    permittedChildren: ['LineItemsCount', 'LineItem', 'ReactNode'],
+    permittedChildren: [
+      'LineItemsCount',
+      'LineItemsEmpty',
+      'LineItem',
+      'ReactNode',
+    ],
     displayName: 'LineItemsContainer',
     propTypes: {
       children: childrenTypes.isRequired,
@@ -533,6 +538,17 @@ const components = {
       className: PropTypes.string,
       name: PropTypes.string,
       style: PropTypes.object,
+    },
+  },
+  LineItemsEmpty: {
+    displayName: 'LineItemsEmpty',
+    propTypes: {
+      children: PropTypes.func,
+      id: PropTypes.string,
+      className: PropTypes.string,
+      name: PropTypes.string,
+      style: PropTypes.object,
+      text: PropTypes.string,
     },
   },
   MetadataInput: {
