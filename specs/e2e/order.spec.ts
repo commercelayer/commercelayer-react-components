@@ -15,7 +15,10 @@ test.describe('Orders', () => {
     const comparePriceItem = await page.textContent(
       ':right-of(:nth-match([data-test=price], 1))'
     )
-    // Check prices
+    let itemsCount = await page.textContent('[data-test=items-count]')
+    let lineItemsEmpty = await page.textContent('[data-test=line-items-empty]')
+    await expect(itemsCount).toBe('0')
+    await expect(lineItemsEmpty).toBe('Your shopping bag is empty')
     await expect(priceItem).toBe('€29,00')
     await expect(comparePriceItem).toBe('€37,70')
     await Promise.all([
@@ -53,7 +56,7 @@ test.describe('Orders', () => {
       await page.waitForTimeout(timeout),
     ])
     await page.waitForLoadState('domcontentloaded')
-    let itemsCount = await page.textContent('[data-test=items-count]')
+    itemsCount = await page.textContent('[data-test=items-count]')
     let subTotalAmount = await page.textContent('[data-test=subtotal-amount]')
     let totalAmount = await page.textContent('[data-test=total-amount]')
     const discountAmount = await page.textContent('[data-test=discount-amount]')
@@ -86,7 +89,9 @@ test.describe('Orders', () => {
     itemsCount = await page.textContent('[data-test=items-count]')
     subTotalAmount = await page.textContent('[data-test=subtotal-amount]')
     totalAmount = await page.textContent('[data-test=total-amount]')
+    lineItemsEmpty = await page.textContent('[data-test=line-items-empty]')
     await expect(itemsCount).toBe('0')
+    await expect(lineItemsEmpty).toBe('Your shopping bag is empty')
     await expect(subTotalAmount).toBe('€0,00')
     await expect(totalAmount).toBe('€0,00')
     await page.screenshot({

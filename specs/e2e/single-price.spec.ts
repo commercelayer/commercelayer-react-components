@@ -17,8 +17,8 @@ test('Prices page', async ({ page, browser }) => {
   const compareSndPrice = await page.textContent(
     ':right-of(:nth-match([data-test="price-0"], 3))'
   )
-  expect(firstPrice).toBe('€29,00')
-  expect(compareFirstPrice).toBe('€37,70')
+  expect(firstPrice).toBe('€35,00')
+  expect(compareFirstPrice).toBe('€45,00')
   expect(sndPrice).toBe('$34.80')
   expect(compareSndPrice).toBe('$45.24')
   await page.screenshot({
