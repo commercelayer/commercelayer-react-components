@@ -1,42 +1,45 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getSalesChannelToken, clientCredentials } from '@commercelayer/js-auth'
-import CommerceLayer from '../src/components/CommerceLayer'
 import { Nav } from '.'
-import OrderContainer from '../src/components/OrderContainer'
-import VariantsContainer from '../src/components/VariantsContainer'
-import VariantSelector from '../src/components/VariantSelector'
-import PricesContainer from '../src/components/PricesContainer'
-import Price from '../src/components/Price'
-import AddToCartButton from '../src/components/AddToCartButton'
-import LineItemsContainer from '../src/components/LineItemsContainer'
-import LineItem from '../src/components/LineItem'
-import LineItemImage from '../src/components/LineItemImage'
-import LineItemName from '../src/components/LineItemName'
-import LineItemQuantity from '../src/components/LineItemQuantity'
-import LineItemAmount from '../src/components/LineItemAmount'
-import LineItemRemoveLink from '../src/components/LineItemRemoveLink'
-import CheckoutLink from '../src/components/CheckoutLink'
-import SubTotalAmount from '../src/components/SubTotalAmount'
-import QuantitySelector from '../src/components/QuantitySelector'
-import LineItemsCount from '../src/components/LineItemsCount'
-import TotalAmount from '../src/components/TotalAmount'
-import DiscountAmount from '../src/components/DiscountAmount'
-import ShippingAmount from '../src/components/ShippingAmount'
-import TaxesAmount from '../src/components/TaxesAmount'
-import GiftCardAmount from '../src/components/GiftCardAmount'
-import AvailabilityContainer from '../src/components/AvailabilityContainer'
-import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
-import ItemContainer from '../src/components/ItemContainer'
-import Errors from '../src/components/Errors'
-import OrderStorage from '#components/OrderStorage'
-import { AddToCartButtonTemplate } from '@commercelayer/react-components'
+import {
+  AddToCartButtonType,
+  CommerceLayer,
+  OrderContainer,
+  VariantsContainer,
+  VariantSelector,
+  PricesContainer,
+  Price,
+  AddToCartButton,
+  LineItemsContainer,
+  LineItem,
+  LineItemImage,
+  LineItemName,
+  LineItemQuantity,
+  LineItemAmount,
+  LineItemRemoveLink,
+  LineItemsCount,
+  LineItemsEmpty,
+  CheckoutLink,
+  SubTotalAmount,
+  QuantitySelector,
+  TotalAmount,
+  DiscountAmount,
+  ShippingAmount,
+  TaxesAmount,
+  GiftCardAmount,
+  AvailabilityContainer,
+  AvailabilityTemplate,
+  ItemContainer,
+  Errors,
+  OrderStorage,
+} from '@commercelayer/react-components'
 // import getSdk from '#utils/getSdk'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
-const CustomAddToCart = (props: AddToCartButtonTemplate) => {
+const CustomAddToCart = (props: AddToCartButtonType) => {
   const { handleClick, disabled, className, ...p } = props
   const classes = disabled ? 'opacity-50 cursor-not-allowed' : ''
   const myClick = async () => {
@@ -198,6 +201,7 @@ export default function Order() {
                   items
                 </p>
                 <div className="flex flex-col p-2">
+                  <LineItemsEmpty data-test="line-items-empty" />
                   <LineItem>
                     <div className="flex justify-around items-center border-b p-5">
                       <LineItemImage className="p-2" width={80} />
