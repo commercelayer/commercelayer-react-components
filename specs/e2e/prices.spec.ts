@@ -21,11 +21,11 @@ test('Prices page', async ({ page, browser }) => {
   const compareDollarPrice = await page.textContent(
     ':nth-match([data-test="price-0"], 4)'
   )
-  expect(filterdPrice).toBe('€29,00')
-  expect(filterdPrice).not.toBe('$29,00')
-  expect(compareFilteredPrice).toBe('€37,70')
-  expect(price).toBe('€29,00')
-  expect(comparePrice).toBe('€37,70')
+  expect(filterdPrice).toBe('€35,00')
+  expect(filterdPrice).not.toBe('$35,00')
+  expect(compareFilteredPrice).toBe('€45,00')
+  expect(price).toBe('€35,00')
+  expect(comparePrice).toBe('€45,00')
   expect(dollarPrice).toBe('$34.80')
   expect(compareDollarPrice).toBe('$45.24')
   await page.screenshot({
