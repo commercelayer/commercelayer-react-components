@@ -1,3 +1,10 @@
+## [2.51.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.51.0...v2.51.1) (2021-12-16)
+
+
+### Bug Fixes
+
+* Save stripe wallet ([f2b1193](https://github.com/commercelayer/commercelayer-react-components/commit/f2b119368555277900fb8c711d8bbfa26696e07a))
+
 # [2.51.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.7...v2.51.0) (2021-12-16)
 
 
