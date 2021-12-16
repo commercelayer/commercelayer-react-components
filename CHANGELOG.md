@@ -1,3 +1,10 @@
+## [2.51.2](https://github.com/commercelayer/commercelayer-react-components/compare/v2.51.1...v2.51.2) (2021-12-16)
+
+
+### Bug Fixes
+
+* Payment by Braintree ([6dc171e](https://github.com/commercelayer/commercelayer-react-components/commit/6dc171e152f2cfcb4d525912d16fc6d02afee22b))
+
 ## [2.51.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.51.0...v2.51.1) (2021-12-16)
 
 
