@@ -171,13 +171,13 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
               paymentSourceId: paymentSource.id,
               paymentResource: 'braintree_payments',
               attributes: {
-                paymentMethodNonce: response.nonce,
+                payment_method_nonce: response.nonce,
                 options: {
                   id: response.nonce,
                   card: {
                     last4: response.details.lastFour,
-                    expYear: response.details.expirationYear,
-                    expMonth: response.details.expirationMonth,
+                    exp_year: response.details.expirationYear,
+                    exp_month: response.details.expirationMonth,
                     brand: response.details.cardType.toLowerCase(),
                   },
                 },
