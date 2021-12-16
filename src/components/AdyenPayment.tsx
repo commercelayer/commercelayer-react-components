@@ -166,6 +166,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
           recurringProcessingModel: 'CardOnFile',
           origin: window.location.origin,
           return_url: window.location.href,
+          redirect_from_issuer_method: 'GET',
           browser_info: {
             acceptHeader:
               'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',

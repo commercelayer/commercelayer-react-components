@@ -19,6 +19,10 @@ export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted'
 
 export type PlaceOrderOptions = {
   paypalPayerId?: string
+  adyen?: {
+    MD: string
+    PaRes: string
+  }
 }
 
 export interface PlaceOrderActionPayload {

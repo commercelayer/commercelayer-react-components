@@ -83,10 +83,24 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       handleClick()
     }
   }, [options?.paypalPayerId])
+  useEffect(() => {
+    if (
+      paymentType === 'adyen_payments' &&
+      options?.adyen?.MD &&
+      options?.adyen?.PaRes &&
+      order?.status &&
+      ['draft', 'pending'].includes(order?.status)
+    ) {
+      handleClick()
+    }
+  }, [options?.adyen])
   const handleClick = async () => {
     let isValid = true
     setForceDisable(true)
-    if (currentPaymentMethodRef?.current?.onsubmit && !options?.paypalPayerId) {
+    if (
+      currentPaymentMethodRef?.current?.onsubmit &&
+      (!options?.paypalPayerId || !options?.adyen?.MD)
+    ) {
       // @ts-ignore
       isValid = (await currentPaymentMethodRef.current?.onsubmit()) as any
       // @ts-ignore
