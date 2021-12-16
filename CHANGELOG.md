@@ -1,3 +1,15 @@
+# [2.51.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.7...v2.51.0) (2021-12-16)
+
+
+### Bug Fixes
+
+* Redirect flow with Adyen 3DS-1 ([1e14e00](https://github.com/commercelayer/commercelayer-react-components/commit/1e14e003f4ba7669f512bb46eec09af5483157c0))
+
+
+### Features
+
+* Add new component LineItemsEmpty ([45b5127](https://github.com/commercelayer/commercelayer-react-components/commit/45b512776318ca636c1c2171a1d31752582e9881))
+
 ## [2.50.7](https://github.com/commercelayer/commercelayer-react-components/compare/v2.50.6...v2.50.7) (2021-12-13)
 
 
