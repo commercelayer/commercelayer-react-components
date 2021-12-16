@@ -174,13 +174,13 @@ export const setPlaceOrder: SetPlaceOrder = async ({
             placed: true,
           }
         default:
+          await sdk.orders.update(updateAttributes)
           if (saveToWallet()) {
             await sdk.orders.update({
               id: order.id,
               _save_payment_source_to_customer_wallet: true,
             })
           }
-          await sdk.orders.update(updateAttributes)
           setOrderErrors && setOrderErrors([])
           return {
             placed: true,
