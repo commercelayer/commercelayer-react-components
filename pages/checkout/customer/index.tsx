@@ -52,6 +52,7 @@ import {
   PlaceOrderContainer,
   PrivacyAndTermsCheckbox,
   PaymentMethodAmount,
+  CustomerCardsType,
 } from '@commercelayer/react-components'
 import { useRouter } from 'next/router'
 import { Address, AddressField } from '@commercelayer/react-components'
@@ -66,6 +67,8 @@ let orderId = ''
 let paypalPayerId = ''
 let paypalReturnUrl = ''
 
+const adyen = { MD: '', PaRes: '' }
+
 const NestedInput = ({ value }: any) => {
   return (
     <AddressInput
@@ -78,6 +81,56 @@ const NestedInput = ({ value }: any) => {
     />
   )
 }
+
+const TemplateCustomerCards = ({
+  customerPayments,
+  PaymentSourceProvider,
+}: CustomerCardsType) => {
+  const components = customerPayments.map((p, k) => {
+    return (
+      <div
+        key={k}
+        onClick={p.handleClick}
+        className="bg-red-100 p-3 text-sm border ml-2 hover:border-blue-500 cursor-pointer"
+      >
+        <PaymentSourceProvider value={{ ...p.card }}>
+          <div className="flex flex-row items-center">
+            <PaymentSourceBrandIcon className="mr-2" />
+            <PaymentSourceBrandName className="mr-1" />
+            ending in
+            <PaymentSourceDetail className="ml-1" type="last4" />
+          </div>
+          <div className="text-gray-500 ml-3">
+            <PaymentSourceDetail type="exp_month" />
+            /
+            <PaymentSourceDetail type="exp_year" />
+          </div>
+        </PaymentSourceProvider>
+      </div>
+    )
+  })
+
+  return <>{components}</>
+}
+
+const TemplateSaveToWalletCheckbox = ({ name }: any) => (
+  <div className="flex flex-row-reverse justify-end">
+    <label
+      htmlFor="billing_address_save_to_customer_book"
+      className="block text-sm font-medium text-gray-700 ml-3 self-end"
+    >
+      Save new card on your wallet
+    </label>
+    <div className="mt-1">
+      <input
+        name={name}
+        data-cy="save-to-wallet"
+        type="checkbox"
+        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded"
+      />
+    </div>
+  </div>
+)
 
 export default function Main() {
   const [token, setToken] = useState('')
@@ -92,6 +145,12 @@ export default function Main() {
   }
   if (query.PayerID) {
     paypalPayerId = query.PayerID as string
+  }
+  if (query.MD) {
+    adyen.MD = query.MD as string
+  }
+  if (query.PaRes) {
+    adyen.PaRes = query.PaRes as string
   }
   if (typeof window !== 'undefined') {
     paypalReturnUrl = window.location.href
@@ -936,34 +995,7 @@ export default function Main() {
               <PaymentMethodsContainer
                 config={{
                   stripePayment: {
-                    // fonts: [
-                    //   {
-                    //     cssSrc:
-                    //       'https://fonts.googleapis.com/css2?family=Josefin+Slab:ital,wght@0,100;1,100&display=swap',
-                    //   },
-                    // ],
-                    options: {
-                      // style: {
-                      //   base: {
-                      //     color: '#000',
-                      //     fontWeight: '400',
-                      //     fontFamily: 'Josefin Slab',
-                      //     ':-webkit-autofill': {
-                      //       color: '#fce883',
-                      //     },
-                      //     '::placeholder': {
-                      //       color: '#e0e0e0',
-                      //     },
-                      //   },
-                      //   invalid: {
-                      //     iconColor: '#FFC7EE',
-                      //     color: '#FFC7EE',
-                      //   },
-                      // },
-                      hideIcon: false,
-                      hidePostalCode: true,
-                    },
-                    containerClassName: 'w-1/2 px-3',
+                    containerClassName: 'p-5 my-2',
                   },
                   paypalPayment: {
                     cancel_url: paypalReturnUrl,
@@ -971,76 +1003,61 @@ export default function Main() {
                   },
                 }}
               >
-                <PlaceOrderContainer options={{ paypalPayerId }}>
-                  <PaymentMethod
-                    className="p-2 my-1 flex items-center justify-items-center bg-gray-300 cursor-pointer"
-                    activeClass="bg-opacity-25"
-                    clickableContainer
-                  >
-                    <PaymentMethodRadioButton data-cy="payment-radio-button" />
-                    <PaymentMethodName className="pl-3" />
-                    <PaymentMethodPrice className="pl-3" />
-                    <PaymentSource
-                      data-cy="payment-source"
-                      className="p-5 my-2"
-                      loader={'Caricamento...'}
+                <PlaceOrderContainer options={{ paypalPayerId, adyen }}>
+                  <div className="flex flex-col">
+                    <PaymentMethod
+                      className="p-2 my-1 flex flex-wrap w-1/2 items-center justify-items-center bg-gray-300"
+                      activeClass="bg-opacity-25"
+                      onClick={() => {
+                        console.log('custom click payment method')
+                      }}
+                      clickableContainer
                     >
-                      <div className="flex flex-row items-center justify-start bg-gray-100 p-5 my-10">
-                        <div className="flex flex-row items-center">
-                          <PaymentSourceBrandIcon className="mr-3" />
-                          <PaymentSourceBrandName
-                            className="mr-1"
-                            data-cy="payment-brand-name-card"
-                          />
-                          ending in
-                          <PaymentSourceDetail
-                            data-cy="payment-last4"
-                            className="ml-1"
-                            type="last4"
-                          />
+                      <PaymentMethodRadioButton />
+                      <PaymentMethodName className="pl-3" />
+                      <PaymentMethodPrice className="pl-3 text-xs text-gray-500" />
+                      <PaymentSource
+                        className="py-2 my-2 flex flex-row"
+                        templateCustomerCards={(props) => (
+                          <TemplateCustomerCards {...props} />
+                        )}
+                        templateCustomerSaveToWallet={(props) => (
+                          <TemplateSaveToWalletCheckbox {...props} />
+                        )}
+                        onClickCustomerCards={() => console.log('clicked')}
+                      >
+                        <div className="flex flex-row items-center justify-start bg-gray-100 p-3 text-sm border">
+                          <div className="flex flex-row items-center">
+                            <PaymentSourceBrandIcon className="mr-2" />
+                            <PaymentSourceBrandName className="mr-1" />
+                            ending in
+                            <PaymentSourceDetail
+                              className="ml-1"
+                              type="last4"
+                            />
+                          </div>
+                          <div className="text-gray-500 ml-3">
+                            <PaymentSourceDetail type="exp_month" />
+                            /
+                            <PaymentSourceDetail type="exp_year" />
+                          </div>
+                          <div className="ml-3">
+                            <PaymentSourceEditButton className="text-blue-500 hover:underline hover:text-blue-600" />
+                          </div>
                         </div>
-                        <div className="text-gray-500 ml-5">
-                          <PaymentSourceDetail
-                            data-cy="payment-exp-month"
-                            type="exp_month"
-                          />
-                          <PaymentSourceDetail
-                            data-cy="payment-exp-year"
-                            type="exp_year"
-                          />
-                        </div>
-                        <div className="ml-5">
-                          <PaymentSourceEditButton
-                            data-cy="payment-edit-button"
-                            className="text-blue-500 hover:underline hover:text-blue-600"
-                          />
-                        </div>
-                      </div>
-                    </PaymentSource>
-                    <Errors
-                      className="text-red-600 block"
-                      resource="payment_methods"
-                    />
-                  </PaymentMethod>
-
-                  <div className="flex flex-row-reverse justify-end">
-                    <label
-                      htmlFor="privacy-terms"
-                      className="block text-sm font-medium text-gray-700 ml-3 self-end"
-                    >
-                      Accept privacy and terms
-                    </label>
-                    <div className="mt-1">
-                      <PrivacyAndTermsCheckbox
-                        id="privacy-terms"
-                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded disabled:opacity-50"
+                      </PaymentSource>
+                      <Errors
+                        className="text-red-600"
+                        resource="payment_methods"
                       />
-                    </div>
+                    </PaymentMethod>
                   </div>
+
                   <div>
                     <PlaceOrderButton
                       onClick={(res: any) => {
                         console.log('res', res)
+                        debugger
                       }}
                       className="mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                     />
