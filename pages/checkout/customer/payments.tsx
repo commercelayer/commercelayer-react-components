@@ -65,24 +65,6 @@ const TemplateCustomerCards = ({
   })
 
   return <>{components}</>
-  //   (
-  // <div
-  //   onClick={handleClick}
-  //   className="flex flex-row items-center justify-start bg-gray-100 p-3 w-1/2 text-sm border ml-2 hover:border-blue-500 cursor-pointer"
-  // >
-  //   <div className="flex flex-row items-center">
-  //     <PaymentSourceBrandIcon className="mr-2" />
-  //     <PaymentSourceBrandName className="mr-1" />
-  //     ending in
-  //     <PaymentSourceDetail className="ml-1" type="last4" />
-  //   </div>
-  //   <div className="text-gray-500 ml-3">
-  //     <PaymentSourceDetail type="expMonth" />
-  //     /
-  //     <PaymentSourceDetail type="expYear" />
-  //   </div>
-  // </div>
-  // )
 }
 
 const TemplateSaveToWalletCheckbox = ({ name }: any) => (
