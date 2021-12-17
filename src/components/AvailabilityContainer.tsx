@@ -29,7 +29,7 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
   props
 ) => {
   const { children, skuCode } = props
-  const { item, skuCode: itemSkuCode } = useContext(ItemContext)
+  const { item, skuCode: itemSkuCode, setItem } = useContext(ItemContext)
   const { lineItem } = useContext(LineItemChildrenContext)
   const config = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(
@@ -40,18 +40,20 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
     const sCode =
       skuCode || getCurrentItemKey(item) || itemSkuCode || lineItem?.sku_code
     if (sCode) {
-      const [level] = item[sCode]?.inventory?.levels || {
-        quantity: null,
-        delivery_lead_times: [],
-      }
+      const [level] = item[sCode]?.inventory?.levels || [
+        {
+          quantity: null,
+          delivery_lead_times: [],
+        },
+      ]
       if (!isEmpty(level) && level?.delivery_lead_times?.length > 0) {
         const [delivery] = level?.delivery_lead_times
         dispatch({
           type: 'setAvailability',
           payload: { ...delivery, quantity: level?.quantity },
         })
-      } else if (config.accessToken) {
-        getAvailability({ skuCode: sCode, config, dispatch })
+      } else if (config.accessToken && !item?.[sCode]) {
+        getAvailability({ skuCode: sCode, config, dispatch, setItem })
       }
     }
     return (): void => {

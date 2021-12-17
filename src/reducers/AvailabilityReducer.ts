@@ -4,6 +4,7 @@ import { Sku } from '@commercelayer/sdk'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Dispatch } from 'react'
 import getSdk from '#utils/getSdk'
+import { Items } from '#reducers/ItemReducer'
 
 export type DeliveryLeadTime = {
   shipping_method: {
@@ -63,18 +64,18 @@ export const availabilityInitialState: AvailabilityState = {
   errors: [],
 }
 
-interface GetAvailability {
-  (args: {
-    skuCode: string
-    dispatch: Dispatch<AvailabilityAction>
-    config: CommerceLayerConfig
-  }): void
-}
+type GetAvailability = (args: {
+  skuCode: string
+  dispatch: Dispatch<AvailabilityAction>
+  config: CommerceLayerConfig
+  setItem?: (item: Items) => void
+}) => void
 
 export const getAvailability: GetAvailability = async ({
   skuCode,
   dispatch,
   config,
+  setItem,
 }) => {
   const sdk = getSdk(config)
   try {
@@ -91,6 +92,7 @@ export const getAvailability: GetAvailability = async ({
       type: 'setAvailability',
       payload: { ...delivery, quantity: skuInventory.inventory.quantity },
     })
+    if (setItem) setItem({ [skuCode]: skuInventory })
   } catch (error) {
     console.error('Get SKU availability', error)
   }

@@ -69,7 +69,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
       ? items[skuCode]?.code
       : skuCode || getCurrentItemKey(item) || itemSkuCode
   ) as string
-  const availabilityQuantity = item[sCode]?.inventory?.quantity || 0
+  const availabilityQuantity = item[sCode]?.inventory?.quantity
   const handleClick = () => {
     const qty = quantity[sCode]
     const opt = option[sCode]
@@ -140,6 +140,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
             return response
           })
   }
+  console.log(`sCode`, sCode, availabilityQuantity)
   const autoDisabled =
     !isEmpty(skuLists) || skuListId
       ? false
