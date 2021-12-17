@@ -1,3 +1,10 @@
+## [2.51.3](https://github.com/commercelayer/commercelayer-react-components/compare/v2.51.2...v2.51.3) (2021-12-17)
+
+
+### Bug Fixes
+
+* Diable AddToCart button and show availability without a VariantSelector ([ecd4d5a](https://github.com/commercelayer/commercelayer-react-components/commit/ecd4d5a285d84ada1f4beeee4524ea82c0ac3556))
+
 ## [2.51.2](https://github.com/commercelayer/commercelayer-react-components/compare/v2.51.1...v2.51.2) (2021-12-16)
 
 
