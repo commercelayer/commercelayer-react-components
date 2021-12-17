@@ -1,7 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 import CommerceLayer from '../src/components/CommerceLayer'
-import { Nav } from '.'
 import OrderContainer from '../src/components/OrderContainer'
 import PriceContainer from '../src/components/PricesContainer'
 import Price from '../src/components/Price'
@@ -47,7 +46,6 @@ export default function Order() {
   }, [])
   return (
     <Fragment>
-      <Nav links={['/']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer>
@@ -92,11 +90,11 @@ export default function Order() {
                       <AddToCart
                         data-cy="BABYONBU000000E63E746MXX-button"
                         skuCode="BABYONBU000000E63E746MXX"
-                        className="w-2/3 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        className="w-2/3 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
                       />
                     </div>
                     <div className="pt-2">
-                      <AvailabilityContainer>
+                      <AvailabilityContainer skuCode="BABYONBU000000E63E746MXX">
                         <AvailabilityTemplate />
                       </AvailabilityContainer>
                     </div>
@@ -146,7 +144,7 @@ export default function Order() {
                       />
                     </div>
                     <div className="pt-2">
-                      <AvailabilityContainer>
+                      <AvailabilityContainer skuCode="LSLEEVMMFFFFFF000000LXXX">
                         <AvailabilityTemplate />
                       </AvailabilityContainer>
                     </div>
