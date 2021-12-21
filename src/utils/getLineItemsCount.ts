@@ -2,24 +2,23 @@ import { LineItem } from '@commercelayer/sdk'
 import { LineItemType } from '#typings'
 
 export interface GetLineItemsCountInterface {
-  (lineItems: LineItem[], quantity?: number): number
+  (args: {
+    lineItems: LineItem[]
+    quantity?: number
+    typeAccepted?: TypeAccepted[]
+  }): number
 }
 
-type TypeAccepted = Extract<
+export type TypeAccepted = Extract<
   LineItemType,
   'skus' | 'gift_cards' | 'bundles' | 'adjustments'
 >
 
-const getLineItemsCount: GetLineItemsCountInterface = (
+const getLineItemsCount: GetLineItemsCountInterface = ({
   lineItems,
-  quantity = 0
-) => {
-  const typeAccepted: TypeAccepted[] = [
-    'skus',
-    'gift_cards',
-    'bundles',
-    'adjustments',
-  ]
+  quantity = 0,
+  typeAccepted = ['skus', 'gift_cards', 'bundles', 'adjustments'],
+}) => {
   lineItems
     .filter(
       (l) => l.item_type && typeAccepted.includes(l.item_type as TypeAccepted)
