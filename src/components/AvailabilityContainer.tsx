@@ -36,10 +36,12 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
     availabilityReducer,
     availabilityInitialState
   )
+  const sCode =
+    skuCode || getCurrentItemKey(item) || itemSkuCode || lineItem?.sku_code
   useEffect(() => {
-    const sCode =
-      skuCode || getCurrentItemKey(item) || itemSkuCode || lineItem?.sku_code
     if (sCode) {
+      const available = item[sCode]?.inventory?.available
+      const quantity = item[sCode]?.inventory?.quantity
       const [level] = item[sCode]?.inventory?.levels || [
         {
           quantity: null,
@@ -54,6 +56,11 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
         })
       } else if (config.accessToken && !item?.[sCode]) {
         getAvailability({ skuCode: sCode, config, dispatch, setItem })
+      } else if (!available) {
+        dispatch({
+          type: 'setAvailability',
+          payload: { quantity },
+        })
       }
     }
     return (): void => {
@@ -62,7 +69,7 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
         payload: {},
       })
     }
-  }, [config.accessToken, item, itemSkuCode])
+  }, [config.accessToken, item, sCode])
   return (
     <AvailabilityContext.Provider value={{ ...state }}>
       {children}
