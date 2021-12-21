@@ -1,3 +1,11 @@
+## [2.52.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.52.0...v2.52.1) (2021-12-21)
+
+
+### Bug Fixes
+
+* Availability ([0096f41](https://github.com/commercelayer/commercelayer-react-components/commit/0096f41a27b6bcd5dbba2eb59421c2d3203416d1))
+* Export AdjustmentAmount ([bc9f050](https://github.com/commercelayer/commercelayer-react-components/commit/bc9f050691a113d01e186d26b72788e0f3012521))
+
 # [2.52.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.51.3...v2.52.0) (2021-12-21)
 
 
