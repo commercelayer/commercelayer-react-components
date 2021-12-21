@@ -1,3 +1,16 @@
+# [2.52.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.51.3...v2.52.0) (2021-12-21)
+
+
+### Bug Fixes
+
+* Reload Price component ([42cebaa](https://github.com/commercelayer/commercelayer-react-components/commit/42cebaa46f4fea48da622761c1a5824bee54fc79))
+
+
+### Features
+
+* Add new component AdjustmentAmount ([231863c](https://github.com/commercelayer/commercelayer-react-components/commit/231863c635c16d2005b107240983df919eb641de))
+* Add new prop typeAccepted to LineItemsCount ([1317bdd](https://github.com/commercelayer/commercelayer-react-components/commit/1317bdd843a5eab1c77874c4b75c62335646ba41))
+
 ## [2.51.3](https://github.com/commercelayer/commercelayer-react-components/compare/v2.51.2...v2.51.3) (2021-12-17)
 
 
