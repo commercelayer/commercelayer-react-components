@@ -33,7 +33,7 @@ const LineItemsEmpty: FunctionComponent<LineItemsCountProps> = (props) => {
   const emptyText = quantity === 0 ? <span {...p}>{text}</span> : null
   useEffect(() => {
     if (!isEmpty(lineItems)) {
-      const qty = getLineItemsCount(lineItems || [])
+      const qty = getLineItemsCount({ lineItems: lineItems || [] })
       setQuantity(qty)
     }
     return (): void => {

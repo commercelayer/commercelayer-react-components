@@ -123,6 +123,13 @@ const components = {
       required: true,
     },
   },
+  AdjustmentAmount: {
+    displayName: 'AdjustmentAmount',
+    propTypes: baseOrderComponentPricePropTypes,
+    defaultProps: {
+      format: 'formatted' as BaseFormatPrice,
+    },
+  },
   AddToCartButton: {
     displayName: 'AddToCartButton',
     propTypes: {
@@ -579,6 +586,7 @@ const components = {
       'LineItemsContainer',
       'SubTotalAmount',
       'DiscountAmount',
+      'AdjustmentAmount',
       'ShippingAmount',
       'TaxesAmount',
       'GiftCardAmount',

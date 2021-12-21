@@ -5,7 +5,7 @@ import React, {
   useEffect,
 } from 'react'
 import Parent from './utils/Parent'
-import getLineItemsCount from '#utils/getLineItemsCount'
+import getLineItemsCount, { TypeAccepted } from '#utils/getLineItemsCount'
 import { isEmpty } from 'lodash'
 import LineItemContext from '#context/LineItemContext'
 import components from '#config/components'
@@ -22,23 +22,28 @@ type LineItemsCountChildrenProps = FunctionChildren<
 
 type LineItemsCountProps = {
   children?: LineItemsCountChildrenProps
+  typeAccepted?: TypeAccepted[]
 } & JSX.IntrinsicElements['span']
 
 const LineItemsCount: FunctionComponent<LineItemsCountProps> = (props) => {
-  const { children, ...p } = props
+  const { children, typeAccepted, ...p } = props
   const { lineItems } = useContext(LineItemContext)
   const [quantity, setQuantity] = useState(0)
   useEffect(() => {
     if (!isEmpty(lineItems)) {
-      const qty = getLineItemsCount(lineItems || [])
+      const qty = getLineItemsCount({
+        lineItems: lineItems || [],
+        typeAccepted,
+      })
       setQuantity(qty)
     }
     return (): void => {
       setQuantity(0)
     }
-  }, [lineItems])
+  }, [lineItems, typeAccepted])
   const parentProps = {
     quantity,
+    typeAccepted,
     ...p,
   }
   return children ? (
