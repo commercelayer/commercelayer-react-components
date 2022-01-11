@@ -239,6 +239,7 @@ export default function Main() {
                 errorClassName="border-red-600 focus:ring-red-600 focus:border-red-600"
                 autoComplete="on"
                 className="p-2"
+                isBusiness
               >
                 <div>
                   <label
@@ -357,6 +358,7 @@ export default function Main() {
                         label: 'Country',
                         disabled: true,
                       }}
+                      value="IT"
                     />
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -386,6 +388,7 @@ export default function Main() {
                         label: 'Select a state',
                         disabled: true,
                       }}
+                      value={'GE'}
                     />
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
