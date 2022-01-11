@@ -18,6 +18,7 @@ type BillingAddressFormProps = {
   children: ReactNode
   reset?: boolean
   errorClassName?: string
+  isBusiness?: boolean
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
@@ -28,6 +29,7 @@ const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
     errorClassName,
     autoComplete = 'on',
     reset = false,
+    isBusiness = false,
     ...p
   } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
