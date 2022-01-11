@@ -13,6 +13,7 @@ export type DefaultContextAddress = {
   requiresBillingInfo?: boolean
   resetField?: (name: string) => void
   values?: Record<string, any>
+  isBusiness?: boolean
 }
 
 const BillingAddressFormContext = createContext<DefaultContextAddress>({})

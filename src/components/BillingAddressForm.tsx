@@ -23,6 +23,7 @@ type BillingAddressFormProps = {
   children: ReactNode
   reset?: boolean
   errorClassName?: string
+  isBusiness?: boolean
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
@@ -33,6 +34,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     errorClassName,
     autoComplete = 'on',
     reset = false,
+    isBusiness = false,
     ...p
   } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
@@ -96,7 +98,13 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
           })
         }
       }
-      setAddress({ values: values as Address, resource: 'billing_address' })
+      setAddress({
+        values: {
+          ...values,
+          ...(isBusiness && { business: isBusiness }),
+        } as Address,
+        resource: 'billing_address',
+      })
     }
     const checkboxChecked =
       ref.current?.querySelector(
@@ -124,9 +132,17 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     const field: any = {
       [name.replace('billing_address_', '')]: value,
     }
-    setAddress({ values: { ...values, ...field }, resource: 'billing_address' })
+    setAddress({
+      values: {
+        ...values,
+        ...field,
+        ...(isBusiness && { business: isBusiness }),
+      },
+      resource: 'billing_address',
+    })
   }
   const providerValues = {
+    isBusiness,
     values,
     validation,
     setValue,
