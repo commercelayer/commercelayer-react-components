@@ -188,6 +188,7 @@ export type PaymentResource = keyof PaymentSourceObject
 export type PaymentResourceKey =
   | 'braintreePayment'
   | 'stripePayment'
+  | 'klarnaPayment'
   | 'wireTransfer'
   | 'paypalPayment'
   | 'adyenPayment'
@@ -398,6 +399,7 @@ export type PaymentMethodConfig = {
   paypalPayment?: PaypalConfig
   adyenPayment?: AdyenPaymentConfig
   checkoutComPayment?: CheckoutComConfig
+  klarnaPayment?: StripeConfig
 }
 
 type SetPaymentMethodConfig = (
