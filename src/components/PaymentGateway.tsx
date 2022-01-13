@@ -110,6 +110,8 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   switch (paymentResource) {
     case 'stripe_payments':
       return <StripeGateway {...gatewayConfig}>{children}</StripeGateway>
+    case 'klarna_payments':
+      return <StripeGateway {...gatewayConfig}>{children}</StripeGateway>
     case 'adyen_payments':
       return <AdyenGateway {...gatewayConfig}>{children}</AdyenGateway>
     case 'braintree_payments':
