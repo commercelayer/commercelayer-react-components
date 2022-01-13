@@ -51,6 +51,9 @@ export default function Main() {
         if (order.shipping_address) {
           setShippingAddress(order.shipping_address)
         }
+        if (order.customer_email) {
+          setCustomerEmail(order.customer_email)
+        }
       } catch (error) {
         console.error(error)
       }
@@ -88,12 +91,8 @@ export default function Main() {
   ]
   const handleOnSave = async () => {
     if (token) {
-      const config = { accessToken: token, endpoint }
       try {
-        const order = await Order.withCredentials(config)
-          .select('customerEmail')
-          .find(orderId)
-        setCustomerEmail(order.customerEmail)
+        await getOrder()
       } catch (error) {
         console.error(error)
       }
