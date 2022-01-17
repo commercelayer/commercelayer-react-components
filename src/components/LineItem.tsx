@@ -28,8 +28,13 @@ const LineItem: FunctionComponent<LineItemProps> = (props) => {
     items &&
     items
       .filter((l) => l.item_type === type)
-      .map((lineItem, k) => {
-        if (lineItem.item_type === 'bundles' && k > 0) return null
+      .map((lineItem, k, check) => {
+        if (
+          lineItem.item_type === 'bundles' &&
+          k > 0 &&
+          check[k - 1].bundle_code === lineItem.bundle_code
+        )
+          return null
         const lineProps = {
           lineItem,
         }
