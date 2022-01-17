@@ -900,11 +900,11 @@ export default function Main() {
                       <div className="text-gray-500 ml-5">
                         <PaymentSourceDetail
                           data-cy="payment-exp-month"
-                          type="expMonth"
+                          type="exp_month"
                         />
                         <PaymentSourceDetail
                           data-cy="payment-exp-year"
-                          type="expYear"
+                          type="exp_year"
                         />
                       </div>
                       <div className="ml-5">
@@ -989,7 +989,13 @@ export default function Main() {
                 </LineItem>
                 <LineItem type="adjustments">
                   <div className="flex justify-between items-center border-b p-5">
-                    <LineItemImage className="p-2" width={40} />
+                    <LineItemImage
+                      className="p-2"
+                      width={40}
+                      placeholder={{
+                        adjustments: '',
+                      }}
+                    />
                     <LineItemName data-test="line-item-name" className="p-2" />
                     <LineItemAmount
                       data-test="line-item-total"
