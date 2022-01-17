@@ -3,6 +3,12 @@ import Parent from './utils/Parent'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import components from '#config/components'
 import { LineItem } from '@commercelayer/sdk'
+import { LineItemType } from '#typings'
+
+const defaultImgUrl =
+  'https://data.commercelayer.app/assets/images/placeholders/img_placeholder.svg'
+const defaultGiftCardImgUrl =
+  'https://data.commercelayer.app/assets/images/placeholders/gift_placeholder.svg'
 
 const propTypes = components.LineItemImage.propTypes
 const displayName = components.LineItemImage.displayName
@@ -15,20 +21,33 @@ export type LineItemImageType = Omit<LineItemImageProps, 'children'> & {
 type LineItemImageProps = {
   children?: (props: LineItemImageType) => ReactNode
   width?: number
-} & Omit<JSX.IntrinsicElements['img'], 'src' | 'srcSet'>
+  placeholder?: {
+    [K in LineItemType]?: string
+  }
+} & Omit<JSX.IntrinsicElements['img'], 'src' | 'srcSet' | 'placeholder'>
 
 const LineItemImage: FunctionComponent<LineItemImageProps> = (props) => {
+  const { placeholder, children, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
-  const src = lineItem?.image_url
+  const itemType = lineItem?.item_type as LineItemType
+  let src = lineItem?.image_url
+  if (!src) {
+    if (placeholder?.[itemType]) {
+      src = placeholder?.[itemType]
+    } else {
+      src = itemType === 'gift_cards' ? defaultGiftCardImgUrl : defaultImgUrl
+    }
+  }
   const parenProps = {
     lineItem,
     src,
-    ...props,
+    placeholder,
+    ...p,
   }
-  return props.children ? (
-    <Parent {...parenProps}>{props.children}</Parent>
-  ) : (
-    <img alt="" src={src} {...props} />
+  return children ? (
+    <Parent {...parenProps}>{children}</Parent>
+  ) : !src ? null : (
+    <img alt="" src={src} {...p} />
   )
 }
 
