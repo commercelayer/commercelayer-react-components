@@ -1,3 +1,10 @@
+## [2.53.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.53.0...v2.53.1) (2022-01-17)
+
+
+### Bug Fixes
+
+* Show multiple bundles in a single order ([6b454a9](https://github.com/commercelayer/commercelayer-react-components/commit/6b454a9597f642c030172bcf3afd8e60bf6538b8))
+
 # [2.53.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.52.1...v2.53.0) (2022-01-17)
 
 
