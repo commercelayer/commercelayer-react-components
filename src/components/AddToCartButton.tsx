@@ -140,7 +140,6 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
             return response
           })
   }
-  console.log(`sCode`, sCode, availabilityQuantity)
   const autoDisabled =
     !isEmpty(skuLists) || skuListId
       ? false
