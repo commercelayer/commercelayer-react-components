@@ -1,3 +1,15 @@
+# [2.53.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.52.1...v2.53.0) (2022-01-17)
+
+
+### Bug Fixes
+
+* Regroup bundle items ([88c6d30](https://github.com/commercelayer/commercelayer-react-components/commit/88c6d30d07a8041a4918ca2978a2c3a5c0202cad))
+
+
+### Features
+
+* Add new prop placeholder and set placeholder image if src is empty ([1717e98](https://github.com/commercelayer/commercelayer-react-components/commit/1717e9847bbfb72799a1cff0f7057060d5024837))
+
 ## [2.52.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.52.0...v2.52.1) (2021-12-21)
 
 
