@@ -19,6 +19,7 @@ import PaypalGateway from './gateways/PaypalGateway'
 import WireTransferGateway from './gateways/WireTransferGateway'
 import CustomerContext from '#context/CustomerContext'
 import CheckoutComGateway from './gateways/CheckoutComGateway'
+import KlarnaGateway from './gateways/KlarnaGateway'
 
 export type GatewayBaseType = PaymentGatewayProps & {
   show: boolean
@@ -111,7 +112,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
     case 'stripe_payments':
       return <StripeGateway {...gatewayConfig}>{children}</StripeGateway>
     case 'klarna_payments':
-      return <StripeGateway {...gatewayConfig}>{children}</StripeGateway>
+      return <KlarnaGateway {...gatewayConfig}>{children}</KlarnaGateway>
     case 'adyen_payments':
       return <AdyenGateway {...gatewayConfig}>{children}</AdyenGateway>
     case 'braintree_payments':
