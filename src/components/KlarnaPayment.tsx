@@ -22,6 +22,7 @@ import { PaymentSourceProps } from './PaymentSource'
 import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
 import { setCustomerOrderParam } from '#utils/localStorage'
+import useExternalScript from '#utils/hooks/useExternalScript'
 
 export type KlarnaConfig = {
   // containerClassName?: string
@@ -192,38 +193,15 @@ export default function KlarnaPayment({
   locale = 'auto',
   ...p
 }: KlarnaPaymentProps) {
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [stripe, setStripe] = useState(null)
-  const {
-    containerClassName,
-    templateCustomerSaveToWallet,
-    fonts = [],
-    ...divProps
-  } = p
-  useEffect(() => {
-    if (show && clientToken) {
-      const { loadStripe } = require('@stripe/stripe-js')
-      const getStripe = async () => {
-        const res = await loadStripe(clientToken, {
-          locale,
-        })
-        setStripe(res)
-        setIsLoaded(true)
-      }
-      getStripe()
-    }
-    return () => {
-      setIsLoaded(false)
-    }
-  }, [show, clientToken])
-  return isLoaded && stripe ? (
-    <div className={containerClassName} {...divProps}>
-      <Elements stripe={stripe} options={{ fonts }}>
-        {/* <StripePaymentForm
-          options={options}
-          templateCustomerSaveToWallet={templateCustomerSaveToWallet}
-        /> */}
-      </Elements>
-    </div>
-  ) : null
+  const loaded = useExternalScript('https://x.klarnacdn.net/kp/lib/v1/api.js')
+  console.log('loaded', loaded)
+  // const [isLoaded, setIsLoaded] = useState(false)
+  // const [stripe, setStripe] = useState(null)
+  // const {
+  //   containerClassName,
+  //   templateCustomerSaveToWallet,
+  //   fonts = [],
+  //   ...divProps
+  // } = p
+  return null
 }

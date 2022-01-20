@@ -1,5 +1,6 @@
+import React, { Fragment, useContext } from 'react'
+import KlarnaPayment from '#components/KlarnaPayment'
 import { GatewayBaseType } from '#components/PaymentGateway'
-import StripePayment from '#components/StripePayment'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
@@ -10,7 +11,6 @@ import {
   PaymentResource,
 } from '#reducers/PaymentMethodReducer'
 import isEmpty from 'lodash/isEmpty'
-import React, { Fragment, useContext } from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
 type KlarnaGateway = GatewayBaseType
@@ -47,7 +47,7 @@ export default function KlarnaGateway(props: KlarnaGateway) {
   const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {
-          return customerPayment.payment_source?.type === 'klarna_payments'
+          return customerPayment.payment_source?.type === paymentResource
         })
       : []
 
@@ -71,7 +71,7 @@ export default function KlarnaGateway(props: KlarnaGateway) {
             </PaymentCardsTemplate>
           </div>
         )}
-        <StripePayment
+        <KlarnaPayment
           show={show}
           templateCustomerSaveToWallet={templateCustomerSaveToWallet}
           clientToken={clientToken}
@@ -83,7 +83,7 @@ export default function KlarnaGateway(props: KlarnaGateway) {
   }
 
   return clientToken && !loading ? (
-    <StripePayment
+    <KlarnaPayment
       show={show}
       clientToken={clientToken}
       locale={locale}
