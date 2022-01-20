@@ -48,7 +48,7 @@ export default function StripeGateway(props: StripeGateway) {
   const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {
-          return customerPayment.payment_source?.type === 'stripe_payments'
+          return customerPayment.payment_source?.type === paymentResource
         })
       : []
 
