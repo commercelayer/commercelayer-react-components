@@ -1,5 +1,6 @@
 #Npm
 lib
+.jest
 
 # Cypress
 cypress/fixtures/*
