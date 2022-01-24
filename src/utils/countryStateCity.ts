@@ -1,5 +1,5 @@
-import { Countries, States } from 'countries-states-cities-service'
-
+import { Countries } from '@ac-dev/countries-service'
+import { States } from '@ac-dev/states-service'
 export function getCountries() {
   return Countries.getCountries({
     sort: {
