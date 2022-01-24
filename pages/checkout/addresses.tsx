@@ -31,6 +31,7 @@ export default function Main() {
   const [customerEmail, setCustomerEmail] = useState('')
   const [shipToDifferentAddress, setShipToDifferentAddress] = useState(false)
   const [saveOnBlur, setSaveOnBlur] = useState(false)
+  const [isBusiness, setIsBusiness] = useState(false)
   const [billingAddress, setBillingAddress] = useState({})
   const [shippingAddress, setShippingAddress] = useState({})
   const { query } = useRouter()
@@ -181,10 +182,32 @@ export default function Main() {
               <h3 className="text-lg font-medium leading-6 text-gray-900 bg-gray-50 p-2 my-3 shadow rounded-sm">
                 Billing Address
               </h3>
+              <div className="flex p-2">
+                <button
+                  data-cy="save-on-blur-button"
+                  data-status={isBusiness}
+                  type="button"
+                  aria-pressed="false"
+                  className={`${
+                    isBusiness ? 'bg-blue-500' : 'bg-gray-200'
+                  } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                  onClick={() => setIsBusiness(!isBusiness)}
+                >
+                  <span className="sr-only">Use setting</span>
+                  <span
+                    aria-hidden="true"
+                    className={`${
+                      isBusiness ? 'translate-x-5' : 'translate-x-0'
+                    } inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
+                  ></span>
+                </button>
+                <p className="ml-5">Business</p>
+              </div>
               <BillingAddressForm
                 errorClassName="border-red-600 focus:ring-red-600 focus:border-red-600"
                 autoComplete="on"
                 className="p-2"
+                isBusiness={isBusiness}
               >
                 <div>
                   <label
