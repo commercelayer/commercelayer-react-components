@@ -1,3 +1,10 @@
+## [2.53.2](https://github.com/commercelayer/commercelayer-react-components/compare/v2.53.1...v2.53.2) (2022-01-24)
+
+
+### Bug Fixes
+
+* Import only countries and states packages ([f31c663](https://github.com/commercelayer/commercelayer-react-components/commit/f31c663377f5b8e35297f5dc85a9a99ed7f3e1b6))
+
 ## [2.53.1](https://github.com/commercelayer/commercelayer-react-components/compare/v2.53.0...v2.53.1) (2022-01-17)
 
 
