@@ -1,3 +1,10 @@
+## [2.53.3](https://github.com/commercelayer/commercelayer-react-components/compare/v2.53.2...v2.53.3) (2022-01-24)
+
+
+### Performance Improvements
+
+* Remove cjs version ([0054e27](https://github.com/commercelayer/commercelayer-react-components/commit/0054e276f32a55a4515210976bb6953c8feb219c))
+
 ## [2.53.2](https://github.com/commercelayer/commercelayer-react-components/compare/v2.53.1...v2.53.2) (2022-01-24)
 
 
