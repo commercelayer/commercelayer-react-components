@@ -2,8 +2,7 @@
   "name": "@commercelayer/react-components",
   "version": "2.53.2",
   "description": "The Official Commerce Layer React Components",
-  "main": "lib/cjs/index.js",
-  "module": "lib/esm/index.js",
+  "module": "lib/index.js",
   "files": [
     "lib",
     "package.json",
@@ -44,8 +43,8 @@
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "build": "tsc -b tsconfig.prod.json tsconfig.prod.esm.json --verbose",
-    "postbuild": "tsc-alias -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.esm.json &&  minimize-js lib -w -s",
+    "build": "tsc -b tsconfig.prod.json --verbose",
+    "postbuild": "tsc-alias -p tsconfig.prod.json &&  minimize-js lib -w -s",
     "start": "NODE_OPTIONS='--inspect' next dev",
     "version:fix": "npm version patch",
     "version:feat": "npm version minor",
