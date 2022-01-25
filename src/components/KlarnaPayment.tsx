@@ -193,15 +193,43 @@ export default function KlarnaPayment({
   locale = 'auto',
   ...p
 }: KlarnaPaymentProps) {
+  const { paymentSource } = useContext(PaymentMethodContext)
   const loaded = useExternalScript('https://x.klarnacdn.net/kp/lib/v1/api.js')
-  console.log('loaded', loaded)
+  const [klarna, setKlarna] = useState<any>()
+  const {
+    containerClassName,
+    templateCustomerSaveToWallet,
+    fonts = [],
+    ...divProps
+  } = p
+  useEffect(() => {
+    if (loaded && window?.Klarna !== undefined) {
+      setKlarna(window.Klarna)
+    }
+  }, [loaded, window.Klarna])
+  if (klarna && clientToken) {
+    // @ts-ignore
+    const [first] = paymentSource?.payment_methods
+    klarna.Payments.init({
+      client_token: clientToken,
+    })
+    klarna.Payments.load(
+      {
+        container: '#klarna-payments-container',
+        payment_method_category: first?.indentifier,
+      },
+      {},
+      (res: any) => {
+        console.log('res', res)
+      }
+    )
+  }
+  console.log('Klarna', klarna, clientToken)
   // const [isLoaded, setIsLoaded] = useState(false)
   // const [stripe, setStripe] = useState(null)
-  // const {
-  //   containerClassName,
-  //   templateCustomerSaveToWallet,
-  //   fonts = [],
-  //   ...divProps
-  // } = p
-  return null
+  return (
+    <div className={containerClassName} {...divProps}>
+      <div id="klarna-payments-container"></div>
+    </div>
+  )
 }
