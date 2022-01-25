@@ -38,11 +38,10 @@ export default function KlarnaGateway(props: KlarnaGateway) {
   const locale = order?.language_code
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-
   // @ts-ignore
   const clientToken = paymentSource?.client_token
-  const stripeConfig = config
-    ? getPaymentConfig<'stripePayment'>(paymentResource, config)
+  const klarnaConfig = config
+    ? getPaymentConfig<'klarnaPayment'>(paymentResource, config)
     : {}
   const customerPayments =
     !isEmpty(payments) && payments
@@ -76,7 +75,7 @@ export default function KlarnaGateway(props: KlarnaGateway) {
           templateCustomerSaveToWallet={templateCustomerSaveToWallet}
           clientToken={clientToken}
           locale={locale}
-          {...stripeConfig}
+          {...klarnaConfig}
         />
       </Fragment>
     )
@@ -87,7 +86,7 @@ export default function KlarnaGateway(props: KlarnaGateway) {
       show={show}
       clientToken={clientToken}
       locale={locale}
-      {...stripeConfig}
+      {...klarnaConfig}
     />
   ) : (
     loaderComponent
