@@ -115,37 +115,48 @@ const Address: FunctionComponent<Props> = (props) => {
   const components =
     typeof children === 'function'
       ? []
-      : items.map((address, k) => {
-          const addressProps = {
-            address,
-          }
-          const disabled =
-            (setShippingAddress &&
+      : items
+          .filter((address) => {
+            if (
+              setShippingAddress &&
               countryLock &&
-              countryLock !== address.country_code) ||
-            false
-          const selectedClass = deselect ? '' : selectedClassName
-          const addressSelectedClass =
-            selected === k ? `${className} ${selectedClass}` : className
-          const customerAddressId: string = address?.reference || ''
-          const finalClassName = disabled
-            ? `${className} ${disabledClassName}`
-            : addressSelectedClass
-          return (
-            <AddressChildrenContext.Provider key={k} value={addressProps}>
-              <div
-                className={finalClassName}
-                onClick={() =>
-                  handleSelect(k, address.id, customerAddressId, disabled)
-                }
-                data-disabled={disabled}
-                {...p}
-              >
-                {children}
-              </div>
-            </AddressChildrenContext.Provider>
-          )
-        })
+              countryLock !== address.country_code
+            ) {
+              return false
+            }
+            return true
+          })
+          .map((address, k) => {
+            const addressProps = {
+              address,
+            }
+            const disabled =
+              (setShippingAddress &&
+                countryLock &&
+                countryLock !== address.country_code) ||
+              false
+            const selectedClass = deselect ? '' : selectedClassName
+            const addressSelectedClass =
+              selected === k ? `${className} ${selectedClass}` : className
+            const customerAddressId: string = address?.reference || ''
+            const finalClassName = disabled
+              ? `${className} ${disabledClassName}`
+              : addressSelectedClass
+            return (
+              <AddressChildrenContext.Provider key={k} value={addressProps}>
+                <div
+                  className={finalClassName}
+                  onClick={() =>
+                    handleSelect(k, address.id, customerAddressId, disabled)
+                  }
+                  data-disabled={disabled}
+                  {...p}
+                >
+                  {children}
+                </div>
+              </AddressChildrenContext.Provider>
+            )
+          })
   const parentProps = {
     customerAddresses: items as CustomerAddress[],
     selected,
