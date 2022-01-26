@@ -28,7 +28,7 @@ const ShippingAddressContainer: FunctionComponent<Props> = (props) => {
     shippingAddressInitialState
   )
   const config = useContext(CommerceLayerContext)
-  const { order, updateOrder } = useContext(OrderContext)
+  const { order } = useContext(OrderContext)
   const { setCloneAddress } = useContext(AddressContext)
   useEffect(() => {
     if (order && config) {
