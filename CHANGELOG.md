@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.0.0...v3.0.1) (2022-01-26)
+
+
+### Bug Fixes
+
+* import getSdk in example page ([97e2247](https://github.com/commercelayer/commercelayer-react-components/commit/97e22477fc495e514c55c7b06d707702391afecb))
+
 # [3.0.0](https://github.com/commercelayer/commercelayer-react-components/compare/v2.53.3...v3.0.0) (2022-01-24)
 
 
