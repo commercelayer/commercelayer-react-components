@@ -1,6 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
 import { getCustomerToken } from '@commercelayer/js-auth'
-import { Nav } from '.'
 import Head from 'next/head'
 import {
   CommerceLayer,
@@ -18,8 +17,8 @@ import {
   AddressField,
   ShippingAddressContainer,
 } from '@commercelayer/react-components'
-import { Order, Address as AddressResource } from '@commercelayer/js-sdk'
 import { useRouter } from 'next/router'
+import getSdk from '#utils/getSdk'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -69,20 +68,23 @@ export default function Main() {
     }
     const cleanAddresses = async () => {
       const config = { accessToken: token, endpoint }
-      const order = await Order.withCredentials(config)
-        .includes('billingAddress', 'shippingAddress')
-        .find(orderId)
-      const billingAddress: any = order.billingAddress()
-      const shippingAddress: any = order.shippingAddress()
-      const billing = await AddressResource.withCredentials(config).find(
-        billingAddress.id
-      )
-      const shipping = await AddressResource.withCredentials(config).find(
-        shippingAddress.id
-      )
-      await billing.withCredentials(config).update({ reference: '' })
-      await shipping.withCredentials(config).update({ reference: '' })
-      push(pathname)
+      const sdk = getSdk(config)
+      try {
+        const order = await sdk.orders.retrieve(orderId, {
+          include: ['billing_address', 'shipping_address'],
+        })
+        const billingAddress = order.billing_address
+        const shippingAddress = order.shipping_address
+        if (billingAddress) {
+          await sdk.addresses.update({ id: billingAddress.id, reference: '' })
+        }
+        if (shippingAddress) {
+          await sdk.addresses.update({ id: shippingAddress.id, reference: '' })
+        }
+        push(pathname)
+      } catch (error) {
+        console.error(error)
+      }
     }
     if (!token) {
       getToken()
@@ -111,32 +113,37 @@ export default function Main() {
   const handleClick = async () => {
     if (token) {
       const config = { accessToken: token, endpoint }
+      const sdk = getSdk(config)
       try {
-        const order = await Order.withCredentials(config)
-          .includes('billingAddress', 'shippingAddress')
-          .find(orderId)
-        const billing: any = order.billingAddress()
-        const shipping: any = order.shippingAddress()
-        setBillingAddress({
-          firstName: billing.firstName,
-          lastName: billing.lastName,
-          line1: billing.line1,
-          city: billing.city,
-          countryCode: billing.countryCode,
-          stateCode: billing.stateCode,
-          zipCode: billing.zipCode,
-          phone: billing.phone,
+        const order = await sdk.orders.retrieve(orderId, {
+          include: ['billing_address', 'shipping_address'],
         })
-        setShippingAddress({
-          firstName: shipping.firstName,
-          lastName: shipping.lastName,
-          line1: shipping.line1,
-          city: shipping.city,
-          countryCode: shipping.countryCode,
-          stateCode: shipping.stateCode,
-          zipCode: shipping.zipCode,
-          phone: shipping.phone,
-        })
+        const billing = order.billing_address
+        const shipping = order.shipping_address
+        if (billing) {
+          setBillingAddress({
+            firstName: billing.first_name,
+            lastName: billing.last_name,
+            line1: billing.line_1,
+            city: billing.city,
+            countryCode: billing.country_code,
+            stateCode: billing.state_code,
+            zipCode: billing.zip_code,
+            phone: billing.phone,
+          })
+        }
+        if (shipping) {
+          setShippingAddress({
+            firstName: shipping.first_name,
+            lastName: shipping.last_name,
+            line1: shipping.line_1,
+            city: shipping.city,
+            countryCode: shipping.country_code,
+            stateCode: shipping.state_code,
+            zipCode: shipping.zip_code,
+            phone: shipping.phone,
+          })
+        }
       } catch (error) {
         console.error(error)
       }
@@ -153,7 +160,6 @@ export default function Main() {
       <Head>
         <script src="http://localhost:8097"></script>
       </Head>
-      <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId={orderId}>
@@ -228,7 +234,7 @@ export default function Main() {
                           value={billingFirstName}
                         /> */}
                       </div>
-                      <p className="mt-2 text-sm text-red-600" id="email-error">
+                      <p className="mt-2 text-sm text-red-600">
                         <Errors
                           data-cy="billing_address_first_name_error"
                           resource="billing_address"
@@ -253,7 +259,7 @@ export default function Main() {
                           placeholder="Last name"
                         />
                       </div>
-                      <p className="mt-2 text-sm text-red-600" id="email-error">
+                      <p className="mt-2 text-sm text-red-600">
                         <Errors
                           data-cy="billing_address_last_name_error"
                           resource="billing_address"
@@ -278,7 +284,7 @@ export default function Main() {
                           placeholder="Address"
                         />
                       </div>
-                      <p className="mt-2 text-sm text-red-600" id="email-error">
+                      <p className="mt-2 text-sm text-red-600">
                         <Errors
                           data-cy="billing_address_line_1_error"
                           resource="billing_address"
@@ -303,7 +309,7 @@ export default function Main() {
                           placeholder="City"
                         />
                       </div>
-                      <p className="mt-2 text-sm text-red-600" id="email-error">
+                      <p className="mt-2 text-sm text-red-600">
                         <Errors
                           data-cy="billing_address_city_error"
                           resource="billing_address"
@@ -331,7 +337,7 @@ export default function Main() {
                           }}
                         />
                       </div>
-                      <p className="mt-2 text-sm text-red-600" id="email-error">
+                      <p className="mt-2 text-sm text-red-600">
                         <Errors
                           data-cy="billing_address_country_code_error"
                           resource="billing_address"
@@ -356,7 +362,7 @@ export default function Main() {
                           placeholder="State"
                         />
                       </div>
-                      <p className="mt-2 text-sm text-red-600" id="email-error">
+                      <p className="mt-2 text-sm text-red-600">
                         <Errors
                           data-cy="billing_address_state_code_error"
                           resource="billing_address"
@@ -381,7 +387,7 @@ export default function Main() {
                           placeholder="Zip code"
                         />
                       </div>
-                      <p className="mt-2 text-sm text-red-600" id="email-error">
+                      <p className="mt-2 text-sm text-red-600">
                         <Errors
                           data-cy="billing_address_zip_code_error"
                           resource="billing_address"
@@ -406,7 +412,7 @@ export default function Main() {
                           placeholder="Phone"
                         />
                       </div>
-                      <p className="mt-2 text-sm text-red-600" id="email-error">
+                      <p className="mt-2 text-sm text-red-600">
                         <Errors
                           data-cy="billing_address_phone_error"
                           resource="billing_address"
@@ -532,10 +538,7 @@ export default function Main() {
                             placeholder="First name"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600">
                           <Errors
                             data-cy="shipping_address_first_name_error"
                             resource="shipping_address"
@@ -560,10 +563,7 @@ export default function Main() {
                             placeholder="Last name"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600">
                           <Errors
                             data-cy="shipping_address_last_name_error"
                             resource="shipping_address"
@@ -588,10 +588,7 @@ export default function Main() {
                             placeholder="Address"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600">
                           <Errors
                             data-cy="shipping_address_line_1_error"
                             resource="shipping_address"
@@ -616,10 +613,7 @@ export default function Main() {
                             placeholder="City"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600">
                           <Errors
                             data-cy="shipping_address_city_error"
                             resource="shipping_address"
@@ -647,10 +641,7 @@ export default function Main() {
                             }}
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600">
                           <Errors
                             data-cy="shipping_address_country_code_error"
                             resource="shipping_address"
@@ -675,10 +666,7 @@ export default function Main() {
                             placeholder="State"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600">
                           <Errors
                             data-cy="shipping_address_state_code_error"
                             resource="shipping_address"
@@ -703,10 +691,7 @@ export default function Main() {
                             placeholder="Zip code"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600">
                           <Errors
                             data-cy="shipping_address_zip_code_error"
                             resource="shipping_address"
@@ -731,10 +716,7 @@ export default function Main() {
                             placeholder="Phone"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600">
                           <Errors
                             data-cy="shipping_address_phone_error"
                             resource="shipping_address"
