@@ -57,6 +57,7 @@ export interface AddressActionPayload {
   shipToDifferentAddress: boolean
   billingAddressId: string
   shippingAddressId: string
+  isBusiness: boolean
 }
 
 export type AddressState = Partial<AddressActionPayload>

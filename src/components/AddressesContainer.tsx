@@ -28,11 +28,12 @@ const displayName = components.AddressesContainer.displayName
 export type AddressesContainerProps = {
   children: ReactNode
   shipToDifferentAddress?: boolean
+  isBusiness?: boolean
 }
 const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
   props
 ) => {
-  const { children, shipToDifferentAddress = false } = props
+  const { children, shipToDifferentAddress = false, isBusiness = false } = props
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
   const { order, orderId, updateOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
@@ -41,6 +42,7 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
       type: 'setShipToDifferentAddress',
       payload: {
         shipToDifferentAddress,
+        isBusiness,
       },
     })
     return () => {
@@ -49,7 +51,7 @@ const AddressesContainer: FunctionComponent<AddressesContainerProps> = (
         payload: {},
       })
     }
-  }, [shipToDifferentAddress])
+  }, [shipToDifferentAddress, isBusiness])
   const contextValue = {
     ...state,
     setAddressErrors: (errors: BaseError[], resource: AddressResource) =>

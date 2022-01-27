@@ -10,39 +10,10 @@ import { BaseInputComponentProps, AddressInputName } from '#typings'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'
+import { businessMandatoryField } from '#utils/validateFormFields'
 
 const propTypes = components.AddressInput.propTypes
 const displayName = components.AddressInput.displayName
-
-type CustomerOptionalField = Extract<
-  AddressInputName,
-  | 'billing_address_line_2'
-  | 'billing_address_company'
-  | 'shipping_address_line_2'
-  | 'shipping_address_company'
->
-
-type BusinessOptionalField = Extract<
-  AddressInputName,
-  | 'billing_address_first_name'
-  | 'billing_address_last_name'
-  | 'shipping_address_first_name'
-  | 'shipping_address_last_name'
->
-
-const businessOptionalFields: BusinessOptionalField[] = [
-  'billing_address_first_name',
-  'billing_address_last_name',
-  'shipping_address_first_name',
-  'shipping_address_last_name',
-]
-
-const customerOptionalFields: CustomerOptionalField[] = [
-  'billing_address_company',
-  'shipping_address_company',
-  'billing_address_line_2',
-  'shipping_address_line_2',
-]
 
 export type AddressInputProps = {
   name: AddressInputName
@@ -92,19 +63,9 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
       setHasError(false)
     }
   }, [value, billingAddress?.errors, shippingAddress?.errors])
-  let mandatoryField = true
-  if (
-    (billingAddress.isBusiness || shippingAddress.isBusiness) &&
-    businessOptionalFields.includes(p.name as BusinessOptionalField)
-  ) {
-    mandatoryField = false
-  }
-  if (
-    (!billingAddress.isBusiness || !shippingAddress.isBusiness) &&
-    customerOptionalFields.includes(p.name as CustomerOptionalField)
-  ) {
-    mandatoryField = false
-  }
+  let mandatoryField = billingAddress.isBusiness
+    ? businessMandatoryField(p.name, billingAddress.isBusiness)
+    : businessMandatoryField(p.name, shippingAddress.isBusiness)
   const reqField = required !== undefined ? required : mandatoryField
   const errorClassName =
     billingAddress?.errorClassName || shippingAddress?.errorClassName
