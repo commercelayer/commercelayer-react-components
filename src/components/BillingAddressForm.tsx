@@ -23,7 +23,6 @@ type BillingAddressFormProps = {
   children: ReactNode
   reset?: boolean
   errorClassName?: string
-  isBusiness?: boolean
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
@@ -34,11 +33,11 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     errorClassName,
     autoComplete = 'on',
     reset = false,
-    isBusiness = false,
     ...p
   } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
-  const { setAddressErrors, setAddress } = useContext(AddressesContext)
+  const { setAddressErrors, setAddress, isBusiness } =
+    useContext(AddressesContext)
   const {
     saveAddressToCustomerAddressBook,
     order,
@@ -125,6 +124,14 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
       }
     }
   }, [errors, values, reset, include, includeLoaded])
+  useEffect(() => {
+    if (ref) {
+      ref.current?.reset()
+      resetForm({ target: ref.current } as any)
+      setAddressErrors([], 'billing_address')
+      setAddress({ values: {} as Address, resource: 'billing_address' })
+    }
+  }, [isBusiness])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any

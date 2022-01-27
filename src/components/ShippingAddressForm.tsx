@@ -36,7 +36,7 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     ...p
   } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
-  const { setAddressErrors, setAddress, shipToDifferentAddress } =
+  const { setAddressErrors, setAddress, shipToDifferentAddress, isBusiness } =
     useContext(AddressesContext)
   const {
     saveAddressToCustomerAddressBook,
@@ -96,7 +96,13 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
           })
         }
       }
-      setAddress({ values: values as Address, resource: 'shipping_address' })
+      setAddress({
+        values: {
+          ...values,
+          ...(isBusiness && { business: isBusiness }),
+        } as Address,
+        resource: 'shipping_address',
+      })
     }
     const checkboxChecked =
       ref.current?.querySelector(
@@ -117,6 +123,14 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
       }
     }
   }, [values, errors, shipToDifferentAddress, reset, include, includeLoaded])
+  useEffect(() => {
+    if (ref) {
+      ref.current?.reset()
+      resetForm({ target: ref.current } as any)
+      setAddressErrors([], 'shipping_address')
+      setAddress({ values: {} as Address, resource: 'shipping_address' })
+    }
+  }, [isBusiness])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any
@@ -125,7 +139,11 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
       [name.replace('shipping_address_', '')]: value,
     }
     setAddress({
-      values: { ...values, ...field },
+      values: {
+        ...values,
+        ...field,
+        ...(isBusiness && { business: isBusiness }),
+      },
       resource: 'shipping_address',
     })
   }
