@@ -39,7 +39,7 @@ export default function Main() {
     orderId = query.orderId as string
   }
   const getOrder = async () => {
-    if (token) {
+    if (token && orderId) {
       const config = { accessToken: token, endpoint }
       const sdk = getSdk(config)
       try {
@@ -178,7 +178,10 @@ export default function Main() {
                 </div>
               </div>
             </CustomerContainer>
-            <AddressesContainer shipToDifferentAddress={shipToDifferentAddress}>
+            <AddressesContainer
+              shipToDifferentAddress={shipToDifferentAddress}
+              isBusiness={isBusiness}
+            >
               <h3 className="text-lg font-medium leading-6 text-gray-900 bg-gray-50 p-2 my-3 shadow rounded-sm">
                 Billing Address
               </h3>
@@ -207,7 +210,6 @@ export default function Main() {
                 errorClassName="border-red-600 focus:ring-red-600 focus:border-red-600"
                 autoComplete="on"
                 className="p-2"
-                isBusiness={isBusiness}
               >
                 {!isBusiness && (
                   <div>
@@ -315,6 +317,33 @@ export default function Main() {
                     />
                   </p>
                 </div>
+                {isBusiness && (
+                  <div>
+                    <label
+                      htmlFor="billing_address_line_2"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Address line 2
+                    </label>
+                    <div className="mt-1">
+                      <AddressInput
+                        data-cy="billing_address_line_2"
+                        name="billing_address_line_2"
+                        type="text"
+                        className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        placeholder="Address"
+                      />
+                    </div>
+                    <p className="mt-2 text-sm text-red-600">
+                      <Errors
+                        data-cy="billing_address_line_2_error"
+                        resource="billing_address"
+                        field="billing_address_line_2"
+                        messages={messages}
+                      />
+                    </p>
+                  </div>
+                )}
                 <div>
                   <label
                     htmlFor="billing_address_city"
