@@ -150,7 +150,7 @@ export default function Main() {
                     errorClassName="border-red-600 focus:ring-red-600 focus:border-red-600"
                   />
                 </div>
-                <p className="mt-2 text-sm text-red-600" id="email-error">
+                <p className="mt-2 text-sm text-red-600">
                   <Errors
                     data-cy="customer_email_error"
                     resource="orders"
@@ -201,7 +201,7 @@ export default function Main() {
                     } inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
                   ></span>
                 </button>
-                <p className="ml-5">Business</p>
+                <p className="ml-5">Business address</p>
               </div>
               <BillingAddressForm
                 errorClassName="border-red-600 focus:ring-red-600 focus:border-red-600"
@@ -209,56 +209,87 @@ export default function Main() {
                 className="p-2"
                 isBusiness={isBusiness}
               >
-                <div>
-                  <label
-                    htmlFor="billing_address_first_name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    First name
-                  </label>
-                  <div className="mt-1">
-                    <AddressInput
-                      data-cy="billing_address_first_name"
-                      name="billing_address_first_name"
-                      type="text"
-                      className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      placeholder="First name"
-                    />
+                {!isBusiness && (
+                  <div>
+                    <label
+                      htmlFor="billing_address_first_name"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      First name
+                    </label>
+                    <div className="mt-1">
+                      <AddressInput
+                        data-cy="billing_address_first_name"
+                        name="billing_address_first_name"
+                        type="text"
+                        className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        placeholder="First name"
+                      />
+                    </div>
+                    <p className="mt-2 text-sm text-red-600">
+                      <Errors
+                        data-cy="billing_address_first_name_error"
+                        resource="billing_address"
+                        field="billing_address_first_name"
+                        messages={messages}
+                      />
+                    </p>
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
-                    <Errors
-                      data-cy="billing_address_first_name_error"
-                      resource="billing_address"
-                      field="billing_address_first_name"
-                      messages={messages}
-                    />
-                  </p>
-                </div>
-                <div>
-                  <label
-                    htmlFor="billing_address_last_name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Last name
-                  </label>
-                  <div className="mt-1">
-                    <AddressInput
-                      data-cy="billing_address_last_name"
-                      name="billing_address_last_name"
-                      type="text"
-                      className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      placeholder="Last name"
-                    />
+                )}
+                {isBusiness && (
+                  <div>
+                    <label
+                      htmlFor="billing_address_company"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Company name
+                    </label>
+                    <div className="mt-1">
+                      <AddressInput
+                        data-cy="billing_address_company"
+                        name="billing_address_company"
+                        type="text"
+                        className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        placeholder="Company name"
+                      />
+                    </div>
+                    <p className="mt-2 text-sm text-red-600">
+                      <Errors
+                        data-cy="billing_address_company_error"
+                        resource="billing_address"
+                        field="billing_address_company"
+                        messages={messages}
+                      />
+                    </p>
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
-                    <Errors
-                      data-cy="billing_address_last_name_error"
-                      resource="billing_address"
-                      field="billing_address_last_name"
-                      messages={messages}
-                    />
-                  </p>
-                </div>
+                )}
+                {!isBusiness && (
+                  <div>
+                    <label
+                      htmlFor="billing_address_last_name"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Last name
+                    </label>
+                    <div className="mt-1">
+                      <AddressInput
+                        data-cy="billing_address_last_name"
+                        name="billing_address_last_name"
+                        type="text"
+                        className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        placeholder="Last name"
+                      />
+                    </div>
+                    <p className="mt-2 text-sm text-red-600">
+                      <Errors
+                        data-cy="billing_address_last_name_error"
+                        resource="billing_address"
+                        field="billing_address_last_name"
+                        messages={messages}
+                      />
+                    </p>
+                  </div>
+                )}
                 <div>
                   <label
                     htmlFor="billing_address_line_1"
@@ -275,7 +306,7 @@ export default function Main() {
                       placeholder="Address"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="billing_address_line_1_error"
                       resource="billing_address"
@@ -300,7 +331,7 @@ export default function Main() {
                       placeholder="City"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="billing_address_city_error"
                       resource="billing_address"
@@ -328,7 +359,7 @@ export default function Main() {
                       }}
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="billing_address_country_code_error"
                       resource="billing_address"
@@ -357,7 +388,7 @@ export default function Main() {
                       }}
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="billing_address_state_code_error"
                       resource="billing_address"
@@ -382,7 +413,7 @@ export default function Main() {
                       placeholder="Zip code"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="billing_address_zip_code_error"
                       resource="billing_address"
@@ -407,7 +438,7 @@ export default function Main() {
                       placeholder="Phone"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="billing_address_phone_error"
                       resource="billing_address"
@@ -432,7 +463,7 @@ export default function Main() {
                       placeholder="Billing info"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="billing_address_billing_info"
                       resource="billing_address"
@@ -503,7 +534,7 @@ export default function Main() {
                       placeholder="First name"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="shipping_address_first_name_error"
                       resource="shipping_address"
@@ -528,7 +559,7 @@ export default function Main() {
                       placeholder="Last name"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="shipping_address_last_name_error"
                       resource="shipping_address"
@@ -553,7 +584,7 @@ export default function Main() {
                       placeholder="Address"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="shipping_address_line_1_error"
                       resource="shipping_address"
@@ -578,7 +609,7 @@ export default function Main() {
                       placeholder="City"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="shipping_address_city_error"
                       resource="shipping_address"
@@ -606,7 +637,7 @@ export default function Main() {
                       }}
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="shipping_address_country_code_error"
                       resource="shipping_address"
@@ -634,7 +665,7 @@ export default function Main() {
                       }}
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="shipping_address_state_code_error"
                       resource="shipping_address"
@@ -659,7 +690,7 @@ export default function Main() {
                       placeholder="Zip code"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="shipping_address_zip_code_error"
                       resource="shipping_address"
@@ -684,7 +715,7 @@ export default function Main() {
                       placeholder="Phone"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
+                  <p className="mt-2 text-sm text-red-600">
                     <Errors
                       data-cy="shipping_address_phone_error"
                       resource="shipping_address"
