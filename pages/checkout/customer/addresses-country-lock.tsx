@@ -442,7 +442,7 @@ export default function Main() {
                 </div>
                 <div className="flex p-2 my-2">
                   <button
-                    data-cy="ship-to-different-address-button"
+                    data-test="ship-to-different-address-button"
                     data-status={shipToDifferentAddress}
                     type="button"
                     aria-pressed="false"
@@ -472,7 +472,7 @@ export default function Main() {
                   <div className="flex">
                     <ShippingAddressContainer>
                       <Address
-                        data-cy="customer-shipping-address"
+                        data-test="customer-shipping-address"
                         className="w-1/2 p-2 border cursor-pointer rounded hover:border-blue-500 m-2 shadow-sm"
                         selectedClassName={'border-blue-500'}
                         disabledClassName={'opacity-50 cursor-not-allowed'}
