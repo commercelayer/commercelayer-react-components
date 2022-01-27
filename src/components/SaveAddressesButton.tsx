@@ -44,7 +44,9 @@ export function SaveAddressesButton(props: Props) {
     saveAddresses,
     billingAddressId,
     shippingAddressId,
+    isBusiness,
   } = useContext(AddressContext)
+  console.log('isBusiness', isBusiness)
   const { order } = useContext(OrderContext)
   const { addresses, isGuest, createCustomerAddress } =
     useContext(CustomerContext)
@@ -75,6 +77,7 @@ export function SaveAddressesButton(props: Props) {
     shipping_address,
     shippingAddressId,
   })
+  debugger
   const disable =
     disabled ||
     customerEmail ||
