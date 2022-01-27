@@ -44,6 +44,7 @@
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage",
+    "test:playwright": "playwright test",
     "build": "tsc -b tsconfig.prod.json --verbose",
     "postbuild": "tsc-alias -p tsconfig.prod.json &&  minimize-js lib -w -s",
     "start": "NODE_OPTIONS='--inspect' next dev",
