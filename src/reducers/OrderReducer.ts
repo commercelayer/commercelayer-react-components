@@ -548,6 +548,7 @@ export const orderInitialState: Partial<OrderState> = {
   orderId: '',
   order: undefined,
   errors: [],
+  include: [],
 }
 
 const orderReducer = (state: OrderState, reducer: OrderActions): OrderState =>
