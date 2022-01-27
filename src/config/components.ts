@@ -188,7 +188,7 @@ const components = {
     },
   },
   BillingAddressForm: {
-    permittedChildren: ['AddressInput', 'ReactNode'],
+    permittedChildren: ['AddressInput', 'ReactNode', 'Errors'],
     propTypes: {
       children: childrenTypes.isRequired,
     },

@@ -94,7 +94,6 @@ export interface FieldsExist {
 }
 
 export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
-  console.log(`address`, address)
   if (!address['business']) {
     const required = without(schema, 'line_2', 'company')
     const validAddress = keys(address).filter((k) =>

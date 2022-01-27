@@ -32,7 +32,7 @@ const checkChildrenTypes: CheckChildrenTypes = (
   }
   Children.map(children, (c): any => {
     if (error) return error
-    const type = c.type
+    const type = c?.type
     const itemTypes = get(components, `${cpName}.permittedChildren`)
     const errorMsg = `Invalid prop '${propName}' supplied to ${cpName}. Only components ${itemTypes.join(
       ', '
@@ -46,7 +46,7 @@ const checkChildrenTypes: CheckChildrenTypes = (
         }
       }
     }
-    if (!isValidElement(c)) {
+    if (!isValidElement(c) && c !== null) {
       error = new Error(errorMsg)
     }
   })
