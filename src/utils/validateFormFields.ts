@@ -8,6 +8,7 @@ import { BaseState } from '#typings/index'
 import { ResourceErrorType, BaseError } from '#typings/errors'
 import { AddressField, addressFields } from '#reducers/AddressReducer'
 import { AddressCreate } from '@commercelayer/sdk'
+import { AddressInputName } from '#typings'
 
 const EMAIL_PATTERN = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/
 
@@ -94,6 +95,7 @@ export interface FieldsExist {
 }
 
 export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
+  console.log('address', address)
   if (!address['business']) {
     const required = without(schema, 'line_2', 'company')
     const validAddress = keys(address).filter((k) =>
@@ -107,6 +109,55 @@ export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
     )
     return required.length > validAddress.length
   }
+}
+
+type CustomerOptionalField = Extract<
+  AddressInputName,
+  | 'billing_address_line_2'
+  | 'billing_address_company'
+  | 'shipping_address_line_2'
+  | 'shipping_address_company'
+>
+
+type BusinessOptionalField = Extract<
+  AddressInputName,
+  | 'billing_address_first_name'
+  | 'billing_address_last_name'
+  | 'shipping_address_first_name'
+  | 'shipping_address_last_name'
+>
+
+const businessOptionalFields: BusinessOptionalField[] = [
+  'billing_address_first_name',
+  'billing_address_last_name',
+  'shipping_address_first_name',
+  'shipping_address_last_name',
+]
+
+const customerOptionalFields: CustomerOptionalField[] = [
+  'billing_address_company',
+  'shipping_address_company',
+  'billing_address_line_2',
+  'shipping_address_line_2',
+]
+
+export function businessMandatoryField(
+  fieldName: AddressInputName,
+  isBusiness?: boolean
+) {
+  if (
+    isBusiness &&
+    businessOptionalFields.includes(fieldName as BusinessOptionalField)
+  ) {
+    return false
+  }
+  if (
+    !isBusiness &&
+    customerOptionalFields.includes(fieldName as CustomerOptionalField)
+  ) {
+    return false
+  }
+  return true
 }
 
 export default validateFormFields

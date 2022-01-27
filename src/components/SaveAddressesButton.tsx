@@ -53,8 +53,9 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     saveAddresses,
     billingAddressId,
     shippingAddressId,
-    customerAddress,
+    isBusiness,
   } = useContext(AddressContext)
+  console.log('isBusiness', isBusiness)
   const { order } = useContext(OrderContext)
   const { addresses, isGuest } = useContext(CustomerContext)
   const [forceDisable, setForceDisable] = useState(disabled)
@@ -84,6 +85,7 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     shipping_address,
     shippingAddressId,
   })
+  debugger
   const disable =
     disabled ||
     customerEmail ||
