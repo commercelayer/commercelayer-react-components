@@ -16,6 +16,7 @@ import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import { Address } from '@commercelayer/sdk'
 import { getSaveShippingAddressToAddressBook } from '#utils/localStorage'
+import { businessMandatoryField } from '#utils/validateFormFields'
 
 const propTypes = components.ShippingAddressForm.propTypes
 
@@ -84,6 +85,11 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
       setAddressErrors([], 'shipping_address')
       for (const name in values) {
         const field = values[name]
+        const mandatory = businessMandatoryField(
+          name as AddressInputName,
+          isBusiness
+        )
+        if (!mandatory) delete values[name]
         if (field?.value) {
           values[name.replace('shipping_address_', '')] = field.value
           delete values[name]
@@ -122,7 +128,15 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
         setAddress({ values: {} as Address, resource: 'shipping_address' })
       }
     }
-  }, [values, errors, shipToDifferentAddress, reset, include, includeLoaded])
+  }, [
+    values,
+    errors,
+    shipToDifferentAddress,
+    reset,
+    include,
+    includeLoaded,
+    isBusiness,
+  ])
   useEffect(() => {
     if (ref) {
       ref.current?.reset()

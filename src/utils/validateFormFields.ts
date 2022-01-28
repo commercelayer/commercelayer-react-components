@@ -95,7 +95,7 @@ export interface FieldsExist {
 }
 
 export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
-  console.log('address', address)
+  // console.log('address', address)
   if (!address['business']) {
     const required = without(schema, 'line_2', 'company')
     const validAddress = keys(address).filter((k) =>
@@ -111,34 +111,44 @@ export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
   }
 }
 
-type CustomerOptionalField = Extract<
-  AddressInputName,
-  | 'billing_address_line_2'
-  | 'billing_address_company'
-  | 'shipping_address_line_2'
-  | 'shipping_address_company'
->
+type CustomerOptionalField =
+  | Extract<
+      AddressInputName,
+      | 'billing_address_line_2'
+      | 'billing_address_company'
+      | 'shipping_address_line_2'
+      | 'shipping_address_company'
+    >
+  | 'company'
+  | 'line_2'
 
-type BusinessOptionalField = Extract<
-  AddressInputName,
-  | 'billing_address_first_name'
-  | 'billing_address_last_name'
-  | 'shipping_address_first_name'
-  | 'shipping_address_last_name'
->
+type BusinessOptionalField =
+  | Extract<
+      AddressInputName,
+      | 'billing_address_first_name'
+      | 'billing_address_last_name'
+      | 'shipping_address_first_name'
+      | 'shipping_address_last_name'
+    >
+  | 'first_name'
+  | 'last_name'
 
 const businessOptionalFields: BusinessOptionalField[] = [
   'billing_address_first_name',
   'billing_address_last_name',
   'shipping_address_first_name',
   'shipping_address_last_name',
+  'first_name',
+  'last_name',
 ]
 
 const customerOptionalFields: CustomerOptionalField[] = [
   'billing_address_company',
-  'shipping_address_company',
   'billing_address_line_2',
+  'shipping_address_company',
   'shipping_address_line_2',
+  'company',
+  'line_2',
 ]
 
 export function businessMandatoryField(

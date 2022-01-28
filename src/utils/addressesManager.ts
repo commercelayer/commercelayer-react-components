@@ -18,7 +18,6 @@ export const billingAddressController: BillingAddressController = ({
   requiresBillingInfo,
 }) => {
   let billingDisable = !isEmpty(errors) || isEmpty(billing_address)
-  debugger
   if (isEmpty(errors) && !isEmpty(billing_address)) {
     let billingInfo = [...addressFields]
     if (requiresBillingInfo) billingInfo = [...billingInfo, 'billing_info']
