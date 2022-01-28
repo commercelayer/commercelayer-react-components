@@ -18,11 +18,12 @@ export type AddressCardsTemplateChildren = FunctionChildren<ChildrenProps>
 
 export type AddressCardsType = ChildrenProps
 
-type HandleSelect = (
+export type HandleSelect = (
   k: number,
   addressId: string,
   customerAddressId: string,
-  disabled: boolean
+  disabled: boolean,
+  address: Address
 ) => void
 
 type Props = {
@@ -64,7 +65,7 @@ export default function AddressCardsTemplate({
       : addressSelectedClass
     const customerAddressId: string = address?.reference || ''
     const onClick = () =>
-      handleSelect(k, address.id, customerAddressId, disabled)
+      handleSelect(k, address.id, customerAddressId, disabled, address)
     return {
       ...attributes,
       className: finalClassName,
