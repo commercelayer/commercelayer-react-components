@@ -53,6 +53,7 @@ export interface BaseSelectComponentProps {
   className?: string
   required?: boolean
   name: string
+  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void
 }
 
 export const BaseInputComponentPropTypes = {
