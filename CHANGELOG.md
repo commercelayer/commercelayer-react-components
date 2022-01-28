@@ -1,3 +1,20 @@
+# [3.1.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.0.1...v3.1.0) (2022-01-28)
+
+
+### Bug Fixes
+
+* API request without any includes ([a3dfb19](https://github.com/commercelayer/commercelayer-react-components/commit/a3dfb19305d504c3c0bed7e5f2d21fca128d6670))
+* Console warning if children are null or boolean ([a13f5a4](https://github.com/commercelayer/commercelayer-react-components/commit/a13f5a42ec91ed92287a69c237cda0ea9730e389))
+* Filter addresses by shipping_country_lock if it has a value ([2f835b6](https://github.com/commercelayer/commercelayer-react-components/commit/2f835b697874b67fdacbf6595e846640d9f02f3f))
+* Order does not include resources after updating/creating a coupon ([6ff1460](https://github.com/commercelayer/commercelayer-react-components/commit/6ff1460da10c3f33d8a2b079a23b9481f72ca0fc))
+* Reset form when isBusiness prop changes status ([2c7da18](https://github.com/commercelayer/commercelayer-react-components/commit/2c7da18b75e6ff13ae1fddd73c8716a9c3b5c55f))
+* Show label free if the price is equal to zero ([406d03d](https://github.com/commercelayer/commercelayer-react-components/commit/406d03ddc392b74f44da34ab4510322917924e5f))
+
+
+### Features
+
+* Add new prop isBusiness to BillingAddressForm ([f49c17b](https://github.com/commercelayer/commercelayer-react-components/commit/f49c17b656f155c3d46dc2428f65a0e73a27fcf6))
+
 ## [3.0.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.0.0...v3.0.1) (2022-01-26)
 
 
