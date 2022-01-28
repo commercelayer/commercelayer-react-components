@@ -24,7 +24,9 @@ export const defaultCustomerContext = {
   saveCustomerUser: async (): Promise<void> => {
     return
   },
-  getCustomerPaymentSources: async (): Promise<void> => {},
+  getCustomerPaymentSources: async (): Promise<void> => {
+    return
+  },
   setCustomerErrors,
   setCustomerEmail,
   deleteCustomerAddress,

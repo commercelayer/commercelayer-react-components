@@ -77,7 +77,7 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
       setHasError(false)
     }
   }, [value, billingAddress?.errors, shippingAddress?.errors])
-  let mandatoryField = billingAddress.isBusiness
+  const mandatoryField = billingAddress?.isBusiness
     ? businessMandatoryField(p.name, billingAddress.isBusiness)
     : businessMandatoryField(p.name, shippingAddress.isBusiness)
   const reqField = required !== undefined ? required : mandatoryField
