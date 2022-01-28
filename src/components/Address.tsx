@@ -18,6 +18,7 @@ import OrderContext from '#context/OrderContext'
 import AddressCardsTemplate, {
   AddressCardsTemplateChildren,
   CustomerAddress,
+  HandleSelect,
 } from './utils/AddressCardsTemplate'
 
 const propTypes = components.Address.propTypes
@@ -26,7 +27,7 @@ type Props = {
   children: ReactNode | AddressCardsTemplateChildren
   selectedClassName?: string
   disabledClassName?: string
-  onSelect?: () => void
+  onSelect?: (address: AddressType) => void
   addresses?: AddressType[]
   deselect?: boolean
 } & JSX.IntrinsicElements['div']
@@ -97,11 +98,12 @@ const Address: FunctionComponent<Props> = (props) => {
     addressesContext,
     shipToDifferentAddress,
   ])
-  const handleSelect = async (
-    k: number,
-    addressId: string,
-    customerAddressId: string,
-    disabled: boolean
+  const handleSelect: HandleSelect = async (
+    k,
+    addressId,
+    customerAddressId,
+    disabled,
+    address
   ) => {
     !disabled && setSelected(k)
     setBillingAddress &&
@@ -109,7 +111,7 @@ const Address: FunctionComponent<Props> = (props) => {
     !disabled &&
       setShippingAddress &&
       (await setShippingAddress(addressId, { customerAddressId }))
-    onSelect && onSelect()
+    onSelect && onSelect(address)
   }
   const countryLock = order?.shipping_country_code_lock
   const components =
@@ -147,7 +149,13 @@ const Address: FunctionComponent<Props> = (props) => {
                 <div
                   className={finalClassName}
                   onClick={() =>
-                    handleSelect(k, address.id, customerAddressId, disabled)
+                    handleSelect(
+                      k,
+                      address.id,
+                      customerAddressId,
+                      disabled,
+                      address
+                    )
                   }
                   data-disabled={disabled}
                   {...p}
