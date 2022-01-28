@@ -1,3 +1,16 @@
+# [3.2.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.1.0...v3.2.0) (2022-01-28)
+
+
+### Bug Fixes
+
+* Reset form properly when isBusiness changes ([1e2fbbd](https://github.com/commercelayer/commercelayer-react-components/commit/1e2fbbd793323b771eef8a64f2fd764d4176d3c8))
+
+
+### Features
+
+* Add onChange prop to BaseSelectComponentProps ([5a51b8e](https://github.com/commercelayer/commercelayer-react-components/commit/5a51b8ef4b170ad41f9b316dac22712e27d4b80d))
+* Expose address as param of onSelect function ([29ee53e](https://github.com/commercelayer/commercelayer-react-components/commit/29ee53e36b548c04ab07ad2b8928527472f8bde6))
+
 # [3.1.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.0.1...v3.1.0) (2022-01-28)
 
 
