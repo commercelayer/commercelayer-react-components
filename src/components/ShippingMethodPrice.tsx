@@ -52,7 +52,7 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
       })
       setPrice(p)
       const c = getAmount<number>({
-        base: 'freeOver',
+        base: 'free_over',
         type,
         format: 'cents',
         obj: shippingMethod,
