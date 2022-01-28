@@ -146,7 +146,7 @@ export default function Main() {
             <Errors
               data-cy="code-error"
               className={classError}
-              resource="order"
+              resource="orders"
               field="giftCardOrCouponCode"
             />
             <p>
