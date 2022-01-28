@@ -16,6 +16,7 @@ import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import { Address } from '@commercelayer/sdk'
 import { getSaveBillingAddressToAddressBook } from '#utils/localStorage'
+import { businessMandatoryField } from '#utils/validateFormFields'
 
 const propTypes = components.BillingAddressForm.propTypes
 
@@ -36,6 +37,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
     ...p
   } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
+  // const [formType, setFormType] = useState<'customer' | 'business'>('customer')
   const { setAddressErrors, setAddress, isBusiness } =
     useContext(AddressesContext)
   const {
@@ -85,6 +87,11 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
       setAddressErrors([], 'billing_address')
       for (const name in values) {
         const field = values[name]
+        const mandatory = businessMandatoryField(
+          name as AddressInputName,
+          isBusiness
+        )
+        if (!mandatory) delete values[name]
         if (field?.value) {
           values[name.replace('billing_address_', '')] = field.value
           delete values[name]
@@ -97,6 +104,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
           })
         }
       }
+      console.log('values', values)
       setAddress({
         values: {
           ...values,
@@ -123,15 +131,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
         setAddress({ values: {} as Address, resource: 'billing_address' })
       }
     }
-  }, [errors, values, reset, include, includeLoaded])
-  useEffect(() => {
-    if (ref) {
-      ref.current?.reset()
-      resetForm({ target: ref.current } as any)
-      setAddressErrors([], 'billing_address')
-      setAddress({ values: {} as Address, resource: 'billing_address' })
-    }
-  }, [isBusiness])
+  }, [errors, values, reset, include, includeLoaded, isBusiness])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any

@@ -158,7 +158,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
           handleSubmit(ref.current as any, adyenCheckout)
         setPaymentRef({ ref })
       }
-      let browserInfo = getBrowserInfo()
+      const browserInfo = getBrowserInfo()
       const attributes: any = {
         payment_request_data: {
           payment_method: state.data.paymentMethod,
