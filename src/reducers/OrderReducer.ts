@@ -468,6 +468,7 @@ export type SetGiftCardOrCouponCode = (args: {
   dispatch?: Dispatch<OrderActions>
   config?: CommerceLayerConfig
   order?: Order
+  include?: string[]
 }) => Promise<{ success: boolean }>
 
 export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
@@ -475,6 +476,7 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
   dispatch,
   config,
   order,
+  include,
 }) => {
   try {
     if (config && order && code && dispatch) {
@@ -483,7 +485,7 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
         id: order.id,
         gift_card_or_coupon_code: code,
       }
-      const orderUpdated = await sdk.orders.update(attributes)
+      const orderUpdated = await sdk.orders.update(attributes, { include })
       dispatch({
         type: 'setErrors',
         payload: {
@@ -509,6 +511,7 @@ export type RemoveGiftCardOrCouponCode = (args: {
   dispatch?: Dispatch<OrderActions>
   config?: CommerceLayerConfig
   order?: Order
+  include?: string[]
 }) => Promise<{ success: boolean }>
 
 export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
@@ -516,6 +519,7 @@ export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
   dispatch,
   config,
   order,
+  include,
 }) => {
   try {
     if (config && order && dispatch) {
@@ -524,7 +528,7 @@ export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
         id: order.id,
         [codeType]: '',
       }
-      const orderUpdated = await sdk.orders.update(attributes)
+      const orderUpdated = await sdk.orders.update(attributes, { include })
       dispatch({
         type: 'setErrors',
         payload: {
