@@ -105,7 +105,7 @@ import {
 
 You can style the selling price and the full price as you like by passing the `className` and `compareClassName` props to the `Price` component. You can choose not to show the full price by passing `showCompare={false}` (default is `true`).
 
-If you need to paginate the list of prices, pass the `perPage` prop to the `PricesContainer` component (default is `10`) — to learn how pagination works, check our [API reference](https://docs.commercelayer.io/api/pagination) or our [SDK documentation](https://github.com/commercelayer/commercelayer-js-sdk#how-to-paginate-a-collection-of-skus).
+If you need to paginate the list of prices, pass the `perPage` prop to the `PricesContainer` component (default is `10`) — to learn how pagination works, check our [API reference](https://docs.commercelayer.io/api/pagination) or our [SDK documentation](https://github.com/commercelayer/commercelayer-sdk#how-to-paginate-a-collection-of-skus).
 
 ## Add to cart
 
@@ -186,7 +186,7 @@ When you add a product to your shopping cart:
 
 > A common best practice — especially for multi-country ecommerce — is to use as `persistKey` a key containing the country code, so that you have a different shopping cart for each country.
 
-If you need to set some of the [order object](https://docs.commercelayer.io/api/resources/orders/create_order) attributes at the moment of the order creation, pass to the optional prop `attributes` to the `OrderContainer` component.
+If you need to set some of the [order object](https://docs.commercelayer.io/developers/v/api-reference/orders/object) attributes at the moment of the order creation, pass to the optional prop `attributes` to the `OrderContainer` component.
 
 ## Shopping cart
 
