@@ -17,12 +17,11 @@ type Defined<T> = T extends undefined ? never : T
  * So, instead we take the union type in cases when a property in defaultProps does not extend
  * the corresponding property in the Props declaration.
  */
-type WithDefaultProps<P, DP> = Omit<P, keyof DP> &
-  {
-    [K in Extract<keyof DP, keyof P>]: DP[K] extends Defined<P[K]>
-      ? Defined<P[K]>
-      : Defined<P[K]> | DP[K]
-  }
+type WithDefaultProps<P, DP> = Omit<P, keyof DP> & {
+  [K in Extract<keyof DP, keyof P>]: DP[K] extends Defined<P[K]>
+    ? Defined<P[K]>
+    : Defined<P[K]> | DP[K]
+}
 
 /**
  * Get the props type from propTypes and defaultProps.

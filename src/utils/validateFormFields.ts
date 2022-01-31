@@ -144,11 +144,8 @@ const businessOptionalFields: BusinessOptionalField[] = [
 
 const customerOptionalFields: CustomerOptionalField[] = [
   'billing_address_company',
-  'billing_address_line_2',
   'shipping_address_company',
-  'shipping_address_line_2',
   'company',
-  'line_2',
 ]
 
 export function businessMandatoryField(
