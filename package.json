@@ -44,7 +44,9 @@
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:playwright": "playwright test",
+    "test:e2e": "NODE_ENV=test playwright test",
+    "test:e2e:coverage": "nyc npm run test:e2e && npm run coverage:report",
+    "coverage:report": "nyc report --reporter=html",
     "lint": "eslint src",
     "build": "tsc -b tsconfig.prod.json --verbose",
     "postbuild": "tsc-alias -p tsconfig.prod.json &&  minimize-js lib -w -s",
@@ -133,6 +135,7 @@
     "jest": "^27.4.7",
     "minimize-js": "^1.2.0",
     "next": "^12.0.9",
+    "nyc": "^15.1.0",
     "playwright": "^1.18.1",
     "postcss": "^8.4.5",
     "postcss-loader": "^6.2.1",

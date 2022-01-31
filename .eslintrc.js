@@ -20,5 +20,6 @@ module.exports = {
   plugins: ['react', '@typescript-eslint'],
   rules: {
     '@typescript-eslint/ban-ts-comment': 0,
+    'no-console': 'warn',
   },
 }

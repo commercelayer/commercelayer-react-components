@@ -3,7 +3,7 @@ const endpoint = `checkout/customer/addresses-country-lock`
 import mock from '../../fixtures/checkout/customer/addresses-country-lock.json'
 import { getScreenshotPath } from '../../utils/response'
 
-test('Customer address country lock', async ({ page, browser, request }) => {
+test('Customer address country lock', async ({ page }) => {
   await page.route('**/oauth/token', (route) => {
     route.fulfill({
       status: 200,
@@ -45,6 +45,4 @@ test('Customer address country lock', async ({ page, browser, request }) => {
   await page.screenshot({
     path: getScreenshotPath('customer-addresses-country-lock.jpg'),
   })
-  await page.coverage.stopJSCoverage()
-  await browser.close()
 })
