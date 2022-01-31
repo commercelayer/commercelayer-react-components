@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.2.0...v3.2.1) (2022-01-31)
+
+
+### Bug Fixes
+
+* Save line_2 value properly ([4689e90](https://github.com/commercelayer/commercelayer-react-components/commit/4689e90a85d1f70e359a77a0ee477b03e96ce0a2))
+
 # [3.2.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.1.0...v3.2.0) (2022-01-28)
 
 
