@@ -104,7 +104,6 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
           })
         }
       }
-      console.log('values', values)
       setAddress({
         values: {
           ...values,
