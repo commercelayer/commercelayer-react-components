@@ -1,3 +1,10 @@
+## [3.2.3](https://github.com/commercelayer/commercelayer-react-components/compare/v3.2.2...v3.2.3) (2022-02-01)
+
+
+### Bug Fixes
+
+* Reset state selector value ([90fdb3f](https://github.com/commercelayer/commercelayer-react-components/commit/90fdb3f2eef95a2994b9a7ba87453a9e2d891c6e))
+
 ## [3.2.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.2.1...v3.2.2) (2022-02-01)
 
 
