@@ -1,3 +1,10 @@
+## [3.2.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.2.1...v3.2.2) (2022-02-01)
+
+
+### Bug Fixes
+
+* Remove reset shipping address by isBusiness prop ([a640f2f](https://github.com/commercelayer/commercelayer-react-components/commit/a640f2fb9add0ef1b40c4f20bd5b4188c5c07215))
+
 ## [3.2.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.2.0...v3.2.1) (2022-01-31)
 
 
