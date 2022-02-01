@@ -1,28 +1,19 @@
 import React, {
-  FunctionComponent,
-  SyntheticEvent,
+  // FunctionComponent,
+  // SyntheticEvent,
   useContext,
   useEffect,
   useRef,
   useState,
 } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import {
-  CardElement,
-  Elements,
-  useElements,
-  useStripe,
-} from '@stripe/react-stripe-js'
-import {
-  StripeCardElementOptions,
-  StripeElementLocale,
-} from '@stripe/stripe-js'
 import { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
 import { PaymentSourceProps } from './PaymentSource'
-import Parent from './utils/Parent'
+// import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
-import { setCustomerOrderParam } from '#utils/localStorage'
+// import { setCustomerOrderParam } from '#utils/localStorage'
 import useExternalScript from '#utils/hooks/useExternalScript'
+// import Klarna from '@adyen/adyen-web/dist/types/components/Klarna'
 
 export type KlarnaConfig = {
   // containerClassName?: string
@@ -32,151 +23,12 @@ export type KlarnaConfig = {
   [key: string]: any
 }
 
-// type KlarnaPaymentFormProps = {
-//   options?: StripeCardElementOptions
-//   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
-// }
-
-// const defaultOptions = {
-//   style: {
-//     base: {
-//       fontSize: '16px',
-//       color: '#424770',
-//       '::placeholder': {
-//         color: '#aab7c4',
-//       },
-//     },
-//     invalid: {
-//       color: '#9e2146',
-//     },
-//   },
-//   hidePostalCode: true,
-// }
-
-// const StripePaymentForm: FunctionComponent<KlarnaPaymentFormProps> = ({
-//   options = defaultOptions,
-//   templateCustomerSaveToWallet,
-// }) => {
-//   const ref = useRef<null | HTMLFormElement>(null)
-//   const {
-//     setPaymentSource,
-//     paymentSource,
-//     currentPaymentMethodType,
-//     setPaymentMethodErrors,
-//     setPaymentRef,
-//   } = useContext(PaymentMethodContext)
-//   const { order } = useContext(OrderContext)
-//   const stripe = useStripe()
-//   const elements = useElements()
-//   useEffect(() => {
-//     if (ref.current && stripe && elements) {
-//       ref.current.onsubmit = () =>
-//         onSubmit(ref.current as any, stripe, elements)
-//       setPaymentRef({ ref })
-//     }
-//     return () => {
-//       setPaymentRef({ ref: { current: null } })
-//     }
-//   }, [ref, stripe, elements])
-//   const onSubmit = async (
-//     event: SyntheticEvent<HTMLFormElement>,
-//     stripe: any,
-//     elements: any
-//   ): Promise<boolean> => {
-//     if (!stripe) return false
-
-//     const savePaymentSourceToCustomerWallet =
-//       // @ts-ignore
-//       event?.elements?.['save_payment_source_to_customer_wallet']?.checked
-//     if (savePaymentSourceToCustomerWallet)
-//       setCustomerOrderParam(
-//         '_save_payment_source_to_customer_wallet',
-//         savePaymentSourceToCustomerWallet
-//       )
-
-//     const cardElement = elements && elements.getElement(CardElement)
-//     if (cardElement) {
-//       const billingInfo = order?.billing_address
-//       const email = order?.customer_email
-//       const billing_details = {
-//         name: billingInfo?.full_name,
-//         email,
-//         phone: billingInfo?.phone,
-//         address: {
-//           city: billingInfo?.city,
-//           country: billingInfo?.country_code,
-//           line1: billingInfo?.line_1,
-//           postal_code: billingInfo?.zip_code,
-//           state: billingInfo?.state_code,
-//         },
-//       }
-//       const { paymentMethod } = await stripe.createPaymentMethod({
-//         type: 'card',
-//         card: cardElement,
-//         billing_details,
-//       })
-//       // @ts-ignore
-//       if (paymentSource?.client_secret) {
-//         const { error, paymentIntent } = await stripe.confirmCardPayment(
-//           // @ts-ignore
-//           paymentSource.client_secret,
-//           {
-//             payment_method: {
-//               card: cardElement,
-//               billing_details,
-//             },
-//           }
-//         )
-//         if (error) {
-//           console.error(error)
-//           setPaymentMethodErrors([
-//             {
-//               code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-//               resource: 'payment_methods',
-//               field: currentPaymentMethodType,
-//               message: error.message as string,
-//             },
-//           ])
-//         } else {
-//           if (
-//             paymentIntent &&
-//             paymentMethod &&
-//             paymentSource &&
-//             currentPaymentMethodType
-//           ) {
-//             try {
-//               await setPaymentSource({
-//                 paymentSourceId: paymentSource.id,
-//                 paymentResource: currentPaymentMethodType,
-//                 attributes: {
-//                   options: {
-//                     ...(paymentMethod as Record<string, any>),
-//                     setup_future_usage: 'off_session',
-//                   },
-//                 },
-//               })
-//               return true
-//             } catch (e) {
-//               return false
-//             }
-//           }
-//         }
-//       }
-//     }
-//     return false
-//   }
-
-//   return (
-//     <form ref={ref} onSubmit={(e) => onSubmit(e, stripe, elements)}>
-//       <CardElement options={{ ...defaultOptions, ...options }} />
-//       {templateCustomerSaveToWallet && (
-//         <Parent {...{ name: 'save_payment_source_to_customer_wallet' }}>
-//           {templateCustomerSaveToWallet}
-//         </Parent>
-//       )}
-//     </form>
-//   )
-// }
+type KlarnaResponse = {
+  show_form: boolean
+  approved: boolean
+  authorization_token?: string
+  Error?: { invalid_fields: string[] }
+}
 
 type KlarnaPaymentProps = PaymentMethodConfig['klarnaPayment'] &
   JSX.IntrinsicElements['div'] &
@@ -190,10 +42,13 @@ export default function KlarnaPayment({
   clientToken,
   show,
   options,
-  locale = 'auto',
+  locale = 'EN',
   ...p
 }: KlarnaPaymentProps) {
-  const { paymentSource } = useContext(PaymentMethodContext)
+  const ref = useRef<null | HTMLFormElement>(null)
+  const { paymentSource, currentPaymentMethodType, setPaymentRef } =
+    useContext(PaymentMethodContext)
+  const { order } = useContext(OrderContext)
   const loaded = useExternalScript('https://x.klarnacdn.net/kp/lib/v1/api.js')
   const [klarna, setKlarna] = useState<any>()
   const {
@@ -207,18 +62,154 @@ export default function KlarnaPayment({
       setKlarna(window.Klarna)
     }
   }, [loaded, window.Klarna])
+  useEffect(() => {
+    if (
+      ref.current &&
+      paymentSource &&
+      currentPaymentMethodType &&
+      loaded &&
+      klarna
+    ) {
+      ref.current.onsubmit = () => handleClick(klarna)
+      setPaymentRef({ ref })
+    }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
+  }, [ref, paymentSource, currentPaymentMethodType, loaded, klarna])
+  const handleClick = (kl: any) => {
+    console.log('klarna', kl, order, paymentSource)
+    // @ts-ignore
+    const [first] = paymentSource?.payment_methods || undefined
+    const payment_method_category = first?.identifier
+    const billing_address = {
+      given_name: order?.billing_address?.first_name,
+      family_name: order?.billing_address?.last_name,
+      email: order?.customer_email,
+      street_address: order?.billing_address?.line_1,
+      street_address2: order?.billing_address?.line_2,
+      postal_code: order?.billing_address?.zip_code,
+      city: order?.billing_address?.city,
+      region: order?.billing_address?.state_code,
+      // phone: order?.billing_address?.phone,
+      country: order?.billing_address?.country_code,
+    }
+    const shipping_address = {
+      given_name: order?.shipping_address?.first_name,
+      family_name: order?.shipping_address?.last_name,
+      street_address: order?.shipping_address?.line_1,
+      street_address2: order?.shipping_address?.line_2,
+      postal_code: order?.shipping_address?.zip_code,
+      city: order?.shipping_address?.city,
+      region: order?.shipping_address?.state_code,
+      // phone: order?.shipping_address?.phone,
+      country: order?.shipping_address?.country_code,
+    }
+    // const order_lines = order?.line_items?.map((item) => {
+    //   return {
+    //     name: item.name,
+    //     reference: item.reference,
+    //     type: item.type,
+    //     quantity: item.quantity,
+    //     unit_price: item.unit_amount_cents,
+    //     tax_rate: item.tax_rate,
+    //     total_amount: item.total_amount_cents,
+    //     total_discount_amount: item.discount_cents,
+    //     total_tax_amount: item.tax_amount_cents,
+    //     image_url: item.image_url,
+    //   }
+    // })
+    // console.log('order_lines', order_lines)
+    console.log('order', order)
+    kl.Payments.load(
+      {
+        container: '#klarna-payments-container',
+        payment_method_category,
+      },
+      {
+        billing_address,
+        shipping_address,
+      },
+      function ({ show_form }: Pick<KlarnaResponse, 'show_form' | 'Error'>) {
+        if (show_form) {
+          try {
+            kl.Payments.authorize(
+              {
+                payment_method_category,
+              },
+              {},
+              // {
+              //   purchase_country: 'ES',
+              //   purchase_currency: 'EUR',
+              //   locale,
+              //   shipping_address,
+              //   order_amount: order?.total_amount_cents,
+              //   order_tax_amount: order?.total_amount_with_taxes_cents,
+              //   order_lines: [
+              //     {
+              //       type: 'physical',
+              //       reference: '19-402',
+              //       name: 'Battery Power Pack',
+              //       quantity: 1,
+              //       unit_price: 29.95,
+              //       tax_rate: 0,
+              //       total_amount: 29.95,
+              //       total_discount_amount: 0,
+              //       total_tax_amount: 0,
+              //       product_url: 'https://www.estore.com/products/f2a8d7e34',
+              //       image_url: 'https://www.exampleobjects.com/logo.png',
+              //     },
+              //   ],
+              // },
+              function (res: KlarnaResponse) {
+                console.log('res', res)
+                debugger
+              }
+            )
+          } catch (e) {
+            console.error('e', e)
+            debugger
+          }
+        }
+      }
+    )
+  }
   if (klarna && clientToken) {
     // @ts-ignore
-    const [first] = paymentSource?.payment_methods
+    const [first] = paymentSource?.payment_methods || undefined
     klarna.Payments.init({
       client_token: clientToken,
     })
     klarna.Payments.load(
       {
         container: '#klarna-payments-container',
-        payment_method_category: first?.indentifier,
+        payment_method_category: first?.identifier,
       },
-      {},
+      {
+        billing_address: {
+          given_name: order?.billing_address?.first_name,
+          family_name: order?.billing_address?.last_name,
+          email: order?.customer_email,
+          street_address: order?.billing_address?.line_1,
+          street_address2: order?.billing_address?.line_2,
+          postal_code: order?.billing_address?.zip_code,
+          city: order?.billing_address?.city,
+          region: order?.billing_address?.state_code,
+          phone: order?.billing_address?.phone,
+          country: order?.billing_address?.country_code,
+        },
+        shipping_address: {
+          given_name: order?.shipping_address?.first_name,
+          family_name: order?.shipping_address?.last_name,
+          street_address: order?.shipping_address?.line_1,
+          street_address2: order?.shipping_address?.line_2,
+          postal_code: order?.shipping_address?.zip_code,
+          city: order?.shipping_address?.city,
+          region: order?.shipping_address?.state_code,
+          phone: order?.shipping_address?.phone,
+          country: order?.shipping_address?.country_code,
+        },
+      },
       (res: any) => {
         console.log('res', res)
       }
@@ -228,8 +219,10 @@ export default function KlarnaPayment({
   // const [isLoaded, setIsLoaded] = useState(false)
   // const [stripe, setStripe] = useState(null)
   return (
-    <div className={containerClassName} {...divProps}>
-      <div id="klarna-payments-container"></div>
-    </div>
+    <form ref={ref}>
+      <div className={containerClassName} {...divProps}>
+        <div id="klarna-payments-container"></div>
+      </div>
+    </form>
   )
 }
