@@ -137,14 +137,6 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     includeLoaded,
     isBusiness,
   ])
-  useEffect(() => {
-    if (ref) {
-      ref.current?.reset()
-      resetForm({ target: ref.current } as any)
-      setAddressErrors([], 'shipping_address')
-      setAddress({ values: {} as Address, resource: 'shipping_address' })
-    }
-  }, [isBusiness])
   const setValue = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any
