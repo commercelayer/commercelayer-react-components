@@ -65,7 +65,7 @@ The code snippets below show how to put into action Commerce Layer React Compone
 - [Shopping cart](#shopping-cart)
 - [Cart summary](#cart-summary)
 
-Under the hood, our React components are built on top of [Commerce Layer JS SDK](https://github.com/commercelayer/commercelayer-js-sdk) — feel free to use it if you want to develop your custom ones.
+Under the hood, our React components are built on top of [Commerce Layer JS SDK](https://github.com/commercelayer/commercelayer-sdk) — feel free to use it if you want to develop your custom ones.
 
 ## Prices
 
@@ -105,7 +105,7 @@ import {
 
 You can style the selling price and the full price as you like by passing the `className` and `compareClassName` props to the `Price` component. You can choose not to show the full price by passing `showCompare={false}` (default is `true`).
 
-If you need to paginate the list of prices, pass the `perPage` prop to the `PricesContainer` component (default is `10`) — to learn how pagination works, check our [API reference](https://docs.commercelayer.io/api/pagination) or our [SDK documentation](https://github.com/commercelayer/commercelayer-sdk#how-to-paginate-a-collection-of-skus).
+If you need to paginate the list of prices, pass the `perPage` prop to the `PricesContainer` component (default is `10`) — to learn how pagination works, check our [documentation](https://docs.commercelayer.io/api/pagination).
 
 ## Add to cart
 
