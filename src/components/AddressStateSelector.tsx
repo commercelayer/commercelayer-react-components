@@ -70,7 +70,11 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
       billingCountryCode,
       countryCode !== billingCountryCode,
     ].every(Boolean)
-    if (changeBillingCountry && !isValidState(val, billingCountryCode)) {
+    if (
+      changeBillingCountry &&
+      !isValidState(val, billingCountryCode) &&
+      !isEmptyStates(billingCountryCode)
+    ) {
       billingAddress.resetField && billingAddress.resetField(name)
       setVal('')
     }
@@ -88,7 +92,11 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
       shippingCountryCode,
       countryCode !== shippingCountryCode,
     ].every(Boolean)
-    if (changeShippingCountry && !isValidState(val, shippingCountryCode)) {
+    if (
+      changeShippingCountry &&
+      !isValidState(val, shippingCountryCode) &&
+      !isEmptyStates(shippingCountryCode)
+    ) {
       shippingAddress.resetField && shippingAddress.resetField(name)
       setVal('')
     }
