@@ -58,6 +58,7 @@ const PaymentMethodsContainer: React.FunctionComponent<
           'available_payment_methods',
           'payment_source',
           'payment_method',
+          'line_items.line_item_options.sku_option',
         ],
       })
     } else if (!includeLoaded?.['available_payment_methods']) {
@@ -66,6 +67,7 @@ const PaymentMethodsContainer: React.FunctionComponent<
           available_payment_methods: true,
           payment_source: true,
           payment_method: true,
+          'line_items.line_item_options.sku_option': true,
         },
       })
     }
