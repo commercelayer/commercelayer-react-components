@@ -13,6 +13,7 @@ import { PaymentSourceProps } from './PaymentSource'
 import OrderContext from '#context/OrderContext'
 // import { setCustomerOrderParam } from '#utils/localStorage'
 import useExternalScript from '#utils/hooks/useExternalScript'
+import { LineItem } from '@commercelayer/sdk'
 // import Klarna from '@adyen/adyen-web/dist/types/components/Klarna'
 
 export type KlarnaConfig = {
@@ -37,6 +38,43 @@ type KlarnaPaymentProps = PaymentMethodConfig['klarnaPayment'] &
     clientToken: string
     locale?: string
   }
+
+function typeOfLine(lineItemType: string): OrderLine['type'] {
+  switch (lineItemType) {
+    case 'payment_methods':
+    default:
+      return null
+    case 'percentage_discount_promotions':
+      return 'discount'
+    case 'shipments':
+      return 'shipping_fee'
+    case 'skus':
+      return 'physical'
+  }
+}
+
+type OrderLine = Partial<{
+  name: string
+  quantity: number
+  total_amount: number
+  unit_price: number
+  type: 'discount' | 'physical' | 'shipping_fee' | null
+}>
+
+function klarnaOrderLines(lineItems?: LineItem[]): OrderLine[] {
+  return lineItems
+    ? lineItems.map((item) => {
+        const type = item.item_type ? typeOfLine(item.item_type) : null
+        return {
+          name: item.name,
+          quantity: item.quantity,
+          total_amount: item.total_amount_cents,
+          unit_price: item.unit_amount_cents,
+          type,
+        }
+      })
+    : []
+}
 
 export default function KlarnaPayment({
   clientToken,
@@ -105,22 +143,19 @@ export default function KlarnaPayment({
       // phone: order?.shipping_address?.phone,
       country: order?.shipping_address?.country_code,
     }
-    // const order_lines = order?.line_items?.map((item) => {
-    //   return {
-    //     name: item.name,
-    //     reference: item.reference,
-    //     type: item.type,
-    //     quantity: item.quantity,
-    //     unit_price: item.unit_amount_cents,
-    //     tax_rate: item.tax_rate,
-    //     total_amount: item.total_amount_cents,
-    //     total_discount_amount: item.discount_cents,
-    //     total_tax_amount: item.tax_amount_cents,
-    //     image_url: item.image_url,
-    //   }
-    // })
-    // console.log('order_lines', order_lines)
+    const klarnaData = {
+      merchant_data: order?.id,
+      purchase_country: order?.country_code,
+      purchase_currency: order?.currency_code,
+      locale,
+      shipping_address,
+      billing_address,
+      order_amount: order?.total_amount_cents,
+      order_tax_amount: order?.total_amount_with_taxes_cents,
+      order_lines: klarnaOrderLines(order?.line_items),
+    }
     console.log('order', order)
+    console.log('klarnaData', klarnaData)
     kl.Payments.load(
       {
         container: '#klarna-payments-container',
@@ -137,30 +172,7 @@ export default function KlarnaPayment({
               {
                 payment_method_category,
               },
-              {},
-              // {
-              //   purchase_country: 'ES',
-              //   purchase_currency: 'EUR',
-              //   locale,
-              //   shipping_address,
-              //   order_amount: order?.total_amount_cents,
-              //   order_tax_amount: order?.total_amount_with_taxes_cents,
-              //   order_lines: [
-              //     {
-              //       type: 'physical',
-              //       reference: '19-402',
-              //       name: 'Battery Power Pack',
-              //       quantity: 1,
-              //       unit_price: 29.95,
-              //       tax_rate: 0,
-              //       total_amount: 29.95,
-              //       total_discount_amount: 0,
-              //       total_tax_amount: 0,
-              //       product_url: 'https://www.estore.com/products/f2a8d7e34',
-              //       image_url: 'https://www.exampleobjects.com/logo.png',
-              //     },
-              //   ],
-              // },
+              klarnaData,
               function (res: KlarnaResponse) {
                 console.log('res', res)
                 debugger
