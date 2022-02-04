@@ -18,6 +18,7 @@ import BraintreeGateway from './gateways/BraintreeGateway'
 import PaypalGateway from './gateways/PaypalGateway'
 import WireTransferGateway from './gateways/WireTransferGateway'
 import CustomerContext from '#context/CustomerContext'
+import CheckoutComGateway from './gateways/CheckoutComGateway'
 
 export type GatewayBaseType = PaymentGatewayProps & {
   show: boolean
@@ -109,6 +110,10 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       )
     case 'paypal_payments':
       return <PaypalGateway {...gatewayConfig}>{children}</PaypalGateway>
+    case 'checkout_com_payments':
+      return (
+        <CheckoutComGateway {...gatewayConfig}>{children}</CheckoutComGateway>
+      )
     default:
       return null
   }

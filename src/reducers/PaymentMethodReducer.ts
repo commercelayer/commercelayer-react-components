@@ -24,6 +24,7 @@ import camelCase from 'lodash/camelCase'
 import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
 import { Dispatch, MutableRefObject } from 'react'
+import { CheckoutComConfig } from '../components/CheckoutComPayment'
 
 export type PaymentSourceType =
   | AdyenPayment
@@ -147,6 +148,7 @@ export type PaymentResource =
   | 'paypal_payments'
   | 'stripe_payments'
   | 'wire_transfers'
+  | 'checkout_com_payments'
 
 export type PaymentResourceKey =
   | 'braintreePayment'
@@ -154,6 +156,7 @@ export type PaymentResourceKey =
   | 'wireTransfer'
   | 'paypalPayment'
   | 'adyenPayment'
+  | 'checkoutComPayment'
 
 export type SDKPaymentResource =
   | 'AdyenPayment'
@@ -162,6 +165,7 @@ export type SDKPaymentResource =
   | 'PaypalPayment'
   | 'StripePayment'
   | 'WireTransfer'
+  | 'CheckoutComPayment'
 
 export type SetPaymentMethod = (args: {
   config?: CommerceLayerConfig
@@ -395,6 +399,7 @@ export type PaymentMethodConfig = {
   wireTransfer?: Partial<WireTransferConfig>
   paypalPayment?: PaypalConfig
   adyenPayment?: AdyenPaymentConfig
+  checkoutComPayment?: CheckoutComConfig
 }
 
 type SetPaymentMethodConfig = (
