@@ -243,11 +243,7 @@ export type SetPaymentSource = (
     config?: CommerceLayerConfig
     dispatch?: Dispatch<PaymentMethodAction>
     getOrder?: getOrderContext
-    attributes?: Record<
-      string,
-      | string
-      | Record<string, string | number | undefined | Record<string, string>>
-    >
+    attributes?: Record<string, unknown>
     order?: Order
     paymentResource: PaymentResource
     paymentSourceId?: string
