@@ -35,7 +35,7 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
   const { payments, isGuest } = useContext(CustomerContext)
   const { currentPaymentMethodId, config, paymentSource } =
     useContext(PaymentMethodContext)
-  const paymentResource: PaymentResource = 'stripe_payments'
+  const paymentResource: PaymentResource = 'checkout_com_payments'
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
@@ -43,12 +43,12 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
   // @ts-ignore
   const publicKey = paymentSource?.public_key
   const paymentConfig = config
-    ? getPaymentConfig<'stripePayment'>(paymentResource, config)
+    ? getPaymentConfig<'checkoutComPayment'>(paymentResource, config)
     : {}
   const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {
-          return customerPayment.payment_source?.type === 'stripe_payments'
+          return customerPayment.payment_source?.type === paymentResource
         })
       : []
 
