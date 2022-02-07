@@ -135,6 +135,7 @@ export default function KlarnaPayment({
     const shipping_address = {
       given_name: order?.shipping_address?.first_name,
       family_name: order?.shipping_address?.last_name,
+      email: order?.customer_email,
       street_address: order?.shipping_address?.line_1,
       street_address2: order?.shipping_address?.line_2,
       postal_code: order?.shipping_address?.zip_code,
@@ -151,7 +152,7 @@ export default function KlarnaPayment({
       shipping_address,
       billing_address,
       order_amount: order?.total_amount_cents,
-      order_tax_amount: order?.total_amount_with_taxes_cents,
+      // order_tax_amount: order?.total_tax_amount_cents,
       order_lines: klarnaOrderLines(order?.line_items),
     }
     console.log('order', order)
