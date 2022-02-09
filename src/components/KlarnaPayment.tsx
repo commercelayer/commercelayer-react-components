@@ -14,6 +14,7 @@ import OrderContext from '#context/OrderContext'
 // import { setCustomerOrderParam } from '#utils/localStorage'
 import useExternalScript from '#utils/hooks/useExternalScript'
 import { LineItem } from '@commercelayer/sdk'
+import PlaceOrderContext from '#context/PlaceOrderContext'
 // import Klarna from '@adyen/adyen-web/dist/types/components/Klarna'
 
 export type KlarnaConfig = {
@@ -84,9 +85,14 @@ export default function KlarnaPayment({
   ...p
 }: KlarnaPaymentProps) {
   const ref = useRef<null | HTMLFormElement>(null)
-  const { paymentSource, currentPaymentMethodType, setPaymentRef } =
-    useContext(PaymentMethodContext)
+  const {
+    paymentSource,
+    currentPaymentMethodType,
+    setPaymentRef,
+    setPaymentSource,
+  } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
+  const { setPlaceOrder } = useContext(PlaceOrderContext)
   const loaded = useExternalScript('https://x.klarnacdn.net/kp/lib/v1/api.js')
   const [klarna, setKlarna] = useState<any>()
   const {
@@ -115,8 +121,7 @@ export default function KlarnaPayment({
       setPaymentRef({ ref: { current: null } })
     }
   }, [ref, paymentSource, currentPaymentMethodType, loaded, klarna])
-  const handleClick = (kl: any) => {
-    console.log('klarna', kl, order, paymentSource)
+  const handleClick = async (kl: any) => {
     // @ts-ignore
     const [first] = paymentSource?.payment_methods || undefined
     const payment_method_category = first?.identifier
@@ -155,37 +160,61 @@ export default function KlarnaPayment({
       // order_tax_amount: order?.total_tax_amount_cents,
       order_lines: klarnaOrderLines(order?.line_items),
     }
-    console.log('order', order)
-    console.log('klarnaData', klarnaData)
-    kl.Payments.load(
-      {
-        container: '#klarna-payments-container',
-        payment_method_category,
-      },
-      {
-        billing_address,
-        shipping_address,
-      },
-      function ({ show_form }: Pick<KlarnaResponse, 'show_form' | 'Error'>) {
-        if (show_form) {
-          try {
-            kl.Payments.authorize(
-              {
-                payment_method_category,
-              },
-              klarnaData,
-              function (res: KlarnaResponse) {
-                console.log('res', res)
-                debugger
-              }
-            )
-          } catch (e) {
-            console.error('e', e)
-            debugger
+    try {
+      kl.Payments.load(
+        {
+          container: '#klarna-payments-container',
+          payment_method_category,
+        },
+        {
+          billing_address,
+          shipping_address,
+        },
+        async function ({
+          show_form,
+        }: Pick<KlarnaResponse, 'show_form' | 'Error'>) {
+          if (show_form) {
+            try {
+              await kl.Payments.authorize(
+                {
+                  payment_method_category,
+                },
+                klarnaData,
+                async function (res: KlarnaResponse) {
+                  if (
+                    res.approved &&
+                    paymentSource &&
+                    currentPaymentMethodType
+                  ) {
+                    const ps = await setPaymentSource({
+                      paymentSourceId: paymentSource.id,
+                      paymentResource: currentPaymentMethodType,
+                      attributes: {
+                        auth_token: res.authorization_token as string,
+                      },
+                    })
+                    const { placed } = (setPlaceOrder &&
+                      ps &&
+                      (await setPlaceOrder({
+                        paymentSource: ps,
+                      }))) || { placed: false }
+                    console.log('placed', placed)
+                    // placed && placeOrderCallback && placeOrderCallback({ placed })
+                  }
+                }
+              )
+            } catch (e) {
+              console.error('e', e)
+              debugger
+            }
           }
         }
-      }
-    )
+      )
+      // return true
+    } catch (e) {
+      console.error('e', e)
+      debugger
+    }
   }
   if (klarna && clientToken) {
     // @ts-ignore
