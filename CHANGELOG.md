@@ -1,3 +1,10 @@
+## [3.2.4](https://github.com/commercelayer/commercelayer-react-components/compare/v3.2.3...v3.2.4) (2022-02-09)
+
+
+### Bug Fixes
+
+* Allow uppercase letters in customer email input ([3d77828](https://github.com/commercelayer/commercelayer-react-components/commit/3d77828a85b97b8927decd49c346b0991e5b2e1d))
+
 ## [3.2.3](https://github.com/commercelayer/commercelayer-react-components/compare/v3.2.2...v3.2.3) (2022-02-01)
 
 
