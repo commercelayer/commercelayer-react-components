@@ -12,6 +12,7 @@ import PlaceOrderContext from '#context/PlaceOrderContext'
 import isFunction from 'lodash/isFunction'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import OrderContext from '#context/OrderContext'
+import getCardDetails from '#utils/getCardDetails'
 
 const propTypes = components.PlaceOrderButton.propTypes
 const defaultProps = components.PlaceOrderButton.defaultProps
@@ -43,16 +44,15 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
   useEffect(() => {
     if (loading) setNotPermitted(loading)
     else {
-      if (paymentType === currentPaymentMethodType) {
+      if (paymentType === currentPaymentMethodType && paymentType) {
+        const card = getCardDetails({
+          customerPayment: { payment_source: paymentSource },
+          paymentType,
+        })
         if (
           (order?.total_amount_with_taxes_cents === 0 ||
             currentPaymentMethodRef?.current?.onsubmit ||
-            // @ts-ignore
-            paymentSource?.metadata?.card?.id ||
-            // @ts-ignore
-            paymentSource?.options?.id ||
-            // @ts-ignore
-            paymentSource?.payment_response?.resultCode === 'Authorised') &&
+            card.brand) &&
           isPermitted
         ) {
           setNotPermitted(false)
@@ -94,23 +94,43 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       handleClick()
     }
   }, [options?.adyen])
+  useEffect(() => {
+    if (
+      paymentType === 'checkout_com_payments' &&
+      options?.checkoutCom?.session_id &&
+      order?.status &&
+      ['draft', 'pending'].includes(order?.status)
+    ) {
+      handleClick()
+    }
+  }, [options?.checkoutCom])
   const handleClick = async () => {
     let isValid = true
     setForceDisable(true)
+    const card =
+      paymentType &&
+      getCardDetails({
+        paymentType,
+        customerPayment: { payment_source: paymentSource },
+      })
     if (
       currentPaymentMethodRef?.current?.onsubmit &&
-      (!options?.paypalPayerId || !options?.adyen?.MD)
+      [
+        !options?.paypalPayerId,
+        !options?.adyen?.MD,
+        !options?.checkoutCom?.session_id,
+      ].every(Boolean)
     ) {
       // @ts-ignore
-      isValid = (await currentPaymentMethodRef.current?.onsubmit()) as any
-      // @ts-ignore
-    } else if (paymentSource?.options?.id) {
+      isValid = (await currentPaymentMethodRef.current?.onsubmit()) as boolean
+    } else if (card?.brand) {
       isValid = true
     }
     const placed =
       isValid &&
       setPlaceOrder &&
-      (await setPlaceOrder({ paymentSource: paymentSource as any }))
+      paymentSource &&
+      (await setPlaceOrder({ paymentSource: paymentSource }))
     setForceDisable(false)
     onClick && placed && onClick(placed)
   }

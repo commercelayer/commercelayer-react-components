@@ -35,6 +35,7 @@ let orderId = 'PDerhJplRp'
 
 let paypalPayerId = ''
 let paypalReturnUrl = ''
+let checkoutComSession = ''
 
 const TemplateCustomerCards = ({
   customerPayments,
@@ -99,6 +100,9 @@ export default function Main() {
   if (typeof window !== 'undefined') {
     paypalReturnUrl = window.location.href
   }
+  if (query['cko-session-id']) {
+    checkoutComSession = query['cko-session-id'] as string
+  }
   // const [shippingMethodId, setShippingMethodId] = useState<string>('')
   const getOrder = async () => {
     const config = { accessToken: token, endpoint }
@@ -160,7 +164,12 @@ export default function Main() {
                   },
                 }}
               >
-                <PlaceOrderContainer options={{ paypalPayerId }}>
+                <PlaceOrderContainer
+                  options={{
+                    paypalPayerId,
+                    checkoutCom: { session_id: checkoutComSession },
+                  }}
+                >
                   <div className="flex flex-col">
                     <PaymentMethod
                       className="p-2 my-1 flex flex-wrap w-1/2 items-center justify-items-center bg-gray-300"
