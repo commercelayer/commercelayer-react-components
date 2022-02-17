@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 
-export type iconBrand =
+export type IconBrand =
   | 'visa'
   | 'credit-card'
   | 'amex'
@@ -12,9 +12,9 @@ export type iconBrand =
   | 'paypal'
 
 type DefaultContext = {
-  brand?: iconBrand
-  exp_month?: number
-  exp_year?: number
+  brand?: IconBrand | string
+  exp_month?: number | string
+  exp_year?: number | string
   last4?: string
   showCard?: boolean
   readonly?: boolean

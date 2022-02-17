@@ -35,6 +35,43 @@ export type PaymentSourceType =
   | StripePayment
   | WireTransfer
 
+type Card = {
+  brand: string
+  last4: string
+  exp_year: number
+  exp_month: number
+}
+
+export type PaymentSourceObject = {
+  adyen_payments: AdyenPayment & {
+    paymentRequestData?: {
+      paymentMethod?: Card
+    }
+  }
+  braintree_payments: BraintreePayment & {
+    options?: {
+      card: Card
+    }
+  }
+  external_payments: ExternalPayment
+  paypal_payments: PaypalPayment
+  stripe_payments: StripePayment & {
+    options?: {
+      card: Card
+    }
+  }
+  wire_transfers: WireTransfer
+  checkout_com_payments: CheckoutComPayment & {
+    payment_response: {
+      source?: Pick<Card, 'last4'> & {
+        scheme: string
+        expiry_year: number
+        expiry_month: number
+      }
+    }
+  }
+}
+
 export type PaymentMethodActionType =
   | 'setErrors'
   | 'setPaymentMethods'
@@ -141,14 +178,7 @@ export const getPaymentMethods: GetPaymentMethods = async ({
   })
 }
 
-export type PaymentResource =
-  | 'adyen_payments'
-  | 'braintree_payments'
-  | 'external_payments'
-  | 'paypal_payments'
-  | 'stripe_payments'
-  | 'wire_transfers'
-  | 'checkout_com_payments'
+export type PaymentResource = keyof PaymentSourceObject
 
 export type PaymentResourceKey =
   | 'braintreePayment'

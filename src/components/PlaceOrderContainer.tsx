@@ -15,6 +15,7 @@ import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
 import { setPlaceOrder } from '../reducers/PlaceOrderReducer'
+import { PaymentSourceType } from '#reducers/PaymentMethodReducer'
 
 const propTypes = components.PlaceOrderContainer.propTypes
 const displayName = components.PlaceOrderContainer.displayName
@@ -93,11 +94,7 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
   }, [order, include, includeLoaded])
   const contextValue = {
     ...state,
-    setPlaceOrder: ({
-      paymentSource,
-    }: {
-      paymentSource: Record<string, string>
-    }) =>
+    setPlaceOrder: ({ paymentSource }: { paymentSource: PaymentSourceType }) =>
       setPlaceOrder({ config, order, state, setOrderErrors, paymentSource }),
     placeOrderPermitted: () =>
       placeOrderPermitted({
