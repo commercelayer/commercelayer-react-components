@@ -7,6 +7,7 @@ import {
 } from '#reducers/PaymentMethodReducer'
 import PaymentSourceContext, { iconBrand } from '#context/PaymentSourceContext'
 import { FunctionChildren } from '#typings'
+import getCardDetails from '#utils/getCardDetails'
 
 type ChildrenProps = Pick<Props, 'customerPayments'> & {
   PaymentSourceProvider: typeof PaymentSourceContext.Provider
@@ -38,18 +39,10 @@ export default function PaymentCardsTemplate({
   const { setPaymentSource } = useContext(PaymentMethodContext)
   const payments = customerPayments.map((customerPayment) => {
     const attributes = customerPayment
-    const card =
-      // @ts-ignore
-      (customerPayment?.payment_source.options?.card as Record<string, any>) ||
-      // @ts-ignore
-      customerPayment?.payment_source?.payment_request_data?.paymentMethod ||
-      // @ts-ignore
-      (customerPayment?.payment_source?.payment_method?.card as Record<
-        string,
-        any
-      >) ||
-      // @ts-ignore
-      (customerPayment?.payment_source?.metadata?.card as Record<string, any>)
+    const card = getCardDetails({
+      customerPayment,
+      paymentType: paymentResource,
+    })
     const handleClick = async (e: MouseEvent) => {
       e.stopPropagation()
       await setPaymentSource({

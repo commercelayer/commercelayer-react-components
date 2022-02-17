@@ -23,6 +23,9 @@ export type PlaceOrderOptions = {
     MD: string
     PaRes: string
   }
+  checkoutCom?: {
+    session_id: string
+  }
 }
 
 export interface PlaceOrderActionPayload {
@@ -114,8 +117,8 @@ export type SetPlaceOrder = (args: {
   config?: CommerceLayerConfig
   order?: Order
   state?: PlaceOrderState
-  setOrderErrors?: (collection: any) => void
-  paymentSource?: Record<string, string>
+  setOrderErrors?: (collection: unknown) => void
+  paymentSource?: PaymentSourceType & { approval_url?: string }
 }) => Promise<{
   placed: boolean
 }>
@@ -139,9 +142,20 @@ export const setPlaceOrder: SetPlaceOrder = async ({
           window.location.href = paymentSource?.approval_url as string
           return response
         }
-        await sdk.paypal_payments.update({
+        await sdk[paymentType].update({
           id: paymentSource.id,
           paypal_payer_id: options?.paypalPayerId,
+        })
+      }
+      if (
+        paymentType === 'checkout_com_payments' &&
+        paymentSource &&
+        options?.checkoutCom?.session_id
+      ) {
+        await sdk[paymentType].update({
+          id: paymentSource.id,
+          _details: true,
+          session_id: options?.checkoutCom?.session_id,
         })
       }
       const updateAttributes: OrderUpdate = {

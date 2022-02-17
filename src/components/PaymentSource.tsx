@@ -8,12 +8,12 @@ import React, {
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import components from '#config/components'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import isEmpty from 'lodash/isEmpty'
 import CustomerContext from '#context/CustomerContext'
 import PaymentGateway from './PaymentGateway'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { LoaderType } from '#typings/index'
 import { CustomerCardsTemplateChildren } from './utils/PaymentCardsTemplate'
+import getCardDetails from '../utils/getCardDetails'
 
 const propTypes = components.PaymentSource.propTypes
 const displayName = components.PaymentSource.displayName
@@ -50,23 +50,11 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
       setShowCard(true)
     } else if (payment?.id === currentPaymentMethodId) {
       setShow(true)
-      // NOTE: Remove metadata in the future
-      const card =
-        // @ts-ignorePayment
-        paymentSource?.options?.card ||
-        // @ts-ignorePayment
-        paymentSource?.payment_method?.card ||
-        // @ts-ignore
-        paymentSource?.metadata?.card ||
-        // NOTE: Adyen payment
-        // @ts-ignore
-        (paymentSource?.paymentRequestData?.paymentMethod?.brand &&
-          // @ts-ignore
-          paymentSource?.paymentResponse?.resultCode === 'Authorised' && {
-            // @ts-ignore
-            brand: paymentSource?.paymentRequestData?.paymentMethod?.brand,
-          })
-      if (!isEmpty(card)) setShowCard(true)
+      const card = getCardDetails({
+        paymentType: payment?.payment_source_type as PaymentResource,
+        customerPayment: { payment_source: paymentSource },
+      })
+      if (card.brand) setShowCard(true)
     } else setShow(false)
     return () => {
       setShow(false)

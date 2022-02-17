@@ -13,6 +13,7 @@ import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React, { Fragment, useContext } from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
+import getCardDetails from '../../utils/getCardDetails'
 
 type CheckoutComGateway = GatewayBaseType
 
@@ -25,7 +26,6 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
     templateCustomerCards,
     show,
     loading,
-    // onClickCustomerCards,
     loaderComponent,
     templateCustomerSaveToWallet,
     ...p
@@ -51,19 +51,20 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
           return customerPayment.payment_source?.type === paymentResource
         })
       : []
-
   if (readonly || showCard) {
-    // @ts-ignore
-    const card = paymentSource?.options?.card as Record<string, any>
+    const card = getCardDetails({
+      customerPayment: { payment_source: paymentSource },
+      paymentType: paymentResource,
+    })
     const value = { ...card, showCard, handleEditClick, readonly }
-    return isEmpty(card) ? null : (
+    return !card.brand ? null : (
       <PaymentSourceContext.Provider value={value}>
         {children}
       </PaymentSourceContext.Provider>
     )
   }
   if (!isGuest && templateCustomerCards) {
-    return (
+    return publicKey && !loading ? (
       <Fragment>
         {isEmpty(customerPayments) ? null : (
           <div className={p.className}>
@@ -80,6 +81,8 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
           {...paymentConfig}
         />
       </Fragment>
+    ) : (
+      loaderComponent
     )
   }
 

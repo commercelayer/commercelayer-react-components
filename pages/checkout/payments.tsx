@@ -31,6 +31,7 @@ const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 let orderId = 'PDerhJplRp'
 let paypalPayerId = ''
 let paypalReturnUrl = ''
+let checkoutComSession = ''
 
 const messages: any = [
   {
@@ -68,6 +69,9 @@ export default function Main() {
   }
   if (query.PayerID) {
     paypalPayerId = query.PayerID as string
+  }
+  if (query['cko-session-id']) {
+    checkoutComSession = query['cko-session-id'] as string
   }
   if (typeof window !== 'undefined') {
     paypalReturnUrl = window.location.href
@@ -147,7 +151,12 @@ export default function Main() {
                   },
                 }}
               >
-                <PlaceOrderContainer options={{ paypalPayerId }}>
+                <PlaceOrderContainer
+                  options={{
+                    paypalPayerId,
+                    checkoutCom: { session_id: checkoutComSession },
+                  }}
+                >
                   <PaymentMethod
                     className="p-2 my-1 flex items-center justify-items-center bg-gray-300 cursor-pointer"
                     activeClass="bg-opacity-25"
