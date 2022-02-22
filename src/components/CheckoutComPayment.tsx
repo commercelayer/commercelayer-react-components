@@ -129,6 +129,8 @@ const CheckoutComPayment: FunctionComponent<CheckoutComPaymentProps> = ({
             attributes: {
               token: data.token,
               payment_type: 'token',
+              success_url: window.location.href,
+              failure_url: window.location.href,
               _authorize: true,
             },
           })) as PaymentSourceObject['checkout_com_payments']
