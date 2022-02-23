@@ -7,7 +7,6 @@ import {
   SetGiftCardOrCouponCode,
   RemoveGiftCardOrCouponCode,
   SaveAddressToCustomerAddressBook,
-  setOrderErrors,
   createOrder,
   setGiftCardOrCouponCode,
   removeGiftCardOrCouponCode,
