@@ -1,3 +1,18 @@
+# [3.3.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.2.4...v3.3.0) (2022-02-23)
+
+
+### Bug Fixes
+
+* Types issues ([df0da67](https://github.com/commercelayer/commercelayer-react-components/commit/df0da67b8d8e06a342b3c09dc7b353272f0f27e2))
+
+
+### Features
+
+* Add customer payment ([38ccef2](https://github.com/commercelayer/commercelayer-react-components/commit/38ccef228932c500450e43e1f7a72a39b0f991a0))
+* Create checkout.com components ([dd54cf6](https://github.com/commercelayer/commercelayer-react-components/commit/dd54cf6ba571c33b3abd160d7ae0c0a51daecf71))
+* Set `success_url` and `failure_url` with `window.location.href` value ([8d2416f](https://github.com/commercelayer/commercelayer-react-components/commit/8d2416fd3714ce415e71cf492b583cf9cc52d8a0))
+* Update checkout_com_payments with card token ([e27ec3c](https://github.com/commercelayer/commercelayer-react-components/commit/e27ec3cb42c582237d6f8c93c45e0cf07216b7a7))
+
 ## [3.2.4](https://github.com/commercelayer/commercelayer-react-components/compare/v3.2.3...v3.2.4) (2022-02-09)
 
 
