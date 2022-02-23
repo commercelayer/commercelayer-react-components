@@ -3,6 +3,7 @@ import OrderContext from '#context/OrderContext'
 import components from '#config/components'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings/index'
+import CommerceLayerContext from '#context/CommerceLayerContext'
 
 const propTypes = components.CheckoutLink.propTypes
 const defaultProps = components.CheckoutLink.defaultProps
@@ -11,26 +12,35 @@ const displayName = components.CheckoutLink.displayName
 type CheckoutLinkChildrenProps = FunctionChildren<
   Omit<CheckoutLinkProps, 'children'> & {
     checkoutUrl: string
+    href: string
   }
 >
 
 type CheckoutLinkProps = {
   children?: CheckoutLinkChildrenProps
   label?: string
+  hostedCheckout?: boolean
 } & JSX.IntrinsicElements['a']
 
 const CheckoutLink: FunctionComponent<CheckoutLinkProps> = (props) => {
-  const { label, children, ...p } = props
+  const { label, hostedCheckout = true, children, ...p } = props
   const { order } = useContext(OrderContext)
+  const { accessToken, endpoint } = useContext(CommerceLayerContext)
+  const [slug] = endpoint.split('.commercelayer')
+  const href = hostedCheckout
+    ? `${slug}.checkout.commercelayer.app/${order?.id}?accessToken=${accessToken}`
+    : order?.checkout_url
   const parentProps = {
     checkoutUrl: order?.checkout_url,
+    hostedCheckout,
     label,
+    href,
     ...p,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a href={order?.checkout_url} {...p}>
+    <a href={href} {...p}>
       {label}
     </a>
   )
