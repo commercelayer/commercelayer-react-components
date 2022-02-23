@@ -19,7 +19,7 @@ type CustomerInputProps = {
   name?: 'customer_email' | string
   type?: 'email' | string
   saveOnBlur?: boolean
-  onBlur?: () => void
+  onBlur?: (email: string) => void
   errorClassName?: string
 } & Omit<BaseInputComponentProps, 'name' | 'type' | 'onBlur'> &
   JSX.IntrinsicElements['input'] &
@@ -45,7 +45,7 @@ const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
   const handleOnBlur = async () => {
     if (saveOnBlur && isEmpty(errors) && !isEmpty(values)) {
       await saveCustomerUser(values[name].value)
-      onBlur && onBlur()
+      onBlur && onBlur(values[name].value)
     }
   }
   useEffect(() => {
