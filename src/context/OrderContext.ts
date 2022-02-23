@@ -20,7 +20,7 @@ import {
 type DefaultContext = {
   createOrder: CreateOrder
   addToCart: AddToCart
-  setOrderErrors: typeof setOrderErrors
+  setOrderErrors: (errors: unknown) => void
   setGiftCardOrCouponCode: SetGiftCardOrCouponCode
   removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode
   saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook
@@ -32,12 +32,14 @@ type DefaultContext = {
 export const defaultOrderContext = {
   addToCart,
   createOrder,
-  setOrderErrors,
+  setOrderErrors: () => {
+    return
+  },
   setGiftCardOrCouponCode,
   removeGiftCardOrCouponCode,
   saveAddressToCustomerAddressBook,
   addResourceToInclude,
-  getOrder: async (_id: string) => {
+  getOrder: async () => {
     return
   },
   updateOrder,

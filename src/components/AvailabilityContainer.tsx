@@ -10,7 +10,6 @@ import availabilityReducer, {
   getAvailability,
 } from '#reducers/AvailabilityReducer'
 import AvailabilityContext from '#context/AvailabilityContext'
-import { isEmpty } from 'lodash'
 import ItemContext from '#context/ItemContext'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import components from '#config/components'
@@ -48,8 +47,8 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
           delivery_lead_times: [],
         },
       ]
-      if (!isEmpty(level) && level?.delivery_lead_times?.length > 0) {
-        const [delivery] = level?.delivery_lead_times
+      if (level !== undefined && level?.delivery_lead_times?.length > 0) {
+        const [delivery] = level.delivery_lead_times
         dispatch({
           type: 'setAvailability',
           payload: { ...delivery, quantity: level?.quantity },

@@ -1,4 +1,4 @@
-import PaymentSourceContext, { iconBrand } from '#context/PaymentSourceContext'
+import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
 import { capitalize } from 'lodash'
 import React, { FunctionComponent, useContext } from 'react'
 import Parent from './utils/Parent'
@@ -9,7 +9,7 @@ const propTypes = components.PaymentSourceBrandName.propTypes
 const displayName = components.PaymentSourceBrandName.displayName
 
 type CustomComponent = FunctionChildren<
-  Omit<Props & { brand: iconBrand }, 'children'>
+  Omit<Props & { brand: IconBrand }, 'children'>
 >
 
 type Props = {
