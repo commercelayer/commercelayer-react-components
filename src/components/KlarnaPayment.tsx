@@ -130,11 +130,12 @@ export default function KlarnaPayment({
       family_name: order?.billing_address?.last_name,
       email: order?.customer_email,
       street_address: order?.billing_address?.line_1,
-      street_address2: order?.billing_address?.line_2,
+      street_address2: null,
+      organization_name: null,
       postal_code: order?.billing_address?.zip_code,
       city: order?.billing_address?.city,
       region: order?.billing_address?.state_code,
-      // phone: order?.billing_address?.phone,
+      phone: order?.billing_address?.phone,
       country: order?.billing_address?.country_code,
     }
     const shipping_address = {
@@ -142,11 +143,12 @@ export default function KlarnaPayment({
       family_name: order?.shipping_address?.last_name,
       email: order?.customer_email,
       street_address: order?.shipping_address?.line_1,
-      street_address2: order?.shipping_address?.line_2,
+      street_address2: null,
       postal_code: order?.shipping_address?.zip_code,
+      organization_name: null,
       city: order?.shipping_address?.city,
       region: order?.shipping_address?.state_code,
-      // phone: order?.shipping_address?.phone,
+      phone: order?.shipping_address?.phone,
       country: order?.shipping_address?.country_code,
     }
     const klarnaData = {
