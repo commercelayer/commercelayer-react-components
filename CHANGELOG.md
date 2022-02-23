@@ -1,3 +1,15 @@
+# [3.4.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.3.0...v3.4.0) (2022-02-23)
+
+
+### Bug Fixes
+
+* Expose customer email through onBlur function ([e552ae1](https://github.com/commercelayer/commercelayer-react-components/commit/e552ae10a07c64cb9cfffe58e3ecff870908a0f8))
+
+
+### Features
+
+* CheckoutLink is linked to hosted checkout by default with a boolean prop `hostedCheckout` ([b19cf7f](https://github.com/commercelayer/commercelayer-react-components/commit/b19cf7fa41dd5a0103cf347b08ab327df8c3df39))
+
 # [3.3.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.2.4...v3.3.0) (2022-02-23)
 
 
