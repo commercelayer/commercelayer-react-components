@@ -1,4 +1,4 @@
-import PaymentSourceContext, { iconBrand } from '#context/PaymentSourceContext'
+import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
 import React, { FunctionComponent, useContext, useRef } from 'react'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings'
@@ -9,7 +9,7 @@ const displayName = components.PaymentSourceBrandIcon.displayName
 
 type CustomComponent = FunctionChildren<
   Omit<
-    Props & { brand: iconBrand; defaultSrc: string; url: string },
+    Props & { brand: IconBrand; defaultSrc: string; url: string },
     'children'
   >
 >
