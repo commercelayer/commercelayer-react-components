@@ -1,3 +1,11 @@
+## [3.4.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.4.0...v3.4.1) (2022-02-24)
+
+
+### Bug Fixes
+
+* Disable button when the order is equal to zero ([7d40ac4](https://github.com/commercelayer/commercelayer-react-components/commit/7d40ac4a05e2a745771727e118c583cb639bc664))
+* Select customer card with Adyen ([f2cc9c3](https://github.com/commercelayer/commercelayer-react-components/commit/f2cc9c334e02ac27cd5bb098d09968f954277c5a))
+
 # [3.4.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.3.0...v3.4.0) (2022-02-23)
 
 
