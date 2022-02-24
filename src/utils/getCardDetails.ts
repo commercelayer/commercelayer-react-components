@@ -51,7 +51,7 @@ export default function getCardDetails({
     case 'adyen_payments': {
       const ps =
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
-      const source = ps?.paymentRequestData?.paymentMethod
+      const source = ps?.payment_request_data?.payment_method
       if (source) {
         return {
           ...source,
