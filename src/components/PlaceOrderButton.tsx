@@ -57,6 +57,8 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
         ) {
           setNotPermitted(false)
         }
+      } else if (order?.total_amount_with_taxes_cents === 0) {
+        setNotPermitted(false)
       } else {
         setNotPermitted(true)
       }
