@@ -44,8 +44,8 @@ type Card = {
 
 export type PaymentSourceObject = {
   adyen_payments: AdyenPayment & {
-    paymentRequestData?: {
-      paymentMethod?: Card
+    payment_request_data?: {
+      payment_method?: Card
     }
   }
   braintree_payments: BraintreePayment & {
