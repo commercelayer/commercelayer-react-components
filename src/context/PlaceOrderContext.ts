@@ -12,7 +12,7 @@ type DefaultContext = {
   setPlaceOrder?: ({
     paymentSource,
   }: {
-    paymentSource: PaymentSourceType
+    paymentSource?: PaymentSourceType
     options?: PlaceOrderOptions
   }) => Promise<{ placed: boolean }>
   placeOrderPermitted?: () => void
