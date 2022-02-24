@@ -41,6 +41,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     currentPaymentMethodType,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
+  const isFree = order?.total_amount_with_taxes_cents === 0
   useEffect(() => {
     if (loading) setNotPermitted(loading)
     else {
@@ -50,14 +51,14 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
           paymentType,
         })
         if (
-          (order?.total_amount_with_taxes_cents === 0 ||
+          (isFree ||
             currentPaymentMethodRef?.current?.onsubmit ||
             card.brand) &&
           isPermitted
         ) {
           setNotPermitted(false)
         }
-      } else if (order?.total_amount_with_taxes_cents === 0) {
+      } else if (isFree) {
         setNotPermitted(false)
       } else {
         setNotPermitted(true)
@@ -131,7 +132,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     const placed =
       isValid &&
       setPlaceOrder &&
-      paymentSource &&
+      (paymentSource || isFree) &&
       (await setPlaceOrder({ paymentSource: paymentSource }))
     setForceDisable(false)
     onClick && placed && onClick(placed)
