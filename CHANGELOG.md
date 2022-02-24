@@ -1,3 +1,11 @@
+## [3.4.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.4.1...v3.4.2) (2022-02-24)
+
+
+### Bug Fixes
+
+* Place order without payment source when order total amount is equal to zero ([a9f13d3](https://github.com/commercelayer/commercelayer-react-components/commit/a9f13d3a032b122c7bdd46507cc7a60e6cde13eb))
+* Types ([677eac1](https://github.com/commercelayer/commercelayer-react-components/commit/677eac1bf51e299e16a945b2464deb043e9c02ea))
+
 ## [3.4.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.4.0...v3.4.1) (2022-02-24)
 
 
