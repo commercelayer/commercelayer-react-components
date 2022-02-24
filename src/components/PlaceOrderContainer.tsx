@@ -94,7 +94,7 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
   }, [order, include, includeLoaded])
   const contextValue = {
     ...state,
-    setPlaceOrder: ({ paymentSource }: { paymentSource: PaymentSourceType }) =>
+    setPlaceOrder: ({ paymentSource }: { paymentSource?: PaymentSourceType }) =>
       setPlaceOrder({ config, order, state, setOrderErrors, paymentSource }),
     placeOrderPermitted: () =>
       placeOrderPermitted({
