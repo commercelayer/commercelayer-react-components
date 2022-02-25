@@ -52,9 +52,11 @@ export default function getCardDetails({
       const ps =
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
       const source = ps?.payment_request_data?.payment_method
-      if (source) {
+      const authorized = ps?.payment_response?.resultCode === 'Authorised'
+      if (source && authorized) {
         return {
           ...source,
+          brand: source?.brand ? source.brand : 'credit-card',
         }
       }
       break

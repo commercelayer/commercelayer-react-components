@@ -47,6 +47,9 @@ export type PaymentSourceObject = {
     payment_request_data?: {
       payment_method?: Card
     }
+    payment_response?: {
+      resultCode?: 'Authorised'
+    }
   }
   braintree_payments: BraintreePayment & {
     options?: {
@@ -298,8 +301,6 @@ export const setPaymentSource: SetPaymentSource = async ({
     if (config && order) {
       let paymentSource: PaymentSourceType
       const sdk = getSdk(config)
-      // const resourceSdk = dynamicNaming(paymentResource)
-      // const o = Order.build({ id: order.id })
       if (!customerPaymentSourceId) {
         if (!paymentSourceId) {
           const attrs: any = {
