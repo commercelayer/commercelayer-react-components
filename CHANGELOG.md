@@ -1,3 +1,10 @@
+## [3.4.3](https://github.com/commercelayer/commercelayer-react-components/compare/v3.4.2...v3.4.3) (2022-02-25)
+
+
+### Bug Fixes
+
+* Select Adyen customer card ([90442ed](https://github.com/commercelayer/commercelayer-react-components/commit/90442eddc8968ef2a2cb66753963fc4e21d34116))
+
 ## [3.4.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.4.1...v3.4.2) (2022-02-24)
 
 
