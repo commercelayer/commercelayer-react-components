@@ -1,3 +1,10 @@
+# [3.5.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.4.4...v3.5.0) (2022-02-28)
+
+
+### Features
+
+* Add data testing attribute to `PaymentMethod` component ([7e08b86](https://github.com/commercelayer/commercelayer-react-components/commit/7e08b86f848d8500930620fef21dea599c42ae2e))
+
 ## [3.4.4](https://github.com/commercelayer/commercelayer-react-components/compare/v3.4.3...v3.4.4) (2022-02-28)
 
 
