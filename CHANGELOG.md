@@ -1,3 +1,10 @@
+## [3.4.4](https://github.com/commercelayer/commercelayer-react-components/compare/v3.4.3...v3.4.4) (2022-02-28)
+
+
+### Bug Fixes
+
+* Edit default success_url and failure_url by configuration object ([ddc61f3](https://github.com/commercelayer/commercelayer-react-components/commit/ddc61f328bdc2588e595aac7f936b60d13e4b0be))
+
 ## [3.4.3](https://github.com/commercelayer/commercelayer-react-components/compare/v3.4.2...v3.4.3) (2022-02-25)
 
 
