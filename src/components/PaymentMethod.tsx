@@ -68,14 +68,13 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
         paymentSelected,
         setPaymentSelected,
       }
+      const paymentResource = payment?.payment_source_type as PaymentResource
       const onClickable = !clickableContainer
         ? undefined
         : async (e: MouseEvent<HTMLDivElement>) => {
             e.stopPropagation()
             setLoadingPlaceOrder({ loading: true })
             setPaymentSelected(payment.id)
-            const paymentResource =
-              payment?.payment_source_type as PaymentResource
             const paymentMethodId = payment?.id as string
             await setPaymentMethod({ paymentResource, paymentMethodId })
             onClick && onClick(payment)
@@ -83,6 +82,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
           }
       return (
         <div
+          data-test-id={paymentResource}
           key={k}
           className={`${className} ${isActive ? activeClass : ''}`}
           onClick={onClickable}
