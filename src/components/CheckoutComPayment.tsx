@@ -23,6 +23,8 @@ export type CheckoutComConfig = {
   containerClassName?: string
   hintLabel?: string
   name?: string
+  success_url?: string
+  failure_url?: string
   options?: {
     style: FramesStyle
   }
@@ -95,7 +97,14 @@ const CheckoutComPayment: FunctionComponent<CheckoutComPaymentProps> = ({
     setPaymentMethodErrors,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
-  const { containerClassName, templateCustomerSaveToWallet, ...divProps } = p
+  const {
+    containerClassName,
+    templateCustomerSaveToWallet,
+    success_url = window.location.href,
+    failure_url = window.location.href,
+    show,
+    ...divProps
+  } = p
   const handleSubmit = async (): Promise<boolean> => {
     const savePaymentSourceToCustomerWallet =
       // @ts-ignore
@@ -129,8 +138,8 @@ const CheckoutComPayment: FunctionComponent<CheckoutComPaymentProps> = ({
             attributes: {
               token: data.token,
               payment_type: 'token',
-              success_url: window.location.href,
-              failure_url: window.location.href,
+              success_url,
+              failure_url,
               _authorize: true,
             },
           })) as PaymentSourceObject['checkout_com_payments']
@@ -155,7 +164,7 @@ const CheckoutComPayment: FunctionComponent<CheckoutComPaymentProps> = ({
   const lang =
     `${locale.toUpperCase()}-${locale.toUpperCase()}` as FramesLanguages
   const localization = systemLanguages.includes(lang) ? lang : 'EN-GB'
-  return loaded ? (
+  return loaded && show ? (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
         <Frames
