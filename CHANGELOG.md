@@ -1,3 +1,10 @@
+## [3.5.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.5.0...v3.5.1) (2022-03-02)
+
+
+### Bug Fixes
+
+* Automatic place order for Paypal and Checkout.com ([c3f73ee](https://github.com/commercelayer/commercelayer-react-components/commit/c3f73eecad6282eceb93f84d7e71cdc9e005ad0b))
+
 # [3.5.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.4.4...v3.5.0) (2022-02-28)
 
 
