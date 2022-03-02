@@ -85,7 +85,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     ) {
       handleClick()
     }
-  }, [options?.paypalPayerId])
+  }, [options?.paypalPayerId, paymentType])
   useEffect(() => {
     if (
       paymentType === 'adyen_payments' &&
@@ -96,7 +96,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     ) {
       handleClick()
     }
-  }, [options?.adyen])
+  }, [options?.adyen, paymentType])
   useEffect(() => {
     if (
       paymentType === 'checkout_com_payments' &&
@@ -106,7 +106,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     ) {
       handleClick()
     }
-  }, [options?.checkoutCom])
+  }, [options?.checkoutCom, paymentType])
   const handleClick = async () => {
     let isValid = true
     setForceDisable(true)
