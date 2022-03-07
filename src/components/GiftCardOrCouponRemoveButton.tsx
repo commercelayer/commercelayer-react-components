@@ -21,7 +21,7 @@ type GiftCardOrCouponRemoveButtonProps = {
   type?: CodeType
   children?: GiftCardOrCouponRemoveButtonChildrenProps
   label?: string | ReactNode
-  onClick?: () => void
+  onClick?: (response: { success: boolean }) => void
 } & Omit<JSX.IntrinsicElements['button'], 'type'>
 
 const GiftCardOrCouponRemoveButton: FunctionComponent<
@@ -40,9 +40,11 @@ const GiftCardOrCouponRemoveButton: FunctionComponent<
   else if (!type) codeType = 'gift_card_code'
   const code = order && codeType ? order[codeType] : ''
   const hide = order && code ? false : true
-  const handleClick = () => {
-    removeGiftCardOrCouponCode && removeGiftCardOrCouponCode({ codeType })
-    onClick && onClick()
+  const handleClick = async () => {
+    const response =
+      removeGiftCardOrCouponCode &&
+      (await removeGiftCardOrCouponCode({ codeType }))
+    onClick && onClick(response)
   }
   const parentProps = {
     ...p,
