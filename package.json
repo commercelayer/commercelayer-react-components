@@ -1,6 +1,6 @@
 {
   "name": "@commercelayer/react-components",
-  "version": "3.5.1",
+  "version": "3.5.2",
   "description": "The Official Commerce Layer React Components",
   "module": "lib/index.js",
   "types": "lib/index.d.ts",
