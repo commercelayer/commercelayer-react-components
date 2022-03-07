@@ -1,3 +1,10 @@
+## [3.5.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.5.1...v3.5.2) (2022-03-07)
+
+
+### Bug Fixes
+
+* Get remove coupon response by onClick ([0e7b8d7](https://github.com/commercelayer/commercelayer-react-components/commit/0e7b8d7aba5f0cdc7507b165902b6a88c2ccee78))
+
 ## [3.5.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.5.0...v3.5.1) (2022-03-02)
 
 
