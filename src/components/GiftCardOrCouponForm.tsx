@@ -20,14 +20,13 @@ const propTypes = components.GiftCardOrCouponForm.propTypes
 
 type GiftCardOrCouponFormProps = {
   children: ReactNode
-  reset?: boolean
   onSubmit?: (response: { success: boolean }) => void
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
   props
 ) => {
-  const { children, autoComplete = 'on', reset = false, onSubmit, ...p } = props
+  const { children, autoComplete = 'on', onSubmit, ...p } = props
   const { validation, values } = useRapidForm()
   const { setGiftCardOrCouponCode, order, errors, setOrderErrors } =
     useContext(OrderContext)
