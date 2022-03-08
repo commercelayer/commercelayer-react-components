@@ -113,6 +113,11 @@ export const getCustomerAddresses: GetCustomerAddresses = async ({
     customerAddresses.forEach((customerAddress) => {
       if (customerAddress.address) addresses.push(customerAddress.address)
     })
+    addresses.sort((a, b) => {
+      if (a.full_name && b.full_name)
+        return a.full_name.localeCompare(b.full_name)
+      return 0
+    })
     dispatch({
       type: 'setAddresses',
       payload: { addresses },
