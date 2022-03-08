@@ -1,3 +1,15 @@
+# [3.6.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.5.2...v3.6.0) (2022-03-08)
+
+
+### Features
+
+* Add sorti for customer addresses ([9916a77](https://github.com/commercelayer/commercelayer-react-components/commit/9916a776565a44cb7414a9349264ae942f87dda5))
+
+
+### Performance Improvements
+
+* Remove unused reset prop ([18c9a67](https://github.com/commercelayer/commercelayer-react-components/commit/18c9a67724c2f9007a627db38b4b02655b4f3a75))
+
 ## [3.5.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.5.1...v3.5.2) (2022-03-07)
 
 
