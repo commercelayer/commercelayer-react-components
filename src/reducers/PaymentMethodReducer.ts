@@ -56,7 +56,9 @@ export type PaymentSourceObject = {
       card: Card
     }
   }
-  external_payments: ExternalPayment
+  external_payments: ExternalPayment & {
+    payment_source_token?: string
+  }
   paypal_payments: PaypalPayment
   stripe_payments: StripePayment & {
     options?: {
@@ -226,6 +228,7 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       const attributes = {
         payment_method: sdk.payment_methods.relationship(paymentMethodId),
       }
+      updateOrder && (await updateOrder({ id: order.id, attributes }))
       dispatch({
         type: 'setPaymentMethods',
         payload: {
@@ -234,31 +237,11 @@ export const setPaymentMethod: SetPaymentMethod = async ({
           errors: [],
         },
       })
-      updateOrder && (await updateOrder({ id: order.id, attributes }))
-      // const attrs: any = {
-      //   order: sdk.orders.relationship(order.id),
-      // }
-      // const paymentSource = await sdk[paymentResource].create(attrs)
-      // dispatch({
-      //   type: 'setPaymentMethods',
-      //   payload: {
-      //     currentPaymentMethodId: paymentMethodId,
-      //     currentPaymentMethodType: paymentResource,
-      //     paymentSource,
-      //     errors: [],
-      //   },
-      // })
       setOrderErrors && setOrderErrors([])
     }
   } catch (error) {
     const errors = getErrors(error, 'orders')
     console.error('Set payment method', errors)
-    // if (dispatch)
-    // setErrors({
-    //   currentErrors: state?.errors,
-    //   newErrors: errors,
-    //   dispatch,
-    // })
   }
 }
 
@@ -309,18 +292,18 @@ export const setPaymentSource: SetPaymentSource = async ({
           }
           paymentSource = await sdk[paymentResource].create(attrs)
         } else {
-          const attrs: any = {
+          const attrs = {
             id: paymentSourceId,
             ...attributes,
           }
           paymentSource = await sdk[paymentResource].update(attrs)
         }
+        getOrder && (await getOrder(order.id))
         dispatch &&
           dispatch({
             type: 'setPaymentSource',
             payload: { paymentSource, errors: [] },
           })
-        getOrder && (await getOrder(order.id))
         return paymentSource
       } else {
         updateOrder &&
@@ -330,29 +313,7 @@ export const setPaymentSource: SetPaymentSource = async ({
               _customer_payment_source_id: customerPaymentSourceId,
             },
           }))
-        // paymentSource = (
-        //   await Order.includes('paymentSource')
-        //     .build({ id: order.id })
-        //     .withCredentials(config)
-        //     .update({
-        //       _customerPaymentSourceId: customerPaymentSourceId,
-        //     })
-        // ).paymentSource()
       }
-      // if (order?.billingAddress() === null)
-      //   await order.withCredentials(config).loadBillingAddress()
-      // if (order?.paymentSource() === null)
-      //   await order.withCredentials(config).loadPaymentSource()
-      // dispatch &&
-      //   dispatch({
-      //     type: 'setPaymentSource',
-      //     payload: { paymentSource, errors: [] },
-      //   })
-      // if (getOrder) order = (await getOrder(order?.id)) as Order
-      // return {
-      //   order,
-      //   paymentSource,
-      // }
     }
   } catch (error: any) {
     const errors = getErrors(error, 'payment_methods')
