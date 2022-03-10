@@ -1,4 +1,4 @@
-import React, { Fragment, FunctionComponent } from 'react'
+import React from 'react'
 import { PriceProps } from '#components/Price'
 import PropTypes from 'prop-types'
 
@@ -16,18 +16,17 @@ export type PTemplateProps = {
   formattedCompare?: string
 } & Omit<PriceProps, 'children'>
 
-const PriceTemplate: FunctionComponent<PTemplateProps> = (props) => {
+const PriceTemplate: React.FunctionComponent<PTemplateProps> = (props) => {
   const {
     showCompare,
     formattedCompare,
     compareClassName,
     className,
     formattedAmount,
-    skuCode,
     ...p
   } = props
   return (
-    <Fragment>
+    <>
       <span className={className} {...p}>
         {formattedAmount}
       </span>
@@ -36,7 +35,7 @@ const PriceTemplate: FunctionComponent<PTemplateProps> = (props) => {
           {formattedCompare}
         </span>
       )}
-    </Fragment>
+    </>
   )
 }
 

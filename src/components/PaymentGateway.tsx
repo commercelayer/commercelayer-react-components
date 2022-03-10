@@ -70,7 +70,10 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         config && paymentResource === 'paypal_payments'
           ? getPaypalConfig(paymentResource, config)
           : {}
-      if (!paymentSource || paymentSource.type !== paymentResource) {
+      if (
+        (!order?.payment_source || (!order?.payment_source && paymentSource)) &&
+        show
+      ) {
         setPaymentSource({
           paymentResource,
           order,
@@ -83,7 +86,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
     return () => {
       setLoading(true)
     }
-  }, [order?.payment_method?.payment_source_type, show, paymentSource])
+  }, [order?.payment_method, show, paymentSource])
   const gatewayConfig = {
     readonly,
     showCard,
