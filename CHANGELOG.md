@@ -1,3 +1,10 @@
+## [3.6.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.6.0...v3.6.1) (2022-03-10)
+
+
+### Performance Improvements
+
+* Add nullify payment source ([0a76d7a](https://github.com/commercelayer/commercelayer-react-components/commit/0a76d7a2ab98672cf1a21d19a439a0b059bb2902))
+
 # [3.6.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.5.2...v3.6.0) (2022-03-08)
 
 
