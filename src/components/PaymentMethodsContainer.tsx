@@ -66,17 +66,18 @@ const PaymentMethodsContainer: FunctionComponent<
         },
       })
     }
-
     if (config && isEmpty(state.config))
       setPaymentMethodConfig(config, dispatch)
-    if (credentials && order && !state.paymentMethods) {
-      getPaymentMethods({ order, dispatch })
-    }
-    if (credentials && order?.payment_source) {
-      dispatch({
-        type: 'setPaymentSource',
-        payload: { paymentSource: order?.payment_source },
-      })
+    if (credentials && order) {
+      if (!state.paymentMethods) {
+        getPaymentMethods({ order, dispatch })
+      }
+      if (order?.payment_source) {
+        dispatch({
+          type: 'setPaymentSource',
+          payload: { paymentSource: order?.payment_source },
+        })
+      }
     }
   }, [order, credentials, include, includeLoaded])
   const contextValue = useMemo(() => {
