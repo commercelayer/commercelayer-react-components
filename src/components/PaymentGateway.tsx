@@ -53,7 +53,6 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   const {
     currentPaymentMethodId,
     config,
-    paymentSource,
     currentPaymentMethodType,
     setPaymentSource,
   } = useContext(PaymentMethodContext)
@@ -70,23 +69,28 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         config && paymentResource === 'paypal_payments'
           ? getPaypalConfig(paymentResource, config)
           : {}
-      if (
-        (!order?.payment_source || (!order?.payment_source && paymentSource)) &&
-        show
-      ) {
-        setPaymentSource({
+      const setPaymentSources = async () => {
+        await setPaymentSource({
           paymentResource,
           order,
           attributes,
         })
-        getCustomerPaymentSources && getCustomerPaymentSources()
+        getCustomerPaymentSources && (await getCustomerPaymentSources())
       }
+      if (order?.payment_source === null && order?.payment_method.id && show) {
+        setPaymentSources()
+      }
+      // @ts-ignore
+      if (order?.payment_source?.mismatched_amounts && show) {
+        setPaymentSources()
+      }
+
       setLoading(false)
     }
     return () => {
       setLoading(true)
     }
-  }, [order?.payment_method, show, paymentSource])
+  }, [order?.payment_method?.id, show, order?.payment_source?.id])
   const gatewayConfig = {
     readonly,
     showCard,

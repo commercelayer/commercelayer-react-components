@@ -95,7 +95,7 @@ export const setShippingMethod: SetShippingMethod = async ({
         id: shipmentId,
         shipping_method: sdk.shipping_methods.relationship(shippingMethodId),
       })
-      if (getOrder && order) getOrder(order.id)
+      if (getOrder && order) await getOrder(order.id)
     }
   } catch (error) {
     console.error(error)

@@ -11,7 +11,7 @@ import {
 } from '#reducers/PaymentMethodReducer'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
-import React, { Fragment, useContext } from 'react'
+import React from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
 type StripeGateway = GatewayBaseType
@@ -25,16 +25,15 @@ export default function StripeGateway(props: StripeGateway) {
     templateCustomerCards,
     show,
     loading,
-    onClickCustomerCards,
     loaderComponent,
     templateCustomerSaveToWallet,
     ...p
   } = props
-  const { order } = useContext(OrderContext)
-  const { payment } = useContext(PaymentMethodChildrenContext)
-  const { payments, isGuest } = useContext(CustomerContext)
+  const { order } = React.useContext(OrderContext)
+  const { payment } = React.useContext(PaymentMethodChildrenContext)
+  const { payments, isGuest } = React.useContext(CustomerContext)
   const { currentPaymentMethodId, config, paymentSource } =
-    useContext(PaymentMethodContext)
+    React.useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = 'stripe_payments'
   const locale = order?.language_code as StripeElementLocale
 
@@ -64,7 +63,7 @@ export default function StripeGateway(props: StripeGateway) {
   }
   if (!isGuest && templateCustomerCards) {
     return (
-      <Fragment>
+      <>
         {isEmpty(customerPayments) ? null : (
           <div className={p.className}>
             <PaymentCardsTemplate {...{ paymentResource, customerPayments }}>
@@ -79,11 +78,11 @@ export default function StripeGateway(props: StripeGateway) {
           locale={locale}
           {...stripeConfig}
         />
-      </Fragment>
+      </>
     )
   }
 
-  return publishableKey && !loading ? (
+  return publishableKey && !loading && order?.payment_source?.id ? (
     <StripePayment
       show={show}
       publishableKey={publishableKey}

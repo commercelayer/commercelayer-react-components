@@ -2,7 +2,6 @@ import PaymentMethodContext, {
   defaultPaymentMethodContext,
 } from '#context/PaymentMethodContext'
 import React, {
-  FunctionComponent,
   ReactNode,
   useContext,
   useEffect,
@@ -30,7 +29,7 @@ type PaymentMethodsContainerProps = {
   children: ReactNode
   config?: PaymentMethodConfig
 }
-const PaymentMethodsContainer: FunctionComponent<
+const PaymentMethodsContainer: React.FunctionComponent<
   PaymentMethodsContainerProps
 > = (props) => {
   const { children, config } = props
@@ -48,6 +47,9 @@ const PaymentMethodsContainer: FunctionComponent<
     includeLoaded,
   } = useContext(OrderContext)
   const credentials = useContext(CommerceLayerContext)
+  async function getPayMethods() {
+    order && (await getPaymentMethods({ order, dispatch }))
+  }
   useEffect(() => {
     if (!include?.includes('available_payment_methods')) {
       addResourceToInclude({
@@ -70,13 +72,7 @@ const PaymentMethodsContainer: FunctionComponent<
       setPaymentMethodConfig(config, dispatch)
     if (credentials && order) {
       if (!state.paymentMethods) {
-        getPaymentMethods({ order, dispatch })
-      }
-      if (order?.payment_source) {
-        dispatch({
-          type: 'setPaymentSource',
-          payload: { paymentSource: order?.payment_source },
-        })
+        getPayMethods()
       }
     }
   }, [order, credentials, include, includeLoaded])
@@ -99,7 +95,7 @@ const PaymentMethodsContainer: FunctionComponent<
           setOrderErrors,
         }),
       setPaymentSource: async (args: any) =>
-        defaultPaymentMethodContext['setPaymentSource']({
+        await defaultPaymentMethodContext['setPaymentSource']({
           ...state,
           ...args,
           config: credentials,
@@ -109,13 +105,13 @@ const PaymentMethodsContainer: FunctionComponent<
           order,
         }),
       updatePaymentSource: async (args: any) =>
-        defaultPaymentMethodContext['updatePaymentSource']({
+        await defaultPaymentMethodContext['updatePaymentSource']({
           ...args,
           config: credentials,
           dispatch,
         }),
       destroyPaymentSource: async (args: any) =>
-        defaultPaymentMethodContext['destroyPaymentSource']({
+        await defaultPaymentMethodContext['destroyPaymentSource']({
           ...args,
           dispatch,
           config: credentials,

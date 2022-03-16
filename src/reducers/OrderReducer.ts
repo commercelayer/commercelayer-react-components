@@ -258,6 +258,7 @@ export type UpdateOrderArgs = {
   dispatch?: Dispatch<OrderActions>
   include?: string[]
   config?: CommerceLayerConfig
+  state?: OrderState
 }
 
 export async function updateOrder({
@@ -266,12 +267,16 @@ export async function updateOrder({
   dispatch,
   config,
   include,
+  state,
 }: UpdateOrderArgs) {
   const sdk = getSdk(config as CommerceLayerConfig)
   try {
     const resource = { ...attributes, id }
-    const order = await sdk.orders.update(resource, { include })
-    dispatch && dispatch({ type: 'setOrder', payload: { order } })
+    // const order = await sdk.orders.update(resource, { include })
+    await sdk.orders.update(resource, { include })
+    // NOTE: Retrieve doesn't response with attributes updated
+    const order = await getApiOrder({ id, config, dispatch, state })
+    dispatch && order && dispatch({ type: 'setOrder', payload: { order } })
   } catch (error) {
     const errors = getErrors(error, 'orders')
     if (dispatch) {
