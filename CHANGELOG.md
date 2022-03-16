@@ -1,3 +1,10 @@
+## [3.6.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.6.1...v3.6.2) (2022-03-16)
+
+
+### Bug Fixes
+
+* Rehydrate payment source props ([0db600b](https://github.com/commercelayer/commercelayer-react-components/commit/0db600bac969a998c4f8d8b6238a20ecae5bbd5e))
+
 ## [3.6.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.6.0...v3.6.1) (2022-03-10)
 
 
