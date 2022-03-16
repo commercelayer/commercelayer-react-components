@@ -175,7 +175,7 @@ export const addGiftCard: AddGiftCard = async (
           order,
           item,
         })
-        getOrder && getOrder(id)
+        getOrder && (await getOrder(id))
       }
     }
     dispatch({

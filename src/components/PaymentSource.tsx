@@ -61,13 +61,13 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
       setShowCard(false)
     }
   }, [currentPaymentMethodId, paymentSource, payments, payment, readonly])
-  const handleEditClick = (e: MouseEvent) => {
+  const handleEditClick = async (e: MouseEvent) => {
     e.stopPropagation()
     paymentSource &&
-      destroyPaymentSource({
+      (await destroyPaymentSource({
         paymentSourceId: paymentSource?.id,
         paymentResource: payment?.payment_source_type as PaymentResource,
-      })
+      }))
     setShowCard(!showCard)
     setShow(true)
   }

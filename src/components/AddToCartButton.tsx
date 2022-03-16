@@ -100,8 +100,8 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
             ],
           },
         })
-          .then((res) => {
-            getOrder && orderId && getOrder(orderId)
+          .then(async (res) => {
+            getOrder && orderId && (await getOrder(orderId))
             return res
           })
           .catch(({ response }) => {
@@ -131,8 +131,8 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
             lineItem: customLineItem,
           },
         })
-          .then((res) => {
-            getOrder && orderId && getOrder(orderId)
+          .then(async (res) => {
+            getOrder && orderId && (await getOrder(orderId))
             return res
           })
           .catch(({ response }) => {

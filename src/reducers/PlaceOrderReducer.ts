@@ -95,6 +95,8 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
     if (!isEmpty(shipments) && !shipment) isPermitted = false
     const paymentMethod = order.payment_method
     const paymentSource = order.payment_source
+    // @ts-ignore
+    if (paymentSource?.mismatched_amounts) isPermitted = false
     if (order.total_amount_with_taxes_cents !== 0 && isEmpty(paymentMethod?.id))
       isPermitted = false
     dispatch({

@@ -1,11 +1,4 @@
-import React, {
-  FunctionComponent,
-  SyntheticEvent,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import {
   CardElement,
@@ -14,14 +7,17 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js'
 import {
+  Stripe,
   StripeCardElementOptions,
   StripeElementLocale,
+  StripeElements,
 } from '@stripe/stripe-js'
 import { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
 import { PaymentSourceProps } from './PaymentSource'
 import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
 import { setCustomerOrderParam } from '#utils/localStorage'
+import { StripePayment as StripePaymentType } from '@commercelayer/sdk'
 
 export type StripeConfig = {
   containerClassName?: string
@@ -34,6 +30,15 @@ export type StripeConfig = {
 type StripePaymentFormProps = {
   options?: StripeCardElementOptions
   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
+}
+
+type SubmitEvent = React.FormEvent<HTMLFormElement>
+
+type OnSubmitArgs = {
+  event: SubmitEvent
+  stripe: Stripe | null
+  elements: StripeElements | null
+  paymentSource?: StripePaymentType
 }
 
 const defaultOptions = {
@@ -52,14 +57,13 @@ const defaultOptions = {
   hidePostalCode: true,
 }
 
-const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
+const StripePaymentForm: React.FunctionComponent<StripePaymentFormProps> = ({
   options = defaultOptions,
   templateCustomerSaveToWallet,
 }) => {
   const ref = useRef<null | HTMLFormElement>(null)
   const {
-    setPaymentSource,
-    paymentSource,
+    // setPaymentSource,
     currentPaymentMethodType,
     setPaymentMethodErrors,
     setPaymentRef,
@@ -68,20 +72,28 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
   const stripe = useStripe()
   const elements = useElements()
   useEffect(() => {
-    if (ref.current && stripe && elements) {
-      ref.current.onsubmit = () =>
-        onSubmit(ref.current as any, stripe, elements)
+    if (ref.current && stripe && elements && order?.payment_source?.id) {
+      // @ts-ignore
+      ref.current.onsubmit = (paymentSource?: StripePaymentType) => {
+        return onSubmit({
+          event: ref.current as any,
+          stripe,
+          elements,
+          paymentSource,
+        })
+      }
       setPaymentRef({ ref })
     }
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  }, [ref, stripe, elements])
-  const onSubmit = async (
-    event: SyntheticEvent<HTMLFormElement>,
-    stripe: any,
-    elements: any
-  ): Promise<boolean> => {
+  }, [ref, stripe, elements, order?.payment_source?.id])
+  const onSubmit = async ({
+    event,
+    stripe,
+    elements,
+    paymentSource,
+  }: OnSubmitArgs): Promise<boolean> => {
     if (!stripe) return false
 
     const savePaymentSourceToCustomerWallet =
@@ -109,16 +121,16 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
           state: billingInfo?.state_code,
         },
       }
-      const { paymentMethod } = await stripe.createPaymentMethod({
+      await stripe.createPaymentMethod({
         type: 'card',
         card: cardElement,
         billing_details,
       })
-      // @ts-ignore
-      if (paymentSource?.client_secret) {
+      const clientSecret = paymentSource?.client_secret
+      const paymentSourceId = paymentSource?.id
+      if (clientSecret) {
         const { error, paymentIntent } = await stripe.confirmCardPayment(
-          // @ts-ignore
-          paymentSource.client_secret,
+          clientSecret,
           {
             payment_method: {
               card: cardElement,
@@ -136,29 +148,33 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
               message: error.message as string,
             },
           ])
+          return false
         } else {
-          if (
-            paymentIntent &&
-            paymentMethod &&
-            paymentSource &&
-            currentPaymentMethodType
-          ) {
-            try {
-              await setPaymentSource({
-                paymentSourceId: paymentSource.id,
-                paymentResource: currentPaymentMethodType,
-                attributes: {
-                  options: {
-                    ...(paymentMethod as Record<string, any>),
-                    setup_future_usage: 'off_session',
-                  },
-                },
-              })
-              return true
-            } catch (e) {
-              return false
-            }
-          }
+          console.log('paymentSourceId', paymentSourceId)
+          console.log('paymentIntent', paymentIntent)
+          return true
+          // if (
+          //   paymentIntent &&
+          //   paymentMethod &&
+          //   paymentSourceId &&
+          //   currentPaymentMethodType
+          // ) {
+          //   try {
+          //     await setPaymentSource({
+          //       paymentSourceId,
+          //       paymentResource: currentPaymentMethodType,
+          //       attributes: {
+          //         options: {
+          //           ...(paymentMethod as Record<string, any>),
+          //           setup_future_usage: 'off_session',
+          //         },
+          //       },
+          //     })
+          //     return true
+          //   } catch (e) {
+          //     return false
+          //   }
+          // }
         }
       }
     }
@@ -166,7 +182,7 @@ const StripePaymentForm: FunctionComponent<StripePaymentFormProps> = ({
   }
 
   return (
-    <form ref={ref} onSubmit={(e) => onSubmit(e, stripe, elements)}>
+    <form ref={ref}>
       <CardElement options={{ ...defaultOptions, ...options }} />
       {templateCustomerSaveToWallet && (
         <Parent {...{ name: 'save_payment_source_to_customer_wallet' }}>
@@ -185,7 +201,7 @@ type StripePaymentProps = PaymentMethodConfig['stripePayment'] &
     locale?: StripeElementLocale
   }
 
-const StripePayment: FunctionComponent<StripePaymentProps> = ({
+const StripePayment: React.FunctionComponent<StripePaymentProps> = ({
   publishableKey,
   show,
   options,
