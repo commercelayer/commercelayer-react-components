@@ -141,6 +141,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
           dispatch,
           config,
           include: state.include,
+          state,
         }),
     }
   }, [state])
