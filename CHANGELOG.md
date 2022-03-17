@@ -1,3 +1,10 @@
+## [3.6.3](https://github.com/commercelayer/commercelayer-react-components/compare/v3.6.2...v3.6.3) (2022-03-17)
+
+
+### Bug Fixes
+
+* Restore payment source patch to save card details ([4d9b3d6](https://github.com/commercelayer/commercelayer-react-components/commit/4d9b3d6be481d41b37606a5cb774bac346d5dab4))
+
 ## [3.6.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.6.1...v3.6.2) (2022-03-16)
 
 
