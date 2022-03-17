@@ -63,7 +63,7 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormProps> = ({
 }) => {
   const ref = useRef<null | HTMLFormElement>(null)
   const {
-    // setPaymentSource,
+    setPaymentSource,
     currentPaymentMethodType,
     setPaymentMethodErrors,
     setPaymentRef,
@@ -121,7 +121,7 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormProps> = ({
           state: billingInfo?.state_code,
         },
       }
-      await stripe.createPaymentMethod({
+      const { paymentMethod } = await stripe.createPaymentMethod({
         type: 'card',
         card: cardElement,
         billing_details,
@@ -150,31 +150,28 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormProps> = ({
           ])
           return false
         } else {
-          console.log('paymentSourceId', paymentSourceId)
-          console.log('paymentIntent', paymentIntent)
-          return true
-          // if (
-          //   paymentIntent &&
-          //   paymentMethod &&
-          //   paymentSourceId &&
-          //   currentPaymentMethodType
-          // ) {
-          //   try {
-          //     await setPaymentSource({
-          //       paymentSourceId,
-          //       paymentResource: currentPaymentMethodType,
-          //       attributes: {
-          //         options: {
-          //           ...(paymentMethod as Record<string, any>),
-          //           setup_future_usage: 'off_session',
-          //         },
-          //       },
-          //     })
-          //     return true
-          //   } catch (e) {
-          //     return false
-          //   }
-          // }
+          if (
+            paymentIntent &&
+            paymentMethod &&
+            paymentSourceId &&
+            currentPaymentMethodType
+          ) {
+            try {
+              await setPaymentSource({
+                paymentSourceId,
+                paymentResource: currentPaymentMethodType,
+                attributes: {
+                  options: {
+                    ...(paymentMethod as Record<string, any>),
+                    setup_future_usage: 'off_session',
+                  },
+                },
+              })
+              return true
+            } catch (e) {
+              return false
+            }
+          }
         }
       }
     }
