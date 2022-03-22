@@ -470,6 +470,7 @@ export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook 
 
 export type SetGiftCardOrCouponCode = (args: {
   code: string
+  codeType: OrderCodeType
   dispatch?: Dispatch<OrderActions>
   config?: CommerceLayerConfig
   order?: Order
@@ -478,6 +479,7 @@ export type SetGiftCardOrCouponCode = (args: {
 
 export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
   code,
+  codeType,
   dispatch,
   config,
   order,
@@ -488,7 +490,7 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
       const sdk = getSdk(config)
       const attributes: OrderUpdate = {
         id: order.id,
-        gift_card_or_coupon_code: code,
+        [codeType]: code,
       }
       const orderUpdated = await sdk.orders.update(attributes, { include })
       dispatch({
@@ -508,7 +510,7 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
   }
 }
 
-export type CodeType = 'coupon' | 'gift_card'
+export type CodeType = 'coupon' | 'gift_card' | 'gift_card_or_coupon'
 export type OrderCodeType = `${CodeType}_code`
 
 export type RemoveGiftCardOrCouponCode = (args: {
