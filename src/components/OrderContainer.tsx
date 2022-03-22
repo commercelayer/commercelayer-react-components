@@ -112,9 +112,16 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
           ...args,
           dispatch,
         }),
-      setGiftCardOrCouponCode: ({ code }: { code: string }) =>
+      setGiftCardOrCouponCode: ({
+        code,
+        codeType,
+      }: {
+        code: string
+        codeType: OrderCodeType
+      }) =>
         defaultOrderContext['setGiftCardOrCouponCode']({
           code,
+          codeType,
           dispatch,
           order: state.order,
           config,
