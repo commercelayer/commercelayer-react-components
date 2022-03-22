@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useRef,
+  useState,
 } from 'react'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import OrderContext from '#context/OrderContext'
@@ -15,11 +16,20 @@ import dropWhile from 'lodash/dropWhile'
 import has from 'lodash/has'
 import { findIndex } from 'lodash'
 import { BaseError } from '#typings/errors'
+import { OrderCodeType } from '#reducers/OrderReducer'
+import { FunctionChildren } from '#typings/index'
+import Parent from './utils/Parent'
 
-const propTypes = components.GiftCardOrCouponForm.propTypes
+// const propTypes = components.GiftCardOrCouponForm.propTypes
+
+type GiftCardOrCouponFormChildrenProps = FunctionChildren<
+  Omit<GiftCardOrCouponFormProps, 'children'> & {
+    codeType?: OrderCodeType
+  }
+>
 
 type GiftCardOrCouponFormProps = {
-  children: ReactNode
+  children: GiftCardOrCouponFormChildrenProps
   onSubmit?: (response: { success: boolean }) => void
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
@@ -28,6 +38,9 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
 ) => {
   const { children, autoComplete = 'on', onSubmit, ...p } = props
   const { validation, values } = useRapidForm()
+  const [codeType, setCodeType] = useState<OrderCodeType>(
+    'gift_card_or_coupon_code'
+  )
   const { setGiftCardOrCouponCode, order, errors, setOrderErrors } =
     useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
@@ -45,16 +58,32 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
       onSubmit && onSubmit({ success: true })
     }
   }, [values])
+
+  useEffect(() => {
+    if (order?.gift_card_code && !order?.coupon_code) {
+      setCodeType('coupon_code')
+    }
+    if (!order?.gift_card_code && order?.coupon_code) {
+      setCodeType('gift_card_code')
+    }
+    if (!order?.gift_card_code && !order?.coupon_code) {
+      setCodeType('gift_card_or_coupon_code')
+    }
+  }, [order])
+
   const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault()
     const code = has(values, inputName) ? values[inputName].value : undefined
     if (code) {
-      const { success } = await setGiftCardOrCouponCode({ code })
+      const { success } = await setGiftCardOrCouponCode({ code, codeType })
       onSubmit && onSubmit({ success })
       success && e.target.reset()
     }
   }
-  return order?.gift_card_or_coupon_code || isEmpty(order) ? null : (
+  const parentProps = { ...p, codeType }
+
+  return (order?.gift_card_code && order?.coupon_code) ||
+    isEmpty(order) ? null : (
     <CouponAndGiftCardFormContext.Provider value={{ validation }}>
       <form
         ref={ref}
@@ -62,12 +91,10 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
         onSubmit={handleSubmit}
         {...p}
       >
-        {children}
+        <Parent {...parentProps}>{children}</Parent>
       </form>
     </CouponAndGiftCardFormContext.Provider>
   )
 }
-
-GiftCardOrCouponForm.propTypes = propTypes
 
 export default GiftCardOrCouponForm
