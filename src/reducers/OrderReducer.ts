@@ -96,6 +96,7 @@ export type ResourceIncluded =
   | 'billing_address'
   | 'shipping_address'
   | 'line_items.line_item_options.sku_option'
+  | 'line_items.item'
   | 'available_customer_payment_sources.payment_source'
   | 'shipments.available_shipping_methods'
   | 'shipments.stock_transfers'
