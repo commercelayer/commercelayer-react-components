@@ -1,11 +1,11 @@
 import useRapidForm from 'rapid-form'
 import React, {
   FunctionComponent,
-  ReactNode,
   useContext,
   useEffect,
   useRef,
   useState,
+  ReactNode,
 } from 'react'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import OrderContext from '#context/OrderContext'
@@ -17,19 +17,11 @@ import has from 'lodash/has'
 import { findIndex } from 'lodash'
 import { BaseError } from '#typings/errors'
 import { OrderCodeType } from '#reducers/OrderReducer'
-import { FunctionChildren } from '#typings/index'
-import Parent from './utils/Parent'
 
-// const propTypes = components.GiftCardOrCouponForm.propTypes
-
-type GiftCardOrCouponFormChildrenProps = FunctionChildren<
-  Omit<GiftCardOrCouponFormProps, 'children'> & {
-    codeType?: OrderCodeType
-  }
->
+const propTypes = components.GiftCardOrCouponForm.propTypes
 
 type GiftCardOrCouponFormProps = {
-  children: GiftCardOrCouponFormChildrenProps
+  children: ReactNode
   onSubmit?: (response: { success: boolean }) => void
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
@@ -80,21 +72,21 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
       success && e.target.reset()
     }
   }
-  const parentProps = { ...p, codeType }
-
   return (order?.gift_card_code && order?.coupon_code) ||
     isEmpty(order) ? null : (
-    <CouponAndGiftCardFormContext.Provider value={{ validation }}>
+    <CouponAndGiftCardFormContext.Provider value={{ validation, codeType }}>
       <form
         ref={ref}
         autoComplete={autoComplete}
         onSubmit={handleSubmit}
         {...p}
       >
-        <Parent {...parentProps}>{children}</Parent>
+        {children}
       </form>
     </CouponAndGiftCardFormContext.Provider>
   )
 }
+
+GiftCardOrCouponForm.propTypes = propTypes
 
 export default GiftCardOrCouponForm

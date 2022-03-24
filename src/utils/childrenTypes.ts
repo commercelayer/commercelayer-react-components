@@ -70,4 +70,4 @@ childrenTypes['isRequired'] = (
   )
 
 // NOTE change in the future (now is general for typescript)
-export default childrenTypes as Requireable<ReactNode>
+export default childrenTypes as Requireable<ReactNode | (() => ReactNode)>
