@@ -1,3 +1,11 @@
+# [3.7.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.6.4...v3.7.0) (2022-03-24)
+
+
+### Features
+
+* Add new prop `placeholderTranslation` to `GiftCardOrCouponInputProps` ([e30c4ab](https://github.com/commercelayer/commercelayer-react-components/commit/e30c4ab22ad3ce1e9331a7bd06b5f67b870b178d))
+* apply both gift_card and coupon on the same order ([ed751fa](https://github.com/commercelayer/commercelayer-react-components/commit/ed751fa10674f51cb176d00a48944004cd840e77))
+
 ## [3.6.4](https://github.com/commercelayer/commercelayer-react-components/compare/v3.6.3...v3.6.4) (2022-03-17)
 
 
