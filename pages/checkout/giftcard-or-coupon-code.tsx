@@ -133,6 +133,17 @@ export default function Main() {
                     <GiftCardOrCouponInput
                       data-cy="code-input"
                       className={`${classError} focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md pl-10 sm:text-sm border-gray-300`}
+                      placeholderTranslation={(codeType) => {
+                        switch (codeType) {
+                          case 'gift_card_or_coupon_code':
+                          default:
+                            return 'Insert a gift card o coupon code'
+                          case 'coupon_code':
+                            return 'Insert a coupon code'
+                          case 'gift_card_code':
+                            return 'Insert a gift card'
+                        }
+                      }}
                     />
                   </div>
                   <GiftCardOrCouponSubmit
