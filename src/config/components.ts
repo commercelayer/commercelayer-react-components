@@ -851,7 +851,7 @@ const components = {
   },
   ShipmentsContainer: {
     displayName: 'ShipmentsContainer',
-    permittedChildren: ['Shipment', 'ReactNode'],
+    permittedChildren: ['Shipment', 'ReactNode', 'Errors'],
     propTypes: {
       children: childrenTypes.isRequired,
     },

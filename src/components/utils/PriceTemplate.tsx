@@ -25,6 +25,7 @@ const PriceTemplate: React.FunctionComponent<PTemplateProps> = (props) => {
     formattedAmount,
     ...p
   } = props
+  delete p.skuCode
   return (
     <>
       <span className={className} {...p}>

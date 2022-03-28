@@ -1,5 +1,4 @@
 import React, {
-  FunctionComponent,
   Fragment,
   useContext,
   ReactNode,
@@ -21,7 +20,7 @@ type ShipmentProps = {
   loader?: LoaderType
 }
 
-const Shipment: FunctionComponent<ShipmentProps> = ({
+const Shipment: React.FunctionComponent<ShipmentProps> = ({
   children,
   loader = 'Loading...',
 }) => {

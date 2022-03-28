@@ -1,15 +1,10 @@
 import ShipmentContext, {
   defaultShipmentContext,
 } from '#context/ShipmentContext'
-import React, {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useReducer,
-} from 'react'
+import React, { ReactNode, useContext, useEffect, useReducer } from 'react'
 import shipmentReducer, {
   shipmentInitialState,
+  setShipmentErrors,
   getShipments,
   setShippingMethod,
 } from '#reducers/ShipmentReducer'
@@ -18,22 +13,14 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
 import { BaseError } from '#typings/errors'
 import { isEmpty } from 'lodash'
-import Parent from './utils/Parent'
-import { FunctionChildren } from '#typings'
 
 const propTypes = components.ShipmentsContainer.propTypes
 const displayName = components.ShipmentsContainer.displayName
 
-type ShipmentsContainerChildrenProps = FunctionChildren<
-  Omit<ShipmentsContainerProps, 'children'> & {
-    errors: BaseError[]
-  }
->
-
 type ShipmentsContainerProps = {
-  children: ShipmentsContainerChildrenProps
+  children: ReactNode
 }
-const ShipmentsContainer: FunctionComponent<ShipmentsContainerProps> = (
+const ShipmentsContainer: React.FunctionComponent<ShipmentsContainerProps> = (
   props
 ) => {
   const { children, ...p } = props
@@ -41,7 +28,6 @@ const ShipmentsContainer: FunctionComponent<ShipmentsContainerProps> = (
   const { order, getOrder, include, addResourceToInclude, includeLoaded } =
     useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
-  const errors: BaseError[] = []
   useEffect(() => {
     if (!include?.includes('shipments.available_shipping_methods')) {
       addResourceToInclude({
@@ -75,49 +61,62 @@ const ShipmentsContainer: FunctionComponent<ShipmentsContainerProps> = (
         },
       })
     }
-
-    if (order && order.shipments && order.shipments.length > 0) {
-      const hasShippingMethods = order.shipments.map((shipment) => {
-        return (
-          shipment.available_shipping_methods &&
-          shipment.available_shipping_methods.length > 0
-        )
-      })
-      if (hasShippingMethods.includes(false)) {
-        errors.push({
-          code: 'NO_SHIPPING_METHODS',
-          message: 'No shipping methods',
-          resource: 'shipments',
-        })
-      }
-    }
-    if (order && order.line_items && order.line_items.length > 0) {
-      const hasStocks = order.line_items.map((line_item) => {
-        return (
-          // @ts-ignore
-          line_item.item?.do_not_ship || line_item.item?.inventory?.available
-        )
-      })
-      if (hasStocks.includes(false)) {
-        errors.push({
-          code: 'OUT_OF_STOCK',
-          message: 'No stock available',
-          resource: 'line_items',
-        })
-      }
-    }
-    if (errors.length > 0) {
-      dispatch({
-        type: 'setErrors',
-        payload: {
-          errors,
-        },
-      })
-    }
     if (order && !isEmpty(config) && order.shipments) {
       getShipments({ order, dispatch, config })
     }
   }, [order, include, includeLoaded])
+  useEffect(() => {
+    if (order) {
+      if (order.shipments && order.shipments.length > 0) {
+        const hasShippingMethods = order.shipments.map((shipment) => {
+          return (
+            shipment.available_shipping_methods &&
+            shipment.available_shipping_methods.length > 0
+          )
+        })
+        if (hasShippingMethods.includes(false)) {
+          setShipmentErrors(
+            [
+              ...(state.errors || []),
+              {
+                code: 'NO_SHIPPING_METHODS',
+                message: 'No shipping methods',
+                resource: 'shipments',
+              },
+            ],
+            dispatch
+          )
+        }
+      }
+      if (order.line_items && order.line_items.length > 0) {
+        const hasStocks = order.line_items.map((line_item) => {
+          // @ts-ignore
+          return !(line_item.item?.inventory?.quantity >= line_item?.quantity)
+            ? false
+            : // @ts-ignore
+              line_item.item?.do_not_ship ||
+                // @ts-ignore
+                line_item.item?.inventory?.available
+        })
+        if (hasStocks.includes(false)) {
+          setShipmentErrors(
+            [
+              ...(state.errors || []),
+              {
+                code: 'OUT_OF_STOCK',
+                message: 'No stock available',
+                resource: 'line_items',
+              },
+            ],
+            dispatch
+          )
+        }
+      }
+    }
+    return () => {
+      setShipmentErrors([], dispatch)
+    }
+  }, [order])
   const contextValue = {
     ...state,
     setShipmentErrors: (errors: BaseError[]) =>
@@ -132,14 +131,14 @@ const ShipmentsContainer: FunctionComponent<ShipmentsContainerProps> = (
       }),
   }
 
-  const parentProps = { ...p, errors: state.errors }
   return (
     <ShipmentContext.Provider value={contextValue}>
-      <Parent {...parentProps}>{children}</Parent>
+      {children}
     </ShipmentContext.Provider>
   )
 }
 
+ShipmentsContainer.propTypes = propTypes
 ShipmentsContainer.displayName = displayName
 
 export default ShipmentsContainer
