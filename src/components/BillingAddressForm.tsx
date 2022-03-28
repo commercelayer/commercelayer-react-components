@@ -1,12 +1,6 @@
 import AddressesContext from '#context/AddressContext'
 import useRapidForm from 'rapid-form'
-import React, {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useRef,
-} from 'react'
+import React, { ReactNode, useContext, useEffect, useRef } from 'react'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import { isEmpty } from 'lodash'
 import { BaseError, CodeErrorType } from '#typings/errors'
@@ -26,7 +20,7 @@ type BillingAddressFormProps = {
   errorClassName?: string
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
-const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
+const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
   props
 ) => {
   const {
@@ -92,7 +86,7 @@ const BillingAddressForm: FunctionComponent<BillingAddressFormProps> = (
           isBusiness
         )
         if (!mandatory) delete values[name]
-        if (field?.value) {
+        if (field?.value || field?.required === false) {
           values[name.replace('billing_address_', '')] = field.value
           delete values[name]
         }
