@@ -1,9 +1,4 @@
-import React, {
-  useContext,
-  FunctionComponent,
-  Fragment,
-  ReactNode,
-} from 'react'
+import React, { useContext, ReactNode } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
 import { isEmpty } from 'lodash'
@@ -12,10 +7,12 @@ import { LineItemOption } from '@commercelayer/sdk'
 
 const displayName = components.LineItemOptions.displayName
 
-export type LineItemOptionsProps = JSX.IntrinsicElements['span'] & {
+export type LineItemOptionsProps = JSX.IntrinsicElements['div'] & {
   children: ReactNode
   title?: string
   showName?: boolean
+  titleTagElement?: keyof JSX.IntrinsicElements
+  titleClassName?: string
 } & (
     | {
         skuOptionId: string
@@ -27,12 +24,25 @@ export type LineItemOptionsProps = JSX.IntrinsicElements['span'] & {
       }
   )
 
-const LineItemOptions: FunctionComponent<LineItemOptionsProps> = (props) => {
-  const { skuOptionId, title, children, showName = true, showAll, ...p } = props
+const LineItemOptions: React.FunctionComponent<LineItemOptionsProps> = (
+  props
+) => {
+  const {
+    skuOptionId,
+    title,
+    children,
+    showName = true,
+    showAll,
+    className,
+    titleTagElement = 'h6',
+    titleClassName,
+    ...p
+  } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const lineItemOptions: LineItemOption[] = !isEmpty(lineItem)
     ? lineItem?.['line_item_options'] || []
     : []
+  const TitleTagElement = titleTagElement as any
   const options = lineItemOptions
     .filter((o) => {
       if (showAll) return true
@@ -40,21 +50,25 @@ const LineItemOptions: FunctionComponent<LineItemOptionsProps> = (props) => {
       return o.skuOption().id === skuOptionId
     })
     .map((o, k) => {
-      const showTitle = showName ? <span {...p}>{title || o.name}</span> : null
+      const showTitle = showName ? (
+        <TitleTagElement className={titleClassName}>
+          {title || o.name}
+        </TitleTagElement>
+      ) : null
       const valueProps = {
         lineItemOption: o,
         showAll,
       }
       return (
-        <Fragment key={k}>
+        <div className={className} key={k} {...p}>
           {showTitle}
           <LineItemOptionChildrenContext.Provider value={valueProps}>
             {children}
           </LineItemOptionChildrenContext.Provider>
-        </Fragment>
+        </div>
       )
     })
-  return <Fragment>{options}</Fragment>
+  return <>{options}</>
 }
 
 LineItemOptions.displayName = displayName
