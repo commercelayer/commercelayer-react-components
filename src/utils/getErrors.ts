@@ -4,10 +4,11 @@ import { Dispatch } from 'react'
 
 export default function getErrors(
   error: any,
-  resource: ResourceErrorType
+  resource: ResourceErrorType,
+  field?: string
 ): BaseError[] {
   return error?.errors?.map((e: any) => {
-    return { ...e, resource }
+    return { ...e, resource, ...(field && { field }) }
   })
 }
 
