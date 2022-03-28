@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext, Fragment, useMemo } from 'react'
+import React, { useContext, Fragment, useMemo } from 'react'
 import Parent from './utils/Parent'
 import GiftCardContext from '#context/GiftCardContext'
 import OrderContext from '#context/OrderContext'
@@ -11,13 +11,14 @@ import components from '#config/components'
 import CustomerContext from '#context/CustomerContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
+import ShipmentContext from '#context/ShipmentContext'
 
 const propTypes = components.Errors.propTypes
 const displayName = components.Errors.displayName
 
 export type ErrorsProps = ErrorComponentProps & JSX.IntrinsicElements['span']
 
-const Errors: FunctionComponent<ErrorsProps> = (props) => {
+const Errors: React.FunctionComponent<ErrorsProps> = (props) => {
   const { children, messages = [], resource, field, ...p } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { errors: orderErrors } = useContext(OrderContext)
@@ -25,6 +26,7 @@ const Errors: FunctionComponent<ErrorsProps> = (props) => {
   const { errors: lineItemErrors } = useContext(LineItemContext)
   const { errors: addressErrors } = useContext(AddressContext)
   const { errors: customerErrors } = useContext(CustomerContext)
+  const { errors: shipmentErrors } = useContext(ShipmentContext)
   const {
     errors: paymentMethodErrors,
     currentPaymentMethodType,
@@ -38,6 +40,7 @@ const Errors: FunctionComponent<ErrorsProps> = (props) => {
       ...(lineItemErrors || []),
       ...(addressErrors || []),
       ...(customerErrors || []),
+      ...(shipmentErrors || []),
       ...(paymentMethodErrors?.filter(
         (v) =>
           v.field === currentPaymentMethodType &&
@@ -50,6 +53,7 @@ const Errors: FunctionComponent<ErrorsProps> = (props) => {
       lineItemErrors,
       addressErrors,
       customerErrors,
+      shipmentErrors,
       paymentMethodErrors,
     ]
   )

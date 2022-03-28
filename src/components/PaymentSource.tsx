@@ -14,6 +14,7 @@ import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { LoaderType } from '#typings/index'
 import { CustomerCardsTemplateChildren } from './utils/PaymentCardsTemplate'
 import getCardDetails from '../utils/getCardDetails'
+import OrderContext from '#context/OrderContext'
 
 const propTypes = components.PaymentSource.propTypes
 const displayName = components.PaymentSource.displayName
@@ -38,6 +39,7 @@ export type PaymentSourceProps = {
 const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
   const { readonly } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
+  const { order } = useContext(OrderContext)
   const { payments } = useContext(CustomerContext)
   const { currentPaymentMethodId, paymentSource, destroyPaymentSource } =
     useContext(PaymentMethodContext)
@@ -52,7 +54,9 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
       setShow(true)
       const card = getCardDetails({
         paymentType: payment?.payment_source_type as PaymentResource,
-        customerPayment: { payment_source: paymentSource },
+        customerPayment: {
+          payment_source: order?.payment_source || paymentSource,
+        },
       })
       if (card.brand) setShowCard(true)
     } else setShow(false)
@@ -60,7 +64,14 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
       setShow(false)
       setShowCard(false)
     }
-  }, [currentPaymentMethodId, paymentSource, payments, payment, readonly])
+  }, [
+    currentPaymentMethodId,
+    paymentSource,
+    payments,
+    payment,
+    readonly,
+    order,
+  ])
   const handleEditClick = async (e: MouseEvent) => {
     e.stopPropagation()
     paymentSource &&

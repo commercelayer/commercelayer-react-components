@@ -505,7 +505,7 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
     }
     return { success: false }
   } catch (error: any) {
-    const errors = getErrors(error, 'gift_card_or_coupon_code')
+    const errors = getErrors(error, 'orders', codeType)
     dispatch && setOrderErrors({ errors, dispatch })
     return { success: false }
   }
@@ -548,7 +548,7 @@ export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
     }
     return { success: false }
   } catch (error: any) {
-    const errors = getErrors(error, 'gift_card_or_coupon_code')
+    const errors = getErrors(error, 'orders', codeType)
     console.error('Remove gift card o coupon code', errors)
     dispatch && setOrderErrors({ errors, dispatch })
     return { success: false }

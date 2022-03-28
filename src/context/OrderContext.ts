@@ -1,4 +1,5 @@
 import { createContext } from 'react'
+import { Order } from '@commercelayer/sdk'
 import {
   addToCart,
   AddToCart,
@@ -26,12 +27,16 @@ type DefaultContext = {
   addResourceToInclude: typeof addResourceToInclude
   getOrder: getOrderContext
   updateOrder: typeof updateOrder
+  setOrder: (order: Order) => void
 } & OrderState
 
 export const defaultOrderContext = {
   addToCart,
   createOrder,
   setOrderErrors: () => {
+    return
+  },
+  setOrder: () => {
     return
   },
   setGiftCardOrCouponCode,

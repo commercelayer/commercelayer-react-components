@@ -240,7 +240,7 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       setOrderErrors && setOrderErrors([])
     }
   } catch (error) {
-    const errors = getErrors(error, 'orders')
+    const errors = getErrors(error, 'orders', paymentResource)
     console.error('Set payment method', errors)
   }
 }
@@ -316,7 +316,7 @@ export const setPaymentSource: SetPaymentSource = async ({
       }
     }
   } catch (error: any) {
-    const errors = getErrors(error, 'payment_methods')
+    const errors = getErrors(error, 'payment_methods', paymentResource)
     console.error('Set payment source:', errors)
     if (dispatch)
       setErrors({
