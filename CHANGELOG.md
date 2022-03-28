@@ -1,3 +1,22 @@
+# [3.8.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.7.0...v3.8.0) (2022-03-28)
+
+
+### Bug Fixes
+
+* Show `checkout.com` card after placing an order ([1083750](https://github.com/commercelayer/commercelayer-react-components/commit/10837508a35d58713184963e8ac9b74bb110b26f))
+* Wrong key for `line_2` attribute ([03b84a9](https://github.com/commercelayer/commercelayer-react-components/commit/03b84a9ce2977bf16579406d4c72f7a9e2370669))
+
+
+### Features
+
+* Add new markup and props to `LineItemOptions` ([7a5450d](https://github.com/commercelayer/commercelayer-react-components/commit/7a5450de8cb3cfe0a1cc8b2118e6de690ef4a559))
+* check for out of stock and shipping method available for shipments ([38000b6](https://github.com/commercelayer/commercelayer-react-components/commit/38000b68699da069b52f65348b3a217117eb543b))
+
+
+### Performance Improvements
+
+* Set attribute field to errors handler ([0f60a39](https://github.com/commercelayer/commercelayer-react-components/commit/0f60a391f2f16c71c1407ebd4c81a2a79cc28453))
+
 # [3.7.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.6.4...v3.7.0) (2022-03-24)
 
 
