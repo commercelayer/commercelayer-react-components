@@ -177,7 +177,7 @@ export default function Order() {
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
                     <div>
-                      <LineItemOptions className="font-bold" showAll>
+                      <LineItemOptions titleClassName="font-bold" showAll>
                         <LineItemOption
                           className="font-bold capitalize"
                           valueClassName="ml-2 font-normal"

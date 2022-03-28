@@ -19,7 +19,8 @@ import {
   StockTransferField,
   DeliveryLeadTime,
   ShipmentField,
-  ShippingMethodRadioButtonOnChange,
+  ShippingMethodRadioButtonType,
+  Errors,
 } from '@commercelayer/react-components'
 import { isEmpty } from 'lodash'
 import { useRouter } from 'next/router'
@@ -74,10 +75,10 @@ export default function Main() {
     if (!token) getToken()
     if (token) getOrder()
   }, [token])
-  const handleChange: ShippingMethodRadioButtonOnChange = (
+  const handleChange = ({
     shippingMethod,
-    shipmentId
-  ) => {
+    shipmentId,
+  }: ShippingMethodRadioButtonType) => {
     console.log(`shippingMethod`, shippingMethod, shipmentId)
     if (shippingMethod?.name) {
       setShippingMethodName(shippingMethod.name)
@@ -128,7 +129,7 @@ export default function Main() {
                   <div className="flex justify-around w-2/3 items-center p-5">
                     <ShippingMethodRadioButton
                       data-cy="shipping-method-button"
-                      onChange={handleChange}
+                      onChange={() => handleChange}
                     />
                     <ShippingMethodName data-cy="shipping-method-name" />
                     <ShippingMethodPrice data-cy="shipping-method-price" />
@@ -148,6 +149,7 @@ export default function Main() {
                   </div>
                 </ShippingMethod>
               </Shipment>
+              <Errors resource="line_items" />
             </ShipmentsContainer>
             <div className="mt-10">
               <ShipmentsContainer>
