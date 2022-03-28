@@ -11,7 +11,7 @@ import {
 } from '#reducers/PaymentMethodReducer'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
-import React, { Fragment, useContext } from 'react'
+import React from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 import getCardDetails from '../../utils/getCardDetails'
 
@@ -30,11 +30,11 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
     templateCustomerSaveToWallet,
     ...p
   } = props
-  const { order } = useContext(OrderContext)
-  const { payment } = useContext(PaymentMethodChildrenContext)
-  const { payments, isGuest } = useContext(CustomerContext)
+  const { order } = React.useContext(OrderContext)
+  const { payment } = React.useContext(PaymentMethodChildrenContext)
+  const { payments, isGuest } = React.useContext(CustomerContext)
   const { currentPaymentMethodId, config, paymentSource } =
-    useContext(PaymentMethodContext)
+    React.useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = 'checkout_com_payments'
   const locale = order?.language_code as StripeElementLocale
 
@@ -53,7 +53,9 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
       : []
   if (readonly || showCard) {
     const card = getCardDetails({
-      customerPayment: { payment_source: paymentSource },
+      customerPayment: {
+        payment_source: order?.payment_source || paymentSource,
+      },
       paymentType: paymentResource,
     })
     const value = { ...card, showCard, handleEditClick, readonly }
@@ -65,7 +67,7 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
   }
   if (!isGuest && templateCustomerCards) {
     return publicKey && !loading ? (
-      <Fragment>
+      <>
         {isEmpty(customerPayments) ? null : (
           <div className={p.className}>
             <PaymentCardsTemplate {...{ paymentResource, customerPayments }}>
@@ -80,7 +82,7 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
           locale={locale}
           {...paymentConfig}
         />
-      </Fragment>
+      </>
     ) : (
       loaderComponent
     )
