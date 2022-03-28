@@ -334,6 +334,7 @@ export default function Main() {
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Address"
+                        required={false}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600">
