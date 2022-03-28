@@ -121,6 +121,8 @@ export type SetPlaceOrder = (args: {
   state?: PlaceOrderState
   setOrderErrors?: (collection: unknown) => void
   paymentSource?: PaymentSourceType & { approval_url?: string }
+  include?: string[]
+  setOrder?: (order: Order) => void
 }) => Promise<{
   placed: boolean
 }>
@@ -131,6 +133,8 @@ export const setPlaceOrder: SetPlaceOrder = async ({
   config,
   setOrderErrors,
   paymentSource,
+  setOrder,
+  include,
 }) => {
   const response = {
     placed: false,
@@ -154,11 +158,25 @@ export const setPlaceOrder: SetPlaceOrder = async ({
         paymentSource &&
         options?.checkoutCom?.session_id
       ) {
-        await sdk[paymentType].update({
+        const payment = await sdk[paymentType].update({
           id: paymentSource.id,
           _details: true,
           session_id: options?.checkoutCom?.session_id,
         })
+        // @ts-ignore
+        if (payment?.payment_response?.status !== 'Authorized') {
+          // @ts-ignore
+          const [action] = payment?.payment_response?.actions || ['']
+          const errors: BaseError[] = [
+            {
+              code: 'PAYMENT_NOT_APPROVED_FOR_EXECUTION',
+              message: action?.response_summary,
+              resource: 'orders',
+              field: 'checkout_com_payments',
+            },
+          ]
+          throw { errors }
+        }
       }
       const updateAttributes: OrderUpdate = {
         id: order.id,
@@ -177,20 +195,27 @@ export const setPlaceOrder: SetPlaceOrder = async ({
         })
       }
       switch (paymentType) {
-        case 'braintree_payments':
+        case 'braintree_payments': {
           if (saveToWallet()) {
             await sdk.orders.update({
               id: order.id,
               _save_payment_source_to_customer_wallet: true,
             })
           }
-          await sdk.orders.update(updateAttributes)
+          const orderUpdated = await sdk.orders.update(updateAttributes, {
+            include,
+          })
+          setOrder && setOrder(orderUpdated)
           setOrderErrors && setOrderErrors([])
           return {
             placed: true,
           }
-        default:
-          await sdk.orders.update(updateAttributes)
+        }
+        default: {
+          const orderUpdated = await sdk.orders.update(updateAttributes, {
+            include,
+          })
+          setOrder && setOrder(orderUpdated)
           if (saveToWallet()) {
             await sdk.orders.update({
               id: order.id,
@@ -201,6 +226,7 @@ export const setPlaceOrder: SetPlaceOrder = async ({
           return {
             placed: true,
           }
+        }
       }
     }
     return response
