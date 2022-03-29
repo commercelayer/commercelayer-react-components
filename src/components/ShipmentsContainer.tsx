@@ -89,15 +89,17 @@ const ShipmentsContainer: React.FunctionComponent<ShipmentsContainerProps> = (
         }
       }
       if (order.line_items && order.line_items.length > 0) {
-        const hasStocks = order.line_items.map((line_item) => {
-          // @ts-ignore
-          return !(line_item.item?.inventory?.quantity >= line_item?.quantity)
-            ? false
-            : // @ts-ignore
-              line_item.item?.do_not_ship ||
-                // @ts-ignore
-                line_item.item?.inventory?.available
-        })
+        const hasStocks = order.line_items
+          .filter(({ item_type }) => item_type === 'skus')
+          .map((lineItem) => {
+            // @ts-ignore
+            return !(lineItem.item?.inventory?.quantity >= lineItem?.quantity)
+              ? false
+              : // @ts-ignore
+                lineItem.item?.do_not_ship ||
+                  // @ts-ignore
+                  lineItem.item?.inventory?.available
+          })
         if (hasStocks.includes(false)) {
           setShipmentErrors(
             [
