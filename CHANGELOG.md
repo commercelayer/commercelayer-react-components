@@ -1,3 +1,10 @@
+## [3.8.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.8.1...v3.8.2) (2022-03-29)
+
+
+### Bug Fixes
+
+* Filter `line_items` by `item_type` to show the correct error ([3667350](https://github.com/commercelayer/commercelayer-react-components/commit/36673503a4c00944444e606543a360df33005fed))
+
 ## [3.8.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.8.0...v3.8.1) (2022-03-29)
 
 
