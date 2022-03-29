@@ -90,7 +90,10 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
           isBusiness
         )
         if (!mandatory) delete values[name]
-        if (field?.value || field?.required === false) {
+        if (
+          field?.value ||
+          (field?.required === false && field?.type !== 'checkbox')
+        ) {
           values[name.replace('shipping_address_', '')] = field.value
           delete values[name]
         }

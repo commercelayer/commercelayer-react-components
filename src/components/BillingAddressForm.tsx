@@ -86,7 +86,10 @@ const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
           isBusiness
         )
         if (!mandatory) delete values[name]
-        if (field?.value || field?.required === false) {
+        if (
+          field?.value ||
+          (field?.required === false && field?.type !== 'checkbox')
+        ) {
           values[name.replace('billing_address_', '')] = field.value
           delete values[name]
         }
