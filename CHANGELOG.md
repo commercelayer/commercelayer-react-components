@@ -1,3 +1,10 @@
+## [3.8.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.8.0...v3.8.1) (2022-03-29)
+
+
+### Bug Fixes
+
+* Save customer address ([4161a3c](https://github.com/commercelayer/commercelayer-react-components/commit/4161a3c13039c567657a662978e850fea69db8fa))
+
 # [3.8.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.7.0...v3.8.0) (2022-03-28)
 
 
