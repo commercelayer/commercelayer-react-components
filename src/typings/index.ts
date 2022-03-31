@@ -178,9 +178,9 @@ export type TimeFormat = 'days' | 'hours'
 
 export type BaseComponent = InferProps<typeof BC>
 
-export interface BaseAction<A = string> {
+export interface BaseAction<A = string, P = Record<string, any>> {
   type: A
-  payload: Record<string, any>
+  payload: P
 }
 
 export interface BaseState {
