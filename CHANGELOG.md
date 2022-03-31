@@ -1,3 +1,10 @@
+# [3.9.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.8.2...v3.9.0) (2022-03-31)
+
+
+### Features
+
+* Add new SKUs components ([ae7b03c](https://github.com/commercelayer/commercelayer-react-components/commit/ae7b03cfa6ec2aaf766ed4ab98640f8264a952c7))
+
 ## [3.8.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.8.1...v3.8.2) (2022-03-29)
 
 
