@@ -892,6 +892,28 @@ const components = {
       type: 'amount',
     },
   },
+  SkuContainer: {
+    displayName: 'SkuContainer',
+    permittedChildren: ['Skus', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
+  Skus: {
+    displayName: 'Skus',
+    permittedChildren: ['SkuField', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
+  SkuField: {
+    displayName: 'SkuField',
+    propTypes: {
+      children: PropTypes.func,
+      attribute: PropTypes.string,
+      tagElement: PropTypes.string,
+    },
+  },
   SkuList: {
     permittedChildren: ['AddToCartButton', 'QuantitySelector', 'ReactNode'],
     displayName: 'SkuList',

@@ -3,6 +3,9 @@ import React, { useEffect, useState } from 'react'
 import Price from '../src/components/Price'
 import PricesContainer from '../src/components/PricesContainer'
 import CommerceLayer from '../src/components/CommerceLayer'
+import SkuContainer from '#components/SkuContainer'
+import Skus from '#components/Skus'
+import SkuField from '#components/SkuField'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
 const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
@@ -359,15 +362,16 @@ const Home = () => {
       <div className="container mx-auto">
         <CommerceLayer accessToken={token} endpoint={endpoint}>
           <div className="flex flex-row flex-wrap justify-around">
+            <SkuContainer skus={skus}>
+              <Skus>
+                <SkuField attribute="image_url" tagElement="img" />
+                <SkuField attribute="code" tagElement="p" />
+              </Skus>
+            </SkuContainer>
             <PricesContainer perPage={20} loader={<Loading />}>
               {skus.map((s, k) => {
-                const lImg = s.substring(0, s.length - 4)
                 return (
                   <div key={k} className="text-center p-3">
-                    <img
-                      src={`https://img.commercelayer.io/skus/${lImg}.png?fm=png&q=70`}
-                      className="rounded-lg md:w-56 m-auto"
-                    />
                     <div className="flex flex-row flex-wrap justify-center">
                       <Price
                         data-test={`price-${k}`}
@@ -375,14 +379,6 @@ const Home = () => {
                         className="text-green-600 text-2xl m-1"
                         compareClassName="text-gray-500 text-2xl m-1 line-through"
                       />
-                    </div>
-                    <div className="p-3">
-                      <a
-                        className="mt-2 primary font-bold py-2 px-4 rounded"
-                        href="/order"
-                      >
-                        Order
-                      </a>
                     </div>
                   </div>
                 )

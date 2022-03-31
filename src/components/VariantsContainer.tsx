@@ -1,11 +1,4 @@
-import React, {
-  useEffect,
-  FunctionComponent,
-  useReducer,
-  useContext,
-  ReactNode,
-  useMemo,
-} from 'react'
+import React, { useEffect, useReducer, useContext, ReactNode } from 'react'
 import variantReducer, {
   variantInitialState,
   unsetVariantState,
@@ -33,7 +26,7 @@ type VariantsContainerProps = {
   skuCode?: string
 }
 
-const VariantsContainer: FunctionComponent<VariantsContainerProps> = (
+const VariantsContainer: React.FunctionComponent<VariantsContainerProps> = (
   props
 ) => {
   const { children, skuCode = '', filters = {} } = props
