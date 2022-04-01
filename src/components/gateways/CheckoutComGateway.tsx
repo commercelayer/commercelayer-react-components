@@ -40,8 +40,9 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
 
-  // @ts-ignore
-  const publicKey = paymentSource?.public_key
+  const publicKey =
+    // @ts-ignore
+    order?.payment_source?.public_key || paymentSource?.public_key
   const paymentConfig = config
     ? getPaymentConfig<'checkoutComPayment'>(paymentResource, config)
     : {}

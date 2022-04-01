@@ -9,6 +9,7 @@ import {
   getPaymentConfig,
   PaymentResource,
 } from '#reducers/PaymentMethodReducer'
+import getCardDetails from '#utils/getCardDetails'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React from 'react'
@@ -39,8 +40,10 @@ export default function StripeGateway(props: StripeGateway) {
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
 
-  // @ts-ignore
-  const publishableKey = paymentSource?.publishable_key
+  const publishableKey =
+    // @ts-ignore
+    order?.payment_source?.publishable_key || paymentSource?.publishable_key
+  const paymentSourceId = order?.payment_source?.id || paymentSource?.id
   const stripeConfig = config
     ? getPaymentConfig<'stripePayment'>(paymentResource, config)
     : {}
@@ -52,8 +55,12 @@ export default function StripeGateway(props: StripeGateway) {
       : []
 
   if (readonly || showCard) {
-    // @ts-ignore
-    const card = paymentSource?.options?.card as Record<string, any>
+    const card = getCardDetails({
+      customerPayment: {
+        payment_source: order?.payment_source || paymentSource,
+      },
+      paymentType: paymentResource,
+    })
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (
       <PaymentSourceContext.Provider value={value}>
@@ -82,7 +89,7 @@ export default function StripeGateway(props: StripeGateway) {
     )
   }
 
-  return publishableKey && !loading && order?.payment_source?.id ? (
+  return publishableKey && !loading && paymentSourceId ? (
     <StripePayment
       show={show}
       publishableKey={publishableKey}
