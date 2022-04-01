@@ -9,6 +9,7 @@ import {
   getPaymentConfig,
   PaymentResource,
 } from '#reducers/PaymentMethodReducer'
+import getCardDetails from '#utils/getCardDetails'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React, { Fragment, useContext } from 'react'
@@ -23,9 +24,7 @@ export default function BraintreeGateway(props: BraintreeGateway) {
     handleEditClick,
     children,
     templateCustomerCards,
-    show,
     loading,
-    onClickCustomerCards,
     loaderComponent,
     templateCustomerSaveToWallet,
     ...p
@@ -39,8 +38,9 @@ export default function BraintreeGateway(props: BraintreeGateway) {
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-ignore
-  const authorization = paymentSource?.client_token
+  const authorization =
+    // @ts-ignore
+    order?.payment_source?.client_token || paymentSource?.client_token
   const braintreeConfig = config
     ? getPaymentConfig<'braintreePayment'>(paymentResource, config)
     : {}
@@ -51,8 +51,12 @@ export default function BraintreeGateway(props: BraintreeGateway) {
         })
       : []
   if (readonly || showCard) {
-    // @ts-ignore
-    const card = paymentSource?.options?.card as Record<string, any>
+    const card = getCardDetails({
+      customerPayment: {
+        payment_source: order?.payment_source || paymentSource,
+      },
+      paymentType: paymentResource,
+    })
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (
       <PaymentSourceContext.Provider value={value}>

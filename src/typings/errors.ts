@@ -126,6 +126,7 @@ export const ErrorPropTypes = {
     'shipping_address',
     'sku_options',
     'variant',
+    'shipments',
   ]).isRequired,
   children: PropTypes.func,
   field: PropTypes.string,
