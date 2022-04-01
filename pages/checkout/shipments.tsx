@@ -150,6 +150,7 @@ export default function Main() {
                 </ShippingMethod>
               </Shipment>
               <Errors resource="line_items" />
+              <Errors resource="shipments" />
             </ShipmentsContainer>
             <div className="mt-10">
               <ShipmentsContainer>
