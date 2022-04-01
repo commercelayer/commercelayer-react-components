@@ -1,3 +1,10 @@
+## [3.9.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.0...v3.9.1) (2022-04-01)
+
+
+### Bug Fixes
+
+* Show selected customer card ([e3eaab8](https://github.com/commercelayer/commercelayer-react-components/commit/e3eaab875b9ddc50f795d0373f0ad935b5537666))
+
 # [3.9.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.8.2...v3.9.0) (2022-03-31)
 
 
