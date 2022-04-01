@@ -1,5 +1,6 @@
 import { GatewayBaseType } from '#components/PaymentGateway'
 import PaypalPayment from '#components/PaypalPayment'
+import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
@@ -7,25 +8,15 @@ import {
   getPaymentConfig,
   PaymentResource,
 } from '#reducers/PaymentMethodReducer'
+import getCardDetails from '#utils/getCardDetails'
 import isEmpty from 'lodash/isEmpty'
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 
-type PaypalGateway = GatewayBaseType
+type PaypalGateway = Partial<GatewayBaseType>
 
 export default function PaypalGateway(props: PaypalGateway) {
-  const {
-    readonly,
-    showCard,
-    handleEditClick,
-    children,
-    templateCustomerCards,
-    show,
-    loading,
-    onClickCustomerCards,
-    loaderComponent,
-    templateCustomerSaveToWallet,
-    ...p
-  } = props
+  const { readonly, showCard, handleEditClick, children, ...p } = props
+  const { order } = useContext(OrderContext)
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { currentPaymentMethodId, config, paymentSource } =
     useContext(PaymentMethodContext)
@@ -33,11 +24,12 @@ export default function PaypalGateway(props: PaypalGateway) {
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
   if (readonly || showCard) {
-    const card =
-      // @ts-ignore
-      paymentSource?.options?.card ||
-      // @ts-ignore
-      (paymentSource?.metadata?.card as Record<string, any>)
+    const card = getCardDetails({
+      customerPayment: {
+        payment_source: order?.payment_source || paymentSource,
+      },
+      paymentType: paymentResource,
+    })
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (
       <PaymentSourceContext.Provider value={value}>
@@ -47,5 +39,11 @@ export default function PaypalGateway(props: PaypalGateway) {
   }
   const paypalConfig =
     config && getPaymentConfig<'paypalPayment'>(paymentResource, config)
+  delete p.show
+  delete p.templateCustomerCards
+  delete p.templateCustomerSaveToWallet
+  delete p.loading
+  delete p.loaderComponent
+  delete p.onClickCustomerCards
   return <PaypalPayment {...p} infoMessage={paypalConfig?.infoMessage} />
 }
