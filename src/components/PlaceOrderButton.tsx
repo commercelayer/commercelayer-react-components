@@ -34,8 +34,12 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
-  const { currentPaymentMethodRef, loading, currentPaymentMethodType } =
-    useContext(PaymentMethodContext)
+  const {
+    currentPaymentMethodRef,
+    loading,
+    currentPaymentMethodType,
+    paymentSource,
+  } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
   useEffect(() => {
@@ -43,7 +47,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     else {
       if (paymentType === currentPaymentMethodType && paymentType) {
         const card = getCardDetails({
-          customerPayment: { payment_source: order?.payment_source },
+          customerPayment: { payment_source: paymentSource },
           paymentType,
         })
         if (
@@ -70,7 +74,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     loading,
     currentPaymentMethodType,
     order,
-    order?.payment_source,
+    paymentSource,
   ])
   useEffect(() => {
     if (
@@ -110,7 +114,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       paymentType &&
       getCardDetails({
         paymentType,
-        customerPayment: { payment_source: order?.payment_source },
+        customerPayment: { payment_source: paymentSource },
       })
     if (
       currentPaymentMethodRef?.current?.onsubmit &&
@@ -123,7 +127,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       // @ts-ignore
       isValid = (await currentPaymentMethodRef.current?.onsubmit(
         // @ts-ignore
-        order.payment_source
+        paymentSource
       )) as boolean
     } else if (card?.brand) {
       isValid = true
@@ -131,8 +135,8 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     const placed =
       isValid &&
       setPlaceOrder &&
-      (order?.payment_source || isFree) &&
-      (await setPlaceOrder({ paymentSource: order?.payment_source }))
+      (paymentSource || isFree) &&
+      (await setPlaceOrder({ paymentSource: paymentSource }))
     setForceDisable(false)
     onClick && placed && onClick(placed)
   }

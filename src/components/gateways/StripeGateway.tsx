@@ -39,10 +39,8 @@ export default function StripeGateway(props: StripeGateway) {
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-
-  const publishableKey =
-    // @ts-ignore
-    order?.payment_source?.publishable_key || paymentSource?.publishable_key
+  // @ts-ignore
+  const publishableKey = paymentSource?.publishable_key
   const paymentSourceId = order?.payment_source?.id || paymentSource?.id
   const stripeConfig = config
     ? getPaymentConfig<'stripePayment'>(paymentResource, config)
@@ -57,7 +55,7 @@ export default function StripeGateway(props: StripeGateway) {
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
-        payment_source: order?.payment_source || paymentSource,
+        payment_source: paymentSource,
       },
       paymentType: paymentResource,
     })

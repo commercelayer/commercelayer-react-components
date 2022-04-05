@@ -6,7 +6,10 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { HostedFieldFieldOptions } from 'braintree-web/modules/hosted-fields'
+import {
+  HostedFieldFieldOptions,
+  HostedFieldsHostedFieldsFieldName,
+} from 'braintree-web/modules/hosted-fields'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isEmpty from 'lodash/isEmpty'
 import OrderContext from '#context/OrderContext'
@@ -14,6 +17,9 @@ import Parent from './utils/Parent'
 import { PaymentSourceProps } from './PaymentSource'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import promisify from '#utils/promisify'
+import { ThreeDSecure } from 'braintree-web'
+import { BraintreePayment as BraintreePaymentType } from '@commercelayer/sdk'
+import { ThreeDSecureVerifyOptions } from 'braintree-web/modules/three-d-secure'
 type BraintreeHostedFields<Type> = {
   [Property in keyof Type]: {
     label?: string
@@ -40,6 +46,13 @@ type BraintreePaymentProps = {
   config?: BraintreeConfig
   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
   locale?: string
+}
+
+type SubmitProps = {
+  event?: FormEvent<HTMLFormElement>
+  hostedFieldsInstance: HostedFieldsHostedFieldsFieldName
+  threeDSInstance: ThreeDSecure
+  paymentSource?: BraintreePaymentType
 }
 
 const defaultConfig: BraintreeConfig = {
@@ -123,11 +136,11 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const ref = useRef<null | HTMLFormElement>(null)
-  const handleSubmitForm = async (
-    event?: FormEvent<HTMLFormElement>,
-    hostedFieldsInstance?: any,
-    threeDSInstance?: any
-  ) => {
+  const handleSubmitForm = async ({
+    event,
+    hostedFieldsInstance,
+    threeDSInstance,
+  }: SubmitProps) => {
     const savePaymentSourceToCustomerWallet =
       // @ts-ignore
       event?.elements?.['save_payment_source_to_customer_wallet']?.checked
@@ -145,7 +158,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
         const verifyCardOptions = {
           nonce: payload.nonce,
           bin: payload.details.bin,
-          amount: order?.total_amount_with_taxes_float,
+          amount: order?.total_amount_with_taxes_float as number,
           email: order?.customer_email,
           billingAddress: {
             givenName: billingAddress?.first_name,
@@ -160,8 +173,10 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
           onLookupComplete: (_data: any, next: any) => {
             next()
           },
-        }
-        const response = await threeDSInstance.verifyCard(verifyCardOptions)
+        } as ThreeDSecureVerifyOptions
+        const response = (await threeDSInstance.verifyCard(
+          verifyCardOptions
+        )) as any
         if (
           response.rawCardinalSDKVerificationData.Validated &&
           paymentSource
@@ -221,7 +236,10 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
               fields: fields as HostedFieldFieldOptions,
               styles: styles,
             },
-            (hostedFieldsErr: any, hostedFieldsInstance: any) => {
+            (
+              hostedFieldsErr: any,
+              hostedFieldsInstance: HostedFieldsHostedFieldsFieldName
+            ) => {
               if (hostedFieldsErr) {
                 console.error(hostedFieldsErr)
                 return
@@ -232,7 +250,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
                   authorization,
                   version: 2,
                 },
-                (threeDSecureErr: any, threeDSecureInstance: any) => {
+                (threeDSecureErr: any, threeDSInstance: ThreeDSecure) => {
                   if (threeDSecureErr) {
                     // Handle error in 3D Secure component creation
                     console.error('3DSecure error', threeDSecureErr)
@@ -246,12 +264,13 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
                     ])
                   }
                   if (ref.current) {
-                    ref.current.onsubmit = () =>
-                      handleSubmitForm(
-                        ref.current as any,
+                    ref.current.onsubmit = (paymentSource: any) =>
+                      handleSubmitForm({
+                        event: ref.current as any,
                         hostedFieldsInstance,
-                        threeDSecureInstance
-                      )
+                        threeDSInstance,
+                        paymentSource,
+                      })
                     setPaymentRef({ ref })
                   }
                 }
@@ -271,7 +290,7 @@ const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
       <form
         ref={ref}
         id="braintree-form"
-        onSubmit={handleSubmitForm}
+        onSubmit={handleSubmitForm as any}
         className={containerClassName}
       >
         <div className={fieldsContainerClassName}>

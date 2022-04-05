@@ -365,14 +365,24 @@ export type DestroyPaymentSource = (args: {
   paymentSourceId: string
   paymentResource: PaymentResource
   dispatch?: Dispatch<PaymentMethodAction>
+  updateOrder?: typeof updateOrder
+  orderId?: string
 }) => Promise<void>
 
 export const destroyPaymentSource: DestroyPaymentSource = async ({
   paymentSourceId,
   paymentResource,
   dispatch,
+  // updateOrder,
+  // orderId,
 }) => {
   if (paymentSourceId && paymentResource) {
+    // await updateOrder({
+    //   id: orderId,
+    //   attributes: {
+    //     payment_source: {},
+    //   },
+    // })
     dispatch &&
       dispatch({
         type: 'setPaymentSource',
