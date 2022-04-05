@@ -38,9 +38,8 @@ export default function BraintreeGateway(props: BraintreeGateway) {
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  const authorization =
-    // @ts-ignore
-    order?.payment_source?.client_token || paymentSource?.client_token
+  // @ts-ignore
+  const authorization = paymentSource?.client_token
   const braintreeConfig = config
     ? getPaymentConfig<'braintreePayment'>(paymentResource, config)
     : {}
@@ -53,7 +52,7 @@ export default function BraintreeGateway(props: BraintreeGateway) {
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
-        payment_source: order?.payment_source || paymentSource,
+        payment_source: paymentSource,
       },
       paymentType: paymentResource,
     })

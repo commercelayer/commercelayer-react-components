@@ -55,7 +55,7 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
       const card = getCardDetails({
         paymentType: payment?.payment_source_type as PaymentResource,
         customerPayment: {
-          payment_source: order?.payment_source || paymentSource,
+          payment_source: paymentSource,
         },
       })
       if (card.brand) setShowCard(true)
@@ -74,11 +74,13 @@ const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
   ])
   const handleEditClick = async (e: MouseEvent) => {
     e.stopPropagation()
-    paymentSource &&
-      (await destroyPaymentSource({
-        paymentSourceId: paymentSource?.id,
+    if (paymentSource) {
+      const paymentSourceId = paymentSource?.id
+      await destroyPaymentSource({
+        paymentSourceId,
         paymentResource: payment?.payment_source_type as PaymentResource,
-      }))
+      })
+    }
     setShowCard(!showCard)
     setShow(true)
   }

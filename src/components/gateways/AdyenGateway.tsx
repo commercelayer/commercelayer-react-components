@@ -39,13 +39,11 @@ export default function AdyenGateway(props: AdyenGateway) {
     useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = 'adyen_payments'
   const locale = order?.language_code as StripeElementLocale
-  const paymentMethods =
-    // @ts-ignore
-    order?.payment_source?.payment_methods || paymentSource?.payment_methods
+  // @ts-ignore
+  const paymentMethods = paymentSource?.payment_methods
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  const clientKey =
-    // @ts-ignore
-    order?.payment_source?.public_key || paymentSource?.public_key
+  // @ts-ignore
+  const clientKey = paymentSource?.public_key
   const environment = jwt(accessToken).test ? 'test' : 'live'
   const adyenConfig = config
     ? getPaymentConfig<'adyenPayment'>(paymentResource, config)
@@ -60,7 +58,7 @@ export default function AdyenGateway(props: AdyenGateway) {
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
-        payment_source: order?.payment_source || paymentSource,
+        payment_source: paymentSource,
       },
       paymentType: paymentResource,
     })
