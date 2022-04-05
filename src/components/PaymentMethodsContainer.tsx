@@ -14,6 +14,7 @@ import paymentMethodReducer, {
   PaymentMethodConfig,
   setPaymentMethodConfig,
   PaymentRef,
+  setPaymentSource,
 } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
@@ -75,6 +76,22 @@ const PaymentMethodsContainer: React.FunctionComponent<
         getPayMethods()
       }
     }
+    if (order?.payment_source) {
+      dispatch({
+        type: 'setPaymentSource',
+        payload: {
+          paymentSource: order?.payment_source,
+        },
+      })
+    }
+    if (order?.payment_source === null) {
+      dispatch({
+        type: 'setPaymentSource',
+        payload: {
+          paymentSource: undefined,
+        },
+      })
+    }
   }, [order, credentials, include, includeLoaded])
   const contextValue = useMemo(() => {
     return {
@@ -115,6 +132,8 @@ const PaymentMethodsContainer: React.FunctionComponent<
           ...args,
           dispatch,
           config: credentials,
+          updateOrder,
+          orderId: order?.id,
         }),
     }
   }, [state])

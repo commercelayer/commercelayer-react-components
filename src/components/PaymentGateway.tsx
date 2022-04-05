@@ -55,6 +55,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
     config,
     currentPaymentMethodType,
     setPaymentSource,
+    paymentSource,
   } = useContext(PaymentMethodContext)
   const paymentResource = readonly
     ? currentPaymentMethodType
@@ -77,20 +78,22 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
         })
         getCustomerPaymentSources && (await getCustomerPaymentSources())
       }
-      if (order?.payment_source === null && order?.payment_method.id && show) {
+      if (!paymentSource && order?.payment_method.id && show) {
         setPaymentSources()
       }
       // @ts-ignore
-      if (order?.payment_source?.mismatched_amounts && show) {
+      if (paymentSource?.mismatched_amounts && show) {
         setPaymentSources()
       }
-
+      if (!paymentSource || paymentSource.type !== paymentResource) {
+        setPaymentSources()
+      }
       setLoading(false)
     }
     return () => {
       setLoading(true)
     }
-  }, [order?.payment_method?.id, show, order?.payment_source?.id])
+  }, [order?.payment_method?.id, show, paymentSource])
   const gatewayConfig = {
     readonly,
     showCard,

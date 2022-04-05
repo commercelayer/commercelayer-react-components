@@ -39,10 +39,8 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-
-  const publicKey =
-    // @ts-ignore
-    order?.payment_source?.public_key || paymentSource?.public_key
+  // @ts-ignore
+  const publicKey = paymentSource?.public_key
   const paymentConfig = config
     ? getPaymentConfig<'checkoutComPayment'>(paymentResource, config)
     : {}
@@ -55,7 +53,7 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
-        payment_source: order?.payment_source || paymentSource,
+        payment_source: paymentSource,
       },
       paymentType: paymentResource,
     })

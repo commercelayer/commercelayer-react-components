@@ -67,12 +67,13 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormProps> = ({
     currentPaymentMethodType,
     setPaymentMethodErrors,
     setPaymentRef,
+    paymentSource,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const stripe = useStripe()
   const elements = useElements()
   useEffect(() => {
-    if (ref.current && stripe && elements && order?.payment_source?.id) {
+    if (ref.current && stripe && elements && paymentSource) {
       // @ts-ignore
       ref.current.onsubmit = (paymentSource?: StripePaymentType) => {
         return onSubmit({
@@ -87,12 +88,12 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormProps> = ({
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  }, [ref, stripe, elements, order?.payment_source?.id])
+  }, [ref, stripe, elements, paymentSource])
   const onSubmit = async ({
     event,
     stripe,
     elements,
-    paymentSource,
+    paymentSource: ps,
   }: OnSubmitArgs): Promise<boolean> => {
     if (!stripe) return false
 
@@ -126,8 +127,8 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormProps> = ({
         card: cardElement,
         billing_details,
       })
-      const clientSecret = paymentSource?.client_secret
-      const paymentSourceId = paymentSource?.id
+      const clientSecret = ps?.client_secret
+      const paymentSourceId = ps?.id
       if (clientSecret) {
         const { error, paymentIntent } = await stripe.confirmCardPayment(
           clientSecret,
