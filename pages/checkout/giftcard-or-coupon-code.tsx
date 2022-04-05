@@ -33,9 +33,15 @@ export default function Main() {
   const classError = codeError
     ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500'
     : ''
-  const handleSubmit = ({ success }: { success: boolean }) => {
-    console.log(`success`, success)
-    if (!success) return setCodeError(true)
+  const handleSubmit = ({
+    success,
+    value,
+  }: {
+    success: boolean
+    value: string
+  }) => {
+    console.log('success, value', success, value)
+    if (!success && value) return setCodeError(true)
     return setCodeError(false)
   }
   const removeIcon = (

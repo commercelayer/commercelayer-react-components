@@ -22,14 +22,14 @@ const propTypes = components.GiftCardOrCouponForm.propTypes
 
 type GiftCardOrCouponFormProps = {
   children: ReactNode
-  onSubmit?: (response: { success: boolean }) => void
+  onSubmit?: (response: { success: boolean; value: string }) => void
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
   props
 ) => {
   const { children, autoComplete = 'on', onSubmit, ...p } = props
-  const { validation, values } = useRapidForm()
+  const { validation, values, reset } = useRapidForm()
   const [codeType, setCodeType] = useState<OrderCodeType>(
     'gift_card_or_coupon_code'
   )
@@ -47,7 +47,10 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
         (i) => i.field === camelCase(inputName)
       ) as BaseError[]
       setOrderErrors({ errors: err })
-      onSubmit && onSubmit({ success: true })
+      onSubmit && onSubmit({ value: values[inputName]?.value, success: true })
+    }
+    if (values[inputName]?.value === '') {
+      onSubmit && onSubmit({ value: values[inputName]?.value, success: false })
     }
   }, [values])
 
@@ -68,8 +71,13 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
     const code = has(values, inputName) ? values[inputName].value : undefined
     if (code) {
       const { success } = await setGiftCardOrCouponCode({ code, codeType })
-      onSubmit && onSubmit({ success })
-      success && e.target.reset()
+      const value = values[inputName]?.value
+      onSubmit &&
+        onSubmit({
+          success,
+          value,
+        })
+      success && reset(e)
     }
   }
   return (order?.gift_card_code && order?.coupon_code) ||
