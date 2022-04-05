@@ -1,3 +1,15 @@
+## [3.9.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.1...v3.9.2) (2022-04-05)
+
+
+### Bug Fixes
+
+* Rehydrate payment source among payment components ([789af62](https://github.com/commercelayer/commercelayer-react-components/commit/789af628e8447cea843fa65d4a6620f56d3d4110))
+
+
+### Performance Improvements
+
+* Add value to onSubmit callback as prop and reset form after submitting ([ad739c2](https://github.com/commercelayer/commercelayer-react-components/commit/ad739c2657bd76f993bb2c993aad1beb367c2a57))
+
 ## [3.9.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.0...v3.9.1) (2022-04-01)
 
 
