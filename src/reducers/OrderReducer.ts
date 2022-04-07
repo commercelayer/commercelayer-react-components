@@ -476,6 +476,7 @@ export type SetGiftCardOrCouponCode = (args: {
   config?: CommerceLayerConfig
   order?: Order
   include?: string[]
+  state?: OrderState
 }) => Promise<{ success: boolean }>
 
 export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
@@ -485,20 +486,25 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
   config,
   order,
   include,
+  state,
 }) => {
   try {
     if (config && order && code && dispatch) {
-      const sdk = getSdk(config)
-      const attributes: OrderUpdate = {
-        id: order.id,
+      const attributes: Omit<OrderUpdate, 'id'> = {
         [codeType]: code,
       }
-      const orderUpdated = await sdk.orders.update(attributes, { include })
+      await updateOrder({
+        id: order.id,
+        attributes,
+        config,
+        include,
+        dispatch,
+        state,
+      })
       dispatch({
         type: 'setErrors',
         payload: {
           errors: [],
-          order: orderUpdated,
         },
       })
       return { success: true }
@@ -520,6 +526,7 @@ export type RemoveGiftCardOrCouponCode = (args: {
   config?: CommerceLayerConfig
   order?: Order
   include?: string[]
+  state?: OrderState
 }) => Promise<{ success: boolean }>
 
 export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
@@ -528,20 +535,25 @@ export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
   config,
   order,
   include,
+  state,
 }) => {
   try {
     if (config && order && dispatch) {
-      const sdk = getSdk(config)
-      const attributes: OrderUpdate = {
-        id: order.id,
+      const attributes: Omit<OrderUpdate, 'id'> = {
         [codeType]: '',
       }
-      const orderUpdated = await sdk.orders.update(attributes, { include })
+      await updateOrder({
+        id: order.id,
+        attributes,
+        config,
+        include,
+        dispatch,
+        state,
+      })
       dispatch({
         type: 'setErrors',
         payload: {
           errors: [],
-          order: orderUpdated,
         },
       })
       return { success: true }
