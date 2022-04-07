@@ -126,6 +126,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
           order: state.order,
           config,
           include: state.include,
+          state,
         }),
       removeGiftCardOrCouponCode: ({ codeType }: { codeType: OrderCodeType }) =>
         defaultOrderContext['removeGiftCardOrCouponCode']({
@@ -134,6 +135,7 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
           order: state.order,
           config,
           include: state.include,
+          state,
         }),
       addResourceToInclude: (args: AddResourceToInclude) =>
         defaultOrderContext['addResourceToInclude']({
