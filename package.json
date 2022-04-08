@@ -85,7 +85,7 @@
     "@ac-dev/countries-service": "^1.2.0",
     "@ac-dev/states-service": "^1.1.0",
     "@adyen/adyen-web": "^5.12.0",
-    "@commercelayer/js-auth": "^3.0.0",
+    "@commercelayer/js-auth": "^2.3.0",
     "@commercelayer/sdk": "^3.7.0",
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.26.0",
