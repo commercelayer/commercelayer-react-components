@@ -4,7 +4,7 @@ import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Order, OrderUpdate } from '@commercelayer/sdk'
 import isEmpty from 'lodash/isEmpty'
-import { shipmentsFilled } from '#utils/shipments'
+import { isDoNotShip, shipmentsFilled } from '#utils/shipments'
 import { PaymentResource } from './PaymentMethodReducer'
 import { PaymentSourceType } from './PaymentMethodReducer'
 import {
@@ -89,7 +89,8 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
     const billingAddress = order.billing_address
     if (isEmpty(billingAddress)) isPermitted = false
     const shippingAddress = order.shipping_address
-    if (isEmpty(shippingAddress)) isPermitted = false
+    const doNotShip = isDoNotShip(order.line_items)
+    if (isEmpty(shippingAddress) && !doNotShip) isPermitted = false
     const shipments = order.shipments
     const shipment = shipments && shipmentsFilled(shipments)
     if (!isEmpty(shipments) && !shipment) isPermitted = false
@@ -139,10 +140,10 @@ export const setPlaceOrder: SetPlaceOrder = async ({
   const response = {
     placed: false,
   }
-  try {
-    if (state && order && config) {
-      const sdk = getSdk(config)
-      const { options, paymentType } = state
+  if (state && config && order) {
+    const sdk = getSdk(config)
+    const { options, paymentType } = state
+    try {
       if (paymentType === 'paypal_payments' && paymentSource) {
         if (!options?.paypalPayerId && paymentSource?.approval_url) {
           window.location.href = paymentSource?.approval_url as string
@@ -228,16 +229,16 @@ export const setPlaceOrder: SetPlaceOrder = async ({
           }
         }
       }
-    }
-    return response
-  } catch (error) {
-    const errors = getErrors(error, 'orders')
-    setOrderErrors && setOrderErrors(errors)
-    return {
-      ...response,
-      errors,
+    } catch (error) {
+      const errors = getErrors(error, 'orders', paymentType)
+      setOrderErrors && setOrderErrors(errors)
+      return {
+        ...response,
+        errors,
+      }
     }
   }
+  return response
 }
 
 const type: PlaceOrderActionType[] = ['setErrors', 'setPlaceOrderPermitted']
