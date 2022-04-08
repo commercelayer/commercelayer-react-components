@@ -1,3 +1,12 @@
+## [3.9.3](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.2...v3.9.3) (2022-04-08)
+
+
+### Bug Fixes
+
+* Check if there is `do_not_ship` set to `true` and the order doesn't have the shipping address ([c282728](https://github.com/commercelayer/commercelayer-react-components/commit/c28272822d0c814c64dfdd2552e96e7cc5f1d289))
+* Reload the order  when a coupon is added or removed ([ecbff39](https://github.com/commercelayer/commercelayer-react-components/commit/ecbff39ec3025fdb4973ff2eb229544cc48acd85))
+* Set @commercelayer/js-auth to latest version `2.3.0` ([4b5ec96](https://github.com/commercelayer/commercelayer-react-components/commit/4b5ec96f9e6d9163e396ad0342d84b452ba15f1f))
+
 ## [3.9.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.1...v3.9.2) (2022-04-05)
 
 
