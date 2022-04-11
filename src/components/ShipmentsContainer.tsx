@@ -23,7 +23,7 @@ type ShipmentsContainerProps = {
 const ShipmentsContainer: React.FunctionComponent<ShipmentsContainerProps> = (
   props
 ) => {
-  const { children, ...p } = props
+  const { children } = props
   const [state, dispatch] = useReducer(shipmentReducer, shipmentInitialState)
   const { order, getOrder, include, addResourceToInclude, includeLoaded } =
     useContext(OrderContext)
@@ -47,17 +47,6 @@ const ShipmentsContainer: React.FunctionComponent<ShipmentsContainerProps> = (
           'shipments.shipping_method': true,
           'shipments.stock_transfers': true,
           'shipments.stock_location': true,
-        },
-      })
-    }
-    if (!include?.includes('line_items.item')) {
-      addResourceToInclude({
-        newResource: ['line_items.item'],
-      })
-    } else if (!includeLoaded?.['line_items.item']) {
-      addResourceToInclude({
-        newResourceLoaded: {
-          'line_items.item': true,
         },
       })
     }
@@ -92,7 +81,6 @@ const ShipmentsContainer: React.FunctionComponent<ShipmentsContainerProps> = (
         const hasStocks = order.line_items
           .filter(({ item_type }) => item_type === 'skus')
           .map((lineItem) => {
-            console.log('lineItem', lineItem)
             // @ts-ignore
             return !(lineItem.item?.inventory?.quantity >= lineItem?.quantity)
               ? false
