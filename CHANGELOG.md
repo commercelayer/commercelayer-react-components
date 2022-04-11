@@ -1,3 +1,10 @@
+## [3.9.4](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.3...v3.9.4) (2022-04-11)
+
+
+### Bug Fixes
+
+* Include `line_items.item` ([27bc292](https://github.com/commercelayer/commercelayer-react-components/commit/27bc29233234ea11c6852fe5cddfe50a5bbf9ada))
+
 ## [3.9.3](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.2...v3.9.3) (2022-04-08)
 
 
