@@ -46,10 +46,11 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
         errors,
         (i) => i.field === camelCase(inputName)
       ) as BaseError[]
-      setOrderErrors({ errors: err })
-      onSubmit && onSubmit({ value: values[inputName]?.value, success: true })
+      setOrderErrors(err)
+      onSubmit && onSubmit({ value: values[inputName]?.value, success: false })
     }
     if (values[inputName]?.value === '') {
+      setOrderErrors([])
       onSubmit && onSubmit({ value: values[inputName]?.value, success: false })
     }
   }, [values])
