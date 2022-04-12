@@ -62,7 +62,7 @@ const messages: any = [
 
 export default function Main() {
   const [token, setToken] = useState('')
-  const [paymentSource, setPaymentSource] = useState<any>(null)
+  const [placed, setPlaced] = useState(false)
   const { query } = useRouter()
   if (query.orderId) {
     orderId = query.orderId as string
@@ -104,7 +104,9 @@ export default function Main() {
     if (!token) getToken()
     // if (token) getOrder()
   }, [token])
-  return (
+  return placed ? (
+    <p>Order placed</p>
+  ) : (
     <Fragment>
       <Head>
         <script src="http://localhost:8097"></script>
@@ -148,6 +150,11 @@ export default function Main() {
                   paypalPayment: {
                     cancel_url: paypalReturnUrl,
                     return_url: paypalReturnUrl,
+                  },
+                  klarnaPayment: {
+                    placeOrderCallback: (res: any) => {
+                      if (res.placed) setPlaced(true)
+                    },
                   },
                 }}
               >
@@ -225,7 +232,7 @@ export default function Main() {
                   <div>
                     <PlaceOrderButton
                       onClick={(res: any) => {
-                        console.log('res', res)
+                        if (res.placed) setPlaced(true)
                       }}
                       className="mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                     />
@@ -255,13 +262,13 @@ export default function Main() {
               </PaymentSource>
             </PaymentMethodsContainer> */}
             </OrderContainer>
-            <div className="mt-5">
+            {/* <div className="mt-5">
               <pre data-cy="current-shipping-method">{`Current payment source options: ${JSON.stringify(
                 paymentSource,
                 null,
                 2
               )}`}</pre>
-            </div>
+            </div> */}
           </div>
         </CommerceLayer>
       </React.StrictMode>
