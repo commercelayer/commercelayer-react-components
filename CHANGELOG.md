@@ -1,3 +1,22 @@
+# [3.10.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.5...v3.10.0) (2022-04-12)
+
+
+### Bug Fixes
+
+* Check billing and shipping address ([6dc7389](https://github.com/commercelayer/commercelayer-react-components/commit/6dc73897f048c649d2cbe011333219bf709dc0d9))
+* Update klarna order ([a78b9ba](https://github.com/commercelayer/commercelayer-react-components/commit/a78b9bac68ae6af66547a8a51906a852816704b1))
+
+
+### Features
+
+* Add Klarna components ([21bbc01](https://github.com/commercelayer/commercelayer-react-components/commit/21bbc018dc222db1077ae5c9973ad91874da24b1))
+* Add klarna_payments to gateways configuration ([87f2520](https://github.com/commercelayer/commercelayer-react-components/commit/87f252063cd1927009bde809f438e10473c31dfe))
+* Add order info to klarna payment ([8c5249d](https://github.com/commercelayer/commercelayer-react-components/commit/8c5249d4a79bd0601718fa4effd4ec77a06d28b9))
+* Add place order after the authorization flow ([eeec7ff](https://github.com/commercelayer/commercelayer-react-components/commit/eeec7ff2fbb854226bab3b02c04353577c7aeec1))
+* Add place order callback flow ([4afda53](https://github.com/commercelayer/commercelayer-react-components/commit/4afda53221d64badbaf9da2066032a9e1c4183ef))
+* Import Klarna external JS script ([888465b](https://github.com/commercelayer/commercelayer-react-components/commit/888465b0462c8df3e87dfb3dc53a1a169e619567))
+* Show Klarna widget ([638c252](https://github.com/commercelayer/commercelayer-react-components/commit/638c25242ecc798af1dc700dabe77811667c8250))
+
 ## [3.9.5](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.4...v3.9.5) (2022-04-12)
 
 
