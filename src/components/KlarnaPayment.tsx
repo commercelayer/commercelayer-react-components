@@ -1,29 +1,11 @@
-import React, {
-  // FunctionComponent,
-  // SyntheticEvent,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
 import { PaymentSourceProps } from './PaymentSource'
-// import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
-// import { setCustomerOrderParam } from '#utils/localStorage'
 import useExternalScript from '#utils/hooks/useExternalScript'
 import { LineItem } from '@commercelayer/sdk'
 import PlaceOrderContext from '#context/PlaceOrderContext'
-// import Klarna from '@adyen/adyen-web/dist/types/components/Klarna'
-
-export type KlarnaConfig = {
-  // containerClassName?: string
-  // hintLabel?: string
-  // name?: string
-  // options?: StripeCardElementOptions
-  [key: string]: any
-}
 
 type KlarnaResponse = {
   show_form: boolean
@@ -79,28 +61,23 @@ function klarnaOrderLines(lineItems?: LineItem[]): OrderLine[] {
 
 export default function KlarnaPayment({
   clientToken,
-  show,
-  options,
+  placeOrderCallback,
   locale = 'EN',
   ...p
 }: KlarnaPaymentProps) {
-  const ref = useRef<null | HTMLFormElement>(null)
+  const ref = React.useRef<null | HTMLFormElement>(null)
   const {
     paymentSource,
     currentPaymentMethodType,
     setPaymentRef,
     setPaymentSource,
+    setPaymentMethodErrors,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const { setPlaceOrder } = useContext(PlaceOrderContext)
   const loaded = useExternalScript('https://x.klarnacdn.net/kp/lib/v1/api.js')
   const [klarna, setKlarna] = useState<any>()
-  const {
-    containerClassName,
-    templateCustomerSaveToWallet,
-    fonts = [],
-    ...divProps
-  } = p
+  const { containerClassName, ...divProps } = p
   useEffect(() => {
     if (loaded && window?.Klarna !== undefined) {
       setKlarna(window.Klarna)
@@ -159,7 +136,6 @@ export default function KlarnaPayment({
       shipping_address,
       billing_address,
       order_amount: order?.total_amount_cents,
-      // order_tax_amount: order?.total_tax_amount_cents,
       order_lines: klarnaOrderLines(order?.line_items),
     }
     try {
@@ -200,22 +176,28 @@ export default function KlarnaPayment({
                       (await setPlaceOrder({
                         paymentSource: ps,
                       }))) || { placed: false }
-                    console.log('placed', placed)
-                    // placed && placeOrderCallback && placeOrderCallback({ placed })
+                    placed &&
+                      placeOrderCallback &&
+                      placeOrderCallback({ placed })
                   }
                 }
               )
             } catch (e) {
               console.error('e', e)
-              debugger
+              setPaymentMethodErrors([
+                {
+                  code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+                  resource: 'payment_methods',
+                  field: currentPaymentMethodType,
+                  message: 'Authorization error',
+                },
+              ])
             }
           }
         }
       )
-      // return true
     } catch (e) {
-      console.error('e', e)
-      debugger
+      console.error('Load Klarna libray', e)
     }
   }
   if (klarna && clientToken) {
@@ -253,15 +235,9 @@ export default function KlarnaPayment({
           phone: order?.shipping_address?.phone,
           country: order?.shipping_address?.country_code,
         },
-      },
-      (res: any) => {
-        console.log('res', res)
       }
     )
   }
-  console.log('Klarna', klarna, clientToken)
-  // const [isLoaded, setIsLoaded] = useState(false)
-  // const [stripe, setStripe] = useState(null)
   return (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
