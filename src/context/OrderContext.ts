@@ -16,11 +16,12 @@ import {
   updateOrder,
   getOrderContext,
 } from '#reducers/OrderReducer'
+import { BaseError } from '#typings/errors'
 
 type DefaultContext = {
   createOrder: CreateOrder
   addToCart: AddToCart
-  setOrderErrors: (errors: unknown) => void
+  setOrderErrors: (errors: BaseError[]) => void
   setGiftCardOrCouponCode: SetGiftCardOrCouponCode
   removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode
   saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook

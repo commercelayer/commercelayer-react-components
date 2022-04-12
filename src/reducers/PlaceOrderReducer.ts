@@ -120,7 +120,7 @@ export type SetPlaceOrder = (args: {
   config?: CommerceLayerConfig
   order?: Order
   state?: PlaceOrderState
-  setOrderErrors?: (collection: unknown) => void
+  setOrderErrors?: (errors: BaseError[]) => void
   paymentSource?: PaymentSourceType & { approval_url?: string }
   include?: string[]
   setOrder?: (order: Order) => void

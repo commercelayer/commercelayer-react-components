@@ -278,6 +278,7 @@ export async function updateOrder({
     // NOTE: Retrieve doesn't response with attributes updated
     const order = await getApiOrder({ id, config, dispatch, state })
     dispatch && order && dispatch({ type: 'setOrder', payload: { order } })
+    return { success: true }
   } catch (error) {
     const errors = getErrors(error, 'orders')
     if (dispatch) {
@@ -289,6 +290,7 @@ export async function updateOrder({
         },
       })
     }
+    return { success: false, error }
   }
 }
 
@@ -435,10 +437,10 @@ export const unsetOrderState: UnsetOrderState = (dispatch) => {
 
 type OrderErrors = {
   dispatch?: Dispatch<OrderActions>
-  errors: any
+  errors: BaseError[]
 }
 
-export function setOrderErrors({ dispatch, errors }: OrderErrors) {
+export function setOrderErrors({ dispatch, errors = [] }: OrderErrors) {
   dispatch &&
     dispatch({
       type: 'setErrors',
@@ -493,7 +495,7 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
       const attributes: Omit<OrderUpdate, 'id'> = {
         [codeType]: code,
       }
-      await updateOrder({
+      const { success, error } = await updateOrder({
         id: order.id,
         attributes,
         config,
@@ -501,13 +503,14 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
         dispatch,
         state,
       })
+      if (!success) throw error
       dispatch({
         type: 'setErrors',
         payload: {
           errors: [],
         },
       })
-      return { success: true }
+      return { success }
     }
     return { success: false }
   } catch (error: any) {
