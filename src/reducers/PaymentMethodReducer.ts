@@ -19,6 +19,7 @@ import {
   CheckoutComPayment,
   ExternalPayment,
   PaypalPayment,
+  KlarnaPayment,
 } from '@commercelayer/sdk'
 import camelCase from 'lodash/camelCase'
 import has from 'lodash/has'
@@ -75,6 +76,7 @@ export type PaymentSourceObject = {
       }
     }
   }
+  klarna_payments: KlarnaPayment
 }
 
 export type PaymentMethodActionType =
@@ -399,7 +401,8 @@ export type PaymentMethodConfig = {
   paypalPayment?: PaypalConfig
   adyenPayment?: AdyenPaymentConfig
   checkoutComPayment?: CheckoutComConfig
-  klarnaPayment?: StripeConfig
+  klarnaPayment?: Pick<AdyenPaymentConfig, 'placeOrderCallback'> &
+    Pick<StripeConfig, 'containerClassName'>
 }
 
 type SetPaymentMethodConfig = (

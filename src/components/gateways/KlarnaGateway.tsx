@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from 'react'
+import React from 'react'
 import KlarnaPayment from '#components/KlarnaPayment'
 import { GatewayBaseType } from '#components/PaymentGateway'
 import CustomerContext from '#context/CustomerContext'
@@ -22,18 +22,15 @@ export default function KlarnaGateway(props: KlarnaGateway) {
     handleEditClick,
     children,
     templateCustomerCards,
-    show,
     loading,
-    onClickCustomerCards,
     loaderComponent,
-    templateCustomerSaveToWallet,
     ...p
   } = props
-  const { order } = useContext(OrderContext)
-  const { payment } = useContext(PaymentMethodChildrenContext)
-  const { payments, isGuest } = useContext(CustomerContext)
+  const { order } = React.useContext(OrderContext)
+  const { payment } = React.useContext(PaymentMethodChildrenContext)
+  const { payments, isGuest } = React.useContext(CustomerContext)
   const { currentPaymentMethodId, config, paymentSource } =
-    useContext(PaymentMethodContext)
+    React.useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = 'klarna_payments'
   const locale = order?.language_code
 
@@ -52,7 +49,7 @@ export default function KlarnaGateway(props: KlarnaGateway) {
 
   if (readonly || showCard) {
     // @ts-ignore
-    const card = paymentSource?.options?.card as Record<string, any>
+    const card = paymentSource?.options?.card
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (
       <PaymentSourceContext.Provider value={value}>
@@ -62,7 +59,7 @@ export default function KlarnaGateway(props: KlarnaGateway) {
   }
   if (!isGuest && templateCustomerCards) {
     return (
-      <Fragment>
+      <>
         {isEmpty(customerPayments) ? null : (
           <div className={p.className}>
             <PaymentCardsTemplate {...{ paymentResource, customerPayments }}>
@@ -71,19 +68,16 @@ export default function KlarnaGateway(props: KlarnaGateway) {
           </div>
         )}
         <KlarnaPayment
-          show={show}
-          templateCustomerSaveToWallet={templateCustomerSaveToWallet}
           clientToken={clientToken}
           locale={locale}
           {...klarnaConfig}
         />
-      </Fragment>
+      </>
     )
   }
 
   return clientToken && !loading ? (
     <KlarnaPayment
-      show={show}
       clientToken={clientToken}
       locale={locale}
       {...klarnaConfig}
