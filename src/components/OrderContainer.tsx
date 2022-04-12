@@ -1,6 +1,5 @@
 import React, {
   useEffect,
-  FunctionComponent,
   useReducer,
   useContext,
   ReactNode,
@@ -25,6 +24,7 @@ import components from '#config/components'
 import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
 import { OrderCreate, Order } from '@commercelayer/sdk'
+import { BaseError } from '#typings/errors'
 
 const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps
@@ -37,7 +37,9 @@ type OrderContainerProps = {
   orderId?: string
 }
 
-const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
+const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
+  props
+) => {
   const { orderId, children, metadata, attributes } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const config = useContext(CommerceLayerContext)
@@ -83,7 +85,8 @@ const OrderContainer: FunctionComponent<OrderContainerProps> = (props) => {
       setOrder: (order: Order) => setOrder(order, dispatch),
       getOrder: (id: string): Promise<void | Order> =>
         getApiOrder({ id, dispatch, config, state }),
-      setOrderErrors: (errors: any) => setOrderErrors({ dispatch, errors }),
+      setOrderErrors: (errors: BaseError[]) =>
+        setOrderErrors({ dispatch, errors }),
       createOrder: async (): Promise<string> =>
         await createOrder({
           persistKey,
