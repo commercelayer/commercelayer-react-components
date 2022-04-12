@@ -164,7 +164,15 @@ export default function Main() {
               data-cy="code-error"
               className={classError}
               resource="orders"
-              field="giftCardOrCouponCode"
+              field="gift_card_or_coupon_code"
+              messages={[
+                {
+                  code: 'VALIDATION_ERROR',
+                  resource: 'orders',
+                  field: 'gift_card_or_coupon_code',
+                  message: 'Invalid coupon code',
+                },
+              ]}
             />
             <p>
               Discount <DiscountAmount />
