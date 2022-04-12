@@ -1,3 +1,15 @@
+## [3.9.5](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.4...v3.9.5) (2022-04-12)
+
+
+### Bug Fixes
+
+* Callback response from `Errors` component ([eac98be](https://github.com/commercelayer/commercelayer-react-components/commit/eac98be1f0e27abd4979df769e912069b747a055))
+
+
+### Performance Improvements
+
+* Clean message if title and detail are equal ([2ff8cc7](https://github.com/commercelayer/commercelayer-react-components/commit/2ff8cc7f59cffd3d0dc3121f662fa9e202a60474))
+
 ## [3.9.4](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.3...v3.9.4) (2022-04-11)
 
 
