@@ -21,6 +21,7 @@ import {
   OrderUpdate,
   QueryParamsRetrieve,
 } from '@commercelayer/sdk'
+import getOrganizationSlug from '#utils/organization'
 
 export type GetOrderParams = Partial<{
   clearWhenPlaced: boolean
@@ -66,6 +67,8 @@ export type AddToCartParams = Partial<{
   orderAttributes: Record<string, any>
   errors: BaseError[]
   setLocalOrder: SetLocalOrder
+  buyNowMode: boolean
+  checkoutUrl: string
 }>
 
 export interface AddToCartImportParams
@@ -120,7 +123,14 @@ export interface OrderPayload {
 
 export type AddToCartValues = Pick<
   AddToCartParams,
-  'bundleCode' | 'lineItem' | 'quantity' | 'skuCode' | 'skuId' | 'option'
+  | 'bundleCode'
+  | 'lineItem'
+  | 'quantity'
+  | 'skuCode'
+  | 'skuId'
+  | 'option'
+  | 'buyNowMode'
+  | 'checkoutUrl'
 >
 
 export type AddToCartImportValues = Pick<AddToCartImportParams, 'lineItems'>
@@ -354,8 +364,22 @@ export const addToCart: AddToCart = async (params) => {
     lineItem,
     state,
     errors = [],
+    buyNowMode,
+    checkoutUrl,
   } = params
   try {
+    if (!config)
+      throw {
+        errors: [
+          {
+            code: 'INVALID_RESOURCE',
+            resource: 'orders',
+            title: 'Markup error',
+            message:
+              'You are trying to place an order outside the OrderContainer component',
+          },
+        ] as BaseError[],
+      }
     const sdk = getSdk(config as CommerceLayerConfig)
     const id = await createOrder(params)
     if (id) {
@@ -403,6 +427,14 @@ export const addToCart: AddToCart = async (params) => {
             errors: [],
           },
         })
+      }
+      if (buyNowMode) {
+        const { organization } = getOrganizationSlug(config.endpoint)
+        const params = `${id}?accessToken=${config.accessToken}`
+        const redirectUrl = checkoutUrl
+          ? `${checkoutUrl}/${params}`
+          : `https://${organization}.checkout.commercelayer.app/${params}`
+        location.href = redirectUrl
       }
       return { success: true }
     }
