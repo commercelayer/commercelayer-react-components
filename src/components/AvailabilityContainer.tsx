@@ -15,6 +15,7 @@ import getCurrentItemKey from '#utils/getCurrentItemKey'
 import components from '#config/components'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
+import SkuChildrenContext from '#context/SkuChildrenContext'
 
 const propTypes = components.AvailabilityContainer.propTypes
 const displayName = components.AvailabilityContainer.displayName
@@ -30,13 +31,18 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
   const { children, skuCode } = props
   const { item, skuCode: itemSkuCode, setItem } = useContext(ItemContext)
   const { lineItem } = useContext(LineItemChildrenContext)
+  const { sku } = useContext(SkuChildrenContext)
   const config = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(
     availabilityReducer,
     availabilityInitialState
   )
   const sCode =
-    skuCode || getCurrentItemKey(item) || itemSkuCode || lineItem?.sku_code
+    skuCode ||
+    getCurrentItemKey(item) ||
+    itemSkuCode ||
+    lineItem?.sku_code ||
+    sku?.code
   useEffect(() => {
     if (sCode) {
       const available = item[sCode]?.inventory?.available

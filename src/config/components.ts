@@ -137,6 +137,8 @@ const components = {
       label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
       skuCode: PropTypes.string,
       disabled: PropTypes.bool,
+      buyNowMode: PropTypes.bool,
+      checkoutUrl: PropTypes.string,
       lineItem: PropTypes.shape({
         name: PropTypes.string.isRequired,
         imageUrl: PropTypes.string,
@@ -892,7 +894,7 @@ const components = {
       type: 'amount',
     },
   },
-  SkuContainer: {
+  SkusContainer: {
     displayName: 'SkuContainer',
     permittedChildren: ['Skus', 'ReactNode'],
     propTypes: {
@@ -901,7 +903,15 @@ const components = {
   },
   Skus: {
     displayName: 'Skus',
-    permittedChildren: ['SkuField', 'ReactNode'],
+    permittedChildren: [
+      'SkuField',
+      'ItemContainer',
+      'PricesContainer',
+      'AddToCartButton',
+      'AvailabilityContainer',
+      'QuantitySelector',
+      'ReactNode',
+    ],
     propTypes: {
       children: childrenTypes.isRequired,
     },

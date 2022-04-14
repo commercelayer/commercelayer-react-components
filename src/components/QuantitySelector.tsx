@@ -11,6 +11,7 @@ import ItemContext from '#context/ItemContext'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import SkuListsContext from '#context/SkuListsContext'
+import SkuChildrenContext from '#context/SkuChildrenContext'
 
 const propTypes = components.QuantitySelector.propTypes
 const defaultProps = components.QuantitySelector.defaultProps
@@ -43,13 +44,14 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
     prices,
     skuCode: itemSkuCode,
   } = useContext(ItemContext)
+  const { sku } = useContext(SkuChildrenContext)
   const { skuLists, listIds } = useContext(SkuListsContext)
   const [value, setValue] = useState(min)
   const [disabled, setDisabled] = useState(!!p.disabled)
   const sCode = (
     !isEmpty(items) && skuCode
       ? items[skuCode]?.code
-      : skuCode || getCurrentItemKey(item) || itemSkuCode
+      : sku?.code || skuCode || getCurrentItemKey(item) || itemSkuCode
   ) as string
 
   const inventory = isEmpty(item) ? 50 : item[sCode]?.inventory?.quantity

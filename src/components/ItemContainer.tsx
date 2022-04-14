@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useReducer,
-  useEffect,
-  ReactNode,
-} from 'react'
+import React, { useReducer, useEffect, ReactNode, useContext } from 'react'
 import ItemContext, {
   initialItemContext,
   InitItemContext,
@@ -20,6 +15,7 @@ import itemReducer, {
 import { ItemPrices } from '#reducers/ItemReducer'
 import components from '#config/components'
 import { BFSetStateContainer } from '#typings'
+import SkuChildrenContext from '#context/SkuChildrenContext'
 
 const propTypes = components.ItemContainer.propTypes
 const displayName = components.ItemContainer.displayName
@@ -33,12 +29,14 @@ type ItemContainerProps = {
   } | null
 }
 
-const ItemContainer: FunctionComponent<ItemContainerProps> = (props) => {
+const ItemContainer: React.FunctionComponent<ItemContainerProps> = (props) => {
   const { children, skuCode, lineItem } = props
   const [state, dispatch] = useReducer(itemReducer, itemInitialState)
+  const { sku } = useContext(SkuChildrenContext)
   useEffect(() => {
-    if (skuCode) {
-      setItemState(skuCode, { type: 'setSkuCode', key: 'skuCode' }, dispatch)
+    const code = skuCode || sku?.code
+    if (code) {
+      setItemState(code, { type: 'setSkuCode', key: 'skuCode' }, dispatch)
     }
     if (lineItem) {
       setItemState(
@@ -47,7 +45,7 @@ const ItemContainer: FunctionComponent<ItemContainerProps> = (props) => {
         dispatch
       )
     }
-  }, [])
+  }, [sku?.code])
   const setItems: BFSetStateContainer<Items> = (items) =>
     setItemState(items, { type: 'setItems', key: 'items' }, dispatch)
   const setItem: BFSetStateContainer<Items> = (item) =>
