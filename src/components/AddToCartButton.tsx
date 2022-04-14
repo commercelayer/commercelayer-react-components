@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  PropsWithoutRef,
-  ReactNode,
-} from 'react'
+import React, { useContext, PropsWithoutRef, ReactNode } from 'react'
 import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
 import { isEmpty, has } from 'lodash'
@@ -16,8 +11,9 @@ import SkuListsContext from '#context/SkuListsContext'
 import ExternalFunctionContext from '#context/ExternalFunctionContext'
 import { VariantOption } from '#components/VariantSelector'
 import isFunction from 'lodash/isFunction'
+import SkuChildrenContext from '#context/SkuChildrenContext'
 
-const propTypes = components.AddToCartButton.propTypes
+const propTypes = components.AddToCartButton.propTypes as any
 const defaultProps = components.AddToCartButton.defaultProps
 const displayName = components.AddToCartButton.displayName
 
@@ -29,6 +25,16 @@ type AddToCartButtonChildrenProps = FunctionChildren<ChildrenProps>
 
 export type AddToCartButtonType = ChildrenProps
 
+type BuyNowMode =
+  | {
+      buyNowMode: true
+      checkoutUrl?: string
+    }
+  | {
+      buyNowMode: false
+      checkoutUrl: never
+    }
+
 type AddToCartButtonProps = {
   children?: AddToCartButtonChildrenProps
   label?: string | ReactNode
@@ -37,9 +43,12 @@ type AddToCartButtonProps = {
   disabled?: boolean
   skuListId?: string
   lineItem?: VariantOption['lineItem']
-} & PropsWithoutRef<JSX.IntrinsicElements['button']>
+} & BuyNowMode &
+  PropsWithoutRef<JSX.IntrinsicElements['button']>
 
-const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
+const AddToCartButton: React.FunctionComponent<AddToCartButtonProps> = (
+  props
+) => {
   const {
     label = 'Add to cart',
     children,
@@ -48,6 +57,8 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     disabled,
     skuListId,
     lineItem,
+    buyNowMode,
+    checkoutUrl,
     ...p
   } = props
   const { addToCart, orderId, getOrder, setOrderErrors } =
@@ -64,10 +75,11 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
     skuCode: itemSkuCode,
   } = useContext(ItemContext)
   const { skuLists } = useContext(SkuListsContext)
+  const { sku } = useContext(SkuChildrenContext)
   const sCode = (
     !isEmpty(items) && skuCode
       ? items[skuCode]?.code
-      : skuCode || getCurrentItemKey(item) || itemSkuCode
+      : sku?.code || skuCode || getCurrentItemKey(item) || itemSkuCode
   ) as string
   const availabilityQuantity = item[sCode]?.inventory?.quantity
   const handleClick = () => {
@@ -81,7 +93,7 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
       if (has(skuLists, skuListId)) {
         const lineItems =
           skuLists &&
-          skuLists[skuListId].map((skuCode: any) => {
+          skuLists[skuListId].map((skuCode: string) => {
             return {
               skuCode,
               quantity: slQty,
@@ -119,6 +131,8 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
             quantity: qty,
             option: opt,
             lineItem: customLineItem,
+            buyNowMode,
+            checkoutUrl,
           })
       : callExternalFunction({
           url,
@@ -129,6 +143,8 @@ const AddToCartButton: FunctionComponent<AddToCartButtonProps> = (props) => {
             quantity: qty,
             option: opt,
             lineItem: customLineItem,
+            buyNowMode,
+            checkoutUrl,
           },
         })
           .then(async (res) => {
