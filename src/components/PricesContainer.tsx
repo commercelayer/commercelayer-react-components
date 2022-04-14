@@ -18,6 +18,7 @@ import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
 import components from '#config/components'
 import { LoaderType } from '#typings'
+import SkuChildrenContext from '#context/SkuChildrenContext'
 
 const propTypes = components.PricesContainer.propTypes
 const defaultProps = components.PricesContainer.defaultProps
@@ -41,6 +42,7 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
   } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
+  const { sku } = useContext(SkuChildrenContext)
   const {
     setPrices,
     prices,
@@ -50,7 +52,8 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
   } = useContext(ItemContext)
   if (indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
-  const sCode = getCurrentItemKey(currentItem) || skuCode || itemSkuCode || ''
+  const sCode =
+    getCurrentItemKey(currentItem) || sku?.code || skuCode || itemSkuCode || ''
   const setSkuCodes: SetSkuCodesPrice = (skuCodes) => {
     dispatch({
       type: 'setSkuCodes',
