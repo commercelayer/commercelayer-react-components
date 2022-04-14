@@ -1,3 +1,16 @@
+# [3.11.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.10.0...v3.11.0) (2022-04-14)
+
+
+### Bug Fixes
+
+* Rename `SkuContainer` to `SkusContainer` ([39d03a9](https://github.com/commercelayer/commercelayer-react-components/commit/39d03a94466694cb5eec5451948289144252f628))
+
+
+### Features
+
+* Add `buyNowMode` and `checkoutUrl` props to `AddToCartButton` ([c6a8535](https://github.com/commercelayer/commercelayer-react-components/commit/c6a853570aab53f61f7c46d08dd2e407f156534f))
+* Allow to use `Sku` context by cart components ([9794859](https://github.com/commercelayer/commercelayer-react-components/commit/979485961b752ee906f141d729fb6563c2563bf9))
+
 # [3.10.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.9.5...v3.10.0) (2022-04-12)
 
 
