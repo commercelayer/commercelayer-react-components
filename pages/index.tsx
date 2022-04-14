@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Price from '../src/components/Price'
 import PricesContainer from '../src/components/PricesContainer'
 import CommerceLayer from '../src/components/CommerceLayer'
-import SkuContainer from '#components/SkuContainer'
+import SkusContainer from '#components/SkusContainer'
 import Skus from '#components/Skus'
 import SkuField from '#components/SkuField'
 
@@ -362,12 +362,12 @@ const Home = () => {
       <div className="container mx-auto">
         <CommerceLayer accessToken={token} endpoint={endpoint}>
           <div className="flex flex-row flex-wrap justify-around">
-            <SkuContainer skus={skus}>
+            <SkusContainer skus={skus}>
               <Skus>
                 <SkuField attribute="image_url" tagElement="img" />
                 <SkuField attribute="code" tagElement="p" />
               </Skus>
-            </SkuContainer>
+            </SkusContainer>
             <PricesContainer perPage={20} loader={<Loading />}>
               {skus.map((s, k) => {
                 return (
