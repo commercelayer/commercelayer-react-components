@@ -11,7 +11,7 @@ type Props = {
   queryParams?: QueryParamsList
 }
 
-export default function SkuContainer<P extends Props>(props: P): JSX.Element {
+export default function SkusContainer<P extends Props>(props: P): JSX.Element {
   const { skus, children, queryParams } = props
   const [state, dispatch] = useReducer(skuReducer, skuInitialState)
   const config = useContext(CommerceLayerContext)
@@ -38,4 +38,4 @@ export default function SkuContainer<P extends Props>(props: P): JSX.Element {
   )
 }
 
-SkuContainer.propTypes = components.SkuContainer.propTypes
+SkusContainer.propTypes = components.SkusContainer.propTypes
