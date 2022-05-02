@@ -42,15 +42,22 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
   useEffect(() => {
     if (!include?.includes('line_items.line_item_options.sku_option')) {
       addResourceToInclude({
-        newResource: [
-          'line_items.line_item_options.sku_option',
-          'line_items.item',
-        ],
+        newResource: ['line_items.line_item_options.sku_option'],
       })
     } else if (!includeLoaded?.['line_items.line_item_options.sku_option']) {
       addResourceToInclude({
         newResourceLoaded: {
           'line_items.line_item_options.sku_option': true,
+        },
+      })
+    }
+    if (!include?.includes('line_items.item')) {
+      addResourceToInclude({
+        newResource: ['line_items.item'],
+      })
+    } else if (!includeLoaded?.['line_items.item']) {
+      addResourceToInclude({
+        newResourceLoaded: {
           'line_items.item': true,
         },
       })

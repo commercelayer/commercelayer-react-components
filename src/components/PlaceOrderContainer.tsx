@@ -48,7 +48,7 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
           'shipments.available_shipping_methods',
           'shipments.shipment_line_items.line_item',
           'shipments.shipping_method',
-          'shipments.stock_transfers',
+          'shipments.stock_transfers.line_item',
           'shipments.stock_location',
         ],
       })
@@ -58,7 +58,7 @@ const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
           'shipments.available_shipping_methods': true,
           'shipments.shipment_line_items.line_item': true,
           'shipments.shipping_method': true,
-          'shipments.stock_transfers': true,
+          'shipments.stock_transfers.line_item': true,
           'shipments.stock_location': true,
         },
       })
