@@ -1,3 +1,15 @@
+## [3.11.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.11.0...v3.11.1) (2022-05-02)
+
+
+### Bug Fixes
+
+* Stock transferts visualization and improve the resources include ([441c611](https://github.com/commercelayer/commercelayer-react-components/commit/441c61142eb67e15f31a25563d2982647dadbdee))
+
+
+### Performance Improvements
+
+* Add new `GenericField` component ([83f9ae6](https://github.com/commercelayer/commercelayer-react-components/commit/83f9ae622002f3464a2f02146439ffec79d025c1))
+
 # [3.11.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.10.0...v3.11.0) (2022-04-14)
 
 
