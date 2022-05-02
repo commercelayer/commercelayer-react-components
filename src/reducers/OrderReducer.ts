@@ -103,6 +103,7 @@ export type ResourceIncluded =
   | 'available_customer_payment_sources.payment_source'
   | 'shipments.available_shipping_methods'
   | 'shipments.stock_transfers'
+  | 'shipments.stock_transfers.line_item'
   | 'shipments.shipment_line_items.line_item'
   | 'shipments.shipping_method'
   | 'shipments.stock_location'
@@ -325,6 +326,15 @@ export type AddResourceToInclude = {
   newResourceLoaded?: ResourceIncludedLoaded
 }
 
+type IncludesType = {
+  include: ResourceIncluded[] | undefined
+  includeLoaded:
+    | {
+        [K in ResourceIncluded]: boolean
+      }
+    | undefined
+}
+
 export function addResourceToInclude({
   resourcesIncluded = [],
   dispatch,
@@ -332,19 +342,28 @@ export function addResourceToInclude({
   newResourceLoaded,
   resourceIncludedLoaded,
 }: AddResourceToInclude) {
-  const payload: any = {
+  const payload = {
     include: undefined,
     includeLoaded: undefined,
-  }
+  } as IncludesType
   if (newResource) {
-    payload.include = [
-      ...resourcesIncluded,
-      ...(typeof newResource === 'string' ? [newResource] : newResource),
-    ]
+    const resources =
+      typeof newResource === 'string' ? [newResource] : newResource
+    payload.include = [...resourcesIncluded, ...resources]
+    resources.forEach((resource) => {
+      payload.includeLoaded = {
+        ...payload.includeLoaded,
+        ...{ [resource]: true },
+      } as IncludesType['includeLoaded']
+    })
   } else {
     delete payload.include
   }
-  payload.includeLoaded = { ...resourceIncludedLoaded, ...newResourceLoaded }
+  payload.includeLoaded = {
+    ...resourceIncludedLoaded,
+    ...newResourceLoaded,
+    ...(payload.includeLoaded && payload.includeLoaded),
+  } as IncludesType['includeLoaded']
   dispatch &&
     dispatch({
       type: 'setIncludesResource',

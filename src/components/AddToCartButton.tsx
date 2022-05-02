@@ -31,8 +31,8 @@ type BuyNowMode =
       checkoutUrl?: string
     }
   | {
-      buyNowMode: false
-      checkoutUrl: never
+      buyNowMode?: false
+      checkoutUrl?: never
     }
 
 type AddToCartButtonProps = {
