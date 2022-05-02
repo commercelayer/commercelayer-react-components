@@ -18,7 +18,7 @@ import {
 import { ErrorPropTypes } from '#typings/errors'
 import { BaseInputComponentPropTypes } from '#typings/index'
 import { DeliveryLeadTimeField } from '../components/DeliveryLeadTime'
-import { StockTransferFieldType } from '#components/StockTransferField'
+// import { StockTransferFieldType } from '#components/StockTransferField'
 import { PaymentSourceDetailType } from '#components/PaymentSourceDetail'
 import { CodeType } from '#reducers/OrderReducer'
 import { ShipmentAttribute } from '#components/ShipmentField'
@@ -998,8 +998,8 @@ const components = {
     displayName: 'StockTransferField',
     propTypes: {
       children: PropTypes.func,
-      type: PropTypes.oneOf<StockTransferFieldType>(['quantity', 'sku_code'])
-        .isRequired,
+      // type: PropTypes.oneOf<StockTransferFieldType>(['quantity', 'sku_code'])
+      //   .isRequired,
     },
   },
   SubmitButton: {

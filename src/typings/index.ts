@@ -243,28 +243,22 @@ export interface FunctionChildren<P = Record<string, any>> {
   (props: P): ReactNode
 }
 
-export type Jwt = {
-  organization: {
-    id: string
-    slug: string
-  }
-  application: {
-    id: string
-    kind: string
-    public: boolean
-  }
-  test: boolean
-  owner?: {
-    id: string
-    type: string
-  }
-  exp: number
-  market: {
-    id: string[]
-    price_list_id: string
-    stock_location_ids: string[]
-    geocoder_id: null
-    allows_external_prices: boolean
-  }
-  rand: number
-}
+export type ExcludeTag<T extends keyof JSX.IntrinsicElements> = Exclude<
+  keyof JSX.IntrinsicElements,
+  T
+>
+
+export type ExtractTag<T extends keyof JSX.IntrinsicElements> = Extract<
+  keyof JSX.IntrinsicElements,
+  T
+>
+
+export type ConditionalElement<E> =
+  | ({
+      attribute: Extract<keyof E, 'image_url'>
+      tagElement: ExtractTag<'img'>
+    } & JSX.IntrinsicElements['img'])
+  | ({
+      attribute: Exclude<keyof E, 'image_url'>
+      tagElement: ExcludeTag<'img'>
+    } & JSX.IntrinsicElements[ExcludeTag<'img'>])
