@@ -1,37 +1,33 @@
-import React, { useContext, FunctionComponent, ReactNode } from 'react'
 import StockTransferChildrenContext from '#context/StockTransferChildrenContext'
-import Parent from './utils/Parent'
-import components from '#config/components'
+import { ConditionalElement } from '#typings'
+import GenericFieldComponent, {
+  TResourceKey,
+  TResources,
+} from './utils/GenericFieldComponent'
 
-const propTypes = components.StockTransferField.propTypes
-const displayName = components.StockTransferField.displayName
+type StockTransferFieldChildrenProps = Omit<
+  Props,
+  'children' | 'attribute' | 'element'
+>
 
-type StockTransferFieldChildrenProps = Omit<StockTransferFieldProps, 'children'>
+type TCondition = ConditionalElement<
+  Exclude<TResources['StockTransfer'], 'resource'>
+>
 
-export type StockTransferFieldType = 'quantity' | 'sku_code'
+type Props = {
+  children?: (props: StockTransferFieldChildrenProps) => JSX.Element
+} & TCondition
 
-type StockTransferFieldProps = {
-  children?: (props: StockTransferFieldChildrenProps) => ReactNode
-  type: StockTransferFieldType
-} & JSX.IntrinsicElements['p']
-
-const StockTransferField: FunctionComponent<StockTransferFieldProps> = (
-  props
-) => {
-  const { type } = props
-  const { stockTransfer } = useContext(StockTransferChildrenContext)
-  const text = stockTransfer ? stockTransfer[type] : ''
-  const parentProps = {
-    ...props,
-  }
-  return props.children ? (
-    <Parent {...parentProps}>{props.children}</Parent>
-  ) : (
-    <p {...props}>{text}</p>
+export default function StockTransferField<P extends Props>(props: P) {
+  const { attribute, tagElement, children } = props
+  return (
+    <GenericFieldComponent<TResourceKey['StockTransfer']>
+      resource="stock_transfers"
+      attribute={attribute}
+      tagElement={tagElement}
+      context={StockTransferChildrenContext}
+    >
+      {children}
+    </GenericFieldComponent>
   )
 }
-
-StockTransferField.propTypes = propTypes
-StockTransferField.displayName = displayName
-
-export default StockTransferField

@@ -3,11 +3,7 @@ import SkuChildrenContext from '#context/SkuChildrenContext'
 import { useContext } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
-
-type ExcludeTag<T extends keyof JSX.IntrinsicElements> = Exclude<
-  keyof JSX.IntrinsicElements,
-  T
->
+import { ExcludeTag } from '#typings'
 
 type Conditional =
   | ({
@@ -36,7 +32,7 @@ export default function SkuField<P extends Props>({
   const { sku } = useContext(SkuChildrenContext)
   const element = (sku && sku[attribute]) || ''
   const Tag = tagElement
-  if (Tag === 'img') {
+  if (Tag === 'img' && !children) {
     const src = element as string
     const name = sku?.name
     return <img alt={name} src={src} {...(p as JSX.IntrinsicElements['img'])} />

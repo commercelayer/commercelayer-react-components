@@ -1,13 +1,9 @@
-import React, {
-  useContext,
-  FunctionComponent,
-  ReactNode,
-  Fragment,
-} from 'react'
+import React, { useContext, ReactNode, Fragment } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import components from '#config/components'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import StockTransferChildrenContext from '#context/StockTransferChildrenContext'
+import { StockTransfer as TStockTransfer } from '@commercelayer/sdk'
 
 const propTypes = components.StockTransfer.propTypes
 const displayName = components.StockTransfer.displayName
@@ -16,15 +12,19 @@ type StockTransferProps = {
   children: ReactNode
 } & JSX.IntrinsicElements['p']
 
-const StockTransfer: FunctionComponent<StockTransferProps> = (props) => {
+const StockTransfer: React.FunctionComponent<StockTransferProps> = (props) => {
   const { children } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const { stockTransfers } = useContext(ShipmentChildrenContext)
-  const components = stockTransfers
-    ?.filter((stock) => stock.sku_code === lineItem?.sku_code)
-    .map((stockTransfer, k) => {
+  const items = [
+    ...(lineItem ? [lineItem] : []),
+    ...(stockTransfers ? stockTransfers : []),
+  ]
+  const components = items
+    ?.filter((stock) => stock.sku_code !== lineItem?.sku_code)
+    .map((stockTransfer: TStockTransfer, k) => {
       const stockTransferProps = {
-        stockTransfer,
+        stockTransfer: stockTransfer?.line_item,
       }
       return (
         <StockTransferChildrenContext.Provider
