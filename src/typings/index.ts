@@ -229,3 +229,23 @@ export type BaseAmountComponent = {
 export interface FunctionChildren<P = Record<string, any>> {
   (props: P): ReactNode
 }
+
+export type ExcludeTag<T extends keyof JSX.IntrinsicElements> = Exclude<
+  keyof JSX.IntrinsicElements,
+  T
+>
+
+export type ExtractTag<T extends keyof JSX.IntrinsicElements> = Extract<
+  keyof JSX.IntrinsicElements,
+  T
+>
+
+export type ConditionalElement<E> =
+  | ({
+      attribute: Extract<keyof E, 'image_url'>
+      tagElement: ExtractTag<'img'>
+    } & JSX.IntrinsicElements['img'])
+  | ({
+      attribute: Exclude<keyof E, 'image_url'>
+      tagElement: ExcludeTag<'img'>
+    } & JSX.IntrinsicElements[ExcludeTag<'img'>])
