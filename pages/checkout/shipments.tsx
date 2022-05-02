@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { getCustomerToken } from '@commercelayer/js-auth'
 import Head from 'next/head'
 import {
@@ -116,7 +116,8 @@ export default function Main() {
                         <div className="flex flex-row" data-cy="stock-transfer">
                           <StockTransferField
                             className="px-1"
-                            type="quantity"
+                            attribute="image_url"
+                            tagElement="img"
                           />{' '}
                           of <LineItemQuantity readonly className="px-1" />
                           items will undergo a transfer
