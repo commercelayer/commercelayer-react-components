@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import customMessages from '#utils/customMessages'
 import { LineItem } from '@commercelayer/sdk'
 import { BaseError, ResourceErrorType } from '#typings/errors'
@@ -27,16 +27,27 @@ const getAllErrors: GetAllErrors = (params) => {
     resource,
     returnHtml = true,
   } = params
-  return allErrors.map((v, k): ReactNode | void => {
-    const objMsg = customMessages(messages, v)
-    let text =
-      v?.title && !v.detail?.includes(v.title)
-        ? `${v.title} - ${v.detail}`
-        : `${v.detail}`
-    if (objMsg?.message) text = objMsg?.message
-    if (field) {
-      if (v.resource === 'line_items') {
-        if (lineItem && v.id === lineItem['id']) {
+  return allErrors
+    .map((v, k): ReactNode | void => {
+      const objMsg = customMessages(messages, v)
+      let text =
+        v?.title && !v.detail?.includes(v.title)
+          ? `${v.title} - ${v.detail}`
+          : `${v.detail}`
+      if (objMsg?.message) text = objMsg?.message
+      if (field) {
+        if (v.resource === 'line_items') {
+          if (lineItem && v.id === lineItem['id']) {
+            return returnHtml ? (
+              <span key={k} {...props}>
+                {text}
+              </span>
+            ) : (
+              text
+            )
+          }
+        }
+        if (field === v.field && resource === v.resource) {
           return returnHtml ? (
             <span key={k} {...props}>
               {text}
@@ -46,7 +57,7 @@ const getAllErrors: GetAllErrors = (params) => {
           )
         }
       }
-      if (field === v.field && resource === v.resource) {
+      if (resource === v.resource && !field) {
         return returnHtml ? (
           <span key={k} {...props}>
             {text}
@@ -55,17 +66,8 @@ const getAllErrors: GetAllErrors = (params) => {
           text
         )
       }
-    }
-    if (resource === v.resource && !field) {
-      return returnHtml ? (
-        <span key={k} {...props}>
-          {text}
-        </span>
-      ) : (
-        text
-      )
-    }
-  })
+    })
+    .filter((v) => v !== undefined)
 }
 
 export default getAllErrors

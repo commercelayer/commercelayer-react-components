@@ -56,7 +56,7 @@ const Errors: React.FunctionComponent<ErrorsProps> = (props) => {
       shipmentErrors,
       paymentMethodErrors,
     ]
-  )
+  ).filter((v, k, a) => v?.code !== a[k - 1]?.code)
   const msgErrors = getAllErrors({
     allErrors,
     field,
