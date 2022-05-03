@@ -1,3 +1,18 @@
+## [3.11.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.11.1...v3.11.2) (2022-05-03)
+
+
+### Bug Fixes
+
+* Children props types ([60e9b46](https://github.com/commercelayer/commercelayer-react-components/commit/60e9b46aff125217d2a895fd32e732f2dc6d00a9))
+* Children props types ([7cdcaa6](https://github.com/commercelayer/commercelayer-react-components/commit/7cdcaa69c8f47b1b2f6dffdc6ee15d2b512631d2))
+* Duplicate `payment_source` request ([12699c2](https://github.com/commercelayer/commercelayer-react-components/commit/12699c20c076fe0367c760280b957014b7906c36))
+* Duplicate error messages ([197b97c](https://github.com/commercelayer/commercelayer-react-components/commit/197b97c12fc7f9100dda412f30fa17be0faea2d7))
+
+
+### Performance Improvements
+
+* Use `labelFreeOver` when the amount is equal to zero ([e514cfa](https://github.com/commercelayer/commercelayer-react-components/commit/e514cfa3c270d012299d1f8299577c7ab6176f64))
+
 ## [3.11.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.11.0...v3.11.1) (2022-05-02)
 
 
