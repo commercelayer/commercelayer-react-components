@@ -1,4 +1,4 @@
-import React, {
+import {
   FunctionComponent,
   ReactNode,
   useContext,
@@ -19,7 +19,9 @@ const defaultProps = components.PlaceOrderButton.defaultProps
 const displayName = components.PlaceOrderButton.displayName
 
 type PlaceOrderButtonChildrenProps = FunctionChildren<
-  Omit<PlaceOrderButtonProps, 'children'>
+  Omit<PlaceOrderButtonProps, 'children'> & {
+    handleClick: () => Promise<void>
+  }
 >
 
 type PlaceOrderButtonProps = {
