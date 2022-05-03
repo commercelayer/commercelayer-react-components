@@ -1,9 +1,4 @@
-import React, {
-  useContext,
-  FunctionComponent,
-  ReactNode,
-  ChangeEvent,
-} from 'react'
+import { useContext, FunctionComponent, ReactNode, ChangeEvent } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
@@ -18,7 +13,10 @@ const displayName = components.PaymentMethodRadioButton.displayName
 type ShippingMethodRadioButtonChildrenProps = Omit<
   ShippingMethodRadioButtonProps,
   'children'
-> & { checked: boolean }
+> & {
+  checked: boolean
+  handleOnChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
+}
 
 type ShippingMethodRadioButtonProps = {
   children?: (props: ShippingMethodRadioButtonChildrenProps) => ReactNode
@@ -59,6 +57,7 @@ const PaymentMethodRadioButton: FunctionComponent<
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
     <input
+      title={name}
       type="radio"
       id={id}
       onChange={handleOnChange}
