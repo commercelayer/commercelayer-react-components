@@ -37,7 +37,11 @@ const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
-const skus = ['BABYONBU000000E63E7412MX', 'CANVASAU000000FFFFFF1824']
+const skus = [
+  'BABYONBU000000E63E7412MX',
+  'CANVASAU000000FFFFFF1824',
+  'BABYONBU000000E63E746MXX',
+]
 
 export default function Cart() {
   const [token, setToken] = useState('')
