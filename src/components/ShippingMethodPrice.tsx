@@ -76,6 +76,8 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
       isNumber(freeOverAmountCents) &&
       freeOverAmountCents < order.total_amount_cents
         ? labelFreeOver
+        : order?.total_amount_cents === 0
+        ? labelFreeOver
         : price}
     </span>
   )
