@@ -81,12 +81,11 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       }
       if (!paymentSource && order?.payment_method.id && show) {
         setPaymentSources()
+      } else if (!paymentSource || paymentSource.type !== paymentResource) {
+        setPaymentSources()
       }
       // @ts-ignore
       if (paymentSource?.mismatched_amounts && show) {
-        setPaymentSources()
-      }
-      if (!paymentSource || paymentSource.type !== paymentResource) {
         setPaymentSources()
       }
       setLoading(false)
