@@ -15,7 +15,6 @@ import itemReducer, {
 import { ItemPrices } from '#reducers/ItemReducer'
 import components from '#config/components'
 import { BFSetStateContainer } from '#typings'
-import SkuChildrenContext from '#context/SkuChildrenContext'
 
 const propTypes = components.ItemContainer.propTypes
 const displayName = components.ItemContainer.displayName
@@ -32,9 +31,8 @@ type ItemContainerProps = {
 const ItemContainer: React.FunctionComponent<ItemContainerProps> = (props) => {
   const { children, skuCode, lineItem } = props
   const [state, dispatch] = useReducer(itemReducer, itemInitialState)
-  const { sku } = useContext(SkuChildrenContext)
   useEffect(() => {
-    const code = skuCode || sku?.code
+    const code = skuCode
     if (code) {
       setItemState(code, { type: 'setSkuCode', key: 'skuCode' }, dispatch)
     }
@@ -45,7 +43,7 @@ const ItemContainer: React.FunctionComponent<ItemContainerProps> = (props) => {
         dispatch
       )
     }
-  }, [sku?.code])
+  }, [])
   const setItems: BFSetStateContainer<Items> = (items) =>
     setItemState(items, { type: 'setItems', key: 'items' }, dispatch)
   const setItem: BFSetStateContainer<Items> = (item) =>

@@ -10,6 +10,7 @@ type SkuAction = BaseAction<SkuActionType, SkuState>
 export type SkuState = Partial<{
   skus: Sku[]
   loading: boolean
+  skuCodes: string[]
 }>
 
 const actionType: SkuActionType[] = ['getSkus']
@@ -17,6 +18,7 @@ const actionType: SkuActionType[] = ['getSkus']
 export const skuInitialState: SkuState = {
   skus: [],
   loading: true,
+  skuCodes: [],
 }
 
 type GetSku = {
@@ -61,6 +63,7 @@ export async function getSku<T extends GetSku>({
     payload: {
       skus: allSkus,
       loading: false,
+      skuCodes: skus,
     },
   })
 }
