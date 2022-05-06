@@ -63,40 +63,40 @@ export default function Cart() {
           <OrderStorage persistKey="orderUS">
             <OrderContainer attributes={{ return_url: 'https://test.co' }}>
               <SkusContainer skus={skus}>
-                <Skus>
-                  <ItemContainer>
-                    <SkuField attribute="image_url" tagElement="img" />
-                    <SkuField attribute="code" tagElement="p" />
-                    <PricesContainer>
-                      <div className="text-center p-3">
-                        <div className="flex flex-row flex-wrap justify-center">
-                          <Price
-                            className="text-green-600 text-2xl m-1"
-                            compareClassName="text-gray-500 text-2xl m-1 line-through"
-                          />
-                        </div>
-                      </div>
-                    </PricesContainer>
-                    <QuantitySelector
-                      max={12}
-                      data-test="quantity-selector"
-                      className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    />
+                <ItemContainer>
+                  <PricesContainer>
                     <AvailabilityContainer>
-                      <AvailabilityTemplate
-                        data-test="availability-template"
-                        showShippingMethodName
-                        showShippingMethodPrice
-                      />
+                      <Skus>
+                        <SkuField attribute="image_url" tagElement="img" />
+                        <SkuField attribute="code" tagElement="p" />
+                        <div className="text-center p-3">
+                          <div className="flex flex-row flex-wrap justify-center">
+                            <Price
+                              className="text-green-600 text-2xl m-1"
+                              compareClassName="text-gray-500 text-2xl m-1 line-through"
+                            />
+                          </div>
+                        </div>
+                        <QuantitySelector
+                          max={12}
+                          data-test="quantity-selector"
+                          className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                        />
+                        <AvailabilityTemplate
+                          data-test="availability-template"
+                          showShippingMethodName
+                          showShippingMethodPrice
+                        />
+                        <AddToCartButton
+                          data-test="add-to-cart-button"
+                          className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                          buyNowMode
+                          checkoutUrl="https://test-checkout.com"
+                        />
+                      </Skus>
                     </AvailabilityContainer>
-                    <AddToCartButton
-                      data-test="add-to-cart-button"
-                      className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                      buyNowMode
-                      checkoutUrl="https://test-checkout.com"
-                    />
-                  </ItemContainer>
-                </Skus>
+                  </PricesContainer>
+                </ItemContainer>
               </SkusContainer>
               <Errors resource="orders" />
               <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
