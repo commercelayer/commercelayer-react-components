@@ -12,6 +12,7 @@ import { getPricesComponent } from '#utils/getPrices'
 import { Price as PriceType } from '@commercelayer/sdk'
 import components from '#config/components'
 import { FunctionChildren, LoaderType } from '#typings/index'
+import SkuChildrenContext from '#context/SkuChildrenContext'
 
 const propTypes = components.Price.propTypes
 const defaultProps = components.Price.defaultProps
@@ -42,8 +43,9 @@ const Price: FunctionComponent<PriceProps> = (props) => {
     setSkuCodes,
     loader,
   } = useContext(PricesContext)
+  const { sku } = useContext(SkuChildrenContext)
   const [skuPrices, setSkuPrices] = useState<PriceType[]>([])
-  const sCode = pricesSkuCode || skuCode
+  const sCode = pricesSkuCode || skuCode || (sku?.code as string)
   useEffect(() => {
     if (!isEmpty(prices) && has(prices, `${sCode}`)) {
       setSkuPrices(prices[sCode] as PriceType[])
