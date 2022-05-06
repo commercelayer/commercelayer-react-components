@@ -1,4 +1,5 @@
-import { first, keys } from 'lodash'
+import first from 'lodash/first'
+import keys from 'lodash/keys'
 import { Items } from '#reducers/ItemReducer'
 
 export interface GetCurrentItemKey {
