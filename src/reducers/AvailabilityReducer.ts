@@ -69,6 +69,7 @@ type GetAvailability = (args: {
   dispatch: Dispatch<AvailabilityAction>
   config: CommerceLayerConfig
   setItem?: (item: Items) => void
+  item?: Items
 }) => void
 
 export const getAvailability: GetAvailability = async ({
@@ -76,6 +77,7 @@ export const getAvailability: GetAvailability = async ({
   dispatch,
   config,
   setItem,
+  item,
 }) => {
   const sdk = getSdk(config)
   try {
@@ -92,7 +94,40 @@ export const getAvailability: GetAvailability = async ({
       type: 'setAvailability',
       payload: { ...delivery, quantity: skuInventory.inventory.quantity },
     })
-    if (setItem) setItem({ [skuCode]: skuInventory })
+    if (setItem) setItem({ ...item, [skuCode]: skuInventory })
+  } catch (error) {
+    console.error('Get SKU availability', error)
+  }
+}
+
+type GetAvailabilityArgs = {
+  skusIds: string[]
+  dispatch: Dispatch<AvailabilityAction>
+  config: CommerceLayerConfig
+  setItem?: (item: Items) => void
+}
+
+export async function getAvailabilityByIds({
+  skusIds,
+  config,
+  setItem,
+}: GetAvailabilityArgs) {
+  const sdk = getSdk(config)
+  try {
+    const inventories = await Promise.all(
+      skusIds.map(async (id) => {
+        return (await sdk.skus.retrieve(id, {
+          fields: { skus: ['inventory', 'code'] },
+        })) as SkuInventory
+      })
+    )
+    const item = {} as Items
+    inventories.forEach((v) => {
+      if (v?.code) {
+        item[v.code] = v
+      }
+    })
+    if (setItem) setItem(item)
   } catch (error) {
     console.error('Get SKU availability', error)
   }

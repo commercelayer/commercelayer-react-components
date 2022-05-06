@@ -1,4 +1,4 @@
-import React, {
+import {
   useEffect,
   FunctionComponent,
   useContext,
@@ -6,7 +6,9 @@ import React, {
   ReactNode,
 } from 'react'
 import getPrices from '#utils/getPrices'
-import { isEmpty, indexOf, has } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
+import has from 'lodash/has'
+import indexOf from 'lodash/indexOf'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import priceReducer, {
   SetSkuCodesPrice,
@@ -18,7 +20,8 @@ import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
 import components from '#config/components'
 import { LoaderType } from '#typings'
-import SkuChildrenContext from '#context/SkuChildrenContext'
+// import SkuChildrenContext from '#context/SkuChildrenContext'
+import SkuContext from '#context/SkuContext'
 
 const propTypes = components.PricesContainer.propTypes
 const defaultProps = components.PricesContainer.defaultProps
@@ -42,7 +45,7 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
   } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
-  const { sku } = useContext(SkuChildrenContext)
+  const { skuCodes } = useContext(SkuContext)
   const {
     setPrices,
     prices,
@@ -53,7 +56,9 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
   if (indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
   const sCode =
-    getCurrentItemKey(currentItem) || sku?.code || skuCode || itemSkuCode || ''
+    skuCodes && skuCodes?.length > 0
+      ? ''
+      : getCurrentItemKey(currentItem) || skuCode || itemSkuCode || ''
   const setSkuCodes: SetSkuCodesPrice = (skuCodes) => {
     dispatch({
       type: 'setSkuCodes',
@@ -61,6 +66,9 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
     })
   }
   useEffect(() => {
+    if (state.skuCodes.length === 0 && skuCodes && skuCodes.length > 0) {
+      setSkuCodes(skuCodes)
+    }
     if (currentItem && has(prices, sCode)) {
       dispatch({
         type: 'setPrices',

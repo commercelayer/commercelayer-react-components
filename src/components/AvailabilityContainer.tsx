@@ -8,6 +8,7 @@ import React, {
 import availabilityReducer, {
   availabilityInitialState,
   getAvailability,
+  getAvailabilityByIds,
 } from '#reducers/AvailabilityReducer'
 import AvailabilityContext from '#context/AvailabilityContext'
 import ItemContext from '#context/ItemContext'
@@ -16,6 +17,8 @@ import components from '#config/components'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import SkuChildrenContext from '#context/SkuChildrenContext'
+import SkuContext from '#context/SkuContext'
+import isEqual from 'lodash/isEqual'
 
 const propTypes = components.AvailabilityContainer.propTypes
 const displayName = components.AvailabilityContainer.displayName
@@ -32,6 +35,7 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
   const { item, skuCode: itemSkuCode, setItem } = useContext(ItemContext)
   const { lineItem } = useContext(LineItemChildrenContext)
   const { sku } = useContext(SkuChildrenContext)
+  const { skus } = useContext(SkuContext)
   const config = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(
     availabilityReducer,
@@ -44,7 +48,7 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
     lineItem?.sku_code ||
     sku?.code
   useEffect(() => {
-    if (sCode) {
+    if (sCode && !skus) {
       const available = item[sCode]?.inventory?.available
       const quantity = item[sCode]?.inventory?.quantity
       const [level] = item[sCode]?.inventory?.levels || [
@@ -60,21 +64,29 @@ const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
           payload: { ...delivery, quantity: level?.quantity },
         })
       } else if (config.accessToken && !item?.[sCode]) {
-        getAvailability({ skuCode: sCode, config, dispatch, setItem })
+        getAvailability({ skuCode: sCode, config, dispatch, setItem, item })
       } else if (!available) {
         dispatch({
           type: 'setAvailability',
           payload: { quantity },
         })
       }
+    } else if (skus && config.accessToken) {
+      const itemKeys = Object.keys(item)
+      const skuCodes = skus.map((s) => s?.code)
+      if (!isEqual(skuCodes, itemKeys)) {
+        const skusIds = skus.map((s) => s.id)
+        getAvailabilityByIds({ skusIds, config, dispatch, setItem })
+      }
     }
+
     return (): void => {
       dispatch({
         type: 'setAvailability',
         payload: {},
       })
     }
-  }, [config.accessToken, item, sCode])
+  }, [config.accessToken, item, sCode, skus])
   return (
     <AvailabilityContext.Provider value={{ ...state }}>
       {children}
