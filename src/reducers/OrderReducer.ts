@@ -195,7 +195,7 @@ export const createOrder: CreateOrder = async (params) => {
         })
       persistKey && setLocalOrder && setLocalOrder(persistKey, o.id)
       return o.id
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errors = getErrors(error, 'orders')
       console.error('Create order', errors)
       if (dispatch)
@@ -458,7 +458,7 @@ export const addToCart: AddToCart = async (params) => {
       return { success: true }
     }
     return { success: false }
-  } catch (error: any) {
+  } catch (error: unknown) {
     const errors = getErrors(error, 'orders')
     console.error('Add to cart', errors)
     if (dispatch)
@@ -564,7 +564,7 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
       return { success }
     }
     return { success: false }
-  } catch (error: any) {
+  } catch (error: unknown) {
     const errors = getErrors(error, 'orders', codeType)
     dispatch && setOrderErrors({ errors, dispatch })
     return { success: false }
@@ -613,7 +613,7 @@ export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
       return { success: true }
     }
     return { success: false }
-  } catch (error: any) {
+  } catch (error: unknown) {
     const errors = getErrors(error, 'orders', codeType)
     console.error('Remove gift card o coupon code', errors)
     dispatch && setOrderErrors({ errors, dispatch })
