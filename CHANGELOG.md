@@ -1,3 +1,15 @@
+# [3.12.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.11.2...v3.12.0) (2022-05-06)
+
+
+### Features
+
+* Update order attributes by `attributes` prop if an order is already loaded ([111c202](https://github.com/commercelayer/commercelayer-react-components/commit/111c2021e43733109786aa7d8bee5f90e1515995))
+
+
+### Performance Improvements
+
+* Improve network requests ([b4ef18e](https://github.com/commercelayer/commercelayer-react-components/commit/b4ef18eceaee6a316ac832eea3a1e3e2a8c85d68))
+
 ## [3.11.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.11.1...v3.11.2) (2022-05-03)
 
 
