@@ -16,6 +16,7 @@ import orderReducer, {
   orderInitialState,
   UpdateOrderArgs,
   SaveAddressToCustomerAddressBook,
+  updateOrder,
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext, { defaultOrderContext } from '#context/OrderContext'
@@ -25,6 +26,7 @@ import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
 import { OrderCreate, Order } from '@commercelayer/sdk'
 import { BaseError } from '#typings/errors'
+import compareObjAttribute from '#utils/compareObjAttribute'
 
 const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps
@@ -79,6 +81,25 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
     }
     return (): void => unsetOrderState(dispatch)
   }, [config.accessToken, orderId, state.includeLoaded, state.include])
+  useEffect(() => {
+    if (state.orderId && attributes && state.order) {
+      const updateAttributes = compareObjAttribute({
+        attributes: attributes,
+        object: state.order,
+      })
+      if (Object.keys(updateAttributes).length > 0) {
+        updateOrder({
+          id: state.orderId,
+          attributes: updateAttributes,
+          dispatch,
+          config,
+          include: state.include,
+          state,
+        })
+      }
+    }
+  }, [attributes, state.orderId, state.order])
+
   const orderValue = useMemo(() => {
     return {
       ...state,

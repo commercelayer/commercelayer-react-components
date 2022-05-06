@@ -776,7 +776,7 @@ const components = {
     },
   },
   PricesContainer: {
-    permittedChildren: ['Price', 'ReactNode'],
+    permittedChildren: ['Price', 'AvailabilityContainer', 'ReactNode'],
     displayName: 'PricesContainer',
     propTypes: {
       children: childrenTypes.isRequired,
@@ -924,7 +924,7 @@ const components = {
   },
   SkusContainer: {
     displayName: 'SkuContainer',
-    permittedChildren: ['Skus', 'ReactNode'],
+    permittedChildren: ['Skus', 'ItemContainer', 'ReactNode'],
     propTypes: {
       children: childrenTypes.isRequired,
     },
@@ -932,12 +932,11 @@ const components = {
   Skus: {
     displayName: 'Skus',
     permittedChildren: [
+      'AvailabilityTemplate',
       'SkuField',
-      'ItemContainer',
-      'PricesContainer',
       'AddToCartButton',
-      'AvailabilityContainer',
       'QuantitySelector',
+      'Price',
       'ReactNode',
     ],
     propTypes: {
