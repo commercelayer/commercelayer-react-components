@@ -82,12 +82,13 @@ const ShipmentsContainer: React.FunctionComponent<ShipmentsContainerProps> = (
           .filter(({ item_type }) => item_type === 'skus')
           .map((lineItem) => {
             // @ts-ignore
-            return !(lineItem.item?.inventory?.quantity >= lineItem?.quantity)
-              ? false
-              : // @ts-ignore
-                lineItem.item?.do_not_ship ||
-                  // @ts-ignore
-                  lineItem.item?.inventory?.available
+            return lineItem.item?.do_not_ship ||
+              // @ts-ignore
+              lineItem.item?.do_not_track ||
+              // @ts-ignore
+              lineItem.item?.inventory?.quantity >= lineItem?.quantity
+              ? true
+              : false
           })
         if (hasStocks.includes(false)) {
           setShipmentErrors(
