@@ -1,3 +1,11 @@
+## [3.12.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.0...v3.12.1) (2022-05-10)
+
+
+### Bug Fixes
+
+* Show stripe errors ([bc96cd6](https://github.com/commercelayer/commercelayer-react-components/commit/bc96cd6b314a3796639909dc0a3dd1cb01a2b7b6))
+* Sku do not track ([b562360](https://github.com/commercelayer/commercelayer-react-components/commit/b562360b794de6fc1216606caf67fbd214ecdf6f))
+
 # [3.12.0](https://github.com/commercelayer/commercelayer-react-components/compare/v3.11.2...v3.12.0) (2022-05-06)
 
 
