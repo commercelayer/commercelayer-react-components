@@ -33,7 +33,7 @@ const getAllErrors: GetAllErrors = (params) => {
       let text =
         v?.title && !v.detail?.includes(v.title)
           ? `${v.title} - ${v.detail}`
-          : `${v.detail}`
+          : `${v?.detail || v.message}`
       if (objMsg?.message) text = objMsg?.message
       if (field) {
         if (v.resource === 'line_items') {
