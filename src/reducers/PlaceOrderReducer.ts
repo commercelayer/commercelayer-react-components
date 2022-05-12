@@ -87,19 +87,19 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
       isPermitted = localStorage.getItem('privacy-terms') === 'true'
     }
     const billingAddress = order.billing_address
-    if (isEmpty(billingAddress)) isPermitted = false
     const shippingAddress = order.shipping_address
     const doNotShip = isDoNotShip(order.line_items)
-    if (isEmpty(shippingAddress) && !doNotShip) isPermitted = false
     const shipments = order.shipments
     const shipment = shipments && shipmentsFilled(shipments)
-    if (!isEmpty(shipments) && !shipment) isPermitted = false
     const paymentMethod = order.payment_method
     const paymentSource = order.payment_source
-    // @ts-ignore
-    if (paymentSource?.mismatched_amounts) isPermitted = false
     if (order.total_amount_with_taxes_cents !== 0 && isEmpty(paymentMethod?.id))
       isPermitted = false
+    if (isEmpty(billingAddress)) isPermitted = false
+    if (isEmpty(shippingAddress) && !doNotShip) isPermitted = false
+    if (!isEmpty(shipments) && !shipment) isPermitted = false
+    // @ts-ignore
+    if (paymentSource?.mismatched_amounts) isPermitted = false
     dispatch({
       type: 'setPlaceOrderPermitted',
       payload: {
