@@ -53,14 +53,14 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
           paymentType,
         })
         if (
-          (isFree ||
+          ((isFree && isPermitted) ||
             currentPaymentMethodRef?.current?.onsubmit ||
             card.brand) &&
           isPermitted
         ) {
           setNotPermitted(false)
         }
-      } else if (isFree) {
+      } else if (isFree && isPermitted) {
         setNotPermitted(false)
       } else {
         setNotPermitted(true)
