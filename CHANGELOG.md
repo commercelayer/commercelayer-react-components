@@ -1,3 +1,10 @@
+## [3.12.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.1...v3.12.2) (2022-05-12)
+
+
+### Bug Fixes
+
+* Disabled the place order button ([35754d8](https://github.com/commercelayer/commercelayer-react-components/commit/35754d82adc8c66480c405cf6dfffd7fb4affcb1))
+
 ## [3.12.1](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.0...v3.12.1) (2022-05-10)
 
 
