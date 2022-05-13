@@ -1,15 +1,10 @@
 import OrderContext from '#context/OrderContext'
 import getAmount from '#utils/getAmount'
 import Parent from './Parent'
-import React, {
-  FunctionComponent,
-  useState,
-  useEffect,
-  useContext,
-} from 'react'
+import { FunctionComponent, useState, useEffect, useContext } from 'react'
 import { PropsType } from '#utils/PropsType'
 import { baseOrderPricePropTypes } from '#typings'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 
 export type BaseOrderPriceProps = PropsType<typeof baseOrderPricePropTypes> &
   JSX.IntrinsicElements['span']

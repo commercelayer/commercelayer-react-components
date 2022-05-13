@@ -251,7 +251,7 @@ export const getApiOrder: GetOrder = async (params) => {
         })
     }
     return order
-  } catch (error: any) {
+  } catch (error: unknown) {
     const errors = getErrors(error, 'orders')
     console.error('Retrieve order', errors)
     if (dispatch)
