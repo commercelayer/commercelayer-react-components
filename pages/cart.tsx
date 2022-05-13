@@ -67,7 +67,11 @@ export default function Cart() {
                   <PricesContainer>
                     <AvailabilityContainer>
                       <Skus>
-                        <SkuField attribute="image_url" tagElement="img" />
+                        <SkuField
+                          attribute="image_url"
+                          tagElement="img"
+                          width={100}
+                        />
                         <SkuField attribute="code" tagElement="p" />
                         <div className="text-center p-3">
                           <div className="flex flex-row flex-wrap justify-center">
