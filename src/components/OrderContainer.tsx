@@ -27,6 +27,7 @@ import OrderStorageContext from '#context/OrderStorageContext'
 import { OrderCreate, Order } from '@commercelayer/sdk'
 import { BaseError } from '#typings/errors'
 import compareObjAttribute from '#utils/compareObjAttribute'
+import checkIncludeResources from '#utils/checkIncludeResource'
 
 const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps
@@ -58,29 +59,45 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
     )
     if (config.accessToken) {
       const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
-      if (localOrder) {
-        dispatch({
-          type: 'setOrderId',
-          payload: {
-            orderId: localOrder,
-          },
+      if (
+        localOrder &&
+        !state.order &&
+        startRequest.length === state.include?.length
+      ) {
+        const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
+        getApiOrder({
+          id: localOrder,
+          dispatch,
+          config,
+          persistKey,
+          clearWhenPlaced: removeOrderPlaced,
+          deleteLocalOrder,
+          state,
         })
-        if (!state.order && startRequest.length === state.include?.length) {
-          const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
+      } else if (state?.order && state?.include) {
+        const allIncluded = checkIncludeResources({
+          order: state.order,
+          resourceInclude: state.include,
+        })
+        if (!allIncluded) {
           getApiOrder({
-            id: localOrder,
+            id: state.orderId,
             dispatch,
             config,
             persistKey,
-            clearWhenPlaced: removeOrderPlaced,
             deleteLocalOrder,
             state,
           })
         }
       }
     }
-    return (): void => unsetOrderState(dispatch)
-  }, [config.accessToken, orderId, state.includeLoaded, state.include])
+  }, [
+    config.accessToken,
+    state.includeLoaded,
+    state.include,
+    orderId,
+    state.order,
+  ])
   useEffect(() => {
     if (state.orderId && attributes && state.order) {
       const updateAttributes = compareObjAttribute({
