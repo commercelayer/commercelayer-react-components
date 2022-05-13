@@ -1,3 +1,11 @@
+## [3.12.3](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.2...v3.12.3) (2022-05-13)
+
+
+### Bug Fixes
+
+* Lose order data when reload the thank you page ([c7b5935](https://github.com/commercelayer/commercelayer-react-components/commit/c7b5935564e50f11d1cc5a490f6c96153c05edff))
+* The `StockTransferField` reads HTML attribute properly ([b310f6f](https://github.com/commercelayer/commercelayer-react-components/commit/b310f6f924b47a181d1e606ade969862b53bb6ad))
+
 ## [3.12.2](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.1...v3.12.2) (2022-05-12)
 
 
