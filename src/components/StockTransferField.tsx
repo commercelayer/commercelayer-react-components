@@ -19,13 +19,14 @@ type Props = {
 } & TCondition
 
 export default function StockTransferField<P extends Props>(props: P) {
-  const { attribute, tagElement, children } = props
+  const { attribute, tagElement, children, ...p } = props
   return (
     <GenericFieldComponent<TResourceKey['StockTransfer']>
       resource="stock_transfers"
       attribute={attribute}
       tagElement={tagElement}
       context={StockTransferChildrenContext}
+      {...p}
     >
       {children}
     </GenericFieldComponent>

@@ -1,52 +1,29 @@
-import { Sku } from '@commercelayer/sdk'
 import SkuChildrenContext from '#context/SkuChildrenContext'
-import { useContext } from 'react'
-import Parent from './utils/Parent'
-import components from '#config/components'
-import { ExcludeTag } from '#typings'
+import { ConditionalElement } from '#typings'
+import GenericFieldComponent, {
+  TResourceKey,
+  TResources,
+} from './utils/GenericFieldComponent'
 
-type Conditional =
-  | ({
-      attribute: 'image_url'
-      tagElement: 'img'
-    } & JSX.IntrinsicElements['img'])
-  | ({
-      attribute: Exclude<keyof Sku, 'image_url'>
-      tagElement: ExcludeTag<'img'>
-    } & JSX.IntrinsicElements[ExcludeTag<'img'>])
+type SkuFieldChildrenProps = Omit<Props, 'children' | 'attribute' | 'element'>
 
-type ChildrenProps = Omit<Props, 'children' | 'attribute'> & {
-  element: Sku[keyof Sku]
-}
+type TCondition = ConditionalElement<Exclude<TResources['Sku'], 'resource'>>
 
 type Props = {
-  children?: (props: ChildrenProps) => JSX.Element
-} & Conditional
+  children?: (props: SkuFieldChildrenProps) => JSX.Element
+} & TCondition
 
-export default function SkuField<P extends Props>({
-  attribute,
-  tagElement,
-  children,
-  ...p
-}: P): JSX.Element {
-  const { sku } = useContext(SkuChildrenContext)
-  const element = (sku && sku[attribute]) || ''
-  const Tag = tagElement
-  if (Tag === 'img' && !children) {
-    const src = element as string
-    const name = sku?.name
-    return <img alt={name} src={src} {...(p as JSX.IntrinsicElements['img'])} />
-  }
-  const parentProps = {
-    element,
-    tagElement,
-    ...p,
-  }
-  return children ? (
-    <Parent {...parentProps}>{children}</Parent>
-  ) : (
-    <Tag>{element}</Tag>
+export default function SkuField<P extends Props>(props: P) {
+  const { attribute, tagElement, children, ...p } = props
+  return (
+    <GenericFieldComponent<TResourceKey['Sku']>
+      resource="skus"
+      attribute={attribute}
+      tagElement={tagElement}
+      context={SkuChildrenContext}
+      {...p}
+    >
+      {children}
+    </GenericFieldComponent>
   )
 }
-
-SkuField.propTypes = components.SkuField.propTypes
