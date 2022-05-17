@@ -20,14 +20,13 @@ import orderReducer, {
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext, { defaultOrderContext } from '#context/OrderContext'
-import { unsetOrderState, ResourceIncluded } from '#reducers/OrderReducer'
+import { ResourceIncluded } from '#reducers/OrderReducer'
 import components from '#config/components'
 import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
 import { OrderCreate, Order } from '@commercelayer/sdk'
 import { BaseError } from '#typings/errors'
 import compareObjAttribute from '#utils/compareObjAttribute'
-import checkIncludeResources from '#utils/checkIncludeResource'
 
 const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps
@@ -38,12 +37,13 @@ type OrderContainerProps = {
   metadata?: BaseMetadataObject
   attributes?: OrderCreate
   orderId?: string
+  fetchOrder?: (order: Order) => void
 }
 
 const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
   props
 ) => {
-  const { orderId, children, metadata, attributes } = props
+  const { orderId, children, metadata, attributes, fetchOrder } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const config = useContext(CommerceLayerContext)
   const {
@@ -57,12 +57,12 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
     const startRequest = Object.keys(state?.includeLoaded || {}).filter(
       (key) => state?.includeLoaded?.[key as ResourceIncluded] === true
     )
-    if (config.accessToken) {
+    if (config.accessToken && !state.loading) {
       const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
       if (
         localOrder &&
         !state.order &&
-        startRequest.length === state.include?.length
+        state.include?.length === startRequest.length
       ) {
         const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
         getApiOrder({
@@ -74,19 +74,25 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
           deleteLocalOrder,
           state,
         })
-      } else if (state?.order && state?.include) {
-        const allIncluded = checkIncludeResources({
-          order: state.order,
-          resourceInclude: state.include,
-        })
-        if (!allIncluded) {
-          getApiOrder({
-            id: state.orderId,
-            dispatch,
-            config,
-            persistKey,
-            deleteLocalOrder,
-            state,
+      } else if (state?.order) {
+        fetchOrder && fetchOrder(state.order)
+      }
+    }
+    return () => {
+      if (!state.order && state.loading) {
+        if (state.include?.length === 0 && startRequest.length > 0) {
+          dispatch({
+            type: 'setLoading',
+            payload: {
+              loading: false,
+            },
+          })
+        } else {
+          dispatch({
+            type: 'setIncludesResource',
+            payload: {
+              include: [],
+            },
           })
         }
       }
