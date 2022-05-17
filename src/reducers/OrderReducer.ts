@@ -622,7 +622,7 @@ export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
 }
 
 export const orderInitialState: Partial<OrderState> = {
-  loading: false,
+  loading: true,
   orderId: '',
   order: undefined,
   errors: [],

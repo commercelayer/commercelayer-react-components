@@ -1,4 +1,4 @@
-import React, {
+import {
   FunctionComponent,
   ReactNode,
   useContext,
@@ -19,7 +19,6 @@ import { saveCustomerUser } from '#reducers/CustomerReducer'
 import CustomerContext from '#context/CustomerContext'
 import { defaultCustomerContext } from '#context/CustomerContext'
 import { BaseError } from '#typings/errors'
-import { isEmpty } from 'lodash'
 
 const propTypes = components.CustomerContainer.propTypes
 const displayName = components.CustomerContainer.displayName
@@ -52,17 +51,21 @@ const CustomerContainer: FunctionComponent<CustomerContainer> = (props) => {
         },
       })
     }
-    if (config.accessToken && isEmpty(state.addresses) && !isGuest) {
+  }, [include, includeLoaded])
+
+  useEffect(() => {
+    if (
+      config.accessToken &&
+      order &&
+      state.addresses?.length === 0 &&
+      !isGuest
+    ) {
       getCustomerAddresses({ config, dispatch })
     }
     if (order?.available_customer_payment_sources && !isGuest) {
       getCustomerPaymentSources({ dispatch, order })
     }
-
-    return () => {
-      dispatch({ type: 'setCustomerEmail', payload: {} })
-    }
-  }, [config.accessToken, order, isGuest, include, includeLoaded])
+  }, [config.accessToken, order, isGuest])
   const contextValue = {
     isGuest,
     ...state,
