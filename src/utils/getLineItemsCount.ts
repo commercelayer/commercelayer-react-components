@@ -21,7 +21,11 @@ const getLineItemsCount: GetLineItemsCountInterface = ({
 }) => {
   lineItems
     .filter(
-      (l) => l.item_type && typeAccepted.includes(l.item_type as TypeAccepted)
+      (l) =>
+        l.item_type &&
+        typeAccepted.includes(l.item_type as TypeAccepted) &&
+        l?.total_amount_cents &&
+        l.total_amount_cents >= 0
     )
     .forEach((l) => {
       if (l.quantity) quantity += l.quantity

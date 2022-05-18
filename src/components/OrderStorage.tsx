@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactNode } from 'react'
+import { FunctionComponent, ReactNode } from 'react'
 import OrderStorageContext from '#context/OrderStorageContext'
 import components from '#config/components'
 import {
