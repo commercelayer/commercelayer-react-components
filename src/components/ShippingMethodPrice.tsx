@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useState,
-  useEffect,
-  useContext,
-} from 'react'
+import { FunctionComponent, useState, useEffect, useContext } from 'react'
 import getAmount from '#utils/getAmount'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from './utils/Parent'
@@ -68,18 +63,16 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
     price,
     ...p,
   }
+  const finalPrice =
+    order?.subtotal_amount_cents &&
+    isNumber(freeOverAmountCents) &&
+    freeOverAmountCents < order.subtotal_amount_cents
+      ? labelFreeOver
+      : price
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <span {...p}>
-      {order?.total_amount_cents &&
-      isNumber(freeOverAmountCents) &&
-      freeOverAmountCents < order.total_amount_cents
-        ? labelFreeOver
-        : order?.total_amount_cents === 0
-        ? labelFreeOver
-        : price}
-    </span>
+    <span {...p}>{finalPrice}</span>
   )
 }
 
