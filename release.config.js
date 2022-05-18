@@ -7,10 +7,12 @@ module.exports = {
       'next-major',
       {
         name: 'beta',
+        channel: 'beta',
         prerelease: true,
       },
       {
         name: 'alpha',
+        channel: 'alpha',
         prerelease: true,
       },
     ],
