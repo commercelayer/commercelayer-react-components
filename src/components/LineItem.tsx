@@ -1,10 +1,9 @@
-import React, { Fragment, useContext, ReactNode } from 'react'
+import { useContext, ReactNode, FunctionComponent } from 'react'
 import LineItemContext from '#context/LineItemContext'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import components from '#config/components'
 import { LineItemType } from '#typings'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
-import { isEmpty } from 'lodash'
 
 const propTypes = components.LineItem.propTypes
 const displayName = components.LineItem.displayName
@@ -14,15 +13,23 @@ type LineItemProps = {
   type?: LineItemType
 }
 
-const LineItem: React.FunctionComponent<LineItemProps> = (props) => {
+const LineItem: FunctionComponent<LineItemProps> = (props) => {
   const { type = 'skus', children } = props
   const { lineItems } = useContext(LineItemContext)
   const { lineItems: shipmentLineItems } = useContext(ShipmentChildrenContext)
-  const items = isEmpty(shipmentLineItems) ? lineItems : shipmentLineItems
+  const items =
+    shipmentLineItems && shipmentLineItems?.length > 0
+      ? shipmentLineItems
+      : lineItems
   const components =
     items &&
     items
-      .filter((l) => l.item_type === type)
+      .filter(
+        (l) =>
+          l.item_type === type &&
+          l?.total_amount_cents &&
+          l.total_amount_cents >= 0
+      )
       .map((lineItem, k, check) => {
         if (
           lineItem.item_type === 'bundles' &&
@@ -39,7 +46,7 @@ const LineItem: React.FunctionComponent<LineItemProps> = (props) => {
           </LineItemChildrenContext.Provider>
         )
       })
-  return <Fragment>{components}</Fragment>
+  return <>{components}</>
 }
 
 LineItem.propTypes = propTypes
