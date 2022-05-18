@@ -1,4 +1,4 @@
-import React, {
+import {
   useEffect,
   FunctionComponent,
   useReducer,
@@ -9,12 +9,10 @@ import lineItemReducer, {
   lineItemInitialState,
   updateLineItem,
   deleteLineItem,
-  // getLineItems,
 } from '#reducers/LineItemReducer'
 import OrderContext from '#context/OrderContext'
 import LineItemContext, { LineItemContextValue } from '#context/LineItemContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import { isEmpty } from 'lodash'
 import components from '#config/components'
 
 const propTypes = components.LineItemsContainer.propTypes
@@ -62,21 +60,16 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
         },
       })
     }
-    if (!isEmpty(order) && order?.line_items) {
+  }, [include, includeLoaded])
+  useEffect(() => {
+    if (order?.line_items && order.line_items.length > 0) {
       dispatch({
         type: 'setLineItems',
         payload: { lineItems: order.line_items },
       })
     }
-    return (): void => {
-      if (isEmpty(order)) {
-        dispatch({
-          type: 'setLineItems',
-          payload: { lineItems: [] },
-        })
-      }
-    }
-  }, [order, include, includeLoaded])
+  }, [order])
+
   const lineItemValue = {
     ...state,
     loader,
