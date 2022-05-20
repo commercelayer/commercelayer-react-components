@@ -50,7 +50,7 @@
     "lint": "eslint src",
     "build": "tsc -b tsconfig.prod.json --verbose",
     "build:dev": "tsc -b tsconfig.prod.json --verbose && tsc-alias -p tsconfig.prod.json",
-    "postbuild": "tsc-alias -p tsconfig.prod.json &&  minimize-js lib -w -s -d",
+    "postbuild": "tsc-alias -p tsconfig.prod.json &&  minimize-js lib -w -s",
     "start": "NODE_OPTIONS='--inspect' next dev",
     "version:fix": "npm version patch",
     "version:feat": "npm version minor",
