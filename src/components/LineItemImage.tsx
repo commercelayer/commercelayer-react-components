@@ -1,14 +1,10 @@
-import React, { FunctionComponent, useContext, ReactNode } from 'react'
+import { FunctionComponent, useContext, ReactNode } from 'react'
 import Parent from './utils/Parent'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import components from '#config/components'
 import { LineItem } from '@commercelayer/sdk'
 import { LineItemType } from '#typings'
-
-const defaultImgUrl =
-  'https://data.commercelayer.app/assets/images/placeholders/img_placeholder.svg'
-const defaultGiftCardImgUrl =
-  'https://data.commercelayer.app/assets/images/placeholders/gift_placeholder.svg'
+import { defaultGiftCardImgUrl, defaultImgUrl } from '#utils/placeholderImages'
 
 const propTypes = components.LineItemImage.propTypes
 const displayName = components.LineItemImage.displayName
