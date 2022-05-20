@@ -4,6 +4,7 @@ import { LineItem, Sku } from '@commercelayer/sdk'
 import Parent from './Parent'
 import { InitialLineItemContext } from '#context/LineItemChildrenContext'
 import { Context, useContext } from 'react'
+import { defaultImgUrl } from '#utils/placeholderImages'
 
 export type TResources = {
   StockTransfer: LineItem & { resource: 'stock_transfers' }
@@ -54,7 +55,7 @@ export default function GenericFieldComponent<R extends keyof TResources>(
   }
   const Tag = tagElement || 'span'
   if (Tag === 'img' && !children) {
-    const src = element as string
+    const src = element || defaultImgUrl
     const name = ''
     return <img alt={name} src={src} {...(p as JSX.IntrinsicElements['img'])} />
   }
