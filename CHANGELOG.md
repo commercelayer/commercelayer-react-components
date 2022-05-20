@@ -1,3 +1,10 @@
+## [3.12.4](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.3...v3.12.4) (2022-05-20)
+
+
+### Bug Fixes
+
+* Expose parentRef for custom children function ([c92587e](https://github.com/commercelayer/commercelayer-react-components/commit/c92587e89b9440b27efca6aa8fdbda228b81089c))
+
 ## [3.12.3](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.2...v3.12.3) (2022-05-13)
 
 
