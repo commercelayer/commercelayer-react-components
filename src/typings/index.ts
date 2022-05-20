@@ -1,4 +1,4 @@
-import { Dispatch, ReactNode, RefObject } from 'react'
+import { Dispatch, ForwardedRef, ReactNode, RefObject } from 'react'
 import PropTypes, { InferProps } from 'prop-types'
 import { BaseError } from './errors'
 
@@ -78,6 +78,7 @@ type BaseInputChildrenComponentProps = Omit<
   handleChange: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void
+  parentRef: ForwardedRef<any>
 }
 
 export interface BaseInputComponentProps {
