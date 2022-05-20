@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react'
+import { useState, useEffect } from 'react'
 import { getCustomerToken } from '@commercelayer/js-auth'
 import Head from 'next/head'
 import {
@@ -13,7 +13,6 @@ import {
   GiftCardOrCouponRemoveButton,
 } from '@commercelayer/react-components'
 import { useRouter } from 'next/router'
-// import { Order } from '@commercelayer/js-sdk'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -59,11 +58,6 @@ export default function Main() {
       />
     </svg>
   )
-  // const [shippingMethodId, setShippingMethodId] = useState<string>('')
-  // const getOrder = async () => {
-  //   const config = { accessToken: token, endpoint }
-  //   const order = await Order.withCredentials(config).find(orderId)
-  // }
   useEffect(() => {
     const getToken = async () => {
       // @ts-ignore
@@ -81,10 +75,9 @@ export default function Main() {
       if (token) setToken(token.accessToken)
     }
     if (!token) getToken()
-    // if (token) getOrder()
   }, [token])
   const labelButton = (
-    <Fragment>
+    <>
       <svg
         className="h-5 w-5 text-gray-400"
         xmlns="http://www.w3.org/2000/svg"
@@ -99,10 +92,10 @@ export default function Main() {
           d="M14 5l7 7m0 0l-7 7m7-7H3"
         />
       </svg>
-    </Fragment>
+    </>
   )
   return (
-    <Fragment>
+    <>
       <Head>
         <script src="http://localhost:8097"></script>
       </Head>
@@ -150,7 +143,19 @@ export default function Main() {
                             return 'Insert a gift card'
                         }
                       }}
-                    />
+                    >
+                      {(props) => {
+                        // Custom input
+                        const { parentRef, placeholder, ...p } = props
+                        return (
+                          <input
+                            ref={parentRef}
+                            placeholder={placeholder}
+                            {...p}
+                          />
+                        )
+                      }}
+                    </GiftCardOrCouponInput>
                   </div>
                   <GiftCardOrCouponSubmit
                     data-cy="code-submit"
@@ -182,7 +187,7 @@ export default function Main() {
                 {(props) => {
                   const { hide, code, ...p } = props
                   return hide ? null : (
-                    <Fragment>
+                    <>
                       <span data-cy="code-label" {...p}>
                         {code}
                         <GiftCardOrCouponRemoveButton
@@ -191,7 +196,7 @@ export default function Main() {
                           label={removeIcon}
                         />
                       </span>
-                    </Fragment>
+                    </>
                   )
                 }}
               </GiftCardOrCouponCode>
@@ -199,6 +204,6 @@ export default function Main() {
           </OrderContainer>
         </div>
       </CommerceLayer>
-    </Fragment>
+    </>
   )
 }
