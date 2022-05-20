@@ -1,20 +1,24 @@
-import React, { FunctionComponent, useContext } from 'react'
+import { FunctionComponent, useContext } from 'react'
 import components from '#config/components'
 import { FunctionChildren } from '#typings'
 import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
 import { CodeType, OrderCodeType } from '#reducers/OrderReducer'
-import { has, isEmpty } from 'lodash'
+import has from 'lodash/has'
+import isEmpty from 'lodash/isEmpty'
 
 const propTypes = components.GiftCardOrCouponCode.propTypes
 const displayName = components.GiftCardOrCouponCode.displayName
 
-type GiftCardOrCouponCodeChildrenProps = FunctionChildren<
-  Omit<GiftCardOrCouponCodeProps, 'children'> & {
-    code?: string
-    hide?: boolean
-  }
->
+type ChildrenProps = Omit<GiftCardOrCouponCodeProps, 'children'> & {
+  code?: string
+  hide?: boolean
+  discountAmountCents?: string
+  discountAmountFloat?: string
+  formattedDiscountAmount?: string
+}
+
+type GiftCardOrCouponCodeChildrenProps = FunctionChildren<ChildrenProps>
 
 type GiftCardOrCouponCodeProps = {
   type?: CodeType
@@ -42,7 +46,10 @@ const GiftCardOrCouponCode: FunctionComponent<GiftCardOrCouponCodeProps> = ({
     ...props,
     code,
     hide,
-  }
+    discountAmountCents: order?.discount_amount_cents,
+    discountAmountFloat: order?.discount_amount_float,
+    formattedDiscountAmount: order?.formatted_discount_amount,
+  } as ChildrenProps
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : hide ? null : (
