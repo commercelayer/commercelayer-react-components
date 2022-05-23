@@ -1,3 +1,10 @@
+## [3.12.5](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.4...v3.12.5) (2022-05-23)
+
+
+### Bug Fixes
+
+* List of stock transfers ([67dd33e](https://github.com/commercelayer/commercelayer-react-components/commit/67dd33e8c46f12a40f951e408fdc38c7ec3dd008))
+
 ## [3.12.4](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.3...v3.12.4) (2022-05-20)
 
 
