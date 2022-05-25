@@ -1,9 +1,9 @@
-import React, { useContext, FunctionComponent, ReactNode } from 'react'
+import { useContext, FunctionComponent, ReactNode, useEffect } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import ShipmentContext from '#context/ShipmentContext'
-import { ShippingMethod } from '@commercelayer/sdk'
+import type { ShippingMethod } from '@commercelayer/sdk'
 
 const propTypes = components.ShippingMethodRadioButton.propTypes
 const displayName = components.ShippingMethodRadioButton.displayName
