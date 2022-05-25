@@ -1,3 +1,10 @@
+## [3.12.6](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.5...v3.12.6) (2022-05-25)
+
+
+### Performance Improvements
+
+* Add `autoSelectSingleShippingMethod` prop to `Shipment` component ([d24b6f7](https://github.com/commercelayer/commercelayer-react-components/commit/d24b6f7b67ec899ea8034d1cf7cc7ae38e0954ed))
+
 ## [3.12.5](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.4...v3.12.5) (2022-05-23)
 
 
