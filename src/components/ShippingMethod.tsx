@@ -1,4 +1,4 @@
-import React, {
+import {
   FunctionComponent,
   Fragment,
   useContext,
@@ -10,7 +10,7 @@ import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContex
 import components from '#config/components'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import isEmpty from 'lodash/isEmpty'
-import { DeliveryLeadTime } from '@commercelayer/sdk'
+import type { DeliveryLeadTime } from '@commercelayer/sdk'
 
 const propTypes = components.ShippingMethod.propTypes
 const displayName = components.ShippingMethod.displayName
