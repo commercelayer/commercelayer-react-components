@@ -5,7 +5,6 @@ import Parent from './utils/Parent'
 import components from '#config/components'
 import { BaseAmountComponent } from '#typings/index'
 import OrderContext from '#context/OrderContext'
-import { isNumber } from 'lodash'
 
 const propTypes = components.ShippingMethodPrice.propTypes
 const displayName = components.ShippingMethodPrice.displayName
@@ -63,10 +62,13 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
     price,
     ...p,
   }
+  const totalPrice =
+    (order?.discount_amount_cents as number) +
+    (order?.subtotal_amount_cents as number)
   const finalPrice =
-    order?.subtotal_amount_cents &&
-    isNumber(freeOverAmountCents) &&
-    freeOverAmountCents < order.subtotal_amount_cents
+    freeOverAmountCents < totalPrice
+      ? labelFreeOver
+      : totalPrice === 0
       ? labelFreeOver
       : price
   return props.children ? (
