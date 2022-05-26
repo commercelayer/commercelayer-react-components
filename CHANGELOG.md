@@ -1,3 +1,15 @@
+## [3.12.7](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.6...v3.12.7) (2022-05-26)
+
+
+### Bug Fixes
+
+* Reset shipping method selector when add or remove a coupon ([88ca65d](https://github.com/commercelayer/commercelayer-react-components/commit/88ca65d32222375be9d27732109b5f62a0cd5640))
+
+
+### Performance Improvements
+
+* `autoSelectSingleShippingMethod` accept even a function ([69c6b2e](https://github.com/commercelayer/commercelayer-react-components/commit/69c6b2ead23c4a21070288024ed735792c26458d))
+
 ## [3.12.6](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.5...v3.12.6) (2022-05-25)
 
 
