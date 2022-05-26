@@ -20,7 +20,7 @@ import orderReducer, {
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext, { defaultOrderContext } from '#context/OrderContext'
-import { unsetOrderState, ResourceIncluded } from '#reducers/OrderReducer'
+import { ResourceIncluded } from '#reducers/OrderReducer'
 import components from '#config/components'
 import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
