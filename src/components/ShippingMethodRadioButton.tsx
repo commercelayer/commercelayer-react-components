@@ -1,4 +1,10 @@
-import { useContext, FunctionComponent, ReactNode, useEffect } from 'react'
+import {
+  useContext,
+  FunctionComponent,
+  ReactNode,
+  useEffect,
+  useState,
+} from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
@@ -27,6 +33,7 @@ const ShippingMethodRadioButton: FunctionComponent<
   ShippingMethodRadioButtonProps
 > = (props) => {
   const { onChange, ...p } = props
+  const [checked, setChecked] = useState(false)
   const { shippingMethod, currentShippingMethodId, shipmentId } = useContext(
     ShippingMethodChildrenContext
   )
@@ -34,12 +41,23 @@ const ShippingMethodRadioButton: FunctionComponent<
   const shippingMethodId = shippingMethod?.id
   const name = `shipment-${shipmentId}`
   const id = `${name}-${shippingMethodId}`
-  const checked = shippingMethodId === currentShippingMethodId
+  // const checked = shippingMethodId === currentShippingMethodId
+  useEffect(() => {
+    if (shippingMethodId === currentShippingMethodId) {
+      setChecked(true)
+    } else setChecked(false)
+    return () => {
+      setChecked(false)
+    }
+  }, [currentShippingMethodId])
+
   const handleOnChange = async () => {
     if (shipmentId) {
-      if (shippingMethodId)
+      if (shippingMethodId) {
+        setChecked(true)
         await setShippingMethod(shipmentId, shippingMethodId)
-      if (shippingMethod && onChange) onChange(shippingMethod, shipmentId)
+        if (shippingMethod && onChange) onChange(shippingMethod, shipmentId)
+      }
     }
   }
   const parentProps = {
@@ -58,7 +76,7 @@ const ShippingMethodRadioButton: FunctionComponent<
       name={name}
       id={id}
       onChange={handleOnChange}
-      defaultChecked={checked}
+      checked={checked}
       {...p}
     />
   )
