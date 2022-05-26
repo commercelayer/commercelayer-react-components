@@ -41,7 +41,6 @@ const ShippingMethodRadioButton: FunctionComponent<
   const shippingMethodId = shippingMethod?.id
   const name = `shipment-${shipmentId}`
   const id = `${name}-${shippingMethodId}`
-  // const checked = shippingMethodId === currentShippingMethodId
   useEffect(() => {
     if (shippingMethodId === currentShippingMethodId) {
       setChecked(true)

@@ -24,17 +24,18 @@ const LineItem: FunctionComponent<LineItemProps> = (props) => {
   const components =
     items &&
     items
-      .filter(
-        (l) =>
-          l.item_type === type &&
-          l?.total_amount_cents &&
-          l.total_amount_cents >= 0
-      )
+      .filter((l) => l.item_type === type)
       .map((lineItem, k, check) => {
         if (
           lineItem.item_type === 'bundles' &&
           k > 0 &&
           check[k - 1].bundle_code === lineItem.bundle_code
+        )
+          return null
+        if (
+          lineItem.item_type === 'gift_cards' &&
+          lineItem?.total_amount_cents &&
+          lineItem?.total_amount_cents <= 0
         )
           return null
         const lineProps = {
