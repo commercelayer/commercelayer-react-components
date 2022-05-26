@@ -26,16 +26,19 @@ export default function Shipment({
   useEffect(() => {
     if (shipments) setLoading(false)
     if (autoSelectSingleShippingMethod && shipments) {
-      shipments.forEach((shipment) => {
-        const isSingle = shipment?.available_shipping_methods?.length === 1
-        if (!shipment?.shipping_method && isSingle) {
-          const [shippingMethod] = shipment?.available_shipping_methods || []
-          setShippingMethod(shipment?.id, shippingMethod?.id)
-          if (typeof autoSelectSingleShippingMethod === 'function') {
-            autoSelectSingleShippingMethod()
+      const autoSelect = async () => {
+        return await shipments.forEach(async (shipment) => {
+          const isSingle = shipment?.available_shipping_methods?.length === 1
+          if (!shipment?.shipping_method && isSingle) {
+            const [shippingMethod] = shipment?.available_shipping_methods || []
+            await setShippingMethod(shipment?.id, shippingMethod?.id)
+            if (typeof autoSelectSingleShippingMethod === 'function') {
+              autoSelectSingleShippingMethod()
+            }
           }
-        }
-      })
+        })
+      }
+      autoSelect()
     }
     return () => {
       setLoading(true)
