@@ -24,24 +24,29 @@ export default function Shipment({
   const { shipments, deliveryLeadTimes, setShippingMethod } =
     useContext(ShipmentContext)
   useEffect(() => {
-    if (shipments) setLoading(false)
-    if (autoSelectSingleShippingMethod && shipments) {
-      const autoSelect = async () => {
-        return await shipments.forEach(async (shipment) => {
-          const isSingle = shipment?.available_shipping_methods?.length === 1
-          if (!shipment?.shipping_method && isSingle) {
-            const [shippingMethod] = shipment?.available_shipping_methods || []
-            await setShippingMethod(shipment?.id, shippingMethod?.id)
-            if (typeof autoSelectSingleShippingMethod === 'function') {
-              autoSelectSingleShippingMethod()
+    if (shipments) {
+      if (autoSelectSingleShippingMethod) {
+        const autoSelect = async () => {
+          return await shipments.forEach(async (shipment) => {
+            const isSingle = shipment?.available_shipping_methods?.length === 1
+            if (!shipment?.shipping_method && isSingle) {
+              const [shippingMethod] =
+                shipment?.available_shipping_methods || []
+              await setShippingMethod(shipment?.id, shippingMethod?.id)
+              if (typeof autoSelectSingleShippingMethod === 'function') {
+                autoSelectSingleShippingMethod()
+              }
+            } else {
+              setTimeout(() => {
+                setLoading(false)
+              }, 200)
             }
-          }
-        })
+          })
+        }
+        autoSelect()
+      } else {
+        setLoading(false)
       }
-      autoSelect()
-    }
-    return () => {
-      setLoading(true)
     }
   }, [shipments])
   const components =
