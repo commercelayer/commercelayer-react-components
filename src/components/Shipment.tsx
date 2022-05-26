@@ -12,7 +12,7 @@ const displayName = components.Shipment.displayName
 type ShipmentProps = {
   children: ReactNode
   loader?: LoaderType
-  autoSelectSingleShippingMethod?: boolean
+  autoSelectSingleShippingMethod?: boolean | (() => void)
 }
 
 export default function Shipment({
@@ -31,6 +31,9 @@ export default function Shipment({
         if (!shipment?.shipping_method && isSingle) {
           const [shippingMethod] = shipment?.available_shipping_methods || []
           setShippingMethod(shipment?.id, shippingMethod?.id)
+          if (typeof autoSelectSingleShippingMethod === 'function') {
+            autoSelectSingleShippingMethod()
+          }
         }
       })
     }

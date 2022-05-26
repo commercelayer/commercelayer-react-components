@@ -108,7 +108,7 @@ const ShipmentsContainer: React.FunctionComponent<ShipmentsContainerProps> = (
     return () => {
       setShipmentErrors([], dispatch)
     }
-  }, [order])
+  }, [order?.shipments])
   const contextValue = {
     ...state,
     setShipmentErrors: (errors: BaseError[]) =>
