@@ -4,7 +4,6 @@ import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContex
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { BaseAmountComponent } from '#typings/index'
-import OrderContext from '#context/OrderContext'
 
 const propTypes = components.ShippingMethodPrice.propTypes
 const displayName = components.ShippingMethodPrice.displayName
@@ -33,9 +32,8 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
     ...p
   } = props
   const { shippingMethod } = useContext(ShippingMethodChildrenContext)
-  const { order } = useContext(OrderContext)
   const [price, setPrice] = useState('')
-  const [freeOverAmountCents, setFreeOverAmountCents] = useState(0)
+  const [priceCents, setPriceCents] = useState(0)
   useEffect(() => {
     if (shippingMethod) {
       const p = getAmount({
@@ -45,32 +43,24 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
         obj: shippingMethod,
       })
       setPrice(p)
-      const c = getAmount<number>({
-        base: 'free_over',
-        type,
+      const pCents = getAmount<number>({
+        base: 'price_amount',
+        type: 'for_shipment',
         format: 'cents',
         obj: shippingMethod,
       })
-      setFreeOverAmountCents(c)
+      setPriceCents(pCents)
     }
     return (): void => {
       setPrice('')
-      setFreeOverAmountCents(0)
+      setPriceCents(0)
     }
   }, [shippingMethod])
   const parentProps = {
     price,
     ...p,
   }
-  const totalPrice =
-    (order?.discount_amount_cents as number) +
-    (order?.subtotal_amount_cents as number)
-  const finalPrice =
-    freeOverAmountCents < totalPrice
-      ? labelFreeOver
-      : totalPrice === 0
-      ? labelFreeOver
-      : price
+  const finalPrice = priceCents === 0 ? labelFreeOver : price
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
