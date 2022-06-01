@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  useState,
-  useEffect,
-} from 'react'
+import { useContext, useState, useEffect } from 'react'
 import Parent from './utils/Parent'
 import getLineItemsCount from '#utils/getLineItemsCount'
 import { isEmpty } from 'lodash'
@@ -26,10 +21,10 @@ type LineItemsCountProps = {
   text?: string
 } & JSX.IntrinsicElements['span']
 
-const LineItemsEmpty: FunctionComponent<LineItemsCountProps> = (props) => {
+export default function LineItemsEmpty(props: LineItemsCountProps) {
   const { children, text = 'Your shopping bag is empty', ...p } = props
   const { lineItems } = useContext(LineItemContext)
-  const [quantity, setQuantity] = useState(0)
+  const [quantity, setQuantity] = useState<undefined | number>()
   const emptyText = quantity === 0 ? <span {...p}>{text}</span> : null
   useEffect(() => {
     if (!isEmpty(lineItems)) {
@@ -37,7 +32,7 @@ const LineItemsEmpty: FunctionComponent<LineItemsCountProps> = (props) => {
       setQuantity(qty)
     }
     return (): void => {
-      setQuantity(0)
+      setQuantity(undefined)
     }
   }, [lineItems])
   const parentProps = {
@@ -50,5 +45,3 @@ const LineItemsEmpty: FunctionComponent<LineItemsCountProps> = (props) => {
 
 LineItemsEmpty.propTypes = propTypes
 LineItemsEmpty.displayName = displayName
-
-export default LineItemsEmpty
