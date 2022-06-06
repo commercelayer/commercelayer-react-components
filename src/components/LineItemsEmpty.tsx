@@ -1,7 +1,6 @@
 import { useContext, useState, useEffect } from 'react'
 import Parent from './utils/Parent'
 import getLineItemsCount from '#utils/getLineItemsCount'
-import { isEmpty } from 'lodash'
 import LineItemContext from '#context/LineItemContext'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
@@ -27,9 +26,13 @@ export default function LineItemsEmpty(props: LineItemsCountProps) {
   const [quantity, setQuantity] = useState<undefined | number>()
   const emptyText = quantity === 0 ? <span {...p}>{text}</span> : null
   useEffect(() => {
-    if (!isEmpty(lineItems)) {
-      const qty = getLineItemsCount({ lineItems: lineItems || [] })
-      setQuantity(qty)
+    if (lineItems) {
+      if (lineItems.length > 0) {
+        const qty = getLineItemsCount({ lineItems: lineItems || [] })
+        setQuantity(qty)
+      } else {
+        setQuantity(0)
+      }
     }
     return (): void => {
       setQuantity(undefined)
