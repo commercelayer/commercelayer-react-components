@@ -62,13 +62,13 @@ const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
     }
   }, [include, includeLoaded])
   useEffect(() => {
-    if (order?.line_items && order.line_items.length > 0) {
+    if (order?.line_items) {
       dispatch({
         type: 'setLineItems',
         payload: { lineItems: order.line_items },
       })
     }
-  }, [order])
+  }, [order?.line_items])
 
   const lineItemValue = {
     ...state,
