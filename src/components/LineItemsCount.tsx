@@ -1,12 +1,6 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  useState,
-  useEffect,
-} from 'react'
+import { FunctionComponent, useContext, useState, useEffect } from 'react'
 import Parent from './utils/Parent'
 import getLineItemsCount, { TypeAccepted } from '#utils/getLineItemsCount'
-import { isEmpty } from 'lodash'
 import LineItemContext from '#context/LineItemContext'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
@@ -30,7 +24,7 @@ const LineItemsCount: FunctionComponent<LineItemsCountProps> = (props) => {
   const { lineItems } = useContext(LineItemContext)
   const [quantity, setQuantity] = useState(0)
   useEffect(() => {
-    if (!isEmpty(lineItems)) {
+    if (lineItems && lineItems.length > 0) {
       const qty = getLineItemsCount({
         lineItems: lineItems || [],
         typeAccepted,
