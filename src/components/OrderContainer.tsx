@@ -103,6 +103,7 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
     state.include,
     orderId,
     state.order,
+    state.loading,
   ])
   useEffect(() => {
     if (state.orderId && attributes && state.order) {
