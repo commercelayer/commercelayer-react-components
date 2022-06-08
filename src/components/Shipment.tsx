@@ -32,7 +32,9 @@ export default function Shipment({
             if (!shipment?.shipping_method && isSingle) {
               const [shippingMethod] =
                 shipment?.available_shipping_methods || []
-              await setShippingMethod(shipment?.id, shippingMethod?.id)
+              if (shippingMethod) {
+                setShippingMethod(shipment.id, shippingMethod.id)
+              }
               if (typeof autoSelectSingleShippingMethod === 'function') {
                 autoSelectSingleShippingMethod()
               }
@@ -64,7 +66,7 @@ export default function Shipment({
         autoSelectSingleShippingMethod &&
         shippingMethods &&
         shippingMethods.length === 1
-          ? shippingMethods[0].id
+          ? shippingMethods[0]?.id
           : shipment.shipping_method?.id
       const stockTransfers = shipment.stock_transfers
       const times = deliveryLeadTimes?.filter(

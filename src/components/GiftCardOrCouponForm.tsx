@@ -1,5 +1,5 @@
 import useRapidForm from 'rapid-form'
-import React, {
+import {
   FunctionComponent,
   useContext,
   useEffect,

@@ -1,20 +1,13 @@
 import PaymentMethodContext, {
   defaultPaymentMethodContext,
 } from '#context/PaymentMethodContext'
-import React, {
-  ReactNode,
-  useContext,
-  useEffect,
-  useReducer,
-  useMemo,
-} from 'react'
+import { ReactNode, useContext, useEffect, useReducer, useMemo } from 'react'
 import paymentMethodReducer, {
   paymentMethodInitialState,
   getPaymentMethods,
   PaymentMethodConfig,
   setPaymentMethodConfig,
   PaymentRef,
-  setPaymentSource,
 } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'

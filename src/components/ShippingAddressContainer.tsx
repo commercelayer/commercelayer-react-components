@@ -1,5 +1,5 @@
 import ShippingAddressContext from '#context/ShippingAddressContext'
-import React, {
+import {
   FunctionComponent,
   ReactNode,
   useContext,

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactNode, useContext } from 'react'
+import { FunctionComponent, ReactNode, useContext } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
@@ -27,9 +27,8 @@ const SaveCustomerButton: FunctionComponent<SaveCustomerButtonProps> = (
   props
 ) => {
   const { children, label = 'Save', resource, disabled, onClick, ...p } = props
-  const { errors, saveCustomerUser, customerEmail } = useContext(
-    CustomerContext
-  )
+  const { errors, saveCustomerUser, customerEmail } =
+    useContext(CustomerContext)
   const disable = disabled || !isEmpty(errors) || isEmpty(customerEmail)
   const handleClick = async () => {
     if (isEmpty(errors) && !disable) {

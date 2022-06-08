@@ -1,6 +1,4 @@
-import React, { Fragment, FunctionComponent, ReactNode } from 'react'
-import { keys } from 'lodash'
-
+import { Fragment, FunctionComponent, ReactNode } from 'react'
 import PropTypes from 'prop-types'
 import { BaseSelectorType } from '#typings'
 import { VariantsObject, SetSkuCode } from '#reducers/VariantReducer'
@@ -53,9 +51,9 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
     handleCallback,
     ...prs
   } = props
-  const vars = keys(variants).map((v, k) => {
+  const vars = Object.keys(variants).map((v, k) => {
     const checked = skuCode === v
-    const label = options.length > 0 ? options[k].label : variants[v].name
+    const label = options.length > 0 ? options[k]?.label : variants[v].name
     return type === 'select' ? (
       <option
         key={variants[v].id}
@@ -91,8 +89,8 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
         onChange={(e): void => {
           const v = e.target.value
           const i = e.target.selectedIndex
-          const id = e.target[i].dataset.skuId as string
-          const label = e.target[i].dataset.label as string
+          const id = e.target[i]?.dataset?.['skuId'] as string
+          const label = e.target[i]?.dataset?.['label'] as string
           handleChange && handleChange(v, id)
           handleCallback && handleCallback({ code: v, label })
         }}
@@ -104,7 +102,7 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
       </select>
     )
   }
-  return <Fragment>{vars}</Fragment>
+  return <>{vars}</>
 }
 
 VariantTemplate.propTypes = propTypes

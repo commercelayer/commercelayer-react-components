@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { FunctionComponent, useContext, useEffect, useState } from 'react'
 import BaseInput from './utils/BaseInput'
 import components from '#config/components'
 import { BaseInputComponentProps } from '#typings'
@@ -52,10 +47,11 @@ const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
     if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
-        const { code, message } = errors[fieldName]
+        const code = errors[fieldName]?.['code']
+        const message = errors[fieldName]?.['message']
         formErrors.push({
           code: code as CodeErrorType,
-          message,
+          message: message || '',
           resource: 'orders',
           field: fieldName,
         })

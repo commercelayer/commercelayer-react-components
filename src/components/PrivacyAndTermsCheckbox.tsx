@@ -1,12 +1,7 @@
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import PlaceOrderContext from '#context/PlaceOrderContext'
-import React, {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { FunctionComponent, useContext, useEffect, useState } from 'react'
 import BaseInput, { BaseInputProps } from './utils/BaseInput'
 
 const propTypes = components.PrivacyAndTermsCheckbox.propTypes

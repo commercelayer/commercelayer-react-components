@@ -1,7 +1,7 @@
 import ExternalFunctionContext, {
   callExternalFunction,
 } from '#context/ExternalFunctionContext'
-import React, { FunctionComponent, ReactNode } from 'react'
+import { FunctionComponent, ReactNode } from 'react'
 import components from '#config/components'
 
 const propTypes = components.ExternalFunction.propTypes

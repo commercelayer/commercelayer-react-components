@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useContext, ReactNode } from 'react'
+import { useEffect, useReducer, useContext, ReactNode } from 'react'
 import variantReducer, {
   variantInitialState,
   unsetVariantState,

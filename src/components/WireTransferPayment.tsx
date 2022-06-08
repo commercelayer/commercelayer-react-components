@@ -1,6 +1,6 @@
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isFunction from 'lodash/isFunction'
-import React, {
+import {
   FunctionComponent,
   ReactNode,
   useContext,
