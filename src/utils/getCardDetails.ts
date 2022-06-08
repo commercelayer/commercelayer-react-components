@@ -64,7 +64,7 @@ export default function getCardDetails({
     default: {
       const ps =
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
-      const source = ps?.metadata?.card
+      const source = ps?.metadata?.['card']
       if (source) {
         return {
           ...source,

@@ -8,24 +8,12 @@ import {
   PaymentResource,
 } from '#reducers/PaymentMethodReducer'
 import isEmpty from 'lodash/isEmpty'
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 
 type WireTransferGateway = GatewayBaseType
 
 export default function WireTransferGateway(props: WireTransferGateway) {
-  const {
-    readonly,
-    showCard,
-    handleEditClick,
-    children,
-    templateCustomerCards,
-    show,
-    loading,
-    onClickCustomerCards,
-    loaderComponent,
-    templateCustomerSaveToWallet,
-    ...p
-  } = props
+  const { readonly, showCard, handleEditClick, children, ...p } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { currentPaymentMethodId, config, paymentSource } =
     useContext(PaymentMethodContext)

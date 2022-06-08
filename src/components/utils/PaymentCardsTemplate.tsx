@@ -1,5 +1,5 @@
 import Parent from '#components/utils/Parent'
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import {
   PaymentResource,

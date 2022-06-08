@@ -1,4 +1,4 @@
-import React, {
+import {
   FunctionComponent,
   useReducer,
   useContext,
@@ -40,9 +40,9 @@ const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = (
       : skuCode || getCurrentItemKey(item)
   const skuOptionsValue = { ...state, skuCode: sCode }
   useEffect(() => {
-    if (sCode && item[sCode].sku_options) {
+    if (sCode && item[sCode]?.sku_options) {
       getSkuOptions({
-        skuOptions: item[sCode].sku_options,
+        skuOptions: item[sCode]?.sku_options,
         dispatch,
       })
     }

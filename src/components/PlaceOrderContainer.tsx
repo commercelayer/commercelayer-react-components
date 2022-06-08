@@ -1,5 +1,5 @@
 import PlaceOrderContext from '#context/PlaceOrderContext'
-import React, {
+import {
   FunctionComponent,
   ReactNode,
   useContext,

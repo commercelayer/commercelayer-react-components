@@ -1,7 +1,7 @@
 import ShipmentContext, {
   defaultShipmentContext,
 } from '#context/ShipmentContext'
-import React, { ReactNode, useContext, useEffect, useReducer } from 'react'
+import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import shipmentReducer, {
   shipmentInitialState,
   setShipmentErrors,

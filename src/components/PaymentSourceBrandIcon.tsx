@@ -1,5 +1,5 @@
 import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
-import React, { FunctionComponent, useContext, useRef } from 'react'
+import { FunctionComponent, useContext, useRef } from 'react'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings'
 import components from '#config/components'

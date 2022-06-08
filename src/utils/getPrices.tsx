@@ -2,7 +2,7 @@ import { isEmpty, first, isArray, has } from 'lodash'
 import { Price } from '@commercelayer/sdk'
 import { Prices } from '#reducers/PriceReducer'
 import { Items } from '#reducers/ItemReducer'
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import PriceTemplate, { PTemplateProps } from '#components/utils/PriceTemplate'
 
 export interface GetPriceByCode {
@@ -56,11 +56,5 @@ export default function getPrices<P extends Price>(prices: P[]) {
       }
     })
   }
-  // else {
-  //   // forEach(prices, (item) => {
-  //   //   const prices = item.prices()?.toArray()
-  //   //   obj[item.code] = prices
-  //   // })
-  // }
   return obj
 }
