@@ -1,4 +1,4 @@
-import React, { FunctionComponent, ReactNode } from 'react'
+import { FunctionComponent, ReactNode } from 'react'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
 

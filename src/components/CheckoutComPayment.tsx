@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext, useRef } from 'react'
+import { FunctionComponent, useContext, useRef } from 'react'
 import {
   PaymentMethodConfig,
   PaymentSourceObject,

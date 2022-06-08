@@ -1,7 +1,7 @@
 import AddressesContext, {
   defaultAddressContext,
 } from '#context/AddressContext'
-import React, {
+import {
   FunctionComponent,
   ReactNode,
   useContext,

@@ -1,5 +1,5 @@
 import Parent from '#components/utils/Parent'
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { Address } from '@commercelayer/sdk'
 import AddressChildrenContext from '#context/AddressChildrenContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'

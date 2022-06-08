@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import components from '#config/components'
 import BaseInput from './utils/BaseInput'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'

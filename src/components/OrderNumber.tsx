@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import { FunctionComponent } from 'react'
 import components from '#config/components'
 import BaseField, { BaseFieldProps } from './utils/BaseField'
 

@@ -1,7 +1,7 @@
 import components from '#config/components'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import { has } from 'lodash'
-import React, { FunctionComponent, useContext } from 'react'
+import { FunctionComponent, useContext } from 'react'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings'
 const propTypes = components.PaymentSourceDetail.propTypes

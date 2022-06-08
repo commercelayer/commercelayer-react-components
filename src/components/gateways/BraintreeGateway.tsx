@@ -12,7 +12,7 @@ import {
 import getCardDetails from '#utils/getCardDetails'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
-import React, { Fragment, useContext } from 'react'
+import { Fragment, useContext } from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
 type BraintreeGateway = GatewayBaseType

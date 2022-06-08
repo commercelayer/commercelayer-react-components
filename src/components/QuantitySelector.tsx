@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  useState,
-  useEffect,
-} from 'react'
+import { FunctionComponent, useContext, useState, useEffect } from 'react'
 import Parent from './utils/Parent'
 import { isEmpty, has } from 'lodash'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
@@ -86,7 +81,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
     if (!valid) {
       const resetVal = Number(qty) < Number(min) ? min : maxInv
-      setValue(resetVal)
+      resetVal && setValue(resetVal)
       if (!isEmpty(skuLists) && skuListId) {
         setQuantity &&
           setQuantity({ ...quantity, [`${skuListId}`]: Number(resetVal) })

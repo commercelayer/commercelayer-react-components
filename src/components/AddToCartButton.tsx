@@ -1,10 +1,10 @@
-import React, { useContext, PropsWithoutRef, ReactNode } from 'react'
+import { useContext, PropsWithoutRef, ReactNode } from 'react'
 import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
-import { isEmpty, has } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
+import has from 'lodash/has'
 import ItemContext from '#context/ItemContext'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
-import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import { AddToCartReturn } from '#reducers/OrderReducer'
 import SkuListsContext from '#context/SkuListsContext'
@@ -13,13 +13,9 @@ import { VariantOption } from '#components/VariantSelector'
 import isFunction from 'lodash/isFunction'
 import SkuChildrenContext from '#context/SkuChildrenContext'
 
-const propTypes = components.AddToCartButton.propTypes as any
-const defaultProps = components.AddToCartButton.defaultProps
-const displayName = components.AddToCartButton.displayName
-
 type ChildrenProps = {
   handleClick: () => AddToCartReturn
-} & Omit<AddToCartButtonProps, 'children'>
+} & Omit<Props, 'children'>
 
 type AddToCartButtonChildrenProps = FunctionChildren<ChildrenProps>
 
@@ -35,7 +31,7 @@ type BuyNowMode =
       checkoutUrl?: never
     }
 
-type AddToCartButtonProps = {
+type Props = {
   children?: AddToCartButtonChildrenProps
   label?: string | ReactNode
   skuCode?: string
@@ -46,9 +42,7 @@ type AddToCartButtonProps = {
 } & BuyNowMode &
   PropsWithoutRef<JSX.IntrinsicElements['button']>
 
-const AddToCartButton: React.FunctionComponent<AddToCartButtonProps> = (
-  props
-) => {
+export default function AddToCartButton(props: Props) {
   const {
     label = 'Add to cart',
     children,
@@ -174,9 +168,3 @@ const AddToCartButton: React.FunctionComponent<AddToCartButtonProps> = (
     </button>
   )
 }
-
-AddToCartButton.propTypes = propTypes
-AddToCartButton.defaultProps = defaultProps
-AddToCartButton.displayName = displayName
-
-export default AddToCartButton

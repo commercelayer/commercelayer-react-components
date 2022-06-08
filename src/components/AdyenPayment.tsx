@@ -1,4 +1,4 @@
-import React, {
+import {
   CSSProperties,
   FunctionComponent,
   useContext,
@@ -238,9 +238,9 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
       clientKey,
       paymentMethodsResponse,
     }
-    options.onChange = (s: any, c: any) =>
+    options['onChange'] = (s: any, c: any) =>
       handleChange(s, c, options, paymentSource)
-    options.onAdditionalDetails = (s: any, c: any) =>
+    options['onAdditionalDetails'] = (s: any, c: any) =>
       handleOnAdditionalDetails(s, c, options)
     if (!ref && clientKey)
       setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'false')

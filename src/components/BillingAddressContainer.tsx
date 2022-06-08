@@ -1,5 +1,5 @@
 import BillingAddressContext from '#context/BillingAddressContext'
-import React, {
+import {
   FunctionComponent,
   ReactNode,
   useContext,
