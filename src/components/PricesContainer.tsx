@@ -58,7 +58,7 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
   const sCode =
     skuCodes && skuCodes?.length > 0
       ? ''
-      : getCurrentItemKey(currentItem) || skuCode || itemSkuCode || ''
+      : skuCode || getCurrentItemKey(currentItem) || itemSkuCode || ''
   const setSkuCodes: SetSkuCodesPrice = (skuCodes) => {
     dispatch({
       type: 'setSkuCodes',
@@ -84,8 +84,8 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
       })
     }
     if (
-      (config.accessToken && isEmpty(currentItem)) ||
-      (config.accessToken && !has(prices, sCode))
+      (config.accessToken && !has(prices, sCode)) ||
+      (config.accessToken && isEmpty(currentItem))
     ) {
       if (state.skuCodes.length > 0 || skuCode) {
         getSkusPrice((sCode && [sCode]) || state.skuCodes, {
