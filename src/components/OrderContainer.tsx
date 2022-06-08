@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useReducer,
-  useContext,
-  ReactNode,
-  useMemo,
-} from 'react'
+import { useEffect, useReducer, useContext, ReactNode, useMemo } from 'react'
 import orderReducer, {
   AddToCartValues,
   createOrder,
@@ -132,14 +126,15 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
         getApiOrder({ id, dispatch, config, state }),
       setOrderErrors: (errors: BaseError[]) =>
         setOrderErrors({ dispatch, errors }),
-      createOrder: async (): Promise<string> =>
-        await createOrder({
+      createOrder: (): Promise<string> =>
+        createOrder({
           persistKey,
           dispatch,
           config,
           state,
           orderMetadata: metadata,
           orderAttributes: attributes,
+          setLocalOrder,
         }),
       addToCart: (values: AddToCartValues): Promise<{ success: boolean }> =>
         defaultOrderContext['addToCart']({
@@ -201,7 +196,7 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
           state,
         }),
     }
-  }, [state])
+  }, [state, config.accessToken])
   return (
     <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
   )

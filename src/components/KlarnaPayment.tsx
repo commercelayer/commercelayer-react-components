@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
 import { PaymentSourceProps } from './PaymentSource'
@@ -65,7 +65,7 @@ export default function KlarnaPayment({
   locale = 'EN',
   ...p
 }: KlarnaPaymentProps) {
-  const ref = React.useRef<null | HTMLFormElement>(null)
+  const ref = useRef<null | HTMLFormElement>(null)
   const {
     paymentSource,
     currentPaymentMethodType,

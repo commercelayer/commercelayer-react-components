@@ -1,5 +1,5 @@
 import OrderContext from '#context/OrderContext'
-import React, {
+import {
   FunctionComponent,
   ReactNode,
   useContext,

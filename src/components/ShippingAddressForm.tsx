@@ -1,6 +1,6 @@
 import AddressesContext from '#context/AddressContext'
 import useRapidForm from 'rapid-form'
-import React, {
+import {
   FunctionComponent,
   ReactNode,
   useContext,
@@ -59,14 +59,15 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
-        const { code, message } = errors[fieldName]
+        const code = errors[fieldName]?.['code']
+        const message = errors[fieldName]?.['message']
         if (['shipping_address_state_code'].includes(fieldName)) {
           if (isEmpty(values['state_code'])) {
             delete errors[fieldName]
           } else {
             formErrors.push({
               code: code as CodeErrorType,
-              message,
+              message: message || '',
               resource: 'shipping_address',
               field: fieldName,
             })
@@ -74,7 +75,7 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
         } else {
           formErrors.push({
             code: code as CodeErrorType,
-            message,
+            message: message || '',
             resource: 'shipping_address',
             field: fieldName,
           })

@@ -1,6 +1,6 @@
 import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
 import { capitalize } from 'lodash'
-import React, { FunctionComponent, useContext } from 'react'
+import { FunctionComponent, useContext } from 'react'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings'
 import components from '#config/components'

@@ -1,4 +1,4 @@
-import React, { useContext, Fragment, useMemo } from 'react'
+import { useContext, Fragment, useMemo } from 'react'
 import Parent from './utils/Parent'
 import GiftCardContext from '#context/GiftCardContext'
 import OrderContext from '#context/OrderContext'

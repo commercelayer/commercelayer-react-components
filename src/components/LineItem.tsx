@@ -29,7 +29,7 @@ const LineItem: FunctionComponent<LineItemProps> = (props) => {
         if (
           lineItem.item_type === 'bundles' &&
           k > 0 &&
-          check[k - 1].bundle_code === lineItem.bundle_code
+          check[k - 1]?.bundle_code === lineItem.bundle_code
         )
           return null
         if (

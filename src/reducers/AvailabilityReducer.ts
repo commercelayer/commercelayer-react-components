@@ -85,16 +85,18 @@ export const getAvailability: GetAvailability = async ({
       fields: { skus: ['id'] },
       filters: { code_in: skuCode },
     })
-    const skuInventory = (await sdk.skus.retrieve(sku.id, {
-      fields: { skus: ['inventory'] },
-    })) as SkuInventory
-    const [level] = skuInventory.inventory?.levels || []
-    const [delivery] = level?.delivery_lead_times || []
-    dispatch({
-      type: 'setAvailability',
-      payload: { ...delivery, quantity: skuInventory.inventory.quantity },
-    })
-    if (setItem) setItem({ ...item, [skuCode]: skuInventory })
+    if (sku) {
+      const skuInventory = (await sdk.skus.retrieve(sku.id, {
+        fields: { skus: ['inventory'] },
+      })) as SkuInventory
+      const [level] = skuInventory.inventory?.levels || []
+      const [delivery] = level?.delivery_lead_times || []
+      dispatch({
+        type: 'setAvailability',
+        payload: { ...delivery, quantity: skuInventory.inventory.quantity },
+      })
+      if (setItem) setItem({ ...item, [skuCode]: skuInventory })
+    }
   } catch (error) {
     console.error('Get SKU availability', error)
   }

@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { FunctionComponent, useContext, useEffect, useState } from 'react'
 import BaseSelect from './utils/BaseSelect'
 import components from '#config/components'
 import { AddressCountrySelectName, BaseSelectComponentProps } from '#typings'
@@ -47,7 +42,7 @@ const AddressCountrySelector: FunctionComponent<AddressCountrySelectorProps> = (
 
     if (
       !isEmpty(billingAddress.errors) &&
-      billingAddress?.errors?.[name as any]?.error
+      billingAddress?.errors?.[name as any]?.['error']
     ) {
       setHasError(true)
     }
@@ -64,7 +59,7 @@ const AddressCountrySelector: FunctionComponent<AddressCountrySelectorProps> = (
 
     if (
       !isEmpty(shippingAddress.errors) &&
-      shippingAddress?.errors?.[name as any]?.error
+      shippingAddress?.errors?.[name as any]?.['error']
     ) {
       setHasError(true)
     }

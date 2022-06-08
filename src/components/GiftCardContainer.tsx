@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useReducer,
-  useContext,
-  ReactNode,
-} from 'react'
+import { FunctionComponent, useReducer, useContext, ReactNode } from 'react'
 import GiftCardContext from '#context/GiftCardContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import giftCardReducer, {

@@ -1,4 +1,4 @@
-import React, { useContext, FunctionComponent, ReactNode } from 'react'
+import { useContext, FunctionComponent, ReactNode } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'

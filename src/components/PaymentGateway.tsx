@@ -4,12 +4,7 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { LoaderType } from '#typings'
 import getPaypalConfig from '#utils/paypalPayment'
-import React, {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { FunctionComponent, useContext, useEffect, useState } from 'react'
 import { PaymentSourceProps } from './PaymentSource'
 import getLoaderComponent from '#utils/getLoaderComponent'
 import AdyenGateway from './gateways/AdyenGateway'

@@ -1,5 +1,5 @@
 import PaymentSourceContext from '#context/PaymentSourceContext'
-import React, { FunctionComponent, ReactNode, useContext } from 'react'
+import { FunctionComponent, ReactNode, useContext } from 'react'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings'
 import components from '#config/components'

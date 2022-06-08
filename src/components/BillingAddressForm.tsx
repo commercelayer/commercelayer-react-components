@@ -1,6 +1,6 @@
 import AddressesContext from '#context/AddressContext'
 import useRapidForm from 'rapid-form'
-import React, { ReactNode, useContext, useEffect, useRef } from 'react'
+import { ReactNode, useContext, useEffect, useRef } from 'react'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import { isEmpty } from 'lodash'
 import { BaseError, CodeErrorType } from '#typings/errors'
@@ -55,14 +55,15 @@ const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
     if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
-        const { code, message } = errors[fieldName]
+        const code = errors[fieldName]?.['code']
+        const message = errors[fieldName]?.['message']
         if (['billing_address_state_code'].includes(fieldName)) {
           if (isEmpty(values['state_code'])) {
             delete errors[fieldName]
           } else {
             formErrors.push({
               code: code as CodeErrorType,
-              message,
+              message: message || '',
               resource: 'billing_address',
               field: fieldName,
             })
@@ -70,7 +71,7 @@ const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
         } else {
           formErrors.push({
             code: code as CodeErrorType,
-            message,
+            message: message || '',
             resource: 'billing_address',
             field: fieldName,
           })

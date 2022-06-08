@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useState,
-} from 'react'
+import { FunctionComponent, ReactNode, useContext, useState } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'

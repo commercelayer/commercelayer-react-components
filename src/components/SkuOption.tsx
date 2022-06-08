@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  Fragment,
-  useContext,
-  ReactNode,
-} from 'react'
+import { FunctionComponent, Fragment, useContext, ReactNode } from 'react'
 import SkuOptionChildrenContext from '#context/SkuOptionChildrenContext'
 import SkuOptionsContext from '#context/SkuOptionsContext'
 import components from '#config/components'

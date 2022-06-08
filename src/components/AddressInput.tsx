@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { FunctionComponent, useContext, useEffect, useState } from 'react'
 import BaseInput from './utils/BaseInput'
 import components from '#config/components'
 import { BaseInputComponentProps, AddressInputName } from '#typings'
@@ -40,7 +35,7 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
 
     if (
       !isEmpty(billingAddress.errors) &&
-      billingAddress?.errors?.[p.name as any]?.error
+      billingAddress?.errors?.[p.name as any]?.['error']
     ) {
       setHasError(true)
     }
@@ -62,7 +57,7 @@ const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
 
     if (
       !isEmpty(shippingAddress.errors) &&
-      shippingAddress?.errors?.[p.name as any]?.error
+      shippingAddress?.errors?.[p.name as any]?.['error']
     ) {
       setHasError(true)
     }

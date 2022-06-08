@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useState,
-  useEffect,
-  useContext,
-} from 'react'
+import { FunctionComponent, useState, useEffect, useContext } from 'react'
 import getAmount from '#utils/getAmount'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import Parent from './utils/Parent'
