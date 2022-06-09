@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 import { Nav } from '..'
 import Head from 'next/head'
@@ -239,7 +239,6 @@ export default function Main() {
                 errorClassName="border-red-600 focus:ring-red-600 focus:border-red-600"
                 autoComplete="on"
                 className="p-2"
-                isBusiness
               >
                 <div>
                   <label
