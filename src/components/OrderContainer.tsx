@@ -18,7 +18,7 @@ import { ResourceIncluded } from '#reducers/OrderReducer'
 import components from '#config/components'
 import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
-import { OrderCreate, Order } from '@commercelayer/sdk'
+import type { OrderCreate, Order } from '@commercelayer/sdk'
 import { BaseError } from '#typings/errors'
 import compareObjAttribute from '#utils/compareObjAttribute'
 
