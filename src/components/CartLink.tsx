@@ -3,6 +3,7 @@ import OrderContext from '#context/OrderContext'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
+import getCartLink from '#utils/getCartLink'
 
 type TChildren = FunctionChildren<
   Omit<Props, 'children'> & {
@@ -20,14 +21,17 @@ export default function CartLink(props: Props) {
   const { order, createOrder } = useContext(OrderContext)
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
   const [slug] = endpoint.split('.commercelayer')
-  const href = `${slug}.stg.commercelayer.app/cart/${order?.id}?accessToken=${accessToken}`
+  const href =
+    slug && order?.id
+      ? getCartLink({ slug, orderId: order?.id, accessToken })
+      : ''
   const handleClick = async (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault()
     if (order?.id) {
       location.href = href
     } else {
       const orderId = await createOrder()
-      location.href = `${slug}.stg.commercelayer.app/cart/${orderId}?accessToken=${accessToken}`
+      if (slug) location.href = getCartLink({ slug, orderId, accessToken })
     }
   }
   const parentProps = {
@@ -35,6 +39,7 @@ export default function CartLink(props: Props) {
     href,
     ...p,
   }
+  if (!accessToken) return null
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
