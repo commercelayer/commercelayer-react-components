@@ -136,7 +136,7 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
           orderAttributes: attributes,
           setLocalOrder,
         }),
-      addToCart: (values: AddToCartValues): Promise<{ success: boolean }> =>
+      addToCart: (values: AddToCartValues) =>
         defaultOrderContext['addToCart']({
           ...values,
           persistKey,
