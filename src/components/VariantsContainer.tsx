@@ -9,7 +9,8 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 import VariantsContext from '#context/VariantsContext'
 import { VariantState } from '#reducers/VariantReducer'
 import { setVariantSkuCodes } from '#reducers/VariantReducer'
-import { isEmpty, isEqual } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
+import isEqual from 'lodash/isEqual'
 
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
@@ -38,6 +39,7 @@ const VariantsContainer: React.FunctionComponent<VariantsContainerProps> = (
     item: currentItem,
     setCustomLineItems,
     skuCode: itemSkuCode,
+    setSkuCode: setItemSkuCode,
   } = useContext(ItemContext)
   const [state, dispatch] = useReducer(variantReducer, variantInitialState)
   const sCode =
@@ -82,6 +84,7 @@ const VariantsContainer: React.FunctionComponent<VariantsContainerProps> = (
         config,
         setItem,
         dispatch,
+        setItemSkuCode,
       })
     },
     setSkuCodes: (skuCodes) =>

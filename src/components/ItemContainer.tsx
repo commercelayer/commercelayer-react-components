@@ -60,6 +60,8 @@ const ItemContainer: React.FunctionComponent<ItemContainerProps> = (props) => {
       { type: 'setCustomLineItems', key: 'lineItems' },
       dispatch
     )
+  const setSkuCode: BFSetStateContainer<string> = (code) =>
+    setItemState(code, { type: 'setSkuCode', key: 'skuCode' }, dispatch)
   const itemValue = {
     ...initialItemContext,
     ...state,
@@ -69,6 +71,7 @@ const ItemContainer: React.FunctionComponent<ItemContainerProps> = (props) => {
     setOption,
     setPrices,
     setCustomLineItems,
+    setSkuCode,
   } as InitItemContext
   return (
     <ItemContext.Provider value={itemValue}>{children}</ItemContext.Provider>

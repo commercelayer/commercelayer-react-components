@@ -83,6 +83,7 @@ export interface AddToCartImportParams
 
 export type AddToCartReturn = Promise<{
   success: boolean
+  orderId: string | undefined
 }>
 
 export interface AddToCart {
@@ -457,9 +458,9 @@ export const addToCart: AddToCart = async (params) => {
           : `https://${organization}.checkout.commercelayer.app/${params}`
         location.href = redirectUrl
       }
-      return { success: true }
+      return { success: true, orderId: id }
     }
-    return { success: false }
+    return { success: false, orderId: undefined }
   } catch (error: unknown) {
     const errors = getErrors(error, 'orders')
     console.error('Add to cart', errors)
@@ -469,7 +470,7 @@ export const addToCart: AddToCart = async (params) => {
         newErrors: errors,
         dispatch,
       })
-    return { success: false }
+    return { success: false, orderId: undefined }
   }
 }
 
