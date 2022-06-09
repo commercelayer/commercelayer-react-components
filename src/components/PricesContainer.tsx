@@ -20,7 +20,6 @@ import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
 import components from '#config/components'
 import { LoaderType } from '#typings'
-// import SkuChildrenContext from '#context/SkuChildrenContext'
 import SkuContext from '#context/SkuContext'
 
 const propTypes = components.PricesContainer.propTypes
@@ -83,10 +82,19 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
         payload: { prices: p },
       })
     }
-    if (
-      (config.accessToken && !has(prices, sCode)) ||
-      (config.accessToken && isEmpty(currentItem))
-    ) {
+    if (config.accessToken && !has(prices, itemSkuCode || sCode)) {
+      if (state.skuCodes.length > 0 || itemSkuCode || sCode) {
+        getSkusPrice((sCode && [itemSkuCode || sCode]) || state.skuCodes, {
+          config,
+          dispatch,
+          setPrices,
+          prices,
+          perPage,
+          filters,
+        })
+      }
+    }
+    if (config.accessToken && isEmpty(currentItem)) {
       if (state.skuCodes.length > 0 || skuCode) {
         getSkusPrice((sCode && [sCode]) || state.skuCodes, {
           config,
@@ -103,7 +111,13 @@ const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
         unsetPriceState(dispatch)
       }
     }
-  }, [config.accessToken, currentItem, sCode, state.skuCodes.length])
+  }, [
+    config.accessToken,
+    currentItem,
+    sCode,
+    state.skuCodes.length,
+    itemSkuCode,
+  ])
   const priceValue: PricesContextValue = {
     ...state,
     skuCode: sCode,
