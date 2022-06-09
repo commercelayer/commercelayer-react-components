@@ -64,7 +64,6 @@ export interface SetItemState {
   (data: DataType, params: ItemParams, dispatch: Dispatch<ItemAction>): void
 }
 
-// TODO: Set to other reducer files
 export const setItemState: SetItemState = (data, params, dispatch) => {
   dispatch({
     type: params.type,

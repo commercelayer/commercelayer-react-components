@@ -16,6 +16,7 @@ type SetSkuCodeVariantParams = {
   config: CommerceLayerConfig
   dispatch: Dispatch<VariantAction>
   setItem: ((item: Items) => void) | undefined
+  setItemSkuCode?: ((skuCode: string) => void) | undefined
 }
 
 export interface SetSkuCodeVariant {
@@ -92,7 +93,7 @@ export interface UnsetVariantState {
 }
 
 export const setSkuCode: SetSkuCodeVariant = (params) => {
-  const { id, code, config, setItem, dispatch } = params
+  const { id, code, config, setItem, dispatch, setItemSkuCode } = params
   if (id) {
     const sdk = getSdk(config)
     sdk.skus
@@ -102,6 +103,7 @@ export const setSkuCode: SetSkuCodeVariant = (params) => {
           setItem({
             [`${code}`]: sku as SkuInventory,
           })
+        setItemSkuCode && setItemSkuCode(code)
       })
       .catch((errors) => {
         dispatch({
