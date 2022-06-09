@@ -12,6 +12,8 @@ import ExternalFunctionContext from '#context/ExternalFunctionContext'
 import { VariantOption } from '#components/VariantSelector'
 import isFunction from 'lodash/isFunction'
 import SkuChildrenContext from '#context/SkuChildrenContext'
+import getCartLink from '#utils/getCartLink'
+import CommerceLayerContext from '#context/CommerceLayerContext'
 
 type ChildrenProps = {
   handleClick: () => AddToCartReturn
@@ -31,6 +33,16 @@ type BuyNowMode =
       checkoutUrl?: never
     }
 
+type THostedCart =
+  | {
+      redirectToHostedCart: true
+      hostedCartUrl?: string
+    }
+  | {
+      redirectToHostedCart?: false
+      hostedCartUrl?: never
+    }
+
 type Props = {
   children?: AddToCartButtonChildrenProps
   label?: string | ReactNode
@@ -40,6 +52,7 @@ type Props = {
   skuListId?: string
   lineItem?: VariantOption['lineItem']
 } & BuyNowMode &
+  THostedCart &
   PropsWithoutRef<JSX.IntrinsicElements['button']>
 
 export default function AddToCartButton(props: Props) {
@@ -53,8 +66,11 @@ export default function AddToCartButton(props: Props) {
     lineItem,
     buyNowMode,
     checkoutUrl,
+    redirectToHostedCart,
+    hostedCartUrl,
     ...p
   } = props
+  const { accessToken, endpoint } = useContext(CommerceLayerContext)
   const { addToCart, orderId, getOrder, setOrderErrors } =
     useContext(OrderContext)
   const { url, callExternalFunction } = useContext(ExternalFunctionContext)
@@ -70,13 +86,14 @@ export default function AddToCartButton(props: Props) {
   } = useContext(ItemContext)
   const { skuLists } = useContext(SkuListsContext)
   const { sku } = useContext(SkuChildrenContext)
+  const [slug] = endpoint.split('.commercelayer')
   const sCode = (
     !isEmpty(items) && skuCode
       ? items[skuCode]?.code
       : sku?.code || skuCode || getCurrentItemKey(item) || itemSkuCode
   ) as string
   const availabilityQuantity = item[sCode]?.inventory?.quantity
-  const handleClick = () => {
+  const handleClick = async () => {
     const qty = quantity[sCode]
     const opt = option[sCode]
     const customLineItem = !isEmpty(lineItem || lineItemContext)
@@ -116,39 +133,82 @@ export default function AddToCartButton(props: Props) {
           })
       }
     }
-    return !url
-      ? addToCart &&
-          addToCart({
-            bundleCode,
-            skuCode: sCode,
-            skuId: item[sCode]?.id,
-            quantity: qty,
-            option: opt,
-            lineItem: customLineItem,
-            buyNowMode,
-            checkoutUrl,
-          })
-      : callExternalFunction({
-          url,
-          data: {
-            bundleCode,
-            skuCode: sCode,
-            skuId: item[sCode]?.id,
-            quantity: qty,
-            option: opt,
-            lineItem: customLineItem,
-            buyNowMode,
-            checkoutUrl,
-          },
+    if (!url && addToCart) {
+      const res = await addToCart({
+        bundleCode,
+        skuCode: sCode,
+        skuId: item[sCode]?.id,
+        quantity: qty,
+        option: opt,
+        lineItem: customLineItem,
+        buyNowMode,
+        checkoutUrl,
+      })
+      if (redirectToHostedCart) {
+        const orderId = res.orderId
+        if (hostedCartUrl) {
+          location.href = `https://${hostedCartUrl}/${orderId}?accessToken=${accessToken}`
+        } else if (orderId && slug) {
+          location.href = getCartLink({ orderId, slug, accessToken })
+        }
+      }
+      return res
+    } else if (url) {
+      return callExternalFunction({
+        url,
+        data: {
+          bundleCode,
+          skuCode: sCode,
+          skuId: item[sCode]?.id,
+          quantity: qty,
+          option: opt,
+          lineItem: customLineItem,
+          buyNowMode,
+          checkoutUrl,
+        },
+      })
+        .then(async (res) => {
+          getOrder && orderId && (await getOrder(orderId))
+          return res
         })
-          .then(async (res) => {
-            getOrder && orderId && (await getOrder(orderId))
-            return res
-          })
-          .catch(({ response }) => {
-            setOrderErrors && setOrderErrors(response['data'])
-            return response
-          })
+        .catch(({ response }) => {
+          setOrderErrors && setOrderErrors(response['data'])
+          return response
+        })
+    }
+    // return !url
+    //   ? addToCart &&
+    //       addToCart({
+    //         bundleCode,
+    //         skuCode: sCode,
+    //         skuId: item[sCode]?.id,
+    //         quantity: qty,
+    //         option: opt,
+    //         lineItem: customLineItem,
+    //         buyNowMode,
+    //         checkoutUrl,
+    //       })
+    //   : callExternalFunction({
+    //       url,
+    //       data: {
+    //         bundleCode,
+    //         skuCode: sCode,
+    //         skuId: item[sCode]?.id,
+    //         quantity: qty,
+    //         option: opt,
+    //         lineItem: customLineItem,
+    //         buyNowMode,
+    //         checkoutUrl,
+    //       },
+    //     })
+    //       .then(async (res) => {
+    //         getOrder && orderId && (await getOrder(orderId))
+    //         return res
+    //       })
+    //       .catch(({ response }) => {
+    //         setOrderErrors && setOrderErrors(response['data'])
+    //         return response
+    //       })
   }
   const autoDisabled =
     !isEmpty(skuLists) || skuListId
