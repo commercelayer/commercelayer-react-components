@@ -81,7 +81,7 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
               loading: false,
             },
           })
-        } else {
+        } else if (state.include && state.include?.length > 0) {
           dispatch({
             type: 'setIncludesResource',
             payload: {

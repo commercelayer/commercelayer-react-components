@@ -16,7 +16,7 @@ export class OrderPage extends DevPage {
     await button.click()
   }
   async checkCurrentUrl(value = 'cart') {
-    await this.page.waitForURL(`**/${value}/**`, { waitUntil: 'networkidle' })
+    await this.page.waitForURL(`**/${value}/**`)
     await expect(this.page.url()).toMatch(/commercelayer.app\/cart\//gm)
   }
 }
