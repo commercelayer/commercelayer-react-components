@@ -176,39 +176,6 @@ export default function AddToCartButton(props: Props) {
           return response
         })
     }
-    // return !url
-    //   ? addToCart &&
-    //       addToCart({
-    //         bundleCode,
-    //         skuCode: sCode,
-    //         skuId: item[sCode]?.id,
-    //         quantity: qty,
-    //         option: opt,
-    //         lineItem: customLineItem,
-    //         buyNowMode,
-    //         checkoutUrl,
-    //       })
-    //   : callExternalFunction({
-    //       url,
-    //       data: {
-    //         bundleCode,
-    //         skuCode: sCode,
-    //         skuId: item[sCode]?.id,
-    //         quantity: qty,
-    //         option: opt,
-    //         lineItem: customLineItem,
-    //         buyNowMode,
-    //         checkoutUrl,
-    //       },
-    //     })
-    //       .then(async (res) => {
-    //         getOrder && orderId && (await getOrder(orderId))
-    //         return res
-    //       })
-    //       .catch(({ response }) => {
-    //         setOrderErrors && setOrderErrors(response['data'])
-    //         return response
-    //       })
   }
   const autoDisabled =
     !isEmpty(skuLists) || skuListId

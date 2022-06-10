@@ -16,7 +16,7 @@ import { BaseError } from '#typings/errors'
 import getSdk from '#utils/getSdk'
 import getErrors, { setErrors } from '../utils/getErrors'
 import { AddressResource } from './AddressReducer'
-import {
+import type {
   Order,
   LineItemCreate,
   LineItemOptionCreate,
@@ -408,6 +408,17 @@ export const addToCart: AddToCart = async (params) => {
       const order = sdk.orders.relationship(id)
       const name = lineItem?.name
       const imageUrl = lineItem?.imageUrl as string
+      if (
+        buyNowMode &&
+        state?.order?.line_items &&
+        state?.order?.line_items.length > 0
+      ) {
+        await Promise.all(
+          state?.order?.line_items.map(async (lineItem) => {
+            await sdk.line_items.delete(lineItem.id)
+          })
+        )
+      }
       const attrs: LineItemCreate = {
         order,
         sku_code: skuCode,
