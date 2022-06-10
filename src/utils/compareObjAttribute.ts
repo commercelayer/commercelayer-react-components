@@ -13,7 +13,14 @@ export default function compareObjAttribute<A extends Item, B extends Item>({
   Object.keys(object).forEach((v) => {
     const element = attributes[v]
     const compare = object[v]
-    if (element && element !== compare) {
+    if (
+      typeof element === 'object' &&
+      element &&
+      JSON.stringify(element) !== JSON.stringify(compare)
+    ) {
+      returnObj[v] = element
+    }
+    if (typeof element !== 'object' && element && element !== compare) {
       returnObj[v] = element
     }
   })
