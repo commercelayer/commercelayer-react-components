@@ -3,7 +3,7 @@ import { expect } from '@playwright/test'
 
 export class OrderPage extends DevPage {
   async clickCartLinkButton() {
-    const button = this.page.locator('[data-test-id=cart-link]')
+    const button = this.page.locator('[data-test=cart-link]')
     await button.waitFor({ state: 'visible' })
     await button.click()
   }
@@ -15,8 +15,20 @@ export class OrderPage extends DevPage {
     await button.waitFor({ state: 'visible' })
     await button.click()
   }
-  async checkCurrentUrl(value = 'cart') {
-    await this.page.waitForURL(`**/${value}/**`)
-    await expect(this.page.url()).toMatch(/commercelayer.app\/cart\//gm)
+  async checkCurrentUrl(value: string) {
+    await this.page.waitForURL(
+      (url) =>
+        url.toJSON().includes(value) && !url.toJSON().includes('localhost')
+    )
+    await expect(this.page.url()).toMatch(/commercelayer.app\//gm)
+  }
+  async checkText(selector: string, text: string) {
+    const button = this.page.locator(selector)
+    await button.waitFor({ state: 'visible' })
+    await expect(button).toContainText(text)
+  }
+  async checkItemsQuantity(quantity: number) {
+    const itemsCounter = this.page.locator('[data-test=items-count]')
+    await expect(itemsCounter).toContainText(quantity.toString())
   }
 }
