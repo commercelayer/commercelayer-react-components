@@ -1,30 +1,27 @@
-import { LineItem } from '@commercelayer/sdk'
+import type { LineItem } from '@commercelayer/sdk'
 import { LineItemType } from '#typings'
-
-export interface GetLineItemsCountInterface {
-  (args: {
-    lineItems: LineItem[]
-    quantity?: number
-    typeAccepted?: TypeAccepted[]
-  }): number
-}
 
 export type TypeAccepted = Extract<
   LineItemType,
   'skus' | 'gift_cards' | 'bundles' | 'adjustments'
 >
 
-const getLineItemsCount: GetLineItemsCountInterface = ({
+type Args = {
+  lineItems: LineItem[]
+  quantity?: number
+  typeAccepted?: TypeAccepted[]
+}
+
+export default function getLineItemsCount({
   lineItems,
   quantity = 0,
   typeAccepted = ['skus', 'gift_cards', 'bundles', 'adjustments'],
-}) => {
+}: Args): number {
   lineItems
     .filter(
       (l) =>
-        l.item_type &&
         typeAccepted.includes(l.item_type as TypeAccepted) &&
-        l?.total_amount_cents &&
+        l?.total_amount_cents !== undefined &&
         l.total_amount_cents >= 0
     )
     .forEach((l) => {
@@ -32,5 +29,3 @@ const getLineItemsCount: GetLineItemsCountInterface = ({
     })
   return quantity
 }
-
-export default getLineItemsCount
