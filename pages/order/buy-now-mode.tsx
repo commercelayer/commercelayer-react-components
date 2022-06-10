@@ -1,8 +1,6 @@
 import { useState, useEffect, Fragment } from 'react'
 import { getSalesChannelToken } from '@commercelayer/js-auth'
-import { Nav } from '.'
 import {
-  AddToCartButtonType,
   CommerceLayer,
   OrderContainer,
   VariantsContainer,
@@ -19,7 +17,6 @@ import {
   LineItemRemoveLink,
   LineItemsCount,
   LineItemsEmpty,
-  CheckoutLink,
   SubTotalAmount,
   QuantitySelector,
   TotalAmount,
@@ -32,49 +29,11 @@ import {
   ItemContainer,
   Errors,
   OrderStorage,
-  CartLink,
 } from '@commercelayer/react-components'
-// import getSdk from '#utils/getSdk'
 
 const clientId = process.env['NEXT_PUBLIC_CLIENT_ID'] as string
 const endpoint = process.env['NEXT_PUBLIC_ENDPOINT'] as string
 const scope = process.env['NEXT_PUBLIC_MARKET_ID'] as string
-
-const CustomAddToCart = (props: AddToCartButtonType) => {
-  const { handleClick, disabled, className, ...p } = props
-  const classes = disabled ? 'opacity-50 cursor-not-allowed' : ''
-  const myClick = async () => {
-    const { success } = await handleClick()
-    if (success) {
-      // NOTE: dispatch your callback or animation
-    }
-  }
-  return (
-    <button
-      className={`${classes} ${className}`}
-      onClick={myClick}
-      disabled={disabled}
-      {...p}
-    >
-      Custom add to cart
-    </button>
-  )
-}
-
-// const CustomQuantity = (props: any) => {
-//   // console.log('props', props)
-//   const myIncrease = (event: any) => {
-//     event.target.value = props.value + 1
-//     props.handleChange(event)
-//   }
-//   return (
-//     <Fragment>
-//       <button>-</button>
-//       <input value={props.value} disabled={true} />
-//       <button onClick={myIncrease}>+</button>
-//     </Fragment>
-//   )
-// }
 
 export default function Order() {
   const [token, setToken] = useState('')
@@ -86,36 +45,15 @@ export default function Order() {
         scope,
       })
       if (token) setToken(token.accessToken)
-      // if (token?.accessToken) {
-      //   const sdk = getSdk({
-      //     accessToken: token?.accessToken,
-      //     endpoint: endpoint,
-      //   })
-      //   const lineItemsCount = (
-      //     await sdk.orders.retrieve('wkykhjznGk', {
-      //       fields: {
-      //         line_items: ['item_type'],
-      //       },
-      //       include: ['line_items'],
-      //     })
-      //   ).line_items?.length
-
-      //   console.log(lineItemsCount)
-      // }
     }
     getToken()
   }, [])
   return (
     <Fragment>
-      <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderStorage persistKey="orderUS">
-            <OrderContainer
-              attributes={{
-                return_url: 'https://test.co',
-              }}
-            >
+            <OrderContainer attributes={{ return_url: 'https://test.co' }}>
               <ItemContainer>
                 <div className="md:flex">
                   <div className="md:flex-shrink-0">
@@ -176,11 +114,10 @@ export default function Order() {
                     </div>
                     <div className="m-2">
                       <AddToCartButton
+                        buyNowMode
                         data-test="add-to-cart-button"
-                        className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                      >
-                        {CustomAddToCart}
-                      </AddToCartButton>
+                        className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      />
                     </div>
                     <div className="m-2">
                       <AvailabilityContainer>
@@ -354,18 +291,6 @@ export default function Order() {
                     <TotalAmount data-test="total-amount" />
                   </div>
                 </div>
-              </div>
-              <div className="flex justify-center p-2">
-                <CheckoutLink
-                  className="mt-2 primary font-bold py-2 px-4 rounded"
-                  label="Checkout"
-                />
-              </div>
-              <div className="flex justify-center p-2">
-                <CartLink
-                  className="mt-2 primary font-bold py-2 px-4 rounded"
-                  label="Go to hosted cart"
-                />
               </div>
             </OrderContainer>
           </OrderStorage>

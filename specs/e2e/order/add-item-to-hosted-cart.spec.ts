@@ -6,7 +6,7 @@ test.describe('Add item to hosted cart', () => {
     const order = new OrderPage(page)
     await order.goto('order/add-item-to-hosted-cart')
     await order.addItemToCart('BABYONBU000000E63E7412MX')
-    await order.checkCurrentUrl()
+    await order.checkCurrentUrl('cart')
   })
   test('Custom hosted cart url', async ({ page }) => {
     const order = new OrderPage(page)

@@ -33,10 +33,11 @@ import {
   OrderStorage,
   CartLink,
 } from '@commercelayer/react-components'
+import { useRouter } from 'next/router'
 
-const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
-const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
-const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
+const clientId = process.env['NEXT_PUBLIC_CLIENT_ID'] as string
+const endpoint = process.env['NEXT_PUBLIC_ENDPOINT'] as string
+const scope = process.env['NEXT_PUBLIC_MARKET_ID'] as string
 
 const CustomAddToCart = (props: AddToCartButtonType) => {
   const { handleClick, disabled, className, ...p } = props
@@ -61,6 +62,12 @@ const CustomAddToCart = (props: AddToCartButtonType) => {
 
 export default function Order() {
   const [token, setToken] = useState('')
+  const { query } = useRouter()
+  const reactNodeLabel = !!query['reactNodeLabel'] ? (
+    <>{'Cart link react node label'}</>
+  ) : (
+    'Cart link string'
+  )
   useEffect(() => {
     const getToken = async () => {
       const token = await getSalesChannelToken({
@@ -325,9 +332,9 @@ export default function Order() {
               </div>
               <div className="flex justify-center p-2">
                 <CartLink
-                  data-test-id="cart-link"
+                  data-test="cart-link"
                   className="mt-2 primary font-bold py-2 px-4 rounded"
-                  label="Go to hosted cart"
+                  label={reactNodeLabel}
                 />
               </div>
             </OrderContainer>

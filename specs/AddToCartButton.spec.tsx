@@ -1,4 +1,3 @@
-import React from 'react'
 import { AddToCartButton, ItemContainer } from '../src'
 import renderer from 'react-test-renderer'
 import PropTypes from 'prop-types'
