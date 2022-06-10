@@ -3,17 +3,19 @@ import type { Page } from '@playwright/test'
 type PathReference = {
   checkout: {
     page: [
-      { path: 'index'; params: [] },
-      { path: 'addresses'; params: [] },
-      { path: 'payments'; params: [] },
-      { path: 'giftcard-or-coupon-code'; params: [] },
-      { path: 'shipments'; params: [] }
+      { path: 'index' },
+      { path: 'addresses' },
+      { path: 'payments' },
+      { path: 'giftcard-or-coupon-code' },
+      { path: 'shipments' }
     ]
   }
   order: {
     page: [
-      { path: 'add-item-to-hosted-cart'; params: [] },
-      { path: 'order-with-cart-link-button'; params: [] },
+      { path: 'buy-now-mode' },
+      { path: 'add-item-to-hosted-cart' },
+      { path: 'order-with-cart-link-button' },
+      { path: 'order-with-cart-link-button?reactNodeLabel=true' },
       {
         path: 'add-item-to-hosted-cart?hostedCartUrl=true'
       }
