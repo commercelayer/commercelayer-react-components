@@ -1,4 +1,4 @@
-import { MouseEvent, useContext } from 'react'
+import { MouseEvent, ReactNode, useContext } from 'react'
 import OrderContext from '#context/OrderContext'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings/index'
@@ -8,12 +8,13 @@ import getCartLink from '#utils/getCartLink'
 type TChildren = FunctionChildren<
   Omit<Props, 'children'> & {
     href: string
+    handleClick?: (e: MouseEvent<HTMLAnchorElement>) => Promise<void>
   }
 >
 
 type Props = {
   children?: TChildren
-  label?: string
+  label?: string | ReactNode
 } & JSX.IntrinsicElements['a']
 
 export default function CartLink(props: Props) {
@@ -35,6 +36,7 @@ export default function CartLink(props: Props) {
     }
   }
   const parentProps = {
+    handleClick,
     label,
     href,
     ...p,
@@ -44,7 +46,7 @@ export default function CartLink(props: Props) {
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <a href={href} {...p} onClick={handleClick}>
-      {label}
+      {typeof label === 'function' ? label() : label}
     </a>
   )
 }
