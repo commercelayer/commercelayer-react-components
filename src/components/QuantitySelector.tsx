@@ -1,6 +1,7 @@
 import { FunctionComponent, useContext, useState, useEffect } from 'react'
 import Parent from './utils/Parent'
-import { isEmpty, has } from 'lodash'
+import has from 'lodash/has'
+import isEmpty from 'lodash/isEmpty'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
 import components from '#config/components'
@@ -41,7 +42,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
   } = useContext(ItemContext)
   const { sku } = useContext(SkuChildrenContext)
   const { skuLists, listIds } = useContext(SkuListsContext)
-  const [value, setValue] = useState(min)
+  const [value, setValue] = useState(p?.value || min)
   const [disabled, setDisabled] = useState(!!p.disabled)
   const sCode = (
     !isEmpty(items) && skuCode
