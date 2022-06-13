@@ -1,13 +1,13 @@
 import StockTransferChildrenContext from '#context/StockTransferChildrenContext'
 import { ConditionalElement } from '#typings'
 import GenericFieldComponent, {
+  TGenericChildrenProps,
   TResourceKey,
   TResources,
 } from './utils/GenericFieldComponent'
 
-type StockTransferFieldChildrenProps = Omit<
-  Props,
-  'children' | 'attribute' | 'element'
+type StockTransferFieldChildrenProps = TGenericChildrenProps<
+  TResources['StockTransfer']
 >
 
 type TCondition = ConditionalElement<
