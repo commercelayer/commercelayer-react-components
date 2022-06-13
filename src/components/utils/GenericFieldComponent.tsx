@@ -1,6 +1,6 @@
 import { InitialSkuContext } from '#context/SkuChildrenContext'
 import { InitialStockTransferContext } from '#context/StockTransferChildrenContext'
-import { LineItem, Sku } from '@commercelayer/sdk'
+import type { LineItem, Sku } from '@commercelayer/sdk'
 import Parent from './Parent'
 import { InitialLineItemContext } from '#context/LineItemChildrenContext'
 import { Context, useContext } from 'react'
@@ -16,12 +16,10 @@ export type TResourceKey = {
   [K in keyof TResources]: K
 }
 
-type ChildrenProps<E extends TResources[keyof TResources]> = Omit<
-  Props<E>,
-  'children' | 'attribute'
-> & {
-  element: E[keyof E]
-}
+export type TGenericChildrenProps<E extends TResources[keyof TResources]> =
+  Omit<Props<E>, 'children' | 'attribute' | 'context' | 'tagElement'> & {
+    attributeValue: E[keyof E]
+  }
 
 type ResourceContext = {
   stock_transfers: InitialStockTransferContext
@@ -34,7 +32,7 @@ type GenericContext<K extends keyof ResourceContext> = Context<
 >
 
 type Props<E extends TResources[keyof TResources]> = {
-  children?: (props: ChildrenProps<E>) => JSX.Element
+  children?: (props: TGenericChildrenProps<E>) => JSX.Element
   resource: E['resource']
   attribute: keyof E
   tagElement: keyof JSX.IntrinsicElements
@@ -46,27 +44,27 @@ export default function GenericFieldComponent<R extends keyof TResources>(
 ) {
   const { children, tagElement, attribute, context, ...p } = props
   const resourceContext = useContext(context)
-  let element
+  let attributeValue
   for (const key in resourceContext) {
     if (Object.prototype.hasOwnProperty.call(resourceContext, key)) {
       const dataContext = resourceContext[key] as any
-      element = dataContext[attribute]
+      attributeValue = dataContext[attribute]
     }
   }
   const Tag = tagElement || 'span'
   if (Tag === 'img' && !children) {
-    const src = element || defaultImgUrl
+    const src = attributeValue || defaultImgUrl
     const name = ''
     return <img alt={name} src={src} {...(p as JSX.IntrinsicElements['img'])} />
   }
   const parentProps = {
-    element,
+    attributeValue,
     tagElement,
     ...p,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <Tag {...p}>{element}</Tag>
+    <Tag {...p}>{attributeValue}</Tag>
   )
 }
