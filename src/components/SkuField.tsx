@@ -1,11 +1,12 @@
 import SkuChildrenContext from '#context/SkuChildrenContext'
 import { ConditionalElement } from '#typings'
 import GenericFieldComponent, {
+  TGenericChildrenProps,
   TResourceKey,
   TResources,
 } from './utils/GenericFieldComponent'
 
-type SkuFieldChildrenProps = Omit<Props, 'children' | 'attribute' | 'element'>
+type SkuFieldChildrenProps = TGenericChildrenProps<TResources['Sku']>
 
 type TCondition = ConditionalElement<Exclude<TResources['Sku'], 'resource'>>
 
