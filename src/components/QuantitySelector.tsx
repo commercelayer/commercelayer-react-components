@@ -42,7 +42,8 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
   } = useContext(ItemContext)
   const { sku } = useContext(SkuChildrenContext)
   const { skuLists, listIds } = useContext(SkuListsContext)
-  const [value, setValue] = useState(p?.value || min)
+  const defaultVal = p?.value || min
+  const [value, setValue] = useState(defaultVal)
   const [disabled, setDisabled] = useState(!!p.disabled)
   const sCode = (
     !isEmpty(items) && skuCode
@@ -53,18 +54,18 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
   const inventory = isEmpty(item) ? 50 : item[sCode]?.inventory?.quantity
   const maxInv = max || inventory
   useEffect(() => {
-    setValue(min)
+    setValue(defaultVal)
     if (!prices[sCode] || !sCode) {
       setDisabled(true)
     }
     skuListId && setDisabled(false)
     if (sCode) {
-      const qty = Number(min)
+      const qty = Number(defaultVal)
       setQuantity && setQuantity({ ...quantity, [`${sCode}`]: qty })
       if (!isEmpty(prices) && has(prices, sCode)) setDisabled(false)
     }
     return (): void => {
-      setValue(p?.value || min)
+      setValue(defaultVal)
     }
   }, [item, listIds, prices])
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
