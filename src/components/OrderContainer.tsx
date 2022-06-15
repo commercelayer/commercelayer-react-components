@@ -1,4 +1,11 @@
-import { useEffect, useReducer, useContext, ReactNode, useMemo } from 'react'
+import {
+  useEffect,
+  useReducer,
+  useContext,
+  ReactNode,
+  useMemo,
+  useState,
+} from 'react'
 import orderReducer, {
   AddToCartValues,
   createOrder,
@@ -39,6 +46,7 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
 ) => {
   const { orderId, children, metadata, attributes, fetchOrder } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
+  const [lock, setLock] = useState(false)
   const config = useContext(CommerceLayerContext)
   const {
     persistKey,
@@ -47,6 +55,36 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
     setLocalOrder,
     deleteLocalOrder,
   } = useContext(OrderStorageContext)
+  useEffect(() => {
+    if (attributes && state?.order && !lock) {
+      const updateAttributes = compareObjAttribute({
+        attributes: attributes,
+        object: state.order,
+      })
+      if (Object.keys(updateAttributes).length > 0) {
+        updateOrder({
+          id: state.order.id,
+          attributes: updateAttributes,
+          dispatch,
+          config,
+          include: state.include,
+          state,
+        })
+        setLock(true)
+      }
+    }
+    return () => {
+      if (attributes && state?.order) {
+        const updateAttributes = compareObjAttribute({
+          attributes: attributes,
+          object: state.order,
+        })
+        if (state.order && Object.keys(updateAttributes).length === 0) {
+          setLock(false)
+        }
+      }
+    }
+  }, [attributes, state?.order, lock])
   useEffect(() => {
     const startRequest = Object.keys(state?.includeLoaded || {}).filter(
       (key) => state?.includeLoaded?.[key as ResourceIncluded] === true
@@ -99,25 +137,6 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
     state.order,
     state.loading,
   ])
-  useEffect(() => {
-    if (state.orderId && attributes && state.order) {
-      const updateAttributes = compareObjAttribute({
-        attributes: attributes,
-        object: state.order,
-      })
-      if (Object.keys(updateAttributes).length > 0) {
-        updateOrder({
-          id: state.orderId,
-          attributes: updateAttributes,
-          dispatch,
-          config,
-          include: state.include,
-          state,
-        })
-      }
-    }
-  }, [attributes, state.orderId, state.order])
-
   const orderValue = useMemo(() => {
     return {
       ...state,
