@@ -64,7 +64,7 @@ export default function AddToCartButton(props: Props) {
     disabled,
     skuListId,
     lineItem,
-    buyNowMode,
+    buyNowMode = false,
     checkoutUrl,
     redirectToHostedCart,
     hostedCartUrl,
