@@ -408,16 +408,26 @@ export const addToCart: AddToCart = async (params) => {
       const order = sdk.orders.relationship(id)
       const name = lineItem?.name
       const imageUrl = lineItem?.imageUrl as string
-      if (
-        buyNowMode &&
-        state?.order?.line_items &&
-        state?.order?.line_items.length > 0
-      ) {
-        await Promise.all(
-          state?.order?.line_items.map(async (lineItem) => {
-            await sdk.line_items.delete(lineItem.id)
+      if (buyNowMode) {
+        if (!state?.order?.line_items) {
+          const { line_items } = await sdk.orders.retrieve(id, {
+            fields: ['line_items'],
+            include: ['line_items'],
           })
-        )
+          if (line_items && line_items?.length > 0) {
+            await Promise.all(
+              line_items.map(async (lineItem) => {
+                await sdk.line_items.delete(lineItem.id)
+              })
+            )
+          }
+        } else {
+          await Promise.all(
+            state?.order?.line_items.map(async (lineItem) => {
+              await sdk.line_items.delete(lineItem.id)
+            })
+          )
+        }
       }
       const attrs: LineItemCreate = {
         order,
