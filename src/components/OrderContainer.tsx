@@ -109,6 +109,13 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
       } else if (state?.order) {
         fetchOrder && fetchOrder(state.order)
       }
+    } else {
+      dispatch({
+        type: 'setLoading',
+        payload: {
+          loading: false,
+        },
+      })
     }
     return () => {
       if (!state.order && state.loading) {
