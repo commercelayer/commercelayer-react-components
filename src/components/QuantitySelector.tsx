@@ -50,7 +50,6 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
       ? items[skuCode]?.code
       : sku?.code || skuCode || getCurrentItemKey(item) || itemSkuCode
   ) as string
-
   const inventory = isEmpty(item) ? 50 : item[sCode]?.inventory?.quantity
   const maxInv = max || inventory
   useEffect(() => {
@@ -59,7 +58,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
       setDisabled(true)
     }
     skuListId && setDisabled(false)
-    if (sCode) {
+    if (sCode && !quantity[sCode]) {
       const qty = Number(defaultVal)
       setQuantity && setQuantity({ ...quantity, [`${sCode}`]: qty })
       if (!isEmpty(prices) && has(prices, sCode)) setDisabled(false)
@@ -67,7 +66,7 @@ const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
     return (): void => {
       setValue(defaultVal)
     }
-  }, [item, listIds, prices])
+  }, [item, listIds, prices, quantity])
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const qty = Number(e.target.value)
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
