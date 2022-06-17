@@ -121,8 +121,9 @@ export interface OrderPayload {
   orderId?: string
   order?: Order
   errors?: BaseError[]
-  include?: ResourceIncluded[]
+  include?: ResourceIncluded[] | undefined
   includeLoaded?: ResourceIncludedLoaded
+  withoutIncludes?: boolean
 }
 
 export type AddToCartValues = Pick<
@@ -370,7 +371,10 @@ export function addResourceToInclude({
   dispatch &&
     dispatch({
       type: 'setIncludesResource',
-      payload,
+      payload: {
+        ...payload,
+        withoutIncludes: false,
+      },
     })
 }
 
@@ -650,7 +654,8 @@ export const orderInitialState: Partial<OrderState> = {
   orderId: '',
   order: undefined,
   errors: [],
-  include: [],
+  include: undefined,
+  withoutIncludes: true,
 }
 
 const orderReducer = (state: OrderState, reducer: OrderActions): OrderState =>
