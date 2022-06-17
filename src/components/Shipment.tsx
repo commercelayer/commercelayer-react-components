@@ -33,7 +33,7 @@ export default function Shipment({
               const [shippingMethod] =
                 shipment?.available_shipping_methods || []
               if (shippingMethod) {
-                setShippingMethod(shipment.id, shippingMethod.id)
+                await setShippingMethod(shipment.id, shippingMethod.id)
               }
               if (typeof autoSelectSingleShippingMethod === 'function') {
                 autoSelectSingleShippingMethod()
