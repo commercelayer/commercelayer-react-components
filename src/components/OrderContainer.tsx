@@ -47,6 +47,7 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
   const { orderId, children, metadata, attributes, fetchOrder } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const [lock, setLock] = useState(false)
+  const [lockOrder, setLockOrder] = useState(true)
   const config = useContext(CommerceLayerContext)
   const {
     persistKey,
@@ -55,6 +56,17 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
     setLocalOrder,
     deleteLocalOrder,
   } = useContext(OrderStorageContext)
+  useEffect(() => {
+    if (!state.withoutIncludes) {
+      dispatch({
+        type: 'setLoading',
+        payload: {
+          loading: true,
+        },
+      })
+    }
+  }, [state.withoutIncludes])
+
   useEffect(() => {
     if (attributes && state?.order && !lock) {
       const updateAttributes = compareObjAttribute({
@@ -86,18 +98,14 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
     }
   }, [attributes, state?.order, lock])
   useEffect(() => {
+    const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
     const startRequest = Object.keys(state?.includeLoaded || {}).filter(
       (key) => state?.includeLoaded?.[key as ResourceIncluded] === true
     )
-    if (config.accessToken && !state.loading) {
-      const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
-      if (
-        localOrder &&
-        !state.order &&
-        state.include?.length === startRequest.length
-      ) {
-        const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
-        getApiOrder({
+    const getOrder = async () => {
+      const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
+      localOrder &&
+        (await getApiOrder({
           id: localOrder,
           dispatch,
           config,
@@ -105,11 +113,34 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
           clearWhenPlaced: removeOrderPlaced,
           deleteLocalOrder,
           state,
-        })
+        }))
+    }
+    if (config.accessToken && !state.loading) {
+      if (
+        localOrder &&
+        !state.order &&
+        state.include?.length === startRequest.length &&
+        !state.withoutIncludes &&
+        !lockOrder
+      ) {
+        getOrder()
       } else if (state?.order) {
         fetchOrder && fetchOrder(state.order)
+      } else if (
+        state.withoutIncludes &&
+        !state.include?.length &&
+        startRequest.length === 0
+      ) {
+        getOrder()
       }
-    } else {
+    } else if (
+      [
+        config.accessToken,
+        !state.order,
+        state.loading,
+        state.withoutIncludes,
+      ].every(Boolean)
+    ) {
       dispatch({
         type: 'setLoading',
         payload: {
@@ -118,7 +149,7 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
       })
     }
     return () => {
-      if (!state.order && state.loading) {
+      if (!state.order && state.loading && !state.withoutIncludes) {
         if (state.include?.length === 0 && startRequest.length > 0) {
           dispatch({
             type: 'setLoading',
@@ -126,6 +157,7 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
               loading: false,
             },
           })
+          setLockOrder(false)
         } else if (state.include && state.include?.length > 0) {
           dispatch({
             type: 'setIncludesResource',
