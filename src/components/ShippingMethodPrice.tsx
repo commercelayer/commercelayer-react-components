@@ -25,9 +25,9 @@ const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
   props
 ) => {
   const {
+    base = 'price_amount',
+    type = 'for_shipment',
     format = 'formatted',
-    type = 'amount',
-    base = 'price',
     labelFreeOver = 'Free',
     ...p
   } = props
