@@ -147,6 +147,20 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
           loading: false,
         },
       })
+    } else if (
+      [
+        config.accessToken,
+        !state.order,
+        state.loading,
+        !state.withoutIncludes,
+      ].every(Boolean)
+    ) {
+      dispatch({
+        type: 'setLoading',
+        payload: {
+          loading: false,
+        },
+      })
     }
     return () => {
       if (!state.order && state.loading && !state.withoutIncludes) {
@@ -157,7 +171,6 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
               loading: false,
             },
           })
-          setLockOrder(false)
         } else if (state.include && state.include?.length > 0) {
           dispatch({
             type: 'setIncludesResource',
@@ -165,6 +178,7 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
               include: [],
             },
           })
+          setLockOrder(false)
         }
       }
     }
@@ -175,6 +189,8 @@ const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
     orderId,
     state.order,
     state.loading,
+    state.withoutIncludes,
+    lockOrder,
   ])
   const orderValue = useMemo(() => {
     return {
