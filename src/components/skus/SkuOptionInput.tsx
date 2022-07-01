@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext } from 'react'
+import { useContext } from 'react'
 import BaseInput from '../utils/BaseInput'
 import ItemContext from '#context/ItemContext'
 import SkuOptionChildrenContext from '#context/SkuOptionChildrenContext'
@@ -10,11 +10,11 @@ import { BaseInputComponentProps } from '#typings'
 const propTypes = components.SkuOptionInput.propTypes
 const displayName = components.SkuOptionInput.displayName
 
-type SkuOptionInputProps = BaseInputComponentProps &
+type Props = BaseInputComponentProps &
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
 
-const SkuOptionInput: FunctionComponent<SkuOptionInputProps> = (props) => {
+export function SkuOptionInput(props: Props) {
   const { name } = props
   const { option, setOption } = useContext(ItemContext)
   const { skuOption, skuCode } = useContext(SkuOptionChildrenContext)
