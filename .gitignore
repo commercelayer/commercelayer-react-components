@@ -1,4 +1,7 @@
-#Npm
+# Env
+.env.*
+.env
+# Npm
 lib
 .jest
 
