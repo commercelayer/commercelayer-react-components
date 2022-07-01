@@ -1,9 +1,12 @@
 import { useContext } from 'react'
-
-import BaseInput from '#components-utils/BaseInput'
+import components from '#config/components'
+import BaseInput from './utils/BaseInput'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import { BaseInputComponentProps } from '#typings'
 import { OrderCodeType } from '#reducers/OrderReducer'
+
+const propTypes = components.GiftCardOrCouponInput.propTypes
+const displayName = components.GiftCardOrCouponInput.displayName
 
 type Props = {
   name?: 'gift_card_or_coupon_code'
@@ -30,7 +33,7 @@ export function GiftCardOrCouponInput(props: Props) {
     <BaseInput
       type="text"
       name="gift_card_or_coupon_code"
-      ref={validation as any}
+      ref={validation}
       required={required !== undefined ? required : true}
       placeholder={placeholderLabel}
       defaultValue={value}
@@ -38,5 +41,8 @@ export function GiftCardOrCouponInput(props: Props) {
     />
   )
 }
+
+GiftCardOrCouponInput.propTypes = propTypes
+GiftCardOrCouponInput.displayName = displayName
 
 export default GiftCardOrCouponInput

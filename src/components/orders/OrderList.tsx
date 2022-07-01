@@ -1,13 +1,14 @@
 import {
   useContext,
+  ReactNode,
   useMemo,
   useState,
   useEffect,
   ReactElement,
   useCallback,
   CSSProperties,
-  ComponentType,
 } from 'react'
+import components from '#config/components'
 import CustomerContext from '#context/CustomerContext'
 import OrderListChildrenContext, {
   InitialOrderListContext,
@@ -21,34 +22,16 @@ import {
   useBlockLayout,
   PluginHook,
 } from 'react-table'
-import { FixedSizeList, ListChildComponentProps } from 'react-window'
+import { FixedSizeList } from 'react-window'
 import scrollbarWidth from '#utils/scrollbarWidth'
 import { sortDescIcon, sortAscIcon } from '#utils/icons'
 import type { Order } from '@commercelayer/sdk'
 
-type TConditional =
-  | {
-      /**
-       * Activate infinity scroll
-       */
-      infiniteScroll: true
-      /**
-       * The window options to use for the infinite scroll
-       */
-      windowOptions?: {
-        height?: number
-        itemSize?: number
-        width?: number
-        column?: number
-      }
-    }
-  | {
-      infiniteScroll?: false
-      windowOptions?: never
-    }
+const propTypes = components.OrderList.propTypes
+const displayName = components.OrderList.displayName
 
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   /**
    * Columns to show
    */
@@ -77,8 +60,28 @@ type Props = {
    * Class name to assign to the table row
    */
   rowTrClassName?: string
-} & TConditional &
-  JSX.IntrinsicElements['table']
+} & JSX.IntrinsicElements['table'] &
+  (
+    | {
+        /**
+         * Activate infinity scroll
+         */
+        infiniteScroll: true
+        /**
+         * The window options to use for the infinite scroll
+         */
+        windowOptions?: {
+          height?: number
+          itemSize?: number
+          width?: number
+          column?: number
+        }
+      }
+    | {
+        infiniteScroll?: false
+        windowOptions?: never
+      }
+  )
 
 interface HeaderColumn
   extends HeaderGroup<Order>,
@@ -99,7 +102,7 @@ export function OrderList({
   theadClassName,
   rowTrClassName,
   ...p
-}: Props): JSX.Element {
+}: Props) {
   const [loading, setLoading] = useState(true)
   const { orders } = useContext(CustomerContext)
   const data = useMemo<Order[]>(() => orders as Order[], [orders])
@@ -214,7 +217,7 @@ export function OrderList({
       </TheadHtmlElement>
       <TbodyHtmlElement {...table.getTableBodyProps()}>
         {!infiniteScroll ? (
-          (components as JSX.Element[])
+          components
         ) : (
           <FixedSizeList
             height={windowOptions?.height || 400}
@@ -224,12 +227,15 @@ export function OrderList({
               windowOptions?.width || table.totalColumnsWidth + scrollBarSize
             }
           >
-            {components as ComponentType<ListChildComponentProps<any>>}
+            {components as () => JSX.Element}
           </FixedSizeList>
         )}
       </TbodyHtmlElement>
     </TableHtmlElement>
   )
 }
+
+OrderList.propTypes = propTypes
+OrderList.displayName = displayName
 
 export default OrderList

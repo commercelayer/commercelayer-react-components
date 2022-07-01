@@ -1,13 +1,15 @@
-import { Fragment, useContext, useEffect, ReactElement } from 'react'
-import VariantTemplate, {
-  VariantHandleCallback,
-} from '#components-utils/VariantTemplate'
-import Parent from '#components-utils/Parent'
+import { Fragment, useContext, useEffect, ReactElement, ReactNode } from 'react'
+import VariantTemplate, { VariantHandleCallback } from './utils/VariantTemplate'
+import Parent from './utils/Parent'
 import VariantsContext from '#context/VariantsContext'
-
+import components from '#config/components'
 import { BaseSelectorType } from '#typings'
 import { FunctionChildren } from '#typings/index'
 import { VariantsObject, SetSkuCode } from '#reducers/VariantReducer'
+
+const propTypes = components.VariantSelector.propTypes
+const defaultProps = components.VariantSelector.defaultProps
+const displayName = components.VariantSelector.displayName
 
 export interface VariantOption {
   label: string
@@ -30,7 +32,7 @@ type Props = {
   children?: ChildrenProps
   options: VariantOption[]
   type?: BaseSelectorType
-  loader?: JSX.Element
+  loader?: ReactNode
   placeholder?: string
   skuCode?: string
   handleCallback?: VariantHandleCallback
@@ -38,15 +40,7 @@ type Props = {
   JSX.IntrinsicElements['select']
 
 export function VariantSelector(props: Props) {
-  const {
-    children,
-    type = 'select',
-    placeholder,
-    skuCode,
-    name,
-    options,
-    ...prs
-  } = props
+  const { children, type, placeholder, skuCode, name, options, ...prs } = props
   const {
     setSkuCode,
     skuCode: variantSkuCode,
@@ -91,5 +85,9 @@ export function VariantSelector(props: Props) {
     </Fragment>
   )
 }
+
+VariantSelector.propTypes = propTypes
+VariantSelector.defaultProps = defaultProps
+VariantSelector.displayName = displayName
 
 export default VariantSelector

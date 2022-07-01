@@ -1,18 +1,20 @@
 import AddressesContext from '#context/AddressContext'
-import { useRapidForm } from 'rapid-form'
-import { useContext, useEffect, useRef } from 'react'
+import useRapidForm from 'rapid-form'
+import { ReactNode, useContext, useEffect, useRef } from 'react'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import { isEmpty } from 'lodash'
 import { BaseError, CodeErrorType } from '#typings/errors'
 import { AddressInputName } from '#typings'
-
+import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import { Address } from '@commercelayer/sdk'
 import { getSaveShippingAddressToAddressBook } from '#utils/localStorage'
 import { businessMandatoryField } from '#utils/validateFormFields'
 
+const propTypes = components.ShippingAddressForm.propTypes
+
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   reset?: boolean
   errorClassName?: string
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
@@ -160,5 +162,7 @@ export function ShippingAddressForm(props: Props) {
     </ShippingAddressFormContext.Provider>
   )
 }
+
+ShippingAddressForm.propTypes = propTypes
 
 export default ShippingAddressForm

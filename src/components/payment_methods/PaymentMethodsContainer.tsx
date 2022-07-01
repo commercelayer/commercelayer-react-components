@@ -1,7 +1,7 @@
 import PaymentMethodContext, {
   defaultPaymentMethodContext,
 } from '#context/PaymentMethodContext'
-import { useContext, useEffect, useReducer, useMemo } from 'react'
+import { ReactNode, useContext, useEffect, useReducer, useMemo } from 'react'
 import paymentMethodReducer, {
   paymentMethodInitialState,
   getPaymentMethods,
@@ -11,12 +11,16 @@ import paymentMethodReducer, {
 } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
+import components from '#config/components'
 import { BaseError } from '#typings/errors'
 import { isEmpty } from 'lodash'
-import { setPaymentRef } from '#reducers/PaymentMethodReducer'
+import { setPaymentRef } from '../reducers/PaymentMethodReducer'
+
+const propTypes = components.PaymentMethodsContainer.propTypes
+const displayName = components.PaymentMethodsContainer.displayName
 
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   config?: PaymentMethodConfig
 }
 export function PaymentMethodsContainer(props: Props) {
@@ -134,5 +138,8 @@ export function PaymentMethodsContainer(props: Props) {
     </PaymentMethodContext.Provider>
   )
 }
+
+PaymentMethodsContainer.propTypes = propTypes
+PaymentMethodsContainer.displayName = displayName
 
 export default PaymentMethodsContainer

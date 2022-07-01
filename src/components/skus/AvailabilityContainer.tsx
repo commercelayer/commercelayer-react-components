@@ -1,4 +1,4 @@
-import { useContext, useReducer, useEffect } from 'react'
+import { useContext, useReducer, useEffect, ReactNode } from 'react'
 import availabilityReducer, {
   availabilityInitialState,
   getAvailability,
@@ -7,15 +7,18 @@ import availabilityReducer, {
 import AvailabilityContext from '#context/AvailabilityContext'
 import ItemContext from '#context/ItemContext'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
-
+import components from '#config/components'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import SkuChildrenContext from '#context/SkuChildrenContext'
 import SkuContext from '#context/SkuContext'
 import isEqual from 'lodash/isEqual'
 
+const propTypes = components.AvailabilityContainer.propTypes
+const displayName = components.AvailabilityContainer.displayName
+
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   skuCode?: string
 }
 
@@ -82,5 +85,8 @@ export function AvailabilityContainer(props: Props) {
     </AvailabilityContext.Provider>
   )
 }
+
+AvailabilityContainer.propTypes = propTypes
+AvailabilityContainer.displayName = displayName
 
 export default AvailabilityContainer

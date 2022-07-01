@@ -1,13 +1,16 @@
-import { useContext, useEffect, useState } from 'react'
+import { FunctionComponent, useContext, useEffect, useState } from 'react'
 import BaseInput from '../utils/BaseInput'
-
+import components from '#config/components'
 import { BaseInputComponentProps } from '#typings'
-import { useRapidForm } from 'rapid-form'
+import useRapidForm from 'rapid-form'
 import CustomerContext from '#context/CustomerContext'
 import isEmpty from 'lodash/isEmpty'
 import { BaseError, CodeErrorType } from '#typings/errors'
 
-type Props = {
+const propTypes = components.CustomerInput.propTypes
+const displayName = components.CustomerInput.displayName
+
+type CustomerInputProps = {
   name?: 'customer_email' | string
   type?: 'email' | string
   saveOnBlur?: boolean
@@ -17,7 +20,7 @@ type Props = {
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
 
-export function CustomerInput(props: Props) {
+const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
   const {
     name = 'customer_email',
     placeholder = '',
@@ -73,7 +76,7 @@ export function CustomerInput(props: Props) {
     <BaseInput
       name={name}
       type={type}
-      ref={validation as any}
+      ref={validation}
       required={required}
       placeholder={placeholder}
       defaultValue={value}
@@ -83,5 +86,8 @@ export function CustomerInput(props: Props) {
     />
   )
 }
+
+CustomerInput.propTypes = propTypes
+CustomerInput.displayName = displayName
 
 export default CustomerInput

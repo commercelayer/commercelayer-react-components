@@ -1,8 +1,13 @@
-import { useContext } from 'react'
+import { useContext, ReactNode } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
-import Parent from '#components-utils/Parent'
+import Parent from './utils/Parent'
+import components from '#config/components'
 import { FunctionChildren } from '#typings'
+
+const propTypes = components.LineItemQuantity.propTypes
+const defaultProps = components.LineItemQuantity.defaultProps
+const displayName = components.LineItemQuantity.displayName
 
 type LineItemQuantityChildrenProps = FunctionChildren<
   Omit<Props, 'children'> & {
@@ -18,11 +23,11 @@ type Props = {
   readonly?: boolean
 } & (JSX.IntrinsicElements['select'] & JSX.IntrinsicElements['span'])
 
-export function LineItemQuantity(props: Props): JSX.Element {
+export function LineItemQuantity(props: Props) {
   const { max = 50, readonly = false, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const { updateLineItem } = useContext(LineItemContext)
-  const options: JSX.Element[] = []
+  const options: ReactNode[] = []
   for (let i = 1; i <= max; i++) {
     options.push(
       <option key={i} value={`${i}`}>
@@ -55,5 +60,9 @@ export function LineItemQuantity(props: Props): JSX.Element {
     </select>
   )
 }
+
+LineItemQuantity.propTypes = propTypes
+LineItemQuantity.defaultProps = defaultProps
+LineItemQuantity.displayName = displayName
 
 export default LineItemQuantity

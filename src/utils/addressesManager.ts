@@ -32,7 +32,7 @@ export const billingAddressController: BillingAddressController = ({
   ) {
     billingDisable = false
   }
-  return addressDisable
+  return billingDisable
 }
 
 type ShippingAddressController = (params: {

@@ -1,17 +1,19 @@
 import BillingAddressContext from '#context/BillingAddressContext'
-import { useContext, useEffect, useReducer } from 'react'
+import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import billingAddressReducer, {
   billingAddressInitialState,
   setBillingAddress,
   setBillingCustomerAddressId,
 } from '#reducers/BillingAddressReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-
+import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import AddressContext from '#context/AddressContext'
 
+const propTypes = components.BillingAddressContainer.propTypes
+
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
 }
 export function BillingAddressContainer(props: Props) {
   const { children } = props
@@ -65,5 +67,7 @@ export function BillingAddressContainer(props: Props) {
     </BillingAddressContext.Provider>
   )
 }
+
+BillingAddressContainer.propTypes = propTypes
 
 export default BillingAddressContainer

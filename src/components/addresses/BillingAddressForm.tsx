@@ -1,6 +1,6 @@
 import AddressesContext from '#context/AddressContext'
-import { useRapidForm } from 'rapid-form'
-import { useContext, useEffect, useRef } from 'react'
+import useRapidForm from 'rapid-form'
+import { ReactNode, useContext, useEffect, useRef } from 'react'
 import BillingAddressFormContext, {
   AddressValuesKeys,
   DefaultContextAddress,
@@ -8,15 +8,19 @@ import BillingAddressFormContext, {
 import { isEmpty } from 'lodash'
 import { BaseError, CodeErrorType } from '#typings/errors'
 import type { AddressInputName } from '#typings'
+import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import { Address } from '@commercelayer/sdk'
 import { getSaveBillingAddressToAddressBook } from '#utils/localStorage'
 import { businessMandatoryField } from '#utils/validateFormFields'
 
+const propTypes = components.BillingAddressForm.propTypes
+
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   reset?: boolean
   errorClassName?: string
+  isBusiness?: boolean
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 export function BillingAddressForm(props: Props) {
@@ -25,6 +29,7 @@ export function BillingAddressForm(props: Props) {
     errorClassName,
     autoComplete = 'on',
     reset = false,
+    isBusiness = false,
     ...p
   } = props
   console.log('useRapidForm', useRapidForm)
@@ -163,5 +168,7 @@ export function BillingAddressForm(props: Props) {
     </BillingAddressFormContext.Provider>
   )
 }
+
+BillingAddressForm.propTypes = propTypes
 
 export default BillingAddressForm

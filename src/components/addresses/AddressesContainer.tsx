@@ -1,7 +1,7 @@
 import AddressesContext, {
   defaultAddressContext,
 } from '#context/AddressContext'
-import { useContext, useEffect, useReducer } from 'react'
+import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import addressReducer, {
   addressInitialState,
   AddressResource,
@@ -14,11 +14,14 @@ import { BaseError } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { saveAddresses } from '#reducers/AddressReducer'
-
+import components from '#config/components'
 import { AddressResource } from '#reducers/AddressReducer'
 
+const propTypes = components.AddressesContainer.propTypes
+const displayName = components.AddressesContainer.displayName
+
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   shipToDifferentAddress?: boolean
   isBusiness?: boolean
 }
@@ -73,5 +76,8 @@ export function AddressesContainer(props: Props) {
     </AddressesContext.Provider>
   )
 }
+
+AddressesContainer.propTypes = propTypes
+AddressesContainer.displayName = displayName
 
 export default AddressesContainer
