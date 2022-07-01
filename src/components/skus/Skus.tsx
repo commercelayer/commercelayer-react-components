@@ -1,9 +1,10 @@
+import components from '#config/components'
 import SkuChildrenContext from '#context/SkuChildrenContext'
 import SkuContext from '#context/SkuContext'
-import { useContext } from 'react'
+import { ReactNode, useContext } from 'react'
 
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
 }
 
 export function Skus<P extends Props>({ children }: P): JSX.Element {
@@ -20,5 +21,7 @@ export function Skus<P extends Props>({ children }: P): JSX.Element {
     })
   return <>{components}</>
 }
+
+Skus.propTypes = components.Skus.propTypes
 
 export default Skus

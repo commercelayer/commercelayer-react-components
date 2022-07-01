@@ -55,7 +55,7 @@ type Props = {
   THostedCart &
   PropsWithoutRef<JSX.IntrinsicElements['button']>
 
-export default function AddToCartButton(props: Props) {
+export function AddToCartButton(props: Props) {
   const {
     label = 'Add to cart',
     children,
@@ -195,3 +195,5 @@ export default function AddToCartButton(props: Props) {
     </button>
   )
 }
+
+export default AddToCartButton
