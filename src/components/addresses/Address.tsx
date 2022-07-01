@@ -1,5 +1,6 @@
-import { Fragment, useContext, useState, useEffect } from 'react'
+import { Fragment, useContext, ReactNode, useState, useEffect } from 'react'
 import AddressChildrenContext from '#context/AddressChildrenContext'
+import components from '#config/components'
 import CustomerContext from '#context/CustomerContext'
 import BillingAddressContext from '#context/BillingAddressContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
@@ -13,8 +14,10 @@ import AddressCardsTemplate, {
   HandleSelect,
 } from '#components-utils/AddressCardsTemplate'
 
+const propTypes = components.Address.propTypes
+
 type Props = {
-  children: AddressCardsTemplateChildren
+  children: ReactNode | AddressCardsTemplateChildren
   selectedClassName?: string
   disabledClassName?: string
   onSelect?: (address: AddressType) => void
@@ -171,5 +174,7 @@ export function Address(props: Props) {
     <Fragment>{components}</Fragment>
   )
 }
+
+Address.propTypes = propTypes
 
 export default Address

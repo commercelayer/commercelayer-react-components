@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import BaseSelect from '#components-utils/BaseSelect'
-
+import components from '#config/components'
 import { AddressStateSelectName, BaseSelectComponentProps } from '#typings'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
@@ -10,6 +10,10 @@ import isEmptyStates from '#utils/isEmptyStates'
 import AddressesContext from '#context/AddressContext'
 import BaseInput from '#components-utils/BaseInput'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
+
+const propTypes = components.AddressStateSelector.propTypes
+const defaultProps = components.AddressStateSelector.defaultProps
+const displayName = components.AddressStateSelector.displayName
 
 type Props = Omit<BaseSelectComponentProps, 'options' | 'name'> & {
   name: AddressStateSelectName
@@ -44,11 +48,6 @@ export function AddressStateSelector(props: Props) {
         : billingAddress?.values?.['billing_address_country_code']?.['value']
     if (billingCountryCode && billingCountryCode !== countryCode)
       setCountryCode(billingCountryCode)
-    const customerCountryCode =
-      customerAddress?.values?.['customer_address_country_code']?.value ||
-      customerAddress?.values?.['country_code']
-    if (!isEmpty(customerCountryCode) && customerCountryCode !== countryCode)
-      setCountryCode(customerCountryCode)
     const shippingCountryCode =
       typeof shippingAddress?.values?.['shipping_address_country_code'] ===
       'string'
@@ -68,15 +67,6 @@ export function AddressStateSelector(props: Props) {
       !isEmptyStates(billingCountryCode)
     ) {
       billingAddress.resetField && billingAddress.resetField(name)
-      setVal('')
-    }
-    const changeCustomerCountry = [
-      !isEmpty(customerAddress),
-      customerCountryCode,
-      countryCode !== customerCountryCode,
-    ].every(Boolean)
-    if (changeCustomerCountry && !isValidState(val, customerCountryCode)) {
-      customerAddress.resetField && customerAddress.resetField(name)
       setVal('')
     }
     const changeShippingCountry = [
@@ -103,11 +93,6 @@ export function AddressStateSelector(props: Props) {
       if (!fieldError) setHasError(false)
       else setHasError(true)
     }
-    if (!isEmpty(customerAddress)) {
-      const fieldError = customerAddress?.errors?.[name as any]?.error
-      if (!fieldError) setHasError(false)
-      else setHasError(true)
-    }
     if (!isEmpty(shippingAddress)) {
       const fieldError = shippingAddress?.errors?.[name]?.['error']
       if (!fieldError) setHasError(false)
@@ -130,7 +115,7 @@ export function AddressStateSelector(props: Props) {
       {...p}
       className={classNameComputed}
       ref={
-        (billingAddress?.validation as any) ||
+        billingAddress?.validation ||
         shippingAddress?.validation ||
         customerAddress?.validation
       }
@@ -144,7 +129,7 @@ export function AddressStateSelector(props: Props) {
       {...(p as any)}
       name={name}
       ref={
-        (billingAddress?.validation as any) ||
+        billingAddress?.validation ||
         shippingAddress?.validation ||
         customerAddress?.validation
       }
@@ -156,5 +141,9 @@ export function AddressStateSelector(props: Props) {
     />
   )
 }
+
+AddressStateSelector.propTypes = propTypes
+AddressStateSelector.defaultProps = defaultProps
+AddressStateSelector.displayName = displayName
 
 export default AddressStateSelector

@@ -13,8 +13,11 @@ type TCondition = ConditionalElement<Exclude<TResources['Sku'], 'resource'>>
 type Props = {
   children?: (props: SkuFieldChildrenProps) => JSX.Element
 } & TCondition
-
-export default function SkuField<P extends Props>(props: P) {
+/**
+ * @param props {@link Props}
+ * @returns
+ */
+export function SkuField<P extends Props>(props: P) {
   const { attribute, tagElement, children, ...p } = props
   return (
     <GenericFieldComponent<TResourceKey['Sku']>
@@ -28,3 +31,5 @@ export default function SkuField<P extends Props>(props: P) {
     </GenericFieldComponent>
   )
 }
+
+export default SkuField

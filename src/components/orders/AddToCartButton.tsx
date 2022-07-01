@@ -1,4 +1,4 @@
-import { useContext, PropsWithoutRef } from 'react'
+import { useContext, PropsWithoutRef, ReactNode } from 'react'
 import Parent from '../utils/Parent'
 import OrderContext from '#context/OrderContext'
 import isEmpty from 'lodash/isEmpty'
@@ -9,7 +9,7 @@ import { FunctionChildren } from '#typings/index'
 import { AddToCartReturn } from '#reducers/OrderReducer'
 import SkuListsContext from '#context/SkuListsContext'
 import ExternalFunctionContext from '#context/ExternalFunctionContext'
-import { VariantOption } from '#components/skus/VariantSelector'
+import { VariantOption } from '#components/VariantSelector'
 import isFunction from 'lodash/isFunction'
 import SkuChildrenContext from '#context/SkuChildrenContext'
 import getCartLink from '#utils/getCartLink'
@@ -45,7 +45,7 @@ type THostedCart =
 
 type Props = {
   children?: AddToCartButtonChildrenProps
-  label?: string | JSX.Element
+  label?: string | ReactNode
   skuCode?: string
   bundleCode?: string
   disabled?: boolean
@@ -55,7 +55,7 @@ type Props = {
   THostedCart &
   PropsWithoutRef<JSX.IntrinsicElements['button']>
 
-export function AddToCartButton(props: Props): JSX.Element {
+export default function AddToCartButton(props: Props) {
   const {
     label = 'Add to cart',
     children,
@@ -86,7 +86,7 @@ export function AddToCartButton(props: Props): JSX.Element {
   } = useContext(ItemContext)
   const { skuLists } = useContext(SkuListsContext)
   const { sku } = useContext(SkuChildrenContext)
-  const [slug] = endpoint ? endpoint.split('.commercelayer') : ['']
+  const [slug] = endpoint.split('.commercelayer')
   const sCode = (
     !isEmpty(items) && skuCode
       ? items[skuCode]?.code
@@ -195,5 +195,3 @@ export function AddToCartButton(props: Props): JSX.Element {
     </button>
   )
 }
-
-export default AddToCartButton

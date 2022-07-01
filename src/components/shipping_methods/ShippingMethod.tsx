@@ -1,11 +1,15 @@
-import { Fragment, useContext, useEffect, useState } from 'react'
+import { Fragment, useContext, ReactNode, useEffect, useState } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
+import components from '#config/components'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import isEmpty from 'lodash/isEmpty'
 import type { DeliveryLeadTime } from '@commercelayer/sdk'
 
+const propTypes = components.ShippingMethod.propTypes
+const displayName = components.ShippingMethod.displayName
+
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   readonly?: boolean
   emptyText?: string
 }
@@ -58,5 +62,8 @@ export function ShippingMethod(props: Props) {
   const components = (!isEmpty(items) && items) || emptyText
   return <Fragment>{components}</Fragment>
 }
+
+ShippingMethod.propTypes = propTypes
+ShippingMethod.displayName = displayName
 
 export default ShippingMethod

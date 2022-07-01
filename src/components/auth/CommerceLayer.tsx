@@ -1,7 +1,11 @@
+import type { ReactNode } from 'react'
 import CommerceLayerContext from '#context/CommerceLayerContext'
+import components from '#config/components'
+
+const propTypes = components.CommerceLayer.propTypes
 
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   accessToken: string
   endpoint: string
 }
@@ -14,5 +18,7 @@ export function CommerceLayer(props: Props) {
     </CommerceLayerContext.Provider>
   )
 }
+
+CommerceLayer.propTypes = propTypes
 
 export default CommerceLayer

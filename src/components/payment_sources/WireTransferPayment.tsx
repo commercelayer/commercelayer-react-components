@@ -1,10 +1,10 @@
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isFunction from 'lodash/isFunction'
-import { useContext, useEffect, useRef } from 'react'
+import { ReactNode, useContext, useEffect, useRef } from 'react'
 
 export type WireTransferConfig = {
   infoMessage?: {
-    text?: string | JSX.Element
+    text?: string | ReactNode
     className?: string
   }
 }
@@ -12,11 +12,8 @@ export type WireTransferConfig = {
 const defaultMessage =
   'after placing the order, you will need to manually complete the payment with your bank'
 
-type Props = WireTransferConfig &
-  JSX.IntrinsicElements['div'] & { 'data-test-id'?: string }
-
-export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
-  const { className, 'data-test-id': dataTestId } = p
+type Props = WireTransferConfig & JSX.IntrinsicElements['div']
+export function WireTransferPayment({ infoMessage, ...p }: Props) {
   const ref = useRef<null | HTMLFormElement>(null)
   const {
     setPaymentSource,
@@ -58,7 +55,7 @@ export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
   }
   return (
     <form ref={ref}>
-      <div className={className} data-test-id={dataTestId}>
+      <div {...p}>
         <span className={infoMessage?.className}>
           {isFunction(infoMessage?.text)
             ? infoMessage?.text()

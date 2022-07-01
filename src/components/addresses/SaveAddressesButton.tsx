@@ -1,5 +1,6 @@
-import { useContext, useState } from 'react'
-import Parent from '#components-utils/Parent'
+import { ReactNode, useContext, useState } from 'react'
+import Parent from './utils/Parent'
+import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import AddressContext from '#context/AddressContext'
 import {
@@ -12,11 +13,15 @@ import CustomerContext from '#context/CustomerContext'
 import isFunction from 'lodash/isFunction'
 import { TCustomerAddress } from '#reducers/CustomerReducer'
 
+const propTypes = components.SaveAddressesButton.propTypes
+const defaultProps = components.SaveAddressesButton.defaultProps
+const displayName = components.SaveAddressesButton.displayName
+
 type ChildrenProps = FunctionChildren<Omit<Props, 'children'>>
 
 type Props = {
   children?: ChildrenProps
-  label?: string | JSX.Element
+  label?: string | ReactNode
   onClick?: () => void
   addressId?: string
 } & JSX.IntrinsicElements['button']
@@ -111,5 +116,9 @@ export function SaveAddressesButton(props: Props) {
     </button>
   )
 }
+
+SaveAddressesButton.propTypes = propTypes
+SaveAddressesButton.defaultProps = defaultProps
+SaveAddressesButton.displayName = displayName
 
 export default SaveAddressesButton

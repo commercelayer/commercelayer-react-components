@@ -1,18 +1,23 @@
-import { Fragment, useRef, useContext, RefObject } from 'react'
+import { Fragment, useRef, useContext, RefObject, ReactNode } from 'react'
 import validateFormFields from '#utils/validateFormFields'
 import { isEmpty } from 'lodash'
 import GiftCardContext from '#context/GiftCardContext'
 import { GiftCardI } from '#reducers/GiftCardReducer'
+import components from '#config/components'
 import { BaseState } from '#typings/index'
 
 type RequiredFields = 'currencyCode' | 'balanceCents'
 
+const propTypes = components.GiftCard.propTypes
+const defaultProps = components.GiftCard.defaultProps
+const displayName = components.GiftCard.displayName
+
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   onSubmit?: (values: BaseState) => void
 } & JSX.IntrinsicElements['form']
 
-export function GiftCard(props: Props): JSX.Element {
+export function GiftCard(props: Props) {
   const { children, onSubmit } = props
   const name = 'giftCardForm'
   const ref: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null)
@@ -44,5 +49,9 @@ export function GiftCard(props: Props): JSX.Element {
     </Fragment>
   )
 }
+
+GiftCard.propTypes = propTypes
+GiftCard.defaultProps = defaultProps
+GiftCard.displayName = displayName
 
 export default GiftCard

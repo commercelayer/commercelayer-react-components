@@ -1,12 +1,16 @@
 import { useContext } from 'react'
 import AvailabilityContext from '#context/AvailabilityContext'
-import Parent from '#components-utils/Parent'
+import Parent from './utils/Parent'
 import { isEmpty } from 'lodash'
-
+import components from '#config/components'
 import { TimeFormat, FunctionChildren } from '#typings/index'
 import { DeliveryLeadTime } from '#reducers/AvailabilityReducer'
 import ItemContext from '#context/ItemContext'
 import SkuChildrenContext from '#context/SkuChildrenContext'
+
+const propTypes = components.AvailabilityTemplate.propTypes
+const defaultProps = components.AvailabilityTemplate.defaultProps as Props
+const displayName = components.AvailabilityTemplate.displayName
 
 type AvailabilityTemplateChildrenProps = FunctionChildren<
   Omit<Props, 'children'> &
@@ -78,5 +82,9 @@ export function AvailabilityTemplate(props: Props) {
     <p {...p}>{text.join(' ')}</p>
   )
 }
+
+AvailabilityTemplate.propTypes = propTypes
+AvailabilityTemplate.defaultProps = defaultProps
+AvailabilityTemplate.displayName = displayName
 
 export default AvailabilityTemplate

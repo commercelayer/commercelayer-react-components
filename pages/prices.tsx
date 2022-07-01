@@ -1,7 +1,7 @@
 import { getIntegrationToken } from '@commercelayer/js-auth'
-import { useEffect, useState } from 'react'
-import Price from '../src/components/prices/Price'
-import PricesContainer from '../src/components/prices/PricesContainer'
+import React, { useEffect, useState } from 'react'
+import Price from '../src/components/Price'
+import PricesContainer from '../src/components/PricesContainer'
 import CommerceLayer from '../src/components/auth/CommerceLayer'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string

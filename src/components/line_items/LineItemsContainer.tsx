@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useContext } from 'react'
+import { useEffect, useReducer, useContext, ReactNode } from 'react'
 import lineItemReducer, {
   lineItemInitialState,
   updateLineItem,
@@ -7,11 +7,16 @@ import lineItemReducer, {
 import OrderContext from '#context/OrderContext'
 import LineItemContext, { LineItemContextValue } from '#context/LineItemContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
+import components from '#config/components'
+
+const propTypes = components.LineItemsContainer.propTypes
+const defaultProps = components.LineItemsContainer.defaultProps
+const displayName = components.LineItemsContainer.displayName
 
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   filters?: Record<string, any>
-  loader?: JSX.Element
+  loader?: ReactNode
 }
 
 export function LineItemsContainer(props: Props) {
@@ -88,5 +93,9 @@ export function LineItemsContainer(props: Props) {
     </LineItemContext.Provider>
   )
 }
+
+LineItemsContainer.propTypes = propTypes
+LineItemsContainer.defaultProps = defaultProps
+LineItemsContainer.displayName = displayName
 
 export default LineItemsContainer

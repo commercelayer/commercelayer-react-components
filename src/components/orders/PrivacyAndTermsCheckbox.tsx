@@ -1,9 +1,15 @@
+import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import PlaceOrderContext from '#context/PlaceOrderContext'
-import { useContext, useEffect, useState } from 'react'
+import { FunctionComponent, useContext, useEffect, useState } from 'react'
 import BaseInput, { BaseInputProps } from '../utils/BaseInput'
 
-export function PrivacyAndTermsCheckbox(props: Partial<BaseInputProps>) {
+const propTypes = components.PrivacyAndTermsCheckbox.propTypes
+const displayName = components.PrivacyAndTermsCheckbox.displayName
+
+const PrivacyAndTermsCheckbox: FunctionComponent<Partial<BaseInputProps>> = (
+  props
+) => {
   const { order } = useContext(OrderContext)
   const { placeOrderPermitted } = useContext(PlaceOrderContext)
   const [forceDisabled, setForceDisabled] = useState(true)
@@ -34,5 +40,8 @@ export function PrivacyAndTermsCheckbox(props: Partial<BaseInputProps>) {
     />
   )
 }
+
+PrivacyAndTermsCheckbox.propTypes = propTypes
+PrivacyAndTermsCheckbox.displayName = displayName
 
 export default PrivacyAndTermsCheckbox

@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, ReactNode } from 'react'
 import Parent from '../utils/Parent'
 import OrderListChildrenContext from '#context/OrderListChildrenContext'
 import { Cell, Row } from 'react-table'
@@ -26,7 +26,7 @@ type ChildrenProps = Omit<Props, 'children'> & {
 }
 
 type Props = {
-  children?: (props: ChildrenProps) => JSX.Element
+  children?: (props: ChildrenProps) => ReactNode
   /**
    * The order field to show
    */
