@@ -17,7 +17,7 @@ type Props = {
   label?: string | ReactNode
 } & JSX.IntrinsicElements['a']
 
-export function CartLink(props: Props) {
+export default function CartLink(props: Props) {
   const { label, children, ...p } = props
   const { order, createOrder } = useContext(OrderContext)
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
@@ -50,5 +50,3 @@ export function CartLink(props: Props) {
     </a>
   )
 }
-
-export default CartLink

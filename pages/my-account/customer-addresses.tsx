@@ -5,7 +5,7 @@ import {
   Address,
   AddressField,
   AddressInput,
-  CustomerAddressForm,
+  BillingAddressForm,
   Errors,
   AddressStateSelector,
   AddressCountrySelector,
@@ -17,19 +17,19 @@ import SaveAddressesButton from '../../src/components/SaveAddressesButton'
 const messages: any = [
   {
     code: 'EMPTY_ERROR',
-    resource: 'customerAddress',
+    resource: 'addresses',
     field: 'firstName',
     message: `Can't be blank`,
   },
   {
     code: 'VALIDATION_ERROR',
-    resource: 'customerAddress',
+    resource: 'addresses',
     field: 'email',
     message: `Must be valid email`,
   },
 ]
 
-const OrdersList = () => {
+const addresseses = () => {
   const config = useGetToken({ userMode: true })
   const [address, setAddress] = useState<any>({})
   const [showForm, setShowForm] = useState(false)
@@ -56,6 +56,7 @@ const OrdersList = () => {
                         type="edit"
                         label="Edit"
                         onClick={(address) => {
+                          console.log('address', address)
                           setAddress(address)
                           setShowForm(true)
                         }}
@@ -102,100 +103,100 @@ const OrdersList = () => {
                 <h3 className="text-lg font-medium leading-6 text-gray-900 bg-gray-50 p-2 my-3 shadow rounded-sm">
                   Fill up the form
                 </h3>
-                <CustomerAddressForm
+                <BillingAddressForm
                   errorClassName="border-red-600 focus:ring-red-600 focus:border-red-600"
                   autoComplete="on"
                   className="p-2"
                 >
                   <div>
                     <label
-                      htmlFor="customer_address_first_name"
+                      htmlFor="billing_address_first_name"
                       className="block text-sm font-medium text-gray-700"
                     >
                       First name
                     </label>
                     <div className="mt-1">
                       <AddressInput
-                        data-cy="customer_address_first_name"
-                        name="customer_address_first_name"
+                        data-cy="billing_address_first_name"
+                        name="billing_address_first_name"
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="First name"
-                        value={address?.firstName || ''}
+                        value={address?.first_name || ''}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
                       <Errors
-                        data-cy="customer_address_first_name_error"
-                        resource="customerAddress"
-                        field="customer_address_first_name"
+                        data-cy="billing_address_first_name_error"
+                        resource="addresses"
+                        field="billing_address_first_name"
                         messages={messages}
                       />
                     </p>
                   </div>
                   <div>
                     <label
-                      htmlFor="customer_address_last_name"
+                      htmlFor="billing_address_last_name"
                       className="block text-sm font-medium text-gray-700"
                     >
                       Last name
                     </label>
                     <div className="mt-1">
                       <AddressInput
-                        data-cy="customer_address_last_name"
-                        name="customer_address_last_name"
+                        data-cy="billing_address_last_name"
+                        name="billing_address_last_name"
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Last name"
-                        value={address?.lastName || ''}
+                        value={address?.last_name || ''}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
                       <Errors
-                        data-cy="customer_address_last_name_error"
-                        resource="customerAddress"
-                        field="customer_address_last_name"
+                        data-cy="billing_address_last_name_error"
+                        resource="addresses"
+                        field="billing_address_last_name"
                         messages={messages}
                       />
                     </p>
                   </div>
                   <div>
                     <label
-                      htmlFor="customer_address_line_1"
+                      htmlFor="billing_address_line_1"
                       className="block text-sm font-medium text-gray-700"
                     >
                       Address
                     </label>
                     <div className="mt-1">
                       <AddressInput
-                        data-cy="customer_address_line_1"
-                        name="customer_address_line_1"
+                        data-cy="billing_address_line_1"
+                        name="billing_address_line_1"
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Address"
-                        value={address?.line1 || ''}
+                        value={address?.line_1 || ''}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
                       <Errors
-                        data-cy="customer_address_line_1_error"
-                        resource="customerAddress"
-                        field="customer_address_line_1"
+                        data-cy="billing_address_line_1_error"
+                        resource="addresses"
+                        field="billing_address_line_1"
                         messages={messages}
                       />
                     </p>
                   </div>
                   <div>
                     <label
-                      htmlFor="customer_address_city"
+                      htmlFor="billing_address_city"
                       className="block text-sm font-medium text-gray-700"
                     >
                       City
                     </label>
                     <div className="mt-1">
                       <AddressInput
-                        data-cy="customer_address_city"
-                        name="customer_address_city"
+                        data-cy="billing_address_city"
+                        name="billing_address_city"
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="City"
@@ -204,53 +205,53 @@ const OrdersList = () => {
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
                       <Errors
-                        data-cy="customer_address_city_error"
-                        resource="customerAddress"
-                        field="customer_address_city"
+                        data-cy="billing_address_city_error"
+                        resource="addresses"
+                        field="billing_address_city"
                         messages={messages}
                       />
                     </p>
                   </div>
                   <div>
                     <label
-                      htmlFor="customer_address_country_code"
+                      htmlFor="billing_address_country_code"
                       className="block text-sm font-medium text-gray-700"
                     >
                       Country
                     </label>
                     <div className="mt-1">
                       <AddressCountrySelector
-                        data-cy="customer_address_country_code"
-                        name="customer_address_country_code"
+                        data-cy="billing_address_country_code"
+                        name="billing_address_country_code"
                         className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                         placeholder={{
                           value: '',
                           label: 'Country',
                           disabled: true,
                         }}
-                        value={address?.countryCode || ''}
+                        value={address?.country_code || ''}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
                       <Errors
-                        data-cy="customer_address_country_code_error"
-                        resource="customerAddress"
-                        field="customer_address_country_code"
+                        data-cy="billing_address_country_code_error"
+                        resource="addresses"
+                        field="billing_address_country_code"
                         messages={messages}
                       />
                     </p>
                   </div>
                   <div>
                     <label
-                      htmlFor="customer_address_state_code"
+                      htmlFor="billing_address_state_code"
                       className="block text-sm font-medium text-gray-700"
                     >
                       State
                     </label>
                     <div className="mt-1">
                       <AddressStateSelector
-                        data-cy="customer_address_state_code"
-                        name="customer_address_state_code"
+                        data-cy="billing_address_state_code"
+                        name="billing_address_state_code"
                         className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                         inputClassName="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                         placeholder={{
@@ -258,55 +259,55 @@ const OrdersList = () => {
                           label: 'Select a state',
                           disabled: true,
                         }}
-                        value={address?.stateCode || ''}
+                        value={address?.state_code || ''}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
                       <Errors
-                        data-cy="customer_address_state_code_error"
-                        resource="customerAddress"
-                        field="customer_address_state_code"
+                        data-cy="billing_address_state_code_error"
+                        resource="addresses"
+                        field="billing_address_state_code"
                         messages={messages}
                       />
                     </p>
                   </div>
                   <div>
                     <label
-                      htmlFor="customer_address_zip_code"
+                      htmlFor="billing_address_zip_code"
                       className="block text-sm font-medium text-gray-700"
                     >
                       Zip code
                     </label>
                     <div className="mt-1">
                       <AddressInput
-                        data-cy="customer_address_zip_code"
-                        name="customer_address_zip_code"
+                        data-cy="billing_address_zip_code"
+                        name="billing_address_zip_code"
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Zip code"
-                        value={address?.zipCode || ''}
+                        value={address?.zip_code || ''}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
                       <Errors
-                        data-cy="customer_address_zip_code_error"
-                        resource="customerAddress"
-                        field="customer_address_zip_code"
+                        data-cy="billing_address_zip_code_error"
+                        resource="addresses"
+                        field="billing_address_zip_code"
                         messages={messages}
                       />
                     </p>
                   </div>
                   <div>
                     <label
-                      htmlFor="customer_address_phone"
+                      htmlFor="billing_address_phone"
                       className="block text-sm font-medium text-gray-700"
                     >
                       Phone
                     </label>
                     <div className="mt-1">
                       <AddressInput
-                        data-cy="customer_address_phone"
-                        name="customer_address_phone"
+                        data-cy="billing_address_phone"
+                        name="billing_address_phone"
                         type="tel"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Phone"
@@ -315,24 +316,24 @@ const OrdersList = () => {
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
                       <Errors
-                        data-cy="customer_address_phone_error"
-                        resource="customerAddress"
-                        field="customer_address_phone"
+                        data-cy="billing_address_phone_error"
+                        resource="addresses"
+                        field="billing_address_phone"
                         messages={messages}
                       />
                     </p>
                   </div>
                   {/* <div>
                     <label
-                      htmlFor="customer_address_customer_info"
+                      htmlFor="billing_address_billing_info"
                       className="block text-sm font-medium text-gray-700"
                     >
                       Billing info
                     </label>
                     <div className="mt-1">
                       <AddressInput
-                        data-cy="customer_address_customer_info"
-                        name="customer_address_billing_info"
+                        data-cy="billing_address_billing_info"
+                        name="billing_address_billing_info"
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Billing info"
@@ -340,14 +341,14 @@ const OrdersList = () => {
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
                       <Errors
-                        data-cy="customer_address_customer_info"
-                        resource="customerAddress"
-                        field="customer_address_customer_info"
+                        data-cy="billing_address_billing_info"
+                        resource="addresses"
+                        field="billing_address_billing_info"
                         messages={messages}
                       />
                     </p>
                   </div> */}
-                </CustomerAddressForm>
+                </BillingAddressForm>
                 <div className="mt-5 p-2 flex justify-between">
                   <SaveAddressesButton
                     data-cy="save-addresses-button"
@@ -372,4 +373,4 @@ const OrdersList = () => {
   )
 }
 
-export default OrdersList
+export default addresseses
