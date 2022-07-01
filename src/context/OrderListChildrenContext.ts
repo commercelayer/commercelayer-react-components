@@ -1,18 +1,35 @@
-import OrderAttributes from '#typings/order'
+import type { Order } from '@commercelayer/sdk'
 import { createContext, ReactNode } from 'react'
 import { Row } from 'react-table'
 
-export interface InitialOrderListContext {
-  order: OrderAttributes | null
-  row: Row<OrderAttributes>
+export type InitialOrderListContext = Partial<{
+  /**
+   * The current order
+   */
+  order: Order | null
+  /**
+   * The current row
+   */
+  row: Row<Order>
+  /**
+   * Show the row actions
+   */
   showActions: boolean
-  actionsComponent?: (props: { order: OrderAttributes }) => ReactNode
-  actionsContainerClassName?: string
-}
+  /**
+   * Function to assign as custom row renderer
+   */
+  actionsComponent: (props: { order: Order }) => ReactNode
+  /**
+   * Class name to assign as custom row renderer
+   */
+  actionsContainerClassName: string
+  /**
+   * Infinite scroll enabled
+   */
+  infiniteScroll: boolean
+}>
 
 const initial: InitialOrderListContext = {
-  order: null,
-  row: {} as any,
   showActions: false,
 }
 

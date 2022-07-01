@@ -1,5 +1,4 @@
 import {
-  FunctionComponent,
   Fragment,
   useContext,
   ReactNode,
@@ -18,7 +17,7 @@ import { PaymentResource } from '#reducers/PaymentMethodReducer'
 const propTypes = components.PaymentMethod.propTypes
 const displayName = components.PaymentMethod.displayName
 
-type PaymentMethodProps = {
+type Props = {
   children: ReactNode
   activeClass?: string
   loader?: LoaderType
@@ -34,7 +33,7 @@ type PaymentMethodProps = {
       }
   )
 
-const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
+export function PaymentMethod({
   children,
   className,
   activeClass,
@@ -42,7 +41,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
   clickableContainer,
   onClick,
   ...p
-}) => {
+}: Props) {
   const [loading, setLoading] = useState(true)
   const [paymentSelected, setPaymentSelected] = useState('')
   const {
@@ -75,7 +74,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
             e.stopPropagation()
             setLoadingPlaceOrder({ loading: true })
             setPaymentSelected(payment.id)
-            const paymentMethodId = payment?.id as string
+            const paymentMethodId = payment?.id
             await setPaymentMethod({ paymentResource, paymentMethodId })
             onClick && onClick(payment)
             setLoadingPlaceOrder({ loading: false })

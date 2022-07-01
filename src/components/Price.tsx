@@ -1,10 +1,4 @@
-import {
-  Fragment,
-  useState,
-  useEffect,
-  useContext,
-  FunctionComponent,
-} from 'react'
+import { Fragment, useState, useEffect, useContext } from 'react'
 import { isEmpty, has, indexOf } from 'lodash'
 import Parent from './utils/Parent'
 import PricesContext from '#context/PricesContext'
@@ -26,14 +20,14 @@ type PriceChildrenProps = FunctionChildren<
   } & Omit<PriceProps, 'children'>
 >
 
-export interface PriceProps extends Partial<JSX.IntrinsicElements['span']> {
+export type PriceProps = Partial<JSX.IntrinsicElements['span']> & {
   children?: PriceChildrenProps
   compareClassName?: string
   showCompare?: boolean
   skuCode?: string
 }
 
-const Price: FunctionComponent<PriceProps> = (props) => {
+export function Price(props: PriceProps) {
   const { children, skuCode = '' } = props
   const {
     prices,

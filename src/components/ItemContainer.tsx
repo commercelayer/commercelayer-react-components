@@ -19,7 +19,7 @@ import { BFSetStateContainer } from '#typings'
 const propTypes = components.ItemContainer.propTypes
 const displayName = components.ItemContainer.displayName
 
-type ItemContainerProps = {
+type Props = {
   children: ReactNode
   skuCode?: string | null
   lineItem?: {
@@ -28,7 +28,7 @@ type ItemContainerProps = {
   } | null
 }
 
-const ItemContainer: React.FunctionComponent<ItemContainerProps> = (props) => {
+export function ItemContainer(props: Props) {
   const { children, skuCode, lineItem } = props
   const [state, dispatch] = useReducer(itemReducer, itemInitialState)
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext } from 'react'
+import { useContext } from 'react'
 import OrderContext from '#context/OrderContext'
 import components from '#config/components'
 import Parent from './utils/Parent'
@@ -10,19 +10,19 @@ const defaultProps = components.CheckoutLink.defaultProps
 const displayName = components.CheckoutLink.displayName
 
 type CheckoutLinkChildrenProps = FunctionChildren<
-  Omit<CheckoutLinkProps, 'children'> & {
+  Omit<Props, 'children'> & {
     checkoutUrl: string
     href: string
   }
 >
 
-type CheckoutLinkProps = {
+type Props = {
   children?: CheckoutLinkChildrenProps
   label?: string
   hostedCheckout?: boolean
 } & JSX.IntrinsicElements['a']
 
-const CheckoutLink: FunctionComponent<CheckoutLinkProps> = (props) => {
+export function CheckoutLink(props: Props) {
   const { label, hostedCheckout = true, children, ...p } = props
   const { order } = useContext(OrderContext)
   const { accessToken, endpoint } = useContext(CommerceLayerContext)

@@ -8,7 +8,13 @@ export type DefaultContextAddress = {
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any
   ) => void
-  errors?: Record<string, { code: string; message: string; error: boolean }>[]
+  errors?: {
+    [name: string]: {
+      code: string
+      message: string
+      error: boolean
+    }
+  }
   errorClassName?: string
   requiresBillingInfo?: boolean
   resetField?: (name: string) => void

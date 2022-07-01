@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, ReactNode } from 'react'
+import { useContext, ReactNode } from 'react'
 import Parent from './utils/Parent'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import components from '#config/components'
@@ -9,12 +9,12 @@ import { defaultGiftCardImgUrl, defaultImgUrl } from '#utils/placeholderImages'
 const propTypes = components.LineItemImage.propTypes
 const displayName = components.LineItemImage.displayName
 
-export type LineItemImageType = Omit<LineItemImageProps, 'children'> & {
+export type LineItemImageType = Omit<Props, 'children'> & {
   src: string
   lineItem: LineItem
 }
 
-type LineItemImageProps = {
+type Props = {
   children?: (props: LineItemImageType) => ReactNode
   width?: number
   placeholder?: {
@@ -22,7 +22,7 @@ type LineItemImageProps = {
   }
 } & Omit<JSX.IntrinsicElements['img'], 'src' | 'srcSet' | 'placeholder'>
 
-const LineItemImage: FunctionComponent<LineItemImageProps> = (props) => {
+export function LineItemImage(props: Props) {
   const { placeholder, children, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const itemType = lineItem?.item_type as LineItemType

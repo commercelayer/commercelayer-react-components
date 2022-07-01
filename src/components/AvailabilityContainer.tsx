@@ -1,10 +1,4 @@
-import {
-  useContext,
-  useReducer,
-  FunctionComponent,
-  useEffect,
-  ReactNode,
-} from 'react'
+import { useContext, useReducer, useEffect, ReactNode } from 'react'
 import availabilityReducer, {
   availabilityInitialState,
   getAvailability,
@@ -23,14 +17,12 @@ import isEqual from 'lodash/isEqual'
 const propTypes = components.AvailabilityContainer.propTypes
 const displayName = components.AvailabilityContainer.displayName
 
-type AvailabilityContainerProps = {
+type Props = {
   children: ReactNode
   skuCode?: string
 }
 
-const AvailabilityContainer: FunctionComponent<AvailabilityContainerProps> = (
-  props
-) => {
+export function AvailabilityContainer(props: Props) {
   const { children, skuCode } = props
   const { item, skuCode: itemSkuCode, setItem } = useContext(ItemContext)
   const { lineItem } = useContext(LineItemChildrenContext)

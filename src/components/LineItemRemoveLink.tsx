@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, PropsWithoutRef } from 'react'
+import { useContext, PropsWithoutRef } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
 import Parent from './utils/Parent'
@@ -9,19 +9,17 @@ const propTypes = components.LineItemRemoveLink.propTypes
 const defaultProps = components.LineItemRemoveLink.defaultProps
 const displayName = components.LineItemRemoveLink.displayName
 
-type ChildrenLineItemRemoveLinkProps = FunctionChildren<{
+type ChildrenProps = FunctionChildren<{
   handleRemove: (event: React.MouseEvent<HTMLAnchorElement>) => void
   label?: string
 }>
 
-type LineItemRemoveLinkProps = {
-  children?: ChildrenLineItemRemoveLinkProps
+type Props = {
+  children?: ChildrenProps
   label?: string
 } & PropsWithoutRef<JSX.IntrinsicElements['a']>
 
-const LineItemRemoveLink: FunctionComponent<LineItemRemoveLinkProps> = (
-  props
-) => {
+export function LineItemRemoveLink(props: Props) {
   const { label = 'Remove' } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const { deleteLineItem } = useContext(LineItemContext)

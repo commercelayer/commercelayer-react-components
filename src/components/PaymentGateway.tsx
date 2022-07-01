@@ -4,7 +4,7 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { LoaderType } from '#typings'
 import getPaypalConfig from '#utils/paypalPayment'
-import { FunctionComponent, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { PaymentSourceProps } from './PaymentSource'
 import getLoaderComponent from '#utils/getLoaderComponent'
 import AdyenGateway from './gateways/AdyenGateway'
@@ -16,20 +16,20 @@ import CustomerContext from '#context/CustomerContext'
 import CheckoutComGateway from './gateways/CheckoutComGateway'
 import KlarnaGateway from './gateways/KlarnaGateway'
 
-export type GatewayBaseType = PaymentGatewayProps & {
+export type GatewayBaseType = Props & {
   show: boolean
   loading: boolean
   loaderComponent: JSX.Element
 }
 
-export type PaymentGatewayProps = PaymentSourceProps & {
+type Props = PaymentSourceProps & {
   showCard: boolean
   handleEditClick: (e: MouseEvent) => void
   show: boolean
   loader?: LoaderType
 }
 
-const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
+export function PaymentGateway({
   readonly,
   showCard,
   handleEditClick,
@@ -40,7 +40,7 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
   show,
   loader = 'Loading...',
   ...p
-}) => {
+}: Props) {
   const loaderComponent = getLoaderComponent(loader)
   const [loading, setLoading] = useState(true)
   const { payment } = useContext(PaymentMethodChildrenContext)
@@ -72,16 +72,16 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
           order,
           attributes,
         })
-        getCustomerPaymentSources && (await getCustomerPaymentSources())
+        getCustomerPaymentSources && getCustomerPaymentSources()
       }
       if (!paymentSource && order?.payment_method.id && show) {
-        setPaymentSources()
+        void setPaymentSources()
       } else if (!paymentSource || paymentSource.type !== paymentResource) {
-        setPaymentSources()
+        void setPaymentSources()
       }
       // @ts-ignore
       if (paymentSource?.mismatched_amounts && show) {
-        setPaymentSources()
+        void setPaymentSources()
       }
       setLoading(false)
     }

@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode, useContext } from 'react'
+import { ReactNode, useContext } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
@@ -13,26 +13,22 @@ type ParentProps = {
   handleClick: () => any
 }
 
-type SaveAddressesButtonChildrenProps = FunctionChildren<
-  Omit<SaveCustomerButtonProps & ParentProps, 'children'>
->
+type ChildrenProps = FunctionChildren<Omit<Props & ParentProps, 'children'>>
 
-type SaveCustomerButtonProps = {
-  children?: SaveAddressesButtonChildrenProps
+type Props = {
+  children?: ChildrenProps
   label?: string | ReactNode
   onClick?: () => void
 } & JSX.IntrinsicElements['button']
 
-const SaveCustomerButton: FunctionComponent<SaveCustomerButtonProps> = (
-  props
-) => {
+export function SaveCustomerButton(props: Props) {
   const { children, label = 'Save', resource, disabled, onClick, ...p } = props
   const { errors, saveCustomerUser, customerEmail } =
     useContext(CustomerContext)
   const disable = disabled || !isEmpty(errors) || isEmpty(customerEmail)
   const handleClick = async () => {
     if (isEmpty(errors) && !disable) {
-      await saveCustomerUser(customerEmail as string)
+      saveCustomerUser && (await saveCustomerUser(customerEmail as string))
       onClick && onClick()
     }
   }
@@ -46,7 +42,7 @@ const SaveCustomerButton: FunctionComponent<SaveCustomerButtonProps> = (
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <button type="button" disabled={disable} onClick={handleClick} {...p}>
+    <button type="button" disabled={disable} onClick={void handleClick} {...p}>
       {label}
     </button>
   )

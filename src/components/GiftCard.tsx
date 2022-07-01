@@ -1,11 +1,4 @@
-import {
-  FunctionComponent,
-  Fragment,
-  useRef,
-  useContext,
-  RefObject,
-  ReactNode,
-} from 'react'
+import { Fragment, useRef, useContext, RefObject, ReactNode } from 'react'
 import validateFormFields from '#utils/validateFormFields'
 import { isEmpty } from 'lodash'
 import GiftCardContext from '#context/GiftCardContext'
@@ -19,12 +12,12 @@ const propTypes = components.GiftCard.propTypes
 const defaultProps = components.GiftCard.defaultProps
 const displayName = components.GiftCard.displayName
 
-type GiftCardProps = {
+type Props = {
   children: ReactNode
   onSubmit?: (values: BaseState) => void
 } & JSX.IntrinsicElements['form']
 
-const GiftCard: FunctionComponent<GiftCardProps> = (props) => {
+export function GiftCard(props: Props) {
   const { children, onSubmit } = props
   const name = 'giftCardForm'
   const ref: RefObject<HTMLFormElement> = useRef<HTMLFormElement>(null)

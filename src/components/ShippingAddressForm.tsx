@@ -1,17 +1,10 @@
 import AddressesContext from '#context/AddressContext'
 import useRapidForm from 'rapid-form'
-import {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useRef,
-} from 'react'
+import { ReactNode, useContext, useEffect, useRef } from 'react'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import { isEmpty } from 'lodash'
 import { BaseError, CodeErrorType } from '#typings/errors'
-import { AddressField } from '#reducers/AddressReducer'
-import { AddressCountrySelectName, AddressInputName } from '#typings'
+import { AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import { Address } from '@commercelayer/sdk'
@@ -20,15 +13,13 @@ import { businessMandatoryField } from '#utils/validateFormFields'
 
 const propTypes = components.ShippingAddressForm.propTypes
 
-type ShippingAddressFormProps = {
+type Props = {
   children: ReactNode
   reset?: boolean
   errorClassName?: string
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
-const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
-  props
-) => {
+export function ShippingAddressForm(props: Props) {
   const {
     children,
     errorClassName,
@@ -141,10 +132,7 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     includeLoaded,
     isBusiness,
   ])
-  const setValue = (
-    name: AddressField | AddressInputName | AddressCountrySelectName,
-    value: any
-  ) => {
+  const setValue = (name: any, value: any) => {
     const field: any = {
       [name.replace('shipping_address_', '')]: value,
     }
@@ -165,7 +153,7 @@ const ShippingAddressForm: FunctionComponent<ShippingAddressFormProps> = (
     errors: errors as any,
     resetField: (name: string) =>
       resetForm({ currentTarget: ref.current } as any, name),
-  }
+  } as any
   return (
     <ShippingAddressFormContext.Provider value={providerValues}>
       <form ref={ref} autoComplete={autoComplete} {...p}>

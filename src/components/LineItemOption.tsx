@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, CSSProperties } from 'react'
+import { useContext, CSSProperties } from 'react'
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
 import get from 'lodash/get'
 import has from 'lodash/has'
@@ -13,12 +13,12 @@ const propTypes = components.LineItemOption.propTypes
 const displayName = components.LineItemOption.displayName
 
 type LineItemOptionChildrenProps = FunctionChildren<
-  Omit<LineItemOptionProps, 'children'> & {
+  Omit<Props, 'children'> & {
     lineItemOption: LineItemOptionType
   }
 >
 
-type LineItemOptionProps = {
+type Props = {
   id?: string
   className?: string
   key?: string
@@ -30,12 +30,11 @@ type LineItemOptionProps = {
   tagContainer?: keyof JSX.IntrinsicElements
 }
 
-const LineItemOption: FunctionComponent<LineItemOptionProps> = (props) => {
+export function LineItemOption(props: Props) {
   const {
     name,
     children,
     valueClassName,
-    id,
     key,
     tagElement = 'li',
     tagContainer = 'ul',

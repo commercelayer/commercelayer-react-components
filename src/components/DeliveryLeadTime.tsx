@@ -1,10 +1,4 @@
-import {
-  FunctionComponent,
-  useContext,
-  ReactNode,
-  useState,
-  useEffect,
-} from 'react'
+import { useContext, ReactNode, useState, useEffect } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
@@ -18,21 +12,15 @@ export type DeliveryLeadTimeField =
   | 'min_days'
   | 'max_days'
 
-export type DeliveryLeadTimeComponentChildren = Omit<
-  ShippingMethodPriceProps,
-  'children'
->
+export type DeliveryLeadTimeComponentChildren = Omit<Props, 'children'>
 
-export interface ShippingMethodPriceProps
-  extends Partial<JSX.IntrinsicElements['span']> {
+type Props = Partial<JSX.IntrinsicElements['span']> & {
   children?: (props: DeliveryLeadTimeComponentChildren) => ReactNode
   type: DeliveryLeadTimeField
   text?: string
 }
 
-const DeliveryLeadTime: FunctionComponent<ShippingMethodPriceProps> = (
-  props
-) => {
+export function DeliveryLeadTime(props: Props) {
   const { type, ...p } = props
   const [text, setText] = useState<string | number>()
   const { deliveryLeadTimeForShipment } = useContext(

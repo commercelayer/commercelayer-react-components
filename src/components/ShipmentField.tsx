@@ -1,4 +1,4 @@
-import { useContext, FunctionComponent, ReactNode } from 'react'
+import { useContext, ReactNode } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import get from 'lodash/get'
@@ -8,7 +8,7 @@ import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 const propTypes = components.ShipmentField.propTypes
 const displayName = components.ShipmentField.displayName
 
-type ShipmentFieldChildrenProps = Omit<ShipmentFieldProps, 'children'> & {
+type ShipmentFieldChildrenProps = Omit<Props, 'children'> & {
   shipment: Shipment
 }
 
@@ -21,12 +21,12 @@ export type ShipmentAttribute =
   | 'formatted_cost_amount'
   | 'key_number'
 
-type ShipmentFieldProps = {
+type Props = {
   children?: (props: ShipmentFieldChildrenProps) => ReactNode
   name: ShipmentAttribute
 } & JSX.IntrinsicElements['span']
 
-const ShipmentField: FunctionComponent<ShipmentFieldProps> = (props) => {
+export function ShipmentField(props: Props) {
   const { name } = props
   const { shipment, keyNumber } = useContext(ShipmentChildrenContext)
   const key = name

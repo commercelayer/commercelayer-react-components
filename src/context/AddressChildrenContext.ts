@@ -2,11 +2,11 @@ import { createContext } from 'react'
 import { Address } from '@commercelayer/sdk'
 
 export interface InitialAddressContext {
-  address: Address | Record<string, any>
+  address: Address | undefined
 }
 
 const initial: InitialAddressContext = {
-  address: {},
+  address: undefined,
 }
 
 const AddressChildrenContext = createContext<InitialAddressContext>(initial)

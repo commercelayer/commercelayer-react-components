@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, useRef } from 'react'
+import { useContext, useRef } from 'react'
 import {
   PaymentMethodConfig,
   PaymentSourceObject,
@@ -73,7 +73,7 @@ const defaultOptions = {
   },
 }
 
-type CheckoutComPaymentProps = PaymentMethodConfig['checkoutComPayment'] &
+type Props = PaymentMethodConfig['checkoutComPayment'] &
   JSX.IntrinsicElements['div'] & {
     show?: boolean
     publicKey: string
@@ -81,12 +81,12 @@ type CheckoutComPaymentProps = PaymentMethodConfig['checkoutComPayment'] &
     templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
   }
 
-const CheckoutComPayment: FunctionComponent<CheckoutComPaymentProps> = ({
+export function CheckoutComPayment({
   publicKey,
   options = defaultOptions,
   locale = 'EN-GB',
   ...p
-}) => {
+}: Props) {
   const ref = useRef<null | HTMLFormElement>(null)
   const loaded = useExternalScript(scriptUrl)
   const {

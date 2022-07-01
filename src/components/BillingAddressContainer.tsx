@@ -1,11 +1,5 @@
 import BillingAddressContext from '#context/BillingAddressContext'
-import {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useReducer,
-} from 'react'
+import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import billingAddressReducer, {
   billingAddressInitialState,
   setBillingAddress,
@@ -21,7 +15,7 @@ const propTypes = components.BillingAddressContainer.propTypes
 type Props = {
   children: ReactNode
 }
-const BillingAddressContainer: FunctionComponent<Props> = (props) => {
+export function BillingAddressContainer(props: Props) {
   const { children } = props
   const [state, dispatch] = useReducer(
     billingAddressReducer,

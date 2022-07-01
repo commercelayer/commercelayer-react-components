@@ -1,4 +1,4 @@
-import { useContext, FunctionComponent, ReactNode, ChangeEvent } from 'react'
+import { useContext, ReactNode, ChangeEvent } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
@@ -10,22 +10,17 @@ import OrderContext from '#context/OrderContext'
 const propTypes = components.PaymentMethodRadioButton.propTypes
 const displayName = components.PaymentMethodRadioButton.displayName
 
-type ShippingMethodRadioButtonChildrenProps = Omit<
-  ShippingMethodRadioButtonProps,
-  'children'
-> & {
+type ShippingMethodRadioButtonChildrenProps = Omit<Props, 'children'> & {
   checked: boolean
   handleOnChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
 }
 
-type ShippingMethodRadioButtonProps = {
+type Props = {
   children?: (props: ShippingMethodRadioButtonChildrenProps) => ReactNode
   onChange?: (payment?: PaymentMethod | Record<string, any>) => void
 } & JSX.IntrinsicElements['input']
 
-const PaymentMethodRadioButton: FunctionComponent<
-  ShippingMethodRadioButtonProps
-> = (props) => {
+export function PaymentMethodRadioButton(props: Props) {
   const { onChange, ...p } = props
   const { payment, paymentSelected, setPaymentSelected, clickableContainer } =
     useContext(PaymentMethodChildrenContext)

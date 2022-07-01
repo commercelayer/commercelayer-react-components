@@ -1,4 +1,4 @@
-import { FunctionComponent, useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import getAmount from '#utils/getAmount'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from './utils/Parent'
@@ -11,13 +11,9 @@ const displayName = components.PaymentMethodPrice.displayName
 type Props = {
   type?: 'amount'
   labelFree?: string
-}
+} & BaseAmountComponent
 
-export type PaymentMethodPriceProps = BaseAmountComponent & Props
-
-const PaymentMethodPrice: FunctionComponent<PaymentMethodPriceProps> = (
-  props
-) => {
+export function PaymentMethodPrice(props: Props) {
   const {
     format = 'formatted',
     type = 'amount',

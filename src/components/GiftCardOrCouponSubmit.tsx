@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
@@ -7,17 +7,15 @@ const propTypes = components.GiftCardOrCouponSubmit.propTypes
 const displayName = components.GiftCardOrCouponSubmit.displayName
 
 type GiftCardOrCouponSubmitChildrenProps = FunctionChildren<
-  Omit<GiftCardOrCouponSubmitProps, 'children'>
+  Omit<Props, 'children'>
 >
 
-type GiftCardOrCouponSubmitProps = {
+type Props = {
   children?: GiftCardOrCouponSubmitChildrenProps
   label?: string | ReactNode
 } & JSX.IntrinsicElements['button']
 
-const GiftCardOrCouponSubmit: FunctionComponent<GiftCardOrCouponSubmitProps> = (
-  props
-) => {
+export function GiftCardOrCouponSubmit(props: Props) {
   const { children, label = 'Submit', ...p } = props
   const parentProps = {
     ...p,

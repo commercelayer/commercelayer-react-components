@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  FunctionComponent,
-  useContext,
-  useReducer,
-  ReactNode,
-} from 'react'
+import { useEffect, useContext, useReducer, ReactNode } from 'react'
 import getPrices from '#utils/getPrices'
 import isEmpty from 'lodash/isEmpty'
 import has from 'lodash/has'
@@ -26,7 +20,7 @@ const propTypes = components.PricesContainer.propTypes
 const defaultProps = components.PricesContainer.defaultProps
 const displayName = components.PricesContainer.displayName
 
-type PricesContainerProps = {
+type Props = {
   children: ReactNode
   filters?: object
   loader?: LoaderType
@@ -34,7 +28,7 @@ type PricesContainerProps = {
   skuCode?: string
 }
 
-const PricesContainer: FunctionComponent<PricesContainerProps> = (props) => {
+export function PricesContainer(props: Props) {
   const {
     children,
     skuCode = '',

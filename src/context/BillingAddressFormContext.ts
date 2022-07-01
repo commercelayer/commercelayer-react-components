@@ -1,18 +1,30 @@
 import { createContext, RefObject } from 'react'
-import { AddressCountrySelectName, AddressInputName } from '#typings'
-import { AddressField } from '#reducers/AddressReducer'
+import type { Address } from '@commercelayer/sdk'
+
+export type AddressValuesKeys =
+  | `${keyof Address}`
+  | `billing_address_${keyof Address}`
+  | `shipping_address_${keyof Address}`
 
 export type DefaultContextAddress = {
-  validation?: () => RefObject<any>
+  validation?: () => RefObject<HTMLFormElement>
   setValue?: (
-    name: AddressField | AddressInputName | AddressCountrySelectName,
-    value: any
+    name: AddressValuesKeys,
+    value: string | number | readonly string[]
   ) => void
-  errors?: Record<string, { code: string; message: string; error: boolean }>[]
+  errors?: {
+    [name: string]: {
+      code: string
+      message: string
+      error: boolean
+    }
+  }
   errorClassName?: string
   requiresBillingInfo?: boolean
   resetField?: (name: string) => void
-  values?: Record<string, any>
+  values?: {
+    [T in AddressValuesKeys]: string | { value: string }
+  }
   isBusiness?: boolean
 }
 

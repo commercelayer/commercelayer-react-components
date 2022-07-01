@@ -1,6 +1,6 @@
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 import { Fragment, useEffect, useState } from 'react'
-import CommerceLayer from '../src/components/CommerceLayer'
+import CommerceLayer from '../src/components/auth/CommerceLayer'
 import GiftCardContainer from '../src/components/GiftCardContainer'
 import SubmitButton from '../src/components/SubmitButton'
 import GiftCard from '../src/components/GiftCard'

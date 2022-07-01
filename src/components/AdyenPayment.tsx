@@ -1,11 +1,4 @@
-import {
-  CSSProperties,
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { CSSProperties, useContext, useEffect, useRef, useState } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isEmpty from 'lodash/isEmpty'
 import { PaymentSourceProps } from './PaymentSource'
@@ -39,7 +32,7 @@ export type AdyenPaymentConfig = {
   styles?: Styles
 }
 
-type AdyenPaymentProps = {
+type Props = {
   clientKey?: string
   config?: AdyenPaymentConfig
   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
@@ -49,13 +42,13 @@ type AdyenPaymentProps = {
 
 const defaultConfig: AdyenPaymentConfig = {}
 
-const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
+export function AdyenPayment({
   clientKey,
   config,
   templateCustomerSaveToWallet,
   environment = 'test',
   locale = 'en_US',
-}) => {
+}: Props) {
   const {
     cardContainerClassName,
     threeDSecureContainerClassName,

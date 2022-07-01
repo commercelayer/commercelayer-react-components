@@ -1,4 +1,4 @@
-import { useContext, ReactNode, FunctionComponent } from 'react'
+import { useContext, ReactNode } from 'react'
 import components from '#config/components'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import StockTransferChildrenContext from '#context/StockTransferChildrenContext'
@@ -7,11 +7,11 @@ import { StockTransfer as TStockTransfer } from '@commercelayer/sdk'
 const propTypes = components.StockTransfer.propTypes
 const displayName = components.StockTransfer.displayName
 
-type StockTransferProps = {
+type Props = {
   children: ReactNode
 } & JSX.IntrinsicElements['p']
 
-const StockTransfer: FunctionComponent<StockTransferProps> = (props) => {
+export function StockTransfer(props: Props) {
   const { children } = props
   const { stockTransfers, lineItems } = useContext(ShipmentChildrenContext)
   const components = stockTransfers

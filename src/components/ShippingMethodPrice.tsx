@@ -1,4 +1,4 @@
-import { FunctionComponent, useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import getAmount from '#utils/getAmount'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from './utils/Parent'
@@ -8,7 +8,7 @@ import { BaseAmountComponent } from '#typings/index'
 const propTypes = components.ShippingMethodPrice.propTypes
 const displayName = components.ShippingMethodPrice.displayName
 
-export type ShippingMethodPriceProps = BaseAmountComponent & {
+type Props = BaseAmountComponent & {
   labelFreeOver?: string
 } & (
     | {
@@ -21,9 +21,7 @@ export type ShippingMethodPriceProps = BaseAmountComponent & {
       }
   )
 
-const ShippingMethodPrice: FunctionComponent<ShippingMethodPriceProps> = (
-  props
-) => {
+export function ShippingMethodPrice(props: Props) {
   const {
     base = 'price_amount',
     type = 'for_shipment',

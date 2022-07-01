@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  FunctionComponent,
-  useReducer,
-  useContext,
-  ReactNode,
-} from 'react'
+import { useEffect, useReducer, useContext, ReactNode } from 'react'
 import lineItemReducer, {
   lineItemInitialState,
   updateLineItem,
@@ -19,13 +13,13 @@ const propTypes = components.LineItemsContainer.propTypes
 const defaultProps = components.LineItemsContainer.defaultProps
 const displayName = components.LineItemsContainer.displayName
 
-type LineItemsContainer = {
+type Props = {
   children: ReactNode
   filters?: Record<string, any>
   loader?: ReactNode
 }
 
-const LineItemsContainer: FunctionComponent<LineItemsContainer> = (props) => {
+export function LineItemsContainer(props: Props) {
   const { children, loader = 'Loading...' } = props
   const {
     order,

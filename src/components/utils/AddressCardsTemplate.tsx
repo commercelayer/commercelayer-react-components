@@ -24,7 +24,7 @@ export type HandleSelect = (
   customerAddressId: string,
   disabled: boolean,
   address: Address
-) => void
+) => Promise<void>
 
 type Props = {
   customerAddresses: CustomerAddress[]

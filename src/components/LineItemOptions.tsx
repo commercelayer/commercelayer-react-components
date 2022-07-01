@@ -7,7 +7,7 @@ import { LineItemOption } from '@commercelayer/sdk'
 
 const displayName = components.LineItemOptions.displayName
 
-export type LineItemOptionsProps = JSX.IntrinsicElements['div'] & {
+type Props = JSX.IntrinsicElements['div'] & {
   children: ReactNode
   title?: string
   showName?: boolean
@@ -24,9 +24,7 @@ export type LineItemOptionsProps = JSX.IntrinsicElements['div'] & {
       }
   )
 
-const LineItemOptions: React.FunctionComponent<LineItemOptionsProps> = (
-  props
-) => {
+export function LineItemOptions(props: Props) {
   const {
     skuOptionId,
     title,

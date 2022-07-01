@@ -1,7 +1,7 @@
 import components from '#config/components'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import { has } from 'lodash'
-import { FunctionComponent, useContext } from 'react'
+import { useContext } from 'react'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings'
 const propTypes = components.PaymentSourceDetail.propTypes
@@ -17,11 +17,7 @@ type Props = {
   children?: CustomComponent
   type: PaymentSourceDetailType
 } & JSX.IntrinsicElements['span']
-const PaymentSourceDetail: FunctionComponent<Props> = ({
-  type,
-  children,
-  ...p
-}) => {
+export function PaymentSourceDetail({ type, children, ...p }: Props) {
   const card = useContext(PaymentSourceContext)
   const text = has(card, type) ? card[type] : type === 'last4' ? '****' : '**'
   const parentProps = {

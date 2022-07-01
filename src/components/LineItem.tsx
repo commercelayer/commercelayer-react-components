@@ -1,4 +1,4 @@
-import { useContext, ReactNode, FunctionComponent } from 'react'
+import { useContext, ReactNode } from 'react'
 import LineItemContext from '#context/LineItemContext'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import components from '#config/components'
@@ -8,12 +8,12 @@ import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 const propTypes = components.LineItem.propTypes
 const displayName = components.LineItem.displayName
 
-type LineItemProps = {
+type Props = {
   children: ReactNode
   type?: LineItemType
 }
 
-const LineItem: FunctionComponent<LineItemProps> = (props) => {
+export function LineItem(props: Props) {
   const { type = 'skus', children } = props
   const { lineItems } = useContext(LineItemContext)
   const { lineItems: shipmentLineItems } = useContext(ShipmentChildrenContext)

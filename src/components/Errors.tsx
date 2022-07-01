@@ -6,19 +6,15 @@ import AddressContext from '#context/AddressContext'
 import getAllErrors from './utils/getAllErrors'
 import LineItemContext from '#context/LineItemContext'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import { ErrorComponentProps } from '#typings/errors'
-import components from '#config/components'
+import type { ErrorComponentProps } from '#typings/errors'
 import CustomerContext from '#context/CustomerContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import ShipmentContext from '#context/ShipmentContext'
 
-const propTypes = components.Errors.propTypes
-const displayName = components.Errors.displayName
+type Props = ErrorComponentProps & JSX.IntrinsicElements['span']
 
-export type ErrorsProps = ErrorComponentProps & JSX.IntrinsicElements['span']
-
-const Errors: React.FunctionComponent<ErrorsProps> = (props) => {
+export function Errors(props: Props) {
   const { children, messages = [], resource, field, ...p } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { errors: orderErrors } = useContext(OrderContext)
@@ -74,8 +70,5 @@ const Errors: React.FunctionComponent<ErrorsProps> = (props) => {
     <Fragment>{msgErrors}</Fragment>
   )
 }
-
-Errors.propTypes = propTypes
-Errors.displayName = displayName
 
 export default Errors

@@ -1,4 +1,4 @@
-import { useContext, FunctionComponent, ReactNode } from 'react'
+import { useContext, ReactNode } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
@@ -7,16 +7,16 @@ import type { LineItem } from '@commercelayer/sdk'
 const propTypes = components.LineItemName.propTypes
 const displayName = components.LineItemName.displayName
 
-export type LineItemNameType = Omit<LineItemNameProps, 'children'> & {
+export type LineItemNameType = Omit<Props, 'children'> & {
   label: string
   lineItem: LineItem
 }
 
-type LineItemNameProps = {
+type Props = {
   children?: (props: LineItemNameType) => ReactNode
 } & JSX.IntrinsicElements['p']
 
-const LineItemName: FunctionComponent<LineItemNameProps> = (props) => {
+export function LineItemName(props: Props) {
   const { lineItem } = useContext(LineItemChildrenContext)
   const label = lineItem?.['name']
   const parentProps = {

@@ -1,9 +1,8 @@
-import CustomerField from '#components/CustomerField'
 import {
   CommerceLayer,
   CustomerContainer,
+  CustomerField,
 } from '@commercelayer/react-components'
-import React from 'react'
 import useGetToken from '../../hooks/useGetToken'
 
 const OrdersList = () => {
@@ -11,7 +10,7 @@ const OrdersList = () => {
   return (
     <CommerceLayer {...config}>
       <CustomerContainer>
-        <CustomerField name="email" />
+        <CustomerField attribute="email" tagElement="p" />
       </CustomerContainer>
     </CommerceLayer>
   )
