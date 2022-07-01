@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import BaseInput from '../utils/BaseInput'
 import components from '#config/components'
 import { BaseInputComponentProps } from '#typings'
@@ -10,7 +10,7 @@ import { BaseError, CodeErrorType } from '#typings/errors'
 const propTypes = components.CustomerInput.propTypes
 const displayName = components.CustomerInput.displayName
 
-type CustomerInputProps = {
+type Props = {
   name?: 'customer_email' | string
   type?: 'email' | string
   saveOnBlur?: boolean
@@ -20,7 +20,7 @@ type CustomerInputProps = {
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
 
-const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
+export function CustomerInput(props: Props) {
   const {
     name = 'customer_email',
     placeholder = '',

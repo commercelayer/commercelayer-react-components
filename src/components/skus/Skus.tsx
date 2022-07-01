@@ -7,7 +7,7 @@ type Props = {
   children: ReactNode
 }
 
-export default function Skus<P extends Props>({ children }: P): JSX.Element {
+export function Skus<P extends Props>({ children }: P): JSX.Element {
   const { skus } = useContext(SkuContext)
   const components =
     skus &&
@@ -23,3 +23,5 @@ export default function Skus<P extends Props>({ children }: P): JSX.Element {
 }
 
 Skus.propTypes = components.Skus.propTypes
+
+export default Skus
