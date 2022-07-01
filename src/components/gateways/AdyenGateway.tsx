@@ -19,7 +19,7 @@ import getCardDetails from '#utils/getCardDetails'
 
 type AdyenGateway = GatewayBaseType
 
-export default function AdyenGateway(props: AdyenGateway) {
+export function AdyenGateway(props: AdyenGateway) {
   const {
     readonly,
     showCard,
@@ -100,3 +100,5 @@ export default function AdyenGateway(props: AdyenGateway) {
     loaderComponent
   )
 }
+
+export default AdyenGateway

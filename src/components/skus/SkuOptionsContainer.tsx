@@ -1,10 +1,4 @@
-import {
-  FunctionComponent,
-  useReducer,
-  useContext,
-  useEffect,
-  ReactNode,
-} from 'react'
+import { useReducer, useContext, useEffect, ReactNode } from 'react'
 import SkuOptionsContext from '#context/SkuOptionsContext'
 import skuOptionsReducer, {
   skuOptionsInitialState,
@@ -19,14 +13,12 @@ import components from '#config/components'
 const propTypes = components.SkuOptionsContainer.propTypes
 const displayName = components.SkuOptionsContainer.displayName
 
-type SkuOptionsContainerProp = {
+type Props = {
   children: ReactNode
   skuCode?: string
 }
 
-const SkuOptionsContainer: FunctionComponent<SkuOptionsContainerProp> = (
-  props
-) => {
+export function SkuOptionsContainer(props: Props) {
   const { skuCode, children } = props
   const [state, dispatch] = useReducer(
     skuOptionsReducer,

@@ -1,10 +1,4 @@
-import {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { ReactNode, useContext, useEffect, useState } from 'react'
 import Parent from '../utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
@@ -18,19 +12,19 @@ const propTypes = components.PlaceOrderButton.propTypes
 const defaultProps = components.PlaceOrderButton.defaultProps
 const displayName = components.PlaceOrderButton.displayName
 
-type PlaceOrderButtonChildrenProps = FunctionChildren<
-  Omit<PlaceOrderButtonProps, 'children'> & {
+type ChildrenProps = FunctionChildren<
+  Omit<Props, 'children'> & {
     handleClick: () => Promise<void>
   }
 >
 
-type PlaceOrderButtonProps = {
-  children?: PlaceOrderButtonChildrenProps
+type Props = {
+  children?: ChildrenProps
   label?: string | ReactNode
   onClick?: (response: { placed: boolean }) => void
 } & JSX.IntrinsicElements['button']
 
-const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
+export function PlaceOrderButton(props: Props) {
   const { children, label = 'Place order', disabled, onClick, ...p } = props
   const { isPermitted, setPlaceOrder, options, paymentType } =
     useContext(PlaceOrderContext)
@@ -85,7 +79,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       order?.status &&
       ['draft', 'pending'].includes(order?.status)
     ) {
-      handleClick()
+      void handleClick()
     }
   }, [options?.paypalPayerId, paymentType])
   useEffect(() => {
@@ -96,7 +90,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       order?.status &&
       ['draft', 'pending'].includes(order?.status)
     ) {
-      handleClick()
+      void handleClick()
     }
   }, [options?.adyen, paymentType])
   useEffect(() => {
@@ -106,7 +100,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       order?.status &&
       ['draft', 'pending'].includes(order?.status)
     ) {
-      handleClick()
+      void handleClick()
     }
   }, [options?.checkoutCom, paymentType])
   const handleClick = async () => {

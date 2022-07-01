@@ -1,11 +1,5 @@
 import PlaceOrderContext from '#context/PlaceOrderContext'
-import {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useReducer,
-} from 'react'
+import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import placeOrderReducer, {
   placeOrderInitialState,
   PlaceOrderOptions,
@@ -20,13 +14,11 @@ import { PaymentSourceType } from '#reducers/PaymentMethodReducer'
 const propTypes = components.PlaceOrderContainer.propTypes
 const displayName = components.PlaceOrderContainer.displayName
 
-type PlaceOrderContainerProps = {
+type Props = {
   children: ReactNode
   options?: PlaceOrderOptions
 }
-const PlaceOrderContainer: FunctionComponent<PlaceOrderContainerProps> = (
-  props
-) => {
+export function PlaceOrderContainer(props: Props) {
   const { children, options } = props
   const [state, dispatch] = useReducer(
     placeOrderReducer,

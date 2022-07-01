@@ -33,7 +33,7 @@ const propTypes = components.OrderContainer.propTypes
 const defaultProps = components.OrderContainer.defaultProps
 const displayName = components.OrderContainer.displayName
 
-type OrderContainerProps = {
+type Props = {
   children: ReactNode
   metadata?: BaseMetadataObject
   attributes?: OrderCreate
@@ -41,9 +41,7 @@ type OrderContainerProps = {
   fetchOrder?: (order: Order) => void
 }
 
-const OrderContainer: React.FunctionComponent<OrderContainerProps> = (
-  props
-) => {
+export function OrderContainer(props: Props) {
   const { orderId, children, metadata, attributes, fetchOrder } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const [lock, setLock] = useState(false)

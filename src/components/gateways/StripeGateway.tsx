@@ -17,7 +17,7 @@ import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
 type StripeGateway = GatewayBaseType
 
-export default function StripeGateway(props: StripeGateway) {
+export function StripeGateway(props: StripeGateway) {
   const {
     readonly,
     showCard,
@@ -98,3 +98,5 @@ export default function StripeGateway(props: StripeGateway) {
     loaderComponent
   )
 }
+
+export default StripeGateway
