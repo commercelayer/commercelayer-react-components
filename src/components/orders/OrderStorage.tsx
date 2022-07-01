@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import OrderStorageContext from '#context/OrderStorageContext'
 import components from '#config/components'
 import {
@@ -10,13 +10,13 @@ import {
 const propTypes = components.OrderStorage.propTypes
 const displayName = components.OrderStorage.displayName
 
-type OrderStorageProps = {
+type Props = {
   children: ReactNode
   persistKey: string
   clearWhenPlaced?: boolean
 }
 
-const OrderStorage: FunctionComponent<OrderStorageProps> = (props) => {
+export function OrderStorage(props: Props) {
   const { children, clearWhenPlaced = true, ...p } = props
   return (
     <OrderStorageContext.Provider

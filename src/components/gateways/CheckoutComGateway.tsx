@@ -17,7 +17,7 @@ import getCardDetails from '../../utils/getCardDetails'
 
 type CheckoutComGateway = GatewayBaseType
 
-export default function CheckoutComGateway(props: CheckoutComGateway) {
+export function CheckoutComGateway(props: CheckoutComGateway) {
   const {
     readonly,
     showCard,
@@ -98,3 +98,5 @@ export default function CheckoutComGateway(props: CheckoutComGateway) {
     loaderComponent
   )
 }
+
+export default CheckoutComGateway

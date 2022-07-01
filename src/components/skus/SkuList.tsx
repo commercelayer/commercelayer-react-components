@@ -1,22 +1,16 @@
-import {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  Fragment,
-  ReactNode,
-} from 'react'
+import { useContext, useEffect, Fragment, ReactNode } from 'react'
 import SkuListsContext from '#context/SkuListsContext'
 import components from '#config/components'
 
 const propTypes = components.SkuList.propTypes
 const displayName = components.SkuList.displayName
 
-type SkuListProp = {
+type Props = {
   children: ReactNode
   id: string
 }
 
-const SkuList: FunctionComponent<SkuListProp> = (props) => {
+export function SkuList(props: Props) {
   const { id, children } = props
   const { listIds } = useContext(SkuListsContext)
   useEffect(() => {

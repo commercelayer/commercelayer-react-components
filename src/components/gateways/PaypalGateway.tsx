@@ -14,7 +14,7 @@ import { useContext } from 'react'
 
 type PaypalGateway = Partial<GatewayBaseType>
 
-export default function PaypalGateway(props: PaypalGateway) {
+export function PaypalGateway(props: PaypalGateway) {
   const { readonly, showCard, handleEditClick, children, ...p } = props
   const { order } = useContext(OrderContext)
   const { payment } = useContext(PaymentMethodChildrenContext)
@@ -47,3 +47,5 @@ export default function PaypalGateway(props: PaypalGateway) {
   delete p.onClickCustomerCards
   return <PaypalPayment {...p} infoMessage={paypalConfig?.infoMessage} />
 }
+
+export default PaypalGateway

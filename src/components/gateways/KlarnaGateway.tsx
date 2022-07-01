@@ -15,7 +15,7 @@ import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
 type KlarnaGateway = GatewayBaseType
 
-export default function KlarnaGateway(props: KlarnaGateway) {
+export function KlarnaGateway(props: KlarnaGateway) {
   const {
     readonly,
     showCard,
@@ -86,3 +86,5 @@ export default function KlarnaGateway(props: KlarnaGateway) {
     loaderComponent
   )
 }
+
+export default KlarnaGateway

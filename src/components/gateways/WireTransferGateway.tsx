@@ -12,7 +12,7 @@ import { useContext } from 'react'
 
 type WireTransferGateway = GatewayBaseType
 
-export default function WireTransferGateway(props: WireTransferGateway) {
+export function WireTransferGateway(props: WireTransferGateway) {
   const { readonly, showCard, handleEditClick, children, ...p } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { currentPaymentMethodId, config, paymentSource } =
@@ -39,3 +39,5 @@ export default function WireTransferGateway(props: WireTransferGateway) {
       : {}
   return <WireTransferPayment {...p} {...wireTransferConfig} />
 }
+
+export default WireTransferGateway

@@ -1,10 +1,4 @@
-import {
-  FunctionComponent,
-  useReducer,
-  useContext,
-  ReactNode,
-  useEffect,
-} from 'react'
+import { useReducer, useContext, ReactNode, useEffect } from 'react'
 import SkuListsContext from '#context/SkuListsContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import skuListsReducer, {
@@ -17,17 +11,17 @@ import components from '#config/components'
 const propTypes = components.SkuListsContainer.propTypes
 const displayName = components.SkuListsContainer.displayName
 
-type SkuListsContainerProp = {
+type Props = {
   children: ReactNode
 }
 
-const SkuListsContainer: FunctionComponent<SkuListsContainerProp> = (props) => {
+export function SkuListsContainer(props: Props) {
   const { children } = props
   const [state, dispatch] = useReducer(skuListsReducer, skuListsInitialState)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     if (state.listIds && state.listIds.length > 0 && config.accessToken) {
-      getSkuList({ listIds: state.listIds, dispatch, config, state })
+      void getSkuList({ listIds: state.listIds, dispatch, config, state })
     }
   }, [config.accessToken])
   return (

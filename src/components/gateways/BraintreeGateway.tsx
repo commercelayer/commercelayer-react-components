@@ -17,7 +17,7 @@ import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
 type BraintreeGateway = GatewayBaseType
 
-export default function BraintreeGateway(props: BraintreeGateway) {
+export function BraintreeGateway(props: BraintreeGateway) {
   const {
     readonly,
     showCard,
@@ -94,3 +94,5 @@ export default function BraintreeGateway(props: BraintreeGateway) {
     loaderComponent
   )
 }
+
+export default BraintreeGateway
