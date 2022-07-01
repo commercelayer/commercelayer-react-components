@@ -12,9 +12,13 @@ import customerReducer, {
 } from '#reducers/CustomerReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
+import components from '#config/components'
 import { saveCustomerUser } from '#reducers/CustomerReducer'
 import CustomerContext from '#context/CustomerContext'
 import { BaseError } from '#typings/errors'
+
+const propTypes = components.CustomerContainer.propTypes
+const displayName = components.CustomerContainer.displayName
 
 type Props = {
   children: ReactNode
@@ -99,5 +103,8 @@ export function CustomerContainer(props: Props) {
     </CustomerContext.Provider>
   )
 }
+
+CustomerContainer.propTypes = propTypes
+CustomerContainer.displayName = displayName
 
 export default CustomerContainer

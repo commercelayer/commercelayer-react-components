@@ -32,6 +32,7 @@
     "paths": {
       "@commercelayer/react-components": ["src/index"],
       "#components/*": ["src/components/*"],
+      "#components-utils/*": ["src/components/utils/*"],
       "#reducers/*": ["src/reducers/*"],
       "#context/*": ["src/context/*"],
       "#typings/*": ["src/typings/*"],

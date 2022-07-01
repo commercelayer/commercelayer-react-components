@@ -1,3 +1,4 @@
+import { FunctionComponent } from 'react'
 import BaseOrderPrice from '../utils/BaseOrderPrice'
 import components from '#config/components'
 import { BaseAmountComponent } from '#typings'
@@ -6,7 +7,7 @@ const propTypes = components.AdjustmentAmount.propTypes
 const defaultProps = components.AdjustmentAmount.defaultProps
 const displayName = components.AdjustmentAmount.displayName
 
-export function AdjustmentAmount(props: BaseAmountComponent) {
+const AdjustmentAmount: FunctionComponent<BaseAmountComponent> = (props) => {
   return <BaseOrderPrice base="amount" type="adjustment" {...props} />
 }
 

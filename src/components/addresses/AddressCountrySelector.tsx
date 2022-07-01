@@ -76,7 +76,7 @@ export function AddressCountrySelector(props: Props) {
     <BaseSelect
       className={classNameComputed}
       ref={
-        (billingAddress?.validation as any) ||
+        billingAddress?.validation ||
         shippingAddress?.validation ||
         customerAddress?.validation
       }
