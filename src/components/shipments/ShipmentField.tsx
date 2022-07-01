@@ -1,5 +1,5 @@
 import { useContext, ReactNode } from 'react'
-import Parent from '#components-utils/Parent'
+import Parent from './utils/Parent'
 import components from '#config/components'
 import get from 'lodash/get'
 import { Shipment } from '@commercelayer/sdk'

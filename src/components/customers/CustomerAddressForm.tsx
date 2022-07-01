@@ -1,32 +1,24 @@
 import AddressesContext from '#context/AddressContext'
 import useRapidForm from 'rapid-form'
-import React, {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useRef,
-} from 'react'
+import { ReactNode, useContext, useEffect, useRef } from 'react'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
-import { isEmpty } from 'lodash'
 import { BaseError, CodeErrorType } from '#typings/errors'
 import { AddressField } from '#reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import isEmptyStates from '#utils/isEmptyStates'
+import type { Address } from '@commercelayer/sdk'
 
 const propTypes = components.CustomerAddressForm.propTypes
 
-type CustomerAddressFormProps = {
+type Props = {
   children: ReactNode
   reset?: boolean
   errorClassName?: string
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
-const CustomerAddressForm: FunctionComponent<CustomerAddressFormProps> = (
-  props
-) => {
+export function CustomerAddressForm(props: Props) {
   const {
     children,
     errorClassName,
@@ -37,20 +29,21 @@ const CustomerAddressForm: FunctionComponent<CustomerAddressFormProps> = (
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
   const { order } = useContext(OrderContext)
-  const ref = useRef<HTMLFormElement>(null)
+  const ref = useRef<HTMLFormElement | null>(null)
   useEffect(() => {
-    if (!isEmpty(errors)) {
+    if (Object.keys(errors).length > 0) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
-        const { code, message } = errors[fieldName]
-        if (['customer_address_state_code'].includes(fieldName)) {
-          if (isEmpty(values['state_code'])) {
+        const code = errors[fieldName]?.code
+        const message = errors[fieldName]?.message || ''
+        if (fieldName === 'billing_address_state_code') {
+          if (values['state_code']) {
             delete errors[fieldName]
           } else {
             formErrors.push({
               code: code as CodeErrorType,
               message,
-              resource: 'customerAddress',
+              resource: 'billing_address',
               field: fieldName,
             })
           }
@@ -58,37 +51,41 @@ const CustomerAddressForm: FunctionComponent<CustomerAddressFormProps> = (
           formErrors.push({
             code: code as CodeErrorType,
             message,
-            resource: 'customerAddress',
+            resource: 'billing_address',
             field: fieldName,
           })
         }
       }
-      setAddressErrors(formErrors, 'customerAddress')
-    } else if (!isEmpty(values)) {
-      setAddressErrors([], 'customerAddress')
+      setAddressErrors(formErrors, 'billing_address')
+    } else if (Object.keys(values).length > 0) {
+      setAddressErrors([], 'billing_address')
       for (const name in values) {
         const field = values[name]
         if (field?.value) {
-          values[name.replace('customer_address_', '')] = field.value
+          values[name.replace('billing_address_', '')] = field.value
           delete values[name]
         }
-        if (['customer_address_state_code'].includes(name)) {
-          const countryCode =
-            values['customer_address_country_code']?.value ||
-            values['country_code']
+        if (['billing_address_state_code'].includes(name)) {
+          const countryCode = (values['billing_address_country_code']?.[
+            'value'
+          ] || values['country_code']) as string
           if (!isEmptyStates(countryCode) && !field.value) {
-            delete values['customer_address_state_code']
+            delete values['billing_address_state_code']
           }
         }
       }
-      setAddress({ values, resource: 'customerAddress' })
+      setAddress({ values: values as Address, resource: 'billing_address' })
     }
-    if (reset && (!isEmpty(values) || !isEmpty(errors))) {
+    if (
+      reset &&
+      (Object.keys(values).length > 0 || Object.keys(errors).length > 0)
+    ) {
       if (ref) {
         ref.current?.reset()
-        resetForm({ target: ref.current } as any)
-        setAddressErrors([], 'customerAddress')
-        setAddress({ values: {}, resource: 'customerAddress' })
+        // @ts-ignore
+        resetForm({ target: ref.current })
+        setAddressErrors([], 'billing_address')
+        setAddress({ values: {} as Address, resource: 'billing_address' })
       }
     }
   }, [errors, values, reset])
@@ -96,10 +93,13 @@ const CustomerAddressForm: FunctionComponent<CustomerAddressFormProps> = (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any
   ) => {
-    const field: any = {
-      [name.replace('customer_address_', '')]: value,
+    const field = {
+      [name.replace('billing_address_', '')]: value,
     }
-    setAddress({ values: { ...values, ...field }, resource: 'customerAddress' })
+    setAddress({
+      values: { ...(values as Address), ...field },
+      resource: 'billing_address',
+    })
   }
   const providerValues = {
     values,
@@ -110,6 +110,7 @@ const CustomerAddressForm: FunctionComponent<CustomerAddressFormProps> = (
     requiresBillingInfo: order?.requiresBillingInfo || false,
     errors: errors as any,
     resetField: (name: string) =>
+      // @ts-ignore
       resetForm({ currentTarget: ref.current } as any, name),
   }
   return (

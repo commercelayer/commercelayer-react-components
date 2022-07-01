@@ -1,5 +1,5 @@
-import { FunctionComponent, useContext, useEffect, useState } from 'react'
-import BaseSelect from './utils/BaseSelect'
+import { useContext, useEffect, useState } from 'react'
+import BaseSelect from '#components-utils/BaseSelect'
 import components from '#config/components'
 import { AddressStateSelectName, BaseSelectComponentProps } from '#typings'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
@@ -8,17 +8,14 @@ import isEmpty from 'lodash/isEmpty'
 import { getStateOfCountry, isValidState } from '#utils/countryStateCity'
 import isEmptyStates from '#utils/isEmptyStates'
 import AddressesContext from '#context/AddressContext'
-import BaseInput from './utils/BaseInput'
+import BaseInput from '#components-utils/BaseInput'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
 
 const propTypes = components.AddressStateSelector.propTypes
 const defaultProps = components.AddressStateSelector.defaultProps
 const displayName = components.AddressStateSelector.displayName
 
-type AddressStateSelectorProps = Omit<
-  BaseSelectComponentProps,
-  'options' | 'name'
-> & {
+type Props = Omit<BaseSelectComponentProps, 'options' | 'name'> & {
   name: AddressStateSelectName
   required?: boolean
   disabled?: boolean
@@ -26,16 +23,14 @@ type AddressStateSelectorProps = Omit<
   selectClassName?: string
 } & Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'>
 
-const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
-  props
-) => {
+export function AddressStateSelector(props: Props) {
   const {
     required = true,
     value,
     name,
-    className,
-    inputClassName,
-    selectClassName,
+    className = '',
+    inputClassName = '',
+    selectClassName = '',
     ...p
   } = props
   const billingAddress = useContext(BillingAddressFormContext)
@@ -47,39 +42,31 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
   const [val, setVal] = useState(value || '')
   useEffect(() => {
     const billingCountryCode =
-      billingAddress?.values?.['billing_address_country_code']?.value ||
-      billingAddress?.values?.['country_code']
-    if (!isEmpty(billingCountryCode) && billingCountryCode !== countryCode)
+      typeof billingAddress?.values?.['billing_address_country_code'] ===
+      'string'
+        ? billingAddress?.values?.['billing_address_country_code']
+        : billingAddress?.values?.['billing_address_country_code']?.['value']
+    if (billingCountryCode && billingCountryCode !== countryCode)
       setCountryCode(billingCountryCode)
-    const customerCountryCode =
-      customerAddress?.values?.['customer_address_country_code']?.value ||
-      customerAddress?.values?.['country_code']
-    if (!isEmpty(customerCountryCode) && customerCountryCode !== countryCode)
-      setCountryCode(customerCountryCode)
     const shippingCountryCode =
-      shippingAddress?.values?.['shipping_address_country_code']?.value
-    if (!isEmpty(shippingCountryCode) && shippingCountryCode !== countryCode)
+      typeof shippingAddress?.values?.['shipping_address_country_code'] ===
+      'string'
+        ? shippingAddress?.values?.['shipping_address_country_code']
+        : shippingAddress?.values?.['shipping_address_country_code']?.value
+    if (shippingCountryCode && shippingCountryCode !== countryCode)
       setCountryCode(shippingCountryCode)
     const changeBillingCountry = [
-      !isEmpty(billingAddress),
+      Object.keys(billingAddress).length > 0,
       billingCountryCode,
       countryCode !== billingCountryCode,
     ].every(Boolean)
     if (
       changeBillingCountry &&
+      billingCountryCode &&
       !isValidState(val, billingCountryCode) &&
       !isEmptyStates(billingCountryCode)
     ) {
       billingAddress.resetField && billingAddress.resetField(name)
-      setVal('')
-    }
-    const changeCustomerCountry = [
-      !isEmpty(customerAddress),
-      customerCountryCode,
-      countryCode !== customerCountryCode,
-    ].every(Boolean)
-    if (changeCustomerCountry && !isValidState(val, customerCountryCode)) {
-      customerAddress.resetField && customerAddress.resetField(name)
       setVal('')
     }
     const changeShippingCountry = [
@@ -89,6 +76,7 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
     ].every(Boolean)
     if (
       changeShippingCountry &&
+      shippingCountryCode &&
       !isValidState(val, shippingCountryCode) &&
       !isEmptyStates(shippingCountryCode)
     ) {
@@ -96,17 +84,17 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
       setVal('')
     }
     if (!isEmpty(billingAddress)) {
-      const fieldError = billingAddress?.errors?.[name as any]?.['error']
+      const fieldError = billingAddress?.errors?.[name]?.['error']
       if (!fieldError) setHasError(false)
       else setHasError(true)
     }
     if (!isEmpty(customerAddress)) {
-      const fieldError = customerAddress?.errors?.[name as any]?.error
+      const fieldError = customerAddress?.errors?.[name]?.error
       if (!fieldError) setHasError(false)
       else setHasError(true)
     }
     if (!isEmpty(shippingAddress)) {
-      const fieldError = shippingAddress?.errors?.[name as any]?.['error']
+      const fieldError = shippingAddress?.errors?.[name]?.['error']
       if (!fieldError) setHasError(false)
       else setHasError(true)
     }
@@ -117,7 +105,8 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
   const errorClassName =
     billingAddress?.errorClassName ||
     shippingAddress?.errorClassName ||
-    customerAddress?.errorClassName
+    customerAddress?.errorClassName ||
+    ''
   const classNameComputed = !isEmptyStates(countryCode)
     ? `${className} ${selectClassName} ${hasError ? errorClassName : ''}`
     : `${className} ${inputClassName} ${hasError ? errorClassName : ''}`

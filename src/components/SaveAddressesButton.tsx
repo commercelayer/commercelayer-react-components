@@ -1,36 +1,32 @@
-import { FunctionComponent, ReactNode, useContext, useState } from 'react'
+import { ReactNode, useContext, useState } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import AddressContext from '#context/AddressContext'
-import isEmpty from 'lodash/isEmpty'
 import {
-  addressController,
   shippingAddressController,
   countryLockController,
+  billingAddressController,
 } from '#utils/addressesManager'
 import OrderContext from '#context/OrderContext'
 import CustomerContext from '#context/CustomerContext'
 import isFunction from 'lodash/isFunction'
+import { TCustomerAddress } from '#reducers/CustomerReducer'
 
 const propTypes = components.SaveAddressesButton.propTypes
 const defaultProps = components.SaveAddressesButton.defaultProps
 const displayName = components.SaveAddressesButton.displayName
 
-type SaveAddressesButtonChildrenProps = FunctionChildren<
-  Omit<SaveAddressesButtonProps, 'children'>
->
+type ChildrenProps = FunctionChildren<Omit<Props, 'children'>>
 
-type SaveAddressesButtonProps = {
-  children?: SaveAddressesButtonChildrenProps
+type Props = {
+  children?: ChildrenProps
   label?: string | ReactNode
   onClick?: () => void
   addressId?: string
 } & JSX.IntrinsicElements['button']
 
-const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
-  props
-) => {
+export function SaveAddressesButton(props: Props) {
   const {
     children,
     label = 'Continue to delivery',
@@ -48,11 +44,10 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     saveAddresses,
     billingAddressId,
     shippingAddressId,
-    // isBusiness,
   } = useContext(AddressContext)
-  // console.log('isBusiness', isBusiness)
   const { order } = useContext(OrderContext)
-  const { addresses, isGuest } = useContext(CustomerContext)
+  const { addresses, isGuest, createCustomerAddress } =
+    useContext(CustomerContext)
   const [forceDisable, setForceDisable] = useState(disabled)
   const customerEmail = !!(
     !!(isGuest === true || typeof isGuest === 'undefined') &&
@@ -85,12 +80,18 @@ const SaveAddressesButton: FunctionComponent<SaveAddressesButtonProps> = (
     customerEmail ||
     billingDisable ||
     shippingDisable ||
-    customerDisable ||
+    // customerDisable ||
     countryLockDisable
-  const handleClick = async () => {
-    if (isEmpty(errors) && !disable) {
+  const handleClick = () => {
+    if (errors && Object.keys(errors).length === 0 && !disable) {
       setForceDisable(true)
-      await saveAddresses(addressId)
+      if (order) {
+        saveAddresses(addressId)
+      } else if (createCustomerAddress && billing_address) {
+        const address = { ...billing_address }
+        if (addressId) address['id'] = addressId
+        void createCustomerAddress(address as TCustomerAddress)
+      }
       setForceDisable(false)
       onClick && onClick()
     }
