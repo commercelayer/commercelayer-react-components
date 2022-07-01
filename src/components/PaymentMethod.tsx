@@ -1,5 +1,4 @@
 import {
-  FunctionComponent,
   Fragment,
   useContext,
   ReactNode,
@@ -40,7 +39,6 @@ type PaymentMethodProps = {
       }
   )
 
-const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
   children,
   className,
   activeClass,
@@ -49,7 +47,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
   autoSelectSinglePaymentMethod,
   onClick,
   ...p
-}) => {
+}: Props) {
   const [loading, setLoading] = useState(true)
   const [paymentSelected, setPaymentSelected] = useState('')
   const {
@@ -138,7 +136,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
             e.stopPropagation()
             setLoadingPlaceOrder({ loading: true })
             setPaymentSelected(payment.id)
-            const paymentMethodId = payment?.id as string
+            const paymentMethodId = payment?.id
             await setPaymentMethod({ paymentResource, paymentMethodId })
             onClick && onClick({ payment })
             setLoadingPlaceOrder({ loading: false })

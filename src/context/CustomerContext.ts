@@ -1,38 +1,30 @@
 import {
-  SetCustomerEmail,
-  setCustomerErrors,
   SetCustomerErrors,
-  setCustomerEmail,
-  CustomerState,
-  DeleteCustomerAddress,
   deleteCustomerAddress,
+  CustomerState,
   GetCustomerAddresses,
-  getCustomerAddresses,
+  getCustomerPaymentSources,
+  setCustomerEmail,
+  TCustomerAddress,
 } from '#reducers/CustomerReducer'
 import { createContext } from 'react'
 
-type DefaultContext = {
-  saveCustomerUser: (customerEmail: string) => Promise<void>
-  setCustomerErrors: SetCustomerErrors
-  setCustomerEmail: SetCustomerEmail
-  getCustomerPaymentSources: () => Promise<void>
-  deleteCustomerAddress: DeleteCustomerAddress
-  getCustomerAddresses: GetCustomerAddresses
-} & Partial<CustomerState>
+export type InitialCustomerContext = Partial<
+  {
+    saveCustomerUser: (customerEmail: string) => Promise<void>
+    setCustomerErrors: SetCustomerErrors
+    setCustomerEmail: typeof setCustomerEmail
+    getCustomerPaymentSources: typeof getCustomerPaymentSources
+    deleteCustomerAddress: typeof deleteCustomerAddress | undefined
+    getCustomerAddresses: GetCustomerAddresses
+    createCustomerAddress: (address: TCustomerAddress) => Promise<void>
+  } & CustomerState
+>
 
-export const defaultCustomerContext = {
-  saveCustomerUser: async (): Promise<void> => {
-    return
-  },
-  getCustomerPaymentSources: async (): Promise<void> => {
-    return
-  },
-  setCustomerErrors,
-  setCustomerEmail,
-  deleteCustomerAddress,
-  getCustomerAddresses,
-}
+export const defaultCustomerContext = {}
 
-const CustomerContext = createContext<DefaultContext>(defaultCustomerContext)
+const CustomerContext = createContext<InitialCustomerContext>(
+  defaultCustomerContext
+)
 
 export default CustomerContext
