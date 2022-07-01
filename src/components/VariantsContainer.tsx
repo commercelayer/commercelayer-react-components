@@ -21,15 +21,13 @@ const propTypes = components.VariantsContainer.propTypes
 const defaultProps = components.VariantsContainer.defaultProps
 const displayName = components.VariantsContainer.displayName
 
-type VariantsContainerProps = {
+type Props = {
   children: ReactNode
   filters?: Record<string, any>
   skuCode?: string
 }
 
-const VariantsContainer: React.FunctionComponent<VariantsContainerProps> = (
-  props
-) => {
+export function VariantsContainer(props: Props) {
   const { children, skuCode = '', filters = {} } = props
   const config = useContext(CommerceLayerContext)
   const {

@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import Parent from './utils/Parent'
 import getLineItemsCount, { TypeAccepted } from '#utils/getLineItemsCount'
 import LineItemContext from '#context/LineItemContext'
@@ -9,17 +9,17 @@ const propTypes = components.LineItemsCount.propTypes
 const displayName = components.LineItemsCount.displayName
 
 type LineItemsCountChildrenProps = FunctionChildren<
-  Omit<LineItemsCountProps, 'children'> & {
+  Omit<Props, 'children'> & {
     quantity: number
   }
 >
 
-type LineItemsCountProps = {
+type Props = {
   children?: LineItemsCountChildrenProps
   typeAccepted?: TypeAccepted[]
 } & JSX.IntrinsicElements['span']
 
-const LineItemsCount: FunctionComponent<LineItemsCountProps> = (props) => {
+export function LineItemsCount(props: Props) {
   const { children, typeAccepted, ...p } = props
   const { lineItems } = useContext(LineItemContext)
   const [quantity, setQuantity] = useState(0)

@@ -57,10 +57,10 @@ const defaultOptions = {
   hidePostalCode: true,
 }
 
-const StripePaymentForm: React.FunctionComponent<StripePaymentFormProps> = ({
+function StripePaymentForm({
   options = defaultOptions,
   templateCustomerSaveToWallet,
-}) => {
+}: StripePaymentFormProps) {
   const ref = useRef<null | HTMLFormElement>(null)
   const {
     setPaymentSource,
@@ -191,7 +191,7 @@ const StripePaymentForm: React.FunctionComponent<StripePaymentFormProps> = ({
   )
 }
 
-type StripePaymentProps = PaymentMethodConfig['stripePayment'] &
+type Props = PaymentMethodConfig['stripePayment'] &
   JSX.IntrinsicElements['div'] &
   Partial<PaymentSourceProps['templateCustomerSaveToWallet']> & {
     show?: boolean
@@ -199,13 +199,13 @@ type StripePaymentProps = PaymentMethodConfig['stripePayment'] &
     locale?: StripeElementLocale
   }
 
-const StripePayment: React.FunctionComponent<StripePaymentProps> = ({
+export function StripePayment({
   publishableKey,
   show,
   options,
   locale = 'auto',
   ...p
-}) => {
+}: Props) {
   const [isLoaded, setIsLoaded] = useState(false)
   const [stripe, setStripe] = useState(null)
   const {

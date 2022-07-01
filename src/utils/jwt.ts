@@ -18,7 +18,7 @@ type JWT = {
     id: string
     slug: string
   }
-  owner: { id: 'gOqzZhZrmQ'; type: 'Customer' }
+  owner: { id: string; type: 'Customer' }
   rand: number
   test: boolean
 }

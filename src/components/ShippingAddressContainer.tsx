@@ -1,11 +1,5 @@
 import ShippingAddressContext from '#context/ShippingAddressContext'
-import {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useReducer,
-} from 'react'
+import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import shippingAddressReducer, {
   setShippingAddress,
   shippingAddressInitialState,
@@ -21,7 +15,7 @@ const propTypes = components.ShippingAddressContainer.propTypes
 type Props = {
   children: ReactNode
 }
-const ShippingAddressContainer: FunctionComponent<Props> = (props) => {
+export function ShippingAddressContainer(props: Props) {
   const { children } = props
   const [state, dispatch] = useReducer(
     shippingAddressReducer,

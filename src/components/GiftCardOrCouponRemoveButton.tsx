@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode, useContext } from 'react'
+import { ReactNode, useContext } from 'react'
 import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
@@ -10,23 +10,21 @@ const propTypes = components.GiftCardOrCouponRemoveButton.propTypes
 const displayName = components.GiftCardOrCouponRemoveButton.displayName
 
 type GiftCardOrCouponRemoveButtonChildrenProps = FunctionChildren<
-  Omit<GiftCardOrCouponRemoveButtonProps, 'children'> & {
+  Omit<Props, 'children'> & {
     codeType?: OrderCodeType
     hide?: boolean
     handleClick?: () => void
   }
 >
 
-type GiftCardOrCouponRemoveButtonProps = {
+type Props = {
   type?: CodeType
   children?: GiftCardOrCouponRemoveButtonChildrenProps
   label?: string | ReactNode
   onClick?: (response: { success: boolean }) => void
 } & Omit<JSX.IntrinsicElements['button'], 'type'>
 
-const GiftCardOrCouponRemoveButton: FunctionComponent<
-  GiftCardOrCouponRemoveButtonProps
-> = (props) => {
+export function GiftCardOrCouponRemoveButton(props: Props) {
   const { children, label = 'Remove', onClick, type, ...p } = props
   const { order, removeGiftCardOrCouponCode } = useContext(OrderContext)
   let codeType = `${type}_code` as OrderCodeType

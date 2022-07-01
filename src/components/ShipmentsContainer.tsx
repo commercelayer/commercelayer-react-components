@@ -17,12 +17,10 @@ import { isEmpty } from 'lodash'
 const propTypes = components.ShipmentsContainer.propTypes
 const displayName = components.ShipmentsContainer.displayName
 
-type ShipmentsContainerProps = {
+type Props = {
   children: ReactNode
 }
-const ShipmentsContainer: React.FunctionComponent<ShipmentsContainerProps> = (
-  props
-) => {
+export function ShipmentsContainer(props: Props) {
   const { children } = props
   const [state, dispatch] = useReducer(shipmentReducer, shipmentInitialState)
   const { order, getOrder, include, addResourceToInclude, includeLoaded } =

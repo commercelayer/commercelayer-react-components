@@ -4,7 +4,7 @@ import GenericFieldComponent, {
   TGenericChildrenProps,
   TResourceKey,
   TResources,
-} from './utils/GenericFieldComponent'
+} from '#components-utils/GenericFieldComponent'
 
 type StockTransferFieldChildrenProps = TGenericChildrenProps<
   TResources['StockTransfer']
@@ -18,7 +18,7 @@ type Props = {
   children?: (props: StockTransferFieldChildrenProps) => JSX.Element
 } & TCondition
 
-export default function StockTransferField<P extends Props>(props: P) {
+export function StockTransferField<P extends Props>(props: P) {
   const { attribute, tagElement, children, ...p } = props
   return (
     <GenericFieldComponent<TResourceKey['StockTransfer']>
@@ -32,3 +32,5 @@ export default function StockTransferField<P extends Props>(props: P) {
     </GenericFieldComponent>
   )
 }
+
+export default StockTransferField

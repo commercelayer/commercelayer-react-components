@@ -1,4 +1,3 @@
-import { FunctionComponent } from 'react'
 import BaseInput from './utils/BaseInput'
 import components from '#config/components'
 import { BaseInputComponentProps, GiftCardInputName } from '#typings'
@@ -6,13 +5,13 @@ import { BaseInputComponentProps, GiftCardInputName } from '#typings'
 const propTypes = components.GiftCardInput.propTypes
 const displayName = components.GiftCardInput.displayName
 
-export type GiftCardInputProps = {
+type Props = {
   name: GiftCardInputName
 } & Omit<BaseInputComponentProps, 'name'> &
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
 
-const GiftCardInput: FunctionComponent<GiftCardInputProps> = (props) => {
+export function GiftCardInput(props: Props) {
   const { placeholder = '', ...p } = props
   return <BaseInput placeholder={placeholder} {...p} />
 }

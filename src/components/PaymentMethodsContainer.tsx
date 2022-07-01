@@ -19,13 +19,11 @@ import { setPaymentRef } from '../reducers/PaymentMethodReducer'
 const propTypes = components.PaymentMethodsContainer.propTypes
 const displayName = components.PaymentMethodsContainer.displayName
 
-type PaymentMethodsContainerProps = {
+type Props = {
   children: ReactNode
   config?: PaymentMethodConfig
 }
-const PaymentMethodsContainer: React.FunctionComponent<
-  PaymentMethodsContainerProps
-> = (props) => {
+export function PaymentMethodsContainer(props: Props) {
   const { children, config } = props
   const [state, dispatch] = useReducer(
     paymentMethodReducer,

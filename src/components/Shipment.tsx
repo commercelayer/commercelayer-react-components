@@ -15,7 +15,7 @@ type ShipmentProps = {
   autoSelectSingleShippingMethod?: boolean | (() => void)
 }
 
-export default function Shipment({
+export function Shipment({
   children,
   loader = 'Loading...',
   autoSelectSingleShippingMethod = false,
@@ -92,3 +92,5 @@ export default function Shipment({
 
 Shipment.propTypes = propTypes
 Shipment.displayName = displayName
+
+export default Shipment

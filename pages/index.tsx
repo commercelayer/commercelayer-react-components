@@ -1,11 +1,11 @@
 import { getIntegrationToken } from '@commercelayer/js-auth'
 import React, { useEffect, useState } from 'react'
-import Price from '../src/components/Price'
-import PricesContainer from '../src/components/PricesContainer'
-import CommerceLayer from '../src/components/CommerceLayer'
-import SkusContainer from '#components/SkusContainer'
-import Skus from '#components/Skus'
-import SkuField from '#components/SkuField'
+import Price from '#components/Price'
+import PricesContainer from '#components/PricesContainer'
+import CommerceLayer from '#components/auth/CommerceLayer'
+import SkusContainer from '#components/skus/SkusContainer'
+import Skus from '#components/skus/Skus'
+import SkuField from '#components/skus/SkuField'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
 const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string

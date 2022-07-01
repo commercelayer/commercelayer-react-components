@@ -1,16 +1,16 @@
-import { FunctionComponent, useContext } from 'react'
+import { useContext } from 'react'
 import components from '#config/components'
 import { FunctionChildren } from '#typings'
 import Parent from './utils/Parent'
 import OrderContext from '#context/OrderContext'
-import { CodeType, OrderCodeType } from '#reducers/OrderReducer'
+import type { CodeType } from '#reducers/OrderReducer'
 import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
 
 const propTypes = components.GiftCardOrCouponCode.propTypes
 const displayName = components.GiftCardOrCouponCode.displayName
 
-type ChildrenProps = Omit<GiftCardOrCouponCodeProps, 'children'> & {
+type ChildrenProps = Omit<Props, 'children'> & {
   code?: string
   hide?: boolean
   discountAmountCents?: string
@@ -20,18 +20,14 @@ type ChildrenProps = Omit<GiftCardOrCouponCodeProps, 'children'> & {
 
 type GiftCardOrCouponCodeChildrenProps = FunctionChildren<ChildrenProps>
 
-type GiftCardOrCouponCodeProps = {
+type Props = {
   type?: CodeType
   children?: GiftCardOrCouponCodeChildrenProps
 } & JSX.IntrinsicElements['span']
 
-const GiftCardOrCouponCode: FunctionComponent<GiftCardOrCouponCodeProps> = ({
-  children,
-  type,
-  ...props
-}) => {
+export function GiftCardOrCouponCode({ children, type, ...props }: Props) {
   const { order } = useContext(OrderContext)
-  let codeType = type && (`${type}_code` as OrderCodeType)
+  let codeType = type && (`${type}_code` as const)
   if (
     !type &&
     order &&

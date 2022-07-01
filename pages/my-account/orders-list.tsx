@@ -1,10 +1,9 @@
 import {
-  CommerceLayer,
-  CustomerContainer,
   OrderList,
   OrderListRow,
+  CustomerContainer,
+  CommerceLayer,
 } from '@commercelayer/react-components'
-import React from 'react'
 import useGetToken from '../../hooks/useGetToken'
 const colClassName = 'uppercase text-left p-1 text-gray-400 text-sm'
 const titleClassName = 'flex flex-row items-center'

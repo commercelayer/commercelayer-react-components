@@ -1,12 +1,5 @@
 import useRapidForm from 'rapid-form'
-import {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  ReactNode,
-} from 'react'
+import { useContext, useEffect, useRef, useState, ReactNode } from 'react'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import OrderContext from '#context/OrderContext'
 import isEmpty from 'lodash/isEmpty'
@@ -15,19 +8,16 @@ import camelCase from 'lodash/camelCase'
 import dropWhile from 'lodash/dropWhile'
 import has from 'lodash/has'
 import { findIndex } from 'lodash'
-import { BaseError } from '#typings/errors'
 import { OrderCodeType } from '#reducers/OrderReducer'
 
 const propTypes = components.GiftCardOrCouponForm.propTypes
 
-type GiftCardOrCouponFormProps = {
+type Props = {
   children: ReactNode
   onSubmit?: (response: { success: boolean; value: string }) => void
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
-const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
-  props
-) => {
+export function GiftCardOrCouponForm(props: Props) {
   const { children, autoComplete = 'on', onSubmit, ...p } = props
   const { validation, values, reset } = useRapidForm()
   const [codeType, setCodeType] = useState<OrderCodeType>(
@@ -42,10 +32,7 @@ const GiftCardOrCouponForm: FunctionComponent<GiftCardOrCouponFormProps> = (
       values[inputName]?.value === '' &&
       findIndex(errors, { field: camelCase(inputName) }) !== -1
     ) {
-      const err = dropWhile(
-        errors,
-        (i) => i.field === camelCase(inputName)
-      ) as BaseError[]
+      const err = dropWhile(errors, (i) => i.field === camelCase(inputName))
       setOrderErrors(err)
       onSubmit && onSubmit({ value: values[inputName]?.value, success: false })
     }

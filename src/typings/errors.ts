@@ -50,6 +50,7 @@ export type ResourceErrorType =
   | 'prices'
   | 'shipments'
   | 'shipping_address'
+  | 'customer_address'
   | 'sku_options'
   | 'variant'
 
@@ -124,6 +125,7 @@ export const ErrorPropTypes = {
     'payment_methods',
     'prices',
     'shipping_address',
+    'customer_address',
     'sku_options',
     'variant',
     'shipments',
@@ -137,10 +139,19 @@ type ErrorChildrenComponentProps = FunctionChildren<
   Omit<ErrorComponentProps, 'children'> & { errors: string[] }
 >
 
-export interface ErrorComponentProps {
+export type ErrorComponentProps = {
+  /**
+   * Resource which caused the error
+   */
   resource: ResourceErrorType
   children?: ErrorChildrenComponentProps
+  /**
+   * Field which caused the error
+   */
   field?: string
+  /**
+   * Error message which you can translate
+   */
   messages?: {
     code: CodeErrorType
     message: string

@@ -1,10 +1,4 @@
-import {
-  useContext,
-  FunctionComponent,
-  ReactNode,
-  useEffect,
-  useState,
-} from 'react'
+import { useContext, ReactNode, useEffect, useState } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from './utils/Parent'
 import components from '#config/components'
@@ -14,24 +8,22 @@ import type { ShippingMethod } from '@commercelayer/sdk'
 const propTypes = components.ShippingMethodRadioButton.propTypes
 const displayName = components.ShippingMethodRadioButton.displayName
 
-export type ShippingMethodRadioButtonType = Omit<
-  ShippingMethodRadioButtonProps,
-  'children'
-> & { shippingMethod: ShippingMethod; shipmentId: string }
+export type ShippingMethodRadioButtonType = Omit<Props, 'children'> & {
+  shippingMethod: ShippingMethod
+  shipmentId: string
+}
 
 export type ShippingMethodRadioButtonOnChangeType = (
   shippingMethod: ShippingMethod,
   shipmentId: string
 ) => void
 
-type ShippingMethodRadioButtonProps = {
+type Props = {
   children?: (props: ShippingMethodRadioButtonType) => ReactNode
   onChange?: ShippingMethodRadioButtonOnChangeType
 } & Omit<JSX.IntrinsicElements['input'], 'onChange'>
 
-const ShippingMethodRadioButton: FunctionComponent<
-  ShippingMethodRadioButtonProps
-> = (props) => {
+export function ShippingMethodRadioButton(props: Props) {
   const { onChange, ...p } = props
   const [checked, setChecked] = useState(false)
   const { shippingMethod, currentShippingMethodId, shipmentId } = useContext(

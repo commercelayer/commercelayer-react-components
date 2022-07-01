@@ -1,4 +1,4 @@
-import { FunctionComponent, useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import getAmount from '#utils/getAmount'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import Parent from './utils/Parent'
@@ -6,15 +6,14 @@ import components from '#config/components'
 import { BaseAmountComponent, BasePriceType } from '#typings/index'
 
 const propTypes = components.LineItemAmount.propTypes
-const defaultProps = components.LineItemAmount
-  .defaultProps as LineItemAmountProps
+const defaultProps = components.LineItemAmount.defaultProps as Props
 const displayName = components.LineItemAmount.displayName
 
-export type LineItemAmountProps = BaseAmountComponent & {
+type Props = BaseAmountComponent & {
   type?: BasePriceType
 }
 
-const LineItemAmount: FunctionComponent<LineItemAmountProps> = (props) => {
+export function LineItemAmount(props: Props) {
   const { format = 'formatted', type = 'total', ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const [price, setPrice] = useState('')

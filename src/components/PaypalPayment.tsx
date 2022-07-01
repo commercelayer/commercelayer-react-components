@@ -1,12 +1,6 @@
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isFunction from 'lodash/isFunction'
-import {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useRef,
-} from 'react'
+import { ReactNode, useContext, useEffect, useRef } from 'react'
 
 export type PaypalConfig = {
   return_url: string
@@ -22,7 +16,7 @@ const defaultMessage =
 
 type Props = Omit<PaypalConfig, 'return_url' | 'cancel_url'> &
   JSX.IntrinsicElements['div']
-const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
+export function PaypalPayment({ infoMessage, ...p }: Props) {
   const ref = useRef<null | HTMLFormElement>(null)
   const {
     setPaymentSource,

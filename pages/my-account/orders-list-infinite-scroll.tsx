@@ -4,7 +4,6 @@ import {
   OrderList,
   OrderListRow,
 } from '@commercelayer/react-components'
-import React from 'react'
 import useGetToken from '../../hooks/useGetToken'
 const colClassName = 'uppercase text-left p-1 text-gray-400 text-sm'
 const titleClassName = 'flex flex-row items-center'
@@ -76,15 +75,16 @@ const OrdersListInfiniteScroll = () => {
           }}
         >
           <OrderListRow field="number">
-            {({ cell, order, ...p }) => {
+            {({ cell, order, infiniteScroll, ...p }) => {
+              const As = infiniteScroll ? 'div' : 'td'
               return cell.map((cell) => {
                 return (
-                  <td {...p} {...cell.getCellProps()} className="py-5 border-b">
+                  <As {...p} {...cell.getCellProps()} className="py-5 border-b">
                     <p className="font-bold">Order # {cell.render('Cell')}</p>
                     <p className="text-xs text-gray-500">
                       contains {order.skus_count} items
                     </p>
-                  </td>
+                  </As>
                 )
               })
             }}

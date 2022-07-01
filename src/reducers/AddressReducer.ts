@@ -2,11 +2,17 @@ import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { BaseError, ResourceErrorType } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { Address, AddressCreate, Order, OrderUpdate } from '@commercelayer/sdk'
+import type {
+  Address,
+  AddressCreate,
+  Order,
+  OrderUpdate,
+} from '@commercelayer/sdk'
 import isEmpty from 'lodash/isEmpty'
 import getSdk from '#utils/getSdk'
 import { updateOrder } from './OrderReducer'
 import camelCase from 'lodash/camelCase'
+import { TCustomerAddress } from './CustomerReducer'
 
 export type AddressActionType =
   | 'setErrors'
@@ -52,7 +58,7 @@ export type AddressSchema = Address
 
 export interface AddressActionPayload {
   errors: BaseError[]
-  billing_address: AddressCreate
+  billing_address: TCustomerAddress
   shipping_address: AddressCreate
   shipToDifferentAddress: boolean
   billingAddressId: string

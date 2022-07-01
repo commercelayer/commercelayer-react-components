@@ -1,4 +1,4 @@
-import { FunctionComponent, useReducer, useContext, ReactNode } from 'react'
+import { useReducer, useContext, ReactNode } from 'react'
 import GiftCardContext from '#context/GiftCardContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import giftCardReducer, {
@@ -14,11 +14,11 @@ import components from '#config/components'
 const propTypes = components.GiftCardContainer.propTypes
 const displayName = components.GiftCardContainer.displayName
 
-export type GiftCardContainer = {
+export type Props = {
   children: ReactNode
 }
 
-const GiftCardContainer: FunctionComponent<GiftCardContainer> = (props) => {
+export function GiftCardContainer(props: Props) {
   const { children } = props
   const [state, dispatch] = useReducer(giftCardReducer, giftCardInitialState)
   const config = useContext(CommerceLayerContext)

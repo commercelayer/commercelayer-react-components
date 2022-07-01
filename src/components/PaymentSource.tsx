@@ -1,10 +1,4 @@
-import {
-  useContext,
-  FunctionComponent,
-  ReactNode,
-  useState,
-  useEffect,
-} from 'react'
+import { useContext, ReactNode, useState, useEffect } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import components from '#config/components'
 import PaymentMethodContext from '#context/PaymentMethodContext'
@@ -36,7 +30,7 @@ export type PaymentSourceProps = {
   loader?: LoaderType
 } & JSX.IntrinsicElements['div']
 
-const PaymentSource: FunctionComponent<PaymentSourceProps> = (props) => {
+export function PaymentSource(props: PaymentSourceProps) {
   const { readonly } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)

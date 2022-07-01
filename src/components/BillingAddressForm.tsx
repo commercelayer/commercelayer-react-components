@@ -1,11 +1,13 @@
 import AddressesContext from '#context/AddressContext'
 import useRapidForm from 'rapid-form'
 import { ReactNode, useContext, useEffect, useRef } from 'react'
-import BillingAddressFormContext from '#context/BillingAddressFormContext'
+import BillingAddressFormContext, {
+  AddressValuesKeys,
+  DefaultContextAddress,
+} from '#context/BillingAddressFormContext'
 import { isEmpty } from 'lodash'
 import { BaseError, CodeErrorType } from '#typings/errors'
-import { AddressField } from '#reducers/AddressReducer'
-import { AddressCountrySelectName, AddressInputName } from '#typings'
+import type { AddressInputName } from '#typings'
 import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import { Address } from '@commercelayer/sdk'
@@ -14,15 +16,13 @@ import { businessMandatoryField } from '#utils/validateFormFields'
 
 const propTypes = components.BillingAddressForm.propTypes
 
-type BillingAddressFormProps = {
+type Props = {
   children: ReactNode
   reset?: boolean
   errorClassName?: string
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
-const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
-  props
-) => {
+export function BillingAddressForm(props: Props) {
   const {
     children,
     errorClassName,
@@ -41,7 +41,7 @@ const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
     addResourceToInclude,
     includeLoaded,
   } = useContext(OrderContext)
-  const ref = useRef<HTMLFormElement>(null)
+  const ref = useRef<HTMLFormElement | null>(null)
   useEffect(() => {
     if (!include?.includes('billing_address')) {
       addResourceToInclude({
@@ -58,7 +58,7 @@ const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
         const code = errors[fieldName]?.['code']
         const message = errors[fieldName]?.['message']
         if (['billing_address_state_code'].includes(fieldName)) {
-          if (isEmpty(values['state_code'])) {
+          if (!values?.['state_code']) {
             delete errors[fieldName]
           } else {
             formErrors.push({
@@ -78,7 +78,7 @@ const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
         }
       }
       setAddressErrors(formErrors, 'billing_address')
-    } else if (!isEmpty(values)) {
+    } else if (values && Object.keys(values).length > 0) {
       setAddressErrors([], 'billing_address')
       for (const name in values) {
         const field = values[name]
@@ -130,8 +130,8 @@ const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
     }
   }, [errors, values, reset, include, includeLoaded, isBusiness])
   const setValue = (
-    name: AddressField | AddressInputName | AddressCountrySelectName,
-    value: any
+    name: AddressValuesKeys,
+    value: string | number | readonly string[]
   ) => {
     const field: any = {
       [name.replace('billing_address_', '')]: value,
@@ -147,7 +147,7 @@ const BillingAddressForm: React.FunctionComponent<BillingAddressFormProps> = (
   }
   const providerValues = {
     isBusiness,
-    values,
+    values: values as DefaultContextAddress['values'],
     validation,
     setValue,
     errorClassName,

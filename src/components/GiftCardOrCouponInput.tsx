@@ -8,7 +8,7 @@ import { OrderCodeType } from '#reducers/OrderReducer'
 const propTypes = components.GiftCardOrCouponInput.propTypes
 const displayName = components.GiftCardOrCouponInput.displayName
 
-export type GiftCardOrCouponInputProps = {
+type Props = {
   name?: 'gift_card_or_coupon_code'
   type?: 'text'
   placeholderTranslation?: (codeType: OrderCodeType) => string
@@ -16,9 +16,7 @@ export type GiftCardOrCouponInputProps = {
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
 
-const GiftCardOrCouponInput: React.FunctionComponent<
-  GiftCardOrCouponInputProps
-> = (props) => {
+export function GiftCardOrCouponInput(props: Props) {
   const {
     placeholder = '',
     required,

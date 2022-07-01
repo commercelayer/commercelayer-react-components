@@ -1,5 +1,5 @@
 import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
-import { FunctionComponent, useContext, useRef } from 'react'
+import { useContext, useRef } from 'react'
 import Parent from './utils/Parent'
 import { FunctionChildren } from '#typings'
 import components from '#config/components'
@@ -19,12 +19,12 @@ type Props = {
   width?: number
   height?: number
 } & JSX.IntrinsicElements['img']
-const PaymentSourceBrandIcon: FunctionComponent<Props> = ({
+export function PaymentSourceBrandIcon({
   src,
   width = 32,
   children,
   ...p
-}) => {
+}: Props) {
   const { brand } = useContext(PaymentSourceContext)
   const ref = useRef<HTMLImageElement>(null)
   const defaultSrc =

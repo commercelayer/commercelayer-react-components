@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import Parent from './utils/Parent'
 import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
@@ -13,15 +13,15 @@ const propTypes = components.QuantitySelector.propTypes
 const defaultProps = components.QuantitySelector.defaultProps
 const displayName = components.QuantitySelector.displayName
 
-type QuantitySelectorChildrenProps = FunctionChildren<
-  Omit<QuantitySelectorProps, 'children'> & {
+type ChildrenProps = FunctionChildren<
+  Omit<Props, 'children'> & {
     handleChange: (event: React.MouseEvent<HTMLInputElement>) => void
     handleBlur: (event: React.MouseEvent<HTMLInputElement>) => void
   }
 >
 
-type QuantitySelectorProps = {
-  children?: QuantitySelectorChildrenProps
+type Props = {
+  children?: ChildrenProps
   disabled?: boolean
   min?: number
   max?: number
@@ -30,7 +30,7 @@ type QuantitySelectorProps = {
   skuListId?: string
 } & JSX.IntrinsicElements['input']
 
-const QuantitySelector: FunctionComponent<QuantitySelectorProps> = (props) => {
+export function QuantitySelector(props: Props) {
   const { skuCode, skuListId, children, min = 1, max, ...p } = props
   const {
     item,

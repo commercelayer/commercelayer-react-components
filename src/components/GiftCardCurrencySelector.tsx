@@ -1,4 +1,3 @@
-import { FunctionComponent } from 'react'
 import BaseSelect from './utils/BaseSelect'
 import currencyOptions from '#config/currency'
 import components from '#config/components'
@@ -8,16 +7,11 @@ const propTypes = components.GiftCardCurrencySelector.propTypes
 const defaultProps = components.GiftCardCurrencySelector.defaultProps
 const displayName = components.GiftCardCurrencySelector.displayName
 
-type GiftCardCurrencySelectorProps = Omit<
-  BaseSelectComponentProps,
-  'options' | 'name'
-> & {
+type Props = Omit<BaseSelectComponentProps, 'options' | 'name'> & {
   required?: boolean
 } & Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'>
 
-const GiftCardCurrencySelector: FunctionComponent<
-  GiftCardCurrencySelectorProps
-> = (props) => {
+export function GiftCardCurrencySelector(props: Props) {
   return <BaseSelect options={currencyOptions} name="currencyCode" {...props} />
 }
 

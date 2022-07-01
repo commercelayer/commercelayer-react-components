@@ -1,4 +1,4 @@
-import { useContext, FunctionComponent } from 'react'
+import { useContext } from 'react'
 import AvailabilityContext from '#context/AvailabilityContext'
 import Parent from './utils/Parent'
 import { isEmpty } from 'lodash'
@@ -9,25 +9,22 @@ import ItemContext from '#context/ItemContext'
 import SkuChildrenContext from '#context/SkuChildrenContext'
 
 const propTypes = components.AvailabilityTemplate.propTypes
-const defaultProps = components.AvailabilityTemplate
-  .defaultProps as AvailabilityTemplateProps
+const defaultProps = components.AvailabilityTemplate.defaultProps as Props
 const displayName = components.AvailabilityTemplate.displayName
 
 type AvailabilityTemplateChildrenProps = FunctionChildren<
-  Omit<AvailabilityTemplateProps, 'children'> &
+  Omit<Props, 'children'> &
     DeliveryLeadTime & { text: string; quantity: number }
 >
 
-type AvailabilityTemplateProps = {
+type Props = {
   children?: AvailabilityTemplateChildrenProps
   timeFormat?: TimeFormat
   showShippingMethodName?: boolean
   showShippingMethodPrice?: boolean
 } & JSX.IntrinsicElements['p']
 
-const AvailabilityTemplate: FunctionComponent<AvailabilityTemplateProps> = (
-  props
-) => {
+export function AvailabilityTemplate(props: Props) {
   const {
     timeFormat,
     showShippingMethodName,

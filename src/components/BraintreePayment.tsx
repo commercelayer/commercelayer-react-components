@@ -1,11 +1,4 @@
-import {
-  FormEvent,
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { FormEvent, useContext, useEffect, useRef, useState } from 'react'
 import {
   HostedFieldFieldOptions,
   HostedFieldsHostedFieldsFieldName,
@@ -41,7 +34,7 @@ export type BraintreeConfig = {
   }
 }
 
-type BraintreePaymentProps = {
+type Props = {
   authorization: string
   config?: BraintreeConfig
   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
@@ -109,11 +102,11 @@ const defaultConfig: BraintreeConfig = {
   submitLabel: 'Set payment method',
 }
 
-const BraintreePayment: FunctionComponent<BraintreePaymentProps> = ({
+export function BraintreePayment({
   authorization,
   config,
   templateCustomerSaveToWallet,
-}) => {
+}: Props) {
   const {
     fields,
     styles,

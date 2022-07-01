@@ -1,4 +1,3 @@
-import { FunctionComponent } from 'react'
 import BaseOrderPrice from './utils/BaseOrderPrice'
 import components from '#config/components'
 import { BaseAmountComponent } from '#typings'
@@ -6,7 +5,7 @@ import { BaseAmountComponent } from '#typings'
 const propTypes = components.ShippingAmount.propTypes
 const displayName = components.ShippingAmount.displayName
 
-const ShippingAmount: FunctionComponent<BaseAmountComponent> = (props) => {
+export function ShippingAmount(props: BaseAmountComponent) {
   return <BaseOrderPrice base="amount" type="shipping" {...props} />
 }
 

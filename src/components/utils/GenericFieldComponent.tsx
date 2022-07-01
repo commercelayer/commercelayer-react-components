@@ -1,15 +1,17 @@
 import { InitialSkuContext } from '#context/SkuChildrenContext'
 import { InitialStockTransferContext } from '#context/StockTransferChildrenContext'
-import type { LineItem, Sku } from '@commercelayer/sdk'
+import type { Customer, LineItem, Sku } from '@commercelayer/sdk'
 import Parent from './Parent'
 import { InitialLineItemContext } from '#context/LineItemChildrenContext'
 import { Context, useContext } from 'react'
 import { defaultImgUrl } from '#utils/placeholderImages'
+import { InitialCustomerContext } from '#context/CustomerContext'
 
 export type TResources = {
   StockTransfer: LineItem & { resource: 'stock_transfers' }
   Sku: Sku & { resource: 'skus' }
   LineItem: LineItem & { resource: 'line_items' }
+  Customer: Customer & { resource: 'customers' }
 }
 
 export type TResourceKey = {
@@ -25,6 +27,7 @@ type ResourceContext = {
   stock_transfers: InitialStockTransferContext
   skus: InitialSkuContext
   line_items: InitialLineItemContext
+  customers: InitialCustomerContext
 }
 
 type GenericContext<K extends keyof ResourceContext> = Context<
@@ -44,11 +47,14 @@ export default function GenericFieldComponent<R extends keyof TResources>(
 ) {
   const { children, tagElement, attribute, context, ...p } = props
   const resourceContext = useContext(context)
-  let attributeValue
-  for (const key in resourceContext) {
-    if (Object.prototype.hasOwnProperty.call(resourceContext, key)) {
-      const dataContext = resourceContext[key] as any
-      attributeValue = dataContext[attribute]
+  let attributeValue = ''
+  const keysContext = Object.keys(resourceContext).filter(
+    (key) => key === p['resource']
+  ) as [keyof ResourceContext[keyof ResourceContext]]
+  if (keysContext.length === 1) {
+    const [keyResource] = keysContext
+    if (keyResource && attribute) {
+      attributeValue = resourceContext[keyResource][attribute]
     }
   }
   const Tag = tagElement || 'span'

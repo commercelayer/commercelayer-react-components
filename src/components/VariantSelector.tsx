@@ -1,11 +1,4 @@
-import {
-  Fragment,
-  FunctionComponent,
-  useContext,
-  useEffect,
-  ReactElement,
-  ReactNode,
-} from 'react'
+import { Fragment, useContext, useEffect, ReactElement, ReactNode } from 'react'
 import VariantTemplate, { VariantHandleCallback } from './utils/VariantTemplate'
 import Parent from './utils/Parent'
 import VariantsContext from '#context/VariantsContext'
@@ -27,16 +20,16 @@ export interface VariantOption {
   } | null
 }
 
-type VariantSelectorChildrenProps = FunctionChildren<
-  Omit<VariantSelectorProps, 'children'> & {
+type ChildrenProps = FunctionChildren<
+  Omit<Props, 'children'> & {
     variants: VariantsObject
     handleSelect: SetSkuCode
     loading: boolean
   }
 >
 
-type VariantSelectorProps = {
-  children?: VariantSelectorChildrenProps
+type Props = {
+  children?: ChildrenProps
   options: VariantOption[]
   type?: BaseSelectorType
   loader?: ReactNode
@@ -46,7 +39,7 @@ type VariantSelectorProps = {
 } & JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['select']
 
-const VariantSelector: FunctionComponent<VariantSelectorProps> = (props) => {
+export function VariantSelector(props: Props) {
   const { children, type, placeholder, skuCode, name, options, ...prs } = props
   const {
     setSkuCode,

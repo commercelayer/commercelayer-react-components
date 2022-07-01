@@ -1,4 +1,4 @@
-import { FunctionComponent, useContext, ReactNode } from 'react'
+import { useContext, ReactNode } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
 import Parent from './utils/Parent'
@@ -10,20 +10,20 @@ const defaultProps = components.LineItemQuantity.defaultProps
 const displayName = components.LineItemQuantity.displayName
 
 type LineItemQuantityChildrenProps = FunctionChildren<
-  Omit<LineItemQuantityProps, 'children'> & {
+  Omit<Props, 'children'> & {
     quantity: number
     handleChange: (event: React.MouseEvent<HTMLSelectElement>) => void
   }
 >
 
-type LineItemQuantityProps = {
+type Props = {
   children?: LineItemQuantityChildrenProps
   max?: number
   disabled?: boolean
   readonly?: boolean
 } & (JSX.IntrinsicElements['select'] & JSX.IntrinsicElements['span'])
 
-const LineItemQuantity: FunctionComponent<LineItemQuantityProps> = (props) => {
+export function LineItemQuantity(props: Props) {
   const { max = 50, readonly = false, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const { updateLineItem } = useContext(LineItemContext)

@@ -20,7 +20,7 @@ type LineItemsCountProps = {
   text?: string
 } & JSX.IntrinsicElements['span']
 
-export default function LineItemsEmpty(props: LineItemsCountProps) {
+export function LineItemsEmpty(props: LineItemsCountProps) {
   const { children, text = 'Your shopping bag is empty', ...p } = props
   const { lineItems } = useContext(LineItemContext)
   const [quantity, setQuantity] = useState<undefined | number>()
@@ -48,3 +48,5 @@ export default function LineItemsEmpty(props: LineItemsCountProps) {
 
 LineItemsEmpty.propTypes = propTypes
 LineItemsEmpty.displayName = displayName
+
+export default LineItemsEmpty

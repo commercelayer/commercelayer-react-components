@@ -406,7 +406,7 @@ export const addToCart: AddToCart = async (params) => {
           },
         ] as BaseError[],
       }
-    const sdk = getSdk(config as CommerceLayerConfig)
+    const sdk = getSdk(config)
     const id = await createOrder(params)
     if (id) {
       const order = sdk.orders.relationship(id)

@@ -1,11 +1,4 @@
-import {
-  FunctionComponent,
-  Fragment,
-  useContext,
-  ReactNode,
-  useEffect,
-  useState,
-} from 'react'
+import { Fragment, useContext, ReactNode, useEffect, useState } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import components from '#config/components'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
@@ -15,13 +8,13 @@ import type { DeliveryLeadTime } from '@commercelayer/sdk'
 const propTypes = components.ShippingMethod.propTypes
 const displayName = components.ShippingMethod.displayName
 
-type ShippingMethodProps = {
+type Props = {
   children: ReactNode
   readonly?: boolean
   emptyText?: string
 }
 
-const ShippingMethod: FunctionComponent<ShippingMethodProps> = (props) => {
+export function ShippingMethod(props: Props) {
   const {
     children,
     readonly,
