@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import Parent from './utils/Parent'
+import Parent from '../utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
