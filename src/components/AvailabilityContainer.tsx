@@ -66,6 +66,8 @@ export function AvailabilityContainer(props: Props) {
     } else if (skus && config.accessToken) {
       const itemKeys = Object.keys(item)
       const skuCodes = skus.map((s) => s?.code)
+      const itemKeys = Object.keys(item).sort()
+      const skuCodes = skus.map((s) => s?.code).sort()
       if (!isEqual(skuCodes, itemKeys)) {
         const skusIds = skus.map((s) => s.id)
         getAvailabilityByIds({ skusIds, config, dispatch, setItem })
