@@ -21,7 +21,7 @@ import { DeliveryLeadTimeField } from '../components/DeliveryLeadTime'
 // import { StockTransferFieldType } from '#components/StockTransferField'
 import { PaymentSourceDetailType } from '#components/PaymentSourceDetail'
 import { CodeType } from '#reducers/OrderReducer'
-import { ShipmentAttribute } from '#components/ShipmentField'
+import { ShipmentAttribute } from '#components/shipments/ShipmentField'
 
 const components = {
   Address: {

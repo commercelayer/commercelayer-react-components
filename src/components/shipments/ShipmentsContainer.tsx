@@ -12,7 +12,7 @@ import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import components from '#config/components'
 import { BaseError } from '#typings/errors'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 
 const propTypes = components.ShipmentsContainer.propTypes
 const displayName = components.ShipmentsContainer.displayName
