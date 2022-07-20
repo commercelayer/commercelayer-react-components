@@ -34,6 +34,10 @@
     "./shipments/*": {
       "require": "./lib/cjs/components/shipments/*.js",
       "import": "./lib/esm/components/shipments/*.js"
+    },
+    "./shipping_methods/*": {
+      "require": "./lib/cjs/components/shipping_methods/*.js",
+      "import": "./lib/esm/components/shipping_methods/*.js"
     }
   },
   "typesVersions": {
@@ -52,6 +56,9 @@
       ],
       "shipments/*": [
         "lib/esm/components/shipments/*.d.ts"
+      ],
+      "shipping_methods/*": [
+        "lib/esm/components/shipping_methods/*.d.ts"
       ]
     }
   },
