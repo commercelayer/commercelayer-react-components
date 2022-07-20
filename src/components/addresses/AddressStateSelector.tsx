@@ -115,7 +115,7 @@ export function AddressStateSelector(props: Props) {
       {...p}
       className={classNameComputed}
       ref={
-        billingAddress?.validation ||
+        (billingAddress?.validation as any) ||
         shippingAddress?.validation ||
         customerAddress?.validation
       }
@@ -129,7 +129,7 @@ export function AddressStateSelector(props: Props) {
       {...(p as any)}
       name={name}
       ref={
-        billingAddress?.validation ||
+        (billingAddress?.validation as any) ||
         shippingAddress?.validation ||
         customerAddress?.validation
       }

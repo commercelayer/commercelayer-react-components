@@ -1,8 +1,8 @@
 import { OrderCodeType } from '#reducers/OrderReducer'
-import { createContext, RefObject } from 'react'
+import { createContext } from 'react'
 
 type DefaultContext = {
-  validation?: () => RefObject<any>
+  validation?: void
   setValue?: (name: string, value: string) => void
   codeType?: OrderCodeType
 }

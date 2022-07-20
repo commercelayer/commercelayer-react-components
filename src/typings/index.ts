@@ -1,4 +1,4 @@
-import { Dispatch, ForwardedRef, ReactNode, RefObject } from 'react'
+import { Dispatch, ForwardedRef, ReactNode, Ref } from 'react'
 import PropTypes, { InferProps } from 'prop-types'
 import { BaseError } from './errors'
 
@@ -82,7 +82,7 @@ type BaseInputChildrenComponentProps = Omit<
 }
 
 export interface BaseInputComponentProps {
-  ref?: () => RefObject<any>
+  ref?: Ref<any>
   children?: (props: BaseInputChildrenComponentProps) => ReactNode
   name: string
   onChange?: (
