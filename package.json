@@ -2,33 +2,49 @@
   "name": "@commercelayer/react-components",
   "version": "3.12.7",
   "description": "The Official Commerce Layer React Components",
-  "module": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "lib/index.js",
+  "module": "lib/esm/index.js",
+  "types": "lib/esm/index.d.ts",
   "files": [
     "lib",
     "package.json",
     "README.md"
   ],
   "exports": {
-    ".": "./lib/index.js",
-    "./auth/*": "./lib/components/auth/*.js",
-    "./orders/*": "./lib/components/orders/*.js",
-    "./skus/*": "./lib/components/skus/*.js",
-    "./customers/*": "./lib/components/customers/*.js"
+    ".": {
+      "require": "./lib/cjs/index.js",
+      "import": "./lib/esm/index.js"
+    },
+    "./auth/*": {
+      "require": "./lib/cjs/components/auth/*.js",
+      "import": "./lib/esm/components/auth/*.js"
+    },
+    "./orders/*": {
+      "require": "./lib/cjs/components/orders/*.js",
+      "import": "./lib/esm/components/orders/*.js"
+    },
+    "./skus/*": {
+      "require": "./lib/cjs/components/skus/*.js",
+      "import": "./lib/esm/components/skus/*.js"
+    },
+    "./customers/*": {
+      "require": "./lib/cjs/components/customers/*.js",
+      "import": "./lib/esm/components/customers/*.js"
+    }
   },
   "typesVersions": {
     "*": {
       "auth/*": [
-        "lib/components/auth/*.d.ts"
+        "lib/esm/components/auth/*.d.ts"
       ],
       "orders/*": [
-        "lib/components/orders/*.d.ts"
+        "lib/esm/components/orders/*.d.ts"
       ],
       "skus/*": [
-        "lib/components/skus/*.d.ts"
+        "lib/esm/components/skus/*.d.ts"
       ],
       "customers/*": [
-        "lib/components/customers/*.d.ts"
+        "lib/esm/components/customers/*.d.ts"
       ]
     }
   },
@@ -42,9 +58,9 @@
     "test:e2e:coverage": "nyc pnpm test:e2e && pnpm coverage:report",
     "coverage:report": "nyc report --reporter=html",
     "lint": "eslint src",
-    "build": "tsc -b tsconfig.prod.json --verbose && pnpm postbuild",
-    "build:dev": "tsc -b tsconfig.prod.json --verbose -f && tsc-alias -p tsconfig.prod.json",
-    "postbuild": "tsc-alias -p tsconfig.prod.json &&  minimize-js lib -w -s",
+    "build": "tsc -b tsconfig.prod.json tsconfig.prod.esm.json --verbose && pnpm postbuild",
+    "build:dev": "tsc -b tsconfig.prod.json tsconfig.prod.esm.json --verbose && tsc-alias -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.esm.json",
+    "postbuild": "tsc-alias -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.esm.json &&  minimize-js lib -w -s",
     "start": "NODE_OPTIONS='--inspect' next dev"
   },
   "repository": {
@@ -72,30 +88,30 @@
   "dependencies": {
     "@ac-dev/countries-service": "^1.2.0",
     "@ac-dev/states-service": "^1.1.0",
-    "@adyen/adyen-web": "^5.16.2",
-    "@commercelayer/sdk": "^4.14.0",
+    "@adyen/adyen-web": "^5.18.0",
+    "@commercelayer/sdk": "^4.15.0",
     "@stripe/react-stripe-js": "^1.9.0",
     "@stripe/stripe-js": "^1.32.0",
     "axios": "^0.27.2",
     "braintree-web": "^3.85.3",
-    "frames-react": "^1.0.10",
+    "frames-react": "^1.0.11",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
-    "rapid-form": "^1.6.2",
+    "rapid-form": "^2.1.0",
     "react-table": "^7.8.0",
     "react-window": "^1.8.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.5",
-    "@babel/plugin-proposal-class-properties": "^7.17.12",
-    "@babel/plugin-syntax-flow": "^7.17.12",
-    "@babel/plugin-transform-react-jsx": "^7.17.12",
-    "@babel/preset-env": "^7.18.2",
-    "@babel/preset-react": "^7.17.12",
-    "@babel/preset-typescript": "^7.17.12",
+    "@babel/core": "^7.18.9",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/plugin-syntax-flow": "^7.18.6",
+    "@babel/plugin-transform-react-jsx": "^7.18.6",
+    "@babel/preset-env": "^7.18.9",
+    "@babel/preset-react": "^7.18.6",
+    "@babel/preset-typescript": "^7.18.6",
     "@commercelayer/js-auth": "^2.3.0",
-    "@playwright/test": "^1.22.2",
+    "@playwright/test": "^1.23.4",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/git": "^10.0.1",
@@ -105,8 +121,8 @@
     "@tailwindcss/aspect-ratio": "^0.4.0",
     "@tailwindcss/forms": "^0.5.2",
     "@tailwindcss/line-clamp": "^0.4.0",
-    "@tailwindcss/typography": "^0.5.2",
-    "@types/braintree-web": "^3.75.19",
+    "@tailwindcss/typography": "^0.5.4",
+    "@types/braintree-web": "^3.75.20",
     "@types/jest": "^27.5.2",
     "@types/lodash": "^4.14.182",
     "@types/node": "^17.0.45",
@@ -115,24 +131,24 @@
     "@types/react-table": "^7.7.12",
     "@types/react-test-renderer": "^17.0.2",
     "@types/react-window": "^1.8.5",
-    "@typescript-eslint/eslint-plugin": "^5.29.0",
-    "@typescript-eslint/parser": "^5.29.0",
+    "@typescript-eslint/eslint-plugin": "^5.30.7",
+    "@typescript-eslint/parser": "^5.30.7",
     "@zerollup/ts-transform-paths": "^1.7.18",
     "autoprefixer": "^10.4.7",
-    "babel-jest": "^28.1.1",
+    "babel-jest": "^28.1.3",
     "babel-loader": "^8.2.5",
     "babel-plugin-istanbul": "^6.1.1",
     "dotenv": "^16.0.1",
-    "eslint": "^8.18.0",
+    "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-react": "^7.30.1",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "jest": "^28.1.1",
+    "jest": "^28.1.3",
     "minimize-js": "^1.3.0",
-    "next": "^12.2.4",
+    "next": "^12.2.2",
     "nyc": "^15.1.0",
-    "playwright": "^1.22.2",
+    "playwright": "^1.23.4",
     "postcss": "^8.4.14",
     "postcss-loader": "^6.2.1",
     "prettier": "^2.7.1",
@@ -141,10 +157,10 @@
     "react-dom": "^17.0.2",
     "react-test-renderer": "^17.0.2",
     "semantic-release": "^19.0.3",
-    "tailwindcss": "^3.1.4",
-    "ts-jest": "^28.0.5",
+    "tailwindcss": "^3.1.6",
+    "ts-jest": "^28.0.7",
     "ts-loader": "^9.3.1",
-    "tsc-alias": "^1.6.11",
+    "tsc-alias": "^1.7.0",
     "tsconfig-paths-jest": "^0.0.1",
     "tslib": "^2.4.0",
     "typescript": "^4.7.4",
