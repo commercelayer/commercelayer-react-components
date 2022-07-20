@@ -1,4 +1,4 @@
-import { createContext, RefObject } from 'react'
+import { createContext } from 'react'
 import type { Address } from '@commercelayer/sdk'
 
 export type AddressValuesKeys =
@@ -7,7 +7,7 @@ export type AddressValuesKeys =
   | `shipping_address_${keyof Address}`
 
 export type DefaultContextAddress = {
-  validation?: () => RefObject<HTMLFormElement>
+  validation?: void
   setValue?: (
     name: AddressValuesKeys,
     value: string | number | readonly string[]

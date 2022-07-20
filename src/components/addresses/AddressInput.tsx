@@ -82,7 +82,7 @@ export function AddressInput(props: Props) {
   return (
     <BaseInput
       ref={
-        billingAddress?.validation ||
+        (billingAddress?.validation as any) ||
         shippingAddress?.validation ||
         customerAddress?.validation
       }

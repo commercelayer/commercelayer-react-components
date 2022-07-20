@@ -1,5 +1,5 @@
 import AddressesContext from '#context/AddressContext'
-import useRapidForm from 'rapid-form'
+import { useRapidForm } from 'rapid-form'
 import { ReactNode, useContext, useEffect, useRef } from 'react'
 import BillingAddressFormContext, {
   AddressValuesKeys,
@@ -32,6 +32,8 @@ export function BillingAddressForm(props: Props) {
     isBusiness = false,
     ...p
   } = props
+  console.log('useRapidForm', useRapidForm)
+  debugger
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   // const [formType, setFormType] = useState<'customer' | 'business'>('customer')
   const { setAddressErrors, setAddress, isBusiness } =
