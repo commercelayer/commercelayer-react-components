@@ -2,7 +2,7 @@
   "name": "@commercelayer/react-components",
   "version": "3.12.7",
   "description": "The Official Commerce Layer React Components",
-  "main": "lib/index.js",
+  "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
   "types": "lib/esm/index.d.ts",
   "files": [
