@@ -1,5 +1,5 @@
 import AddressesContext from '#context/AddressContext'
-import useRapidForm from 'rapid-form'
+import { useRapidForm } from 'rapid-form'
 import { ReactNode, useContext, useEffect, useRef } from 'react'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import { isEmpty } from 'lodash'
