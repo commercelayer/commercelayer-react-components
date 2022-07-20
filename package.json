@@ -30,6 +30,10 @@
     "./customers/*": {
       "require": "./lib/cjs/components/customers/*.js",
       "import": "./lib/esm/components/customers/*.js"
+    },
+    "./shipments/*": {
+      "require": "./lib/cjs/components/shipments/*.js",
+      "import": "./lib/esm/components/shipments/*.js"
     }
   },
   "typesVersions": {
@@ -45,6 +49,9 @@
       ],
       "customers/*": [
         "lib/esm/components/customers/*.d.ts"
+      ],
+      "shipments/*": [
+        "lib/esm/components/shipments/*.d.ts"
       ]
     }
   },
