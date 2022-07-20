@@ -1,4 +1,4 @@
-import useRapidForm from 'rapid-form'
+import { useRapidForm } from 'rapid-form'
 import { useContext, useEffect, useRef, useState, ReactNode } from 'react'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import OrderContext from '#context/OrderContext'
