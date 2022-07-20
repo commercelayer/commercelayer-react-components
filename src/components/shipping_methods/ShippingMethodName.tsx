@@ -1,6 +1,6 @@
 import { useContext, ReactNode } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
-import Parent from './utils/Parent'
+import Parent from '#components-utils/Parent'
 import components from '#config/components'
 import { ShippingMethod } from '@commercelayer/sdk'
 
