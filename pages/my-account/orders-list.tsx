@@ -27,7 +27,7 @@ const columns = [
     titleClassName,
   },
   {
-    Header: 'Date',
+    Header: 'Amount',
     accessor: 'formatted_total_amount_with_taxes',
     className: colClassName,
     titleClassName,
