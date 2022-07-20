@@ -1,5 +1,5 @@
 import AddressesContext from '#context/AddressContext'
-import useRapidForm from 'rapid-form'
+import { useRapidForm } from 'rapid-form'
 import { ReactNode, useContext, useEffect, useRef } from 'react'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
 import { BaseError, CodeErrorType } from '#typings/errors'
@@ -26,6 +26,8 @@ export function CustomerAddressForm(props: Props) {
     reset = false,
     ...p
   } = props
+  console.log(useRapidForm)
+  debugger
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
   const { order } = useContext(OrderContext)
