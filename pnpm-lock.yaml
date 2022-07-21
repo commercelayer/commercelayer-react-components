@@ -3,7 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@ac-dev/countries-service': ^1.2.0
   '@ac-dev/states-service': ^1.1.0
-  '@adyen/adyen-web': ^5.15.0
+  '@adyen/adyen-web': ^5.19.0
   '@babel/core': ^7.17.12
   '@babel/plugin-proposal-class-properties': ^7.17.12
   '@babel/plugin-syntax-flow': ^7.17.12
@@ -12,7 +12,7 @@ specifiers:
   '@babel/preset-react': ^7.17.12
   '@babel/preset-typescript': ^7.17.12
   '@commercelayer/js-auth': ^2.3.0
-  '@commercelayer/sdk': ^4.13.2
+  '@commercelayer/sdk': ^4.15.0
   '@playwright/test': ^1.22.1
   '@semantic-release/changelog': ^6.0.1
   '@semantic-release/commit-analyzer': ^9.0.2
@@ -20,8 +20,8 @@ specifiers:
   '@semantic-release/github': ^8.0.4
   '@semantic-release/npm': ^9.0.1
   '@semantic-release/release-notes-generator': ^10.0.3
-  '@stripe/react-stripe-js': ^1.8.0
-  '@stripe/stripe-js': ^1.29.0
+  '@stripe/react-stripe-js': ^1.9.0
+  '@stripe/stripe-js': ^1.32.0
   '@tailwindcss/aspect-ratio': ^0.4.0
   '@tailwindcss/forms': ^0.5.1
   '@tailwindcss/line-clamp': ^0.4.0
@@ -48,7 +48,7 @@ specifiers:
   eslint-config-react-app: ^7.0.1
   eslint-plugin-react: ^7.29.4
   eslint-plugin-react-hooks: ^4.5.0
-  frames-react: ^1.0.9
+  frames-react: ^1.0.11
   jest: ^28.1.0
   jwt-decode: ^3.1.2
   lodash: ^4.17.21
@@ -61,7 +61,7 @@ specifiers:
   postcss-loader: ^6.2.1
   prettier: ^2.6.2
   prop-types: ^15.8.1
-  rapid-form: ^1.6.2
+  rapid-form: ^2.1.0
   react: ^17.0.2
   react-dom: ^17.0.2
   react-test-renderer: ^17.0.2
@@ -79,17 +79,17 @@ specifiers:
 dependencies:
   '@ac-dev/countries-service': 1.2.0
   '@ac-dev/states-service': 1.1.0
-  '@adyen/adyen-web': 5.15.0
-  '@commercelayer/sdk': 4.13.2
-  '@stripe/react-stripe-js': 1.8.0_bjxx2w3efan6uttpsw566wd6vy
-  '@stripe/stripe-js': 1.29.0
+  '@adyen/adyen-web': 5.19.0
+  '@commercelayer/sdk': 4.15.0
+  '@stripe/react-stripe-js': 1.9.0_tzvypnxpwh2c3fm7koz6ltfgai
+  '@stripe/stripe-js': 1.32.0
   axios: 0.27.2
   braintree-web: 3.85.3
-  frames-react: 1.0.9_react@17.0.2
+  frames-react: 1.0.11_react@17.0.2
   jwt-decode: 3.1.2
   lodash: 4.17.21
   lodash-es: 4.17.21
-  rapid-form: 1.6.2
+  rapid-form: 2.1.0
 
 devDependencies:
   '@babel/core': 7.17.12
@@ -166,16 +166,16 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@adyen/adyen-web/5.15.0:
-    resolution: {integrity: sha512-/mqiAgOD0QrKqBhOGEOuKLFyqFDF22FAky+ZK3/HBQqNhWunTyp5ROlSbB/MxV+RH3HKpzvMc+FRtZFg9hGhdA==}
+  /@adyen/adyen-web/5.19.0:
+    resolution: {integrity: sha512-Asjws3ICic6IQ7gxI+qObtQajR3RrnDA0MYFdinWg2gafx9IO8LCUbclv+WuZiP8sx614vMliNdl41xQjK+VOw==}
     dependencies:
-      '@babel/runtime': 7.16.7
-      '@babel/runtime-corejs3': 7.16.7
+      '@babel/runtime': 7.18.9
+      '@babel/runtime-corejs3': 7.18.9
       '@types/applepayjs': 3.0.4
-      '@types/googlepay': 0.6.3
+      '@types/googlepay': 0.6.4
       classnames: 2.3.1
-      core-js-pure: 3.19.1
-      preact: 10.5.15
+      core-js-pure: 3.23.5
+      preact: 10.10.0
     dev: false
 
   /@ampproject/remapping/2.2.0:
@@ -1566,12 +1566,29 @@ packages:
     dependencies:
       core-js-pure: 3.19.1
       regenerator-runtime: 0.13.9
+    dev: true
+
+  /@babel/runtime-corejs3/7.18.9:
+    resolution: {integrity: sha512-qZEWeccZCrHA2Au4/X05QW5CMdm4VjUDCrGq5gf1ZDcM4hRqreKrtwAn7yci9zfgAS9apvnsFXiGBHBAxZdK9A==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      core-js-pure: 3.23.5
+      regenerator-runtime: 0.13.9
+    dev: false
 
   /@babel/runtime/7.16.7:
     resolution: {integrity: sha512-9E9FJowqAsytyOY6LG+1KuueckRL+aQW+mKvXRXnuFGyRAyepJPmEo9vgMfXUA6O9u3IeEdv9MAkppFcaQwogQ==}
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.9
+    dev: true
+
+  /@babel/runtime/7.18.9:
+    resolution: {integrity: sha512-lkqXDcvlFT5rvEjiu6+QYO+1GXrEHRo2LOtS7E4GtX5ESIZOgepqsZBVIj6Pv+a6zqsya9VCgiK1KAK4BvJDAw==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      regenerator-runtime: 0.13.9
+    dev: false
 
   /@babel/template/7.16.7:
     resolution: {integrity: sha512-I8j/x8kHUrbYRTUxXrrMbfCa7jxkE7tZre39x3kjr9hvI82cK1FfqLygotcWN5kdPGWcLdWMHpSBavse5tWw3w==}
@@ -1690,8 +1707,8 @@ packages:
       tslib: 2.4.0
     dev: true
 
-  /@commercelayer/sdk/4.13.2:
-    resolution: {integrity: sha512-aKEychHvjEBL6HVCcENmWm6F2CPj43OMPie6SxIEYufFHZwB0e/frYcciLe8KRCHkpjzCklra2xwhh/gzT5qxQ==}
+  /@commercelayer/sdk/4.15.0:
+    resolution: {integrity: sha512-MiJzO5qYiokReP/lRaycfeA/CuQXfY2zmVt+rbNRQPwJNBYFMSWAVhnJMlAiYCRIiLRcjgwcpqQV90jKBHF26w==}
     engines: {node: '>=16 || ^14.17'}
     dependencies:
       axios: 0.27.2
@@ -2416,21 +2433,21 @@ packages:
       '@sinonjs/commons': 1.8.3
     dev: true
 
-  /@stripe/react-stripe-js/1.8.0_bjxx2w3efan6uttpsw566wd6vy:
-    resolution: {integrity: sha512-WtF2mIWJKnyAaZledC48NfynFckEseCPG8tybwFgisFxHvLPKrArlLISJOi2cjIY20DkMAkSkdlEljXifJi0ZA==}
+  /@stripe/react-stripe-js/1.9.0_tzvypnxpwh2c3fm7koz6ltfgai:
+    resolution: {integrity: sha512-Fn49X+Gu5fOTxhPOita1cPMi0jw+0v4xfJ3FCXbbvmfuuDl3M7ZvpRkoijBjql11NXsaXO3TMm3rkN3mEolJzw==}
     peerDependencies:
-      '@stripe/stripe-js': ^1.26.0
+      '@stripe/stripe-js': ^1.32.0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      '@stripe/stripe-js': 1.29.0
+      '@stripe/stripe-js': 1.32.0
       prop-types: 15.8.1
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
     dev: false
 
-  /@stripe/stripe-js/1.29.0:
-    resolution: {integrity: sha512-OsUxk0VLlum8E2d6onlEdKuQcvLMs7qTrOXCnl/BGV3fAm65qr6h3e1IZ5AX4lgUlPRrzRcddSOA5DvkKKYLvg==}
+  /@stripe/stripe-js/1.32.0:
+    resolution: {integrity: sha512-7EvBnbBfS1aynfLRmBFcuumHNGjKxnNkO47rorFBktqDYHwo7Yw6pfDW2iqq0R8r7i7XiJEdWPvvEgQAiDrx3A==}
     dev: false
 
   /@tailwindcss/aspect-ratio/0.4.0_tailwindcss@3.0.24:
@@ -2534,6 +2551,11 @@ packages:
 
   /@types/googlepay/0.6.3:
     resolution: {integrity: sha512-mA9d9UoSAKbfcP3xYvTtpyBTxFytu1bwjquy8oZdZPG8z0xnfQwtmTI4F44ptyz8OBWiCmvBj8QR0Rb2D/hQXg==}
+    dev: true
+
+  /@types/googlepay/0.6.4:
+    resolution: {integrity: sha512-PTt/UCllzl8z5HmhymPpSj6uENZvVKZvCBYdDVmbBVJnLStitxtWrterAOQZkKGlqVdzxNXYeif5hOAMNMS5mw==}
+    dev: false
 
   /@types/graceful-fs/4.1.5:
     resolution: {integrity: sha512-anKkLmZZ+xm4p8JWBf4hElkM4XR+EZeA2M9BAkkTldmcyDY4mbdIJnRghDJH3Ov5ooY7/UAoENtmdMSkaAd7Cw==}
@@ -3784,6 +3806,12 @@ packages:
   /core-js-pure/3.19.1:
     resolution: {integrity: sha512-Q0Knr8Es84vtv62ei6/6jXH/7izKmOrtrxH9WJTHLCMAVeU+8TF8z8Nr08CsH4Ot0oJKzBzJJL9SJBYIv7WlfQ==}
     requiresBuild: true
+    dev: true
+
+  /core-js-pure/3.23.5:
+    resolution: {integrity: sha512-8t78LdpKSuCq4pJYCYk8hl7XEkAX+BP16yRIwL3AanTksxuEf7CM83vRyctmiEL8NDZ3jpUcv56fk9/zG3aIuw==}
+    requiresBuild: true
+    dev: false
 
   /core-util-is/1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
@@ -4824,8 +4852,8 @@ packages:
       '@braintree/uuid': 0.1.0
     dev: false
 
-  /frames-react/1.0.9_react@17.0.2:
-    resolution: {integrity: sha512-BpOrS4iFNxb78QPyI0esvEW9Eqk9k1uAdepQHoSIMo9Al/grQ0yIhgEhLbdFcSozze5Jf+yDqw9qAnOvzwaKgQ==}
+  /frames-react/1.0.11_react@17.0.2:
+    resolution: {integrity: sha512-m1Vn770ZArqN7NrqLKLmD2NX48X1IeV3L8M1ygDjEh3zPiYCHAifo0RZZgcG8Al9axTaDBS+tMfN6xvSl6vUxg==}
     peerDependencies:
       react: '>=16.8'
     dependencies:
@@ -5009,7 +5037,7 @@ packages:
       source-map: 0.6.1
       wordwrap: 1.0.0
     optionalDependencies:
-      uglify-js: 3.15.5
+      uglify-js: 3.16.2
     dev: true
 
   /hard-rejection/2.1.0:
@@ -6983,8 +7011,8 @@ packages:
       source-map-js: 1.0.2
     dev: true
 
-  /preact/10.5.15:
-    resolution: {integrity: sha512-5chK29n6QcJc3m1lVrKQSQ+V7K1Gb8HeQY6FViQ5AxCAEGu3DaHffWNDkC9+miZgsLvbvU9rxbV1qinGHMHzqA==}
+  /preact/10.10.0:
+    resolution: {integrity: sha512-fszkg1iJJjq68I4lI8ZsmBiaoQiQHbxf1lNq+72EmC/mZOsFF5zn3k1yv9QGoFgIXzgsdSKtYymLJsrJPoamjQ==}
     dev: false
 
   /prelude-ls/1.2.1:
@@ -7094,8 +7122,8 @@ packages:
       safe-buffer: 5.2.1
     dev: true
 
-  /rapid-form/1.6.2:
-    resolution: {integrity: sha512-6EPtpxxaD8Vxvu5utw7NKCg3Cq8rqzUIOBKMz6ukbPjPSvpVfihqUk/xjkcGFmSVeO1K7UM2kd6vb3xgDcFdmw==}
+  /rapid-form/2.1.0:
+    resolution: {integrity: sha512-tZwrgbQLUDK8AFgVsw2DVd8eCqxuujblrc4QPyML/3qneR1/RzaDx5HB29zdAgp8TS4OC17DlD8fiQNiJx+6Tg==}
     dev: false
 
   /rc/1.2.8:
@@ -7117,7 +7145,6 @@ packages:
       object-assign: 4.1.1
       react: 17.0.2
       scheduler: 0.20.2
-    dev: true
 
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -7158,7 +7185,6 @@ packages:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
-    dev: true
 
   /read-pkg-up/7.0.1:
     resolution: {integrity: sha512-zK0TB7Xd6JpCLmlLmufqykGE+/TlOePD6qKClNW7hHDKFh/J7/7gCWGR7joEQEW1bKq3a3yUZSObOoWLFQ4ohg==}
@@ -7380,7 +7406,6 @@ packages:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
-    dev: true
 
   /schema-utils/2.7.1:
     resolution: {integrity: sha512-SHiNtMOUGWBQJwzISiVYKu82GiV4QYGePp3odlY1tuKO7gPtphAT5R/py0fA6xtbgLL/RvtJZnU9b8s0F1q0Xg==}
@@ -8135,8 +8160,8 @@ packages:
     hasBin: true
     dev: true
 
-  /uglify-js/3.15.5:
-    resolution: {integrity: sha512-hNM5q5GbBRB5xB+PMqVRcgYe4c8jbyZ1pzZhS6jbq54/4F2gFK869ZheiE5A8/t+W5jtTNpWef/5Q9zk639FNQ==}
+  /uglify-js/3.16.2:
+    resolution: {integrity: sha512-AaQNokTNgExWrkEYA24BTNMSjyqEXPSfhqoS0AxmHkCJ4U+Dyy5AvbGV/sqxuxficEfGGoX3zWw9R7QpLFfEsg==}
     engines: {node: '>=0.8.0'}
     hasBin: true
     requiresBuild: true
