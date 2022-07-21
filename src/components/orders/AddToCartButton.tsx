@@ -86,7 +86,7 @@ export function AddToCartButton(props: Props) {
   } = useContext(ItemContext)
   const { skuLists } = useContext(SkuListsContext)
   const { sku } = useContext(SkuChildrenContext)
-  const [slug] = endpoint.split('.commercelayer')
+  const [slug] = endpoint ? endpoint.split('.commercelayer') : ['']
   const sCode = (
     !isEmpty(items) && skuCode
       ? items[skuCode]?.code
