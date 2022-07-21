@@ -26,8 +26,6 @@ export function CustomerAddressForm(props: Props) {
     reset = false,
     ...p
   } = props
-  console.log(useRapidForm)
-  debugger
   const { validation, values, errors, reset: resetForm } = useRapidForm()
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
   const { order } = useContext(OrderContext)
