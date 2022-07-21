@@ -49,17 +49,17 @@
   "dependencies": {
     "@ac-dev/countries-service": "^1.2.0",
     "@ac-dev/states-service": "^1.1.0",
-    "@adyen/adyen-web": "^5.15.0",
-    "@commercelayer/sdk": "^4.13.2",
-    "@stripe/react-stripe-js": "^1.8.0",
-    "@stripe/stripe-js": "^1.29.0",
+    "@adyen/adyen-web": "^5.19.0",
+    "@commercelayer/sdk": "^4.15.0",
+    "@stripe/react-stripe-js": "^1.9.0",
+    "@stripe/stripe-js": "^1.32.0",
     "axios": "^0.27.2",
     "braintree-web": "^3.85.3",
-    "frames-react": "^1.0.9",
+    "frames-react": "^1.0.11",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
-    "rapid-form": "^1.6.2"
+    "rapid-form": "^2.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.12",
