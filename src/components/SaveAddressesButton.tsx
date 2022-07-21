@@ -88,7 +88,7 @@ export function SaveAddressesButton(props: Props) {
     if (errors && Object.keys(errors).length === 0 && !disable) {
       setForceDisable(true)
       if (order) {
-        saveAddresses(addressId)
+        saveAddresses()
       } else if (createCustomerAddress && billing_address) {
         const address = { ...billing_address }
         if (addressId) address['id'] = addressId
