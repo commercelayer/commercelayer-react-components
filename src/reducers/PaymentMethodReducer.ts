@@ -1,5 +1,5 @@
 import { AdyenPaymentConfig } from '#components/AdyenPayment'
-import { BraintreeConfig } from '#components/BraintreePayment'
+import { MultisafepayConfig } from '#components/MultisafepayPayment'
 import { PaypalConfig } from '#components/PaypalPayment'
 import { StripeConfig } from '#components/StripePayment'
 import { WireTransferConfig } from '#components/WireTransferPayment'
@@ -25,7 +25,6 @@ import camelCase from 'lodash/camelCase'
 import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
 import { Dispatch, MutableRefObject } from 'react'
-import { CheckoutComConfig } from '../components/CheckoutComPayment'
 
 export type PaymentSourceType =
   | AdyenPayment
@@ -44,21 +43,11 @@ type Card = {
 }
 
 export type PaymentSourceObject = {
-  adyen_payments: AdyenPayment & {
-    payment_request_data?: {
-      payment_method?: Card
-    }
-    payment_response?: {
-      resultCode?: 'Authorised'
-    }
-  }
-  braintree_payments: BraintreePayment & {
-    options?: {
-      card: Card
-    }
-  }
   external_payments: ExternalPayment & {
     payment_source_token?: string
+    approval_url?: string
+    cancel_url?: string
+    return_url?: string
   }
   paypal_payments: PaypalPayment
   stripe_payments: StripePayment & {
@@ -188,13 +177,11 @@ export const getPaymentMethods: GetPaymentMethods = async ({
 export type PaymentResource = keyof PaymentSourceObject
 
 export type PaymentResourceKey =
-  | 'braintreePayment'
   | 'stripePayment'
   | 'klarnaPayment'
   | 'wireTransfer'
   | 'paypalPayment'
-  | 'adyenPayment'
-  | 'checkoutComPayment'
+  | 'multisafepayPayment'
 
 export type SDKPaymentResource =
   | 'AdyenPayment'
@@ -396,13 +383,11 @@ export const destroyPaymentSource: DestroyPaymentSource = async ({
 
 export type PaymentMethodConfig = {
   stripePayment?: StripeConfig
-  braintreePayment?: BraintreeConfig
   wireTransfer?: Partial<WireTransferConfig>
   paypalPayment?: PaypalConfig
-  adyenPayment?: AdyenPaymentConfig
-  checkoutComPayment?: CheckoutComConfig
   klarnaPayment?: Pick<AdyenPaymentConfig, 'placeOrderCallback'> &
     Pick<StripeConfig, 'containerClassName'>
+  multisafepayPayment?: MultisafepayConfig
 }
 
 type SetPaymentMethodConfig = (

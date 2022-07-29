@@ -88,27 +88,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       handleClick()
     }
   }, [options?.paypalPayerId, paymentType])
-  useEffect(() => {
-    if (
-      paymentType === 'adyen_payments' &&
-      options?.adyen?.MD &&
-      options?.adyen?.PaRes &&
-      order?.status &&
-      ['draft', 'pending'].includes(order?.status)
-    ) {
-      handleClick()
-    }
-  }, [options?.adyen, paymentType])
-  useEffect(() => {
-    if (
-      paymentType === 'checkout_com_payments' &&
-      options?.checkoutCom?.session_id &&
-      order?.status &&
-      ['draft', 'pending'].includes(order?.status)
-    ) {
-      handleClick()
-    }
-  }, [options?.checkoutCom, paymentType])
+  
   const handleClick = async () => {
     let isValid = true
     setForceDisable(true)

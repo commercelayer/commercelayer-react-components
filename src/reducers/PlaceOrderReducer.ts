@@ -153,30 +153,9 @@ export const setPlaceOrder: SetPlaceOrder = async ({
           id: paymentSource.id,
           paypal_payer_id: options?.paypalPayerId,
         })
-      }
-      if (
-        paymentType === 'checkout_com_payments' &&
-        paymentSource &&
-        options?.checkoutCom?.session_id
-      ) {
-        const payment = await sdk[paymentType].update({
-          id: paymentSource.id,
-          _details: true,
-          session_id: options?.checkoutCom?.session_id,
-        })
-        // @ts-ignore
-        if (payment?.payment_response?.status !== 'Authorized') {
-          // @ts-ignore
-          const [action] = payment?.payment_response?.actions || ['']
-          const errors: BaseError[] = [
-            {
-              code: 'PAYMENT_NOT_APPROVED_FOR_EXECUTION',
-              message: action?.response_summary,
-              resource: 'orders',
-              field: 'checkout_com_payments',
-            },
-          ]
-          throw { errors }
+      } else if (paymentType === 'external_payments' && paymentSource) {
+        if (paymentSource.reference_origin === 'MULTISAFEPAY') {
+          
         }
       }
       const updateAttributes: OrderUpdate = {
@@ -195,40 +174,22 @@ export const setPlaceOrder: SetPlaceOrder = async ({
           _save_shipping_address_to_customer_address_book: true,
         })
       }
-      switch (paymentType) {
-        case 'braintree_payments': {
-          if (saveToWallet()) {
-            await sdk.orders.update({
-              id: order.id,
-              _save_payment_source_to_customer_wallet: true,
-            })
-          }
-          const orderUpdated = await sdk.orders.update(updateAttributes, {
-            include,
-          })
-          setOrder && setOrder(orderUpdated)
-          setOrderErrors && setOrderErrors([])
-          return {
-            placed: true,
-          }
-        }
-        default: {
-          const orderUpdated = await sdk.orders.update(updateAttributes, {
-            include,
-          })
-          setOrder && setOrder(orderUpdated)
-          if (saveToWallet()) {
-            await sdk.orders.update({
-              id: order.id,
-              _save_payment_source_to_customer_wallet: true,
-            })
-          }
-          setOrderErrors && setOrderErrors([])
-          return {
-            placed: true,
-          }
-        }
+      
+      const orderUpdated = await sdk.orders.update(updateAttributes, {
+        include,
+      })
+      setOrder && setOrder(orderUpdated)
+      if (saveToWallet()) {
+        await sdk.orders.update({
+          id: order.id,
+          _save_payment_source_to_customer_wallet: true,
+        })
       }
+      setOrderErrors && setOrderErrors([])
+      return {
+        placed: true,
+      }
+        
     } catch (error) {
       const errors = getErrors(error, 'orders', paymentType)
       setOrderErrors && setOrderErrors(errors)

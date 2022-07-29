@@ -7,14 +7,12 @@ import getPaypalConfig from '#utils/paypalPayment'
 import { FunctionComponent, useContext, useEffect, useState } from 'react'
 import { PaymentSourceProps } from './PaymentSource'
 import getLoaderComponent from '#utils/getLoaderComponent'
-import AdyenGateway from './gateways/AdyenGateway'
 import StripeGateway from './gateways/StripeGateway'
-import BraintreeGateway from './gateways/BraintreeGateway'
 import PaypalGateway from './gateways/PaypalGateway'
 import WireTransferGateway from './gateways/WireTransferGateway'
 import CustomerContext from '#context/CustomerContext'
-import CheckoutComGateway from './gateways/CheckoutComGateway'
 import KlarnaGateway from './gateways/KlarnaGateway'
+import MultisafepayGateway from './gateways/MultisafepayGateway'
 
 export type GatewayBaseType = PaymentGatewayProps & {
   show: boolean
@@ -107,20 +105,23 @@ const PaymentGateway: FunctionComponent<PaymentGatewayProps> = ({
       return <StripeGateway {...gatewayConfig}>{children}</StripeGateway>
     case 'klarna_payments':
       return <KlarnaGateway {...gatewayConfig}>{children}</KlarnaGateway>
-    case 'adyen_payments':
-      return <AdyenGateway {...gatewayConfig}>{children}</AdyenGateway>
-    case 'braintree_payments':
-      return <BraintreeGateway {...gatewayConfig}>{children}</BraintreeGateway>
     case 'wire_transfers':
       return (
         <WireTransferGateway {...gatewayConfig}>{children}</WireTransferGateway>
       )
     case 'paypal_payments':
       return <PaypalGateway {...gatewayConfig}>{children}</PaypalGateway>
-    case 'checkout_com_payments':
-      return (
-        <CheckoutComGateway {...gatewayConfig}>{children}</CheckoutComGateway>
-      )
+    case "external_payments":
+      if (
+        order?.payment_method?.reference_origin?.toUpperCase() === "MULTISAFEPAY"
+      ) {
+        return (
+          <MultisafepayGateway {...gatewayConfig}>
+            {children}
+          </MultisafepayGateway>
+        )
+      }
+      return null
     default:
       return null
   }
