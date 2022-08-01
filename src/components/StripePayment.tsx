@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useContext, useEffect, useRef, useState } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import {
@@ -216,6 +217,7 @@ const StripePayment: React.FunctionComponent<StripePaymentProps> = ({
   } = p
   useEffect(() => {
     if (show && publishableKey) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { loadStripe } = require('@stripe/stripe-js')
       const getStripe = async () => {
         const res = await loadStripe(publishableKey, {

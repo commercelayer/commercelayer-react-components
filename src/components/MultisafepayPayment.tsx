@@ -3,23 +3,6 @@ import { FunctionComponent, useContext, useEffect, useRef, ReactNode } from "rea
 
 import PaymentMethodContext from "#context/PaymentMethodContext"
 
-type MultisafepayGatewayType =
-  | "AFTERPAY"
-  | "APPLEPAY"
-  | "BANKTRANS"
-  | "BELFIUS"
-  | "CBC"
-  | "CREDITCARD"
-  | "DIRECTBANK"
-  | "DOTPAY"
-  | "GOOGLEPAY"
-  | "IDEAL"
-  | "IDEALQR"
-  | "KBC"
-  | "MISTERCASH"
-  | "TRUSTLY"
-  | "VVVGIFTCARD"
-
 export type MultisafepayConfig = {
   infoMessage?: {
     text?: string | ReactNode
@@ -63,6 +46,7 @@ const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
           paymentSourceId: paymentSource.id,
           paymentResource: currentPaymentMethodType,
           attributes: {
+            payment_source_token: "xxx.yyy.zzz",
             metadata: {
               card: {
                 id: paymentSource.id,

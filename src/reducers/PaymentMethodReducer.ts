@@ -1,4 +1,3 @@
-import { AdyenPaymentConfig } from '#components/AdyenPayment'
 import { MultisafepayConfig } from '#components/MultisafepayPayment'
 import { PaypalConfig } from '#components/PaypalPayment'
 import { StripeConfig } from '#components/StripePayment'
@@ -14,9 +13,6 @@ import {
   PaymentMethod,
   StripePayment,
   WireTransfer,
-  AdyenPayment,
-  BraintreePayment,
-  CheckoutComPayment,
   ExternalPayment,
   PaypalPayment,
   KlarnaPayment,
@@ -27,9 +23,6 @@ import isEmpty from 'lodash/isEmpty'
 import { Dispatch, MutableRefObject } from 'react'
 
 export type PaymentSourceType =
-  | AdyenPayment
-  | BraintreePayment
-  | CheckoutComPayment
   | ExternalPayment
   | PaypalPayment
   | StripePayment
@@ -45,9 +38,6 @@ type Card = {
 export type PaymentSourceObject = {
   external_payments: ExternalPayment & {
     payment_source_token?: string
-    approval_url?: string
-    cancel_url?: string
-    return_url?: string
   }
   paypal_payments: PaypalPayment
   stripe_payments: StripePayment & {
@@ -56,15 +46,6 @@ export type PaymentSourceObject = {
     }
   }
   wire_transfers: WireTransfer
-  checkout_com_payments: CheckoutComPayment & {
-    payment_response: {
-      source?: Pick<Card, 'last4'> & {
-        scheme: string
-        expiry_year: number
-        expiry_month: number
-      }
-    }
-  }
   klarna_payments: KlarnaPayment
 }
 
@@ -274,6 +255,9 @@ export const setPaymentSource: SetPaymentSource = async ({
     if (config && order) {
       let paymentSource: PaymentSourceType
       const sdk = getSdk(config)
+      if (paymentResource === "external_payments") {
+        attributes["payment_source_token"] = "aaa.bbb.ccc"
+      }
       if (!customerPaymentSourceId) {
         if (!paymentSourceId) {
           const attrs: any = {
@@ -385,7 +369,7 @@ export type PaymentMethodConfig = {
   stripePayment?: StripeConfig
   wireTransfer?: Partial<WireTransferConfig>
   paypalPayment?: PaypalConfig
-  klarnaPayment?: Pick<AdyenPaymentConfig, 'placeOrderCallback'> &
+  klarnaPayment?: { placeOrderCallback?: (response: { placed: boolean }) => void } &
     Pick<StripeConfig, 'containerClassName'>
   multisafepayPayment?: MultisafepayConfig
 }

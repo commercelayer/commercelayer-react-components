@@ -2,6 +2,12 @@ import { Dispatch, ForwardedRef, ReactNode, RefObject } from 'react'
 import PropTypes, { InferProps } from 'prop-types'
 import { BaseError } from './errors'
 
+declare global {
+  interface Window {
+    Klarna: unknown
+  }
+}
+
 export const BC = {
   id: PropTypes.string,
   className: PropTypes.string,
