@@ -14,6 +14,7 @@ import {
 } from '#utils/customerOrderOptions'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
+import axios from 'axios'
 
 export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted'
 
@@ -26,6 +27,7 @@ export type PlaceOrderOptions = {
   checkoutCom?: {
     session_id: string
   }
+  mspAuthorized?: boolean
 }
 
 export interface PlaceOrderActionPayload {
@@ -121,7 +123,11 @@ export type SetPlaceOrder = (args: {
   order?: Order
   state?: PlaceOrderState
   setOrderErrors?: (errors: BaseError[]) => void
-  paymentSource?: PaymentSourceType & { approval_url?: string }
+  paymentSource?: PaymentSourceType & { 
+    approval_url?: string 
+    cancel_url?: string
+    return_url?: string
+  }
   include?: string[]
   setOrder?: (order: Order) => void
 }) => Promise<{
@@ -154,8 +160,18 @@ export const setPlaceOrder: SetPlaceOrder = async ({
           paypal_payer_id: options?.paypalPayerId,
         })
       } else if (paymentType === 'external_payments' && paymentSource) {
-        if (paymentSource.reference_origin === 'MULTISAFEPAY') {
-          
+        if (paymentSource.reference_origin?.toUpperCase() === 'MULTISAFEPAY' && !options?.mspAuthorized) {
+          const mspResponse = await axios({ 
+            url: '/api/multisafepay/create-order', 
+            method: 'POST', 
+            data: { order: order },
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+            }
+          })
+          window.location.href = mspResponse.data.mspUrl
+          return response
         }
       }
       const updateAttributes: OrderUpdate = {

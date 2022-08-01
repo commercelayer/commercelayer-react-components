@@ -88,6 +88,16 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       handleClick()
     }
   }, [options?.paypalPayerId, paymentType])
+  useEffect(() => {
+    if (
+      paymentType === 'external_payments' &&
+      options?.mspAuthorized &&
+      order?.status &&
+      ['draft', 'pending'].includes(order?.status)
+    ) {
+      handleClick()
+    }
+  }, [options?.mspAuthorized, paymentType])
   
   const handleClick = async () => {
     let isValid = true

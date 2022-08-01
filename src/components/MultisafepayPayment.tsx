@@ -21,8 +21,6 @@ type MultisafepayGatewayType =
   | "VVVGIFTCARD"
 
 export type MultisafepayConfig = {
-  return_url: string
-  cancel_url: string
   infoMessage?: {
     text?: string | ReactNode
     className?: string
@@ -32,7 +30,7 @@ export type MultisafepayConfig = {
 const defaultMessage =
   "by placing the order, you will be redirected to a Multisafepay page to authorize the payment"
 
-type Props = Omit<MultisafepayConfig, "return_url" | "cancel_url"> &
+type Props = MultisafepayConfig &
   JSX.IntrinsicElements["div"]
 const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
   const ref = useRef<null | HTMLFormElement>(null)
