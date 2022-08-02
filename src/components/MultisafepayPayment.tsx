@@ -18,7 +18,7 @@ type Props = MultisafepayConfig &
 const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
   const ref = useRef<null | HTMLFormElement>(null)
   const {
-    setPaymentSource,
+    //setPaymentSource,
     paymentSource,
     currentPaymentMethodType,
     setPaymentRef,
@@ -26,12 +26,13 @@ const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
   useEffect(() => {
     if (
       ref.current &&
-      paymentSource &&
-      currentPaymentMethodType &&
+      //paymentSource &&
+      currentPaymentMethodType 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      paymentSource?.approval_url
+      //paymentSource?.approval_url
     ) {
+      console.log("Current payment method type", currentPaymentMethodType)
       ref.current.onsubmit = () => handleClick()
       setPaymentRef({ ref })
     }
@@ -40,28 +41,29 @@ const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
     }
   }, [ref, paymentSource, currentPaymentMethodType])
   const handleClick = async () => {
-    if (paymentSource && currentPaymentMethodType) {
-      try {
-        await setPaymentSource({
-          paymentSourceId: paymentSource.id,
-          paymentResource: currentPaymentMethodType,
-          attributes: {
-            payment_source_token: "xxx.yyy.zzz",
-            metadata: {
-              card: {
-                id: paymentSource.id,
-                brand: "mastercard",
-                last4: "",
-              },
-            },
-          },
-        })
-        return true
-      } catch (e) {
-        return false
-      }
-    }
-    return false
+    //if (paymentSource && currentPaymentMethodType) {
+      // try {
+      //   await setPaymentSource({
+      //     paymentSourceId: paymentSource.id,
+      //     paymentResource: currentPaymentMethodType,
+      //     attributes: {
+      //       payment_source_token: "xxx.yyy.zzz",
+      //       metadata: {
+      //         card: {
+      //           id: paymentSource.id,
+      //           brand: "mastercard",
+      //           last4: "",
+      //         },
+      //       },
+      //     },
+      //   })
+      //   return true
+      // } catch (e) {
+      //   return false
+      // }
+    //}
+    //return false
+    return true
   }
   return (
     <form ref={ref}>

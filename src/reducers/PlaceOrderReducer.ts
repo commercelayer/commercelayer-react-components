@@ -87,6 +87,7 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
     let isPermitted = true
     if (order.privacy_url && order.terms_url) {
       isPermitted = localStorage.getItem('privacy-terms') === 'true'
+      console.log("privacy terms required")
     }
     const billingAddress = order.billing_address
     const shippingAddress = order.shipping_address
@@ -95,13 +96,18 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
     const shipment = shipments && shipmentsFilled(shipments)
     const paymentMethod = order.payment_method
     const paymentSource = order.payment_source
-    if (order.total_amount_with_taxes_cents !== 0 && isEmpty(paymentMethod?.id))
+    if (order.total_amount_with_taxes_cents !== 0 && isEmpty(paymentMethod?.id)) {
       isPermitted = false
+      console.log(paymentMethod)
+    }
     if (isEmpty(billingAddress)) isPermitted = false
     if (isEmpty(shippingAddress) && !doNotShip) isPermitted = false
     if (!isEmpty(shipments) && !shipment) isPermitted = false
     // @ts-ignore
-    if (paymentSource?.mismatched_amounts) isPermitted = false
+    if (paymentSource?.mismatched_amounts) {
+      isPermitted = false
+      console.log("mismatched amounts")
+    }
     dispatch({
       type: 'setPlaceOrderPermitted',
       payload: {
@@ -159,8 +165,8 @@ export const setPlaceOrder: SetPlaceOrder = async ({
           id: paymentSource.id,
           paypal_payer_id: options?.paypalPayerId,
         })
-      } else if (paymentType === 'external_payments' && paymentSource) {
-        if (paymentSource.reference_origin?.toUpperCase() === 'MULTISAFEPAY' && !options?.mspAuthorized) {
+      } else if (paymentType === 'external_payments' && order.payment_method) {
+        if (order.payment_method.reference_origin?.toUpperCase() === 'MULTISAFEPAY' && !options?.mspAuthorized) {
           const mspResponse = await axios({ 
             url: '/api/multisafepay/create-order', 
             method: 'POST', 
