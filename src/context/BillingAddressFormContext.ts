@@ -1,30 +1,18 @@
 import { createContext } from 'react'
-import type { Address } from '@commercelayer/sdk'
-
-export type AddressValuesKeys =
-  | `${keyof Address}`
-  | `billing_address_${keyof Address}`
-  | `shipping_address_${keyof Address}`
+import { AddressCountrySelectName, AddressInputName } from '#typings'
+import { AddressField } from '#reducers/AddressReducer'
 
 export type DefaultContextAddress = {
   validation?: void
   setValue?: (
-    name: AddressValuesKeys,
-    value: string | number | readonly string[]
+    name: AddressField | AddressInputName | AddressCountrySelectName,
+    value: any
   ) => void
-  errors?: {
-    [name: string]: {
-      code: string
-      message: string
-      error: boolean
-    }
-  }
+  errors?: Record<string, { code: string; message: string; error: boolean }>[]
   errorClassName?: string
   requiresBillingInfo?: boolean
   resetField?: (name: string) => void
-  values?: {
-    [T in AddressValuesKeys]: string | { value: string }
-  }
+  values?: Record<string, any>
   isBusiness?: boolean
 }
 
