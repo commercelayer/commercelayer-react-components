@@ -1,4 +1,4 @@
-import useRapidForm from 'rapid-form'
+import { useRapidForm } from 'rapid-form'
 import {
   FunctionComponent,
   useContext,

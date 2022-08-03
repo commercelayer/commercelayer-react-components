@@ -102,7 +102,7 @@ const AddressStateSelector: FunctionComponent<AddressStateSelectorProps> = (
     <BaseSelect
       {...p}
       className={classNameComputed}
-      ref={billingAddress?.validation || shippingAddress?.validation}
+      ref={(billingAddress?.validation as any) || shippingAddress?.validation}
       required={required}
       options={getStateOfCountry(countryCode)}
       name={name}
