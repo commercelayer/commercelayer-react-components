@@ -2,13 +2,14 @@
 .env.*
 .env
 !.env.example
-# Npm
+#Npm
 lib
 .jest
 
-# Yalc
-.yalc
-yalc.lock
+# Cypress
+cypress/fixtures/*
+cypress/videos/*
+cypress/screenshots/*
 
 # Playwright
 specs/e2e/screenshots

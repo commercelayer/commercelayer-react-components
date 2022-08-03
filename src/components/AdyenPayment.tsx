@@ -27,43 +27,11 @@ type Styles = Partial<{
   validated: CSSProperties
 }>
 
-type PaypalStyle = Partial<{
-  /**
-   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#color}
-   */
-  color: 'gold' | 'blue' | 'silver' | 'white' | 'black';
-  /**
-   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#shape}
-   */
-  shape: 'rect' | 'pill';
-  /**
-   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#height}
-   */
-  height: string | number;
-  /**
-   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#label}
-   */
-  label: 'paypal' | 'checkout' | 'buynow' | 'pay';
-  /**
-   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#tagline}
-   */
-  tagline: boolean;
-  /**
-   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#layout}
-   */
-  layout: 'vertical' | 'horizontal';
-}>
-
-interface PaymentMethodsStyle {
-  card?: Styles,
-  paypal?: PaypalStyle,
-}
-
 export type AdyenPaymentConfig = {
   cardContainerClassName?: string
   threeDSecureContainerClassName?: string
   placeOrderCallback?: (response: { placed: boolean }) => void
-  styles?: PaymentMethodsStyle
+  styles?: Styles
 }
 
 type AdyenCheckout = Dropin | Card | null
@@ -88,6 +56,7 @@ export function AdyenPayment({
   const {
     cardContainerClassName,
     threeDSecureContainerClassName,
+    placeOrderCallback,
     styles,
   } = {
     ...defaultConfig,
@@ -103,7 +72,7 @@ export function AdyenPayment({
     setPaymentRef,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
-  const { placeOrderButtonRef } = useContext(PlaceOrderContext)
+  const { setPlaceOrder } = useContext(PlaceOrderContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const handleSubmit = async (
     e: any,
@@ -174,28 +143,15 @@ export function AdyenPayment({
       const resultCode = pSource?.payment_response?.resultCode
       if (adyenAction && component) {
         component.handleAction(adyenAction)
-        return false
       }
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-        if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
-          if (placeOrderButtonRef.current.disabled === true) {
-            placeOrderButtonRef.current.disabled = false
-          }
-          placeOrderButtonRef.current?.click()
-        }
+        const { placed } = (setPlaceOrder &&
+          (await setPlaceOrder({
+            // @ts-ignore
+            paymentSource: pSource,
+          }))) || { placed: false }
+        placed && placeOrderCallback && placeOrderCallback({ placed })
         return true
-      }
-      if (['Cancelled'].includes(resultCode)) {
-        // @ts-ignore
-        const message = pSource?.payment_response?.refusalReason
-          setPaymentMethodErrors([
-            {
-              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-              resource: 'payment_methods',
-              field: currentPaymentMethodType,
-              message,
-            },
-          ])
       }
       return false
     } catch (error) {
@@ -204,15 +160,6 @@ export function AdyenPayment({
     }
   }
   const onSubmit = async (state: any, component: AdyenCheckout) => {
-    const control = await setPaymentSource({
-      paymentSourceId: paymentSource?.id,
-      paymentResource: 'adyen_payments',
-    })
-    // @ts-ignore
-    const controlCode = control?.payment_response?.resultCode
-    if (controlCode === 'Authorised') {
-      return true
-    }
     const attributes: any = {
       payment_request_data: {
         ...state.data,
@@ -235,47 +182,18 @@ export function AdyenPayment({
         return false
       }
       // @ts-ignore
-      const resultCode = res?.payment_response?.resultCode
-      if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-        if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
-            if (placeOrderButtonRef.current.disabled === true) {
-              placeOrderButtonRef.current.disabled = false
-            }
-            placeOrderButtonRef.current?.click()
-          }
-        return true
-      }
-      if (['Cancelled'].includes(resultCode)) {
-        // @ts-ignore
-        const message = res?.payment_response?.refusalReason
-          setPaymentMethodErrors([
-            {
-              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-              resource: 'payment_methods',
-              field: currentPaymentMethodType,
-              message,
-            },
-          ])
-      }
-      // @ts-ignore
-      const errorType = res?.payment_response?.errorType
+      const errorType = paymentSource?.payment_response?.errorType
       if (errorType) {
         // @ts-ignore
-        const errorCode = res?.payment_response?.errorCode
-        if (errorCode === '14_006') {
-          onSubmit(state, component)
-        } else {
-          // @ts-ignore
-          const message = res?.payment_response?.message
-          setPaymentMethodErrors([
-            {
-              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-              resource: 'payment_methods',
-              field: currentPaymentMethodType,
-              message,
-            },
-          ])
-        }
+        const message = paymentSource?.payment_response?.message
+        setPaymentMethodErrors([
+          {
+            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+            resource: 'payment_methods',
+            field: currentPaymentMethodType,
+            message,
+          },
+        ])
       }
       return false
     } catch (error: any) {
@@ -287,7 +205,6 @@ export function AdyenPayment({
           message: error.message as string,
         },
       ])
-      return false
     }
   }
   useEffect(() => {
@@ -323,10 +240,8 @@ export function AdyenPayment({
         threeDS2: threeDSConfiguration,
         paypal: {
           showPayButton: true,
-          style: styles?.paypal
         },
         card: {
-          styles: styles?.card,
           holderNameRequired: false,
         },
       },
@@ -342,13 +257,18 @@ export function AdyenPayment({
         AdyenCheckout(options).then((adyenCheckout) => {
           const component = adyenCheckout
             .create(type, {
+              styles,
               onSelect: (component) => {
                 const id: string = component._id
                 if (id.search('scheme') === -1) {
                   if (ref.current) {
                     if (id.search('paypal') === -1) {
-                      ref.current.onsubmit = () =>
-                        handleSubmit(ref.current as any, component)
+                      // ref.current.onsubmit = () =>
+                      //   handleSubmit(ref.current as any, component)
+                      ref.current.onsubmit = null
+                      window.alert(
+                        'This payment method is not supported yet. Please, try another one.'
+                      )
                     } else {
                       ref.current.onsubmit = null
                     }

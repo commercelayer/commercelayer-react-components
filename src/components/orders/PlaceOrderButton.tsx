@@ -3,10 +3,9 @@ import {
   ReactNode,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from 'react'
-import Parent from '../utils/Parent'
+import Parent from './utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
@@ -19,22 +18,21 @@ const propTypes = components.PlaceOrderButton.propTypes
 const defaultProps = components.PlaceOrderButton.defaultProps
 const displayName = components.PlaceOrderButton.displayName
 
-type ChildrenProps = FunctionChildren<
-  Omit<Props, 'children'> & {
+type PlaceOrderButtonChildrenProps = FunctionChildren<
+  Omit<PlaceOrderButtonProps, 'children'> & {
     handleClick: () => Promise<void>
   }
 >
 
-type Props = {
-  children?: ChildrenProps
+type PlaceOrderButtonProps = {
+  children?: PlaceOrderButtonChildrenProps
   label?: string | ReactNode
   onClick?: (response: { placed: boolean }) => void
 } & JSX.IntrinsicElements['button']
 
 const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
-  const ref = useRef(null)
   const { children, label = 'Place order', disabled, onClick, ...p } = props
-  const { isPermitted, setPlaceOrder, options, paymentType, setButtonRef } =
+  const { isPermitted, setPlaceOrder, options, paymentType } =
     useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
@@ -43,7 +41,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     loading,
     currentPaymentMethodType,
     paymentSource,
-    setPaymentSource,
+    // setPaymentSource,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
@@ -88,38 +86,37 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       order?.status &&
       ['draft', 'pending'].includes(order?.status)
     ) {
-      void handleClick()
+      handleClick()
     }
   }, [options?.paypalPayerId, paymentType])
   useEffect(() => {
-    if (
-      paymentType === 'adyen_payments' &&
-      options?.adyen?.redirectResult &&
-      order?.status &&
-      ['draft', 'pending'].includes(order?.status)
-    ) {
-      const attributes = {
-        payment_request_details: {
-          details: {
-            redirectResult: options?.adyen?.redirectResult,
-          },
-          // @ts-ignore
-          paymentData: paymentSource.payment_response.paymentData,
-        },
-        _details: 1,
-      }
-      setPaymentSource({
-        paymentSourceId: paymentSource?.id,
-        paymentResource: 'adyen_payments',
-        attributes,
-      }).then((res) => {
-        // @ts-ignore
-        const resultCode = res?.payment_response?.resultCode
-        if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-          handleClick()
-        }
-      })
-    }
+    // if (
+    //   paymentType === 'adyen_payments' &&
+    //   options?.adyen?.redirectResult &&
+    //   order?.status &&
+    //   ['draft', 'pending'].includes(order?.status)
+    // ) {
+    //   const attributes = {
+    //     payment_request_details: {
+    //       details: {
+    //         redirectResult: options?.adyen?.redirectResult,
+    //         // @ts-ignore
+    //         paymentData: paymentSource.payment_response.paymentData,
+    //       },
+    //     },
+    //   }
+    //   setPaymentSource({
+    //     paymentSourceId: paymentSource?.id,
+    //     paymentResource: 'adyen_payments',
+    //     attributes,
+    //   }).then((res) => {
+    //     // @ts-ignore
+    //     const resultCode = res?.payment_response?.resultCode
+    //     if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
+    //       handleClick()
+    //     }
+    //   })
+    // }
     if (
       paymentType === 'adyen_payments' &&
       options?.adyen?.MD &&
@@ -127,7 +124,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       order?.status &&
       ['draft', 'pending'].includes(order?.status)
     ) {
-      void handleClick()
+      handleClick()
     }
   }, [options?.adyen, paymentType])
   useEffect(() => {
@@ -137,15 +134,9 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       order?.status &&
       ['draft', 'pending'].includes(order?.status)
     ) {
-      void handleClick()
+      handleClick()
     }
   }, [options?.checkoutCom, paymentType])
-  useEffect(() => {
-    if (ref != null && ref.current != null && setButtonRef != null) {
-      setButtonRef(ref)
-    }
-  }, [ref])
-  
   const handleClick = async () => {
     let isValid = true
     setForceDisable(true)
@@ -164,11 +155,10 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       ].every(Boolean)
     ) {
       // @ts-ignore
-      isValid = (await currentPaymentMethodRef.current?.onsubmit(paymentSource)) as boolean
-      // @ts-ignore
-      if (isValid === false && paymentSource.payment_response?.resultCode === 'Authorised') {
-        isValid = true
-      } 
+      isValid = (await currentPaymentMethodRef.current?.onsubmit(
+        // @ts-ignore
+        paymentSource
+      )) as boolean
     } else if (card?.brand) {
       isValid = true
     }
@@ -186,13 +176,11 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     label,
     disabled: disabledButton,
     handleClick,
-    ref
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-      <button
-        ref={ref}
+    <button
       type="button"
       disabled={disabledButton || forceDisable}
       onClick={handleClick}
