@@ -7,10 +7,7 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "lib": [
-      "dom",
-      "es2017"
-    ],
+    "lib": ["dom", "es2017"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
@@ -35,7 +32,6 @@
     "paths": {
       "@commercelayer/react-components": ["src/index"],
       "#components/*": ["src/components/*"],
-      "#components-utils/*": ["src/components/utils/*"],
       "#reducers/*": ["src/reducers/*"],
       "#context/*": ["src/context/*"],
       "#typings/*": ["src/typings/*"],
