@@ -1,29 +1,25 @@
-import { useContext, useEffect, useState } from 'react'
-import BaseInput from '#components-utils/BaseInput'
+import { FunctionComponent, useContext, useEffect, useState } from 'react'
+import BaseInput from './utils/BaseInput'
 import components from '#config/components'
 import { BaseInputComponentProps, AddressInputName } from '#typings'
-import BillingAddressFormContext, {
-  AddressValuesKeys,
-} from '#context/BillingAddressFormContext'
+import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'
 import { businessMandatoryField } from '#utils/validateFormFields'
-import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
 
 const propTypes = components.AddressInput.propTypes
 const displayName = components.AddressInput.displayName
 
-type Props = {
-  name: Extract<AddressValuesKeys, AddressInputName>
+export type AddressInputProps = {
+  name: AddressInputName
 } & Omit<BaseInputComponentProps, 'name'> &
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
 
-export function AddressInput(props: Props) {
+const AddressInput: FunctionComponent<AddressInputProps> = (props) => {
   const { placeholder = '', required, value, className, ...p } = props
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
-  const customerAddress = useContext(CustomerAddressFormContext)
   const [hasError, setHasError] = useState(false)
   useEffect(() => {
     if (value && billingAddress?.setValue) {
@@ -32,31 +28,28 @@ export function AddressInput(props: Props) {
     if (value && shippingAddress?.setValue) {
       shippingAddress.setValue(p.name, value)
     }
-    if (value && customerAddress?.setValue) {
-      customerAddress.setValue(p.name, value)
-    }
-
-    if (billingAddress.errors && billingAddress?.errors?.[p.name]?.error) {
-      setHasError(true)
-    }
-    if (billingAddress && isEmpty(billingAddress?.errors?.[p.name]) && hasError)
-      setHasError(false)
-
-    if (customerAddress.errors && customerAddress?.errors?.[p.name]?.error) {
-      setHasError(true)
-    }
-    if (isEmpty(customerAddress?.errors?.[p.name]) && hasError)
-      setHasError(false)
-
     if (
-      shippingAddress.errors &&
-      shippingAddress?.errors?.[p.name]?.['error']
+      !isEmpty(billingAddress.errors) &&
+      billingAddress?.errors?.[p.name as any]?.['error']
     ) {
       setHasError(true)
     }
     if (
-      shippingAddress &&
-      isEmpty(shippingAddress?.errors?.[p.name]) &&
+      !isEmpty(billingAddress) &&
+      isEmpty(billingAddress?.errors?.[p.name as any]) &&
+      hasError
+    )
+      setHasError(false)
+
+    if (
+      !isEmpty(shippingAddress.errors) &&
+      shippingAddress?.errors?.[p.name as any]?.['error']
+    ) {
+      setHasError(true)
+    }
+    if (
+      !isEmpty(shippingAddress) &&
+      isEmpty(shippingAddress?.errors?.[p.name as any]) &&
       hasError
     )
       setHasError(false)
@@ -71,9 +64,7 @@ export function AddressInput(props: Props) {
   const reqField = required !== undefined ? required : mandatoryField
   const errorClassName =
     billingAddress?.errorClassName || shippingAddress?.errorClassName
-  const classNameComputed = `${className ? className : ''} ${
-    hasError && errorClassName ? errorClassName : ''
-  }`
+  const classNameComputed = `${className} ${hasError ? errorClassName : ''}`
   if (
     p.name === 'billing_address_billing_info' &&
     !billingAddress.requiresBillingInfo
@@ -81,11 +72,7 @@ export function AddressInput(props: Props) {
     return null
   return (
     <BaseInput
-      ref={
-        (billingAddress?.validation as any) ||
-        shippingAddress?.validation ||
-        customerAddress?.validation
-      }
+      ref={(billingAddress?.validation as any) || shippingAddress?.validation}
       className={classNameComputed}
       required={reqField}
       placeholder={placeholder}
