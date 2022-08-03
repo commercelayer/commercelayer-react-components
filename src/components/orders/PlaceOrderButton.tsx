@@ -3,7 +3,6 @@ import {
   ReactNode,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from 'react'
 import Parent from './utils/Parent'
@@ -19,22 +18,21 @@ const propTypes = components.PlaceOrderButton.propTypes
 const defaultProps = components.PlaceOrderButton.defaultProps
 const displayName = components.PlaceOrderButton.displayName
 
-type ChildrenProps = FunctionChildren<
-  Omit<Props, 'children'> & {
+type PlaceOrderButtonChildrenProps = FunctionChildren<
+  Omit<PlaceOrderButtonProps, 'children'> & {
     handleClick: () => Promise<void>
   }
 >
 
-type Props = {
-  children?: ChildrenProps
+type PlaceOrderButtonProps = {
+  children?: PlaceOrderButtonChildrenProps
   label?: string | ReactNode
   onClick?: (response: { placed: boolean }) => void
 } & JSX.IntrinsicElements['button']
 
 const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
-  const ref = useRef(null)
   const { children, label = 'Place order', disabled, onClick, ...p } = props
-  const { isPermitted, setPlaceOrder, options, paymentType, setButtonRef } =
+  const { isPermitted, setPlaceOrder, options, paymentType } =
     useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
@@ -88,7 +86,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       order?.status &&
       ['draft', 'pending'].includes(order?.status)
     ) {
-      void handleClick()
+      handleClick()
     }
   }, [options?.paypalPayerId, paymentType])
   useEffect(() => {
@@ -126,7 +124,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       order?.status &&
       ['draft', 'pending'].includes(order?.status)
     ) {
-      void handleClick()
+      handleClick()
     }
   }, [options?.adyen, paymentType])
   useEffect(() => {
@@ -136,15 +134,9 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       order?.status &&
       ['draft', 'pending'].includes(order?.status)
     ) {
-      void handleClick()
+      handleClick()
     }
   }, [options?.checkoutCom, paymentType])
-  useEffect(() => {
-    if (ref != null && ref.current != null && setButtonRef != null) {
-      setButtonRef(ref)
-    }
-  }, [ref])
-  
   const handleClick = async () => {
     let isValid = true
     setForceDisable(true)
@@ -184,13 +176,11 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     label,
     disabled: disabledButton,
     handleClick,
-    ref
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-      <button
-        ref={ref}
+    <button
       type="button"
       disabled={disabledButton || forceDisable}
       onClick={handleClick}
