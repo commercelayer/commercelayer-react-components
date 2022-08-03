@@ -32,6 +32,7 @@ let orderId = 'PDerhJplRp'
 let paypalPayerId = ''
 let paypalReturnUrl = ''
 let checkoutComSession = ''
+let redirectResult = ''
 
 const messages: any = [
   {
@@ -72,6 +73,9 @@ export default function Main() {
   }
   if (query['cko-session-id']) {
     checkoutComSession = query['cko-session-id'] as string
+  }
+  if (query['redirectResult']) {
+    redirectResult = query['redirectResult'] as string
   }
   if (typeof window !== 'undefined') {
     paypalReturnUrl = window.location.href
@@ -156,12 +160,20 @@ export default function Main() {
                       if (res.placed) setPlaced(true)
                     },
                   },
+                  adyenPayment: {
+                    placeOrderCallback: (res: any) => {
+                      if (res.placed) setPlaced(true)
+                    },
+                  },
                 }}
               >
                 <PlaceOrderContainer
                   options={{
                     paypalPayerId,
                     checkoutCom: { session_id: checkoutComSession },
+                    adyen: {
+                      redirectResult,
+                    },
                   }}
                 >
                   <PaymentMethod
@@ -173,7 +185,7 @@ export default function Main() {
                     <PaymentMethodName className="pl-3" />
                     <PaymentMethodPrice className="pl-3" />
                     <PaymentSource
-                      data-cy="payment-source"
+                      data-test-id="payment-source"
                       className="p-5 my-2"
                       loader={'Caricamento...'}
                     >

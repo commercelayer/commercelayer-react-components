@@ -41,6 +41,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     loading,
     currentPaymentMethodType,
     paymentSource,
+    // setPaymentSource,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
@@ -89,6 +90,33 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     }
   }, [options?.paypalPayerId, paymentType])
   useEffect(() => {
+    // if (
+    //   paymentType === 'adyen_payments' &&
+    //   options?.adyen?.redirectResult &&
+    //   order?.status &&
+    //   ['draft', 'pending'].includes(order?.status)
+    // ) {
+    //   const attributes = {
+    //     payment_request_details: {
+    //       details: {
+    //         redirectResult: options?.adyen?.redirectResult,
+    //         // @ts-ignore
+    //         paymentData: paymentSource.payment_response.paymentData,
+    //       },
+    //     },
+    //   }
+    //   setPaymentSource({
+    //     paymentSourceId: paymentSource?.id,
+    //     paymentResource: 'adyen_payments',
+    //     attributes,
+    //   }).then((res) => {
+    //     // @ts-ignore
+    //     const resultCode = res?.payment_response?.resultCode
+    //     if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
+    //       handleClick()
+    //     }
+    //   })
+    // }
     if (
       paymentType === 'adyen_payments' &&
       options?.adyen?.MD &&

@@ -1,19 +1,14 @@
-import {
-  CSSProperties,
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { CSSProperties, useContext, useEffect, useRef, useState } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import isEmpty from 'lodash/isEmpty'
 import { PaymentSourceProps } from './PaymentSource'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import { CoreOptions } from '@adyen/adyen-web/dist/types/core/types'
 import Parent from '#components/utils/Parent'
 import getBrowserInfo from '../utils/browserInfo'
 import PlaceOrderContext from '#context/PlaceOrderContext'
+import OrderContext from '#context/OrderContext'
+import type Dropin from '@adyen/adyen-web/dist/types/components/Dropin'
+import type Card from '@adyen/adyen-web/dist/types/components/Card'
 
 const threeDSConfiguration = {
   challengeWindowSize: '05',
@@ -39,7 +34,9 @@ export type AdyenPaymentConfig = {
   styles?: Styles
 }
 
-type AdyenPaymentProps = {
+type AdyenCheckout = Dropin | Card | null
+
+type Props = {
   clientKey?: string
   config?: AdyenPaymentConfig
   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
@@ -49,13 +46,13 @@ type AdyenPaymentProps = {
 
 const defaultConfig: AdyenPaymentConfig = {}
 
-const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
+export function AdyenPayment({
   clientKey,
   config,
   templateCustomerSaveToWallet,
   environment = 'test',
   locale = 'en_US',
-}) => {
+}: Props) {
   const {
     cardContainerClassName,
     threeDSecureContainerClassName,
@@ -66,7 +63,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
     ...config,
   }
   const [loadAdyen, setLoadAdyen] = useState(false)
-  const [checkout, setCheckout] = useState({})
+  const [checkout, setCheckout] = useState<AdyenCheckout>(null)
   const {
     setPaymentSource,
     paymentSource,
@@ -74,9 +71,13 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
     currentPaymentMethodType,
     setPaymentRef,
   } = useContext(PaymentMethodContext)
+  const { order } = useContext(OrderContext)
   const { setPlaceOrder } = useContext(PlaceOrderContext)
   const ref = useRef<null | HTMLFormElement>(null)
-  const handleSubmit = async (e: any, checkout: any): Promise<boolean> => {
+  const handleSubmit = async (
+    e: any,
+    component: AdyenCheckout
+  ): Promise<boolean> => {
     const savePaymentSourceToCustomerWallet =
       // @ts-ignore
       e?.elements?.['save_payment_source_to_customer_wallet']?.checked
@@ -85,77 +86,15 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
         '_save_payment_source_to_customer_wallet',
         savePaymentSourceToCustomerWallet
       )
-    const attributes: any = {
-      _authorize: 1,
+    if (component && component.submit) {
+      component.submit()
     }
-    try {
-      const pSource =
-        paymentSource &&
-        (await setPaymentSource({
-          paymentSourceId: paymentSource.id,
-          paymentResource: 'adyen_payments',
-          attributes,
-        }))
-      // @ts-ignore
-      const adyenAction = pSource?.payment_response?.action
-      // @ts-ignore
-      const resultCode = pSource?.payment_response?.resultCode
-      if (
-        adyenAction &&
-        ['IdentifyShopper', 'RedirectShopper'].includes(resultCode)
-      ) {
-        checkout
-          .createFromAction(adyenAction, threeDSConfiguration)
-          .mount('#adyen-action')
-      } else if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-        const brand =
-          // @ts-ignore
-          pSource?.payment_request_data?.payment_method?.brand
-        if (brand) {
-          const attributes = { metadata: { card: { brand } } }
-          await setPaymentSource({
-            paymentSourceId: pSource?.id,
-            paymentResource: 'adyen_payments',
-            attributes,
-          })
-        }
-        return true
-      }
-      // @ts-ignore
-      const message = pSource?.payment_response?.refusalReason
-      setPaymentMethodErrors([
-        {
-          code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-          resource: 'payment_methods',
-          field: currentPaymentMethodType,
-          message,
-        },
-      ])
-      return false
-    } catch (error: any) {
-      setPaymentMethodErrors([
-        {
-          code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-          resource: 'payment_methods',
-          field: currentPaymentMethodType,
-          message: error.message as string,
-        },
-      ])
-      return false
-    }
+    return false
   }
-  const handleChange = async (
-    state: any,
-    _component: any,
-    config: any,
-    paySource: any
-  ) => {
+  const handleChange = async (state: any, checkout: AdyenCheckout) => {
     if (state.isValid) {
       if (ref.current) {
-        const AdyenCheckout = require('@adyen/adyen-web')
-        const adyenCheckout = await AdyenCheckout(config)
-        ref.current.onsubmit = () =>
-          handleSubmit(ref.current as any, adyenCheckout)
+        ref.current.onsubmit = () => handleSubmit(ref.current as any, checkout)
         setPaymentRef({ ref })
       }
       const browserInfo = getBrowserInfo()
@@ -174,9 +113,9 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
           },
         },
       }
-      paySource &&
+      paymentSource &&
         (await setPaymentSource({
-          paymentSourceId: paySource.id,
+          paymentSourceId: paymentSource.id,
           paymentResource: 'adyen_payments',
           attributes,
         }))
@@ -184,10 +123,9 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
   }
   const handleOnAdditionalDetails = async (
     state: any,
-    _component: any,
-    config: any
-  ) => {
-    const attributes: any = {
+    component: AdyenCheckout
+  ): Promise<boolean> => {
+    const attributes = {
       payment_request_details: state.data,
       _details: 1,
     }
@@ -203,12 +141,8 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
       const adyenAction = pSource?.payment_response?.action
       // @ts-ignore
       const resultCode = pSource?.payment_response?.resultCode
-      const AdyenCheckout = require('@adyen/adyen-web')
-      if (adyenAction) {
-        const adyenCheckout = await AdyenCheckout(config)
-        adyenCheckout
-          .createFromAction(adyenAction, threeDSConfiguration)
-          .mount('#adyen-action')
+      if (adyenAction && component) {
+        component.handleAction(adyenAction)
       }
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
         const { placed } = (setPlaceOrder &&
@@ -217,43 +151,138 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
             paymentSource: pSource,
           }))) || { placed: false }
         placed && placeOrderCallback && placeOrderCallback({ placed })
+        return true
       }
+      return false
     } catch (error) {
       console.error('Adyen additional details error:', error)
+      return false
+    }
+  }
+  const onSubmit = async (state: any, component: AdyenCheckout) => {
+    const attributes: any = {
+      payment_request_data: {
+        ...state.data,
+        payment_method: state.data.paymentMethod,
+        return_url: window.location.href,
+      },
+      _authorize: 1,
+    }
+    delete attributes.payment_request_data.paymentMethod
+    try {
+      const res = await setPaymentSource({
+        paymentSourceId: paymentSource?.id,
+        paymentResource: 'adyen_payments',
+        attributes,
+      })
+      // @ts-ignore
+      const action = res?.payment_response?.action
+      if (component && action) {
+        component.handleAction(action)
+        return false
+      }
+      // @ts-ignore
+      const errorType = paymentSource?.payment_response?.errorType
+      if (errorType) {
+        // @ts-ignore
+        const message = paymentSource?.payment_response?.message
+        setPaymentMethodErrors([
+          {
+            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+            resource: 'payment_methods',
+            field: currentPaymentMethodType,
+            message,
+          },
+        ])
+      }
+      return false
+    } catch (error: any) {
+      setPaymentMethodErrors([
+        {
+          code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+          resource: 'payment_methods',
+          field: currentPaymentMethodType,
+          message: error.message as string,
+        },
+      ])
     }
   }
   useEffect(() => {
     // @ts-ignore
-    const paymentMethodsResponse = !isEmpty(paymentSource?.payment_methods)
+    const paymentMethodsResponse = paymentSource?.payment_methods
+      ?.paymentMethods
       ? // @ts-ignore
-        paymentSource?.payment_methods
-      : {}
-    if (isEmpty(paymentMethodsResponse))
+        paymentSource?.payment_methods.paymentMethods
+      : []
+    const [firstPaymentMethod] = paymentMethodsResponse
+    const isOnlyCard =
+      paymentMethodsResponse?.length === 1 &&
+      firstPaymentMethod.type === 'scheme'
+    if (paymentMethodsResponse.length === 0) {
       console.error(
         'Payment methods are not available. Please, check your Adyen configuration.'
       )
+    }
     const options: CoreOptions = {
       locale,
       environment,
       clientKey,
-      paymentMethodsResponse,
+      amount: {
+        currency: order?.currency_code || '',
+        value: order?.total_amount_with_taxes_cents || 0,
+      },
+      countryCode: order?.country_code || '',
+      paymentMethodsResponse: {
+        paymentMethods: paymentMethodsResponse,
+      },
+      showPayButton: false,
+      paymentMethodsConfiguration: {
+        threeDS2: threeDSConfiguration,
+        paypal: {
+          showPayButton: true,
+        },
+        card: {
+          holderNameRequired: false,
+        },
+      },
+      onAdditionalDetails: handleOnAdditionalDetails,
+      onChange: handleChange,
+      onSubmit,
     }
-    options['onChange'] = (s: any, c: any) =>
-      handleChange(s, c, options, paymentSource)
-    options['onAdditionalDetails'] = (s: any, c: any) =>
-      handleOnAdditionalDetails(s, c, options)
     if (!ref && clientKey)
       setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'false')
-    if (clientKey && !loadAdyen && !isEmpty(window)) {
-      const AdyenCheckout = require('@adyen/adyen-web')
-      AdyenCheckout(options).then((adyenCheckout: any) => {
-        const card = adyenCheckout
-          .create('card', { styles })
-          .mount('#adyen-card')
-        if (card) {
-          setCheckout(adyenCheckout)
-          setLoadAdyen(true)
-        }
+    if (clientKey && !loadAdyen && window && !checkout) {
+      import('@adyen/adyen-web').then(({ default: AdyenCheckout }) => {
+        const type = isOnlyCard ? 'card' : 'dropin'
+        AdyenCheckout(options).then((adyenCheckout) => {
+          const component = adyenCheckout
+            .create(type, {
+              styles,
+              onSelect: (component) => {
+                const id: string = component._id
+                if (id.search('scheme') === -1) {
+                  if (ref.current) {
+                    if (id.search('paypal') === -1) {
+                      // ref.current.onsubmit = () =>
+                      //   handleSubmit(ref.current as any, component)
+                      ref.current.onsubmit = null
+                      window.alert(
+                        'This payment method is not supported yet. Please, try another one.'
+                      )
+                    } else {
+                      ref.current.onsubmit = null
+                    }
+                    setPaymentRef({ ref })
+                  }
+                }
+              },
+            })
+            .mount('#adyen-dropin')
+          if (component) {
+            setCheckout(component)
+            setLoadAdyen(true)
+          }
+        })
       })
     }
     return () => {
@@ -263,7 +292,7 @@ const AdyenPayment: FunctionComponent<AdyenPaymentProps> = ({
   }, [clientKey, ref])
   return !clientKey && !loadAdyen && !checkout ? null : (
     <form ref={ref} onSubmit={(e) => handleSubmit(e, checkout)}>
-      <div className={cardContainerClassName} id="adyen-card"></div>
+      <div className={cardContainerClassName} id="adyen-dropin"></div>
       {templateCustomerSaveToWallet && (
         <Parent {...{ name: 'save_payment_source_to_customer_wallet' }}>
           {templateCustomerSaveToWallet}
