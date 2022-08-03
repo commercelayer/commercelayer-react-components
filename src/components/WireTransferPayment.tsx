@@ -18,11 +18,13 @@ export type WireTransferConfig = {
 const defaultMessage =
   'after placing the order, you will need to manually complete the payment with your bank'
 
-type Props = WireTransferConfig & JSX.IntrinsicElements['div']
+type Props = WireTransferConfig &
+  JSX.IntrinsicElements['div'] & { 'data-test-id'?: string }
 const WireTransferPayment: FunctionComponent<Props> = ({
   infoMessage,
   ...p
 }) => {
+  const { className, 'data-test-id': dataTestId } = p
   const ref = useRef<null | HTMLFormElement>(null)
   const {
     setPaymentSource,
@@ -64,7 +66,7 @@ const WireTransferPayment: FunctionComponent<Props> = ({
   }
   return (
     <form ref={ref}>
-      <div {...p}>
+      <div className={className} data-test-id={dataTestId}>
         <span className={infoMessage?.className}>
           {isFunction(infoMessage?.text)
             ? infoMessage?.text()

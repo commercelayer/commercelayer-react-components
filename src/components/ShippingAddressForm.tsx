@@ -1,5 +1,5 @@
 import AddressesContext from '#context/AddressContext'
-import useRapidForm from 'rapid-form'
+import { useRapidForm } from 'rapid-form'
 import {
   FunctionComponent,
   ReactNode,
