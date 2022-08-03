@@ -205,6 +205,7 @@ export function AdyenPayment({
           message: error.message as string,
         },
       ])
+      return false
     }
   }
   useEffect(() => {
