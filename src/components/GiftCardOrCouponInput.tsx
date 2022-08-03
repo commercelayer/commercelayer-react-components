@@ -35,7 +35,7 @@ const GiftCardOrCouponInput: React.FunctionComponent<
     <BaseInput
       type="text"
       name="gift_card_or_coupon_code"
-      ref={validation}
+      ref={validation as any}
       required={required !== undefined ? required : true}
       placeholder={placeholderLabel}
       defaultValue={value}

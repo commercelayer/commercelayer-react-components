@@ -2,7 +2,7 @@ import { FunctionComponent, useContext, useEffect, useState } from 'react'
 import BaseInput from './utils/BaseInput'
 import components from '#config/components'
 import { BaseInputComponentProps } from '#typings'
-import useRapidForm from 'rapid-form'
+import { useRapidForm } from 'rapid-form'
 import CustomerContext from '#context/CustomerContext'
 import isEmpty from 'lodash/isEmpty'
 import { BaseError, CodeErrorType } from '#typings/errors'
@@ -74,7 +74,7 @@ const CustomerInput: FunctionComponent<CustomerInputProps> = (props) => {
     <BaseInput
       name={name}
       type={type}
-      ref={validation}
+      ref={validation as any}
       required={required}
       placeholder={placeholder}
       defaultValue={value}
