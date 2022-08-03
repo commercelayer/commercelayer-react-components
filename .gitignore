@@ -1,7 +1,7 @@
 # Env
 .env.*
 .env
-!.env.local
+!.env.example
 # Npm
 lib
 .jest
