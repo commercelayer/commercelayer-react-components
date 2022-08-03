@@ -1,9 +1,9 @@
-import { createContext, RefObject } from 'react'
+import { createContext } from 'react'
 import { AddressCountrySelectName, AddressInputName } from '#typings'
 import { AddressField } from '#reducers/AddressReducer'
 
 export type DefaultContextAddress = {
-  validation?: () => RefObject<any>
+  validation?: void
   setValue?: (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any
