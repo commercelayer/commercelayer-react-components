@@ -84,11 +84,11 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
   options,
 }) => {
   if (order && config) {
-    let isPermitted = true
-    if (order.privacy_url && order.terms_url) {
-      isPermitted = localStorage.getItem('privacy-terms') === 'true'
-      console.log("privacy terms required")
-    }
+    let isPermitted = localStorage.getItem('privacy-terms') === 'true'
+    // if (order.privacy_url && order.terms_url) {
+    //   isPermitted = localStorage.getItem('privacy-terms') === 'true'
+    //   console.log("privacy terms required")
+    // }
     const billingAddress = order.billing_address
     const shippingAddress = order.shipping_address
     const doNotShip = isDoNotShip(order.line_items)
@@ -98,7 +98,6 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
     const paymentSource = order.payment_source
     if (order.total_amount_with_taxes_cents !== 0 && isEmpty(paymentMethod?.id)) {
       isPermitted = false
-      console.log(paymentMethod)
     }
     if (isEmpty(billingAddress)) isPermitted = false
     if (isEmpty(shippingAddress) && !doNotShip) isPermitted = false
@@ -106,7 +105,6 @@ export const placeOrderPermitted: PlaceOrderPermitted = async ({
     // @ts-ignore
     if (paymentSource?.mismatched_amounts) {
       isPermitted = false
-      console.log("mismatched amounts")
     }
     dispatch({
       type: 'setPlaceOrderPermitted',

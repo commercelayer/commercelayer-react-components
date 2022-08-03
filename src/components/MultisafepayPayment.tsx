@@ -11,11 +11,11 @@ export type MultisafepayConfig = {
 }
 
 const defaultMessage =
-  "by placing the order, you will be redirected to a Multisafepay page to authorize the payment"
+  "By placing the order, you will be redirected to a Multisafepay page to authorize the payment"
 
 type Props = MultisafepayConfig &
   JSX.IntrinsicElements["div"]
-const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
+const MultisafepayPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
   const ref = useRef<null | HTMLFormElement>(null)
   const {
     //setPaymentSource,
@@ -28,7 +28,7 @@ const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
       ref.current &&
       //paymentSource &&
       currentPaymentMethodType 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment 
       // @ts-ignore
       //paymentSource?.approval_url
     ) {
@@ -78,4 +78,4 @@ const PaypalPayment: FunctionComponent<Props> = ({ infoMessage, ...p }) => {
   )
 }
 
-export default PaypalPayment
+export default MultisafepayPayment
