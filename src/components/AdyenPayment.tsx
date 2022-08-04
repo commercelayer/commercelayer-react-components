@@ -182,18 +182,24 @@ export function AdyenPayment({
         return false
       }
       // @ts-ignore
-      const errorType = paymentSource?.payment_response?.errorType
+      const errorType = res?.payment_response?.errorType
       if (errorType) {
         // @ts-ignore
-        const message = paymentSource?.payment_response?.message
-        setPaymentMethodErrors([
-          {
-            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-            resource: 'payment_methods',
-            field: currentPaymentMethodType,
-            message,
-          },
-        ])
+        const errorCode = res?.payment_response?.errorCode
+        if (errorCode === '14_006') {
+          onSubmit(state, component)
+        } else {
+          // @ts-ignore
+          const message = res?.payment_response?.message
+          setPaymentMethodErrors([
+            {
+              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+              resource: 'payment_methods',
+              field: currentPaymentMethodType,
+              message,
+            },
+          ])
+        }
       }
       return false
     } catch (error: any) {
@@ -264,12 +270,8 @@ export function AdyenPayment({
                 if (id.search('scheme') === -1) {
                   if (ref.current) {
                     if (id.search('paypal') === -1) {
-                      // ref.current.onsubmit = () =>
-                      //   handleSubmit(ref.current as any, component)
-                      ref.current.onsubmit = null
-                      window.alert(
-                        'This payment method is not supported yet. Please, try another one.'
-                      )
+                      ref.current.onsubmit = () =>
+                        handleSubmit(ref.current as any, component)
                     } else {
                       ref.current.onsubmit = null
                     }
