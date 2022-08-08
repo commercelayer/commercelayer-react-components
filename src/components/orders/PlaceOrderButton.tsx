@@ -3,6 +3,7 @@ import {
   ReactNode,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react'
 import Parent from './utils/Parent'
@@ -31,8 +32,9 @@ type PlaceOrderButtonProps = {
 } & JSX.IntrinsicElements['button']
 
 const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
+  const ref = useRef(null)
   const { children, label = 'Place order', disabled, onClick, ...p } = props
-  const { isPermitted, setPlaceOrder, options, paymentType } =
+  const { isPermitted, setPlaceOrder, options, paymentType, setButtonRef } =
     useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
@@ -138,6 +140,12 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       handleClick()
     }
   }, [options?.checkoutCom, paymentType])
+  useEffect(() => {
+    if (ref != null && ref.current != null && setButtonRef != null) {
+      setButtonRef(ref)
+    }
+  }, [ref])
+  
   const handleClick = async () => {
     let isValid = true
     setForceDisable(true)
@@ -177,11 +185,13 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     label,
     disabled: disabledButton,
     handleClick,
+    ref
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <button
+      <button
+        ref={ref}
       type="button"
       disabled={disabledButton || forceDisable}
       onClick={handleClick}

@@ -52,14 +52,13 @@ export default function getCardDetails({
       const ps =
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
       // @ts-ignore
-      const source = ps?.payment_request_data?.payment_method
+      const source = ps?.payment_request_data?.payment_method?.type != null ? { brand: ps?.payment_request_data?.payment_method?.type } : ps?.payment_request_data?.payment_method?.type
       // @ts-ignore
       const authorized = ps?.payment_response?.resultCode === 'Authorised'
       if (source && authorized) {
-        const brand = source.type === 'scheme' ? source.brand ?? 'credit-card' : source.type.replace('_account', '')
         return {
           ...source,
-          brand,
+          brand: source?.brand ? source.brand : 'credit-card',
         }
       }
       break
