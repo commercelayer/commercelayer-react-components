@@ -51,7 +51,9 @@ export default function getCardDetails({
     case 'adyen_payments': {
       const ps =
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
-      const source = ps?.payment_request_data?.payment_method
+      // @ts-ignore
+      const source = ps?.payment_request_data?.payment_method?.type != null ? { brand: ps?.payment_request_data?.payment_method?.type } : ps?.payment_request_data?.payment_method?.type
+      // @ts-ignore
       const authorized = ps?.payment_response?.resultCode === 'Authorised'
       if (source && authorized) {
         return {
