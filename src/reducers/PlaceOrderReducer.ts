@@ -1,5 +1,5 @@
 import baseReducer from '#utils/baseReducer'
-import { Dispatch } from 'react'
+import { Dispatch, RefObject } from 'react'
 import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Order, OrderUpdate } from '@commercelayer/sdk'
@@ -15,7 +15,7 @@ import {
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
 
-export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted'
+export type PlaceOrderActionType = 'setErrors' | 'setPlaceOrderPermitted' | 'setButtonRef'
 
 export type PlaceOrderOptions = {
   paypalPayerId?: string
@@ -37,6 +37,18 @@ export interface PlaceOrderActionPayload {
   paymentId: string
   paymentSource: PaymentSourceType
   options?: PlaceOrderOptions
+  placeOrderButtonRef?: RefObject<HTMLButtonElement>
+}
+
+export function setButtonRef(ref: RefObject<HTMLButtonElement>, dispatch: Dispatch<PlaceOrderAction>): void {
+  if (ref != null && ref.current != null) {
+    dispatch({
+      type: 'setButtonRef',
+      payload: {
+        placeOrderButtonRef: ref,
+      },
+    })
+  }
 }
 
 export type PlaceOrderState = Partial<PlaceOrderActionPayload>
@@ -242,7 +254,7 @@ export const setPlaceOrder: SetPlaceOrder = async ({
   return response
 }
 
-const type: PlaceOrderActionType[] = ['setErrors', 'setPlaceOrderPermitted']
+const type: PlaceOrderActionType[] = ['setErrors', 'setPlaceOrderPermitted', 'setButtonRef']
 
 const placeOrderReducer = (
   state: PlaceOrderState,

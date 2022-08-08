@@ -1,9 +1,17 @@
 import PlaceOrderContext from '#context/PlaceOrderContext'
-import { ReactNode, useContext, useEffect, useReducer } from 'react'
+import {
+  FunctionComponent,
+  ReactNode,
+  RefObject,
+  useContext,
+  useEffect,
+  useReducer,
+} from 'react'
 import placeOrderReducer, {
   placeOrderInitialState,
   PlaceOrderOptions,
   placeOrderPermitted,
+  setButtonRef,
 } from '#reducers/PlaceOrderReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
@@ -106,6 +114,7 @@ export function PlaceOrderContainer(props: Props) {
           ...options,
         },
       }),
+    setButtonRef: (ref: RefObject<HTMLButtonElement>) => setButtonRef(ref, dispatch)
   }
   return (
     <PlaceOrderContext.Provider value={contextValue}>
