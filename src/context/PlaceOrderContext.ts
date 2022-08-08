@@ -1,4 +1,4 @@
-import { createContext } from 'react'
+import { createContext, RefObject } from 'react'
 import {
   PlaceOrderOptions,
   PlaceOrderState,
@@ -16,6 +16,7 @@ type DefaultContext = {
     options?: PlaceOrderOptions
   }) => Promise<{ placed: boolean }>
   placeOrderPermitted?: () => void
+  setButtonRef?: (ref: RefObject<HTMLButtonElement>) => void
 } & PlaceOrderState
 
 export const defaultPlaceOrderContext = {
