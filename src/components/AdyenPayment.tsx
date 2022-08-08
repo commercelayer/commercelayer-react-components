@@ -72,7 +72,7 @@ export function AdyenPayment({
     setPaymentRef,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
-  const { setPlaceOrder } = useContext(PlaceOrderContext)
+  const { setPlaceOrder , placeOrderButtonRef } = useContext(PlaceOrderContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const handleSubmit = async (
     e: any,
@@ -150,6 +150,9 @@ export function AdyenPayment({
             // @ts-ignore
             paymentSource: pSource,
           }))) || { placed: false }
+          if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null && placed) {
+            placeOrderButtonRef.current?.click()
+          }
         placed && placeOrderCallback && placeOrderCallback({ placed })
         return true
       }
