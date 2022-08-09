@@ -153,6 +153,18 @@ export function AdyenPayment({
         }
         return true
       }
+      if (['Cancelled'].includes(resultCode)) {
+        // @ts-ignore
+        const message = pSource?.payment_response?.refusalReason
+          setPaymentMethodErrors([
+            {
+              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+              resource: 'payment_methods',
+              field: currentPaymentMethodType,
+              message,
+            },
+          ])
+      }
       return false
     } catch (error) {
       console.error('Adyen additional details error:', error)
@@ -184,13 +196,25 @@ export function AdyenPayment({
       // @ts-ignore
       const resultCode = res?.payment_response?.resultCode
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-          if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
+        if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
             if (placeOrderButtonRef.current.disabled === true) {
               placeOrderButtonRef.current.disabled = false
             }
             placeOrderButtonRef.current?.click()
           }
         return true
+      }
+      if (['Cancelled'].includes(resultCode)) {
+        // @ts-ignore
+        const message = res?.payment_response?.refusalReason
+          setPaymentMethodErrors([
+            {
+              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+              resource: 'payment_methods',
+              field: currentPaymentMethodType,
+              message,
+            },
+          ])
       }
       // @ts-ignore
       const errorType = res?.payment_response?.errorType
