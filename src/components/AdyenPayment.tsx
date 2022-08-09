@@ -142,6 +142,7 @@ export function AdyenPayment({
       const resultCode = pSource?.payment_response?.resultCode
       if (adyenAction && component) {
         component.handleAction(adyenAction)
+        return false
       }
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
         if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
