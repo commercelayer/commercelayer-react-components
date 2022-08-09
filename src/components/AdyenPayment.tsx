@@ -143,6 +143,7 @@ export function AdyenPayment({
       const resultCode = pSource?.payment_response?.resultCode
       if (adyenAction && component) {
         component.handleAction(adyenAction)
+        return false
       }
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
         const { placed } = (setPlaceOrder &&
@@ -183,6 +184,20 @@ export function AdyenPayment({
       if (component && action) {
         component.handleAction(action)
         return false
+      }
+      // @ts-ignore
+      const resultCode = res?.payment_response?.resultCode
+      if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
+        const { placed } = (setPlaceOrder &&
+          (await setPlaceOrder({
+            // @ts-ignore
+            paymentSource: res,
+          }))) || { placed: false }
+          if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null && placed) {
+            placeOrderButtonRef.current?.click()
+          }
+        placed && placeOrderCallback && placeOrderCallback({ placed })
+        return true
       }
       // @ts-ignore
       const errorType = res?.payment_response?.errorType
