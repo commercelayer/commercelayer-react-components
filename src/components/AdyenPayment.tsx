@@ -56,7 +56,6 @@ export function AdyenPayment({
   const {
     cardContainerClassName,
     threeDSecureContainerClassName,
-    placeOrderCallback,
     styles,
   } = {
     ...defaultConfig,
@@ -72,7 +71,7 @@ export function AdyenPayment({
     setPaymentRef,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
-  const { setPlaceOrder , placeOrderButtonRef } = useContext(PlaceOrderContext)
+  const { placeOrderButtonRef } = useContext(PlaceOrderContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const handleSubmit = async (
     e: any,
@@ -145,15 +144,12 @@ export function AdyenPayment({
         component.handleAction(adyenAction)
       }
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-        const { placed } = (setPlaceOrder &&
-          (await setPlaceOrder({
-            // @ts-ignore
-            paymentSource: pSource,
-          }))) || { placed: false }
-          if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null && placed) {
-            placeOrderButtonRef.current?.click()
+        if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
+          if (placeOrderButtonRef.current.disabled === true) {
+            placeOrderButtonRef.current.disabled = false
           }
-        placed && placeOrderCallback && placeOrderCallback({ placed })
+          placeOrderButtonRef.current?.click()
+        }
         return true
       }
       return false
@@ -185,18 +181,35 @@ export function AdyenPayment({
         return false
       }
       // @ts-ignore
-      const errorType = paymentSource?.payment_response?.errorType
+      const resultCode = res?.payment_response?.resultCode
+      if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
+          if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
+            if (placeOrderButtonRef.current.disabled === true) {
+              placeOrderButtonRef.current.disabled = false
+            }
+            placeOrderButtonRef.current?.click()
+          }
+        return true
+      }
+      // @ts-ignore
+      const errorType = res?.payment_response?.errorType
       if (errorType) {
         // @ts-ignore
-        const message = paymentSource?.payment_response?.message
-        setPaymentMethodErrors([
-          {
-            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-            resource: 'payment_methods',
-            field: currentPaymentMethodType,
-            message,
-          },
-        ])
+        const errorCode = res?.payment_response?.errorCode
+        if (errorCode === '14_006') {
+          onSubmit(state, component)
+        } else {
+          // @ts-ignore
+          const message = res?.payment_response?.message
+          setPaymentMethodErrors([
+            {
+              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+              resource: 'payment_methods',
+              field: currentPaymentMethodType,
+              message,
+            },
+          ])
+        }
       }
       return false
     } catch (error: any) {
@@ -208,6 +221,7 @@ export function AdyenPayment({
           message: error.message as string,
         },
       ])
+      return false
     }
   }
   useEffect(() => {
@@ -266,12 +280,8 @@ export function AdyenPayment({
                 if (id.search('scheme') === -1) {
                   if (ref.current) {
                     if (id.search('paypal') === -1) {
-                      // ref.current.onsubmit = () =>
-                      //   handleSubmit(ref.current as any, component)
-                      ref.current.onsubmit = null
-                      window.alert(
-                        'This payment method is not supported yet. Please, try another one.'
-                      )
+                      ref.current.onsubmit = () =>
+                        handleSubmit(ref.current as any, component)
                     } else {
                       ref.current.onsubmit = null
                     }
