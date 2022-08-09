@@ -56,7 +56,6 @@ export function AdyenPayment({
   const {
     cardContainerClassName,
     threeDSecureContainerClassName,
-    placeOrderCallback,
     styles,
   } = {
     ...defaultConfig,
@@ -72,7 +71,7 @@ export function AdyenPayment({
     setPaymentRef,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
-  const { setPlaceOrder , placeOrderButtonRef } = useContext(PlaceOrderContext)
+  const { placeOrderButtonRef } = useContext(PlaceOrderContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const handleSubmit = async (
     e: any,
@@ -143,17 +142,15 @@ export function AdyenPayment({
       const resultCode = pSource?.payment_response?.resultCode
       if (adyenAction && component) {
         component.handleAction(adyenAction)
+        return false
       }
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-        const { placed } = (setPlaceOrder &&
-          (await setPlaceOrder({
-            // @ts-ignore
-            paymentSource: pSource,
-          }))) || { placed: false }
-          if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null && placed) {
-            placeOrderButtonRef.current?.click()
+        if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
+          if (placeOrderButtonRef.current.disabled === true) {
+            placeOrderButtonRef.current.disabled = false
           }
-        placed && placeOrderCallback && placeOrderCallback({ placed })
+          placeOrderButtonRef.current?.click()
+        }
         return true
       }
       return false
@@ -183,6 +180,17 @@ export function AdyenPayment({
       if (component && action) {
         component.handleAction(action)
         return false
+      }
+      // @ts-ignore
+      const resultCode = res?.payment_response?.resultCode
+      if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
+          if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
+            if (placeOrderButtonRef.current.disabled === true) {
+              placeOrderButtonRef.current.disabled = false
+            }
+            placeOrderButtonRef.current?.click()
+          }
+        return true
       }
       // @ts-ignore
       const errorType = res?.payment_response?.errorType
