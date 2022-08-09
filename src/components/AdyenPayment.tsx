@@ -56,7 +56,6 @@ export function AdyenPayment({
   const {
     cardContainerClassName,
     threeDSecureContainerClassName,
-    placeOrderCallback,
     styles,
   } = {
     ...defaultConfig,
@@ -72,7 +71,7 @@ export function AdyenPayment({
     setPaymentRef,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
-  const { setPlaceOrder , placeOrderButtonRef } = useContext(PlaceOrderContext)
+  const { placeOrderButtonRef } = useContext(PlaceOrderContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const handleSubmit = async (
     e: any,
@@ -146,15 +145,12 @@ export function AdyenPayment({
         return false
       }
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-        const { placed } = (setPlaceOrder &&
-          (await setPlaceOrder({
-            // @ts-ignore
-            paymentSource: pSource,
-          }))) || { placed: false }
-          if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null && placed) {
-            placeOrderButtonRef.current?.click()
+        if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
+          if (placeOrderButtonRef.current.disabled === true) {
+            placeOrderButtonRef.current.disabled = false
           }
-        placed && placeOrderCallback && placeOrderCallback({ placed })
+          placeOrderButtonRef.current?.click()
+        }
         return true
       }
       return false
@@ -188,15 +184,12 @@ export function AdyenPayment({
       // @ts-ignore
       const resultCode = res?.payment_response?.resultCode
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-        const { placed } = (setPlaceOrder &&
-          (await setPlaceOrder({
-            // @ts-ignore
-            paymentSource: res,
-          }))) || { placed: false }
-          if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null && placed) {
+          if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
+            if (placeOrderButtonRef.current.disabled === true) {
+              placeOrderButtonRef.current.disabled = false
+            }
             placeOrderButtonRef.current?.click()
           }
-        placed && placeOrderCallback && placeOrderCallback({ placed })
         return true
       }
       // @ts-ignore
