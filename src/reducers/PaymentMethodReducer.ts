@@ -37,6 +37,7 @@ export type PaymentSourceType =
   | WireTransfer
 
 type Card = {
+  type: string
   brand: string
   last4: string
   exp_year: number
