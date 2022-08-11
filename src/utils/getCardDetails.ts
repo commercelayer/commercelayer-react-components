@@ -56,7 +56,7 @@ export default function getCardDetails({
       // @ts-ignore
       const authorized = ps?.payment_response?.resultCode === 'Authorised'
       if (source && authorized) {
-        const brand = source.type === 'scheme' ? source.brand : source.type.replace('_account', '')
+        const brand = source.type === 'scheme' ? source.brand ?? 'credit-card' : source.type.replace('_account', '')
         return {
           ...source,
           brand,
