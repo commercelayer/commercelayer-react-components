@@ -27,11 +27,43 @@ type Styles = Partial<{
   validated: CSSProperties
 }>
 
+type PaypalStyle = Partial<{
+  /**
+   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#color}
+   */
+  color: 'gold' | 'blue' | 'silver' | 'white' | 'black';
+  /**
+   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#shape}
+   */
+  shape: 'rect' | 'pill';
+  /**
+   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#height}
+   */
+  height: string | number;
+  /**
+   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#label}
+   */
+  label: 'paypal' | 'checkout' | 'buynow' | 'pay';
+  /**
+   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#tagline}
+   */
+  tagline: boolean;
+  /**
+   * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#layout}
+   */
+  layout: 'vertical' | 'horizontal';
+}>
+
+interface PaymentMethodsStyle {
+  card?: Styles,
+  paypal?: PaypalStyle,
+}
+
 export type AdyenPaymentConfig = {
   cardContainerClassName?: string
   threeDSecureContainerClassName?: string
   placeOrderCallback?: (response: { placed: boolean }) => void
-  styles?: Styles
+  styles?: PaymentMethodsStyle
 }
 
 type AdyenCheckout = Dropin | Card | null
@@ -160,6 +192,15 @@ export function AdyenPayment({
     }
   }
   const onSubmit = async (state: any, component: AdyenCheckout) => {
+    const control = await setPaymentSource({
+      paymentSourceId: paymentSource?.id,
+      paymentResource: 'adyen_payments',
+    })
+    // @ts-ignore
+    const controlCode = control?.payment_response?.resultCode
+    if (controlCode === 'Authorised') {
+      return true
+    }
     const attributes: any = {
       payment_request_data: {
         ...state.data,
@@ -258,8 +299,10 @@ export function AdyenPayment({
         threeDS2: threeDSConfiguration,
         paypal: {
           showPayButton: true,
+          style: styles?.paypal
         },
         card: {
+          styles: styles?.card,
           holderNameRequired: false,
         },
       },
@@ -275,7 +318,6 @@ export function AdyenPayment({
         AdyenCheckout(options).then((adyenCheckout) => {
           const component = adyenCheckout
             .create(type, {
-              styles,
               onSelect: (component) => {
                 const id: string = component._id
                 if (id.search('scheme') === -1) {
