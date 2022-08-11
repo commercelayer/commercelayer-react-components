@@ -164,10 +164,11 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       ].every(Boolean)
     ) {
       // @ts-ignore
-      isValid = (await currentPaymentMethodRef.current?.onsubmit(
-        // @ts-ignore
-        paymentSource
-      )) as boolean
+      isValid = (await currentPaymentMethodRef.current?.onsubmit(paymentSource)) as boolean
+      // @ts-ignore
+      if (isValid === false && paymentSource.payment_response?.resultCode === 'Authorised') {
+        isValid = true
+      } 
     } else if (card?.brand) {
       isValid = true
     }
