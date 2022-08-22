@@ -95,7 +95,7 @@ export function AdyenGateway(props: AdyenGateway) {
   }
   // @ts-ignore
   return clientKey && !loading && paymentMethods ? (
-    <AdyenPayment clientKey={clientKey} locale={locale} config={adyenConfig} />
+    <AdyenPayment clientKey={clientKey} locale={locale} config={adyenConfig} environment={environment} />
   ) : (
     loaderComponent
   )
