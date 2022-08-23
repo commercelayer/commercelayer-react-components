@@ -18,6 +18,8 @@ import { PaymentResource } from '#reducers/PaymentMethodReducer'
 const propTypes = components.PaymentMethod.propTypes
 const displayName = components.PaymentMethod.displayName
 
+type THandleClick = (params: { payment?: PaymentMethodType | Record<string, any>, paymentSource?: Record<string, any> }) => void
+
 type PaymentMethodProps = {
   children: ReactNode
   activeClass?: string
@@ -27,7 +29,7 @@ type PaymentMethodProps = {
   (
     | {
         clickableContainer: true
-        onClick?: (payment?: PaymentMethodType | Record<string, any>) => void
+        onClick?: THandleClick
       }
     | {
         clickableContainer?: never
@@ -52,7 +54,15 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
     currentPaymentMethodId,
     setPaymentMethod,
     setLoading: setLoadingPlaceOrder,
+    paymentSource
   } = useContext(PaymentMethodContext)
+  useEffect(() => {
+    const isSingle = paymentMethods?.length === 1
+    if (isSingle && paymentSource != null && autoSelectSinglePaymentMethod != null && onClick != null) {
+      const [payment] = paymentMethods ?? []
+      onClick({ payment, paymentSource })
+    }
+  }, [paymentSource, paymentMethods])
   useEffect(() => {
     if (paymentMethods != null) {
       if (autoSelectSinglePaymentMethod != null) {
@@ -67,7 +77,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
                 const paymentMethodId = paymentMethod?.id as string
                 const paymentResource = paymentMethod?.payment_source_type as PaymentResource
                 await setPaymentMethod({ paymentResource, paymentMethodId })
-                onClick && onClick(paymentMethod)
+                onClick && onClick({ payment: paymentMethod })
                 setLoadingPlaceOrder({ loading: false })
               }
               if (typeof autoSelectSinglePaymentMethod === 'function') {
@@ -111,7 +121,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
             setPaymentSelected(payment.id)
             const paymentMethodId = payment?.id as string
             await setPaymentMethod({ paymentResource, paymentMethodId })
-            onClick && onClick(payment)
+            onClick && onClick({ payment })
             setLoadingPlaceOrder({ loading: false })
           }
       return (
