@@ -1,4 +1,5 @@
 import {
+  FunctionComponent,
   Fragment,
   useContext,
   ReactNode,
@@ -17,7 +18,9 @@ import { PaymentResource } from '#reducers/PaymentMethodReducer'
 const propTypes = components.PaymentMethod.propTypes
 const displayName = components.PaymentMethod.displayName
 
-type Props = {
+type THandleClick = (params: { payment?: PaymentMethodType | Record<string, any>, paymentSource?: Record<string, any> }) => void
+
+type PaymentMethodProps = {
   children: ReactNode
   activeClass?: string
   loader?: LoaderType
@@ -26,7 +29,7 @@ type Props = {
   (
     | {
         clickableContainer: true
-        onClick?: (payment?: PaymentMethodType | Record<string, any>) => void
+        onClick?: THandleClick
       }
     | {
         clickableContainer?: never
@@ -34,7 +37,7 @@ type Props = {
       }
   )
 
-export function PaymentMethod({
+const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
   children,
   className,
   activeClass,
@@ -43,7 +46,7 @@ export function PaymentMethod({
   autoSelectSinglePaymentMethod,
   onClick,
   ...p
-}: Props) {
+}) => {
   const [loading, setLoading] = useState(true)
   const [paymentSelected, setPaymentSelected] = useState('')
   const {
@@ -51,7 +54,15 @@ export function PaymentMethod({
     currentPaymentMethodId,
     setPaymentMethod,
     setLoading: setLoadingPlaceOrder,
+    paymentSource
   } = useContext(PaymentMethodContext)
+  useEffect(() => {
+    const isSingle = paymentMethods?.length === 1
+    if (isSingle && paymentSource != null && autoSelectSinglePaymentMethod != null && onClick != null) {
+      const [payment] = paymentMethods ?? []
+      onClick({ payment, paymentSource })
+    }
+  }, [paymentSource, paymentMethods])
   useEffect(() => {
     if (paymentMethods != null) {
       if (autoSelectSinglePaymentMethod != null) {
@@ -66,7 +77,7 @@ export function PaymentMethod({
                 const paymentMethodId = paymentMethod?.id as string
                 const paymentResource = paymentMethod?.payment_source_type as PaymentResource
                 await setPaymentMethod({ paymentResource, paymentMethodId })
-                onClick && onClick(paymentMethod)
+                onClick && onClick({ payment: paymentMethod })
                 setLoadingPlaceOrder({ loading: false })
               }
               if (typeof autoSelectSinglePaymentMethod === 'function') {
@@ -108,9 +119,9 @@ export function PaymentMethod({
             e.stopPropagation()
             setLoadingPlaceOrder({ loading: true })
             setPaymentSelected(payment.id)
-            const paymentMethodId = payment?.id
+            const paymentMethodId = payment?.id as string
             await setPaymentMethod({ paymentResource, paymentMethodId })
-            onClick && onClick(payment)
+            onClick && onClick({ payment })
             setLoadingPlaceOrder({ loading: false })
           }
       return (

@@ -177,10 +177,14 @@ export default function Main() {
                   }}
                 >
                   <PaymentMethod
-                    className="p-2 my-1 flex items-center justify-items-center bg-gray-300 cursor-pointer"
-                    activeClass="bg-opacity-25"
+                      className="p-2 my-1 flex items-center justify-items-center bg-gray-300 cursor-pointer"
+                      activeClass="bg-opacity-25"
                       clickableContainer
                       autoSelectSinglePaymentMethod
+                      onClick={({payment, paymentSource}) => { 
+                        console.log('payment', payment)
+                        console.log('paymentSource', paymentSource)
+                      }}
                   >
                     <PaymentMethodRadioButton data-cy="payment-radio-button" />
                     <PaymentMethodName className="pl-3" />
