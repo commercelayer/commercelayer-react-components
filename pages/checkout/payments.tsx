@@ -179,7 +179,8 @@ export default function Main() {
                   <PaymentMethod
                     className="p-2 my-1 flex items-center justify-items-center bg-gray-300 cursor-pointer"
                     activeClass="bg-opacity-25"
-                    clickableContainer
+                      clickableContainer
+                      autoSelectSinglePaymentMethod
                   >
                     <PaymentMethodRadioButton data-cy="payment-radio-button" />
                     <PaymentMethodName className="pl-3" />

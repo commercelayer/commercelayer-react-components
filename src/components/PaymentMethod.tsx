@@ -22,6 +22,7 @@ type PaymentMethodProps = {
   children: ReactNode
   activeClass?: string
   loader?: LoaderType
+  autoSelectSinglePaymentMethod?: boolean | (() => void)
 } & Omit<JSX.IntrinsicElements['div'], 'onClick'> &
   (
     | {
@@ -40,6 +41,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
   activeClass,
   loader = 'Loading...',
   clickableContainer,
+  autoSelectSinglePaymentMethod,
   onClick,
   ...p
 }) => {
@@ -51,6 +53,38 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
     setPaymentMethod,
     setLoading: setLoadingPlaceOrder,
   } = useContext(PaymentMethodContext)
+  useEffect(() => {
+    if (paymentMethods != null) {
+      if (autoSelectSinglePaymentMethod != null) {
+        const autoSelect = async () => {
+          const isSingle = paymentMethods.length === 1
+          if (isSingle) {
+              const [paymentMethod] =
+                paymentMethods || []
+              if (paymentMethod) {
+                setLoadingPlaceOrder({ loading: true })
+                setPaymentSelected(paymentMethod.id)
+                const paymentMethodId = paymentMethod?.id as string
+                const paymentResource = paymentMethod?.payment_source_type as PaymentResource
+                await setPaymentMethod({ paymentResource, paymentMethodId })
+                onClick && onClick(paymentMethod)
+                setLoadingPlaceOrder({ loading: false })
+              }
+              if (typeof autoSelectSinglePaymentMethod === 'function') {
+                autoSelectSinglePaymentMethod()
+              }
+            } else {
+              setTimeout(() => {
+                setLoading(false)
+              }, 200)
+            }
+        }
+        autoSelect()
+      } else {
+        setLoading(false)
+      }
+    }
+  }, [paymentMethods])
   useEffect(() => {
     if (paymentMethods) setLoading(false)
     if (currentPaymentMethodId) setPaymentSelected(currentPaymentMethodId)
