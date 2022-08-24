@@ -103,7 +103,7 @@ export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
     )
     return required.length > validAddress.length
   } else {
-    const required = without(schema, 'first_name', 'last_name')
+    const required = without(schema, 'first_name', 'last_name', 'line_2')
     const validAddress = keys(address).filter((k) =>
       required.includes(k as any)
     )
