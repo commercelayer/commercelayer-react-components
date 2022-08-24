@@ -70,7 +70,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
           const isSingle = paymentMethods.length === 1
           if (isSingle) {
             const [paymentMethod] = paymentMethods ?? []
-              if (paymentMethod && !paymentSource) {
+            if (paymentMethod && !paymentSource) {
                 setLoadingPlaceOrder({ loading: true })
                 setPaymentSelected(paymentMethod.id)
                 const paymentMethodId = paymentMethod?.id as string
@@ -86,6 +86,9 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
                 })
                 if (ps && paymentMethod && onClick != null) {
                   onClick({ payment: paymentMethod, paymentSource })
+                  setTimeout(() => {
+                    setLoading(false)
+                  }, 200)
                 }
                 if (getCustomerPaymentSources) (await getCustomerPaymentSources())
                 setLoadingPlaceOrder({ loading: false })
@@ -120,7 +123,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
     return () => {
       setLoading(true)
     }
-  }, [paymentMethods, currentPaymentMethodId, paymentSource])
+  }, [paymentMethods, currentPaymentMethodId])
   const components =
     paymentMethods &&
     paymentMethods.map((payment, k) => {
