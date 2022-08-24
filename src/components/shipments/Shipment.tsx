@@ -50,6 +50,7 @@ export function Shipment({
         setLoading(false)
       }
     }
+    return () => setLoading(true)
   }, [shipments])
   const components =
     shipments &&
