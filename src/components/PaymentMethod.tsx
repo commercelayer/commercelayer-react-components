@@ -14,6 +14,9 @@ import { LoaderType } from '#typings'
 import getLoaderComponent from '../utils/getLoaderComponent'
 import { PaymentMethod as PaymentMethodType } from '@commercelayer/sdk'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
+import getPaypalConfig from '#utils/paypalPayment'
+import OrderContext from '#context/OrderContext'
+import CustomerContext from '#context/CustomerContext'
 
 const propTypes = components.PaymentMethod.propTypes
 const displayName = components.PaymentMethod.displayName
@@ -54,54 +57,70 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
     currentPaymentMethodId,
     setPaymentMethod,
     setLoading: setLoadingPlaceOrder,
-    paymentSource
+    paymentSource,
+    setPaymentSource,
+    config
   } = useContext(PaymentMethodContext)
-  useEffect(() => {
-    const isSingle = paymentMethods?.length === 1
-    if (isSingle && paymentSource != null && autoSelectSinglePaymentMethod != null && onClick != null) {
-      const [payment] = paymentMethods ?? []
-      onClick({ payment, paymentSource })
-    }
-  }, [paymentSource, paymentMethods])
+  const { order } = useContext(OrderContext)
+  const { getCustomerPaymentSources } = useContext(CustomerContext)
   useEffect(() => {
     if (paymentMethods != null) {
       if (autoSelectSinglePaymentMethod != null) {
         const autoSelect = async () => {
           const isSingle = paymentMethods.length === 1
           if (isSingle) {
-              const [paymentMethod] =
-                paymentMethods || []
-              if (paymentMethod) {
+            const [paymentMethod] = paymentMethods ?? []
+              if (paymentMethod && !paymentSource) {
                 setLoadingPlaceOrder({ loading: true })
                 setPaymentSelected(paymentMethod.id)
                 const paymentMethodId = paymentMethod?.id as string
                 const paymentResource = paymentMethod?.payment_source_type as PaymentResource
                 await setPaymentMethod({ paymentResource, paymentMethodId })
-                onClick && onClick({ payment: paymentMethod })
+                const attributes = config && paymentResource === 'paypal_payments'
+                  ? getPaypalConfig(paymentResource, config)
+                  : {}
+                const ps = await setPaymentSource({
+                  paymentResource,
+                  order,
+                  attributes,
+                })
+                if (ps && paymentMethod && onClick != null) {
+                  onClick({ payment: paymentMethod, paymentSource })
+                }
+                if (getCustomerPaymentSources) (await getCustomerPaymentSources())
                 setLoadingPlaceOrder({ loading: false })
               }
               if (typeof autoSelectSinglePaymentMethod === 'function') {
                 autoSelectSinglePaymentMethod()
               }
-            } else {
-              setTimeout(() => {
-                setLoading(false)
-              }, 200)
-            }
+          } else {
+            setTimeout(() => {
+              setLoading(false)
+            }, 200)
+          }
         }
         autoSelect()
-      } else {
-        setLoading(false)
       }
     }
   }, [paymentMethods])
   useEffect(() => {
-    if (paymentMethods) setLoading(false)
+    if (paymentMethods) { 
+      const isSingle = paymentMethods.length === 1
+      if (isSingle && autoSelectSinglePaymentMethod) {
+        if (paymentSource) {
+          setTimeout(() => {
+            setLoading(false)
+          }, 200)
+        }
+      } else {
+        setLoading(false)
+      }
+    }
     if (currentPaymentMethodId) setPaymentSelected(currentPaymentMethodId)
     return () => {
       setLoading(true)
     }
-  }, [paymentMethods, currentPaymentMethodId])
+  }, [paymentMethods, currentPaymentMethodId, paymentSource])
   const components =
     paymentMethods &&
     paymentMethods.map((payment, k) => {
