@@ -85,7 +85,7 @@ const PaymentMethod: FunctionComponent<PaymentMethodProps> = ({
                   attributes,
                 })
                 if (ps && paymentMethod && onClick != null) {
-                  onClick({ payment: paymentMethod, paymentSource })
+                  onClick({ payment: paymentMethod, paymentSource: ps })
                   setTimeout(() => {
                     setLoading(false)
                   }, 200)
