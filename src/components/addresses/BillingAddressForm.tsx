@@ -17,7 +17,6 @@ type Props = {
   children: JSX.Element[] | JSX.Element
   reset?: boolean
   errorClassName?: string
-  isBusiness?: boolean
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 export function BillingAddressForm(props: Props) {
@@ -26,13 +25,9 @@ export function BillingAddressForm(props: Props) {
     errorClassName,
     autoComplete = 'on',
     reset = false,
-    isBusiness = false,
     ...p
   } = props
-  console.log('useRapidForm', useRapidForm)
-  debugger
   const { validation, values, errors, reset: resetForm } = useRapidForm()
-  // const [formType, setFormType] = useState<'customer' | 'business'>('customer')
   const { setAddressErrors, setAddress, isBusiness } =
     useContext(AddressesContext)
   const {
