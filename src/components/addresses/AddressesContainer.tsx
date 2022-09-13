@@ -15,8 +15,6 @@ import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { saveAddresses } from '#reducers/AddressReducer'
 
-import { AddressResource } from '#reducers/AddressReducer'
-
 type Props = {
   children: JSX.Element[] | JSX.Element
   shipToDifferentAddress?: boolean
@@ -53,16 +51,14 @@ export function AddressesContainer(props: Props) {
       }),
     setAddress: (params: SetAddressParams<AddressSchema>) =>
       defaultAddressContext['setAddress']({ ...params, dispatch }),
-    saveAddresses: async (addressId?: string): Promise<void> =>
+    saveAddresses: async (): Promise<void> =>
       await saveAddresses({
         config,
         dispatch,
         updateOrder,
         order,
         orderId,
-        addressId,
         state,
-        getCustomerAddresses,
       }),
     setCloneAddress: (id: string, resource: AddressResource): void =>
       setCloneAddress(id, resource, dispatch),

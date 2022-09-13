@@ -255,13 +255,6 @@ export function OrderContainer(props: Props): JSX.Element {
           include: state.include,
           state,
         }),
-      updateOrder: async (args: UpdateOrderArgs) =>
-        await defaultOrderContext['updateOrder']({
-          ...args,
-          dispatch,
-          config,
-          include: state.include,
-        }),
     }
   }, [state, config.accessToken])
   return (
