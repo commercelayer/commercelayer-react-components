@@ -1,4 +1,4 @@
-import { useReducer, useContext, useEffect, ReactNode } from 'react'
+import { useReducer, useContext, useEffect } from 'react'
 import SkuOptionsContext from '#context/SkuOptionsContext'
 import skuOptionsReducer, {
   skuOptionsInitialState,
@@ -8,13 +8,9 @@ import { isEmpty } from 'lodash'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
 import { getSkuOptions } from '#reducers/SkuOptionsReducer'
-import components from '#config/components'
-
-const propTypes = components.SkuOptionsContainer.propTypes
-const displayName = components.SkuOptionsContainer.displayName
 
 type Props = {
-  children: ReactNode
+  children: JSX.Element
   skuCode?: string
 }
 
@@ -55,8 +51,5 @@ export function SkuOptionsContainer(props: Props) {
     </SkuOptionsContext.Provider>
   )
 }
-
-SkuOptionsContainer.propTypes = propTypes
-SkuOptionsContainer.displayName = displayName
 
 export default SkuOptionsContainer

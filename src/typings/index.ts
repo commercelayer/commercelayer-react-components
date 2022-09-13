@@ -1,4 +1,4 @@
-import { Dispatch, ForwardedRef, ReactNode, Ref } from 'react'
+import { Dispatch, ForwardedRef, Ref } from 'react'
 import PropTypes, { InferProps } from 'prop-types'
 import { BaseError } from './errors'
 
@@ -46,7 +46,7 @@ type Option = {
 }
 
 export interface BaseSelectComponentProps {
-  children?: (props: BaseSelectChildrenComponentProps) => ReactNode
+  children?: (props: BaseSelectChildrenComponentProps) => JSX.Element
   options: Option[]
   placeholder?: Option
   value?: string
@@ -83,7 +83,7 @@ type BaseInputChildrenComponentProps = Omit<
 
 export interface BaseInputComponentProps {
   ref?: Ref<any>
-  children?: (props: BaseInputChildrenComponentProps) => ReactNode
+  children?: (props: BaseInputChildrenComponentProps) => JSX.Element
   name: string
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -168,7 +168,7 @@ export type BaseInputType =
   | 'text'
   | 'textarea'
 
-export type LoaderType = string | ReactNode
+export type LoaderType = string | JSX.Element
 
 export const BMObject = PropTypes.objectOf(PropTypes.string)
 export type BaseMetadataObject = {
@@ -233,15 +233,15 @@ export type BaseSelectorType = 'select' | 'radio'
 export type BaseAmountComponentChildren = Omit<BaseAmountComponent, 'children'>
 
 export type BaseAmountComponent = {
-  children?: (props: BaseAmountComponentChildren) => ReactNode
+  children?: (props: BaseAmountComponentChildren) => JSX.Element
   format?: BaseFormatPrice
   price?: string
   priceCents?: number
   labelFree?: string
 } & JSX.IntrinsicElements['span']
 
-export interface FunctionChildren<P = Record<string, any>> {
-  (props: P): ReactNode
+export interface FunctionChildren<P> {
+  (props: P): JSX.Element
 }
 
 export type ExcludeTag<T extends keyof JSX.IntrinsicElements> = Exclude<

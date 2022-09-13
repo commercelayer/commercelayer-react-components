@@ -31,7 +31,7 @@ test('<CustomerContainer check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to CustomerContainer. Only components CustomerInput, SaveCustomerButton, AddressesContainer, ReactNode are allowed.`
+      `Invalid prop 'children' supplied to CustomerContainer. Only components CustomerInput, SaveCustomerButton, AddressesContainer,  are allowed.`
     )
   )
 })

@@ -1,5 +1,5 @@
 import { Sku } from '@commercelayer/sdk'
-import { VariantOption } from '#components/VariantSelector'
+import { VariantOption } from '#components/skus/VariantSelector'
 import { Dispatch } from 'react'
 import baseReducer from '#utils/baseReducer'
 import getSkus from '#utils/getSkus'
