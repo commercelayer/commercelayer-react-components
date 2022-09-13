@@ -1,14 +1,11 @@
 import { useContext } from 'react'
-import components from '#config/components'
+
 import { FunctionChildren } from '#typings'
-import Parent from './utils/Parent'
+import Parent from '#components-utils/Parent'
 import OrderContext from '#context/OrderContext'
 import type { CodeType } from '#reducers/OrderReducer'
 import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
-
-const propTypes = components.GiftCardOrCouponCode.propTypes
-const displayName = components.GiftCardOrCouponCode.displayName
 
 type ChildrenProps = Omit<Props, 'children'> & {
   code?: string
@@ -52,8 +49,5 @@ export function GiftCardOrCouponCode({ children, type, ...props }: Props) {
     <span {...props}>{code}</span>
   )
 }
-
-GiftCardOrCouponCode.propTypes = propTypes
-GiftCardOrCouponCode.displayName = displayName
 
 export default GiftCardOrCouponCode

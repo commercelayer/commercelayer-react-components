@@ -1,22 +1,12 @@
-import components from '#config/components'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import SkuContext from '#context/SkuContext'
 import skuReducer, { getSku, skuInitialState } from '#reducers/SkuReducer'
 import type { QueryParamsList } from '@commercelayer/sdk'
-import { ReactNode, useContext, useEffect, useMemo, useReducer } from 'react'
+import { useContext, useEffect, useMemo, useReducer } from 'react'
 
 type Props = {
-  /**
-   * An array of skus to display.
-   */
   skus: string[]
-  /**
-   * Accept a React node, [Skus](./Skus.d.ts), and [ItemContainer](../ItemContainer.d.ts)  as children to display above the skus.
-   */
-  children: ReactNode
-  /**
-   * An object params to query the skus resource
-   */
+  children: JSX.Element[] | JSX.Element
   queryParams?: QueryParamsList
 }
 
@@ -29,7 +19,7 @@ export function SkusContainer<P extends Props>(props: P): JSX.Element {
   useEffect(() => {
     if (config.accessToken && state?.skus) {
       if (state?.skus.length === 0) {
-        void loadSkus()
+        loadSkus()
       }
     }
     return () => {
@@ -46,7 +36,5 @@ export function SkusContainer<P extends Props>(props: P): JSX.Element {
     <SkuContext.Provider value={contextValue}>{children}</SkuContext.Provider>
   )
 }
-
-SkusContainer.propTypes = components.SkusContainer.propTypes
 
 export default SkusContainer

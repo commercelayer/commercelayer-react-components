@@ -1,12 +1,9 @@
-import { useContext, ReactNode } from 'react'
-import Parent from './utils/Parent'
-import components from '#config/components'
+import { useContext } from 'react'
+import Parent from '#components-utils/Parent'
+
 import get from 'lodash/get'
 import { Shipment } from '@commercelayer/sdk'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
-
-const propTypes = components.ShipmentField.propTypes
-const displayName = components.ShipmentField.displayName
 
 type ShipmentFieldChildrenProps = Omit<Props, 'children'> & {
   shipment: Shipment
@@ -22,7 +19,7 @@ export type ShipmentAttribute =
   | 'key_number'
 
 type Props = {
-  children?: (props: ShipmentFieldChildrenProps) => ReactNode
+  children?: (props: ShipmentFieldChildrenProps) => JSX.Element
   name: ShipmentAttribute
 } & JSX.IntrinsicElements['span']
 
@@ -41,8 +38,5 @@ export function ShipmentField(props: Props) {
     <span {...props}>{text}</span>
   )
 }
-
-ShipmentField.propTypes = propTypes
-ShipmentField.displayName = displayName
 
 export default ShipmentField

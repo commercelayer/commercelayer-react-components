@@ -1,10 +1,10 @@
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isFunction from 'lodash/isFunction'
-import { ReactNode, useContext, useEffect, useRef } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 
 export type WireTransferConfig = {
   infoMessage?: {
-    text?: string | ReactNode
+    text?: string | JSX.Element
     className?: string
   }
 }
@@ -14,10 +14,8 @@ const defaultMessage =
 
 type Props = WireTransferConfig &
   JSX.IntrinsicElements['div'] & { 'data-test-id'?: string }
-const WireTransferPayment: FunctionComponent<Props> = ({
-  infoMessage,
-  ...p
-}) => {
+
+export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
   const { className, 'data-test-id': dataTestId } = p
   const ref = useRef<null | HTMLFormElement>(null)
   const {

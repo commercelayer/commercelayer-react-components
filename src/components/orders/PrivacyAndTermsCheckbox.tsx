@@ -1,11 +1,7 @@
-import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import { useContext, useEffect, useState } from 'react'
 import BaseInput, { BaseInputProps } from '../utils/BaseInput'
-
-const propTypes = components.PrivacyAndTermsCheckbox.propTypes
-const displayName = components.PrivacyAndTermsCheckbox.displayName
 
 export function PrivacyAndTermsCheckbox(props: Partial<BaseInputProps>) {
   const { order } = useContext(OrderContext)
@@ -38,8 +34,5 @@ export function PrivacyAndTermsCheckbox(props: Partial<BaseInputProps>) {
     />
   )
 }
-
-PrivacyAndTermsCheckbox.propTypes = propTypes
-PrivacyAndTermsCheckbox.displayName = displayName
 
 export default PrivacyAndTermsCheckbox

@@ -1,17 +1,13 @@
 import { useContext, useState, useEffect } from 'react'
-import Parent from './utils/Parent'
+import Parent from '../utils/Parent'
 import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
-import components from '#config/components'
+
 import { FunctionChildren } from '#typings/index'
 import SkuListsContext from '#context/SkuListsContext'
 import SkuChildrenContext from '#context/SkuChildrenContext'
-
-const propTypes = components.QuantitySelector.propTypes
-const defaultProps = components.QuantitySelector.defaultProps
-const displayName = components.QuantitySelector.displayName
 
 type ChildrenProps = FunctionChildren<
   Omit<Props, 'children'> & {
@@ -116,9 +112,5 @@ export function QuantitySelector(props: Props) {
     />
   )
 }
-
-QuantitySelector.propTypes = propTypes
-QuantitySelector.defaultProps = defaultProps
-QuantitySelector.displayName = displayName
 
 export default QuantitySelector

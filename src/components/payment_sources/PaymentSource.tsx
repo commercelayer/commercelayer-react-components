@@ -1,17 +1,13 @@
-import { useContext, ReactNode, useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
-import components from '#config/components'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import CustomerContext from '#context/CustomerContext'
-import PaymentGateway from './PaymentGateway'
+import PaymentGateway from '#components/payment_gateways/PaymentGateway'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { LoaderType } from '#typings/index'
-import { CustomerCardsTemplateChildren } from './utils/PaymentCardsTemplate'
-import getCardDetails from '../utils/getCardDetails'
+import { CustomerCardsTemplateChildren } from '#components-utils/PaymentCardsTemplate'
+import getCardDetails from '#utils/getCardDetails'
 import OrderContext from '#context/OrderContext'
-
-const propTypes = components.PaymentSource.propTypes
-const displayName = components.PaymentSource.displayName
 
 export type CustomerCardsProps = {
   handleClick: () => void
@@ -22,11 +18,13 @@ export type CustomerSaveToWalletProps = {
 }
 
 export type PaymentSourceProps = {
-  children?: ReactNode
+  children?: JSX.Element[] | JSX.Element
   readonly?: boolean
   templateCustomerCards?: CustomerCardsTemplateChildren
   onClickCustomerCards?: () => void
-  templateCustomerSaveToWallet?: (props: CustomerSaveToWalletProps) => ReactNode
+  templateCustomerSaveToWallet?: (
+    props: CustomerSaveToWalletProps
+  ) => JSX.Element
   loader?: LoaderType
 } & JSX.IntrinsicElements['div']
 
@@ -81,8 +79,5 @@ export function PaymentSource(props: PaymentSourceProps) {
   const gatewayProps = { ...props, show, showCard, handleEditClick, readonly }
   return <PaymentGateway {...gatewayProps} />
 }
-
-PaymentSource.propTypes = propTypes
-PaymentSource.displayName = displayName
 
 export default PaymentSource

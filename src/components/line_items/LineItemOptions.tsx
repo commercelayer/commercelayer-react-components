@@ -1,14 +1,11 @@
-import { useContext, ReactNode } from 'react'
+import { useContext } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
 import { isEmpty } from 'lodash'
-import components from '#config/components'
 import { LineItemOption } from '@commercelayer/sdk'
 
-const displayName = components.LineItemOptions.displayName
-
 type Props = JSX.IntrinsicElements['div'] & {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   title?: string
   showName?: boolean
   titleTagElement?: keyof JSX.IntrinsicElements
@@ -24,7 +21,7 @@ type Props = JSX.IntrinsicElements['div'] & {
       }
   )
 
-export function LineItemOptions(props: Props) {
+export function LineItemOptions(props: Props): JSX.Element {
   const {
     skuOptionId,
     title,
@@ -68,7 +65,5 @@ export function LineItemOptions(props: Props) {
     })
   return <>{options}</>
 }
-
-LineItemOptions.displayName = displayName
 
 export default LineItemOptions

@@ -1,7 +1,7 @@
 import ShipmentContext, {
   defaultShipmentContext,
 } from '#context/ShipmentContext'
-import { ReactNode, useContext, useEffect, useReducer } from 'react'
+import { useContext, useEffect, useReducer } from 'react'
 import shipmentReducer, {
   shipmentInitialState,
   setShipmentErrors,
@@ -10,17 +10,13 @@ import shipmentReducer, {
 } from '#reducers/ShipmentReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import components from '#config/components'
 import { BaseError } from '#typings/errors'
 import { isEmpty } from 'lodash'
 
-const propTypes = components.ShipmentsContainer.propTypes
-const displayName = components.ShipmentsContainer.displayName
-
 type Props = {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
 }
-export function ShipmentsContainer(props: Props) {
+export function ShipmentsContainer(props: Props): JSX.Element {
   const { children } = props
   const [state, dispatch] = useReducer(shipmentReducer, shipmentInitialState)
   const { order, getOrder, include, addResourceToInclude, includeLoaded } =
@@ -127,8 +123,5 @@ export function ShipmentsContainer(props: Props) {
     </ShipmentContext.Provider>
   )
 }
-
-ShipmentsContainer.propTypes = propTypes
-ShipmentsContainer.displayName = displayName
 
 export default ShipmentsContainer

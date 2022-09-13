@@ -1,13 +1,9 @@
-import { Fragment, useContext, ReactNode } from 'react'
+import { Fragment, useContext } from 'react'
 import SkuOptionChildrenContext from '#context/SkuOptionChildrenContext'
 import SkuOptionsContext from '#context/SkuOptionsContext'
-import components from '#config/components'
-
-const propTypes = components.SkuOption.propTypes
-const displayName = components.SkuOption.displayName
 
 type Props = {
-  children: ReactNode
+  children: JSX.Element
   id: string
 }
 
@@ -30,8 +26,5 @@ export function SkuOption(props: Props) {
       })
   return <Fragment>{items}</Fragment>
 }
-
-SkuOption.propTypes = propTypes
-SkuOption.displayName = displayName
 
 export default SkuOption

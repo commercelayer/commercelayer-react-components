@@ -1,4 +1,4 @@
-import { useContext, PropsWithoutRef, ReactNode } from 'react'
+import { useContext, PropsWithoutRef } from 'react'
 import Parent from '../utils/Parent'
 import OrderContext from '#context/OrderContext'
 import isEmpty from 'lodash/isEmpty'
@@ -9,7 +9,7 @@ import { FunctionChildren } from '#typings/index'
 import { AddToCartReturn } from '#reducers/OrderReducer'
 import SkuListsContext from '#context/SkuListsContext'
 import ExternalFunctionContext from '#context/ExternalFunctionContext'
-import { VariantOption } from '#components/VariantSelector'
+import { VariantOption } from '#components/skus/VariantSelector'
 import isFunction from 'lodash/isFunction'
 import SkuChildrenContext from '#context/SkuChildrenContext'
 import getCartLink from '#utils/getCartLink'
@@ -45,7 +45,7 @@ type THostedCart =
 
 type Props = {
   children?: AddToCartButtonChildrenProps
-  label?: string | ReactNode
+  label?: string | JSX.Element
   skuCode?: string
   bundleCode?: string
   disabled?: boolean
@@ -55,7 +55,7 @@ type Props = {
   THostedCart &
   PropsWithoutRef<JSX.IntrinsicElements['button']>
 
-export function AddToCartButton(props: Props) {
+export function AddToCartButton(props: Props): JSX.Element {
   const {
     label = 'Add to cart',
     children,

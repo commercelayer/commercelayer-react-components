@@ -1,12 +1,5 @@
 import PlaceOrderContext from '#context/PlaceOrderContext'
-import {
-  FunctionComponent,
-  ReactNode,
-  RefObject,
-  useContext,
-  useEffect,
-  useReducer,
-} from 'react'
+import { RefObject, useContext, useEffect, useReducer } from 'react'
 import placeOrderReducer, {
   placeOrderInitialState,
   PlaceOrderOptions,
@@ -15,15 +8,11 @@ import placeOrderReducer, {
 } from '#reducers/PlaceOrderReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import components from '#config/components'
 import { setPlaceOrder } from '../../reducers/PlaceOrderReducer'
 import { PaymentSourceType } from '#reducers/PaymentMethodReducer'
 
-const propTypes = components.PlaceOrderContainer.propTypes
-const displayName = components.PlaceOrderContainer.displayName
-
 type Props = {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   options?: PlaceOrderOptions
 }
 export function PlaceOrderContainer(props: Props) {
@@ -114,7 +103,8 @@ export function PlaceOrderContainer(props: Props) {
           ...options,
         },
       }),
-    setButtonRef: (ref: RefObject<HTMLButtonElement>) => setButtonRef(ref, dispatch)
+    setButtonRef: (ref: RefObject<HTMLButtonElement>) =>
+      setButtonRef(ref, dispatch),
   }
   return (
     <PlaceOrderContext.Provider value={contextValue}>
@@ -122,8 +112,5 @@ export function PlaceOrderContainer(props: Props) {
     </PlaceOrderContext.Provider>
   )
 }
-
-PlaceOrderContainer.propTypes = propTypes
-PlaceOrderContainer.displayName = displayName
 
 export default PlaceOrderContainer

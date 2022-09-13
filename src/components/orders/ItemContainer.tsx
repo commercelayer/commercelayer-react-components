@@ -1,4 +1,4 @@
-import { useReducer, useEffect, ReactNode } from 'react'
+import { useReducer, useEffect } from 'react'
 import ItemContext, {
   initialItemContext,
   InitItemContext,
@@ -13,14 +13,10 @@ import itemReducer, {
   CustomLineItem,
 } from '#reducers/ItemReducer'
 import { ItemPrices } from '#reducers/ItemReducer'
-import components from '#config/components'
 import { BFSetStateContainer } from '#typings'
 
-const propTypes = components.ItemContainer.propTypes
-const displayName = components.ItemContainer.displayName
-
 type Props = {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   skuCode?: string | null
   lineItem?: {
     name: string
@@ -28,7 +24,7 @@ type Props = {
   } | null
 }
 
-export function ItemContainer(props: Props) {
+export function ItemContainer(props: Props): JSX.Element {
   const { children, skuCode, lineItem } = props
   const [state, dispatch] = useReducer(itemReducer, itemInitialState)
   useEffect(() => {
@@ -77,8 +73,5 @@ export function ItemContainer(props: Props) {
     <ItemContext.Provider value={itemValue}>{children}</ItemContext.Provider>
   )
 }
-
-ItemContainer.propTypes = propTypes
-ItemContainer.displayName = displayName
 
 export default ItemContainer

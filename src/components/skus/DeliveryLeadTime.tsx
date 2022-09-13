@@ -1,10 +1,6 @@
-import { useContext, ReactNode, useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
-import Parent from './utils/Parent'
-import components from '#config/components'
-
-const propTypes = components.DeliveryLeadTime.propTypes
-const displayName = components.DeliveryLeadTime.displayName
+import Parent from '../utils/Parent'
 
 export type DeliveryLeadTimeField =
   | 'min_hours'
@@ -15,7 +11,7 @@ export type DeliveryLeadTimeField =
 export type DeliveryLeadTimeComponentChildren = Omit<Props, 'children'>
 
 type Props = Partial<JSX.IntrinsicElements['span']> & {
-  children?: (props: DeliveryLeadTimeComponentChildren) => ReactNode
+  children?: (props: DeliveryLeadTimeComponentChildren) => JSX.Element
   type: DeliveryLeadTimeField
   text?: string
 }
@@ -43,8 +39,5 @@ export function DeliveryLeadTime(props: Props) {
     <span {...p}>{text}</span>
   )
 }
-
-DeliveryLeadTime.propTypes = propTypes
-DeliveryLeadTime.displayName = displayName
 
 export default DeliveryLeadTime

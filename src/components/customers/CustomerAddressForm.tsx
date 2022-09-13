@@ -1,24 +1,21 @@
 import AddressesContext from '#context/AddressContext'
 import { useRapidForm } from 'rapid-form'
-import { ReactNode, useContext, useEffect, useRef } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
 import { BaseError, CodeErrorType } from '#typings/errors'
 import { AddressField } from '#reducers/AddressReducer'
 import { AddressCountrySelectName, AddressInputName } from '#typings'
-import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import isEmptyStates from '#utils/isEmptyStates'
 import type { Address } from '@commercelayer/sdk'
 
-const propTypes = components.CustomerAddressForm.propTypes
-
 type Props = {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   reset?: boolean
   errorClassName?: string
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
-export function CustomerAddressForm(props: Props) {
+export function CustomerAddressForm(props: Props): JSX.Element {
   const {
     children,
     errorClassName,
@@ -123,7 +120,5 @@ export function CustomerAddressForm(props: Props) {
     </CustomerAddressFormContext.Provider>
   )
 }
-
-CustomerAddressForm.propTypes = propTypes
 
 export default CustomerAddressForm
