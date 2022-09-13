@@ -1,16 +1,12 @@
-import { useContext, ReactNode, useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import ShipmentContext from '#context/ShipmentContext'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
-import components from '#config/components'
 import { LoaderType } from '#typings'
 import getLoaderComponent from '#utils/getLoaderComponent'
 import { ShipmentLineItem } from '#reducers/ShipmentReducer'
 
-const propTypes = components.Shipment.propTypes
-const displayName = components.Shipment.displayName
-
 type ShipmentProps = {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   loader?: LoaderType
   autoSelectSingleShippingMethod?: boolean | (() => void)
 }
@@ -90,8 +86,5 @@ export function Shipment({
     })
   return !loading ? <>{components}</> : getLoaderComponent(loader)
 }
-
-Shipment.propTypes = propTypes
-Shipment.displayName = displayName
 
 export default Shipment

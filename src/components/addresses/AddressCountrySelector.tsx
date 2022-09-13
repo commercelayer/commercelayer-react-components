@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
 import BaseSelect from '../utils/BaseSelect'
-import components from '#config/components'
 import { AddressCountrySelectName, BaseSelectComponentProps } from '#typings'
 import BillingAddressFormContext, {
   AddressValuesKeys,
@@ -8,10 +7,6 @@ import BillingAddressFormContext, {
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import { getCountries } from '#utils/countryStateCity'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
-
-const propTypes = components.AddressCountrySelector.propTypes
-const defaultProps = components.AddressCountrySelector.defaultProps
-const displayName = components.AddressCountrySelector.displayName
 
 type Props = Omit<BaseSelectComponentProps, 'options' | 'name'> & {
   name: Extract<AddressValuesKeys, AddressCountrySelectName>
@@ -88,9 +83,5 @@ export function AddressCountrySelector(props: Props) {
     />
   )
 }
-
-AddressCountrySelector.propTypes = propTypes
-AddressCountrySelector.defaultProps = defaultProps
-AddressCountrySelector.displayName = displayName
 
 export default AddressCountrySelector

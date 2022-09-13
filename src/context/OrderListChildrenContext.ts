@@ -1,5 +1,5 @@
 import type { Order } from '@commercelayer/sdk'
-import { createContext, ReactNode } from 'react'
+import { createContext } from 'react'
 import { Row } from 'react-table'
 
 export type InitialOrderListContext = Partial<{
@@ -18,7 +18,7 @@ export type InitialOrderListContext = Partial<{
   /**
    * Function to assign as custom row renderer
    */
-  actionsComponent: (props: { order: Order }) => ReactNode
+  actionsComponent: (props: { order: Order }) => JSX.Element
   /**
    * Class name to assign as custom row renderer
    */

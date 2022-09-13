@@ -46,7 +46,7 @@ test('<LineItemsContainer check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to LineItemsContainer. Only components LineItemsCount, LineItem, ReactNode are allowed.`
+      `Invalid prop 'children' supplied to LineItemsContainer. Only components LineItemsCount, LineItem,  are allowed.`
     )
   )
 })

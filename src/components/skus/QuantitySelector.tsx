@@ -1,0 +1,116 @@
+import { useContext, useState, useEffect } from 'react'
+import Parent from '../utils/Parent'
+import has from 'lodash/has'
+import isEmpty from 'lodash/isEmpty'
+import getCurrentItemKey from '#utils/getCurrentItemKey'
+import ItemContext from '#context/ItemContext'
+
+import { FunctionChildren } from '#typings/index'
+import SkuListsContext from '#context/SkuListsContext'
+import SkuChildrenContext from '#context/SkuChildrenContext'
+
+type ChildrenProps = FunctionChildren<
+  Omit<Props, 'children'> & {
+    handleChange: (event: React.MouseEvent<HTMLInputElement>) => void
+    handleBlur: (event: React.MouseEvent<HTMLInputElement>) => void
+  }
+>
+
+type Props = {
+  children?: ChildrenProps
+  disabled?: boolean
+  min?: number
+  max?: number
+  value?: string
+  skuCode?: string
+  skuListId?: string
+} & JSX.IntrinsicElements['input']
+
+export function QuantitySelector(props: Props) {
+  const { skuCode, skuListId, children, min = 1, max, ...p } = props
+  const {
+    item,
+    setQuantity,
+    items,
+    quantity,
+    prices,
+    skuCode: itemSkuCode,
+  } = useContext(ItemContext)
+  const { sku } = useContext(SkuChildrenContext)
+  const { skuLists, listIds } = useContext(SkuListsContext)
+  const defaultVal = p?.value || min
+  const [value, setValue] = useState(defaultVal)
+  const [disabled, setDisabled] = useState(!!p.disabled)
+  const sCode = (
+    !isEmpty(items) && skuCode
+      ? items[skuCode]?.code
+      : sku?.code || skuCode || getCurrentItemKey(item) || itemSkuCode
+  ) as string
+  const inventory = isEmpty(item) ? 50 : item[sCode]?.inventory?.quantity
+  const maxInv = max || inventory
+  useEffect(() => {
+    setValue(defaultVal)
+    if (!prices[sCode] || !sCode) {
+      setDisabled(true)
+    }
+    skuListId && setDisabled(false)
+    if (sCode && !quantity[sCode]) {
+      const qty = Number(defaultVal)
+      setQuantity && setQuantity({ ...quantity, [`${sCode}`]: qty })
+      if (!isEmpty(prices) && has(prices, sCode)) setDisabled(false)
+    }
+    return (): void => {
+      setValue(defaultVal)
+    }
+  }, [item, listIds, prices, quantity])
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const qty = Number(e.target.value)
+    const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
+    setValue(qty)
+    if (!isEmpty(skuLists) && skuListId && valid) {
+      setQuantity && setQuantity({ ...quantity, [`${skuListId}`]: Number(qty) })
+    } else if (sCode && valid) {
+      setQuantity && setQuantity({ ...quantity, [`${sCode}`]: Number(qty) })
+    }
+  }
+  const handleBlur = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const qty = e.target.value
+    const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
+    if (!valid) {
+      const resetVal = Number(qty) < Number(min) ? min : maxInv
+      resetVal && setValue(resetVal)
+      if (!isEmpty(skuLists) && skuListId) {
+        setQuantity &&
+          setQuantity({ ...quantity, [`${skuListId}`]: Number(resetVal) })
+      } else {
+        setQuantity &&
+          setQuantity({ ...quantity, [`${sCode}`]: Number(resetVal) })
+      }
+    }
+  }
+  const parentProps = {
+    min,
+    max: maxInv,
+    disabled,
+    handleChange,
+    handleBlur,
+    value,
+    ...props,
+  }
+  return children ? (
+    <Parent {...parentProps}>{children}</Parent>
+  ) : (
+    <input
+      type="number"
+      max={maxInv}
+      min={min}
+      value={value || ''}
+      disabled={disabled}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      {...p}
+    />
+  )
+}
+
+export default QuantitySelector
