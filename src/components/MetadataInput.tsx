@@ -1,9 +1,5 @@
-import BaseInput from './utils/BaseInput'
-import components from '#config/components'
+import BaseInput from '#components-utils/BaseInput'
 import { BaseInputComponentProps } from '#typings'
-
-const propTypes = components.MetadataInput.propTypes
-const displayName = components.MetadataInput.displayName
 
 type Props = BaseInputComponentProps &
   JSX.IntrinsicElements['input'] &
@@ -12,8 +8,5 @@ type Props = BaseInputComponentProps &
 export function MetadataInput(props: Props) {
   return <BaseInput data-metadata {...props} />
 }
-
-MetadataInput.propTypes = propTypes
-MetadataInput.displayName = displayName
 
 export default MetadataInput

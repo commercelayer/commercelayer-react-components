@@ -1,13 +1,9 @@
-import { ReactNode, useContext } from 'react'
-import Parent from './utils/Parent'
-import components from '#config/components'
+import { useContext } from 'react'
+import Parent from '#components-utils/Parent'
 import { FunctionChildren } from '#typings/index'
 import OrderContext from '#context/OrderContext'
 import { CodeType, OrderCodeType } from '#reducers/OrderReducer'
 import { has, isEmpty } from 'lodash'
-
-const propTypes = components.GiftCardOrCouponRemoveButton.propTypes
-const displayName = components.GiftCardOrCouponRemoveButton.displayName
 
 type GiftCardOrCouponRemoveButtonChildrenProps = FunctionChildren<
   Omit<Props, 'children'> & {
@@ -20,11 +16,11 @@ type GiftCardOrCouponRemoveButtonChildrenProps = FunctionChildren<
 type Props = {
   type?: CodeType
   children?: GiftCardOrCouponRemoveButtonChildrenProps
-  label?: string | ReactNode
+  label?: string | JSX.Element
   onClick?: (response: { success: boolean }) => void
 } & Omit<JSX.IntrinsicElements['button'], 'type'>
 
-export function GiftCardOrCouponRemoveButton(props: Props) {
+export function GiftCardOrCouponRemoveButton(props: Props): JSX.Element | null {
   const { children, label = 'Remove', onClick, type, ...p } = props
   const { order, removeGiftCardOrCouponCode } = useContext(OrderContext)
   let codeType = `${type}_code` as OrderCodeType
@@ -58,8 +54,5 @@ export function GiftCardOrCouponRemoveButton(props: Props) {
     </button>
   )
 }
-
-GiftCardOrCouponRemoveButton.propTypes = propTypes
-GiftCardOrCouponRemoveButton.displayName = displayName
 
 export default GiftCardOrCouponRemoveButton

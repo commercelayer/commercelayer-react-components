@@ -1,13 +1,9 @@
 import { useContext, PropsWithoutRef } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
-import Parent from './utils/Parent'
-import components from '#config/components'
-import { FunctionChildren } from '#typings/index'
+import Parent from '#components-utils/Parent'
 
-const propTypes = components.LineItemRemoveLink.propTypes
-const defaultProps = components.LineItemRemoveLink.defaultProps
-const displayName = components.LineItemRemoveLink.displayName
+import { FunctionChildren } from '#typings/index'
 
 type ChildrenProps = FunctionChildren<{
   handleRemove: (event: React.MouseEvent<HTMLAnchorElement>) => void
@@ -39,9 +35,5 @@ export function LineItemRemoveLink(props: Props) {
     </a>
   )
 }
-
-LineItemRemoveLink.propTypes = propTypes
-LineItemRemoveLink.defaultProps = defaultProps
-LineItemRemoveLink.displayName = displayName
 
 export default LineItemRemoveLink

@@ -1,30 +1,20 @@
 import { useRapidForm } from 'rapid-form'
-import {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  ReactNode,
-} from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import OrderContext from '#context/OrderContext'
 import isEmpty from 'lodash/isEmpty'
-import components from '#config/components'
 import camelCase from 'lodash/camelCase'
 import dropWhile from 'lodash/dropWhile'
 import has from 'lodash/has'
 import { findIndex } from 'lodash'
 import { OrderCodeType } from '#reducers/OrderReducer'
 
-const propTypes = components.GiftCardOrCouponForm.propTypes
-
 type Props = {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   onSubmit?: (response: { success: boolean; value: string }) => void
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
-export function GiftCardOrCouponForm(props: Props) {
+export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
   const { children, autoComplete = 'on', onSubmit, ...p } = props
   const { validation, values, reset } = useRapidForm()
   const [codeType, setCodeType] = useState<OrderCodeType>(
@@ -89,7 +79,5 @@ export function GiftCardOrCouponForm(props: Props) {
     </CouponAndGiftCardFormContext.Provider>
   )
 }
-
-GiftCardOrCouponForm.propTypes = propTypes
 
 export default GiftCardOrCouponForm

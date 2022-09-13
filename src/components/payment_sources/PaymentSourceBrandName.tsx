@@ -1,12 +1,8 @@
 import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
 import { capitalize } from 'lodash'
 import { useContext } from 'react'
-import Parent from './utils/Parent'
+import Parent from '#components-utils/Parent'
 import { FunctionChildren } from '#typings'
-import components from '#config/components'
-
-const propTypes = components.PaymentSourceBrandName.propTypes
-const displayName = components.PaymentSourceBrandName.displayName
 
 type CustomComponent = FunctionChildren<
   Omit<Props & { brand: IconBrand }, 'children'>
@@ -30,8 +26,5 @@ export function PaymentSourceBrandName({ children, label, ...props }: Props) {
     <span {...props}>{label || capitalize(brandName)}</span>
   )
 }
-
-PaymentSourceBrandName.propTypes = propTypes
-PaymentSourceBrandName.displayName = displayName
 
 export default PaymentSourceBrandName

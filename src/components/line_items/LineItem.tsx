@@ -1,19 +1,15 @@
-import { useContext, ReactNode } from 'react'
+import { useContext } from 'react'
 import LineItemContext from '#context/LineItemContext'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import components from '#config/components'
 import { LineItemType } from '#typings'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 
-const propTypes = components.LineItem.propTypes
-const displayName = components.LineItem.displayName
-
 type Props = {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   type?: LineItemType
 }
 
-export function LineItem(props: Props) {
+export function LineItem(props: Props): JSX.Element {
   const { type = 'skus', children } = props
   const { lineItems } = useContext(LineItemContext)
   const { lineItems: shipmentLineItems } = useContext(ShipmentChildrenContext)
@@ -49,8 +45,5 @@ export function LineItem(props: Props) {
       })
   return <>{components}</>
 }
-
-LineItem.propTypes = propTypes
-LineItem.displayName = displayName
 
 export default LineItem

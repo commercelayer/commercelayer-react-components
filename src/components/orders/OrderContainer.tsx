@@ -1,11 +1,4 @@
-import {
-  useEffect,
-  useReducer,
-  useContext,
-  ReactNode,
-  useMemo,
-  useState,
-} from 'react'
+import { useEffect, useReducer, useContext, useMemo, useState } from 'react'
 import orderReducer, {
   AddToCartValues,
   createOrder,
@@ -22,26 +15,21 @@ import orderReducer, {
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext, { defaultOrderContext } from '#context/OrderContext'
 import { ResourceIncluded } from '#reducers/OrderReducer'
-import components from '#config/components'
 import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
 import type { OrderCreate, Order } from '@commercelayer/sdk'
 import { BaseError } from '#typings/errors'
 import compareObjAttribute from '#utils/compareObjAttribute'
 
-const propTypes = components.OrderContainer.propTypes
-const defaultProps = components.OrderContainer.defaultProps
-const displayName = components.OrderContainer.displayName
-
 type Props = {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   metadata?: BaseMetadataObject
   attributes?: OrderCreate
   orderId?: string
   fetchOrder?: (order: Order) => void
 }
 
-export function OrderContainer(props: Props) {
+export function OrderContainer(props: Props): JSX.Element {
   const { orderId, children, metadata, attributes, fetchOrder } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const [lock, setLock] = useState(false)
@@ -280,9 +268,5 @@ export function OrderContainer(props: Props) {
     <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
   )
 }
-
-OrderContainer.propTypes = propTypes
-OrderContainer.defaultProps = defaultProps
-OrderContainer.displayName = displayName
 
 export default OrderContainer

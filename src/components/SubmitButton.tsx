@@ -1,21 +1,15 @@
-import { ReactNode } from 'react'
-import Parent from './utils/Parent'
-import components from '#config/components'
+import Parent from '#components-utils/Parent'
 import { FunctionChildren } from '#typings/index'
 import isFunction from 'lodash/isFunction'
-
-const propTypes = components.SubmitButton.propTypes
-const defaultProps = components.SubmitButton.defaultProps
-const displayName = components.SubmitButton.displayName
 
 type ChildrenProps = FunctionChildren<Omit<Props, 'children'>>
 
 type Props = {
   children?: ChildrenProps
-  label?: string | ReactNode
+  label?: string | JSX.Element
 } & JSX.IntrinsicElements['button']
 
-export function SubmitButton(props: Props) {
+export function SubmitButton(props: Props): JSX.Element {
   const { children, label = 'Submit', ...p } = props
   const parentProps = {
     ...p,
@@ -29,9 +23,5 @@ export function SubmitButton(props: Props) {
     </button>
   )
 }
-
-SubmitButton.propTypes = propTypes
-SubmitButton.defaultProps = defaultProps
-SubmitButton.displayName = displayName
 
 export default SubmitButton

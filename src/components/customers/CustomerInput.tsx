@@ -1,14 +1,11 @@
 import { useContext, useEffect, useState } from 'react'
 import BaseInput from '../utils/BaseInput'
-import components from '#config/components'
+
 import { BaseInputComponentProps } from '#typings'
 import { useRapidForm } from 'rapid-form'
 import CustomerContext from '#context/CustomerContext'
 import isEmpty from 'lodash/isEmpty'
 import { BaseError, CodeErrorType } from '#typings/errors'
-
-const propTypes = components.CustomerInput.propTypes
-const displayName = components.CustomerInput.displayName
 
 type Props = {
   name?: 'customer_email' | string
@@ -86,8 +83,5 @@ export function CustomerInput(props: Props) {
     />
   )
 }
-
-CustomerInput.propTypes = propTypes
-CustomerInput.displayName = displayName
 
 export default CustomerInput

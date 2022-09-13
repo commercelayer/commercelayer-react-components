@@ -1,11 +1,8 @@
-import components from '#config/components'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import { has } from 'lodash'
 import { useContext } from 'react'
-import Parent from './utils/Parent'
+import Parent from '#components-utils/Parent'
 import { FunctionChildren } from '#typings'
-const propTypes = components.PaymentSourceDetail.propTypes
-const displayName = components.PaymentSourceDetail.displayName
 
 export type PaymentSourceDetailType = 'last4' | 'exp_year' | 'exp_month'
 
@@ -31,8 +28,5 @@ export function PaymentSourceDetail({ type, children, ...p }: Props) {
     <span {...p}>{text}</span>
   )
 }
-
-PaymentSourceDetail.propTypes = propTypes
-PaymentSourceDetail.displayName = displayName
 
 export default PaymentSourceDetail
