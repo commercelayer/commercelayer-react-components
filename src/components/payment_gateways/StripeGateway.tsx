@@ -17,7 +17,7 @@ import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
 type StripeGateway = GatewayBaseType
 
-export function StripeGateway(props: StripeGateway) {
+export function StripeGateway(props: StripeGateway): JSX.Element | null {
   const {
     readonly,
     showCard,
@@ -39,7 +39,7 @@ export function StripeGateway(props: StripeGateway) {
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-ignore
+  // @ts-expect-error
   const publishableKey = paymentSource?.publishable_key
   const paymentSourceId = order?.payment_source?.id || paymentSource?.id
   const stripeConfig = config
@@ -86,7 +86,6 @@ export function StripeGateway(props: StripeGateway) {
       </>
     )
   }
-
   return publishableKey && !loading && paymentSourceId ? (
     <StripePayment
       show={show}

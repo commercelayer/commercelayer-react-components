@@ -18,6 +18,10 @@ const propTypes = components.PaymentMethod.propTypes
 const displayName = components.PaymentMethod.displayName
 
 type Props = {
+  /**
+   * Hide payment methods by an array of strings
+   */
+  hide?: Array<PaymentResource>
   children: ReactNode
   activeClass?: string
   loader?: LoaderType
@@ -39,6 +43,7 @@ export function PaymentMethod({
   activeClass,
   loader = 'Loading...',
   clickableContainer,
+  hide,
   onClick,
   ...p
 }: Props) {
@@ -59,40 +64,48 @@ export function PaymentMethod({
   }, [paymentMethods, currentPaymentMethodId])
   const components =
     paymentMethods &&
-    paymentMethods.map((payment, k) => {
-      const isActive = currentPaymentMethodId === payment?.id
-      const paymentMethodProps = {
-        payment,
-        clickableContainer,
-        paymentSelected,
-        setPaymentSelected,
-      }
-      const paymentResource = payment?.payment_source_type as PaymentResource
-      const onClickable = !clickableContainer
-        ? undefined
-        : async (e: MouseEvent<HTMLDivElement>) => {
-            e.stopPropagation()
-            setLoadingPlaceOrder({ loading: true })
-            setPaymentSelected(payment.id)
-            const paymentMethodId = payment?.id
-            await setPaymentMethod({ paymentResource, paymentMethodId })
-            onClick && onClick(payment)
-            setLoadingPlaceOrder({ loading: false })
-          }
-      return (
-        <div
-          data-test-id={paymentResource}
-          key={k}
-          className={`${className} ${isActive ? activeClass : ''}`}
-          onClick={onClickable}
-          {...p}
-        >
-          <PaymentMethodChildrenContext.Provider value={paymentMethodProps}>
-            {children}
-          </PaymentMethodChildrenContext.Provider>
-        </div>
-      )
-    })
+    paymentMethods
+      .filter((payment) => {
+        if (hide) {
+          const source = payment?.payment_source_type as PaymentResource
+          return hide?.includes(source) === false
+        }
+        return true
+      })
+      .map((payment, k) => {
+        const isActive = currentPaymentMethodId === payment?.id
+        const paymentMethodProps = {
+          payment,
+          clickableContainer,
+          paymentSelected,
+          setPaymentSelected,
+        }
+        const paymentResource = payment?.payment_source_type as PaymentResource
+        const onClickable = !clickableContainer
+          ? undefined
+          : async (e: MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation()
+              setLoadingPlaceOrder({ loading: true })
+              setPaymentSelected(payment.id)
+              const paymentMethodId = payment?.id
+              await setPaymentMethod({ paymentResource, paymentMethodId })
+              onClick && onClick(payment)
+              setLoadingPlaceOrder({ loading: false })
+            }
+        return (
+          <div
+            data-test-id={paymentResource}
+            key={k}
+            className={`${className} ${isActive ? activeClass : ''}`}
+            onClick={onClickable}
+            {...p}
+          >
+            <PaymentMethodChildrenContext.Provider value={paymentMethodProps}>
+              {children}
+            </PaymentMethodChildrenContext.Provider>
+          </div>
+        )
+      })
   return !loading ? (
     <Fragment>{components}</Fragment>
   ) : (
