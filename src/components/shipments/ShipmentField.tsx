@@ -1,4 +1,4 @@
-import { useContext, ReactNode } from 'react'
+import { useContext } from 'react'
 import Parent from '#components-utils/Parent'
 import components from '#config/components'
 import get from 'lodash/get'
@@ -22,7 +22,7 @@ export type ShipmentAttribute =
   | 'key_number'
 
 type Props = {
-  children?: (props: ShipmentFieldChildrenProps) => ReactNode
+  children?: (props: ShipmentFieldChildrenProps) => JSX.Element
   name: ShipmentAttribute
 } & JSX.IntrinsicElements['span']
 

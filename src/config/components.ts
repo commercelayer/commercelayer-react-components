@@ -17,9 +17,9 @@ import {
 } from '#typings'
 import { ErrorPropTypes } from '#typings/errors'
 import { BaseInputComponentPropTypes } from '#typings/index'
-import { DeliveryLeadTimeField } from '../components/DeliveryLeadTime'
+import { DeliveryLeadTimeField } from '../components/skus/DeliveryLeadTime'
 // import { StockTransferFieldType } from '#components/StockTransferField'
-import { PaymentSourceDetailType } from '#components/PaymentSourceDetail'
+import { PaymentSourceDetailType } from '#components/payment_source/PaymentSourceDetail'
 import { CodeType } from '#reducers/OrderReducer'
 import { ShipmentAttribute } from '#components/shipments/ShipmentField'
 

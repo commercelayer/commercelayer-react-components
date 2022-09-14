@@ -1,4 +1,4 @@
-import BaseInput from './utils/BaseInput'
+import BaseInput from '#components-utils/BaseInput'
 import components from '#config/components'
 import { BaseInputComponentProps } from '#typings'
 

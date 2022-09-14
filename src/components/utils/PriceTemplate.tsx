@@ -1,5 +1,5 @@
 import React from 'react'
-import { PriceProps } from '#components/Price'
+import { PriceProps } from '#components/prices/Price'
 import PropTypes from 'prop-types'
 
 const propTypes = {

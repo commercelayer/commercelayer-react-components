@@ -1,11 +1,4 @@
-import {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import Parent from '../utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
@@ -31,7 +24,7 @@ type Props = {
   onClick?: (response: { placed: boolean }) => void
 } & JSX.IntrinsicElements['button']
 
-const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
+export function PlaceOrderButton(props: Props) {
   const ref = useRef(null)
   const { children, label = 'Place order', disabled, onClick, ...p } = props
   const { isPermitted, setPlaceOrder, options, paymentType, setButtonRef } =
@@ -145,7 +138,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       setButtonRef(ref)
     }
   }, [ref])
-  
+
   const handleClick = async () => {
     let isValid = true
     setForceDisable(true)
@@ -163,12 +156,17 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
         !options?.checkoutCom?.session_id,
       ].every(Boolean)
     ) {
-      // @ts-ignore
-      isValid = (await currentPaymentMethodRef.current?.onsubmit(paymentSource)) as boolean
-      // @ts-ignore
-      if (isValid === false && paymentSource.payment_response?.resultCode === 'Authorised') {
+      isValid = (await currentPaymentMethodRef.current?.onsubmit(
+        // @ts-expect-error
+        paymentSource
+      )) as boolean
+      if (
+        isValid === false &&
+        // @ts-expect-error
+        paymentSource.payment_response?.resultCode === 'Authorised'
+      ) {
         isValid = true
-      } 
+      }
     } else if (card?.brand) {
       isValid = true
     }
@@ -186,13 +184,13 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     label,
     disabled: disabledButton,
     handleClick,
-    ref
+    ref,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-      <button
-        ref={ref}
+    <button
+      ref={ref}
       type="button"
       disabled={disabledButton || forceDisable}
       onClick={handleClick}

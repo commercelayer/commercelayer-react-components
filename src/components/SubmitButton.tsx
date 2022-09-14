@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import Parent from './utils/Parent'
+import Parent from '#components-utils/Parent'
 import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import isFunction from 'lodash/isFunction'

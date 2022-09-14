@@ -217,7 +217,7 @@ export function OrderList({
       </TheadHtmlElement>
       <TbodyHtmlElement {...table.getTableBodyProps()}>
         {!infiniteScroll ? (
-          components
+          (components as JSX.Element[])
         ) : (
           <FixedSizeList
             height={windowOptions?.height || 400}

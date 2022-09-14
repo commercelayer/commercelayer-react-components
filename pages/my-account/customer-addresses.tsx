@@ -12,7 +12,7 @@ import {
 } from '@commercelayer/react-components'
 import { useState } from 'react'
 import useGetToken from '../../hooks/useGetToken'
-import SaveAddressesButton from '../../src/components/SaveAddressesButton'
+import SaveAddressesButton from '../../src/components/addresses/SaveAddressesButton'
 
 const messages: any = [
   {

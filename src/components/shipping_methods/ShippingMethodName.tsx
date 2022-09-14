@@ -1,4 +1,4 @@
-import { useContext, ReactNode } from 'react'
+import { useContext } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from '#components-utils/Parent'
 import components from '#config/components'
@@ -13,7 +13,7 @@ type ChildrenProps = Omit<Props, 'children'> & {
 }
 
 type Props = {
-  children?: (props: ChildrenProps) => ReactNode
+  children?: (props: ChildrenProps) => JSX.Element
 } & JSX.IntrinsicElements['label']
 
 export function ShippingMethodName(props: Props) {

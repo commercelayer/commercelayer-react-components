@@ -18,7 +18,7 @@ type Props =
       type?: 'field'
       label?: never
       onClick?: never
-      children?: (props: AddressFieldChildrenProps) => ReactNode
+      children?: (props: AddressFieldChildrenProps) => JSX.Element
       name: AddressFieldView
       className?: string
     }
@@ -26,7 +26,7 @@ type Props =
       type?: 'edit'
       label: string | ReactNode
       onClick: (address: Address) => void
-      children?: (props: AddressFieldChildrenProps) => ReactNode
+      children?: (props: AddressFieldChildrenProps) => JSX.Element
       name?: AddressFieldView
       className?: string
     }
@@ -34,7 +34,7 @@ type Props =
       type?: 'delete'
       label: string
       onClick: () => void
-      children?: (props: AddressFieldChildrenProps) => ReactNode
+      children?: (props: AddressFieldChildrenProps) => JSX.Element
       name?: AddressFieldView
       className?: string
     }
@@ -42,7 +42,7 @@ type Props =
       type?: 'edit' | 'field' | 'delete'
       label?: never
       onClick?: never
-      children: (props: AddressFieldChildrenProps) => ReactNode
+      children: (props: AddressFieldChildrenProps) => JSX.Element
       name?: never
       className?: string
     }
@@ -70,7 +70,7 @@ export function AddressField(props: Props) {
     <p {...{ ...p, name }}>{text}</p>
   ) : (
     <a {...p} onClick={handleClick}>
-      {typeof label === 'function' ? label() : label}
+      {label}
     </a>
   )
 }

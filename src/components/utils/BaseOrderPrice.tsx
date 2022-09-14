@@ -47,6 +47,4 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
   )
 }
 
-BaseOrderPrice.propTypes = baseOrderPricePropTypes
-
 export default BaseOrderPrice

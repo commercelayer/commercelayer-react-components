@@ -46,7 +46,7 @@ export function CartLink(props: Props) {
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <a href={href} {...p} onClick={handleClick}>
-      {typeof label === 'function' ? label() : label}
+      {label}
     </a>
   )
 }

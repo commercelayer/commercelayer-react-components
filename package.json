@@ -15,21 +15,45 @@
       "require": "./lib/cjs/index.js",
       "import": "./lib/esm/index.js"
     },
+    "./addresses/*": {
+      "require": "./lib/cjs/components/addresses/*.js",
+      "import": "./lib/esm/components/addresses/*.js"
+    },
     "./auth/*": {
       "require": "./lib/cjs/components/auth/*.js",
       "import": "./lib/esm/components/auth/*.js"
+    },
+    "./customers/*": {
+      "require": "./lib/cjs/components/customers/*.js",
+      "import": "./lib/esm/components/customers/*.js"
+    },
+    "./gift_cards/*": {
+      "require": "./lib/cjs/components/gift_cards/*.js",
+      "import": "./lib/esm/components/gift_cards/*.js"
+    },
+    "./line_items/*": {
+      "require": "./lib/cjs/components/line_items/*.js",
+      "import": "./lib/esm/components/line_items/*.js"
     },
     "./orders/*": {
       "require": "./lib/cjs/components/orders/*.js",
       "import": "./lib/esm/components/orders/*.js"
     },
-    "./skus/*": {
-      "require": "./lib/cjs/components/skus/*.js",
-      "import": "./lib/esm/components/skus/*.js"
+    "./payment_gateways/*": {
+      "require": "./lib/cjs/components/payment_gateways/*.js",
+      "import": "./lib/esm/components/payment_gateways/*.js"
     },
-    "./customers/*": {
-      "require": "./lib/cjs/components/customers/*.js",
-      "import": "./lib/esm/components/customers/*.js"
+    "./payment_methods/*": {
+      "require": "./lib/cjs/components/payment_methods/*.js",
+      "import": "./lib/esm/components/payment_methods/*.js"
+    },
+    "./payment_source/*": {
+      "require": "./lib/cjs/components/payment_source/*.js",
+      "import": "./lib/esm/components/payment_source/*.js"
+    },
+    "./prices/*": {
+      "require": "./lib/cjs/components/prices/*.js",
+      "import": "./lib/esm/components/prices/*.js"
     },
     "./shipments/*": {
       "require": "./lib/cjs/components/shipments/*.js",
@@ -38,27 +62,59 @@
     "./shipping_methods/*": {
       "require": "./lib/cjs/components/shipping_methods/*.js",
       "import": "./lib/esm/components/shipping_methods/*.js"
+    },
+    "./skus/*": {
+      "require": "./lib/cjs/components/skus/*.js",
+      "import": "./lib/esm/components/skus/*.js"
+    },
+    "./stock_transfers/*": {
+      "require": "./lib/cjs/components/stock_transfers/*.js",
+      "import": "./lib/esm/components/stock_transfers/*.js"
     }
   },
   "typesVersions": {
     "*": {
+      "addresses/*": [
+        "lib/esm/components/addresses/*.d.ts"
+      ],
       "auth/*": [
         "lib/esm/components/auth/*.d.ts"
+      ],
+      "customers/*": [
+        "lib/esm/components/customers/*.d.ts"
+      ],
+      "gift_cards/*": [
+        "lib/esm/components/gift_cards/*.d.ts"
+      ],
+      "line_items/*": [
+        "lib/esm/components/line_items/*.d.ts"
       ],
       "orders/*": [
         "lib/esm/components/orders/*.d.ts"
       ],
-      "skus/*": [
-        "lib/esm/components/skus/*.d.ts"
+      "payment_gateways/*": [
+        "lib/esm/components/payment_gateways/*.d.ts"
       ],
-      "customers/*": [
-        "lib/esm/components/customers/*.d.ts"
+      "payment_methods/*": [
+        "lib/esm/components/payment_methods/*.d.ts"
+      ],
+      "payment_source/*": [
+        "lib/esm/components/payment_source/*.d.ts"
+      ],
+      "prices/*": [
+        "lib/esm/components/prices/*.d.ts"
       ],
       "shipments/*": [
         "lib/esm/components/shipments/*.d.ts"
       ],
       "shipping_methods/*": [
         "lib/esm/components/shipping_methods/*.d.ts"
+      ],
+      "skus/*": [
+        "lib/esm/components/skus/*.d.ts"
+      ],
+      "stock_transfers/*": [
+        "lib/esm/components/stock_transfers/*.d.ts"
       ]
     }
   },

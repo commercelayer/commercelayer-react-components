@@ -46,7 +46,7 @@ type Option = {
 }
 
 export interface BaseSelectComponentProps {
-  children?: (props: BaseSelectChildrenComponentProps) => ReactNode
+  children?: (props: BaseSelectChildrenComponentProps) => JSX.Element
   options: Option[]
   placeholder?: Option
   value?: string
@@ -83,7 +83,7 @@ type BaseInputChildrenComponentProps = Omit<
 
 export interface BaseInputComponentProps {
   ref?: Ref<any>
-  children?: (props: BaseInputChildrenComponentProps) => ReactNode
+  children?: (props: BaseInputChildrenComponentProps) => JSX.Element
   name: string
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -233,7 +233,7 @@ export type BaseSelectorType = 'select' | 'radio'
 export type BaseAmountComponentChildren = Omit<BaseAmountComponent, 'children'>
 
 export type BaseAmountComponent = {
-  children?: (props: BaseAmountComponentChildren) => ReactNode
+  children?: (props: BaseAmountComponentChildren) => JSX.Element
   format?: BaseFormatPrice
   price?: string
   priceCents?: number
@@ -241,7 +241,7 @@ export type BaseAmountComponent = {
 } & JSX.IntrinsicElements['span']
 
 export interface FunctionChildren<P = Record<string, any>> {
-  (props: P): ReactNode
+  (props: P): JSX.Element
 }
 
 export type ExcludeTag<T extends keyof JSX.IntrinsicElements> = Exclude<

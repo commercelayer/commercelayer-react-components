@@ -2,7 +2,7 @@ import { Fragment, FunctionComponent, ReactNode } from 'react'
 import PropTypes from 'prop-types'
 import { BaseSelectorType } from '#typings'
 import { VariantsObject, SetSkuCode } from '#reducers/VariantReducer'
-import { VariantOption } from '#components/VariantSelector'
+import { VariantOption } from '#components/skus/VariantSelector'
 
 export const propTypes = {
   variants: PropTypes.any.isRequired,
@@ -104,7 +104,5 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
   }
   return <>{vars}</>
 }
-
-VariantTemplate.propTypes = propTypes
 
 export default VariantTemplate

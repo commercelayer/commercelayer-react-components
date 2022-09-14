@@ -1,12 +1,5 @@
 import PlaceOrderContext from '#context/PlaceOrderContext'
-import {
-  FunctionComponent,
-  ReactNode,
-  RefObject,
-  useContext,
-  useEffect,
-  useReducer,
-} from 'react'
+import { ReactNode, RefObject, useContext, useEffect, useReducer } from 'react'
 import placeOrderReducer, {
   placeOrderInitialState,
   PlaceOrderOptions,
@@ -114,7 +107,8 @@ export function PlaceOrderContainer(props: Props) {
           ...options,
         },
       }),
-    setButtonRef: (ref: RefObject<HTMLButtonElement>) => setButtonRef(ref, dispatch)
+    setButtonRef: (ref: RefObject<HTMLButtonElement>) =>
+      setButtonRef(ref, dispatch),
   }
   return (
     <PlaceOrderContext.Provider value={contextValue}>

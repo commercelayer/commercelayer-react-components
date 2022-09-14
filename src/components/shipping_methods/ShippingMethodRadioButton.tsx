@@ -1,4 +1,4 @@
-import { useContext, ReactNode, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from '#components-utils/Parent'
 import components from '#config/components'
@@ -19,7 +19,7 @@ export type ShippingMethodRadioButtonOnChangeType = (
 ) => void
 
 type Props = {
-  children?: (props: ShippingMethodRadioButtonType) => ReactNode
+  children?: (props: ShippingMethodRadioButtonType) => JSX.Element
   onChange?: ShippingMethodRadioButtonOnChangeType
 } & Omit<JSX.IntrinsicElements['input'], 'onChange'>
 

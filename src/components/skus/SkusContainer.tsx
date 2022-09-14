@@ -1,4 +1,3 @@
-import components from '#config/components'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import SkuContext from '#context/SkuContext'
 import skuReducer, { getSku, skuInitialState } from '#reducers/SkuReducer'
@@ -46,7 +45,5 @@ export function SkusContainer<P extends Props>(props: P): JSX.Element {
     <SkuContext.Provider value={contextValue}>{children}</SkuContext.Provider>
   )
 }
-
-SkusContainer.propTypes = components.SkusContainer.propTypes
 
 export default SkusContainer
