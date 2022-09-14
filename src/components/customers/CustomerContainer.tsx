@@ -1,4 +1,4 @@
-import { useContext, useEffect, useReducer } from 'react'
+import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import customerReducer, {
   customerInitialState,
   getCustomerAddresses,
@@ -17,14 +17,14 @@ import CustomerContext from '#context/CustomerContext'
 import { BaseError } from '#typings/errors'
 
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   /**
    * Customer type
    */
   isGuest?: boolean
 }
 
-export function CustomerContainer(props: Props): JSX.Element {
+export function CustomerContainer(props: Props) {
   const { children, isGuest = false } = props
   const [state, dispatch] = useReducer(customerReducer, customerInitialState)
   const { order, addResourceToInclude, include, updateOrder, includeLoaded } =

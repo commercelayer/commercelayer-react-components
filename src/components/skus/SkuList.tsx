@@ -1,8 +1,12 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, Fragment, ReactNode } from 'react'
 import SkuListsContext from '#context/SkuListsContext'
+import components from '#config/components'
+
+const propTypes = components.SkuList.propTypes
+const displayName = components.SkuList.displayName
 
 type Props = {
-  children: JSX.Element
+  children: ReactNode
   id: string
 }
 
@@ -14,7 +18,10 @@ export function SkuList(props: Props) {
       listIds.push(id)
     }
   }, [])
-  return <>{children}</>
+  return <Fragment>{children}</Fragment>
 }
+
+SkuList.propTypes = propTypes
+SkuList.displayName = displayName
 
 export default SkuList

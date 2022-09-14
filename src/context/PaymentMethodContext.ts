@@ -2,7 +2,7 @@ import { createContext } from 'react'
 import {
   UpdatePaymentSource,
   updatePaymentSource,
-} from '#reducers/PaymentMethodReducer'
+} from '../reducers/PaymentMethodReducer'
 import {
   PaymentMethodState,
   SetPaymentMethodErrors,

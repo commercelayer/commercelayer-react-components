@@ -22,11 +22,11 @@ import {
 import { useRouter } from 'next/router'
 import '@adyen/adyen-web/dist/adyen.css'
 
-const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
-const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
-const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
-const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
-const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
+const clientId = process.env['NEXT_PUBLIC_CLIENT_ID']
+const endpoint = process.env['NEXT_PUBLIC_ENDPOINT']
+const scope = process.env['NEXT_PUBLIC_MARKET_ID']
+const username = process.env['NEXT_PUBLIC_USERNAME']
+const password = process.env['NEXT_PUBLIC_PASSWORD']
 
 let orderId = 'PDerhJplRp'
 let paypalPayerId = ''
@@ -65,11 +65,11 @@ export default function Main() {
   const [token, setToken] = useState('')
   const [placed, setPlaced] = useState(false)
   const { query } = useRouter()
-  if (query.orderId) {
-    orderId = query.orderId as string
+  if (query?.orderId) {
+    orderId = query?.orderId as string
   }
-  if (query.PayerID) {
-    paypalPayerId = query.PayerID as string
+  if (query?.PayerID) {
+    paypalPayerId = query?.PayerID as string
   }
   if (query['cko-session-id']) {
     checkoutComSession = query['cko-session-id'] as string
@@ -116,7 +116,7 @@ export default function Main() {
         <script src="http://localhost:8097"></script>
       </Head>
       <React.StrictMode>
-        <CommerceLayer accessToken={token} endpoint={endpoint}>
+        <CommerceLayer accessToken={token} endpoint={endpoint ?? ''}>
           <div className="container mx-auto mt-5 px-5">
             <OrderContainer orderId={orderId}>
               <PaymentMethodsContainer
@@ -177,14 +177,14 @@ export default function Main() {
                   }}
                 >
                   <PaymentMethod
-                      className="p-2 my-1 flex items-center justify-items-center bg-gray-300 cursor-pointer"
-                      activeClass="bg-opacity-25"
-                      clickableContainer
-                      autoSelectSinglePaymentMethod
-                      onClick={({payment, paymentSource}) => { 
-                        console.log('payment', payment)
-                        console.log('paymentSource', paymentSource)
-                      }}
+                    hide={[
+                      'stripe_payments',
+                      'adyen_payments',
+                      'klarna_payments',
+                    ]}
+                    className="p-2 my-1 flex items-center justify-items-center bg-gray-300 cursor-pointer"
+                    activeClass="bg-opacity-25"
+                    clickableContainer
                   >
                     <PaymentMethodRadioButton data-cy="payment-radio-button" />
                     <PaymentMethodName className="pl-3" />

@@ -2,8 +2,11 @@ import { useState, useEffect, useContext } from 'react'
 import getAmount from '#utils/getAmount'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components-utils/Parent'
-
+import components from '#config/components'
 import { BaseAmountComponent } from '#typings/index'
+
+const propTypes = components.PaymentMethodPrice.propTypes
+const displayName = components.PaymentMethodPrice.displayName
 
 type Props = {
   type?: 'amount'
@@ -49,5 +52,8 @@ export function PaymentMethodPrice(props: Props) {
     <span {...p}>{priceCents === 0 ? labelFree : price}</span>
   )
 }
+
+PaymentMethodPrice.propTypes = propTypes
+PaymentMethodPrice.displayName = displayName
 
 export default PaymentMethodPrice

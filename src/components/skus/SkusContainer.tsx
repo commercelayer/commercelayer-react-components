@@ -2,11 +2,20 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 import SkuContext from '#context/SkuContext'
 import skuReducer, { getSku, skuInitialState } from '#reducers/SkuReducer'
 import type { QueryParamsList } from '@commercelayer/sdk'
-import { useContext, useEffect, useMemo, useReducer } from 'react'
+import { ReactNode, useContext, useEffect, useMemo, useReducer } from 'react'
 
 type Props = {
+  /**
+   * An array of skus to display.
+   */
   skus: string[]
-  children: JSX.Element[] | JSX.Element
+  /**
+   * Accept a React node, [Skus](./Skus.d.ts), and [ItemContainer](../ItemContainer.d.ts)  as children to display above the skus.
+   */
+  children: ReactNode
+  /**
+   * An object params to query the skus resource
+   */
   queryParams?: QueryParamsList
 }
 
@@ -19,7 +28,7 @@ export function SkusContainer<P extends Props>(props: P): JSX.Element {
   useEffect(() => {
     if (config.accessToken && state?.skus) {
       if (state?.skus.length === 0) {
-        loadSkus()
+        void loadSkus()
       }
     }
     return () => {

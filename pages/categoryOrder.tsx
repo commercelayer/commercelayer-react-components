@@ -21,8 +21,8 @@ import DiscountAmount from '../src/components/orders/DiscountAmount'
 import ShippingAmount from '../src/components/orders/ShippingAmount'
 import TaxesAmount from '../src/components/TaxesAmount'
 import GiftCardAmount from '../src/components/orders/GiftCardAmount'
-import AvailabilityContainer from '../src/components/skus/AvailabilityContainer'
-import AvailabilityTemplate from '../src/components/AvailabilityTemplate'
+import AvailabilityContainer from '../src/components/AvailabilityContainer'
+import AvailabilityTemplate from '../src/components/skus/AvailabilityTemplate'
 import ItemContainer from '../src/components/orders/ItemContainer'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string

@@ -1,8 +1,8 @@
-import { AdyenPaymentConfig } from '#components/payment_sources/AdyenPayment'
-import { BraintreeConfig } from '#components/payment_sources/BraintreePayment'
-import { PaypalConfig } from '#components/payment_sources/PaypalPayment'
-import { StripeConfig } from '#components/payment_sources/StripePayment'
-import { WireTransferConfig } from '#components/payment_sources/WireTransferPayment'
+import { AdyenPaymentConfig } from '#components/payment_source/AdyenPayment'
+import { BraintreeConfig } from '#components/payment_source/BraintreePayment'
+import { PaypalConfig } from '#components/payment_source/PaypalPayment'
+import { StripeConfig } from '#components/payment_source/StripePayment'
+import { WireTransferConfig } from '#components/payment_source/WireTransferPayment'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext, updateOrder } from '#reducers/OrderReducer'
 import { BaseError } from '#typings/errors'
@@ -25,7 +25,7 @@ import camelCase from 'lodash/camelCase'
 import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
 import { Dispatch, MutableRefObject } from 'react'
-import { CheckoutComConfig } from '#components/payment_sources/CheckoutComPayment'
+import { CheckoutComConfig } from '#components/payment_source/CheckoutComPayment'
 
 export type PaymentSourceType =
   | AdyenPayment

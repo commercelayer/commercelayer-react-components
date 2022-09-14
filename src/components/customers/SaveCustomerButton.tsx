@@ -1,18 +1,18 @@
-import { useContext } from 'react'
+import { ReactNode, useContext } from 'react'
 import Parent from '../utils/Parent'
 import { FunctionChildren } from '#typings/index'
 import { isEmpty } from 'lodash'
 import CustomerContext from '#context/CustomerContext'
 
 type ParentProps = {
-  handleClick: () => any
+  handleClick: () => void
 }
 
 type ChildrenProps = FunctionChildren<Omit<Props & ParentProps, 'children'>>
 
 type Props = {
   children?: ChildrenProps
-  label?: string | JSX.Element
+  label?: string | ReactNode
   onClick?: () => void
 } & JSX.IntrinsicElements['button']
 

@@ -35,7 +35,7 @@ test('<AvailabilityContainer children error />', () => {
 
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to AvailabilityContainer. Only components AvailabilityTemplate,  are allowed`
+      `Invalid prop 'children' supplied to AvailabilityContainer. Only components AvailabilityTemplate, ReactNode are allowed`
     )
   )
 })

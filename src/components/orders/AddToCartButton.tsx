@@ -10,7 +10,6 @@ import { AddToCartReturn } from '#reducers/OrderReducer'
 import SkuListsContext from '#context/SkuListsContext'
 import ExternalFunctionContext from '#context/ExternalFunctionContext'
 import { VariantOption } from '#components/skus/VariantSelector'
-import isFunction from 'lodash/isFunction'
 import SkuChildrenContext from '#context/SkuChildrenContext'
 import getCartLink from '#utils/getCartLink'
 import CommerceLayerContext from '#context/CommerceLayerContext'
@@ -55,7 +54,7 @@ type Props = {
   THostedCart &
   PropsWithoutRef<JSX.IntrinsicElements['button']>
 
-export function AddToCartButton(props: Props): JSX.Element {
+export function AddToCartButton(props: Props) {
   const {
     label = 'Add to cart',
     children,
@@ -86,7 +85,7 @@ export function AddToCartButton(props: Props): JSX.Element {
   } = useContext(ItemContext)
   const { skuLists } = useContext(SkuListsContext)
   const { sku } = useContext(SkuChildrenContext)
-  const [slug] = endpoint.split('.commercelayer')
+  const [slug] = endpoint ? endpoint.split('.commercelayer') : ['']
   const sCode = (
     !isEmpty(items) && skuCode
       ? items[skuCode]?.code
@@ -191,7 +190,7 @@ export function AddToCartButton(props: Props): JSX.Element {
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <button {...p} disabled={autoDisabled} onClick={handleClick}>
-      {isFunction(label) ? label() : label}
+      {label}
     </button>
   )
 }

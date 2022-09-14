@@ -1,5 +1,5 @@
 import { getIntegrationToken } from '@commercelayer/js-auth'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Price from '#components/prices/Price'
 import PricesContainer from '#components/prices/PricesContainer'
 import CommerceLayer from '#components/auth/CommerceLayer'

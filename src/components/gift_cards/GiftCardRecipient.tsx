@@ -1,7 +1,7 @@
 // import  {
 //   FunctionComponent,
 //   Fragment,
-//   ,
+//   ReactNode,
 //   useRef,
 //   useContext
 // } from 'react'
@@ -14,7 +14,7 @@
 // type RequiredFields = 'email'
 
 // export interface GiftCardRecipientProps {
-//   children:
+//   children: ReactNode
 //   id?: string
 //   customer?: object // Customer Collection
 //   onSubmit?: () => void

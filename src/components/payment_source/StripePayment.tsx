@@ -14,7 +14,7 @@ import {
 } from '@stripe/stripe-js'
 import { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
 import { PaymentSourceProps } from './PaymentSource'
-import Parent from '../utils/Parent'
+import Parent from '#components-utils/Parent'
 import OrderContext from '#context/OrderContext'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import { StripePayment as StripePaymentType } from '@commercelayer/sdk'

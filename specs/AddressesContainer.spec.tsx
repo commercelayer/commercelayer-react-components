@@ -3,6 +3,8 @@ import { AddressesContainer, CheckoutLink } from '../src'
 import renderer from 'react-test-renderer'
 import components from '../src/config/components'
 
+const propTypes = components.AddressesContainer.propTypes
+
 test('<AddressesContainer/>', () => {
   expect.assertions(3)
   const component = renderer.create(
@@ -32,7 +34,7 @@ test('<AddressesContainer check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to AddressesContainer. Only components BillingAddressForm, BillingAddressContainer, ShippingAddressForm, ShippingAddressContainer, SaveAddressesButton,  are allowed.`
+      `Invalid prop 'children' supplied to AddressesContainer. Only components BillingAddressForm, BillingAddressContainer, ShippingAddressForm, ShippingAddressContainer, SaveAddressesButton, ReactNode are allowed.`
     )
   )
 })

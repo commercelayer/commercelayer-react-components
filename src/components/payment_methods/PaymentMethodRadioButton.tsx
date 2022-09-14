@@ -1,10 +1,14 @@
 import { useContext, ChangeEvent } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components-utils/Parent'
+import components from '#config/components'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { PaymentMethod } from '@commercelayer/sdk'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
+
+const propTypes = components.PaymentMethodRadioButton.propTypes
+const displayName = components.PaymentMethodRadioButton.displayName
 
 type ShippingMethodRadioButtonChildrenProps = Omit<Props, 'children'> & {
   checked: boolean
@@ -57,5 +61,8 @@ export function PaymentMethodRadioButton(props: Props) {
     />
   )
 }
+
+PaymentMethodRadioButton.propTypes = propTypes
+PaymentMethodRadioButton.displayName = displayName
 
 export default PaymentMethodRadioButton

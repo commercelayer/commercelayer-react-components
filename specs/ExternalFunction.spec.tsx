@@ -52,7 +52,7 @@ test('<ExternalFunction permitted children error />', () => {
 
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to ExternalFunction. Only components AddToCartButton,  are allowed`
+      `Invalid prop 'children' supplied to ExternalFunction. Only components AddToCartButton, ReactNode are allowed`
     )
   )
 })

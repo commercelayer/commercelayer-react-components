@@ -45,7 +45,7 @@ test('<LineItem check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to LineItem. Only components LineItemImage, LineItemName, LineItemOptions, LineItemQuantity, LineItemAmount, LineItemRemoveLink, StockTransfer, Errors,  are allowed.`
+      `Invalid prop 'children' supplied to LineItem. Only components LineItemImage, LineItemName, LineItemOptions, LineItemQuantity, LineItemAmount, LineItemRemoveLink, StockTransfer, Errors, ReactNode are allowed.`
     )
   )
 })

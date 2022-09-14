@@ -1,10 +1,13 @@
 import { useContext, ReactNode } from 'react'
 import AddressChildrenContext from '#context/AddressChildrenContext'
 import Parent from '#components-utils/Parent'
-
+import components from '#config/components'
 import { AddressFieldView } from '#reducers/AddressReducer'
 import type { Address } from '@commercelayer/sdk'
 import CustomerContext from '#context/CustomerContext'
+
+const propTypes = components.AddressField.propTypes
+const displayName = components.AddressField.displayName
 
 type AddressFieldChildrenProps = Omit<Props, 'children' | 'name'> & {
   address: Address
@@ -44,7 +47,7 @@ type Props =
       className?: string
     }
 
-export function AddressField(props: Props): JSX.Element {
+export function AddressField(props: Props) {
   const { name, type = 'field', label, onClick, ...p } = props
   const { address } = useContext(AddressChildrenContext)
   const text = name && address ? address?.[name] : ''
@@ -71,5 +74,8 @@ export function AddressField(props: Props): JSX.Element {
     </a>
   )
 }
+
+AddressField.propTypes = propTypes
+AddressField.displayName = displayName
 
 export default AddressField

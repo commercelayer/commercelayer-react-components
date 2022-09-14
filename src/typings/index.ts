@@ -1,4 +1,4 @@
-import { Dispatch, ForwardedRef, Ref } from 'react'
+import { Dispatch, ForwardedRef, ReactNode, Ref } from 'react'
 import PropTypes, { InferProps } from 'prop-types'
 import { BaseError } from './errors'
 
@@ -168,7 +168,7 @@ export type BaseInputType =
   | 'text'
   | 'textarea'
 
-export type LoaderType = string | JSX.Element
+export type LoaderType = string | ReactNode
 
 export const BMObject = PropTypes.objectOf(PropTypes.string)
 export type BaseMetadataObject = {
@@ -240,7 +240,7 @@ export type BaseAmountComponent = {
   labelFree?: string
 } & JSX.IntrinsicElements['span']
 
-export interface FunctionChildren<P> {
+export interface FunctionChildren<P = Record<string, any>> {
   (props: P): JSX.Element
 }
 

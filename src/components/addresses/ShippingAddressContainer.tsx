@@ -1,17 +1,19 @@
 import ShippingAddressContext from '#context/ShippingAddressContext'
-import { useContext, useEffect, useReducer } from 'react'
+import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import shippingAddressReducer, {
   setShippingAddress,
   shippingAddressInitialState,
   setShippingCustomerAddressId,
 } from '#reducers/ShippingAddressReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-
+import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import AddressContext from '#context/AddressContext'
 
+const propTypes = components.ShippingAddressContainer.propTypes
+
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
 }
 export function ShippingAddressContainer(props: Props) {
   const { children } = props
@@ -58,5 +60,7 @@ export function ShippingAddressContainer(props: Props) {
     </ShippingAddressContext.Provider>
   )
 }
+
+ShippingAddressContainer.propTypes = propTypes
 
 export default ShippingAddressContainer

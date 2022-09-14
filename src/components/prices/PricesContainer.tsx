@@ -1,4 +1,4 @@
-import { useEffect, useContext, useReducer } from 'react'
+import { useEffect, useContext, useReducer, ReactNode } from 'react'
 import getPrices from '#utils/getPrices'
 import isEmpty from 'lodash/isEmpty'
 import has from 'lodash/has'
@@ -12,11 +12,16 @@ import { priceInitialState, getSkusPrice } from '#reducers/PriceReducer'
 import PricesContext, { PricesContextValue } from '#context/PricesContext'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
+import components from '#config/components'
 import { LoaderType } from '#typings'
 import SkuContext from '#context/SkuContext'
 
+const propTypes = components.PricesContainer.propTypes
+const defaultProps = components.PricesContainer.defaultProps
+const displayName = components.PricesContainer.displayName
+
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   filters?: object
   loader?: LoaderType
   perPage?: number
@@ -119,5 +124,9 @@ export function PricesContainer(props: Props) {
     </PricesContext.Provider>
   )
 }
+
+PricesContainer.propTypes = propTypes
+PricesContainer.defaultProps = defaultProps
+PricesContainer.displayName = displayName
 
 export default PricesContainer

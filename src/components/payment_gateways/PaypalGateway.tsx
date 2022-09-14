@@ -1,5 +1,5 @@
 import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
-import PaypalPayment from '#components/payment_sources/PaypalPayment'
+import PaypalPayment from '#components/payment_source/PaypalPayment'
 import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'

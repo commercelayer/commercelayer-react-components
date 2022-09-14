@@ -1,5 +1,5 @@
 import PlaceOrderContext from '#context/PlaceOrderContext'
-import { RefObject, useContext, useEffect, useReducer } from 'react'
+import { ReactNode, RefObject, useContext, useEffect, useReducer } from 'react'
 import placeOrderReducer, {
   placeOrderInitialState,
   PlaceOrderOptions,
@@ -8,11 +8,15 @@ import placeOrderReducer, {
 } from '#reducers/PlaceOrderReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
+import components from '#config/components'
 import { setPlaceOrder } from '../../reducers/PlaceOrderReducer'
 import { PaymentSourceType } from '#reducers/PaymentMethodReducer'
 
+const propTypes = components.PlaceOrderContainer.propTypes
+const displayName = components.PlaceOrderContainer.displayName
+
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   options?: PlaceOrderOptions
 }
 export function PlaceOrderContainer(props: Props) {
@@ -112,5 +116,8 @@ export function PlaceOrderContainer(props: Props) {
     </PlaceOrderContext.Provider>
   )
 }
+
+PlaceOrderContainer.propTypes = propTypes
+PlaceOrderContainer.displayName = displayName
 
 export default PlaceOrderContainer

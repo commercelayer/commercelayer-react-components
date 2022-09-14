@@ -4,10 +4,13 @@ import get from 'lodash/get'
 import has from 'lodash/has'
 import map from 'lodash/map'
 import Parent from '#components-utils/Parent'
-
+import components from '#config/components'
 import { LineItemOption as LineItemOptionType } from '@commercelayer/sdk'
 import { FunctionChildren } from '#typings/index'
 import isJSON from '#utils/isJSON'
+
+const propTypes = components.LineItemOption.propTypes
+const displayName = components.LineItemOption.displayName
 
 type LineItemOptionChildrenProps = FunctionChildren<
   Omit<Props, 'children'> & {
@@ -68,5 +71,8 @@ export function LineItemOption(props: Props) {
     <TagContainer>{components}</TagContainer>
   )
 }
+
+LineItemOption.propTypes = propTypes
+LineItemOption.displayName = displayName
 
 export default LineItemOption

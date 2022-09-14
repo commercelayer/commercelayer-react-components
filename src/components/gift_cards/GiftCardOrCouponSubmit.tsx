@@ -1,5 +1,10 @@
+import { ReactNode } from 'react'
 import Parent from '#components-utils/Parent'
+import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
+
+const propTypes = components.GiftCardOrCouponSubmit.propTypes
+const displayName = components.GiftCardOrCouponSubmit.displayName
 
 type GiftCardOrCouponSubmitChildrenProps = FunctionChildren<
   Omit<Props, 'children'>
@@ -7,10 +12,10 @@ type GiftCardOrCouponSubmitChildrenProps = FunctionChildren<
 
 type Props = {
   children?: GiftCardOrCouponSubmitChildrenProps
-  label?: string | JSX.Element
+  label?: string | ReactNode
 } & JSX.IntrinsicElements['button']
 
-export function GiftCardOrCouponSubmit(props: Props): JSX.Element {
+export function GiftCardOrCouponSubmit(props: Props) {
   const { children, label = 'Submit', ...p } = props
   const parentProps = {
     ...p,
@@ -24,5 +29,8 @@ export function GiftCardOrCouponSubmit(props: Props): JSX.Element {
     </button>
   )
 }
+
+GiftCardOrCouponSubmit.propTypes = propTypes
+GiftCardOrCouponSubmit.displayName = displayName
 
 export default GiftCardOrCouponSubmit

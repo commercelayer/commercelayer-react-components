@@ -1,4 +1,4 @@
-import { MouseEvent, useContext } from 'react'
+import { MouseEvent, ReactNode, useContext } from 'react'
 import OrderContext from '#context/OrderContext'
 import Parent from '../utils/Parent'
 import { FunctionChildren } from '#typings/index'
@@ -14,10 +14,10 @@ type TChildren = FunctionChildren<
 
 type Props = {
   children?: TChildren
-  label?: string | JSX.Element
+  label?: string | ReactNode
 } & JSX.IntrinsicElements['a']
 
-export function CartLink(props: Props): JSX.Element | null {
+export function CartLink(props: Props) {
   const { label, children, ...p } = props
   const { order, createOrder } = useContext(OrderContext)
   const { accessToken, endpoint } = useContext(CommerceLayerContext)

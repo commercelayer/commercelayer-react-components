@@ -1,4 +1,4 @@
-import BraintreePayment from '#components/payment_sources/BraintreePayment'
+import BraintreePayment from '#components/payment_source/BraintreePayment'
 import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'

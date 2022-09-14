@@ -1,6 +1,10 @@
 import { useContext } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components-utils/Parent'
+import components from '#config/components'
+
+const propTypes = components.PaymentMethodName.propTypes
+const displayName = components.PaymentMethodName.displayName
 
 type PaymentMethodNameChildrenProps = Omit<Props, 'children'> & {
   labelName: string
@@ -27,5 +31,8 @@ export function PaymentMethodName(props: Props) {
     </label>
   )
 }
+
+PaymentMethodName.propTypes = propTypes
+PaymentMethodName.displayName = displayName
 
 export default PaymentMethodName

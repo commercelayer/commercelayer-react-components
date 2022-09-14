@@ -1,7 +1,29 @@
-import { Fragment, FunctionComponent } from 'react'
+import { Fragment, FunctionComponent, ReactNode } from 'react'
+import PropTypes from 'prop-types'
 import { BaseSelectorType } from '#typings'
 import { VariantsObject, SetSkuCode } from '#reducers/VariantReducer'
 import { VariantOption } from '#components/skus/VariantSelector'
+
+export const propTypes = {
+  variants: PropTypes.any.isRequired,
+  onChange: PropTypes.func,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      code: PropTypes.string.isRequired,
+      lineItem: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        imageUrl: PropTypes.string,
+      }),
+    }).isRequired
+  ).isRequired,
+  name: PropTypes.string,
+  children: PropTypes.func,
+  type: PropTypes.oneOf<BaseSelectorType>(['select', 'radio']),
+  loader: PropTypes.element,
+  placeholder: PropTypes.string,
+  skuCode: PropTypes.string,
+}
 
 export type VariantHandleCallback = (variant: VariantOption) => void
 
@@ -10,7 +32,7 @@ export type VariantTemplateProps = {
   handleChange?: SetSkuCode
   options: VariantOption[]
   type?: BaseSelectorType
-  loader?: string | JSX.Element
+  loader?: ReactNode
   placeholder?: string
   skuCode?: string
   handleCallback?: VariantHandleCallback

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import BaseInput from '#components-utils/BaseInput'
-
+import components from '#config/components'
 import { BaseInputComponentProps, AddressInputName } from '#typings'
 import BillingAddressFormContext, {
   AddressValuesKeys,
@@ -9,6 +9,9 @@ import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'
 import { businessMandatoryField } from '#utils/validateFormFields'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
+
+const propTypes = components.AddressInput.propTypes
+const displayName = components.AddressInput.displayName
 
 type Props = {
   name: Extract<AddressValuesKeys, AddressInputName>
@@ -91,5 +94,8 @@ export function AddressInput(props: Props) {
     />
   )
 }
+
+AddressInput.propTypes = propTypes
+AddressInput.displayName = displayName
 
 export default AddressInput

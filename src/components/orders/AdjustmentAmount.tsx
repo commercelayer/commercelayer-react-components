@@ -1,7 +1,8 @@
-import BaseOrderPrice from '#components-utils/BaseOrderPrice'
+import { FunctionComponent } from 'react'
+import BaseOrderPrice from '../utils/BaseOrderPrice'
 import { BaseAmountComponent } from '#typings'
 
-export  function AdjustmentAmount(props: BaseAmountComponent): JSX.Element {
+const AdjustmentAmount: FunctionComponent<BaseAmountComponent> = (props) => {
   return <BaseOrderPrice base="amount" type="adjustment" {...props} />
 }
 

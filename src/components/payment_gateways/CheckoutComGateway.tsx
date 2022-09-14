@@ -1,4 +1,4 @@
-import CheckoutComPayment from '#components/payment_sources/CheckoutComPayment'
+import CheckoutComPayment from '#components/payment_source/CheckoutComPayment'
 import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'

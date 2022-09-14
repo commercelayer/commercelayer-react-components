@@ -4,9 +4,13 @@ import Parent from '#components-utils/Parent'
 import PricesContext from '#context/PricesContext'
 import { getPricesComponent } from '#utils/getPrices'
 import { Price as PriceType } from '@commercelayer/sdk'
-
+import components from '#config/components'
 import { FunctionChildren, LoaderType } from '#typings/index'
 import SkuChildrenContext from '#context/SkuChildrenContext'
+
+const propTypes = components.Price.propTypes
+const defaultProps = components.Price.defaultProps
+const displayName = components.Price.displayName
 
 type PriceChildrenProps = FunctionChildren<
   {
@@ -67,5 +71,9 @@ export function Price(props: PriceProps) {
     </Fragment>
   )
 }
+
+Price.propTypes = propTypes
+Price.defaultProps = defaultProps
+Price.displayName = displayName
 
 export default Price

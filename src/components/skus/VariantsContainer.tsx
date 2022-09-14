@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useContext } from 'react'
+import { useEffect, useReducer, useContext, ReactNode } from 'react'
 import variantReducer, {
   variantInitialState,
   unsetVariantState,
@@ -14,11 +14,15 @@ import isEqual from 'lodash/isEqual'
 
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
-
+import components from '#config/components'
 import { Items } from '#reducers/ItemReducer'
 
+const propTypes = components.VariantsContainer.propTypes
+const defaultProps = components.VariantsContainer.defaultProps
+const displayName = components.VariantsContainer.displayName
+
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
   filters?: Record<string, any>
   skuCode?: string
 }
@@ -90,5 +94,9 @@ export function VariantsContainer(props: Props) {
     </VariantsContext.Provider>
   )
 }
+
+VariantsContainer.propTypes = propTypes
+VariantsContainer.defaultProps = defaultProps
+VariantsContainer.displayName = displayName
 
 export default VariantsContainer

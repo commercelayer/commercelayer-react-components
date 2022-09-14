@@ -1,5 +1,5 @@
-import { useContext, useState } from 'react'
-import Parent from '#components-utils/Parent'
+import { ReactNode, useContext, useState } from 'react'
+import Parent from '../utils/Parent'
 import { FunctionChildren } from '#typings/index'
 import AddressContext from '#context/AddressContext'
 import {
@@ -16,7 +16,7 @@ type ChildrenProps = FunctionChildren<Omit<Props, 'children'>>
 
 type Props = {
   children?: ChildrenProps
-  label?: string | JSX.Element
+  label?: string | ReactNode
   onClick?: () => void
   addressId?: string
 } & JSX.IntrinsicElements['button']
@@ -75,7 +75,6 @@ export function SaveAddressesButton(props: Props) {
     customerEmail ||
     billingDisable ||
     shippingDisable ||
-    // customerDisable ||
     countryLockDisable
   const handleClick = () => {
     if (errors && Object.keys(errors).length === 0 && !disable) {

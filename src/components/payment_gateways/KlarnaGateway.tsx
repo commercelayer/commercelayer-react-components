@@ -1,5 +1,5 @@
 import React from 'react'
-import KlarnaPayment from '#components/payment_sources/KlarnaPayment'
+import KlarnaPayment from '#components/payment_source/KlarnaPayment'
 import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'

@@ -4,8 +4,11 @@ import ItemContext from '#context/ItemContext'
 import SkuOptionChildrenContext from '#context/SkuOptionChildrenContext'
 import has from 'lodash/has'
 import { ItemOptions } from '#reducers/ItemReducer'
-
+import components from '#config/components'
 import { BaseInputComponentProps } from '#typings'
+
+const propTypes = components.SkuOptionInput.propTypes
+const displayName = components.SkuOptionInput.displayName
 
 type Props = BaseInputComponentProps &
   JSX.IntrinsicElements['input'] &
@@ -36,5 +39,8 @@ export function SkuOptionInput(props: Props) {
   }
   return <BaseInput onChange={handleChange} {...props} />
 }
+
+SkuOptionInput.propTypes = propTypes
+SkuOptionInput.displayName = displayName
 
 export default SkuOptionInput

@@ -44,7 +44,7 @@ test('<ShippingAddressForm check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to ShippingAddressForm. Only components AddressInput,  are allowed.`
+      `Invalid prop 'children' supplied to ShippingAddressForm. Only components AddressInput, ReactNode are allowed.`
     )
   )
 })

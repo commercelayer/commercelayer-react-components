@@ -4,7 +4,7 @@ import { PaymentSourceProps } from './PaymentSource'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import { CoreOptions } from '@adyen/adyen-web/dist/types/core/types'
 import Parent from '#components/utils/Parent'
-import getBrowserInfo from '../../utils/browserInfo'
+import getBrowserInfo from '#utils/browserInfo'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import OrderContext from '#context/OrderContext'
 import type Dropin from '@adyen/adyen-web/dist/types/components/Dropin'
@@ -84,7 +84,7 @@ export function AdyenPayment({
   templateCustomerSaveToWallet,
   environment = 'test',
   locale = 'en_US',
-}: Props): JSX.Element | null {
+}: Props) {
   const { cardContainerClassName, threeDSecureContainerClassName, styles } = {
     ...defaultConfig,
     ...config,

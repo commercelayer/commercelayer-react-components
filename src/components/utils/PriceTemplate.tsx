@@ -1,5 +1,15 @@
 import React from 'react'
 import { PriceProps } from '#components/prices/Price'
+import PropTypes from 'prop-types'
+
+const propTypes = {
+  formattedAmount: PropTypes.string,
+  formattedCompare: PropTypes.string,
+}
+const defaultProps = {
+  formattedAmount: '',
+  formattedCompare: '',
+}
 
 export type PTemplateProps = {
   formattedAmount?: string
@@ -15,7 +25,7 @@ const PriceTemplate: React.FunctionComponent<PTemplateProps> = (props) => {
     formattedAmount,
     ...p
   } = props
-  delete p?.['skuCode']
+  delete p.skuCode
   return (
     <>
       <span className={className} {...p}>
@@ -29,5 +39,8 @@ const PriceTemplate: React.FunctionComponent<PTemplateProps> = (props) => {
     </>
   )
 }
+
+PriceTemplate.propTypes = propTypes
+PriceTemplate.defaultProps = defaultProps
 
 export default PriceTemplate

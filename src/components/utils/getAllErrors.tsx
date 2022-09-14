@@ -13,7 +13,9 @@ export type AllErrorsParams = {
 }
 
 export interface GetAllErrors {
-  <P extends AllErrorsParams>(params: P): (JSX.Element | string | undefined)[]
+  <P extends AllErrorsParams>(params: P): Array<
+    JSX.Element | string | undefined
+  >
 }
 
 const getAllErrors: GetAllErrors = (params) => {
@@ -27,7 +29,7 @@ const getAllErrors: GetAllErrors = (params) => {
     returnHtml = true,
   } = params
   return allErrors
-    .map((v, k): string | JSX.Element | undefined => {
+    .map((v, k): JSX.Element | string | undefined => {
       const objMsg = customMessages(messages, v)
       let text =
         v?.title && !v.detail?.includes(v.title)

@@ -1,13 +1,17 @@
 import PaymentSourceContext from '#context/PaymentSourceContext'
-import { useContext } from 'react'
+import { ReactNode, useContext } from 'react'
 import Parent from '#components-utils/Parent'
 import { FunctionChildren } from '#typings'
+import components from '#config/components'
+
+const displayName = components.PaymentSourceEditButton.displayName
+const propTypes = components.PaymentSourceEditButton.propTypes
 
 type CustomComponent = FunctionChildren<Omit<Props, 'children'>>
 
 type Props = {
   children?: CustomComponent
-  label?: string | JSX.Element
+  label?: string | ReactNode
 } & Omit<JSX.IntrinsicElements['button'], 'onClick'>
 export function PaymentSourceEditButton({
   children,
@@ -30,5 +34,8 @@ export function PaymentSourceEditButton({
     </button>
   ) : null
 }
+
+PaymentSourceEditButton.propTypes = propTypes
+PaymentSourceEditButton.displayName = displayName
 
 export default PaymentSourceEditButton

@@ -1,10 +1,13 @@
 import { useContext } from 'react'
 import Parent from '#components-utils/Parent'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
-
+import components from '#config/components'
 import { LineItem } from '@commercelayer/sdk'
 import { LineItemType } from '#typings'
 import { defaultGiftCardImgUrl, defaultImgUrl } from '#utils/placeholderImages'
+
+const propTypes = components.LineItemImage.propTypes
+const displayName = components.LineItemImage.displayName
 
 export type LineItemImageType = Omit<Props, 'children'> & {
   src: string
@@ -43,5 +46,8 @@ export function LineItemImage(props: Props) {
     <img alt="" src={src} {...p} />
   )
 }
+
+LineItemImage.propTypes = propTypes
+LineItemImage.displayName = displayName
 
 export default LineItemImage

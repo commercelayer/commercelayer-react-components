@@ -1,11 +1,16 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import Parent from '../utils/Parent'
+import components from '#config/components'
 import { FunctionChildren } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import isFunction from 'lodash/isFunction'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import OrderContext from '#context/OrderContext'
 import getCardDetails from '#utils/getCardDetails'
+
+const propTypes = components.PlaceOrderButton.propTypes
+const defaultProps = components.PlaceOrderButton.defaultProps
+const displayName = components.PlaceOrderButton.displayName
 
 type ChildrenProps = FunctionChildren<
   Omit<Props, 'children'> & {
@@ -15,11 +20,11 @@ type ChildrenProps = FunctionChildren<
 
 type Props = {
   children?: ChildrenProps
-  label?: string | JSX.Element
+  label?: string | ReactNode
   onClick?: (response: { placed: boolean }) => void
 } & JSX.IntrinsicElements['button']
 
-export function PlaceOrderButton(props: Props): JSX.Element {
+export function PlaceOrderButton(props: Props) {
   const ref = useRef(null)
   const { children, label = 'Place order', disabled, onClick, ...p } = props
   const { isPermitted, setPlaceOrder, options, paymentType, setButtonRef } =
@@ -195,5 +200,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     </button>
   )
 }
+
+PlaceOrderButton.propTypes = propTypes
+PlaceOrderButton.defaultProps = defaultProps
+PlaceOrderButton.displayName = displayName
 
 export default PlaceOrderButton

@@ -46,7 +46,7 @@ test('<GiftCard check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to GiftCard. Only components GiftCardCurrencySelector, GiftCardInput, Errors, MetadataInput, SubmitButton,  are allowed.`
+      `Invalid prop 'children' supplied to GiftCard. Only components GiftCardCurrencySelector, GiftCardInput, Errors, MetadataInput, SubmitButton, ReactNode are allowed.`
     )
   )
 })

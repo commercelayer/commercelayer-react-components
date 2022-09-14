@@ -1,9 +1,12 @@
 import { useContext } from 'react'
-
+import components from '#config/components'
 import BaseInput from '#components-utils/BaseInput'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import { BaseInputComponentProps } from '#typings'
 import { OrderCodeType } from '#reducers/OrderReducer'
+
+const propTypes = components.GiftCardOrCouponInput.propTypes
+const displayName = components.GiftCardOrCouponInput.displayName
 
 type Props = {
   name?: 'gift_card_or_coupon_code'
@@ -38,5 +41,8 @@ export function GiftCardOrCouponInput(props: Props) {
     />
   )
 }
+
+GiftCardOrCouponInput.propTypes = propTypes
+GiftCardOrCouponInput.displayName = displayName
 
 export default GiftCardOrCouponInput

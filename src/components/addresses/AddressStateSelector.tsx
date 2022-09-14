@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import BaseSelect from '#components-utils/BaseSelect'
-
+import components from '#config/components'
 import { AddressStateSelectName, BaseSelectComponentProps } from '#typings'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
@@ -10,6 +10,10 @@ import isEmptyStates from '#utils/isEmptyStates'
 import AddressesContext from '#context/AddressContext'
 import BaseInput from '#components-utils/BaseInput'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
+
+const propTypes = components.AddressStateSelector.propTypes
+const defaultProps = components.AddressStateSelector.defaultProps
+const displayName = components.AddressStateSelector.displayName
 
 type Props = Omit<BaseSelectComponentProps, 'options' | 'name'> & {
   name: AddressStateSelectName
@@ -137,5 +141,9 @@ export function AddressStateSelector(props: Props) {
     />
   )
 }
+
+AddressStateSelector.propTypes = propTypes
+AddressStateSelector.defaultProps = defaultProps
+AddressStateSelector.displayName = displayName
 
 export default AddressStateSelector

@@ -1,5 +1,5 @@
 import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
-import WireTransferPayment from '#components/payment_sources/WireTransferPayment'
+import WireTransferPayment from '#components/payment_source/WireTransferPayment'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'

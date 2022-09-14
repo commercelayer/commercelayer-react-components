@@ -1,17 +1,16 @@
 import BillingAddressContext from '#context/BillingAddressContext'
-import { useContext, useEffect, useReducer } from 'react'
+import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import billingAddressReducer, {
   billingAddressInitialState,
   setBillingAddress,
   setBillingCustomerAddressId,
 } from '#reducers/BillingAddressReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-
 import OrderContext from '#context/OrderContext'
 import AddressContext from '#context/AddressContext'
 
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: ReactNode
 }
 export function BillingAddressContainer(props: Props) {
   const { children } = props

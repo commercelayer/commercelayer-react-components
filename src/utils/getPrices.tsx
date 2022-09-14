@@ -2,6 +2,7 @@ import { isEmpty, first, isArray, has } from 'lodash'
 import { Price } from '@commercelayer/sdk'
 import { Prices } from '#reducers/PriceReducer'
 import { Items } from '#reducers/ItemReducer'
+import { ReactNode } from 'react'
 import PriceTemplate, { PTemplateProps } from '#components/utils/PriceTemplate'
 
 export interface GetPriceByCode {
@@ -15,7 +16,7 @@ export const getPriceByCode: GetPriceByCode = (skuPrices, code = '') => {
 }
 
 export interface GetPricesComponent {
-  (skuPrices: Price[], props: PTemplateProps): JSX.Element | JSX.Element[]
+  (skuPrices: Price[], props: PTemplateProps): ReactNode
 }
 
 export const getPricesComponent: GetPricesComponent = (skuPrices, props) => {

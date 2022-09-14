@@ -1,8 +1,11 @@
 import { useContext } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from '#components-utils/Parent'
-
+import components from '#config/components'
 import { ShippingMethod } from '@commercelayer/sdk'
+
+const propTypes = components.ShippingMethodName.propTypes
+const displayName = components.ShippingMethodName.displayName
 
 type ChildrenProps = Omit<Props, 'children'> & {
   label: string
@@ -33,5 +36,8 @@ export function ShippingMethodName(props: Props) {
     </label>
   )
 }
+
+ShippingMethodName.propTypes = propTypes
+ShippingMethodName.displayName = displayName
 
 export default ShippingMethodName

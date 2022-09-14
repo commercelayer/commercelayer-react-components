@@ -2,8 +2,11 @@ import { useState, useEffect, useContext } from 'react'
 import getAmount from '#utils/getAmount'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from '#components-utils/Parent'
-
+import components from '#config/components'
 import { BaseAmountComponent } from '#typings/index'
+
+const propTypes = components.ShippingMethodPrice.propTypes
+const displayName = components.ShippingMethodPrice.displayName
 
 type Props = BaseAmountComponent & {
   labelFreeOver?: string
@@ -62,5 +65,8 @@ export function ShippingMethodPrice(props: Props) {
     <span {...p}>{finalPrice}</span>
   )
 }
+
+ShippingMethodPrice.propTypes = propTypes
+ShippingMethodPrice.displayName = displayName
 
 export default ShippingMethodPrice

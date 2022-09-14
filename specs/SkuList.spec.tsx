@@ -50,7 +50,7 @@ test('<SkuList check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to SkuList. Only components AddToCartButton, QuantitySelector,  are allowed.`
+      `Invalid prop 'children' supplied to SkuList. Only components AddToCartButton, QuantitySelector, ReactNode are allowed.`
     )
   )
 })

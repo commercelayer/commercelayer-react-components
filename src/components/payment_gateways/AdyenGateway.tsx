@@ -12,7 +12,7 @@ import {
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import { Fragment, useContext } from 'react'
-import AdyenPayment from '../payment_sources/AdyenPayment'
+import AdyenPayment from '#components/payment_source/AdyenPayment'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 import jwt from '#utils/jwt'
 import getCardDetails from '#utils/getCardDetails'

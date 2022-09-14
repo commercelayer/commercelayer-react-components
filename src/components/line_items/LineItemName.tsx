@@ -1,8 +1,11 @@
 import { useContext } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import Parent from '#components-utils/Parent'
-
+import components from '#config/components'
 import type { LineItem } from '@commercelayer/sdk'
+
+const propTypes = components.LineItemName.propTypes
+const displayName = components.LineItemName.displayName
 
 export type LineItemNameType = Omit<Props, 'children'> & {
   label: string
@@ -27,5 +30,8 @@ export function LineItemName(props: Props) {
     <p {...props}>{label}</p>
   )
 }
+
+LineItemName.propTypes = propTypes
+LineItemName.displayName = displayName
 
 export default LineItemName

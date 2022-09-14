@@ -46,7 +46,7 @@ test('<ItemContainer check children />', () => {
   expect(tree).toMatchSnapshot()
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to ItemContainer. Only components PricesContainer, VariantsContainer, SkuOptionContainer, QuantitySelector, AddToCartButton, AvailabilityContainer, SkuListsContainer,  are allowed.`
+      `Invalid prop 'children' supplied to ItemContainer. Only components PricesContainer, VariantsContainer, SkuOptionContainer, QuantitySelector, AddToCartButton, AvailabilityContainer, SkuListsContainer, ReactNode are allowed.`
     )
   )
 })

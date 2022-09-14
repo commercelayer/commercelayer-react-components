@@ -40,7 +40,7 @@ test('<CommerceLayer children error />', () => {
 
   expect(console.error.mock.calls[0][2]).toEqual(
     expect.stringContaining(
-      `Invalid prop 'children' supplied to CommerceLayer. Only components OrderContainer, PricesContainer, GiftCardContainer,  are allowed`
+      `Invalid prop 'children' supplied to CommerceLayer. Only components OrderContainer, PricesContainer, GiftCardContainer, ReactNode are allowed`
     )
   )
 })
