@@ -31,32 +31,32 @@ type PaypalStyle = Partial<{
   /**
    * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#color}
    */
-  color: 'gold' | 'blue' | 'silver' | 'white' | 'black';
+  color: 'gold' | 'blue' | 'silver' | 'white' | 'black'
   /**
    * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#shape}
    */
-  shape: 'rect' | 'pill';
+  shape: 'rect' | 'pill'
   /**
    * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#height}
    */
-  height: string | number;
+  height: string | number
   /**
    * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#label}
    */
-  label: 'paypal' | 'checkout' | 'buynow' | 'pay';
+  label: 'paypal' | 'checkout' | 'buynow' | 'pay'
   /**
    * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#tagline}
    */
-  tagline: boolean;
+  tagline: boolean
   /**
    * @see {@link https://developer.paypal.com/docs/checkout/integration-features/customize-button/#layout}
    */
-  layout: 'vertical' | 'horizontal';
+  layout: 'vertical' | 'horizontal'
 }>
 
 interface PaymentMethodsStyle {
-  card?: Styles,
-  paypal?: PaypalStyle,
+  card?: Styles
+  paypal?: PaypalStyle
 }
 
 export type AdyenPaymentConfig = {
@@ -85,11 +85,7 @@ export function AdyenPayment({
   environment = 'test',
   locale = 'en_US',
 }: Props) {
-  const {
-    cardContainerClassName,
-    threeDSecureContainerClassName,
-    styles,
-  } = {
+  const { cardContainerClassName, threeDSecureContainerClassName, styles } = {
     ...defaultConfig,
     ...config,
   }
@@ -124,6 +120,7 @@ export function AdyenPayment({
   }
   const handleChange = async (state: any, checkout: AdyenCheckout) => {
     if (state.isValid) {
+      debugger
       if (ref.current) {
         ref.current.onsubmit = () => handleSubmit(ref.current as any, checkout)
         setPaymentRef({ ref })
@@ -177,7 +174,10 @@ export function AdyenPayment({
         return false
       }
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-        if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
+        if (
+          placeOrderButtonRef !== null &&
+          placeOrderButtonRef?.current != null
+        ) {
           if (placeOrderButtonRef.current.disabled === true) {
             placeOrderButtonRef.current.disabled = false
           }
@@ -188,14 +188,14 @@ export function AdyenPayment({
       if (['Cancelled'].includes(resultCode)) {
         // @ts-ignore
         const message = pSource?.payment_response?.refusalReason
-          setPaymentMethodErrors([
-            {
-              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-              resource: 'payment_methods',
-              field: currentPaymentMethodType,
-              message,
-            },
-          ])
+        setPaymentMethodErrors([
+          {
+            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+            resource: 'payment_methods',
+            field: currentPaymentMethodType,
+            message,
+          },
+        ])
       }
       return false
     } catch (error) {
@@ -204,7 +204,8 @@ export function AdyenPayment({
     }
   }
   const onSubmit = async (state: any, component: AdyenCheckout) => {
-    const control = await setPaymentSource({
+    const browserInfo = getBrowserInfo()
+    let control = await setPaymentSource({
       paymentSourceId: paymentSource?.id,
       paymentResource: 'adyen_payments',
     })
@@ -213,11 +214,41 @@ export function AdyenPayment({
     if (controlCode === 'Authorised') {
       return true
     }
+    const paymentDataAvailable =
+      // @ts-expect-error
+      Object.keys(control?.payment_request_data).length > 0
+    if (paymentDataAvailable === false) {
+      control = await setPaymentSource({
+        paymentSourceId: paymentSource?.id,
+        paymentResource: 'adyen_payments',
+        attributes: {
+          payment_request_data: {
+            ...state.data,
+            payment_method: state.data.paymentMethod,
+            return_url: window.location.href,
+            origin: window.location.origin,
+            redirect_from_issuer_method: 'GET',
+            browser_info: {
+              acceptHeader:
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+              ...browserInfo,
+            },
+          },
+        },
+      })
+    }
     const attributes: any = {
       payment_request_data: {
         ...state.data,
         payment_method: state.data.paymentMethod,
         return_url: window.location.href,
+        origin: window.location.origin,
+        redirect_from_issuer_method: 'GET',
+        browser_info: {
+          acceptHeader:
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+          ...browserInfo,
+        },
       },
       _authorize: 1,
     }
@@ -237,25 +268,28 @@ export function AdyenPayment({
       // @ts-ignore
       const resultCode = res?.payment_response?.resultCode
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-        if (placeOrderButtonRef !== null && placeOrderButtonRef?.current != null) {
-            if (placeOrderButtonRef.current.disabled === true) {
-              placeOrderButtonRef.current.disabled = false
-            }
-            placeOrderButtonRef.current?.click()
+        if (
+          placeOrderButtonRef !== null &&
+          placeOrderButtonRef?.current != null
+        ) {
+          if (placeOrderButtonRef.current.disabled === true) {
+            placeOrderButtonRef.current.disabled = false
           }
+          placeOrderButtonRef.current?.click()
+        }
         return true
       }
       if (['Cancelled'].includes(resultCode)) {
         // @ts-ignore
         const message = res?.payment_response?.refusalReason
-          setPaymentMethodErrors([
-            {
-              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-              resource: 'payment_methods',
-              field: currentPaymentMethodType,
-              message,
-            },
-          ])
+        setPaymentMethodErrors([
+          {
+            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+            resource: 'payment_methods',
+            field: currentPaymentMethodType,
+            message,
+          },
+        ])
       }
       // @ts-ignore
       const errorType = res?.payment_response?.errorType
@@ -323,7 +357,7 @@ export function AdyenPayment({
         threeDS2: threeDSConfiguration,
         paypal: {
           showPayButton: true,
-          style: styles?.paypal
+          style: styles?.paypal,
         },
         card: {
           styles: styles?.card,
