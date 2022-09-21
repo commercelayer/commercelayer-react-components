@@ -1,46 +1,36 @@
-import React from 'react'
 import { PriceProps } from '#components/prices/Price'
-import PropTypes from 'prop-types'
-
-const propTypes = {
-  formattedAmount: PropTypes.string,
-  formattedCompare: PropTypes.string,
-}
-const defaultProps = {
-  formattedAmount: '',
-  formattedCompare: '',
-}
 
 export type PTemplateProps = {
   formattedAmount?: string
   formattedCompare?: string
 } & Omit<PriceProps, 'children'>
 
-const PriceTemplate: React.FunctionComponent<PTemplateProps> = (props) => {
+export function PriceTemplate(props: PTemplateProps): JSX.Element {
   const {
     showCompare,
     formattedCompare,
     compareClassName,
     className,
     formattedAmount,
+    skuCode,
     ...p
   } = props
-  delete p.skuCode
   return (
     <>
-      <span className={className} {...p}>
+      <span data-testid={`price-${skuCode ?? ''}`} className={className} {...p}>
         {formattedAmount}
       </span>
       {showCompare && (
-        <span className={compareClassName || ''} {...p}>
+        <span
+          data-testid={`compare-${skuCode ?? ''}`}
+          className={compareClassName || ''}
+          {...p}
+        >
           {formattedCompare}
         </span>
       )}
     </>
   )
 }
-
-PriceTemplate.propTypes = propTypes
-PriceTemplate.defaultProps = defaultProps
 
 export default PriceTemplate

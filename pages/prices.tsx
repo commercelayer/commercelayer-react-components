@@ -4,10 +4,10 @@ import Price from '#components/prices/Price'
 import PricesContainer from '#components/prices/PricesContainer'
 import CommerceLayer from '#components/auth/CommerceLayer'
 
-const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
-const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
-const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
-const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
+const clientId = process.env['NEXT_PUBLIC_CLIENT_ID_INTEGRATION'] as string
+const clientSecret = process.env['NEXT_PUBLIC_CLIENT_SECRET'] as string
+const endpoint = process.env['NEXT_PUBLIC_ENDPOINT'] as string
+const scope = process.env['NEXT_PUBLIC_MARKET_ID'] as string
 
 export const Nav = ({ links }: any) => (
   <header className="dark p-6">
@@ -86,9 +86,9 @@ const Home = () => {
   const Loading = () => <div>Caricamento...</div>
   return (
     <section className="bg-gray-100">
-      <Nav links={['/order', '/multiOrder', '/multiApp', '/giftCard']} />
       <div className="mx-auto">
-        <CommerceLayer accessToken={token} endpoint={endpoint}>
+        <CommerceLayer>
+          {/* <CommerceLayer accessToken={token} endpoint={endpoint}> */}
           <h1 className="text-center text-3xl py-5">Filtered by EUR</h1>
           <div className="flex flex-row flex-wrap justify-around p-5">
             <PricesContainer
@@ -134,14 +134,10 @@ const Home = () => {
           </div>
           <div className="flex flex-row flex-wrap justify-around bg-gray-900 p-5">
             <PricesContainer>
-              {skus.map((s, k) => {
+              {skus.map((s, k): JSX.Element => {
                 const lImg = s.substring(0, s.length - 4)
                 return (
-                  <div
-                    key={k}
-                    className="text-center p-5 w-full"
-                    style={{ maxWidth: '15rem' }}
-                  >
+                  <div key={k} className="text-center p-5 w-full">
                     <img
                       src={`https://img.commercelayer.io/skus/${lImg}.png?fm=png&q=70`}
                       className="rounded-lg w-56 m-auto"

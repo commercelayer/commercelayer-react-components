@@ -1,11 +1,8 @@
-import type { ReactNode } from 'react'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import components from '#config/components'
-
-const propTypes = components.CommerceLayer.propTypes
+import ErrorBoundary from '#components/utils/ErrorBoundary'
 
 type Props = {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   accessToken: string
   endpoint: string
 }
@@ -13,12 +10,12 @@ type Props = {
 export function CommerceLayer(props: Props) {
   const { children, ...p } = props
   return (
-    <CommerceLayerContext.Provider value={{ ...p }}>
-      {children}
-    </CommerceLayerContext.Provider>
+    <ErrorBoundary>
+      <CommerceLayerContext.Provider value={{ ...p }}>
+        {children}
+      </CommerceLayerContext.Provider>
+    </ErrorBoundary>
   )
 }
-
-CommerceLayer.propTypes = propTypes
 
 export default CommerceLayer

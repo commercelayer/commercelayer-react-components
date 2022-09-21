@@ -1,16 +1,11 @@
-import { Fragment, useState, useEffect, useContext } from 'react'
-import { isEmpty, has, indexOf } from 'lodash'
 import Parent from '#components-utils/Parent'
 import PricesContext from '#context/PricesContext'
+import { useState, useEffect, useContext } from 'react'
+import { isEmpty, has, indexOf } from 'lodash'
 import { getPricesComponent } from '#utils/getPrices'
 import { Price as PriceType } from '@commercelayer/sdk'
-import components from '#config/components'
 import { FunctionChildren, LoaderType } from '#typings/index'
 import SkuChildrenContext from '#context/SkuChildrenContext'
-
-const propTypes = components.Price.propTypes
-const defaultProps = components.Price.defaultProps
-const displayName = components.Price.displayName
 
 type PriceChildrenProps = FunctionChildren<
   {
@@ -27,7 +22,7 @@ export type PriceProps = Partial<JSX.IntrinsicElements['span']> & {
   skuCode?: string
 }
 
-export function Price(props: PriceProps) {
+export function Price(props: PriceProps): JSX.Element {
   const { children, skuCode = '' } = props
   const {
     prices,
@@ -35,7 +30,7 @@ export function Price(props: PriceProps) {
     loading,
     skuCodes,
     setSkuCodes,
-    loader,
+    loader
   } = useContext(PricesContext)
   const { sku } = useContext(SkuChildrenContext)
   const [skuPrices, setSkuPrices] = useState<PriceType[]>([])
@@ -46,7 +41,7 @@ export function Price(props: PriceProps) {
     } else {
       if (sCode && indexOf(skuCodes, sCode) === -1) {
         skuCodes.push(sCode)
-        setSkuCodes && setSkuCodes(skuCodes)
+        if (setSkuCodes) setSkuCodes(skuCodes)
       }
     }
     return (): void => {
@@ -57,7 +52,7 @@ export function Price(props: PriceProps) {
     loading,
     loader,
     prices: skuPrices,
-    ...props,
+    ...props
   }
   const pricesComponent =
     isEmpty(prices) || isEmpty(skuPrices)
@@ -66,14 +61,8 @@ export function Price(props: PriceProps) {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <Fragment>
-      {loading || isEmpty(pricesComponent) ? loader : pricesComponent}
-    </Fragment>
+    <>{loading || isEmpty(pricesComponent) ? loader : pricesComponent}</>
   )
 }
-
-Price.propTypes = propTypes
-Price.defaultProps = defaultProps
-Price.displayName = displayName
 
 export default Price
