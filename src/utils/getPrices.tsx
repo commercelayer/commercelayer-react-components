@@ -1,25 +1,20 @@
 import { isEmpty, first, isArray, has } from 'lodash'
 import { Price } from '@commercelayer/sdk'
-import { Prices } from '#reducers/PriceReducer'
-import { Items } from '#reducers/ItemReducer'
-import { ReactNode } from 'react'
 import PriceTemplate, { PTemplateProps } from '#components/utils/PriceTemplate'
 
-export interface GetPriceByCode {
-  (skuPrices: Price[], code: string): Price | undefined
-}
-
-export const getPriceByCode: GetPriceByCode = (skuPrices, code = '') => {
+export function getPriceByCode(
+  skuPrices: Price[],
+  code: string = ''
+): Price | undefined {
   return code
     ? first(skuPrices.filter((p) => p.currency_code === code))
     : first(skuPrices)
 }
 
-export interface GetPricesComponent {
-  (skuPrices: Price[], props: PTemplateProps): ReactNode
-}
-
-export const getPricesComponent: GetPricesComponent = (skuPrices, props) => {
+export function getPricesComponent(
+  skuPrices: Price[],
+  props: PTemplateProps
+): JSX.Element[] | JSX.Element {
   if (isEmpty(skuPrices)) {
     return <PriceTemplate {...props} />
   }
@@ -40,11 +35,9 @@ export const getPricesComponent: GetPricesComponent = (skuPrices, props) => {
   })
 }
 
-export interface GetPrices {
-  (prices: Price[] | Items): Prices
-}
-
-export default function getPrices<P extends Price>(prices: P[]) {
+export default function getPrices<P extends Price>(
+  prices: P[]
+): Record<string, P[]> {
   const obj: Record<string, any> = {}
   if (isArray(prices)) {
     prices.forEach((p) => {

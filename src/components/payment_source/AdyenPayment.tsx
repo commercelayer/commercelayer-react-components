@@ -203,7 +203,8 @@ export function AdyenPayment({
     }
   }
   const onSubmit = async (state: any, component: AdyenCheckout) => {
-    const control = await setPaymentSource({
+    const browserInfo = getBrowserInfo()
+    let control = await setPaymentSource({
       paymentSourceId: paymentSource?.id,
       paymentResource: 'adyen_payments',
     })
@@ -212,11 +213,41 @@ export function AdyenPayment({
     if (controlCode === 'Authorised') {
       return true
     }
+    const paymentDataAvailable =
+      // @ts-expect-error
+      Object.keys(control?.payment_request_data).length > 0
+    if (paymentDataAvailable === false) {
+      control = await setPaymentSource({
+        paymentSourceId: paymentSource?.id,
+        paymentResource: 'adyen_payments',
+        attributes: {
+          payment_request_data: {
+            ...state.data,
+            payment_method: state.data.paymentMethod,
+            return_url: window.location.href,
+            origin: window.location.origin,
+            redirect_from_issuer_method: 'GET',
+            browser_info: {
+              acceptHeader:
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+              ...browserInfo,
+            },
+          },
+        },
+      })
+    }
     const attributes: any = {
       payment_request_data: {
         ...state.data,
         payment_method: state.data.paymentMethod,
         return_url: window.location.href,
+        origin: window.location.origin,
+        redirect_from_issuer_method: 'GET',
+        browser_info: {
+          acceptHeader:
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+          ...browserInfo,
+        },
       },
       _authorize: 1,
     }
