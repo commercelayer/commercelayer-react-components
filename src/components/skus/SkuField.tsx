@@ -3,7 +3,7 @@ import { ConditionalElement } from '#typings'
 import GenericFieldComponent, {
   TGenericChildrenProps,
   TResourceKey,
-  TResources,
+  TResources
 } from '../utils/GenericFieldComponent'
 
 type SkuFieldChildrenProps = TGenericChildrenProps<TResources['Sku']>
@@ -17,11 +17,11 @@ type Props = {
  * @param props {@link Props}
  * @returns
  */
-export function SkuField<P extends Props>(props: P) {
+export function SkuField<P extends Props>(props: P): JSX.Element {
   const { attribute, tagElement, children, ...p } = props
   return (
     <GenericFieldComponent<TResourceKey['Sku']>
-      resource="skus"
+      resource='skus'
       attribute={attribute}
       tagElement={tagElement}
       context={SkuChildrenContext}

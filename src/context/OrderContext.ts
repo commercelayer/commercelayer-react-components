@@ -14,7 +14,7 @@ import {
   saveAddressToCustomerAddressBook,
   addResourceToInclude,
   updateOrder,
-  getOrderContext,
+  getOrderContext
 } from '#reducers/OrderReducer'
 import { BaseError } from '#typings/errors'
 
@@ -34,20 +34,14 @@ type DefaultContext = {
 export const defaultOrderContext = {
   addToCart,
   createOrder,
-  setOrderErrors: () => {
-    return
-  },
-  setOrder: () => {
-    return
-  },
+  setOrderErrors: () => {},
+  setOrder: () => {},
   setGiftCardOrCouponCode,
   removeGiftCardOrCouponCode,
   saveAddressToCustomerAddressBook,
   addResourceToInclude,
-  getOrder: async () => {
-    return
-  },
-  updateOrder,
+  getOrder: async () => {},
+  updateOrder
 }
 
 const OrderContext = createContext<DefaultContext>(defaultOrderContext)

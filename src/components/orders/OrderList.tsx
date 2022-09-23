@@ -4,14 +4,12 @@ import {
   useMemo,
   useState,
   useEffect,
-  ReactElement,
   useCallback,
-  CSSProperties,
+  CSSProperties
 } from 'react'
-import components from '#config/components'
 import CustomerContext from '#context/CustomerContext'
 import OrderListChildrenContext, {
-  InitialOrderListContext,
+  InitialOrderListContext
 } from '#context/OrderListChildrenContext'
 import {
   Column,
@@ -20,26 +18,30 @@ import {
   useSortBy,
   UseSortByColumnProps,
   useBlockLayout,
-  PluginHook,
+  PluginHook
 } from 'react-table'
 import { FixedSizeList } from 'react-window'
 import scrollbarWidth from '#utils/scrollbarWidth'
 import { sortDescIcon, sortAscIcon } from '#utils/icons'
 import type { Order } from '@commercelayer/sdk'
 
-const propTypes = components.OrderList.propTypes
-const displayName = components.OrderList.displayName
+export type OrderListColumn = Column & {
+  Header: string
+  accessor: keyof Order
+  className?: string
+  titleClassName?: string
+}
 
 type Props = {
   children: ReactNode
   /**
    * Columns to show
    */
-  columns: (Column & { className?: string })[]
+  columns: OrderListColumn[]
   /**
    * Custom loader component
    */
-  loadingElement?: ReactElement
+  loadingElement?: string | JSX.Element
   /**
    * Function to assign as custom row renderer
    */
@@ -102,16 +104,16 @@ export function OrderList({
   theadClassName,
   rowTrClassName,
   ...p
-}: Props) {
+}: Props): JSX.Element {
   const [loading, setLoading] = useState(true)
   const { orders } = useContext(CustomerContext)
-  const data = useMemo<Order[]>(() => orders as Order[], [orders])
-  const cols = useMemo(() => columns, [columns]) as Column<Order>[]
-  const tablePlugins: PluginHook<Order>[] = [useSortBy]
+  const data = useMemo<Order[]>(() => orders ?? [], [orders])
+  const cols = useMemo(() => columns, [columns]) as Array<Column<Order>>
+  const tablePlugins: Array<PluginHook<Order>> = [useSortBy]
   if (infiniteScroll) tablePlugins.push(useBlockLayout)
   const defaultColumn = useMemo(
     () => ({
-      width: windowOptions?.column || 150,
+      width: windowOptions?.column || 150
     }),
     [windowOptions?.column]
   )
@@ -126,7 +128,7 @@ export function OrderList({
   const TrHtmlElement = !infiniteScroll ? 'tr' : 'div'
 
   useEffect(() => {
-    orders && orders.length > 0 && setLoading(false)
+    if (orders !== undefined) setLoading(false)
     return () => {
       setLoading(true)
     }
@@ -143,7 +145,7 @@ export function OrderList({
           )}
           key={k}
         >
-          <span className={column?.titleClassName}>
+          <span data-testid={`thead-${k}`} className={column?.titleClassName}>
             {column.render('Header')}
             {column.isSorted
               ? column.isSortedDesc
@@ -164,12 +166,13 @@ export function OrderList({
     ? table.rows.map((row, i) => {
         table.prepareRow(row)
         const childProps = {
+          orders,
           order: orders?.[i] as Order,
           row,
           showActions,
           actionsComponent,
           actionsContainerClassName,
-          infiniteScroll,
+          infiniteScroll
         }
         return (
           <TrHtmlElement
@@ -188,16 +191,17 @@ export function OrderList({
           const row = table.rows[index]
           row && table.prepareRow(row)
           const childProps = {
+            orders,
             order: orders?.[index] as Order,
             row,
             showActions,
             actionsComponent,
             actionsContainerClassName,
-            infiniteScroll,
+            infiniteScroll
           }
           return (
             <TrHtmlElement
-              {...(row && row.getRowProps({ style }))}
+              {...row?.getRowProps({ style })}
               className={rowTrClassName}
             >
               <OrderListChildrenContext.Provider value={childProps}>
@@ -208,8 +212,14 @@ export function OrderList({
         },
         [table.prepareRow, table.rows]
       )
-  return loading ? (
-    LoadingComponent
+
+  if (loading && orders == null) {
+    return <>{LoadingComponent}</>
+  }
+  return orders?.length === 0 ? (
+    <OrderListChildrenContext.Provider value={{ orders }}>
+      {children}
+    </OrderListChildrenContext.Provider>
   ) : (
     <TableHtmlElement {...p} {...table.getTableProps()}>
       <TheadHtmlElement className={theadClassName}>
@@ -234,8 +244,5 @@ export function OrderList({
     </TableHtmlElement>
   )
 }
-
-OrderList.propTypes = propTypes
-OrderList.displayName = displayName
 
 export default OrderList

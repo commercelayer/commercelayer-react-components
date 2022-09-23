@@ -8,7 +8,7 @@ import type {
   Customer,
   CustomerPaymentSource,
   Order,
-  OrderUpdate,
+  OrderUpdate
 } from '@commercelayer/sdk'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { updateOrder } from './OrderReducer'
@@ -23,7 +23,7 @@ export type CustomerActionType =
   | 'setPayments'
   | 'setOrders'
 
-export type CustomerActionPayload = {
+export interface CustomerActionPayload {
   addresses: Address[]
   payments: CustomerPaymentSource[]
   customerEmail: string
@@ -45,7 +45,7 @@ export type SetSaveOnBlur = (args: {
   dispatch: Dispatch<CustomerAction>
 }) => void
 
-export type SaveCustomerUser = {
+export interface SaveCustomerUser {
   /**
    * The Commerce Layer Config
    */
@@ -71,20 +71,21 @@ export type SaveCustomerUser = {
 export async function saveCustomerUser({
   customerEmail,
   order,
-  updateOrder,
+  updateOrder
 }: SaveCustomerUser): Promise<void> {
   if (order) {
     const attributes: OrderUpdate = {
       customer_email: customerEmail,
-      id: order.id,
+      id: order.id
     }
     await updateOrder({ id: order.id, attributes })
   }
 }
 
-export interface SetCustomerErrors {
-  <V extends BaseError[]>(errors: V, dispatch?: Dispatch<CustomerAction>): void
-}
+export type SetCustomerErrors = <V extends BaseError[]>(
+  errors: V,
+  dispatch?: Dispatch<CustomerAction>
+) => void
 
 export function setCustomerErrors(
   /**
@@ -95,13 +96,13 @@ export function setCustomerErrors(
    * @param dispatch - The dispatch function
    */
   dispatch?: Dispatch<CustomerAction>
-) {
-  dispatch &&
+): void {
+  if (dispatch)
     dispatch({
       type: 'setErrors',
       payload: {
-        errors,
-      },
+        errors
+      }
     })
 }
 
@@ -115,16 +116,16 @@ export function setCustomerEmail(
    */
   dispatch?: Dispatch<CustomerAction>
 ): void {
-  dispatch &&
+  if (dispatch)
     dispatch({
       type: 'setCustomerEmail',
       payload: {
-        customerEmail,
-      },
+        customerEmail
+      }
     })
 }
 
-export type GetCustomerAddresses = {
+export interface GetCustomerAddresses {
   /**
    * The Commerce Layer config
    */
@@ -137,13 +138,13 @@ export type GetCustomerAddresses = {
 
 export async function getCustomerAddresses({
   config,
-  dispatch,
+  dispatch
 }: GetCustomerAddresses): Promise<void> {
   try {
     const addresses = [] as Address[]
     const sdk = getSdk(config)
     const customerAddresses = await sdk.customer_addresses.list({
-      include: ['address'],
+      include: ['address']
     })
     customerAddresses.forEach((customerAddress) => {
       if (customerAddress.address) addresses.push(customerAddress.address)
@@ -155,20 +156,20 @@ export async function getCustomerAddresses({
     })
     dispatch({
       type: 'setAddresses',
-      payload: { addresses },
+      payload: { addresses }
     })
   } catch (error) {
     const errors = getErrors(error, 'addresses')
     dispatch({
       type: 'setErrors',
       payload: {
-        errors,
-      },
+        errors
+      }
     })
   }
 }
 
-export type DeleteCustomerAddress = {
+export interface DeleteCustomerAddress {
   config?: CommerceLayerConfig
   dispatch?: Dispatch<CustomerAction>
   customerAddressId: string
@@ -179,7 +180,7 @@ export async function deleteCustomerAddress({
   config,
   dispatch,
   customerAddressId,
-  addresses,
+  addresses
 }: DeleteCustomerAddress): Promise<void> {
   if (config && addresses && dispatch && config) {
     try {
@@ -191,8 +192,8 @@ export async function deleteCustomerAddress({
       dispatch({
         type: 'setAddresses',
         payload: {
-          addresses: newAddresses,
-        },
+          addresses: newAddresses
+        }
       })
     } catch (error) {
       throw new Error("Couldn't delete address")
@@ -200,7 +201,7 @@ export async function deleteCustomerAddress({
   }
 }
 
-export type GetCustomerPaymentSources = {
+export interface GetCustomerPaymentSources {
   /**
    * The Customer dispatch function
    */
@@ -219,7 +220,7 @@ export function getCustomerPaymentSources(
     if (order?.available_customer_payment_sources && dispatch) {
       dispatch({
         type: 'setPayments',
-        payload: { payments: order.available_customer_payment_sources },
+        payload: { payments: order.available_customer_payment_sources }
       })
     }
   }
@@ -238,21 +239,21 @@ export type GetCustomerOrders = (params: {
 
 export const getCustomerOrders: GetCustomerOrders = async ({
   config,
-  dispatch,
+  dispatch
 }) => {
   if (config.accessToken) {
     const { owner } = jwtDecode(config.accessToken)
     if (owner?.id) {
       const sdk = getSdk(config)
       const customers = await sdk.customers.retrieve(owner.id, {
-        include: ['orders'],
+        include: ['orders']
       })
       const orders = customers.orders?.filter(
         (order) => order.status !== 'pending' && order.status !== 'draft'
       )
       dispatch({
         type: 'setOrders',
-        payload: { orders, customers },
+        payload: { orders, customers }
       })
     }
   }
@@ -260,7 +261,7 @@ export const getCustomerOrders: GetCustomerOrders = async ({
 
 export type TCustomerAddress = AddressCreate & AddressUpdate
 
-type TCreateCustomerAddress = {
+interface TCreateCustomerAddress {
   /**
    * Customer address dispatch function
    */
@@ -283,7 +284,7 @@ export async function createCustomerAddress({
   address,
   config,
   dispatch,
-  state,
+  state
 }: TCreateCustomerAddress): Promise<void> {
   if (config && address) {
     const sdk = getSdk(config)
@@ -298,7 +299,7 @@ export async function createCustomerAddress({
         if (dispatch) {
           dispatch({
             type: 'setAddresses',
-            payload: { addresses: updatedAddresses },
+            payload: { addresses: updatedAddresses }
           })
         }
       } else {
@@ -306,17 +307,17 @@ export async function createCustomerAddress({
         if (state?.customers?.id && newAddress?.id) {
           const newCustomerAddress = await sdk.customer_addresses.create({
             customer: sdk.customers.relationship(state?.customers?.id),
-            address: sdk.addresses.relationship(newAddress.id),
+            address: sdk.addresses.relationship(newAddress.id)
           })
           await sdk.addresses.update({
             id: newAddress.id,
-            reference: newCustomerAddress.id,
+            reference: newCustomerAddress.id
           })
           if (dispatch && state?.addresses) {
-            newAddress['reference'] = newCustomerAddress.id
+            newAddress.reference = newCustomerAddress.id
             dispatch({
               type: 'setAddresses',
-              payload: { addresses: [...state.addresses, newAddress] },
+              payload: { addresses: [...state.addresses, newAddress] }
             })
           }
         }
@@ -330,8 +331,7 @@ export async function createCustomerAddress({
 export const customerInitialState: CustomerState = {
   errors: [],
   addresses: [],
-  payments: [],
-  orders: [],
+  payments: []
 }
 
 const type: CustomerActionType[] = [
@@ -339,7 +339,7 @@ const type: CustomerActionType[] = [
   'setCustomerEmail',
   'setAddresses',
   'setPayments',
-  'setOrders',
+  'setOrders'
 ]
 
 const customerReducer = (

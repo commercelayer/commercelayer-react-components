@@ -3,11 +3,13 @@ import {
   OrderListRow,
   CustomerContainer,
   CommerceLayer,
+  OrderListEmpty,
+  OrderListColumn
 } from '@commercelayer/react-components'
 import useGetToken from '../../hooks/useGetToken'
 const colClassName = 'uppercase text-left p-1 text-gray-400 text-sm'
 const titleClassName = 'flex flex-row items-center'
-const columns = [
+const columns: OrderListColumn[] = [
   {
     Header: 'Order',
     accessor: 'number',
@@ -69,9 +71,10 @@ const OrdersList = () => {
           theadClassName="thead-class"
           rowTrClassName="row-tr-class"
         >
+          <OrderListEmpty />
           <OrderListRow field="number">
             {({ cell, order, ...p }) => {
-              return cell.map((cell) => {
+              return <>{cell?.map((cell) => {
                 return (
                   <td {...p} {...cell.getCellProps()} className="py-5 border-b">
                     <p className="font-bold">Order # {cell.render('Cell')}</p>
@@ -80,7 +83,7 @@ const OrdersList = () => {
                     </p>
                   </td>
                 )
-              })
+              })}</>
             }}
           </OrderListRow>
           <OrderListRow field="status" className="align-top py-5 border-b" />

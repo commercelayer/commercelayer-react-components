@@ -31,23 +31,23 @@ type Props = {
    * The order field to show
    */
   field: keyof Order
-} & JSX.IntrinsicElements['td']
+} & Omit<JSX.IntrinsicElements['td'], 'children'>
 
-export function OrderListRow({ field, children, ...p }: Props) {
+export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
   const {
     order,
     row,
     showActions,
     actionsComponent,
     actionsContainerClassName,
-    infiniteScroll,
+    infiniteScroll
   } = useContext(OrderListChildrenContext)
-  const cell: Cell<Order, string>[] | undefined = row?.cells.filter(
+  const cell: Array<Cell<Order, string>> | undefined = row?.cells.filter(
     (cell) => cell.column.id === field
   )
   const isLastRow = last(row?.cells)?.column.id === field
   const As = infiniteScroll ? 'div' : 'td'
-  const ActionRow = () => {
+  const ActionRow = (): JSX.Element | null => {
     return (
       (showActions && isLastRow && actionsComponent && (
         <As {...p} className={actionsContainerClassName}>
@@ -63,7 +63,7 @@ export function OrderListRow({ field, children, ...p }: Props) {
     order,
     row,
     cell,
-    infiniteScroll,
+    infiniteScroll
   }
   return children ? (
     <>

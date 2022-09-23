@@ -6,10 +6,6 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "preserve",
-    "lib": [
-      "dom",
-      "es2017"
-    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
@@ -67,7 +63,12 @@
     "types": [
       "vitest/globals"
     ],
-    "isolatedModules": true
+    "isolatedModules": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ]
   },
   "exclude": [
     "node_modules"

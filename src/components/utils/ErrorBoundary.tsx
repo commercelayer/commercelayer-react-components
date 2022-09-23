@@ -10,14 +10,14 @@ interface State {
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false,
+    hasError: false
   }
 
   public static getDerivedStateFromError(): State {
     return { hasError: true }
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     if (process.env.NODE_ENV !== 'test') {
       console.error('Uncaught error:', error, errorInfo)
     } else {

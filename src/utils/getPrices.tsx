@@ -30,6 +30,7 @@ export function getPricesComponent(
         showCompare={showCompare}
         formattedAmount={p.formatted_amount}
         formattedCompare={p.formatted_compare_at_amount}
+        skuCode={p.sku_code}
       />
     )
   })

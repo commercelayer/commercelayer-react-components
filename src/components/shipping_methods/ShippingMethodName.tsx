@@ -1,11 +1,7 @@
 import { useContext } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from '#components-utils/Parent'
-import components from '#config/components'
 import { ShippingMethod } from '@commercelayer/sdk'
-
-const propTypes = components.ShippingMethodName.propTypes
-const displayName = components.ShippingMethodName.displayName
 
 type ChildrenProps = Omit<Props, 'children'> & {
   label: string
@@ -16,17 +12,18 @@ type Props = {
   children?: (props: ChildrenProps) => JSX.Element
 } & JSX.IntrinsicElements['label']
 
-export function ShippingMethodName(props: Props) {
+export function ShippingMethodName(props: Props): JSX.Element {
   const { shippingMethod, deliveryLeadTimeForShipment, shipmentId } =
     useContext(ShippingMethodChildrenContext)
-  const htmlFor = `shipment-${shipmentId}-${shippingMethod?.id}` || ''
-  const labelName = shippingMethod?.['name']
+  const htmlFor =
+    `shipment-${shipmentId ?? ''}-${shippingMethod?.id ?? ''}` || ''
+  const labelName = shippingMethod?.name
   const parentProps = {
     shippingMethod,
     deliveryLeadTimeForShipment,
     label: labelName,
     htmlFor,
-    ...props,
+    ...props
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
@@ -36,8 +33,5 @@ export function ShippingMethodName(props: Props) {
     </label>
   )
 }
-
-ShippingMethodName.propTypes = propTypes
-ShippingMethodName.displayName = displayName
 
 export default ShippingMethodName
