@@ -8,6 +8,10 @@ export type InitialOrderListContext = Partial<{
    */
   order: Order | null
   /**
+   * The list of orders
+   */
+  orders: Order[] | null
+  /**
    * The current row
    */
   row: Row<Order>
@@ -30,7 +34,7 @@ export type InitialOrderListContext = Partial<{
 }>
 
 const initial: InitialOrderListContext = {
-  showActions: false,
+  showActions: false
 }
 
 const OrderListChildrenContext = createContext<InitialOrderListContext>(initial)

@@ -27,21 +27,23 @@ export interface ShipmentAction {
 }
 
 export const shipmentInitialState: ShipmentState = {
-  errors: [],
+  errors: []
 }
 
-export interface SetShipmentErrors {
-  <V extends BaseError[]>(errors: V, dispatch?: Dispatch<ShipmentAction>): void
-}
+export type SetShipmentErrors = <V extends BaseError[]>(
+  errors: V,
+  dispatch?: Dispatch<ShipmentAction>
+) => void
 
 export const setShipmentErrors: SetShipmentErrors = (errors, dispatch) => {
-  dispatch &&
+  if (dispatch) {
     dispatch({
       type: 'setErrors',
       payload: {
-        errors,
-      },
+        errors
+      }
     })
+  }
 }
 
 type GetShipments = (args: {
@@ -53,20 +55,20 @@ type GetShipments = (args: {
 export const getShipments: GetShipments = async ({
   order,
   dispatch,
-  config,
+  config
 }) => {
   try {
     const sdk = getSdk(config)
     const shipments = order.shipments
     const deliveryLeadTimes = await sdk.delivery_lead_times.list({
-      include: ['shipping_method', 'stock_location'],
+      include: ['shipping_method', 'stock_location']
     })
     dispatch({
       type: 'setShipments',
       payload: {
         shipments,
-        deliveryLeadTimes,
-      },
+        deliveryLeadTimes
+      }
     })
   } catch (error) {
     console.error(error)
@@ -86,14 +88,14 @@ export const setShippingMethod: SetShippingMethod = async ({
   shipmentId,
   shippingMethodId,
   getOrder,
-  order,
+  order
 }) => {
   try {
     if (shippingMethodId) {
       const sdk = getSdk(config)
       await sdk.shipments.update({
         id: shipmentId,
-        shipping_method: sdk.shipping_methods.relationship(shippingMethodId),
+        shipping_method: sdk.shipping_methods.relationship(shippingMethodId)
       })
       if (getOrder && order) await getOrder(order.id)
     }
@@ -105,7 +107,7 @@ export const setShippingMethod: SetShippingMethod = async ({
 const type: ShipmentActionType[] = [
   'setErrors',
   'setShipments',
-  'setShippingMethod',
+  'setShippingMethod'
 ]
 
 const shipmentReducer = (

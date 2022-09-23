@@ -12,7 +12,7 @@ specifiers:
   '@babel/preset-react': ^7.18.6
   '@babel/preset-typescript': ^7.18.6
   '@commercelayer/js-auth': ^2.3.0
-  '@commercelayer/sdk': ^4.15.0
+  '@commercelayer/sdk': ^4.16.0
   '@playwright/test': ^1.26.0
   '@semantic-release/changelog': ^6.0.1
   '@semantic-release/commit-analyzer': ^9.0.2
@@ -20,8 +20,8 @@ specifiers:
   '@semantic-release/github': ^8.0.5
   '@semantic-release/npm': ^9.0.1
   '@semantic-release/release-notes-generator': ^10.0.3
-  '@stripe/react-stripe-js': ^1.9.0
-  '@stripe/stripe-js': ^1.36.0
+  '@stripe/react-stripe-js': ^1.11.0
+  '@stripe/stripe-js': ^1.37.0
   '@tailwindcss/aspect-ratio': ^0.4.0
   '@tailwindcss/forms': ^0.5.2
   '@tailwindcss/line-clamp': ^0.4.0
@@ -31,7 +31,7 @@ specifiers:
   '@types/lodash': ^4.14.185
   '@types/node': ^18.7.18
   '@types/prop-types': ^15.7.5
-  '@types/react': ^18.0.20
+  '@types/react': ^18.0.21
   '@types/react-table': ^7.7.12
   '@types/react-test-renderer': ^18.0.0
   '@types/react-window': ^1.8.5
@@ -52,7 +52,7 @@ specifiers:
   eslint-config-standard-jsx: ^11.0.0
   eslint-config-standard-with-typescript: ^23.0.0
   eslint-plugin-import: ^2.26.0
-  eslint-plugin-n: ^15.2.5
+  eslint-plugin-n: ^15.3.0
   eslint-plugin-prettier: ^4.2.1
   eslint-plugin-promise: ^6.0.1
   eslint-plugin-react: ^7.31.8
@@ -94,9 +94,9 @@ dependencies:
   '@ac-dev/countries-service': 1.2.0
   '@ac-dev/states-service': 1.1.0
   '@adyen/adyen-web': 5.25.0
-  '@commercelayer/sdk': 4.15.1
-  '@stripe/react-stripe-js': 1.10.0_wfgeltlko2jxfvdpdhsbptstym
-  '@stripe/stripe-js': 1.36.0
+  '@commercelayer/sdk': 4.16.0
+  '@stripe/react-stripe-js': 1.11.0_riwfxomrqyedf6ggrddddpsrxy
+  '@stripe/stripe-js': 1.37.0
   axios: 0.27.2
   braintree-web: 3.88.1
   frames-react: 1.0.12_react@18.2.0
@@ -132,7 +132,7 @@ devDependencies:
   '@types/lodash': 4.14.185
   '@types/node': 18.7.18
   '@types/prop-types': 15.7.5
-  '@types/react': 18.0.20
+  '@types/react': 18.0.21
   '@types/react-table': 7.7.12
   '@types/react-test-renderer': 18.0.0
   '@types/react-window': 1.8.5
@@ -149,9 +149,9 @@ devDependencies:
   eslint-config-prettier: 8.5.0_eslint@8.23.1
   eslint-config-react-app: 7.0.1_jrutdprru54szjan2cdmf5tjv4
   eslint-config-standard-jsx: 11.0.0_g6sljrn72fr5r5n2js2jyjg7bi
-  eslint-config-standard-with-typescript: 23.0.0_fsqc7gnfr7ufpr4slszrtm5abq
+  eslint-config-standard-with-typescript: 23.0.0_yn3agje4gk5pioxure65nsmf3y
   eslint-plugin-import: 2.26.0_cxqatnnjiq7ozd2bkspxnuicdq
-  eslint-plugin-n: 15.2.5_eslint@8.23.1
+  eslint-plugin-n: 15.3.0_eslint@8.23.1
   eslint-plugin-prettier: 4.2.1_cabrci5exjdaojcvd6xoxgeowu
   eslint-plugin-promise: 6.0.1_eslint@8.23.1
   eslint-plugin-react: 7.31.8_eslint@8.23.1
@@ -1684,8 +1684,8 @@ packages:
       tslib: 2.4.0
     dev: true
 
-  /@commercelayer/sdk/4.15.1:
-    resolution: {integrity: sha512-0YWYzyRl6GukEFSEp6boQ5DuQUPsgatUBreQYJ/m0vhmnwocahnnaj20WF+KpJxCJE+EayjljOvI9Z6EejMx3A==}
+  /@commercelayer/sdk/4.16.0:
+    resolution: {integrity: sha512-tGBGl8VMJzDNmvHnKn6xPOCshUhmSHioFbiay9NfsQgE/4Y3UhQdgEnxkRIIemRLxzlDQi8glq2zm4tiR0vkWA==}
     engines: {node: '>=16 || ^14.17'}
     dependencies:
       axios: 0.27.2
@@ -2459,21 +2459,21 @@ packages:
       '@sinonjs/commons': 1.8.3
     dev: true
 
-  /@stripe/react-stripe-js/1.10.0_wfgeltlko2jxfvdpdhsbptstym:
-    resolution: {integrity: sha512-vuIjJUZJ3nyiaGa5z5iyMCzZfGGsgzOOjWjqknbbhkNsewyyginfeky9EZLSz9+iSAsgC9K6MeNOTLKVGcMycQ==}
+  /@stripe/react-stripe-js/1.11.0_riwfxomrqyedf6ggrddddpsrxy:
+    resolution: {integrity: sha512-NDoumqS26/FldY419IGHdc42JGTNI1L0g8RRZvrCtiKWkAtOMn6XDbTYbkLremuy4GQ+MBkoS2IzRzldgn+dtg==}
     peerDependencies:
-      '@stripe/stripe-js': ^1.34.0
+      '@stripe/stripe-js': ^1.37.0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      '@stripe/stripe-js': 1.36.0
+      '@stripe/stripe-js': 1.37.0
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     dev: false
 
-  /@stripe/stripe-js/1.36.0:
-    resolution: {integrity: sha512-m45BD9JxOfIBT0Tz4MupiKzM8M58NX/We8wKlf+54TCZpW1RVAyFpJ58CbtyU/LxAM+opT6cewHRVfs7bTUtBA==}
+  /@stripe/stripe-js/1.37.0:
+    resolution: {integrity: sha512-khoaEqpvQUwEz/PyeKiiOGfzzhX8i009BJNTXjkkUpT2uCjnemo2JyFPCyHGszViqTSpDbFXeNIGIv+dtvd+9g==}
     dev: false
 
   /@swc/helpers/0.4.11:
@@ -2692,29 +2692,29 @@ packages:
   /@types/react-dom/18.0.6:
     resolution: {integrity: sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==}
     dependencies:
-      '@types/react': 18.0.20
+      '@types/react': 18.0.21
     dev: true
 
   /@types/react-table/7.7.12:
     resolution: {integrity: sha512-bRUent+NR/WwtDGwI/BqhZ8XnHghwHw0HUKeohzB5xN3K2qKWYE5w19e7GCuOkL1CXD9Gi1HFy7TIm2AvgWUHg==}
     dependencies:
-      '@types/react': 18.0.20
+      '@types/react': 18.0.21
     dev: true
 
   /@types/react-test-renderer/18.0.0:
     resolution: {integrity: sha512-C7/5FBJ3g3sqUahguGi03O79b8afNeSD6T8/GU50oQrJCU0bVCCGQHaGKUbg2Ce8VQEEqTw8/HiS6lXHHdgkdQ==}
     dependencies:
-      '@types/react': 18.0.20
+      '@types/react': 18.0.21
     dev: true
 
   /@types/react-window/1.8.5:
     resolution: {integrity: sha512-V9q3CvhC9Jk9bWBOysPGaWy/Z0lxYcTXLtLipkt2cnRj1JOSFNF7wqGpkScSXMgBwC+fnVRg/7shwgddBG5ICw==}
     dependencies:
-      '@types/react': 18.0.20
+      '@types/react': 18.0.21
     dev: true
 
-  /@types/react/18.0.20:
-    resolution: {integrity: sha512-MWul1teSPxujEHVwZl4a5HxQ9vVNsjTchVA+xRqv/VYGCuKGAU6UhfrTdF5aBefwD1BHUD8i/zq+O/vyCm/FrA==}
+  /@types/react/18.0.21:
+    resolution: {integrity: sha512-7QUCOxvFgnD5Jk8ZKlUAhVcRj7GuJRjnjjiY/IUBWKgOlnvDvTMLD4RTF7NPyVmbRhNrbomZiOepg7M/2Kj1mA==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
@@ -4907,7 +4907,7 @@ packages:
       eslint-plugin-react: 7.31.8_eslint@8.23.1
     dev: true
 
-  /eslint-config-standard-with-typescript/23.0.0_fsqc7gnfr7ufpr4slszrtm5abq:
+  /eslint-config-standard-with-typescript/23.0.0_yn3agje4gk5pioxure65nsmf3y:
     resolution: {integrity: sha512-iaaWifImn37Z1OXbNW1es7KI+S7D408F9ys0bpaQf2temeBWlvb0Nc5qHkOgYaRb5QxTZT32GGeN1gtswASOXA==}
     peerDependencies:
       '@typescript-eslint/eslint-plugin': ^5.0.0
@@ -4920,16 +4920,16 @@ packages:
       '@typescript-eslint/eslint-plugin': 5.38.0_wsb62dxj2oqwgas4kadjymcmry
       '@typescript-eslint/parser': 5.38.0_irgkl5vooow2ydyo6aokmferha
       eslint: 8.23.1
-      eslint-config-standard: 17.0.0_4nulviyjkaspo7v2xlghuwxbf4
+      eslint-config-standard: 17.0.0_p6gl7hlfuayuj4pnyydm4qj6t4
       eslint-plugin-import: 2.26.0_cxqatnnjiq7ozd2bkspxnuicdq
-      eslint-plugin-n: 15.2.5_eslint@8.23.1
+      eslint-plugin-n: 15.3.0_eslint@8.23.1
       eslint-plugin-promise: 6.0.1_eslint@8.23.1
       typescript: 4.8.3
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /eslint-config-standard/17.0.0_4nulviyjkaspo7v2xlghuwxbf4:
+  /eslint-config-standard/17.0.0_p6gl7hlfuayuj4pnyydm4qj6t4:
     resolution: {integrity: sha512-/2ks1GKyqSOkH7JFvXJicu0iMpoojkwB+f5Du/1SC0PtBL+s8v30k9njRZ21pm2drKYm2342jFnGWzttxPmZVg==}
     peerDependencies:
       eslint: ^8.0.1
@@ -4939,7 +4939,7 @@ packages:
     dependencies:
       eslint: 8.23.1
       eslint-plugin-import: 2.26.0_cxqatnnjiq7ozd2bkspxnuicdq
-      eslint-plugin-n: 15.2.5_eslint@8.23.1
+      eslint-plugin-n: 15.3.0_eslint@8.23.1
       eslint-plugin-promise: 6.0.1_eslint@8.23.1
     dev: true
 
@@ -5082,8 +5082,8 @@ packages:
       semver: 6.3.0
     dev: true
 
-  /eslint-plugin-n/15.2.5_eslint@8.23.1:
-    resolution: {integrity: sha512-8+BYsqiyZfpu6NXmdLOXVUfk8IocpCjpd8nMRRH0A9ulrcemhb2VI9RSJMEy5udx++A/YcVPD11zT8hpFq368g==}
+  /eslint-plugin-n/15.3.0_eslint@8.23.1:
+    resolution: {integrity: sha512-IyzPnEWHypCWasDpxeJnim60jhlumbmq0pubL6IOcnk8u2y53s5QfT8JnXy7skjHJ44yWHRb11PLtDHuu1kg/Q==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       eslint: '>=7.0.0'

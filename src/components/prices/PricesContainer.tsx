@@ -7,15 +7,16 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 import priceReducer, {
   SetSkuCodesPrice,
   unsetPriceState,
+  priceInitialState,
+  getSkusPrice
 } from '#reducers/PriceReducer'
-import { priceInitialState, getSkusPrice } from '#reducers/PriceReducer'
 import PricesContext, { PricesContextValue } from '#context/PricesContext'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
 import { LoaderType } from '#typings'
 import SkuContext from '#context/SkuContext'
 
-type Props = {
+interface Props {
   children: JSX.Element | JSX.Element[]
   filters?: object
   loader?: LoaderType
@@ -29,7 +30,7 @@ export function PricesContainer(props: Props): JSX.Element {
     skuCode = '',
     loader = 'Loading...',
     perPage = 10,
-    filters = {},
+    filters = {}
   } = props
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
@@ -39,7 +40,7 @@ export function PricesContainer(props: Props): JSX.Element {
     prices,
     items,
     item: currentItem,
-    skuCode: itemSkuCode,
+    skuCode: itemSkuCode
   } = useContext(ItemContext)
   if (indexOf(state.skuCodes, skuCode) === -1 && skuCode)
     state.skuCodes.push(skuCode)
@@ -50,7 +51,7 @@ export function PricesContainer(props: Props): JSX.Element {
   const setSkuCodes: SetSkuCodesPrice = (skuCodes) => {
     dispatch({
       type: 'setSkuCodes',
-      payload: { skuCodes },
+      payload: { skuCodes }
     })
   }
   useEffect(() => {
@@ -60,7 +61,7 @@ export function PricesContainer(props: Props): JSX.Element {
     if (currentItem && has(prices, sCode)) {
       dispatch({
         type: 'setPrices',
-        payload: { prices: prices },
+        payload: { prices }
       })
     }
     if (!isEmpty(items) && isEmpty(currentItem)) {
@@ -68,7 +69,7 @@ export function PricesContainer(props: Props): JSX.Element {
       const p = getPrices(items as any)
       dispatch({
         type: 'setPrices',
-        payload: { prices: p },
+        payload: { prices: p }
       })
     }
     if (config.accessToken && !has(prices, itemSkuCode || sCode)) {
@@ -79,7 +80,7 @@ export function PricesContainer(props: Props): JSX.Element {
           setPrices,
           prices,
           perPage,
-          filters,
+          filters
         })
       }
     }
@@ -91,7 +92,7 @@ export function PricesContainer(props: Props): JSX.Element {
           setPrices,
           prices,
           perPage,
-          filters,
+          filters
         })
       }
     }
@@ -105,13 +106,13 @@ export function PricesContainer(props: Props): JSX.Element {
     currentItem,
     sCode,
     state.skuCodes.length,
-    itemSkuCode,
+    itemSkuCode
   ])
   const priceValue: PricesContextValue = {
     ...state,
     skuCode: sCode,
     loader,
-    setSkuCodes,
+    setSkuCodes
   }
   if (!config.accessToken) throw new Error('No access token provided')
   if (!config.endpoint) throw new Error('No endpoint provided')

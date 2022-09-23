@@ -1,69 +1,56 @@
-import { Fragment, useContext, ReactNode, useEffect, useState } from 'react'
+import { useContext, ReactNode, useEffect, useState } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
-import components from '#config/components'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import isEmpty from 'lodash/isEmpty'
 import type { DeliveryLeadTime } from '@commercelayer/sdk'
 
-const propTypes = components.ShippingMethod.propTypes
-const displayName = components.ShippingMethod.displayName
-
-type Props = {
+interface Props {
   children: ReactNode
   readonly?: boolean
   emptyText?: string
 }
-
-export function ShippingMethod(props: Props) {
+export function ShippingMethod(props: Props): JSX.Element {
   const {
     children,
     readonly,
-    emptyText = `There are not any shipping method available`,
+    emptyText = `There are not any shipping method available`
   } = props
   const {
     shippingMethods,
     currentShippingMethodId,
     deliveryLeadTimes,
-    shipment,
+    shipment
   } = useContext(ShipmentChildrenContext)
   const [items, setItems] = useState<JSX.Element[]>([])
   useEffect(() => {
-    const methods =
-      shippingMethods &&
-      shippingMethods
-        .filter((s) => {
-          if (readonly) return s.id === currentShippingMethodId
-          return true
-        })
-        .map((shippingMethod, k) => {
-          const [deliveryLeadTimeForShipment] = deliveryLeadTimes?.filter(
-            (delivery) => {
-              const deliveryShippingMethodId = delivery.shipping_method?.id
-              return shippingMethod.id === deliveryShippingMethodId
-            }
-          ) as DeliveryLeadTime[]
-          const shippingProps = {
-            shipmentId: shipment?.id,
-            shippingMethod,
-            currentShippingMethodId,
-            deliveryLeadTimeForShipment,
+    const methods = shippingMethods
+      ?.filter((s) => {
+        if (readonly) return s.id === currentShippingMethodId
+        return true
+      })
+      .map((shippingMethod, k) => {
+        const [deliveryLeadTimeForShipment] = deliveryLeadTimes?.filter(
+          (delivery) => {
+            const deliveryShippingMethodId = delivery.shipping_method?.id
+            return shippingMethod.id === deliveryShippingMethodId
           }
-          return (
-            <ShippingMethodChildrenContext.Provider
-              key={k}
-              value={shippingProps}
-            >
-              {children}
-            </ShippingMethodChildrenContext.Provider>
-          )
-        })
+        ) as DeliveryLeadTime[]
+        const shippingProps = {
+          shipmentId: shipment?.id,
+          shippingMethod,
+          currentShippingMethodId,
+          deliveryLeadTimeForShipment
+        }
+        return (
+          <ShippingMethodChildrenContext.Provider key={k} value={shippingProps}>
+            {children}
+          </ShippingMethodChildrenContext.Provider>
+        )
+      })
     if (methods) setItems(methods)
   }, [currentShippingMethodId, deliveryLeadTimes, shippingMethods])
   const components = (!isEmpty(items) && items) || emptyText
-  return <Fragment>{components}</Fragment>
+  return <>{components}</>
 }
-
-ShippingMethod.propTypes = propTypes
-ShippingMethod.displayName = displayName
 
 export default ShippingMethod

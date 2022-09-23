@@ -5,7 +5,7 @@ import {
   GetCustomerAddresses,
   getCustomerPaymentSources,
   setCustomerEmail,
-  TCustomerAddress,
+  TCustomerAddress
 } from '#reducers/CustomerReducer'
 import { createContext } from 'react'
 

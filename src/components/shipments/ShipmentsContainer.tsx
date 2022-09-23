@@ -1,26 +1,22 @@
 import ShipmentContext, {
-  defaultShipmentContext,
+  defaultShipmentContext
 } from '#context/ShipmentContext'
 import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import shipmentReducer, {
   shipmentInitialState,
   setShipmentErrors,
   getShipments,
-  setShippingMethod,
+  setShippingMethod
 } from '#reducers/ShipmentReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import components from '#config/components'
 import { BaseError } from '#typings/errors'
 import isEmpty from 'lodash/isEmpty'
 
-const propTypes = components.ShipmentsContainer.propTypes
-const displayName = components.ShipmentsContainer.displayName
-
-type Props = {
+interface Props {
   children: ReactNode
 }
-export function ShipmentsContainer(props: Props) {
+export function ShipmentsContainer(props: Props): JSX.Element {
   const { children } = props
   const [state, dispatch] = useReducer(shipmentReducer, shipmentInitialState)
   const { order, getOrder, include, addResourceToInclude, includeLoaded } =
@@ -35,7 +31,8 @@ export function ShipmentsContainer(props: Props) {
           'shipments.shipping_method',
           'shipments.stock_transfers.line_item',
           'shipments.stock_location',
-        ],
+          'shipments.parcels'
+        ]
       })
     } else if (!includeLoaded?.['shipments.available_shipping_methods']) {
       addResourceToInclude({
@@ -45,11 +42,12 @@ export function ShipmentsContainer(props: Props) {
           'shipments.shipping_method': true,
           'shipments.stock_transfers.line_item': true,
           'shipments.stock_location': true,
-        },
+          'shipments.parcels': true
+        }
       })
     }
     if (order && !isEmpty(config) && order.shipments) {
-      getShipments({ order, dispatch, config })
+      void getShipments({ order, dispatch, config })
     }
   }, [order, include, includeLoaded])
   useEffect(() => {
@@ -68,8 +66,8 @@ export function ShipmentsContainer(props: Props) {
               {
                 code: 'NO_SHIPPING_METHODS',
                 message: 'No shipping methods',
-                resource: 'shipments',
-              },
+                resource: 'shipments'
+              }
             ],
             dispatch
           )
@@ -77,16 +75,16 @@ export function ShipmentsContainer(props: Props) {
       }
       if (order.line_items && order.line_items.length > 0) {
         const hasStocks = order.line_items
-          .filter(({ item_type }) => item_type === 'skus')
+          .filter(({ item_type: itemType }) => itemType === 'skus')
           .map((lineItem) => {
-            // @ts-ignore
-            return lineItem.item?.do_not_ship ||
-              // @ts-ignore
+            const conditions =
+              // @ts-expect-error
+              lineItem.item?.do_not_ship ||
+              // @ts-expect-error
               lineItem.item?.do_not_track ||
-              // @ts-ignore
+              // @ts-expect-error
               lineItem.item?.inventory?.quantity >= lineItem?.quantity
-              ? true
-              : false
+            return !!conditions
           })
         if (hasStocks.includes(false)) {
           setShipmentErrors(
@@ -95,8 +93,8 @@ export function ShipmentsContainer(props: Props) {
               {
                 code: 'OUT_OF_STOCK',
                 message: 'No stock available',
-                resource: 'line_items',
-              },
+                resource: 'line_items'
+              }
             ],
             dispatch
           )
@@ -110,15 +108,15 @@ export function ShipmentsContainer(props: Props) {
   const contextValue = {
     ...state,
     setShipmentErrors: (errors: BaseError[]) =>
-      defaultShipmentContext['setShipmentErrors'](errors, dispatch),
+      defaultShipmentContext.setShipmentErrors(errors, dispatch),
     setShippingMethod: async (shipmentId: string, shippingMethodId: string) =>
       await setShippingMethod({
         shippingMethodId,
         shipmentId,
         config,
         getOrder,
-        order,
-      }),
+        order
+      })
   }
 
   return (
@@ -127,8 +125,5 @@ export function ShipmentsContainer(props: Props) {
     </ShipmentContext.Provider>
   )
 }
-
-ShipmentsContainer.propTypes = propTypes
-ShipmentsContainer.displayName = displayName
 
 export default ShipmentsContainer

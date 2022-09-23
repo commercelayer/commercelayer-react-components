@@ -1,7 +1,7 @@
 import { useReducer, useEffect, ReactNode } from 'react'
 import ItemContext, {
   initialItemContext,
-  InitItemContext,
+  InitItemContext
 } from '#context/ItemContext'
 import itemReducer, {
   itemInitialState,
@@ -11,15 +11,11 @@ import itemReducer, {
   ItemOptions,
   CustomLineItems,
   CustomLineItem,
+  ItemPrices
 } from '#reducers/ItemReducer'
-import { ItemPrices } from '#reducers/ItemReducer'
-import components from '#config/components'
 import { BFSetStateContainer } from '#typings'
 
-const propTypes = components.ItemContainer.propTypes
-const displayName = components.ItemContainer.displayName
-
-type Props = {
+interface Props {
   children: ReactNode
   skuCode?: string | null
   lineItem?: {
@@ -28,7 +24,7 @@ type Props = {
   } | null
 }
 
-export function ItemContainer(props: Props) {
+export function ItemContainer(props: Props): JSX.Element {
   const { children, skuCode, lineItem } = props
   const [state, dispatch] = useReducer(itemReducer, itemInitialState)
   useEffect(() => {
@@ -62,7 +58,7 @@ export function ItemContainer(props: Props) {
     )
   const setSkuCode: BFSetStateContainer<string> = (code) =>
     setItemState(code, { type: 'setSkuCode', key: 'skuCode' }, dispatch)
-  const itemValue = {
+  const itemValue: InitItemContext = {
     ...initialItemContext,
     ...state,
     setItems,
@@ -71,14 +67,11 @@ export function ItemContainer(props: Props) {
     setOption,
     setPrices,
     setCustomLineItems,
-    setSkuCode,
-  } as InitItemContext
+    setSkuCode
+  }
   return (
     <ItemContext.Provider value={itemValue}>{children}</ItemContext.Provider>
   )
 }
-
-ItemContainer.propTypes = propTypes
-ItemContainer.displayName = displayName
 
 export default ItemContainer
