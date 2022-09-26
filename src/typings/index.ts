@@ -238,7 +238,7 @@ export type BaseAmountComponent = {
   labelFree?: string
 } & JSX.IntrinsicElements['span']
 
-export type FunctionChildren<P = Record<string, any>> = (
+export type ChildrenFunction<P = Record<string, any>> = (
   props: P
 ) => JSX.Element
 

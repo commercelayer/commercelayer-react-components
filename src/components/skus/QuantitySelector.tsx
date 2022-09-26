@@ -4,24 +4,17 @@ import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
-import components from '#config/components'
-import { FunctionChildren } from '#typings/index'
+import { ChildrenFunction } from '#typings/index'
 import SkuListsContext from '#context/SkuListsContext'
 import SkuChildrenContext from '#context/SkuChildrenContext'
 
-const propTypes = components.QuantitySelector.propTypes
-const defaultProps = components.QuantitySelector.defaultProps
-const displayName = components.QuantitySelector.displayName
-
-type ChildrenProps = FunctionChildren<
-  Omit<Props, 'children'> & {
-    handleChange: (event: React.MouseEvent<HTMLInputElement>) => void
-    handleBlur: (event: React.MouseEvent<HTMLInputElement>) => void
-  }
->
+interface ChildrenProps extends Omit<Props, 'children'> {
+  handleChange: (event: React.MouseEvent<HTMLInputElement>) => void
+  handleBlur: (event: React.MouseEvent<HTMLInputElement>) => void
+}
 
 type Props = {
-  children?: ChildrenProps
+  children?: ChildrenFunction<ChildrenProps>
   disabled?: boolean
   min?: number
   max?: number
@@ -30,7 +23,7 @@ type Props = {
   skuListId?: string
 } & JSX.IntrinsicElements['input']
 
-export function QuantitySelector(props: Props) {
+export function QuantitySelector(props: Props): JSX.Element {
   const { skuCode, skuListId, children, min = 1, max, ...p } = props
   const {
     item,
@@ -38,7 +31,7 @@ export function QuantitySelector(props: Props) {
     items,
     quantity,
     prices,
-    skuCode: itemSkuCode,
+    skuCode: itemSkuCode
   } = useContext(ItemContext)
   const { sku } = useContext(SkuChildrenContext)
   const { skuLists, listIds } = useContext(SkuListsContext)
@@ -60,7 +53,7 @@ export function QuantitySelector(props: Props) {
     skuListId && setDisabled(false)
     if (sCode && !quantity[sCode]) {
       const qty = Number(defaultVal)
-      setQuantity && setQuantity({ ...quantity, [`${sCode}`]: qty })
+      if (setQuantity) setQuantity({ ...quantity, [`${sCode}`]: qty })
       if (!isEmpty(prices) && has(prices, sCode)) setDisabled(false)
     }
     return (): void => {
@@ -72,9 +65,10 @@ export function QuantitySelector(props: Props) {
     const valid = Number(qty) >= Number(min) && Number(qty) <= Number(maxInv)
     setValue(qty)
     if (!isEmpty(skuLists) && skuListId && valid) {
-      setQuantity && setQuantity({ ...quantity, [`${skuListId}`]: Number(qty) })
+      if (setQuantity)
+        setQuantity({ ...quantity, [`${skuListId}`]: Number(qty) })
     } else if (sCode && valid) {
-      setQuantity && setQuantity({ ...quantity, [`${sCode}`]: Number(qty) })
+      if (setQuantity) setQuantity({ ...quantity, [`${sCode}`]: Number(qty) })
     }
   }
   const handleBlur = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -84,10 +78,10 @@ export function QuantitySelector(props: Props) {
       const resetVal = Number(qty) < Number(min) ? min : maxInv
       resetVal && setValue(resetVal)
       if (!isEmpty(skuLists) && skuListId) {
-        setQuantity &&
+        if (setQuantity)
           setQuantity({ ...quantity, [`${skuListId}`]: Number(resetVal) })
       } else {
-        setQuantity &&
+        if (setQuantity)
           setQuantity({ ...quantity, [`${sCode}`]: Number(resetVal) })
       }
     }
@@ -99,13 +93,13 @@ export function QuantitySelector(props: Props) {
     handleChange,
     handleBlur,
     value,
-    ...props,
+    ...props
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <input
-      type="number"
+      type='number'
       max={maxInv}
       min={min}
       value={value || ''}
@@ -116,9 +110,5 @@ export function QuantitySelector(props: Props) {
     />
   )
 }
-
-QuantitySelector.propTypes = propTypes
-QuantitySelector.defaultProps = defaultProps
-QuantitySelector.displayName = displayName
 
 export default QuantitySelector

@@ -1,17 +1,12 @@
-import { Fragment, useContext, useEffect, ReactElement, ReactNode } from 'react'
+import { useContext, useEffect, ReactElement, ReactNode } from 'react'
 import VariantTemplate, {
-  VariantHandleCallback,
+  VariantHandleCallback
 } from '../utils/VariantTemplate'
 import Parent from '../utils/Parent'
 import VariantsContext from '#context/VariantsContext'
-import components from '#config/components'
 import { BaseSelectorType } from '#typings'
-import { FunctionChildren } from '#typings/index'
+import { ChildrenFunction } from '#typings/index'
 import { VariantsObject, SetSkuCode } from '#reducers/VariantReducer'
-
-const propTypes = components.VariantSelector.propTypes
-const defaultProps = components.VariantSelector.defaultProps
-const displayName = components.VariantSelector.displayName
 
 export interface VariantOption {
   label: string
@@ -22,16 +17,14 @@ export interface VariantOption {
   } | null
 }
 
-type ChildrenProps = FunctionChildren<
-  Omit<Props, 'children'> & {
-    variants: VariantsObject
-    handleSelect: SetSkuCode
-    loading: boolean
-  }
->
+interface ChildrenProps extends Omit<Props, 'children'> {
+  variants: VariantsObject
+  handleSelect: SetSkuCode
+  loading: boolean
+}
 
 type Props = {
-  children?: ChildrenProps
+  children?: ChildrenFunction<ChildrenProps>
   options: VariantOption[]
   type?: BaseSelectorType
   loader?: ReactNode
@@ -41,25 +34,33 @@ type Props = {
 } & JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['select']
 
-export function VariantSelector(props: Props) {
-  const { children, type, placeholder, skuCode, name, options, ...prs } = props
+export function VariantSelector(props: Props): JSX.Element {
+  const {
+    children,
+    type = 'select',
+    placeholder,
+    skuCode,
+    name,
+    options,
+    ...prs
+  } = props
   const {
     setSkuCode,
     skuCode: variantSkuCode,
     loading,
     variants,
-    setSkuCodes,
+    setSkuCodes
   } = useContext(VariantsContext)
   useEffect(() => {
-    setSkuCodes && setSkuCodes(options)
+    if (setSkuCodes) setSkuCodes(options)
     return (): void => {
-      setSkuCodes && setSkuCodes([])
+      if (setSkuCodes) setSkuCodes([])
     }
   }, [options])
   const sCode = variantSkuCode || skuCode || ''
   const DefaultTemplate = (): ReactElement =>
     loading ? (
-      <Fragment>{props.loader || 'Loading...'}</Fragment>
+      <>{props.loader || 'Loading...'}</>
     ) : (
       <VariantTemplate
         variants={variants}
@@ -77,19 +78,13 @@ export function VariantSelector(props: Props) {
     loading: !!loading,
     handleSelect: setSkuCode,
     skuCode: sCode,
-    ...props,
+    ...props
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <Fragment>
-      <DefaultTemplate />
-    </Fragment>
+    <DefaultTemplate />
   )
 }
-
-VariantSelector.propTypes = propTypes
-VariantSelector.defaultProps = defaultProps
-VariantSelector.displayName = displayName
 
 export default VariantSelector

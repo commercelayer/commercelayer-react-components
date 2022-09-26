@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { FunctionChildren } from './index'
+import { ChildrenFunction } from './index'
 
 export type CodeErrorType =
   | 'EMPTY_ERROR'
@@ -135,7 +135,7 @@ export const ErrorPropTypes = {
   // messages: PropTypes.arrayOf(BaseErrorObject.isRequired),
 }
 
-type ErrorChildrenComponentProps = FunctionChildren<
+type ErrorChildrenComponentProps = ChildrenFunction<
   Omit<ErrorComponentProps, 'children'> & { errors: string[] }
 >
 

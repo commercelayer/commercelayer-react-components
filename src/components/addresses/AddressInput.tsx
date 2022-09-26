@@ -1,17 +1,13 @@
 import { useContext, useEffect, useState } from 'react'
 import BaseInput from '#components-utils/BaseInput'
-import components from '#config/components'
 import { BaseInputComponentProps, AddressInputName } from '#typings'
 import BillingAddressFormContext, {
-  AddressValuesKeys,
+  AddressValuesKeys
 } from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'
 import { businessMandatoryField } from '#utils/validateFormFields'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
-
-const propTypes = components.AddressInput.propTypes
-const displayName = components.AddressInput.displayName
 
 type Props = {
   name: Extract<AddressValuesKeys, AddressInputName>
@@ -19,7 +15,7 @@ type Props = {
   JSX.IntrinsicElements['input'] &
   JSX.IntrinsicElements['textarea']
 
-export function AddressInput(props: Props) {
+export function AddressInput(props: Props): JSX.Element | null {
   const { placeholder = '', required, value, className, ...p } = props
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
@@ -48,10 +44,7 @@ export function AddressInput(props: Props) {
     if (isEmpty(customerAddress?.errors?.[p.name]) && hasError)
       setHasError(false)
 
-    if (
-      shippingAddress.errors &&
-      shippingAddress?.errors?.[p.name]?.['error']
-    ) {
+    if (shippingAddress.errors && shippingAddress?.errors?.[p.name]?.error) {
       setHasError(true)
     }
     if (
@@ -71,7 +64,7 @@ export function AddressInput(props: Props) {
   const reqField = required !== undefined ? required : mandatoryField
   const errorClassName =
     billingAddress?.errorClassName || shippingAddress?.errorClassName
-  const classNameComputed = `${className ? className : ''} ${
+  const classNameComputed = `${className || ''} ${
     hasError && errorClassName ? errorClassName : ''
   }`
   if (
@@ -94,8 +87,5 @@ export function AddressInput(props: Props) {
     />
   )
 }
-
-AddressInput.propTypes = propTypes
-AddressInput.displayName = displayName
 
 export default AddressInput

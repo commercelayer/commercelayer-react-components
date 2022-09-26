@@ -1,31 +1,29 @@
 import { useContext } from 'react'
-import components from '#config/components'
-import { FunctionChildren } from '#typings'
+import { ChildrenFunction } from '#typings'
 import Parent from '#components-utils/Parent'
 import OrderContext from '#context/OrderContext'
 import type { CodeType } from '#reducers/OrderReducer'
 import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
 
-const propTypes = components.GiftCardOrCouponCode.propTypes
-const displayName = components.GiftCardOrCouponCode.displayName
-
-type ChildrenProps = Omit<Props, 'children'> & {
+interface ChildrenProps extends Omit<Props, 'children'> {
   code?: string
   hide?: boolean
-  discountAmountCents?: string
-  discountAmountFloat?: string
+  discountAmountCents?: number
+  discountAmountFloat?: number
   formattedDiscountAmount?: string
 }
 
-type GiftCardOrCouponCodeChildrenProps = FunctionChildren<ChildrenProps>
-
-type Props = {
+interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
   type?: CodeType
-  children?: GiftCardOrCouponCodeChildrenProps
-} & JSX.IntrinsicElements['span']
+  children?: ChildrenFunction<ChildrenProps>
+}
 
-export function GiftCardOrCouponCode({ children, type, ...props }: Props) {
+export function GiftCardOrCouponCode({
+  children,
+  type,
+  ...props
+}: Props): JSX.Element | null {
   const { order } = useContext(OrderContext)
   let codeType = type && (`${type}_code` as const)
   if (
@@ -37,23 +35,20 @@ export function GiftCardOrCouponCode({ children, type, ...props }: Props) {
     codeType = 'coupon_code'
   else if (!type) codeType = 'gift_card_code'
   const code = order && codeType ? order[codeType] : ''
-  const hide = order && code ? false : true
-  const parentProps = {
+  const hide = !(order && code)
+  const parentProps: ChildrenProps = {
     ...props,
     code,
     hide,
     discountAmountCents: order?.discount_amount_cents,
     discountAmountFloat: order?.discount_amount_float,
-    formattedDiscountAmount: order?.formatted_discount_amount,
-  } as ChildrenProps
+    formattedDiscountAmount: order?.formatted_discount_amount
+  }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : hide ? null : (
     <span {...props}>{code}</span>
   )
 }
-
-GiftCardOrCouponCode.propTypes = propTypes
-GiftCardOrCouponCode.displayName = displayName
 
 export default GiftCardOrCouponCode

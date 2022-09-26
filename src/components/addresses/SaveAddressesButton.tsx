@@ -1,27 +1,27 @@
 import { ReactNode, useContext, useState } from 'react'
-import Parent from '../utils/Parent'
-import { FunctionChildren } from '#typings/index'
+import Parent from '#components-utils/Parent'
+import { ChildrenFunction } from '#typings/index'
 import AddressContext from '#context/AddressContext'
 import {
   shippingAddressController,
   countryLockController,
-  billingAddressController,
+  billingAddressController
 } from '#utils/addressesManager'
 import OrderContext from '#context/OrderContext'
 import CustomerContext from '#context/CustomerContext'
 import isFunction from 'lodash/isFunction'
 import { TCustomerAddress } from '#reducers/CustomerReducer'
 
-type ChildrenProps = FunctionChildren<Omit<Props, 'children'>>
+interface ChildrenProps extends Omit<Props, 'children'> {}
 
 type Props = {
-  children?: ChildrenProps
+  children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
   onClick?: () => void
   addressId?: string
 } & JSX.IntrinsicElements['button']
 
-export function SaveAddressesButton(props: Props) {
+export function SaveAddressesButton(props: Props): JSX.Element {
   const {
     children,
     label = 'Continue to delivery',
@@ -33,12 +33,12 @@ export function SaveAddressesButton(props: Props) {
   } = props
   const {
     errors,
-    billing_address,
+    billing_address: billingAddress,
     shipToDifferentAddress,
-    shipping_address,
+    shipping_address: shippingAddress,
     saveAddresses,
     billingAddressId,
-    shippingAddressId,
+    shippingAddressId
   } = useContext(AddressContext)
   const { order } = useContext(OrderContext)
   const { addresses, isGuest, createCustomerAddress } =
@@ -49,26 +49,26 @@ export function SaveAddressesButton(props: Props) {
     !order?.customer_email
   )
   const billingDisable = billingAddressController({
-    billing_address,
+    billing_address: billingAddress,
     errors,
     billingAddressId,
-    requiresBillingInfo: order?.requires_billing_info,
+    requiresBillingInfo: order?.requires_billing_info
   })
   const shippingDisable = shippingAddressController({
     billingDisable,
     errors,
     shipToDifferentAddress,
-    shipping_address,
-    shippingAddressId,
+    shipping_address: shippingAddress,
+    shippingAddressId
   })
   const countryLockDisable = countryLockController({
     countryCodeLock: order?.shipping_country_code_lock,
     addresses,
     shipToDifferentAddress,
     billingAddressId,
-    billing_address,
-    shipping_address,
-    shippingAddressId,
+    billing_address: billingAddress,
+    shipping_address: shippingAddress,
+    shippingAddressId
   })
   const disable =
     disabled ||
@@ -76,18 +76,18 @@ export function SaveAddressesButton(props: Props) {
     billingDisable ||
     shippingDisable ||
     countryLockDisable
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (errors && Object.keys(errors).length === 0 && !disable) {
       setForceDisable(true)
       if (order) {
         saveAddresses()
-      } else if (createCustomerAddress && billing_address) {
-        const address = { ...billing_address }
-        if (addressId) address['id'] = addressId
+      } else if (createCustomerAddress && billingAddress) {
+        const address = { ...billingAddress }
+        if (addressId) address.id = addressId
         void createCustomerAddress(address as TCustomerAddress)
       }
       setForceDisable(false)
-      onClick && onClick()
+      if (onClick) onClick()
     }
   }
   const parentProps = {
@@ -95,13 +95,13 @@ export function SaveAddressesButton(props: Props) {
     label,
     resource,
     handleClick,
-    disabled: disable,
+    disabled: disable
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <button
-      type="button"
+      type='button'
       disabled={disable || forceDisable}
       onClick={handleClick}
       {...p}

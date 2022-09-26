@@ -1,30 +1,23 @@
 import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import Parent from '../utils/Parent'
-import components from '#config/components'
-import { FunctionChildren } from '#typings/index'
+import { ChildrenFunction } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import isFunction from 'lodash/isFunction'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import OrderContext from '#context/OrderContext'
 import getCardDetails from '#utils/getCardDetails'
 
-const propTypes = components.PlaceOrderButton.propTypes
-const defaultProps = components.PlaceOrderButton.defaultProps
-const displayName = components.PlaceOrderButton.displayName
-
-type ChildrenProps = FunctionChildren<
-  Omit<Props, 'children'> & {
-    handleClick: () => Promise<void>
-  }
->
+interface ChildrenProps extends Omit<Props, 'children'> {
+  handleClick: () => Promise<void>
+}
 
 type Props = {
-  children?: ChildrenProps
+  children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
   onClick?: (response: { placed: boolean }) => void
 } & JSX.IntrinsicElements['button']
 
-export function PlaceOrderButton(props: Props) {
+export function PlaceOrderButton(props: Props): JSX.Element {
   const ref = useRef(null)
   const { children, label = 'Place order', disabled, onClick, ...p } = props
   const { isPermitted, setPlaceOrder, options, paymentType, setButtonRef } =
@@ -36,7 +29,7 @@ export function PlaceOrderButton(props: Props) {
     loading,
     currentPaymentMethodType,
     paymentSource,
-    setPaymentSource,
+    setPaymentSource
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
@@ -46,7 +39,7 @@ export function PlaceOrderButton(props: Props) {
       if (paymentType === currentPaymentMethodType && paymentType) {
         const card = getCardDetails({
           customerPayment: { payment_source: paymentSource },
-          paymentType,
+          paymentType
         })
         if (
           ((isFree && isPermitted) ||
@@ -72,7 +65,7 @@ export function PlaceOrderButton(props: Props) {
     loading,
     currentPaymentMethodType,
     order,
-    paymentSource,
+    paymentSource
   ])
   useEffect(() => {
     if (
@@ -94,22 +87,22 @@ export function PlaceOrderButton(props: Props) {
       const attributes = {
         payment_request_details: {
           details: {
-            redirectResult: options?.adyen?.redirectResult,
+            redirectResult: options?.adyen?.redirectResult
           },
-          // @ts-ignore
-          paymentData: paymentSource.payment_response.paymentData,
+          // @ts-expect-error
+          paymentData: paymentSource.payment_response.paymentData
         },
-        _details: 1,
+        _details: 1
       }
-      setPaymentSource({
+      void setPaymentSource({
         paymentSourceId: paymentSource?.id,
         paymentResource: 'adyen_payments',
-        attributes,
+        attributes
       }).then((res) => {
-        // @ts-ignore
+        // @ts-expect-error
         const resultCode = res?.payment_response?.resultCode
         if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-          handleClick()
+          void handleClick()
         }
       })
     }
@@ -134,26 +127,26 @@ export function PlaceOrderButton(props: Props) {
     }
   }, [options?.checkoutCom, paymentType])
   useEffect(() => {
-    if (ref != null && ref.current != null && setButtonRef != null) {
+    if (ref?.current != null && setButtonRef != null) {
       setButtonRef(ref)
     }
   }, [ref])
 
-  const handleClick = async () => {
+  const handleClick = async (): Promise<void> => {
     let isValid = true
     setForceDisable(true)
     const card =
       paymentType &&
       getCardDetails({
         paymentType,
-        customerPayment: { payment_source: paymentSource },
+        customerPayment: { payment_source: paymentSource }
       })
     if (
       currentPaymentMethodRef?.current?.onsubmit &&
       [
         !options?.paypalPayerId,
         !options?.adyen?.MD,
-        !options?.checkoutCom?.session_id,
+        !options?.checkoutCom?.session_id
       ].every(Boolean)
     ) {
       isValid = (await currentPaymentMethodRef.current?.onsubmit(
@@ -161,7 +154,7 @@ export function PlaceOrderButton(props: Props) {
         paymentSource
       )) as boolean
       if (
-        isValid === false &&
+        !isValid &&
         // @ts-expect-error
         paymentSource.payment_response?.resultCode === 'Authorised'
       ) {
@@ -174,7 +167,7 @@ export function PlaceOrderButton(props: Props) {
       isValid &&
       setPlaceOrder &&
       (paymentSource || isFree) &&
-      (await setPlaceOrder({ paymentSource: paymentSource }))
+      (await setPlaceOrder({ paymentSource }))
     setForceDisable(false)
     onClick && placed && onClick(placed)
   }
@@ -184,25 +177,23 @@ export function PlaceOrderButton(props: Props) {
     label,
     disabled: disabledButton,
     handleClick,
-    ref,
+    ref
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <button
       ref={ref}
-      type="button"
+      type='button'
       disabled={disabledButton || forceDisable}
-      onClick={handleClick}
+      onClick={() => {
+        void handleClick()
+      }}
       {...p}
     >
       {isFunction(label) ? label() : label}
     </button>
   )
 }
-
-PlaceOrderButton.propTypes = propTypes
-PlaceOrderButton.defaultProps = defaultProps
-PlaceOrderButton.displayName = displayName
 
 export default PlaceOrderButton

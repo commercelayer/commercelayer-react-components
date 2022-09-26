@@ -2,25 +2,19 @@ import { useContext, useState, useEffect } from 'react'
 import Parent from '#components-utils/Parent'
 import getLineItemsCount from '#utils/getLineItemsCount'
 import LineItemContext from '#context/LineItemContext'
-import components from '#config/components'
-import { FunctionChildren } from '#typings/index'
+import { ChildrenFunction } from '#typings/index'
 
-const propTypes = components.LineItemsEmpty.propTypes
-const displayName = components.LineItemsEmpty.displayName
+interface ChildrenProps extends Omit<Props, 'children'> {
+  quantity: number
+  text: string
+}
 
-export type LineItemsCountType = FunctionChildren<
-  Omit<LineItemsCountProps, 'children'> & {
-    quantity: number
-    text: string
-  }
->
-
-type LineItemsCountProps = {
-  children?: LineItemsCountType
+interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+  children?: ChildrenFunction<ChildrenProps>
   text?: string
-} & JSX.IntrinsicElements['span']
+}
 
-export function LineItemsEmpty(props: LineItemsCountProps) {
+export function LineItemsEmpty(props: Props): JSX.Element | null {
   const { children, text = 'Your shopping bag is empty', ...p } = props
   const { lineItems } = useContext(LineItemContext)
   const [quantity, setQuantity] = useState<undefined | number>()
@@ -41,12 +35,9 @@ export function LineItemsEmpty(props: LineItemsCountProps) {
   const parentProps = {
     quantity,
     text,
-    ...p,
+    ...p
   }
   return children ? <Parent {...parentProps}>{children}</Parent> : emptyText
 }
-
-LineItemsEmpty.propTypes = propTypes
-LineItemsEmpty.displayName = displayName
 
 export default LineItemsEmpty
