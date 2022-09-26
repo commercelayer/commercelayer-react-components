@@ -6,7 +6,7 @@ export type AddressValuesKeys =
   | `billing_address_${keyof Address}`
   | `shipping_address_${keyof Address}`
 
-export type DefaultContextAddress = {
+export interface DefaultContextAddress {
   validation?: void
   setValue?: (
     name: AddressValuesKeys,

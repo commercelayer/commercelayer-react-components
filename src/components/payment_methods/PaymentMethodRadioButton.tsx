@@ -46,14 +46,14 @@ export function PaymentMethodRadioButton(props: Props) {
     checked,
     id,
     name,
-    ...props,
+    ...props
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
     <input
       title={name}
-      type="radio"
+      type='radio'
       id={id}
       onChange={handleOnChange}
       checked={checked}

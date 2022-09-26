@@ -2,27 +2,28 @@ import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
 import { capitalize } from 'lodash'
 import { useContext } from 'react'
 import Parent from '#components-utils/Parent'
-import { FunctionChildren } from '#typings'
-import components from '#config/components'
+import { ChildrenFunction } from '#typings'
 
-const propTypes = components.PaymentSourceBrandName.propTypes
-const displayName = components.PaymentSourceBrandName.displayName
-
-type CustomComponent = FunctionChildren<
-  Omit<Props & { brand: IconBrand }, 'children'>
->
+interface CustomComponent extends Omit<Props, 'children'> {
+  brand: IconBrand
+}
 
 type Props = {
-  children?: CustomComponent
+  children?: ChildrenFunction<CustomComponent>
   label?: string
 } & JSX.IntrinsicElements['span']
-export function PaymentSourceBrandName({ children, label, ...props }: Props) {
+
+export function PaymentSourceBrandName({
+  children,
+  label,
+  ...props
+}: Props): JSX.Element {
   const { brand } = useContext(PaymentSourceContext)
   const brandName = brand && capitalize(brand.replace('-', ' '))
   const parentProps = {
     brand: brandName,
     label,
-    ...props,
+    ...props
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -30,8 +31,5 @@ export function PaymentSourceBrandName({ children, label, ...props }: Props) {
     <span {...props}>{label || capitalize(brandName)}</span>
   )
 }
-
-PaymentSourceBrandName.propTypes = propTypes
-PaymentSourceBrandName.displayName = displayName
 
 export default PaymentSourceBrandName

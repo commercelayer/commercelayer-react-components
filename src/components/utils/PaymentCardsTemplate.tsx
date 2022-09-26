@@ -6,7 +6,7 @@ import {
   PaymentSourceType,
 } from '#reducers/PaymentMethodReducer'
 import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
-import { FunctionChildren } from '#typings'
+import { ChildrenFunction } from '#typings'
 import getCardDetails from '#utils/getCardDetails'
 
 type ChildrenProps = Pick<Props, 'customerPayments'> & {
@@ -21,7 +21,7 @@ type CustomerPayment = PaymentSourceType & {
   handleClick?: () => void
 }
 
-export type CustomerCardsTemplateChildren = FunctionChildren<ChildrenProps>
+export type CustomerCardsTemplateChildren = ChildrenFunction<ChildrenProps>
 
 export type CustomerCardsType = ChildrenProps
 

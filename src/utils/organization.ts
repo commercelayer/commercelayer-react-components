@@ -1,4 +1,4 @@
-type ReturnObj = {
+interface ReturnObj {
   organization: string
   domain: string
 }
@@ -8,7 +8,7 @@ export default function getOrganizationSlug<E extends string>(
 ): ReturnObj {
   const org = {
     organization: '',
-    domain: 'commercelayer.io',
+    domain: 'commercelayer.io'
   }
   if (endpoint.search('commercelayer.io') === -1)
     org.domain = 'commercelayer.co'

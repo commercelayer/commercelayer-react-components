@@ -21,7 +21,7 @@ export function SkuOptionInput(props: Props) {
   const handleChange: BaseInputComponentProps['onChange'] = (event) => {
     const val = event.target.value
     const options = has(option, `${skuCode}.${skuOption?.id}`)
-      ? option[skuCode]?.[`${skuOption?.id}`]?.['options']
+      ? option[skuCode]?.[`${skuOption?.id}`]?.options
       : {}
     const o = {
       [skuCode]: {
@@ -30,10 +30,10 @@ export function SkuOptionInput(props: Props) {
           skuOptionId: skuOption?.id,
           options: {
             ...options,
-            [name]: val,
-          },
-        },
-      },
+            [name]: val
+          }
+        }
+      }
     } as ItemOptions
     setOption && setOption(o)
   }

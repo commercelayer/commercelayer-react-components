@@ -1,21 +1,16 @@
 import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
 import { useContext, useRef } from 'react'
 import Parent from '#components-utils/Parent'
-import { FunctionChildren } from '#typings'
-import components from '#config/components'
+import { ChildrenFunction } from '#typings'
 
-const propTypes = components.PaymentSourceBrandIcon.propTypes
-const displayName = components.PaymentSourceBrandIcon.displayName
-
-type CustomComponent = FunctionChildren<
-  Omit<
-    Props & { brand: IconBrand; defaultSrc: string; url: string },
-    'children'
-  >
->
+interface ChildrenProps extends Omit<Props, 'children'> {
+  brand: IconBrand
+  defaultSrc: string
+  url: string
+}
 
 type Props = {
-  children?: CustomComponent
+  children?: ChildrenFunction<ChildrenProps>
   width?: number
   height?: number
 } & JSX.IntrinsicElements['img']
@@ -24,15 +19,17 @@ export function PaymentSourceBrandIcon({
   width = 32,
   children,
   ...p
-}: Props) {
+}: Props): JSX.Element {
   const { brand } = useContext(PaymentSourceContext)
   const ref = useRef<HTMLImageElement>(null)
   const defaultSrc =
     '//data.commercelayer.app/assets/images/icons/credit-cards/color/credit-card.svg'
-  const url = src
-    ? src
-    : `//data.commercelayer.app/assets/images/icons/credit-cards/color/${brand}.svg`
-  const handleError = () => {
+  const url =
+    src ||
+    `//data.commercelayer.app/assets/images/icons/credit-cards/color/${
+      brand ?? 'credit-card'
+    }.svg`
+  const handleError = (): void => {
     if (ref.current) ref.current.src = defaultSrc
   }
   const parentProps = {
@@ -40,7 +37,7 @@ export function PaymentSourceBrandIcon({
     defaultSrc,
     url,
     width,
-    ...p,
+    ...p
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -48,8 +45,5 @@ export function PaymentSourceBrandIcon({
     <img ref={ref} src={url} onError={handleError} width={width} {...p} />
   )
 }
-
-PaymentSourceBrandIcon.propTypes = propTypes
-PaymentSourceBrandIcon.displayName = displayName
 
 export default PaymentSourceBrandIcon

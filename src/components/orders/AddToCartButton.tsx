@@ -5,7 +5,7 @@ import isEmpty from 'lodash/isEmpty'
 import has from 'lodash/has'
 import ItemContext from '#context/ItemContext'
 import getCurrentItemKey from '#utils/getCurrentItemKey'
-import { FunctionChildren } from '#typings/index'
+import { ChildrenFunction } from '#typings/index'
 import { AddToCartReturn } from '#reducers/OrderReducer'
 import SkuListsContext from '#context/SkuListsContext'
 import ExternalFunctionContext from '#context/ExternalFunctionContext'
@@ -14,11 +14,9 @@ import SkuChildrenContext from '#context/SkuChildrenContext'
 import getCartLink from '#utils/getCartLink'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 
-type ChildrenProps = {
+interface ChildrenProps extends Omit<Props, 'children'> {
   handleClick: () => AddToCartReturn
-} & Omit<Props, 'children'>
-
-type AddToCartButtonChildrenProps = FunctionChildren<ChildrenProps>
+}
 
 export type AddToCartButtonType = ChildrenProps
 
@@ -43,7 +41,7 @@ type THostedCart =
     }
 
 type Props = {
-  children?: AddToCartButtonChildrenProps
+  children?: ChildrenFunction<ChildrenProps>
   label?: string | JSX.Element
   skuCode?: string
   bundleCode?: string
@@ -54,7 +52,7 @@ type Props = {
   THostedCart &
   PropsWithoutRef<JSX.IntrinsicElements['button']>
 
-export function AddToCartButton(props: Props) {
+export function AddToCartButton(props: Props): JSX.Element {
   const {
     label = 'Add to cart',
     children,
@@ -81,7 +79,7 @@ export function AddToCartButton(props: Props) {
     prices,
     lineItems,
     lineItem: lineItemContext,
-    skuCode: itemSkuCode,
+    skuCode: itemSkuCode
   } = useContext(ItemContext)
   const { skuLists } = useContext(SkuListsContext)
   const { sku } = useContext(SkuChildrenContext)
@@ -92,7 +90,14 @@ export function AddToCartButton(props: Props) {
       : sku?.code || skuCode || getCurrentItemKey(item) || itemSkuCode
   ) as string
   const availabilityQuantity = item[sCode]?.inventory?.quantity
-  const handleClick = async () => {
+  const handleClick = async (): Promise<
+    | {
+        success: boolean
+        orderId?: string
+      }
+    | Record<string, any>
+    | undefined
+  > => {
     const qty = quantity[sCode]
     const opt = option[sCode]
     const customLineItem = !isEmpty(lineItem || lineItemContext)
@@ -101,33 +106,31 @@ export function AddToCartButton(props: Props) {
     if (!isEmpty(skuLists) && skuListId && url) {
       const slQty = quantity[skuListId] || 1
       if (has(skuLists, skuListId)) {
-        const lineItems =
-          skuLists &&
-          skuLists[skuListId].map((skuCode: string) => {
-            return {
-              skuCode,
-              quantity: slQty,
-              _update_quantity: 1,
-            }
-          })
-        return callExternalFunction({
+        const lineItems = skuLists?.[skuListId]?.map((skuCode: string) => {
+          return {
+            skuCode,
+            quantity: slQty,
+            _update_quantity: 1
+          }
+        })
+        return await callExternalFunction({
           url,
           data: {
             resourceType: 'orders',
             inputs: [
               {
                 id: orderId,
-                lineItems,
-              },
-            ],
-          },
+                lineItems
+              }
+            ]
+          }
         })
           .then(async (res) => {
             getOrder && orderId && (await getOrder(orderId))
             return res
           })
           .catch(({ response }) => {
-            setOrderErrors && setOrderErrors(response['data'])
+            if (setOrderErrors) setOrderErrors(response.data)
             return response
           })
       }
@@ -141,11 +144,11 @@ export function AddToCartButton(props: Props) {
         option: opt,
         lineItem: customLineItem,
         buyNowMode,
-        checkoutUrl,
+        checkoutUrl
       })
       if (redirectToHostedCart) {
         const orderId = res.orderId
-        if (hostedCartUrl) {
+        if (hostedCartUrl && orderId) {
           location.href = `https://${hostedCartUrl}/${orderId}?accessToken=${accessToken}`
         } else if (orderId && slug) {
           location.href = getCartLink({ orderId, slug, accessToken })
@@ -153,7 +156,7 @@ export function AddToCartButton(props: Props) {
       }
       return res
     } else if (url) {
-      return callExternalFunction({
+      return await callExternalFunction({
         url,
         data: {
           bundleCode,
@@ -163,18 +166,19 @@ export function AddToCartButton(props: Props) {
           option: opt,
           lineItem: customLineItem,
           buyNowMode,
-          checkoutUrl,
-        },
+          checkoutUrl
+        }
       })
         .then(async (res) => {
           getOrder && orderId && (await getOrder(orderId))
           return res
         })
         .catch(({ response }) => {
-          setOrderErrors && setOrderErrors(response['data'])
+          if (setOrderErrors) setOrderErrors(response.data)
           return response
         })
     }
+    return undefined
   }
   const autoDisabled =
     !isEmpty(skuLists) || skuListId
@@ -184,12 +188,18 @@ export function AddToCartButton(props: Props) {
     handleClick,
     disabled: disabled || autoDisabled,
     label,
-    ...props,
+    ...props
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <button {...p} disabled={autoDisabled} onClick={handleClick}>
+    <button
+      {...p}
+      disabled={autoDisabled}
+      onClick={() => {
+        void handleClick()
+      }}
+    >
       {label}
     </button>
   )

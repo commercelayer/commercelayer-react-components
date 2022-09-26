@@ -4,19 +4,18 @@ import { useState, useEffect, useContext } from 'react'
 import { isEmpty, has, indexOf } from 'lodash'
 import { getPricesComponent } from '#utils/getPrices'
 import { Price as PriceType } from '@commercelayer/sdk'
-import { FunctionChildren, LoaderType } from '#typings/index'
+import { ChildrenFunction, LoaderType } from '#typings/index'
 import SkuChildrenContext from '#context/SkuChildrenContext'
 
-type PriceChildrenProps = FunctionChildren<
-  {
-    loading: boolean
-    loader: LoaderType
-    prices: PriceType[]
-  } & Omit<PriceProps, 'children'>
->
+interface PriceChildrenProps extends Omit<PriceProps, 'children'> {
+  loading: boolean
+  loader: LoaderType
+  prices: PriceType[]
+}
 
-export type PriceProps = Partial<JSX.IntrinsicElements['span']> & {
-  children?: PriceChildrenProps
+export interface PriceProps
+  extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+  children?: ChildrenFunction<PriceChildrenProps>
   compareClassName?: string
   showCompare?: boolean
   skuCode?: string

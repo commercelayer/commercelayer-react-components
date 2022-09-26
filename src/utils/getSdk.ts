@@ -4,11 +4,11 @@ import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 
 export default function getSdk({
   endpoint,
-  accessToken,
+  accessToken
 }: CommerceLayerConfig): ReturnType<typeof Sdk> {
   const org = getOrganizationSlug(endpoint)
   return Sdk({
     accessToken,
-    ...org,
+    ...org
   })
 }

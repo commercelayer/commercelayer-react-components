@@ -1,37 +1,28 @@
 import { ReactNode } from 'react'
 import Parent from '#components-utils/Parent'
-import components from '#config/components'
-import { FunctionChildren } from '#typings/index'
+import { ChildrenFunction } from '#typings/index'
 import isFunction from 'lodash/isFunction'
 
-const propTypes = components.SubmitButton.propTypes
-const defaultProps = components.SubmitButton.defaultProps
-const displayName = components.SubmitButton.displayName
+interface ChildrenProps extends Omit<Props, 'children'> {}
 
-type ChildrenProps = FunctionChildren<Omit<Props, 'children'>>
-
-type Props = {
-  children?: ChildrenProps
+interface Props extends Omit<JSX.IntrinsicElements['button'], 'children'> {
+  children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
-} & JSX.IntrinsicElements['button']
+}
 
-export function SubmitButton(props: Props) {
+export function SubmitButton(props: Props): JSX.Element {
   const { children, label = 'Submit', ...p } = props
   const parentProps = {
     ...p,
-    label,
+    label
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <button type="submit" {...p}>
+    <button type='submit' {...p}>
       {isFunction(label) ? label() : label}
     </button>
   )
 }
-
-SubmitButton.propTypes = propTypes
-SubmitButton.defaultProps = defaultProps
-SubmitButton.displayName = displayName
 
 export default SubmitButton

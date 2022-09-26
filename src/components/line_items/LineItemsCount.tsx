@@ -2,24 +2,18 @@ import { useContext, useState, useEffect } from 'react'
 import Parent from '#components-utils/Parent'
 import getLineItemsCount, { TypeAccepted } from '#utils/getLineItemsCount'
 import LineItemContext from '#context/LineItemContext'
-import components from '#config/components'
-import { FunctionChildren } from '#typings/index'
+import { ChildrenFunction } from '#typings/index'
 
-const propTypes = components.LineItemsCount.propTypes
-const displayName = components.LineItemsCount.displayName
-
-type LineItemsCountChildrenProps = FunctionChildren<
-  Omit<Props, 'children'> & {
-    quantity: number
-  }
->
+interface ChildrenProps extends Omit<Props, 'children'> {
+  quantity: number
+}
 
 type Props = {
-  children?: LineItemsCountChildrenProps
+  children?: ChildrenFunction<ChildrenProps>
   typeAccepted?: TypeAccepted[]
 } & JSX.IntrinsicElements['span']
 
-export function LineItemsCount(props: Props) {
+export function LineItemsCount(props: Props): JSX.Element {
   const { children, typeAccepted, ...p } = props
   const { lineItems } = useContext(LineItemContext)
   const [quantity, setQuantity] = useState(0)
@@ -27,7 +21,7 @@ export function LineItemsCount(props: Props) {
     if (lineItems && lineItems.length > 0) {
       const qty = getLineItemsCount({
         lineItems: lineItems || [],
-        typeAccepted,
+        typeAccepted
       })
       setQuantity(qty)
     }
@@ -38,7 +32,7 @@ export function LineItemsCount(props: Props) {
   const parentProps = {
     quantity,
     typeAccepted,
-    ...p,
+    ...p
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -46,8 +40,5 @@ export function LineItemsCount(props: Props) {
     <span {...p}>{quantity}</span>
   )
 }
-
-LineItemsCount.propTypes = propTypes
-LineItemsCount.displayName = displayName
 
 export default LineItemsCount

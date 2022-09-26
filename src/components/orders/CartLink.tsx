@@ -1,23 +1,21 @@
 import { MouseEvent, ReactNode, useContext } from 'react'
 import OrderContext from '#context/OrderContext'
 import Parent from '../utils/Parent'
-import { FunctionChildren } from '#typings/index'
+import { ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import getCartLink from '#utils/getCartLink'
 
-type TChildren = FunctionChildren<
-  Omit<Props, 'children'> & {
-    href: string
-    handleClick?: (e: MouseEvent<HTMLAnchorElement>) => Promise<void>
-  }
->
+interface ChildrenProps extends Omit<Props, 'children'> {
+  href: string
+  handleClick?: (e: MouseEvent<HTMLAnchorElement>) => Promise<void>
+}
 
-type Props = {
-  children?: TChildren
+interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
+  children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
-} & JSX.IntrinsicElements['a']
+}
 
-export function CartLink(props: Props) {
+export function CartLink(props: Props): JSX.Element | null {
   const { label, children, ...p } = props
   const { order, createOrder } = useContext(OrderContext)
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
@@ -26,7 +24,9 @@ export function CartLink(props: Props) {
     slug && order?.id
       ? getCartLink({ slug, orderId: order?.id, accessToken })
       : ''
-  const handleClick = async (event: MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = async (
+    event: MouseEvent<HTMLAnchorElement>
+  ): Promise<void> => {
     event.preventDefault()
     if (order?.id) {
       location.href = href
@@ -39,13 +39,19 @@ export function CartLink(props: Props) {
     handleClick,
     label,
     href,
-    ...p,
+    ...p
   }
   if (!accessToken) return null
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a href={href} {...p} onClick={handleClick}>
+    <a
+      href={href}
+      {...p}
+      onClick={(e) => {
+        void handleClick(e)
+      }}
+    >
       {label}
     </a>
   )

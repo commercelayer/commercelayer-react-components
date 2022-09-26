@@ -1,29 +1,30 @@
-import components from '#config/components'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import { has } from 'lodash'
 import { useContext } from 'react'
 import Parent from '#components-utils/Parent'
-import { FunctionChildren } from '#typings'
-const propTypes = components.PaymentSourceDetail.propTypes
-const displayName = components.PaymentSourceDetail.displayName
+import { ChildrenFunction } from '#typings'
 
 export type PaymentSourceDetailType = 'last4' | 'exp_year' | 'exp_month'
 
-type CustomComponent = FunctionChildren<
-  Omit<Props & { text: string }, 'children'>
->
+interface ChildrenProps extends Omit<Props, 'children'> {
+  text: string
+}
 
-type Props = {
-  children?: CustomComponent
+interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+  children?: ChildrenFunction<ChildrenProps>
   type: PaymentSourceDetailType
-} & JSX.IntrinsicElements['span']
-export function PaymentSourceDetail({ type, children, ...p }: Props) {
+}
+export function PaymentSourceDetail({
+  type,
+  children,
+  ...p
+}: Props): JSX.Element {
   const card = useContext(PaymentSourceContext)
   const text = has(card, type) ? card[type] : type === 'last4' ? '****' : '**'
   const parentProps = {
     type,
     text,
-    ...p,
+    ...p
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -31,8 +32,5 @@ export function PaymentSourceDetail({ type, children, ...p }: Props) {
     <span {...p}>{text}</span>
   )
 }
-
-PaymentSourceDetail.propTypes = propTypes
-PaymentSourceDetail.displayName = displayName
 
 export default PaymentSourceDetail

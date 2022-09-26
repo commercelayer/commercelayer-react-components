@@ -6,13 +6,13 @@ import map from 'lodash/map'
 import Parent from '#components-utils/Parent'
 import components from '#config/components'
 import { LineItemOption as LineItemOptionType } from '@commercelayer/sdk'
-import { FunctionChildren } from '#typings/index'
+import { ChildrenFunction } from '#typings/index'
 import isJSON from '#utils/isJSON'
 
 const propTypes = components.LineItemOption.propTypes
 const displayName = components.LineItemOption.displayName
 
-type LineItemOptionChildrenProps = FunctionChildren<
+type LineItemOptionChildrenProps = ChildrenFunction<
   Omit<Props, 'children'> & {
     lineItemOption: LineItemOptionType
   }

@@ -3,7 +3,7 @@ import { useContext } from 'react'
 import { Address } from '@commercelayer/sdk'
 import AddressChildrenContext from '#context/AddressChildrenContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
-import { FunctionChildren } from '#typings'
+import { ChildrenFunction } from '#typings'
 
 type ChildrenProps = Pick<Props, 'customerAddresses' | 'className'> & {
   AddressProvider: typeof AddressChildrenContext.Provider
@@ -14,7 +14,7 @@ export type CustomerAddress = Address & {
   handleSelect?: () => void
 }
 
-export type AddressCardsTemplateChildren = FunctionChildren<ChildrenProps>
+export type AddressCardsTemplateChildren = ChildrenFunction<ChildrenProps>
 
 export type AddressCardsType = ChildrenProps
 

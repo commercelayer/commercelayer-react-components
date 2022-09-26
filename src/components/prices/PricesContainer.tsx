@@ -114,8 +114,6 @@ export function PricesContainer(props: Props): JSX.Element {
     loader,
     setSkuCodes
   }
-  if (!config.accessToken) throw new Error('No access token provided')
-  if (!config.endpoint) throw new Error('No endpoint provided')
   return (
     <PricesContext.Provider value={priceValue}>
       {children}

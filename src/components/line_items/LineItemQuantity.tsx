@@ -2,28 +2,21 @@ import { useContext, ReactNode } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
 import Parent from '#components-utils/Parent'
-import components from '#config/components'
-import { FunctionChildren } from '#typings'
+import { ChildrenFunction } from '#typings'
 
-const propTypes = components.LineItemQuantity.propTypes
-const defaultProps = components.LineItemQuantity.defaultProps
-const displayName = components.LineItemQuantity.displayName
-
-type LineItemQuantityChildrenProps = FunctionChildren<
-  Omit<Props, 'children'> & {
-    quantity: number
-    handleChange: (event: React.MouseEvent<HTMLSelectElement>) => void
-  }
->
+interface ChildrenProps extends Omit<Props, 'children'> {
+  quantity: number
+  handleChange: (event: React.MouseEvent<HTMLSelectElement>) => void
+}
 
 type Props = {
-  children?: LineItemQuantityChildrenProps
+  children?: ChildrenFunction<ChildrenProps>
   max?: number
   disabled?: boolean
   readonly?: boolean
 } & (JSX.IntrinsicElements['select'] & JSX.IntrinsicElements['span'])
 
-export function LineItemQuantity(props: Props) {
+export function LineItemQuantity(props: Props): JSX.Element {
   const { max = 50, readonly = false, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const { updateLineItem } = useContext(LineItemContext)
@@ -37,13 +30,13 @@ export function LineItemQuantity(props: Props) {
   }
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const quantity = Number(e.target.value)
-    updateLineItem && lineItem && updateLineItem(lineItem['id'], quantity)
+    updateLineItem && lineItem && updateLineItem(lineItem.id, quantity)
   }
-  const quantity = lineItem?.['quantity']
+  const quantity = lineItem?.quantity
   const parentProps = {
     handleChange,
     quantity,
-    ...props,
+    ...props
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
@@ -60,9 +53,5 @@ export function LineItemQuantity(props: Props) {
     </select>
   )
 }
-
-LineItemQuantity.propTypes = propTypes
-LineItemQuantity.defaultProps = defaultProps
-LineItemQuantity.displayName = displayName
 
 export default LineItemQuantity
