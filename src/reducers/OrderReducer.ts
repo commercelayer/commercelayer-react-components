@@ -35,7 +35,7 @@ export type GetOrderParams = Partial<{
   state: OrderState
 }>
 
-export type GetOrder = (params: GetOrderParams) => Promise<void | Order>
+export type GetOrder = (params: GetOrderParams) => Promise<undefined | Order>
 
 type CreateOrderParams = Pick<
   AddToCartParams,
@@ -131,7 +131,7 @@ export type AddToCartValues = Pick<
 
 export type AddToCartImportValues = Pick<AddToCartImportParams, 'lineItems'>
 
-export type getOrderContext = (id: string) => Promise<void | Order>
+export type getOrderContext = (id: string) => Promise<undefined | Order>
 
 export type OrderState = Partial<OrderPayload>
 
@@ -280,7 +280,7 @@ export async function updateOrder({
   config,
   include,
   state
-}: UpdateOrderArgs) {
+}: UpdateOrderArgs): Promise<{ success: boolean; error?: unknown }> {
   const sdk = getSdk(config as CommerceLayerConfig)
   try {
     const resource = { ...attributes, id }
@@ -331,7 +331,7 @@ interface IncludesType {
   include: ResourceIncluded[] | undefined
   includeLoaded:
     | {
-        [K in ResourceIncluded]: boolean
+        [K in ResourceIncluded]?: boolean
       }
     | undefined
 }
@@ -342,7 +342,7 @@ export function addResourceToInclude({
   newResource,
   newResourceLoaded,
   resourceIncludedLoaded
-}: AddResourceToInclude) {
+}: AddResourceToInclude): void {
   const payload: IncludesType = {
     include: undefined,
     includeLoaded: undefined
@@ -352,20 +352,22 @@ export function addResourceToInclude({
       typeof newResource === 'string' ? [newResource] : newResource
     payload.include = [...resourcesIncluded, ...resources]
     resources.forEach((resource) => {
-      payload.includeLoaded = {
+      const includeLoaded = {
         ...payload.includeLoaded,
         ...{ [resource]: true }
-      } as IncludesType['includeLoaded']
+      }
+      payload.includeLoaded = includeLoaded
     })
   } else {
     delete payload.include
   }
-  payload.includeLoaded = {
+  const payloadIncludeLoaded = {
     ...resourceIncludedLoaded,
     ...newResourceLoaded,
     ...(payload.includeLoaded && payload.includeLoaded)
-  } as IncludesType['includeLoaded']
-  dispatch &&
+  }
+  payload.includeLoaded = payloadIncludeLoaded
+  if (dispatch)
     dispatch({
       type: 'setIncludesResource',
       payload: {
@@ -411,13 +413,13 @@ export const addToCart: AddToCart = async (params) => {
       const imageUrl = lineItem?.imageUrl as string
       if (buyNowMode) {
         if (!state?.order?.line_items) {
-          const { line_items } = await sdk.orders.retrieve(id, {
+          const { line_items: lineItems } = await sdk.orders.retrieve(id, {
             fields: ['line_items'],
             include: ['line_items']
           })
-          if (line_items && line_items?.length > 0) {
+          if (lineItems && lineItems?.length > 0) {
             await Promise.all(
-              line_items.map(async (lineItem) => {
+              lineItems.map(async (lineItem) => {
                 await sdk.line_items.delete(lineItem.id)
               })
             )
@@ -516,8 +518,10 @@ interface OrderErrors {
   errors: BaseError[]
 }
 
-export function setOrderErrors({ dispatch, errors = [] }: OrderErrors) {
-  dispatch &&
+export function setOrderErrors({ dispatch, errors = [] }: OrderErrors): {
+  success: boolean
+} {
+  if (dispatch)
     dispatch({
       type: 'setErrors',
       payload: {
@@ -532,13 +536,12 @@ export type SaveAddressToCustomerAddressBook = (params: {
   type: AddressResource
   value: boolean
 }) => void
-
 export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook =
   ({ type, value, dispatch }) => {
     const k: CustomerOrderParams = `_save_${type}_to_customer_address_book`
-    const v = `${value}`
+    const v = `${value.toString()}`
     setCustomerOrderParam(k, v)
-    dispatch &&
+    if (dispatch)
       dispatch({
         type: 'setSaveAddressToCustomerAddressBook',
         payload: {
