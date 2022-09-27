@@ -1,11 +1,4 @@
-import {
-  useEffect,
-  useReducer,
-  useContext,
-  ReactNode,
-  useMemo,
-  useState,
-} from 'react'
+import { useEffect, useReducer, useContext, useMemo, useState } from 'react'
 import orderReducer, {
   AddToCartValues,
   createOrder,
@@ -18,30 +11,25 @@ import orderReducer, {
   UpdateOrderArgs,
   SaveAddressToCustomerAddressBook,
   updateOrder,
+  ResourceIncluded
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext, { defaultOrderContext } from '#context/OrderContext'
-import { ResourceIncluded } from '#reducers/OrderReducer'
-import components from '#config/components'
 import { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
 import type { OrderCreate, Order } from '@commercelayer/sdk'
 import { BaseError } from '#typings/errors'
 import compareObjAttribute from '#utils/compareObjAttribute'
 
-const propTypes = components.OrderContainer.propTypes
-const defaultProps = components.OrderContainer.defaultProps
-const displayName = components.OrderContainer.displayName
-
-type Props = {
-  children: ReactNode
+interface Props {
+  children: JSX.Element[] | JSX.Element
   metadata?: BaseMetadataObject
   attributes?: OrderCreate
   orderId?: string
   fetchOrder?: (order: Order) => void
 }
 
-export function OrderContainer(props: Props) {
+export function OrderContainer(props: Props): JSX.Element {
   const { orderId, children, metadata, attributes, fetchOrder } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const [lock, setLock] = useState(false)
@@ -52,15 +40,15 @@ export function OrderContainer(props: Props) {
     clearWhenPlaced,
     getLocalOrder,
     setLocalOrder,
-    deleteLocalOrder,
+    deleteLocalOrder
   } = useContext(OrderStorageContext)
   useEffect(() => {
     if (!state.withoutIncludes) {
       dispatch({
         type: 'setLoading',
         payload: {
-          loading: true,
-        },
+          loading: true
+        }
       })
     }
   }, [state.withoutIncludes])
@@ -68,8 +56,8 @@ export function OrderContainer(props: Props) {
   useEffect(() => {
     if (attributes && state?.order && !lock) {
       const updateAttributes = compareObjAttribute({
-        attributes: attributes,
-        object: state.order,
+        attributes,
+        object: state.order
       })
       if (Object.keys(updateAttributes).length > 0) {
         void updateOrder({
@@ -78,7 +66,7 @@ export function OrderContainer(props: Props) {
           dispatch,
           config,
           include: state.include,
-          state,
+          state
         })
         setLock(true)
       }
@@ -86,8 +74,8 @@ export function OrderContainer(props: Props) {
     return () => {
       if (attributes && state?.order) {
         const updateAttributes = compareObjAttribute({
-          attributes: attributes,
-          object: state.order,
+          attributes,
+          object: state.order
         })
         if (state.order && Object.keys(updateAttributes).length === 0) {
           setLock(false)
@@ -100,7 +88,7 @@ export function OrderContainer(props: Props) {
     const startRequest = Object.keys(state?.includeLoaded || {}).filter(
       (key) => state?.includeLoaded?.[key as ResourceIncluded] === true
     )
-    const getOrder = async () => {
+    const getOrder = async (): Promise<void> => {
       const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
       localOrder &&
         (await getApiOrder({
@@ -110,7 +98,7 @@ export function OrderContainer(props: Props) {
           persistKey,
           clearWhenPlaced: removeOrderPlaced,
           deleteLocalOrder,
-          state,
+          state
         }))
     }
     if (config.accessToken && !state.loading) {
@@ -122,8 +110,8 @@ export function OrderContainer(props: Props) {
         !lockOrder
       ) {
         void getOrder()
-      } else if (state?.order) {
-        fetchOrder && fetchOrder(state.order)
+      } else if (state?.order && fetchOrder) {
+        fetchOrder(state.order)
       } else if (
         state.withoutIncludes &&
         !state.include?.length &&
@@ -136,28 +124,28 @@ export function OrderContainer(props: Props) {
         config.accessToken,
         !state.order,
         state.loading,
-        state.withoutIncludes,
+        state.withoutIncludes
       ].every(Boolean)
     ) {
       dispatch({
         type: 'setLoading',
         payload: {
-          loading: false,
-        },
+          loading: false
+        }
       })
     } else if (
       [
         config.accessToken,
         !state.order,
         state.loading,
-        !state.withoutIncludes,
+        !state.withoutIncludes
       ].every(Boolean)
     ) {
       dispatch({
         type: 'setLoading',
         payload: {
-          loading: false,
-        },
+          loading: false
+        }
       })
     }
     return () => {
@@ -166,15 +154,15 @@ export function OrderContainer(props: Props) {
           dispatch({
             type: 'setLoading',
             payload: {
-              loading: false,
-            },
+              loading: false
+            }
           })
         } else if (state.include && state.include?.length > 0) {
           dispatch({
             type: 'setIncludesResource',
             payload: {
-              include: [],
-            },
+              include: []
+            }
           })
           setLockOrder(false)
         }
@@ -188,28 +176,28 @@ export function OrderContainer(props: Props) {
     state.order,
     state.loading,
     state.withoutIncludes,
-    lockOrder,
+    lockOrder
   ])
   const orderValue = useMemo(() => {
     return {
       ...state,
       setOrder: (order: Order) => setOrder(order, dispatch),
-      getOrder: (id: string): Promise<void | Order> =>
-        getApiOrder({ id, dispatch, config, state }),
+      getOrder: async (id: string): Promise<Order | undefined> =>
+        await getApiOrder({ id, dispatch, config, state }),
       setOrderErrors: (errors: BaseError[]) =>
         setOrderErrors({ dispatch, errors }),
-      createOrder: (): Promise<string> =>
-        createOrder({
+      createOrder: async (): Promise<string> =>
+        await createOrder({
           persistKey,
           dispatch,
           config,
           state,
           orderMetadata: metadata,
           orderAttributes: attributes,
-          setLocalOrder,
+          setLocalOrder
         }),
-      addToCart: (values: AddToCartValues) =>
-        defaultOrderContext['addToCart']({
+      addToCart: async (values: AddToCartValues) =>
+        await defaultOrderContext.addToCart({
           ...values,
           persistKey,
           dispatch,
@@ -218,64 +206,64 @@ export function OrderContainer(props: Props) {
           errors: state.errors,
           orderMetadata: metadata || {},
           orderAttributes: attributes,
-          setLocalOrder,
+          setLocalOrder
         }),
       saveAddressToCustomerAddressBook: (
         args: Parameters<SaveAddressToCustomerAddressBook>[0]
       ) =>
-        defaultOrderContext['saveAddressToCustomerAddressBook']({
+        defaultOrderContext.saveAddressToCustomerAddressBook({
           ...args,
-          dispatch,
+          dispatch
         }),
-      setGiftCardOrCouponCode: ({
+      setGiftCardOrCouponCode: async ({
         code,
-        codeType,
+        codeType
       }: {
         code: string
         codeType: OrderCodeType
       }) =>
-        defaultOrderContext['setGiftCardOrCouponCode']({
+        await defaultOrderContext.setGiftCardOrCouponCode({
           code,
           codeType,
           dispatch,
           order: state.order,
           config,
           include: state.include,
-          state,
+          state
         }),
-      removeGiftCardOrCouponCode: ({ codeType }: { codeType: OrderCodeType }) =>
-        defaultOrderContext['removeGiftCardOrCouponCode']({
+      removeGiftCardOrCouponCode: async ({
+        codeType
+      }: {
+        codeType: OrderCodeType
+      }) =>
+        await defaultOrderContext.removeGiftCardOrCouponCode({
           codeType,
           dispatch,
           order: state.order,
           config,
           include: state.include,
-          state,
+          state
         }),
       addResourceToInclude: (args: AddResourceToInclude) =>
-        defaultOrderContext['addResourceToInclude']({
+        defaultOrderContext.addResourceToInclude({
           ...args,
           dispatch,
           resourcesIncluded: state.include,
-          resourceIncludedLoaded: state.includeLoaded,
+          resourceIncludedLoaded: state.includeLoaded
         }),
       updateOrder: async (args: UpdateOrderArgs) =>
-        await defaultOrderContext['updateOrder']({
+        await defaultOrderContext.updateOrder({
           ...args,
           dispatch,
           config,
           include: state.include,
-          state,
-        }),
+          state
+        })
     }
   }, [state, config.accessToken])
   return (
     <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
   )
 }
-
-OrderContainer.propTypes = propTypes
-OrderContainer.defaultProps = defaultProps
-OrderContainer.displayName = displayName
 
 export default OrderContainer

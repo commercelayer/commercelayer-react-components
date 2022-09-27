@@ -1,12 +1,12 @@
 import { useContext } from 'react'
-import Parent from '../utils/Parent'
+import Parent from '#components-utils/Parent'
 import OrderListChildrenContext from '#context/OrderListChildrenContext'
-import { Cell, Row } from 'react-table'
 import isDate from '#utils/isDate'
 import last from 'lodash/last'
+import type { Cell, Row } from 'react-table'
 import type { Order } from '@commercelayer/sdk'
 
-type ChildrenProps = Omit<Props, 'children'> & {
+interface ChildrenProps extends Omit<Props, 'children'> {
   /**
    * The order resource
    */
@@ -20,18 +20,22 @@ type ChildrenProps = Omit<Props, 'children'> & {
    */
   cell: Cell[]
   /**
+   * All table cells
+   */
+  cells: Cell[]
+  /**
    * Infinite scroll enabled
    */
   infiniteScroll: boolean
 }
 
-type Props = {
+interface Props extends Omit<JSX.IntrinsicElements['td'], 'children'> {
   children?: (props: ChildrenProps) => JSX.Element
   /**
    * The order field to show
    */
   field: keyof Order
-} & Omit<JSX.IntrinsicElements['td'], 'children'>
+}
 
 export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
   const {
@@ -78,7 +82,7 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
           ? new Date(Date.parse(cellValue)).toLocaleString()
           : cell.render('Cell')
         return (
-          <As {...p} {...cell.getCellProps()} key={k}>
+          <As data-testid={`cell-${k}`} {...p} {...cell.getCellProps()} key={k}>
             {value}
           </As>
         )

@@ -1,6 +1,5 @@
 import {
   useContext,
-  ReactNode,
   useMemo,
   useState,
   useEffect,
@@ -33,7 +32,7 @@ export type OrderListColumn = Column & {
 }
 
 type Props = {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   /**
    * Columns to show
    */
@@ -137,15 +136,22 @@ export function OrderList({
   const LoadingComponent = loadingElement || <div>Loading...</div>
   const headerComponent = table.headerGroups.map((headerGroup, i) => {
     const columns = headerGroup.headers.map((column: HeaderColumn, k) => {
+      const sortLabel = column.isSorted
+        ? column.isSortedDesc
+          ? 'desc'
+          : 'asc'
+        : ''
       return (
         <ThHtmlElement
+          data-testid={`thead-${k}`}
+          data-sort={`${sortLabel}`}
           className={column?.className}
           {...column.getHeaderProps(
             column?.getSortByToggleProps && column?.getSortByToggleProps()
           )}
           key={k}
         >
-          <span data-testid={`thead-${k}`} className={column?.titleClassName}>
+          <span className={column?.titleClassName}>
             {column.render('Header')}
             {column.isSorted
               ? column.isSortedDesc

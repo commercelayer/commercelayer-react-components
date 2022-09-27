@@ -18,7 +18,7 @@ import {
 } from '#reducers/OrderReducer'
 import { BaseError } from '#typings/errors'
 
-type DefaultContext = {
+interface DefaultContext extends OrderState {
   createOrder: CreateOrder
   addToCart: AddToCart
   setOrderErrors: (errors: BaseError[]) => void
@@ -29,7 +29,7 @@ type DefaultContext = {
   getOrder: getOrderContext
   updateOrder: typeof updateOrder
   setOrder: (order: Order) => void
-} & OrderState
+}
 
 export const defaultOrderContext = {
   addToCart,
@@ -40,7 +40,7 @@ export const defaultOrderContext = {
   removeGiftCardOrCouponCode,
   saveAddressToCustomerAddressBook,
   addResourceToInclude,
-  getOrder: async () => {},
+  getOrder: async () => undefined,
   updateOrder
 }
 
