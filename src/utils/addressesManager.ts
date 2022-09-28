@@ -2,7 +2,8 @@ import { isEmpty } from 'lodash'
 import { fieldsExist } from '#utils/validateFormFields'
 import { BaseError } from '#typings/errors'
 import { addressFields } from '#reducers/AddressReducer'
-import { AddressCreate } from '@commercelayer/sdk'
+import { Address, AddressCreate } from '@commercelayer/sdk'
+import { TCustomerAddress } from '#reducers/CustomerReducer'
 
 type BillingAddressController = (params: {
   billing_address?: AddressCreate
@@ -15,7 +16,7 @@ export const billingAddressController: BillingAddressController = ({
   billing_address,
   billingAddressId,
   errors,
-  requiresBillingInfo = false,
+  requiresBillingInfo = false
 }) => {
   let billingDisable = !isEmpty(errors) || isEmpty(billing_address)
   if (isEmpty(errors) && !isEmpty(billing_address)) {
@@ -48,7 +49,7 @@ export const shippingAddressController: ShippingAddressController = ({
   errors,
   shipToDifferentAddress,
   shipping_address,
-  shippingAddressId,
+  shippingAddressId
 }) => {
   let shippingDisable = !!(!billingDisable && shipToDifferentAddress)
   if (shippingDisable && isEmpty(errors) && !isEmpty(shipping_address)) {
@@ -65,12 +66,12 @@ export const shippingAddressController: ShippingAddressController = ({
 }
 
 type CountryLockController = (params: {
-  addresses?: Record<string, any>[]
-  billing_address?: Record<string, any>
+  addresses?: Address[] | null
+  billing_address?: TCustomerAddress
   billingAddressId?: string
   countryCodeLock?: string
   shipToDifferentAddress?: boolean
-  shipping_address?: Record<string, any>
+  shipping_address?: AddressCreate
   shippingAddressId?: string
 }) => boolean
 
@@ -81,7 +82,7 @@ export const countryLockController: CountryLockController = ({
   countryCodeLock,
   shipToDifferentAddress,
   shipping_address,
-  shippingAddressId,
+  shippingAddressId
 }) => {
   if (
     countryCodeLock &&
@@ -91,17 +92,16 @@ export const countryLockController: CountryLockController = ({
   ) {
     const addressLocked = addresses?.find(
       (a) =>
-        (a?.['id'] === billingAddressId ||
-          a?.['reference'] === billingAddressId) &&
-        a?.['country_code'] !== countryCodeLock
+        (a?.id === billingAddressId || a?.reference === billingAddressId) &&
+        a?.country_code !== countryCodeLock
     )
     if (!isEmpty(addressLocked)) return true
   }
   if (countryCodeLock && !isEmpty(billing_address) && !shipToDifferentAddress) {
-    return billing_address?.['country_code'] !== countryCodeLock
+    return billing_address?.country_code !== countryCodeLock
   }
   if (countryCodeLock && !isEmpty(shipping_address) && shipToDifferentAddress) {
-    return shipping_address?.['country_code'] !== countryCodeLock
+    return shipping_address?.country_code !== countryCodeLock
   }
   if (
     countryCodeLock &&
@@ -111,9 +111,8 @@ export const countryLockController: CountryLockController = ({
   ) {
     const addressLocked = addresses?.find(
       (a) =>
-        (a?.['id'] === shippingAddressId ||
-          a?.['reference'] === shippingAddressId) &&
-        a?.['country_code'] !== countryCodeLock
+        (a?.id === shippingAddressId || a?.reference === shippingAddressId) &&
+        a?.country_code !== countryCodeLock
     )
     if (!isEmpty(addressLocked)) return true
   }
