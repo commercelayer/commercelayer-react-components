@@ -1,24 +1,23 @@
 import { useContext, ReactNode } from 'react'
 import AddressChildrenContext from '#context/AddressChildrenContext'
 import Parent from '#components-utils/Parent'
-import components from '#config/components'
 import { AddressFieldView } from '#reducers/AddressReducer'
 import type { Address } from '@commercelayer/sdk'
 import CustomerContext from '#context/CustomerContext'
+import { ChildrenFunction } from '#typings/index'
 
-const propTypes = components.AddressField.propTypes
-const displayName = components.AddressField.displayName
-
-type AddressFieldChildrenProps = Omit<Props, 'children' | 'name'> & {
+interface ChildrenProps extends Omit<Props, 'children' | 'name'> {
   address: Address
 }
+
+type ChildrenProp = ChildrenFunction<ChildrenProps>
 
 type Props =
   | {
       type?: 'field'
       label?: never
       onClick?: never
-      children?: (props: AddressFieldChildrenProps) => JSX.Element
+      children?: ChildrenProp
       name: AddressFieldView
       className?: string
     }
@@ -26,7 +25,7 @@ type Props =
       type?: 'edit'
       label: string | ReactNode
       onClick: (address: Address) => void
-      children?: (props: AddressFieldChildrenProps) => JSX.Element
+      children?: ChildrenProp
       name?: AddressFieldView
       className?: string
     }
@@ -34,7 +33,7 @@ type Props =
       type?: 'delete'
       label: string
       onClick: () => void
-      children?: (props: AddressFieldChildrenProps) => JSX.Element
+      children?: ChildrenProp
       name?: AddressFieldView
       className?: string
     }
@@ -42,17 +41,17 @@ type Props =
       type?: 'edit' | 'field' | 'delete'
       label?: never
       onClick?: never
-      children: (props: AddressFieldChildrenProps) => JSX.Element
+      children: ChildrenProp
       name?: never
       className?: string
     }
 
-export function AddressField(props: Props) {
+export function AddressField(props: Props): JSX.Element {
   const { name, type = 'field', label, onClick, ...p } = props
   const { address } = useContext(AddressChildrenContext)
   const text = name && address ? address?.[name] : ''
   const { deleteCustomerAddress } = useContext(CustomerContext)
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>): void => {
     e.stopPropagation()
     e.preventDefault()
     if (type === 'delete' && deleteCustomerAddress && address?.reference) {
@@ -62,20 +61,19 @@ export function AddressField(props: Props) {
   }
   const parentProps = {
     address,
-    ...props,
+    ...props
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : type === 'field' ? (
-    <p {...{ ...p, name }}>{text}</p>
+    <p data-testid={`address-field-${name ?? ''}`} {...{ ...p, name }}>
+      {text}
+    </p>
   ) : (
-    <a {...p} onClick={handleClick}>
+    <a data-testid={`address-field-${name ?? ''}`} {...p} onClick={handleClick}>
       {label}
     </a>
   )
 }
-
-AddressField.propTypes = propTypes
-AddressField.displayName = displayName
 
 export default AddressField

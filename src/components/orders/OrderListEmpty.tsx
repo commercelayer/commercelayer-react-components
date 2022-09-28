@@ -7,7 +7,7 @@ interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
   /**
    * Function allow you to customize the component
    */
-  children?: ChildrenFunction<Props>
+  children?: ChildrenFunction<Omit<Props, 'children'>>
   /**
    * Label to show. Default: 'No orders available.'
    */

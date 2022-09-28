@@ -1,6 +1,5 @@
-import { Fragment, useContext, ReactNode, useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import AddressChildrenContext from '#context/AddressChildrenContext'
-import components from '#config/components'
 import CustomerContext from '#context/CustomerContext'
 import BillingAddressContext from '#context/BillingAddressContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
@@ -11,21 +10,20 @@ import OrderContext from '#context/OrderContext'
 import AddressCardsTemplate, {
   AddressCardsTemplateChildren,
   CustomerAddress,
-  HandleSelect,
+  HandleSelect
 } from '#components-utils/AddressCardsTemplate'
 
-const propTypes = components.Address.propTypes
-
-type Props = {
-  children: ReactNode | AddressCardsTemplateChildren
+interface Props
+  extends Omit<JSX.IntrinsicElements['div'], 'children' | 'onSelect'> {
+  children: JSX.Element[] | JSX.Element | AddressCardsTemplateChildren
   selectedClassName?: string
   disabledClassName?: string
   onSelect?: (address: AddressType) => void
   addresses?: AddressType[]
   deselect?: boolean
-} & JSX.IntrinsicElements['div']
+}
 
-export function Address(props: Props) {
+export function Address(props: Props): JSX.Element {
   const {
     children,
     className,
@@ -52,33 +50,31 @@ export function Address(props: Props) {
     : (addressesContext && addressesContext) || []
   useEffect(() => {
     if (items && !deselect) {
-      items.map((address, k) => {
+      items.forEach((address, k) => {
         if (billingCustomerAddressId) {
           const preselected = address.reference === billingCustomerAddressId
           if (preselected && selected === null) {
             setSelected(k)
           }
         }
-        if (!billingAddressId && k === selected) {
-          setBillingAddress &&
-            setBillingAddress(address.id, {
-              customerAddressId: address.reference as string,
-            })
+        if (!billingAddressId && k === selected && setBillingAddress) {
+          void setBillingAddress(address.id, {
+            customerAddressId: address.reference as string
+          })
         }
         if (shippingCustomerAddressId) {
           const preselected = address.reference === shippingCustomerAddressId
           preselected && selected === null && setSelected(k)
         }
-        if (!shippingAddressId && k === selected) {
-          setShippingAddress &&
-            setShippingAddress(address.id, {
-              customerAddressId: address.reference as string,
-            })
+        if (!shippingAddressId && k === selected && setShippingAddress) {
+          void setShippingAddress(address.id, {
+            customerAddressId: address.reference as string
+          })
         }
       })
     }
     if (deselect) {
-      const disabledSaveButton = async () => {
+      const disabledSaveButton = async (): Promise<void> => {
         setBillingAddress && (await setBillingAddress(''))
         setShippingAddress && (await setShippingAddress(''))
       }
@@ -89,7 +85,7 @@ export function Address(props: Props) {
     billingCustomerAddressId,
     shippingCustomerAddressId,
     addressesContext,
-    shipToDifferentAddress,
+    shipToDifferentAddress
   ])
   const handleSelect: HandleSelect = async (
     k,
@@ -104,8 +100,7 @@ export function Address(props: Props) {
     !disabled &&
       setShippingAddress &&
       (await setShippingAddress(addressId, { customerAddressId }))
-    onSelect && onSelect(address)
-    return
+    if (onSelect) onSelect(address)
   }
   const countryLock = order?.shipping_country_code_lock
   const components =
@@ -124,7 +119,7 @@ export function Address(props: Props) {
           })
           .map((address, k) => {
             const addressProps = {
-              address,
+              address
             }
             const disabled =
               (setShippingAddress &&
@@ -142,7 +137,7 @@ export function Address(props: Props) {
               <AddressChildrenContext.Provider key={k} value={addressProps}>
                 <div
                   className={finalClassName}
-                  onClick={() =>
+                  onClick={() => {
                     void handleSelect(
                       k,
                       address.id,
@@ -150,7 +145,7 @@ export function Address(props: Props) {
                       disabled,
                       address
                     )
-                  }
+                  }}
                   data-disabled={disabled}
                   {...p}
                 >
@@ -164,17 +159,13 @@ export function Address(props: Props) {
     selected,
     handleSelect,
     countryLock,
-    ...props,
+    ...props
   }
   return typeof children === 'function' ? (
-    <AddressCardsTemplate {...parentProps}>
-      {children as AddressCardsTemplateChildren}
-    </AddressCardsTemplate>
+    <AddressCardsTemplate {...parentProps}>{children}</AddressCardsTemplate>
   ) : (
-    <Fragment>{components}</Fragment>
+    <>{components}</>
   )
 }
-
-Address.propTypes = propTypes
 
 export default Address

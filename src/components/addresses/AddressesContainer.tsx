@@ -1,5 +1,5 @@
 import AddressesContext, {
-  defaultAddressContext,
+  defaultAddressContext
 } from '#context/AddressContext'
 import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import addressReducer, {
@@ -9,22 +9,18 @@ import addressReducer, {
   setAddressErrors,
   SetAddressParams,
   setCloneAddress,
+  saveAddresses
 } from '#reducers/AddressReducer'
 import { BaseError } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import { saveAddresses } from '#reducers/AddressReducer'
-import components from '#config/components'
 
-const propTypes = components.AddressesContainer.propTypes
-const displayName = components.AddressesContainer.displayName
-
-type Props = {
+interface Props {
   children: ReactNode
   shipToDifferentAddress?: boolean
   isBusiness?: boolean
 }
-export function AddressesContainer(props: Props) {
+export function AddressesContainer(props: Props): JSX.Element {
   const { children, shipToDifferentAddress = false, isBusiness } = props
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
   const { order, orderId, updateOrder } = useContext(OrderContext)
@@ -34,13 +30,13 @@ export function AddressesContainer(props: Props) {
       type: 'setShipToDifferentAddress',
       payload: {
         shipToDifferentAddress,
-        isBusiness,
-      },
+        isBusiness
+      }
     })
     return () => {
       dispatch({
         type: 'cleanup',
-        payload: {},
+        payload: {}
       })
     }
   }, [shipToDifferentAddress, isBusiness])
@@ -51,10 +47,10 @@ export function AddressesContainer(props: Props) {
         errors,
         resource,
         dispatch,
-        currentErrors: state.errors,
+        currentErrors: state.errors
       }),
     setAddress: (params: SetAddressParams<AddressSchema>) =>
-      defaultAddressContext['setAddress']({ ...params, dispatch }),
+      defaultAddressContext.setAddress({ ...params, dispatch }),
     saveAddresses: async (): Promise<void> =>
       await saveAddresses({
         config,
@@ -62,10 +58,10 @@ export function AddressesContainer(props: Props) {
         updateOrder,
         order,
         orderId,
-        state,
+        state
       }),
     setCloneAddress: (id: string, resource: AddressResource): void =>
-      setCloneAddress(id, resource, dispatch),
+      setCloneAddress(id, resource, dispatch)
   }
   return (
     <AddressesContext.Provider value={contextValue}>
@@ -73,8 +69,5 @@ export function AddressesContainer(props: Props) {
     </AddressesContext.Provider>
   )
 }
-
-AddressesContainer.propTypes = propTypes
-AddressesContainer.displayName = displayName
 
 export default AddressesContainer

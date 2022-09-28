@@ -8,7 +8,6 @@ import {
   fireEvent,
   render,
   screen,
-  // waitFor,
   waitForElementToBeRemoved
 } from '@testing-library/react'
 import { LocalContext } from './utils/context'
@@ -49,12 +48,13 @@ describe('Orders list', () => {
       ctx.accessToken = accessToken
       ctx.endpoint = endpoint
     }
+    ctx.columns = columns
   })
-  it<LocalContext>('Show orders list', async (ctx) => {
+  it<OrderListContext>('Show orders list', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <CustomerContainer>
-          <OrderList columns={columns}>
+          <OrderList columns={ctx.columns}>
             <OrderListRow field='number' />
             <OrderListRow field='status' className='align-top py-5 border-b' />
             <OrderListRow
@@ -87,7 +87,7 @@ describe('Orders list', () => {
     expect(firstCell?.getAttribute('data-testid')).toBe('cell-0')
     expect(first?.textContent).not.toBe('')
   })
-  it<LocalContext>('Show orders list empty', async (ctx) => {
+  it<OrderListContext>('Show orders list empty', async (ctx) => {
     const { accessToken, endpoint } = await getToken('customer_empty')
     if (accessToken !== undefined) {
       ctx.accessToken = accessToken
@@ -96,7 +96,7 @@ describe('Orders list', () => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <CustomerContainer>
-          <OrderList columns={columns}>
+          <OrderList columns={ctx.columns}>
             <OrderListEmpty />
             <OrderListRow field='number' />
             <OrderListRow field='status' className='align-top py-5 border-b' />
@@ -118,7 +118,7 @@ describe('Orders list', () => {
     })
     expect(screen.getByText('No orders available'))
   })
-  it<LocalContext>('Show orders list empty with custom component', async (ctx) => {
+  it<OrderListContext>('Show orders list empty with custom component', async (ctx) => {
     const { accessToken, endpoint } = await getToken('customer_empty')
     if (accessToken !== undefined) {
       ctx.accessToken = accessToken
@@ -127,7 +127,7 @@ describe('Orders list', () => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <CustomerContainer>
-          <OrderList columns={columns}>
+          <OrderList columns={ctx.columns}>
             <OrderListEmpty>
               {() => <>There are not any orders available</>}
             </OrderListEmpty>
@@ -151,11 +151,14 @@ describe('Orders list', () => {
     })
     expect(screen.getByText('There are not any orders available'))
   })
-  it<LocalContext>('Show orders list with custom loading even if there is OrderListEmpty', async (ctx) => {
+  it<OrderListContext>('Show orders list with custom loading even if there is OrderListEmpty', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <CustomerContainer>
-          <OrderList columns={columns} loadingElement={<>Custom loading...</>}>
+          <OrderList
+            columns={ctx.columns}
+            loadingElement={<>Custom loading...</>}
+          >
             <OrderListEmpty />
             <OrderListRow field='number' />
             <OrderListRow field='status' className='align-top py-5 border-b' />
@@ -190,12 +193,12 @@ describe('Orders list', () => {
     expect(firstCell?.tagName).toBe('TD')
     expect(firstCell?.textContent).not.toBe('')
   })
-  it<LocalContext>('Show orders list with actions and custom Order list row', async (ctx) => {
+  it<OrderListContext>('Show orders list with actions and custom Order list row', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <CustomerContainer>
           <OrderList
-            columns={columns}
+            columns={ctx.columns}
             showActions
             actionsComponent={() => <>Actions</>}
             actionsContainerClassName='action-container-class'
@@ -261,11 +264,11 @@ describe('Orders list', () => {
     expect(action?.getAttribute('data-testid')).toBe('action-cell')
     expect(action?.className).toBe('action-container-class')
   })
-  it<LocalContext>('Show orders list with infinite scroll', async (ctx) => {
+  it<OrderListContext>('Show orders list with infinite scroll', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <CustomerContainer>
-          <OrderList columns={columns} infiniteScroll>
+          <OrderList columns={ctx.columns} infiniteScroll>
             <OrderListEmpty />
             <OrderListRow field='number' />
             <OrderListRow field='status' className='align-top py-5 border-b' />
@@ -297,12 +300,12 @@ describe('Orders list', () => {
     expect(firstCell?.tagName).toBe('DIV')
     expect(firstCell?.textContent).not.toBe('')
   })
-  it<LocalContext>('Show orders list with infinite scroll with windowOptions', async (ctx) => {
+  it<OrderListContext>('Show orders list with infinite scroll with windowOptions', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <CustomerContainer>
           <OrderList
-            columns={columns}
+            columns={ctx.columns}
             infiniteScroll
             windowOptions={{
               column: 200,

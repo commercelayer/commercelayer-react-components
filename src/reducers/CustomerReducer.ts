@@ -24,7 +24,7 @@ export type CustomerActionType =
   | 'setOrders'
 
 export interface CustomerActionPayload {
-  addresses: Address[]
+  addresses: Address[] | null
   payments: CustomerPaymentSource[]
   customerEmail: string
   errors: BaseError[]
@@ -330,7 +330,7 @@ export async function createCustomerAddress({
 
 export const customerInitialState: CustomerState = {
   errors: [],
-  addresses: [],
+  addresses: null,
   payments: []
 }
 
