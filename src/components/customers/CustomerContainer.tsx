@@ -9,14 +9,14 @@ import customerReducer, {
   deleteCustomerAddress,
   createCustomerAddress,
   TCustomerAddress,
+  saveCustomerUser
 } from '#reducers/CustomerReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import { saveCustomerUser } from '#reducers/CustomerReducer'
 import CustomerContext from '#context/CustomerContext'
 import { BaseError } from '#typings/errors'
 
-type Props = {
+interface Props {
   children: ReactNode
   /**
    * Customer type
@@ -24,7 +24,7 @@ type Props = {
   isGuest?: boolean
 }
 
-export function CustomerContainer(props: Props) {
+export function CustomerContainer(props: Props): JSX.Element {
   const { children, isGuest = false } = props
   const [state, dispatch] = useReducer(customerReducer, customerInitialState)
   const { order, addResourceToInclude, include, updateOrder, includeLoaded } =
@@ -36,7 +36,7 @@ export function CustomerContainer(props: Props) {
       !isGuest
     ) {
       addResourceToInclude({
-        newResource: 'available_customer_payment_sources.payment_source',
+        newResource: 'available_customer_payment_sources.payment_source'
       })
     } else if (
       !includeLoaded?.['available_customer_payment_sources.payment_source'] &&
@@ -44,14 +44,14 @@ export function CustomerContainer(props: Props) {
     ) {
       addResourceToInclude({
         newResourceLoaded: {
-          'available_customer_payment_sources.payment_source': true,
-        },
+          'available_customer_payment_sources.payment_source': true
+        }
       })
     }
   }, [include, includeLoaded])
 
   useEffect(() => {
-    if (config.accessToken && state.addresses?.length === 0 && !isGuest) {
+    if (config.accessToken && state.addresses == null && !isGuest) {
       void getCustomerAddresses({ config, dispatch })
     }
     if (order?.available_customer_payment_sources && !isGuest) {
@@ -70,7 +70,7 @@ export function CustomerContainer(props: Props) {
         customerEmail,
         dispatch,
         updateOrder,
-        order,
+        order
       })
     },
     setCustomerErrors: (errors: BaseError[]) =>
@@ -79,19 +79,19 @@ export function CustomerContainer(props: Props) {
       setCustomerEmail(customerEmail, dispatch),
     getCustomerPaymentSources: () =>
       getCustomerPaymentSources({ dispatch, order }),
-    deleteCustomerAddress: ({
-      customerAddressId,
+    deleteCustomerAddress: async ({
+      customerAddressId
     }: {
       customerAddressId: string
     }) =>
-      deleteCustomerAddress({
+      await deleteCustomerAddress({
         customerAddressId,
         dispatch,
         config,
-        addresses: state.addresses,
+        addresses: state.addresses
       }),
-    createCustomerAddress: (address: TCustomerAddress) =>
-      createCustomerAddress({ address, config, dispatch, state }),
+    createCustomerAddress: async (address: TCustomerAddress) =>
+      await createCustomerAddress({ address, config, dispatch, state })
   }
   return (
     <CustomerContext.Provider value={contextValue}>

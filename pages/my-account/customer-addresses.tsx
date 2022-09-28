@@ -9,6 +9,7 @@ import {
   Errors,
   AddressStateSelector,
   AddressCountrySelector,
+  AddressesEmpty,
 } from '@commercelayer/react-components'
 import { useState } from 'react'
 import useGetToken from '../../hooks/useGetToken'
@@ -38,6 +39,7 @@ const addresseses = () => {
     <CommerceLayer {...config}>
       <CustomerContainer>
         <AddressesContainer>
+        <AddressesEmpty />
           <div className="w-full p-5">
             <div className="flex flex-wrap mx-auto w-full">
               <Address className="w-1/3 p-2 border hover:border-blue-500 rounded m-2 shadow-sm">
@@ -76,6 +78,7 @@ const addresseses = () => {
             </div>
             <div className="mt-3 ml-2">
               <button
+                title='button'
                 type="button"
                 className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 onClick={() => {
