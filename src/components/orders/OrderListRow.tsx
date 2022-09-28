@@ -54,7 +54,11 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
   const ActionRow = (): JSX.Element | null => {
     return (
       (showActions && isLastRow && actionsComponent && (
-        <As {...p} className={actionsContainerClassName}>
+        <As
+          data-testid='action-cell'
+          {...p}
+          className={actionsContainerClassName}
+        >
           <Parent {...parentProps}>{actionsComponent}</Parent>
         </As>
       )) ||
