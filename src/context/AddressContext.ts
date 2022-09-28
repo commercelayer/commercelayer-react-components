@@ -3,7 +3,7 @@ import {
   AddressState,
   SetAddress,
   setAddress,
-  AddressResource,
+  AddressResource
 } from '#reducers/AddressReducer'
 import { BaseError } from '#typings/errors'
 
@@ -15,16 +15,10 @@ type DefaultContext = {
 } & AddressState
 
 export const defaultAddressContext = {
-  saveAddresses: (): void => {
-    return
-  },
-  setCloneAddress: (): void => {
-    return
-  },
+  saveAddresses: (): void => {},
+  setCloneAddress: (): void => {},
   setAddress,
-  setAddressErrors: () => {
-    return
-  },
+  setAddressErrors: () => {}
 }
 
 const AddressesContext = createContext<DefaultContext>(defaultAddressContext)

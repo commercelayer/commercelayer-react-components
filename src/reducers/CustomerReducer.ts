@@ -173,7 +173,7 @@ export interface DeleteCustomerAddress {
   config?: CommerceLayerConfig
   dispatch?: Dispatch<CustomerAction>
   customerAddressId: string
-  addresses?: Address[]
+  addresses?: Address[] | null
 }
 
 export async function deleteCustomerAddress({
