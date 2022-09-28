@@ -1,9 +1,16 @@
 import CommerceLayer from '#components/auth/CommerceLayer'
 import CustomerContainer from '#components/customers/CustomerContainer'
 import OrderList, { OrderListColumn } from '#components/orders/OrderList'
+import OrderListEmpty from '#components/orders/OrderListEmpty'
 import OrderListRow from '#components/orders/OrderListRow'
 import { Order } from '@commercelayer/sdk'
-import { render, screen, waitFor } from '@testing-library/react'
+import {
+  fireEvent,
+  render,
+  screen,
+  // waitFor,
+  waitForElementToBeRemoved
+} from '@testing-library/react'
 import { LocalContext } from './utils/context'
 import getToken from './utils/getToken'
 
@@ -63,13 +70,281 @@ describe('Orders list', () => {
       </CommerceLayer>
     )
     expect(screen.getByText('Loading...'))
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).toBeNull()
+    await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+      timeout: 5000
     })
-    const theadOrder = await screen.findByText('Order')
-    // const compare = screen.queryByTestId(`compare-${ctx.sku}`)
-    expect(theadOrder.textContent).not.toBe('')
-    expect(theadOrder.textContent).toBe('Order')
-    // expect(compare?.textContent).not.toBe('')
+    const [first] = screen.getAllByTestId(/thead/)
+    expect(first).toBeDefined()
+    expect(first?.getAttribute('data-testid')).toBe('thead-0')
+    expect(screen.getByText('Order')).toBeDefined()
+    expect(first?.getAttribute('data-sort')).toBe('')
+    fireEvent.click(screen.getByText('Order'))
+    expect(first?.getAttribute('data-sort')).toBe('asc')
+    fireEvent.click(screen.getByText('Order'))
+    expect(first?.getAttribute('data-sort')).toBe('desc')
+    const [firstCell] = screen.getAllByTestId(/cell/)
+    expect(firstCell).toBeDefined()
+    expect(firstCell?.getAttribute('data-testid')).toBe('cell-0')
+    expect(first?.textContent).not.toBe('')
+  })
+  it<LocalContext>('Show orders list empty', async (ctx) => {
+    const { accessToken, endpoint } = await getToken('customer_empty')
+    if (accessToken !== undefined) {
+      ctx.accessToken = accessToken
+      ctx.endpoint = endpoint
+    }
+    render(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <CustomerContainer>
+          <OrderList columns={columns}>
+            <OrderListEmpty />
+            <OrderListRow field='number' />
+            <OrderListRow field='status' className='align-top py-5 border-b' />
+            <OrderListRow
+              field='updated_at'
+              className='align-top py-5 border-b'
+            />
+            <OrderListRow
+              field='formatted_total_amount_with_taxes'
+              className='align-top py-5 border-b font-bold'
+            />
+          </OrderList>
+        </CustomerContainer>
+      </CommerceLayer>
+    )
+    expect(screen.getByText('Loading...'))
+    await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+      timeout: 5000
+    })
+    expect(screen.getByText('No orders available'))
+  })
+  it<LocalContext>('Show orders list empty with custom component', async (ctx) => {
+    const { accessToken, endpoint } = await getToken('customer_empty')
+    if (accessToken !== undefined) {
+      ctx.accessToken = accessToken
+      ctx.endpoint = endpoint
+    }
+    render(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <CustomerContainer>
+          <OrderList columns={columns}>
+            <OrderListEmpty>
+              {() => <>There are not any orders available</>}
+            </OrderListEmpty>
+            <OrderListRow field='number' />
+            <OrderListRow field='status' className='align-top py-5 border-b' />
+            <OrderListRow
+              field='updated_at'
+              className='align-top py-5 border-b'
+            />
+            <OrderListRow
+              field='formatted_total_amount_with_taxes'
+              className='align-top py-5 border-b font-bold'
+            />
+          </OrderList>
+        </CustomerContainer>
+      </CommerceLayer>
+    )
+    expect(screen.getByText('Loading...'))
+    await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+      timeout: 5000
+    })
+    expect(screen.getByText('There are not any orders available'))
+  })
+  it<LocalContext>('Show orders list with custom loading even if there is OrderListEmpty', async (ctx) => {
+    render(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <CustomerContainer>
+          <OrderList columns={columns} loadingElement={<>Custom loading...</>}>
+            <OrderListEmpty />
+            <OrderListRow field='number' />
+            <OrderListRow field='status' className='align-top py-5 border-b' />
+            <OrderListRow
+              field='updated_at'
+              className='align-top py-5 border-b'
+            />
+            <OrderListRow
+              field='formatted_total_amount_with_taxes'
+              className='align-top py-5 border-b font-bold'
+            />
+          </OrderList>
+        </CustomerContainer>
+      </CommerceLayer>
+    )
+    expect(screen.getByText('Custom loading...'))
+    await waitForElementToBeRemoved(
+      () => screen.queryByText('Custom loading...'),
+      {
+        timeout: 5000
+      }
+    )
+    const [first] = screen.getAllByTestId(/thead/)
+    expect(first).toBeDefined()
+    expect(first?.getAttribute('data-testid')).toBe('thead-0')
+    expect(first?.textContent).not.toBe('')
+    expect(first?.tagName).toBe('TH')
+    expect(screen.getByText('Order')).toBeDefined()
+    const [firstCell] = screen.getAllByTestId(/cell/)
+    expect(firstCell).toBeDefined()
+    expect(firstCell?.getAttribute('data-testid')).toBe('cell-0')
+    expect(firstCell?.tagName).toBe('TD')
+    expect(firstCell?.textContent).not.toBe('')
+  })
+  it<LocalContext>('Show orders list with actions and custom Order list row', async (ctx) => {
+    render(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <CustomerContainer>
+          <OrderList
+            columns={columns}
+            showActions
+            actionsComponent={() => <>Actions</>}
+            actionsContainerClassName='action-container-class'
+          >
+            <OrderListEmpty />
+            <OrderListRow field='number'>
+              {({ cell, order, infiniteScroll, ...p }) => {
+                return (
+                  <>
+                    {cell?.map((cell, k) => {
+                      return (
+                        <td
+                          {...p}
+                          {...cell.getCellProps()}
+                          className='py-5 border-b'
+                          key={k}
+                          data-testid={`custom-cell-${k}`}
+                        >
+                          <p className='font-bold'>
+                            Order # {cell.render('Cell')}
+                          </p>
+                          <p className='text-xs text-gray-500'>
+                            contains {order.skus_count} items
+                          </p>
+                        </td>
+                      )
+                    })}
+                  </>
+                )
+              }}
+            </OrderListRow>
+            <OrderListRow field='status' className='align-top py-5 border-b' />
+            <OrderListRow
+              field='updated_at'
+              className='align-top py-5 border-b'
+            />
+            <OrderListRow
+              field='formatted_total_amount_with_taxes'
+              className='align-top py-5 border-b font-bold'
+            />
+          </OrderList>
+        </CustomerContainer>
+      </CommerceLayer>
+    )
+    expect(screen.getByText('Loading...'))
+    await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+      timeout: 5000
+    })
+    const [first] = screen.getAllByTestId(/thead/)
+    expect(first).toBeDefined()
+    expect(first?.getAttribute('data-testid')).toBe('thead-0')
+    expect(first?.textContent).not.toBe('')
+    expect(first?.tagName).toBe('TH')
+    expect(screen.getByText('Order')).toBeDefined()
+    const [firstCell] = screen.getAllByTestId(/cell/)
+    expect(firstCell).toBeDefined()
+    expect(firstCell?.getAttribute('data-testid')).toBe('custom-cell-0')
+    expect(firstCell?.tagName).toBe('TD')
+    expect(firstCell?.textContent).not.toBe('')
+    expect(firstCell?.textContent).toContain('Order #')
+    const [action] = screen.getAllByTestId('action-cell')
+    expect(action).toBeDefined()
+    expect(action?.getAttribute('data-testid')).toBe('action-cell')
+    expect(action?.className).toBe('action-container-class')
+  })
+  it<LocalContext>('Show orders list with infinite scroll', async (ctx) => {
+    render(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <CustomerContainer>
+          <OrderList columns={columns} infiniteScroll>
+            <OrderListEmpty />
+            <OrderListRow field='number' />
+            <OrderListRow field='status' className='align-top py-5 border-b' />
+            <OrderListRow
+              field='updated_at'
+              className='align-top py-5 border-b'
+            />
+            <OrderListRow
+              field='formatted_total_amount_with_taxes'
+              className='align-top py-5 border-b font-bold'
+            />
+          </OrderList>
+        </CustomerContainer>
+      </CommerceLayer>
+    )
+    expect(screen.getByText('Loading...'))
+    await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+      timeout: 5000
+    })
+    const [first] = screen.getAllByTestId(/thead/)
+    expect(first).toBeDefined()
+    expect(first?.getAttribute('data-testid')).toBe('thead-0')
+    expect(first?.tagName).toBe('DIV')
+    expect(screen.getByText('Order')).toBeDefined()
+    expect(first?.textContent).not.toBe('')
+    const [firstCell] = screen.getAllByTestId(/cell/)
+    expect(firstCell).toBeDefined()
+    expect(firstCell?.getAttribute('data-testid')).toBe('cell-0')
+    expect(firstCell?.tagName).toBe('DIV')
+    expect(firstCell?.textContent).not.toBe('')
+  })
+  it<LocalContext>('Show orders list with infinite scroll with windowOptions', async (ctx) => {
+    render(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <CustomerContainer>
+          <OrderList
+            columns={columns}
+            infiniteScroll
+            windowOptions={{
+              column: 200,
+              height: 500,
+              itemSize: 200,
+              width: 400
+            }}
+          >
+            <OrderListEmpty />
+            <OrderListRow field='number' />
+            <OrderListRow field='status' className='align-top py-5 border-b' />
+            <OrderListRow
+              field='updated_at'
+              className='align-top py-5 border-b'
+            />
+            <OrderListRow
+              field='formatted_total_amount_with_taxes'
+              className='align-top py-5 border-b font-bold'
+            />
+          </OrderList>
+        </CustomerContainer>
+      </CommerceLayer>
+    )
+    expect(screen.getByText('Loading...'))
+    await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+      timeout: 5000
+    })
+    const [first] = screen.getAllByTestId(/thead/)
+    expect(first).toBeDefined()
+    expect(first?.getAttribute('data-testid')).toBe('thead-0')
+    expect(first?.tagName).toBe('DIV')
+    expect(screen.getByText('Order')).toBeDefined()
+    expect(first?.textContent).not.toBe('')
+    expect(first?.getAttribute('data-sort')).toBe('')
+    fireEvent.click(screen.getByText('Order'))
+    expect(first?.getAttribute('data-sort')).toBe('asc')
+    fireEvent.click(screen.getByText('Order'))
+    expect(first?.getAttribute('data-sort')).toBe('desc')
+    const [firstCell] = screen.getAllByTestId(/cell/)
+    expect(firstCell).toBeDefined()
+    expect(firstCell?.getAttribute('data-testid')).toBe('cell-0')
+    expect(firstCell?.tagName).toBe('DIV')
+    expect(firstCell?.textContent).not.toBe('')
   })
 })
