@@ -101,6 +101,7 @@ export type ResourceIncluded =
   | 'shipments.shipping_method'
   | 'shipments.stock_location'
   | 'shipments.parcels'
+  | 'shipments.parcels.parcel_line_items'
   | 'payment_source'
   | 'available_payment_methods'
   | 'payment_method'
@@ -226,7 +227,7 @@ export const getApiOrder: GetOrder = async (
     const order = await sdk.orders.retrieve(id as string, options)
     if (
       (clearWhenPlaced && order.status === 'placed') ||
-      order.status === 'approved' ||
+      (clearWhenPlaced && order.status === 'approved') ||
       order.status === 'cancelled'
     ) {
       persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)

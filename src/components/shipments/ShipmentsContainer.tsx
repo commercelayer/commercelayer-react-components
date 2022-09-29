@@ -31,7 +31,7 @@ export function ShipmentsContainer(props: Props): JSX.Element {
           'shipments.shipping_method',
           'shipments.stock_transfers.line_item',
           'shipments.stock_location',
-          'shipments.parcels'
+          'shipments.parcels.parcel_line_items'
         ]
       })
     } else if (!includeLoaded?.['shipments.available_shipping_methods']) {
@@ -42,7 +42,7 @@ export function ShipmentsContainer(props: Props): JSX.Element {
           'shipments.shipping_method': true,
           'shipments.stock_transfers.line_item': true,
           'shipments.stock_location': true,
-          'shipments.parcels': true
+          'shipments.parcels.parcel_line_items': true
         }
       })
     }

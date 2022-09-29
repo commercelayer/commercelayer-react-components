@@ -6,7 +6,7 @@ interface Props {
   children: JSX.Element | JSX.Element[]
 }
 
-export function Parcel({ children }: Props): JSX.Element {
+export function Parcels({ children }: Props): JSX.Element {
   const { parcels } = useContext(ShipmentChildrenContext)
   const components =
     parcels?.map((parcel, key): JSX.Element => {
@@ -19,4 +19,4 @@ export function Parcel({ children }: Props): JSX.Element {
   return <>{components}</>
 }
 
-export default Parcel
+export default Parcels

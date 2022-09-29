@@ -1,17 +1,29 @@
 import { InitialSkuContext } from '#context/SkuChildrenContext'
 import { InitialStockTransferContext } from '#context/StockTransferChildrenContext'
-import type { Customer, LineItem, Sku } from '@commercelayer/sdk'
+import type {
+  Customer,
+  LineItem,
+  Sku,
+  Parcel,
+  ParcelLineItem
+} from '@commercelayer/sdk'
 import Parent from './Parent'
 import { InitialLineItemContext } from '#context/LineItemChildrenContext'
 import { Context, useContext } from 'react'
 import { defaultImgUrl } from '#utils/placeholderImages'
 import { InitialCustomerContext } from '#context/CustomerContext'
+import { InitialParcelContext } from '#context/ParcelChildrenContext'
+import { InitialParcelLineItemContext } from '#context/ParcelLineItemChildrenContext'
 
-export type TResources = {
+export interface TResources {
   StockTransfer: LineItem & { resource: 'stock_transfers' }
   Sku: Sku & { resource: 'skus' }
   LineItem: LineItem & { resource: 'line_items' }
   Customer: Customer & { resource: 'customers' }
+  Parcel: Pick<Parcel, 'number' | 'tracking_number'> & { resource: 'parcel' }
+  ParcelLineItem: Pick<ParcelLineItem, 'quantity' | 'sku_code'> & {
+    resource: 'parcelLineItem'
+  }
 }
 
 export type TResourceKey = {
@@ -23,18 +35,20 @@ export type TGenericChildrenProps<E extends TResources[keyof TResources]> =
     attributeValue: E[keyof E]
   }
 
-type ResourceContext = {
+interface ResourceContext {
   stock_transfers: InitialStockTransferContext
   skus: InitialSkuContext
   line_items: InitialLineItemContext
   customers: InitialCustomerContext
+  parcel: InitialParcelContext
+  parcelLineItem: InitialParcelLineItemContext
 }
 
 type GenericContext<K extends keyof ResourceContext> = Context<
   ResourceContext[K]
 >
 
-type Props<E extends TResources[keyof TResources]> = {
+interface Props<E extends TResources[keyof TResources]> {
   children?: (props: TGenericChildrenProps<E>) => JSX.Element
   resource: E['resource']
   attribute: keyof E
@@ -44,12 +58,12 @@ type Props<E extends TResources[keyof TResources]> = {
 
 export default function GenericFieldComponent<R extends keyof TResources>(
   props: Props<TResources[R]>
-) {
+): JSX.Element {
   const { children, tagElement, attribute, context, ...p } = props
   const resourceContext = useContext(context)
   let attributeValue = ''
   const keysContext = Object.keys(resourceContext).filter(
-    (key) => key === p['resource']
+    (key) => key === p.resource
   ) as [keyof ResourceContext[keyof ResourceContext]]
   if (keysContext.length === 1) {
     const [keyResource] = keysContext
@@ -66,7 +80,7 @@ export default function GenericFieldComponent<R extends keyof TResources>(
   const parentProps = {
     attributeValue,
     tagElement,
-    ...p,
+    ...p
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
