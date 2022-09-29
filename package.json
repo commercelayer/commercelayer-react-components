@@ -48,7 +48,7 @@
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
     "@ac-dev/countries-service": "^1.2.0",
-    "@ac-dev/states-service": "^1.1.0",
+    "@ac-dev/states-service": "^1.1.1",
     "@adyen/adyen-web": "^5.21.0",
     "@commercelayer/sdk": "^4.15.1",
     "@stripe/react-stripe-js": "^1.10.0",
