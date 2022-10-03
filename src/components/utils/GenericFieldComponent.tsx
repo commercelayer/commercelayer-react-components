@@ -20,8 +20,12 @@ export interface TResources {
   Sku: Sku & { resource: 'skus' }
   LineItem: LineItem & { resource: 'line_items' }
   Customer: Customer & { resource: 'customers' }
-  Parcel: Pick<Parcel, 'number' | 'tracking_number'> & { resource: 'parcel' }
-  ParcelLineItem: Pick<ParcelLineItem, 'quantity' | 'sku_code'> & {
+  Parcel: Parcel & { resource: 'parcel' }
+  ParcelLineItem: Pick<
+    ParcelLineItem,
+    // @ts-expect-error
+    'quantity' | 'sku_code' | 'name' | 'image_url'
+  > & {
     resource: 'parcelLineItem'
   }
 }
