@@ -67,6 +67,10 @@ export default function Main() {
                     <ParcelLineItemField tagElement='p' attribute='sku_code' data-testid="test" />
                     <p>{'Quantity'}</p>
                     <ParcelLineItemField tagElement='p' attribute='quantity' />
+                    <p>{'Name'}</p>
+                    <ParcelLineItemField tagElement='p' attribute='name' />
+                    <p>{'Image'}</p>
+                    <ParcelLineItemField tagElement='img' attribute='image_url' />
                   </ParcelLineItem>
                 </Parcels>
               </Shipment>

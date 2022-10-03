@@ -8,14 +8,13 @@ interface Props {
 
 export function Parcels({ children }: Props): JSX.Element {
   const { parcels } = useContext(ShipmentChildrenContext)
-  const components =
-    parcels?.map((parcel, key): JSX.Element => {
-      return (
-        <ParcelChildrenContext.Provider key={key} value={{ parcel }}>
-          {children}
-        </ParcelChildrenContext.Provider>
-      )
-    }) ?? null
+  const components = parcels?.map((parcel, key): JSX.Element => {
+    return (
+      <ParcelChildrenContext.Provider key={key} value={{ parcel }}>
+        {children}
+      </ParcelChildrenContext.Provider>
+    )
+  })
   return <>{components}</>
 }
 
