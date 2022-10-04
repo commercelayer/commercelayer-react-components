@@ -12,6 +12,7 @@ import {
   ParcelField,
   ParcelLineItem,
   ParcelLineItemField,
+  ShipmentsCount,
 } from '@commercelayer/react-components'
 import { useRouter } from 'next/router'
 
@@ -59,6 +60,7 @@ export default function Main() {
                 <div className="flex">
                   Shipments N:
                   <ShipmentField className="font-bold pl-1" name="key_number" />
+                  /<ShipmentsCount className="font-bold pl-1" />
                 </div>
                 <Parcels>
                   <ParcelField attribute='number' tagElement='span' />
