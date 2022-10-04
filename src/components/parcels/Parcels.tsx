@@ -4,17 +4,20 @@ import { useContext } from 'react'
 
 interface Props {
   children: JSX.Element | JSX.Element[]
+  filterBy?: string[]
 }
 
-export function Parcels({ children }: Props): JSX.Element {
+export function Parcels({ children, filterBy }: Props): JSX.Element {
   const { parcels } = useContext(ShipmentChildrenContext)
-  const components = parcels?.map((parcel, key): JSX.Element => {
-    return (
-      <ParcelChildrenContext.Provider key={key} value={{ parcel }}>
-        {children}
-      </ParcelChildrenContext.Provider>
-    )
-  })
+  const components = parcels
+    ?.filter((parcel) => filterBy?.includes(parcel.id) ?? true)
+    .map((parcel, key): JSX.Element => {
+      return (
+        <ParcelChildrenContext.Provider key={key} value={{ parcel }}>
+          {children}
+        </ParcelChildrenContext.Provider>
+      )
+    })
   return <>{components}</>
 }
 
