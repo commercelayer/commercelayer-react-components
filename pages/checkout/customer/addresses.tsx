@@ -24,8 +24,8 @@ import getSdk from '#utils/getSdk'
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
-const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
-const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
+const username = process.env.NEXT_PUBLIC_USERNAME as string
+const password = process.env.NEXT_PUBLIC_PASSWORD as string
 let orderId = 'PDerhJplRp'
 
 const NestedInput = ({ value }: any) => {
