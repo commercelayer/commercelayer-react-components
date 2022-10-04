@@ -6,15 +6,15 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource,
+  PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import getCardDetails from '#utils/getCardDetails'
 import isEmpty from 'lodash/isEmpty'
 import { useContext } from 'react'
 
-type PaypalGateway = Partial<GatewayBaseType>
+type Props = Partial<GatewayBaseType>
 
-export function PaypalGateway(props: PaypalGateway) {
+export function PaypalGateway(props: Props): JSX.Element | null {
   const { readonly, showCard, handleEditClick, children, ...p } = props
   const { order } = useContext(OrderContext)
   const { payment } = useContext(PaymentMethodChildrenContext)
@@ -26,9 +26,9 @@ export function PaypalGateway(props: PaypalGateway) {
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
-        payment_source: order?.payment_source || paymentSource,
+        payment_source: order?.payment_source || paymentSource
       },
-      paymentType: paymentResource,
+      paymentType: paymentResource
     })
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (

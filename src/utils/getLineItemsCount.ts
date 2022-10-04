@@ -6,7 +6,7 @@ export type TypeAccepted = Extract<
   'skus' | 'gift_cards' | 'bundles' | 'adjustments'
 >
 
-type Args = {
+interface Args {
   lineItems: LineItem[]
   quantity?: number
   typeAccepted?: TypeAccepted[]
@@ -15,7 +15,7 @@ type Args = {
 export default function getLineItemsCount({
   lineItems,
   quantity = 0,
-  typeAccepted = ['skus', 'gift_cards', 'bundles', 'adjustments'],
+  typeAccepted = ['skus', 'gift_cards', 'bundles', 'adjustments']
 }: Args): number {
   lineItems
     .filter(

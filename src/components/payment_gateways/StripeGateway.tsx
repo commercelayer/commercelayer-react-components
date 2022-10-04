@@ -7,7 +7,7 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource,
+  PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import getCardDetails from '#utils/getCardDetails'
 import { StripeElementLocale } from '@stripe/stripe-js'
@@ -15,9 +15,9 @@ import isEmpty from 'lodash/isEmpty'
 import React from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
-type StripeGateway = GatewayBaseType
+type Props = GatewayBaseType
 
-export function StripeGateway(props: StripeGateway): JSX.Element | null {
+export function StripeGateway(props: Props): JSX.Element | null {
   const {
     readonly,
     showCard,
@@ -55,9 +55,9 @@ export function StripeGateway(props: StripeGateway): JSX.Element | null {
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
-        payment_source: paymentSource,
+        payment_source: paymentSource
       },
-      paymentType: paymentResource,
+      paymentType: paymentResource
     })
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (

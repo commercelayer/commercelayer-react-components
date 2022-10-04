@@ -8,14 +8,14 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource,
+  PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import isEmpty from 'lodash/isEmpty'
-import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
+import PaymentCardsTemplate from '#components-utils/PaymentCardsTemplate'
 
-type KlarnaGateway = GatewayBaseType
+type Props = GatewayBaseType
 
-export function KlarnaGateway(props: KlarnaGateway) {
+export function KlarnaGateway(props: Props): JSX.Element | null {
   const {
     readonly,
     showCard,
@@ -35,7 +35,7 @@ export function KlarnaGateway(props: KlarnaGateway) {
   const locale = order?.language_code
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-ignore
+  // @ts-expect-error
   const clientToken = paymentSource?.client_token
   const klarnaConfig = config
     ? getPaymentConfig<'klarnaPayment'>(paymentResource, config)
@@ -48,7 +48,7 @@ export function KlarnaGateway(props: KlarnaGateway) {
       : []
 
   if (readonly || showCard) {
-    // @ts-ignore
+    // @ts-expect-error
     const card = paymentSource?.options?.card
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (

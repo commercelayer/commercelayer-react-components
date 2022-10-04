@@ -7,17 +7,17 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource,
+  PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React from 'react'
-import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
-import getCardDetails from '../../utils/getCardDetails'
+import PaymentCardsTemplate from '#components-utils/PaymentCardsTemplate'
+import getCardDetails from '#utils/getCardDetails'
 
-type CheckoutComGateway = GatewayBaseType
+type Props = GatewayBaseType
 
-export function CheckoutComGateway(props: CheckoutComGateway) {
+export function CheckoutComGateway(props: Props): JSX.Element | null {
   const {
     readonly,
     showCard,
@@ -39,7 +39,7 @@ export function CheckoutComGateway(props: CheckoutComGateway) {
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-ignore
+  // @ts-expect-error
   const publicKey = paymentSource?.public_key
   const paymentConfig = config
     ? getPaymentConfig<'checkoutComPayment'>(paymentResource, config)
@@ -53,9 +53,9 @@ export function CheckoutComGateway(props: CheckoutComGateway) {
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
-        payment_source: paymentSource,
+        payment_source: paymentSource
       },
-      paymentType: paymentResource,
+      paymentType: paymentResource
     })
     const value = { ...card, showCard, handleEditClick, readonly }
     return !card.brand ? null : (

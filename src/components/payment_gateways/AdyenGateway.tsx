@@ -7,19 +7,19 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource,
+  PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
-import { Fragment, useContext } from 'react'
+import { useContext } from 'react'
 import AdyenPayment from '#components/payment_source/AdyenPayment'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 import jwt from '#utils/jwt'
 import getCardDetails from '#utils/getCardDetails'
 
-type AdyenGateway = GatewayBaseType
+type Props = GatewayBaseType
 
-export function AdyenGateway(props: AdyenGateway) {
+export function AdyenGateway(props: Props): JSX.Element | null {
   const {
     readonly,
     showCard,
@@ -39,10 +39,10 @@ export function AdyenGateway(props: AdyenGateway) {
     useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = 'adyen_payments'
   const locale = order?.language_code as StripeElementLocale
-  // @ts-ignore
+  // @ts-expect-error
   const paymentMethods = paymentSource?.payment_methods
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-ignore
+  // @ts-expect-error
   const clientKey = paymentSource?.public_key
   const environment = jwt(accessToken).test ? 'test' : 'live'
   const adyenConfig = config
@@ -58,9 +58,9 @@ export function AdyenGateway(props: AdyenGateway) {
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
-        payment_source: paymentSource,
+        payment_source: paymentSource
       },
-      paymentType: paymentResource,
+      paymentType: paymentResource
     })
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (
@@ -71,9 +71,8 @@ export function AdyenGateway(props: AdyenGateway) {
   }
 
   if (!isGuest && templateCustomerCards) {
-    // @ts-ignore
     return clientKey && !loading && paymentMethods ? (
-      <Fragment>
+      <>
         {isEmpty(customerPayments) ? null : (
           <div className={p.className}>
             <PaymentCardsTemplate {...{ paymentResource, customerPayments }}>
@@ -88,12 +87,11 @@ export function AdyenGateway(props: AdyenGateway) {
           environment={environment}
           config={adyenConfig}
         />
-      </Fragment>
+      </>
     ) : (
       loaderComponent
     )
   }
-  // @ts-ignore
   return clientKey && !loading && paymentMethods ? (
     <AdyenPayment
       clientKey={clientKey}

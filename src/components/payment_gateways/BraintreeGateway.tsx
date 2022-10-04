@@ -7,17 +7,17 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource,
+  PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import getCardDetails from '#utils/getCardDetails'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
-import { Fragment, useContext } from 'react'
+import { useContext } from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
-type BraintreeGateway = GatewayBaseType
+type Props = GatewayBaseType
 
-export function BraintreeGateway(props: BraintreeGateway) {
+export function BraintreeGateway(props: Props): JSX.Element | null {
   const {
     readonly,
     showCard,
@@ -38,7 +38,7 @@ export function BraintreeGateway(props: BraintreeGateway) {
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-ignore
+  // @ts-expect-error
   const authorization = paymentSource?.client_token
   const braintreeConfig = config
     ? getPaymentConfig<'braintreePayment'>(paymentResource, config)
@@ -52,9 +52,9 @@ export function BraintreeGateway(props: BraintreeGateway) {
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
-        payment_source: paymentSource,
+        payment_source: paymentSource
       },
-      paymentType: paymentResource,
+      paymentType: paymentResource
     })
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (
@@ -65,7 +65,7 @@ export function BraintreeGateway(props: BraintreeGateway) {
   }
   if (!isGuest && templateCustomerCards) {
     return authorization && !loading ? (
-      <Fragment>
+      <>
         {isEmpty(customerPayments) ? null : (
           <div className={p.className}>
             <PaymentCardsTemplate {...{ paymentResource, customerPayments }}>
@@ -79,7 +79,7 @@ export function BraintreeGateway(props: BraintreeGateway) {
           locale={locale}
           config={braintreeConfig}
         />
-      </Fragment>
+      </>
     ) : (
       loaderComponent
     )

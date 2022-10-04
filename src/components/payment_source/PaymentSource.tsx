@@ -1,23 +1,19 @@
 import { useContext, ReactNode, useState, useEffect } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
-import components from '#config/components'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import CustomerContext from '#context/CustomerContext'
 import PaymentGateway from '../payment_gateways/PaymentGateway'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { LoaderType } from '#typings/index'
 import { CustomerCardsTemplateChildren } from '../utils/PaymentCardsTemplate'
-import getCardDetails from '../../utils/getCardDetails'
+import getCardDetails from '#utils/getCardDetails'
 import OrderContext from '#context/OrderContext'
 
-const propTypes = components.PaymentSource.propTypes
-const displayName = components.PaymentSource.displayName
-
-export type CustomerCardsProps = {
+export interface CustomerCardsProps {
   handleClick: () => void
 }
 
-export type CustomerSaveToWalletProps = {
+export interface CustomerSaveToWalletProps {
   name: 'save_payment_source_to_customer_wallet'
 }
 
@@ -32,7 +28,7 @@ export type PaymentSourceProps = {
   loader?: LoaderType
 } & JSX.IntrinsicElements['div']
 
-export function PaymentSource(props: PaymentSourceProps) {
+export function PaymentSource(props: PaymentSourceProps): JSX.Element {
   const { readonly } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
@@ -51,8 +47,8 @@ export function PaymentSource(props: PaymentSourceProps) {
       const card = getCardDetails({
         paymentType: payment?.payment_source_type as PaymentResource,
         customerPayment: {
-          payment_source: paymentSource,
-        },
+          payment_source: paymentSource
+        }
       })
       if (card.brand) setShowCard(true)
     } else setShow(false)
@@ -66,15 +62,15 @@ export function PaymentSource(props: PaymentSourceProps) {
     payments,
     payment,
     readonly,
-    order,
+    order
   ])
-  const handleEditClick = async (e: MouseEvent) => {
+  const handleEditClick = async (e: MouseEvent): Promise<void> => {
     e.stopPropagation()
     if (paymentSource) {
       const paymentSourceId = paymentSource?.id
       await destroyPaymentSource({
         paymentSourceId,
-        paymentResource: payment?.payment_source_type as PaymentResource,
+        paymentResource: payment?.payment_source_type as PaymentResource
       })
     }
     setShowCard(!showCard)
@@ -83,8 +79,5 @@ export function PaymentSource(props: PaymentSourceProps) {
   const gatewayProps = { ...props, show, showCard, handleEditClick, readonly }
   return <PaymentGateway {...gatewayProps} />
 }
-
-PaymentSource.propTypes = propTypes
-PaymentSource.displayName = displayName
 
 export default PaymentSource
