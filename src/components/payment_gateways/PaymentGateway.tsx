@@ -40,7 +40,7 @@ export function PaymentGateway({
   show,
   loader = 'Loading...',
   ...p
-}: Props) {
+}: Props): JSX.Element | null {
   const loaderComponent = getLoaderComponent(loader)
   const [loading, setLoading] = useState(true)
   const { payment } = useContext(PaymentMethodChildrenContext)
@@ -51,7 +51,7 @@ export function PaymentGateway({
     config,
     currentPaymentMethodType,
     setPaymentSource,
-    paymentSource,
+    paymentSource
   } = useContext(PaymentMethodContext)
   const paymentResource = readonly
     ? currentPaymentMethodType
@@ -66,20 +66,20 @@ export function PaymentGateway({
         config && paymentResource === 'paypal_payments'
           ? getPaypalConfig(paymentResource, config)
           : {}
-      const setPaymentSources = async () => {
+      const setPaymentSources = async (): Promise<void> => {
         await setPaymentSource({
           paymentResource,
           order,
-          attributes,
+          attributes
         })
-        getCustomerPaymentSources && getCustomerPaymentSources()
+        if (getCustomerPaymentSources) getCustomerPaymentSources()
       }
       if (!paymentSource && order?.payment_method.id && show) {
         void setPaymentSources()
       } else if (!paymentSource || paymentSource.type !== paymentResource) {
         void setPaymentSources()
       }
-      // @ts-ignore
+      // @ts-expect-error
       if (paymentSource?.mismatched_amounts && show) {
         void setPaymentSources()
       }
@@ -100,7 +100,7 @@ export function PaymentGateway({
     onClickCustomerCards,
     loaderComponent,
     templateCustomerSaveToWallet,
-    ...p,
+    ...p
   }
   switch (paymentResource) {
     case 'stripe_payments':

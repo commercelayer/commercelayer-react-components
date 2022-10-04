@@ -5,14 +5,14 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource,
+  PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import isEmpty from 'lodash/isEmpty'
 import { useContext } from 'react'
 
-type WireTransferGateway = GatewayBaseType
+type Props = GatewayBaseType
 
-export function WireTransferGateway(props: WireTransferGateway) {
+export function WireTransferGateway(props: Props): JSX.Element | null {
   const { readonly, showCard, handleEditClick, children, ...p } = props
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { currentPaymentMethodId, config, paymentSource } =
@@ -22,10 +22,8 @@ export function WireTransferGateway(props: WireTransferGateway) {
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
   if (readonly || showCard) {
     const card =
-      // @ts-ignore
-      paymentSource?.options?.card ||
-      // @ts-ignore
-      (paymentSource?.metadata?.card as Record<string, any>)
+      // @ts-expect-error
+      paymentSource?.options?.card || paymentSource?.metadata?.card
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (
       <PaymentSourceContext.Provider value={value}>

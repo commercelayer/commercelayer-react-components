@@ -43,10 +43,6 @@
       "require": "./lib/cjs/components/parcels/*.js",
       "import": "./lib/esm/components/parcels/*.js"
     },
-    "./payment_gateways/*": {
-      "require": "./lib/cjs/components/payment_gateways/*.js",
-      "import": "./lib/esm/components/payment_gateways/*.js"
-    },
     "./payment_methods/*": {
       "require": "./lib/cjs/components/payment_methods/*.js",
       "import": "./lib/esm/components/payment_methods/*.js"
@@ -98,9 +94,6 @@
       ],
       "parcels/*": [
         "lib/esm/components/parcels/*.d.ts"
-      ],
-      "payment_gateways/*": [
-        "lib/esm/components/payment_gateways/*.d.ts"
       ],
       "payment_methods/*": [
         "lib/esm/components/payment_methods/*.d.ts"
