@@ -21,7 +21,11 @@ interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
 
 export function ShipmentsCount({ children, ...p }: Props): JSX.Element {
   const { shipments } = useContext(ShipmentContext)
-  const quantity = shipments?.length ?? 0
+  if (shipments === undefined)
+    throw new Error(
+      'Cannot use `ShipmentsCount` outside of `ShipmentsContainer`'
+    )
+  const quantity = shipments.length
   const childrenProps: ChildrenProps = {
     ...p,
     quantity,
