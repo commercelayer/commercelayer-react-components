@@ -9,7 +9,10 @@ const displayName = components.PaymentMethodName.displayName
 type PaymentMethodNameChildrenProps = Omit<
   PaymentMethodNameProps,
   'children'
-> & { labelName: string }
+> & { 
+  labelName: string 
+  imagePath: string
+}
 
 type PaymentMethodNameProps = {
   children?: (props: PaymentMethodNameChildrenProps) => ReactNode
@@ -21,6 +24,10 @@ const PaymentMethodName: FunctionComponent<PaymentMethodNameProps> = (
   const { payment } = useContext(PaymentMethodChildrenContext)
   let labelName = payment?.['name']
   let htmlFor = payment?.payment_source_type
+  let imagePath = ''
+  if (payment?.metadata && payment.metadata['image_path']) {
+    imagePath = payment?.metadata['image_path']
+  }
 
   if (payment?.reference) {
     htmlFor = payment.reference
@@ -76,6 +83,7 @@ const PaymentMethodName: FunctionComponent<PaymentMethodNameProps> = (
   const parentProps = {
     htmlFor,
     labelName,
+    imagePath,
     ...props,
   }
   return props.children ? (
