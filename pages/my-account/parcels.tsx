@@ -13,7 +13,8 @@ import {
   ParcelLineItem,
   ParcelLineItemField,
   ShipmentsCount,
-  ParcelsCount
+  ParcelsCount,
+  ParcelLineItemsCount
 } from '@commercelayer/react-components'
 import { useRouter } from 'next/router'
 
@@ -67,6 +68,9 @@ export default function Main() {
                     Total parcels: <ParcelsCount />
                   </p>
                 <Parcels>
+                  <p>
+                    Parcel line Items count: <ParcelLineItemsCount />
+                  </p>
                   <ParcelField attribute='number' tagElement='span' />
                   <ParcelLineItem>
                     <p>{'Sku code'}</p>

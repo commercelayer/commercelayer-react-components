@@ -9,6 +9,7 @@ import Shipment from '#components/shipments/Shipment'
 import ShipmentField from '#components/shipments/ShipmentField'
 import ShipmentsContainer from '#components/shipments/ShipmentsContainer'
 import ShipmentsCount from '#components/shipments/ShipmentsCount'
+import { ParcelLineItemsCount } from '@commercelayer/react-components'
 import {
   render,
   screen,
@@ -39,8 +40,9 @@ describe('Parcels components', () => {
             <Shipment>
               <ShipmentsCount data-testid='shipments-count' />
               <ShipmentField data-testid='shipment-number' name='key_number' />
+              <ParcelsCount data-testid='parcels-count' />
               <Parcels>
-                <ParcelsCount data-testid='parcels-count' />
+                <ParcelLineItemsCount data-testid='parcel-line-items-count' />
                 <ParcelField
                   data-testid='parcel-number'
                   attribute='number'
@@ -63,6 +65,9 @@ describe('Parcels components', () => {
     const parcelsCount = screen.getByTestId(`parcels-count`)
     expect(parcelsCount).toBeDefined()
     expect(parcelsCount.textContent).not.toBe('')
+    const parcelLineItemsCount = screen.getByTestId(`parcel-line-items-count`)
+    expect(parcelLineItemsCount).toBeDefined()
+    expect(parcelLineItemsCount.textContent).not.toBe('')
     const parcel = screen.getByTestId(`parcel-number`)
     expect(parcel).toBeDefined()
     expect(parcel.tagName).toBe('SPAN')
@@ -118,10 +123,17 @@ describe('Parcels components', () => {
           <ShipmentsContainer>
             <Shipment>
               <ShipmentField data-testid='shipment-number' name='key_number' />
+              <ParcelsCount>
+                {(props) => <>{props.parcels?.length ?? 0}</>}
+              </ParcelsCount>
               <Parcels>
-                <ParcelsCount>
-                  {(props) => <>{props.parcels?.length ?? 0}</>}
-                </ParcelsCount>
+                <ParcelLineItemsCount>
+                  {(props) => (
+                    <span data-testid='parcel-line-items-count'>
+                      {props.parcel?.parcel_line_items?.length ?? 0}
+                    </span>
+                  )}
+                </ParcelLineItemsCount>
                 <ParcelField attribute='number' tagElement='span' />
                 <ParcelLineItem>
                   <ParcelLineItemField
@@ -146,6 +158,9 @@ describe('Parcels components', () => {
       timeout: 5000
     })
     expect(screen.getByTestId(`shipment-number`)).toBeDefined()
+    const parcelLineItemsCount = screen.getByTestId(`parcel-line-items-count`)
+    expect(parcelLineItemsCount).toBeDefined()
+    expect(parcelLineItemsCount.textContent).not.toBe('')
     const parcelLineItemSku = screen.getByTestId(`parcel-line-item-sku-code`)
     expect(parcelLineItemSku).toBeDefined()
     expect(parcelLineItemSku.tagName).toBe('P')
@@ -206,6 +221,7 @@ describe('Parcels components', () => {
               <ShipmentField data-testid='shipment-number' name='key_number' />
               <ParcelsCount data-testid='parcels-count' />
               <Parcels>
+                <ParcelLineItemsCount />
                 <ParcelField
                   data-testid='parcel-number'
                   attribute='number'
@@ -236,6 +252,11 @@ describe('Parcels components', () => {
   it<ParcelContext>('ShipmentsCount outside of ShipmentsContainer', () => {
     expect(() => render(<ShipmentsCount />)).toThrow(
       'Cannot use `ShipmentsCount` outside of `ShipmentsContainer`'
+    )
+  })
+  it<ParcelContext>('ParcelLineItemsCount outside of Parcels', () => {
+    expect(() => render(<ParcelLineItemsCount />)).toThrow(
+      'Cannot use `ParcelLineItemsCount` outside of `Parcels`'
     )
   })
 })
