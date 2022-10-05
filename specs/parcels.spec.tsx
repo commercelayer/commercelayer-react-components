@@ -4,9 +4,11 @@ import ParcelField from '#components/parcels/ParcelField'
 import ParcelLineItem from '#components/parcels/ParcelLineItem'
 import { ParcelLineItemField } from '#components/parcels/ParcelLineItemField'
 import Parcels from '#components/parcels/Parcels'
+import { ParcelsCount } from '#components/parcels/ParcelsCount'
 import Shipment from '#components/shipments/Shipment'
 import ShipmentField from '#components/shipments/ShipmentField'
 import ShipmentsContainer from '#components/shipments/ShipmentsContainer'
+import ShipmentsCount from '#components/shipments/ShipmentsCount'
 import {
   render,
   screen,
@@ -35,8 +37,10 @@ describe('Parcels components', () => {
         <OrderContainer orderId={ctx.orderId}>
           <ShipmentsContainer>
             <Shipment>
+              <ShipmentsCount data-testid='shipments-count' />
               <ShipmentField data-testid='shipment-number' name='key_number' />
               <Parcels>
+                <ParcelsCount data-testid='parcels-count' />
                 <ParcelField
                   data-testid='parcel-number'
                   attribute='number'
@@ -53,6 +57,55 @@ describe('Parcels components', () => {
       timeout: 5000
     })
     expect(screen.getByTestId(`shipment-number`)).toBeDefined()
+    const shipmentsCount = screen.getByTestId(`shipments-count`)
+    expect(shipmentsCount).toBeDefined()
+    expect(shipmentsCount.textContent).not.toBe('')
+    const parcelsCount = screen.getByTestId(`parcels-count`)
+    expect(parcelsCount).toBeDefined()
+    expect(parcelsCount.textContent).not.toBe('')
+    const parcel = screen.getByTestId(`parcel-number`)
+    expect(parcel).toBeDefined()
+    expect(parcel.tagName).toBe('SPAN')
+    expect(parcel.textContent).not.toBe('')
+  })
+  it<ParcelContext>('Show a parcel by a filter', async (ctx) => {
+    render(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <OrderContainer orderId={ctx.orderId}>
+          <ShipmentsContainer>
+            <Shipment>
+              <ShipmentsCount>
+                {(props) => (
+                  <span data-testid='shipments-count'>
+                    {props.shipments?.length ?? 0}
+                  </span>
+                )}
+              </ShipmentsCount>
+              <ShipmentField data-testid='shipment-number' name='key_number' />
+              <Parcels filterBy={['jezvyfrVeK']}>
+                <ParcelsCount data-testid='parcels-count' />
+                <ParcelField
+                  data-testid='parcel-number'
+                  attribute='number'
+                  tagElement='span'
+                />
+              </Parcels>
+            </Shipment>
+          </ShipmentsContainer>
+        </OrderContainer>
+      </CommerceLayer>
+    )
+    expect(screen.getByText('Loading...'))
+    await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+      timeout: 5000
+    })
+    expect(screen.getByTestId(`shipment-number`)).toBeDefined()
+    const shipmentsCount = screen.getByTestId(`shipments-count`)
+    expect(shipmentsCount).toBeDefined()
+    expect(shipmentsCount.textContent).not.toBe('')
+    const parcelsCount = screen.getByTestId(`parcels-count`)
+    expect(parcelsCount).toBeDefined()
+    expect(parcelsCount.textContent).not.toBe('')
     const parcel = screen.getByTestId(`parcel-number`)
     expect(parcel).toBeDefined()
     expect(parcel.tagName).toBe('SPAN')
@@ -66,6 +119,9 @@ describe('Parcels components', () => {
             <Shipment>
               <ShipmentField data-testid='shipment-number' name='key_number' />
               <Parcels>
+                <ParcelsCount>
+                  {(props) => <>{props.parcels?.length ?? 0}</>}
+                </ParcelsCount>
                 <ParcelField attribute='number' tagElement='span' />
                 <ParcelLineItem>
                   <ParcelLineItemField
@@ -148,6 +204,7 @@ describe('Parcels components', () => {
           <ShipmentsContainer>
             <Shipment>
               <ShipmentField data-testid='shipment-number' name='key_number' />
+              <ParcelsCount data-testid='parcels-count' />
               <Parcels>
                 <ParcelField
                   data-testid='parcel-number'
@@ -165,7 +222,20 @@ describe('Parcels components', () => {
       timeout: 5000
     })
     expect(screen.getByTestId(`shipment-number`)).toBeDefined()
+    const parcelsCount = screen.queryByTestId('parcels-count')
+    expect(parcelsCount).toBeDefined()
+    expect(parcelsCount?.textContent).toBe('0')
     const parcels = screen.queryByTestId('parcel-number')
     expect(parcels).toBeNull()
+  })
+  it<ParcelContext>('ParcelsCount outside of ShipmentsContainer', () => {
+    expect(() => render(<ParcelsCount />)).toThrow(
+      'Cannot use `ParcelsCount` outside of `ShipmentsContainer`'
+    )
+  })
+  it<ParcelContext>('ShipmentsCount outside of ShipmentsContainer', () => {
+    expect(() => render(<ShipmentsCount />)).toThrow(
+      'Cannot use `ShipmentsCount` outside of `ShipmentsContainer`'
+    )
   })
 })

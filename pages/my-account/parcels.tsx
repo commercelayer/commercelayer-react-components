@@ -63,10 +63,10 @@ export default function Main() {
                   <ShipmentField className="font-bold pl-1" name="key_number" />
                   /<ShipmentsCount className="font-bold pl-1" />
                 </div>
-                <Parcels>
                   <p>
                     Total parcels: <ParcelsCount />
                   </p>
+                <Parcels>
                   <ParcelField attribute='number' tagElement='span' />
                   <ParcelLineItem>
                     <p>{'Sku code'}</p>
