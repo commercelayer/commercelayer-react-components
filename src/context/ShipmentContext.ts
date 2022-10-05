@@ -2,7 +2,7 @@ import { createContext } from 'react'
 import {
   ShipmentState,
   SetShipmentErrors,
-  setShipmentErrors,
+  setShipmentErrors
 } from '#reducers/ShipmentReducer'
 
 type DefaultContext = {
@@ -15,9 +15,7 @@ type DefaultContext = {
 
 export const defaultShipmentContext = {
   setShipmentErrors,
-  setShippingMethod: async (): Promise<void> => {
-    return
-  },
+  setShippingMethod: async (): Promise<void> => {}
 }
 
 const ShipmentContext = createContext<DefaultContext>(defaultShipmentContext)
