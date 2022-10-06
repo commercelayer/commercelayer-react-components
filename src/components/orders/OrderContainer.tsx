@@ -11,7 +11,8 @@ import orderReducer, {
   UpdateOrderArgs,
   SaveAddressToCustomerAddressBook,
   updateOrder,
-  ResourceIncluded
+  ResourceIncluded,
+  addToCart
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext, { defaultOrderContext } from '#context/OrderContext'
@@ -197,7 +198,7 @@ export function OrderContainer(props: Props): JSX.Element {
           setLocalOrder
         }),
       addToCart: async (values: AddToCartValues) =>
-        await defaultOrderContext.addToCart({
+        await addToCart({
           ...values,
           persistKey,
           dispatch,

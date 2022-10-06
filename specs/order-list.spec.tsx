@@ -42,13 +42,21 @@ const columns: OrderListColumn[] = [
 ]
 
 describe('Orders list', () => {
-  beforeEach<OrderListContext>(async (ctx) => {
+  let token: string | undefined
+  let domain: string | undefined
+  beforeAll(async () => {
     const { accessToken, endpoint } = await getToken('customer')
     if (accessToken !== undefined) {
-      ctx.accessToken = accessToken
-      ctx.endpoint = endpoint
+      token = accessToken
+      domain = endpoint
     }
-    ctx.columns = columns
+  })
+  beforeEach<OrderListContext>(async (ctx) => {
+    if (token != null && domain != null) {
+      ctx.accessToken = token
+      ctx.endpoint = domain
+      ctx.columns = columns
+    }
   })
   it<OrderListContext>('Show orders list', async (ctx) => {
     render(

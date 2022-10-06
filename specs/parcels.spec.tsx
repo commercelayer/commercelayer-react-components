@@ -23,11 +23,19 @@ interface ParcelContext extends LocalContext {
 }
 
 describe('Parcels components', () => {
-  beforeEach<ParcelContext>(async (ctx) => {
+  let token: string | undefined
+  let domain: string | undefined
+  beforeAll(async () => {
     const { accessToken, endpoint } = await getToken('customer')
     if (accessToken !== undefined) {
-      ctx.accessToken = accessToken
-      ctx.endpoint = endpoint
+      token = accessToken
+      domain = endpoint
+    }
+  })
+  beforeEach<ParcelContext>(async (ctx) => {
+    if (token != null && domain != null) {
+      ctx.accessToken = token
+      ctx.endpoint = domain
       // TODO: create a new one in the future
       ctx.orderId = 'NrnYhAdEkx'
     }

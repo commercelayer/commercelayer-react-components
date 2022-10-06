@@ -2,11 +2,8 @@ import { useState, useEffect, Fragment } from 'react'
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 import { Nav } from '.'
 import {
-  AddToCartButtonType,
   CommerceLayer,
   OrderContainer,
-  VariantsContainer,
-  VariantSelector,
   PricesContainer,
   Price,
   AddToCartButton,
@@ -21,7 +18,6 @@ import {
   LineItemsEmpty,
   CheckoutLink,
   SubTotalAmount,
-  QuantitySelector,
   TotalAmount,
   DiscountAmount,
   ShippingAmount,
@@ -29,55 +25,18 @@ import {
   GiftCardAmount,
   AvailabilityContainer,
   AvailabilityTemplate,
-  ItemContainer,
   Errors,
   OrderStorage,
   CartLink,
 } from '@commercelayer/react-components'
-// import getSdk from '#utils/getSdk'
 
 const clientId = process.env['NEXT_PUBLIC_CLIENT_ID'] as string
 const endpoint = process.env['NEXT_PUBLIC_ENDPOINT'] as string
 const scope = process.env['NEXT_PUBLIC_MARKET_ID'] as string
 
-const CustomAddToCart = (props: AddToCartButtonType): JSX.Element => {
-  const { handleClick, disabled, className, ...p } = props
-  const classes = disabled ? 'opacity-50 cursor-not-allowed' : ''
-  const myClick = async () => {
-    const { success } = await handleClick()
-    if (success) {
-      // NOTE: dispatch your callback or animation
-    }
-  }
-  return (
-    <button
-      className={`${classes} ${className}`}
-      onClick={myClick}
-      disabled={disabled}
-      {...p}
-    >
-      Custom add to cart
-    </button>
-  )
-}
-
-// const CustomQuantity = (props: any) => {
-//   // console.log('props', props)
-//   const myIncrease = (event: any) => {
-//     event.target.value = props.value + 1
-//     props.handleChange(event)
-//   }
-//   return (
-//     <Fragment>
-//       <button>-</button>
-//       <input value={props.value} disabled={true} />
-//       <button onClick={myIncrease}>+</button>
-//     </Fragment>
-//   )
-// }
-
 export default function Order() {
   const [token, setToken] = useState('')
+  const [quantity, setQuantity] = useState('0')
   useEffect(() => {
     const getToken = async () => {
       const token = await getSalesChannelToken({
@@ -86,22 +45,6 @@ export default function Order() {
         scope,
       })
       if (token) setToken(token.accessToken)
-      // if (token?.accessToken) {
-      //   const sdk = getSdk({
-      //     accessToken: token?.accessToken,
-      //     endpoint: endpoint,
-      //   })
-      //   const lineItemsCount = (
-      //     await sdk.orders.retrieve('wkykhjznGk', {
-      //       fields: {
-      //         line_items: ['item_type'],
-      //       },
-      //       include: ['line_items'],
-      //     })
-      //   ).line_items?.length
-
-      //   console.log(lineItemsCount)
-      // }
     }
     getToken()
   }, [])
@@ -116,7 +59,6 @@ export default function Order() {
                 return_url: 'https://test.co',
               }}
             >
-              <ItemContainer>
                 <div className="md:flex">
                   <div className="md:flex-shrink-0">
                     <img
@@ -135,55 +77,18 @@ export default function Order() {
                           compareClassName="text-gray-500 text-2xl m-1 line-through"
                         />
                       </PricesContainer>
-                    </div>
-                    <VariantsContainer skuCode="BABYONBU000000E63E746MXX">
-                      <div className="m-2" data-test="variant-container">
-                        <VariantSelector
-                          data-test="variant-selector"
-                          className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                          name="variant1"
-                          options={[
-                            {
-                              label: '12 months',
-                              code: 'BABYONBU000000E63E7412MX',
-                              lineItem: {
-                                name: 'Darth Vader (12 Months)',
-                                imageUrl:
-                                  'https://i.pinimg.com/736x/a5/32/de/a532de337eff9b1c1c4bfb8df73acea4--darth-vader-stencil-darth-vader-head.jpg?b=t',
-                              },
-                            },
-                            {
-                              label: '6 months',
-                              code: 'BABYONBU000000E63E746MXX',
-                            },
-                            {
-                              label: '24 months',
-                              code: 'BABYONBU000000E63E746MXXFAKE',
-                            },
-                          ]}
-                          handleCallback={(variant) => {
-                            console.log(`variant`, variant)
-                          }}
-                        />
-                      </div>
-                    </VariantsContainer>
+                  </div>
+                    <input title='quantity' type='number' value={quantity} onChange={(e) => setQuantity(e.target.value)} />
                     <div className="m-2">
-                      <QuantitySelector
-                        max={12}
-                        data-test="quantity-selector"
-                        className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                      <AddToCartButton
+                        skuCode='BABYONBU000000E63E7412MX'
+                        quantity={quantity}
+                        data-test="add-to-cart-button"
+                        className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                       />
                     </div>
                     <div className="m-2">
-                      <AddToCartButton
-                        data-test="add-to-cart-button"
-                        className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                      >
-                        {CustomAddToCart}
-                      </AddToCartButton>
-                    </div>
-                    <div className="m-2">
-                      <AvailabilityContainer>
+                      <AvailabilityContainer skuCode='BABYONBU000000E63E7412MX'>
                         <AvailabilityTemplate
                           data-test="availability-template"
                           showShippingMethodName
@@ -193,7 +98,6 @@ export default function Order() {
                     </div>
                   </div>
                 </div>
-              </ItemContainer>
               <Errors resource="orders" />
               <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
               <LineItemsContainer>

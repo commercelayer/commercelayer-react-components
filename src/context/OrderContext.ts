@@ -1,7 +1,6 @@
 import { createContext } from 'react'
 import { Order } from '@commercelayer/sdk'
 import {
-  addToCart,
   AddToCart,
   OrderState,
   CreateOrder,
@@ -20,7 +19,7 @@ import { BaseError } from '#typings/errors'
 
 interface DefaultContext extends OrderState {
   createOrder: CreateOrder
-  addToCart: AddToCart
+  addToCart?: AddToCart
   setOrderErrors: (errors: BaseError[]) => void
   setGiftCardOrCouponCode: SetGiftCardOrCouponCode
   removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode
@@ -32,7 +31,6 @@ interface DefaultContext extends OrderState {
 }
 
 export const defaultOrderContext = {
-  addToCart,
   createOrder,
   setOrderErrors: () => {},
   setOrder: () => {},
