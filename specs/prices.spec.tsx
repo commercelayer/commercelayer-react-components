@@ -15,11 +15,19 @@ interface PricesContext extends LocalContext {
 }
 
 describe('Prices components', () => {
-  beforeEach<PricesContext>(async (ctx) => {
-    const { accessToken, endpoint } = await getToken()
+  let token: string | undefined
+  let domain: string | undefined
+  beforeAll(async () => {
+    const { accessToken, endpoint } = await getToken('customer')
     if (accessToken !== undefined) {
-      ctx.accessToken = accessToken
-      ctx.endpoint = endpoint
+      token = accessToken
+      domain = endpoint
+    }
+  })
+  beforeEach<PricesContext>(async (ctx) => {
+    if (token != null && domain != null) {
+      ctx.accessToken = token
+      ctx.endpoint = domain
       ctx.sku = 'BABYONBU000000E63E7412MX'
       ctx.skus = ['BABYONBU000000E63E7412MX', 'BABYONBU000000FFFFFF12MX']
     }
