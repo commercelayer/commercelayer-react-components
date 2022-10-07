@@ -28,14 +28,17 @@ interface Props {
   attributes?: OrderCreate
   orderId?: string
   fetchOrder?: (order: Order) => void
+  loader?: string | JSX.Element
 }
 
 export function OrderContainer(props: Props): JSX.Element {
-  const { orderId, children, metadata, attributes, fetchOrder } = props
+  const { orderId, children, metadata, attributes, fetchOrder, loader } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const [lock, setLock] = useState(false)
   const [lockOrder, setLockOrder] = useState(true)
   const config = useContext(CommerceLayerContext)
+  if (config.accessToken == null)
+    throw new Error('Cannot use `OrderContainer` outside of `CommerceLayer`')
   const {
     persistKey,
     clearWhenPlaced,
@@ -262,6 +265,7 @@ export function OrderContainer(props: Props): JSX.Element {
         })
     }
   }, [state, config.accessToken])
+  if (state.loading && loader != null) return <>{loader}</>
   return (
     <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
   )

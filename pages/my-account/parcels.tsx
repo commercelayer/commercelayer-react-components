@@ -56,7 +56,7 @@ export default function Main() {
       </Head>
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
-          <OrderContainer orderId={orderId}>
+          <OrderContainer orderId={orderId} loader={<span>Caricamento...</span>}>
             <ShipmentsContainer>
               <Shipment>
                 <div className="flex">

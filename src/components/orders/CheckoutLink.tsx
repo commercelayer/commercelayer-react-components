@@ -19,6 +19,8 @@ export function CheckoutLink(props: Props): JSX.Element {
   const { label, hostedCheckout = true, children, ...p } = props
   const { order } = useContext(OrderContext)
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
+  if (accessToken == null || endpoint == null)
+    throw new Error('Cannot use `CheckoutLink` outside of `CommerceLayer`')
   const [slug] = endpoint.split('.commercelayer')
   const href =
     hostedCheckout && slug && order?.id
