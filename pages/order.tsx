@@ -115,6 +115,7 @@ export default function Order() {
               attributes={{
                 return_url: 'https://test.co',
               }}
+              loader='Loading...'
             >
               <ItemContainer>
                 <div className="md:flex">

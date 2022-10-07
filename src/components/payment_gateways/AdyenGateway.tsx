@@ -44,7 +44,7 @@ export function AdyenGateway(props: Props): JSX.Element | null {
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
   // @ts-expect-error
   const clientKey = paymentSource?.public_key
-  const environment = jwt(accessToken).test ? 'test' : 'live'
+  const environment = accessToken && jwt(accessToken).test ? 'test' : 'live'
   const adyenConfig = config
     ? getPaymentConfig<'adyenPayment'>(paymentResource, config)
     : {}

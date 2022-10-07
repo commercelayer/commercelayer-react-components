@@ -476,8 +476,8 @@ export const addToCart: AddToCart = async (params) => {
         })
       }
       if (buyNowMode) {
-        const { organization } = getOrganizationSlug(config.endpoint)
-        const params = `${id}?accessToken=${config.accessToken}`
+        const { organization } = getOrganizationSlug(config.endpoint ?? '')
+        const params = `${id}?accessToken=${config.accessToken ?? ''}`
         const redirectUrl = checkoutUrl
           ? `${checkoutUrl}/${params}`
           : `https://${organization}.checkout.commercelayer.app/${params}`

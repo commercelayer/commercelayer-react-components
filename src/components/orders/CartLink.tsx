@@ -19,7 +19,9 @@ export function CartLink(props: Props): JSX.Element | null {
   const { label, children, ...p } = props
   const { order, createOrder } = useContext(OrderContext)
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
-  const [slug] = endpoint.split('.commercelayer')
+  const [slug] = endpoint?.split('.commercelayer') ?? ''
+  if (accessToken == null)
+    throw new Error('Cannot use `CartLink` outside of `CommerceLayer`')
   const href =
     slug && order?.id
       ? getCartLink({ slug, orderId: order?.id, accessToken })
