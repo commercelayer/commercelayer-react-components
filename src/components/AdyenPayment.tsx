@@ -120,7 +120,6 @@ export function AdyenPayment({
   }
   const handleChange = async (state: any, checkout: AdyenCheckout) => {
     if (state.isValid) {
-      debugger
       if (ref.current) {
         ref.current.onsubmit = () => handleSubmit(ref.current as any, checkout)
         setPaymentRef({ ref })
@@ -217,7 +216,9 @@ export function AdyenPayment({
     const paymentDataAvailable =
       // @ts-expect-error
       Object.keys(control?.payment_request_data).length > 0
-    if (paymentDataAvailable === false) {
+    // @ts-expect-error
+    const paymentMethodSelected = control?.payment_request_data?.payment_method?.type
+    if (paymentDataAvailable === false || paymentMethodSelected !== state.data.paymentMethod.type) {
       control = await setPaymentSource({
         paymentSourceId: paymentSource?.id,
         paymentResource: 'adyen_payments',
@@ -250,7 +251,7 @@ export function AdyenPayment({
           ...browserInfo,
         },
       },
-      _authorize: 1,
+      _authorize: 1
     }
     delete attributes.payment_request_data.paymentMethod
     try {
@@ -259,7 +260,7 @@ export function AdyenPayment({
         paymentResource: 'adyen_payments',
         attributes,
       })
-      // @ts-ignore
+      // @ts-expect-error
       const action = res?.payment_response?.action
       if (component && action) {
         component.handleAction(action)
