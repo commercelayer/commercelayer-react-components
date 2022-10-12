@@ -300,7 +300,11 @@ export const setPaymentSource: SetPaymentSource = async ({
             id: paymentSourceId,
             ...attributes,
           }
-          paymentSource = await sdk[paymentResource].update(attrs)
+          // @ts-expect-error
+          paymentSource =
+            attributes != null
+              ? await sdk[paymentResource].update(attrs)
+              : sdk[paymentResource].retrieve(paymentSourceId)
         }
         getOrder && (await getOrder(order.id))
         dispatch &&

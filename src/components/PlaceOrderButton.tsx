@@ -44,6 +44,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
     currentPaymentMethodType,
     paymentSource,
     setPaymentSource,
+    setPaymentMethodErrors
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
@@ -96,27 +97,41 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       paymentType === 'adyen_payments' &&
       options?.adyen?.redirectResult &&
       order?.status &&
-      ['draft', 'pending'].includes(order?.status)
+      ['draft', 'pending'].includes(order?.status) &&
+      paymentSource != null
     ) {
       const attributes = {
         payment_request_details: {
           details: {
-            redirectResult: options?.adyen?.redirectResult,
+            redirectResult: options?.adyen?.redirectResult
           },
-          // @ts-ignore
-          paymentData: paymentSource.payment_response.paymentData,
+          // @ts-expect-error
+          paymentData: paymentSource.payment_response.paymentData
         },
-        _details: 1,
+        _details: 1
       }
-      setPaymentSource({
+      void setPaymentSource({
         paymentSourceId: paymentSource?.id,
         paymentResource: 'adyen_payments',
-        attributes,
+        attributes
       }).then((res) => {
-        // @ts-ignore
+        // @ts-expect-error
         const resultCode = res?.payment_response?.resultCode
+        // @ts-expect-error
+        const errorCode = res?.payment_response?.errorCode
+        // @ts-expect-error
+        const message = res?.payment_response?.message
         if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-          handleClick()
+          void handleClick()
+        } else if (errorCode != null) {
+          setPaymentMethodErrors([
+            {
+              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+              resource: 'payment_methods',
+              field: currentPaymentMethodType,
+              message
+            }
+          ])
         }
       })
     }
@@ -127,7 +142,7 @@ const PlaceOrderButton: FunctionComponent<PlaceOrderButtonProps> = (props) => {
       order?.status &&
       ['draft', 'pending'].includes(order?.status)
     ) {
-      handleClick()
+      void handleClick()
     }
   }, [options?.adyen, paymentType])
   useEffect(() => {
