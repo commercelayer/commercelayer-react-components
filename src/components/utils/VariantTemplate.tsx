@@ -13,8 +13,8 @@ export const propTypes = {
       code: PropTypes.string.isRequired,
       lineItem: PropTypes.shape({
         name: PropTypes.string.isRequired,
-        imageUrl: PropTypes.string,
-      }),
+        imageUrl: PropTypes.string
+      })
     }).isRequired
   ).isRequired,
   name: PropTypes.string,
@@ -22,7 +22,7 @@ export const propTypes = {
   type: PropTypes.oneOf<BaseSelectorType>(['select', 'radio']),
   loader: PropTypes.element,
   placeholder: PropTypes.string,
-  skuCode: PropTypes.string,
+  skuCode: PropTypes.string
 }
 
 export type VariantHandleCallback = (variant: VariantOption) => void
@@ -66,14 +66,14 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
     ) : (
       <Fragment key={variants[v].id}>
         <input
-          id={id && `${id}-${k}`}
+          id={`${id ?? 'radio'}-${k}`}
           defaultChecked={checked}
-          type="radio"
+          type='radio'
           value={variants[v].code}
           onChange={(e): void => {
             const code = e.target.value
-            handleChange && handleChange(code, variants[v].id)
-            handleCallback && handleCallback({ code, label })
+            if (handleChange) handleChange(code, variants[v].id)
+            if (handleCallback) handleCallback({ code, label })
           }}
           {...prs}
         />
@@ -81,18 +81,19 @@ const VariantTemplate: FunctionComponent<VariantTemplateProps> = (props) => {
       </Fragment>
     )
   })
+  console.log('vars', vars, variants)
   if (type === 'select') {
     return (
       <select
         id={id}
-        title="Variant selector"
+        title='Variant selector'
         onChange={(e): void => {
           const v = e.target.value
           const i = e.target.selectedIndex
           const id = e.target[i]?.dataset?.['skuId'] as string
           const label = e.target[i]?.dataset?.['label'] as string
-          handleChange && handleChange(v, id)
-          handleCallback && handleCallback({ code: v, label })
+          if (handleChange) handleChange(v, id)
+          if (handleCallback) handleCallback({ code: v, label })
         }}
         value={skuCode || ''}
         {...prs}

@@ -1,4 +1,4 @@
-import { useContext, useEffect, ReactElement, ReactNode } from 'react'
+import { useContext, useEffect, ReactNode } from 'react'
 import VariantTemplate, {
   VariantHandleCallback
 } from '../utils/VariantTemplate'
@@ -56,9 +56,9 @@ export function VariantSelector(props: Props): JSX.Element {
     return (): void => {
       if (setSkuCodes) setSkuCodes([])
     }
-  }, [options])
+  }, [options.length])
   const sCode = variantSkuCode || skuCode || ''
-  const DefaultTemplate = (): ReactElement =>
+  const DefaultTemplate = (): JSX.Element =>
     loading ? (
       <>{props.loader || 'Loading...'}</>
     ) : (
@@ -73,6 +73,7 @@ export function VariantSelector(props: Props): JSX.Element {
         {...prs}
       />
     )
+  console.log('variants', variants, options)
   const parentProps = {
     variants,
     loading: !!loading,
