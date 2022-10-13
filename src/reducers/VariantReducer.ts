@@ -10,7 +10,7 @@ import { isEmpty, has } from 'lodash'
 import getSdk from '#utils/getSdk'
 import { SkuInventory } from './AvailabilityReducer'
 
-type SetSkuCodeVariantParams = {
+interface SetSkuCodeVariantParams {
   code: string
   id: string
   config: CommerceLayerConfig
@@ -19,19 +19,15 @@ type SetSkuCodeVariantParams = {
   setItemSkuCode?: ((skuCode: string) => void) | undefined
 }
 
-export interface SetSkuCodeVariant {
-  (params: SetSkuCodeVariantParams): void
-}
+export type SetSkuCodeVariant = (params: SetSkuCodeVariantParams) => void
 
-type SetVariantSkuCodesParams = {
+interface SetVariantSkuCodesParams {
   skuCodes: VariantOption[]
   dispatch: Dispatch<VariantAction>
   setCustomLineItems?: SetCustomLineItems
 }
 
-export interface SetVariantSkuCodes {
-  (params: SetVariantSkuCodesParams): void
-}
+export type SetVariantSkuCodes = (params: SetVariantSkuCodesParams) => void
 
 export interface VariantsObject {
   [key: string]: Sku
@@ -70,7 +66,7 @@ export interface VariantAction {
 export const setVariantSkuCodes: SetVariantSkuCodes = ({
   skuCodes,
   dispatch,
-  setCustomLineItems,
+  setCustomLineItems
 }) => {
   const lineItems: any = {}
   const sCodes = skuCodes.map((s) => {
@@ -79,18 +75,16 @@ export const setVariantSkuCodes: SetVariantSkuCodes = ({
     }
     return s.code
   })
-  if (!isEmpty(lineItems)) {
-    setCustomLineItems && setCustomLineItems(lineItems)
+  if (!isEmpty(lineItems) && setCustomLineItems) {
+    setCustomLineItems(lineItems)
   }
   dispatch({
     type: 'setSkuCodes',
-    payload: { skuCodes: sCodes },
+    payload: { skuCodes: sCodes }
   })
 }
 
-export interface UnsetVariantState {
-  (dispatch: Dispatch<VariantAction>): void
-}
+export type UnsetVariantState = (dispatch: Dispatch<VariantAction>) => void
 
 export const setSkuCode: SetSkuCodeVariant = (params) => {
   const { id, code, config, setItem, dispatch, setItemSkuCode } = params
@@ -99,24 +93,25 @@ export const setSkuCode: SetSkuCodeVariant = (params) => {
     sdk.skus
       .retrieve(id, { include: ['sku_options'] })
       .then((sku) => {
-        setItem &&
+        if (setItem) {
           setItem({
-            [`${code}`]: sku as SkuInventory,
+            [`${code}`]: sku as SkuInventory
           })
-        setItemSkuCode && setItemSkuCode(code)
+        }
+        if (setItemSkuCode) setItemSkuCode(code)
       })
       .catch((errors) => {
         dispatch({
           type: 'setErrors',
           payload: {
-            errors,
-          },
+            errors
+          }
         })
       })
   }
 }
 
-type GetVariantsParams = {
+interface GetVariantsParams {
   config: CommerceLayerConfig
   state: VariantState
   skuCode: string
@@ -125,9 +120,7 @@ type GetVariantsParams = {
   setItem: ((item: Items) => void) | undefined
 }
 
-export interface GetVariants {
-  (params: GetVariantsParams): void
-}
+export type GetVariants = (params: GetVariantsParams) => void
 
 export const getVariants: GetVariants = (params) => {
   const { config, state, skuCode, dispatch, setItem, filters } = params
@@ -136,8 +129,8 @@ export const getVariants: GetVariants = (params) => {
     .list({
       filters: {
         code_in: state.skuCodes.join(','),
-        ...filters,
-      },
+        ...filters
+      }
     })
     .then((skus) => {
       const skusObj = getSkus(skus, state.skuCodes)
@@ -147,28 +140,28 @@ export const getVariants: GetVariants = (params) => {
           id: skusObj[skuCode].id,
           config,
           dispatch,
-          setItem,
+          setItem
         })
       }
       dispatch({
         type: 'setVariants',
         payload: {
-          variants: skusObj,
-        },
+          variants: skusObj
+        }
       })
       dispatch({
         type: 'setLoading',
         payload: {
-          loading: false,
-        },
+          loading: false
+        }
       })
     })
     .catch((errors) => {
       dispatch({
         type: 'setErrors',
         payload: {
-          errors,
-        },
+          errors
+        }
       })
     })
 }
@@ -176,15 +169,15 @@ export const getVariants: GetVariants = (params) => {
 export const unsetVariantState: UnsetVariantState = (dispatch) => {
   dispatch({
     type: 'setSkuCode',
-    payload: { skuCode: '' },
+    payload: { skuCode: '' }
   })
   dispatch({
     type: 'setVariants',
-    payload: { variants: {} },
+    payload: { variants: {} }
   })
   dispatch({
     type: 'setLoading',
-    payload: { loading: false },
+    payload: { loading: false }
   })
 }
 
@@ -198,10 +191,10 @@ export const variantInitialState: VariantState = {
   currentSkuInventory: {
     available: false,
     quantity: 0,
-    levels: [],
+    levels: []
   },
   currentQuantity: 1,
-  currentPrices: [],
+  currentPrices: []
 }
 
 export type VariantActionType =
@@ -222,7 +215,7 @@ const actionType: VariantActionType[] = [
   'setCurrentSkuId',
   'setCurrentSkuInventory',
   'setCurrentPrices',
-  'setErrors',
+  'setErrors'
 ]
 
 const variantReducer = (

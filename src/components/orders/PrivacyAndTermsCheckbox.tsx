@@ -1,13 +1,11 @@
-import components from '#config/components'
 import OrderContext from '#context/OrderContext'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import { useContext, useEffect, useState } from 'react'
 import BaseInput, { BaseInputProps } from '../utils/BaseInput'
 
-const propTypes = components.PrivacyAndTermsCheckbox.propTypes
-const displayName = components.PrivacyAndTermsCheckbox.displayName
-
-export function PrivacyAndTermsCheckbox(props: Partial<BaseInputProps>) {
+export function PrivacyAndTermsCheckbox(
+  props: Partial<BaseInputProps>
+): JSX.Element {
   const { order } = useContext(OrderContext)
   const { placeOrderPermitted } = useContext(PlaceOrderContext)
   const [forceDisabled, setForceDisabled] = useState(true)
@@ -16,12 +14,12 @@ export function PrivacyAndTermsCheckbox(props: Partial<BaseInputProps>) {
   const handleChange: any = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const v = e.target?.checked
     setChecked(v)
-    localStorage.setItem(fieldName, `${v}`)
-    placeOrderPermitted && placeOrderPermitted()
+    localStorage.setItem(fieldName, v.toString())
+    if (placeOrderPermitted) placeOrderPermitted()
   }
   useEffect(() => {
     if (order?.privacy_url && order?.terms_url) setForceDisabled(false)
-    if (!checked) localStorage.setItem(fieldName, `${checked}`)
+    if (!checked) localStorage.setItem(fieldName, checked.toString())
     return () => {
       setForceDisabled(true)
       localStorage.removeItem(fieldName)
@@ -29,7 +27,7 @@ export function PrivacyAndTermsCheckbox(props: Partial<BaseInputProps>) {
   }, [order?.privacy_url, order?.terms_url])
   return (
     <BaseInput
-      type="checkbox"
+      type='checkbox'
       name={fieldName}
       disabled={forceDisabled}
       onChange={handleChange}
@@ -38,8 +36,5 @@ export function PrivacyAndTermsCheckbox(props: Partial<BaseInputProps>) {
     />
   )
 }
-
-PrivacyAndTermsCheckbox.propTypes = propTypes
-PrivacyAndTermsCheckbox.displayName = displayName
 
 export default PrivacyAndTermsCheckbox

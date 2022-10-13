@@ -1,35 +1,32 @@
-import { useEffect, useReducer, useContext, ReactNode } from 'react'
+import { useEffect, useReducer, useContext } from 'react'
 import variantReducer, {
   variantInitialState,
   unsetVariantState,
   setSkuCode,
   getVariants,
+  VariantState,
+  setVariantSkuCodes
 } from '#reducers/VariantReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import VariantsContext from '#context/VariantsContext'
-import { VariantState } from '#reducers/VariantReducer'
-import { setVariantSkuCodes } from '#reducers/VariantReducer'
 import isEmpty from 'lodash/isEmpty'
 import isEqual from 'lodash/isEqual'
 
 import getCurrentItemKey from '#utils/getCurrentItemKey'
 import ItemContext from '#context/ItemContext'
-import components from '#config/components'
 import { Items } from '#reducers/ItemReducer'
 
-const propTypes = components.VariantsContainer.propTypes
-const defaultProps = components.VariantsContainer.defaultProps
-const displayName = components.VariantsContainer.displayName
-
-type Props = {
-  children: ReactNode
+interface Props {
+  children: JSX.Element | JSX.Element[]
   filters?: Record<string, any>
   skuCode?: string
 }
 
-export function VariantsContainer(props: Props) {
+export function VariantsContainer(props: Props): JSX.Element {
   const { children, skuCode = '', filters = {} } = props
   const config = useContext(CommerceLayerContext)
+  if (config.accessToken == null)
+    throw new Error('Cannot use `VariantsContainer` outside of `CommerceLayer`')
   const {
     setItem,
     setItems,
@@ -37,7 +34,7 @@ export function VariantsContainer(props: Props) {
     item: currentItem,
     setCustomLineItems,
     skuCode: itemSkuCode,
-    setSkuCode: setItemSkuCode,
+    setSkuCode: setItemSkuCode
   } = useContext(ItemContext)
   const [state, dispatch] = useReducer(variantReducer, variantInitialState)
   const sCode =
@@ -50,13 +47,14 @@ export function VariantsContainer(props: Props) {
     if (!isEmpty(items) && !isEmpty(state.variants)) {
       if (!isEqual(items, state.variants)) {
         const mergeItems = { ...items, ...state.variants } as Items
-        setItems && setItems(mergeItems)
+        if (setItems) setItems(mergeItems)
       }
     }
+    console.log('state.skuCodes', state.skuCodes)
     if (state.skuCodes.length >= 1 && config.accessToken) {
       dispatch({
         type: 'setLoading',
-        payload: { loading: true },
+        payload: { loading: true }
       })
       getVariants({
         config,
@@ -64,17 +62,17 @@ export function VariantsContainer(props: Props) {
         dispatch,
         setItem,
         skuCode: sCode,
-        filters,
+        filters
       })
     }
     return (): void => unsetVariantState(dispatch)
-  }, [config.accessToken])
+  }, [config?.accessToken])
   const variantValue: VariantState = {
     ...state,
     skuCode: sCode,
     setSkuCode: (code, id, lineItem = {}) => {
-      if (!isEmpty(lineItem)) {
-        setCustomLineItems && setCustomLineItems({ [code]: lineItem })
+      if (!isEmpty(lineItem) && setCustomLineItems) {
+        setCustomLineItems({ [code]: lineItem })
       }
       setSkuCode({
         code,
@@ -82,11 +80,11 @@ export function VariantsContainer(props: Props) {
         config,
         setItem,
         dispatch,
-        setItemSkuCode,
+        setItemSkuCode
       })
     },
     setSkuCodes: (skuCodes) =>
-      setVariantSkuCodes({ skuCodes, dispatch, setCustomLineItems }),
+      setVariantSkuCodes({ skuCodes, dispatch, setCustomLineItems })
   }
   return (
     <VariantsContext.Provider value={variantValue}>
@@ -94,9 +92,5 @@ export function VariantsContainer(props: Props) {
     </VariantsContext.Provider>
   )
 }
-
-VariantsContainer.propTypes = propTypes
-VariantsContainer.defaultProps = defaultProps
-VariantsContainer.displayName = displayName
 
 export default VariantsContainer

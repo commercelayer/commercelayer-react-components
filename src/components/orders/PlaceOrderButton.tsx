@@ -29,7 +29,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     loading,
     currentPaymentMethodType,
     paymentSource,
-    setPaymentSource
+    setPaymentSource,
+    setPaymentMethodErrors
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
@@ -82,29 +83,46 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       paymentType === 'adyen_payments' &&
       options?.adyen?.redirectResult &&
       order?.status &&
-      ['draft', 'pending'].includes(order?.status)
+      ['draft', 'pending'].includes(order?.status) &&
+      paymentSource != null
     ) {
+      // @ts-expect-error
+      const paymentData = paymentSource?.payment_response?.paymentData
       const attributes = {
         payment_request_details: {
           details: {
             redirectResult: options?.adyen?.redirectResult
           },
-          // @ts-expect-error
-          paymentData: paymentSource.payment_response.paymentData
+          paymentData
         },
         _details: 1
       }
-      void setPaymentSource({
-        paymentSourceId: paymentSource?.id,
-        paymentResource: 'adyen_payments',
-        attributes
-      }).then((res) => {
-        // @ts-expect-error
-        const resultCode = res?.payment_response?.resultCode
-        if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-          void handleClick()
-        }
-      })
+      if (paymentData != null) {
+        void setPaymentSource({
+          paymentSourceId: paymentSource?.id,
+          paymentResource: 'adyen_payments',
+          attributes
+        }).then((res) => {
+          // @ts-expect-error
+          const resultCode = res?.payment_response?.resultCode
+          // @ts-expect-error
+          const errorCode = res?.payment_response?.errorCode
+          // @ts-expect-error
+          const message = res?.payment_response?.message
+          if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
+            void handleClick()
+          } else if (errorCode != null) {
+            setPaymentMethodErrors([
+              {
+                code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+                resource: 'payment_methods',
+                field: currentPaymentMethodType,
+                message
+              }
+            ])
+          }
+        })
+      }
     }
     if (
       paymentType === 'adyen_payments' &&
