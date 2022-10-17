@@ -4,8 +4,8 @@ import LineItemsCount from '#components/line_items/LineItemsCount'
 import AddToCartButton from '#components/orders/AddToCartButton'
 import OrderContainer from '#components/orders/OrderContainer'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { LocalContext } from './utils/context'
-import getToken from './utils/getToken'
+import { LocalContext } from '../utils/context'
+import getToken from '../utils/getToken'
 
 interface AddToCartContext extends LocalContext {
   skuCode: string

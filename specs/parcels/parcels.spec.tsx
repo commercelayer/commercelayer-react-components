@@ -15,8 +15,8 @@ import {
   screen,
   waitForElementToBeRemoved
 } from '@testing-library/react'
-import { LocalContext } from './utils/context'
-import getToken from './utils/getToken'
+import { LocalContext } from '../utils/context'
+import getToken from '../utils/getToken'
 
 interface ParcelContext extends LocalContext {
   orderId: string
@@ -254,17 +254,17 @@ describe('Parcels components', () => {
   })
   it<ParcelContext>('ParcelsCount outside of ShipmentsContainer', () => {
     expect(() => render(<ParcelsCount />)).toThrow(
-      'Cannot use `ParcelsCount` outside of `ShipmentsContainer`'
+      'Cannot use <ParcelsCount/> outside of <ShipmentsContainer/>'
     )
   })
   it<ParcelContext>('ShipmentsCount outside of ShipmentsContainer', () => {
     expect(() => render(<ShipmentsCount />)).toThrow(
-      'Cannot use `ShipmentsCount` outside of `ShipmentsContainer`'
+      'Cannot use <ShipmentsCount/> outside of <ShipmentsContainer/>'
     )
   })
   it<ParcelContext>('ParcelLineItemsCount outside of Parcels', () => {
     expect(() => render(<ParcelLineItemsCount />)).toThrow(
-      'Cannot use `ParcelLineItemsCount` outside of `Parcels`'
+      'Cannot use <ParcelLineItemsCount/> outside of <Parcels/>'
     )
   })
 })

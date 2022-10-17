@@ -230,13 +230,14 @@ export type BaseSelectorType = 'select' | 'radio'
 
 export type BaseAmountComponentChildren = Omit<BaseAmountComponent, 'children'>
 
-export type BaseAmountComponent = {
-  children?: (props: BaseAmountComponentChildren) => JSX.Element
+export interface BaseAmountComponent
+  extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+  children?: ChildrenFunction<BaseAmountComponentChildren>
   format?: BaseFormatPrice
   price?: string
   priceCents?: number
   labelFree?: string
-} & JSX.IntrinsicElements['span']
+}
 
 export type ChildrenFunction<P = Record<string, any>> = (
   props: P

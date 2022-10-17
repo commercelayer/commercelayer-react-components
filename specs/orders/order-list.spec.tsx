@@ -10,8 +10,8 @@ import {
   screen,
   waitForElementToBeRemoved
 } from '@testing-library/react'
-import { LocalContext } from './utils/context'
-import getToken from './utils/getToken'
+import { LocalContext } from '../utils/context'
+import getToken from '../utils/getToken'
 
 interface OrderListContext extends Omit<LocalContext, 'sku' | 'skus'> {
   columns: Array<{

@@ -4,22 +4,19 @@ import placeOrderReducer, {
   placeOrderInitialState,
   PlaceOrderOptions,
   placeOrderPermitted,
-  setButtonRef,
+  setButtonRef
 } from '#reducers/PlaceOrderReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import components from '#config/components'
 import { setPlaceOrder } from '../../reducers/PlaceOrderReducer'
 import { PaymentSourceType } from '#reducers/PaymentMethodReducer'
+import useCustomContext from '#utils/hooks/useCustomContext'
 
-const propTypes = components.PlaceOrderContainer.propTypes
-const displayName = components.PlaceOrderContainer.displayName
-
-type Props = {
+interface Props {
   children: ReactNode
   options?: PlaceOrderOptions
 }
-export function PlaceOrderContainer(props: Props) {
+export function PlaceOrderContainer(props: Props): JSX.Element {
   const { children, options } = props
   const [state, dispatch] = useReducer(
     placeOrderReducer,
@@ -31,8 +28,13 @@ export function PlaceOrderContainer(props: Props) {
     setOrderErrors,
     include,
     addResourceToInclude,
-    includeLoaded,
-  } = useContext(OrderContext)
+    includeLoaded
+  } = useCustomContext({
+    context: OrderContext,
+    contextComponentName: 'OrderContainer',
+    currentComponentName: 'PlaceOrderContainer',
+    key: 'order'
+  })
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     if (!include?.includes('shipments.available_shipping_methods')) {
@@ -42,8 +44,8 @@ export function PlaceOrderContainer(props: Props) {
           'shipments.shipment_line_items.line_item',
           'shipments.shipping_method',
           'shipments.stock_transfers.line_item',
-          'shipments.stock_location',
-        ],
+          'shipments.stock_location'
+        ]
       })
     } else if (!includeLoaded?.['shipments.available_shipping_methods']) {
       addResourceToInclude({
@@ -52,27 +54,27 @@ export function PlaceOrderContainer(props: Props) {
           'shipments.shipment_line_items.line_item': true,
           'shipments.shipping_method': true,
           'shipments.stock_transfers.line_item': true,
-          'shipments.stock_location': true,
-        },
+          'shipments.stock_location': true
+        }
       })
     }
     if (!include?.includes('billing_address')) {
       addResourceToInclude({
-        newResource: 'billing_address',
+        newResource: 'billing_address'
       })
-    } else if (!includeLoaded?.['billing_address']) {
+    } else if (!includeLoaded?.billing_address) {
       addResourceToInclude({
-        newResourceLoaded: { billing_address: true },
+        newResourceLoaded: { billing_address: true }
       })
     }
     if (!include?.includes('shipping_address')) {
       addResourceToInclude({
         newResource: 'shipping_address',
-        resourcesIncluded: include,
+        resourcesIncluded: include
       })
-    } else if (!includeLoaded?.['shipping_address']) {
+    } else if (!includeLoaded?.shipping_address) {
       addResourceToInclude({
-        newResourceLoaded: { shipping_address: true },
+        newResourceLoaded: { shipping_address: true }
       })
     }
     if (order) {
@@ -81,22 +83,26 @@ export function PlaceOrderContainer(props: Props) {
         dispatch,
         order,
         options: {
-          ...options,
-        },
+          ...options
+        }
       })
     }
   }, [order, include, includeLoaded])
   const contextValue = {
     ...state,
-    setPlaceOrder: ({ paymentSource }: { paymentSource?: PaymentSourceType }) =>
-      setPlaceOrder({
+    setPlaceOrder: async ({
+      paymentSource
+    }: {
+      paymentSource?: PaymentSourceType
+    }) =>
+      await setPlaceOrder({
         config,
         order,
         state,
         setOrderErrors,
         paymentSource,
         include,
-        setOrder,
+        setOrder
       }),
     placeOrderPermitted: () =>
       placeOrderPermitted({
@@ -104,11 +110,11 @@ export function PlaceOrderContainer(props: Props) {
         dispatch,
         order,
         options: {
-          ...options,
-        },
+          ...options
+        }
       }),
     setButtonRef: (ref: RefObject<HTMLButtonElement>) =>
-      setButtonRef(ref, dispatch),
+      setButtonRef(ref, dispatch)
   }
   return (
     <PlaceOrderContext.Provider value={contextValue}>
@@ -116,8 +122,5 @@ export function PlaceOrderContainer(props: Props) {
     </PlaceOrderContext.Provider>
   )
 }
-
-PlaceOrderContainer.propTypes = propTypes
-PlaceOrderContainer.displayName = displayName
 
 export default PlaceOrderContainer

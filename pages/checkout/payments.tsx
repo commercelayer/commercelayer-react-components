@@ -17,7 +17,7 @@ import {
   PaymentSourceEditButton,
   PlaceOrderButton,
   PlaceOrderContainer,
-  PrivacyAndTermsCheckbox,
+  PrivacyAndTermsCheckbox
 } from '@commercelayer/react-components'
 import { useRouter } from 'next/router'
 import '@adyen/adyen-web/dist/adyen.css'
@@ -39,26 +39,26 @@ const messages: any = [
     code: 'VALIDATION_ERROR',
     resource: 'order',
     field: 'status',
-    message: 'test 1',
+    message: 'test 1'
   },
   {
     code: 'VALIDATION_ERROR',
     resource: 'order',
     field: 'billingAddress',
-    message: 'test 2',
+    message: 'test 2'
   },
   {
     code: 'INVALID_RESOURCE_ID',
     resource: 'order',
     field: 'base',
-    message: 'Paypal error',
+    message: 'Paypal error'
   },
   {
     code: 'PAYMENT_NOT_APPROVED_FOR_EXECUTION',
     resource: 'order',
     field: 'base',
-    message: 'Paypal payment not approved for execution',
-  },
+    message: 'Paypal payment not approved for execution'
+  }
 ]
 
 export default function Main() {
@@ -91,16 +91,16 @@ export default function Main() {
   // }
   useEffect(() => {
     const getToken = async () => {
-      // @ts-ignore
+      // @ts-expect-error
       const token = await getCustomerToken(
         {
           clientId,
           endpoint,
-          scope,
+          scope
         },
         {
           username,
-          password,
+          password
         }
       )
       if (token) setToken(token.accessToken)
@@ -111,13 +111,13 @@ export default function Main() {
   return placed ? (
     <p>Order placed</p>
   ) : (
-    <Fragment>
+    <>
       <Head>
-        <script src="http://localhost:8097"></script>
+        <script src='http://localhost:8097' />
       </Head>
       <React.StrictMode>
         <CommerceLayer accessToken={token} endpoint={endpoint ?? ''}>
-          <div className="container mx-auto mt-5 px-5">
+          <div className='container mx-auto mt-5 px-5'>
             <OrderContainer orderId={orderId}>
               <PaymentMethodsContainer
                 config={{
@@ -147,24 +147,24 @@ export default function Main() {
                       //   },
                       // },
                       hideIcon: false,
-                      hidePostalCode: true,
+                      hidePostalCode: true
                     },
-                    containerClassName: 'w-1/2 px-3',
+                    containerClassName: 'w-1/2 px-3'
                   },
                   paypalPayment: {
                     cancel_url: paypalReturnUrl,
-                    return_url: paypalReturnUrl,
+                    return_url: paypalReturnUrl
                   },
                   klarnaPayment: {
                     placeOrderCallback: (res: any) => {
                       if (res.placed) setPlaced(true)
-                    },
+                    }
                   },
                   adyenPayment: {
                     placeOrderCallback: (res: any) => {
                       if (res.placed) setPlaced(true)
-                    },
-                  },
+                    }
+                  }
                 }}
               >
                 <PlaceOrderContainer
@@ -172,77 +172,77 @@ export default function Main() {
                     paypalPayerId,
                     checkoutCom: { session_id: checkoutComSession },
                     adyen: {
-                      redirectResult,
-                    },
+                      redirectResult
+                    }
                   }}
                 >
                   <PaymentMethod
                     hide={[
                       'stripe_payments',
                       'adyen_payments',
-                      'klarna_payments',
+                      'klarna_payments'
                     ]}
-                    className="p-2 my-1 flex items-center justify-items-center bg-gray-300 cursor-pointer"
-                    activeClass="bg-opacity-25"
+                    className='p-2 my-1 flex items-center justify-items-center bg-gray-300 cursor-pointer'
+                    activeClass='bg-opacity-25'
                     clickableContainer
                   >
-                    <PaymentMethodRadioButton data-cy="payment-radio-button" />
-                    <PaymentMethodName className="pl-3" />
-                    <PaymentMethodPrice className="pl-3" />
+                    <PaymentMethodRadioButton data-cy='payment-radio-button' />
+                    <PaymentMethodName className='pl-3' />
+                    <PaymentMethodPrice className='pl-3' />
                     <PaymentSource
-                      data-test-id="payment-source"
-                      className="p-5 my-2"
-                      loader={'Caricamento...'}
+                      data-test-id='payment-source'
+                      className='p-5 my-2'
+                      loader='Caricamento...'
                     >
-                      <div className="flex flex-row items-center justify-start bg-gray-100 p-5 my-10">
-                        <div className="flex flex-row items-center">
-                          <PaymentSourceBrandIcon className="mr-3" />
+                      <div className='flex flex-row items-center justify-start bg-gray-100 p-5 my-10'>
+                        <div className='flex flex-row items-center'>
+                          <PaymentSourceBrandIcon className='mr-3' />
                           <PaymentSourceBrandName
-                            className="mr-1"
-                            data-cy="payment-brand-name-card"
+                            className='mr-1'
+                            data-cy='payment-brand-name-card'
                           />
                           ending in
                           <PaymentSourceDetail
-                            data-cy="payment-last4"
-                            className="ml-1"
-                            type="last4"
+                            data-cy='payment-last4'
+                            className='ml-1'
+                            type='last4'
                           />
                         </div>
-                        <div className="text-gray-500 ml-5">
+                        <div className='text-gray-500 ml-5'>
                           <PaymentSourceDetail
-                            data-cy="payment-exp-month"
-                            type="exp_month"
+                            data-cy='payment-exp-month'
+                            type='exp_month'
                           />
                           <PaymentSourceDetail
-                            data-cy="payment-exp-year"
-                            type="exp_year"
+                            data-cy='payment-exp-year'
+                            type='exp_year'
                           />
                         </div>
-                        <div className="ml-5">
+                        <div className='ml-5'>
                           <PaymentSourceEditButton
-                            data-cy="payment-edit-button"
-                            className="text-blue-500 hover:underline hover:text-blue-600"
+                            data-cy='payment-edit-button'
+                            className='text-blue-500 hover:underline hover:text-blue-600'
                           />
                         </div>
                       </div>
                     </PaymentSource>
                     <Errors
-                      className="text-red-600 block"
-                      resource="payment_methods"
+                      className='text-red-600 block'
+                      resource='payment_methods'
                     />
                   </PaymentMethod>
 
-                  <div className="flex flex-row-reverse justify-end">
+                  <div className='flex flex-row-reverse justify-end'>
                     <label
-                      htmlFor="privacy-terms"
-                      className="block text-sm font-medium text-gray-700 ml-3 self-end"
+                      htmlFor='privacy-terms'
+                      className='block text-sm font-medium text-gray-700 ml-3 self-end'
                     >
                       Accept privacy and terms
                     </label>
-                    <div className="mt-1">
+                    <div className='mt-1'>
                       <PrivacyAndTermsCheckbox
-                        id="privacy-terms"
-                        className="h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded disabled:opacity-50"
+                        id='privacy-terms'
+                        className='h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300 rounded disabled:opacity-50'
                       />
                     </div>
                   </div>
@@ -251,13 +251,13 @@ export default function Main() {
                       onClick={(res: any) => {
                         if (res.placed) setPlaced(true)
                       }}
-                      className="mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                      className='mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50'
                     />
                   </div>
                 </PlaceOrderContainer>
               </PaymentMethodsContainer>
-              <div className="flex flex-col text-red-600 mt-5">
-                <Errors resource="orders" messages={messages} />
+              <div className='flex flex-col text-red-600 mt-5'>
+                <Errors resource='orders' messages={messages} />
               </div>
               {/* <PaymentMethodsContainer>
               <PaymentSource readonly>
@@ -289,6 +289,6 @@ export default function Main() {
           </div>
         </CommerceLayer>
       </React.StrictMode>
-    </Fragment>
+    </>
   )
 }

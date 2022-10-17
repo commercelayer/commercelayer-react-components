@@ -1,13 +1,13 @@
 import CommerceLayer from '#components/auth/CommerceLayer'
 import PricesContainer from '#components/prices/PricesContainer'
 import Price from '#components/prices/Price'
-import getToken from './utils/getToken'
+import getToken from '../utils/getToken'
 import { render, waitFor, screen } from '@testing-library/react'
 import SkusContainer from '#components/skus/SkusContainer'
 import Skus from '#components/skus/Skus'
 import SkuField from '#components/skus/SkuField'
 import ItemContainer from '#components/orders/ItemContainer'
-import { LocalContext } from './utils/context'
+import { LocalContext } from '../utils/context'
 
 interface PricesContext extends LocalContext {
   sku: string

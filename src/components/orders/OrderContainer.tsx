@@ -21,6 +21,7 @@ import OrderStorageContext from '#context/OrderStorageContext'
 import type { OrderCreate, Order } from '@commercelayer/sdk'
 import { BaseError } from '#typings/errors'
 import compareObjAttribute from '#utils/compareObjAttribute'
+import useCustomContext from '#utils/hooks/useCustomContext'
 
 interface Props {
   children: JSX.Element[] | JSX.Element
@@ -35,7 +36,11 @@ export function OrderContainer(props: Props): JSX.Element {
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const [lock, setLock] = useState(false)
   const [lockOrder, setLockOrder] = useState(true)
-  const config = useContext(CommerceLayerContext)
+  const config = useCustomContext({
+    context: CommerceLayerContext,
+    contextComponentName: 'CommerceLayer',
+    currentComponentName: 'OrderContainer'
+  })
   if (config.accessToken == null)
     throw new Error('Cannot use `OrderContainer` outside of `CommerceLayer`')
   const {
