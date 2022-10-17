@@ -1,8 +1,8 @@
 import Parent from '#components/utils/Parent'
 import ParcelChildrenContext from '#context/ParcelChildrenContext'
 import { ChildrenFunction } from '#typings/index'
+import useCustomContext from '#utils/hooks/useCustomContext'
 import type { Parcel } from '@commercelayer/sdk'
-import { useContext } from 'react'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   /**
@@ -20,10 +20,13 @@ interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
 }
 
 export function ParcelLineItemsCount({ children, ...p }: Props): JSX.Element {
-  const { parcel } = useContext(ParcelChildrenContext)
-  if (parcel === undefined)
-    throw new Error('Cannot use `ParcelLineItemsCount` outside of `Parcels`')
-  const quantity = parcel.parcel_line_items?.length ?? 0
+  const { parcel } = useCustomContext({
+    context: ParcelChildrenContext,
+    contextComponentName: 'Parcels',
+    currentComponentName: 'ParcelLineItemsCount',
+    key: 'parcel'
+  })
+  const quantity = parcel?.parcel_line_items?.length ?? 0
   const childrenProps: ChildrenProps = {
     ...p,
     quantity,

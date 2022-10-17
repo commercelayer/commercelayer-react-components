@@ -139,7 +139,8 @@ export interface PaymentMethodAction {
 }
 
 export const paymentMethodInitialState: PaymentMethodState = {
-  errors: []
+  errors: [],
+  paymentMethods: undefined
 }
 
 export type SetPaymentMethodErrors = <V extends BaseError[]>(

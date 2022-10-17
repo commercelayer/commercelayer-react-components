@@ -1,15 +1,15 @@
 import OrderContext from '#context/OrderContext'
 import getAmount from '#utils/getAmount'
 import Parent from './Parent'
-import { FunctionComponent, useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { PropsType } from '#utils/PropsType'
 import { baseOrderPricePropTypes } from '#typings'
 import isEmpty from 'lodash/isEmpty'
 
 export type BaseOrderPriceProps = PropsType<typeof baseOrderPricePropTypes> &
-  JSX.IntrinsicElements['span']
+  Omit<JSX.IntrinsicElements['span'], 'children'>
 
-const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
+export function BaseOrderPrice(props: BaseOrderPriceProps): JSX.Element {
   const { format = 'formatted', base, type, children, ...p } = props
   const { order } = useContext(OrderContext)
   const [price, setPrice] = useState('')
@@ -19,13 +19,13 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
       base,
       type,
       format: format as string,
-      obj: order || {},
+      obj: order || {}
     })
     const c = getAmount<number>({
       base,
       type,
       format: 'cents',
-      obj: order || {},
+      obj: order || {}
     })
     setPrice(p)
     setCents(c)
@@ -38,7 +38,7 @@ const BaseOrderPrice: FunctionComponent<BaseOrderPriceProps> = (props) => {
   const parentProps = {
     priceCents: cents,
     price,
-    ...p,
+    ...p
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>

@@ -1,10 +1,11 @@
-import { useContext, ReactNode, useState, useEffect, MouseEvent } from 'react'
+import { ReactNode, useState, useEffect, MouseEvent } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import { LoaderType } from '#typings'
 import getLoaderComponent from '../../utils/getLoaderComponent'
 import { PaymentMethod as PaymentMethodType } from '@commercelayer/sdk'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
+import useCustomContext from '#utils/hooks/useCustomContext'
 
 type Props = {
   /**
@@ -43,7 +44,12 @@ export function PaymentMethod({
     currentPaymentMethodId,
     setPaymentMethod,
     setLoading: setLoadingPlaceOrder
-  } = useContext(PaymentMethodContext)
+  } = useCustomContext({
+    context: PaymentMethodContext,
+    contextComponentName: 'PaymentMethodsContainer',
+    currentComponentName: 'PaymentMethod',
+    key: 'paymentMethods'
+  })
   useEffect(() => {
     if (paymentMethods) setLoading(false)
     if (currentPaymentMethodId) setPaymentSelected(currentPaymentMethodId)

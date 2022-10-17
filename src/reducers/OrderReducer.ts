@@ -228,7 +228,7 @@ export const getApiOrder: GetOrder = async (
     if (
       (clearWhenPlaced && order.status === 'placed') ||
       (clearWhenPlaced && order.status === 'approved') ||
-      order.status === 'cancelled'
+      (clearWhenPlaced && order.status === 'cancelled')
     ) {
       persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
       if (dispatch) {

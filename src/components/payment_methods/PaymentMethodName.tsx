@@ -1,27 +1,29 @@
-import { useContext } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components-utils/Parent'
-import components from '#config/components'
+import useCustomContext from '#utils/hooks/useCustomContext'
+import { ChildrenFunction } from '#typings/index'
 
-const propTypes = components.PaymentMethodName.propTypes
-const displayName = components.PaymentMethodName.displayName
-
-type PaymentMethodNameChildrenProps = Omit<Props, 'children'> & {
+interface ChildrenProps extends Omit<Props, 'children'> {
   labelName: string
 }
 
-type Props = {
-  children?: (props: PaymentMethodNameChildrenProps) => JSX.Element
-} & JSX.IntrinsicElements['label']
+interface Props extends Omit<JSX.IntrinsicElements['label'], 'children'> {
+  children?: ChildrenFunction<ChildrenProps>
+}
 
-export function PaymentMethodName(props: Props) {
-  const { payment } = useContext(PaymentMethodChildrenContext)
-  const labelName = payment?.['name']
+export function PaymentMethodName(props: Props): JSX.Element {
+  const { payment } = useCustomContext({
+    context: PaymentMethodChildrenContext,
+    contextComponentName: 'PaymentMethod',
+    currentComponentName: 'PaymentMethodName',
+    key: 'payment'
+  })
+  const labelName = payment?.name
   const htmlFor = payment?.payment_source_type
   const parentProps = {
     htmlFor,
     labelName,
-    ...props,
+    ...props
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
@@ -31,8 +33,5 @@ export function PaymentMethodName(props: Props) {
     </label>
   )
 }
-
-PaymentMethodName.propTypes = propTypes
-PaymentMethodName.displayName = displayName
 
 export default PaymentMethodName

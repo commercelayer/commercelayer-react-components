@@ -1,29 +1,32 @@
 import { useContext, ChangeEvent } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components-utils/Parent'
-import components from '#config/components'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { PaymentMethod } from '@commercelayer/sdk'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
+import useCustomContext from '#utils/hooks/useCustomContext'
+import { ChildrenFunction } from '#typings/index'
 
-const propTypes = components.PaymentMethodRadioButton.propTypes
-const displayName = components.PaymentMethodRadioButton.displayName
-
-type ShippingMethodRadioButtonChildrenProps = Omit<Props, 'children'> & {
+interface ChildrenProps extends Omit<Props, 'children'> {
   checked: boolean
   handleOnChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
 }
 
 type Props = {
-  children?: (props: ShippingMethodRadioButtonChildrenProps) => JSX.Element
+  children?: ChildrenFunction<ChildrenProps>
   onChange?: (payment?: PaymentMethod | Record<string, any>) => void
 } & JSX.IntrinsicElements['input']
 
-export function PaymentMethodRadioButton(props: Props) {
+export function PaymentMethodRadioButton(props: Props): JSX.Element {
   const { onChange, ...p } = props
   const { payment, paymentSelected, setPaymentSelected, clickableContainer } =
-    useContext(PaymentMethodChildrenContext)
+    useCustomContext({
+      context: PaymentMethodChildrenContext,
+      contextComponentName: 'PaymentMethod',
+      currentComponentName: 'PaymentMethodRadioButton',
+      key: 'payment'
+    })
   const { order } = useContext(OrderContext)
   const { setPaymentMethod, setLoading } = useContext(PaymentMethodContext)
   const orderId = order?.id || ''
@@ -31,13 +34,15 @@ export function PaymentMethodRadioButton(props: Props) {
   const paymentMethodId = payment?.id as string
   const name = `payment-${orderId}`
   const checked = paymentSelected === payment?.id
-  const handleOnChange = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleOnChange = async (
+    e: ChangeEvent<HTMLInputElement>
+  ): Promise<void> => {
     e.stopPropagation()
-    setPaymentSelected && setPaymentSelected(paymentMethodId)
+    if (setPaymentSelected) setPaymentSelected(paymentMethodId)
     setLoading({ loading: true })
     !clickableContainer &&
       (await setPaymentMethod({ paymentResource, paymentMethodId }))
-    onChange && onChange(payment)
+    if (onChange) onChange(payment)
     setLoading({ loading: false })
   }
   const id = payment?.payment_source_type
@@ -55,14 +60,13 @@ export function PaymentMethodRadioButton(props: Props) {
       title={name}
       type='radio'
       id={id}
-      onChange={handleOnChange}
+      onChange={(e) => {
+        void handleOnChange(e)
+      }}
       checked={checked}
       {...p}
     />
   )
 }
-
-PaymentMethodRadioButton.propTypes = propTypes
-PaymentMethodRadioButton.displayName = displayName
 
 export default PaymentMethodRadioButton

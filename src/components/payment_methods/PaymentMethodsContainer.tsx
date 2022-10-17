@@ -14,6 +14,7 @@ import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { BaseError } from '#typings/errors'
 import { isEmpty } from 'lodash'
+import useCustomContext from '#utils/hooks/useCustomContext'
 
 interface Props {
   children: ReactNode
@@ -33,7 +34,12 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     addResourceToInclude,
     updateOrder,
     includeLoaded
-  } = useContext(OrderContext)
+  } = useCustomContext({
+    context: OrderContext,
+    contextComponentName: 'OrderContainer',
+    currentComponentName: 'PaymentMethodsContainer',
+    key: 'order'
+  })
   const credentials = useContext(CommerceLayerContext)
   async function getPayMethods(): Promise<void> {
     order && (await getPaymentMethods({ order, dispatch }))

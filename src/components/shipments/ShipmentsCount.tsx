@@ -1,8 +1,8 @@
 import Parent from '#components/utils/Parent'
 import ShipmentContext from '#context/ShipmentContext'
 import { ChildrenFunction } from '#typings/index'
+import useCustomContext from '#utils/hooks/useCustomContext'
 import type { Shipment } from '@commercelayer/sdk'
-import { useContext } from 'react'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   /**
@@ -20,12 +20,13 @@ interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
 }
 
 export function ShipmentsCount({ children, ...p }: Props): JSX.Element {
-  const { shipments } = useContext(ShipmentContext)
-  if (shipments === undefined)
-    throw new Error(
-      'Cannot use `ShipmentsCount` outside of `ShipmentsContainer`'
-    )
-  const quantity = shipments.length
+  const { shipments } = useCustomContext({
+    context: ShipmentContext,
+    contextComponentName: 'ShipmentsContainer',
+    currentComponentName: 'ShipmentsCount',
+    key: 'shipments'
+  })
+  const quantity = shipments?.length ?? 0
   const childrenProps: ChildrenProps = {
     ...p,
     quantity,

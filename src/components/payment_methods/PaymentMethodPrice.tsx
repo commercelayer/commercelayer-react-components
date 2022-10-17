@@ -1,26 +1,28 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import getAmount from '#utils/getAmount'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components-utils/Parent'
-import components from '#config/components'
 import { BaseAmountComponent } from '#typings/index'
+import useCustomContext from '#utils/hooks/useCustomContext'
 
-const propTypes = components.PaymentMethodPrice.propTypes
-const displayName = components.PaymentMethodPrice.displayName
-
-type Props = {
+interface Props extends BaseAmountComponent {
   type?: 'amount'
   labelFree?: string
-} & BaseAmountComponent
+}
 
-export function PaymentMethodPrice(props: Props) {
+export function PaymentMethodPrice(props: Props): JSX.Element {
   const {
     format = 'formatted',
     type = 'amount',
     labelFree = 'Free',
     ...p
   } = props
-  const { payment } = useContext(PaymentMethodChildrenContext)
+  const { payment } = useCustomContext({
+    context: PaymentMethodChildrenContext,
+    contextComponentName: 'PaymentMethod',
+    currentComponentName: 'PaymentMethodPrice',
+    key: 'payment'
+  })
   const [price, setPrice] = useState('')
   const [priceCents, setPriceCents] = useState(0)
   useEffect(() => {
@@ -31,7 +33,7 @@ export function PaymentMethodPrice(props: Props) {
         base: 'price',
         type,
         format: 'cents',
-        obj: payment,
+        obj: payment
       })
       setPriceCents(c)
     }
@@ -44,7 +46,7 @@ export function PaymentMethodPrice(props: Props) {
     labelFree,
     price,
     priceCents,
-    ...p,
+    ...p
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
@@ -52,8 +54,5 @@ export function PaymentMethodPrice(props: Props) {
     <span {...p}>{priceCents === 0 ? labelFree : price}</span>
   )
 }
-
-PaymentMethodPrice.propTypes = propTypes
-PaymentMethodPrice.displayName = displayName
 
 export default PaymentMethodPrice
