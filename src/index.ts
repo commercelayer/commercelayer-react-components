@@ -38,7 +38,6 @@ export * from '#components/line_items/LineItemOption'
 export * from '#components/line_items/LineItemOptions'
 export * from '#components/line_items/LineItemQuantity'
 export * from '#components/line_items/LineItemRemoveLink'
-export * from '#components/line_items/LineItemsContainer'
 export * from '#components/line_items/LineItemsCount'
 export * from '#components/line_items/LineItemsEmpty'
 export * from '#components/orders/AddToCartButton'
@@ -47,7 +46,6 @@ export * from '#components/orders/CartLink'
 export * from '#components/orders/CheckoutLink'
 export * from '#components/orders/DiscountAmount'
 export * from '#components/orders/GiftCardAmount'
-export * from '#components/orders/ItemContainer'
 export * from '#components/orders/OrderContainer'
 export * from '#components/orders/OrderList'
 export * from '#components/orders/OrderListEmpty'
@@ -91,34 +89,23 @@ export * from '#components/shipping_methods/ShippingMethodRadioButton'
 export * from '#components/skus/AvailabilityContainer'
 export * from '#components/skus/AvailabilityTemplate'
 export * from '#components/skus/DeliveryLeadTime'
-export * from '#components/skus/QuantitySelector'
 export * from '#components/skus/SkuField'
 export * from '#components/skus/SkuList'
 export * from '#components/skus/SkuListsContainer'
-export * from '#components/skus/SkuOption'
-export * from '#components/skus/SkuOptionInput'
-export * from '#components/skus/SkuOptionsContainer'
 export * from '#components/skus/Skus'
 export * from '#components/skus/SkusContainer'
-export * from '#components/skus/VariantSelector'
-export * from '#components/skus/VariantsContainer'
 export * from '#components/stock_transfers/StockTransfer'
 export * from '#components/stock_transfers/StockTransferField'
 export type { CustomerCardsType } from '#components/utils/PaymentCardsTemplate'
-export type { AddressCardsType } from '#components/utils/AddressCardsTemplate'
-export type { AddToCartButtonType } from '#components/orders/AddToCartButton'
 export type {
   ShippingMethodRadioButtonType,
   ShippingMethodRadioButtonOnChangeType
 } from '#components/shipping_methods/ShippingMethodRadioButton'
-export type { LineItemCodeType } from '#components/line_items/LineItemCode'
-export type { LineItemNameType } from '#components/line_items/LineItemName'
-export type { LineItemImageType } from '#components/line_items/LineItemImage'
-export type { LineItemType } from '#typings'
 export type { ErrorComponentProps, ResourceErrorType } from '#typings/errors'
 export type {
   AddressCountrySelectName,
   AddressInputName,
   AddressStateSelectName,
-  BaseInputType
+  BaseInputType,
+  LineItemType
 } from '#typings'

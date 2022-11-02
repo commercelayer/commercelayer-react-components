@@ -7,10 +7,7 @@ import {
 } from '#utils/localStorage'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import baseReducer from '#utils/baseReducer'
-import { ItemOption, CustomLineItem } from './ItemReducer'
 import isEmpty from 'lodash/isEmpty'
-import size from 'lodash/size'
-import map from 'lodash/map'
 import { BaseMetadataObject } from '#typings/index'
 import { BaseError } from '#typings/errors'
 import getSdk from '#utils/getSdk'
@@ -50,25 +47,6 @@ type CreateOrderParams = Pick<
 
 export type CreateOrder = (params?: CreateOrderParams) => Promise<string>
 
-export type AddToCartParams = Partial<{
-  bundleCode: string
-  skuCode: string
-  persistKey: string
-  config: CommerceLayerConfig
-  dispatch: Dispatch<OrderActions>
-  state: Partial<OrderState>
-  skuId: string
-  quantity: number
-  option: ItemOption
-  lineItem: CustomLineItem
-  orderMetadata: BaseMetadataObject
-  orderAttributes: Record<string, any>
-  errors: BaseError[]
-  setLocalOrder: SetLocalOrder
-  buyNowMode: boolean
-  checkoutUrl: string
-}>
-
 export interface AddToCartImportParams
   extends Omit<
     AddToCartParams,
@@ -81,8 +59,6 @@ export type AddToCartReturn = Promise<{
   success: boolean
   orderId: string | undefined
 }>
-
-export type AddToCart = (params: AddToCartParams) => AddToCartReturn
 
 export type AddToCartImport = (params: AddToCartImportParams) => AddToCartReturn
 
@@ -117,18 +93,6 @@ export interface OrderPayload {
   includeLoaded?: ResourceIncludedLoaded
   withoutIncludes?: boolean
 }
-
-export type AddToCartValues = Pick<
-  AddToCartParams,
-  | 'bundleCode'
-  | 'lineItem'
-  | 'quantity'
-  | 'skuCode'
-  | 'skuId'
-  | 'option'
-  | 'buyNowMode'
-  | 'checkoutUrl'
->
 
 export type AddToCartImportValues = Pick<AddToCartImportParams, 'lineItems'>
 
@@ -378,114 +342,131 @@ export function addResourceToInclude({
     })
 }
 
-export const addToCart: AddToCart = async (params) => {
+export interface LineItemOption {
+  /**
+   * SKU Option ID. Ex: mNJEgsJwBn
+   */
+  skuOptionId: string
+  /**
+   * Set of key-value pairs that represent the selected options. Ex: { message: 'This is a option message' }
+   */
+  options: Record<string, string>
+  quantity?: number
+}
+
+export interface CustomLineItem {
+  name?: string
+  imageUrl?: string | null
+}
+
+export type AddToCartParams = Partial<{
+  bundleCode: string
+  skuCode: string
+  persistKey: string
+  config: CommerceLayerConfig
+  dispatch: Dispatch<OrderActions>
+  state: Partial<OrderState>
+  quantity: number
+  lineItemOption: LineItemOption
+  lineItem: CustomLineItem
+  orderMetadata: BaseMetadataObject
+  orderAttributes: Record<string, any>
+  errors: BaseError[]
+  setLocalOrder: SetLocalOrder
+  buyNowMode: boolean
+  checkoutUrl: string
+}>
+
+export async function addToCart(
+  params: AddToCartParams
+): Promise<{ success: boolean; orderId?: string }> {
   const {
     skuCode,
     bundleCode,
-    skuId,
     quantity,
-    option,
     config,
     dispatch,
     lineItem,
     state,
     errors = [],
     buyNowMode,
-    checkoutUrl
+    checkoutUrl,
+    lineItemOption
   } = params
   try {
-    if (!config)
-      throw {
-        errors: [
-          {
-            code: 'INVALID_RESOURCE',
-            resource: 'orders',
-            title: 'Markup error',
-            message:
-              'You are trying to place an order outside the OrderContainer component'
-          }
-        ] as BaseError[]
-      }
-    const sdk = getSdk(config)
-    const id = await createOrder(params)
-    if (id) {
-      const order = sdk.orders.relationship(id)
-      const name = lineItem?.name
-      const imageUrl = lineItem?.imageUrl as string
-      if (buyNowMode) {
-        if (!state?.order?.line_items) {
-          const { line_items: lineItems } = await sdk.orders.retrieve(id, {
-            fields: ['line_items'],
-            include: ['line_items']
-          })
-          if (lineItems && lineItems?.length > 0) {
+    if (config) {
+      const sdk = getSdk(config)
+      const id = await createOrder(params)
+      if (id) {
+        const order = sdk.orders.relationship(id)
+        const name = lineItem?.name
+        const imageUrl = lineItem?.imageUrl as string
+        if (buyNowMode) {
+          if (!state?.order?.line_items) {
+            const { line_items: lineItems } = await sdk.orders.retrieve(id, {
+              fields: ['line_items'],
+              include: ['line_items']
+            })
+            if (lineItems && lineItems?.length > 0) {
+              await Promise.all(
+                lineItems.map(async (lineItem) => {
+                  await sdk.line_items.delete(lineItem.id)
+                })
+              )
+            }
+          } else {
             await Promise.all(
-              lineItems.map(async (lineItem) => {
+              state?.order?.line_items.map(async (lineItem) => {
                 await sdk.line_items.delete(lineItem.id)
               })
             )
           }
-        } else {
-          await Promise.all(
-            state?.order?.line_items.map(async (lineItem) => {
-              await sdk.line_items.delete(lineItem.id)
-            })
-          )
         }
-      }
-      const attrs: LineItemCreate = {
-        order,
-        sku_code: skuCode,
-        name,
-        image_url: imageUrl,
-        quantity: quantity || 1,
-        _update_quantity: true,
-        bundle_code: bundleCode
-      }
-      if (skuId) {
-        attrs.item = sdk.skus.relationship(skuId)
-      }
-      const newLineItem = await sdk.line_items.create(attrs)
-      if (!isEmpty(option)) {
-        let c = 0
-        map(option, async (opt) => {
-          const { options, skuOptionId } = opt
+        const attrs: LineItemCreate = {
+          order,
+          sku_code: skuCode,
+          name,
+          image_url: imageUrl,
+          quantity: quantity ?? 1,
+          _update_quantity: true,
+          bundle_code: bundleCode
+        }
+        const newLineItem = await sdk.line_items.create(attrs)
+        if (lineItemOption != null) {
+          const { skuOptionId, options, quantity } = lineItemOption
           const skuOption = sdk.sku_options.relationship(skuOptionId)
           const lineItemRel = sdk.line_items.relationship(newLineItem.id)
           const lineItemOptionsAttributes: LineItemOptionCreate = {
-            quantity: 1,
+            quantity: quantity ?? 1,
             options,
             sku_option: skuOption,
             line_item: lineItemRel
           }
           await sdk.line_item_options.create(lineItemOptionsAttributes)
-          c += 1
-          if (c === size(option)) {
-            await getApiOrder({ id, ...params })
-          }
-        })
-      } else {
-        await getApiOrder({ id, ...params, state })
+          await getApiOrder({ id, ...params })
+        } else {
+          await getApiOrder({ id, ...params, state })
+        }
+        if (!isEmpty(errors) && dispatch) {
+          dispatch({
+            type: 'setErrors',
+            payload: {
+              errors: []
+            }
+          })
+        }
+        if (buyNowMode) {
+          const { organization } = getOrganizationSlug(config.endpoint ?? '')
+          const params = `${id}?accessToken=${config.accessToken ?? ''}`
+          const redirectUrl = checkoutUrl
+            ? `${checkoutUrl}/${params}`
+            : `https://${organization}.checkout.commercelayer.app/${params}`
+          location.href = redirectUrl
+        }
+        return { success: true, orderId: id }
       }
-      if (!isEmpty(errors) && dispatch) {
-        dispatch({
-          type: 'setErrors',
-          payload: {
-            errors: []
-          }
-        })
-      }
-      if (buyNowMode) {
-        const { organization } = getOrganizationSlug(config.endpoint ?? '')
-        const params = `${id}?accessToken=${config.accessToken ?? ''}`
-        const redirectUrl = checkoutUrl
-          ? `${checkoutUrl}/${params}`
-          : `https://${organization}.checkout.commercelayer.app/${params}`
-        location.href = redirectUrl
-      }
-      return { success: true, orderId: id }
     }
-    return { success: false, orderId: undefined }
+    return { success: false }
   } catch (error: unknown) {
     const errors = getErrors(error, 'orders')
     console.error('Add to cart', errors)
@@ -495,7 +476,7 @@ export const addToCart: AddToCart = async (params) => {
         newErrors: errors,
         dispatch
       })
-    return { success: false, orderId: undefined }
+    return { success: false }
   }
 }
 

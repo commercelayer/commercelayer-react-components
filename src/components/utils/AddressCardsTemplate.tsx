@@ -5,7 +5,8 @@ import AddressChildrenContext from '#context/AddressChildrenContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
 import { ChildrenFunction } from '#typings'
 
-type ChildrenProps = Pick<Props, 'customerAddresses' | 'className'> & {
+export interface TAddressCards
+  extends Pick<Props, 'customerAddresses' | 'className'> {
   AddressProvider: typeof AddressChildrenContext.Provider
 }
 
@@ -14,9 +15,7 @@ export interface CustomerAddress extends Address {
   handleSelect?: () => void
 }
 
-export type AddressCardsTemplateChildren = ChildrenFunction<ChildrenProps>
-
-export type AddressCardsType = ChildrenProps
+export type AddressCardsTemplateChildren = ChildrenFunction<TAddressCards>
 
 export type HandleSelect = (
   k: number,

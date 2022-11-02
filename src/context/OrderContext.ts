@@ -1,7 +1,6 @@
 import { createContext } from 'react'
 import { Order } from '@commercelayer/sdk'
 import {
-  AddToCart,
   OrderState,
   CreateOrder,
   SetGiftCardOrCouponCode,
@@ -13,13 +12,14 @@ import {
   saveAddressToCustomerAddressBook,
   addResourceToInclude,
   updateOrder,
-  getOrderContext
+  getOrderContext,
+  addToCart
 } from '#reducers/OrderReducer'
 import { BaseError } from '#typings/errors'
 
 interface DefaultContext extends OrderState {
   createOrder: CreateOrder
-  addToCart?: AddToCart
+  addToCart?: typeof addToCart
   setOrderErrors: (errors: BaseError[]) => void
   setGiftCardOrCouponCode: SetGiftCardOrCouponCode
   removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode

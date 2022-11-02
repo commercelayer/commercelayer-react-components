@@ -6,13 +6,7 @@ import { render, waitFor, screen } from '@testing-library/react'
 import SkusContainer from '#components/skus/SkusContainer'
 import Skus from '#components/skus/Skus'
 import SkuField from '#components/skus/SkuField'
-import ItemContainer from '#components/orders/ItemContainer'
-import { LocalContext } from '../utils/context'
-
-interface PricesContext extends LocalContext {
-  sku: string
-  skus: string[]
-}
+import { SkusContext } from '../utils/context'
 
 describe('Prices components', () => {
   let token: string | undefined
@@ -24,7 +18,7 @@ describe('Prices components', () => {
       domain = endpoint
     }
   })
-  beforeEach<PricesContext>(async (ctx) => {
+  beforeEach<SkusContext>(async (ctx) => {
     if (token != null && domain != null) {
       ctx.accessToken = token
       ctx.endpoint = domain
@@ -32,7 +26,7 @@ describe('Prices components', () => {
       ctx.skus = ['BABYONBU000000E63E7412MX', 'BABYONBU000000FFFFFF12MX']
     }
   })
-  it<PricesContext>('Show single price', async (ctx) => {
+  it<SkusContext>('Show single price', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <PricesContainer>
@@ -47,7 +41,7 @@ describe('Prices components', () => {
     expect(price.textContent).not.toBe('')
     expect(compare?.textContent).not.toBe('')
   })
-  it<PricesContext>('Show single price with custom loading', async (ctx) => {
+  it<SkusContext>('Show single price with custom loading', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <PricesContainer loader={<>Caricamento...</>}>
@@ -57,7 +51,7 @@ describe('Prices components', () => {
     )
     expect(screen.getByText('Caricamento...'))
   })
-  it<PricesContext>('Show single price without compare price', async (ctx) => {
+  it<SkusContext>('Show single price without compare price', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <PricesContainer>
@@ -71,7 +65,7 @@ describe('Prices components', () => {
     expect(price).toBeDefined()
     expect(compare).toBeNull()
   })
-  it<PricesContext>('Show single price with compare class name', async (ctx) => {
+  it<SkusContext>('Show single price with compare class name', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <PricesContainer>
@@ -85,7 +79,7 @@ describe('Prices components', () => {
     expect(price).toBeDefined()
     expect(compare?.className).toBe('compare-class-name')
   })
-  it<PricesContext>('Show single price with skuCode on Price container', async (ctx) => {
+  it<SkusContext>('Show single price with skuCode on Price container', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <PricesContainer skuCode={ctx.sku}>
@@ -99,23 +93,7 @@ describe('Prices components', () => {
     expect(price.textContent).not.toBe('')
     expect(compare?.textContent).not.toBe('')
   })
-  it<PricesContext>('Show single price with skuCode on Item container', async (ctx) => {
-    render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
-        <ItemContainer skuCode={ctx.sku}>
-          <PricesContainer>
-            <Price />
-          </PricesContainer>
-        </ItemContainer>
-      </CommerceLayer>
-    )
-    await waitFor(() => screen.getByTestId(`price-${ctx.sku}`))
-    const price = screen.getByTestId(`price-${ctx.sku}`)
-    const compare = screen.queryByTestId(`compare-${ctx.sku}`)
-    expect(price.textContent).not.toBe('')
-    expect(compare?.textContent).not.toBe('')
-  })
-  it<PricesContext>('Show twice prices', async (ctx) => {
+  it<SkusContext>('Show twice prices', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <PricesContainer>
@@ -133,7 +111,7 @@ describe('Prices components', () => {
       expect(compare?.textContent).not.toBe('')
     }
   })
-  it<PricesContext>('Show twice prices using Skus components', async (ctx) => {
+  it<SkusContext>('Show twice prices using Skus components', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <SkusContainer skus={ctx.skus}>

@@ -132,7 +132,7 @@
     "build": "tsc -b tsconfig.prod.json tsconfig.prod.esm.json --verbose && pnpm postbuild",
     "build:dev": "tsc -b tsconfig.prod.json tsconfig.prod.esm.json --verbose && tsc-alias -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.esm.json",
     "postbuild": "tsc-alias -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.esm.json &&  minimize-js lib -w -s",
-    "start": "NODE_OPTIONS='--inspect' next dev"
+    "dev": "NODE_OPTIONS='--inspect' next dev"
   },
   "repository": {
     "type": "git",

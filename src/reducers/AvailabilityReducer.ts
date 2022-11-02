@@ -4,7 +4,6 @@ import { Sku } from '@commercelayer/sdk'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Dispatch } from 'react'
 import getSdk from '#utils/getSdk'
-import { Items } from '#reducers/ItemReducer'
 
 export interface DeliveryLeadTime {
   shipping_method: {
@@ -40,8 +39,9 @@ export interface LeadTimes {
 }
 
 export type AvailabilityPayload = {
-  quantity?: number | null
+  quantity?: number
   errors?: BaseError[]
+  parent?: boolean
 } & Partial<DeliveryLeadTime>
 
 export type AvailabilityState = AvailabilityPayload
@@ -51,34 +51,17 @@ export interface AvailabilityAction {
   payload: AvailabilityPayload
 }
 
-export const availabilityInitialState: AvailabilityState = {
-  quantity: null,
-  min: {
-    days: 0,
-    hours: 0
-  },
-  max: {
-    days: 0,
-    hours: 0
-  },
-  errors: []
-}
+export const availabilityInitialState: AvailabilityState = {}
 
-type GetAvailability = (args: {
+export async function getAvailability({
+  skuCode,
+  dispatch,
+  config
+}: {
   skuCode: string
   dispatch: Dispatch<AvailabilityAction>
   config: CommerceLayerConfig
-  setItem?: (item: Items) => void
-  item?: Items
-}) => void
-
-export const getAvailability: GetAvailability = async ({
-  skuCode,
-  dispatch,
-  config,
-  setItem,
-  item
-}) => {
+}): Promise<void> {
   const sdk = getSdk(config)
   try {
     const [sku] = await sdk.skus.list({
@@ -95,41 +78,7 @@ export const getAvailability: GetAvailability = async ({
         type: 'setAvailability',
         payload: { ...delivery, quantity: skuInventory.inventory.quantity }
       })
-      if (setItem) setItem({ ...item, [skuCode]: skuInventory })
     }
-  } catch (error) {
-    console.error('Get SKU availability', error)
-  }
-}
-
-interface GetAvailabilityArgs {
-  skusIds: string[]
-  dispatch: Dispatch<AvailabilityAction>
-  config: CommerceLayerConfig
-  setItem?: (item: Items) => void
-}
-
-export async function getAvailabilityByIds({
-  skusIds,
-  config,
-  setItem
-}: GetAvailabilityArgs) {
-  const sdk = getSdk(config)
-  try {
-    const inventories = await Promise.all(
-      skusIds.map(async (id) => {
-        return (await sdk.skus.retrieve(id, {
-          fields: { skus: ['inventory', 'code'] }
-        })) as SkuInventory
-      })
-    )
-    const item = {} as Items
-    inventories.forEach((v) => {
-      if (v?.code) {
-        item[v.code] = v
-      }
-    })
-    if (setItem) setItem(item)
   } catch (error) {
     console.error('Get SKU availability', error)
   }

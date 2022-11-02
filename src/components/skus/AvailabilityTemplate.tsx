@@ -1,11 +1,8 @@
-import { useContext } from 'react'
 import AvailabilityContext from '#context/AvailabilityContext'
-import Parent from '../utils/Parent'
-import { isEmpty } from 'lodash'
+import Parent from '#components-utils/Parent'
 import { TimeFormat, ChildrenFunction } from '#typings/index'
 import { DeliveryLeadTime } from '#reducers/AvailabilityReducer'
-import ItemContext from '#context/ItemContext'
-import SkuChildrenContext from '#context/SkuChildrenContext'
+import useCustomContext from '#utils/hooks/useCustomContext'
 
 interface AvailabilityTemplateChildrenProps
   extends Omit<Props, 'children'>,
@@ -14,12 +11,36 @@ interface AvailabilityTemplateChildrenProps
   quantity: number
 }
 
+type FormatRules =
+  | {
+      /**
+       * Set time format for shipping method
+       */
+      timeFormat?: TimeFormat
+      /**
+       * Show shipping method name
+       */
+      showShippingMethodName?: false
+      /**
+       * Show shipping method price
+       */
+      showShippingMethodPrice?: false
+    }
+  | {
+      timeFormat: TimeFormat
+      showShippingMethodName: true
+      showShippingMethodPrice?: boolean
+    }
+  | {
+      timeFormat: TimeFormat
+      showShippingMethodName?: boolean
+      showShippingMethodPrice: true
+    }
+
 type Props = {
   children?: ChildrenFunction<AvailabilityTemplateChildrenProps>
-  timeFormat?: TimeFormat
-  showShippingMethodName?: boolean
-  showShippingMethodPrice?: boolean
-} & JSX.IntrinsicElements['p']
+} & Omit<JSX.IntrinsicElements['span'], 'children'> &
+  FormatRules
 
 export function AvailabilityTemplate(props: Props): JSX.Element {
   const {
@@ -29,31 +50,20 @@ export function AvailabilityTemplate(props: Props): JSX.Element {
     children,
     ...p
   } = props
-  let {
+  const {
     min,
     max,
     shipping_method: shippingMethod,
     quantity
-  } = useContext(AvailabilityContext)
-  const { item } = useContext(ItemContext)
-  const { sku } = useContext(SkuChildrenContext)
+  } = useCustomContext({
+    context: AvailabilityContext,
+    contextComponentName: 'AvailabilityContainer',
+    currentComponentName: 'AvailabilityTemplate',
+    key: 'parent'
+  })
   const text: string[] = []
-  if (item && sku) {
-    const code = sku.code as string
-    const currentItem = item[code]
-    if (currentItem) {
-      const [level] = currentItem.inventory?.levels || []
-      const [delivery] = level?.delivery_lead_times || []
-      if (delivery) {
-        min = delivery?.min
-        max = delivery?.max
-        shippingMethod = delivery?.shipping_method
-      }
-      quantity = currentItem.inventory.quantity
-    }
-  }
-  const mn = !isEmpty(min) && timeFormat ? min?.[timeFormat] : ''
-  const mx = !isEmpty(max) && timeFormat ? max?.[timeFormat] : ''
+  const mn = min != null && timeFormat != null ? min?.[timeFormat] : ''
+  const mx = max != null && timeFormat != null ? max?.[timeFormat] : ''
   const shippingMethodPrice =
     showShippingMethodPrice && shippingMethod?.formatted_price_amount
       ? `(${shippingMethod?.formatted_price_amount})`
@@ -64,10 +74,8 @@ export function AvailabilityTemplate(props: Props): JSX.Element {
       : ''
   if (quantity && quantity > 0) {
     text.push('Available')
-    if (mn && mx) {
-      text.push(
-        `in ${mn} - ${mx} ${timeFormat ?? ''} ${name} ${shippingMethodPrice}`
-      )
+    if (mn && mx && timeFormat) {
+      text.push(`in ${mn} - ${mx} ${timeFormat} ${name} ${shippingMethodPrice}`)
     }
   } else if (quantity === 0) {
     text.push('Out of stock')
@@ -83,7 +91,7 @@ export function AvailabilityTemplate(props: Props): JSX.Element {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <p {...p}>{text.join(' ')}</p>
+    <span {...p}>{text.join(' ')}</span>
   )
 }
 

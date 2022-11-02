@@ -1,6 +1,5 @@
 import { useEffect, useReducer, useContext, useMemo, useState } from 'react'
 import orderReducer, {
-  AddToCartValues,
   createOrder,
   getApiOrder,
   setOrderErrors,
@@ -204,9 +203,11 @@ export function OrderContainer(props: Props): JSX.Element {
           orderAttributes: attributes,
           setLocalOrder
         }),
-      addToCart: async (values: AddToCartValues) =>
+      addToCart: async (
+        params: Parameters<typeof addToCart>[number]
+      ): ReturnType<typeof addToCart> =>
         await addToCart({
-          ...values,
+          ...params,
           persistKey,
           dispatch,
           state,

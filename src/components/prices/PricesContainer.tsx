@@ -1,18 +1,11 @@
 import { useEffect, useContext, useReducer } from 'react'
-import getPrices from '#utils/getPrices'
-import isEmpty from 'lodash/isEmpty'
-import has from 'lodash/has'
-import indexOf from 'lodash/indexOf'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import priceReducer, {
-  SetSkuCodesPrice,
-  unsetPriceState,
   priceInitialState,
-  getSkusPrice
+  getSkusPrice,
+  setSkuCodes
 } from '#reducers/PriceReducer'
 import PricesContext, { PricesContextValue } from '#context/PricesContext'
-import getCurrentItemKey from '#utils/getCurrentItemKey'
-import ItemContext from '#context/ItemContext'
 import { LoaderType } from '#typings'
 import SkuContext from '#context/SkuContext'
 
@@ -35,84 +28,34 @@ export function PricesContainer(props: Props): JSX.Element {
   const [state, dispatch] = useReducer(priceReducer, priceInitialState)
   const config = useContext(CommerceLayerContext)
   const { skuCodes } = useContext(SkuContext)
-  const {
-    setPrices,
-    prices,
-    items,
-    item: currentItem,
-    skuCode: itemSkuCode
-  } = useContext(ItemContext)
-  if (indexOf(state.skuCodes, skuCode) === -1 && skuCode)
-    state.skuCodes.push(skuCode)
-  const sCode =
-    skuCodes && skuCodes?.length > 0
-      ? ''
-      : skuCode || getCurrentItemKey(currentItem) || itemSkuCode || ''
-  const setSkuCodes: SetSkuCodesPrice = (skuCodes) => {
-    dispatch({
-      type: 'setSkuCodes',
-      payload: { skuCodes }
-    })
-  }
+  if (!state.skuCodes.includes(skuCode) && skuCode) state.skuCodes.push(skuCode)
+  const sCode = skuCodes && skuCodes?.length > 0 ? '' : skuCode ?? ''
   useEffect(() => {
-    if (state.skuCodes.length === 0 && skuCodes && skuCodes.length > 0) {
-      setSkuCodes(skuCodes)
+    if (
+      state.skuCodes.length === 0 &&
+      skuCodes != null &&
+      skuCodes.length > 0 &&
+      state.setSkuCodes != null
+    ) {
+      state.setSkuCodes({ skuCodes, dispatch })
     }
-    if (currentItem && has(prices, sCode)) {
-      dispatch({
-        type: 'setPrices',
-        payload: { prices }
-      })
-    }
-    if (!isEmpty(items) && isEmpty(currentItem)) {
-      // TODO: Remove any type
-      const p = getPrices(items as any)
-      dispatch({
-        type: 'setPrices',
-        payload: { prices: p }
-      })
-    }
-    if (config.accessToken && !has(prices, itemSkuCode || sCode)) {
-      if (state.skuCodes.length > 0 || itemSkuCode || sCode) {
-        getSkusPrice((sCode && [itemSkuCode || sCode]) || state.skuCodes, {
-          config,
-          dispatch,
-          setPrices,
-          prices,
-          perPage,
-          filters
-        })
-      }
-    }
-    if (config.accessToken && isEmpty(currentItem)) {
-      if (state.skuCodes.length > 0 || skuCode) {
+    if (config.accessToken) {
+      if (state.skuCodes.length > 0 || sCode) {
         getSkusPrice((sCode && [sCode]) || state.skuCodes, {
           config,
           dispatch,
-          setPrices,
-          prices,
           perPage,
           filters
         })
       }
     }
-    return (): void => {
-      if (isEmpty(currentItem)) {
-        unsetPriceState(dispatch)
-      }
-    }
-  }, [
-    config.accessToken,
-    currentItem,
-    sCode,
-    state.skuCodes.length,
-    itemSkuCode
-  ])
+  }, [config.accessToken, sCode, state.skuCodes.length])
   const priceValue: PricesContextValue = {
     ...state,
     skuCode: sCode,
     loader,
-    setSkuCodes
+    setSkuCodes: (params: Parameters<typeof setSkuCodes>[number]): void =>
+      setSkuCodes({ ...params, dispatch })
   }
   return (
     <PricesContext.Provider value={priceValue}>

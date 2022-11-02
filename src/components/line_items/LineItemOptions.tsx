@@ -1,19 +1,16 @@
 import { useContext, ReactNode } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
-import { isEmpty } from 'lodash'
-import components from '#config/components'
 import { LineItemOption } from '@commercelayer/sdk'
 
-const displayName = components.LineItemOptions.displayName
-
-type Props = JSX.IntrinsicElements['div'] & {
+type Props = {
   children: ReactNode
   title?: string
   showName?: boolean
   titleTagElement?: keyof JSX.IntrinsicElements
   titleClassName?: string
-} & (
+} & Omit<JSX.IntrinsicElements['div'], 'children'> &
+  (
     | {
         skuOptionId: string
         showAll?: never
@@ -24,7 +21,7 @@ type Props = JSX.IntrinsicElements['div'] & {
       }
   )
 
-export function LineItemOptions(props: Props) {
+export function LineItemOptions(props: Props): JSX.Element {
   const {
     skuOptionId,
     title,
@@ -37,14 +34,13 @@ export function LineItemOptions(props: Props) {
     ...p
   } = props
   const { lineItem } = useContext(LineItemChildrenContext)
-  const lineItemOptions: LineItemOption[] = !isEmpty(lineItem)
-    ? lineItem?.['line_item_options'] || []
-    : []
+  const lineItemOptions: LineItemOption[] =
+    lineItem != null ? lineItem?.line_item_options || [] : []
   const TitleTagElement = titleTagElement as any
   const options = lineItemOptions
     .filter((o) => {
       if (showAll) return true
-      // @ts-ignore
+      // @ts-expect-error
       return o.skuOption().id === skuOptionId
     })
     .map((o, k) => {
@@ -55,7 +51,7 @@ export function LineItemOptions(props: Props) {
       ) : null
       const valueProps = {
         lineItemOption: o,
-        showAll,
+        showAll
       }
       return (
         <div className={className} key={k} {...p}>
@@ -68,7 +64,5 @@ export function LineItemOptions(props: Props) {
     })
   return <>{options}</>
 }
-
-LineItemOptions.displayName = displayName
 
 export default LineItemOptions

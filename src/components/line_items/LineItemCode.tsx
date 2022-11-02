@@ -1,29 +1,30 @@
 import { useContext } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import Parent from '#components-utils/Parent'
-import components from '#config/components'
 import { LineItem } from '@commercelayer/sdk'
+import { ChildrenFunction } from '#typings/index'
 
-const propTypes = components.LineItemCode.propTypes
-const displayName = components.LineItemCode.displayName
-
-export type LineItemCodeType = Omit<Props, 'children'> & {
+export interface TLineItemCode extends Omit<Props, 'children'> {
   lineItem: LineItem
   skuCode: string
 }
 
-type Props = {
-  children?: (props: LineItemCodeType) => JSX.Element
+interface Props extends Omit<JSX.IntrinsicElements['p'], 'children'> {
+  children?: ChildrenFunction<TLineItemCode>
   type?: 'sku_code' | 'bundle_code'
-} & JSX.IntrinsicElements['p']
+}
 
-export function LineItemCode({ type = 'sku_code', children, ...p }: Props) {
+export function LineItemCode({
+  type = 'sku_code',
+  children,
+  ...p
+}: Props): JSX.Element {
   const { lineItem } = useContext(LineItemChildrenContext)
   const labelName = lineItem?.[type]
   const parentProps = {
     lineItem,
     skuCode: labelName,
-    ...p,
+    ...p
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -31,8 +32,5 @@ export function LineItemCode({ type = 'sku_code', children, ...p }: Props) {
     <p {...p}>{labelName}</p>
   )
 }
-
-LineItemCode.propTypes = propTypes
-LineItemCode.displayName = displayName
 
 export default LineItemCode

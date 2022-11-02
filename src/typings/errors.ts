@@ -86,7 +86,7 @@ const CEType: CodeErrorType[] = [
   'TYPE_MISMATCH',
   'UNAUTHORIZED',
   'UNSUPPORTED_MEDIA_TYPE',
-  'VALIDATION_ERROR',
+  'VALIDATION_ERROR'
 ]
 
 export interface BaseError {
@@ -105,7 +105,7 @@ export const REType: ResourceErrorType[] = [
   'orders',
   'prices',
   'sku_options',
-  'variant',
+  'variant'
 ]
 
 export const BaseErrorObject = PropTypes.shape({
@@ -113,7 +113,7 @@ export const BaseErrorObject = PropTypes.shape({
   message: PropTypes.string.isRequired,
   resource: PropTypes.oneOf(REType),
   field: PropTypes.string,
-  id: PropTypes.string,
+  id: PropTypes.string
 })
 
 export const ErrorPropTypes = {
@@ -128,10 +128,10 @@ export const ErrorPropTypes = {
     'customer_address',
     'sku_options',
     'variant',
-    'shipments',
+    'shipments'
   ]).isRequired,
   children: PropTypes.func,
-  field: PropTypes.string,
+  field: PropTypes.string
   // messages: PropTypes.arrayOf(BaseErrorObject.isRequired),
 }
 
@@ -139,7 +139,7 @@ type ErrorChildrenComponentProps = ChildrenFunction<
   Omit<ErrorComponentProps, 'children'> & { errors: string[] }
 >
 
-export type ErrorComponentProps = {
+export interface ErrorComponentProps {
   /**
    * Resource which caused the error
    */
@@ -152,11 +152,11 @@ export type ErrorComponentProps = {
   /**
    * Error message which you can translate
    */
-  messages?: {
+  messages?: Array<{
     code: CodeErrorType
     message: string
     resource?: ResourceErrorType
     field?: string
     id?: string
-  }[]
+  }>
 }
