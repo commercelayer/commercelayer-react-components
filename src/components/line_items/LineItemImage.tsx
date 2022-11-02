@@ -1,28 +1,24 @@
 import { useContext } from 'react'
-import Parent from '#components-utils/Parent'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import components from '#config/components'
 import { LineItem } from '@commercelayer/sdk'
-import { LineItemType } from '#typings'
+import { ChildrenFunction, LineItemType } from '#typings'
 import { defaultGiftCardImgUrl, defaultImgUrl } from '#utils/placeholderImages'
+import Parent from '#components/utils/Parent'
 
-const propTypes = components.LineItemImage.propTypes
-const displayName = components.LineItemImage.displayName
-
-export type LineItemImageType = Omit<Props, 'children'> & {
+export interface TLineItemImage extends Omit<Props, 'children'> {
   src: string
   lineItem: LineItem
 }
 
 type Props = {
-  children?: (props: LineItemImageType) => JSX.Element
+  children?: ChildrenFunction<TLineItemImage>
   width?: number
   placeholder?: {
     [K in LineItemType]?: string
   }
 } & Omit<JSX.IntrinsicElements['img'], 'src' | 'srcSet' | 'placeholder'>
 
-export function LineItemImage(props: Props) {
+export function LineItemImage(props: Props): JSX.Element | null {
   const { placeholder, children, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const itemType = lineItem?.item_type as LineItemType
@@ -38,16 +34,18 @@ export function LineItemImage(props: Props) {
     lineItem,
     src,
     placeholder,
-    ...p,
+    ...p
   }
   return children ? (
     <Parent {...parenProps}>{children}</Parent>
   ) : !src ? null : (
-    <img alt="" src={src} {...p} />
+    <img
+      data-testid={`line-item-image-${lineItem?.sku_code ?? ''}`}
+      alt={lineItem?.name}
+      src={src}
+      {...p}
+    />
   )
 }
-
-LineItemImage.propTypes = propTypes
-LineItemImage.displayName = displayName
 
 export default LineItemImage

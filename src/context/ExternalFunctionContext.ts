@@ -1,7 +1,7 @@
 import { createContext } from 'react'
 import axios from 'axios'
 
-type Context = {
+interface Context {
   url: string | null
   callExternalFunction: CallExternalFunction
 }
@@ -13,12 +13,12 @@ type CallExternalFunction = (params: {
 
 export const callExternalFunction: CallExternalFunction = async ({
   url,
-  data,
-}) => axios.post(url, data)
+  data
+}) => await axios.post(url, data)
 
 const ExternalFunctionContext = createContext<Context>({
   url: null,
-  callExternalFunction,
+  callExternalFunction
 })
 
 export default ExternalFunctionContext

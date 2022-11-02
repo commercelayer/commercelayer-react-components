@@ -8,3 +8,8 @@ export interface LocalContext extends TestContext {
 export interface OrderContext extends LocalContext {
   orderId: string
 }
+
+export interface SkusContext extends LocalContext {
+  sku: string
+  skus: string[]
+}

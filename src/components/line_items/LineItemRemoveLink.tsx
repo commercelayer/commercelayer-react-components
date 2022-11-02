@@ -3,6 +3,7 @@ import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
 import Parent from '#components-utils/Parent'
 import { ChildrenFunction } from '#typings/index'
+import useCustomContext from '#utils/hooks/useCustomContext'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   handleRemove: (event: React.MouseEvent<HTMLAnchorElement>) => void
@@ -16,12 +17,18 @@ interface Props
 }
 
 export function LineItemRemoveLink(props: Props): JSX.Element {
-  const { label = 'Remove' } = props
-  const { lineItem } = useContext(LineItemChildrenContext)
+  const { label = 'Remove', onClick } = props
+  const { lineItem } = useCustomContext({
+    context: LineItemChildrenContext,
+    contextComponentName: 'LineItem',
+    currentComponentName: 'LineItemRemoveLink',
+    key: 'lineItem'
+  })
   const { deleteLineItem } = useContext(LineItemContext)
   const handleRemove = (e: React.MouseEvent<HTMLAnchorElement>): void => {
     e.preventDefault()
-    deleteLineItem && lineItem && deleteLineItem(lineItem.id)
+    if (deleteLineItem != null && lineItem != null) deleteLineItem(lineItem.id)
+    if (onClick != null) onClick(e)
   }
   const parentProps = {
     handleRemove,
@@ -30,7 +37,12 @@ export function LineItemRemoveLink(props: Props): JSX.Element {
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <a {...props} href='#' onClick={handleRemove}>
+    <a
+      data-testid={`line-item-remove-link-${lineItem?.sku_code ?? ''}`}
+      {...props}
+      href='#'
+      onClick={handleRemove}
+    >
       {label}
     </a>
   )

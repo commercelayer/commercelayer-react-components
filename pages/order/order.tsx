@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { getSalesChannelToken } from '@commercelayer/js-auth'
-import { Nav } from '.'
 import {
   CommerceLayer,
   OrderContainer,
@@ -34,11 +33,12 @@ const clientId = process.env['NEXT_PUBLIC_CLIENT_ID'] as string
 const endpoint = process.env['NEXT_PUBLIC_ENDPOINT'] as string
 const scope = process.env['NEXT_PUBLIC_MARKET_ID'] as string
 
-export default function Order() {
+export default function Order(): JSX.Element {
   const [token, setToken] = useState('')
-  const [quantity, setQuantity] = useState('0')
+  const [currentSku, setCurrentSku] = useState('BABYONBU000000E63E746MXX')
+  const [availability, setAvailability] = useState(0)
   useEffect(() => {
-    const getToken = async () => {
+    const getToken = async (): Promise<void> => {
       const token = await getSalesChannelToken({
         clientId,
         endpoint,
@@ -46,11 +46,10 @@ export default function Order() {
       })
       if (token) setToken(token.accessToken)
     }
-    getToken()
+    void getToken()
   }, [])
   return (
     <>
-      <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className='container mx-auto mt-5 px-5'>
           <OrderStorage persistKey='orderUS'>
@@ -78,24 +77,42 @@ export default function Order() {
                       />
                     </PricesContainer>
                   </div>
-                  <input
-                    title='quantity'
-                    type='number'
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                  />
+                  <div className='m-2' data-test='variant-container'>
+                    <select
+                      title='variant-selector'
+                      onChange={(e) => setCurrentSku(e.target.value)}
+                    >
+                      <option value='BABYONBU000000E63E746MXX'>6 months</option>
+                      <option value='BABYONBU000000E63E7412MX'>
+                        12 months
+                      </option>
+                    </select>
+                  </div>
                   <div className='m-2'>
-                    <AddToCartButton
-                      skuCode='BABYONBU000000E63E7412MX'
-                      quantity={quantity}
-                      data-test='add-to-cart-button'
-                      className='w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded'
+                    <input
+                      disabled={availability === 0}
+                      defaultValue={1}
+                      title='quantity selector'
+                      type='number'
+                      className='w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500 disabled:opacity-50'
                     />
                   </div>
                   <div className='m-2'>
-                    <AvailabilityContainer skuCode='BABYONBU000000E63E7412MX'>
+                    <AddToCartButton
+                      disabled={availability === 0}
+                      skuCode={currentSku}
+                      data-test='add-to-cart-button'
+                      className='w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50'
+                    />
+                  </div>
+                  <div className='m-2'>
+                    <AvailabilityContainer
+                      skuCode={currentSku}
+                      getQuantity={(quantity) => setAvailability(quantity)}
+                    >
                       <AvailabilityTemplate
                         data-test='availability-template'
+                        timeFormat='days'
                         showShippingMethodName
                         showShippingMethodPrice
                       />

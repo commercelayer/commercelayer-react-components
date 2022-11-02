@@ -1,24 +1,22 @@
 import { useContext, PropsWithoutRef } from 'react'
 import Parent from '../utils/Parent'
 import OrderContext from '#context/OrderContext'
-import isEmpty from 'lodash/isEmpty'
-import has from 'lodash/has'
-import ItemContext from '#context/ItemContext'
-import getCurrentItemKey from '#utils/getCurrentItemKey'
 import { ChildrenFunction } from '#typings/index'
-import { AddToCartReturn } from '#reducers/OrderReducer'
+import {
+  AddToCartReturn,
+  CustomLineItem,
+  LineItemOption
+} from '#reducers/OrderReducer'
 import SkuListsContext from '#context/SkuListsContext'
 import ExternalFunctionContext from '#context/ExternalFunctionContext'
-import { VariantOption } from '#components/skus/VariantSelector'
 import SkuChildrenContext from '#context/SkuChildrenContext'
 import getCartLink from '#utils/getCartLink'
 import CommerceLayerContext from '#context/CommerceLayerContext'
+import useCustomContext from '#utils/hooks/useCustomContext'
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+interface TAddToCartButton extends Omit<Props, 'children'> {
   handleClick: () => AddToCartReturn
 }
-
-export type AddToCartButtonType = ChildrenProps
 
 type BuyNowMode =
   | {
@@ -45,13 +43,38 @@ type TButton = PropsWithoutRef<
 >
 
 type Props = {
+  /**
+   * Code of a bundle
+   */
   bundleCode?: string
-  children?: ChildrenFunction<ChildrenProps>
+  children?: ChildrenFunction<TAddToCartButton>
+  /**
+   * Disable the cart button
+   */
   disabled?: boolean
+  /**
+   * Label to display
+   */
   label?: string | JSX.Element
-  lineItem?: VariantOption['lineItem']
+  /**
+   * Line item which allow you customize the cart item
+   */
+  lineItem?: CustomLineItem
+  /**
+   * Line item option to add to cart
+   */
+  lineItemOption?: LineItemOption
+  /**
+   * Quantity of the item
+   */
   quantity?: string
+  /**
+   * SKU code to add to cart
+   */
   skuCode?: string
+  /**
+   * SKU list to add to cart
+   */
   skuListId?: string
 } & TButton &
   BuyNowMode &
@@ -63,7 +86,6 @@ export function AddToCartButton(props: Props): JSX.Element {
     children,
     skuCode,
     bundleCode,
-    disabled,
     skuListId,
     lineItem,
     buyNowMode = false,
@@ -71,35 +93,26 @@ export function AddToCartButton(props: Props): JSX.Element {
     redirectToHostedCart,
     hostedCartUrl,
     quantity,
+    lineItemOption,
     ...p
   } = props
-  const { accessToken, endpoint } = useContext(CommerceLayerContext)
-  const { addToCart, orderId, getOrder, setOrderErrors } =
-    useContext(OrderContext)
+  const { accessToken, endpoint } = useCustomContext({
+    context: CommerceLayerContext,
+    contextComponentName: 'CommerceLayer',
+    currentComponentName: 'AddToCartButton',
+    key: 'accessToken'
+  })
+  const { addToCart, orderId, getOrder, setOrderErrors } = useCustomContext({
+    context: OrderContext,
+    contextComponentName: 'OrderContainer',
+    currentComponentName: 'AddToCartButton',
+    key: 'addToCart'
+  })
   const { url, callExternalFunction } = useContext(ExternalFunctionContext)
-  const {
-    item,
-    items,
-    quantity: quantityCtx,
-    option,
-    prices,
-    lineItems,
-    lineItem: lineItemContext,
-    skuCode: itemSkuCode
-  } = useContext(ItemContext)
-  if (accessToken === undefined)
-    throw new Error('Cannot use `AddToCartButton` outside of `CommerceLayer`')
-  if (addToCart === undefined)
-    throw new Error('Cannot use `AddToCartButton` outside of `OrderContainer`')
   const { skuLists } = useContext(SkuListsContext)
   const { sku } = useContext(SkuChildrenContext)
   const [slug] = endpoint ? endpoint.split('.commercelayer') : ['']
-  const sCode = (
-    !isEmpty(items) && skuCode
-      ? items[skuCode]?.code
-      : sku?.code || skuCode || getCurrentItemKey(item) || itemSkuCode
-  ) as string
-  const availabilityQuantity = item[sCode]?.inventory?.quantity
+  const sCode = sku?.code ?? skuCode
   const handleClick = async (): Promise<
     | {
         success: boolean
@@ -108,18 +121,13 @@ export function AddToCartButton(props: Props): JSX.Element {
     | Record<string, any>
     | undefined
   > => {
-    const qty = quantity != null ? parseInt(quantity) : quantityCtx[sCode] ?? 1
-    const opt = option[sCode]
-    const customLineItem = !isEmpty(lineItem || lineItemContext)
-      ? lineItem || lineItemContext
-      : lineItems[sCode]
-    if (!isEmpty(skuLists) && skuListId && url) {
-      const slQty = quantity ?? quantityCtx[skuListId] ?? 1
-      if (has(skuLists, skuListId)) {
+    const qty: number = quantity != null ? parseInt(quantity) : 1
+    if (skuLists != null && skuListId && url) {
+      if (skuListId in skuLists) {
         const lineItems = skuLists?.[skuListId]?.map((skuCode: string) => {
           return {
             skuCode,
-            quantity: slQty,
+            quantity: qty,
             _update_quantity: 1
           }
         })
@@ -145,19 +153,18 @@ export function AddToCartButton(props: Props): JSX.Element {
           })
       }
     }
-    if (!url) {
+    if (!url && addToCart != null) {
       const res = await addToCart({
         bundleCode,
         skuCode: sCode,
-        skuId: item[sCode]?.id,
         quantity: qty,
-        option: opt,
-        lineItem: customLineItem,
+        lineItemOption,
+        lineItem,
         buyNowMode,
         checkoutUrl
       })
-      if (redirectToHostedCart) {
-        const orderId = res.orderId
+      if (redirectToHostedCart && accessToken != null) {
+        const orderId = res?.orderId
         if (hostedCartUrl && orderId) {
           location.href = `https://${hostedCartUrl}/${orderId}?accessToken=${accessToken}`
         } else if (orderId && slug) {
@@ -171,10 +178,9 @@ export function AddToCartButton(props: Props): JSX.Element {
         data: {
           bundleCode,
           skuCode: sCode,
-          skuId: item[sCode]?.id,
           quantity: qty,
-          option: opt,
-          lineItem: customLineItem,
+          lineItemOption,
+          lineItem,
           buyNowMode,
           checkoutUrl
         }
@@ -190,15 +196,8 @@ export function AddToCartButton(props: Props): JSX.Element {
     }
     return undefined
   }
-  const disableByCtx =
-    (!isEmpty(prices) && !prices[sCode]) || availabilityQuantity === 0
-  const autoDisabled =
-    !isEmpty(skuLists) || skuListId
-      ? false
-      : (disabled || disableByCtx) ?? (!quantity || !sCode)
   const parentProps = {
     handleClick,
-    disabled: disabled || autoDisabled,
     label,
     ...props
   }
@@ -207,7 +206,6 @@ export function AddToCartButton(props: Props): JSX.Element {
   ) : (
     <button
       {...p}
-      disabled={autoDisabled}
       onClick={() => {
         void handleClick()
       }}
