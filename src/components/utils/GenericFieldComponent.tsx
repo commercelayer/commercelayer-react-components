@@ -17,8 +17,8 @@ import { InitialParcelLineItemContext } from '#context/ParcelLineItemChildrenCon
 
 export interface TResources {
   StockTransfer: LineItem & { resource: 'stock_transfers' }
-  Sku: Sku & { resource: 'skus' }
-  LineItem: LineItem & { resource: 'line_items' }
+  Sku: Sku & { resource: 'sku' }
+  LineItem: LineItem & { resource: 'lineItem' }
   Customer: Customer & { resource: 'customers' }
   Parcel: Parcel & { resource: 'parcel' }
   ParcelLineItem: Pick<
@@ -41,8 +41,8 @@ export type TGenericChildrenProps<E extends TResources[keyof TResources]> =
 
 interface ResourceContext {
   stock_transfers: InitialStockTransferContext
-  skus: InitialSkuContext
-  line_items: InitialLineItemContext
+  sku: InitialSkuContext
+  lineItem: InitialLineItemContext
   customers: InitialCustomerContext
   parcel: InitialParcelContext
   parcelLineItem: InitialParcelLineItemContext
@@ -69,6 +69,9 @@ export default function GenericFieldComponent<R extends keyof TResources>(
   const keysContext = Object.keys(resourceContext).filter(
     (key) => key === p.resource
   ) as [keyof ResourceContext[keyof ResourceContext]]
+  console.log('keys', Object.keys(resourceContext))
+  console.log('p.resource', p.resource)
+  console.log('keyContext', keysContext)
   if (keysContext.length === 1) {
     const [keyResource] = keysContext
     if (keyResource && attribute) {

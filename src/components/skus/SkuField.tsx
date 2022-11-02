@@ -21,7 +21,7 @@ export function SkuField<P extends Props>(props: P): JSX.Element {
   const { attribute, tagElement, children, ...p } = props
   return (
     <GenericFieldComponent<TResourceKey['Sku']>
-      resource='skus'
+      resource='sku'
       attribute={attribute}
       tagElement={tagElement}
       context={SkuChildrenContext}
