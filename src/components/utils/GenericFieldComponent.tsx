@@ -69,9 +69,6 @@ export default function GenericFieldComponent<R extends keyof TResources>(
   const keysContext = Object.keys(resourceContext).filter(
     (key) => key === p.resource
   ) as [keyof ResourceContext[keyof ResourceContext]]
-  console.log('keys', Object.keys(resourceContext))
-  console.log('p.resource', p.resource)
-  console.log('keyContext', keysContext)
   if (keysContext.length === 1) {
     const [keyResource] = keysContext
     if (keyResource && attribute) {
