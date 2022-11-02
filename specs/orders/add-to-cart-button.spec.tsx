@@ -1,5 +1,6 @@
 import CommerceLayer from '#components/auth/CommerceLayer'
 import LineItem from '#components/line_items/LineItem'
+import LineItemField from '#components/line_items/LineItemField'
 import LineItemImage from '#components/line_items/LineItemImage'
 import LineItemName from '#components/line_items/LineItemName'
 import LineItemOption from '#components/line_items/LineItemOption'
@@ -138,6 +139,11 @@ describe('AddToCartButton component', () => {
             <LineItem>
               <LineItemName />
               <LineItemImage />
+              <LineItemField
+                data-testid={`line-item-code-${ctx.skuCode}`}
+                attribute='sku_code'
+                tagElement='span'
+              />
             </LineItem>
           </LineItemsContainer>
         </OrderContainer>
@@ -153,10 +159,13 @@ describe('AddToCartButton component', () => {
     expect(count.textContent).toBe('3')
     const lineItemName = screen.getByTestId(`line-item-name-${ctx.skuCode}`)
     const lineItemImage = screen.getByTestId(`line-item-image-${ctx.skuCode}`)
+    const lineItemCode = screen.getByTestId(`line-item-code-${ctx.skuCode}`)
     expect(lineItemName).toBeDefined()
     expect(lineItemImage).toBeDefined()
+    expect(lineItemCode).toBeDefined()
     expect(lineItemName.textContent).toBe(ctx.lineItem.name)
     expect(lineItemImage.getAttribute('src')).toBe(ctx.lineItem.imageUrl)
+    expect(lineItemCode.textContent).toBe(ctx.skuCode)
   })
   it<AddToCartContext>('Add SKU to the order with sku options', async (ctx) => {
     render(

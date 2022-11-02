@@ -14,7 +14,6 @@ import LineItemAmount from '#components/line_items/LineItemAmount'
 import LineItemRemoveLink from '#components/line_items/LineItemRemoveLink'
 import CheckoutLink from '#components/orders/CheckoutLink'
 import SubTotalAmount from '#components/orders/SubTotalAmount'
-import QuantitySelector from '#components/skus/QuantitySelector'
 import LineItemsCount from '#components/line_items/LineItemsCount'
 import TotalAmount from '#components/orders/TotalAmount'
 import DiscountAmount from '#components/orders/DiscountAmount'
@@ -23,13 +22,10 @@ import TaxesAmount from '#components/orders/TaxesAmount'
 import GiftCardAmount from '#components/orders/GiftCardAmount'
 import AvailabilityContainer from '#components/skus/AvailabilityContainer'
 import AvailabilityTemplate from '#components/skus/AvailabilityTemplate'
-import ItemContainer from '#components/orders/ItemContainer'
 import Errors from '#components/Errors'
-import SkuOptionsContainer from '#components/skus/SkuOptionsContainer'
-import SkuOption from '#components/skus/SkuOption'
-import SkuOptionInput from '#components/skus/SkuOptionInput'
 import LineItemOptions from '#components/line_items/LineItemOptions'
 import LineItemOption from '#components/line_items/LineItemOption'
+import LineItemField from '#components/line_items/LineItemField'
 
 const clientId = process.env['NEXT_PUBLIC_CLIENT_ID'] as string
 const endpoint = process.env['NEXT_PUBLIC_ENDPOINT'] as string
@@ -85,82 +81,51 @@ export default function Order(): JSX.Element {
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className='container mx-auto mt-5 px-5'>
           <OrderContainer>
-            <ItemContainer>
-              <div className='md:flex'>
-                <div className='md:flex-shrink-0'>
-                  <img
-                    alt=''
-                    className='rounded-lg md:w-56'
-                    src='https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90'
+            <div className='md:flex'>
+              <div className='md:flex-shrink-0'>
+                <img
+                  alt=''
+                  className='rounded-lg md:w-56'
+                  src='https://img.commercelayer.io/skus/BABYONBU000000E63E74.png?fm=jpg&q=90'
+                />
+              </div>
+              <div className='mt-4 md:mt-0 md:ml-6'>
+                <h1 className='text-4xl'>Tutina da Bambino</h1>
+                <div className='w-auto m-2'>
+                  <PricesContainer skuCode='BABYONBU000000E63E746MXX'>
+                    <Price
+                      className='text-green-600 text-2xl m-1'
+                      compareClassName='text-gray-500 text-2xl m-1 line-through'
+                    />
+                  </PricesContainer>
+                </div>
+                <select
+                  title='Variant selector'
+                  onChange={(e) => setCurrentSku(e.target.value)}
+                >
+                  {variants.map((variant) => (
+                    <option key={variant.code} value={variant.code}>
+                      {variant.label}
+                    </option>
+                  ))}
+                </select>
+
+                <div className='m-2'>
+                  <AddToCartButton
+                    skuCode={currentSku}
+                    className='w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded'
                   />
                 </div>
-                <div className='mt-4 md:mt-0 md:ml-6'>
-                  <h1 className='text-4xl'>Tutina da Bambino</h1>
-                  <div className='w-auto m-2'>
-                    <PricesContainer skuCode='BABYONBU000000E63E746MXX'>
-                      <Price
-                        className='text-green-600 text-2xl m-1'
-                        compareClassName='text-gray-500 text-2xl m-1 line-through'
-                      />
-                    </PricesContainer>
-                  </div>
-                  <select
-                    title='Variant selector'
-                    onChange={(e) => setCurrentSku(e.target.value)}
-                  >
-                    {variants.map((variant) => (
-                      <option key={variant.code} value={variant.code}>
-                        {variant.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className='m-2'>
-                    <SkuOptionsContainer skuCode={currentSku}>
-                      <SkuOption id='mNJEgsJwBn'>
-                        <SkuOptionInput
-                          name='message'
-                          type='text'
-                          className='w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
-                          placeholder='Message'
-                        />
-                        <SkuOptionInput
-                          name='size'
-                          type='text'
-                          className='w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
-                          placeholder='Text size'
-                        />
-                      </SkuOption>
-                      <SkuOption id='gNlGlsAOBk'>
-                        <SkuOptionInput
-                          name='back'
-                          type='text'
-                          className='w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
-                          placeholder='Back color'
-                        />
-                      </SkuOption>
-                    </SkuOptionsContainer>
-                  </div>
-                  <div className='m-2'>
-                    <QuantitySelector
-                      max={12}
-                      id='quantity-selector'
-                      className='w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
+                <div className='m-2'>
+                  <AvailabilityContainer skuCode={currentSku}>
+                    <AvailabilityTemplate
+                      timeFormat='days'
+                      showShippingMethodName
                     />
-                  </div>
-                  <div className='m-2'>
-                    <AddToCartButton className='w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded' />
-                  </div>
-                  <div className='m-2'>
-                    <AvailabilityContainer skuCode={currentSku}>
-                      <AvailabilityTemplate
-                        timeFormat='days'
-                        showShippingMethodName
-                      />
-                    </AvailabilityContainer>
-                  </div>
+                  </AvailabilityContainer>
                 </div>
               </div>
-            </ItemContainer>
+            </div>
             <h1 className='text-4xl border-b-2 my-5'>Shopping Bag</h1>
             <LineItemsContainer>
               <p className='text-sm m-2'>
@@ -180,6 +145,7 @@ export default function Order(): JSX.Element {
                         />
                       </LineItemOptions>
                     </div>
+                    <LineItemField attribute='sku_code' tagElement='span' />
                     <LineItemQuantity
                       id='line-item-quantity'
                       max={100}
