@@ -2,11 +2,17 @@ import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { BaseError, ResourceErrorType } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { Address, AddressCreate, Order, OrderUpdate } from '@commercelayer/sdk'
+import type {
+  Address,
+  AddressCreate,
+  Order,
+  OrderUpdate
+} from '@commercelayer/sdk'
 import isEmpty from 'lodash/isEmpty'
 import getSdk from '#utils/getSdk'
 import { updateOrder } from './OrderReducer'
 import camelCase from 'lodash/camelCase'
+import { TCustomerAddress } from './CustomerReducer'
 
 export type AddressActionType =
   | 'setErrors'
@@ -40,7 +46,7 @@ export const addressFields: AddressField[] = [
   'line_2',
   'phone',
   'state_code',
-  'zip_code',
+  'zip_code'
 ]
 
 export type AddressResource = Extract<
@@ -52,7 +58,7 @@ export type AddressSchema = Address
 
 export interface AddressActionPayload {
   errors: BaseError[]
-  billing_address: AddressCreate
+  billing_address: TCustomerAddress
   shipping_address: AddressCreate
   shipToDifferentAddress: boolean
   billingAddressId: string
@@ -68,44 +74,41 @@ export interface AddressAction {
 }
 
 export const addressInitialState: AddressState = {
-  errors: [],
+  errors: []
 }
 
-export interface SetAddressErrors {
-  <V extends BaseError[]>(args: {
-    errors: V
-    resource: Extract<ResourceErrorType, 'billing_address' | 'shipping_address'>
-    dispatch?: Dispatch<AddressAction>
-    currentErrors?: V
-  }): void
-}
+export type SetAddressErrors = <V extends BaseError[]>(args: {
+  errors: V
+  resource: Extract<ResourceErrorType, 'billing_address' | 'shipping_address'>
+  dispatch?: Dispatch<AddressAction>
+  currentErrors?: V
+}) => void
 
-export type SetAddressParams<V extends AddressSchema> = {
+export interface SetAddressParams<V extends AddressSchema> {
   values: V
   resource: AddressResource
   dispatch?: Dispatch<AddressAction>
 }
 
-export interface SetAddress {
-  <V extends AddressSchema>(params: SetAddressParams<V>): void
-}
+export type SetAddress = <V extends AddressSchema>(
+  params: SetAddressParams<V>
+) => void
 
-export interface SaveAddresses {
-  (params: {
-    orderId?: string
-    order?: Order | null
-    updateOrder?: typeof updateOrder
-    config: CommerceLayerConfig
-    state: AddressState
-    dispatch: Dispatch<AddressAction>
-  }): Promise<void>
-}
+export type SaveAddresses = (params: {
+  orderId?: string
+  order?: Order | null
+  updateOrder?: typeof updateOrder
+  config: CommerceLayerConfig
+  state: AddressState
+  dispatch: Dispatch<AddressAction>
+  getCustomerAddresses?: () => Promise<void>
+}) => Promise<void>
 
 export const setAddressErrors: SetAddressErrors = ({
   errors,
   dispatch,
   currentErrors = [],
-  resource,
+  resource
 }) => {
   const billingErrors =
     resource === 'billing_address'
@@ -116,22 +119,22 @@ export const setAddressErrors: SetAddressErrors = ({
       ? errors.filter((e) => e.resource === resource)
       : currentErrors.filter((e) => e.resource === 'shipping_address')
   const finalErrors = [...billingErrors, ...shippingErrors]
-  dispatch &&
+  if (dispatch)
     dispatch({
       type: 'setErrors',
       payload: {
-        errors: finalErrors,
-      },
+        errors: finalErrors
+      }
     })
 }
 
 export const setAddress: SetAddress = ({ values, resource, dispatch }) => {
-  dispatch &&
+  if (dispatch)
     dispatch({
       type: 'setAddress',
       payload: {
-        [`${resource}`]: values,
-      },
+        [`${resource}`]: values
+      }
     })
 }
 
@@ -145,8 +148,8 @@ export const setCloneAddress: SetCloneAddress = (id, resource, dispatch) => {
   dispatch({
     type: 'setCloneAddress',
     payload: {
-      [`${camelCase(resource)}Id`]: id,
-    },
+      [`${camelCase(resource)}Id`]: id
+    }
   })
 }
 
@@ -154,14 +157,14 @@ export const saveAddresses: SaveAddresses = async ({
   config,
   updateOrder,
   order,
-  state,
+  state
 }) => {
   const {
     shipToDifferentAddress,
-    billing_address,
-    shipping_address,
+    billing_address: billingAddress,
+    shipping_address: shippingAddress,
     billingAddressId,
-    shippingAddressId,
+    shippingAddressId
   } = state
   try {
     const sdk = getSdk(config)
@@ -170,26 +173,26 @@ export const saveAddresses: SaveAddresses = async ({
       const orderAttributes: OrderUpdate = {
         id: order?.id,
         _billing_address_clone_id: billingAddressId,
-        _shipping_address_clone_id: billingAddressId,
+        _shipping_address_clone_id: billingAddressId
       }
       if (currentBillingAddressRef === billingAddressId) {
         orderAttributes._billing_address_clone_id = order?.billing_address?.id
         orderAttributes._shipping_address_clone_id = order?.shipping_address?.id
       }
-      if (!isEmpty(billing_address) && billing_address) {
+      if (!isEmpty(billingAddress) && billingAddress) {
         delete orderAttributes._billing_address_clone_id
         delete orderAttributes._shipping_address_clone_id
         orderAttributes._shipping_address_same_as_billing = true
-        const address = await sdk.addresses.create(billing_address)
+        const address = await sdk.addresses.create(billingAddress)
         orderAttributes.billing_address = sdk.addresses.relationship(address.id)
       }
       if (shipToDifferentAddress) {
         delete orderAttributes._shipping_address_same_as_billing
         if (shippingAddressId)
           orderAttributes._shipping_address_clone_id = shippingAddressId
-        if (!isEmpty(shipping_address) && shipping_address) {
+        if (!isEmpty(shippingAddress) && shippingAddress) {
           delete orderAttributes._shipping_address_clone_id
-          const address = await sdk.addresses.create(shipping_address)
+          const address = await sdk.addresses.create(shippingAddress)
           orderAttributes.shipping_address = sdk.addresses.relationship(
             address.id
           )
@@ -209,7 +212,7 @@ const type: AddressActionType[] = [
   'setAddress',
   'setShipToDifferentAddress',
   'setCloneAddress',
-  'cleanup',
+  'cleanup'
 ]
 
 const addressReducer = (

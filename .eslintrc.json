@@ -1,0 +1,7 @@
+{
+  "extends": ["@commercelayer/eslint-config-ts-react"],
+  "rules": {
+    "@typescript-eslint/prefer-nullish-coalescing": "off",
+    "@typescript-eslint/strict-boolean-expressions": "off"
+  }
+}

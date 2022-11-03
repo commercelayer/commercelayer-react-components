@@ -7,14 +7,10 @@ type DefaultContext = {
     options?: {
       customerAddressId: string
     }
-  ) => void
+  ) => Promise<void>
 } & BillingAddressState
 
-export const defaultBillingAddressContext = {
-  setBillingAddress: (): void => {
-    return
-  },
-}
+export const defaultBillingAddressContext = {}
 
 const BillingAddressContext = createContext<DefaultContext>(
   defaultBillingAddressContext

@@ -10,6 +10,7 @@ export class OrderPage extends DevPage {
   async addItemToCart(code: string) {
     const selector = this.page.locator(`[data-test=variant-selector]`)
     await selector.waitFor({ state: 'visible' })
+    await selector.waitFor({ state: 'attached' })
     await selector.selectOption({ value: code })
     const button = this.page.locator('[data-test=add-to-cart-button]')
     await button.waitFor({ state: 'visible' })

@@ -1,4 +1,3 @@
-import { ReactNode } from 'react'
 import customMessages from '#utils/customMessages'
 import { LineItem } from '@commercelayer/sdk'
 import { BaseError, ResourceErrorType } from '#typings/errors'
@@ -14,7 +13,9 @@ export type AllErrorsParams = {
 }
 
 export interface GetAllErrors {
-  <P extends AllErrorsParams>(params: P): ReactNode
+  <P extends AllErrorsParams>(params: P): Array<
+    JSX.Element | string | undefined
+  >
 }
 
 const getAllErrors: GetAllErrors = (params) => {
@@ -28,7 +29,7 @@ const getAllErrors: GetAllErrors = (params) => {
     returnHtml = true,
   } = params
   return allErrors
-    .map((v, k): ReactNode | void => {
+    .map((v, k): JSX.Element | string | undefined => {
       const objMsg = customMessages(messages, v)
       let text =
         v?.title && !v.detail?.includes(v.title)
@@ -66,6 +67,7 @@ const getAllErrors: GetAllErrors = (params) => {
           text
         )
       }
+      return undefined
     })
     .filter((v) => v !== undefined)
 }

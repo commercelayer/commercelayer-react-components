@@ -4,8 +4,9 @@ import { PlaywrightTestConfig } from '@playwright/test'
 const config: PlaywrightTestConfig = {
   // timeout: 3000,
   webServer: {
-    command: 'npm run start',
+    command: 'pnpm start',
     port: 3000,
+    reuseExistingServer: true,
   },
   testDir: 'specs/e2e',
   use: {

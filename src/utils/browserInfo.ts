@@ -34,7 +34,7 @@ export default function getBrowserInfo(): TReturn {
   return browserInfo
 }
 
-export function cleanUrlBy(symbol = '&'): string {
+export function cleanUrlBy(symbol: string = '&'): string {
   const currentLocation = window?.location.href
   const [splitLocation] = currentLocation.split(symbol)
   return splitLocation ?? currentLocation

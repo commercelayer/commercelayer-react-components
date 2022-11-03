@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { FunctionChildren } from './index'
+import { ChildrenFunction } from './index'
 
 export type CodeErrorType =
   | 'EMPTY_ERROR'
@@ -50,6 +50,7 @@ export type ResourceErrorType =
   | 'prices'
   | 'shipments'
   | 'shipping_address'
+  | 'customer_address'
   | 'sku_options'
   | 'variant'
 
@@ -85,7 +86,7 @@ const CEType: CodeErrorType[] = [
   'TYPE_MISMATCH',
   'UNAUTHORIZED',
   'UNSUPPORTED_MEDIA_TYPE',
-  'VALIDATION_ERROR',
+  'VALIDATION_ERROR'
 ]
 
 export interface BaseError {
@@ -104,7 +105,7 @@ export const REType: ResourceErrorType[] = [
   'orders',
   'prices',
   'sku_options',
-  'variant',
+  'variant'
 ]
 
 export const BaseErrorObject = PropTypes.shape({
@@ -112,7 +113,7 @@ export const BaseErrorObject = PropTypes.shape({
   message: PropTypes.string.isRequired,
   resource: PropTypes.oneOf(REType),
   field: PropTypes.string,
-  id: PropTypes.string,
+  id: PropTypes.string
 })
 
 export const ErrorPropTypes = {
@@ -124,28 +125,38 @@ export const ErrorPropTypes = {
     'payment_methods',
     'prices',
     'shipping_address',
+    'customer_address',
     'sku_options',
     'variant',
-    'shipments',
+    'shipments'
   ]).isRequired,
   children: PropTypes.func,
-  field: PropTypes.string,
+  field: PropTypes.string
   // messages: PropTypes.arrayOf(BaseErrorObject.isRequired),
 }
 
-type ErrorChildrenComponentProps = FunctionChildren<
+type ErrorChildrenComponentProps = ChildrenFunction<
   Omit<ErrorComponentProps, 'children'> & { errors: string[] }
 >
 
 export interface ErrorComponentProps {
+  /**
+   * Resource which caused the error
+   */
   resource: ResourceErrorType
   children?: ErrorChildrenComponentProps
+  /**
+   * Field which caused the error
+   */
   field?: string
-  messages?: {
+  /**
+   * Error message which you can translate
+   */
+  messages?: Array<{
     code: CodeErrorType
     message: string
     resource?: ResourceErrorType
     field?: string
     id?: string
-  }[]
+  }>
 }

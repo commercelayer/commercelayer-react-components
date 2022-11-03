@@ -18,10 +18,10 @@ const actionType: SkuActionType[] = ['getSkus']
 export const skuInitialState: SkuState = {
   skus: [],
   loading: true,
-  skuCodes: [],
+  skuCodes: []
 }
 
-type GetSku = {
+interface GetSku {
   config: CommerceLayerConfig
   skus: string[]
   dispatch: Dispatch<SkuAction>
@@ -32,7 +32,7 @@ export async function getSku<T extends GetSku>({
   config,
   skus,
   dispatch,
-  queryParams,
+  queryParams
 }: T): Promise<void> {
   if (!config.accessToken) return
   if (skus.length === 0) return
@@ -40,7 +40,7 @@ export async function getSku<T extends GetSku>({
   let allSkus: Sku[] = []
   const get = await sdk.skus.list({
     ...queryParams,
-    filters: { ...queryParams?.filters, code_in: skus.join(',') },
+    filters: { ...queryParams?.filters, code_in: skus.join(',') }
   })
   allSkus = [...get]
   const meta = get.meta
@@ -53,7 +53,7 @@ export async function getSku<T extends GetSku>({
       const getPage = await sdk.skus.list({
         ...queryParams,
         filters: { ...queryParams?.filters, code_in: skus.join(',') },
-        pageNumber,
+        pageNumber
       })
       allSkus = [...allSkus, ...getPage]
     }
@@ -63,8 +63,8 @@ export async function getSku<T extends GetSku>({
     payload: {
       skus: allSkus,
       loading: false,
-      skuCodes: skus,
-    },
+      skuCodes: skus
+    }
   })
 }
 

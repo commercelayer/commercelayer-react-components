@@ -17,11 +17,11 @@ import {
 } from '#typings'
 import { ErrorPropTypes } from '#typings/errors'
 import { BaseInputComponentPropTypes } from '#typings/index'
-import { DeliveryLeadTimeField } from '../components/DeliveryLeadTime'
+import { DeliveryLeadTimeField } from '../components/skus/DeliveryLeadTime'
 // import { StockTransferFieldType } from '#components/StockTransferField'
-import { PaymentSourceDetailType } from '#components/PaymentSourceDetail'
+import { PaymentSourceDetailType } from '#components/payment_source/PaymentSourceDetail'
 import { CodeType } from '#reducers/OrderReducer'
-import { ShipmentAttribute } from '#components/ShipmentField'
+import { ShipmentAttribute } from '#components/shipments/ShipmentField'
 
 const components = {
   Address: {
@@ -195,6 +195,12 @@ const components = {
       children: childrenTypes.isRequired,
     },
   },
+  CustomerAddressForm: {
+    permittedChildren: ['AddressInput', 'ReactNode'],
+    propTypes: {
+      children: childrenTypes.isRequired,
+    },
+  },
   CheckoutLink: {
     displayName: 'CheckoutLink',
     propTypes: {
@@ -211,6 +217,7 @@ const components = {
       'OrderStorage',
       'PricesContainer',
       'GiftCardContainer',
+      'CustomerContainer',
       'ReactNode',
     ],
     propTypes: {
@@ -228,10 +235,18 @@ const components = {
       'PaymentMethodsContainer',
       'ShipmentsContainer',
       'ReactNode',
+      'CustomerField',
     ],
     propTypes: {
       children: childrenTypes.isRequired,
       isGuest: PropTypes.bool,
+    },
+  },
+  CustomerField: {
+    displayName: 'CustomerField',
+    propTypes: {
+      children: PropTypes.func,
+      name: PropTypes.oneOf<'email'>(['email']).isRequired,
     },
   },
   CustomerInput: {
@@ -598,6 +613,18 @@ const components = {
     },
     defaultProps: {
       metadata: {},
+    },
+  },
+  OrderList: {
+    permittedChildren: [
+      'OrderListHeader',
+      'OrderListRow',
+      'OrderListRowActions',
+      'ReactNode',
+    ],
+    displayName: 'OrderList',
+    propTypes: {
+      children: childrenTypes.isRequired,
     },
   },
   OrderNumber: {

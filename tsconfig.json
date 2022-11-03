@@ -5,12 +5,11 @@
     "allowJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
     "jsx": "preserve",
-    "lib": ["dom", "es2017"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
+    /* Strict Type-Checking Options */
     "strict": true /* Enable all strict type-checking options. */,
     "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
     "strictNullChecks": true /* Enable strict null checks. */,
@@ -30,19 +29,52 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@commercelayer/react-components": ["src/index"],
-      "#components/*": ["src/components/*"],
-      "#reducers/*": ["src/reducers/*"],
-      "#context/*": ["src/context/*"],
-      "#typings/*": ["src/typings/*"],
-      "#typings": ["src/typings/index"],
-      "#utils/*": ["src/utils/*"],
-      "#config/*": ["src/config/*"]
+      "@commercelayer/react-components": [
+        "src/index"
+      ],
+      "#components/*": [
+        "src/components/*"
+      ],
+      "#components-utils/*": [
+        "src/components/utils/*"
+      ],
+      "#reducers/*": [
+        "src/reducers/*"
+      ],
+      "#context/*": [
+        "src/context/*"
+      ],
+      "#typings/*": [
+        "src/typings/*"
+      ],
+      "#typings": [
+        "src/typings/index"
+      ],
+      "#utils/*": [
+        "src/utils/*"
+      ],
+      "#config/*": [
+        "src/config/*"
+      ]
     },
     "incremental": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": [
+      "vitest/globals"
+    ],
+    "isolatedModules": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ]
   },
-  "exclude": ["node_modules", "specs"],
-  "include": ["**/*.ts", "**/*.tsx"]
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }

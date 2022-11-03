@@ -1,11 +1,11 @@
 import { getIntegrationToken } from '@commercelayer/js-auth'
-import React, { useEffect, useState } from 'react'
-import Price from '../src/components/Price'
-import PricesContainer from '../src/components/PricesContainer'
-import CommerceLayer from '../src/components/CommerceLayer'
-import SkusContainer from '#components/SkusContainer'
-import Skus from '#components/Skus'
-import SkuField from '#components/SkuField'
+import { useEffect, useState } from 'react'
+import Price from '#components/prices/Price'
+import PricesContainer from '#components/prices/PricesContainer'
+import CommerceLayer from '#components/auth/CommerceLayer'
+import SkusContainer from '#components/skus/SkusContainer'
+import Skus from '#components/skus/Skus'
+import SkuField from '#components/skus/SkuField'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
 const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
@@ -13,21 +13,21 @@ const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
 export const Nav = ({ links }: any) => (
-  <header className="dark p-6">
-    <div className="container mx-auto">
-      <nav className="flex flex-row items-center">
-        <div className="flex items-center mr-10">
-          <a href="/" className="w-48">
-            <img src="//commercelayer.io/assets/img/logos/commercelayer-logo-white.svg" />
+  <header className='dark p-6'>
+    <div className='container mx-auto'>
+      <nav className='flex flex-row items-center'>
+        <div className='flex items-center mr-10'>
+          <a href='/' className='w-48'>
+            <img src='//commercelayer.io/assets/img/logos/commercelayer-logo-white.svg' />
           </a>
         </div>
-        <div className="flex w-full justify-end">
-          <div className="">
+        <div className='flex w-full justify-end'>
+          <div className=''>
             {links.map((l: string, i: number) => {
               return (
                 <a
                   key={i}
-                  className="dark capitalize text-base font-normal mr-5"
+                  className='dark capitalize text-base font-normal mr-5'
                   href={l}
                 >
                   {l === '/' ? 'home' : l.replace('/', ' ')}
@@ -42,17 +42,17 @@ export const Nav = ({ links }: any) => (
 )
 
 export const Title = ({ title }: any) => (
-  <div className="font-bold text-2xl mb-2 bg-green-300">{title}</div>
+  <div className='font-bold text-2xl mb-2 bg-green-300'>{title}</div>
 )
 
 export const Type = ({ text }: any) => (
-  <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
+  <span className='inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2'>
     #{text}
   </span>
 )
 
 const skus = [
-  'BABYONBU000000E63E7412MX',
+  'BABYONBU000000E63E7412MX'
   // 'BABYONBU000000E63E74',
   // 'BABYONBU000000E63E7412MX',
   // 'BABYONBU000000E63E7418MX',
@@ -349,7 +349,7 @@ const Home = () => {
         clientId,
         clientSecret,
         endpoint,
-        scope,
+        scope
       })
       setToken(accessToken)
     }
@@ -357,27 +357,27 @@ const Home = () => {
   }, [])
   const Loading = () => <div>Caricamento...</div>
   return (
-    <section className="bg-gray-100">
+    <section className='bg-gray-100'>
       <Nav links={['/order', '/multiOrder', '/multiApp', '/giftCard']} />
-      <div className="container mx-auto">
+      <div className='container mx-auto'>
         <CommerceLayer accessToken={token} endpoint={endpoint}>
-          <div className="flex flex-row flex-wrap justify-around">
+          <div className='flex flex-row flex-wrap justify-around'>
             <SkusContainer skus={skus}>
               <Skus>
-                <SkuField attribute="image_url" tagElement="img" />
-                <SkuField attribute="code" tagElement="p" />
+                <SkuField attribute='image_url' tagElement='img' />
+                <SkuField attribute='code' tagElement='p' />
               </Skus>
             </SkusContainer>
             <PricesContainer perPage={20} loader={<Loading />}>
               {skus.map((s, k) => {
                 return (
-                  <div key={k} className="text-center p-3">
-                    <div className="flex flex-row flex-wrap justify-center">
+                  <div key={k} className='text-center p-3'>
+                    <div className='flex flex-row flex-wrap justify-center'>
                       <Price
                         data-test={`price-${k}`}
                         skuCode={s}
-                        className="text-green-600 text-2xl m-1"
-                        compareClassName="text-gray-500 text-2xl m-1 line-through"
+                        className='text-green-600 text-2xl m-1'
+                        compareClassName='text-gray-500 text-2xl m-1 line-through'
                       />
                     </div>
                   </div>

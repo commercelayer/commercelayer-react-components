@@ -3,7 +3,6 @@ import { Price } from '@commercelayer/sdk'
 import getPrices from '#utils/getPrices'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Dispatch } from 'react'
-import { ItemPrices } from './ItemReducer'
 import baseReducer from '#utils/baseReducer'
 import { BaseError } from '#typings/errors'
 import getSdk from '#utils/getSdk'
@@ -15,17 +14,13 @@ export interface Prices {
 
 type SkuCodesPrice = string[]
 
-export interface SetSkuCodesPrice {
-  (skuCodes: SkuCodesPrice): void
-}
-
 export interface PriceState {
   loading: boolean
   prices: Prices
   skuCodes: SkuCodesPrice
   errors?: BaseError[]
   skuCode?: string
-  setSkuCodes?: SetSkuCodesPrice
+  setSkuCodes?: typeof setSkuCodes
   loader?: LoaderType
 }
 
@@ -37,47 +32,55 @@ export const priceInitialState: PriceState = {
   loading: true,
   prices: {},
   skuCodes: [],
-  errors: [],
+  errors: []
 }
 
-export interface GetSkusPrice {
-  (
-    skuCodes: SkuCodesPrice,
-    options: {
-      config: CommerceLayerConfig
-      dispatch: Dispatch<PriceAction>
-      setPrices: ((item: ItemPrices) => void) | undefined
-      prices: ItemPrices
-      perPage: number
-      filters: Record<string, any>
-    }
-  ): void
-}
-
-export const getSkusPrice: GetSkusPrice = (
+export function setSkuCodes({
   skuCodes,
-  { config, dispatch, setPrices, prices, perPage, filters }
-) => {
+  dispatch
+}: {
+  skuCodes: SkuCodesPrice
+  dispatch?: Dispatch<PriceAction>
+}): void {
+  if (dispatch) {
+    dispatch({
+      type: 'setSkuCodes',
+      payload: { skuCodes }
+    })
+  }
+}
+
+export function getSkusPrice(
+  skuCodes: SkuCodesPrice,
+  {
+    config,
+    dispatch,
+    perPage,
+    filters
+  }: {
+    config: CommerceLayerConfig
+    dispatch: Dispatch<PriceAction>
+    perPage: number
+    filters: Record<string, any>
+  }
+): void {
   let allPrices = {}
   const sdk = getSdk(config)
   sdk.prices
     .list({
       filters: { sku_code_in: skuCodes.join(','), ...filters },
-      pageSize: perPage,
+      pageSize: perPage
     })
     .then(async (response) => {
       const pricesObj = getPrices(response)
-      allPrices = { ...allPrices, ...prices, ...pricesObj }
-      if (setPrices) {
-        setPrices(allPrices)
-      }
+      allPrices = { ...allPrices, ...pricesObj }
       dispatch({
         type: 'setPrices',
-        payload: { prices: allPrices },
+        payload: { prices: allPrices }
       })
       dispatch({
         type: 'setLoading',
-        payload: { loading: false },
+        payload: { loading: false }
       })
       const meta = response.meta
       if (meta.pageCount > 1) {
@@ -89,16 +92,13 @@ export const getSkusPrice: GetSkusPrice = (
           const pageResponse = await sdk.prices.list({
             filters: { sku_code_in: skuCodes.join(','), ...filters },
             pageSize: perPage,
-            pageNumber,
+            pageNumber
           })
           const pricesObj = getPrices(pageResponse)
           allPrices = { ...allPrices, ...pricesObj }
-          if (setPrices) {
-            setPrices(allPrices)
-          }
           dispatch({
             type: 'setPrices',
-            payload: { prices: allPrices },
+            payload: { prices: allPrices }
           })
         }
       }
@@ -108,26 +108,24 @@ export const getSkusPrice: GetSkusPrice = (
       dispatch({
         type: 'setErrors',
         payload: {
-          errors,
-        },
+          errors
+        }
       })
     })
 }
 
-export interface UnsetPriceState {
-  (dispatch: Dispatch<PriceAction>): void
-}
+export type UnsetPriceState = (dispatch: Dispatch<PriceAction>) => void
 
 export const unsetPriceState: UnsetPriceState = (dispatch) => {
   dispatch({
     type: 'setPrices',
     payload: {
-      prices: {},
-    },
+      prices: {}
+    }
   })
   dispatch({
     type: 'setLoading',
-    payload: { loading: false },
+    payload: { loading: false }
   })
 }
 
@@ -141,7 +139,7 @@ const typeAction: PriceActionType[] = [
   'setLoading',
   'setPrices',
   'setSkuCodes',
-  'setErrors',
+  'setErrors'
 ]
 
 const priceReducer = (state: PriceState, reducer: PriceAction): PriceState =>

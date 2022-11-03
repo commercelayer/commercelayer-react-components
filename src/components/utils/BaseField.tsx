@@ -1,18 +1,12 @@
 import OrderContext from '#context/OrderContext'
-import {
-  FunctionComponent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { FunctionComponent, useContext, useEffect, useState } from 'react'
 import Parent from './Parent'
 
 type BaseFieldChildren = Omit<BaseFieldProps, 'children'>
 
 export type BaseFieldProps = {
   attribute: 'number' | 'id'
-  children?: (props: BaseFieldChildren) => ReactNode
+  children?: (props: BaseFieldChildren) => JSX.Element
 } & JSX.IntrinsicElements['span']
 
 const BaseField: FunctionComponent<BaseFieldProps> = ({
