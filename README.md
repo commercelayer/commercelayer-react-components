@@ -116,12 +116,8 @@ import {
   CommerceLayer,
   OrderContainer,
   OrderStorage,
-  ItemContainer,
   PricesContainer,
   Price,
-  VariantsContainer,
-  VariantSelector,
-  QuantitySelector,
   AddToCartButton,
   AvailabilityContainer,
   AvailabilityTemplate
@@ -137,36 +133,11 @@ import {
         return_url: 'https://yourdomain.com/return',
         privacy_url: 'https://yourdomain.com/privacy'
       }}>
-      <ItemContainer>
         <PricesContainer>
           <Price skuCode="BABYONBU000000E63E746MXX" />
         </PricesContainer>
-        <VariantsContainer>
-          <VariantSelector
-            placeholder="Select a size"
-            options={[
-              {
-                label: '6 months',
-                code: 'BABYONBU000000E63E746MXX',
-                lineItem: {
-                  name: 'your-item-name',
-                  imageUrl: 'https://img.yourdomain.com/your-item-image.png'
-                }
-              },
-              {
-                label: '12 months',
-                code: 'BABYONBU000000E63E7412MX',
-                lineItem: {
-                  name: 'your-item-name',
-                  imageUrl: 'https://img.yourdomain.com/your-item-image.png'
-                }
-              }
-            ]}
-          />
-        </VariantsContainer>
-        <QuantitySelector />
-        <AddToCartButton />
-        <AvailabilityContainer>
+        <AddToCartButton quantity={1} skuCode="BABYONBU000000E63E746MXX" />
+        <AvailabilityContainer skuCode="BABYONBU000000E63E746MXX">
           <AvailabilityTemplate />
         </AvailabilityContainer>
       </ItemContainer>
@@ -177,7 +148,7 @@ import {
 // your code [...]
 ```
 
-For each variant you can define the custom name (i.e. its translation based on location) and image that will be shown on the corresponding line item, by passing the `options` prop to the `VariantSelector` component and properly setting the `lineItem` key — all these content data are usually taken from your CMS, since Commerce Layer doesn't manage any kind of content. You can change the type of input by passing `type="radio"` (default is `select`).
+For each variant you can define the custom name (i.e. its translation based on location) and image that will be shown on the corresponding line item, by passing the `lineItem` prop to the `AddToCartButton` component and properly setting the `lineItem` key — all these content data are usually taken from your CMS, since Commerce Layer doesn't manage any kind of content.
 
 When you add a product to your shopping cart:
 
@@ -288,7 +259,7 @@ For each component, the table below shows its props and the list of the permitte
 
 | Name                       | Props                                                                            | Children                                                                                                                                                                                                             |
 | -------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AddToCartButton`          | `disabled`<br />`label`<br />`skuCode`<br />`lineItem`                           |
+| `AddToCartButton`          | `disabled`<br />`label`<br />`skuCode`<br />`lineItem`<br/>`lineItemOption`<br/>`quantity`                           |
 | `AvailabilityContainer`    | `skuCode`                                                                        | `AvailabilityTemplate`                                                                                                                                                                                               |
 | `AvailabilityTemplate`     | `showShippingMethodName`<br />`timeFormat`                                       |
 | `CheckoutLink`             | `label`                                                                          |
@@ -301,8 +272,7 @@ For each component, the table below shows its props and the list of the permitte
 | `GiftCardContainer`        |                                                                                  | `GiftCard`<br/>`Errors`                                                                                                                                                                                              |
 | `GiftCardCurrencySelector` | `placeholder`<br />`required`<br />`value`                                       |
 | `GiftCardInput`            | `name`<br />`placeholder`<br />`type`                                            |
-| `ItemContainer`            | `lineItem`<br />`skuCode`                                                        | `AddToCartButton`<br />`AvailabilityContainer`<br />`QuantitySelector`<br />`PricesContainer`<br />`SkuOptionContainer`<br />`VariantsContainer`                                                                     |
-| `LineItem`                 | `type`                                                                           | `Errors`<br />`LineItemAmount`<br />`LineItemImage`<br />`LineItemName`<br />`LineItemOptions`<br />`LineItemQuantity`<br />`LineItemRemoveLink`                                                                     |
+ `LineItem`                 | `type`                                                                           | `Errors`<br />`LineItemAmount`<br />`LineItemImage`<br />`LineItemName`<br />`LineItemOptions`<br />`LineItemQuantity`<br />`LineItemRemoveLink`                                                                     |
 | `LineItemAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`<br />`type`         |
 | `LineItemImage`            | `width`                                                                          |
 | `LineItemName`             |                                                                                  |
@@ -317,19 +287,13 @@ For each component, the table below shows its props and the list of the permitte
 | `OrderStorage`             | `clearWhenPlaced`<br />`persistKey`                                              | `OrderContainer`                                                                                                                                                                                                     |
 | `Price`                    | `compareClassName`<br />`showCompare`<br />`skuCode`                             |
 | `PricesContainer`          | `filters`<br />`loader`<br />`perPage`<br />`skuCode`                            | `Price`                                                                                                                                                                                                              |
-| `QuantitySelector`         | `disabled`<br />`max`<br />`min`<br />`skuCode`<br />`value`                     |
-| `ShippingAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
-| `SkuOption`                | `id`                                                                             | `SkuOptionInput`                                                                                                                                                                                                     |
-| `SkuOptionInput`           | `name`<br />`onChange`<br />`placeholder`<br />`type`                            |
-| `SkuOptionsContainer`      | `skuCode`                                                                        | `SkuOption`                                                                                                                                                                                                          |
+ `ShippingAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
 | `SubmitButton`             | `label`                                                                          |
 | `SubTotalAmount`           | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
 | `TaxesAmount`              | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
 | `TotalAmount`              | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
-| `VariantsContainer`        | `filters`<br />`skuCode`                                                         | `VariantSelector`                                                                                                                                                                                                    |
-| `VariantSelector`          | `loader`<br />`name`<br />`options`<br />`placehoder`<br />`skuCode`<br />`type` |
 
-For more detailed information on each components (i.e. prop types and default values, required props, etc.), have a look at the configuration file [`src/config/components.ts`](/src/config/components.ts).
+For more detailed information on each components (i.e. prop types and default values, required props, etc.), have a look at the components folder [`src/components`](/src/components).
 
 ---
 

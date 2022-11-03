@@ -10,15 +10,13 @@ import {
   BaseFormatPrice,
   PTLoader,
   BMObject,
-  BaseSelectorType,
   AddressInputName,
   AddressCountrySelectName,
-  AddressStateSelectName,
+  AddressStateSelectName
 } from '#typings'
 import { ErrorPropTypes } from '#typings/errors'
 import { BaseInputComponentPropTypes } from '#typings/index'
 import { DeliveryLeadTimeField } from '../components/skus/DeliveryLeadTime'
-// import { StockTransferFieldType } from '#components/StockTransferField'
 import { PaymentSourceDetailType } from '#components/payment_source/PaymentSourceDetail'
 import { CodeType } from '#reducers/OrderReducer'
 import { ShipmentAttribute } from '#components/shipments/ShipmentField'
@@ -28,8 +26,8 @@ const components = {
     permittedChildren: ['AddressField', 'ReactNode'],
     displayName: 'Address',
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   AddressCountrySelector: {
     displayName: 'AddressCountrySelector',
@@ -38,18 +36,18 @@ const components = {
       placeholder: PropTypes.shape({
         label: PropTypes.string.isRequired,
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-          .isRequired,
+          .isRequired
       }),
       value: PropTypes.string,
       name: PropTypes.oneOf<AddressCountrySelectName>([
         'billing_address_country_code',
-        'shipping_address_country_code',
+        'shipping_address_country_code'
       ]).isRequired,
-      required: PropTypes.bool,
+      required: PropTypes.bool
     },
     defaultProps: {
-      required: true,
-    },
+      required: true
+    }
   },
   AddressStateSelector: {
     displayName: 'AddressStateSelector',
@@ -58,24 +56,24 @@ const components = {
       placeholder: PropTypes.shape({
         label: PropTypes.string.isRequired,
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-          .isRequired,
+          .isRequired
       }),
       value: PropTypes.string,
       name: PropTypes.oneOf<AddressStateSelectName>([
         'billing_address_state_code',
-        'shipping_address_state_code',
+        'shipping_address_state_code'
       ]).isRequired,
-      required: PropTypes.bool,
+      required: PropTypes.bool
     },
     defaultProps: {
-      required: true,
-    },
+      required: true
+    }
   },
   AddressField: {
     displayName: 'AddressField',
     propTypes: {
-      children: PropTypes.func,
-    },
+      children: PropTypes.func
+    }
   },
   AddressInput: {
     displayName: 'AddressInput',
@@ -104,7 +102,7 @@ const components = {
         'shipping_address_phone',
         'shipping_address_state_code',
         'shipping_address_zip_code',
-        'shipping_address_save_to_customer_book',
+        'shipping_address_save_to_customer_book'
       ]).isRequired,
       type: PropTypes.oneOf<BaseInputType>([
         'checkbox',
@@ -113,22 +111,22 @@ const components = {
         'number',
         'tel',
         'text',
-        'textarea',
+        'textarea'
       ]).isRequired,
       placeholder: PropTypes.string,
       disabled: PropTypes.bool,
-      required: PropTypes.bool,
+      required: PropTypes.bool
     },
     defaultProps: {
-      required: true,
-    },
+      required: true
+    }
   },
   AdjustmentAmount: {
     displayName: 'AdjustmentAmount',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
-      format: 'formatted' as BaseFormatPrice,
-    },
+      format: 'formatted' as BaseFormatPrice
+    }
   },
   AddToCartButton: {
     displayName: 'AddToCartButton',
@@ -141,12 +139,12 @@ const components = {
       checkoutUrl: PropTypes.string,
       lineItem: PropTypes.shape({
         name: PropTypes.string.isRequired,
-        imageUrl: PropTypes.string,
-      }),
+        imageUrl: PropTypes.string
+      })
     },
     defaultProps: {
-      label: 'Add to cart',
-    },
+      label: 'Add to cart'
+    }
   },
   AddressesContainer: {
     displayName: 'AddressesContainer',
@@ -156,60 +154,60 @@ const components = {
       'ShippingAddressForm',
       'ShippingAddressContainer',
       'SaveAddressesButton',
-      'ReactNode',
+      'ReactNode'
     ],
     propTypes: {
       children: childrenTypes.isRequired,
-      shipToDifferentAddress: PropTypes.bool,
-    },
+      shipToDifferentAddress: PropTypes.bool
+    }
   },
   AvailabilityContainer: {
     displayName: 'AvailabilityContainer',
     permittedChildren: ['AvailabilityTemplate', 'ReactNode'],
     propTypes: {
       children: childrenTypes.isRequired,
-      skuCode: PropTypes.string,
-    },
+      skuCode: PropTypes.string
+    }
   },
   AvailabilityTemplate: {
     displayName: 'AvailabilityTemplate',
     propTypes: {
       timeFormat: PropTypes.oneOf<TimeFormat>(['days', 'hours']),
       showShippingMethodName: PropTypes.bool,
-      children: PropTypes.func,
+      children: PropTypes.func
     },
     defaultProps: {
       timeFormat: 'days',
-      showShippingMethodName: false,
-    },
+      showShippingMethodName: false
+    }
   },
   BillingAddressContainer: {
     permittedChildren: ['Address', 'ReactNode'],
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   BillingAddressForm: {
     permittedChildren: ['AddressInput', 'ReactNode', 'Errors'],
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   CustomerAddressForm: {
     permittedChildren: ['AddressInput', 'ReactNode'],
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   CheckoutLink: {
     displayName: 'CheckoutLink',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.string,
+      label: PropTypes.string
     },
     defaultProps: {
-      label: 'Checkout',
-    },
+      label: 'Checkout'
+    }
   },
   CommerceLayer: {
     permittedChildren: [
@@ -218,13 +216,13 @@ const components = {
       'PricesContainer',
       'GiftCardContainer',
       'CustomerContainer',
-      'ReactNode',
+      'ReactNode'
     ],
     propTypes: {
       children: childrenTypes.isRequired,
       accessToken: PropTypes.string.isRequired,
-      endpoint: PropTypes.string.isRequired,
-    },
+      endpoint: PropTypes.string.isRequired
+    }
   },
   CustomerContainer: {
     displayName: 'CustomerContainer',
@@ -235,19 +233,19 @@ const components = {
       'PaymentMethodsContainer',
       'ShipmentsContainer',
       'ReactNode',
-      'CustomerField',
+      'CustomerField'
     ],
     propTypes: {
       children: childrenTypes.isRequired,
-      isGuest: PropTypes.bool,
-    },
+      isGuest: PropTypes.bool
+    }
   },
   CustomerField: {
     displayName: 'CustomerField',
     propTypes: {
       children: PropTypes.func,
-      name: PropTypes.oneOf<'email'>(['email']).isRequired,
-    },
+      name: PropTypes.oneOf<'email'>(['email']).isRequired
+    }
   },
   CustomerInput: {
     displayName: 'CustomerInput',
@@ -258,11 +256,11 @@ const components = {
       placeholder: PropTypes.string,
       disabled: PropTypes.bool,
       required: PropTypes.bool,
-      saveOnBlur: PropTypes.bool,
+      saveOnBlur: PropTypes.bool
     },
     defaultProps: {
-      required: true,
-    },
+      required: true
+    }
   },
   DeliveryLeadTime: {
     displayName: 'DeliveryLeadTime',
@@ -271,33 +269,33 @@ const components = {
         'max_days',
         'max_hours',
         'min_days',
-        'min_hours',
+        'min_hours'
       ]).isRequired,
-      children: PropTypes.func,
-    },
+      children: PropTypes.func
+    }
   },
   DiscountAmount: {
     displayName: 'DiscountAmount',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
-      format: 'formatted' as BaseFormatPrice,
-    },
+      format: 'formatted' as BaseFormatPrice
+    }
   },
   Errors: {
     displayName: 'Errors',
     propTypes: ErrorPropTypes,
     defaultProps: {
       messages: [],
-      field: 'base',
-    },
+      field: 'base'
+    }
   },
   ExternalFunction: {
     displayName: 'ExternalFunction',
     permittedChildren: ['AddToCartButton', 'ReactNode'],
     propTypes: {
       children: childrenTypes.isRequired,
-      url: PropTypes.string.isRequired,
-    },
+      url: PropTypes.string.isRequired
+    }
   },
   GiftCard: {
     permittedChildren: [
@@ -306,27 +304,27 @@ const components = {
       'Errors',
       'MetadataInput',
       'SubmitButton',
-      'ReactNode',
+      'ReactNode'
     ],
     displayName: 'GiftCard',
     propTypes: {
       children: childrenTypes.isRequired,
-      onSubmit: PropTypes.func,
+      onSubmit: PropTypes.func
     },
     defaultProps: {
-      onSubmit: undefined,
-    },
+      onSubmit: undefined
+    }
   },
   GiftCardAmount: {
     displayName: 'GiftCardAmount',
-    propTypes: baseOrderComponentPricePropTypes,
+    propTypes: baseOrderComponentPricePropTypes
   },
   GiftCardContainer: {
     permittedChildren: ['GiftCard', 'Errors', 'ReactNode'],
     displayName: 'GiftCardContainer',
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   GiftCardCurrencySelector: {
     displayName: 'GiftCardCurrencySelector',
@@ -335,14 +333,14 @@ const components = {
       placeholder: PropTypes.shape({
         value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
           .isRequired,
-        label: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired
       }),
       value: PropTypes.string,
-      required: PropTypes.bool,
+      required: PropTypes.bool
     },
     defaultProps: {
-      required: true,
-    },
+      required: true
+    }
   },
   GiftCardInput: {
     displayName: 'GiftCardInput',
@@ -352,7 +350,7 @@ const components = {
         'email',
         'number',
         'date',
-        'checkbox',
+        'checkbox'
       ]).isRequired,
       name: PropTypes.oneOf<GiftCardInputName>([
         'balanceCents',
@@ -365,21 +363,21 @@ const components = {
         'email',
         'firstName',
         'lastName',
-        'reference',
+        'reference'
       ]).isRequired,
       children: PropTypes.func,
-      placeholder: PropTypes.string,
-    },
+      placeholder: PropTypes.string
+    }
   },
   GiftCardOrCouponForm: {
     permittedChildren: [
       'GiftCardOrCouponInput',
       'GiftCardOrCouponSubmit',
-      'ReactNode',
+      'ReactNode'
     ],
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   GiftCardOrCouponInput: {
     displayName: 'GiftCardOrCouponInput',
@@ -387,51 +385,30 @@ const components = {
       children: PropTypes.func,
       placeholder: PropTypes.string,
       disabled: PropTypes.bool,
-      required: PropTypes.bool,
-    },
+      required: PropTypes.bool
+    }
   },
   GiftCardOrCouponSubmit: {
     displayName: 'GiftCardOrCouponSubmit',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    },
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+    }
   },
   GiftCardOrCouponCode: {
     displayName: 'GiftCardOrCouponCode',
     propTypes: {
       children: PropTypes.func,
-      type: PropTypes.oneOf<CodeType>(['coupon', 'gift_card']),
-    },
+      type: PropTypes.oneOf<CodeType>(['coupon', 'gift_card'])
+    }
   },
   GiftCardOrCouponRemoveButton: {
     displayName: 'GiftCardOrCouponRemoveButton',
     propTypes: {
       children: PropTypes.func,
       type: PropTypes.oneOf<CodeType>(['coupon', 'gift_card']),
-      label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    },
-  },
-  ItemContainer: {
-    permittedChildren: [
-      'PricesContainer',
-      'VariantsContainer',
-      'SkuOptionContainer',
-      'QuantitySelector',
-      'AddToCartButton',
-      'AvailabilityContainer',
-      'SkuListsContainer',
-      'ReactNode',
-    ],
-    displayName: 'ItemContainer',
-    propTypes: {
-      children: childrenTypes.isRequired,
-      skuCode: PropTypes.string,
-      lineItem: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        imageUrl: PropTypes.string,
-      }),
-    },
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+    }
   },
   LineItem: {
     permittedChildren: [
@@ -444,7 +421,7 @@ const components = {
       'LineItemRemoveLink',
       'StockTransfer',
       'Errors',
-      'ReactNode',
+      'ReactNode'
     ],
     displayName: 'LineItem',
     propTypes: {
@@ -456,42 +433,42 @@ const components = {
         'payment_methods',
         'promotions',
         'adjustments',
-        'bundles',
-      ]),
+        'bundles'
+      ])
     },
     defaultProps: {
-      type: 'skus',
-    },
+      type: 'skus'
+    }
   },
   LineItemAmount: {
     displayName: 'LineItemAmount',
     propTypes: {
       ...baseOrderComponentPricePropTypes,
-      type: PropTypes.oneOf<BasePriceType>(['total', 'unit', 'option']),
+      type: PropTypes.oneOf<BasePriceType>(['total', 'unit', 'option'])
     },
     defaultProps: {
       format: 'formatted',
-      type: 'total',
-    },
+      type: 'total'
+    }
   },
   LineItemImage: {
     displayName: 'LineItemImage',
     propTypes: {
       width: PropTypes.number,
-      children: PropTypes.func,
-    },
+      children: PropTypes.func
+    }
   },
   LineItemName: {
     displayName: 'LineItemName',
     propTypes: {
-      children: PropTypes.func,
-    },
+      children: PropTypes.func
+    }
   },
   LineItemCode: {
     displayName: 'LineItemCode',
     propTypes: {
-      children: PropTypes.func,
-    },
+      children: PropTypes.func
+    }
   },
   LineItemOption: {
     displayName: 'LineItemOption',
@@ -501,8 +478,8 @@ const components = {
       valueClassName: PropTypes.string,
       className: PropTypes.string,
       id: PropTypes.string,
-      style: PropTypes.object,
-    },
+      style: PropTypes.object
+    }
   },
   LineItemOptions: {
     permittedChildren: ['LineItemOption', 'ReactNode'],
@@ -511,8 +488,8 @@ const components = {
       children: childrenTypes.isRequired,
       title: PropTypes.string,
       showName: PropTypes.bool,
-      skuOptionId: PropTypes.string,
-    },
+      skuOptionId: PropTypes.string
+    }
   },
   LineItemQuantity: {
     displayName: 'LineItemQuantity',
@@ -520,39 +497,39 @@ const components = {
       children: PropTypes.func,
       max: PropTypes.number,
       disabled: PropTypes.bool,
-      readonly: PropTypes.bool,
+      readonly: PropTypes.bool
     },
     defaultProps: {
-      max: 50,
-    },
+      max: 50
+    }
   },
   LineItemRemoveLink: {
     displayName: 'LineItemRemoveLink',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.string,
+      label: PropTypes.string
     },
     defaultProps: {
-      label: 'Remove',
-    },
+      label: 'Remove'
+    }
   },
   LineItemsContainer: {
     permittedChildren: [
       'LineItemsCount',
       'LineItemsEmpty',
       'LineItem',
-      'ReactNode',
+      'ReactNode'
     ],
     displayName: 'LineItemsContainer',
     propTypes: {
       children: childrenTypes.isRequired,
       filters: PropTypes.object,
-      loader: PTLoader,
+      loader: PTLoader
     },
     defaultProps: {
       filters: {},
-      loader: 'Loading...',
-    },
+      loader: 'Loading...'
+    }
   },
   LineItemsCount: {
     displayName: 'LineItemsCount',
@@ -561,8 +538,8 @@ const components = {
       id: PropTypes.string,
       className: PropTypes.string,
       name: PropTypes.string,
-      style: PropTypes.object,
-    },
+      style: PropTypes.object
+    }
   },
   LineItemsEmpty: {
     displayName: 'LineItemsEmpty',
@@ -572,12 +549,12 @@ const components = {
       className: PropTypes.string,
       name: PropTypes.string,
       style: PropTypes.object,
-      text: PropTypes.string,
-    },
+      text: PropTypes.string
+    }
   },
   MetadataInput: {
     displayName: 'MetadataInput',
-    propTypes: BaseInputComponentPropTypes,
+    propTypes: BaseInputComponentPropTypes
   },
   OrderContainer: {
     permittedChildren: [
@@ -602,39 +579,39 @@ const components = {
       'GiftCardOrCouponRemoveButton',
       'Errors',
       'OrderNumber',
-      'ReactNode',
+      'ReactNode'
     ],
     displayName: 'OrderContainer',
     propTypes: {
       children: childrenTypes.isRequired,
       orderId: PropTypes.string,
       metadata: BMObject,
-      attributes: PropTypes.object,
+      attributes: PropTypes.object
     },
     defaultProps: {
-      metadata: {},
-    },
+      metadata: {}
+    }
   },
   OrderList: {
     permittedChildren: [
       'OrderListHeader',
       'OrderListRow',
       'OrderListRowActions',
-      'ReactNode',
+      'ReactNode'
     ],
     displayName: 'OrderList',
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   OrderNumber: {
     displayName: 'OrderNumber',
     propTypes: {
-      className: PropTypes.string,
+      className: PropTypes.string
     },
     defaultProps: {
-      format: 'formatted' as BaseFormatPrice,
-    },
+      format: 'formatted' as BaseFormatPrice
+    }
   },
   OrderStorage: {
     permittedChildren: ['OrderContainer', 'ReactNode'],
@@ -642,8 +619,8 @@ const components = {
     propTypes: {
       children: childrenTypes.isRequired,
       clearWhenPlaced: PropTypes.bool,
-      persistKey: PropTypes.string.isRequired,
-    },
+      persistKey: PropTypes.string.isRequired
+    }
   },
   PaymentMethod: {
     permittedChildren: [
@@ -652,45 +629,45 @@ const components = {
       'PaymentMethodPrice',
       'PaymentSource',
       'ReactNode',
-      'Errors',
+      'Errors'
     ],
     displayName: 'PaymentMethod',
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   PaymentMethodAmount: {
     displayName: 'PaymentMethodAmount',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
-      format: 'formatted' as BaseFormatPrice,
-    },
+      format: 'formatted' as BaseFormatPrice
+    }
   },
   PaymentMethodName: {
     displayName: 'PaymentMethodName',
     propTypes: {
-      children: PropTypes.func,
-    },
+      children: PropTypes.func
+    }
   },
   PaymentMethodPrice: {
     displayName: 'PaymentMethodPrice',
     propTypes: {
       ...baseOrderComponentPricePropTypes,
-      type: PropTypes.oneOf<'amount'>(['amount']),
-    },
+      type: PropTypes.oneOf<'amount'>(['amount'])
+    }
   },
   PaymentMethodRadioButton: {
     displayName: 'PaymentMethodRadioButton',
     propTypes: {
-      children: PropTypes.func,
-    },
+      children: PropTypes.func
+    }
   },
   PaymentMethodsContainer: {
     displayName: 'PaymentMethodsContainer',
     permittedChildren: ['PaymentSource', 'ReactNode', 'PlaceOrderContainer'],
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   PaymentSource: {
     displayName: 'PaymentSource',
@@ -699,12 +676,12 @@ const components = {
       'PaymentSourceBrandName',
       'PaymentSourceEditButton',
       'PaymentSourceDetail',
-      'ReactNode',
+      'ReactNode'
     ],
     propTypes: {
       children: childrenTypes,
-      readonly: PropTypes.bool,
-    },
+      readonly: PropTypes.bool
+    }
   },
   PaymentSourceBrandIcon: {
     displayName: 'PaymentSourceBrandIcon',
@@ -713,22 +690,22 @@ const components = {
       width: PropTypes.number,
       height: PropTypes.number,
       src: PropTypes.string,
-      className: PropTypes.string,
-    },
+      className: PropTypes.string
+    }
   },
   PaymentSourceBrandName: {
     displayName: 'PaymentSourceBrandName',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.string,
-    },
+      label: PropTypes.string
+    }
   },
   PaymentSourceEditButton: {
     displayName: 'PaymentSourceEditButton',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-    },
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element])
+    }
   },
   PaymentSourceDetail: {
     displayName: 'PaymentSourceDetail',
@@ -736,19 +713,19 @@ const components = {
       type: PropTypes.oneOf<PaymentSourceDetailType>([
         'last4',
         'exp_year',
-        'exp_month',
-      ]).isRequired,
-    },
+        'exp_month'
+      ]).isRequired
+    }
   },
   PlaceOrderButton: {
     displayName: 'PlaceOrderButton',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element])
     },
     defaultProps: {
-      label: 'Place order',
-    },
+      label: 'Place order'
+    }
   },
   PlaceOrderContainer: {
     displayName: 'PlaceOrderContainer',
@@ -756,11 +733,11 @@ const components = {
       'PaymentMethod',
       'PlaceOrderButton',
       'PrivacyAndTermsCheckbox',
-      'ReactNode',
+      'ReactNode'
     ],
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   Price: {
     displayName: 'Price',
@@ -768,11 +745,11 @@ const components = {
       children: PropTypes.func,
       compareClassName: PropTypes.string,
       skuCode: PropTypes.string,
-      showCompare: PropTypes.bool,
+      showCompare: PropTypes.bool
     },
     defaultProps: {
-      skuCode: '',
-    },
+      skuCode: ''
+    }
   },
   PricesContainer: {
     permittedChildren: ['Price', 'AvailabilityContainer', 'ReactNode'],
@@ -782,20 +759,20 @@ const components = {
       skuCode: PropTypes.string,
       loader: PTLoader,
       perPage: PropTypes.number,
-      filters: PropTypes.object,
+      filters: PropTypes.object
     },
     defaultProps: {
       perPage: 10,
       filters: {},
       loader: 'Loading...',
-      skuCode: '',
-    },
+      skuCode: ''
+    }
   },
   PrivacyAndTermsCheckbox: {
     displayName: 'PrivacyAndTermsCheckbox',
     propTypes: {
-      children: PropTypes.func,
-    },
+      children: PropTypes.func
+    }
   },
   QuantitySelector: {
     displayName: 'QuantitySelector',
@@ -805,11 +782,11 @@ const components = {
       max: PropTypes.number,
       value: PropTypes.string,
       skuCode: PropTypes.string,
-      disabled: PropTypes.bool,
+      disabled: PropTypes.bool
     },
     defaultProps: {
-      min: 1,
-    },
+      min: 1
+    }
   },
   SaveAddressesButton: {
     displayName: 'SaveAddressesButton',
@@ -817,23 +794,23 @@ const components = {
       children: PropTypes.func,
       label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
       onClick: PropTypes.func,
-      disabled: PropTypes.bool,
+      disabled: PropTypes.bool
     },
     defaultProps: {
-      label: 'Continue to delivery',
-    },
+      label: 'Continue to delivery'
+    }
   },
   Shipment: {
     permittedChildren: [
       'LineItemsContainer',
       'LineItem',
       'ShippingMethod',
-      'ReactNode',
+      'ReactNode'
     ],
     displayName: 'Shipment',
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   ShipmentField: {
     displayName: 'ShipmentField',
@@ -846,43 +823,43 @@ const components = {
         'formatted_cost_amount',
         'number',
         'status',
-        'key_number',
-      ]).isRequired,
-    },
+        'key_number'
+      ]).isRequired
+    }
   },
   ShipmentsContainer: {
     displayName: 'ShipmentsContainer',
     permittedChildren: ['Shipment', 'ReactNode', 'Errors'],
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   ShippingAddressContainer: {
     permittedChildren: ['Address', 'ReactNode'],
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   SaveCustomerButton: {
     displayName: 'SaveCustomerButton',
     propTypes: {
       children: PropTypes.func,
       label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-      onClick: PropTypes.func,
+      onClick: PropTypes.func
     },
     defaultProps: {
-      label: 'Save',
-    },
+      label: 'Save'
+    }
   },
   ShippingAddressForm: {
     permittedChildren: ['AddressInput', 'ReactNode'],
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   ShippingAmount: {
     displayName: 'ShippingAmount',
-    propTypes: baseOrderComponentPricePropTypes,
+    propTypes: baseOrderComponentPricePropTypes
   },
   ShippingMethod: {
     permittedChildren: [
@@ -890,43 +867,43 @@ const components = {
       'ShippingMethodPrice',
       'ShippingMethodRadioButton',
       'DeliveryLeadTime',
-      'ReactNode',
+      'ReactNode'
     ],
     displayName: 'ShippingMethod',
     propTypes: {
       children: childrenTypes.isRequired,
-      readonly: PropTypes.bool,
-    },
+      readonly: PropTypes.bool
+    }
   },
   ShippingMethodName: {
     displayName: 'ShippingMethodName',
     propTypes: {
-      children: PropTypes.func,
-    },
+      children: PropTypes.func
+    }
   },
   ShippingMethodRadioButton: {
     displayName: 'ShippingMethodRadioButton',
     propTypes: {
-      children: PropTypes.func,
-    },
+      children: PropTypes.func
+    }
   },
   ShippingMethodPrice: {
     displayName: 'ShippingMethodPrice',
     propTypes: {
       ...baseOrderComponentPricePropTypes,
-      type: PropTypes.oneOf<'amount'>(['amount']),
+      type: PropTypes.oneOf<'amount'>(['amount'])
     },
     defaultProps: {
       format: 'formatted',
-      type: 'amount',
-    },
+      type: 'amount'
+    }
   },
   SkusContainer: {
     displayName: 'SkuContainer',
     permittedChildren: ['Skus', 'ItemContainer', 'ReactNode'],
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   Skus: {
     displayName: 'Skus',
@@ -936,139 +913,79 @@ const components = {
       'AddToCartButton',
       'QuantitySelector',
       'Price',
-      'ReactNode',
+      'ReactNode'
     ],
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   SkuField: {
     displayName: 'SkuField',
     propTypes: {
       children: PropTypes.func,
       attribute: PropTypes.string,
-      tagElement: PropTypes.string,
-    },
+      tagElement: PropTypes.string
+    }
   },
   SkuList: {
     permittedChildren: ['AddToCartButton', 'QuantitySelector', 'ReactNode'],
     displayName: 'SkuList',
     propTypes: {
       children: childrenTypes.isRequired,
-      id: PropTypes.string.isRequired,
-    },
+      id: PropTypes.string.isRequired
+    }
   },
   SkuListsContainer: {
     permittedChildren: ['SkuList', 'ReactNode'],
     displayName: 'SkuListsContainer',
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
-  },
-  SkuOption: {
-    permittedChildren: ['SkuOptionInput', 'ReactNode'],
-    displayName: 'SkuOption',
-    propTypes: {
-      children: childrenTypes.isRequired,
-      id: PropTypes.string.isRequired,
-    },
-  },
-  SkuOptionInput: {
-    displayName: 'SkuOptionInput',
-    propTypes: BaseInputComponentPropTypes,
-  },
-  SkuOptionsContainer: {
-    permittedChildren: ['SkuOption', 'ReactNode'],
-    displayName: 'SkuOptionsContainer',
-    propTypes: {
-      children: childrenTypes.isRequired,
-      skuCode: PropTypes.string,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   StockTransfer: {
     permittedChildren: ['StockTransferField', 'ReactNode'],
     displayName: 'StockTransfer',
     propTypes: {
-      children: childrenTypes.isRequired,
-    },
+      children: childrenTypes.isRequired
+    }
   },
   StockTransferField: {
     displayName: 'StockTransferField',
     propTypes: {
-      children: PropTypes.func,
-      // type: PropTypes.oneOf<StockTransferFieldType>(['quantity', 'sku_code'])
-      //   .isRequired,
-    },
+      children: PropTypes.func
+    }
   },
   SubmitButton: {
     displayName: 'SubmitButton',
     propTypes: {
       children: PropTypes.func,
-      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+      label: PropTypes.oneOfType([PropTypes.string, PropTypes.element])
     },
     defaultProps: {
-      label: 'Submit',
-    },
+      label: 'Submit'
+    }
   },
   SubTotalAmount: {
     displayName: 'SubTotalAmount',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
-      format: 'formatted' as BaseFormatPrice,
-    },
+      format: 'formatted' as BaseFormatPrice
+    }
   },
   TaxesAmount: {
     displayName: 'TaxesAmount',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
-      format: 'formatted' as BaseFormatPrice,
-    },
+      format: 'formatted' as BaseFormatPrice
+    }
   },
   TotalAmount: {
     displayName: 'TotalAmount',
     propTypes: baseOrderComponentPricePropTypes,
     defaultProps: {
-      format: 'formatted' as BaseFormatPrice,
-    },
-  },
-  VariantsContainer: {
-    permittedChildren: ['VariantSelector', 'ReactNode'],
-    displayName: 'VariantsContainer',
-    propTypes: {
-      children: childrenTypes.isRequired,
-      skuCode: PropTypes.string,
-      filters: PropTypes.object,
-    },
-    defaultProps: {
-      skuCode: '',
-      filters: {},
-    },
-  },
-  VariantSelector: {
-    displayName: 'VariantSelector',
-    propTypes: {
-      options: PropTypes.arrayOf(
-        PropTypes.shape({
-          label: PropTypes.string.isRequired,
-          code: PropTypes.string.isRequired,
-          lineItem: PropTypes.shape({
-            name: PropTypes.string.isRequired,
-            imageUrl: PropTypes.string,
-          }),
-        }).isRequired
-      ).isRequired,
-      name: PropTypes.string,
-      children: PropTypes.func,
-      type: PropTypes.oneOf<BaseSelectorType>(['select', 'radio']),
-      loader: PropTypes.element,
-      placeholder: PropTypes.string,
-      skuCode: PropTypes.string,
-    },
-    defaultProps: {
-      placeholder: 'Select a variant',
-      type: 'select' as BaseSelectorType,
-    },
-  },
+      format: 'formatted' as BaseFormatPrice
+    }
+  }
 }
 
 export default components
