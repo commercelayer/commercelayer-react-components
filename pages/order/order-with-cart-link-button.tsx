@@ -39,7 +39,7 @@ const clientId = process.env['NEXT_PUBLIC_CLIENT_ID'] as string
 const endpoint = process.env['NEXT_PUBLIC_ENDPOINT'] as string
 const scope = process.env['NEXT_PUBLIC_MARKET_ID'] as string
 
-const CustomAddToCart = (props: AddToCartButtonType) => {
+const CustomAddToCart = (props: AddToCartButtonType): JSX.Element => {
   const { handleClick, disabled, className, ...p } = props
   const classes = disabled ? 'opacity-50 cursor-not-allowed' : ''
   const myClick = async () => {

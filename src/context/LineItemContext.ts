@@ -3,11 +3,11 @@ import { LineItemState } from '#reducers/LineItemReducer'
 import { LineItem } from '@commercelayer/sdk'
 
 export interface LineItemContextValue extends LineItemState {
-  lineItems: LineItem[] | undefined
+  lineItems?: LineItem[] | undefined
 }
 
 const initial: LineItemContextValue = {
-  lineItems: [],
+  lineItems: []
 }
 
 const LineItemContext = createContext<LineItemContextValue>(initial)

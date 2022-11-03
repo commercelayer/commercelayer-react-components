@@ -1,8 +1,8 @@
-import { AdyenPaymentConfig } from '#components/AdyenPayment'
-import { BraintreeConfig } from '#components/BraintreePayment'
-import { PaypalConfig } from '#components/PaypalPayment'
-import { StripeConfig } from '#components/StripePayment'
-import { WireTransferConfig } from '#components/WireTransferPayment'
+import { AdyenPaymentConfig } from '#components/payment_source/AdyenPayment'
+import { BraintreeConfig } from '#components/payment_source/BraintreePayment'
+import { PaypalConfig } from '#components/payment_source/PaypalPayment'
+import { StripeConfig } from '#components/payment_source/StripePayment'
+import { WireTransferConfig } from '#components/payment_source/WireTransferPayment'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext, updateOrder } from '#reducers/OrderReducer'
 import { BaseError } from '#typings/errors'
@@ -19,13 +19,13 @@ import {
   CheckoutComPayment,
   ExternalPayment,
   PaypalPayment,
-  KlarnaPayment,
+  KlarnaPayment
 } from '@commercelayer/sdk'
 import camelCase from 'lodash/camelCase'
 import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
 import { Dispatch, MutableRefObject } from 'react'
-import { CheckoutComConfig } from '../components/CheckoutComPayment'
+import { CheckoutComConfig } from '#components/payment_source/CheckoutComPayment'
 
 export type PaymentSourceType =
   | AdyenPayment
@@ -36,7 +36,7 @@ export type PaymentSourceType =
   | StripePayment
   | WireTransfer
 
-type Card = {
+interface Card {
   type: string
   brand: string
   last4: string
@@ -44,7 +44,7 @@ type Card = {
   exp_month: number
 }
 
-export type PaymentSourceObject = {
+export interface PaymentSourceObject {
   adyen_payments: AdyenPayment & {
     payment_request_data?: {
       payment_method?: Card
@@ -103,15 +103,15 @@ export interface PaymentMethodActionPayload {
 
 export function setLoading({
   loading,
-  dispatch,
+  dispatch
 }: {
   loading: boolean
   dispatch?: Dispatch<PaymentMethodAction>
-}) {
-  dispatch &&
+}): void {
+  if (dispatch)
     dispatch({
       type: 'setLoading',
-      payload: { loading },
+      payload: { loading }
     })
 }
 
@@ -125,8 +125,8 @@ export const setPaymentRef: SetPaymentRef = ({ ref, dispatch }) => {
     dispatch({
       type: 'setPaymentRef',
       payload: {
-        currentPaymentMethodRef: ref,
-      },
+        currentPaymentMethodRef: ref
+      }
     })
   }
 }
@@ -140,25 +140,24 @@ export interface PaymentMethodAction {
 
 export const paymentMethodInitialState: PaymentMethodState = {
   errors: [],
+  paymentMethods: undefined
 }
 
-export interface SetPaymentMethodErrors {
-  <V extends BaseError[]>(
-    errors: V,
-    dispatch?: Dispatch<PaymentMethodAction>
-  ): void
-}
+export type SetPaymentMethodErrors = <V extends BaseError[]>(
+  errors: V,
+  dispatch?: Dispatch<PaymentMethodAction>
+) => void
 
 export const setPaymentMethodErrors: SetPaymentMethodErrors = (
   errors,
   dispatch
 ) => {
-  dispatch &&
+  if (dispatch)
     dispatch({
       type: 'setErrors',
       payload: {
-        errors,
-      },
+        errors
+      }
     })
 }
 
@@ -169,7 +168,7 @@ type GetPaymentMethods = (args: {
 
 export const getPaymentMethods: GetPaymentMethods = async ({
   order,
-  dispatch,
+  dispatch
 }) => {
   const paymentMethods = order.available_payment_methods
   const paymentMethod = order.payment_method
@@ -181,8 +180,8 @@ export const getPaymentMethods: GetPaymentMethods = async ({
       currentPaymentMethodId: paymentMethod?.id,
       currentPaymentMethodType:
         paymentMethod?.payment_source_type as PaymentResource,
-      paymentSource,
-    },
+      paymentSource
+    }
   })
 }
 
@@ -223,14 +222,14 @@ export const setPaymentMethod: SetPaymentMethod = async ({
   paymentMethodId,
   updateOrder,
   setOrderErrors,
-  paymentResource,
+  paymentResource
 }) => {
   try {
     if (config && order && dispatch && paymentResource) {
       localStorage.removeItem('_save_payment_source_to_customer_wallet')
       const sdk = getSdk(config)
       const attributes = {
-        payment_method: sdk.payment_methods.relationship(paymentMethodId),
+        payment_method: sdk.payment_methods.relationship(paymentMethodId)
       }
       updateOrder && (await updateOrder({ id: order.id, attributes }))
       dispatch({
@@ -238,10 +237,10 @@ export const setPaymentMethod: SetPaymentMethod = async ({
         payload: {
           currentPaymentMethodId: paymentMethodId,
           currentPaymentMethodType: paymentResource,
-          errors: [],
-        },
+          errors: []
+        }
       })
-      setOrderErrors && setOrderErrors([])
+      if (setOrderErrors) setOrderErrors([])
     }
   } catch (error) {
     const errors = getErrors(error, 'orders', paymentResource)
@@ -270,20 +269,20 @@ export type SetPaymentSource = (
     customerPaymentSourceId?: string
     updateOrder?: typeof updateOrder
   } & PaymentMethodState
-) => Promise<PaymentSourceType | void>
+) => Promise<PaymentSourceType | undefined>
 
 export const setPaymentSource: SetPaymentSource = async ({
   config,
   dispatch,
   getOrder,
-  attributes = {},
+  attributes,
   order,
   paymentResource,
   customerPaymentSourceId,
   paymentSourceId,
   updateOrder,
-  errors: currentErrors,
-}) => {
+  errors: currentErrors
+}): Promise<PaymentSourceType | undefined> => {
   try {
     if (config && order) {
       let paymentSource: PaymentSourceType
@@ -292,13 +291,13 @@ export const setPaymentSource: SetPaymentSource = async ({
         if (!paymentSourceId) {
           const attrs: any = {
             ...attributes,
-            order: sdk.orders.relationship(order.id),
+            order: sdk.orders.relationship(order.id)
           }
           paymentSource = await sdk[paymentResource].create(attrs)
         } else {
           const attrs = {
             id: paymentSourceId,
-            ...attributes,
+            ...attributes
           }
           // @ts-expect-error
           paymentSource =
@@ -307,33 +306,35 @@ export const setPaymentSource: SetPaymentSource = async ({
               : sdk[paymentResource].retrieve(paymentSourceId)
         }
         getOrder && (await getOrder(order.id))
-        dispatch &&
+        if (dispatch) {
           dispatch({
             type: 'setPaymentSource',
-            payload: { paymentSource, errors: [] },
+            payload: { paymentSource, errors: [] }
           })
+        }
         return paymentSource
       } else {
         updateOrder &&
           (await updateOrder({
             id: order.id,
             attributes: {
-              _customer_payment_source_id: customerPaymentSourceId,
-            },
+              _customer_payment_source_id: customerPaymentSourceId
+            }
           }))
       }
     }
   } catch (error: any) {
     const errors = getErrors(error, 'payment_methods', paymentResource)
     console.error('Set payment source:', errors)
-    if (dispatch)
+    if (dispatch) {
       setErrors({
         currentErrors,
         newErrors: errors,
-        dispatch,
+        dispatch
       })
+    }
   }
-  return
+  return undefined
 }
 
 export type UpdatePaymentSource = (args: {
@@ -349,20 +350,21 @@ export const updatePaymentSource: UpdatePaymentSource = async ({
   attributes,
   config,
   dispatch,
-  paymentResource,
+  paymentResource
 }) => {
   if (config) {
     try {
       const sdk = getSdk(config)
       const paymentSource = await sdk[paymentResource].update({
         id,
-        ...attributes,
+        ...attributes
       })
-      dispatch &&
+      if (dispatch) {
         dispatch({
           type: 'setPaymentSource',
-          payload: { paymentSource },
+          payload: { paymentSource }
         })
+      }
     } catch (err) {
       console.error('Update payment source:', err)
     }
@@ -380,7 +382,7 @@ export type DestroyPaymentSource = (args: {
 export const destroyPaymentSource: DestroyPaymentSource = async ({
   paymentSourceId,
   paymentResource,
-  dispatch,
+  dispatch
   // updateOrder,
   // orderId,
 }) => {
@@ -391,15 +393,15 @@ export const destroyPaymentSource: DestroyPaymentSource = async ({
     //     payment_source: {},
     //   },
     // })
-    dispatch &&
+    if (dispatch)
       dispatch({
         type: 'setPaymentSource',
-        payload: { paymentSource: undefined },
+        payload: { paymentSource: undefined }
       })
   }
 }
 
-export type PaymentMethodConfig = {
+export interface PaymentMethodConfig {
   stripePayment?: StripeConfig
   braintreePayment?: BraintreeConfig
   wireTransfer?: Partial<WireTransferConfig>
@@ -421,7 +423,7 @@ export const setPaymentMethodConfig: SetPaymentMethodConfig = (
 ) => {
   dispatch({
     type: 'setPaymentMethodConfig',
-    payload: { config },
+    payload: { config }
   })
 }
 
@@ -443,7 +445,7 @@ const type: PaymentMethodActionType[] = [
   'setPaymentMethods',
   'setPaymentSource',
   'setPaymentRef',
-  'setLoading',
+  'setLoading'
 ]
 
 const paymentMethodReducer = (

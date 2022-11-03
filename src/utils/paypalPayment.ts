@@ -1,4 +1,4 @@
-import { PaypalConfig } from '#components/PaypalPayment'
+import { PaypalConfig } from '#components/payment_source/PaypalPayment'
 import {
   PaymentResource,
   PaymentMethodConfig,

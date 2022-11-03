@@ -7,7 +7,7 @@ type DefaultContext = {
     options?: {
       customerAddressId: string
     }
-  ) => void
+  ) => Promise<void>
 } & ShippingAddressState
 
 export const defaultShippingAddressContext = {}

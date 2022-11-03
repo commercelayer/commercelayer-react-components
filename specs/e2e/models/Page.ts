@@ -38,4 +38,11 @@ export default class DevPage {
   async goBack() {
     await this.page.goBack()
   }
+  async isFinished(response, url) {
+    return (
+      response.url().includes(url) &&
+      response.status() === 200 &&
+      (await response.json()).response === 'Completed'
+    )
+  }
 }

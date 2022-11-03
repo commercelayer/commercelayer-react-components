@@ -1,7 +1,7 @@
 import ExternalFunctionContext, {
   callExternalFunction,
 } from '#context/ExternalFunctionContext'
-import { FunctionComponent, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import components from '#config/components'
 
 const propTypes = components.ExternalFunction.propTypes
@@ -12,7 +12,7 @@ type Props = {
   url: string
 }
 
-const ExternalFunction: FunctionComponent<Props> = ({ children, url }) => {
+export function ExternalFunction({ children, url }: Props) {
   return (
     <ExternalFunctionContext.Provider value={{ url, callExternalFunction }}>
       {children}

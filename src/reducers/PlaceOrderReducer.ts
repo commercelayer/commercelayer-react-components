@@ -159,7 +159,7 @@ export const setPlaceOrder: SetPlaceOrder = async ({
     try {
       if (paymentType === 'paypal_payments' && paymentSource) {
         if (!options?.paypalPayerId && paymentSource?.approval_url) {
-          window.location.href = paymentSource?.approval_url as string
+          window.location.href = paymentSource?.approval_url 
           return response
         }
         await sdk[paymentType].update({

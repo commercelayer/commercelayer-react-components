@@ -4,11 +4,13 @@ import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 
 export default function getSdk({
   endpoint,
-  accessToken,
+  accessToken
 }: CommerceLayerConfig): ReturnType<typeof Sdk> {
+  if (accessToken == null || endpoint == null)
+    throw new Error('accessToken and endpoint are required parameters')
   const org = getOrganizationSlug(endpoint)
   return Sdk({
     accessToken,
-    ...org,
+    ...org
   })
 }

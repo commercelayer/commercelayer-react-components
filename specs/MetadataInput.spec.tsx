@@ -10,11 +10,11 @@ const propTypes = components.MetadataInput.propTypes
 test('<MetadataInput/>', () => {
   expect.assertions(5)
   const component = renderer.create(
-    <MetadataInput type="text" name="firstName" />
+    <MetadataInput type='text' name='firstName' />
   )
   const tree = component.toJSON()
   const root = component.toTree()
-  const proptypes = root.type['propTypes']
+  const proptypes = root.type.propTypes
   expect(tree).toMatchSnapshot()
   expect(proptypes.children).toBe(propTypes.children)
   expect(proptypes.type).toBe(propTypes.type)
@@ -43,7 +43,7 @@ test('<MetadataInput check type required />', () => {
 test('<MetadataInput check children type textarea />', () => {
   expect.assertions(3)
   const component = renderer.create(
-    <MetadataInput type="textarea" name="reference" />
+    <MetadataInput type='textarea' name='reference' />
   )
   const tree = component.toJSON()
   const root = component.toTree()
@@ -55,7 +55,7 @@ test('<MetadataInput check children type textarea />', () => {
 test('<MetadataInput check children type date />', () => {
   expect.assertions(4)
   const component = renderer.create(
-    <MetadataInput type="date" name="expiresAt" />
+    <MetadataInput type='date' name='expiresAt' />
   )
   const tree = component.toJSON()
   const root = component.toTree()
