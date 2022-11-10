@@ -3,8 +3,6 @@ import { getSalesChannelToken } from '@commercelayer/js-auth'
 import {
   CommerceLayer,
   OrderContainer,
-  VariantsContainer,
-  VariantSelector,
   PricesContainer,
   Price,
   AddToCartButton,
@@ -18,7 +16,6 @@ import {
   LineItemsCount,
   LineItemsEmpty,
   SubTotalAmount,
-  QuantitySelector,
   TotalAmount,
   DiscountAmount,
   ShippingAmount,
@@ -26,7 +23,6 @@ import {
   GiftCardAmount,
   AvailabilityContainer,
   AvailabilityTemplate,
-  ItemContainer,
   Errors,
   OrderStorage,
 } from '@commercelayer/react-components'
@@ -37,6 +33,8 @@ const scope = process.env['NEXT_PUBLIC_MARKET_ID'] as string
 
 export default function Order() {
   const [token, setToken] = useState('')
+  const [currentSku, setCurrentSku] = useState('BABYONBU000000E63E746MXX')
+  const [availability, setAvailability] = useState(0)
   useEffect(() => {
     const getToken = async () => {
       const token = await getSalesChannelToken({
@@ -54,7 +52,6 @@ export default function Order() {
         <div className="container mx-auto mt-5 px-5">
           <OrderStorage persistKey="orderUS">
             <OrderContainer attributes={{ return_url: 'https://test.co' }}>
-              <ItemContainer>
                 <div className="md:flex">
                   <div className="md:flex-shrink-0">
                     <img
@@ -74,63 +71,50 @@ export default function Order() {
                         />
                       </PricesContainer>
                     </div>
-                    <VariantsContainer skuCode="BABYONBU000000E63E746MXX">
                       <div className="m-2" data-test="variant-container">
-                        <VariantSelector
-                          data-test="variant-selector"
-                          className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                          name="variant1"
-                          options={[
-                            {
-                              label: '12 months',
-                              code: 'BABYONBU000000E63E7412MX',
-                              lineItem: {
-                                name: 'Darth Vader (12 Months)',
-                                imageUrl:
-                                  'https://i.pinimg.com/736x/a5/32/de/a532de337eff9b1c1c4bfb8df73acea4--darth-vader-stencil-darth-vader-head.jpg?b=t',
-                              },
-                            },
-                            {
-                              label: '6 months',
-                              code: 'BABYONBU000000E63E746MXX',
-                            },
-                            {
-                              label: '24 months',
-                              code: 'BABYONBU000000E63E746MXXFAKE',
-                            },
-                          ]}
-                          handleCallback={(variant) => {
-                            console.log(`variant`, variant)
-                          }}
-                        />
+                        <select
+                      title='variant-selector'
+                      onChange={(e) => setCurrentSku(e.target.value)}
+                    >
+                      <option value='BABYONBU000000E63E746MXX'>6 months</option>
+                      <option value='BABYONBU000000E63E7412MX'>
+                        12 months
+                      </option>
+                    </select>
                       </div>
-                    </VariantsContainer>
                     <div className="m-2">
-                      <QuantitySelector
-                        max={12}
-                        data-test="quantity-selector"
-                        className="w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                      />
+                      <input
+                      disabled={availability === 0}
+                      defaultValue={1}
+                      title='quantity selector'
+                      type='number'
+                      className='w-full block bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500 disabled:opacity-50'
+                    />
                     </div>
                     <div className="m-2">
                       <AddToCartButton
-                        buyNowMode
-                        data-test="add-to-cart-button"
-                        className="w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                      />
+                      disabled={availability === 0}
+                      skuCode={currentSku}
+                      buyNowMode
+                      data-test='add-to-cart-button'
+                      className='w-full primary hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50'
+                    />
                     </div>
                     <div className="m-2">
-                      <AvailabilityContainer>
-                        <AvailabilityTemplate
-                          data-test="availability-template"
-                          showShippingMethodName
-                          showShippingMethodPrice
-                        />
-                      </AvailabilityContainer>
+                      <AvailabilityContainer
+                      skuCode={currentSku}
+                      getQuantity={(quantity) => setAvailability(quantity)}
+                    >
+                      <AvailabilityTemplate
+                        data-test='availability-template'
+                        timeFormat='days'
+                        showShippingMethodName
+                        showShippingMethodPrice
+                      />
+                    </AvailabilityContainer>
                     </div>
                   </div>
                 </div>
-              </ItemContainer>
               <Errors resource="orders" />
               <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
               <LineItemsContainer>
