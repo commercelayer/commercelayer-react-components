@@ -1,4 +1,4 @@
-import { AddToCartButton, ItemContainer } from '../src'
+import { AddToCartButton, ItemContainer } from '../packages/react-components/src'
 import renderer from 'react-test-renderer'
 import PropTypes from 'prop-types'
 

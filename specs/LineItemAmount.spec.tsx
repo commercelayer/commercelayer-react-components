@@ -1,8 +1,8 @@
 import React from 'react'
-import { LineItemAmount } from '../src'
+import { LineItemAmount } from '../packages/react-components/src'
 import renderer from 'react-test-renderer'
-import components from '../src/config/components'
-import Parent from '../src/components/utils/Parent'
+import components from '../#config/components'
+import Parent from '../#components/utils/Parent'
 
 const propTypes = components.LineItemAmount.propTypes
 

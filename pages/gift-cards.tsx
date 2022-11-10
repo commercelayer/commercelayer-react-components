@@ -1,16 +1,16 @@
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 import { Fragment, useEffect, useState } from 'react'
-import CommerceLayer from '../src/components/auth/CommerceLayer'
-import GiftCardContainer from '../src/components/GiftCardContainer'
-import SubmitButton from '../src/components/SubmitButton'
-import GiftCard from '../src/components/gift_cards/GiftCard'
-import GiftCardInput from '../src/components/GiftCardInput'
-import GiftCardCurrencySelector from '../src/components/GiftCardCurrencySelector'
-import MetadataInput from '../src/components/MetadataInput'
-import Errors from '../src/components/Errors'
+import CommerceLayer from '../#components/auth/CommerceLayer'
+import GiftCardContainer from '../#components/GiftCardContainer'
+import SubmitButton from '../#components/SubmitButton'
+import GiftCard from '../#components/gift_cards/GiftCard'
+import GiftCardInput from '../#components/GiftCardInput'
+import GiftCardCurrencySelector from '../#components/GiftCardCurrencySelector'
+import MetadataInput from '../#components/MetadataInput'
+import Errors from '../#components/Errors'
 import { Nav } from '.'
-import OrderContainer from '../src/components/OrderContainer'
-import { BaseError } from '../src/typings/errors'
+import OrderContainer from '../#components/OrderContainer'
+import { BaseError } from '../#typings/errors'
 import {
   LineItemsContainer,
   LineItemsCount,
@@ -28,7 +28,7 @@ import {
   TotalAmount,
   CheckoutLink,
   OrderStorage,
-} from '../src'
+} from '../packages/react-components/src'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string

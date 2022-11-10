@@ -9,7 +9,7 @@ import Shipment from '#components/shipments/Shipment'
 import ShipmentField from '#components/shipments/ShipmentField'
 import ShipmentsContainer from '#components/shipments/ShipmentsContainer'
 import ShipmentsCount from '#components/shipments/ShipmentsCount'
-import { ParcelLineItemsCount } from '@commercelayer/react-components'
+import { ParcelLineItemsCount } from 'packages/react-components/src'
 import {
   render,
   screen,

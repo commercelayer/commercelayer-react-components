@@ -21,7 +21,7 @@ import {
   ShipmentField,
   ShippingMethodRadioButtonType,
   Errors,
-} from '@commercelayer/react-components'
+} from 'packages/react-components/src'
 import { isEmpty } from 'lodash'
 import { useRouter } from 'next/router'
 import getSdk from '#utils/getSdk'

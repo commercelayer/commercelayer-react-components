@@ -1,5 +1,5 @@
 import React from 'react'
-import { SaveAddressesButton } from '../src'
+import { SaveAddressesButton } from '../packages/react-components/src'
 import renderer from 'react-test-renderer'
 import PropTypes from 'prop-types'
 

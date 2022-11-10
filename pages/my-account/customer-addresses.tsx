@@ -10,10 +10,10 @@ import {
   AddressStateSelector,
   AddressCountrySelector,
   AddressesEmpty,
-} from '@commercelayer/react-components'
+} from 'packages/react-components/src'
 import { useState } from 'react'
 import useGetToken from '../../hooks/useGetToken'
-import SaveAddressesButton from '../../src/components/addresses/SaveAddressesButton'
+import SaveAddressesButton from '../../#components/addresses/SaveAddressesButton'
 
 const messages: any = [
   {

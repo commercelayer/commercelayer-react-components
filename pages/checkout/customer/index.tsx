@@ -53,9 +53,9 @@ import {
   PrivacyAndTermsCheckbox,
   PaymentMethodAmount,
   CustomerCardsType,
-} from '@commercelayer/react-components'
+} from 'packages/react-components/src'
 import { useRouter } from 'next/router'
-import { Address, AddressField } from '@commercelayer/react-components'
+import { Address, AddressField } from 'packages/react-components/src'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string

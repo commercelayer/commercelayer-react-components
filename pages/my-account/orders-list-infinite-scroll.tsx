@@ -3,7 +3,7 @@ import {
   CustomerContainer,
   OrderList,
   OrderListRow,
-} from '@commercelayer/react-components'
+} from 'packages/react-components/src'
 import useGetToken from '../../hooks/useGetToken'
 const colClassName = 'uppercase text-left p-1 text-gray-400 text-sm'
 const titleClassName = 'flex flex-row items-center'

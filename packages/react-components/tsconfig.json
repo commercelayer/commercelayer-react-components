@@ -1,0 +1,80 @@
+{
+  "compilerOptions": {
+    "removeComments": true,
+    "importHelpers": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "preserve",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noEmit": true,
+    /* Strict Type-Checking Options */
+    "strict": true /* Enable all strict type-checking options. */,
+    "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
+    "strictNullChecks": true /* Enable strict null checks. */,
+    "strictFunctionTypes": true /* Enable strict checking of function types. */,
+    "strictBindCallApply": true /* Enable strict 'bind', 'call', and 'apply' methods on functions. */,
+    "strictPropertyInitialization": true /* Enable strict checking of property initialization in classes. */,
+    "noImplicitThis": true /* Raise error on 'this' expressions with an implied 'any' type. */,
+    "alwaysStrict": true /* Parse in strict mode and emit "use strict" for each source file. */,
+    /* Additional Checks */
+    "noUnusedLocals": true /* Report errors on unused locals. */,
+    "noUnusedParameters": true /* Report errors on unused parameters. */,
+    "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
+    "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */,
+    "noUncheckedIndexedAccess": true /* Include 'undefined' in index signature results */,
+    "noPropertyAccessFromIndexSignature": true /* Require undeclared properties from index signatures to use element accesses. */,
+    "target": "esnext",
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@commercelayer/react-components": [
+        "./src/index"
+      ],
+      "#components/*": [
+        "./src/components/*"
+      ],
+      "#components-utils/*": [
+        "./src/components/utils/*"
+      ],
+      "#reducers/*": [
+        "./src/reducers/*"
+      ],
+      "#context/*": [
+        "./src/context/*"
+      ],
+      "#typings/*": [
+        "./src/typings/*"
+      ],
+      "#typings": [
+        "./src/typings/index"
+      ],
+      "#utils/*": [
+        "./src/utils/*"
+      ],
+      "#config/*": [
+        "./src/config/*"
+      ]
+    },
+    "incremental": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "types": [
+      "vitest/globals"
+    ],
+    "isolatedModules": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ]
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
+}

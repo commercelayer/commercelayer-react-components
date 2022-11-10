@@ -16,7 +16,7 @@ import {
   CustomerInput,
   SaveCustomerButton,
   AddressStateSelector,
-} from '@commercelayer/react-components'
+} from 'packages/react-components/src'
 import { useRouter } from 'next/router'
 import getSdk from '#utils/getSdk'
 

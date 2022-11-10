@@ -20,7 +20,7 @@ import {
   PlaceOrderButton,
   PlaceOrderContainer,
   CustomerCardsType,
-} from '@commercelayer/react-components'
+} from 'packages/react-components/src'
 import { useRouter } from 'next/router'
 import '@adyen/adyen-web/dist/adyen.css'
 import getSdk from '#utils/getSdk'

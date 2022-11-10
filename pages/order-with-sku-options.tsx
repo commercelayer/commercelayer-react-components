@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getSalesChannelToken } from '@commercelayer/js-auth'
-import CommerceLayer from '../src/components/auth/CommerceLayer'
+import CommerceLayer from '../#components/auth/CommerceLayer'
 import OrderContainer from '#components/orders/OrderContainer'
 import PricesContainer from '#components/prices/PricesContainer'
 import Price from '#components/prices/Price'

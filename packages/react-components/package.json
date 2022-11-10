@@ -1,0 +1,204 @@
+{
+  "name": "@commercelayer/react-components",
+  "version": "4.0.0",
+  "description": "The Official Commerce Layer React Components",
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
+  "types": "lib/esm/index.d.ts",
+  "files": [
+    "lib",
+    "package.json",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "require": "./lib/cjs/index.js",
+      "import": "./lib/esm/index.js"
+    },
+    "./addresses/*": {
+      "require": "./lib/cjs/components/addresses/*.js",
+      "import": "./lib/esm/components/addresses/*.js"
+    },
+    "./auth/*": {
+      "require": "./lib/cjs/components/auth/*.js",
+      "import": "./lib/esm/components/auth/*.js"
+    },
+    "./customers/*": {
+      "require": "./lib/cjs/components/customers/*.js",
+      "import": "./lib/esm/components/customers/*.js"
+    },
+    "./gift_cards/*": {
+      "require": "./lib/cjs/components/gift_cards/*.js",
+      "import": "./lib/esm/components/gift_cards/*.js"
+    },
+    "./line_items/*": {
+      "require": "./lib/cjs/components/line_items/*.js",
+      "import": "./lib/esm/components/line_items/*.js"
+    },
+    "./orders/*": {
+      "require": "./lib/cjs/components/orders/*.js",
+      "import": "./lib/esm/components/orders/*.js"
+    },
+    "./parcels/*": {
+      "require": "./lib/cjs/components/parcels/*.js",
+      "import": "./lib/esm/components/parcels/*.js"
+    },
+    "./payment_methods/*": {
+      "require": "./lib/cjs/components/payment_methods/*.js",
+      "import": "./lib/esm/components/payment_methods/*.js"
+    },
+    "./payment_source/*": {
+      "require": "./lib/cjs/components/payment_source/*.js",
+      "import": "./lib/esm/components/payment_source/*.js"
+    },
+    "./prices/*": {
+      "require": "./lib/cjs/components/prices/*.js",
+      "import": "./lib/esm/components/prices/*.js"
+    },
+    "./shipments/*": {
+      "require": "./lib/cjs/components/shipments/*.js",
+      "import": "./lib/esm/components/shipments/*.js"
+    },
+    "./shipping_methods/*": {
+      "require": "./lib/cjs/components/shipping_methods/*.js",
+      "import": "./lib/esm/components/shipping_methods/*.js"
+    },
+    "./skus/*": {
+      "require": "./lib/cjs/components/skus/*.js",
+      "import": "./lib/esm/components/skus/*.js"
+    },
+    "./stock_transfers/*": {
+      "require": "./lib/cjs/components/stock_transfers/*.js",
+      "import": "./lib/esm/components/stock_transfers/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "addresses/*": [
+        "lib/esm/components/addresses/*.d.ts"
+      ],
+      "auth/*": [
+        "lib/esm/components/auth/*.d.ts"
+      ],
+      "customers/*": [
+        "lib/esm/components/customers/*.d.ts"
+      ],
+      "gift_cards/*": [
+        "lib/esm/components/gift_cards/*.d.ts"
+      ],
+      "line_items/*": [
+        "lib/esm/components/line_items/*.d.ts"
+      ],
+      "orders/*": [
+        "lib/esm/components/orders/*.d.ts"
+      ],
+      "parcels/*": [
+        "lib/esm/components/parcels/*.d.ts"
+      ],
+      "payment_methods/*": [
+        "lib/esm/components/payment_methods/*.d.ts"
+      ],
+      "payment_source/*": [
+        "lib/esm/components/payment_source/*.d.ts"
+      ],
+      "prices/*": [
+        "lib/esm/components/prices/*.d.ts"
+      ],
+      "shipments/*": [
+        "lib/esm/components/shipments/*.d.ts"
+      ],
+      "shipping_methods/*": [
+        "lib/esm/components/shipping_methods/*.d.ts"
+      ],
+      "skus/*": [
+        "lib/esm/components/skus/*.d.ts"
+      ],
+      "stock_transfers/*": [
+        "lib/esm/components/stock_transfers/*.d.ts"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "test": "pnpm run lint && vitest run",
+    "coverage": "vitest run --coverage",
+    "test:e2e": "NODE_ENV=test playwright test",
+    "test:e2e:coverage": "nyc pnpm test:e2e && pnpm coverage:report",
+    "coverage:report": "nyc report --reporter=html",
+    "build": "tsc -b tsconfig.prod.json tsconfig.prod.esm.json --verbose && pnpm postbuild",
+    "build:dev": "tsc -b tsconfig.prod.json tsconfig.prod.esm.json --verbose && tsc-alias -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.esm.json",
+    "postbuild": "tsc-alias -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.esm.json &&  minimize-js lib -w -s",
+    "dev": "NODE_OPTIONS='--inspect' next dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/commercelayer/commercelayer-react-components.git"
+  },
+  "keywords": [
+    "reactjs",
+    "jamstack",
+    "headless",
+    "ecommerce",
+    "api",
+    "react-components",
+    "commercelayer"
+  ],
+  "author": {
+    "name": "Alessandro Casazza",
+    "email": "alessandro@commercelayer.io"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/commercelayer/commercelayer-react-components/issues"
+  },
+  "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
+  "dependencies": {
+    "@ac-dev/countries-service": "^1.2.0",
+    "@ac-dev/states-service": "^1.1.1",
+    "@adyen/adyen-web": "^5.27.0",
+    "@commercelayer/sdk": "^4.16.0",
+    "@stripe/react-stripe-js": "^1.12.0",
+    "@stripe/stripe-js": "^1.38.1",
+    "axios": "^1.0.0",
+    "braintree-web": "^3.88.1",
+    "frames-react": "^1.0.12",
+    "jwt-decode": "^3.1.2",
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
+    "rapid-form": "^2.1.0",
+    "react-table": "^7.8.0",
+    "react-window": "^1.8.7"
+  },
+  "devDependencies": {
+    "@commercelayer/js-auth": "^2.3.0",
+    "@playwright/test": "^1.26.1",
+    "@types/braintree-web": "^3.75.22",
+    "@types/lodash": "^4.14.186",
+    "@types/node": "^18.8.2",
+    "@types/prop-types": "^15.7.5",
+    "@types/react": "^18.0.21",
+    "@types/react-table": "^7.7.12",
+    "@types/react-test-renderer": "^18.0.0",
+    "@types/react-window": "^1.8.5",
+    "@vitejs/plugin-react": "^2.1.0",
+    "@vitest/coverage-c8": "^0.23.4",
+    "jsdom": "^20.0.1",
+    "minimize-js": "^1.3.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-test-renderer": "^18.2.0",
+    "tsc-alias": "^1.7.0",
+    "tslib": "^2.4.0",
+    "typescript": "^4.8.4",
+    "vite": "^3.1.6",
+    "vite-tsconfig-paths": "^3.5.1",
+    "vitest": "^0.23.4"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  }
+}

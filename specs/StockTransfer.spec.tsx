@@ -1,7 +1,7 @@
 import React from 'react'
-import { StockTransfer, Price } from '../src'
+import { StockTransfer, Price } from '../packages/react-components/src'
 import renderer from 'react-test-renderer'
-import components from '../src/config/components'
+import components from '../#config/components'
 
 const propTypes = components.StockTransfer.propTypes
 

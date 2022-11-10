@@ -2,7 +2,7 @@ import {
   CommerceLayer,
   CustomerContainer,
   CustomerField,
-} from '@commercelayer/react-components'
+} from 'packages/react-components/src'
 import useGetToken from '../../hooks/useGetToken'
 
 const OrdersList = () => {

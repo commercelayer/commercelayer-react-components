@@ -33,7 +33,7 @@ import {
   Errors,
   OrderStorage,
   CartLink
-} from '@commercelayer/react-components'
+} from 'packages/react-components/src'
 // import getSdk from '#utils/getSdk'
 
 const clientId = process.env['NEXT_PUBLIC_CLIENT_ID'] as string

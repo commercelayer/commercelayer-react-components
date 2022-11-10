@@ -11,7 +11,7 @@ import {
   OrderContainer,
   GiftCardOrCouponCode,
   GiftCardOrCouponRemoveButton,
-} from '@commercelayer/react-components'
+} from 'packages/react-components/src'
 import { useRouter } from 'next/router'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string

@@ -1,9 +1,9 @@
 import React from 'react'
-import { GiftCardInput } from '../src'
+import { GiftCardInput } from '../packages/react-components/src'
 import renderer from 'react-test-renderer'
-import components from '../src/config/components'
-import BaseInput from '../src/components/utils/BaseInput'
-import Parent from '../src/components/utils/Parent'
+import components from '../#config/components'
+import BaseInput from '../#components/utils/BaseInput'
+import Parent from '../#components/utils/Parent'
 
 const propTypes = components.GiftCardInput.propTypes
 

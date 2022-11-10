@@ -1,0 +1,24 @@
+# .github/release.yaml
+
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+    authors:
+      - octocat
+  categories:
+    - title: 💥 Breaking Change
+      labels:
+        - breaking-change
+    - title: 🚀 Enhancement
+      labels:
+        - enhancement
+    - title: 🐛 Bug Fix
+      labels:
+        - bug
+    - title: 📝 Documentation
+      labels:
+        - documentation
+    - title: Other Changes
+      labels:
+        - "*"

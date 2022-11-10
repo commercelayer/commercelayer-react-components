@@ -1,5 +1,5 @@
 import React from 'react'
-import PriceTemplate from '../src/components/utils/PriceTemplate'
+import PriceTemplate from '../#components/utils/PriceTemplate'
 import renderer from 'react-test-renderer'
 import PropTypes from 'prop-types'
 

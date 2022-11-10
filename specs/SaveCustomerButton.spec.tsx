@@ -1,5 +1,5 @@
 import React from 'react'
-import { SaveCustomerButton } from '../src'
+import { SaveCustomerButton } from '../packages/react-components/src'
 import renderer from 'react-test-renderer'
 import PropTypes from 'prop-types'
 

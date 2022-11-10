@@ -1,7 +1,7 @@
 import React from 'react'
 import VariantTemplate, {
   propTypes,
-} from '../src/components/utils/VariantTemplate'
+} from '../#components/utils/VariantTemplate'
 import renderer from 'react-test-renderer'
 
 test('<VariantTemplate/>', () => {

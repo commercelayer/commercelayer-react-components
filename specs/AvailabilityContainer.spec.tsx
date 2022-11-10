@@ -1,8 +1,8 @@
 import React from 'react'
-import { AvailabilityContainer, Price } from '../src'
+import { AvailabilityContainer, Price } from '../packages/react-components/src'
 import renderer from 'react-test-renderer'
 import PropTypes from 'prop-types'
-import childrenTypes from '../src/utils/childrenTypes'
+import childrenTypes from '../#utils/childrenTypes'
 
 test('<AvailabilityContainer/>', () => {
   expect.assertions(4)

@@ -1,8 +1,8 @@
 import React from 'react'
-import { GiftCardCurrencySelector } from '../src'
+import { GiftCardCurrencySelector } from '../packages/react-components/src'
 import renderer from 'react-test-renderer'
-import components from '../src/config/components'
-import currencyOptions from '../src/config/currency.json'
+import components from '../#config/components'
+import currencyOptions from '../#config/currency.json'
 
 const propTypes = components.GiftCardCurrencySelector.propTypes
 

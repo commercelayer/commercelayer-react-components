@@ -1,9 +1,9 @@
 import React from 'react'
-import { GiftCardAmount } from '../src'
+import { GiftCardAmount } from '../packages/react-components/src'
 import renderer from 'react-test-renderer'
-import components from '../src/config/components'
-import BaseOrderPrice from '../src/components/utils/BaseOrderPrice'
-import Parent from '../src/components/utils/Parent'
+import components from '../#config/components'
+import BaseOrderPrice from '../#components/utils/BaseOrderPrice'
+import Parent from '../#components/utils/Parent'
 
 const propTypes = components.GiftCardAmount.propTypes
 

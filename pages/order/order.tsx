@@ -27,7 +27,7 @@ import {
   Errors,
   OrderStorage,
   CartLink
-} from '@commercelayer/react-components'
+} from 'packages/react-components/src'
 
 const clientId = process.env['NEXT_PUBLIC_CLIENT_ID'] as string
 const endpoint = process.env['NEXT_PUBLIC_ENDPOINT'] as string

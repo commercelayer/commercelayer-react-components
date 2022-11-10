@@ -1,8 +1,8 @@
 import React from 'react'
-import { CommerceLayer, Price } from '../src'
+import { CommerceLayer, Price } from '../packages/react-components/src'
 import renderer from 'react-test-renderer'
 import PropTypes from 'prop-types'
-import childrenTypes from '../src/utils/childrenTypes'
+import childrenTypes from '../#utils/childrenTypes'
 
 test('<CommerceLayer/>', () => {
   expect.assertions(6)
