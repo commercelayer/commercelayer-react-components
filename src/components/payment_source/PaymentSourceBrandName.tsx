@@ -8,10 +8,10 @@ interface CustomComponent extends Omit<Props, 'children'> {
   brand: IconBrand
 }
 
-type Props = {
+interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
   children?: ChildrenFunction<CustomComponent>
   label?: string
-} & JSX.IntrinsicElements['span']
+}
 
 export function PaymentSourceBrandName({
   children,

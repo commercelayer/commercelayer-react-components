@@ -61,7 +61,7 @@ type Props = {
    * Class name to assign to the table row
    */
   rowTrClassName?: string
-} & JSX.IntrinsicElements['table'] &
+} & Omit<JSX.IntrinsicElements['table'], 'children'> &
   (
     | {
         /**

@@ -8,10 +8,10 @@ interface ChildrenProps extends Omit<Props, 'children'> {
   quantity: number
 }
 
-type Props = {
+interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
   children?: ChildrenFunction<ChildrenProps>
   typeAccepted?: TypeAccepted[]
-} & JSX.IntrinsicElements['span']
+}
 
 export function LineItemsCount(props: Props): JSX.Element {
   const { children, typeAccepted, ...p } = props

@@ -9,11 +9,11 @@ interface ChildrenProps extends Omit<Props, 'children'> {
   href: string
 }
 
-type Props = {
+interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
   children?: ChildrenFunction<ChildrenProps>
   label?: string
   hostedCheckout?: boolean
-} & JSX.IntrinsicElements['a']
+}
 
 export function CheckoutLink(props: Props): JSX.Element {
   const { label, hostedCheckout = true, children, ...p } = props
