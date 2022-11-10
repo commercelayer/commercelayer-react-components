@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getSalesChannelToken } from '@commercelayer/js-auth'
-import CommerceLayer from '../src/components/auth/CommerceLayer'
+import CommerceLayer from '../../src/components/auth/CommerceLayer'
 import OrderContainer from '#components/orders/OrderContainer'
 import PricesContainer from '#components/prices/PricesContainer'
 import Price from '#components/prices/Price'
@@ -31,22 +31,6 @@ const clientId = process.env['NEXT_PUBLIC_CLIENT_ID'] as string
 const endpoint = process.env['NEXT_PUBLIC_ENDPOINT'] as string
 const scope = process.env['NEXT_PUBLIC_MARKET_ID'] as string
 
-// const CustomAddToCart = (props: AddToCartButtonTemplate) => {
-//   const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
-//   const myClick = () => {
-//     props.handleClick()
-//   }
-//   return (
-//     <button
-//       id='add-to-bag'
-//       className={`${classes} ${props.className}`}
-//       onClick={myClick}
-//       disabled={props.disabled}
-//     >
-//       Custom add to cart
-//     </button>
-//   )
-// }
 const variants = [
   {
     label: '6 months',
