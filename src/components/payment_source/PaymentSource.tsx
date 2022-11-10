@@ -1,4 +1,4 @@
-import { useContext, ReactNode, useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import CustomerContext from '#context/CustomerContext'
@@ -17,8 +17,9 @@ export interface CustomerSaveToWalletProps {
   name: 'save_payment_source_to_customer_wallet'
 }
 
-export type PaymentSourceProps = {
-  children?: ReactNode
+export interface PaymentSourceProps
+  extends Omit<JSX.IntrinsicElements['div'], 'children'> {
+  children?: JSX.Element | JSX.Element[]
   readonly?: boolean
   templateCustomerCards?: CustomerCardsTemplateChildren
   onClickCustomerCards?: () => void
@@ -26,7 +27,7 @@ export type PaymentSourceProps = {
     props: CustomerSaveToWalletProps
   ) => JSX.Element
   loader?: LoaderType
-} & JSX.IntrinsicElements['div']
+}
 
 export function PaymentSource(props: PaymentSourceProps): JSX.Element {
   const { readonly } = props

@@ -12,10 +12,10 @@ const propTypes = components.GiftCard.propTypes
 const defaultProps = components.GiftCard.defaultProps
 const displayName = components.GiftCard.displayName
 
-type Props = {
+interface Props extends Omit<JSX.IntrinsicElements['form'], 'children'> {
   children: ReactNode
   onSubmit?: (values: BaseState) => void
-} & JSX.IntrinsicElements['form']
+}
 
 export function GiftCard(props: Props) {
   const { children, onSubmit } = props

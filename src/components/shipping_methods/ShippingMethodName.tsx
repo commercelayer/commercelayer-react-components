@@ -8,9 +8,9 @@ type ChildrenProps = Omit<Props, 'children'> & {
   shippingMethod: ShippingMethod
 }
 
-type Props = {
+interface Props extends Omit<JSX.IntrinsicElements['label'], 'children'> {
   children?: (props: ChildrenProps) => JSX.Element
-} & JSX.IntrinsicElements['label']
+}
 
 export function ShippingMethodName(props: Props): JSX.Element {
   const { shippingMethod, deliveryLeadTimeForShipment, shipmentId } =

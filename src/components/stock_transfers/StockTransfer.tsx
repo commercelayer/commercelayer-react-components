@@ -1,17 +1,13 @@
-import { useContext, ReactNode } from 'react'
-import components from '#config/components'
+import { useContext } from 'react'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import StockTransferChildrenContext from '#context/StockTransferChildrenContext'
 import { StockTransfer as TStockTransfer } from '@commercelayer/sdk'
 
-const propTypes = components.StockTransfer.propTypes
-const displayName = components.StockTransfer.displayName
+interface Props {
+  children: JSX.Element[] | JSX.Element
+}
 
-type Props = {
-  children: ReactNode
-} & JSX.IntrinsicElements['p']
-
-export function StockTransfer(props: Props) {
+export function StockTransfer(props: Props): JSX.Element {
   const { children } = props
   const { stockTransfers, lineItems } = useContext(ShipmentChildrenContext)
   const components = stockTransfers
@@ -21,7 +17,7 @@ export function StockTransfer(props: Props) {
         stockTransfer:
           stockTransfer.type === 'line_items'
             ? stockTransfer
-            : stockTransfer?.line_item,
+            : stockTransfer?.line_item
       }
       return (
         <StockTransferChildrenContext.Provider
@@ -34,8 +30,5 @@ export function StockTransfer(props: Props) {
     })
   return <>{components}</>
 }
-
-StockTransfer.propTypes = propTypes
-StockTransfer.displayName = displayName
 
 export default StockTransfer

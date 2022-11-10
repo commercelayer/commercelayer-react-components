@@ -4,10 +4,11 @@ import Parent from './Parent'
 
 type BaseFieldChildren = Omit<BaseFieldProps, 'children'>
 
-export type BaseFieldProps = {
+export interface BaseFieldProps
+  extends Omit<JSX.IntrinsicElements['span'], 'children'> {
   attribute: 'number' | 'id'
   children?: (props: BaseFieldChildren) => JSX.Element
-} & JSX.IntrinsicElements['span']
+}
 
 const BaseField: FunctionComponent<BaseFieldProps> = ({
   children,
