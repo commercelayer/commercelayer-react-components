@@ -14,12 +14,12 @@ import { TCustomerAddress } from '#reducers/CustomerReducer'
 
 interface ChildrenProps extends Omit<Props, 'children'> {}
 
-type Props = {
+interface Props extends Omit<JSX.IntrinsicElements['button'], 'children'> {
   children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
   onClick?: () => void
   addressId?: string
-} & JSX.IntrinsicElements['button']
+}
 
 export function SaveAddressesButton(props: Props): JSX.Element {
   const {

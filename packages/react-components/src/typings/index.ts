@@ -261,4 +261,4 @@ export type ConditionalElement<E> =
   | ({
       attribute: Exclude<keyof E, 'image_url'>
       tagElement: ExcludeTag<'img'>
-    } & JSX.IntrinsicElements[ExcludeTag<'img'>])
+    } & Omit<JSX.IntrinsicElements[ExcludeTag<'img'>], 'children'>)

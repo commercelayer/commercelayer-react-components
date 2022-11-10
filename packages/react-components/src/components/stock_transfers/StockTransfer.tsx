@@ -1,11 +1,11 @@
-import { useContext, ReactNode } from 'react'
+import { useContext } from 'react'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import StockTransferChildrenContext from '#context/StockTransferChildrenContext'
 import { StockTransfer as TStockTransfer } from '@commercelayer/sdk'
 
-type Props = {
-  children: ReactNode
-} & JSX.IntrinsicElements['p']
+interface Props {
+  children: JSX.Element[] | JSX.Element
+}
 
 export function StockTransfer(props: Props): JSX.Element {
   const { children } = props

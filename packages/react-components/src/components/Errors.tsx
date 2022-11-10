@@ -12,7 +12,8 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import ShipmentContext from '#context/ShipmentContext'
 
-type Props = ErrorComponentProps & JSX.IntrinsicElements['span']
+type Props = ErrorComponentProps &
+  Omit<JSX.IntrinsicElements['span'], 'children'>
 
 export function Errors(props: Props): JSX.Element {
   const { children, messages = [], resource, field, ...p } = props

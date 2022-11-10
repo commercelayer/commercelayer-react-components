@@ -17,10 +17,10 @@ export type ShipmentAttribute =
   | 'formatted_cost_amount'
   | 'key_number'
 
-type Props = {
+interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
   children?: (props: ShipmentFieldChildrenProps) => JSX.Element
   name: ShipmentAttribute
-} & JSX.IntrinsicElements['span']
+}
 
 export function ShipmentField(props: Props): JSX.Element {
   const { name } = props

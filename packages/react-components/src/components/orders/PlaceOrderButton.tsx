@@ -11,11 +11,12 @@ interface ChildrenProps extends Omit<Props, 'children'> {
   handleClick: () => Promise<void>
 }
 
-type Props = {
+interface Props
+  extends Omit<JSX.IntrinsicElements['button'], 'children' | 'onClick'> {
   children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
   onClick?: (response: { placed: boolean }) => void
-} & JSX.IntrinsicElements['button']
+}
 
 export function PlaceOrderButton(props: Props): JSX.Element {
   const ref = useRef(null)

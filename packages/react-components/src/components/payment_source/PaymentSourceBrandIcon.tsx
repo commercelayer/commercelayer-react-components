@@ -9,11 +9,11 @@ interface ChildrenProps extends Omit<Props, 'children'> {
   url: string
 }
 
-type Props = {
+interface Props extends Omit<JSX.IntrinsicElements['img'], 'children'> {
   children?: ChildrenFunction<ChildrenProps>
   width?: number
   height?: number
-} & JSX.IntrinsicElements['img']
+}
 export function PaymentSourceBrandIcon({
   src,
   width = 32,
