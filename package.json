@@ -6,7 +6,8 @@
     "email": "alessandro@commercelayer.io"
   },
   "scripts": {
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "build": "pnpm -r build"
   },
   "devDependencies": {
     "@commercelayer/eslint-config-ts-react": "^0.1.3",
