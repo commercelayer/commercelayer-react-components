@@ -1,5 +1,6 @@
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 import { useEffect, useState } from 'react'
+import { customer, salesChannel } from '../assets/config'
 
 interface UseGetTokenOptions {
   userMode?: boolean
@@ -12,13 +13,13 @@ export default function useGetToken<T extends UseGetTokenOptions>(
   endpoint: string
 } {
   const [token, setToken] = useState('')
-  const clientId = process.env['NEXT_PUBLIC_CLIENT_ID'] as string
-  const endpoint = process.env['NEXT_PUBLIC_ENDPOINT'] as string
-  const scope = process.env['NEXT_PUBLIC_MARKET_ID'] as string
+  const clientId = salesChannel.clientId
+  const endpoint = salesChannel.endpoint
+  const scope = salesChannel.scope
   const user = options?.userMode
     ? {
-        username: process.env['NEXT_PUBLIC_USERNAME'] as string,
-        password: process.env['NEXT_PUBLIC_PASSWORD'] as string
+        username: customer.username,
+        password: customer.password
       }
     : undefined
   useEffect(() => {
