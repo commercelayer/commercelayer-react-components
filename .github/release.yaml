@@ -12,7 +12,7 @@ changelog:
         - breaking-change
     - title: 🚀 Enhancement
       labels:
-        - enhancement
+        - feature
     - title: 🐛 Bug Fix
       labels:
         - bug
