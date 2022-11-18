@@ -31,6 +31,10 @@
       "require": "./lib/cjs/components/gift_cards/*.js",
       "import": "./lib/esm/components/gift_cards/*.js"
     },
+    "./hooks/*": {
+      "require": "./lib/cjs/hooks/*.js",
+      "import": "./lib/esm/hooks/*.js"
+    },
     "./line_items/*": {
       "require": "./lib/cjs/components/line_items/*.js",
       "import": "./lib/esm/components/line_items/*.js"
@@ -85,6 +89,9 @@
       ],
       "gift_cards/*": [
         "lib/esm/components/gift_cards/*.d.ts"
+      ],
+      "hooks/*": [
+        "lib/esm/hooks/*.d.ts"
       ],
       "line_items/*": [
         "lib/esm/components/line_items/*.d.ts"
@@ -176,6 +183,7 @@
   "devDependencies": {
     "@commercelayer/js-auth": "^2.3.0",
     "@playwright/test": "^1.26.1",
+    "@testing-library/react": "^13.4.0",
     "@types/braintree-web": "^3.75.22",
     "@types/lodash": "^4.14.186",
     "@types/node": "^18.8.2",

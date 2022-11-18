@@ -241,7 +241,7 @@ export interface BaseAmountComponent
 
 export type ChildrenFunction<P = Record<string, any>> = (
   props: P
-) => JSX.Element
+) => JSX.Element | null
 
 export type ExcludeTag<T extends keyof JSX.IntrinsicElements> = Exclude<
   keyof JSX.IntrinsicElements,

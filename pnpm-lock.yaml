@@ -79,6 +79,7 @@ importers:
       '@playwright/test': ^1.26.1
       '@stripe/react-stripe-js': ^1.12.0
       '@stripe/stripe-js': ^1.38.1
+      '@testing-library/react': ^13.4.0
       '@types/braintree-web': ^3.75.22
       '@types/lodash': ^4.14.186
       '@types/node': ^18.8.2
@@ -128,6 +129,7 @@ importers:
     devDependencies:
       '@commercelayer/js-auth': 2.3.0
       '@playwright/test': 1.27.1
+      '@testing-library/react': 13.4.0_biqbaboplfbrettd7655fr4n2y
       '@types/braintree-web': 3.75.22
       '@types/lodash': 4.14.187
       '@types/node': 18.11.9
@@ -4647,6 +4649,20 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
+  /@testing-library/react/13.4.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-sXOGON+WNTh3MLE9rve97ftaZukN3oNf2KjDy7YTx6hcTO2uuLHuCGynMDhFwGw/jYf4OJ2Qk0i4i79qMNNkyw==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: ^18.0.0
+      react-dom: ^18.0.0
+    dependencies:
+      '@babel/runtime': 7.20.1
+      '@testing-library/dom': 8.19.0
+      '@types/react-dom': 18.0.9
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: true
+
   /@testing-library/user-event/13.5.0_aaq3sbffpfe3jnxzm2zngsddei:
     resolution: {integrity: sha512-5Kwtbo3Y/NowpkbRuSepbyMFkZmHgD+vPzYB/RJ4oxt5Gj/avFFBYjhw27cqSVPVw/3a67NK1PbiIr9k4Gwmdg==}
     engines: {node: '>=10', npm: '>=6'}
@@ -4833,6 +4849,12 @@ packages:
 
   /@types/qs/6.9.7:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
+    dev: true
+
+  /@types/react-dom/18.0.9:
+    resolution: {integrity: sha512-qnVvHxASt/H7i+XG1U1xMiY5t+IHcPGUK7TDMDzom08xa7e86eCeKOiLZezwCKVxJn6NEiiy2ekgX8aQssjIKg==}
+    dependencies:
+      '@types/react': 18.0.24
     dev: true
 
   /@types/react-table/7.7.12:

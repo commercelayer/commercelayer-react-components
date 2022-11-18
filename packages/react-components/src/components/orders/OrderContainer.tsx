@@ -24,9 +24,21 @@ import useCustomContext from '#utils/hooks/useCustomContext'
 
 interface Props {
   children: JSX.Element[] | JSX.Element
+  /**
+   * Metadata to add when creates a new order
+   */
   metadata?: BaseMetadataObject
+  /**
+   * Attribute to add when creates/updates an order
+   */
   attributes?: OrderCreate
+  /**
+   * ID of the order
+   */
   orderId?: string
+  /**
+   * Callback called when the order is updated
+   */
   fetchOrder?: (order: Order) => void
 }
 

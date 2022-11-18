@@ -8,8 +8,8 @@ export default defineConfig({
     environment: 'jsdom',
     coverage: {
       provider: 'c8',
-      reporter: ['text', 'json', 'html'],
-    },
+      reporter: ['text', 'json', 'html']
+    }
   },
-  plugins: [tsconfigPaths(), react()],
+  plugins: [tsconfigPaths(), react()]
 })
