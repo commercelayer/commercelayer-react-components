@@ -113,7 +113,8 @@ describe('AvailabilityContainer component', () => {
       </CommerceLayer>
     )
     await waitFor(
-      async () => await screen.findByText(`Available`, { exact: false }),
+      async (): Promise<HTMLElement> =>
+        await screen.findByText(`Available`, { exact: false }),
       {
         timeout: 5000
       }
@@ -136,7 +137,8 @@ describe('AvailabilityContainer component', () => {
       </CommerceLayer>
     )
     await waitFor(
-      async () => await screen.findByText(`Available`, { exact: false }),
+      async (): Promise<HTMLElement> =>
+        await screen.findByText(`Available`, { exact: false }),
       {
         timeout: 5000
       }
@@ -174,9 +176,12 @@ describe('AvailabilityContainer component', () => {
         </AvailabilityContainer>
       </CommerceLayer>
     )
-    await waitFor(async () => await screen.findByText(`Out of stock`), {
-      timeout: 5000
-    })
+    await waitFor(
+      async (): Promise<HTMLElement> => await screen.findByText(`Out of stock`),
+      {
+        timeout: 5000
+      }
+    )
     const template = screen.getByTestId('availability-template')
     expect(template.textContent).toBe('Out of stock')
   })
