@@ -48,6 +48,6 @@
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
     "@commercelayer/js-auth": "^2.3.0",
-    "@commercelayer/react-components": "workspace:^4.0.0"
+    "@commercelayer/react-components": "workspace:*"
   }
 }
