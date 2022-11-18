@@ -3,7 +3,7 @@ import { Component, ForwardedRef } from 'react'
 export interface ParentProps {
   // Add parent ref to child
   parentRef?: ForwardedRef<any>
-  children?: typeof Component | ((P: any) => JSX.Element)
+  children?: typeof Component | ((P: any) => JSX.Element | null)
 }
 
 export default function Parent({
