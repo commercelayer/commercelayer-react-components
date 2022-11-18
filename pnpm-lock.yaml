@@ -16,7 +16,7 @@ importers:
     specifiers:
       '@babel/core': ^7.19.6
       '@commercelayer/js-auth': ^2.3.0
-      '@commercelayer/react-components': workspace:^4.0.0
+      '@commercelayer/react-components': workspace:*
       '@mdx-js/react': ^2.1.5
       '@storybook/addon-actions': ^6.5.13
       '@storybook/addon-backgrounds': ^6.5.13
