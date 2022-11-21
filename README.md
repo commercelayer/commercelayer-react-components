@@ -293,7 +293,7 @@ For each component, the table below shows its props and the list of the permitte
 | `TaxesAmount`              | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
 | `TotalAmount`              | `className`<br />`format`<br />`id`<br />`name`<br />`style`                     |
 
-For more detailed information on each components (i.e. prop types and default values, required props, etc.), have a look at the components folder [`src/components`](/src/components).
+For more detailed information on each components (i.e. prop types and default values, required props, etc.), have a look at the components folder [`packages/react-components/src/components`](/packages/react-components/src/components).
 
 ---
 
