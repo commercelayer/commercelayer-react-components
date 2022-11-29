@@ -2,12 +2,15 @@ import CommerceLayer from '#components/auth/CommerceLayer'
 import CustomerContainer from '#components/customers/CustomerContainer'
 import OrderList, { OrderListColumn } from '#components/orders/OrderList'
 import OrderListEmpty from '#components/orders/OrderListEmpty'
+import OrderListPaginationButtons from '#components/orders/OrderListPaginationButtons'
+import { OrderListPaginationInfo } from '#components/orders/OrderListPaginationInfo'
 import OrderListRow from '#components/orders/OrderListRow'
 import { Order } from '@commercelayer/sdk'
 import {
   fireEvent,
   render,
   screen,
+  waitFor,
   waitForElementToBeRemoved
 } from '@testing-library/react'
 import { LocalContext } from '../utils/context'
@@ -357,5 +360,182 @@ describe('Orders list', () => {
     expect(firstCell?.getAttribute('data-testid')).toBe('cell-0')
     expect(firstCell?.tagName).toBe('DIV')
     expect(firstCell?.textContent).not.toBe('')
+  })
+  it<OrderListContext>('Show orders list with pagination', async (ctx) => {
+    const { rerender } = render(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <CustomerContainer>
+          <OrderList columns={ctx.columns} showPagination>
+            <OrderListRow field='number' />
+            <OrderListRow field='status' className='align-top py-5 border-b' />
+            <OrderListRow
+              field='updated_at'
+              className='align-top py-5 border-b'
+            />
+            <OrderListRow
+              field='formatted_total_amount_with_taxes'
+              className='align-top py-5 border-b font-bold'
+            />
+            <OrderListPaginationInfo data-testid='pagination-info' />
+            <OrderListPaginationButtons
+              navigationButtons={{ activeClassName: 'active' }}
+            />
+          </OrderList>
+        </CustomerContainer>
+      </CommerceLayer>
+    )
+    expect(screen.getByText('Loading...'))
+    await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+      timeout: 8000
+    })
+    const [first] = screen.getAllByTestId(/thead/)
+    expect(first).toBeDefined()
+    expect(first?.getAttribute('data-testid')).toBe('thead-0')
+    expect(screen.getByText('Order')).toBeDefined()
+    expect(first?.getAttribute('data-sort')).toBe('')
+    fireEvent.click(screen.getByText('Order'))
+    expect(first?.getAttribute('data-sort')).toBe('asc')
+    fireEvent.click(screen.getByText('Order'))
+    expect(first?.getAttribute('data-sort')).toBe('desc')
+    const [firstCell] = screen.getAllByTestId(/cell/)
+    expect(firstCell).toBeDefined()
+    expect(firstCell?.getAttribute('data-testid')).toBe('cell-0')
+    expect(first?.textContent).not.toBe('')
+    let paginationInfo = screen.getByTestId('pagination-info')
+    expect(paginationInfo?.tagName).toBe('SPAN')
+    expect(paginationInfo?.textContent).toContain('1 - 10')
+    // TODO: check disabled
+    let prevButton = screen.getByTestId('prev-button')
+    expect(prevButton).toBeDefined()
+    expect(prevButton.textContent).toBe('<')
+    let nextButton = screen.getByTestId('next-button')
+    expect(nextButton).toBeDefined()
+    expect(nextButton.textContent).toBe('>')
+    let navButtons = screen.getAllByTestId(/page-/)
+    expect(navButtons).toBeDefined()
+    expect(navButtons.length).toBe(3)
+    expect(navButtons[0]?.className).toContain('active')
+    fireEvent.click(nextButton)
+    await waitFor(async () => await screen.findByText(/11 - 20/), {
+      timeout: 2000
+    })
+    paginationInfo = screen.getByTestId('pagination-info')
+    expect(paginationInfo?.textContent).toContain('11 - 20')
+    navButtons = screen.getAllByTestId(/page-/)
+    expect(navButtons).toBeDefined()
+    expect(navButtons.length).toBe(3)
+    nextButton = screen.getByTestId('next-button')
+    fireEvent.click(nextButton)
+    await waitFor(async () => await screen.findByText(/21 - 30/), {
+      timeout: 2000
+    })
+    paginationInfo = screen.getByTestId('pagination-info')
+    expect(paginationInfo?.textContent).toContain('21 - 30')
+    navButtons = screen.getAllByTestId(/page-/)
+    expect(navButtons).toBeDefined()
+    expect(navButtons.length).toBe(3)
+    expect(navButtons[1]?.className).toContain('active')
+    prevButton = screen.getByTestId('prev-button')
+    fireEvent.click(prevButton)
+    await waitFor(async () => await screen.findByText(/11 - 20/), {
+      timeout: 2000
+    })
+    paginationInfo = screen.getByTestId('pagination-info')
+    expect(paginationInfo?.textContent).toContain('11 - 20')
+    navButtons = screen.getAllByTestId(/page-/)
+    expect(navButtons).toBeDefined()
+    expect(navButtons.length).toBe(3)
+    expect(navButtons[1]?.className).toContain('active')
+    prevButton = screen.getByTestId('prev-button')
+    fireEvent.click(prevButton)
+    await waitFor(async () => await screen.findByText(/1 - 10/), {
+      timeout: 2000
+    })
+    paginationInfo = screen.getByTestId('pagination-info')
+    expect(paginationInfo?.textContent).toContain('1 - 10')
+    navButtons = screen.getAllByTestId(/page-/)
+    expect(navButtons).toBeDefined()
+    expect(navButtons.length).toBe(3)
+    expect(navButtons[0]?.className).toContain('active')
+    const page = screen.getByTestId('page-3')
+    fireEvent.click(page)
+    await waitFor(async () => await screen.findByText(/21 - 30/), {
+      timeout: 2000
+    })
+    paginationInfo = screen.getByTestId('pagination-info')
+    expect(paginationInfo?.textContent).toContain('21 - 30')
+    navButtons = screen.getAllByTestId(/page-/)
+    expect(navButtons).toBeDefined()
+    expect(navButtons.length).toBe(3)
+    expect(navButtons[1]?.className).toContain('active')
+    rerender(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <CustomerContainer>
+          <OrderList columns={ctx.columns} showPagination>
+            <OrderListRow field='number' />
+            <OrderListRow field='status' className='align-top py-5 border-b' />
+            <OrderListRow
+              field='updated_at'
+              className='align-top py-5 border-b'
+            />
+            <OrderListRow
+              field='formatted_total_amount_with_taxes'
+              className='align-top py-5 border-b font-bold'
+            />
+            <OrderListPaginationInfo data-testid='pagination-info'>
+              {(props) => (
+                <span data-testid='custom-pagination-info'>
+                  {props.firstRow} - {props.lastRow}
+                </span>
+              )}
+            </OrderListPaginationInfo>
+            <OrderListPaginationButtons
+              navigationButtons={{ show: false }}
+              previousPageButton={{ show: false }}
+              nextPageButton={{ show: false }}
+            >
+              {(props) => (
+                <span data-testid='custom-pagination-button'>
+                  {props.pageIndex}
+                </span>
+              )}
+            </OrderListPaginationButtons>
+          </OrderList>
+        </CustomerContainer>
+      </CommerceLayer>
+    )
+    paginationInfo = screen.getByTestId('custom-pagination-info')
+    expect(paginationInfo?.textContent).toContain('21 - 30')
+    const customPaginationCustom = screen.getByTestId(
+      'custom-pagination-button'
+    )
+    expect(customPaginationCustom?.textContent).toContain('2')
+  }, 12000)
+  it<OrderListContext>('Wrong component as children into <OrderList/>', async (ctx) => {
+    expect(() =>
+      render(
+        <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+          <CustomerContainer>
+            <OrderList columns={ctx.columns} showPagination>
+              <OrderListRow field='number' />
+              <OrderListRow
+                field='status'
+                className='align-top py-5 border-b'
+              />
+              <OrderListRow
+                field='updated_at'
+                className='align-top py-5 border-b'
+              />
+              <OrderListRow
+                field='formatted_total_amount_with_taxes'
+                className='align-top py-5 border-b font-bold'
+              />
+              <div>wrong element</div>
+              <OrderListPaginationInfo data-testid='pagination-info' />
+            </OrderList>
+          </CustomerContainer>
+        </CommerceLayer>
+      )
+    ).toThrow('Only library components are allowed into <OrderList/>')
   })
 })
