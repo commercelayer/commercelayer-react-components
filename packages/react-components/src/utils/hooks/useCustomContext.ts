@@ -28,6 +28,7 @@ export default function useCustomContext<T>({
   const currentContext = useContext<T>(context)
   const isProduction = process.env.NODE_ENV === 'production'
   const msg = `Cannot use <${currentComponentName}/> outside of <${contextComponentName}/>`
+  // @ts-expect-error
   if (key != null && key in currentContext) return currentContext
   if (key == null && currentContext != null) return currentContext
   if (currentContext != null) return currentContext

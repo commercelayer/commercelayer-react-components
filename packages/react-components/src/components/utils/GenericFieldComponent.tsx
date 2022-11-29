@@ -23,7 +23,6 @@ export interface TResources {
   Parcel: Parcel & { resource: 'parcel' }
   ParcelLineItem: Pick<
     ParcelLineItem,
-    // @ts-expect-error
     'quantity' | 'sku_code' | 'name' | 'image_url'
   > & {
     resource: 'parcelLineItem'
