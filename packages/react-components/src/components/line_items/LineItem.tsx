@@ -36,7 +36,7 @@ export function LineItem(props: Props): JSX.Element {
         lineItem
       }
       return (
-        <LineItemChildrenContext.Provider key={k} value={lineProps}>
+        <LineItemChildrenContext.Provider key={lineItem.id} value={lineProps}>
           {children}
         </LineItemChildrenContext.Provider>
       )

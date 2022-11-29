@@ -189,11 +189,7 @@ export const getApiOrder: GetOrder = async (
       options.include = state.include
     }
     const order = await sdk.orders.retrieve(id as string, options)
-    if (
-      (clearWhenPlaced && order.status === 'placed') ||
-      (clearWhenPlaced && order.status === 'approved') ||
-      (clearWhenPlaced && order.status === 'cancelled')
-    ) {
+    if (clearWhenPlaced && order.editable === false) {
       persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
       if (dispatch) {
         dispatch({

@@ -1,4 +1,4 @@
-export * from '#components/Errors'
+export * from '#components/errors/Errors'
 export * from '#components/ExternalFunction'
 export * from '#components/MetadataInput'
 export * from '#components/SubmitButton'

@@ -10,6 +10,7 @@ import CustomerContext from '#context/CustomerContext'
 import OrderListChildrenContext, {
   InitialOrderListContext
 } from '#context/OrderListChildrenContext'
+import OrderListPagination from '#context/OrderListPaginationContext'
 import {
   Column,
   HeaderGroup,
@@ -17,12 +18,25 @@ import {
   useSortBy,
   UseSortByColumnProps,
   useBlockLayout,
-  PluginHook
+  PluginHook,
+  usePagination,
+  Row
 } from 'react-table'
 import { FixedSizeList } from 'react-window'
 import scrollbarWidth from '#utils/scrollbarWidth'
 import { sortDescIcon, sortAscIcon } from '#utils/icons'
 import type { Order } from '@commercelayer/sdk'
+import filterChildren from '#utils/filterChildren'
+
+type RowComponent = 'OrderListRow'
+type PaginationComponent =
+  | 'OrderListPaginationInfo'
+  | 'OrderListPaginationButtons'
+const rowComponents: RowComponent[] = ['OrderListRow']
+const paginationComponents: PaginationComponent[] = [
+  'OrderListPaginationInfo',
+  'OrderListPaginationButtons'
+]
 
 export type OrderListColumn = Column & {
   Header: string
@@ -30,6 +44,22 @@ export type OrderListColumn = Column & {
   className?: string
   titleClassName?: string
 }
+
+type PaginationProps =
+  | {
+      /**
+       * Show table pagination. Default is false.
+       */
+      showPagination: true
+      pageSize?: number
+    }
+  | {
+      /**
+       * Show table pagination. Default is false.
+       */
+      showPagination?: false
+      pageSize?: never
+    }
 
 type Props = {
   children: JSX.Element[] | JSX.Element
@@ -50,15 +80,19 @@ type Props = {
    */
   actionsContainerClassName?: string
   /**
-   * Show actions column
+   * Show actions column. Default is false.
    */
   showActions?: boolean
   /**
-   * Class name to assign to the table header
+   * Class name to assign to pagination container.
+   */
+  paginationContainerClassName?: string
+  /**
+   * Class name to assign to the table header.
    */
   theadClassName?: string
   /**
-   * Class name to assign to the table row
+   * Class name to assign to the table row.
    */
   rowTrClassName?: string
 } & Omit<JSX.IntrinsicElements['table'], 'children'> &
@@ -82,7 +116,8 @@ type Props = {
         infiniteScroll?: false
         windowOptions?: never
       }
-  )
+  ) &
+  PaginationProps
 
 interface HeaderColumn
   extends HeaderGroup<Order>,
@@ -96,6 +131,9 @@ export function OrderList({
   columns,
   loadingElement,
   showActions = false,
+  showPagination = false,
+  pageSize = 10,
+  paginationContainerClassName,
   actionsComponent,
   actionsContainerClassName,
   infiniteScroll,
@@ -110,6 +148,7 @@ export function OrderList({
   const cols = useMemo(() => columns, [columns]) as Array<Column<Order>>
   const tablePlugins: Array<PluginHook<Order>> = [useSortBy]
   if (infiniteScroll) tablePlugins.push(useBlockLayout)
+  if (showPagination) tablePlugins.push(usePagination)
   const defaultColumn = useMemo(
     () => ({
       width: windowOptions?.column || 150
@@ -117,7 +156,12 @@ export function OrderList({
     [windowOptions?.column]
   )
   const table = useTable<Order>(
-    { data, columns: cols, ...(infiniteScroll && { defaultColumn }) },
+    {
+      data,
+      columns: cols,
+      ...(infiniteScroll && { defaultColumn }),
+      ...(showPagination && { pageSize })
+    },
     ...tablePlugins
   )
   const TableHtmlElement = !infiniteScroll ? 'table' : 'div'
@@ -168,8 +212,15 @@ export function OrderList({
       </TrHtmlElement>
     )
   })
+  // @ts-expect-error
+  const rows: Array<Row<Order>> = showPagination ? table.page : table.rows
+  const rowsComponents = filterChildren({
+    children,
+    filterBy: rowComponents,
+    componentName: 'OrderList'
+  })
   const components = !infiniteScroll
-    ? table.rows.map((row, i) => {
+    ? rows.map((row, i) => {
         table.prepareRow(row)
         const childProps = {
           orders,
@@ -187,14 +238,14 @@ export function OrderList({
             key={i}
           >
             <OrderListChildrenContext.Provider value={childProps}>
-              {children}
+              {rowsComponents}
             </OrderListChildrenContext.Provider>
           </TrHtmlElement>
         )
       })
     : useCallback(
         ({ index, style }: { index: number; style: CSSProperties }) => {
-          const row = table.rows[index]
+          const row = rows[index]
           row && table.prepareRow(row)
           const childProps = {
             orders,
@@ -211,14 +262,53 @@ export function OrderList({
               className={rowTrClassName}
             >
               <OrderListChildrenContext.Provider value={childProps}>
-                {children}
+                {rowsComponents}
               </OrderListChildrenContext.Provider>
             </TrHtmlElement>
           )
         },
         [table.prepareRow, table.rows]
       )
-
+  // TODO: Waiting for react table types for pagination
+  const pagComponents = filterChildren({
+    children,
+    filterBy: paginationComponents,
+    componentName: 'OrderList'
+  })
+  const Pagination = (): JSX.Element | null =>
+    !showPagination ? null : (
+      <OrderListPagination.Provider
+        value={{
+          // @ts-expect-error
+          canNextPage: table.canNextPage,
+          // @ts-expect-error
+          canPreviousPage: table.canPreviousPage,
+          // @ts-expect-error
+          gotoPage: table.gotoPage,
+          // @ts-expect-error
+          nextPage: table.nextPage,
+          // @ts-expect-error
+          page: table.page,
+          // @ts-expect-error
+          pageCount: table.pageCount,
+          // @ts-expect-error
+          pageIndex: table.state.pageIndex,
+          // @ts-expect-error
+          pageNumber: table.pageNumber,
+          // @ts-expect-error
+          pageOptions: table.pageOptions,
+          // @ts-expect-error
+          pageSize: table.state.pageSize,
+          // @ts-expect-error
+          previousPage: table.previousPage,
+          // @ts-expect-error
+          setPageSize: table.setPageSize,
+          totalRows: orders?.length ?? 0
+        }}
+      >
+        {pagComponents}
+      </OrderListPagination.Provider>
+    )
   if (loading && orders == null) {
     return <>{LoadingComponent}</>
   }
@@ -227,27 +317,32 @@ export function OrderList({
       {children}
     </OrderListChildrenContext.Provider>
   ) : (
-    <TableHtmlElement {...p} {...table.getTableProps()}>
-      <TheadHtmlElement className={theadClassName}>
-        {headerComponent}
-      </TheadHtmlElement>
-      <TbodyHtmlElement {...table.getTableBodyProps()}>
-        {!infiniteScroll ? (
-          (components as JSX.Element[])
-        ) : (
-          <FixedSizeList
-            height={windowOptions?.height || 400}
-            itemCount={table.rows.length}
-            itemSize={windowOptions?.itemSize || 100}
-            width={
-              windowOptions?.width || table.totalColumnsWidth + scrollBarSize
-            }
-          >
-            {components as () => JSX.Element}
-          </FixedSizeList>
-        )}
-      </TbodyHtmlElement>
-    </TableHtmlElement>
+    <>
+      <TableHtmlElement {...p} {...table.getTableProps()}>
+        <TheadHtmlElement className={theadClassName}>
+          {headerComponent}
+        </TheadHtmlElement>
+        <TbodyHtmlElement {...table.getTableBodyProps()}>
+          {!infiniteScroll ? (
+            (components as JSX.Element[])
+          ) : (
+            <FixedSizeList
+              height={windowOptions?.height || 400}
+              itemCount={table.rows.length}
+              itemSize={windowOptions?.itemSize || 100}
+              width={
+                windowOptions?.width || table.totalColumnsWidth + scrollBarSize
+              }
+            >
+              {components as () => JSX.Element}
+            </FixedSizeList>
+          )}
+        </TbodyHtmlElement>
+      </TableHtmlElement>
+      <div className={paginationContainerClassName}>
+        <Pagination />
+      </div>
+    </>
   )
 }
 

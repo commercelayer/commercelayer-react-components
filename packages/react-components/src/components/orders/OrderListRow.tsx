@@ -96,4 +96,6 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
   )
 }
 
+OrderListRow.displayName = 'OrderListRow'
+
 export default OrderListRow

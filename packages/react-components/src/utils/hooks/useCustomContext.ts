@@ -30,6 +30,7 @@ export default function useCustomContext<T>({
   const msg = `Cannot use <${currentComponentName}/> outside of <${contextComponentName}/>`
   if (key != null && key in currentContext) return currentContext
   if (key == null && currentContext != null) return currentContext
+  if (currentContext != null) return currentContext
   if (isProduction) console.error(msg)
   else throw new Error(msg)
   return currentContext
