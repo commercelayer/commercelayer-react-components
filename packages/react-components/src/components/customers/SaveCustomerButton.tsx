@@ -1,7 +1,7 @@
 import { ReactNode, useContext } from 'react'
 import Parent from '#components/utils/Parent'
 import { ChildrenFunction } from '#typings/index'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import CustomerContext from '#context/CustomerContext'
 
 interface ChildrenProps extends Omit<Props, 'children'> {

@@ -13,7 +13,7 @@ import paymentMethodReducer, {
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { BaseError } from '#typings/errors'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import useCustomContext from '#utils/hooks/useCustomContext'
 
 interface Props {

@@ -1,4 +1,4 @@
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import { fieldsExist } from '#utils/validateFormFields'
 import { BaseError } from '#typings/errors'
 import { addressFields } from '#reducers/AddressReducer'

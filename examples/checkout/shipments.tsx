@@ -22,7 +22,7 @@ import {
   ShippingMethodRadioButtonType,
   Errors,
 } from 'packages/react-components/src'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import { useRouter } from 'next/router'
 import getSdk from '#utils/getSdk'
 

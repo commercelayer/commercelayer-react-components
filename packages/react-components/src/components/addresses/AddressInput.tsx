@@ -13,7 +13,7 @@ type Props = {
   name: Extract<AddressValuesKeys, AddressInputName>
 } & Omit<BaseInputComponentProps, 'name'> &
   JSX.IntrinsicElements['input'] &
-  JSX.IntrinsicElements['textarea']
+  Omit<JSX.IntrinsicElements['textarea'], 'children'>
 
 export function AddressInput(props: Props): JSX.Element | null {
   const { placeholder = '', required, value, className, ...p } = props
@@ -69,7 +69,8 @@ export function AddressInput(props: Props): JSX.Element | null {
   }`
   if (
     p.name === 'billing_address_billing_info' &&
-    !billingAddress.requiresBillingInfo
+    billingAddress.requiresBillingInfo === false &&
+    required === undefined
   )
     return null
   return (

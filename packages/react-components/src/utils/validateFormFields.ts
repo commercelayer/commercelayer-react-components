@@ -14,30 +14,26 @@ const EMAIL_PATTERN = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/
 
 type FormField = HTMLInputElement | HTMLSelectElement
 
-export interface ValidateFormFields {
-  <R extends string[]>(
-    fields: HTMLFormControlsCollection,
-    required: R,
-    resourceType: ResourceErrorType
-  ): {
-    errors: BaseError[]
-    values: BaseState
-  }
+export type ValidateFormFields = <R extends string[]>(
+  fields: HTMLFormControlsCollection,
+  required: R,
+  resourceType: ResourceErrorType
+) => {
+  errors: BaseError[]
+  values: BaseState
 }
 
-export interface ValidateValue {
-  <
-    V extends string | boolean,
-    N extends string,
-    T extends string,
-    B extends ResourceErrorType
-  >(
-    val: V,
-    name: N,
-    type: T,
-    resourceType: B
-  ): BaseError | Record<string, any>
-}
+export type ValidateValue = <
+  V extends string | boolean,
+  N extends string,
+  T extends string,
+  B extends ResourceErrorType
+>(
+  val: V,
+  name: N,
+  type: T,
+  resourceType: B
+) => BaseError | Record<string, any>
 
 export const validateValue: ValidateValue = (val, name, type, resourceType) => {
   if (!val) {
@@ -45,7 +41,7 @@ export const validateValue: ValidateValue = (val, name, type, resourceType) => {
       field: name,
       code: 'VALIDATION_ERROR',
       message: `${name} - is required`,
-      resourceType,
+      resourceType
     }
   }
   if (type === 'email' && isString(val) && !val.match(EMAIL_PATTERN)) {
@@ -53,7 +49,7 @@ export const validateValue: ValidateValue = (val, name, type, resourceType) => {
       field: name,
       code: 'VALIDATION_ERROR',
       message: `${name} - is not valid`,
-      resourceType,
+      resourceType
     }
   }
   return {}
@@ -68,9 +64,9 @@ const validateFormFields: ValidateFormFields = (
   let values = { metadata: {} }
   map(fields, (v: FormField) => {
     const isTick = !!get(v, 'checked')
-    const val = isTick ? isTick : v.value === 'on' ? false : v.value
+    const val = isTick || (v.value === 'on' ? false : v.value)
     const attrName = v.getAttribute('name')
-    if ((attrName && required.indexOf(attrName) !== -1) || v.required) {
+    if ((attrName && required.includes(attrName)) || v.required) {
       const error = validateValue(val, v.name, v.type, resourceType)
       if (!isEmpty(error)) {
         errors.push(error as BaseError)
@@ -82,7 +78,7 @@ const validateFormFields: ValidateFormFields = (
       values = isMetadata
         ? {
             ...values,
-            metadata: { ...values.metadata, [`${v.name}`]: val },
+            metadata: { ...values.metadata, [`${v.name}`]: val }
           }
         : { ...values, [`${v.name}`]: val }
     }
@@ -90,13 +86,14 @@ const validateFormFields: ValidateFormFields = (
   return { errors, values }
 }
 
-export interface FieldsExist {
-  (address: AddressCreate, schema?: AddressField[]): boolean
-}
+export type FieldsExist = (
+  address: AddressCreate,
+  schema?: AddressField[]
+) => boolean
 
 export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
   // console.log('address', address)
-  if (!address['business']) {
+  if (!address.business) {
     const required = without(schema, 'line_2', 'company')
     const validAddress = keys(address).filter((k) =>
       required.includes(k as any)
@@ -139,19 +136,19 @@ const businessOptionalFields: BusinessOptionalField[] = [
   'shipping_address_first_name',
   'shipping_address_last_name',
   'first_name',
-  'last_name',
+  'last_name'
 ]
 
 const customerOptionalFields: CustomerOptionalField[] = [
   'billing_address_company',
   'shipping_address_company',
-  'company',
+  'company'
 ]
 
 export function businessMandatoryField(
   fieldName: AddressInputName,
   isBusiness?: boolean
-) {
+): boolean {
   if (
     isBusiness &&
     businessOptionalFields.includes(fieldName as BusinessOptionalField)

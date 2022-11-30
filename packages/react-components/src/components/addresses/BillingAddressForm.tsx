@@ -53,7 +53,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
         const code = errors[fieldName]?.code
         const message = errors[fieldName]?.message
         if (['billing_address_state_code'].includes(fieldName)) {
-          if (!values?.['state_code']) {
+          if (!values?.state_code) {
             // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete errors[fieldName]
           } else {
