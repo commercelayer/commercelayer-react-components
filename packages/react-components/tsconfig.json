@@ -15,8 +15,7 @@
     // "declarationMap": true,                      /* Generates a sourcemap for each corresponding '.d.ts' file. */
     // "sourceMap": true,                           /* Generates corresponding '.map' file. */
     // "outFile": "./",                             /* Concatenate and emit output to single file. */
-    "outDir": "lib/esm" /* Redirect output structure to the directory. */,
-    "rootDir": "./src" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
+    // "rootDir": "./src" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
     // "composite": true,                           /* Enable project compilation */
     // "tsBuildInfoFile": "./",                     /* Specify file to store incremental compilation information */
     // "removeComments": true,                      /* Do not emit comments to output. */
@@ -42,10 +41,12 @@
     // "noFallthroughCasesInSwitch": true,          /* Report errors for fallthrough cases in switch statement. */
     // "noUncheckedIndexedAccess": true,            /* Include 'undefined' in index signature results */
     // "noPropertyAccessFromIndexSignature": true,  /* Require undeclared properties from index signatures to use element accesses. */
-
+    "types": [
+      "vitest/globals"
+    ],
     /* Module Resolution Options */
     "moduleResolution": "Node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
-    "baseUrl": "./" /* Base directory to resolve non-absolute module names. */,
+    "baseUrl": "." /* Base directory to resolve non-absolute module names. */,
     "paths": {
       "@commercelayer/react-components": ["src/index"],
       "#components/*": ["src/components/*"],
@@ -80,6 +81,9 @@
     "skipLibCheck": true /* Skip type checking of declaration files. */,
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
   },
-  "include": ["src/**/*"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
   "exclude": ["node_modules"]
 }

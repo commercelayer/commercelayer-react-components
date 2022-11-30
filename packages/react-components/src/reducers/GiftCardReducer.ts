@@ -10,7 +10,7 @@ import {
 import { BaseMetadata } from '#typings'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 import { BaseError } from '#typings/errors'
 import getErrors from '#utils/getErrors'
 import getSdk from '#utils/getSdk'
