@@ -45,7 +45,7 @@ export function OrderListPaginationInfo<A extends TAsComponent = 'span'>({
   let firstRow = pageIndex === 0 ? pageIndex + 1 : pageIndex
   let lastRow = firstRow * pageSize
   if (ctx?.canPreviousPage === true) {
-    firstRow = Math.floor(firstRow * 10) + 1
+    firstRow = Math.floor(firstRow * pageSize) + 1
     lastRow = Math.floor(firstRow + pageSize - 1)
   }
   if (ctx?.canNextPage === false) {

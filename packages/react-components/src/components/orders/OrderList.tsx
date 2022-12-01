@@ -45,6 +45,19 @@ export type OrderListColumn = Column & {
   titleClassName?: string
 }
 
+type SortBy = {
+  id: keyof Order
+} & (
+  | {
+      desc: true
+      asc?: never
+    }
+  | {
+      desc?: never
+      asc: true
+    }
+)
+
 type PaginationProps =
   | {
       /**
@@ -84,9 +97,15 @@ type Props = {
    */
   showActions?: boolean
   /**
+   * Sort by column. Default is `number` column descending.
+   */
+  sortBy?: SortBy[]
+  /**
    * Class name to assign to pagination container.
    */
   paginationContainerClassName?: string
+
+  // sortBy?:
   /**
    * Class name to assign to the table header.
    */
@@ -132,6 +151,7 @@ export function OrderList({
   loadingElement,
   showActions = false,
   showPagination = false,
+  sortBy = [{ id: 'number', desc: true }],
   pageSize = 10,
   paginationContainerClassName,
   actionsComponent,
@@ -155,12 +175,20 @@ export function OrderList({
     }),
     [windowOptions?.column]
   )
+  const initialState = useMemo(
+    () => ({
+      ...(showPagination && { pageSize }),
+      sortBy
+    }),
+    [showPagination, pageSize]
+  )
   const table = useTable<Order>(
     {
       data,
       columns: cols,
       ...(infiniteScroll && { defaultColumn }),
-      ...(showPagination && { pageSize })
+      // @ts-expect-error
+      initialState
     },
     ...tablePlugins
   )

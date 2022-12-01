@@ -14,7 +14,7 @@ type Props = {
   max?: number
   disabled?: boolean
   readonly?: boolean
-} & (JSX.IntrinsicElements['select'] &
+} & (Omit<JSX.IntrinsicElements['select'], 'children'> &
   Omit<JSX.IntrinsicElements['span'], 'children'>)
 
 export function LineItemQuantity(props: Props): JSX.Element {

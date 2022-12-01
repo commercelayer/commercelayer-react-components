@@ -6,9 +6,7 @@ export interface LineItemContextValue extends LineItemState {
   lineItems?: LineItem[] | undefined
 }
 
-const initial: LineItemContextValue = {
-  lineItems: []
-}
+const initial: LineItemContextValue = {}
 
 const LineItemContext = createContext<LineItemContextValue>(initial)
 
