@@ -664,6 +664,107 @@ describe('Orders list', () => {
     },
     globalTimeout
   )
+  it<OrderListContext>(
+    'Hide previous and next buttons',
+    async (ctx) => {
+      const { accessToken, endpoint } = await getToken('customer_with_low_data')
+      if (accessToken !== undefined) {
+        ctx.accessToken = accessToken
+        ctx.endpoint = endpoint
+      }
+      render(
+        <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+          <CustomerContainer>
+            <OrderList columns={ctx.columns} showPagination>
+              <OrderListRow field='number' data-testid='number' />
+              <OrderListRow
+                field='status'
+                className='align-top py-5 border-b'
+              />
+              <OrderListRow
+                field='updated_at'
+                className='align-top py-5 border-b'
+              />
+              <OrderListRow
+                field='formatted_total_amount_with_taxes'
+                className='align-top py-5 border-b font-bold'
+              />
+              <OrderListPaginationInfo data-testid='pagination-info' />
+              <OrderListPaginationButtons
+                previousPageButton={{ hideWhenDisabled: true }}
+                nextPageButton={{ hideWhenDisabled: true }}
+              />
+            </OrderList>
+          </CustomerContainer>
+        </CommerceLayer>
+      )
+      expect(screen.getByText('Loading...'))
+      await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+        timeout: globalTimeout
+      })
+      let prevButton = screen.queryByTestId('prev-button')
+      expect(prevButton).toBeNull()
+      let nextButton = screen.queryByTestId('next-button')
+      expect(nextButton).toBeDefined()
+      if (nextButton != null) {
+        fireEvent.click(nextButton)
+        prevButton = screen.queryByTestId('prev-button')
+        expect(prevButton).toBeDefined()
+        nextButton = screen.queryByTestId('next-button')
+        expect(nextButton).toBeNull()
+      }
+    },
+    globalTimeout
+  )
+  it<OrderListContext>(
+    'Hide previous and next buttons',
+    async (ctx) => {
+      const { accessToken, endpoint } = await getToken('customer_with_low_data')
+      if (accessToken !== undefined) {
+        ctx.accessToken = accessToken
+        ctx.endpoint = endpoint
+      }
+      render(
+        <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+          <CustomerContainer>
+            <OrderList columns={ctx.columns} showPagination>
+              <OrderListRow field='number' data-testid='number' />
+              <OrderListRow
+                field='status'
+                className='align-top py-5 border-b'
+              />
+              <OrderListRow
+                field='updated_at'
+                className='align-top py-5 border-b'
+              />
+              <OrderListRow
+                field='formatted_total_amount_with_taxes'
+                className='align-top py-5 border-b font-bold'
+              />
+              <OrderListPaginationInfo data-testid='pagination-info' />
+              <OrderListPaginationButtons
+                previousPageButton={{ hideWhenDisabled: true }}
+              />
+            </OrderList>
+          </CustomerContainer>
+        </CommerceLayer>
+      )
+      expect(screen.getByText('Loading...'))
+      await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+        timeout: globalTimeout
+      })
+      let prevButton = screen.queryByTestId('prev-button')
+      expect(prevButton).toBeNull()
+      let nextButton = screen.getByTestId('next-button')
+      expect(nextButton).toBeDefined()
+      fireEvent.click(nextButton)
+      prevButton = screen.queryByTestId('prev-button')
+      expect(prevButton).toBeDefined()
+      nextButton = screen.getByTestId('next-button')
+      expect(nextButton).toBeDefined()
+    },
+    globalTimeout
+  )
   it<OrderListContext>('Wrong component as children into <OrderList/>', async (ctx) => {
     expect(() =>
       render(

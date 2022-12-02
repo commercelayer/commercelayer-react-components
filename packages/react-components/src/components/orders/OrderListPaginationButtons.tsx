@@ -11,11 +11,15 @@ interface PaginationButton
   /**
    * Show or hide the pagination button. Default is true.
    */
-  show: boolean
+  show?: boolean
   /**
    * Label to display
    */
   label?: string | JSX.Element
+  /**
+   * Hide the pagination button when the attribute disabled is true. Default is false.
+   */
+  hideWhenDisabled?: boolean
 }
 
 interface NavigationButtons
@@ -64,24 +68,30 @@ export function OrderListPaginationButtons({
     currentComponentName: 'OrderListPaginationButtons'
   })
   const PrevButton = prevButton.show ? (
-    <button
-      data-testid='prev-button'
-      {...omit(prevButton, ['show'])}
-      disabled={ctx?.canPreviousPage === false}
-      onClick={() => ctx?.previousPage()}
-    >
-      {previousPageButton?.label ?? '<'}
-    </button>
+    prevButton.hideWhenDisabled === true &&
+    ctx?.canPreviousPage === false ? null : (
+      <button
+        data-testid='prev-button'
+        {...omit(prevButton, ['show'])}
+        disabled={ctx?.canPreviousPage === false}
+        onClick={() => ctx?.previousPage()}
+      >
+        {previousPageButton?.label ?? '<'}
+      </button>
+    )
   ) : null
   const NextButton = nextButton.show ? (
-    <button
-      data-testid='next-button'
-      {...omit(nextButton, ['show'])}
-      disabled={ctx?.canNextPage === false}
-      onClick={() => ctx?.nextPage()}
-    >
-      {nextButton?.label ?? '>'}
-    </button>
+    nextButton.hideWhenDisabled === true &&
+    ctx?.canPreviousPage === false ? null : (
+      <button
+        data-testid='next-button'
+        {...omit(nextButton, ['show'])}
+        disabled={ctx?.canNextPage === false}
+        onClick={() => ctx?.nextPage()}
+      >
+        {nextButton?.label ?? '>'}
+      </button>
+    )
   ) : null
   const pagesToShow =
     ctx?.canPreviousPage === false
