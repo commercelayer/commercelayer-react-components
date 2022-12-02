@@ -8,7 +8,7 @@ import { Order, LineItem } from '@commercelayer/sdk'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
 
-export type UpdateLineItemParams = {
+export interface UpdateLineItemParams {
   lineItemId: string
   quantity?: number
   dispatch: Dispatch<LineItemAction>
@@ -18,26 +18,20 @@ export type UpdateLineItemParams = {
   errors: BaseError[] | undefined
 }
 
-export interface UpdateLineItem {
-  (params: UpdateLineItemParams): void
-}
+export type UpdateLineItem = (params: UpdateLineItemParams) => Promise<void>
 
 export type DeleteLineItemParam = Record<string, any> & UpdateLineItemParams
 
-export interface DeleteLineItem {
-  (params: DeleteLineItemParam): void
-}
+export type DeleteLineItem = (params: DeleteLineItemParam) => Promise<void>
 
-export type GetLineItemsParams = {
+export interface GetLineItemsParams {
   dispatch: Dispatch<LineItemAction>
   config: CommerceLayerConfig
   order: Order | null
   filters: Record<string, any>
 }
 
-export interface GetLineItems {
-  (params: GetLineItemsParams): void
-}
+export type GetLineItems = (params: GetLineItemsParams) => void
 
 export interface LineItemPayload {
   loading?: boolean
@@ -65,23 +59,23 @@ export const getLineItems: GetLineItems = (params) => {
       .retrieve(order?.id, {
         include: ['line_items', 'line_items.line_item_options.sku_option'],
         fields: {
-          orders: ['line_items'],
-        },
+          orders: ['line_items']
+        }
       })
       .then((response) => {
         dispatch({
           type: 'setLoading',
           payload: {
-            loading: false,
-          },
+            loading: false
+          }
         })
         const items = response.line_items || []
         allLineItems = [...allLineItems, ...items]
         dispatch({
           type: 'setLineItems',
           payload: {
-            lineItems: allLineItems,
-          },
+            lineItems: allLineItems
+          }
         })
       })
       .catch((error) => {
@@ -89,8 +83,8 @@ export const getLineItems: GetLineItems = (params) => {
         dispatch({
           type: 'setErrors',
           payload: {
-            errors,
-          },
+            errors
+          }
         })
       })
 }
@@ -104,16 +98,16 @@ export const updateLineItem: UpdateLineItem = async (params) => {
     dispatch({
       type: 'setErrors',
       payload: {
-        errors: [],
-      },
+        errors: []
+      }
     })
   } catch (error) {
     const errors = getErrors(error, 'line_items')
     dispatch({
       type: 'setErrors',
       payload: {
-        errors,
-      },
+        errors
+      }
     })
   }
 }
@@ -127,24 +121,23 @@ export const deleteLineItem: DeleteLineItem = async (params) => {
     dispatch({
       type: 'setErrors',
       payload: {
-        errors: [],
-      },
+        errors: []
+      }
     })
   } catch (error) {
     const errors = getErrors(error, 'line_items')
     dispatch({
       type: 'setErrors',
       payload: {
-        errors,
-      },
+        errors
+      }
     })
   }
 }
 
 export const lineItemInitialState: LineItemState = {
   loading: false,
-  lineItems: [],
-  errors: [],
+  errors: []
 }
 
 export type LineItemActionType = 'setLineItems' | 'setErrors' | 'setLoading'
@@ -152,7 +145,7 @@ export type LineItemActionType = 'setLineItems' | 'setErrors' | 'setLoading'
 const actionType: LineItemActionType[] = [
   'setLineItems',
   'setErrors',
-  'setLoading',
+  'setLoading'
 ]
 
 const lineItemReducer = (
