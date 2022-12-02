@@ -116,7 +116,7 @@ describe('Orders list', () => {
       render(
         <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
           <CustomerContainer>
-            <OrderList columns={ctx.columns}>
+            <OrderList columns={ctx.columns} showPagination>
               <OrderListEmpty />
               <OrderListRow field='number' />
               <OrderListRow
@@ -131,6 +131,8 @@ describe('Orders list', () => {
                 field='formatted_total_amount_with_taxes'
                 className='align-top py-5 border-b font-bold'
               />
+              <OrderListPaginationInfo />
+              <OrderListPaginationButtons />
             </OrderList>
           </CustomerContainer>
         </CommerceLayer>

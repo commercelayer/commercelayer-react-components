@@ -28,11 +28,11 @@ import { sortDescIcon, sortAscIcon } from '#utils/icons'
 import type { Order } from '@commercelayer/sdk'
 import filterChildren from '#utils/filterChildren'
 
-type RowComponent = 'OrderListRow'
+type RowComponent = 'OrderListRow' | 'OrderListEmpty'
 type PaginationComponent =
   | 'OrderListPaginationInfo'
   | 'OrderListPaginationButtons'
-const rowComponents: RowComponent[] = ['OrderListRow']
+const rowComponents: RowComponent[] = ['OrderListRow', 'OrderListEmpty']
 const paginationComponents: PaginationComponent[] = [
   'OrderListPaginationInfo',
   'OrderListPaginationButtons'
@@ -342,7 +342,8 @@ export function OrderList({
   }
   return orders?.length === 0 ? (
     <OrderListChildrenContext.Provider value={{ orders }}>
-      {children}
+      {rowsComponents}
+      <Pagination />
     </OrderListChildrenContext.Provider>
   ) : (
     <>

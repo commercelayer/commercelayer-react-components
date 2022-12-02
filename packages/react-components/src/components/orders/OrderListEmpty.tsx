@@ -28,4 +28,6 @@ export function OrderListEmpty(props: Props): JSX.Element | null {
   )
 }
 
+OrderListEmpty.displayName = 'OrderListEmpty'
+
 export default OrderListEmpty
