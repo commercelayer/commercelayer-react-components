@@ -368,9 +368,11 @@ export function OrderList({
           )}
         </TbodyHtmlElement>
       </TableHtmlElement>
-      <div className={paginationContainerClassName}>
-        <Pagination />
-      </div>
+      {table.rows.length < pageSize ? null : (
+        <div className={paginationContainerClassName}>
+          <Pagination />
+        </div>
+      )}
     </>
   )
 }
