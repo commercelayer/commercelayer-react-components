@@ -1,6 +1,10 @@
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 
-type TokenType = 'sales_channel' | 'customer' | 'customer_empty'
+type TokenType =
+  | 'sales_channel'
+  | 'customer'
+  | 'customer_empty'
+  | 'customer_with_low_data'
 
 export default async function getToken(
   type: TokenType = 'sales_channel'
@@ -18,6 +22,11 @@ export default async function getToken(
       ? {
           username: process.env.VITE_TEST_USERNAME_EMPTY ?? '',
           password: process.env.VITE_TEST_PASSWORD_EMPTY ?? ''
+        }
+      : type === 'customer_with_low_data'
+      ? {
+          username: process.env.VITE_TEST_USERNAME_WITH_LOW_DATA ?? '',
+          password: process.env.VITE_TEST_PASSWORD_WITH_LOW_DATA ?? ''
         }
       : undefined
   const token = await getSalesChannelToken(
