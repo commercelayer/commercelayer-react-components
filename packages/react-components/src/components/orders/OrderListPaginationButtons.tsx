@@ -58,7 +58,7 @@ export function OrderListPaginationButtons({
   navigationButtons,
   children,
   ...props
-}: Props): JSX.Element {
+}: Props): JSX.Element | null {
   const { ...prevButton } = { show: true, ...previousPageButton }
   const { ...nextButton } = { show: true, ...nextPageButton }
   const { ...navButton } = { show: true, ...navigationButtons }
@@ -72,7 +72,7 @@ export function OrderListPaginationButtons({
     ctx?.canPreviousPage === false ? null : (
       <button
         data-testid='prev-button'
-        {...omit(prevButton, ['show'])}
+        {...omit(prevButton, ['show', 'hideWhenDisabled'])}
         disabled={ctx?.canPreviousPage === false}
         onClick={() => ctx?.previousPage()}
       >
@@ -82,10 +82,10 @@ export function OrderListPaginationButtons({
   ) : null
   const NextButton = nextButton.show ? (
     nextButton.hideWhenDisabled === true &&
-    ctx?.canPreviousPage === false ? null : (
+    ctx?.canNextPage === false ? null : (
       <button
         data-testid='next-button'
-        {...omit(nextButton, ['show'])}
+        {...omit(nextButton, ['show', 'hideWhenDisabled'])}
         disabled={ctx?.canNextPage === false}
         onClick={() => ctx?.nextPage()}
       >
@@ -133,11 +133,13 @@ export function OrderListPaginationButtons({
     ...props
   }
   return children == null ? (
-    <div {...props}>
-      {PrevButton}
-      {NavButtons}
-      {NextButton}
-    </div>
+    ctx?.totalRows === 0 ? null : (
+      <div {...props}>
+        {PrevButton}
+        {NavButtons}
+        {NextButton}
+      </div>
+    )
   ) : (
     <Parent {...parentProps}>{children}</Parent>
   )
