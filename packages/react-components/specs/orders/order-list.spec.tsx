@@ -142,6 +142,12 @@ describe('Orders list', () => {
         timeout: globalTimeout
       })
       expect(screen.getByText('No orders available'))
+      const paginationInfo = screen.queryByTestId('pagination-info')
+      expect(paginationInfo).toBeNull()
+      const prevButton = screen.queryByTestId('prev-button')
+      expect(prevButton).toBeNull()
+      const nextButton = screen.queryByTestId('next-button')
+      expect(nextButton).toBeNull()
     },
     globalTimeout
   )
@@ -746,6 +752,7 @@ describe('Orders list', () => {
               <OrderListPaginationInfo data-testid='pagination-info' />
               <OrderListPaginationButtons
                 previousPageButton={{ hideWhenDisabled: true }}
+                nextPageButton={{ hideWhenDisabled: true }}
               />
             </OrderList>
           </CustomerContainer>
@@ -757,18 +764,20 @@ describe('Orders list', () => {
       })
       let prevButton = screen.queryByTestId('prev-button')
       expect(prevButton).toBeNull()
-      let nextButton = screen.getByTestId('next-button')
+      let nextButton = screen.queryByTestId('next-button')
       expect(nextButton).toBeDefined()
-      fireEvent.click(nextButton)
+      if (nextButton) {
+        fireEvent.click(nextButton)
+      }
       prevButton = screen.queryByTestId('prev-button')
       expect(prevButton).toBeDefined()
-      nextButton = screen.getByTestId('next-button')
-      expect(nextButton).toBeDefined()
+      nextButton = screen.queryByTestId('next-button')
+      expect(nextButton).toBeNull()
     },
     globalTimeout
   )
   it<OrderListContext>(
-    'Hide previous and next buttons',
+    'Hide previous and next buttons with few orders',
     async (ctx) => {
       const { accessToken, endpoint } = await getToken('customer_with_low_data')
       if (accessToken !== undefined) {
@@ -793,9 +802,7 @@ describe('Orders list', () => {
                 className='align-top py-5 border-b font-bold'
               />
               <OrderListPaginationInfo data-testid='pagination-info' />
-              <OrderListPaginationButtons
-                previousPageButton={{ hideWhenDisabled: true }}
-              />
+              <OrderListPaginationButtons />
             </OrderList>
           </CustomerContainer>
         </CommerceLayer>

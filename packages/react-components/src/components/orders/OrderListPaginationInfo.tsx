@@ -32,7 +32,7 @@ export function OrderListPaginationInfo<A extends TAsComponent = 'span'>({
   as = 'span',
   children,
   ...props
-}: Props<A>): JSX.Element {
+}: Props<A>): JSX.Element | null {
   const ctx = useCustomContext({
     context: OrderListPaginationContext,
     contextComponentName: 'OrderList',
@@ -53,9 +53,11 @@ export function OrderListPaginationInfo<A extends TAsComponent = 'span'>({
   }
   const parentProps = { ...props, as, firstRow, lastRow, totRows }
   return children == null ? (
-    <TagElement {...props}>
-      {`${firstRow} - ${lastRow} of ${totRows}`}
-    </TagElement>
+    totRows === 0 ? null : (
+      <TagElement {...props}>
+        {`${firstRow} - ${lastRow} of ${totRows}`}
+      </TagElement>
+    )
   ) : (
     <Parent {...parentProps}>{children}</Parent>
   )
