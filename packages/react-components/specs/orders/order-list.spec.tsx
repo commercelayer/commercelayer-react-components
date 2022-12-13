@@ -12,6 +12,11 @@ import {
   screen,
   waitForElementToBeRemoved
 } from '@testing-library/react'
+import { baseUrl } from 'mocks/handlers'
+import { customerOrders } from 'mocks/resources/orders/customer-orders'
+import { customerOrdersEmpty } from 'mocks/resources/orders/customer-orders-empty'
+import { server } from 'mocks/server'
+import { rest } from 'msw'
 import { LocalContext } from '../utils/context'
 import getToken from '../utils/getToken'
 
@@ -113,6 +118,11 @@ describe('Orders list', () => {
         ctx.accessToken = accessToken
         ctx.endpoint = endpoint
       }
+      server.use(
+        rest.get(`${baseUrl}/customers*`, (_req, res, ctx) => {
+          return res.once(ctx.status(200), ctx.json(customerOrdersEmpty))
+        })
+      )
       render(
         <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
           <CustomerContainer>
@@ -157,6 +167,11 @@ describe('Orders list', () => {
       ctx.accessToken = accessToken
       ctx.endpoint = endpoint
     }
+    server.use(
+      rest.get(`${baseUrl}/customers*`, (_req, res, ctx) => {
+        return res.once(ctx.status(200), ctx.json(customerOrdersEmpty))
+      })
+    )
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <CustomerContainer>
@@ -680,6 +695,11 @@ describe('Orders list', () => {
         ctx.accessToken = accessToken
         ctx.endpoint = endpoint
       }
+      server.use(
+        rest.get(`${baseUrl}/customers*`, (_req, res, ctx) => {
+          return res.once(ctx.status(200), ctx.json(customerOrders))
+        })
+      )
       render(
         <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
           <CustomerContainer>
@@ -732,6 +752,11 @@ describe('Orders list', () => {
         ctx.accessToken = accessToken
         ctx.endpoint = endpoint
       }
+      server.use(
+        rest.get(`${baseUrl}/customers*`, (_req, res, ctx) => {
+          return res.once(ctx.status(200), ctx.json(customerOrders))
+        })
+      )
       render(
         <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
           <CustomerContainer>
@@ -784,6 +809,11 @@ describe('Orders list', () => {
         ctx.accessToken = accessToken
         ctx.endpoint = endpoint
       }
+      server.use(
+        rest.get(`${baseUrl}/customers*`, (_req, res, ctx) => {
+          return res.once(ctx.status(200), ctx.json(customerOrders))
+        })
+      )
       render(
         <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
           <CustomerContainer>

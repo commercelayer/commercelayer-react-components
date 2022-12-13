@@ -9,7 +9,8 @@ export default defineConfig({
     coverage: {
       provider: 'c8',
       reporter: ['text', 'json', 'html']
-    }
+    },
+    setupFiles: ['./mocks/setup.ts']
   },
   plugins: [tsconfigPaths(), react()]
 })
