@@ -55,6 +55,15 @@ export interface PaymentSourceObject {
       resultCode?: 'Authorised'
     }
   }
+  // TODO: Update this when SDK is ready
+  axerve_payments: AdyenPayment & {
+    payment_request_data?: {
+      payment_method?: Card
+    }
+    payment_response?: {
+      resultCode?: 'Authorised'
+    }
+  }
   braintree_payments: BraintreePayment & {
     options?: {
       card: Card
@@ -197,6 +206,7 @@ export type PaymentResourceKey =
   | 'paypalPayment'
   | 'adyenPayment'
   | 'checkoutComPayment'
+  | 'axervePayment'
 
 export type SDKPaymentResource =
   | 'AdyenPayment'
@@ -206,6 +216,7 @@ export type SDKPaymentResource =
   | 'StripePayment'
   | 'WireTransfer'
   | 'CheckoutComPayment'
+  | 'AxervePayment'
 
 interface TSetPaymentMethodParams {
   config?: CommerceLayerConfig
@@ -420,6 +431,7 @@ export const destroyPaymentSource: DestroyPaymentSource = async ({
 
 export interface PaymentMethodConfig {
   adyenPayment?: AdyenPaymentConfig
+  axervePayment?: unknown
   braintreePayment?: BraintreeConfig
   checkoutComPayment?: CheckoutComConfig
   externalPayment?: ExternalPaymentConfig

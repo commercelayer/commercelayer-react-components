@@ -73,6 +73,11 @@ export function PaymentGateway({
       if (config != null && paymentResource === 'external_payments') {
         attributes = getExternalPaymentAttributes(paymentResource, config)
       }
+      if (config != null && paymentResource === 'axerve_payments') {
+        attributes = {
+          return_url: window.location.href
+        }
+      }
       const setPaymentSources = async (): Promise<void> => {
         await setPaymentSource({
           paymentResource,
