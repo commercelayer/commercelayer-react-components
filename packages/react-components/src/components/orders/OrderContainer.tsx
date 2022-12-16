@@ -120,7 +120,7 @@ export function OrderContainer(props: Props): JSX.Element {
           state
         }))
     }
-    if (config.accessToken && !state.loading) {
+    if (config.accessToken && state.loading === false && state?.order == null) {
       if (
         localOrder &&
         !state.order &&
@@ -141,7 +141,7 @@ export function OrderContainer(props: Props): JSX.Element {
     } else if (
       [
         config.accessToken,
-        !state.order,
+        state.order != null,
         state.loading,
         state.withoutIncludes
       ].every(Boolean)
@@ -155,9 +155,9 @@ export function OrderContainer(props: Props): JSX.Element {
     } else if (
       [
         config.accessToken,
-        !state.order,
+        state.order != null,
         state.loading,
-        !state.withoutIncludes
+        state.withoutIncludes === false
       ].every(Boolean)
     ) {
       dispatch({
@@ -168,7 +168,11 @@ export function OrderContainer(props: Props): JSX.Element {
       })
     }
     return () => {
-      if (!state.order && state.loading && !state.withoutIncludes) {
+      if (
+        state.order == null &&
+        state.loading &&
+        state.withoutIncludes === false
+      ) {
         if (state.include?.length === 0 && startRequest.length > 0) {
           dispatch({
             type: 'setLoading',
@@ -189,8 +193,8 @@ export function OrderContainer(props: Props): JSX.Element {
     }
   }, [
     config.accessToken,
-    state.includeLoaded,
-    state.include,
+    Object.keys(state.includeLoaded ?? {}).length,
+    state.include?.length,
     orderId,
     state.order,
     state.loading,

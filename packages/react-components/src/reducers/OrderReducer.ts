@@ -188,7 +188,9 @@ export const getApiOrder: GetOrder = async (
     if (state?.include && state.include.length > 0) {
       options.include = state.include
     }
+    console.log('includes', options)
     const order = await sdk.orders.retrieve(id as string, options)
+    console.log('order', order)
     if (clearWhenPlaced && order.editable === false) {
       persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
       if (dispatch) {
@@ -311,7 +313,7 @@ export function addResourceToInclude({
   if (newResource) {
     const resources =
       typeof newResource === 'string' ? [newResource] : newResource
-    payload.include = [...resourcesIncluded, ...resources]
+    payload.include = [...new Set([...resourcesIncluded, ...resources])]
     resources.forEach((resource) => {
       const includeLoaded = {
         ...payload.includeLoaded,
@@ -328,6 +330,8 @@ export function addResourceToInclude({
     ...(payload.includeLoaded && payload.includeLoaded)
   }
   payload.includeLoaded = payloadIncludeLoaded
+  console.log(payload)
+  debugger
   if (dispatch)
     dispatch({
       type: 'setIncludesResource',
