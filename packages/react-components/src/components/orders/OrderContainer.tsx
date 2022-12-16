@@ -50,10 +50,9 @@ export function OrderContainer(props: Props): JSX.Element {
   const config = useCustomContext({
     context: CommerceLayerContext,
     contextComponentName: 'CommerceLayer',
-    currentComponentName: 'OrderContainer'
+    currentComponentName: 'OrderContainer',
+    key: 'accessToken'
   })
-  if (config.accessToken == null)
-    throw new Error('Cannot use `OrderContainer` outside of `CommerceLayer`')
   const {
     persistKey,
     clearWhenPlaced,
