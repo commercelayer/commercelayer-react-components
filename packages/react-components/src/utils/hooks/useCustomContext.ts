@@ -16,7 +16,7 @@ interface TParams<C> {
   /**
    * Key of the context to check
    */
-  key?: string
+  key: string
 }
 
 export default function useCustomContext<T>({
@@ -31,7 +31,6 @@ export default function useCustomContext<T>({
   // @ts-expect-error
   if (key != null && key in currentContext) return currentContext
   if (key == null && currentContext != null) return currentContext
-  if (currentContext != null) return currentContext
   if (isProduction) console.error(msg)
   else throw new Error(msg)
   return currentContext

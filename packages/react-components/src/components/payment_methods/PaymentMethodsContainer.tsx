@@ -87,7 +87,12 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
         }
       })
     }
-  }, [order, credentials, include, includeLoaded])
+  }, [
+    order,
+    credentials,
+    include?.length,
+    Object.keys(includeLoaded ?? []).length
+  ])
   const contextValue = useMemo(() => {
     return {
       ...state,
