@@ -27,6 +27,6 @@ describe('OrderContainer component', () => {
           <></>
         </OrderContainer>
       )
-    ).toThrow('Cannot use `OrderContainer` outside of `CommerceLayer`')
+    ).toThrow('Cannot use <OrderContainer/> outside of <CommerceLayer/>')
   })
 })
