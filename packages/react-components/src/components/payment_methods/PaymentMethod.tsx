@@ -11,7 +11,7 @@ type Props = {
   /**
    * Hide payment methods by an array of strings
    */
-  hide?: PaymentResource[]
+  hide?: (paymentMethod: PaymentMethodType) => boolean
   children: ReactNode
   activeClass?: string
   loader?: LoaderType
@@ -58,13 +58,7 @@ export function PaymentMethod({
     }
   }, [paymentMethods, currentPaymentMethodId])
   const components = paymentMethods
-    ?.filter((payment) => {
-      if (hide) {
-        const source = payment?.payment_source_type as PaymentResource
-        return !hide?.includes(source)
-      }
-      return true
-    })
+    ?.filter((paymentMethod) => (hide ? hide(paymentMethod) : true))
     .map((payment, k) => {
       const isActive = currentPaymentMethodId === payment?.id
       const paymentMethodProps = {
