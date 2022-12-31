@@ -20,11 +20,11 @@ export function PaymentMethodName(props: Props): JSX.Element {
   })
   const labelName = payment?.name
   const htmlFor = payment?.payment_source_type
-  const paymentReference = payment?.payment_gateway?.reference
+  const paymentGateway = payment?.payment_gateway
   const parentProps = {
     htmlFor,
     labelName,
-    paymentReference,
+    paymentGateway,
     ...props
   }
   return props.children ? (
