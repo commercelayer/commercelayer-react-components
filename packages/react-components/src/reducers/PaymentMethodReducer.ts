@@ -26,6 +26,7 @@ import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
 import { Dispatch, MutableRefObject } from 'react'
 import { CheckoutComConfig } from '#components/payment_source/CheckoutComPayment'
+import { ExternalPaymentConfig } from '#components/payment_source/ExternalPayment'
 
 export type PaymentSourceType =
   | AdyenPayment
@@ -402,14 +403,15 @@ export const destroyPaymentSource: DestroyPaymentSource = async ({
 }
 
 export interface PaymentMethodConfig {
-  stripePayment?: StripeConfig
-  braintreePayment?: BraintreeConfig
-  wireTransfer?: Partial<WireTransferConfig>
-  paypalPayment?: PaypalConfig
   adyenPayment?: AdyenPaymentConfig
+  braintreePayment?: BraintreeConfig
   checkoutComPayment?: CheckoutComConfig
+  externalPayment?: ExternalPaymentConfig
   klarnaPayment?: Pick<AdyenPaymentConfig, 'placeOrderCallback'> &
     Pick<StripeConfig, 'containerClassName'>
+  paypalPayment?: PaypalConfig
+  stripePayment?: StripeConfig
+  wireTransfer?: Partial<WireTransferConfig>
 }
 
 type SetPaymentMethodConfig = (
@@ -427,7 +429,7 @@ export const setPaymentMethodConfig: SetPaymentMethodConfig = (
   })
 }
 
-export function getPaymentConfig<K extends PaymentResourceKey>(
+export function getPaymentConfig<K extends keyof PaymentMethodConfig>(
   paymentResource: PaymentResource,
   config: PaymentMethodConfig
 ): PaymentMethodConfig[K] {

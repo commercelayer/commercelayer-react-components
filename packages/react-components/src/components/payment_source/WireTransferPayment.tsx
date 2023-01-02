@@ -1,10 +1,9 @@
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import isFunction from 'lodash/isFunction'
-import { ReactNode, useContext, useEffect, useRef } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 
-export type WireTransferConfig = {
+export interface WireTransferConfig {
   infoMessage?: {
-    text?: string | ReactNode
+    text?: string | JSX.Element[]
     className?: string
   }
 }
@@ -15,25 +14,25 @@ const defaultMessage =
 type Props = WireTransferConfig &
   JSX.IntrinsicElements['div'] & { 'data-test-id'?: string }
 
-export function WireTransferPayment({ infoMessage, ...p }: Props) {
+export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
   const { className, 'data-test-id': dataTestId } = p
   const ref = useRef<null | HTMLFormElement>(null)
   const {
     setPaymentSource,
     paymentSource,
     currentPaymentMethodType,
-    setPaymentRef,
+    setPaymentRef
   } = useContext(PaymentMethodContext)
   useEffect(() => {
     if (ref.current && paymentSource && currentPaymentMethodType) {
-      ref.current.onsubmit = () => handleClick()
+      ref.current.onsubmit = async () => await handleClick()
       setPaymentRef({ ref })
     }
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
   }, [ref, paymentSource, currentPaymentMethodType])
-  const handleClick = async () => {
+  const handleClick = async (): Promise<boolean> => {
     if (paymentSource && currentPaymentMethodType) {
       try {
         await setPaymentSource({
@@ -44,10 +43,10 @@ export function WireTransferPayment({ infoMessage, ...p }: Props) {
               card: {
                 id: paymentSource.id,
                 brand: 'wire-transfer',
-                last4: '',
-              },
-            },
-          },
+                last4: ''
+              }
+            }
+          }
         })
         return true
       } catch (error) {
@@ -60,9 +59,7 @@ export function WireTransferPayment({ infoMessage, ...p }: Props) {
     <form ref={ref}>
       <div className={className} data-test-id={dataTestId}>
         <span className={infoMessage?.className}>
-          {isFunction(infoMessage?.text)
-            ? infoMessage?.text()
-            : infoMessage?.text || defaultMessage}
+          {infoMessage?.text || defaultMessage}
         </span>
       </div>
     </form>

@@ -3,9 +3,8 @@ import Parent from '#components/utils/Parent'
 import { ChildrenFunction } from '#typings/index'
 import OrderContext from '#context/OrderContext'
 import { CodeType, OrderCodeType } from '#reducers/OrderReducer'
-import { has, isEmpty } from 'lodash'
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+interface ChildrenProps extends Omit<Props, 'children' | 'onClick'> {
   codeType?: OrderCodeType
   hide?: boolean
   handleClick?: () => void
@@ -16,18 +15,13 @@ type Props = {
   children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
   onClick?: (response: { success: boolean }) => void
-} & Omit<JSX.IntrinsicElements['button'], 'type'>
+} & Omit<JSX.IntrinsicElements['button'], 'type' | 'onClick'>
 
 export function GiftCardOrCouponRemoveButton(props: Props): JSX.Element | null {
   const { children, label = 'Remove', onClick, type, ...p } = props
   const { order, removeGiftCardOrCouponCode } = useContext(OrderContext)
   let codeType = type ? (`${type}_code` as const) : undefined
-  if (
-    !type &&
-    order &&
-    has(order, 'coupon_code') &&
-    !isEmpty(order.coupon_code)
-  )
+  if (!type && order && 'coupon_code' in order && order.coupon_code != null)
     codeType = 'coupon_code'
   else if (!type) codeType = 'gift_card_code'
   const code = order && codeType ? order[codeType] : ''
