@@ -21,12 +21,13 @@ import {
   PaypalPayment,
   KlarnaPayment
 } from '@commercelayer/sdk'
-import camelCase from 'lodash/camelCase'
-import has from 'lodash/has'
-import isEmpty from 'lodash/isEmpty'
 import { Dispatch, MutableRefObject } from 'react'
 import { CheckoutComConfig } from '#components/payment_source/CheckoutComPayment'
 import { ExternalPaymentConfig } from '#components/payment_source/ExternalPayment'
+import { snakeToCamelCase } from '#utils/snakeToCamelCase'
+import { replace } from '#utils/replace'
+import { pick } from '#utils/pick'
+import { ResourceKeys } from '#utils/getPaymentAttributes'
 
 export type PaymentSourceType =
   | AdyenPayment
@@ -429,16 +430,17 @@ export const setPaymentMethodConfig: SetPaymentMethodConfig = (
   })
 }
 
-export function getPaymentConfig<K extends keyof PaymentMethodConfig>(
-  paymentResource: PaymentResource,
-  config: PaymentMethodConfig
-): PaymentMethodConfig[K] {
-  const resource = camelCase(paymentResource)
-    .replace('Payments', 'Payment')
-    .replace('Transfers', 'Transfer') as K
-  return !isEmpty(config) && has(config, resource)
-    ? config[resource]
-    : undefined
+export function getPaymentConfig<
+  R extends PaymentResource = PaymentResource,
+  K extends PaymentMethodConfig = PaymentMethodConfig
+>(paymentResource: R, config: K): Pick<K, ResourceKeys<R>> {
+  const resourceKeys = replace(
+    replace(paymentResource, 'payments', 'payment'),
+    'transfers',
+    'transfer'
+  )
+  const resource = snakeToCamelCase(resourceKeys)
+  return pick(config, [resource])
 }
 
 const type: PaymentMethodActionType[] = [

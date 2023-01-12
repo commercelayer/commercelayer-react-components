@@ -5,15 +5,13 @@ import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
-import {
-  getPaymentConfig,
-  PaymentResource
-} from '#reducers/PaymentMethodReducer'
+import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import getCardDetails from '#utils/getCardDetails'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import { useContext } from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
+import { getPaymentAttributes } from '#utils/getPaymentAttributes'
 
 type Props = GatewayBaseType
 
@@ -40,9 +38,12 @@ export function BraintreeGateway(props: Props): JSX.Element | null {
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
   // @ts-expect-error
   const authorization = paymentSource?.client_token
-  const braintreeConfig = config
-    ? getPaymentConfig<'braintreePayment'>(paymentResource, config)
-    : {}
+  const braintreeConfig = getPaymentAttributes({
+    resource: paymentResource,
+    config: config ?? {},
+    keys: ['braintree_payments']
+  })
+  const paymentConfig = braintreeConfig?.braintreePayment
   const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {
@@ -77,7 +78,7 @@ export function BraintreeGateway(props: Props): JSX.Element | null {
           templateCustomerSaveToWallet={templateCustomerSaveToWallet}
           authorization={authorization}
           locale={locale}
-          config={braintreeConfig}
+          config={paymentConfig}
         />
       </>
     ) : (
@@ -88,7 +89,7 @@ export function BraintreeGateway(props: Props): JSX.Element | null {
     <BraintreePayment
       locale={locale}
       authorization={authorization}
-      config={braintreeConfig}
+      config={paymentConfig}
     />
   ) : (
     loaderComponent

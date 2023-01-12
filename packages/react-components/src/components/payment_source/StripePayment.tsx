@@ -207,7 +207,7 @@ export function StripePayment({
   ...p
 }: Props): JSX.Element | null {
   const [isLoaded, setIsLoaded] = useState(false)
-  const [stripe, setStripe] = useState(null)
+  const [stripe, setStripe] = useState<Stripe | null>(null)
   const {
     containerClassName,
     templateCustomerSaveToWallet,
@@ -216,15 +216,18 @@ export function StripePayment({
   } = p
   useEffect(() => {
     if (show && publishableKey) {
-      const { loadStripe } = require('@stripe/stripe-js')
-      const getStripe = async (): Promise<void> => {
-        const res = await loadStripe(publishableKey, {
-          locale
-        })
-        setStripe(res)
-        setIsLoaded(true)
-      }
-      void getStripe()
+      void import('@stripe/stripe-js').then(({ loadStripe }) => {
+        const getStripe = async (): Promise<void> => {
+          const res = await loadStripe(publishableKey, {
+            locale
+          })
+          if (res != null) {
+            setStripe(res)
+            setIsLoaded(true)
+          }
+        }
+        void getStripe()
+      })
     }
     return () => {
       setIsLoaded(false)

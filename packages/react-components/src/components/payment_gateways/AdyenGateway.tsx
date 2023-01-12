@@ -5,10 +5,7 @@ import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
-import {
-  getPaymentConfig,
-  PaymentResource
-} from '#reducers/PaymentMethodReducer'
+import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import { useContext } from 'react'
@@ -16,6 +13,7 @@ import AdyenPayment from '#components/payment_source/AdyenPayment'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 import jwt from '#utils/jwt'
 import getCardDetails from '#utils/getCardDetails'
+import { getPaymentAttributes } from '#utils/getPaymentAttributes'
 
 type Props = GatewayBaseType
 
@@ -45,9 +43,12 @@ export function AdyenGateway(props: Props): JSX.Element | null {
   // @ts-expect-error
   const clientKey = paymentSource?.public_key
   const environment = accessToken && jwt(accessToken).test ? 'test' : 'live'
-  const adyenConfig = config
-    ? getPaymentConfig<'adyenPayment'>(paymentResource, config)
-    : {}
+  const adyenConfig = getPaymentAttributes({
+    resource: paymentResource,
+    config: config ?? {},
+    keys: ['adyen_payments']
+  })
+  const paymentConfig = adyenConfig?.adyenPayment
   const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {
@@ -85,7 +86,7 @@ export function AdyenGateway(props: Props): JSX.Element | null {
           clientKey={clientKey}
           locale={locale}
           environment={environment}
-          config={adyenConfig}
+          config={paymentConfig}
         />
       </>
     ) : (
@@ -96,7 +97,7 @@ export function AdyenGateway(props: Props): JSX.Element | null {
     <AdyenPayment
       clientKey={clientKey}
       locale={locale}
-      config={adyenConfig}
+      config={paymentConfig}
       environment={environment}
     />
   ) : (

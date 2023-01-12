@@ -9,9 +9,9 @@ import useCustomContext from '#utils/hooks/useCustomContext'
 
 type Props = {
   /**
-   * Hide payment methods by an array of strings
+   * Hide payment methods by an array of strings or a function that returns a boolean
    */
-  hide?: PaymentResource[]
+  hide?: PaymentResource[] | ((payment: PaymentMethodType) => boolean)
   children: ReactNode
   activeClass?: string
   loader?: LoaderType
@@ -59,9 +59,11 @@ export function PaymentMethod({
   }, [paymentMethods, currentPaymentMethodId])
   const components = paymentMethods
     ?.filter((payment) => {
-      if (hide) {
+      if (Array.isArray(hide)) {
         const source = payment?.payment_source_type as PaymentResource
         return !hide?.includes(source)
+      } else if (typeof hide === 'function') {
+        return hide(payment)
       }
       return true
     })

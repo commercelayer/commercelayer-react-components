@@ -42,9 +42,10 @@ export function ExternalGateway(props: Props): JSX.Element | null {
   // @ts-expect-error
   const paymentSourceToken = paymentSource?.payment_source_token
   const paymentSourceId = order?.payment_source?.id || paymentSource?.id
-  const paymentConfig = config
-    ? getPaymentConfig<'externalPayment'>(paymentResource, config)
+  const getConfig = config
+    ? getPaymentConfig<'external_payments'>(paymentResource, config)
     : {}
+  const paymentConfig = getConfig?.externalPayment
   const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {

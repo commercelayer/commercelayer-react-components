@@ -38,7 +38,7 @@ export function KlarnaGateway(props: Props): JSX.Element | null {
   // @ts-expect-error
   const clientToken = paymentSource?.client_token
   const klarnaConfig = config
-    ? getPaymentConfig<'klarnaPayment'>(paymentResource, config)
+    ? getPaymentConfig<'klarna_payments'>(paymentResource, config)
     : {}
   const customerPayments =
     !isEmpty(payments) && payments

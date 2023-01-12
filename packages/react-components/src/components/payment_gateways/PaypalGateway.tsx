@@ -4,11 +4,9 @@ import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
-import {
-  getPaymentConfig,
-  PaymentResource
-} from '#reducers/PaymentMethodReducer'
+import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import getCardDetails from '#utils/getCardDetails'
+import { getPaymentAttributes } from '#utils/getPaymentAttributes'
 import isEmpty from 'lodash/isEmpty'
 import { useContext } from 'react'
 
@@ -37,15 +35,19 @@ export function PaypalGateway(props: Props): JSX.Element | null {
       </PaymentSourceContext.Provider>
     )
   }
-  const paypalConfig =
-    config && getPaymentConfig<'paypalPayment'>(paymentResource, config)
+  const attributes = getPaymentAttributes({
+    resource: paymentResource,
+    config: config ?? {},
+    keys: ['paypal_payments']
+  })
+  const infoMessage = attributes?.paypalPayment?.infoMessage
   delete p.show
   delete p.templateCustomerCards
   delete p.templateCustomerSaveToWallet
   delete p.loading
   delete p.loaderComponent
   delete p.onClickCustomerCards
-  return <PaypalPayment {...p} infoMessage={paypalConfig?.infoMessage} />
+  return <PaypalPayment {...p} infoMessage={infoMessage} />
 }
 
 export default PaypalGateway
