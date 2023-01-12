@@ -33,7 +33,7 @@ export function WireTransferGateway(props: Props): JSX.Element | null {
   }
   const wireTransferConfig =
     config && paymentResource
-      ? getPaymentConfig<'wireTransfer'>(paymentResource, config)
+      ? getPaymentConfig<'wire_transfers'>(paymentResource, config)
       : {}
   return <WireTransferPayment {...p} {...wireTransferConfig} />
 }

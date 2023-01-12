@@ -29,7 +29,6 @@ import AvailabilityTemplate from '../#components/skus/AvailabilityTemplate'
 import ItemContainer from '../#components/orders/ItemContainer'
 import Errors from '../#components/Errors'
 import OrderStorage from '#components/orders/OrderStorage'
-import { keys } from 'lodash'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
 const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string

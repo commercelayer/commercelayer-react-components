@@ -330,8 +330,6 @@ export function addResourceToInclude({
     ...(payload.includeLoaded && payload.includeLoaded)
   }
   payload.includeLoaded = payloadIncludeLoaded
-  console.log(payload)
-  debugger
   if (dispatch)
     dispatch({
       type: 'setIncludesResource',

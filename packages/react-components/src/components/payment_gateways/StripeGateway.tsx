@@ -43,7 +43,7 @@ export function StripeGateway(props: Props): JSX.Element | null {
   const publishableKey = paymentSource?.publishable_key
   const paymentSourceId = order?.payment_source?.id || paymentSource?.id
   const stripeConfig = config
-    ? getPaymentConfig<'stripePayment'>(paymentResource, config)
+    ? getPaymentConfig<'stripe_payments'>(paymentResource, config)
     : {}
   const customerPayments =
     !isEmpty(payments) && payments

@@ -42,7 +42,7 @@ export function CheckoutComGateway(props: Props): JSX.Element | null {
   // @ts-expect-error
   const publicKey = paymentSource?.public_key
   const paymentConfig = config
-    ? getPaymentConfig<'checkoutComPayment'>(paymentResource, config)
+    ? getPaymentConfig<'checkout_com_payments'>(paymentResource, config)
     : {}
   const customerPayments =
     !isEmpty(payments) && payments

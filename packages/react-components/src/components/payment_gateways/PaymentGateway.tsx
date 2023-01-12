@@ -3,7 +3,6 @@ import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { LoaderType } from '#typings'
-import getPaypalConfig from '#utils/paypalPayment'
 import { useContext, useEffect, useState } from 'react'
 import { PaymentSourceProps } from '../payment_source/PaymentSource'
 import getLoaderComponent from '#utils/getLoaderComponent'
@@ -15,6 +14,11 @@ import WireTransferGateway from './WireTransferGateway'
 import CustomerContext from '#context/CustomerContext'
 import CheckoutComGateway from './CheckoutComGateway'
 import KlarnaGateway from './KlarnaGateway'
+import {
+  getExternalPaymentAttributes,
+  getPaypalAttributes
+} from '#utils/getPaymentAttributes'
+import ExternalGateway from './ExternalGateway'
 
 export type GatewayBaseType = Props & {
   show: boolean
@@ -62,10 +66,13 @@ export function PaymentGateway({
       paymentResource &&
       order?.payment_method?.payment_source_type === paymentResource
     ) {
-      const attributes =
-        config && paymentResource === 'paypal_payments'
-          ? getPaypalConfig(paymentResource, config)
-          : {}
+      let attributes: Record<string, unknown> | undefined = {}
+      if (config != null && paymentResource === 'paypal_payments') {
+        attributes = getPaypalAttributes(paymentResource, config)
+      }
+      if (config != null && paymentResource === 'external_payments') {
+        attributes = getExternalPaymentAttributes(paymentResource, config)
+      }
       const setPaymentSources = async (): Promise<void> => {
         await setPaymentSource({
           paymentResource,
@@ -103,24 +110,26 @@ export function PaymentGateway({
     ...p
   }
   switch (paymentResource) {
-    case 'stripe_payments':
-      return <StripeGateway {...gatewayConfig}>{children}</StripeGateway>
-    case 'klarna_payments':
-      return <KlarnaGateway {...gatewayConfig}>{children}</KlarnaGateway>
     case 'adyen_payments':
       return <AdyenGateway {...gatewayConfig}>{children}</AdyenGateway>
     case 'braintree_payments':
       return <BraintreeGateway {...gatewayConfig}>{children}</BraintreeGateway>
+    case 'checkout_com_payments':
+      return (
+        <CheckoutComGateway {...gatewayConfig}>{children}</CheckoutComGateway>
+      )
+    case 'external_payments':
+      return <ExternalGateway {...gatewayConfig}>{children}</ExternalGateway>
+    case 'klarna_payments':
+      return <KlarnaGateway {...gatewayConfig}>{children}</KlarnaGateway>
+    case 'stripe_payments':
+      return <StripeGateway {...gatewayConfig}>{children}</StripeGateway>
     case 'wire_transfers':
       return (
         <WireTransferGateway {...gatewayConfig}>{children}</WireTransferGateway>
       )
     case 'paypal_payments':
       return <PaypalGateway {...gatewayConfig}>{children}</PaypalGateway>
-    case 'checkout_com_payments':
-      return (
-        <CheckoutComGateway {...gatewayConfig}>{children}</CheckoutComGateway>
-      )
     default:
       return null
   }
