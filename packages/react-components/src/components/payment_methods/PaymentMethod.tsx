@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect, MouseEvent } from 'react'
+import { useState, useEffect, MouseEvent } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import { LoaderType } from '#typings'
@@ -12,10 +12,10 @@ type Props = {
    * Hide payment methods by an array of strings or a function that returns a boolean
    */
   hide?: PaymentResource[] | ((payment: PaymentMethodType) => boolean)
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   activeClass?: string
   loader?: LoaderType
-} & Omit<JSX.IntrinsicElements['div'], 'onClick'> &
+} & Omit<JSX.IntrinsicElements['div'], 'onClick' | 'children'> &
   (
     | {
         clickableContainer: true

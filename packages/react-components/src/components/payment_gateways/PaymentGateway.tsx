@@ -83,7 +83,10 @@ export function PaymentGateway({
       }
       if (!paymentSource && order?.payment_method.id && show) {
         void setPaymentSources()
-      } else if (!paymentSource || paymentSource.type !== paymentResource) {
+      } else if (
+        (!paymentSource || paymentSource.type !== paymentResource) &&
+        show
+      ) {
         void setPaymentSources()
       }
       // @ts-expect-error

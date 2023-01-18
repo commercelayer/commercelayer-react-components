@@ -23,13 +23,13 @@ export function Shipment({
     if (shipments) {
       if (autoSelectSingleShippingMethod) {
         const autoSelect = async (): Promise<void> => {
-          shipments.forEach(async (shipment): Promise<void> => {
+          shipments.forEach((shipment) => {
             const isSingle = shipment?.available_shipping_methods?.length === 1
             if (!shipment?.shipping_method && isSingle) {
               const [shippingMethod] =
                 shipment?.available_shipping_methods || []
               if (shippingMethod) {
-                await setShippingMethod(shipment.id, shippingMethod.id)
+                void setShippingMethod(shipment.id, shippingMethod.id)
               }
               if (typeof autoSelectSingleShippingMethod === 'function') {
                 autoSelectSingleShippingMethod()

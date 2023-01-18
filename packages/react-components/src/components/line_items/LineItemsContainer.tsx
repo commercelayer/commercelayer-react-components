@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useContext, ReactNode } from 'react'
+import { useEffect, useReducer, useContext } from 'react'
 import lineItemReducer, {
   lineItemInitialState,
   updateLineItem,
@@ -9,9 +9,9 @@ import LineItemContext, { LineItemContextValue } from '#context/LineItemContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 
 interface Props {
-  children: ReactNode
+  children: JSX.Element[] | JSX.Element
   filters?: Record<string, any>
-  loader?: ReactNode
+  loader?: JSX.Element
 }
 
 export function LineItemsContainer(props: Props): JSX.Element {
@@ -62,8 +62,8 @@ export function LineItemsContainer(props: Props): JSX.Element {
   const lineItemValue: LineItemContextValue = {
     ...state,
     loader,
-    updateLineItem: (lineItemId, quantity = 1) =>
-      updateLineItem({
+    updateLineItem: async (lineItemId, quantity = 1) =>
+      await updateLineItem({
         lineItemId,
         quantity,
         dispatch,
@@ -72,8 +72,8 @@ export function LineItemsContainer(props: Props): JSX.Element {
         orderId: orderId as string,
         errors: state.errors
       }),
-    deleteLineItem: (lineItemId) =>
-      deleteLineItem({
+    deleteLineItem: async (lineItemId) =>
+      await deleteLineItem({
         lineItemId,
         dispatch,
         config,

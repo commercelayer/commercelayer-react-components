@@ -168,7 +168,7 @@ export type BaseInputType =
   | 'text'
   | 'textarea'
 
-export type LoaderType = string | ReactNode
+export type LoaderType = string | JSX.Element
 
 export const BMObject = PropTypes.objectOf(PropTypes.string)
 export interface BaseMetadataObject {
