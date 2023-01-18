@@ -118,7 +118,6 @@ export function ShipmentsContainer(props: Props): JSX.Element {
         order
       })
   }
-
   return (
     <ShipmentContext.Provider value={contextValue}>
       {children}

@@ -87,43 +87,38 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ['draft', 'pending'].includes(order?.status) &&
       paymentSource != null
     ) {
-      // @ts-expect-error
-      const paymentData = paymentSource?.payment_response?.paymentData
       const attributes = {
         payment_request_details: {
           details: {
             redirectResult: options?.adyen?.redirectResult
-          },
-          paymentData
+          }
         },
         _details: 1
       }
-      if (paymentData != null) {
-        void setPaymentSource({
-          paymentSourceId: paymentSource?.id,
-          paymentResource: 'adyen_payments',
-          attributes
-        }).then((res) => {
-          // @ts-expect-error
-          const resultCode = res?.payment_response?.resultCode
-          // @ts-expect-error
-          const errorCode = res?.payment_response?.errorCode
-          // @ts-expect-error
-          const message = res?.payment_response?.message
-          if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-            void handleClick()
-          } else if (errorCode != null) {
-            setPaymentMethodErrors([
-              {
-                code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-                resource: 'payment_methods',
-                field: currentPaymentMethodType,
-                message
-              }
-            ])
-          }
-        })
-      }
+      void setPaymentSource({
+        paymentSourceId: paymentSource?.id,
+        paymentResource: 'adyen_payments',
+        attributes
+      }).then((res) => {
+        // @ts-expect-error
+        const resultCode = res?.payment_response?.resultCode
+        // @ts-expect-error
+        const errorCode = res?.payment_response?.errorCode
+        // @ts-expect-error
+        const message = res?.payment_response?.message
+        if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
+          void handleClick()
+        } else if (errorCode != null) {
+          setPaymentMethodErrors([
+            {
+              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+              resource: 'payment_methods',
+              field: currentPaymentMethodType,
+              message
+            }
+          ])
+        }
+      })
     }
     if (
       paymentType === 'adyen_payments' &&
@@ -154,11 +149,16 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const handleClick = async (): Promise<void> => {
     let isValid = true
     setForceDisable(true)
+    const checkPaymentSource = await setPaymentSource({
+      // @ts-expect-error not be undefined
+      paymentResource: paymentType,
+      paymentSourceId: paymentSource?.id
+    })
     const card =
       paymentType &&
       getCardDetails({
         paymentType,
-        customerPayment: { payment_source: paymentSource }
+        customerPayment: { payment_source: checkPaymentSource }
       })
     if (
       currentPaymentMethodRef?.current?.onsubmit &&
@@ -170,12 +170,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     ) {
       isValid = (await currentPaymentMethodRef.current?.onsubmit(
         // @ts-expect-error
-        paymentSource
+        checkPaymentSource
       )) as boolean
       if (
         !isValid &&
         // @ts-expect-error
-        paymentSource.payment_response?.resultCode === 'Authorised'
+        checkPaymentSource.payment_response?.resultCode === 'Authorised'
       ) {
         isValid = true
       }
@@ -185,8 +185,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     const placed =
       isValid &&
       setPlaceOrder &&
-      (paymentSource || isFree) &&
-      (await setPlaceOrder({ paymentSource }))
+      (checkPaymentSource || isFree) &&
+      (await setPlaceOrder({ paymentSource: checkPaymentSource }))
     setForceDisable(false)
     onClick && placed && onClick(placed)
   }
