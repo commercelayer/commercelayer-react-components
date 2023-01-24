@@ -4,11 +4,12 @@ import isEmpty from 'lodash/isEmpty'
 import GiftCardContext from '#context/GiftCardContext'
 import { GiftCardI } from '#reducers/GiftCardReducer'
 import { BaseState } from '#typings/index'
+import type { DefaultChildrenType } from '#typings/globals'
 
 type RequiredFields = 'currencyCode' | 'balanceCents'
 
 interface Props extends Omit<JSX.IntrinsicElements['form'], 'children'> {
-  children: JSX.Element[] | JSX.Element
+  children: DefaultChildrenType
   onSubmit?: (values: BaseState) => void
 }
 

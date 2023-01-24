@@ -1,6 +1,6 @@
 import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
-import { BaseError, ResourceErrorType } from '#typings/errors'
+import { BaseError } from '#typings/errors'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import type {
   Address,
@@ -13,6 +13,7 @@ import getSdk from '#utils/getSdk'
 import { updateOrder } from './OrderReducer'
 import camelCase from 'lodash/camelCase'
 import { TCustomerAddress } from './CustomerReducer'
+import { TResourceError } from '#components/errors/Errors'
 
 export type AddressActionType =
   | 'setErrors'
@@ -50,7 +51,7 @@ export const addressFields: AddressField[] = [
 ]
 
 export type AddressResource = Extract<
-  ResourceErrorType,
+  TResourceError,
   'billing_address' | 'shipping_address'
 >
 
@@ -82,7 +83,7 @@ export const addressInitialState: AddressState = {
 
 export type SetAddressErrors = <V extends BaseError[]>(args: {
   errors: V
-  resource: Extract<ResourceErrorType, 'billing_address' | 'shipping_address'>
+  resource: Extract<TResourceError, 'billing_address' | 'shipping_address'>
   dispatch?: Dispatch<AddressAction>
   currentErrors?: V
 }) => void

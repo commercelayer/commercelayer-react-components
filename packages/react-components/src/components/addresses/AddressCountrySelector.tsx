@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import BaseSelect from '../utils/BaseSelect'
-import { AddressCountrySelectName, BaseSelectComponentProps } from '#typings'
+import { BaseSelectComponentProps } from '#typings'
 import BillingAddressFormContext, {
   AddressValuesKeys
 } from '#context/BillingAddressFormContext'
@@ -8,11 +8,16 @@ import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import { getCountries } from '#utils/countryStateCity'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
 
-type Props = Omit<BaseSelectComponentProps, 'options' | 'name'> & {
-  name: Extract<AddressValuesKeys, AddressCountrySelectName>
+type TCountryFieldName =
+  | 'billing_address_country_code'
+  | 'shipping_address_country_code'
+  | 'customer_address_country_code'
+
+interface Props extends Omit<BaseSelectComponentProps, 'options' | 'name'>, Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'> {
+  name: Extract<AddressValuesKeys, TCountryFieldName>
   required?: boolean
   disabled?: boolean
-} & Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'>
+}
 
 export function AddressCountrySelector(props: Props): JSX.Element {
   const { required = true, value, name, className, ...p } = props

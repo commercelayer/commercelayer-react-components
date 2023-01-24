@@ -1,9 +1,10 @@
 import ParcelChildrenContext from '#context/ParcelChildrenContext'
 import ParcelLineItemChildrenContext from '#context/ParcelLineItemChildrenContext'
+import type { DefaultChildrenType } from '#typings/globals'
 import { useContext } from 'react'
 
 interface Props {
-  children: JSX.Element[] | JSX.Element
+  children: DefaultChildrenType
 }
 
 export function ParcelLineItem({ children }: Props): JSX.Element {

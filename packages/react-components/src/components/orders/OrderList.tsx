@@ -27,6 +27,7 @@ import scrollbarWidth from '#utils/scrollbarWidth'
 import { sortDescIcon, sortAscIcon } from '#utils/icons'
 import type { Order } from '@commercelayer/sdk'
 import filterChildren from '#utils/filterChildren'
+import type { DefaultChildrenType } from '#typings/globals'
 
 type RowComponent = 'OrderListRow' | 'OrderListEmpty'
 type PaginationComponent =
@@ -75,7 +76,7 @@ type PaginationProps =
     }
 
 type Props = {
-  children: JSX.Element[] | JSX.Element
+  children: DefaultChildrenType
   /**
    * Columns to show
    */

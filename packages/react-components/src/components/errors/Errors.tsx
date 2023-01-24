@@ -6,14 +6,56 @@ import AddressContext from '#context/AddressContext'
 import getAllErrors from '#components-utils/getAllErrors'
 import LineItemContext from '#context/LineItemContext'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import type { ErrorComponentProps } from '#typings/errors'
+import type { CodeErrorType } from '#typings/errors'
 import CustomerContext from '#context/CustomerContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import ShipmentContext from '#context/ShipmentContext'
+import { ChildrenFunction } from '#typings/index'
 
-type Props = ErrorComponentProps &
-  Omit<JSX.IntrinsicElements['span'], 'children'>
+export type TResourceError =
+  | 'addresses'
+  | 'billing_address'
+  | 'gift_cards'
+  | 'gift_card_or_coupon_code'
+  | 'line_items'
+  | 'orders'
+  | 'payment_methods'
+  | 'prices'
+  | 'shipments'
+  | 'shipping_address'
+  | 'customer_address'
+  | 'sku_options'
+  | 'variant'
+
+type ErrorChildrenComponentProps = ChildrenFunction<
+  Omit<TErrorComponent, 'children'> & { errors: string[] }
+>
+
+export interface TErrorComponent extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+  /**
+   * Resource which get the error
+   */
+  resource: TResourceError
+  children?: ErrorChildrenComponentProps
+  /**
+   * Field which get the error
+   */
+  field?: string
+  /**
+   * Error message which you can translate
+   */
+  messages?: Array<{
+    code: CodeErrorType
+    message: string
+    resource?: TResourceError
+    field?: string
+    id?: string
+  }>
+}
+
+
+type Props = TErrorComponent
 
 export function Errors(props: Props): JSX.Element {
   const { children, messages = [], resource, field, ...p } = props

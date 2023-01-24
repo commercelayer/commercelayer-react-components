@@ -1,8 +1,8 @@
+import type { TLineItem } from '#components/line_items/LineItem'
 import type { LineItem } from '@commercelayer/sdk'
-import { LineItemType } from '#typings'
 
 export type TypeAccepted = Extract<
-  LineItemType,
+  TLineItem,
   'skus' | 'gift_cards' | 'bundles' | 'adjustments'
 >
 

@@ -21,9 +21,10 @@ import type { OrderCreate, Order } from '@commercelayer/sdk'
 import { BaseError } from '#typings/errors'
 import compareObjAttribute from '#utils/compareObjAttribute'
 import useCustomContext from '#utils/hooks/useCustomContext'
+import type { DefaultChildrenType } from '#typings/globals'
 
 interface Props {
-  children: JSX.Element[] | JSX.Element
+  children: DefaultChildrenType
   /**
    * Metadata to add when creates a new order
    */

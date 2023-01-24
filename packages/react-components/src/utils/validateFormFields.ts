@@ -5,10 +5,11 @@ import keys from 'lodash/keys'
 import map from 'lodash/map'
 import get from 'lodash/get'
 import { BaseState } from '#typings/index'
-import { ResourceErrorType, BaseError } from '#typings/errors'
+import { BaseError } from '#typings/errors'
 import { AddressField, addressFields } from '#reducers/AddressReducer'
 import { AddressCreate } from '@commercelayer/sdk'
 import { AddressInputName } from '#typings'
+import { TResourceError } from '#components/errors/Errors'
 
 const EMAIL_PATTERN = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/
 
@@ -17,7 +18,7 @@ type FormField = HTMLInputElement | HTMLSelectElement
 export type ValidateFormFields = <R extends string[]>(
   fields: HTMLFormControlsCollection,
   required: R,
-  resourceType: ResourceErrorType
+  resourceType: TResourceError
 ) => {
   errors: BaseError[]
   values: BaseState
@@ -27,7 +28,7 @@ export type ValidateValue = <
   V extends string | boolean,
   N extends string,
   T extends string,
-  B extends ResourceErrorType
+  B extends TResourceError
 >(
   val: V,
   name: N,
