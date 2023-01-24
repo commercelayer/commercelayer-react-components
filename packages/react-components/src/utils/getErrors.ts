@@ -1,10 +1,11 @@
-import { BaseError, ResourceErrorType } from '#typings/errors'
+import { TResourceError } from '#components/errors/Errors'
+import { BaseError } from '#typings/errors'
 import differenceBy from 'lodash/differenceBy'
 import { Dispatch } from 'react'
 
 export default function getErrors(
   error: any,
-  resource: ResourceErrorType,
+  resource: TResourceError,
   field?: string
 ): BaseError[] {
   return error?.errors?.map((e: any) => {

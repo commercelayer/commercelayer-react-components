@@ -8,9 +8,10 @@ import shippingAddressReducer, {
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext from '#context/OrderContext'
 import AddressContext from '#context/AddressContext'
+import type { DefaultChildrenType } from '#typings/globals'
 
 interface Props {
-  children: JSX.Element[] | JSX.Element
+  children: DefaultChildrenType
 }
 
 export function ShippingAddressContainer(props: Props): JSX.Element {

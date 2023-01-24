@@ -1,12 +1,21 @@
 import { useContext } from 'react'
 import LineItemContext from '#context/LineItemContext'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import { LineItemType } from '#typings'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
+
+export type TLineItem =
+  | 'gift_cards'
+  | 'payment_methods'
+  | 'promotions'
+  | 'shipments'
+  | 'skus'
+  | 'bundles'
+  | 'adjustments'
+
 
 interface Props {
   children: JSX.Element | JSX.Element[]
-  type?: LineItemType
+  type?: TLineItem
 }
 
 export function LineItem(props: Props): JSX.Element {

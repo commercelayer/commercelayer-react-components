@@ -12,10 +12,11 @@ import AddressCardsTemplate, {
   CustomerAddress,
   HandleSelect
 } from '#components/utils/AddressCardsTemplate'
+import type { DefaultChildrenType } from '#typings/globals'
 
 interface Props
   extends Omit<JSX.IntrinsicElements['div'], 'children' | 'onSelect'> {
-  children: JSX.Element[] | JSX.Element | AddressCardsTemplateChildren
+  children: DefaultChildrenType | AddressCardsTemplateChildren
   selectedClassName?: string
   disabledClassName?: string
   onSelect?: (address: AddressType) => void

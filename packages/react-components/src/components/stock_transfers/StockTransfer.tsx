@@ -2,9 +2,10 @@ import { useContext } from 'react'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import StockTransferChildrenContext from '#context/StockTransferChildrenContext'
 import { StockTransfer as TStockTransfer } from '@commercelayer/sdk'
+import type { DefaultChildrenType } from '#typings/globals'
 
 interface Props {
-  children: JSX.Element[] | JSX.Element
+  children: DefaultChildrenType
 }
 
 export function StockTransfer(props: Props): JSX.Element {

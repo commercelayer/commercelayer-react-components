@@ -1,8 +1,9 @@
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import ErrorBoundary from '#components/utils/ErrorBoundary'
+import type { DefaultChildrenType } from '#typings/globals'
 
 interface Props {
-  children: JSX.Element[] | JSX.Element
+  children: DefaultChildrenType
   accessToken: string
   endpoint: string
 }

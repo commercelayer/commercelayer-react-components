@@ -1,5 +1,7 @@
+import { DefaultChildrenType } from "#typings/globals"
+
 interface Props<T> {
-  children: JSX.Element | JSX.Element[]
+  children: DefaultChildrenType
   filterBy: T[]
   componentName: string
 }
@@ -8,10 +10,10 @@ export default function filterChildren<T = string>({
   children,
   filterBy,
   componentName
-}: Props<T>): JSX.Element | JSX.Element[] {
+}: Props<T>): JSX.Element | JSX.Element[] | null {
   const wrongComponents = Array.isArray(children)
     ? children.filter((child) => typeof child.type === 'string').length > 0
-    : typeof children.type === 'string'
+    : typeof children?.type === 'string'
   if (wrongComponents) {
     throw new Error(
       `Only library components are allowed into <${componentName}/>`

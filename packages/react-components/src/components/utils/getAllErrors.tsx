@@ -1,6 +1,7 @@
 import customMessages from '#utils/customMessages'
 import { LineItem } from '@commercelayer/sdk'
-import { BaseError, ResourceErrorType } from '#typings/errors'
+import { BaseError } from '#typings/errors'
+import { TResourceError } from '#components/errors/Errors'
 
 export type AllErrorsParams = {
   allErrors: BaseError[]
@@ -8,7 +9,7 @@ export type AllErrorsParams = {
   field?: string
   props: JSX.IntrinsicElements['span']
   lineItem?: LineItem
-  resource?: ResourceErrorType
+  resource?: TResourceError
   returnHtml?: boolean
 }
 

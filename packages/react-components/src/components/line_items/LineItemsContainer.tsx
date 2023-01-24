@@ -7,9 +7,10 @@ import lineItemReducer, {
 import OrderContext from '#context/OrderContext'
 import LineItemContext, { LineItemContextValue } from '#context/LineItemContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
+import type { DefaultChildrenType } from '#typings/globals'
 
 interface Props {
-  children: JSX.Element[] | JSX.Element
+  children: DefaultChildrenType
   filters?: Record<string, any>
   loader?: JSX.Element
 }
