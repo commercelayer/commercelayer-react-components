@@ -1,26 +1,19 @@
 import { createContext, RefObject } from 'react'
 import {
-  PlaceOrderOptions,
   PlaceOrderState,
-  SetPlaceOrderErrors,
-  setPlaceOrderErrors,
+  setPlaceOrder,
+  setPlaceOrderErrors
 } from '#reducers/PlaceOrderReducer'
-import { PaymentSourceType } from '#reducers/PaymentMethodReducer'
 
 type DefaultContext = {
-  setPlaceOrderErrors?: SetPlaceOrderErrors
-  setPlaceOrder?: ({
-    paymentSource,
-  }: {
-    paymentSource?: PaymentSourceType
-    options?: PlaceOrderOptions
-  }) => Promise<{ placed: boolean }>
+  setPlaceOrderErrors?: typeof setPlaceOrderErrors
+  setPlaceOrder?: typeof setPlaceOrder
   placeOrderPermitted?: () => void
   setButtonRef?: (ref: RefObject<HTMLButtonElement>) => void
 } & PlaceOrderState
 
 export const defaultPlaceOrderContext = {
-  setPlaceOrderErrors,
+  setPlaceOrderErrors
 }
 
 const PlaceOrderContext = createContext<DefaultContext>(

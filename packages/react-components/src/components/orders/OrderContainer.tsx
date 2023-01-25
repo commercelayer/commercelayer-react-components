@@ -202,6 +202,7 @@ export function OrderContainer(props: Props): JSX.Element {
   const orderValue = useMemo(() => {
     if (fetchOrder != null && state?.order != null) {
       fetchOrder(state.order)
+      debugger
     }
     return {
       ...state,

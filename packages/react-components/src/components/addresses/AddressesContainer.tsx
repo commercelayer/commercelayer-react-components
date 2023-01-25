@@ -51,7 +51,7 @@ export function AddressesContainer(props: Props): JSX.Element {
       }),
     setAddress: (params: SetAddressParams<AddressSchema>) =>
       defaultAddressContext.setAddress({ ...params, dispatch }),
-    saveAddresses: async (): Promise<void> =>
+    saveAddresses: async (): ReturnType<typeof saveAddresses> =>
       await saveAddresses({
         config,
         dispatch,

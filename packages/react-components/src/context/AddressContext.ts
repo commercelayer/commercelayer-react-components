@@ -3,20 +3,20 @@ import {
   AddressState,
   SetAddress,
   setAddress,
-  AddressResource
+  AddressResource,
+  saveAddresses
 } from '#reducers/AddressReducer'
 import { BaseError } from '#typings/errors'
 
 type DefaultContext = {
-  saveAddresses: () => void
+  saveAddresses?: () => ReturnType<typeof saveAddresses>
   setCloneAddress: (id: string, resource: AddressResource) => void
   setAddress: SetAddress
   setAddressErrors: (errors: BaseError[], resource: AddressResource) => void
 } & AddressState
 
 export const defaultAddressContext = {
-  saveAddresses: (): void => {},
-  setCloneAddress: (): void => {},
+  setCloneAddress: () => {},
   setAddress,
   setAddressErrors: () => {}
 }
