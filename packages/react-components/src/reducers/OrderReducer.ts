@@ -241,7 +241,11 @@ export async function updateOrder({
   config,
   include,
   state
-}: UpdateOrderArgs): Promise<{ success: boolean; error?: unknown }> {
+}: UpdateOrderArgs): Promise<{
+  success: boolean
+  error?: unknown
+  order?: Order
+}> {
   const sdk = getSdk(config as CommerceLayerConfig)
   try {
     const resource = { ...attributes, id }
@@ -250,7 +254,7 @@ export async function updateOrder({
     // NOTE: Retrieve doesn't response with attributes updated
     const order = await getApiOrder({ id, config, dispatch, state })
     dispatch && order && dispatch({ type: 'setOrder', payload: { order } })
-    return { success: true }
+    return { success: true, order }
   } catch (error) {
     const errors = getErrors(error, 'orders')
     if (dispatch) {

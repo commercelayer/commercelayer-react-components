@@ -6,6 +6,8 @@ import isFunction from 'lodash/isFunction'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import OrderContext from '#context/OrderContext'
 import getCardDetails from '#utils/getCardDetails'
+import type { BaseError } from '#typings/errors'
+import type { Order } from '@commercelayer/sdk'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   handleClick: () => Promise<void>
@@ -15,7 +17,11 @@ interface Props
   extends Omit<JSX.IntrinsicElements['button'], 'children' | 'onClick'> {
   children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
-  onClick?: (response: { placed: boolean }) => void
+  onClick?: (response: {
+    placed: boolean
+    order?: Order
+    errors?: BaseError[]
+  }) => void
 }
 
 export function PlaceOrderButton(props: Props): JSX.Element {

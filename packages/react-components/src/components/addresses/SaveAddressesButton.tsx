@@ -11,13 +11,20 @@ import OrderContext from '#context/OrderContext'
 import CustomerContext from '#context/CustomerContext'
 import isFunction from 'lodash/isFunction'
 import { TCustomerAddress } from '#reducers/CustomerReducer'
+import type { Order } from '@commercelayer/sdk'
+
+interface TOnClick {
+  success: boolean
+  order?: Order
+}
 
 interface ChildrenProps extends Omit<Props, 'children'> {}
 
-interface Props extends Omit<JSX.IntrinsicElements['button'], 'children'> {
+interface Props
+  extends Omit<JSX.IntrinsicElements['button'], 'children' | 'onClick'> {
   children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
-  onClick?: () => void
+  onClick?: (params: TOnClick) => void
   addressId?: string
 }
 
@@ -76,20 +83,27 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     billingDisable ||
     shippingDisable ||
     countryLockDisable
-  const handleClick = (): void => {
+  const handleClick = async (): Promise<void> => {
     if (errors && Object.keys(errors).length === 0 && !disable) {
+      let orderUpdated: {
+        success: boolean
+        order?: Order
+      } = {
+        success: false
+      }
       setForceDisable(true)
-      if (order) {
-        saveAddresses()
+      if (order && saveAddresses != null) {
+        orderUpdated = await saveAddresses()
       } else if (createCustomerAddress && billingAddress) {
         const address = { ...billingAddress }
         if (addressId) address.id = addressId
         void createCustomerAddress(address as TCustomerAddress)
       }
       setForceDisable(false)
-      if (onClick) onClick()
+      if (onClick && orderUpdated.success) onClick(orderUpdated)
     }
   }
+
   const parentProps = {
     ...p,
     label,
@@ -103,7 +117,9 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     <button
       type='button'
       disabled={disable || forceDisable}
-      onClick={handleClick}
+      onClick={() => {
+        void handleClick()
+      }}
       {...p}
     >
       {isFunction(label) ? label() : label}

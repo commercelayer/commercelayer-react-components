@@ -98,16 +98,6 @@ export type SetAddress = <V extends AddressSchema>(
   params: SetAddressParams<V>
 ) => void
 
-export type SaveAddresses = (params: {
-  orderId?: string
-  order?: Order | null
-  updateOrder?: typeof updateOrder
-  config: CommerceLayerConfig
-  state: AddressState
-  dispatch: Dispatch<AddressAction>
-  getCustomerAddresses?: () => Promise<void>
-}) => Promise<void>
-
 export const setAddressErrors: SetAddressErrors = ({
   errors,
   dispatch,
@@ -157,12 +147,26 @@ export const setCloneAddress: SetCloneAddress = (id, resource, dispatch) => {
   })
 }
 
-export const saveAddresses: SaveAddresses = async ({
+interface TSaveAddressesParams {
+  orderId?: string
+  order?: Order | null
+  updateOrder?: typeof updateOrder
+  config: CommerceLayerConfig
+  state: AddressState
+  dispatch: Dispatch<AddressAction>
+  getCustomerAddresses?: () => Promise<void>
+}
+
+export async function saveAddresses({
   config,
   updateOrder,
   order,
   state
-}) => {
+}: TSaveAddressesParams): Promise<{
+  success: boolean
+  order?: Order
+  error?: unknown
+}> {
   const {
     shipToDifferentAddress,
     billing_address: billingAddress,
@@ -203,11 +207,17 @@ export const saveAddresses: SaveAddresses = async ({
         }
       }
       if (!isEmpty(orderAttributes) && updateOrder) {
-        await updateOrder({ id: order.id, attributes: orderAttributes })
+        const orderUpdated = await updateOrder({
+          id: order.id,
+          attributes: orderAttributes
+        })
+        return { success: true, order: orderUpdated?.order }
       }
     }
+    return { success: false }
   } catch (error) {
     console.error(error)
+    return { success: false, error }
   }
 }
 
