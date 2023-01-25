@@ -129,8 +129,6 @@ export function OrderContainer(props: Props): JSX.Element {
         !lockOrder
       ) {
         void getOrder()
-      } else if (state?.order && fetchOrder) {
-        fetchOrder(state.order)
       } else if (
         state.withoutIncludes &&
         !state.include?.length &&
@@ -196,12 +194,15 @@ export function OrderContainer(props: Props): JSX.Element {
     Object.keys(state.includeLoaded ?? {}).length,
     state.include?.length,
     orderId,
-    state.order,
+    Object.keys(state?.order ?? {}).length,
     state.loading,
     state.withoutIncludes,
     lockOrder
   ])
   const orderValue = useMemo(() => {
+    if (fetchOrder != null && state?.order != null) {
+      fetchOrder(state.order)
+    }
     return {
       ...state,
       setOrder: (order: Order) => setOrder(order, dispatch),
