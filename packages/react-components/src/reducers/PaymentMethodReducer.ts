@@ -28,6 +28,7 @@ import { snakeToCamelCase } from '#utils/snakeToCamelCase'
 import { replace } from '#utils/replace'
 import { pick } from '#utils/pick'
 import { ResourceKeys } from '#utils/getPaymentAttributes'
+import { response } from 'msw'
 
 export type PaymentSourceType =
   | AdyenPayment
@@ -207,7 +208,7 @@ export type SDKPaymentResource =
   | 'WireTransfer'
   | 'CheckoutComPayment'
 
-export type SetPaymentMethod = (args: {
+interface TSetPaymentMethodParams {
   config?: CommerceLayerConfig
   dispatch?: Dispatch<PaymentMethodAction>
   updateOrder?: typeof updateOrder
@@ -215,9 +216,9 @@ export type SetPaymentMethod = (args: {
   order?: Order
   paymentMethodId: string
   paymentResource?: PaymentResource
-}) => Promise<void>
+}
 
-export const setPaymentMethod: SetPaymentMethod = async ({
+export async function setPaymentMethod({
   config,
   dispatch,
   order,
@@ -225,7 +226,10 @@ export const setPaymentMethod: SetPaymentMethod = async ({
   updateOrder,
   setOrderErrors,
   paymentResource
-}) => {
+}: TSetPaymentMethodParams): Promise<{ success: boolean; order?: Order }> {
+  let response: { success: boolean; order?: Order } = {
+    success: false
+  }
   try {
     if (config && order && dispatch && paymentResource) {
       localStorage.removeItem('_save_payment_source_to_customer_wallet')
@@ -233,7 +237,10 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       const attributes = {
         payment_method: sdk.payment_methods.relationship(paymentMethodId)
       }
-      updateOrder && (await updateOrder({ id: order.id, attributes }))
+      if (updateOrder != null) {
+        const currentOrder = await updateOrder({ id: order.id, attributes })
+        response = currentOrder
+      }
       dispatch({
         type: 'setPaymentMethods',
         payload: {
@@ -244,9 +251,11 @@ export const setPaymentMethod: SetPaymentMethod = async ({
       })
       if (setOrderErrors) setOrderErrors([])
     }
+    return response
   } catch (error) {
     const errors = getErrors(error, 'orders', paymentResource)
     console.error('Set payment method', errors)
+    return response
   }
 }
 

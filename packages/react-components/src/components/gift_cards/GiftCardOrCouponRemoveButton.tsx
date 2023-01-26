@@ -3,6 +3,7 @@ import Parent from '#components/utils/Parent'
 import { ChildrenFunction } from '#typings/index'
 import OrderContext from '#context/OrderContext'
 import { CodeType, OrderCodeType } from '#reducers/OrderReducer'
+import type { Order } from '@commercelayer/sdk'
 
 interface ChildrenProps extends Omit<Props, 'children' | 'onClick'> {
   codeType?: OrderCodeType
@@ -14,7 +15,7 @@ type Props = {
   type?: CodeType
   children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
-  onClick?: (response: { success: boolean }) => void
+  onClick?: (response: { success: boolean; order?: Order }) => void
 } & Omit<JSX.IntrinsicElements['button'], 'type' | 'onClick'>
 
 export function GiftCardOrCouponRemoveButton(props: Props): JSX.Element | null {
@@ -27,11 +28,10 @@ export function GiftCardOrCouponRemoveButton(props: Props): JSX.Element | null {
   const code = order && codeType ? order[codeType] : ''
   const hide = !(order && code)
   const handleClick = async (): Promise<void> => {
-    const response =
-      removeGiftCardOrCouponCode &&
-      codeType &&
-      (await removeGiftCardOrCouponCode({ codeType }))
-    if (onClick && response) onClick(response)
+    if (codeType != null && removeGiftCardOrCouponCode != null) {
+      const response = await removeGiftCardOrCouponCode({ codeType })
+      if (onClick != null && response != null) onClick(response)
+    }
   }
   const parentProps = {
     ...p,

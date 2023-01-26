@@ -3,8 +3,6 @@ import { Order } from '@commercelayer/sdk'
 import {
   OrderState,
   CreateOrder,
-  SetGiftCardOrCouponCode,
-  RemoveGiftCardOrCouponCode,
   SaveAddressToCustomerAddressBook,
   createOrder,
   setGiftCardOrCouponCode,
@@ -21,8 +19,8 @@ interface DefaultContext extends OrderState {
   createOrder: CreateOrder
   addToCart?: typeof addToCart
   setOrderErrors: (errors: BaseError[]) => void
-  setGiftCardOrCouponCode: SetGiftCardOrCouponCode
-  removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode
+  setGiftCardOrCouponCode?: typeof setGiftCardOrCouponCode
+  removeGiftCardOrCouponCode?: typeof removeGiftCardOrCouponCode
   saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook
   addResourceToInclude: typeof addResourceToInclude
   getOrder: getOrderContext

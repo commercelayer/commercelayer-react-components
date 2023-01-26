@@ -9,7 +9,7 @@ import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
 import { ChildrenFunction } from '#typings'
 import getCardDetails from '#utils/getCardDetails'
 
-type ChildrenProps = Pick<Props, 'customerPayments'> & {
+interface ChildrenProps extends Pick<Props, 'customerPayments'> {
   PaymentSourceProvider: typeof PaymentSourceContext.Provider
 }
 
@@ -22,8 +22,6 @@ type CustomerPayment = PaymentSourceType & {
 }
 
 export type CustomerCardsTemplateChildren = ChildrenFunction<ChildrenProps>
-
-export type CustomerCardsType = ChildrenProps
 
 interface Props {
   customerPayments: CustomerPayment[]

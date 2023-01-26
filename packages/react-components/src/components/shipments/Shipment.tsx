@@ -28,7 +28,7 @@ export function Shipment({
             if (!shipment?.shipping_method && isSingle) {
               const [shippingMethod] =
                 shipment?.available_shipping_methods || []
-              if (shippingMethod) {
+              if (shippingMethod && setShippingMethod != null) {
                 void setShippingMethod(shipment.id, shippingMethod.id)
               }
               if (typeof autoSelectSingleShippingMethod === 'function') {

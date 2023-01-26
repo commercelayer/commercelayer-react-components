@@ -532,7 +532,7 @@ export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook 
       })
   }
 
-export type SetGiftCardOrCouponCode = (args: {
+interface TSetGiftCardOrCouponCodeParams {
   code: string
   codeType: OrderCodeType
   dispatch?: Dispatch<OrderActions>
@@ -540,9 +540,9 @@ export type SetGiftCardOrCouponCode = (args: {
   order?: Order
   include?: string[]
   state?: OrderState
-}) => Promise<{ success: boolean }>
+}
 
-export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
+export async function setGiftCardOrCouponCode({
   code,
   codeType,
   dispatch,
@@ -550,13 +550,20 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
   order,
   include,
   state
-}) => {
+}: TSetGiftCardOrCouponCodeParams): Promise<{
+  success: boolean
+  order?: Order
+}> {
   try {
     if (config && order && code && dispatch) {
       const attributes: Omit<OrderUpdate, 'id'> = {
         [codeType]: code
       }
-      const { success, error } = await updateOrder({
+      const {
+        success,
+        order: currentOrder,
+        error
+      } = await updateOrder({
         id: order.id,
         attributes,
         config,
@@ -571,7 +578,7 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
           errors: []
         }
       })
-      return { success }
+      return { success, order: currentOrder }
     }
     return { success: false }
   } catch (error: unknown) {
@@ -584,29 +591,32 @@ export const setGiftCardOrCouponCode: SetGiftCardOrCouponCode = async ({
 export type CodeType = 'coupon' | 'gift_card' | 'gift_card_or_coupon'
 export type OrderCodeType = `${CodeType}_code`
 
-export type RemoveGiftCardOrCouponCode = (args: {
+interface TRemoveGiftCardOrCouponCodeParams {
   codeType: OrderCodeType
   dispatch?: Dispatch<OrderActions>
   config?: CommerceLayerConfig
   order?: Order
   include?: string[]
   state?: OrderState
-}) => Promise<{ success: boolean }>
+}
 
-export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
+export async function removeGiftCardOrCouponCode({
   codeType,
   dispatch,
   config,
   order,
   include,
   state
-}) => {
+}: TRemoveGiftCardOrCouponCodeParams): Promise<{
+  success: boolean
+  order?: Order
+}> {
   try {
     if (config && order && dispatch) {
       const attributes: Omit<OrderUpdate, 'id'> = {
         [codeType]: ''
       }
-      await updateOrder({
+      const orderUpdated = await updateOrder({
         id: order.id,
         attributes,
         config,
@@ -620,7 +630,7 @@ export const removeGiftCardOrCouponCode: RemoveGiftCardOrCouponCode = async ({
           errors: []
         }
       })
-      return { success: true }
+      return { success: true, order: orderUpdated?.order }
     }
     return { success: false }
   } catch (error: unknown) {

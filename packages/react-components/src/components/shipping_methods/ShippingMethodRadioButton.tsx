@@ -2,21 +2,22 @@ import { useContext, useEffect, useState } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from '#components/utils/Parent'
 import ShipmentContext from '#context/ShipmentContext'
-import type { ShippingMethod } from '@commercelayer/sdk'
+import type { Order, ShippingMethod } from '@commercelayer/sdk'
 
-export type ShippingMethodRadioButtonType = Omit<Props, 'children'> & {
+interface ShippingMethodRadioButtonType extends Omit<Props, 'children'> {
   shippingMethod: ShippingMethod
   shipmentId: string
 }
 
-export type ShippingMethodRadioButtonOnChangeType = (
-  shippingMethod: ShippingMethod,
+interface TOnChange {
+  shippingMethod: ShippingMethod
   shipmentId: string
-) => void
+  order?: Order
+}
 
 type Props = {
   children?: (props: ShippingMethodRadioButtonType) => JSX.Element
-  onChange?: ShippingMethodRadioButtonOnChangeType
+  onChange?: (params: TOnChange) => void
 } & Omit<JSX.IntrinsicElements['input'], 'onChange'>
 
 export function ShippingMethodRadioButton(props: Props): JSX.Element {
@@ -40,10 +41,15 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
 
   const handleOnChange = async (): Promise<void> => {
     if (shipmentId) {
-      if (shippingMethodId) {
+      if (shippingMethodId && setShippingMethod != null) {
         setChecked(true)
-        await setShippingMethod(shipmentId, shippingMethodId)
-        if (shippingMethod && onChange) onChange(shippingMethod, shipmentId)
+        const { order } = await setShippingMethod(shipmentId, shippingMethodId)
+        if (shippingMethod && onChange != null)
+          onChange({
+            shippingMethod,
+            shipmentId,
+            order
+          })
       }
     }
   }

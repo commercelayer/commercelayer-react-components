@@ -98,9 +98,4 @@ export * from '#components/skus/Skus'
 export * from '#components/skus/SkusContainer'
 export * from '#components/stock_transfers/StockTransfer'
 export * from '#components/stock_transfers/StockTransferField'
-export type { CustomerCardsType } from '#components/utils/PaymentCardsTemplate'
-export type {
-  ShippingMethodRadioButtonType,
-  ShippingMethodRadioButtonOnChangeType
-} from '#components/shipping_methods/ShippingMethodRadioButton'
 export * from '#typings/errors'

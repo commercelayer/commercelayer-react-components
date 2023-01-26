@@ -1,15 +1,26 @@
 import { useState, useEffect, MouseEvent, useContext } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
-import { LoaderType } from '#typings'
+import type { LoaderType } from '#typings'
 import getLoaderComponent from '../../utils/getLoaderComponent'
-import { PaymentMethod as PaymentMethodType } from '@commercelayer/sdk'
-import { PaymentResource } from '#reducers/PaymentMethodReducer'
+import type {
+  Order,
+  PaymentMethod as PaymentMethodType
+} from '@commercelayer/sdk'
+import type { PaymentResource } from '#reducers/PaymentMethodReducer'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import type { DefaultChildrenType } from '#typings/globals'
 import OrderContext from '#context/OrderContext'
 import CustomerContext from '#context/CustomerContext'
-import { getExternalPaymentAttributes, getPaypalAttributes } from '#utils/getPaymentAttributes'
+import {
+  getExternalPaymentAttributes,
+  getPaypalAttributes
+} from '#utils/getPaymentAttributes'
+
+interface TOnClickParams {
+  payment?: PaymentMethodType | Record<string, any>
+  order?: Order
+}
 
 type Props = {
   /**
@@ -24,7 +35,7 @@ type Props = {
   (
     | {
         clickableContainer: true
-        onClick?: (payment?: PaymentMethodType | Record<string, any>) => void
+        onClick?: (params?: TOnClickParams) => void
       }
     | {
         clickableContainer?: never
@@ -64,52 +75,56 @@ export function PaymentMethod({
   useEffect(() => {
     if (paymentMethods != null) {
       if (autoSelectSinglePaymentMethod != null) {
-        const autoSelect = async () => {
+        const autoSelect = async (): Promise<void> => {
           const isSingle = paymentMethods.length === 1
           if (isSingle) {
             const [paymentMethod] = paymentMethods ?? []
             if (paymentMethod && !paymentSource) {
-                setLoadingPlaceOrder({ loading: true })
-                setPaymentSelected(paymentMethod.id)
-                const paymentMethodId = paymentMethod?.id
-                const paymentResource = paymentMethod?.payment_source_type as PaymentResource
-                await setPaymentMethod({ paymentResource, paymentMethodId })
-                let attributes: Record<string, unknown> | undefined = {}
-                if (config != null && paymentResource === 'paypal_payments') {
-                  attributes = getPaypalAttributes(paymentResource, config)
-                }
-                if (config != null && paymentResource === 'external_payments') {
-                  attributes = getExternalPaymentAttributes(paymentResource, config)
-                }
-                const ps = await setPaymentSource({
+              setLoadingPlaceOrder({ loading: true })
+              setPaymentSelected(paymentMethod.id)
+              const paymentMethodId = paymentMethod?.id
+              const paymentResource =
+                paymentMethod?.payment_source_type as PaymentResource
+              await setPaymentMethod({ paymentResource, paymentMethodId })
+              let attributes: Record<string, unknown> | undefined = {}
+              if (config != null && paymentResource === 'paypal_payments') {
+                attributes = getPaypalAttributes(paymentResource, config)
+              }
+              if (config != null && paymentResource === 'external_payments') {
+                attributes = getExternalPaymentAttributes(
                   paymentResource,
-                  order,
-                  attributes,
-                })
-                if (ps && paymentMethod && onClick != null) {
-                  onClick({ payment: paymentMethod, paymentSource: ps })
-                  setTimeout(() => {
-                    setLoading(false)
-                  }, 200)
-                }
-                if (getCustomerPaymentSources) (await getCustomerPaymentSources())
-                setLoadingPlaceOrder({ loading: false })
+                  config
+                )
               }
-              if (typeof autoSelectSinglePaymentMethod === 'function') {
-                autoSelectSinglePaymentMethod()
+              const ps = await setPaymentSource({
+                paymentResource,
+                order,
+                attributes
+              })
+              if (ps && paymentMethod && onClick != null) {
+                onClick({ payment: paymentMethod, order })
+                setTimeout(() => {
+                  setLoading(false)
+                }, 200)
               }
+              if (getCustomerPaymentSources) await getCustomerPaymentSources()
+              setLoadingPlaceOrder({ loading: false })
+            }
+            if (typeof autoSelectSinglePaymentMethod === 'function') {
+              autoSelectSinglePaymentMethod()
+            }
           } else {
             setTimeout(() => {
               setLoading(false)
             }, 200)
           }
         }
-        autoSelect()
+        void autoSelect()
       }
     }
   }, [paymentMethods])
   useEffect(() => {
-    if (paymentMethods) { 
+    if (paymentMethods) {
       const isSingle = paymentMethods.length === 1
       if (isSingle && autoSelectSinglePaymentMethod) {
         if (paymentSource) {
@@ -152,8 +167,11 @@ export function PaymentMethod({
             setLoadingPlaceOrder({ loading: true })
             setPaymentSelected(payment.id)
             const paymentMethodId = payment?.id
-            await setPaymentMethod({ paymentResource, paymentMethodId })
-            if (onClick) onClick(payment)
+            const { order } = await setPaymentMethod({
+              paymentResource,
+              paymentMethodId
+            })
+            if (onClick) onClick({ payment, order })
             setLoadingPlaceOrder({ loading: false })
           }
       return (
