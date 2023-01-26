@@ -2,20 +2,20 @@ import { createContext } from 'react'
 import {
   ShipmentState,
   SetShipmentErrors,
-  setShipmentErrors
+  setShipmentErrors,
+  setShippingMethod
 } from '#reducers/ShipmentReducer'
 
 type DefaultContext = {
   setShipmentErrors: SetShipmentErrors
-  setShippingMethod: (
+  setShippingMethod?: (
     shipmentId: string,
     shippingMethodId: string
-  ) => Promise<void>
+  ) => ReturnType<typeof setShippingMethod>
 } & ShipmentState
 
 export const defaultShipmentContext = {
-  setShipmentErrors,
-  setShippingMethod: async (): Promise<void> => {}
+  setShipmentErrors
 }
 
 const ShipmentContext = createContext<DefaultContext>(defaultShipmentContext)

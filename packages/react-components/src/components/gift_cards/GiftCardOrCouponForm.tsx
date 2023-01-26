@@ -1,18 +1,24 @@
 import { useRapidForm } from 'rapid-form'
-import { useContext, useEffect, useRef, useState, ReactNode } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import OrderContext from '#context/OrderContext'
 import isEmpty from 'lodash/isEmpty'
 import camelCase from 'lodash/camelCase'
 import dropWhile from 'lodash/dropWhile'
 import has from 'lodash/has'
-import { findIndex } from 'lodash'
-import { OrderCodeType } from '#reducers/OrderReducer'
+import findIndex from 'lodash/findIndex'
+import type { OrderCodeType } from '#reducers/OrderReducer'
+import type { Order } from '@commercelayer/sdk'
+import type { DefaultChildrenType } from '#typings/globals'
 
-type Props = {
-  children: ReactNode
-  onSubmit?: (response: { success: boolean; value: string }) => void
-} & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
+interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
+  children: DefaultChildrenType
+  onSubmit?: (response: {
+    success: boolean
+    value: string
+    order?: Order
+  }) => void
+}
 
 export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
   const { children, autoComplete = 'on', onSubmit, ...p } = props
@@ -60,13 +66,17 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
   ): Promise<void> => {
     e.preventDefault()
     const code = has(values, inputName) ? values[inputName].value : undefined
-    if (code) {
-      const { success } = await setGiftCardOrCouponCode({ code, codeType })
+    if (code != null && setGiftCardOrCouponCode != null) {
+      const { success, order } = await setGiftCardOrCouponCode({
+        code,
+        codeType
+      })
       const value = values[inputName]?.value
       if (onSubmit) {
         onSubmit({
           success,
-          value
+          value,
+          order
         })
       }
       if (success) reset(e)

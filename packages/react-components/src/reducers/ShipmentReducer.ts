@@ -75,21 +75,21 @@ export const getShipments: GetShipments = async ({
   }
 }
 
-type SetShippingMethod = (args: {
+interface TSetShippingMethodParams {
   config: CommerceLayerConfig
   shipmentId: string
   shippingMethodId: string
   order?: Order
   getOrder?: getOrderContext
-}) => Promise<void>
+}
 
-export const setShippingMethod: SetShippingMethod = async ({
+export async function setShippingMethod({
   config,
   shipmentId,
   shippingMethodId,
   getOrder,
   order
-}) => {
+}: TSetShippingMethodParams): Promise<{ success: boolean; order?: Order }> {
   try {
     if (shippingMethodId) {
       const sdk = getSdk(config)
@@ -97,10 +97,15 @@ export const setShippingMethod: SetShippingMethod = async ({
         id: shipmentId,
         shipping_method: sdk.shipping_methods.relationship(shippingMethodId)
       })
-      if (getOrder && order) await getOrder(order.id)
+      if (getOrder != null && order != null) {
+        const currentOrder = await getOrder(order.id)
+        return { success: true, order: currentOrder }
+      }
     }
+    return { success: false }
   } catch (error) {
     console.error(error)
+    return { success: false }
   }
 }
 

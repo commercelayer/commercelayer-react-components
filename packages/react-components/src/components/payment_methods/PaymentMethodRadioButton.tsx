@@ -2,7 +2,7 @@ import { useContext, ChangeEvent } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components/utils/Parent'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import { PaymentMethod } from '@commercelayer/sdk'
+import type { Order, PaymentMethod } from '@commercelayer/sdk'
 import { PaymentResource } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import useCustomContext from '#utils/hooks/useCustomContext'
@@ -13,9 +13,14 @@ interface ChildrenProps extends Omit<Props, 'children'> {
   handleOnChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
 }
 
+interface TOnChangeParams {
+  payment?: PaymentMethod | Record<string, any>
+  order?: Order
+}
+
 type Props = {
   children?: ChildrenFunction<ChildrenProps>
-  onChange?: (payment?: PaymentMethod | Record<string, any>) => void
+  onChange?: (params: TOnChangeParams) => void
 } & JSX.IntrinsicElements['input']
 
 export function PaymentMethodRadioButton(props: Props): JSX.Element {
@@ -40,9 +45,13 @@ export function PaymentMethodRadioButton(props: Props): JSX.Element {
     e.stopPropagation()
     if (setPaymentSelected) setPaymentSelected(paymentMethodId)
     setLoading({ loading: true })
-    !clickableContainer &&
-      (await setPaymentMethod({ paymentResource, paymentMethodId }))
-    if (onChange) onChange(payment)
+    if (!clickableContainer) {
+      const { order } = await setPaymentMethod({
+        paymentResource,
+        paymentMethodId
+      })
+      if (onChange) onChange({ payment, order })
+    }
     setLoading({ loading: false })
   }
   const id = payment?.payment_source_type

@@ -7,7 +7,6 @@ import {
   setPaymentMethodErrors,
   SetPaymentSource,
   setPaymentSource,
-  SetPaymentMethod,
   setPaymentMethod,
   destroyPaymentSource,
   DestroyPaymentSource,
@@ -18,7 +17,7 @@ import {
 
 type DefaultContext = {
   setPaymentMethodErrors: SetPaymentMethodErrors
-  setPaymentMethod: SetPaymentMethod
+  setPaymentMethod: typeof setPaymentMethod
   setPaymentSource: SetPaymentSource
   setPaymentRef: SetPaymentRef
   destroyPaymentSource: DestroyPaymentSource
