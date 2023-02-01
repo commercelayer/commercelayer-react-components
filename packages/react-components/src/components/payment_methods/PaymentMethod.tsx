@@ -176,7 +176,7 @@ export function PaymentMethod({
           }
       return (
         <div
-          data-test-id={paymentResource}
+          data-testid={paymentResource}
           key={k}
           className={`${className ?? ''} ${
             isActive && activeClass != null ? activeClass : ''
