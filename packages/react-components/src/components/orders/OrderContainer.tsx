@@ -139,7 +139,7 @@ export function OrderContainer(props: Props): JSX.Element {
     } else if (
       [
         config.accessToken,
-        state.order != null,
+        state.order == null,
         state.loading,
         state.withoutIncludes
       ].every(Boolean)
@@ -153,7 +153,7 @@ export function OrderContainer(props: Props): JSX.Element {
     } else if (
       [
         config.accessToken,
-        state.order != null,
+        state.order == null,
         state.loading,
         state.withoutIncludes === false
       ].every(Boolean)
@@ -202,7 +202,6 @@ export function OrderContainer(props: Props): JSX.Element {
   const orderValue = useMemo(() => {
     if (fetchOrder != null && state?.order != null) {
       fetchOrder(state.order)
-      debugger
     }
     return {
       ...state,
