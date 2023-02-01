@@ -28,7 +28,6 @@ import { snakeToCamelCase } from '#utils/snakeToCamelCase'
 import { replace } from '#utils/replace'
 import { pick } from '#utils/pick'
 import { ResourceKeys } from '#utils/getPaymentAttributes'
-import { response } from 'msw'
 
 export type PaymentSourceType =
   | AdyenPayment
