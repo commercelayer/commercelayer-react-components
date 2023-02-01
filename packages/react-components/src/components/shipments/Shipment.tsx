@@ -1,14 +1,15 @@
 import { useContext, ReactNode, useState, useEffect } from 'react'
 import ShipmentContext from '#context/ShipmentContext'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
-import { LoaderType } from '#typings'
 import getLoaderComponent from '#utils/getLoaderComponent'
-import { ShipmentLineItem } from '#reducers/ShipmentReducer'
+import type { LoaderType } from '#typings'
+import type { ShipmentLineItem } from '#reducers/ShipmentReducer'
+import type { Order } from '@commercelayer/sdk'
 
 interface ShipmentProps {
   children: ReactNode
   loader?: LoaderType
-  autoSelectSingleShippingMethod?: boolean | (() => void)
+  autoSelectSingleShippingMethod?: boolean | ((order?: Order) => void)
 }
 
 export function Shipment({
@@ -23,23 +24,29 @@ export function Shipment({
     if (shipments) {
       if (autoSelectSingleShippingMethod) {
         const autoSelect = async (): Promise<void> => {
-          shipments.forEach((shipment) => {
+          for (const shipment of shipments) {
             const isSingle = shipment?.available_shipping_methods?.length === 1
             if (!shipment?.shipping_method && isSingle) {
               const [shippingMethod] =
                 shipment?.available_shipping_methods || []
               if (shippingMethod && setShippingMethod != null) {
-                void setShippingMethod(shipment.id, shippingMethod.id)
-              }
-              if (typeof autoSelectSingleShippingMethod === 'function') {
-                autoSelectSingleShippingMethod()
+                const { success, order } = await setShippingMethod(
+                  shipment.id,
+                  shippingMethod.id
+                )
+                if (
+                  typeof autoSelectSingleShippingMethod === 'function' &&
+                  success
+                ) {
+                  autoSelectSingleShippingMethod(order)
+                }
               }
             } else {
               setTimeout(() => {
                 setLoading(false)
               }, 200)
             }
-          })
+          }
         }
         void autoSelect()
       } else {
