@@ -9,7 +9,7 @@ import {
 import { BaseError } from '#typings/errors'
 
 type DefaultContext = {
-  saveAddresses?: () => ReturnType<typeof saveAddresses>
+  saveAddresses?: (customerEmail?: string) => ReturnType<typeof saveAddresses>
   setCloneAddress: (id: string, resource: AddressResource) => void
   setAddress: SetAddress
   setAddressErrors: (errors: BaseError[], resource: AddressResource) => void

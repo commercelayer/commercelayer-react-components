@@ -51,14 +51,17 @@ export function AddressesContainer(props: Props): JSX.Element {
       }),
     setAddress: (params: SetAddressParams<AddressSchema>) =>
       defaultAddressContext.setAddress({ ...params, dispatch }),
-    saveAddresses: async (): ReturnType<typeof saveAddresses> =>
+    saveAddresses: async (
+      customerEmail?: string
+    ): ReturnType<typeof saveAddresses> =>
       await saveAddresses({
         config,
         dispatch,
         updateOrder,
         order,
         orderId,
-        state
+        state,
+        customerEmail
       }),
     setCloneAddress: (id: string, resource: AddressResource): void =>
       setCloneAddress(id, resource, dispatch)
