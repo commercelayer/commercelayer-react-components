@@ -155,13 +155,15 @@ interface TSaveAddressesParams {
   state: AddressState
   dispatch: Dispatch<AddressAction>
   getCustomerAddresses?: () => Promise<void>
+  customerEmail?: string
 }
 
 export async function saveAddresses({
   config,
   updateOrder,
   order,
-  state
+  state,
+  customerEmail
 }: TSaveAddressesParams): Promise<{
   success: boolean
   order?: Order
@@ -181,7 +183,8 @@ export async function saveAddresses({
       const orderAttributes: OrderUpdate = {
         id: order?.id,
         _billing_address_clone_id: billingAddressId,
-        _shipping_address_clone_id: billingAddressId
+        _shipping_address_clone_id: billingAddressId,
+        customer_email: customerEmail
       }
       if (currentBillingAddressRef === billingAddressId) {
         orderAttributes._billing_address_clone_id = order?.billing_address?.id

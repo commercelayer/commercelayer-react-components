@@ -48,13 +48,20 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     shippingAddressId
   } = useContext(AddressContext)
   const { order } = useContext(OrderContext)
-  const { addresses, isGuest, createCustomerAddress } =
-    useContext(CustomerContext)
+  const {
+    customerEmail: email,
+    addresses,
+    isGuest,
+    createCustomerAddress
+  } = useContext(CustomerContext)
   const [forceDisable, setForceDisable] = useState(disabled)
-  const customerEmail = !!(
+  let customerEmail = !!(
     !!(isGuest === true || typeof isGuest === 'undefined') &&
     !order?.customer_email
   )
+  if (email != null && email !== '') {
+    customerEmail = false
+  }
   const billingDisable = billingAddressController({
     billing_address: billingAddress,
     errors,
@@ -93,7 +100,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
       }
       setForceDisable(true)
       if (order && saveAddresses != null) {
-        orderUpdated = await saveAddresses()
+        orderUpdated = await saveAddresses(email)
       } else if (createCustomerAddress && billingAddress) {
         const address = { ...billingAddress }
         if (addressId) address.id = addressId

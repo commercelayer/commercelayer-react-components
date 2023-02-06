@@ -38,8 +38,10 @@ export function CustomerInput(props: Props): JSX.Element {
       Object.keys(errors).length === 0 &&
       Object.keys(values).length > 0
     ) {
-      if (saveCustomerUser) await saveCustomerUser(values[name].value)
-      if (onBlur) onBlur(values[name].value)
+      if (saveCustomerUser != null) {
+        await saveCustomerUser(values[name].value)
+        if (onBlur) onBlur(values[name].value)
+      }
     }
   }
   useEffect(() => {
