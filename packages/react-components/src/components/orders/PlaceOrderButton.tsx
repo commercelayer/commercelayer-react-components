@@ -135,7 +135,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     ) {
       void handleClick()
     }
-  }, [options?.adyen, paymentType])
+  }, [options?.adyen, paymentType, paymentSource])
   useEffect(() => {
     if (
       paymentType === 'checkout_com_payments' &&
