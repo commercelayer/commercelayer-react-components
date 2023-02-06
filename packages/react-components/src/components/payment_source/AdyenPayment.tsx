@@ -391,7 +391,7 @@ export function AdyenPayment({
                   if (ref.current) {
                     if (id.search('paypal') === -1) {
                       ref.current.onsubmit = async () =>
-                        await handleSubmit(ref.current as any, component)
+                        await handleSubmit(ref.current as any, component as any)
                     } else {
                       ref.current.onsubmit = null
                     }
