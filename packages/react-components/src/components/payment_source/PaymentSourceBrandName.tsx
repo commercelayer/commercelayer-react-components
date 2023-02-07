@@ -19,7 +19,7 @@ export function PaymentSourceBrandName({
   ...props
 }: Props): JSX.Element {
   const { brand } = useContext(PaymentSourceContext)
-  const brandName = brand && capitalize(brand.replace('-', ' '))
+  const brandName = brand && capitalize(brand.replaceAll(/_|-/gm, ' '))
   const parentProps = {
     brand: brandName,
     label,
