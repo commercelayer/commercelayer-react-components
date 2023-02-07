@@ -86,56 +86,59 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     }
   }, [options?.paypalPayerId, paymentType])
   useEffect(() => {
-    if (
-      paymentType === 'adyen_payments' &&
-      options?.adyen?.redirectResult &&
-      order?.status &&
-      ['draft', 'pending'].includes(order?.status) &&
-      paymentSource != null
-    ) {
-      const attributes = {
-        payment_request_details: {
-          details: {
-            redirectResult: options?.adyen?.redirectResult
-          }
-        },
-        _details: 1
-      }
-      void setPaymentSource({
-        paymentSourceId: paymentSource?.id,
-        paymentResource: 'adyen_payments',
-        attributes
-      }).then((res) => {
-        // @ts-expect-error
-        const resultCode = res?.payment_response?.resultCode
-        // @ts-expect-error
-        const errorCode = res?.payment_response?.errorCode
-        // @ts-expect-error
-        const message = res?.payment_response?.message
-        if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-          void handleClick()
-        } else if (errorCode != null) {
-          setPaymentMethodErrors([
-            {
-              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-              resource: 'payment_methods',
-              field: currentPaymentMethodType,
-              message
+    if (order?.status != null && ['draft', 'pending'].includes(order?.status)) {
+      if (
+        paymentType === 'adyen_payments' &&
+        options?.adyen?.redirectResult &&
+        paymentSource != null
+      ) {
+        const attributes = {
+          payment_request_details: {
+            details: {
+              redirectResult: options?.adyen?.redirectResult
             }
-          ])
+          },
+          _details: 1
         }
-      })
+        void setPaymentSource({
+          paymentSourceId: paymentSource?.id,
+          paymentResource: 'adyen_payments',
+          attributes
+        }).then((res) => {
+          // @ts-expect-error
+          const resultCode = res?.payment_response?.resultCode
+          // @ts-expect-error
+          const errorCode = res?.payment_response?.errorCode
+          // @ts-expect-error
+          const message = res?.payment_response?.message
+          if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
+            void handleClick()
+          } else if (errorCode != null) {
+            setPaymentMethodErrors([
+              {
+                code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+                resource: 'payment_methods',
+                field: currentPaymentMethodType,
+                message
+              }
+            ])
+          }
+        })
+      } else if (
+        paymentType === 'adyen_payments' &&
+        options?.adyen?.MD &&
+        options?.adyen?.PaRes
+      ) {
+        void handleClick()
+      } else if (
+        paymentType === 'adyen_payments' &&
+        // @ts-expect-error
+        order?.payment_source?.payment_response?.resultCode === 'Authorised'
+      ) {
+        void handleClick()
+      }
     }
-    if (
-      paymentType === 'adyen_payments' &&
-      options?.adyen?.MD &&
-      options?.adyen?.PaRes &&
-      order?.status &&
-      ['draft', 'pending'].includes(order?.status)
-    ) {
-      void handleClick()
-    }
-  }, [options?.adyen, paymentType, paymentSource])
+  }, [options?.adyen, paymentType, order?.payment_source])
   useEffect(() => {
     if (
       paymentType === 'checkout_com_payments' &&
