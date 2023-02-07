@@ -180,7 +180,7 @@ export function AdyenPayment({
           if (placeOrderButtonRef.current.disabled) {
             placeOrderButtonRef.current.disabled = false
           }
-          placeOrderButtonRef.current?.click()
+          placeOrderButtonRef.current.click()
         }
         return true
       }
@@ -284,7 +284,7 @@ export function AdyenPayment({
           if (placeOrderButtonRef.current.disabled) {
             placeOrderButtonRef.current.disabled = false
           }
-          placeOrderButtonRef.current?.click()
+          placeOrderButtonRef.current.click()
         }
         return true
       }
