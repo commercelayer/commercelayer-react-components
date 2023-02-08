@@ -21,7 +21,7 @@ export function Shipment({
   const { shipments, deliveryLeadTimes, setShippingMethod } =
     useContext(ShipmentContext)
   useEffect(() => {
-    if (shipments) {
+    if (shipments != null) {
       if (autoSelectSingleShippingMethod) {
         const autoSelect = async (): Promise<void> => {
           for (const shipment of shipments) {
@@ -53,7 +53,10 @@ export function Shipment({
         setLoading(false)
       }
     }
-  }, [shipments])
+    return () => {
+      setLoading(true)
+    }
+  }, [shipments != null, shipments?.length])
   const components = shipments?.map((shipment, k) => {
     const shipmentLineItems = shipment.shipment_line_items as ShipmentLineItem[]
     const lineItems = shipmentLineItems?.map((shipmentLineItem) => {

@@ -1,7 +1,7 @@
 import ShipmentContext, {
   defaultShipmentContext
 } from '#context/ShipmentContext'
-import { ReactNode, useContext, useEffect, useReducer } from 'react'
+import { ReactNode, useContext, useEffect, useMemo, useReducer } from 'react'
 import shipmentReducer, {
   shipmentInitialState,
   setShipmentErrors,
@@ -46,10 +46,12 @@ export function ShipmentsContainer(props: Props): JSX.Element {
         }
       })
     }
-    if (order && !isEmpty(config) && order.shipments) {
+  }, [include?.length, includeLoaded != null])
+  useEffect(() => {
+    if (order != null && !isEmpty(config) && order.shipments) {
       void getShipments({ order, dispatch, config })
     }
-  }, [order, include, includeLoaded])
+  }, [order != null, order?.shipments?.length])
   useEffect(() => {
     if (order) {
       if (order.shipments && order.shipments.length > 0) {
@@ -105,19 +107,21 @@ export function ShipmentsContainer(props: Props): JSX.Element {
       setShipmentErrors([], dispatch)
     }
   }, [order?.shipments])
-  const contextValue = {
-    ...state,
-    setShipmentErrors: (errors: BaseError[]) =>
-      defaultShipmentContext.setShipmentErrors(errors, dispatch),
-    setShippingMethod: async (shipmentId: string, shippingMethodId: string) =>
-      await setShippingMethod({
-        shippingMethodId,
-        shipmentId,
-        config,
-        getOrder,
-        order
-      })
-  }
+  const contextValue = useMemo(() => {
+    return {
+      ...state,
+      setShipmentErrors: (errors: BaseError[]) =>
+        defaultShipmentContext.setShipmentErrors(errors, dispatch),
+      setShippingMethod: async (shipmentId: string, shippingMethodId: string) =>
+        await setShippingMethod({
+          shippingMethodId,
+          shipmentId,
+          config,
+          getOrder,
+          order
+        })
+    }
+  }, [state])
   return (
     <ShipmentContext.Provider value={contextValue}>
       {children}
