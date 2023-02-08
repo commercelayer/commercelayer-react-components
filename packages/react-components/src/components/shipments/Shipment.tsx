@@ -5,6 +5,7 @@ import getLoaderComponent from '#utils/getLoaderComponent'
 import type { LoaderType } from '#typings'
 import type { ShipmentLineItem } from '#reducers/ShipmentReducer'
 import type { Order } from '@commercelayer/sdk'
+import OrderContext from '#context/OrderContext'
 
 interface ShipmentProps {
   children: ReactNode
@@ -20,6 +21,7 @@ export function Shipment({
   const [loading, setLoading] = useState(true)
   const { shipments, deliveryLeadTimes, setShippingMethod } =
     useContext(ShipmentContext)
+  const { order } = useContext(OrderContext)
   useEffect(() => {
     if (shipments != null) {
       if (autoSelectSingleShippingMethod) {
@@ -56,7 +58,7 @@ export function Shipment({
     return () => {
       setLoading(true)
     }
-  }, [shipments != null, shipments?.length])
+  }, [shipments != null, shipments?.length, order?.gift_card_or_coupon_code])
   const components = shipments?.map((shipment, k) => {
     const shipmentLineItems = shipment.shipment_line_items as ShipmentLineItem[]
     const lineItems = shipmentLineItems?.map((shipmentLineItem) => {
