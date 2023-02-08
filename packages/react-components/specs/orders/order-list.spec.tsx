@@ -877,4 +877,55 @@ describe('Orders list', () => {
       )
     ).toThrow('Only library components are allowed into <OrderList/>')
   })
+  it<OrderListContext>(
+    'Hydratate props',
+    async (ctx) => {
+      render(
+        <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+          <CustomerContainer>
+            <OrderList columns={ctx.columns}>
+              <OrderListRow field='number' data-testid='number'>
+                {(props) => {
+                  return (
+                    <>
+                      <span data-testid='order-number'>
+                        {props.order.number}
+                      </span>
+                      <span data-testid='row-original-number'>
+                        {props.row.original?.number}
+                      </span>
+                    </>
+                  )
+                }}
+              </OrderListRow>
+              <OrderListRow
+                field='status'
+                className='align-top py-5 border-b'
+              />
+              <OrderListRow
+                field='updated_at'
+                className='align-top py-5 border-b'
+              />
+              <OrderListRow
+                field='formatted_total_amount_with_taxes'
+                className='align-top py-5 border-b font-bold'
+              />
+              <OrderListPaginationInfo data-testid='pagination-info' />
+              <OrderListPaginationButtons />
+            </OrderList>
+          </CustomerContainer>
+        </CommerceLayer>
+      )
+      expect(screen.getByText('Loading...'))
+      await waitForElementToBeRemoved(() => screen.queryByText('Loading...'), {
+        timeout: globalTimeout
+      })
+      const [orderNumber] = screen.queryAllByTestId('order-number')
+      const [rowOriginalNumber] = screen.queryAllByTestId('row-original-number')
+      expect(orderNumber).toBeDefined()
+      expect(rowOriginalNumber).toBeDefined()
+      expect(orderNumber?.textContent).toBe(rowOriginalNumber?.textContent)
+    },
+    globalTimeout
+  )
 })
