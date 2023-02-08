@@ -5,11 +5,11 @@ import ParcelLineItem from '#components/parcels/ParcelLineItem'
 import { ParcelLineItemField } from '#components/parcels/ParcelLineItemField'
 import Parcels from '#components/parcels/Parcels'
 import { ParcelsCount } from '#components/parcels/ParcelsCount'
+import { ParcelLineItemsCount } from '#components/parcels/ParcelLineItemsCount'
 import Shipment from '#components/shipments/Shipment'
 import ShipmentField from '#components/shipments/ShipmentField'
 import ShipmentsContainer from '#components/shipments/ShipmentsContainer'
 import ShipmentsCount from '#components/shipments/ShipmentsCount'
-import { ParcelLineItemsCount } from 'packages/react-components/src'
 import {
   render,
   screen,
