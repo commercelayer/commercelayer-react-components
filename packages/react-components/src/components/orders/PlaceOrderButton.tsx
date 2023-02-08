@@ -1,4 +1,11 @@
-import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import {
+  ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  MouseEvent
+} from 'react'
 import Parent from '../utils/Parent'
 import { ChildrenFunction } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
@@ -133,12 +140,19 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       } else if (
         paymentType === 'adyen_payments' &&
         // @ts-expect-error
-        order?.payment_source?.payment_response?.resultCode === 'Authorised'
+        order?.payment_source?.payment_response?.resultCode === 'Authorised' &&
+        // @ts-expect-error
+        ref?.current?.disabled === false
       ) {
         void handleClick()
       }
     }
-  }, [options?.adyen, paymentType, order?.payment_source])
+  }, [
+    options?.adyen,
+    paymentType,
+    // @ts-expect-error
+    order?.payment_source?.payment_response?.resultCode
+  ])
   useEffect(() => {
     if (
       paymentType === 'checkout_com_payments' &&
@@ -155,7 +169,11 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     }
   }, [ref])
 
-  const handleClick = async (): Promise<void> => {
+  const handleClick = async (
+    e?: MouseEvent<HTMLButtonElement>
+  ): Promise<void> => {
+    e?.preventDefault()
+    e?.stopPropagation()
     let isValid = true
     setForceDisable(true)
     const checkPaymentSource = await setPaymentSource({
@@ -214,8 +232,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ref={ref}
       type='button'
       disabled={disabledButton || forceDisable}
-      onClick={() => {
-        void handleClick()
+      onClick={(e) => {
+        void handleClick(e)
       }}
       {...p}
     >
