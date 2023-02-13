@@ -39,6 +39,7 @@ export interface LeadTimes {
 }
 
 export type AvailabilityPayload = {
+  skuCode?: string
   quantity?: number
   errors?: BaseError[]
   parent?: boolean
@@ -76,7 +77,11 @@ export async function getAvailability({
       const [delivery] = level?.delivery_lead_times || []
       dispatch({
         type: 'setAvailability',
-        payload: { ...delivery, quantity: skuInventory.inventory.quantity }
+        payload: {
+          ...delivery,
+          quantity: skuInventory.inventory.quantity,
+          skuCode
+        }
       })
     }
   } catch (error) {

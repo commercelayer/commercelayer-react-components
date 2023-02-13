@@ -186,25 +186,32 @@ describe('AvailabilityContainer component', () => {
     expect(template.textContent).toBe('Out of stock')
   })
   it<SkusContext>('Show twice availability using Skus components', async (ctx) => {
+    const skus = ['BABYONBU000000E63E7412MX', 'BABYONBU000000E63E746MXX']
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
-        <SkusContainer skus={ctx.skus}>
+        <SkusContainer skus={skus}>
           <Skus>
             <SkuField attribute='image_url' tagElement='img' />
             <SkuField attribute='code' tagElement='p' />
             <AvailabilityContainer>
-              <AvailabilityTemplate data-testid='availability-template' />
+              <AvailabilityTemplate />
             </AvailabilityContainer>
           </Skus>
         </SkusContainer>
       </CommerceLayer>
     )
-    for await (const sku of ctx.skus) {
-      await waitFor(() => screen.getByTestId(`price-${sku}`))
-      const price = screen.getByTestId(`price-${sku}`)
-      const compare = screen.queryByTestId(`compare-${sku}`)
-      expect(price.textContent).not.toBe('')
-      expect(compare?.textContent).not.toBe('')
+    for await (const sku of skus) {
+      await waitFor(() => screen.getByTestId(sku))
+      await waitFor(() => screen.getByTestId(`availability-${sku}`))
+      const code = screen.getByTestId(sku)
+      const compare = screen.getByTestId(`availability-${sku}`)
+      expect(code.textContent).not.toBe('')
+      expect(compare.textContent).not.toBe('')
+      if (sku === skus[1]) {
+        expect(compare.textContent).toBe('Out of stock')
+      } else {
+        expect(compare.textContent).toBe('Available')
+      }
     }
   })
 })

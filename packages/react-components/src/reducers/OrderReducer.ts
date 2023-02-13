@@ -73,7 +73,7 @@ export type ResourceIncluded =
   | 'shipments.available_shipping_methods'
   | 'shipments.stock_transfers'
   | 'shipments.stock_transfers.line_item'
-  | 'shipments.shipment_line_items.line_item'
+  | 'shipments.stock_line_items.line_item'
   | 'shipments.shipping_method'
   | 'shipments.stock_location'
   | 'shipments.parcels'

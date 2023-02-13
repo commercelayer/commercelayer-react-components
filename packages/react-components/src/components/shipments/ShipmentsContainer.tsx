@@ -27,7 +27,7 @@ export function ShipmentsContainer(props: Props): JSX.Element {
       addResourceToInclude({
         newResource: [
           'shipments.available_shipping_methods',
-          'shipments.shipment_line_items.line_item',
+          'shipments.stock_line_items.line_item',
           'shipments.shipping_method',
           'shipments.stock_transfers.line_item',
           'shipments.stock_location',
@@ -38,7 +38,7 @@ export function ShipmentsContainer(props: Props): JSX.Element {
       addResourceToInclude({
         newResourceLoaded: {
           'shipments.available_shipping_methods': true,
-          'shipments.shipment_line_items.line_item': true,
+          'shipments.stock_line_items.line_item': true,
           'shipments.shipping_method': true,
           'shipments.stock_transfers.line_item': true,
           'shipments.stock_location': true,
