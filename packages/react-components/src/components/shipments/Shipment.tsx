@@ -60,7 +60,7 @@ export function Shipment({
     }
   }, [shipments != null, shipments?.length, order?.gift_card_or_coupon_code])
   const components = shipments?.map((shipment, k) => {
-    const shipmentLineItems = shipment.shipment_line_items as ShipmentLineItem[]
+    const shipmentLineItems = shipment.stock_line_items as ShipmentLineItem[]
     const lineItems = shipmentLineItems?.map((shipmentLineItem) => {
       const l = shipmentLineItem.line_item
       if (l) l.quantity = shipmentLineItem.quantity

@@ -62,11 +62,11 @@ interface Props<E extends TResources[keyof TResources]> {
 export default function GenericFieldComponent<R extends keyof TResources>(
   props: Props<TResources[R]>
 ): JSX.Element {
-  const { children, tagElement, attribute, context, ...p } = props
+  const { children, tagElement, attribute, context, resource, ...p } = props
   const resourceContext = useContext(context)
   let attributeValue = ''
   const keysContext = Object.keys(resourceContext).filter(
-    (key) => key === p.resource
+    (key) => key === resource
   ) as [keyof ResourceContext[keyof ResourceContext]]
   if (keysContext.length === 1) {
     const [keyResource] = keysContext
@@ -88,6 +88,8 @@ export default function GenericFieldComponent<R extends keyof TResources>(
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <Tag {...p}>{attributeValue}</Tag>
+    <Tag key={attributeValue} data-testid={attributeValue} {...p}>
+      {attributeValue}
+    </Tag>
   )
 }

@@ -54,7 +54,8 @@ export function AvailabilityTemplate(props: Props): JSX.Element {
     min,
     max,
     shipping_method: shippingMethod,
-    quantity
+    quantity,
+    skuCode
   } = useCustomContext({
     context: AvailabilityContext,
     contextComponentName: 'AvailabilityContainer',
@@ -91,7 +92,9 @@ export function AvailabilityTemplate(props: Props): JSX.Element {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <span {...p}>{text.join(' ')}</span>
+    <span data-testid={skuCode ? `availability-${skuCode}` : ''} {...p}>
+      {text.join(' ')}
+    </span>
   )
 }
 

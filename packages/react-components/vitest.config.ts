@@ -8,9 +8,11 @@ export default defineConfig({
     environment: 'jsdom',
     coverage: {
       provider: 'c8',
-      reporter: ['text', 'json', 'html']
+      reporter: ['text', 'json', 'html'],
+      exclude: ['mocks', 'specs']
     },
-    setupFiles: ['./mocks/setup.ts']
+    setupFiles: ['./mocks/setup.ts'],
+    exclude: ['**/e2e/**', '**/node_modules/**']
   },
   plugins: [tsconfigPaths(), react()]
 })

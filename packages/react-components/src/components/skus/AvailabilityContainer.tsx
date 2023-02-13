@@ -1,4 +1,4 @@
-import { useContext, useReducer, useEffect, ReactNode } from 'react'
+import { useContext, useReducer, useEffect, ReactNode, useMemo } from 'react'
 import availabilityReducer, {
   availabilityInitialState,
   getAvailability
@@ -51,9 +51,11 @@ export function AvailabilityContainer({
     if (getQuantity != null && state?.quantity != null)
       getQuantity(state?.quantity)
   }, [state.quantity])
-
+  const memoized = useMemo(() => {
+    return { ...state, parent: true }
+  }, [state])
   return (
-    <AvailabilityContext.Provider value={{ ...state, parent: true }}>
+    <AvailabilityContext.Provider value={memoized}>
       {children}
     </AvailabilityContext.Provider>
   )
