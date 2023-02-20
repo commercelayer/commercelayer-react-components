@@ -357,6 +357,7 @@ export interface LineItemOption {
 export interface CustomLineItem {
   name?: string
   imageUrl?: string | null
+  metadata?: Record<string, string>
 }
 
 export type AddToCartParams = Partial<{
@@ -401,6 +402,7 @@ export async function addToCart(
         const order = sdk.orders.relationship(id)
         const name = lineItem?.name
         const imageUrl = lineItem?.imageUrl as string
+        const metadata = lineItem?.metadata
         if (buyNowMode) {
           if (!state?.order?.line_items) {
             const { line_items: lineItems } = await sdk.orders.retrieve(id, {
@@ -429,7 +431,8 @@ export async function addToCart(
           image_url: imageUrl,
           quantity: quantity ?? 1,
           _update_quantity: true,
-          bundle_code: bundleCode
+          bundle_code: bundleCode,
+          metadata
         }
         const newLineItem = await sdk.line_items.create(attrs)
         if (lineItemOption != null) {
