@@ -71,5 +71,10 @@ export const handlers = [
     const originalResponse = await ctx.fetch(req)
     const originalResData = await originalResponse.json()
     return await res(ctx.status(200), ctx.json(originalResData))
+  }),
+  rest.get(`${baseUrl}/customer_payment_sources*`, async (req, res, ctx) => {
+    const originalResponse = await ctx.fetch(req)
+    const originalResData = await originalResponse.json()
+    return await res(ctx.status(200), ctx.json(originalResData))
   })
 ]
