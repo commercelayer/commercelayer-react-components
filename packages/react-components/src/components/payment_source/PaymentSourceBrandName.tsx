@@ -1,8 +1,9 @@
 import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
-import { capitalize } from 'lodash'
+import capitalize from 'lodash/capitalize'
 import { useContext } from 'react'
 import Parent from '#components/utils/Parent'
 import { ChildrenFunction } from '#typings'
+import CustomerPaymentSourceContext from '#context/CustomerPaymentSourceContext'
 
 interface CustomComponent extends Omit<Props, 'children'> {
   brand: IconBrand
@@ -19,7 +20,9 @@ export function PaymentSourceBrandName({
   ...props
 }: Props): JSX.Element {
   const { brand } = useContext(PaymentSourceContext)
-  const brandName = brand && capitalize(brand.replaceAll(/_|-/gm, ' '))
+  const { brand: customerCardBrand } = useContext(CustomerPaymentSourceContext)
+  const cardBrand = brand ?? customerCardBrand
+  const brandName = cardBrand && capitalize(cardBrand.replaceAll(/_|-/gm, ' '))
   const parentProps = {
     brand: brandName,
     label,

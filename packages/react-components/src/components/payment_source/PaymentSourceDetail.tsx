@@ -1,8 +1,8 @@
 import PaymentSourceContext from '#context/PaymentSourceContext'
-import { has } from 'lodash'
 import { useContext } from 'react'
 import Parent from '#components/utils/Parent'
-import { ChildrenFunction } from '#typings'
+import type { ChildrenFunction } from '#typings'
+import CustomerPaymentSourceContext from '#context/CustomerPaymentSourceContext'
 
 export type PaymentSourceDetailType = 'last4' | 'exp_year' | 'exp_month'
 
@@ -12,6 +12,9 @@ interface ChildrenProps extends Omit<Props, 'children'> {
 
 interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
   children?: ChildrenFunction<ChildrenProps>
+  /**
+   * Type of detail to display
+   */
   type: PaymentSourceDetailType
 }
 export function PaymentSourceDetail({
@@ -20,7 +23,10 @@ export function PaymentSourceDetail({
   ...p
 }: Props): JSX.Element {
   const card = useContext(PaymentSourceContext)
-  const text = has(card, type) ? card[type] : type === 'last4' ? '****' : '**'
+  const customerCard = useContext(CustomerPaymentSourceContext)
+  const cardObj = card ?? customerCard
+  const text =
+    type in cardObj ? cardObj[type] : type === 'last4' ? '****' : '**'
   const parentProps = {
     type,
     text,

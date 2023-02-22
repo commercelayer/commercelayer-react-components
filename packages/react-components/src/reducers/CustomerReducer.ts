@@ -25,7 +25,7 @@ export type CustomerActionType =
 
 export interface CustomerActionPayload {
   addresses: Address[] | null
-  payments: CustomerPaymentSource[]
+  payments: CustomerPaymentSource[] | null
   customerEmail: string
   errors: BaseError[]
   orders: Order[]
@@ -226,7 +226,7 @@ export function getCustomerPaymentSources(
   }
 }
 
-export type GetCustomerOrders = (params: {
+interface GetCustomerOrdersProps {
   /**
    * The Commerce Layer config
    */
@@ -235,12 +235,12 @@ export type GetCustomerOrders = (params: {
    * The Customer dispatch function
    */
   dispatch: Dispatch<CustomerAction>
-}) => Promise<void>
+}
 
-export const getCustomerOrders: GetCustomerOrders = async ({
+export async function getCustomerOrders({
   config,
   dispatch
-}) => {
+}: GetCustomerOrdersProps): Promise<void> {
   if (config.accessToken) {
     const { owner } = jwtDecode(config.accessToken)
     if (owner?.id) {
@@ -328,10 +328,30 @@ export async function createCustomerAddress({
   }
 }
 
+interface GetCustomerPaymentsParams extends GetCustomerOrdersProps {}
+
+export async function getCustomerPayments({
+  config,
+  dispatch
+}: GetCustomerPaymentsParams): Promise<void> {
+  if (config != null && dispatch != null) {
+    const sdk = getSdk(config)
+    const payments = await sdk.customer_payment_sources.list({
+      include: ['payment_source']
+    })
+    dispatch({
+      type: 'setPayments',
+      payload: {
+        payments
+      }
+    })
+  }
+}
+
 export const customerInitialState: CustomerState = {
   errors: [],
   addresses: null,
-  payments: []
+  payments: null
 }
 
 const type: CustomerActionType[] = [

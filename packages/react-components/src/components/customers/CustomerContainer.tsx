@@ -1,4 +1,4 @@
-import { ReactNode, useContext, useEffect, useReducer } from 'react'
+import { useContext, useEffect, useReducer, useMemo } from 'react'
 import customerReducer, {
   customerInitialState,
   getCustomerAddresses,
@@ -9,15 +9,17 @@ import customerReducer, {
   deleteCustomerAddress,
   createCustomerAddress,
   TCustomerAddress,
-  saveCustomerUser
+  saveCustomerUser,
+  getCustomerPayments
 } from '#reducers/CustomerReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import CustomerContext from '#context/CustomerContext'
-import { BaseError } from '#typings/errors'
+import type { BaseError } from '#typings/errors'
+import type { DefaultChildrenType } from '#typings/globals'
 
 interface Props {
-  children: ReactNode
+  children: DefaultChildrenType
   /**
    * Customer type
    */
@@ -48,7 +50,7 @@ export function CustomerContainer(props: Props): JSX.Element {
         }
       })
     }
-  }, [include, includeLoaded])
+  }, [include?.length, Object.keys(includeLoaded ?? {}).length])
 
   useEffect(() => {
     if (config.accessToken && state.addresses == null && !isGuest) {
@@ -57,42 +59,50 @@ export function CustomerContainer(props: Props): JSX.Element {
     if (order?.available_customer_payment_sources && !isGuest) {
       getCustomerPaymentSources({ dispatch, order })
     }
-    if (config.accessToken && !order && !include && !includeLoaded) {
+    if (
+      config.accessToken &&
+      order == null &&
+      include == null &&
+      includeLoaded == null
+    ) {
       void getCustomerOrders({ config, dispatch })
+      void getCustomerPayments({ config, dispatch })
     }
   }, [config.accessToken, order, isGuest])
-  const contextValue = {
-    isGuest,
-    ...state,
-    saveCustomerUser: async (customerEmail: string) => {
-      await saveCustomerUser({
-        config,
-        customerEmail,
-        dispatch,
-        updateOrder,
-        order
-      })
-    },
-    setCustomerErrors: (errors: BaseError[]) =>
-      setCustomerErrors(errors, dispatch),
-    setCustomerEmail: (customerEmail: string) =>
-      setCustomerEmail(customerEmail, dispatch),
-    getCustomerPaymentSources: () =>
-      getCustomerPaymentSources({ dispatch, order }),
-    deleteCustomerAddress: async ({
-      customerAddressId
-    }: {
-      customerAddressId: string
-    }) =>
-      await deleteCustomerAddress({
-        customerAddressId,
-        dispatch,
-        config,
-        addresses: state.addresses
-      }),
-    createCustomerAddress: async (address: TCustomerAddress) =>
-      await createCustomerAddress({ address, config, dispatch, state })
-  }
+  const contextValue = useMemo(() => {
+    return {
+      isGuest,
+      ...state,
+      saveCustomerUser: async (customerEmail: string) => {
+        await saveCustomerUser({
+          config,
+          customerEmail,
+          dispatch,
+          updateOrder,
+          order
+        })
+      },
+      setCustomerErrors: (errors: BaseError[]) =>
+        setCustomerErrors(errors, dispatch),
+      setCustomerEmail: (customerEmail: string) =>
+        setCustomerEmail(customerEmail, dispatch),
+      getCustomerPaymentSources: () =>
+        getCustomerPaymentSources({ dispatch, order }),
+      deleteCustomerAddress: async ({
+        customerAddressId
+      }: {
+        customerAddressId: string
+      }) =>
+        await deleteCustomerAddress({
+          customerAddressId,
+          dispatch,
+          config,
+          addresses: state.addresses
+        }),
+      createCustomerAddress: async (address: TCustomerAddress) =>
+        await createCustomerAddress({ address, config, dispatch, state })
+    }
+  }, [state, isGuest])
   return (
     <CustomerContext.Provider value={contextValue}>
       {children}

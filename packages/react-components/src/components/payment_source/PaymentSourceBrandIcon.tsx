@@ -2,6 +2,7 @@ import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
 import { useContext, useRef } from 'react'
 import Parent from '#components/utils/Parent'
 import { ChildrenFunction } from '#typings'
+import CustomerPaymentSourceContext from '#context/CustomerPaymentSourceContext'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   brand: IconBrand
@@ -21,19 +22,21 @@ export function PaymentSourceBrandIcon({
   ...p
 }: Props): JSX.Element {
   const { brand } = useContext(PaymentSourceContext)
+  const { brand: customerCardBrand } = useContext(CustomerPaymentSourceContext)
+  const cardBrand = brand ?? customerCardBrand
   const ref = useRef<HTMLImageElement>(null)
   const defaultSrc =
     '//data.commercelayer.app/assets/images/icons/credit-cards/color/credit-card.svg'
   const url =
     src ||
     `//data.commercelayer.app/assets/images/icons/credit-cards/color/${
-      brand ?? 'credit-card'
+      cardBrand ?? 'credit-card'
     }.svg`
   const handleError = (): void => {
     if (ref.current) ref.current.src = defaultSrc
   }
   const parentProps = {
-    brand,
+    brand: cardBrand,
     defaultSrc,
     url,
     width,

@@ -11,7 +11,7 @@ export type IconBrand =
   | 'cirrus'
   | 'paypal'
 
-type DefaultContext = {
+interface DefaultContext {
   brand?: IconBrand | string
   exp_month?: number | string
   exp_year?: number | string
