@@ -2,10 +2,10 @@ import {
   SetCustomerErrors,
   deleteCustomerAddress,
   CustomerState,
-  GetCustomerAddresses,
   getCustomerPaymentSources,
   setCustomerEmail,
-  TCustomerAddress
+  TCustomerAddress,
+  getCustomerAddresses
 } from '#reducers/CustomerReducer'
 import { createContext } from 'react'
 
@@ -15,8 +15,8 @@ export type InitialCustomerContext = Partial<
     setCustomerErrors: SetCustomerErrors
     setCustomerEmail: typeof setCustomerEmail
     getCustomerPaymentSources: typeof getCustomerPaymentSources
-    deleteCustomerAddress: typeof deleteCustomerAddress | undefined
-    getCustomerAddresses: GetCustomerAddresses
+    deleteCustomerAddress: typeof deleteCustomerAddress
+    getCustomerAddresses: typeof getCustomerAddresses
     createCustomerAddress: (address: TCustomerAddress) => Promise<void>
   } & CustomerState
 >
