@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@commercelayer/eslint-config-ts-react": "^0.1.4",
-    "lerna": "^6.4.1",
+    "lerna": "^6.5.1",
     "typescript": "^4.9.5"
   }
 }
