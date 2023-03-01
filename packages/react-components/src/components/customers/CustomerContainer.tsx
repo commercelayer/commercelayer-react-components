@@ -63,7 +63,8 @@ export function CustomerContainer(props: Props): JSX.Element {
       config.accessToken &&
       order == null &&
       include == null &&
-      includeLoaded == null
+      includeLoaded == null &&
+      !isGuest
     ) {
       void getCustomerOrders({ config, dispatch })
       void getCustomerPayments({ config, dispatch })
