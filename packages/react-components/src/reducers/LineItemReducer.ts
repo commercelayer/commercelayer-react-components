@@ -79,7 +79,10 @@ export const getLineItems: GetLineItems = (params) => {
         })
       })
       .catch((error) => {
-        const errors = getErrors(error, 'line_items')
+        const errors = getErrors({
+          error,
+          resource: 'line_items'
+        })
         dispatch({
           type: 'setErrors',
           payload: {
@@ -101,14 +104,22 @@ export const updateLineItem: UpdateLineItem = async (params) => {
         errors: []
       }
     })
-  } catch (error) {
-    const errors = getErrors(error, 'line_items')
-    dispatch({
-      type: 'setErrors',
-      payload: {
-        errors
-      }
-    })
+  } catch (error: any) {
+    throw new Error(error)
+    // console.log('Update line items error', error)
+    // const errors = getErrors({
+    //   error,
+    //   resource: 'line_items',
+    //   attributes: {
+    //     id: lineItemId
+    //   }
+    // })
+    // dispatch({
+    //   type: 'setErrors',
+    //   payload: {
+    //     errors
+    //   }
+    // })
   }
 }
 
@@ -124,8 +135,11 @@ export const deleteLineItem: DeleteLineItem = async (params) => {
         errors: []
       }
     })
-  } catch (error) {
-    const errors = getErrors(error, 'line_items')
+  } catch (error: any) {
+    const errors = getErrors({
+      error,
+      resource: 'line_items'
+    })
     dispatch({
       type: 'setErrors',
       payload: {

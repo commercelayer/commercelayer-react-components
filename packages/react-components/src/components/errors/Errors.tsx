@@ -32,7 +32,8 @@ type ErrorChildrenComponentProps = ChildrenFunction<
   Omit<TErrorComponent, 'children'> & { errors: string[] }
 >
 
-export interface TErrorComponent extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+export interface TErrorComponent
+  extends Omit<JSX.IntrinsicElements['span'], 'children'> {
   /**
    * Resource which get the error
    */
@@ -53,7 +54,6 @@ export interface TErrorComponent extends Omit<JSX.IntrinsicElements['span'], 'ch
     id?: string
   }>
 }
-
 
 type Props = TErrorComponent
 

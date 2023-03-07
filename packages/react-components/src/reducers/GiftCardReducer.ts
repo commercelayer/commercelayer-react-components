@@ -177,8 +177,8 @@ export async function addGiftCard<V extends GiftCardI>(
       }
     })
     addGiftCardLoading(false, dispatch)
-  } catch (error) {
-    const errors = getErrors(error, 'gift_cards')
+  } catch (error: any) {
+    const errors = getErrors({ error, resource: 'gift_cards' })
     dispatch({
       type: 'setGiftCardErrors',
       payload: {

@@ -1,4 +1,4 @@
-import { TResourceError } from "#components/errors/Errors"
+import { TResourceError } from '#components/errors/Errors'
 
 export type CodeErrorType =
   | 'EMPTY_ERROR'
@@ -46,4 +46,8 @@ export interface BaseError {
   id?: string
   title?: string
   detail?: string
+}
+
+export interface TAPIError {
+  errors: BaseError[]
 }

@@ -278,7 +278,7 @@ export function OrderList({
           row && table.prepareRow(row)
           const childProps = {
             orders,
-            order: row.original,
+            order: row?.original,
             row,
             showActions,
             actionsComponent,
