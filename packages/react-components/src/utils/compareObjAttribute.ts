@@ -1,22 +1,22 @@
 type Item = Record<string, any>
 
-type TArgs<A, B> = {
+interface TArgs<A, B> {
   attributes: A
   object: B
 }
 
-function sortObj<T extends Item>(obj: T) {
+function sortObj<T extends Item>(obj: T): Item {
   return Object.keys(obj)
     .sort()
-    .reduce((result, key) => {
+    .reduce<Item>((result, key) => {
       result[key] = obj[key]
       return result
-    }, {} as Item)
+    }, {})
 }
 
 export default function compareObjAttribute<A extends Item, B extends Item>({
   attributes,
-  object,
+  object
 }: TArgs<A, B>): Item {
   const returnObj: Item = {}
   Object.keys(object).forEach((v) => {

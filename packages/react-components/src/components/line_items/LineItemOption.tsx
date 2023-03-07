@@ -43,7 +43,7 @@ export function LineItemOption(props: Props): JSX.Element {
   const TagContainer = tagContainer
   const components =
     showAll && isJSON(JSON.stringify(lineItemOption?.options)) ? (
-      map(lineItemOption?.options, (value, key) => {
+      map(lineItemOption?.options, (value: string, key) => {
         return (
           <TagElement key={key} {...p}>
             {`${key}:`}
@@ -51,7 +51,7 @@ export function LineItemOption(props: Props): JSX.Element {
           </TagElement>
         )
       })
-    ) : has(lineItemOption, `options.${name}`) ? (
+    ) : name != null && has(lineItemOption, `options.${name}`) ? (
       <TagElement key={key} {...p}>
         {`${name}:`}
         <span className={valueClassName} {...p}>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import isEmpty from 'lodash/isEmpty'
 import { fieldsExist } from '#utils/validateFormFields'
 import { BaseError } from '#typings/errors'

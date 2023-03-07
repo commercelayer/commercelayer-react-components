@@ -1,7 +1,8 @@
 import { OrderCodeType } from '#reducers/OrderReducer'
 import { createContext } from 'react'
 
-type DefaultContext = {
+interface DefaultContext {
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   validation?: void
   setValue?: (name: string, value: string) => void
   codeType?: OrderCodeType

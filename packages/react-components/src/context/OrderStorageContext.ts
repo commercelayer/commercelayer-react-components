@@ -2,7 +2,7 @@ import { createContext } from 'react'
 import {
   getLocalOrder,
   setLocalOrder,
-  deleteLocalOrder,
+  deleteLocalOrder
 } from '#utils/localStorage'
 
 export interface OrderStorageConfig {
@@ -18,7 +18,7 @@ const initial: OrderStorageConfig = {
   clearWhenPlaced: true,
   getLocalOrder,
   setLocalOrder,
-  deleteLocalOrder,
+  deleteLocalOrder
 }
 
 const OrderStorageContext = createContext<OrderStorageConfig>(initial)

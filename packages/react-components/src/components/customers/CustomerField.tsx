@@ -2,7 +2,7 @@ import { ConditionalElement } from '#typings'
 import GenericFieldComponent, {
   TGenericChildrenProps,
   TResourceKey,
-  TResources,
+  TResources
 } from '#components/utils/GenericFieldComponent'
 import CustomerContext from '#context/CustomerContext'
 
@@ -18,11 +18,11 @@ type Props = {
   children?: (props: StockTransferFieldChildrenProps) => JSX.Element
 } & TCondition
 
-export function CustomerField<P extends Props>(props: P) {
+export function CustomerField<P extends Props>(props: P): JSX.Element {
   const { attribute, tagElement, children, ...p } = props
   return (
     <GenericFieldComponent<TResourceKey['Customer']>
-      resource="customers"
+      resource='customers'
       attribute={attribute}
       tagElement={tagElement}
       context={CustomerContext}

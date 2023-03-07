@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { FormEvent, useContext, useEffect, useRef, useState } from 'react'
 import {
   HostedFieldFieldOptions,
@@ -106,7 +107,7 @@ export function BraintreePayment({
   authorization,
   config,
   templateCustomerSaveToWallet
-}: Props) {
+}: Props): JSX.Element | null {
   const {
     fields,
     styles,
@@ -133,7 +134,7 @@ export function BraintreePayment({
     event,
     hostedFieldsInstance,
     threeDSInstance
-  }: SubmitProps) => {
+  }: SubmitProps): Promise<boolean> => {
     const savePaymentSourceToCustomerWallet =
       // @ts-expect-error
       event?.elements?.save_payment_source_to_customer_wallet?.checked
@@ -148,7 +149,9 @@ export function BraintreePayment({
           (payload) => payload
         )
         const billingAddress = order?.billing_address
-        const verifyCardOptions = {
+        const verifyCardOptions: ThreeDSecureVerifyOptions & {
+          onLookupComplete: unknown
+        } = {
           nonce: payload.nonce,
           bin: payload.details.bin,
           amount: order?.total_amount_with_taxes_float as number,
@@ -166,7 +169,7 @@ export function BraintreePayment({
           onLookupComplete: (_data: any, next: any) => {
             next()
           }
-        } as ThreeDSecureVerifyOptions
+        }
         const response = (await threeDSInstance.verifyCard(
           verifyCardOptions
         )) as any

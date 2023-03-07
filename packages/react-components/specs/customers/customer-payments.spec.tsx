@@ -6,6 +6,7 @@ import PaymentSourceBrandIcon from '#components/payment_source/PaymentSourceBran
 import PaymentSourceBrandName from '#components/payment_source/PaymentSourceBrandName'
 import PaymentSourceDetail from '#components/payment_source/PaymentSourceDetail'
 import {
+  logDOM,
   render,
   screen,
   waitForElementToBeRemoved
@@ -81,6 +82,7 @@ describe('Customer payments', () => {
     for (const last4 of last4Numbers) {
       expect(last4).toBeDefined()
       expect(last4?.textContent).not.toBe('')
+      expect(last4?.textContent).toMatch(/[0-9]{4}|[*]{4}/gm)
     }
     for (const expMonth of expMonthNumbers) {
       expect(expMonth).toBeDefined()

@@ -12,7 +12,6 @@ export type TLineItem =
   | 'bundles'
   | 'adjustments'
 
-
 interface Props {
   children: JSX.Element | JSX.Element[]
   type?: TLineItem

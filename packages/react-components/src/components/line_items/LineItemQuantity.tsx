@@ -31,7 +31,7 @@ export function LineItemQuantity(props: Props): JSX.Element {
   }
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const quantity = Number(e.target.value)
-    updateLineItem && lineItem && updateLineItem(lineItem.id, quantity)
+    if (updateLineItem && lineItem) void updateLineItem(lineItem.id, quantity)
   }
   const quantity = lineItem?.quantity
   const parentProps = {

@@ -1,15 +1,15 @@
 import { ResourceIncluded } from '#reducers/OrderReducer'
 import type { Order } from '@commercelayer/sdk'
 
-type Params = {
+interface Params {
   order: Order
   resourceInclude: ResourceIncluded[]
 }
 
 export default function checkIncludeResources({
   order,
-  resourceInclude,
-}: Params) {
+  resourceInclude
+}: Params): boolean {
   const checkKeys: boolean[] = []
   resourceInclude.forEach((v) => {
     const isMultiKey = v.includes('.')

@@ -27,7 +27,8 @@ export function LineItemRemoveLink(props: Props): JSX.Element {
   const { deleteLineItem } = useContext(LineItemContext)
   const handleRemove = (e: React.MouseEvent<HTMLAnchorElement>): void => {
     e.preventDefault()
-    if (deleteLineItem != null && lineItem != null) deleteLineItem(lineItem.id)
+    if (deleteLineItem != null && lineItem != null)
+      void deleteLineItem(lineItem.id)
     if (onClick != null) onClick(e)
   }
   const parentProps = {

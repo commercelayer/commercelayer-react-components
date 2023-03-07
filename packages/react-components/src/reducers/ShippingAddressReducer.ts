@@ -1,11 +1,10 @@
 import baseReducer from '#utils/baseReducer'
 import { Dispatch } from 'react'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { Order } from '@commercelayer/sdk'
+import type { Order, AddressUpdate } from '@commercelayer/sdk'
 import { getOrderContext } from '#reducers/OrderReducer'
 import { AddressResource } from './AddressReducer'
 import getSdk from '#utils/getSdk'
-import { AddressUpdate } from '@commercelayer/sdk'
 
 export type ShippingAddressActionType =
   | 'setShippingAddress'
@@ -25,7 +24,7 @@ export interface ShippingAddressAction {
 }
 
 export const shippingAddressInitialState: ShippingAddressState = {
-  _shipping_address_clone_id: '',
+  _shipping_address_clone_id: ''
 }
 
 export type SetShippingAddress = (
@@ -46,15 +45,15 @@ export const setShippingAddress: SetShippingAddress = async (id, options) => {
         const sdk = getSdk(options.config)
         const attributes: AddressUpdate = {
           id,
-          reference: options.customerAddressId,
+          reference: options.customerAddressId
         }
         await sdk.addresses.update(attributes)
       }
       options.dispatch({
         type: 'setShippingAddress',
         payload: {
-          _shipping_address_clone_id: id,
-        },
+          _shipping_address_clone_id: id
+        }
       })
     }
   } catch (error) {
@@ -62,32 +61,35 @@ export const setShippingAddress: SetShippingAddress = async (id, options) => {
   }
 }
 
-type SetShippingCustomerAddressId = (args: {
+interface SetShippingCustomerAddressIdParams {
   dispatch: Dispatch<ShippingAddressAction>
   order: Order
   setCloneAddress: (id: string, resource: AddressResource) => void
-}) => void
+}
 
-export const setShippingCustomerAddressId: SetShippingCustomerAddressId =
-  async ({ dispatch, order, setCloneAddress }) => {
-    const customerAddressId = order?.shipping_address?.reference
-    try {
-      if (customerAddressId) {
-        dispatch({
-          type: 'setShippingCustomerAddressId',
-          payload: { shippingCustomerAddressId: customerAddressId },
-        })
-        setCloneAddress(customerAddressId, 'shipping_address')
-      }
-    } catch (error) {
-      console.error('error', error)
+export function setShippingCustomerAddressId({
+  dispatch,
+  order,
+  setCloneAddress
+}: SetShippingCustomerAddressIdParams): void {
+  const customerAddressId = order?.shipping_address?.reference
+  try {
+    if (customerAddressId) {
+      dispatch({
+        type: 'setShippingCustomerAddressId',
+        payload: { shippingCustomerAddressId: customerAddressId }
+      })
+      setCloneAddress(customerAddressId, 'shipping_address')
     }
+  } catch (error) {
+    console.error('error', error)
   }
+}
 
 const type: ShippingAddressActionType[] = [
   'setShippingAddress',
   'setShippingCustomerAddressId',
-  'cleanup',
+  'cleanup'
 ]
 
 const shippingAddressReducer = (

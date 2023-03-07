@@ -13,7 +13,7 @@ export type SkuListsState = Partial<{
 }>
 
 export const skuListsInitialState: SkuListsState = {
-  listIds: [],
+  listIds: []
 }
 
 export interface SkuListsAction {
@@ -32,19 +32,20 @@ export const getSkuList: GetSkuList = async ({ listIds, config, dispatch }) => {
   const skuLists: Record<string, any> = {}
   try {
     const sdk = getSdk(config)
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     listIds.forEach(async (id) => {
       const skuList = await sdk.sku_lists.retrieve(id, {
         include: ['skus'],
-        fields: { skus: ['code'] },
+        fields: { skus: ['code'] }
       })
       const skuCodes = skuList.skus
       skuLists[id] = skuCodes
     })
     dispatch({
       payload: {
-        skuLists,
+        skuLists
       },
-      type: 'getSkuList',
+      type: 'getSkuList'
     })
   } catch (error: any) {
     console.error(error)

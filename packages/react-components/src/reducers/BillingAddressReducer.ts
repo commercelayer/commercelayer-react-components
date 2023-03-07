@@ -23,7 +23,7 @@ export interface BillingAddressAction {
 }
 
 export const billingAddressInitialState: BillingAddressState = {
-  _billing_address_clone_id: '',
+  _billing_address_clone_id: ''
 }
 
 export type SetBillingAddress = (
@@ -44,15 +44,15 @@ export const setBillingAddress: SetBillingAddress = async (id, options) => {
         const sdk = getSdk(options.config)
         const attributes: AddressUpdate = {
           id,
-          reference: options.customerAddressId,
+          reference: options.customerAddressId
         }
         await sdk.addresses.update(attributes)
       }
       options.dispatch({
         type: 'setBillingAddress',
         payload: {
-          _billing_address_clone_id: id,
-        },
+          _billing_address_clone_id: id
+        }
       })
     }
   } catch (error) {
@@ -60,23 +60,23 @@ export const setBillingAddress: SetBillingAddress = async (id, options) => {
   }
 }
 
-type SetBillingCustomerAddressId = (args: {
+interface SetBillingCustomerAddressIdParams {
   dispatch: Dispatch<BillingAddressAction>
   order: Order
   setCloneAddress: (id: string, resource: AddressResource) => void
-}) => void
+}
 
-export const setBillingCustomerAddressId: SetBillingCustomerAddressId = async ({
+export function setBillingCustomerAddressId({
   dispatch,
   order,
-  setCloneAddress,
-}) => {
+  setCloneAddress
+}: SetBillingCustomerAddressIdParams): void {
   const customerAddressId = order?.billing_address?.reference
   try {
     if (customerAddressId) {
       dispatch({
         type: 'setBillingCustomerAddressId',
-        payload: { billingCustomerAddressId: customerAddressId },
+        payload: { billingCustomerAddressId: customerAddressId }
       })
       setCloneAddress(customerAddressId, 'billing_address')
     }
@@ -88,7 +88,7 @@ export const setBillingCustomerAddressId: SetBillingCustomerAddressId = async ({
 const type: BillingAddressActionType[] = [
   'setBillingAddress',
   'setBillingCustomerAddressId',
-  'cleanup',
+  'cleanup'
 ]
 
 const billingAddressReducer = (

@@ -2,7 +2,7 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import isFunction from 'lodash/isFunction'
 import { ReactNode, useContext, useEffect, useRef } from 'react'
 
-export type PaypalConfig = {
+export interface PaypalConfig {
   return_url: string
   cancel_url: string
   infoMessage?: {
@@ -16,30 +16,33 @@ const defaultMessage =
 
 type Props = Omit<PaypalConfig, 'return_url' | 'cancel_url'> &
   JSX.IntrinsicElements['div']
-export function PaypalPayment({ infoMessage, ...p }: Props) {
+export function PaypalPayment({
+  infoMessage,
+  ...p
+}: Props): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
   const {
     setPaymentSource,
     paymentSource,
     currentPaymentMethodType,
-    setPaymentRef,
+    setPaymentRef
   } = useContext(PaymentMethodContext)
   useEffect(() => {
     if (
       ref.current &&
       paymentSource &&
       currentPaymentMethodType &&
-      // @ts-ignore
+      // @ts-expect-error
       paymentSource?.approval_url
     ) {
-      ref.current.onsubmit = () => handleClick()
+      ref.current.onsubmit = async () => await handleClick()
       setPaymentRef({ ref })
     }
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
   }, [ref, paymentSource, currentPaymentMethodType])
-  const handleClick = async () => {
+  const handleClick = async (): Promise<boolean> => {
     if (paymentSource && currentPaymentMethodType) {
       try {
         await setPaymentSource({
@@ -50,10 +53,10 @@ export function PaypalPayment({ infoMessage, ...p }: Props) {
               card: {
                 id: paymentSource.id,
                 brand: 'paypal',
-                last4: '',
-              },
-            },
-          },
+                last4: ''
+              }
+            }
+          }
         })
         return true
       } catch (e) {

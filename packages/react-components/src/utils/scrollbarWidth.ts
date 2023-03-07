@@ -1,4 +1,4 @@
-export default function scrollbarWidth() {
+export default function scrollbarWidth(): number {
   if (typeof document === 'undefined') return 0
   const scrollDiv = document.createElement('div')
   scrollDiv.setAttribute(

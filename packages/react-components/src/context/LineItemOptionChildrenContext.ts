@@ -7,7 +7,7 @@ export interface InitialLineItemContext {
 }
 
 const initial: InitialLineItemContext = {
-  lineItemOption: {},
+  lineItemOption: {}
 }
 
 const LineItemOptionChildrenContext =

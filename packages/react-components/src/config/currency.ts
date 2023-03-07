@@ -186,5 +186,5 @@ export default [
   { value: 'ZWD', label: 'ZWD' },
   { value: 'ZWL', label: 'ZWL' },
   { value: 'ZWN', label: 'ZWN' },
-  { value: 'ZWR', label: 'ZWR' },
+  { value: 'ZWR', label: 'ZWR' }
 ]
