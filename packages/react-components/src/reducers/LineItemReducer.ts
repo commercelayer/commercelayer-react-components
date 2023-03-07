@@ -105,21 +105,19 @@ export const updateLineItem: UpdateLineItem = async (params) => {
       }
     })
   } catch (error: any) {
-    throw new Error(error)
-    // console.log('Update line items error', error)
-    // const errors = getErrors({
-    //   error,
-    //   resource: 'line_items',
-    //   attributes: {
-    //     id: lineItemId
-    //   }
-    // })
-    // dispatch({
-    //   type: 'setErrors',
-    //   payload: {
-    //     errors
-    //   }
-    // })
+    const errors = getErrors({
+      error,
+      resource: 'line_items',
+      attributes: {
+        id: lineItemId
+      }
+    })
+    dispatch({
+      type: 'setErrors',
+      payload: {
+        errors
+      }
+    })
   }
 }
 
