@@ -193,6 +193,7 @@ export async function setPlaceOrder({
               field: 'checkout_com_payments'
             }
           ]
+          // eslint-disable-next-line @typescript-eslint/no-throw-literal
           throw { errors }
         }
       }

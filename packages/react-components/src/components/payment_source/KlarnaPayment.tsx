@@ -7,7 +7,7 @@ import useExternalScript from '#utils/hooks/useExternalScript'
 import { LineItem } from '@commercelayer/sdk'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 
-type KlarnaResponse = {
+interface KlarnaResponse {
   show_form: boolean
   approved: boolean
   authorization_token?: string
@@ -24,15 +24,15 @@ type KlarnaPaymentProps = PaymentMethodConfig['klarnaPayment'] &
 
 function typeOfLine(lineItemType: string): OrderLine['type'] {
   switch (lineItemType) {
-    case 'payment_methods':
-    default:
-      return null
     case 'percentage_discount_promotions':
       return 'discount'
     case 'shipments':
       return 'shipping_fee'
     case 'skus':
       return 'physical'
+    case 'payment_methods':
+    default:
+      return null
   }
 }
 
@@ -53,7 +53,7 @@ function klarnaOrderLines(lineItems?: LineItem[]): OrderLine[] {
           quantity: item.quantity,
           total_amount: item.total_amount_cents,
           unit_price: item.unit_amount_cents,
-          type,
+          type
         }
       })
     : []
@@ -64,14 +64,14 @@ export default function KlarnaPayment({
   placeOrderCallback,
   locale = 'EN',
   ...p
-}: KlarnaPaymentProps) {
+}: KlarnaPaymentProps): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
   const {
     paymentSource,
     currentPaymentMethodType,
     setPaymentRef,
     setPaymentSource,
-    setPaymentMethodErrors,
+    setPaymentMethodErrors
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const { setPlaceOrder } = useContext(PlaceOrderContext)
@@ -91,18 +91,18 @@ export default function KlarnaPayment({
       loaded &&
       klarna
     ) {
-      ref.current.onsubmit = () => handleClick(klarna)
+      ref.current.onsubmit = async () => await handleClick(klarna)
       setPaymentRef({ ref })
     }
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
   }, [ref, paymentSource, currentPaymentMethodType, loaded, klarna])
-  const handleClick = async (kl: any) => {
-    // @ts-ignore
+  const handleClick = async (kl: any): Promise<void> => {
+    // @ts-expect-error
     const [first] = paymentSource?.payment_methods || undefined
-    const payment_method_category = first?.identifier
-    const billing_address = {
+    const paymentMethodCategory = first?.identifier
+    const billingAddress = {
       given_name: order?.billing_address?.first_name,
       family_name: order?.billing_address?.last_name,
       email: order?.customer_email,
@@ -113,9 +113,9 @@ export default function KlarnaPayment({
       city: order?.billing_address?.city,
       region: order?.billing_address?.state_code,
       phone: order?.billing_address?.phone,
-      country: order?.billing_address?.country_code,
+      country: order?.billing_address?.country_code
     }
-    const shipping_address = {
+    const shippingAddress = {
       given_name: order?.shipping_address?.first_name,
       family_name: order?.shipping_address?.last_name,
       email: order?.customer_email,
@@ -126,36 +126,37 @@ export default function KlarnaPayment({
       city: order?.shipping_address?.city,
       region: order?.shipping_address?.state_code,
       phone: order?.shipping_address?.phone,
-      country: order?.shipping_address?.country_code,
+      country: order?.shipping_address?.country_code
     }
     const klarnaData = {
       merchant_data: order?.id,
       purchase_country: order?.country_code,
       purchase_currency: order?.currency_code,
       locale,
-      shipping_address,
-      billing_address,
+      shipping_address: shippingAddress,
+      billing_address: billingAddress,
       order_amount: order?.total_amount_cents,
-      order_lines: klarnaOrderLines(order?.line_items),
+      order_lines: klarnaOrderLines(order?.line_items)
     }
     try {
       kl.Payments.load(
         {
           container: '#klarna-payments-container',
-          payment_method_category,
+          payment_method_category: paymentMethodCategory
         },
         {
-          billing_address,
-          shipping_address,
+          billing_address: billingAddress,
+          shipping_address: shippingAddress
         },
         async function ({
-          show_form,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          show_form
         }: Pick<KlarnaResponse, 'show_form' | 'Error'>) {
           if (show_form) {
             try {
               await kl.Payments.authorize(
                 {
-                  payment_method_category,
+                  payment_method_category: paymentMethodCategory
                 },
                 klarnaData,
                 async function (res: KlarnaResponse) {
@@ -168,13 +169,13 @@ export default function KlarnaPayment({
                       paymentSourceId: paymentSource.id,
                       paymentResource: currentPaymentMethodType,
                       attributes: {
-                        auth_token: res.authorization_token as string,
-                      },
+                        auth_token: res.authorization_token as string
+                      }
                     })
                     const { placed } = (setPlaceOrder &&
                       ps &&
                       (await setPlaceOrder({
-                        paymentSource: ps,
+                        paymentSource: ps
                       }))) || { placed: false }
                     placed &&
                       placeOrderCallback &&
@@ -189,8 +190,8 @@ export default function KlarnaPayment({
                   code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
                   resource: 'payment_methods',
                   field: currentPaymentMethodType,
-                  message: 'Authorization error',
-                },
+                  message: 'Authorization error'
+                }
               ])
             }
           }
@@ -201,15 +202,15 @@ export default function KlarnaPayment({
     }
   }
   if (klarna && clientToken) {
-    // @ts-ignore
+    // @ts-expect-error
     const [first] = paymentSource?.payment_methods || undefined
     klarna.Payments.init({
-      client_token: clientToken,
+      client_token: clientToken
     })
     klarna.Payments.load(
       {
         container: '#klarna-payments-container',
-        payment_method_category: first?.identifier,
+        payment_method_category: first?.identifier
       },
       {
         billing_address: {
@@ -222,7 +223,7 @@ export default function KlarnaPayment({
           city: order?.billing_address?.city,
           region: order?.billing_address?.state_code,
           phone: order?.billing_address?.phone,
-          country: order?.billing_address?.country_code,
+          country: order?.billing_address?.country_code
         },
         shipping_address: {
           given_name: order?.shipping_address?.first_name,
@@ -233,15 +234,15 @@ export default function KlarnaPayment({
           city: order?.shipping_address?.city,
           region: order?.shipping_address?.state_code,
           phone: order?.shipping_address?.phone,
-          country: order?.shipping_address?.country_code,
-        },
+          country: order?.shipping_address?.country_code
+        }
       }
     )
   }
   return (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
-        <div id="klarna-payments-container"></div>
+        <div id='klarna-payments-container' />
       </div>
     </form>
   )

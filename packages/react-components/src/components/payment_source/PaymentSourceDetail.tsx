@@ -24,7 +24,7 @@ export function PaymentSourceDetail({
 }: Props): JSX.Element {
   const card = useContext(PaymentSourceContext)
   const customerCard = useContext(CustomerPaymentSourceContext)
-  const cardObj = card ?? customerCard
+  const cardObj = Object.keys(card).length > 0 ? card : customerCard
   const text =
     type in cardObj ? cardObj[type] : type === 'last4' ? '****' : '**'
   const parentProps = {

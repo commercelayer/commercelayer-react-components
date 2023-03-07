@@ -1,7 +1,7 @@
 import { useContext, useRef } from 'react'
 import {
   PaymentMethodConfig,
-  PaymentSourceObject,
+  PaymentSourceObject
 } from '#reducers/PaymentMethodReducer'
 import { PaymentSourceProps } from './PaymentSource'
 import useExternalScript from '#utils/hooks/useExternalScript'
@@ -12,14 +12,14 @@ import {
   ExpiryDate,
   Cvv,
   FramesLanguages,
-  FramesStyle,
+  FramesStyle
 } from 'frames-react'
 import OrderContext from '#context/OrderContext'
 import Parent from '#components/utils/Parent'
 import { setCustomerOrderParam } from '#utils/localStorage'
 const scriptUrl = 'https://cdn.checkout.com/js/framesv2.min.js'
 
-export type CheckoutComConfig = {
+export interface CheckoutComConfig {
   containerClassName?: string
   hintLabel?: string
   name?: string
@@ -38,39 +38,39 @@ const systemLanguages: FramesLanguages[] = [
   'FR-FR',
   'IT-IT',
   'KR-KR',
-  'NL-NL',
+  'NL-NL'
 ]
 
 const defaultOptions = {
   style: {
     base: {
       color: 'black',
-      fontSize: '18px',
+      fontSize: '18px'
     },
     autofill: {
-      backgroundColor: 'yellow',
+      backgroundColor: 'yellow'
     },
     hover: {
-      color: 'blue',
+      color: 'blue'
     },
     focus: {
-      color: 'blue',
+      color: 'blue'
     },
     valid: {
-      color: 'green',
+      color: 'green'
     },
     invalid: {
-      color: 'red',
+      color: 'red'
     },
     placeholder: {
       base: {
-        color: 'gray',
+        color: 'gray'
       },
       focus: {
-        border: 'solid 1px blue',
-      },
-    },
-  },
+        border: 'solid 1px blue'
+      }
+    }
+  }
 }
 
 type Props = PaymentMethodConfig['checkoutComPayment'] &
@@ -86,7 +86,7 @@ export function CheckoutComPayment({
   options = defaultOptions,
   locale = 'EN-GB',
   ...p
-}: Props) {
+}: Props): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
   const loaded = useExternalScript(scriptUrl)
   const {
@@ -94,22 +94,21 @@ export function CheckoutComPayment({
     currentPaymentMethodType,
     paymentSource,
     setPaymentSource,
-    setPaymentMethodErrors,
+    setPaymentMethodErrors
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const {
     containerClassName,
     templateCustomerSaveToWallet,
-    success_url = window.location.href,
-    failure_url = window.location.href,
+    successUrl = window.location.href,
+    failureUrl = window.location.href,
     show,
     ...divProps
   } = p
   const handleSubmit = async (): Promise<boolean> => {
     const savePaymentSourceToCustomerWallet =
-      // @ts-ignore
-      ref?.current?.elements?.['save_payment_source_to_customer_wallet']
-        ?.checked
+      // @ts-expect-error
+      ref?.current?.elements?.save_payment_source_to_customer_wallet?.checked
     if (savePaymentSourceToCustomerWallet) {
       setCustomerOrderParam(
         '_save_payment_source_to_customer_wallet',
@@ -125,9 +124,9 @@ export function CheckoutComPayment({
           zip: order?.billing_address?.zip_code,
           city: order?.billing_address?.city,
           state: order?.billing_address?.state_code,
-          country: order?.billing_address?.country_code,
+          country: order?.billing_address?.country_code
         },
-        phone: order?.billing_address?.phone,
+        phone: order?.billing_address?.phone
       }
       try {
         const data = await window.Frames.submitCard()
@@ -138,12 +137,12 @@ export function CheckoutComPayment({
             attributes: {
               token: data.token,
               payment_type: 'token',
-              success_url,
-              failure_url,
-              _authorize: true,
-            },
+              success_url: successUrl,
+              failure_url: failureUrl,
+              _authorize: true
+            }
           })) as PaymentSourceObject['checkout_com_payments']
-          if (ps && ps.redirect_uri) {
+          if (ps?.redirect_uri) {
             window.location.href = ps.redirect_uri
           }
         }
@@ -154,8 +153,8 @@ export function CheckoutComPayment({
             code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
             resource: 'payment_methods',
             field: currentPaymentMethodType,
-            message: error?.message as string,
-          },
+            message: error?.message as string
+          }
         ])
       }
     }
@@ -172,11 +171,11 @@ export function CheckoutComPayment({
             debug: true,
             publicKey,
             localization,
-            ...options,
+            ...options
           }}
           cardValidationChanged={(e) => {
             if (e.isValid && ref.current) {
-              ref.current.onsubmit = () => handleSubmit()
+              ref.current.onsubmit = async () => await handleSubmit()
               setPaymentRef({ ref })
             }
           }}

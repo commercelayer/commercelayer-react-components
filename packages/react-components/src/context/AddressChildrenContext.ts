@@ -6,7 +6,7 @@ export interface InitialAddressContext {
 }
 
 const initial: InitialAddressContext = {
-  address: undefined,
+  address: undefined
 }
 
 const AddressChildrenContext = createContext<InitialAddressContext>(initial)

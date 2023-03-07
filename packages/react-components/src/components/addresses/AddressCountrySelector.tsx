@@ -13,7 +13,9 @@ type TCountryFieldName =
   | 'shipping_address_country_code'
   | 'customer_address_country_code'
 
-interface Props extends Omit<BaseSelectComponentProps, 'options' | 'name'>, Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'> {
+interface Props
+  extends Omit<BaseSelectComponentProps, 'options' | 'name'>,
+    Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'> {
   name: Extract<AddressValuesKeys, TCountryFieldName>
   required?: boolean
   disabled?: boolean

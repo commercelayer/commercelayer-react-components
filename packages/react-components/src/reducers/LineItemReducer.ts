@@ -41,8 +41,8 @@ export interface LineItemPayload {
 }
 
 export interface LineItemState extends LineItemPayload {
-  updateLineItem?: (lineItemId: string, quantity?: number) => void
-  deleteLineItem?: (lineItemId: string) => void
+  updateLineItem?: (lineItemId: string, quantity?: number) => Promise<void>
+  deleteLineItem?: (lineItemId: string) => Promise<void>
 }
 
 export interface LineItemAction {
@@ -92,7 +92,9 @@ export const getLineItems: GetLineItems = (params) => {
       })
 }
 
-export const updateLineItem: UpdateLineItem = async (params) => {
+export async function updateLineItem(
+  params: UpdateLineItemParams
+): Promise<void> {
   const { config, lineItemId, quantity, getOrder, orderId, dispatch } = params
   const sdk = getSdk(config)
   try {

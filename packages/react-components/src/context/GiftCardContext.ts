@@ -3,7 +3,7 @@ import {
   giftCardInitialState,
   GiftCardState,
   GiftCardRecipientI,
-  GiftCardI,
+  GiftCardI
 } from '#reducers/GiftCardReducer'
 import { BaseError } from '#typings/errors'
 

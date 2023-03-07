@@ -3,16 +3,16 @@ import { ReactNode, useContext, useEffect, useReducer } from 'react'
 import billingAddressReducer, {
   billingAddressInitialState,
   setBillingAddress,
-  setBillingCustomerAddressId,
+  setBillingCustomerAddressId
 } from '#reducers/BillingAddressReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext from '#context/OrderContext'
 import AddressContext from '#context/AddressContext'
 
-type Props = {
+interface Props {
   children: ReactNode
 }
-export function BillingAddressContainer(props: Props) {
+export function BillingAddressContainer(props: Props): JSX.Element {
   const { children } = props
   const [state, dispatch] = useReducer(
     billingAddressReducer,
@@ -25,20 +25,20 @@ export function BillingAddressContainer(props: Props) {
     if (!include?.includes('billing_address')) {
       addResourceToInclude({
         newResource: 'billing_address',
-        resourcesIncluded: include,
+        resourcesIncluded: include
       })
     }
     if (order && config) {
       setBillingCustomerAddressId({
         dispatch,
         order,
-        setCloneAddress,
+        setCloneAddress
       })
     }
     return () => {
       dispatch({
         type: 'cleanup',
-        payload: {},
+        payload: {}
       })
     }
   }, [order, include])
@@ -53,10 +53,10 @@ export function BillingAddressContainer(props: Props) {
         dispatch,
         order,
         shipToDifferentAddress,
-        customerAddressId: options?.customerAddressId,
+        customerAddressId: options?.customerAddressId
       })
       setCloneAddress(id, 'billing_address')
-    },
+    }
   }
   return (
     <BillingAddressContext.Provider value={contextValue}>

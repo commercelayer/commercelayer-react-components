@@ -1,6 +1,6 @@
 import jwtDecode from 'jwt-decode'
 
-type JWT = {
+interface JWT {
   application: {
     id: string
     kind: 'sales_channel' | 'integration'
@@ -23,6 +23,6 @@ type JWT = {
   test: boolean
 }
 
-export default function jwt(accessToken: string) {
+export default function jwt(accessToken: string): JWT {
   return jwtDecode<JWT>(accessToken)
 }

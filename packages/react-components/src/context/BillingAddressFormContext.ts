@@ -7,6 +7,7 @@ export type AddressValuesKeys =
   | `shipping_address_${keyof Address}`
 
 export interface DefaultContextAddress {
+  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   validation?: void
   setValue?: (
     name: AddressValuesKeys,

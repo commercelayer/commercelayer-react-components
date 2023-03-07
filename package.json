@@ -7,11 +7,14 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "prepare": "husky install",
+    "test": "pnpm -r test"
   },
   "devDependencies": {
     "@commercelayer/eslint-config-ts-react": "^0.1.4",
     "lerna": "^6.5.1",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "husky": "^8.0.0"
   }
 }

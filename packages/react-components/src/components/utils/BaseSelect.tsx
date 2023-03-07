@@ -32,7 +32,7 @@ const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (
   const parentProps = {
     options,
     ref,
-    ...p,
+    ...p
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
