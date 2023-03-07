@@ -4,7 +4,7 @@ import getPrices from '#utils/getPrices'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { Dispatch } from 'react'
 import baseReducer from '#utils/baseReducer'
-import { BaseError } from '#typings/errors'
+import { BaseError, TAPIError } from '#typings/errors'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
 
@@ -103,8 +103,11 @@ export function getSkusPrice(
         }
       }
     })
-    .catch((error) => {
-      const errors = getErrors(error, 'prices')
+    .catch((error: TAPIError) => {
+      const errors = getErrors({
+        error,
+        resource: 'prices'
+      })
       dispatch({
         type: 'setErrors',
         payload: {

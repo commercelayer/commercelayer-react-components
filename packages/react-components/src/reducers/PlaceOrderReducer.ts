@@ -248,8 +248,12 @@ export async function setPlaceOrder({
           }
         }
       }
-    } catch (error) {
-      const errors = getErrors(error, 'orders', paymentType)
+    } catch (error: any) {
+      const errors = getErrors({
+        error,
+        resource: 'orders',
+        field: paymentType
+      })
       if (setOrderErrors) setOrderErrors(errors)
       return {
         ...response,

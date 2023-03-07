@@ -158,8 +158,8 @@ export async function getCustomerAddresses({
       type: 'setAddresses',
       payload: { addresses }
     })
-  } catch (error) {
-    const errors = getErrors(error, 'addresses')
+  } catch (error: any) {
+    const errors = getErrors({ error, resource: 'addresses' })
     dispatch({
       type: 'setErrors',
       payload: {

@@ -3,7 +3,7 @@ import { LineItem } from '@commercelayer/sdk'
 import { BaseError } from '#typings/errors'
 import { TResourceError } from '#components/errors/Errors'
 
-export type AllErrorsParams = {
+export interface AllErrorsParams {
   allErrors: BaseError[]
   messages: BaseError[]
   field?: string
@@ -13,11 +13,9 @@ export type AllErrorsParams = {
   returnHtml?: boolean
 }
 
-export interface GetAllErrors {
-  <P extends AllErrorsParams>(params: P): Array<
-    JSX.Element | string | undefined
-  >
-}
+export type GetAllErrors = <P extends AllErrorsParams>(
+  params: P
+) => Array<JSX.Element | string | undefined>
 
 const getAllErrors: GetAllErrors = (params) => {
   const {
@@ -27,19 +25,19 @@ const getAllErrors: GetAllErrors = (params) => {
     props,
     lineItem,
     resource,
-    returnHtml = true,
+    returnHtml = true
   } = params
   return allErrors
     .map((v, k): JSX.Element | string | undefined => {
       const objMsg = customMessages(messages, v)
       let text =
-        v?.title && !v.detail?.includes(v.title)
+        v?.title && v?.detail != null && !v.detail?.includes(v.title)
           ? `${v.title} - ${v.detail}`
           : `${v?.detail || v.message}`
       if (objMsg?.message) text = objMsg?.message
       if (field) {
         if (v.resource === 'line_items') {
-          if (lineItem && v.id === lineItem['id']) {
+          if (lineItem && v.id === lineItem.id) {
             return returnHtml ? (
               <span key={k} {...props}>
                 {text}

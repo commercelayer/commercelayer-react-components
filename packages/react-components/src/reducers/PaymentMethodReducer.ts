@@ -5,7 +5,7 @@ import { StripeConfig } from '#components/payment_source/StripePayment'
 import { WireTransferConfig } from '#components/payment_source/WireTransferPayment'
 import { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { getOrderContext, updateOrder } from '#reducers/OrderReducer'
-import { BaseError } from '#typings/errors'
+import type { BaseError } from '#typings/errors'
 import baseReducer from '#utils/baseReducer'
 import getErrors, { setErrors } from '#utils/getErrors'
 import getSdk from '#utils/getSdk'
@@ -251,8 +251,12 @@ export async function setPaymentMethod({
       if (setOrderErrors) setOrderErrors([])
     }
     return response
-  } catch (error) {
-    const errors = getErrors(error, 'orders', paymentResource)
+  } catch (error: any) {
+    const errors = getErrors({
+      error,
+      resource: 'orders',
+      field: paymentResource
+    })
     console.error('Set payment method', errors)
     return response
   }
@@ -333,7 +337,11 @@ export const setPaymentSource: SetPaymentSource = async ({
       }
     }
   } catch (error: any) {
-    const errors = getErrors(error, 'payment_methods', paymentResource)
+    const errors = getErrors({
+      error,
+      resource: 'payment_methods',
+      field: paymentResource
+    })
     console.error('Set payment source:', errors)
     if (dispatch) {
       setErrors({

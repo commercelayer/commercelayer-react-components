@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`<SkuOption check children /> 1`] = `null`;
-
-exports[`<SkuOption proptypes required /> 1`] = `null`;
-
-exports[`<SkuOption/> 1`] = `null`;

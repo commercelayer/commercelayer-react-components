@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`<Price with custom children /> 1`] = `<span />`;
-
-exports[`<Price/> 1`] = `null`;

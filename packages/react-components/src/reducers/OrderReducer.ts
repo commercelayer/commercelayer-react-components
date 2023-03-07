@@ -156,8 +156,11 @@ export const createOrder: CreateOrder = async (params) => {
       }
       persistKey && setLocalOrder && setLocalOrder(persistKey, o.id)
       return o.id
-    } catch (error: unknown) {
-      const errors = getErrors(error, 'orders')
+    } catch (error: any) {
+      const errors = getErrors({
+        error,
+        resource: 'orders'
+      })
       console.error('Create order', errors)
       if (dispatch)
         setErrors({
@@ -212,8 +215,11 @@ export const getApiOrder: GetOrder = async (
       }
     }
     return order
-  } catch (error: unknown) {
-    const errors = getErrors(error, 'orders')
+  } catch (error: any) {
+    const errors = getErrors({
+      error,
+      resource: 'orders'
+    })
     console.error('Retrieve order', errors)
     if (dispatch)
       setErrors({
@@ -255,8 +261,11 @@ export async function updateOrder({
     const order = await getApiOrder({ id, config, dispatch, state })
     dispatch && order && dispatch({ type: 'setOrder', payload: { order } })
     return { success: true, order }
-  } catch (error) {
-    const errors = getErrors(error, 'orders')
+  } catch (error: any) {
+    const errors = getErrors({
+      error,
+      resource: 'orders'
+    })
     if (dispatch) {
       setOrderErrors({ errors, dispatch })
       dispatch({
@@ -470,8 +479,11 @@ export async function addToCart(
       }
     }
     return { success: false }
-  } catch (error: unknown) {
-    const errors = getErrors(error, 'orders')
+  } catch (error: any) {
+    const errors = getErrors({
+      error,
+      resource: 'orders'
+    })
     console.error('Add to cart', errors)
     if (dispatch)
       setErrors({
@@ -584,8 +596,12 @@ export async function setGiftCardOrCouponCode({
       return { success, order: currentOrder }
     }
     return { success: false }
-  } catch (error: unknown) {
-    const errors = getErrors(error, 'orders', codeType)
+  } catch (error: any) {
+    const errors = getErrors({
+      error,
+      resource: 'orders',
+      field: codeType
+    })
     dispatch && setOrderErrors({ errors, dispatch })
     return { success: false }
   }
@@ -636,8 +652,8 @@ export async function removeGiftCardOrCouponCode({
       return { success: true, order: orderUpdated?.order }
     }
     return { success: false }
-  } catch (error: unknown) {
-    const errors = getErrors(error, 'orders', codeType)
+  } catch (error: any) {
+    const errors = getErrors({ error, resource: 'orders', field: codeType })
     console.error('Remove gift card o coupon code', errors)
     dispatch && setOrderErrors({ errors, dispatch })
     return { success: false }

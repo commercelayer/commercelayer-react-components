@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`<Errors proptypes required /> 1`] = `null`;
-
-exports[`<Errors proptypes validation /> 1`] = `null`;
-
-exports[`<Errors with custom children /> 1`] = `<span />`;
-
-exports[`<Errors/> 1`] = `null`;

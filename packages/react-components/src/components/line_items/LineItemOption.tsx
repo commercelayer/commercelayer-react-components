@@ -55,7 +55,7 @@ export function LineItemOption(props: Props): JSX.Element {
       <TagElement key={key} {...p}>
         {`${name}:`}
         <span className={valueClassName} {...p}>
-          {`${get(lineItemOption, `options.${name}`)}`}
+          {`${get(lineItemOption, `options.${name}`) ?? ''}`}
         </span>
       </TagElement>
     ) : null

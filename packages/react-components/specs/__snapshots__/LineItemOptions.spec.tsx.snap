@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`<LineItemOptions check children /> 1`] = `null`;
-
-exports[`<LineItemOptions proptypes required /> 1`] = `null`;
-
-exports[`<LineItemOptions/> 1`] = `null`;
