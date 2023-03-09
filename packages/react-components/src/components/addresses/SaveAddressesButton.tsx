@@ -92,7 +92,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     countryLockDisable
   const handleClick = async (): Promise<void> => {
     if (errors && Object.keys(errors).length === 0 && !disable) {
-      let orderUpdated: {
+      let response: {
         success: boolean
         order?: Order
       } = {
@@ -100,14 +100,17 @@ export function SaveAddressesButton(props: Props): JSX.Element {
       }
       setForceDisable(true)
       if (order && saveAddresses != null) {
-        orderUpdated = await saveAddresses(email)
+        response = await saveAddresses(email)
       } else if (createCustomerAddress && billingAddress) {
         const address = { ...billingAddress }
         if (addressId) address.id = addressId
         void createCustomerAddress(address as TCustomerAddress)
+        response = {
+          success: true
+        }
       }
       setForceDisable(false)
-      if (onClick && orderUpdated.success) onClick(orderUpdated)
+      if (onClick && response.success) onClick(response)
     }
   }
 
