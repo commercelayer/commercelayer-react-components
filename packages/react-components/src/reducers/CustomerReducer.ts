@@ -147,7 +147,12 @@ export async function getCustomerAddresses({
       include: ['address']
     })
     customerAddresses.forEach((customerAddress) => {
-      if (customerAddress.address) addresses.push(customerAddress.address)
+      if (customerAddress.address) {
+        if (customerAddress.id !== customerAddress.address.reference) {
+          customerAddress.address.reference = customerAddress.id
+        }
+        addresses.push(customerAddress.address)
+      }
     })
     addresses.sort((a, b) => {
       if (a.full_name && b.full_name)
