@@ -44,6 +44,19 @@ jobs:
           pnpm -r publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Trigger deploy to gh-pages 🚀
+        # if: '!github.event.release.prerelease'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.COMMERCELAYER_CI_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.ref,
+              workflow_id: 'gh-pages.yaml'
+            });
 
       - name: Post to a Slack channel
         id: slack
