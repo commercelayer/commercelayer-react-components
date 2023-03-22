@@ -9,6 +9,7 @@ import PlaceOrderContext from '#context/PlaceOrderContext'
 import OrderContext from '#context/OrderContext'
 import type Dropin from '@adyen/adyen-web/dist/types/components/Dropin'
 import type Card from '@adyen/adyen-web/dist/types/components/Card'
+import omit from '#utils/omit'
 
 const threeDSConfiguration = {
   challengeWindowSize: '05'
@@ -252,7 +253,12 @@ export function AdyenPayment({
     const attributes: any = {
       payment_request_data: {
         ...state.data,
-        payment_method: state.data.paymentMethod,
+        payment_method: omit(state.data.paymentMethod, [
+          'encryptedCardNumber',
+          'encryptedExpiryMonth',
+          'encryptedExpiryYear',
+          'encryptedSecurityCode'
+        ]),
         return_url: url,
         origin: window.location.origin,
         redirect_from_issuer_method: 'GET',
