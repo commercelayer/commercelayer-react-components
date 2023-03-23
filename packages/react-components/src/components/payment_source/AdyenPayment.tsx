@@ -211,6 +211,9 @@ export function AdyenPayment({
     component: AdyenCheckout
   ): Promise<boolean> => {
     const browserInfo = getBrowserInfo()
+    const saveCustomer = document.getElementById(
+      'save_payment_source_to_customer_wallet'
+    ) as HTMLInputElement
     const url = cleanUrlBy()
     let control = await setPaymentSource({
       paymentSourceId: paymentSource?.id,
@@ -227,6 +230,14 @@ export function AdyenPayment({
     const paymentMethodSelected =
       // @ts-expect-error
       control?.payment_request_data?.payment_method?.type
+    const paymentMethod = !saveCustomer.checked
+      ? omit(state.data.paymentMethod, [
+          'encryptedCardNumber',
+          'encryptedExpiryMonth',
+          'encryptedExpiryYear',
+          'encryptedSecurityCode'
+        ])
+      : state.data.paymentMethod
     if (
       !paymentDataAvailable ||
       paymentMethodSelected !== state.data.paymentMethod.type
@@ -237,7 +248,7 @@ export function AdyenPayment({
         attributes: {
           payment_request_data: {
             ...state.data,
-            payment_method: state.data.paymentMethod,
+            payment_method: paymentMethod,
             return_url: url,
             origin: window.location.origin,
             redirect_from_issuer_method: 'GET',
@@ -253,12 +264,7 @@ export function AdyenPayment({
     const attributes: any = {
       payment_request_data: {
         ...state.data,
-        payment_method: omit(state.data.paymentMethod, [
-          'encryptedCardNumber',
-          'encryptedExpiryMonth',
-          'encryptedExpiryYear',
-          'encryptedSecurityCode'
-        ]),
+        payment_method: paymentMethod,
         return_url: url,
         origin: window.location.origin,
         redirect_from_issuer_method: 'GET',
