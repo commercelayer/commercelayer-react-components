@@ -54,7 +54,11 @@ export function CustomerContainer(props: Props): JSX.Element {
 
   useEffect(() => {
     if (config.accessToken && state.addresses == null && !isGuest) {
-      void getCustomerAddresses({ config, dispatch })
+      void getCustomerAddresses({
+        config,
+        dispatch,
+        isOrderAvailable: updateOrder != null
+      })
     }
     if (order?.available_customer_payment_sources && !isGuest) {
       getCustomerPaymentSources({ dispatch, order })
