@@ -134,11 +134,16 @@ export interface GetCustomerAddresses {
    * The Customer dispatch function
    */
   dispatch: Dispatch<CustomerAction>
+  /**
+   * Order details
+   */
+  isOrderAvailable?: boolean
 }
 
 export async function getCustomerAddresses({
   config,
-  dispatch
+  dispatch,
+  isOrderAvailable
 }: GetCustomerAddresses): Promise<void> {
   try {
     const addresses = [] as Address[]
@@ -148,7 +153,10 @@ export async function getCustomerAddresses({
     })
     customerAddresses.forEach((customerAddress) => {
       if (customerAddress.address) {
-        if (customerAddress.id !== customerAddress.address.reference) {
+        if (
+          customerAddress.id !== customerAddress.address.reference &&
+          !isOrderAvailable
+        ) {
           customerAddress.address.reference = customerAddress.id
         }
         addresses.push(customerAddress.address)
