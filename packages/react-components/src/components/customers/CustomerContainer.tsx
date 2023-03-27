@@ -29,8 +29,14 @@ interface Props {
 export function CustomerContainer(props: Props): JSX.Element {
   const { children, isGuest = false } = props
   const [state, dispatch] = useReducer(customerReducer, customerInitialState)
-  const { order, addResourceToInclude, include, updateOrder, includeLoaded } =
-    useContext(OrderContext)
+  const {
+    order,
+    addResourceToInclude,
+    include,
+    updateOrder,
+    includeLoaded,
+    withoutIncludes
+  } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     if (
@@ -57,7 +63,7 @@ export function CustomerContainer(props: Props): JSX.Element {
       void getCustomerAddresses({
         config,
         dispatch,
-        isOrderAvailable: updateOrder != null
+        isOrderAvailable: withoutIncludes != null
       })
     }
     if (order?.available_customer_payment_sources && !isGuest) {
