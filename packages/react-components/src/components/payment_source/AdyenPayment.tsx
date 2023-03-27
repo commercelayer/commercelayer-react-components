@@ -230,7 +230,7 @@ export function AdyenPayment({
     const paymentMethodSelected =
       // @ts-expect-error
       control?.payment_request_data?.payment_method?.type
-    const paymentMethod = !saveCustomer.checked
+    const paymentMethod = !saveCustomer?.checked
       ? omit(state.data.paymentMethod, [
           'encryptedCardNumber',
           'encryptedExpiryMonth',
