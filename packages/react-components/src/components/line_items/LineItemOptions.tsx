@@ -1,7 +1,8 @@
 import { useContext, type ReactNode } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
-import { type LineItemOption } from '@commercelayer/sdk'
+import LineItemOptionChildrenContext, {
+  type TLineItemOptions
+} from '#context/LineItemOptionChildrenContext'
 
 type Props = {
   children: ReactNode
@@ -34,7 +35,7 @@ export function LineItemOptions(props: Props): JSX.Element {
     ...p
   } = props
   const { lineItem } = useContext(LineItemChildrenContext)
-  const lineItemOptions: LineItemOption[] =
+  const lineItemOptions =
     lineItem != null ? lineItem?.line_item_options || [] : []
   const TitleTagElement = titleTagElement as any
   const options = lineItemOptions
@@ -50,7 +51,7 @@ export function LineItemOptions(props: Props): JSX.Element {
         </TitleTagElement>
       ) : null
       const valueProps = {
-        lineItemOption: o,
+        lineItemOption: o as TLineItemOptions,
         showAll
       }
       return (
