@@ -1,6 +1,6 @@
-import { ReactNode, useContext, useState } from 'react'
+import { type ReactNode, useContext, useState } from 'react'
 import Parent from '#components/utils/Parent'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 import AddressContext from '#context/AddressContext'
 import {
   shippingAddressController,
@@ -10,7 +10,7 @@ import {
 import OrderContext from '#context/OrderContext'
 import CustomerContext from '#context/CustomerContext'
 import isFunction from 'lodash/isFunction'
-import { TCustomerAddress } from '#reducers/CustomerReducer'
+import { type TCustomerAddress } from '#reducers/CustomerReducer'
 import type { Order } from '@commercelayer/sdk'
 
 interface TOnClick {

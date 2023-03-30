@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react'
 import BaseInput from '#components/utils/BaseInput'
-import { BaseInputComponentProps, AddressInputName } from '#typings'
+import { type BaseInputComponentProps, type AddressInputName } from '#typings'
 import BillingAddressFormContext, {
-  AddressValuesKeys
+  type AddressValuesKeys
 } from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'

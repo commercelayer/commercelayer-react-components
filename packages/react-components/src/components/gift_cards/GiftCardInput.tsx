@@ -1,5 +1,5 @@
 import BaseInput from '#components/utils/BaseInput'
-import { BaseInputComponentProps, GiftCardInputName } from '#typings'
+import { type BaseInputComponentProps, type GiftCardInputName } from '#typings'
 
 type Props = {
   name: GiftCardInputName

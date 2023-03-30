@@ -1,11 +1,9 @@
-import { useContext, CSSProperties } from 'react'
+import { useContext, type CSSProperties } from 'react'
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
-import get from 'lodash/get'
-import has from 'lodash/has'
 import map from 'lodash/map'
 import Parent from '#components/utils/Parent'
-import { LineItemOption as LineItemOptionType } from '@commercelayer/sdk'
-import { ChildrenFunction } from '#typings/index'
+import { type LineItemOption as LineItemOptionType } from '@commercelayer/sdk'
+import { type ChildrenFunction } from '#typings/index'
 import isJSON from '#utils/isJSON'
 
 export interface TLineItemOption extends Omit<Props, 'children'> {
@@ -41,6 +39,7 @@ export function LineItemOption(props: Props): JSX.Element {
   }
   const TagElement = tagElement as any
   const TagContainer = tagContainer
+  const label = name != null ? lineItemOption?.options?.[name] : ''
   const components =
     showAll && isJSON(JSON.stringify(lineItemOption?.options)) ? (
       map(lineItemOption?.options, (value: string, key) => {
@@ -51,11 +50,13 @@ export function LineItemOption(props: Props): JSX.Element {
           </TagElement>
         )
       })
-    ) : name != null && has(lineItemOption, `options.${name}`) ? (
+    ) : name != null &&
+      lineItemOption?.options != null &&
+      name in lineItemOption.options ? (
       <TagElement key={key} {...p}>
         {`${name}:`}
         <span className={valueClassName} {...p}>
-          {`${get(lineItemOption, `options.${name}`) ?? ''}`}
+          {label ?? ''}
         </span>
       </TagElement>
     ) : null

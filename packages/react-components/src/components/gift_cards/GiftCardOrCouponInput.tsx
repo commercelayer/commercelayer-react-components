@@ -1,8 +1,8 @@
 import { useContext } from 'react'
 import BaseInput from '#components/utils/BaseInput'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
-import { BaseInputComponentProps } from '#typings'
-import { OrderCodeType } from '#reducers/OrderReducer'
+import { type BaseInputComponentProps } from '#typings'
+import { type OrderCodeType } from '#reducers/OrderReducer'
 
 type Props = {
   name?: 'gift_card_or_coupon_code'

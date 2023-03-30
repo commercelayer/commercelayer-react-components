@@ -91,7 +91,7 @@ export default function Main() {
   // }
   useEffect(() => {
     const getToken = async () => {
-      // @ts-expect-error
+      // @ts-expect-error no type
       const token = await getCustomerToken(
         {
           clientId,

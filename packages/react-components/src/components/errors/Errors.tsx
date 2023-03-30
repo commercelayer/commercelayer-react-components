@@ -11,7 +11,7 @@ import CustomerContext from '#context/CustomerContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import ShipmentContext from '#context/ShipmentContext'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 
 export type TResourceError =
   | 'addresses'

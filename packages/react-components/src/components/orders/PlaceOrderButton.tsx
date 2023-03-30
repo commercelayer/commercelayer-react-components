@@ -1,13 +1,13 @@
 import {
-  ReactNode,
+  type ReactNode,
   useContext,
   useEffect,
   useRef,
   useState,
-  MouseEvent
+  type MouseEvent
 } from 'react'
 import Parent from '../utils/Parent'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import isFunction from 'lodash/isFunction'
 import PaymentMethodContext from '#context/PaymentMethodContext'
@@ -93,6 +93,16 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     }
   }, [options?.paypalPayerId, paymentType])
   useEffect(() => {
+    if (
+      paymentType === 'stripe_payments' &&
+      options?.stripe?.redirectStatus === 'succeeded' &&
+      order?.status &&
+      ['draft', 'pending'].includes(order?.status)
+    ) {
+      void handleClick()
+    }
+  }, [options?.stripe?.redirectStatus, paymentType])
+  useEffect(() => {
     if (order?.status != null && ['draft', 'pending'].includes(order?.status)) {
       if (
         paymentType === 'adyen_payments' &&
@@ -112,11 +122,11 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           paymentResource: 'adyen_payments',
           attributes
         }).then((res) => {
-          // @ts-expect-error
+          // @ts-expect-error no type
           const resultCode = res?.payment_response?.resultCode
-          // @ts-expect-error
+          // @ts-expect-error no type
           const errorCode = res?.payment_response?.errorCode
-          // @ts-expect-error
+          // @ts-expect-error no type
           const message = res?.payment_response?.message
           if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
             void handleClick()
@@ -139,9 +149,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         void handleClick()
       } else if (
         paymentType === 'adyen_payments' &&
-        // @ts-expect-error
+        // @ts-expect-error no type
         order?.payment_source?.payment_response?.resultCode === 'Authorised' &&
-        // @ts-expect-error
+        // @ts-expect-error no type
         ref?.current?.disabled === false
       ) {
         void handleClick()
@@ -150,7 +160,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   }, [
     options?.adyen,
     paymentType,
-    // @ts-expect-error
+    // @ts-expect-error no type
     order?.payment_source?.payment_response?.resultCode
   ])
   useEffect(() => {
@@ -177,7 +187,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     let isValid = true
     setForceDisable(true)
     const checkPaymentSource = await setPaymentSource({
-      // @ts-expect-error not be undefined
+      // @ts-expect-error no type not be undefined
       paymentResource: paymentType,
       paymentSourceId: paymentSource?.id
     })
@@ -196,12 +206,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ].every(Boolean)
     ) {
       isValid = (await currentPaymentMethodRef.current?.onsubmit(
-        // @ts-expect-error
+        // @ts-expect-error no type
         checkPaymentSource
       )) as boolean
       if (
         !isValid &&
-        // @ts-expect-error
+        // @ts-expect-error no type
         checkPaymentSource.payment_response?.resultCode === 'Authorised'
       ) {
         isValid = true

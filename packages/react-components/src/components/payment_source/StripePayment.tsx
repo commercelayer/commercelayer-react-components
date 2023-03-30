@@ -1,34 +1,35 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import {
-  CardElement,
   Elements,
+  PaymentElement,
   useElements,
   useStripe
 } from '@stripe/react-stripe-js'
 import {
-  Stripe,
-  StripeCardElementOptions,
-  StripeElementLocale,
-  StripeElements
+  type Stripe,
+  type StripeElementLocale,
+  type StripeElements,
+  type StripeElementsOptions,
+  type StripePaymentElementOptions
 } from '@stripe/stripe-js'
-import { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
-import { PaymentSourceProps } from './PaymentSource'
+import { type PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
+import { type PaymentSourceProps } from './PaymentSource'
 import Parent from '#components/utils/Parent'
-import OrderContext from '#context/OrderContext'
 import { setCustomerOrderParam } from '#utils/localStorage'
-import { StripePayment as StripePaymentType } from '@commercelayer/sdk'
+import OrderContext from '#context/OrderContext'
 
 export interface StripeConfig {
   containerClassName?: string
   hintLabel?: string
   name?: string
-  options?: StripeCardElementOptions
+  options?: StripePaymentElementOptions
+  appearance?: StripeElementsOptions['appearance']
   [key: string]: any
 }
 
 interface StripePaymentFormProps {
-  options?: StripeCardElementOptions
+  options?: StripePaymentElementOptions
   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
 }
 
@@ -38,23 +39,37 @@ interface OnSubmitArgs {
   event: SubmitEvent
   stripe: Stripe | null
   elements: StripeElements | null
-  paymentSource?: StripePaymentType
 }
 
-const defaultOptions = {
-  style: {
-    base: {
-      fontSize: '16px',
-      color: '#424770',
-      '::placeholder': {
-        color: '#aab7c4'
-      }
-    },
-    invalid: {
-      color: '#9e2146'
-    }
+const defaultOptions: StripePaymentElementOptions = {
+  layout: {
+    type: 'accordion',
+    defaultCollapsed: false,
+    radios: true,
+    spacedAccordionItems: false
   },
-  hidePostalCode: true
+  fields: { billingDetails: 'never' }
+  // style: {
+  //   base: {
+  //     fontSize: '16px',
+  //     color: '#424770',
+  //     '::placeholder': {
+  //       color: '#aab7c4'
+  //     }
+  //   },
+  //   invalid: {
+  //     color: '#9e2146'
+  //   }
+  // },
+  // hidePostalCode: true
+}
+
+const defaultAppearance: StripeElementsOptions['appearance'] = {
+  theme: 'stripe',
+  variables: {
+    colorText: '#32325d',
+    fontFamily: '"Helvetica Neue", Helvetica, sans-serif'
+  }
 }
 
 function StripePaymentForm({
@@ -62,25 +77,18 @@ function StripePaymentForm({
   templateCustomerSaveToWallet
 }: StripePaymentFormProps): JSX.Element {
   const ref = useRef<null | HTMLFormElement>(null)
-  const {
-    setPaymentSource,
-    currentPaymentMethodType,
-    setPaymentMethodErrors,
-    setPaymentRef,
-    paymentSource
-  } = useContext(PaymentMethodContext)
+  const { currentPaymentMethodType, setPaymentMethodErrors, setPaymentRef } =
+    useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const stripe = useStripe()
   const elements = useElements()
   useEffect(() => {
-    if (ref.current && stripe && elements && paymentSource) {
-      // @ts-expect-error
-      ref.current.onsubmit = async (paymentSource?: StripePaymentType) => {
+    if (ref.current && stripe && elements) {
+      ref.current.onsubmit = async () => {
         return await onSubmit({
           event: ref.current as any,
           stripe,
-          elements,
-          paymentSource
+          elements
         })
       }
       setPaymentRef({ ref })
@@ -88,26 +96,23 @@ function StripePaymentForm({
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  }, [ref, stripe, elements, paymentSource])
+  }, [ref, stripe, elements])
   const onSubmit = async ({
     event,
     stripe,
-    elements,
-    paymentSource: ps
+    elements
   }: OnSubmitArgs): Promise<boolean> => {
     if (!stripe) return false
 
     const savePaymentSourceToCustomerWallet =
-      // @ts-expect-error
+      // @ts-expect-error no type
       event?.elements?.save_payment_source_to_customer_wallet?.checked
     if (savePaymentSourceToCustomerWallet)
       setCustomerOrderParam(
         '_save_payment_source_to_customer_wallet',
         savePaymentSourceToCustomerWallet
       )
-
-    const cardElement = elements?.getElement(CardElement)
-    if (cardElement) {
+    if (elements != null) {
       const billingInfo = order?.billing_address
       const email = order?.customer_email
       const billingDetails = {
@@ -118,62 +123,33 @@ function StripePaymentForm({
           city: billingInfo?.city,
           country: billingInfo?.country_code,
           line1: billingInfo?.line_1,
+          line2: billingInfo?.line_2,
           postal_code: billingInfo?.zip_code,
           state: billingInfo?.state_code
         }
       }
-      const { paymentMethod } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-        billing_details: billingDetails
-      })
-      const clientSecret = ps?.client_secret
-      const paymentSourceId = ps?.id
-      if (clientSecret) {
-        const { error, paymentIntent } = await stripe.confirmCardPayment(
-          clientSecret,
-          {
-            payment_method: {
-              card: cardElement,
-              billing_details: billingDetails
-            }
-          }
-        )
-        if (error) {
-          console.error(error)
-          setPaymentMethodErrors([
-            {
-              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-              resource: 'payment_methods',
-              field: currentPaymentMethodType,
-              message: error.message as string
-            }
-          ])
-          return false
-        } else {
-          if (
-            paymentIntent &&
-            paymentMethod &&
-            paymentSourceId &&
-            currentPaymentMethodType
-          ) {
-            try {
-              await setPaymentSource({
-                paymentSourceId,
-                paymentResource: currentPaymentMethodType,
-                attributes: {
-                  options: {
-                    ...(paymentMethod as Record<string, any>),
-                    setup_future_usage: 'off_session'
-                  }
-                }
-              })
-              return true
-            } catch (e) {
-              return false
-            }
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: window.location.href,
+          payment_method_data: {
+            billing_details: billingDetails
           }
         }
+      })
+      if (error) {
+        console.error(error)
+        setPaymentMethodErrors([
+          {
+            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+            resource: 'payment_methods',
+            field: currentPaymentMethodType,
+            message: error.message as string
+          }
+        ])
+        return false
+      } else {
+        return true
       }
     }
     return false
@@ -181,7 +157,11 @@ function StripePaymentForm({
 
   return (
     <form ref={ref}>
-      <CardElement options={{ ...defaultOptions, ...options }} />
+      {/* <CardElement options={{ ...defaultOptions, ...options }} /> */}
+      <PaymentElement
+        id='payment-element'
+        options={{ ...defaultOptions, ...options }}
+      />
       {templateCustomerSaveToWallet && (
         <Parent {...{ name: 'save_payment_source_to_customer_wallet' }}>
           {templateCustomerSaveToWallet}
@@ -197,12 +177,14 @@ type Props = PaymentMethodConfig['stripePayment'] &
     show?: boolean
     publishableKey: string
     locale?: StripeElementLocale
+    clientSecret: string
   }
 
 export function StripePayment({
   publishableKey,
   show,
   options,
+  clientSecret,
   locale = 'auto',
   ...p
 }: Props): JSX.Element | null {
@@ -212,6 +194,7 @@ export function StripePayment({
     containerClassName,
     templateCustomerSaveToWallet,
     fonts = [],
+    appearance,
     ...divProps
   } = p
   useEffect(() => {
@@ -233,9 +216,14 @@ export function StripePayment({
       setIsLoaded(false)
     }
   }, [show, publishableKey])
-  return isLoaded && stripe ? (
+  const elementsOptions: StripeElementsOptions = {
+    clientSecret,
+    appearance: { ...defaultAppearance, ...appearance },
+    fonts
+  }
+  return isLoaded && stripe != null && clientSecret != null ? (
     <div className={containerClassName} {...divProps}>
-      <Elements stripe={stripe} options={{ fonts }}>
+      <Elements stripe={stripe} options={elementsOptions}>
         <StripePaymentForm
           options={options}
           templateCustomerSaveToWallet={templateCustomerSaveToWallet}

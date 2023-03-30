@@ -1,7 +1,7 @@
-import { createContext, RefObject } from 'react'
+import { createContext, type RefObject } from 'react'
 import {
-  PlaceOrderState,
-  setPlaceOrder,
+  type PlaceOrderState,
+  type setPlaceOrder,
   setPlaceOrderErrors
 } from '#reducers/PlaceOrderReducer'
 

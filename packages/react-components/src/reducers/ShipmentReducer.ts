@@ -1,9 +1,14 @@
 import baseReducer from '#utils/baseReducer'
-import { Dispatch } from 'react'
-import { BaseError } from '#typings/errors'
-import { DeliveryLeadTime, LineItem, Order, Shipment } from '@commercelayer/sdk'
-import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { getOrderContext } from './OrderReducer'
+import { type Dispatch } from 'react'
+import { type BaseError } from '#typings/errors'
+import {
+  type DeliveryLeadTime,
+  type LineItem,
+  type Order,
+  type Shipment
+} from '@commercelayer/sdk'
+import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
+import { type getOrderContext } from './OrderReducer'
 import getSdk from '#utils/getSdk'
 
 export type ShipmentActionType =

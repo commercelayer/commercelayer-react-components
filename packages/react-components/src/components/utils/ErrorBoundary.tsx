@@ -1,4 +1,4 @@
-import { Component, ErrorInfo } from 'react'
+import { Component, type ErrorInfo } from 'react'
 
 interface Props {
   children: JSX.Element

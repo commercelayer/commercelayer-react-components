@@ -1,7 +1,7 @@
 import baseReducer from '#utils/baseReducer'
-import { Dispatch } from 'react'
-import { BaseError } from '#typings/errors'
-import { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import { type Dispatch } from 'react'
+import { type BaseError } from '#typings/errors'
+import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
 import type {
   Address,
   AddressCreate,
@@ -10,10 +10,10 @@ import type {
 } from '@commercelayer/sdk'
 import isEmpty from 'lodash/isEmpty'
 import getSdk from '#utils/getSdk'
-import { updateOrder } from './OrderReducer'
+import { type updateOrder } from './OrderReducer'
 import camelCase from 'lodash/camelCase'
-import { TCustomerAddress } from './CustomerReducer'
-import { TResourceError } from '#components/errors/Errors'
+import { type TCustomerAddress } from './CustomerReducer'
+import { type TResourceError } from '#components/errors/Errors'
 
 export type AddressActionType =
   | 'setErrors'

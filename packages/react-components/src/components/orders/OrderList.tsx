@@ -4,23 +4,23 @@ import {
   useState,
   useEffect,
   useCallback,
-  CSSProperties
+  type CSSProperties
 } from 'react'
 import CustomerContext from '#context/CustomerContext'
 import OrderListChildrenContext, {
-  InitialOrderListContext
+  type InitialOrderListContext
 } from '#context/OrderListChildrenContext'
 import OrderListPagination from '#context/OrderListPaginationContext'
 import {
-  Column,
-  HeaderGroup,
+  type Column,
+  type HeaderGroup,
   useTable,
   useSortBy,
-  UseSortByColumnProps,
+  type UseSortByColumnProps,
   useBlockLayout,
-  PluginHook,
+  type PluginHook,
   usePagination,
-  Row
+  type Row
 } from 'react-table'
 import { FixedSizeList } from 'react-window'
 import scrollbarWidth from '#utils/scrollbarWidth'
@@ -188,7 +188,7 @@ export function OrderList({
       data,
       columns: cols,
       ...(infiniteScroll && { defaultColumn }),
-      // @ts-expect-error
+      // @ts-expect-error no type
       initialState
     },
     ...tablePlugins
@@ -241,7 +241,7 @@ export function OrderList({
       </TrHtmlElement>
     )
   })
-  // @ts-expect-error
+  // @ts-expect-error no type
   const rows: Array<Row<Order>> = showPagination ? table.page : table.rows
   const rowsComponents = filterChildren({
     children,
@@ -308,29 +308,29 @@ export function OrderList({
     !showPagination ? null : (
       <OrderListPagination.Provider
         value={{
-          // @ts-expect-error
+          // @ts-expect-error no type
           canNextPage: table.canNextPage,
-          // @ts-expect-error
+          // @ts-expect-error no type
           canPreviousPage: table.canPreviousPage,
-          // @ts-expect-error
+          // @ts-expect-error no type
           gotoPage: table.gotoPage,
-          // @ts-expect-error
+          // @ts-expect-error no type
           nextPage: table.nextPage,
-          // @ts-expect-error
+          // @ts-expect-error no type
           page: table.page,
-          // @ts-expect-error
+          // @ts-expect-error no type
           pageCount: table.pageCount,
-          // @ts-expect-error
+          // @ts-expect-error no type
           pageIndex: table.state.pageIndex,
-          // @ts-expect-error
+          // @ts-expect-error no type
           pageNumber: table.pageNumber,
-          // @ts-expect-error
+          // @ts-expect-error no type
           pageOptions: table.pageOptions,
-          // @ts-expect-error
+          // @ts-expect-error no type
           pageSize: table.state.pageSize,
-          // @ts-expect-error
+          // @ts-expect-error no type
           previousPage: table.previousPage,
-          // @ts-expect-error
+          // @ts-expect-error no type
           setPageSize: table.setPageSize,
           totalRows: orders?.length ?? 0
         }}

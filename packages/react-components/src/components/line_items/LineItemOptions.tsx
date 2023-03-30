@@ -1,7 +1,7 @@
-import { useContext, ReactNode } from 'react'
+import { useContext, type ReactNode } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
-import { LineItemOption } from '@commercelayer/sdk'
+import { type LineItemOption } from '@commercelayer/sdk'
 
 type Props = {
   children: ReactNode
@@ -40,7 +40,7 @@ export function LineItemOptions(props: Props): JSX.Element {
   const options = lineItemOptions
     .filter((o) => {
       if (showAll) return true
-      // @ts-expect-error
+      // @ts-expect-error no type
       return o.skuOption().id === skuOptionId
     })
     .map((o, k) => {

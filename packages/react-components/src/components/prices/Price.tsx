@@ -2,8 +2,8 @@ import Parent from '#components/utils/Parent'
 import PricesContext from '#context/PricesContext'
 import { useState, useEffect, useContext } from 'react'
 import { getPricesComponent } from '#utils/getPrices'
-import { Price as PriceType } from '@commercelayer/sdk'
-import { ChildrenFunction, LoaderType } from '#typings/index'
+import { type Price as PriceType } from '@commercelayer/sdk'
+import { type ChildrenFunction, type LoaderType } from '#typings/index'
 import SkuChildrenContext from '#context/SkuChildrenContext'
 
 interface PriceChildrenProps extends Omit<PriceProps, 'children'> {

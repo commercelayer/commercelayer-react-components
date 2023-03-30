@@ -1,12 +1,12 @@
-import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
+import { type GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
-import { PaymentResource } from '#reducers/PaymentMethodReducer'
-import { StripeElementLocale } from '@stripe/stripe-js'
+import { type PaymentResource } from '#reducers/PaymentMethodReducer'
+import { type StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import { useContext } from 'react'
 import AdyenPayment from '#components/payment_source/AdyenPayment'
@@ -37,10 +37,10 @@ export function AdyenGateway(props: Props): JSX.Element | null {
     useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = 'adyen_payments'
   const locale = order?.language_code as StripeElementLocale
-  // @ts-expect-error
+  // @ts-expect-error no type
   const paymentMethods = paymentSource?.payment_methods
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-expect-error
+  // @ts-expect-error no type
   const clientKey = paymentSource?.public_key
   const environment = accessToken && jwt(accessToken).test ? 'test' : 'live'
   const adyenConfig = getPaymentAttributes({

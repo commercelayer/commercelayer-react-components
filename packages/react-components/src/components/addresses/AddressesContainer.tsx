@@ -1,17 +1,17 @@
 import AddressesContext, {
   defaultAddressContext
 } from '#context/AddressContext'
-import { ReactNode, useContext, useEffect, useReducer } from 'react'
+import { type ReactNode, useContext, useEffect, useReducer } from 'react'
 import addressReducer, {
   addressInitialState,
-  AddressResource,
-  AddressSchema,
+  type AddressResource,
+  type AddressSchema,
   setAddressErrors,
-  SetAddressParams,
+  type SetAddressParams,
   setCloneAddress,
   saveAddresses
 } from '#reducers/AddressReducer'
-import { BaseError } from '#typings/errors'
+import { type BaseError } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 
@@ -42,15 +42,17 @@ export function AddressesContainer(props: Props): JSX.Element {
   }, [shipToDifferentAddress, isBusiness])
   const contextValue = {
     ...state,
-    setAddressErrors: (errors: BaseError[], resource: AddressResource) =>
+    setAddressErrors: (errors: BaseError[], resource: AddressResource) => {
       setAddressErrors({
         errors,
         resource,
         dispatch,
         currentErrors: state.errors
-      }),
-    setAddress: (params: SetAddressParams<AddressSchema>) =>
-      defaultAddressContext.setAddress({ ...params, dispatch }),
+      })
+    },
+    setAddress: (params: SetAddressParams<AddressSchema>) => {
+      defaultAddressContext.setAddress({ ...params, dispatch })
+    },
     saveAddresses: async (
       customerEmail?: string
     ): ReturnType<typeof saveAddresses> =>
@@ -63,8 +65,9 @@ export function AddressesContainer(props: Props): JSX.Element {
         state,
         customerEmail
       }),
-    setCloneAddress: (id: string, resource: AddressResource): void =>
+    setCloneAddress: (id: string, resource: AddressResource): void => {
       setCloneAddress(id, resource, dispatch)
+    }
   }
   return (
     <AddressesContext.Provider value={contextValue}>

@@ -1,6 +1,12 @@
-import { CSSProperties, useContext, useEffect, useRef, useState } from 'react'
+import {
+  type CSSProperties,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import { PaymentSourceProps } from './PaymentSource'
+import { type PaymentSourceProps } from './PaymentSource'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import type { CoreOptions } from '@adyen/adyen-web/dist/types/core/types'
 import Parent from '#components/utils/Parent'
@@ -168,9 +174,9 @@ export function AdyenPayment({
           paymentResource: 'adyen_payments',
           attributes
         }))
-      // @ts-expect-error
+      // @ts-expect-error no type
       const adyenAction = pSource?.payment_response?.action
-      // @ts-expect-error
+      // @ts-expect-error no type
       const resultCode = pSource?.payment_response?.resultCode
       if (adyenAction && component) {
         component.handleAction(adyenAction)
@@ -186,7 +192,7 @@ export function AdyenPayment({
         return true
       }
       if (['Cancelled', 'Refused'].includes(resultCode)) {
-        // @ts-expect-error
+        // @ts-expect-error no type
         const message = pSource?.payment_response?.refusalReason
         setPaymentMethodErrors([
           {
@@ -219,16 +225,16 @@ export function AdyenPayment({
       paymentSourceId: paymentSource?.id,
       paymentResource: 'adyen_payments'
     })
-    // @ts-expect-error
+    // @ts-expect-error no type
     const controlCode = control?.payment_response?.resultCode
     if (controlCode === 'Authorised') {
       return true
     }
     const paymentDataAvailable =
-      // @ts-expect-error
+      // @ts-expect-error no type
       Object.keys(control?.payment_request_data).length > 0
     const paymentMethodSelected =
-      // @ts-expect-error
+      // @ts-expect-error no type
       control?.payment_request_data?.payment_method?.type
     const paymentMethod = !saveCustomer?.checked
       ? omit(state.data.paymentMethod, [
@@ -283,13 +289,13 @@ export function AdyenPayment({
         paymentResource: 'adyen_payments',
         attributes
       })
-      // @ts-expect-error
+      // @ts-expect-error no type
       const action = res?.payment_response?.action
       if (component && action) {
         component.handleAction(action)
         return false
       }
-      // @ts-expect-error
+      // @ts-expect-error no type
       const resultCode = res?.payment_response?.resultCode
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
         if (placeOrderButtonRef?.current != null) {
@@ -301,7 +307,7 @@ export function AdyenPayment({
         return true
       }
       if (['Cancelled'].includes(resultCode)) {
-        // @ts-expect-error
+        // @ts-expect-error no type
         const message = res?.payment_response?.refusalReason
         setPaymentMethodErrors([
           {
@@ -312,15 +318,15 @@ export function AdyenPayment({
           }
         ])
       }
-      // @ts-expect-error
+      // @ts-expect-error no type
       const errorType = res?.payment_response?.errorType
       if (errorType) {
-        // @ts-expect-error
+        // @ts-expect-error no type
         const errorCode = res?.payment_response?.errorCode
         if (errorCode === '14_006') {
           void onSubmit(state, component)
         } else {
-          // @ts-expect-error
+          // @ts-expect-error no type
           const message = res?.payment_response?.message
           setPaymentMethodErrors([
             {
@@ -346,10 +352,10 @@ export function AdyenPayment({
     }
   }
   useEffect(() => {
-    // @ts-expect-error
+    // @ts-expect-error no type
     const paymentMethodsResponse = paymentSource?.payment_methods
       ?.paymentMethods
-      ? // @ts-expect-error
+      ? // @ts-expect-error no type
         paymentSource?.payment_methods.paymentMethods
       : []
     const [firstPaymentMethod] = paymentMethodsResponse

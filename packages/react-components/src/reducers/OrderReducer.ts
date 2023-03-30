@@ -1,18 +1,18 @@
-import { Dispatch } from 'react'
+import { type Dispatch } from 'react'
 import {
-  SetLocalOrder,
-  DeleteLocalOrder,
+  type SetLocalOrder,
+  type DeleteLocalOrder,
   setCustomerOrderParam,
-  CustomerOrderParams
+  type CustomerOrderParams
 } from '#utils/localStorage'
-import { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
 import baseReducer from '#utils/baseReducer'
 import isEmpty from 'lodash/isEmpty'
-import { BaseMetadataObject } from '#typings/index'
-import { BaseError } from '#typings/errors'
+import { type BaseMetadataObject } from '#typings/index'
+import { type BaseError } from '#typings/errors'
 import getSdk from '#utils/getSdk'
 import getErrors, { setErrors } from '../utils/getErrors'
-import { AddressResource } from './AddressReducer'
+import { type AddressResource } from './AddressReducer'
 import type {
   Order,
   LineItemCreate,

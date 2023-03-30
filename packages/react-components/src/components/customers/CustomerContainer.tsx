@@ -8,7 +8,7 @@ import customerReducer, {
   setCustomerErrors,
   deleteCustomerAddress,
   createCustomerAddress,
-  TCustomerAddress,
+  type TCustomerAddress,
   saveCustomerUser,
   getCustomerPayments
 } from '#reducers/CustomerReducer'
@@ -93,25 +93,30 @@ export function CustomerContainer(props: Props): JSX.Element {
           order
         })
       },
-      setCustomerErrors: (errors: BaseError[]) =>
-        setCustomerErrors(errors, dispatch),
-      setCustomerEmail: (customerEmail: string) =>
-        setCustomerEmail(customerEmail, dispatch),
-      getCustomerPaymentSources: () =>
-        getCustomerPaymentSources({ dispatch, order }),
+      setCustomerErrors: (errors: BaseError[]) => {
+        setCustomerErrors(errors, dispatch)
+      },
+      setCustomerEmail: (customerEmail: string) => {
+        setCustomerEmail(customerEmail, dispatch)
+      },
+      getCustomerPaymentSources: () => {
+        getCustomerPaymentSources({ dispatch, order })
+      },
       deleteCustomerAddress: async ({
         customerAddressId
       }: {
         customerAddressId: string
-      }) =>
+      }) => {
         await deleteCustomerAddress({
           customerAddressId,
           dispatch,
           config,
           addresses: state.addresses
-        }),
-      createCustomerAddress: async (address: TCustomerAddress) =>
+        })
+      },
+      createCustomerAddress: async (address: TCustomerAddress) => {
         await createCustomerAddress({ address, config, dispatch, state })
+      }
     }
   }, [state, isGuest])
   return (

@@ -2,7 +2,7 @@ import { useContext, useState, useEffect } from 'react'
 import Parent from '#components/utils/Parent'
 import getLineItemsCount, { type TypeAccepted } from '#utils/getLineItemsCount'
 import LineItemContext from '#context/LineItemContext'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   quantity: number

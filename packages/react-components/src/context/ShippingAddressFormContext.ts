@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { DefaultContextAddress } from './BillingAddressFormContext'
+import { type DefaultContextAddress } from './BillingAddressFormContext'
 
 const ShippingAddressFormContext = createContext<DefaultContextAddress>({})
 

@@ -1,8 +1,8 @@
-import { useContext, ReactNode } from 'react'
+import { useContext, type ReactNode } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
 import Parent from '#components/utils/Parent'
-import { ChildrenFunction } from '#typings'
+import { type ChildrenFunction } from '#typings'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   quantity: number

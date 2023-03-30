@@ -8,9 +8,9 @@ import isEmpty from 'lodash/isEmpty'
 import AddressContext from '#context/AddressContext'
 import OrderContext from '#context/OrderContext'
 import AddressCardsTemplate, {
-  AddressCardsTemplateChildren,
-  CustomerAddress,
-  HandleSelect
+  type AddressCardsTemplateChildren,
+  type CustomerAddress,
+  type HandleSelect
 } from '#components/utils/AddressCardsTemplate'
 import type { DefaultChildrenType } from '#typings/globals'
 

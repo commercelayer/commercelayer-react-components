@@ -5,8 +5,8 @@ import priceReducer, {
   getSkusPrice,
   setSkuCodes
 } from '#reducers/PriceReducer'
-import PricesContext, { PricesContextValue } from '#context/PricesContext'
-import { LoaderType } from '#typings'
+import PricesContext, { type PricesContextValue } from '#context/PricesContext'
+import { type LoaderType } from '#typings'
 import SkuContext from '#context/SkuContext'
 
 interface Props {
@@ -54,8 +54,9 @@ export function PricesContainer(props: Props): JSX.Element {
     ...state,
     skuCode: sCode,
     loader,
-    setSkuCodes: (params: Parameters<typeof setSkuCodes>[number]): void =>
+    setSkuCodes: (params: Parameters<typeof setSkuCodes>[number]): void => {
       setSkuCodes({ ...params, dispatch })
+    }
   }
   return (
     <PricesContext.Provider value={priceValue}>

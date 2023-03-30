@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { FormEvent, useContext, useEffect, useRef, useState } from 'react'
+import { type FormEvent, useContext, useEffect, useRef, useState } from 'react'
 import {
-  HostedFieldFieldOptions,
-  HostedFieldsHostedFieldsFieldName
+  type HostedFieldFieldOptions,
+  type HostedFieldsHostedFieldsFieldName
 } from 'braintree-web/modules/hosted-fields'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isEmpty from 'lodash/isEmpty'
 import OrderContext from '#context/OrderContext'
 import Parent from '#components/utils/Parent'
-import { PaymentSourceProps } from './PaymentSource'
+import { type PaymentSourceProps } from './PaymentSource'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import promisify from '#utils/promisify'
-import { ThreeDSecure } from 'braintree-web'
-import { BraintreePayment as BraintreePaymentType } from '@commercelayer/sdk'
-import { ThreeDSecureVerifyOptions } from 'braintree-web/modules/three-d-secure'
+import { type ThreeDSecure } from 'braintree-web'
+import { type BraintreePayment as BraintreePaymentType } from '@commercelayer/sdk'
+import { type ThreeDSecureVerifyOptions } from 'braintree-web/modules/three-d-secure'
 type BraintreeHostedFields<Type> = {
   [Property in keyof Type]: {
     label?: string
@@ -30,9 +30,7 @@ export interface BraintreeConfig {
   fieldLabelClassName?: string
   inputWrapperClassName?: string
   fields?: BraintreeHostedFields<HostedFieldFieldOptions>
-  styles?: {
-    [key: string]: Record<string, string>
-  }
+  styles?: Record<string, Record<string, string>>
 }
 
 interface Props {
@@ -77,7 +75,7 @@ const defaultConfig: BraintreeConfig = {
     // Media queries
     // Note that these apply to the iframe, not the root window.
     '@media screen and (max-width: 700px)': {
-      // @ts-expect-error
+      // @ts-expect-error no type
       input: {
         'font-size': '14px'
       }
@@ -136,7 +134,7 @@ export function BraintreePayment({
     threeDSInstance
   }: SubmitProps): Promise<boolean> => {
     const savePaymentSourceToCustomerWallet =
-      // @ts-expect-error
+      // @ts-expect-error no type
       event?.elements?.save_payment_source_to_customer_wallet?.checked
     if (savePaymentSourceToCustomerWallet)
       setCustomerOrderParam(

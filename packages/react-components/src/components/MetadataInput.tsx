@@ -1,5 +1,5 @@
 import BaseInput from '#components/utils/BaseInput'
-import { BaseInputComponentProps } from '#typings'
+import { type BaseInputComponentProps } from '#typings'
 
 type Props = BaseInputComponentProps &
   JSX.IntrinsicElements['input'] &

@@ -1,18 +1,24 @@
 import PaymentMethodContext, {
   defaultPaymentMethodContext
 } from '#context/PaymentMethodContext'
-import { ReactNode, useContext, useEffect, useReducer, useMemo } from 'react'
+import {
+  type ReactNode,
+  useContext,
+  useEffect,
+  useReducer,
+  useMemo
+} from 'react'
 import paymentMethodReducer, {
   paymentMethodInitialState,
   getPaymentMethods,
-  PaymentMethodConfig,
+  type PaymentMethodConfig,
   setPaymentMethodConfig,
-  PaymentRef,
+  type PaymentRef,
   setPaymentRef
 } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import { BaseError } from '#typings/errors'
+import { type BaseError } from '#typings/errors'
 import isEmpty from 'lodash/isEmpty'
 import useCustomContext from '#utils/hooks/useCustomContext'
 
@@ -96,12 +102,15 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
   const contextValue = useMemo(() => {
     return {
       ...state,
-      setLoading: ({ loading }: { loading: boolean }) =>
-        defaultPaymentMethodContext.setLoading({ loading, dispatch }),
-      setPaymentRef: ({ ref }: { ref: PaymentRef }) =>
-        setPaymentRef({ ref, dispatch }),
-      setPaymentMethodErrors: (errors: BaseError[]) =>
-        defaultPaymentMethodContext.setPaymentMethodErrors(errors, dispatch),
+      setLoading: ({ loading }: { loading: boolean }) => {
+        defaultPaymentMethodContext.setLoading({ loading, dispatch })
+      },
+      setPaymentRef: ({ ref }: { ref: PaymentRef }) => {
+        setPaymentRef({ ref, dispatch })
+      },
+      setPaymentMethodErrors: (errors: BaseError[]) => {
+        defaultPaymentMethodContext.setPaymentMethodErrors(errors, dispatch)
+      },
       setPaymentMethod: async (args: any) =>
         await defaultPaymentMethodContext.setPaymentMethod({
           ...args,
@@ -121,13 +130,14 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
           updateOrder,
           order
         }),
-      updatePaymentSource: async (args: any) =>
+      updatePaymentSource: async (args: any) => {
         await defaultPaymentMethodContext.updatePaymentSource({
           ...args,
           config: credentials,
           dispatch
-        }),
-      destroyPaymentSource: async (args: any) =>
+        })
+      },
+      destroyPaymentSource: async (args: any) => {
         await defaultPaymentMethodContext.destroyPaymentSource({
           ...args,
           dispatch,
@@ -135,6 +145,7 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
           updateOrder,
           orderId: order?.id
         })
+      }
     }
   }, [state])
   return (

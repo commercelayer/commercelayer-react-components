@@ -1,9 +1,9 @@
 import { useContext, useRef } from 'react'
 import {
-  PaymentMethodConfig,
-  PaymentSourceObject
+  type PaymentMethodConfig,
+  type PaymentSourceObject
 } from '#reducers/PaymentMethodReducer'
-import { PaymentSourceProps } from './PaymentSource'
+import { type PaymentSourceProps } from './PaymentSource'
 import useExternalScript from '#utils/hooks/useExternalScript'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import {
@@ -11,8 +11,8 @@ import {
   CardNumber,
   ExpiryDate,
   Cvv,
-  FramesLanguages,
-  FramesStyle
+  type FramesLanguages,
+  type FramesStyle
 } from 'frames-react'
 import OrderContext from '#context/OrderContext'
 import Parent from '#components/utils/Parent'
@@ -107,7 +107,7 @@ export function CheckoutComPayment({
   } = p
   const handleSubmit = async (): Promise<boolean> => {
     const savePaymentSourceToCustomerWallet =
-      // @ts-expect-error
+      // @ts-expect-error no type
       ref?.current?.elements?.save_payment_source_to_customer_wallet?.checked
     if (savePaymentSourceToCustomerWallet) {
       setCustomerOrderParam(

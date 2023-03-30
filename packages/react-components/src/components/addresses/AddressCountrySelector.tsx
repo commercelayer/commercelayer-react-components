@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react'
 import BaseSelect from '../utils/BaseSelect'
-import { BaseSelectComponentProps } from '#typings'
+import { type BaseSelectComponentProps } from '#typings'
 import BillingAddressFormContext, {
-  AddressValuesKeys
+  type AddressValuesKeys
 } from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import { getCountries } from '#utils/countryStateCity'

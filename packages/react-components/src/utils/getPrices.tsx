@@ -1,6 +1,8 @@
 import { isEmpty, first, isArray, has } from 'lodash'
-import { Price } from '@commercelayer/sdk'
-import PriceTemplate, { PTemplateProps } from '#components/utils/PriceTemplate'
+import { type Price } from '@commercelayer/sdk'
+import PriceTemplate, {
+  type PTemplateProps
+} from '#components/utils/PriceTemplate'
 
 export function getPriceByCode(
   skuPrices: Price[],

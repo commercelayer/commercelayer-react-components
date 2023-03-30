@@ -1,7 +1,7 @@
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components/utils/Parent'
 import useCustomContext from '#utils/hooks/useCustomContext'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   labelName: string

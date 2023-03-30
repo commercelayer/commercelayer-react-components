@@ -1,8 +1,8 @@
-import { ReactNode, useContext } from 'react'
+import { type ReactNode, useContext } from 'react'
 import Parent from '#components/utils/Parent'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 import OrderContext from '#context/OrderContext'
-import { CodeType, OrderCodeType } from '#reducers/OrderReducer'
+import { type CodeType, type OrderCodeType } from '#reducers/OrderReducer'
 import type { Order } from '@commercelayer/sdk'
 
 interface ChildrenProps extends Omit<Props, 'children' | 'onClick'> {

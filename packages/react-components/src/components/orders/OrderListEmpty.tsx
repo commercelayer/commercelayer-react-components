@@ -1,6 +1,6 @@
 import Parent from '#components/utils/Parent'
 import OrderListChildrenContext from '#context/OrderListChildrenContext'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 import { useContext } from 'react'
 
 interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {

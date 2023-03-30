@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import isEmpty from 'lodash/isEmpty'
 import { fieldsExist } from '#utils/validateFormFields'
-import { BaseError } from '#typings/errors'
+import { type BaseError } from '#typings/errors'
 import { addressFields } from '#reducers/AddressReducer'
-import { Address, AddressCreate } from '@commercelayer/sdk'
-import { TCustomerAddress } from '#reducers/CustomerReducer'
+import { type Address, type AddressCreate } from '@commercelayer/sdk'
+import { type TCustomerAddress } from '#reducers/CustomerReducer'
 
 type BillingAddressController = (params: {
   billing_address?: AddressCreate

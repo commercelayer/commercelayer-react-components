@@ -1,5 +1,5 @@
 import BaseOrderPrice from '../utils/BaseOrderPrice'
-import { BaseAmountComponent } from '#typings'
+import { type BaseAmountComponent } from '#typings'
 
 export function TaxesAmount(props: BaseAmountComponent): JSX.Element {
   return <BaseOrderPrice base='amount' type='total_tax' {...props} />

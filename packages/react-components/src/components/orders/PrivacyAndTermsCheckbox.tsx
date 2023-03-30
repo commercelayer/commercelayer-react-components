@@ -1,7 +1,7 @@
 import OrderContext from '#context/OrderContext'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import { useContext, useEffect, useState } from 'react'
-import BaseInput, { BaseInputProps } from '../utils/BaseInput'
+import BaseInput, { type BaseInputProps } from '../utils/BaseInput'
 
 export function PrivacyAndTermsCheckbox(
   props: Partial<BaseInputProps>

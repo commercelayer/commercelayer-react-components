@@ -1,10 +1,10 @@
 import AddressesContext from '#context/AddressContext'
 import { useRapidForm } from 'rapid-form'
-import { ReactNode, useContext, useEffect, useRef } from 'react'
+import { type ReactNode, useContext, useEffect, useRef } from 'react'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'
-import { BaseError, CodeErrorType } from '#typings/errors'
-import { AddressInputName } from '#typings'
+import { type BaseError, type CodeErrorType } from '#typings/errors'
+import { type AddressInputName } from '#typings'
 import OrderContext from '#context/OrderContext'
 import { getSaveShippingAddressToAddressBook } from '#utils/localStorage'
 import { businessMandatoryField } from '#utils/validateFormFields'
@@ -108,7 +108,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     const checkboxChecked =
       ref.current?.querySelector(
         '[name="shipping_address_save_to_customer_book"]'
-        // @ts-expect-error
+        // @ts-expect-error no type
       )?.checked || getSaveShippingAddressToAddressBook()
     if (reset && (!isEmpty(values) || !isEmpty(errors) || checkboxChecked)) {
       if (saveAddressToCustomerAddressBook) {
@@ -152,8 +152,9 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     setValue,
     errorClassName,
     errors: errors as any,
-    resetField: (name: string) =>
+    resetField: (name: string) => {
       resetForm({ currentTarget: ref.current } as any, name)
+    }
   } as any
   return (
     <ShippingAddressFormContext.Provider value={providerValues}>

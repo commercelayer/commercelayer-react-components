@@ -1,4 +1,4 @@
-import { LineItem, Shipment } from '@commercelayer/sdk'
+import { type LineItem, type Shipment } from '@commercelayer/sdk'
 import compact from 'lodash/compact'
 import isEmpty from 'lodash/isEmpty'
 
@@ -16,7 +16,7 @@ export function isDoNotShip(lineItems?: LineItem[]): boolean {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         .filter(({ item_type }) => item_type === 'skus')
         .map((lineItem) => {
-          // @ts-expect-error
+          // @ts-expect-error no type
           if (lineItem.item && lineItem?.item?.do_not_ship)
             itemDoNotShip.push(true)
           return lineItem

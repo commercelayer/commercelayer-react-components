@@ -1,6 +1,6 @@
 import Parent from '#components/utils/Parent'
 import OrderListPaginationContext from '#context/OrderListPaginationContext'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
 
 type TAsComponent = keyof Pick<JSX.IntrinsicElements, 'p' | 'span' | 'div'>

@@ -1,10 +1,10 @@
 import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import { PaymentResource } from '#reducers/PaymentMethodReducer'
-import { LoaderType } from '#typings'
+import { type PaymentResource } from '#reducers/PaymentMethodReducer'
+import { type LoaderType } from '#typings'
 import { useContext, useEffect, useState } from 'react'
-import { PaymentSourceProps } from '../payment_source/PaymentSource'
+import { type PaymentSourceProps } from '../payment_source/PaymentSource'
 import getLoaderComponent from '#utils/getLoaderComponent'
 import AdyenGateway from './AdyenGateway'
 import StripeGateway from './StripeGateway'
@@ -89,7 +89,7 @@ export function PaymentGateway({
       ) {
         void setPaymentSources()
       }
-      // @ts-expect-error
+      // @ts-expect-error no type
       if (paymentSource?.mismatched_amounts && show) {
         void setPaymentSources()
       }

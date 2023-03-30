@@ -1,9 +1,9 @@
 import Parent from '#components/utils/Parent'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 import type { StripeElementLocale } from '@stripe/stripe-js'
 import { useContext, useEffect, useRef } from 'react'
-import { PaymentSourceProps } from './PaymentSource'
+import { type PaymentSourceProps } from './PaymentSource'
 
 export interface ExternalPaymentConfig {
   /**
@@ -32,7 +32,7 @@ export function ExternalPayment(props: Props): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
   useEffect(() => {
     if (ref !== null) {
-      // @ts-expect-error
+      // @ts-expect-error no type
       ref.current.onsubmit = async () => {
         return true
       }

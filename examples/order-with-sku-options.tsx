@@ -66,7 +66,7 @@ export default function Order(): JSX.Element {
   const [currentSku, setCurrentSku] = useState('BABYONBU000000E63E746MXX')
   useEffect(() => {
     const getToken = async (): Promise<void> => {
-      // @ts-expect-error
+      // @ts-expect-error no type
       const { accessToken } = await getSalesChannelToken({
         clientId,
         endpoint,

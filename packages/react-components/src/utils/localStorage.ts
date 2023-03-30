@@ -7,7 +7,7 @@ export const getLocalOrder: GetLocalOrder = (key) => {
 export type SetLocalOrder = (key: string, value: string) => void
 
 export const setLocalOrder: SetLocalOrder = (key, value) => {
-  return localStorage.setItem(key, value)
+  localStorage.setItem(key, value)
 }
 
 export type DeleteLocalOrder = (key: string) => void
@@ -45,5 +45,5 @@ export function setCustomerOrderParam<T extends CustomerOrderParams>(
   key: T,
   value: string
 ): void {
-  return setLocalOrder(key, value)
+  setLocalOrder(key, value)
 }

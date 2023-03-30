@@ -1,12 +1,12 @@
 import { createContext } from 'react'
 import {
-  AddressState,
-  SetAddress,
+  type AddressState,
+  type SetAddress,
   setAddress,
-  AddressResource,
-  saveAddresses
+  type AddressResource,
+  type saveAddresses
 } from '#reducers/AddressReducer'
-import { BaseError } from '#typings/errors'
+import { type BaseError } from '#typings/errors'
 
 type DefaultContext = {
   saveAddresses?: (customerEmail?: string) => ReturnType<typeof saveAddresses>

@@ -1,6 +1,6 @@
 import React from 'react'
 import KlarnaPayment from '#components/payment_source/KlarnaPayment'
-import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
+import { type GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
@@ -8,7 +8,7 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource
+  type PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import isEmpty from 'lodash/isEmpty'
 import PaymentCardsTemplate from '#components/utils/PaymentCardsTemplate'
@@ -35,7 +35,7 @@ export function KlarnaGateway(props: Props): JSX.Element | null {
   const locale = order?.language_code
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-expect-error
+  // @ts-expect-error no type
   const clientToken = paymentSource?.client_token
   const klarnaConfig = config
     ? getPaymentConfig<'klarna_payments'>(paymentResource, config)
@@ -48,7 +48,7 @@ export function KlarnaGateway(props: Props): JSX.Element | null {
       : []
 
   if (readonly || showCard) {
-    // @ts-expect-error
+    // @ts-expect-error no type
     const card = paymentSource?.options?.card
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (

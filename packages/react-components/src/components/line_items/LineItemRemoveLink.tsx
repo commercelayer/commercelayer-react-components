@@ -1,8 +1,8 @@
-import { useContext, PropsWithoutRef } from 'react'
+import { useContext, type PropsWithoutRef } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
 import Parent from '#components/utils/Parent'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
 
 interface ChildrenProps extends Omit<Props, 'children'> {

@@ -1,11 +1,11 @@
-import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
+import { type GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import WireTransferPayment from '#components/payment_source/WireTransferPayment'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource
+  type PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import isEmpty from 'lodash/isEmpty'
 import { useContext } from 'react'
@@ -22,7 +22,7 @@ export function WireTransferGateway(props: Props): JSX.Element | null {
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
   if (readonly || showCard) {
     const card =
-      // @ts-expect-error
+      // @ts-expect-error no type
       paymentSource?.options?.card || paymentSource?.metadata?.card
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (

@@ -1,6 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
 import BaseSelect from '#components/utils/BaseSelect'
-import { AddressStateSelectName, BaseSelectComponentProps } from '#typings'
+import {
+  type AddressStateSelectName,
+  type BaseSelectComponentProps
+} from '#typings'
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'

@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
 import BaseInput from '#components-utils/BaseInput'
-import { BaseInputComponentProps } from '#typings'
+import { type BaseInputComponentProps } from '#typings'
 import { useRapidForm } from 'rapid-form'
 import CustomerContext from '#context/CustomerContext'
-import { BaseError, CodeErrorType } from '#typings/errors'
+import { type BaseError, type CodeErrorType } from '#typings/errors'
 
 type Props = {
   name?: 'customer_email' | string

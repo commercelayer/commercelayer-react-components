@@ -1,9 +1,9 @@
-import { IconBrand } from '#context/PaymentSourceContext'
+import { type IconBrand } from '#context/PaymentSourceContext'
 import {
-  PaymentResource,
-  PaymentSourceObject
+  type PaymentResource,
+  type PaymentSourceObject
 } from '#reducers/PaymentMethodReducer'
-import { CustomerPaymentSource } from '@commercelayer/sdk'
+import { type CustomerPaymentSource } from '@commercelayer/sdk'
 
 interface CardDetails {
   brand: IconBrand | string
@@ -36,7 +36,17 @@ export default function getCardDetails({
       }
       break
     }
-    case 'stripe_payments':
+    case 'stripe_payments': {
+      const ps =
+        customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
+      const source = ps?.options?.card ?? ps?.payment_method?.card
+      if (source) {
+        return {
+          ...source
+        }
+      }
+      break
+    }
     case 'braintree_payments': {
       const ps =
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]

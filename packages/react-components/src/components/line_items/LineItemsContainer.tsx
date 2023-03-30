@@ -5,7 +5,9 @@ import lineItemReducer, {
   deleteLineItem
 } from '#reducers/LineItemReducer'
 import OrderContext from '#context/OrderContext'
-import LineItemContext, { LineItemContextValue } from '#context/LineItemContext'
+import LineItemContext, {
+  type LineItemContextValue
+} from '#context/LineItemContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import type { DefaultChildrenType } from '#typings/globals'
 
@@ -63,7 +65,7 @@ export function LineItemsContainer(props: Props): JSX.Element {
   const lineItemValue: LineItemContextValue = {
     ...state,
     loader,
-    updateLineItem: async (lineItemId, quantity = 1) =>
+    updateLineItem: async (lineItemId, quantity = 1) => {
       await updateLineItem({
         lineItemId,
         quantity,
@@ -72,8 +74,9 @@ export function LineItemsContainer(props: Props): JSX.Element {
         getOrder,
         orderId: orderId as string,
         errors: state.errors
-      }),
-    deleteLineItem: async (lineItemId) =>
+      })
+    },
+    deleteLineItem: async (lineItemId) => {
       await deleteLineItem({
         lineItemId,
         dispatch,
@@ -82,6 +85,7 @@ export function LineItemsContainer(props: Props): JSX.Element {
         orderId: orderId as string,
         errors: state.errors
       })
+    }
   }
   return (
     <LineItemContext.Provider value={lineItemValue}>

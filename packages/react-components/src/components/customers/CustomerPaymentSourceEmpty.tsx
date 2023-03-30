@@ -1,6 +1,6 @@
 import Parent from '#components/utils/Parent'
 import CustomerContext from '#context/CustomerContext'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
 
 interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {

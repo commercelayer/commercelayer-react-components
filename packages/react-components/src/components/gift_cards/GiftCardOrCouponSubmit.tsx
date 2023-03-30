@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import Parent from '#components/utils/Parent'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 
 interface ChildrenProps extends Omit<Props, 'children'> {}
 

@@ -1,19 +1,19 @@
 import { createContext } from 'react'
-import { Order } from '@commercelayer/sdk'
+import { type Order } from '@commercelayer/sdk'
 import {
-  OrderState,
-  CreateOrder,
-  SaveAddressToCustomerAddressBook,
+  type OrderState,
+  type CreateOrder,
+  type SaveAddressToCustomerAddressBook,
   createOrder,
   setGiftCardOrCouponCode,
   removeGiftCardOrCouponCode,
   saveAddressToCustomerAddressBook,
   addResourceToInclude,
   updateOrder,
-  getOrderContext,
-  addToCart
+  type getOrderContext,
+  type addToCart
 } from '#reducers/OrderReducer'
-import { BaseError } from '#typings/errors'
+import { type BaseError } from '#typings/errors'
 
 interface DefaultContext extends OrderState {
   createOrder: CreateOrder

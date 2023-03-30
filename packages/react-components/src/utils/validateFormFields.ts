@@ -3,13 +3,12 @@ import isString from 'lodash/isString'
 import without from 'lodash/without'
 import keys from 'lodash/keys'
 import map from 'lodash/map'
-import get from 'lodash/get'
-import { BaseState } from '#typings/index'
-import { BaseError } from '#typings/errors'
-import { AddressField, addressFields } from '#reducers/AddressReducer'
-import { AddressCreate } from '@commercelayer/sdk'
-import { AddressInputName } from '#typings'
-import { TResourceError } from '#components/errors/Errors'
+import { type BaseState } from '#typings/index'
+import { type BaseError } from '#typings/errors'
+import { type AddressField, addressFields } from '#reducers/AddressReducer'
+import { type AddressCreate } from '@commercelayer/sdk'
+import { type AddressInputName } from '#typings'
+import { type TResourceError } from '#components/errors/Errors'
 
 const EMAIL_PATTERN = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/
 
@@ -64,7 +63,7 @@ const validateFormFields: ValidateFormFields = (
   const errors: BaseError[] = []
   let values = { metadata: {} }
   map(fields, (v: FormField) => {
-    const isTick = !!get(v, 'checked')
+    const isTick = 'checked' in v
     const val = isTick || (v.value === 'on' ? false : v.value)
     const attrName = v.getAttribute('name')
     if ((attrName && required.includes(attrName)) || v.required) {

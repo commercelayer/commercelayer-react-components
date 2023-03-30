@@ -1,6 +1,6 @@
 import { createContext } from 'react'
-import { LineItemState } from '#reducers/LineItemReducer'
-import { LineItem } from '@commercelayer/sdk'
+import { type LineItemState } from '#reducers/LineItemReducer'
+import { type LineItem } from '@commercelayer/sdk'
 
 export interface LineItemContextValue extends LineItemState {
   lineItems?: LineItem[] | undefined

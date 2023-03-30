@@ -1,4 +1,4 @@
-import { useState, useEffect, MouseEvent, useContext } from 'react'
+import { useState, useEffect, type MouseEvent, useContext } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import type { LoaderType } from '#typings'
@@ -107,7 +107,9 @@ export function PaymentMethod({
                   setLoading(false)
                 }, 200)
               }
-              if (getCustomerPaymentSources) await getCustomerPaymentSources()
+              if (getCustomerPaymentSources) {
+                getCustomerPaymentSources()
+              }
               setLoadingPlaceOrder({ loading: false })
             }
             if (typeof autoSelectSinglePaymentMethod === 'function') {
