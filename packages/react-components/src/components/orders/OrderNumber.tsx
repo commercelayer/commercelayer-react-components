@@ -1,4 +1,4 @@
-import BaseField, { BaseFieldProps } from '../utils/BaseField'
+import BaseField, { type BaseFieldProps } from '../utils/BaseField'
 
 type Props = Omit<BaseFieldProps, 'attribute'>
 

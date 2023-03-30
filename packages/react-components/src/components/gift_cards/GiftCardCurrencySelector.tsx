@@ -1,6 +1,6 @@
 import BaseSelect from '#components/utils/BaseSelect'
 import currencyOptions from '#config/currency'
-import { BaseSelectComponentProps } from '#typings'
+import { type BaseSelectComponentProps } from '#typings'
 
 type Props = Omit<BaseSelectComponentProps, 'options' | 'name'> & {
   required?: boolean

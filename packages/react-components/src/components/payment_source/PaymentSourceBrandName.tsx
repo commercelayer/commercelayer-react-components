@@ -1,8 +1,10 @@
-import PaymentSourceContext, { IconBrand } from '#context/PaymentSourceContext'
+import PaymentSourceContext, {
+  type IconBrand
+} from '#context/PaymentSourceContext'
 import capitalize from 'lodash/capitalize'
 import { useContext } from 'react'
 import Parent from '#components/utils/Parent'
-import { ChildrenFunction } from '#typings'
+import { type ChildrenFunction } from '#typings'
 import CustomerPaymentSourceContext from '#context/CustomerPaymentSourceContext'
 
 interface CustomComponent extends Omit<Props, 'children'> {

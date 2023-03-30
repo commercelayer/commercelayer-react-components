@@ -1,4 +1,10 @@
-import { useContext, useReducer, useEffect, ReactNode, useMemo } from 'react'
+import {
+  useContext,
+  useReducer,
+  useEffect,
+  type ReactNode,
+  useMemo
+} from 'react'
 import availabilityReducer, {
   availabilityInitialState,
   getAvailability

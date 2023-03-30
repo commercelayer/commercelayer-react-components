@@ -1,6 +1,6 @@
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isFunction from 'lodash/isFunction'
-import { ReactNode, useContext, useEffect, useRef } from 'react'
+import { type ReactNode, useContext, useEffect, useRef } from 'react'
 
 export interface PaypalConfig {
   return_url: string
@@ -32,7 +32,7 @@ export function PaypalPayment({
       ref.current &&
       paymentSource &&
       currentPaymentMethodType &&
-      // @ts-expect-error
+      // @ts-expect-error no type
       paymentSource?.approval_url
     ) {
       ref.current.onsubmit = async () => await handleClick()

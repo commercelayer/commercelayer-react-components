@@ -1,7 +1,13 @@
 import ShipmentContext, {
   defaultShipmentContext
 } from '#context/ShipmentContext'
-import { ReactNode, useContext, useEffect, useMemo, useReducer } from 'react'
+import {
+  type ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer
+} from 'react'
 import shipmentReducer, {
   shipmentInitialState,
   setShipmentErrors,
@@ -10,7 +16,7 @@ import shipmentReducer, {
 } from '#reducers/ShipmentReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import { BaseError } from '#typings/errors'
+import { type BaseError } from '#typings/errors'
 import isEmpty from 'lodash/isEmpty'
 
 interface Props {
@@ -80,11 +86,11 @@ export function ShipmentsContainer(props: Props): JSX.Element {
           .filter(({ item_type: itemType }) => itemType === 'skus')
           .map((lineItem) => {
             const conditions =
-              // @ts-expect-error
+              // @ts-expect-error no type
               lineItem.item?.do_not_ship ||
-              // @ts-expect-error
+              // @ts-expect-error no type
               lineItem.item?.do_not_track ||
-              // @ts-expect-error
+              // @ts-expect-error no type
               lineItem.item?.inventory?.quantity >= lineItem?.quantity
             return !!conditions
           })
@@ -110,8 +116,9 @@ export function ShipmentsContainer(props: Props): JSX.Element {
   const contextValue = useMemo(() => {
     return {
       ...state,
-      setShipmentErrors: (errors: BaseError[]) =>
-        defaultShipmentContext.setShipmentErrors(errors, dispatch),
+      setShipmentErrors: (errors: BaseError[]) => {
+        defaultShipmentContext.setShipmentErrors(errors, dispatch)
+      },
       setShippingMethod: async (shipmentId: string, shippingMethodId: string) =>
         await setShippingMethod({
           shippingMethodId,

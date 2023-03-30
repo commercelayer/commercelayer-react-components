@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import Parent from '#components/utils/Parent'
 import type { LineItem } from '@commercelayer/sdk'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 
 export interface TLineItemName extends Omit<Props, 'children'> {
   label: string

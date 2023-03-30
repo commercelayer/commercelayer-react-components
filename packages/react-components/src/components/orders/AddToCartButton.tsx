@@ -1,11 +1,11 @@
-import { useContext, PropsWithoutRef } from 'react'
+import { useContext, type PropsWithoutRef } from 'react'
 import Parent from '../utils/Parent'
 import OrderContext from '#context/OrderContext'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 import {
-  AddToCartReturn,
-  CustomLineItem,
-  LineItemOption
+  type AddToCartReturn,
+  type CustomLineItem,
+  type LineItemOption
 } from '#reducers/OrderReducer'
 import SkuListsContext from '#context/SkuListsContext'
 import ExternalFunctionContext from '#context/ExternalFunctionContext'

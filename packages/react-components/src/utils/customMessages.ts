@@ -1,6 +1,6 @@
 import findIndex from 'lodash/findIndex'
 import pick from 'lodash/pick'
-import { BaseError } from '#typings/errors'
+import { type BaseError } from '#typings/errors'
 
 export default function customMessages(
   messages: BaseError[] = [],

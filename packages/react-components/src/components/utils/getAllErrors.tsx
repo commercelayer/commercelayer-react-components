@@ -1,7 +1,7 @@
 import customMessages from '#utils/customMessages'
-import { LineItem } from '@commercelayer/sdk'
-import { BaseError } from '#typings/errors'
-import { TResourceError } from '#components/errors/Errors'
+import { type LineItem } from '@commercelayer/sdk'
+import { type BaseError } from '#typings/errors'
+import { type TResourceError } from '#components/errors/Errors'
 
 export interface AllErrorsParams {
   allErrors: BaseError[]

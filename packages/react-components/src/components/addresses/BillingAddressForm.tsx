@@ -1,12 +1,12 @@
 import AddressesContext from '#context/AddressContext'
 import { useRapidForm } from 'rapid-form'
-import { ReactNode, useContext, useEffect, useRef } from 'react'
+import { type ReactNode, useContext, useEffect, useRef } from 'react'
 import BillingAddressFormContext, {
-  AddressValuesKeys,
-  DefaultContextAddress
+  type AddressValuesKeys,
+  type DefaultContextAddress
 } from '#context/BillingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'
-import { BaseError, CodeErrorType } from '#typings/errors'
+import { type BaseError, type CodeErrorType } from '#typings/errors'
 import type { AddressInputName } from '#typings'
 import OrderContext from '#context/OrderContext'
 import { getSaveBillingAddressToAddressBook } from '#utils/localStorage'
@@ -112,7 +112,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     const checkboxChecked =
       ref.current?.querySelector(
         '[name="billing_address_save_to_customer_book"]'
-        // @ts-expect-error
+        // @ts-expect-error no type no types
       )?.checked || getSaveBillingAddressToAddressBook()
     if (reset && (!isEmpty(values) || !isEmpty(errors) || checkboxChecked)) {
       if (saveAddressToCustomerAddressBook) {
@@ -153,8 +153,9 @@ export function BillingAddressForm(props: Props): JSX.Element {
     errorClassName,
     requiresBillingInfo: order?.requires_billing_info || false,
     errors: errors as any,
-    resetField: (name: string) =>
+    resetField: (name: string) => {
       resetForm({ currentTarget: ref.current } as any, name)
+    }
   }
   return (
     <BillingAddressFormContext.Provider value={providerValues}>

@@ -1,4 +1,4 @@
-import { useReducer, useContext, ReactNode } from 'react'
+import { useReducer, useContext, type ReactNode } from 'react'
 import GiftCardContext from '#context/GiftCardContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import giftCardReducer, {
@@ -21,16 +21,21 @@ export function GiftCardContainer(props: Props): JSX.Element {
   const { getOrder, createOrder, order } = useContext(OrderContext)
   const giftCardValue = {
     ...state,
-    addGiftCardRecipient: async (values: any) =>
-      await addGiftCardRecipient(values, config, dispatch),
-    addGiftCard: async (values: any) =>
+    addGiftCardRecipient: async (values: any) => {
+      await addGiftCardRecipient(values, config, dispatch)
+    },
+    addGiftCard: async (values: any) => {
       await addGiftCard(
         { ...values },
         { config, dispatch, getOrder, createOrder, order }
-      ),
-    addGiftCardError: (errors: any): void => addGiftCardError(errors, dispatch),
-    addGiftCardLoading: (loading: boolean): void =>
+      )
+    },
+    addGiftCardError: (errors: any): void => {
+      addGiftCardError(errors, dispatch)
+    },
+    addGiftCardLoading: (loading: boolean): void => {
       addGiftCardLoading(loading, dispatch)
+    }
   }
   return (
     <GiftCardContext.Provider value={giftCardValue}>

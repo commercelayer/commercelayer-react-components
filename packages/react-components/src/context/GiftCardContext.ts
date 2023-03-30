@@ -1,11 +1,11 @@
 import { createContext } from 'react'
 import {
   giftCardInitialState,
-  GiftCardState,
-  GiftCardRecipientI,
-  GiftCardI
+  type GiftCardState,
+  type GiftCardRecipientI,
+  type GiftCardI
 } from '#reducers/GiftCardReducer'
-import { BaseError } from '#typings/errors'
+import { type BaseError } from '#typings/errors'
 
 export interface GCContext extends GiftCardState {
   addGiftCardRecipient: (values: GiftCardRecipientI & object) => void

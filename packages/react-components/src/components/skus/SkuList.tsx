@@ -1,4 +1,4 @@
-import { useContext, useEffect, ReactNode } from 'react'
+import { useContext, useEffect, type ReactNode } from 'react'
 import SkuListsContext from '#context/SkuListsContext'
 
 interface Props {

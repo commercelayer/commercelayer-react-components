@@ -1,5 +1,5 @@
 import BillingAddressContext from '#context/BillingAddressContext'
-import { ReactNode, useContext, useEffect, useReducer } from 'react'
+import { type ReactNode, useContext, useEffect, useReducer } from 'react'
 import billingAddressReducer, {
   billingAddressInitialState,
   setBillingAddress,

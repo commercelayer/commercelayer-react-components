@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { IconBrand } from './PaymentSourceContext'
+import { type IconBrand } from './PaymentSourceContext'
 
 interface DefaultContext {
   brand?: IconBrand | string

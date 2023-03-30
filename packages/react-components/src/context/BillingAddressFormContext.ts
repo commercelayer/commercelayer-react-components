@@ -13,13 +13,14 @@ export interface DefaultContextAddress {
     name: AddressValuesKeys,
     value: string | number | readonly string[]
   ) => void
-  errors?: {
-    [name: string]: {
+  errors?: Record<
+    string,
+    {
       code: string
       message: string
       error: boolean
     }
-  }
+  >
   errorClassName?: string
   requiresBillingInfo?: boolean
   resetField?: (name: string) => void

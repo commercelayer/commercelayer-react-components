@@ -1,6 +1,6 @@
-import { Dispatch, ForwardedRef, Ref } from 'react'
-import PropTypes, { InferProps } from 'prop-types'
-import { BaseError } from './errors'
+import { type Dispatch, type ForwardedRef, type Ref } from 'react'
+import PropTypes, { type InferProps } from 'prop-types'
+import { type BaseError } from './errors'
 
 export const BC = {
   id: PropTypes.string,
@@ -138,9 +138,7 @@ export type AddressStateSelectName =
 export type LoaderType = string | JSX.Element
 
 export const BMObject = PropTypes.objectOf(PropTypes.string)
-export interface BaseMetadataObject {
-  [key: string]: string | undefined | null
-}
+export type BaseMetadataObject = Record<string, string | undefined | null>
 
 export type TimeFormat = 'days' | 'hours'
 
@@ -172,9 +170,7 @@ export type BaseReducer = <
 
 export type BaseUnsetState<A> = (dispatch: Dispatch<A>) => void
 
-export interface BaseMetadata {
-  [key: string]: string | undefined | null
-}
+export type BaseMetadata = Record<string, string | undefined | null>
 
 export type BaseFormatPrice = 'formatted' | 'cents' | 'float'
 

@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { LineItem } from '@commercelayer/sdk'
+import { type LineItem } from '@commercelayer/sdk'
 
 export type InitialLineItemContext = Partial<{
   lineItem: LineItem

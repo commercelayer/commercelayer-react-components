@@ -1,11 +1,11 @@
 import {
-  SetCustomerErrors,
-  deleteCustomerAddress,
-  CustomerState,
-  getCustomerPaymentSources,
-  setCustomerEmail,
-  TCustomerAddress,
-  getCustomerAddresses
+  type SetCustomerErrors,
+  type deleteCustomerAddress,
+  type CustomerState,
+  type getCustomerPaymentSources,
+  type setCustomerEmail,
+  type TCustomerAddress,
+  type getCustomerAddresses
 } from '#reducers/CustomerReducer'
 import { createContext } from 'react'
 

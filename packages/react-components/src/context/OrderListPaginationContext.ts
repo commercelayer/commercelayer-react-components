@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { Row } from 'react-table'
+import { type Row } from 'react-table'
 
 export interface OrderListPaginationContext {
   canNextPage: boolean

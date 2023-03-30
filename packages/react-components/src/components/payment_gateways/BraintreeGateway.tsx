@@ -1,13 +1,13 @@
 import BraintreePayment from '#components/payment_source/BraintreePayment'
-import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
+import { type GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
-import { PaymentResource } from '#reducers/PaymentMethodReducer'
+import { type PaymentResource } from '#reducers/PaymentMethodReducer'
 import getCardDetails from '#utils/getCardDetails'
-import { StripeElementLocale } from '@stripe/stripe-js'
+import { type StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import { useContext } from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
@@ -36,7 +36,7 @@ export function BraintreeGateway(props: Props): JSX.Element | null {
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-expect-error
+  // @ts-expect-error no type
   const authorization = paymentSource?.client_token
   const braintreeConfig = getPaymentAttributes({
     resource: paymentResource,

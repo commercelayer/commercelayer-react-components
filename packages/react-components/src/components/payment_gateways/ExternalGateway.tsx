@@ -1,4 +1,4 @@
-import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
+import { type GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import ExternalPayment from '#components/payment_source/ExternalPayment'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
@@ -7,10 +7,10 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource
+  type PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import getCardDetails from '#utils/getCardDetails'
-import { StripeElementLocale } from '@stripe/stripe-js'
+import { type StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
@@ -39,7 +39,7 @@ export function ExternalGateway(props: Props): JSX.Element | null {
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-expect-error
+  // @ts-expect-error no type
   const paymentSourceToken = paymentSource?.payment_source_token
   const paymentSourceId = order?.payment_source?.id || paymentSource?.id
   const getConfig = config

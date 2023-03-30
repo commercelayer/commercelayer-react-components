@@ -1,4 +1,4 @@
-import { OrderCodeType } from '#reducers/OrderReducer'
+import { type OrderCodeType } from '#reducers/OrderReducer'
 import { createContext } from 'react'
 
 interface DefaultContext {

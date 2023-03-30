@@ -1,6 +1,6 @@
 import baseReducer from '#utils/baseReducer'
-import { Dispatch } from 'react'
-import { BaseError } from '#typings/errors'
+import { type Dispatch } from 'react'
+import { type BaseError } from '#typings/errors'
 import type {
   Address,
   AddressCreate,
@@ -10,8 +10,8 @@ import type {
   Order,
   OrderUpdate
 } from '@commercelayer/sdk'
-import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { updateOrder } from './OrderReducer'
+import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
+import { type updateOrder } from './OrderReducer'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
 import jwtDecode from '#utils/jwt'

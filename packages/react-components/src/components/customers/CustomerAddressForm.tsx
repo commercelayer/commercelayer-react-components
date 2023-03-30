@@ -1,10 +1,10 @@
 import AddressesContext from '#context/AddressContext'
 import { useRapidForm } from 'rapid-form'
-import { ReactNode, useContext, useEffect, useRef } from 'react'
+import { type ReactNode, useContext, useEffect, useRef } from 'react'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
-import { BaseError, CodeErrorType } from '#typings/errors'
-import { AddressField } from '#reducers/AddressReducer'
-import { AddressCountrySelectName, AddressInputName } from '#typings'
+import { type BaseError, type CodeErrorType } from '#typings/errors'
+import { type AddressField } from '#reducers/AddressReducer'
+import { type AddressCountrySelectName, type AddressInputName } from '#typings'
 import OrderContext from '#context/OrderContext'
 import isEmptyStates from '#utils/isEmptyStates'
 import type { Address } from '@commercelayer/sdk'
@@ -81,7 +81,7 @@ export function CustomerAddressForm(props: Props): JSX.Element {
     ) {
       if (ref) {
         ref.current?.reset()
-        // @ts-expect-error
+        // @ts-expect-error no type
         resetForm({ target: ref.current })
         setAddressErrors([], 'billing_address')
         setAddress({ values: {}, resource: 'billing_address' })
@@ -107,8 +107,9 @@ export function CustomerAddressForm(props: Props): JSX.Element {
     errorClassName,
     requiresBillingInfo: order?.requires_billing_info || false,
     errors: errors as any,
-    resetField: (name: string) =>
+    resetField: (name: string) => {
       resetForm({ currentTarget: ref.current } as any, name)
+    }
   }
   return (
     <CustomerAddressFormContext.Provider value={providerValues}>

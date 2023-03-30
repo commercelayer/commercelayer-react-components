@@ -1,5 +1,5 @@
 import OrderContext from '#context/OrderContext'
-import { FunctionComponent, useContext, useEffect, useState } from 'react'
+import { type FunctionComponent, useContext, useEffect, useState } from 'react'
 import Parent from './Parent'
 
 type BaseFieldChildren = Omit<BaseFieldProps, 'children'>

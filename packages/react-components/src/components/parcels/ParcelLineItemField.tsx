@@ -1,8 +1,8 @@
-import { ConditionalElement } from '#typings'
+import { type ConditionalElement } from '#typings'
 import GenericFieldComponent, {
-  TGenericChildrenProps,
-  TResourceKey,
-  TResources
+  type TGenericChildrenProps,
+  type TResourceKey,
+  type TResources
 } from '#components/utils/GenericFieldComponent'
 import ParcelLineItemChildrenContext from '#context/ParcelLineItemChildrenContext'
 

@@ -1,4 +1,4 @@
-import { SkuState } from '#reducers/SkuReducer'
+import { type SkuState } from '#reducers/SkuReducer'
 import { createContext } from 'react'
 
 export type SkuContextValue = SkuState

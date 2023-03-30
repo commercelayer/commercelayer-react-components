@@ -1,6 +1,6 @@
 import type { Order } from '@commercelayer/sdk'
 import { createContext } from 'react'
-import { Row } from 'react-table'
+import { type Row } from 'react-table'
 
 export type InitialOrderListContext = Partial<{
   /**

@@ -1,10 +1,10 @@
-import { useContext, ReactNode } from 'react'
+import { useContext, type ReactNode } from 'react'
 import AddressChildrenContext from '#context/AddressChildrenContext'
 import Parent from '#components/utils/Parent'
-import { AddressFieldView } from '#reducers/AddressReducer'
+import { type AddressFieldView } from '#reducers/AddressReducer'
 import type { Address } from '@commercelayer/sdk'
 import CustomerContext from '#context/CustomerContext'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 
 interface ChildrenProps extends Omit<Props, 'children' | 'name'> {
   address: Address

@@ -1,8 +1,10 @@
 import { createContext } from 'react'
-import { LineItemOption } from '@commercelayer/sdk'
+import type { LineItemOption } from '@commercelayer/sdk'
 
 export interface InitialLineItemContext {
-  lineItemOption: Partial<LineItemOption>
+  lineItemOption: Partial<
+    Omit<LineItemOption, 'options'> & { options?: Record<string, string> }
+  >
   showAll?: boolean
 }
 

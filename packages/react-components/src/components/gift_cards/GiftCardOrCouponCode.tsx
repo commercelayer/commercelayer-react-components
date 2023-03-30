@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { ChildrenFunction } from '#typings'
+import { type ChildrenFunction } from '#typings'
 import Parent from '#components/utils/Parent'
 import OrderContext from '#context/OrderContext'
 import type { CodeType } from '#reducers/OrderReducer'

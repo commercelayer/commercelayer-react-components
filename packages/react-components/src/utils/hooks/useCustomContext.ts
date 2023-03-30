@@ -1,4 +1,4 @@
-import { Context, useContext } from 'react'
+import { type Context, useContext } from 'react'
 
 interface TParams<C> {
   /**
@@ -28,7 +28,7 @@ export default function useCustomContext<T>({
   const currentContext = useContext<T>(context)
   const isProduction = process.env.NODE_ENV === 'production'
   const msg = `Cannot use <${currentComponentName}/> outside of <${contextComponentName}/>`
-  // @ts-expect-error
+  // @ts-expect-error no type type is not assignable to currentContext
   if (key != null && key in currentContext) return currentContext
   if (key == null && currentContext != null) return currentContext
   if (isProduction) console.error(msg)

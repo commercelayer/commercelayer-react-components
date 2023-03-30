@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { Sku } from '@commercelayer/sdk'
+import { type Sku } from '@commercelayer/sdk'
 
 export type InitialSkuContext = Partial<{
   sku: Sku

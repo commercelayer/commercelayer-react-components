@@ -1,4 +1,4 @@
-import { Sku } from '@commercelayer/sdk'
+import { type Sku } from '@commercelayer/sdk'
 
 const getSkus = (skus: Sku[], sortBy: string[]): Record<string, any> => {
   const obj: Record<string, Sku> = {}

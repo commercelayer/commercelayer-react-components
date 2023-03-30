@@ -1,9 +1,9 @@
 import baseReducer from '#utils/baseReducer'
-import { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
 import getSdk from '#utils/getSdk'
-import { BaseAction } from '#typings'
-import { QueryParamsList, Sku } from '@commercelayer/sdk'
-import { Dispatch } from 'react'
+import { type BaseAction } from '#typings'
+import { type QueryParamsList, type Sku } from '@commercelayer/sdk'
+import { type Dispatch } from 'react'
 
 type SkuActionType = 'getSkus' | 'setLoading'
 type SkuAction = BaseAction<SkuActionType, SkuState>

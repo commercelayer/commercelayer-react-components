@@ -1,5 +1,5 @@
 import CheckoutComPayment from '#components/payment_source/CheckoutComPayment'
-import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
+import { type GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
@@ -7,9 +7,9 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource
+  type PaymentResource
 } from '#reducers/PaymentMethodReducer'
-import { StripeElementLocale } from '@stripe/stripe-js'
+import { type StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React from 'react'
 import PaymentCardsTemplate from '#components/utils/PaymentCardsTemplate'
@@ -39,7 +39,7 @@ export function CheckoutComGateway(props: Props): JSX.Element | null {
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-expect-error
+  // @ts-expect-error no type
   const publicKey = paymentSource?.public_key
   const paymentConfig = config
     ? getPaymentConfig<'checkout_com_payments'>(paymentResource, config)

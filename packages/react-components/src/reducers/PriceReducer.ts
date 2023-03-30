@@ -1,16 +1,14 @@
-import { BaseAction, LoaderType } from '#typings'
-import { Price } from '@commercelayer/sdk'
+import { type BaseAction, type LoaderType } from '#typings'
+import { type Price } from '@commercelayer/sdk'
 import getPrices from '#utils/getPrices'
-import { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { Dispatch } from 'react'
+import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
+import { type Dispatch } from 'react'
 import baseReducer from '#utils/baseReducer'
-import { BaseError, TAPIError } from '#typings/errors'
+import { type BaseError, type TAPIError } from '#typings/errors'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
 
-export interface Prices {
-  [key: string]: Price | Price[]
-}
+export type Prices = Record<string, Price | Price[]>
 
 type SkuCodesPrice = string[]
 

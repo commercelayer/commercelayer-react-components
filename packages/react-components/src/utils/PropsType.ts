@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types'
+import type PropTypes from 'prop-types'
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
@@ -35,7 +35,4 @@ type WithDefaultProps<P, DP> = Omit<P, keyof DP> & {
  * type Props = PropsType<typeof propTypes, typeof defaultProps>;
  * ```
  */
-export type PropsType<PT, DP = {}> = WithDefaultProps<
-  PropTypes.InferProps<PT>,
-  DP
->
+export type PropsType<PT, DP> = WithDefaultProps<PropTypes.InferProps<PT>, DP>

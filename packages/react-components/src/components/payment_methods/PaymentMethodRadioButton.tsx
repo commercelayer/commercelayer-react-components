@@ -1,12 +1,12 @@
-import { useContext, ChangeEvent } from 'react'
+import { useContext, type ChangeEvent } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components/utils/Parent'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import type { Order, PaymentMethod } from '@commercelayer/sdk'
-import { PaymentResource } from '#reducers/PaymentMethodReducer'
+import { type PaymentResource } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import useCustomContext from '#utils/hooks/useCustomContext'
-import { ChildrenFunction } from '#typings/index'
+import { type ChildrenFunction } from '#typings/index'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   checked: boolean

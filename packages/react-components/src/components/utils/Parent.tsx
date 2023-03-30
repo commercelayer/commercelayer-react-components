@@ -1,4 +1,4 @@
-import { Component, ForwardedRef } from 'react'
+import { type Component, type ForwardedRef } from 'react'
 
 export interface ParentProps {
   // Add parent ref to child

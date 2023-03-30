@@ -1,4 +1,4 @@
-import { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
+import { type GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import StripePayment from '#components/payment_source/StripePayment'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
@@ -7,10 +7,10 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import {
   getPaymentConfig,
-  PaymentResource
+  type PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import getCardDetails from '#utils/getCardDetails'
-import { StripeElementLocale } from '@stripe/stripe-js'
+import { type StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
@@ -39,8 +39,10 @@ export function StripeGateway(props: Props): JSX.Element | null {
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  // @ts-expect-error
+  // @ts-expect-error no type
   const publishableKey = paymentSource?.publishable_key
+  // @ts-expect-error no type
+  const clientSecret = paymentSource?.client_secret
   const paymentSourceId = order?.payment_source?.id || paymentSource?.id
   const stripeConfig = config
     ? getPaymentConfig<'stripe_payments'>(paymentResource, config)
@@ -80,6 +82,7 @@ export function StripeGateway(props: Props): JSX.Element | null {
           show={show}
           templateCustomerSaveToWallet={templateCustomerSaveToWallet}
           publishableKey={publishableKey}
+          clientSecret={clientSecret}
           locale={locale}
           {...stripeConfig}
         />
@@ -90,6 +93,7 @@ export function StripeGateway(props: Props): JSX.Element | null {
     <StripePayment
       show={show}
       publishableKey={publishableKey}
+      clientSecret={clientSecret}
       locale={locale}
       {...stripeConfig}
     />

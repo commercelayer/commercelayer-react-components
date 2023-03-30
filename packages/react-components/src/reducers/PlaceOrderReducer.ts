@@ -5,7 +5,10 @@ import type { BaseError } from '#typings/errors'
 import type { Order, OrderUpdate } from '@commercelayer/sdk'
 import isEmpty from 'lodash/isEmpty'
 import { isDoNotShip, shipmentsFilled } from '#utils/shipments'
-import { PaymentResource, PaymentSourceType } from './PaymentMethodReducer'
+import {
+  type PaymentResource,
+  type PaymentSourceType
+} from './PaymentMethodReducer'
 import {
   saveBillingAddress,
   saveShippingAddress,
@@ -28,6 +31,9 @@ export interface PlaceOrderOptions {
   }
   checkoutCom?: {
     session_id: string
+  }
+  stripe?: {
+    redirectStatus: string
   }
 }
 
@@ -113,16 +119,16 @@ export function placeOrderPermitted({
     if (isEmpty(billingAddress)) isPermitted = false
     if (isEmpty(shippingAddress) && !doNotShip) isPermitted = false
     if (!isEmpty(shipments) && !shipment) isPermitted = false
-    // @ts-expect-error
+    // @ts-expect-error no type
     if (paymentSource?.mismatched_amounts) isPermitted = false
     dispatch({
       type: 'setPlaceOrderPermitted',
       payload: {
         isPermitted,
         paymentType: paymentMethod?.payment_source_type as PaymentResource,
-        // @ts-expect-error
+        // @ts-expect-error no type
         paymentSecret: paymentSource?.client_secret,
-        // @ts-expect-error
+        // @ts-expect-error no type
         paymentId: paymentSource?.options?.id,
         paymentSource,
         options
@@ -181,9 +187,9 @@ export async function setPlaceOrder({
           _details: true,
           session_id: options?.checkoutCom?.session_id
         })
-        // @ts-expect-error
+        // @ts-expect-error no type
         if (payment?.payment_response?.status !== 'Authorized') {
-          // @ts-expect-error
+          // @ts-expect-error no type
           const [action] = payment?.payment_response?.actions || ['']
           const errors: BaseError[] = [
             {

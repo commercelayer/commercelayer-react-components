@@ -1,9 +1,9 @@
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import { ConditionalElement } from '#typings'
+import { type ConditionalElement } from '#typings'
 import GenericFieldComponent, {
-  TGenericChildrenProps,
-  TResourceKey,
-  TResources
+  type TGenericChildrenProps,
+  type TResourceKey,
+  type TResources
 } from '#components/utils/GenericFieldComponent'
 
 type LineItemFieldChildrenProps = TGenericChildrenProps<TResources['LineItem']>

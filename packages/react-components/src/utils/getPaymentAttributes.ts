@@ -4,10 +4,10 @@ import {
   type PaymentMethodConfig,
   type PaymentResource
 } from '#reducers/PaymentMethodReducer'
-import { ExternalPayment } from '@commercelayer/sdk'
+import { type ExternalPayment } from '@commercelayer/sdk'
 import { pick } from './pick'
-import { replace, StringReplace } from './replace'
-import { SnakeToCamelCase, snakeToCamelCase } from './snakeToCamelCase'
+import { replace, type StringReplace } from './replace'
+import { type SnakeToCamelCase, snakeToCamelCase } from './snakeToCamelCase'
 
 interface Params<R extends PaymentResource, C extends PaymentMethodConfig> {
   resource: R

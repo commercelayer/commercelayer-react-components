@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react'
 import getAmount from '#utils/getAmount'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import Parent from '#components/utils/Parent'
-import { BaseAmountComponent, BasePriceType } from '#typings/index'
+import { type BaseAmountComponent, type BasePriceType } from '#typings/index'
 
 type Props = BaseAmountComponent & {
   type?: BasePriceType

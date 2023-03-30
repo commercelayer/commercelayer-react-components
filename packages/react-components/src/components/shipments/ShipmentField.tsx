@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import Parent from '#components/utils/Parent'
 import get from 'lodash/get'
-import { Shipment } from '@commercelayer/sdk'
+import { type Shipment } from '@commercelayer/sdk'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 
 type ShipmentFieldChildrenProps = Omit<Props, 'children'> & {

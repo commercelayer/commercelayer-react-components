@@ -1,9 +1,9 @@
 import { createContext } from 'react'
 import {
-  ShipmentState,
-  SetShipmentErrors,
+  type ShipmentState,
+  type SetShipmentErrors,
   setShipmentErrors,
-  setShippingMethod
+  type setShippingMethod
 } from '#reducers/ShipmentReducer'
 
 type DefaultContext = {

@@ -1,10 +1,10 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
-import { PaymentSourceProps } from './PaymentSource'
+import { type PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
+import { type PaymentSourceProps } from './PaymentSource'
 import OrderContext from '#context/OrderContext'
 import useExternalScript from '#utils/hooks/useExternalScript'
-import { LineItem } from '@commercelayer/sdk'
+import { type LineItem } from '@commercelayer/sdk'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 
 interface KlarnaResponse {
@@ -91,7 +91,9 @@ export default function KlarnaPayment({
       loaded &&
       klarna
     ) {
-      ref.current.onsubmit = async () => await handleClick(klarna)
+      ref.current.onsubmit = async () => {
+        await handleClick(klarna)
+      }
       setPaymentRef({ ref })
     }
     return () => {
@@ -99,7 +101,7 @@ export default function KlarnaPayment({
     }
   }, [ref, paymentSource, currentPaymentMethodType, loaded, klarna])
   const handleClick = async (kl: any): Promise<void> => {
-    // @ts-expect-error
+    // @ts-expect-error no type
     const [first] = paymentSource?.payment_methods || undefined
     const paymentMethodCategory = first?.identifier
     const billingAddress = {
@@ -202,7 +204,7 @@ export default function KlarnaPayment({
     }
   }
   if (klarna && clientToken) {
-    // @ts-expect-error
+    // @ts-expect-error no type
     const [first] = paymentSource?.payment_methods || undefined
     klarna.Payments.init({
       client_token: clientToken

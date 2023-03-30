@@ -4,21 +4,21 @@ import orderReducer, {
   getApiOrder,
   setOrderErrors,
   setOrder,
-  OrderCodeType,
-  AddResourceToInclude,
+  type OrderCodeType,
+  type AddResourceToInclude,
   orderInitialState,
-  UpdateOrderArgs,
-  SaveAddressToCustomerAddressBook,
+  type UpdateOrderArgs,
+  type SaveAddressToCustomerAddressBook,
   updateOrder,
-  ResourceIncluded,
+  type ResourceIncluded,
   addToCart
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext, { defaultOrderContext } from '#context/OrderContext'
-import { BaseMetadataObject } from '#typings'
+import { type BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
 import type { OrderCreate, Order } from '@commercelayer/sdk'
-import { BaseError } from '#typings/errors'
+import { type BaseError } from '#typings/errors'
 import compareObjAttribute from '#utils/compareObjAttribute'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import type { DefaultChildrenType } from '#typings/globals'
@@ -205,7 +205,9 @@ export function OrderContainer(props: Props): JSX.Element {
     }
     return {
       ...state,
-      setOrder: (order: Order) => setOrder(order, dispatch),
+      setOrder: (order: Order) => {
+        setOrder(order, dispatch)
+      },
       getOrder: async (id: string): Promise<Order | undefined> =>
         await getApiOrder({ id, dispatch, config, state }),
       setOrderErrors: (errors: BaseError[]) =>
@@ -236,11 +238,12 @@ export function OrderContainer(props: Props): JSX.Element {
         }),
       saveAddressToCustomerAddressBook: (
         args: Parameters<SaveAddressToCustomerAddressBook>[0]
-      ) =>
+      ) => {
         defaultOrderContext.saveAddressToCustomerAddressBook({
           ...args,
           dispatch
-        }),
+        })
+      },
       setGiftCardOrCouponCode: async ({
         code,
         codeType
@@ -270,13 +273,14 @@ export function OrderContainer(props: Props): JSX.Element {
           include: state.include,
           state
         }),
-      addResourceToInclude: (args: AddResourceToInclude) =>
+      addResourceToInclude: (args: AddResourceToInclude) => {
         defaultOrderContext.addResourceToInclude({
           ...args,
           dispatch,
           resourcesIncluded: state.include,
           resourceIncludedLoaded: state.includeLoaded
-        }),
+        })
+      },
       updateOrder: async (args: UpdateOrderArgs) =>
         await defaultOrderContext.updateOrder({
           ...args,

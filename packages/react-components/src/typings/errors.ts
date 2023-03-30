@@ -1,4 +1,4 @@
-import { TResourceError } from '#components/errors/Errors'
+import { type TResourceError } from '#components/errors/Errors'
 
 export type CodeErrorType =
   | 'EMPTY_ERROR'
