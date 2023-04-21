@@ -219,9 +219,9 @@ export type ExtractTag<T extends keyof JSX.IntrinsicElements> = Extract<
 export type ConditionalElement<E> =
   | ({
       attribute: Extract<keyof E, 'image_url'>
-      tagElement: ExtractTag<'img'>
+      tagElement?: ExtractTag<'img'>
     } & JSX.IntrinsicElements['img'])
   | ({
       attribute: Exclude<keyof E, 'image_url'>
-      tagElement: ExcludeTag<'img'>
+      tagElement?: ExcludeTag<'img'>
     } & Omit<JSX.IntrinsicElements[ExcludeTag<'img'>], 'children'>)

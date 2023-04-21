@@ -18,7 +18,7 @@ type Props = {
  * @returns
  */
 export function ParcelField<P extends Props>(props: P): JSX.Element {
-  const { attribute, tagElement, children, ...p } = props
+  const { attribute, tagElement = 'span', children, ...p } = props
   return (
     <GenericFieldComponent<TResourceKey['Parcel']>
       resource='parcel'
