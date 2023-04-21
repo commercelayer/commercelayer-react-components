@@ -459,7 +459,6 @@ export function getPaymentConfig<
     'transfer'
   )
   const resource = snakeToCamelCase(resourceKeys)
-  // @ts-expect-error Type 'ResourceKeys<R>' is not assignable to type 'SnakeToCamelCase<StringReplace<StringReplace<R, "payments", "payment">, "transfers", "transfer">>'
   return pick(config, [resource])
 }
 
