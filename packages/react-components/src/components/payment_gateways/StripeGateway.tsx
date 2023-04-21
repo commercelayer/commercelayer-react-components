@@ -31,7 +31,9 @@ export function StripeGateway(props: Props): JSX.Element | null {
     ...p
   } = props
   const { order } = React.useContext(OrderContext)
-  const { payment } = React.useContext(PaymentMethodChildrenContext)
+  const { payment, expressPayments } = React.useContext(
+    PaymentMethodChildrenContext
+  )
   const { payments, isGuest } = React.useContext(CustomerContext)
   const { currentPaymentMethodId, config, paymentSource } =
     React.useContext(PaymentMethodContext)
@@ -83,6 +85,7 @@ export function StripeGateway(props: Props): JSX.Element | null {
           templateCustomerSaveToWallet={templateCustomerSaveToWallet}
           publishableKey={publishableKey}
           clientSecret={clientSecret}
+          expressPayments={expressPayments}
           locale={locale}
           {...stripeConfig}
         />
@@ -95,6 +98,7 @@ export function StripeGateway(props: Props): JSX.Element | null {
       publishableKey={publishableKey}
       clientSecret={clientSecret}
       locale={locale}
+      expressPayments={expressPayments}
       {...stripeConfig}
     />
   ) : (

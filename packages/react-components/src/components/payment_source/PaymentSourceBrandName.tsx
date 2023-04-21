@@ -24,7 +24,7 @@ export function PaymentSourceBrandName({
   const { brand } = useContext(PaymentSourceContext)
   const { brand: customerCardBrand } = useContext(CustomerPaymentSourceContext)
   const cardBrand = brand ?? customerCardBrand
-  const brandName = cardBrand && capitalize(cardBrand.replaceAll(/_|-/gm, ' '))
+  const brandName = cardBrand && capitalize(cardBrand.replace(/_|-/gm, ' '))
   const parentProps = {
     brand: brandName,
     label,

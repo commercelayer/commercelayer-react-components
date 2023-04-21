@@ -16,6 +16,8 @@ import {
   getExternalPaymentAttributes,
   getPaypalAttributes
 } from '#utils/getPaymentAttributes'
+import { isEmpty } from '#utils/isEmpty'
+import { getAvailableExpressPayments } from '#utils/expressPaymentHelper'
 
 interface TOnClickParams {
   payment?: PaymentMethodType | Record<string, any>
@@ -28,9 +30,22 @@ type Props = {
    */
   hide?: PaymentResource[] | ((payment: PaymentMethodType) => boolean)
   children: DefaultChildrenType
+  /**
+   * Set CSS classes when the payment method is selected
+   */
   activeClass?: string
+  /**
+   * Customize the loader component
+   */
   loader?: LoaderType
+  /**
+   * Auto select the payment method when there is only one available
+   */
   autoSelectSinglePaymentMethod?: boolean | (() => void)
+  /**
+   * Enable express payment. Other payment methods will be disabled.
+   */
+  expressPayments?: boolean
 } & Omit<JSX.IntrinsicElements['div'], 'onClick' | 'children'> &
   (
     | {
@@ -50,6 +65,7 @@ export function PaymentMethod({
   loader = 'Loading...',
   clickableContainer,
   autoSelectSinglePaymentMethod,
+  expressPayments,
   hide,
   onClick,
   ...p
@@ -73,8 +89,35 @@ export function PaymentMethod({
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
   useEffect(() => {
+    if (paymentMethods != null && !isEmpty(paymentMethods) && expressPayments) {
+      const [paymentMethod] = getAvailableExpressPayments(paymentMethods)
+      if (!paymentSource && paymentMethod != null) {
+        const selectExpressPayment = async (): Promise<void> => {
+          setLoadingPlaceOrder({ loading: true })
+          setPaymentSelected(paymentMethod.id)
+          const paymentMethodId = paymentMethod?.id
+          const paymentResource =
+            paymentMethod?.payment_source_type as PaymentResource
+          await setPaymentMethod({ paymentResource, paymentMethodId })
+          const ps = await setPaymentSource({
+            paymentResource,
+            order
+          })
+          if (ps && paymentMethod && onClick != null) {
+            onClick({ payment: paymentMethod, order })
+            setTimeout(() => {
+              setLoading(false)
+            }, 200)
+          }
+          setLoadingPlaceOrder({ loading: false })
+        }
+        void selectExpressPayment()
+      }
+    }
+  }, [!isEmpty(paymentMethods), expressPayments])
+  useEffect(() => {
     if (paymentMethods != null) {
-      if (autoSelectSinglePaymentMethod != null) {
+      if (autoSelectSinglePaymentMethod != null && !expressPayments) {
         const autoSelect = async (): Promise<void> => {
           const isSingle = paymentMethods.length === 1
           if (isSingle) {
@@ -124,7 +167,7 @@ export function PaymentMethod({
         void autoSelect()
       }
     }
-  }, [paymentMethods])
+  }, [paymentMethods, expressPayments])
   useEffect(() => {
     if (paymentMethods) {
       const isSingle = paymentMethods.length === 1
@@ -159,7 +202,8 @@ export function PaymentMethod({
         payment,
         clickableContainer,
         paymentSelected,
-        setPaymentSelected
+        setPaymentSelected,
+        expressPayments
       }
       const paymentResource = payment?.payment_source_type as PaymentResource
       const onClickable = !clickableContainer

@@ -31,7 +31,7 @@ export interface PaymentSourceProps
 
 export function PaymentSource(props: PaymentSourceProps): JSX.Element {
   const { readonly } = props
-  const { payment } = useContext(PaymentMethodChildrenContext)
+  const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
   const { payments } = useContext(CustomerContext)
   const { currentPaymentMethodId, paymentSource, destroyPaymentSource } =
@@ -52,6 +52,8 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
         }
       })
       if (card.brand) setShowCard(true)
+    } else if (expressPayments) {
+      setShow(true)
     } else setShow(false)
     return () => {
       setShow(false)

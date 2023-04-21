@@ -6,6 +6,7 @@ export interface InitialPaymentMethodChildrenContext {
   clickableContainer?: boolean
   paymentSelected?: string
   setPaymentSelected?: (paymentId: string) => void
+  expressPayments?: boolean
 }
 
 const initial: InitialPaymentMethodChildrenContext = {}

@@ -18,6 +18,7 @@ import { type PaymentSourceProps } from './PaymentSource'
 import Parent from '#components/utils/Parent'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import OrderContext from '#context/OrderContext'
+import { StripeExpressPayment } from './StripeExpressPayment'
 
 export interface StripeConfig {
   containerClassName?: string
@@ -178,6 +179,7 @@ type Props = PaymentMethodConfig['stripePayment'] &
     publishableKey: string
     locale?: StripeElementLocale
     clientSecret: string
+    expressPayments?: boolean
   }
 
 export function StripePayment({
@@ -186,6 +188,7 @@ export function StripePayment({
   options,
   clientSecret,
   locale = 'auto',
+  expressPayments = false,
   ...p
 }: Props): JSX.Element | null {
   const [isLoaded, setIsLoaded] = useState(false)
@@ -224,10 +227,14 @@ export function StripePayment({
   return isLoaded && stripe != null && clientSecret != null ? (
     <div className={containerClassName} {...divProps}>
       <Elements stripe={stripe} options={elementsOptions}>
-        <StripePaymentForm
-          options={options}
-          templateCustomerSaveToWallet={templateCustomerSaveToWallet}
-        />
+        {expressPayments ? (
+          <StripeExpressPayment clientSecret={clientSecret} />
+        ) : (
+          <StripePaymentForm
+            options={options}
+            templateCustomerSaveToWallet={templateCustomerSaveToWallet}
+          />
+        )}
       </Elements>
     </div>
   ) : null

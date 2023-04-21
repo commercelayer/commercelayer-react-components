@@ -47,7 +47,7 @@ export function PaymentGateway({
 }: Props): JSX.Element | null {
   const loaderComponent = getLoaderComponent(loader)
   const [loading, setLoading] = useState(true)
-  const { payment } = useContext(PaymentMethodChildrenContext)
+  const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
   const {
@@ -64,7 +64,8 @@ export function PaymentGateway({
     if (
       payment?.id === currentPaymentMethodId &&
       paymentResource &&
-      order?.payment_method?.payment_source_type === paymentResource
+      order?.payment_method?.payment_source_type === paymentResource &&
+      !expressPayments
     ) {
       let attributes: Record<string, unknown> | undefined = {}
       if (config != null && paymentResource === 'paypal_payments') {
@@ -81,10 +82,16 @@ export function PaymentGateway({
         })
         if (getCustomerPaymentSources) getCustomerPaymentSources()
       }
-      if (!paymentSource && order?.payment_method.id && show) {
+      if (
+        !paymentSource &&
+        order?.payment_method.id &&
+        show &&
+        !expressPayments
+      ) {
         void setPaymentSources()
       } else if (
-        (!paymentSource || paymentSource.type !== paymentResource) &&
+        ((!paymentSource && !expressPayments) ||
+          paymentSource?.type !== paymentResource) &&
         show
       ) {
         void setPaymentSources()
@@ -95,6 +102,7 @@ export function PaymentGateway({
       }
       setLoading(false)
     }
+    if (expressPayments) setLoading(false)
     return () => {
       setLoading(true)
     }

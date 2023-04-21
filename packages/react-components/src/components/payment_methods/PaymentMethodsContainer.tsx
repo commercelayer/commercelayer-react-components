@@ -19,8 +19,8 @@ import paymentMethodReducer, {
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { type BaseError } from '#typings/errors'
-import isEmpty from 'lodash/isEmpty'
 import useCustomContext from '#utils/hooks/useCustomContext'
+import { isEmpty } from '#utils/isEmpty'
 
 interface Props {
   children: ReactNode
