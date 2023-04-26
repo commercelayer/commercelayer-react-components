@@ -1,12 +1,13 @@
 import { createContext } from 'react'
 import { type LineItem } from '@commercelayer/sdk'
 
-export type InitialLineItemContext = Partial<{
-  lineItem: LineItem
+export type InitialLineItemChildrenContext = Partial<{
+  lineItem: LineItem | null | undefined
 }>
 
-const initial: InitialLineItemContext = {}
+const initial: InitialLineItemChildrenContext = {}
 
-const LineItemChildrenContext = createContext<InitialLineItemContext>(initial)
+const LineItemChildrenContext =
+  createContext<InitialLineItemChildrenContext>(initial)
 
 export default LineItemChildrenContext

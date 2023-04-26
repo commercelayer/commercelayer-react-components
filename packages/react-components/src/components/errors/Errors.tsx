@@ -12,6 +12,7 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import ShipmentContext from '#context/ShipmentContext'
 import { type ChildrenFunction } from '#typings/index'
+import InStockSubscriptionContext from '#context/InStockSubscriptionContext'
 
 export type TResourceError =
   | 'addresses'
@@ -27,7 +28,7 @@ export type TResourceError =
   | 'customer_address'
   | 'sku_options'
   | 'variant'
-
+  | 'in_stock_subscriptions'
 type ErrorChildrenComponentProps = ChildrenFunction<
   Omit<TErrorComponent, 'children'> & { errors: string[] }
 >
@@ -66,6 +67,9 @@ export function Errors(props: Props): JSX.Element {
   const { errors: addressErrors } = useContext(AddressContext)
   const { errors: customerErrors } = useContext(CustomerContext)
   const { errors: shipmentErrors } = useContext(ShipmentContext)
+  const { errors: inStockSubscriptionErrors } = useContext(
+    InStockSubscriptionContext
+  )
   const {
     errors: paymentMethodErrors,
     currentPaymentMethodType,
@@ -80,6 +84,7 @@ export function Errors(props: Props): JSX.Element {
       ...(addressErrors || []),
       ...(customerErrors || []),
       ...(shipmentErrors || []),
+      ...(inStockSubscriptionErrors || []),
       ...(paymentMethodErrors?.filter(
         (v) =>
           v.field === currentPaymentMethodType &&
@@ -93,6 +98,7 @@ export function Errors(props: Props): JSX.Element {
       addressErrors,
       customerErrors,
       shipmentErrors,
+      inStockSubscriptionErrors,
       paymentMethodErrors
     ]
   ).filter((v, k, a) => v?.code !== a[k - 1]?.code)

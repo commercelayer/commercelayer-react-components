@@ -15,7 +15,6 @@ import placeOrderReducer, {
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { setPlaceOrder } from '../../reducers/PlaceOrderReducer'
-import { type PaymentSourceType } from '#reducers/PaymentMethodReducer'
 import useCustomContext from '#utils/hooks/useCustomContext'
 
 interface Props {
@@ -99,7 +98,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
     setPlaceOrder: async ({
       paymentSource
     }: {
-      paymentSource?: PaymentSourceType
+      paymentSource?: Parameters<typeof setPlaceOrder>['0']['paymentSource']
     }) =>
       await setPlaceOrder({
         config,

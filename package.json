@@ -15,6 +15,6 @@
     "@commercelayer/eslint-config-ts-react": "^1.0.0",
     "husky": "^8.0.0",
     "lerna": "^6.6.1",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.4"
   }
 }

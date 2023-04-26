@@ -19,10 +19,12 @@ type KlarnaPaymentProps = PaymentMethodConfig['klarnaPayment'] &
   Partial<PaymentSourceProps['templateCustomerSaveToWallet']> & {
     show?: boolean
     clientToken: string
-    locale?: string
+    locale?: string | null
   }
 
-function typeOfLine(lineItemType: string): OrderLine['type'] {
+function typeOfLine(
+  lineItemType: string | null | undefined
+): OrderLine['type'] {
   switch (lineItemType) {
     case 'percentage_discount_promotions':
       return 'discount'
@@ -44,12 +46,13 @@ type OrderLine = Partial<{
   type: 'discount' | 'physical' | 'shipping_fee' | null
 }>
 
-function klarnaOrderLines(lineItems?: LineItem[]): OrderLine[] {
+function klarnaOrderLines(lineItems?: LineItem[] | null): OrderLine[] {
+  // @ts-expect-error check types
   return lineItems
-    ? lineItems.map((item) => {
+    ? lineItems?.map((item) => {
         const type = item.item_type ? typeOfLine(item.item_type) : null
         return {
-          name: item.name,
+          // name: item.name,
           quantity: item.quantity,
           total_amount: item.total_amount_cents,
           unit_price: item.unit_amount_cents,

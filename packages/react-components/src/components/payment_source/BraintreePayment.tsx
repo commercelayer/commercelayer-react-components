@@ -153,14 +153,14 @@ export function BraintreePayment({
           nonce: payload.nonce,
           bin: payload.details.bin,
           amount: order?.total_amount_with_taxes_float as number,
-          email: order?.customer_email,
+          email: order?.customer_email ?? '',
           billingAddress: {
-            givenName: billingAddress?.first_name,
-            surname: billingAddress?.last_name,
+            givenName: billingAddress?.first_name ?? '',
+            surname: billingAddress?.last_name ?? '',
             phoneNumber: billingAddress?.phone,
             streetAddress: billingAddress?.line_1,
             countryCodeAlpha2: billingAddress?.country_code,
-            postalCode: billingAddress?.zip_code,
+            postalCode: billingAddress?.zip_code ?? '',
             region: billingAddress?.state_code,
             locality: billingAddress?.city
           },

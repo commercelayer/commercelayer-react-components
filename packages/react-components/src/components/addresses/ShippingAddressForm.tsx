@@ -98,6 +98,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
         }
       }
       setAddress({
+        // @ts-expect-error no type
         values: {
           ...values,
           ...(isBusiness && { business: isBusiness })
@@ -121,6 +122,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
         ref.current?.reset()
         resetForm({ target: ref.current } as any)
         setAddressErrors([], 'shipping_address')
+        // @ts-expect-error no type
         setAddress({ values: {}, resource: 'shipping_address' })
       }
     }

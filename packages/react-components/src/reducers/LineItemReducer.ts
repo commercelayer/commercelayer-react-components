@@ -36,7 +36,7 @@ export type GetLineItems = (params: GetLineItemsParams) => void
 export interface LineItemPayload {
   loading?: boolean
   loader?: LoaderType
-  lineItems?: LineItem[]
+  lineItems?: LineItem[] | null
   errors?: BaseError[]
 }
 

@@ -17,7 +17,7 @@ export interface PriceProps
   children?: ChildrenFunction<PriceChildrenProps>
   compareClassName?: string
   showCompare?: boolean
-  skuCode?: string
+  skuCode?: string | null
 }
 
 export function Price(props: PriceProps): JSX.Element {

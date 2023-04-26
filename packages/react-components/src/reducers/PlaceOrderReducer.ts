@@ -142,7 +142,7 @@ interface TSetPlaceOrderParams {
   order?: Order
   state?: PlaceOrderState
   setOrderErrors?: (errors: BaseError[]) => void
-  paymentSource?: PaymentSourceType & { approval_url?: string }
+  paymentSource?: PaymentSourceType
   include?: string[]
   setOrder?: (order: Order) => void
 }
@@ -167,7 +167,10 @@ export async function setPlaceOrder({
     const sdk = getSdk(config)
     const { options, paymentType } = state
     try {
-      if (paymentType === 'paypal_payments' && paymentSource) {
+      if (
+        paymentType === 'paypal_payments' &&
+        paymentSource?.type === 'paypal_payments'
+      ) {
         if (!options?.paypalPayerId && paymentSource?.approval_url) {
           window.location.href = paymentSource?.approval_url
           return response

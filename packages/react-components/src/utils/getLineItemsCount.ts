@@ -21,8 +21,8 @@ export default function getLineItemsCount({
     .filter(
       (l) =>
         typeAccepted.includes(l.item_type as TypeAccepted) &&
-        l?.total_amount_cents !== undefined &&
-        l.total_amount_cents >= 0
+        l?.total_amount_cents != null &&
+        l?.total_amount_cents >= 0
     )
     .forEach((l) => {
       if (l.quantity) quantity += l.quantity

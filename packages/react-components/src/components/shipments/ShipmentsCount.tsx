@@ -8,7 +8,7 @@ interface ChildrenProps extends Omit<Props, 'children'> {
   /**
    * Shipments of the current order
    */
-  shipments?: Shipment[]
+  shipments?: Shipment[] | null
   /**
    * Quantity of the shipments
    */

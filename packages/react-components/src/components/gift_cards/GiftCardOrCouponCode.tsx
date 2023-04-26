@@ -7,11 +7,11 @@ import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
-  code?: string
+  code?: string | null
   hide?: boolean
-  discountAmountCents?: number
-  discountAmountFloat?: number
-  formattedDiscountAmount?: string
+  discountAmountCents?: number | null
+  discountAmountFloat?: number | null
+  formattedDiscountAmount?: string | null
 }
 
 interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {

@@ -39,6 +39,7 @@ export function LineItemOption(props: Props): JSX.Element {
   }
   const TagElement = tagElement as any
   const TagContainer = tagContainer
+  // @ts-expect-error type is an object
   const label = name != null ? lineItemOption?.options?.[name] : ''
   const components =
     showAll && isJSON(JSON.stringify(lineItemOption?.options)) ? (

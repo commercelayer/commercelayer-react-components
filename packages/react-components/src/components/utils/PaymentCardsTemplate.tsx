@@ -1,32 +1,28 @@
 import Parent from '#components/utils/Parent'
 import { useContext } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import {
-  type PaymentResource,
-  type PaymentSourceType
-} from '#reducers/PaymentMethodReducer'
-import PaymentSourceContext, {
-  type IconBrand
-} from '#context/PaymentSourceContext'
+import { type PaymentResource } from '#reducers/PaymentMethodReducer'
+import PaymentSourceContext from '#context/PaymentSourceContext'
 import { type ChildrenFunction } from '#typings'
 import getCardDetails from '#utils/getCardDetails'
+import { type CustomerPaymentSource } from '@commercelayer/sdk'
 
 interface ChildrenProps extends Pick<Props, 'customerPayments'> {
   PaymentSourceProvider: typeof PaymentSourceContext.Provider
 }
 
-type CustomerPayment = PaymentSourceType & {
-  card?: {
-    brand?: IconBrand
-    last4?: string
-  }
-  handleClick?: () => void
-}
+// type CustomerPayment = PaymentSourceType & {
+//   card?: {
+//     brand?: IconBrand
+//     last4?: string
+//   }
+//   handleClick?: () => void
+// }
 
 export type CustomerCardsTemplateChildren = ChildrenFunction<ChildrenProps>
 
 interface Props {
-  customerPayments: CustomerPayment[]
+  customerPayments: CustomerPaymentSource[]
   children: CustomerCardsTemplateChildren
   paymentResource: PaymentResource
 }

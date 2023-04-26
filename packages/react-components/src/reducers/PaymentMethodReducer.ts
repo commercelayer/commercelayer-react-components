@@ -29,14 +29,7 @@ import { replace } from '#utils/replace'
 import { pick } from '#utils/pick'
 import { type ResourceKeys } from '#utils/getPaymentAttributes'
 
-export type PaymentSourceType =
-  | AdyenPayment
-  | BraintreePayment
-  | CheckoutComPayment
-  | ExternalPayment
-  | PaypalPayment
-  | StripePayment
-  | WireTransfer
+export type PaymentSourceType = Order['payment_source']
 
 interface Card {
   type: string
@@ -98,12 +91,12 @@ export type PaymentRef = MutableRefObject<null | HTMLFormElement>
 
 export interface PaymentMethodActionPayload {
   errors: BaseError[]
-  paymentMethods: PaymentMethod[]
+  paymentMethods: PaymentMethod[] | null
   currentPaymentMethodType: PaymentResource
   currentPaymentMethodId: string
   currentPaymentMethodRef: PaymentRef
   config: PaymentMethodConfig
-  paymentSource: PaymentSourceTypes
+  paymentSource: Order['payment_source'] | null
   loading: boolean
 }
 
@@ -275,21 +268,20 @@ export type SetPaymentSourceResponse = {
   paymentSource: PaymentSourceTypes
 } | null
 
-export type SetPaymentSource = (
-  args: {
-    config?: CommerceLayerConfig
-    dispatch?: Dispatch<PaymentMethodAction>
-    getOrder?: getOrderContext
-    attributes?: Record<string, unknown>
-    order?: Order
-    paymentResource: PaymentResource
-    paymentSourceId?: string
-    customerPaymentSourceId?: string
-    updateOrder?: typeof updateOrder
-  } & PaymentMethodState
-) => Promise<PaymentSourceType | undefined>
+export interface SetPaymentSourceParams
+  extends Omit<PaymentMethodState, 'config'> {
+  config?: CommerceLayerConfig
+  dispatch?: Dispatch<PaymentMethodAction>
+  getOrder?: getOrderContext
+  attributes?: Record<string, unknown>
+  order?: Order
+  paymentResource: PaymentResource
+  paymentSourceId?: string
+  customerPaymentSourceId?: string
+  updateOrder?: typeof updateOrder
+}
 
-export const setPaymentSource: SetPaymentSource = async ({
+export async function setPaymentSource({
   config,
   dispatch,
   getOrder,
@@ -300,7 +292,7 @@ export const setPaymentSource: SetPaymentSource = async ({
   paymentSourceId,
   updateOrder,
   errors: currentErrors
-}): Promise<PaymentSourceType | undefined> => {
+}: SetPaymentSourceParams): Promise<PaymentSourceType | undefined | null> {
   try {
     if (config && order) {
       let paymentSource: PaymentSourceType

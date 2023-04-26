@@ -36,7 +36,7 @@ export function StripeExpressPayment({
       return
     }
     const pr = stripe.paymentRequest({
-      country: order.country_code ?? '',
+      country: order?.country_code ?? 'US',
       currency: order?.currency_code?.toLowerCase() ?? '',
       total: {
         label: `#${order?.number ?? ''}`,

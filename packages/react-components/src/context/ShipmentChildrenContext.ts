@@ -10,13 +10,13 @@ import type {
 
 export interface InitialShipmentContext {
   currentShippingMethodId?: string
-  deliveryLeadTimes?: DeliveryLeadTime[]
+  deliveryLeadTimes?: DeliveryLeadTime[] | null | undefined
   keyNumber: number
-  lineItems?: LineItem[]
-  parcels?: Parcel[]
+  lineItems?: Array<LineItem | null | undefined>
+  parcels?: Parcel[] | null | undefined
   shipment?: Shipment
-  shippingMethods?: ShippingMethod[]
-  stockTransfers?: StockTransfer[]
+  shippingMethods?: ShippingMethod[] | null | undefined
+  stockTransfers?: StockTransfer[] | null | undefined
 }
 
 const initial: InitialShipmentContext = {

@@ -27,7 +27,7 @@ export type HandleSelect = (
 
 interface Props {
   customerAddresses: CustomerAddress[]
-  countryLock?: string
+  countryLock?: string | null
   children: AddressCardsTemplateChildren
   selectedClassName?: string
   disabledClassName?: string

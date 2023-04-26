@@ -25,7 +25,7 @@ export function CheckoutLink(props: Props): JSX.Element {
   const href =
     hostedCheckout && slug && order?.id
       ? `${slug}.commercelayer.app/checkout/${order.id}?accessToken=${accessToken}`
-      : order?.checkout_url
+      : order?.checkout_url ?? ''
   const parentProps = {
     checkoutUrl: order?.checkout_url,
     hostedCheckout,
