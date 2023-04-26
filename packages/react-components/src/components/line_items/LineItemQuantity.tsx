@@ -46,7 +46,7 @@ export function LineItemQuantity(props: Props): JSX.Element {
   ) : (
     <select
       data-testid={lineItem?.sku_code}
-      title={lineItem?.name}
+      title={lineItem?.name ?? ''}
       value={quantity}
       onChange={handleChange}
       {...p}

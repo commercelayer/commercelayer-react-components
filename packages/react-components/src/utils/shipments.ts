@@ -9,7 +9,7 @@ export function shipmentsFilled(shipments: Shipment[]): boolean {
   return !isEmpty(filled)
 }
 
-export function isDoNotShip(lineItems?: LineItem[]): boolean {
+export function isDoNotShip(lineItems?: LineItem[] | null): boolean {
   const itemDoNotShip: boolean[] = []
   const items = lineItems
     ? lineItems

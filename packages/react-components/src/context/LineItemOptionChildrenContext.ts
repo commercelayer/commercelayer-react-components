@@ -1,9 +1,7 @@
 import { createContext } from 'react'
 import type { LineItemOption } from '@commercelayer/sdk'
 
-export interface TLineItemOptions extends LineItemOption {
-  options?: Record<string, string>
-}
+export interface TLineItemOptions extends LineItemOption {}
 
 export interface InitialLineItemContext {
   lineItemOption: Partial<TLineItemOptions>

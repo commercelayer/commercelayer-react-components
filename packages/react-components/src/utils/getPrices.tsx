@@ -23,7 +23,7 @@ export function getPricesComponent(
   return skuPrices.map((p, k) => {
     const showCompare =
       (typeof props.showCompare === 'undefined' &&
-        (p?.compare_at_amount_cents as number) > (p?.amount_cents as number)) ||
+        p?.compare_at_amount_cents > p?.amount_cents) ||
       props.showCompare
     return (
       <PriceTemplate

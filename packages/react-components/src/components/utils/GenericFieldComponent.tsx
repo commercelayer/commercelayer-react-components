@@ -8,7 +8,7 @@ import type {
   ParcelLineItem
 } from '@commercelayer/sdk'
 import Parent from './Parent'
-import { type InitialLineItemContext } from '#context/LineItemChildrenContext'
+import { type InitialLineItemChildrenContext } from '#context/LineItemChildrenContext'
 import { type Context, useContext } from 'react'
 import { defaultImgUrl } from '#utils/placeholderImages'
 import { type InitialCustomerContext } from '#context/CustomerContext'
@@ -41,7 +41,7 @@ export type TGenericChildrenProps<E extends TResources[keyof TResources]> =
 interface ResourceContext {
   stock_transfers: InitialStockTransferContext
   sku: InitialSkuContext
-  lineItem: InitialLineItemContext
+  lineItem: InitialLineItemChildrenContext
   customers: InitialCustomerContext
   parcel: InitialParcelContext
   parcelLineItem: InitialParcelLineItemContext

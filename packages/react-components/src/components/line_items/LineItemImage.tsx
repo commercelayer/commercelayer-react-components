@@ -42,7 +42,7 @@ export function LineItemImage(props: Props): JSX.Element | null {
   ) : !src ? null : (
     <img
       data-testid={`line-item-image-${lineItem?.sku_code ?? ''}`}
-      alt={lineItem?.name}
+      alt={lineItem?.name ?? ''}
       src={src}
       {...p}
     />

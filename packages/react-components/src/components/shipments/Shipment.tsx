@@ -1,9 +1,10 @@
 import { useContext, type ReactNode, useState, useEffect } from 'react'
 import ShipmentContext from '#context/ShipmentContext'
-import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
+import ShipmentChildrenContext, {
+  type InitialShipmentContext
+} from '#context/ShipmentChildrenContext'
 import getLoaderComponent from '#utils/getLoaderComponent'
 import type { LoaderType } from '#typings'
-import type { ShipmentLineItem } from '#reducers/ShipmentReducer'
 import type { Order } from '@commercelayer/sdk'
 import OrderContext from '#context/OrderContext'
 
@@ -60,7 +61,7 @@ export function Shipment({
     }
   }, [shipments != null, shipments?.length, order?.gift_card_or_coupon_code])
   const components = shipments?.map((shipment, k) => {
-    const shipmentLineItems = shipment.stock_line_items as ShipmentLineItem[]
+    const shipmentLineItems = shipment.stock_line_items
     const lineItems = shipmentLineItems?.map((shipmentLineItem) => {
       const l = shipmentLineItem.line_item
       if (l) l.quantity = shipmentLineItem.quantity
@@ -78,7 +79,7 @@ export function Shipment({
     const times = deliveryLeadTimes?.filter(
       (time) => time.stock_location?.id === shipment.stock_location?.id
     )
-    const shipmentProps = {
+    const shipmentProps: InitialShipmentContext = {
       parcels,
       lineItems,
       shippingMethods,

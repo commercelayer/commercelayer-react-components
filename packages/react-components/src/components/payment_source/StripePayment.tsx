@@ -115,17 +115,17 @@ function StripePaymentForm({
       )
     if (elements != null) {
       const billingInfo = order?.billing_address
-      const email = order?.customer_email
+      const email = order?.customer_email ?? ''
       const billingDetails = {
-        name: billingInfo?.full_name,
+        name: billingInfo?.full_name ?? '',
         email,
         phone: billingInfo?.phone,
         address: {
           city: billingInfo?.city,
           country: billingInfo?.country_code,
           line1: billingInfo?.line_1,
-          line2: billingInfo?.line_2,
-          postal_code: billingInfo?.zip_code,
+          line2: billingInfo?.line_2 ?? '',
+          postal_code: billingInfo?.zip_code ?? '',
           state: billingInfo?.state_code
         }
       }

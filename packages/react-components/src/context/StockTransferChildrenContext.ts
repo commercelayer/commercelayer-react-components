@@ -1,8 +1,8 @@
 import { createContext } from 'react'
-import { type StockTransfer } from '@commercelayer/sdk'
+import { type LineItem, type StockTransfer } from '@commercelayer/sdk'
 
 export interface InitialStockTransferContext {
-  stockTransfer?: StockTransfer
+  stockTransfer?: StockTransfer | null | LineItem
 }
 
 const initial: InitialStockTransferContext = {}

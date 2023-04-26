@@ -18,7 +18,7 @@ type Props = Partial<JSX.IntrinsicElements['span']> & {
 
 export function DeliveryLeadTime(props: Props): JSX.Element {
   const { type, ...p } = props
-  const [text, setText] = useState<string | number>()
+  const [text, setText] = useState<string | number | null>()
   const { deliveryLeadTimeForShipment } = useContext(
     ShippingMethodChildrenContext
   )

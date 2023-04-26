@@ -120,8 +120,8 @@ export function CheckoutComPayment({
         name: order?.billing_address?.full_name,
         billingAddress: {
           addressLine1: order?.billing_address?.line_1,
-          addressLine2: order?.billing_address?.line_2,
-          zip: order?.billing_address?.zip_code,
+          addressLine2: order?.billing_address?.line_2 ?? '',
+          zip: order?.billing_address?.zip_code ?? '',
           city: order?.billing_address?.city,
           state: order?.billing_address?.state_code,
           country: order?.billing_address?.country_code

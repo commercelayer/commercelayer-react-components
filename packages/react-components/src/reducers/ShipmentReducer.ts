@@ -20,7 +20,7 @@ export type ShipmentLineItem = LineItem & { line_item: LineItem }
 
 export interface ShipmentActionPayload {
   errors: BaseError[]
-  shipments: Shipment[]
+  shipments: Shipment[] | null
   deliveryLeadTimes: DeliveryLeadTime[]
 }
 

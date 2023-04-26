@@ -84,6 +84,7 @@ export function CustomerAddressForm(props: Props): JSX.Element {
         // @ts-expect-error no type
         resetForm({ target: ref.current })
         setAddressErrors([], 'billing_address')
+        // @ts-expect-error Check this type
         setAddress({ values: {}, resource: 'billing_address' })
       }
     }

@@ -8,7 +8,7 @@ export interface AllErrorsParams {
   messages: BaseError[]
   field?: string
   props: JSX.IntrinsicElements['span']
-  lineItem?: LineItem
+  lineItem?: LineItem | null
   resource?: TResourceError
   returnHtml?: boolean
 }
