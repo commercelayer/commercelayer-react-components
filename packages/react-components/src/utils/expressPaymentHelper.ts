@@ -225,10 +225,11 @@ export async function setExpressPlaceOrder({
     id: orderId,
     payment_source: sdk[paymentResource].relationship(paymentSourceId)
   })
-  await sdk[paymentResource].update({
-    id: paymentSourceId,
-    _update: true
-  } as any)
+  // TODO: enable this when the API will support it
+  // await sdk[paymentResource].update({
+  //   id: paymentSourceId,
+  //   _update: true
+  // } as any)
   return await sdk.orders.update({
     id: orderId,
     _place: true
