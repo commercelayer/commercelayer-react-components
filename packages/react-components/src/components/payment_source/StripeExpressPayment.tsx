@@ -130,7 +130,6 @@ export function StripeExpressPayment({
       }
     })
     paymentRequest.on('paymentmethod', async (ev) => {
-      console.log('ev', ev)
       if (order?.id == null) throw new Error('Order is null')
       if (paymentMethods == null) throw new Error('Payment methods are null')
       const [paymentMethod] = getAvailableExpressPayments(paymentMethods)
@@ -142,6 +141,7 @@ export function StripeExpressPayment({
       if (accessToken != null && endpoint != null) {
         const [firstName, lastName] = ev.payerName?.split(' ') ?? []
         const [line] = ev.shippingAddress?.addressLine ?? ''
+        const email = ev.payerEmail ?? ''
         await setExpressFakeAddress({
           orderId: order.id,
           config: {
@@ -158,7 +158,8 @@ export function StripeExpressPayment({
             state_code: ev?.shippingAddress?.region ?? 'Fake state',
             phone: ev?.payerPhone ?? '1234567890',
             billing_info: requiresBillingInfo ? 'Fake billing info' : undefined
-          }
+          },
+          email
         })
         await setExpressShippingMethod({
           orderId: order.id,
