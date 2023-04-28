@@ -173,6 +173,16 @@ export function StripeExpressPayment({
             include: ['shipments.available_shipping_methods']
           }
         })
+        const placeOrderParams: TSetExpressPlaceOrderParams = {
+          config: {
+            accessToken,
+            endpoint
+          },
+          orderId: order?.id,
+          paymentResource,
+          paymentSourceId: paymentSource?.id
+        }
+        await setExpressPlaceOrder(placeOrderParams)
         // Confirm the PaymentIntent without handling potential next actions (yet).
         const { paymentIntent, error: confirmError } =
           await stripe.confirmCardPayment(
@@ -207,8 +217,7 @@ export function StripeExpressPayment({
                   endpoint
                 },
                 orderId: order?.id,
-                paymentResource,
-                paymentSourceId: paymentSource?.id
+                placeTheOrder: true
               }
               try {
                 const order = await setExpressPlaceOrder(placeOrderParams)
@@ -233,8 +242,7 @@ export function StripeExpressPayment({
                 endpoint
               },
               orderId: order?.id,
-              paymentResource,
-              paymentSourceId: paymentSource?.id
+              placeTheOrder: true
             }
             try {
               const order = await setExpressPlaceOrder(placeOrderParams)
