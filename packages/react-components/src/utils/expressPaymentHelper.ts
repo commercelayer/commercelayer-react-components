@@ -188,7 +188,7 @@ export async function setExpressShippingMethod({
   return await sdk.orders.retrieve(order.id, params)
 }
 
-export interface TSetExpressPlaceOrderParams {
+export type TSetExpressPlaceOrderParams = {
   /**
    * The Commerce Layer config
    */
@@ -197,39 +197,61 @@ export interface TSetExpressPlaceOrderParams {
    * The order id
    */
   orderId: string
-  /**
-   * The payment resource
-   */
-  paymentResource: PaymentResource
-  /**
-   * The payment source id
-   */
-  paymentSourceId: string
-}
+} & (
+  | {
+      /**
+       * The payment resource
+       */
+      paymentResource: PaymentResource
+      /**
+       * The payment source id
+       */
+      paymentSourceId: string
+      /**
+       * Place the order
+       */
+      placeTheOrder?: false
+    }
+  | {
+      paymentResource?: never
+      paymentSourceId?: never
+      placeTheOrder?: true
+    }
+)
 
 export async function setExpressPlaceOrder({
   config,
   orderId,
   paymentResource,
-  paymentSourceId
+  paymentSourceId,
+  placeTheOrder = false
 }: TSetExpressPlaceOrderParams): Promise<Order> {
   const sdk = getSdk(config)
-  await sdk.orders.retrieve(orderId, {
-    include: ['shipments.shipping_method', 'payment_source', 'payment_method']
-  })
-  await sdk[paymentResource].update({
-    id: paymentSourceId,
-    order: sdk.orders.relationship(orderId)
-  } as any)
-  await sdk.orders.update({
-    id: orderId,
-    payment_source: sdk[paymentResource].relationship(paymentSourceId)
-  })
-  // TODO: enable this when the API will support it
-  // await sdk[paymentResource].update({
-  //   id: paymentSourceId,
-  //   _update: true
-  // } as any)
+  if (!placeTheOrder && paymentResource != null && paymentSourceId != null) {
+    const include = [
+      'shipments.shipping_method',
+      'payment_source',
+      'payment_method'
+    ]
+    await sdk.orders.retrieve(orderId, {
+      include
+    })
+    await sdk[paymentResource].update({
+      id: paymentSourceId,
+      order: sdk.orders.relationship(orderId)
+    } as any)
+    await sdk.orders.update({
+      id: orderId,
+      payment_source: sdk[paymentResource].relationship(paymentSourceId)
+    })
+    await sdk[paymentResource].update({
+      id: paymentSourceId,
+      _update: true
+    } as any)
+    return await sdk.orders.retrieve(orderId, {
+      include
+    })
+  }
   return await sdk.orders.update({
     id: orderId,
     _place: true
