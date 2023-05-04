@@ -15,32 +15,25 @@ import {
   screen,
   waitForElementToBeRemoved
 } from '@testing-library/react'
-import { LocalContext } from '../utils/context'
-import getToken from '../utils/getToken'
+import { type LocalContext } from '../utils/context'
+import { getAccessToken } from 'mocks/getAccessToken'
 
 interface ParcelContext extends LocalContext {
   orderId: string
 }
 
 describe('Parcels components', () => {
-  let token: string | undefined
-  let domain: string | undefined
-  beforeAll(async () => {
-    const { accessToken, endpoint } = await getToken('customer')
-    if (accessToken !== undefined) {
-      token = accessToken
-      domain = endpoint
-    }
-  })
   beforeEach<ParcelContext>(async (ctx) => {
-    if (token != null && domain != null) {
-      ctx.accessToken = token
-      ctx.endpoint = domain
+    const { accessToken, endpoint } = await getAccessToken('customer')
+    if (accessToken != null && endpoint != null) {
+      ctx.accessToken = accessToken
+      ctx.endpoint = endpoint
       // TODO: create a new one in the future
       ctx.orderId = 'NrnYhAdEkx'
     }
   })
   it<ParcelContext>('Show a parcel', async (ctx) => {
+    console.log('accessToken', ctx)
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <OrderContainer orderId={ctx.orderId}>

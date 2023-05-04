@@ -6,12 +6,11 @@ import PaymentSourceBrandIcon from '#components/payment_source/PaymentSourceBran
 import PaymentSourceBrandName from '#components/payment_source/PaymentSourceBrandName'
 import PaymentSourceDetail from '#components/payment_source/PaymentSourceDetail'
 import {
-  logDOM,
   render,
   screen,
   waitForElementToBeRemoved
 } from '@testing-library/react'
-import { LocalContext } from '../utils/context'
+import { type LocalContext } from '../utils/context'
 import getToken from '../utils/getToken'
 
 describe('Customer payments', () => {

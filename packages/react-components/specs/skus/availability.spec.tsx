@@ -2,26 +2,18 @@ import AvailabilityContainer from '#components/skus/AvailabilityContainer'
 import AvailabilityTemplate from '#components/skus/AvailabilityTemplate'
 import CommerceLayer from '#components/auth/CommerceLayer'
 import { render, screen, waitFor } from '@testing-library/react'
-import { SkusContext } from '../utils/context'
-import getToken from '../utils/getToken'
+import { type SkusContext } from '../utils/context'
 import Skus from '#components/skus/Skus'
 import { SkusContainer } from '#components/skus/SkusContainer'
 import SkuField from '#components/skus/SkuField'
+import { getAccessToken } from 'mocks/getAccessToken'
 
 describe('AvailabilityContainer component', () => {
-  let token: string | undefined
-  let domain: string | undefined
-  beforeAll(async () => {
-    const { accessToken, endpoint } = await getToken()
-    if (accessToken !== undefined) {
-      token = accessToken
-      domain = endpoint
-    }
-  })
   beforeEach<SkusContext>(async (ctx) => {
-    if (token != null && domain != null) {
-      ctx.accessToken = token
-      ctx.endpoint = domain
+    const { accessToken, endpoint } = await getAccessToken()
+    if (accessToken != null && endpoint != null) {
+      ctx.accessToken = accessToken
+      ctx.endpoint = endpoint
       ctx.sku = 'BABYONBU000000E63E7412MX'
       ctx.skus = ['BABYONBU000000E63E7412MX', 'BABYONBU000000FFFFFF12MX']
     }

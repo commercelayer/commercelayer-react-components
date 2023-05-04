@@ -7,15 +7,9 @@ import LineItemCode from '#components/line_items/LineItemCode'
 import AddToCartButton from '#components/orders/AddToCartButton'
 import OrderContainer from '#components/orders/OrderContainer'
 import Errors from '#components/errors/Errors'
-import {
-  fireEvent,
-  logDOM,
-  render,
-  screen,
-  waitFor
-} from '@testing-library/react'
-import { LocalContext } from '../utils/context'
-import getToken from '../utils/getToken'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { type LocalContext } from '../utils/context'
+import { getAccessToken } from 'mocks/getAccessToken'
 
 interface AddToCartContext extends LocalContext {
   skuCode: string
@@ -32,20 +26,12 @@ interface AddToCartContext extends LocalContext {
 }
 
 describe('Line items components', () => {
-  let token: string | undefined
-  let domain: string | undefined
   const globalTimeout: number = 5000
-  beforeAll(async () => {
-    const { accessToken, endpoint } = await getToken('customer')
-    if (accessToken !== undefined) {
-      token = accessToken
-      domain = endpoint
-    }
-  })
   beforeEach<AddToCartContext>(async (ctx) => {
-    if (token != null && domain != null) {
-      ctx.accessToken = token
-      ctx.endpoint = domain
+    const { accessToken, endpoint } = await getAccessToken()
+    if (accessToken != null && endpoint != null) {
+      ctx.accessToken = accessToken
+      ctx.endpoint = endpoint
       ctx.skuCode = 'BABYONBU000000E63E7412MX'
       ctx.quantity = '3'
       ctx.lineItem = {
@@ -99,14 +85,16 @@ describe('Line items components', () => {
     expect(count.textContent).toBe('0')
     fireEvent.click(button)
     await waitFor(
-      () =>
-        expect(screen.getByTestId(`line-items-count`).textContent).toBe('3'),
+      () => {
+        expect(screen.getByTestId(`line-items-count`).textContent).toBe('3')
+      },
       { timeout: globalTimeout }
     )
     fireEvent.click(secondButton)
     await waitFor(
-      () =>
-        expect(screen.getByTestId(`line-items-count`).textContent).toBe('6'),
+      () => {
+        expect(screen.getByTestId(`line-items-count`).textContent).toBe('6')
+      },
       { timeout: globalTimeout }
     )
     const quantitySelector =
@@ -117,8 +105,9 @@ describe('Line items components', () => {
       target: { value: '6' }
     })
     await waitFor(
-      () =>
-        expect(screen.getByTestId(`line-items-count`).textContent).toBe('6'),
+      () => {
+        expect(screen.getByTestId(`line-items-count`).textContent).toBe('6')
+      },
       { timeout: globalTimeout }
     )
     expect(screen.getByTestId(`line-items-count`).textContent).toBe('6')

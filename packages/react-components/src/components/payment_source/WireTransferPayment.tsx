@@ -59,7 +59,7 @@ export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
     <form ref={ref}>
       <div className={className} data-testid={dataTestId}>
         <span className={infoMessage?.className}>
-          {infoMessage?.text || defaultMessage}
+          {infoMessage?.text ?? defaultMessage}
         </span>
       </div>
     </form>

@@ -1,22 +1,14 @@
 import PaymentMethodPrice from '#components/payment_methods/PaymentMethodPrice'
 import { render } from '@testing-library/react'
-import { OrderContext } from '../utils/context'
-import getToken from '../utils/getToken'
+import { type OrderContext } from '../utils/context'
+import { getAccessToken } from 'mocks/getAccessToken'
 
 describe('PaymentMethodPrice component', () => {
-  let token: string | undefined
-  let domain: string | undefined
-  beforeAll(async () => {
-    const { accessToken, endpoint } = await getToken()
-    if (accessToken !== undefined) {
-      token = accessToken
-      domain = endpoint
-    }
-  })
   beforeEach<OrderContext>(async (ctx) => {
-    if (token != null && domain != null) {
-      ctx.accessToken = token
-      ctx.endpoint = domain
+    const { accessToken, endpoint } = await getAccessToken()
+    if (accessToken != null && endpoint != null) {
+      ctx.accessToken = accessToken
+      ctx.endpoint = endpoint
       ctx.orderId = 'NrnYhAdEkx'
     }
   })

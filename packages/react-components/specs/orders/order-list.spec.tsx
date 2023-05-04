@@ -1,11 +1,11 @@
 import CommerceLayer from '#components/auth/CommerceLayer'
 import CustomerContainer from '#components/customers/CustomerContainer'
-import OrderList, { OrderListColumn } from '#components/orders/OrderList'
+import OrderList, { type OrderListColumn } from '#components/orders/OrderList'
 import OrderListEmpty from '#components/orders/OrderListEmpty'
 import OrderListPaginationButtons from '#components/orders/OrderListPaginationButtons'
 import { OrderListPaginationInfo } from '#components/orders/OrderListPaginationInfo'
 import OrderListRow from '#components/orders/OrderListRow'
-import { Order } from '@commercelayer/sdk'
+import { type Order } from '@commercelayer/sdk'
 import {
   fireEvent,
   render,
@@ -17,8 +17,8 @@ import { customerOrders } from 'mocks/resources/orders/customer-orders'
 import { customerOrdersEmpty } from 'mocks/resources/orders/customer-orders-empty'
 import { server } from 'mocks/server'
 import { rest } from 'msw'
-import { LocalContext } from '../utils/context'
-import getToken from '../utils/getToken'
+import { type LocalContext } from '../utils/context'
+import { getAccessToken } from 'mocks/getAccessToken'
 
 interface OrderListContext extends Omit<LocalContext, 'sku' | 'skus'> {
   columns: Array<{
@@ -49,20 +49,12 @@ const columns: OrderListColumn[] = [
 ]
 
 describe('Orders list', () => {
-  let token: string | undefined
-  let domain: string | undefined
   const globalTimeout: number = 10000
-  beforeAll(async () => {
-    const { accessToken, endpoint } = await getToken('customer')
-    if (accessToken !== undefined) {
-      token = accessToken
-      domain = endpoint
-    }
-  })
   beforeEach<OrderListContext>(async (ctx) => {
-    if (token != null && domain != null) {
-      ctx.accessToken = token
-      ctx.endpoint = domain
+    const { accessToken, endpoint } = await getAccessToken('customer')
+    if (accessToken != null && endpoint != null) {
+      ctx.accessToken = accessToken
+      ctx.endpoint = endpoint
       ctx.columns = columns
     }
   })
@@ -113,14 +105,14 @@ describe('Orders list', () => {
   it<OrderListContext>(
     'Show orders list empty',
     async (ctx) => {
-      const { accessToken, endpoint } = await getToken('customer_empty')
+      const { accessToken, endpoint } = await getAccessToken('customer_empty')
       if (accessToken !== undefined) {
         ctx.accessToken = accessToken
         ctx.endpoint = endpoint
       }
       server.use(
-        rest.get(`${baseUrl}/customers*`, (_req, res, ctx) => {
-          return res.once(ctx.status(200), ctx.json(customerOrdersEmpty))
+        rest.get(`${baseUrl}/customers*`, async (_req, res, ctx) => {
+          return await res.once(ctx.status(200), ctx.json(customerOrdersEmpty))
         })
       )
       render(
@@ -162,14 +154,14 @@ describe('Orders list', () => {
     globalTimeout
   )
   it<OrderListContext>('Show orders list empty with custom component', async (ctx) => {
-    const { accessToken, endpoint } = await getToken('customer_empty')
-    if (accessToken !== undefined) {
+    const { accessToken, endpoint } = await getAccessToken('customer_empty')
+    if (accessToken != null) {
       ctx.accessToken = accessToken
       ctx.endpoint = endpoint
     }
     server.use(
-      rest.get(`${baseUrl}/customers*`, (_req, res, ctx) => {
-        return res.once(ctx.status(200), ctx.json(customerOrdersEmpty))
+      rest.get(`${baseUrl}/customers*`, async (_req, res, ctx) => {
+        return await res.once(ctx.status(200), ctx.json(customerOrdersEmpty))
       })
     )
     render(
@@ -690,14 +682,16 @@ describe('Orders list', () => {
   it<OrderListContext>(
     'Hide previous and next buttons',
     async (ctx) => {
-      const { accessToken, endpoint } = await getToken('customer_with_low_data')
+      const { accessToken, endpoint } = await getAccessToken(
+        'customer_with_low_data'
+      )
       if (accessToken !== undefined) {
         ctx.accessToken = accessToken
         ctx.endpoint = endpoint
       }
       server.use(
-        rest.get(`${baseUrl}/customers*`, (_req, res, ctx) => {
-          return res.once(ctx.status(200), ctx.json(customerOrders))
+        rest.get(`${baseUrl}/customers*`, async (_req, res, ctx) => {
+          return await res.once(ctx.status(200), ctx.json(customerOrders))
         })
       )
       render(
@@ -747,14 +741,16 @@ describe('Orders list', () => {
   it<OrderListContext>(
     'Hide previous and next buttons',
     async (ctx) => {
-      const { accessToken, endpoint } = await getToken('customer_with_low_data')
+      const { accessToken, endpoint } = await getAccessToken(
+        'customer_with_low_data'
+      )
       if (accessToken !== undefined) {
         ctx.accessToken = accessToken
         ctx.endpoint = endpoint
       }
       server.use(
-        rest.get(`${baseUrl}/customers*`, (_req, res, ctx) => {
-          return res.once(ctx.status(200), ctx.json(customerOrders))
+        rest.get(`${baseUrl}/customers*`, async (_req, res, ctx) => {
+          return await res.once(ctx.status(200), ctx.json(customerOrders))
         })
       )
       render(
@@ -804,14 +800,16 @@ describe('Orders list', () => {
   it<OrderListContext>(
     'Hide previous and next buttons with few orders',
     async (ctx) => {
-      const { accessToken, endpoint } = await getToken('customer_with_low_data')
+      const { accessToken, endpoint } = await getAccessToken(
+        'customer_with_low_data'
+      )
       if (accessToken !== undefined) {
         ctx.accessToken = accessToken
         ctx.endpoint = endpoint
       }
       server.use(
-        rest.get(`${baseUrl}/customers*`, (_req, res, ctx) => {
-          return res.once(ctx.status(200), ctx.json(customerOrders))
+        rest.get(`${baseUrl}/customers*`, async (_req, res, ctx) => {
+          return await res.once(ctx.status(200), ctx.json(customerOrders))
         })
       )
       render(

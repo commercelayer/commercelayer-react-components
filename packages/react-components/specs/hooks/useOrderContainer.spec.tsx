@@ -2,7 +2,7 @@ import CommerceLayer from '#components/auth/CommerceLayer'
 import OrderContainer from '#components/orders/OrderContainer'
 import { render, renderHook, waitFor, screen } from '@testing-library/react'
 import { useEffect } from 'react'
-import { OrderContext } from 'specs/utils/context'
+import { type OrderContext } from 'specs/utils/context'
 import useOrderContainer from 'src/hooks/useOrderContainer'
 import getToken from '../utils/getToken'
 

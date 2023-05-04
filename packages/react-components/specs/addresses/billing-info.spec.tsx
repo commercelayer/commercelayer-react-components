@@ -1,7 +1,7 @@
 import CommerceLayer from '#components/auth/CommerceLayer'
 import getToken from '../utils/getToken'
 import { render, screen } from '@testing-library/react'
-import { LocalContext, OrderContext } from '../utils/context'
+import { type LocalContext, type OrderContext } from '../utils/context'
 import AddressesContainer from '#components/addresses/AddressesContainer'
 import AddressInput from '#components/addresses/AddressInput'
 import BillingAddressForm from '#components/addresses/BillingAddressForm'

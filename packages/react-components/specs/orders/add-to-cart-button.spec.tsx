@@ -10,8 +10,8 @@ import LineItemsCount from '#components/line_items/LineItemsCount'
 import AddToCartButton from '#components/orders/AddToCartButton'
 import OrderContainer from '#components/orders/OrderContainer'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { LocalContext } from '../utils/context'
-import getToken from '../utils/getToken'
+import { type LocalContext } from '../utils/context'
+import { getAccessToken } from 'mocks/getAccessToken'
 
 interface AddToCartContext extends LocalContext {
   skuCode: string
@@ -28,19 +28,11 @@ interface AddToCartContext extends LocalContext {
 }
 
 describe('AddToCartButton component', () => {
-  let token: string | undefined
-  let domain: string | undefined
-  beforeAll(async () => {
-    const { accessToken, endpoint } = await getToken('customer')
-    if (accessToken !== undefined) {
-      token = accessToken
-      domain = endpoint
-    }
-  })
   beforeEach<AddToCartContext>(async (ctx) => {
-    if (token != null && domain != null) {
-      ctx.accessToken = token
-      ctx.endpoint = domain
+    const { accessToken, endpoint } = await getAccessToken()
+    if (accessToken != null && endpoint != null) {
+      ctx.accessToken = accessToken
+      ctx.endpoint = endpoint
       ctx.skuCode = 'BABYONBU000000E63E7412MX'
       ctx.quantity = '3'
       ctx.lineItem = {

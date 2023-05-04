@@ -1,27 +1,19 @@
 import CommerceLayer from '#components/auth/CommerceLayer'
 import PricesContainer from '#components/prices/PricesContainer'
 import Price from '#components/prices/Price'
-import getToken from '../utils/getToken'
 import { render, waitFor, screen } from '@testing-library/react'
 import SkusContainer from '#components/skus/SkusContainer'
 import Skus from '#components/skus/Skus'
 import SkuField from '#components/skus/SkuField'
-import { SkusContext } from '../utils/context'
+import { type SkusContext } from '../utils/context'
+import { getAccessToken } from 'mocks/getAccessToken'
 
 describe('Prices components', () => {
-  let token: string | undefined
-  let domain: string | undefined
-  beforeAll(async () => {
-    const { accessToken, endpoint } = await getToken('customer')
-    if (accessToken !== undefined) {
-      token = accessToken
-      domain = endpoint
-    }
-  })
   beforeEach<SkusContext>(async (ctx) => {
-    if (token != null && domain != null) {
-      ctx.accessToken = token
-      ctx.endpoint = domain
+    const { accessToken, endpoint } = await getAccessToken()
+    if (accessToken != null && endpoint != null) {
+      ctx.accessToken = accessToken
+      ctx.endpoint = endpoint
       ctx.sku = 'BABYONBU000000E63E7412MX'
       ctx.skus = ['BABYONBU000000E63E7412MX', 'BABYONBU000000FFFFFF12MX']
     }

@@ -12,7 +12,8 @@ const handlerPaths = [
   `${baseUrl}/line_items*`,
   `${baseUrl}/line_item_options*`,
   `${baseUrl}/delivery_lead_times*`,
-  `${baseUrl}/customer_payment_sources*`
+  `${baseUrl}/customer_payment_sources*`,
+  `${baseUrl}/in_stock_subscriptions*`
 ].map((path: string) => {
   return rest.all(path, async (req, res, ctx) => {
     const originalResponse = await ctx.fetch(req)
