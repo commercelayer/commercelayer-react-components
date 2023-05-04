@@ -1,6 +1,6 @@
 import { getSalesChannelToken } from '@commercelayer/js-auth'
 
-type TokenType =
+export type TokenType =
   | 'sales_channel'
   | 'customer'
   | 'customer_empty'

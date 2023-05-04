@@ -7,7 +7,8 @@ import inStockSubscriptionReducer, {
   setInStockSubscription
 } from '#reducers/InStockSubscriptionReducer'
 import { type DefaultChildrenType } from '#typings/globals'
-import { useContext, useReducer } from 'react'
+import useCustomContext from '#utils/hooks/useCustomContext'
+import { useReducer } from 'react'
 
 interface Props {
   /**
@@ -19,7 +20,12 @@ interface Props {
 export function InStockSubscriptionsContainer({
   children
 }: Props): JSX.Element | null {
-  const config = useContext(CommerceLayerContext)
+  const config = useCustomContext({
+    context: CommerceLayerContext,
+    contextComponentName: 'CommerceLayer',
+    currentComponentName: 'InStockSubscriptionsContainer',
+    key: 'accessToken'
+  })
   const [state, dispatch] = useReducer(
     inStockSubscriptionReducer,
     inStockSubscriptionInitialState
