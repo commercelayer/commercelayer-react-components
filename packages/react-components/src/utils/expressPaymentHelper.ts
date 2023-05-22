@@ -280,7 +280,7 @@ export function expressRedirectUrl({
   const href =
     order?.checkout_url != null
       ? order?.checkout_url
-      : `${slug}.commercelayer.app/checkout/${order.id}?accessToken=${accessToken}`
+      : `https://${slug}.commercelayer.app/checkout/${order.id}?accessToken=${accessToken}`
   const isOnTheCheckout =
     window.location.pathname.includes(`/checkout`) ||
     window.location.pathname.includes(`/${order.id}`)

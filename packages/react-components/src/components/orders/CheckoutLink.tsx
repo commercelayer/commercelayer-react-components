@@ -24,7 +24,7 @@ export function CheckoutLink(props: Props): JSX.Element {
   const [slug] = endpoint.split('.commercelayer')
   const href =
     hostedCheckout && slug && order?.id
-      ? `${slug}.commercelayer.app/checkout/${order.id}?accessToken=${accessToken}`
+      ? `https://${slug}.commercelayer.app/checkout/${order.id}?accessToken=${accessToken}`
       : order?.checkout_url ?? ''
   const parentProps = {
     checkoutUrl: order?.checkout_url,

@@ -9,5 +9,5 @@ export default function getCartLink({
   slug
 }: TArgs): string {
   const env = process.env.NODE_ENV === 'production' ? '' : 'stg.'
-  return `${slug}.${env}commercelayer.app/cart/${orderId}?accessToken=${accessToken}`
+  return `https://${slug}.${env}commercelayer.app/cart/${orderId}?accessToken=${accessToken}`
 }
