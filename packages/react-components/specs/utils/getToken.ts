@@ -1,4 +1,4 @@
-import { getSalesChannelToken } from '@commercelayer/js-auth'
+import { authentication } from '@commercelayer/js-auth'
 
 export type TokenType =
   | 'sales_channel'
@@ -9,36 +9,44 @@ export type TokenType =
 export default async function getToken(
   type: TokenType = 'sales_channel'
 ): Promise<{ accessToken: string | undefined; endpoint: string }> {
-  const clientId = process.env.VITE_TEST_CLIENT_ID ?? ''
-  const endpoint = process.env.VITE_TEST_ENDPOINT ?? ''
-  const scope = process.env.VITE_TEST_MARKET_ID ?? ''
+  const clientId = process.env['VITE_TEST_CLIENT_ID'] ?? ''
+  const slug = process.env['VITE_TEST_SLUG'] ?? ''
+  const scope = process.env['VITE_TEST_MARKET_ID'] ?? ''
+  const domain = process.env['VITE_TEST_DOMAIN'] ?? ''
   const user =
     type === 'customer'
       ? {
-          username: process.env.VITE_TEST_USERNAME ?? '',
-          password: process.env.VITE_TEST_PASSWORD ?? ''
+          username: process.env['VITE_TEST_USERNAME'] ?? '',
+          password: process.env['VITE_TEST_PASSWORD'] ?? ''
         }
       : type === 'customer_empty'
       ? {
-          username: process.env.VITE_TEST_USERNAME_EMPTY ?? '',
-          password: process.env.VITE_TEST_PASSWORD_EMPTY ?? ''
+          username: process.env['VITE_TEST_USERNAME_EMPTY'] ?? '',
+          password: process.env['VITE_TEST_PASSWORD_EMPTY'] ?? ''
         }
       : type === 'customer_with_low_data'
       ? {
-          username: process.env.VITE_TEST_USERNAME_WITH_LOW_DATA ?? '',
-          password: process.env.VITE_TEST_PASSWORD_WITH_LOW_DATA ?? ''
+          username: process.env['VITE_TEST_USERNAME_WITH_LOW_DATA'] ?? '',
+          password: process.env['VITE_TEST_PASSWORD_WITH_LOW_DATA'] ?? ''
         }
       : undefined
-  const token = await getSalesChannelToken(
-    {
-      clientId,
-      endpoint,
-      scope
-    },
-    user
-  )
+  const { accessToken } =
+    user == null
+      ? await authentication('client_credentials', {
+          clientId,
+          slug,
+          domain,
+          scope
+        })
+      : await authentication('password', {
+          clientId,
+          slug,
+          domain,
+          scope,
+          ...user
+        })
   return {
-    accessToken: token?.accessToken,
-    endpoint
+    accessToken,
+    endpoint: `https://${slug}.${domain}`
   }
 }

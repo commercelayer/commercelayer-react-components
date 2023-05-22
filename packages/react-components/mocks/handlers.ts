@@ -5,6 +5,7 @@ import { customerOrdersFull } from './resources/orders/customer-orders-full'
 export const baseUrl = 'https://*.commercelayer.*/api'
 
 const handlerPaths = [
+  `https://*.commercelayer.*/oauth/token`,
   `${baseUrl}/prices*`,
   `${baseUrl}/skus*`,
   `${baseUrl}/sku_options*`,
