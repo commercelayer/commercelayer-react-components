@@ -13,6 +13,7 @@ import SkuChildrenContext from '#context/SkuChildrenContext'
 import getCartLink from '#utils/getCartLink'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import useCustomContext from '#utils/hooks/useCustomContext'
+import { getDomain } from '#utils/getDomain'
 
 interface TAddToCartButton extends Omit<Props, 'children'> {
   handleClick: () => AddToCartReturn
@@ -111,7 +112,6 @@ export function AddToCartButton(props: Props): JSX.Element {
   const { url, callExternalFunction } = useContext(ExternalFunctionContext)
   const { skuLists } = useContext(SkuListsContext)
   const { sku } = useContext(SkuChildrenContext)
-  const [slug] = endpoint ? endpoint.split('.commercelayer') : ['']
   const sCode = sku?.code ?? skuCode
   const handleClick = async (): Promise<
     | {
@@ -163,12 +163,13 @@ export function AddToCartButton(props: Props): JSX.Element {
         buyNowMode,
         checkoutUrl
       })
-      if (redirectToHostedCart && accessToken != null) {
+      if (redirectToHostedCart && accessToken != null && endpoint != null) {
+        const { slug, domain } = getDomain(endpoint)
         const orderId = res?.orderId
         if (hostedCartUrl && orderId) {
           location.href = `https://${hostedCartUrl}/${orderId}?accessToken=${accessToken}`
         } else if (orderId && slug) {
-          location.href = getCartLink({ orderId, slug, accessToken })
+          location.href = getCartLink({ orderId, slug, accessToken, domain })
         }
       }
       return res

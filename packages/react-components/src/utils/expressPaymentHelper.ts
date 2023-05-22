@@ -9,6 +9,7 @@ import {
 import getSdk from './getSdk'
 import { type PaymentRequestShippingOption } from '@stripe/stripe-js'
 import { type PaymentResource } from '#reducers/PaymentMethodReducer'
+import { getDomain } from './getDomain'
 
 const availablePaymentMethods = ['stripe_payments']
 
@@ -275,7 +276,7 @@ export function expressRedirectUrl({
 }: TExpressRedirectUrlParams): void {
   if (accessToken == null) throw new Error('No access token found')
   if (endpoint == null) throw new Error('No endpoint found')
-  const [slug] = endpoint.split('.commercelayer')
+  const { slug } = getDomain(endpoint)
   if (slug == null) throw new Error('No slug found')
   const href =
     order?.checkout_url != null
