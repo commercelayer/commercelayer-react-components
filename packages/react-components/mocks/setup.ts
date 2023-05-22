@@ -1,7 +1,7 @@
 import { server } from './server'
 
 beforeAll(async () => {
-  server.listen({ onUnhandledRequest: 'error' })
+  server.listen()
 })
 afterAll(() => {
   server.close()
