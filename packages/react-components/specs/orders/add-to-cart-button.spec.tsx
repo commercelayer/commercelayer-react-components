@@ -9,6 +9,7 @@ import LineItemsContainer from '#components/line_items/LineItemsContainer'
 import LineItemsCount from '#components/line_items/LineItemsCount'
 import AddToCartButton from '#components/orders/AddToCartButton'
 import OrderContainer from '#components/orders/OrderContainer'
+import CartLink from '#components/orders/CartLink'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { type LocalContext } from '../utils/context'
 import { getAccessToken } from 'mocks/getAccessToken'
@@ -71,6 +72,34 @@ describe('AddToCartButton component', () => {
     fireEvent.click(button)
     await waitFor(async () => await screen.findByText('3'), { timeout: 5000 })
     expect(count.textContent).toBe('3')
+  })
+  it<AddToCartContext>('Add SKU to the order with quantity and check CartLink href', async (ctx) => {
+    render(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <OrderContainer>
+          <AddToCartButton
+            data-testid='add-to-cart-button'
+            skuCode={ctx.skuCode}
+            quantity={ctx.quantity}
+          />
+          <LineItemsContainer>
+            <LineItemsCount data-testid='line-items-count' />
+          </LineItemsContainer>
+          <CartLink data-testid='cart-link' />
+        </OrderContainer>
+      </CommerceLayer>
+    )
+    const button = screen.getByTestId(`add-to-cart-button`)
+    const count = screen.getByTestId(`line-items-count`)
+    expect(button).toBeDefined()
+    expect(count).toBeDefined()
+    expect(count.textContent).toBe('0')
+    fireEvent.click(button)
+    await waitFor(async () => await screen.findByText('3'), { timeout: 5000 })
+    expect(count.textContent).toBe('3')
+    const link = screen.getByTestId(`cart-link`)
+    expect(link).toBeDefined()
+    expect(link.getAttribute('href')).toContain('stg.commercelayer')
   })
   it<AddToCartContext>('Add SKU to the order with quantity and change quantity', async (ctx) => {
     const { rerender } = render(

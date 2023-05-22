@@ -4,6 +4,7 @@ import Parent from '../utils/Parent'
 import { type ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import getCartLink from '#utils/getCartLink'
+import { getDomain } from '#utils/getDomain'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   href: string
@@ -19,12 +20,14 @@ export function CartLink(props: Props): JSX.Element | null {
   const { label, children, ...p } = props
   const { order, createOrder } = useContext(OrderContext)
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
-  const [slug] = endpoint?.split('.commercelayer') ?? ''
   if (accessToken == null)
     throw new Error('Cannot use `CartLink` outside of `CommerceLayer`')
+  if (endpoint == null)
+    throw new Error('Cannot use `CartLink` outside of `CommerceLayer`')
+  const { domain, slug } = getDomain(endpoint)
   const href =
     slug && order?.id
-      ? getCartLink({ slug, orderId: order?.id, accessToken })
+      ? getCartLink({ slug, orderId: order?.id, accessToken, domain })
       : ''
   const handleClick = async (
     event: MouseEvent<HTMLAnchorElement>
@@ -34,7 +37,8 @@ export function CartLink(props: Props): JSX.Element | null {
       location.href = href
     } else {
       const orderId = await createOrder()
-      if (slug) location.href = getCartLink({ slug, orderId, accessToken })
+      if (slug)
+        location.href = getCartLink({ slug, orderId, accessToken, domain })
     }
   }
   const parentProps = {

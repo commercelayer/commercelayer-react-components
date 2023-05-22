@@ -48,7 +48,6 @@ export async function getAccessToken(
     }
   }
   const config = await getToken(type)
-  console.log('config', config, type, accessToken)
   const token = config.accessToken
   switch (type) {
     case 'customer':
