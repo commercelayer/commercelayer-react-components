@@ -61,6 +61,36 @@ export function OrderContainer(props: Props): JSX.Element {
     setLocalOrder,
     deleteLocalOrder
   } = useContext(OrderStorageContext)
+  const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
+  const getOrder = async (): Promise<void> => {
+    const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
+    localOrder &&
+      (await getApiOrder({
+        id: localOrder,
+        dispatch,
+        config,
+        persistKey,
+        clearWhenPlaced: removeOrderPlaced,
+        deleteLocalOrder,
+        state
+      }))
+  }
+  useEffect(() => {
+    if (state?.orderId) {
+      console.log('localOrder', localOrder)
+      if (localOrder != null && state.orderId !== localOrder) {
+        void getOrder()
+      } else {
+        dispatch({
+          type: 'setOrderId',
+          payload: {
+            orderId: undefined,
+            order: undefined
+          }
+        })
+      }
+    }
+  }, [persistKey])
   useEffect(() => {
     if (!state.withoutIncludes) {
       dispatch({
@@ -103,23 +133,23 @@ export function OrderContainer(props: Props): JSX.Element {
     }
   }, [attributes, state?.order, lock])
   useEffect(() => {
-    const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
+    // const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
     const startRequest = Object.keys(state?.includeLoaded || {}).filter(
       (key) => state?.includeLoaded?.[key as ResourceIncluded] === true
     )
-    const getOrder = async (): Promise<void> => {
-      const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
-      localOrder &&
-        (await getApiOrder({
-          id: localOrder,
-          dispatch,
-          config,
-          persistKey,
-          clearWhenPlaced: removeOrderPlaced,
-          deleteLocalOrder,
-          state
-        }))
-    }
+    // const getOrder = async (): Promise<void> => {
+    //   const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
+    //   localOrder &&
+    //     (await getApiOrder({
+    //       id: localOrder,
+    //       dispatch,
+    //       config,
+    //       persistKey,
+    //       clearWhenPlaced: removeOrderPlaced,
+    //       deleteLocalOrder,
+    //       state
+    //     }))
+    // }
     if (config.accessToken && state.loading === false && state?.order == null) {
       if (
         localOrder &&
@@ -197,8 +227,7 @@ export function OrderContainer(props: Props): JSX.Element {
     Object.keys(state?.order ?? {}).length,
     state.loading,
     state.withoutIncludes,
-    lockOrder,
-    persistKey
+    lockOrder
   ])
   const orderValue = useMemo(() => {
     if (fetchOrder != null && state?.order != null) {
