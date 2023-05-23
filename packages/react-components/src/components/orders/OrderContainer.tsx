@@ -197,7 +197,8 @@ export function OrderContainer(props: Props): JSX.Element {
     Object.keys(state?.order ?? {}).length,
     state.loading,
     state.withoutIncludes,
-    lockOrder
+    lockOrder,
+    persistKey
   ])
   const orderValue = useMemo(() => {
     if (fetchOrder != null && state?.order != null) {
