@@ -133,23 +133,9 @@ export function OrderContainer(props: Props): JSX.Element {
     }
   }, [attributes, state?.order, lock])
   useEffect(() => {
-    // const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
     const startRequest = Object.keys(state?.includeLoaded || {}).filter(
       (key) => state?.includeLoaded?.[key as ResourceIncluded] === true
     )
-    // const getOrder = async (): Promise<void> => {
-    //   const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
-    //   localOrder &&
-    //     (await getApiOrder({
-    //       id: localOrder,
-    //       dispatch,
-    //       config,
-    //       persistKey,
-    //       clearWhenPlaced: removeOrderPlaced,
-    //       deleteLocalOrder,
-    //       state
-    //     }))
-    // }
     if (config.accessToken && state.loading === false && state?.order == null) {
       if (
         localOrder &&
