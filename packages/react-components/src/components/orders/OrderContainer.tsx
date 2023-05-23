@@ -291,7 +291,7 @@ export function OrderContainer(props: Props): JSX.Element {
           state
         })
     }
-  }, [state, config.accessToken])
+  }, [state, config.accessToken, persistKey])
   return (
     <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
   )
