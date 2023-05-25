@@ -367,6 +367,16 @@ export interface CustomLineItem {
   name?: string
   imageUrl?: string | null
   metadata?: Record<string, string>
+  frequency?:
+    | 'hourly'
+    | 'daily'
+    | 'weekly'
+    | 'monthly'
+    | 'two-month'
+    | 'three-month'
+    | 'four-month'
+    | 'six-month'
+    | 'yearly'
 }
 
 export type AddToCartParams = Partial<{
@@ -412,6 +422,7 @@ export async function addToCart(
         const name = lineItem?.name
         const imageUrl = lineItem?.imageUrl as string
         const metadata = lineItem?.metadata
+        const frequency = lineItem?.frequency
         if (buyNowMode) {
           if (!state?.order?.line_items) {
             const { line_items: lineItems } = await sdk.orders.retrieve(id, {
@@ -441,7 +452,8 @@ export async function addToCart(
           quantity: quantity ?? 1,
           _update_quantity: true,
           bundle_code: bundleCode,
-          metadata
+          metadata,
+          frequency
         }
         const newLineItem = await sdk.line_items.create(attrs)
         if (lineItemOption != null) {

@@ -73,6 +73,42 @@ describe('AddToCartButton component', () => {
     await waitFor(async () => await screen.findByText('3'), { timeout: 5000 })
     expect(count.textContent).toBe('3')
   })
+  it<AddToCartContext>('Add SKU with frequency to the order with quantity', async (ctx) => {
+    render(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <OrderContainer>
+          <AddToCartButton
+            data-testid='add-to-cart-button'
+            skuCode={ctx.skuCode}
+            quantity={ctx.quantity}
+            lineItem={{
+              frequency: 'monthly'
+            }}
+          />
+          <LineItemsContainer>
+            <LineItemsCount data-testid='line-items-count' />
+            <LineItem>
+              <LineItemField
+                data-testid='line-item-frequency'
+                attribute='frequency'
+              />
+            </LineItem>
+          </LineItemsContainer>
+        </OrderContainer>
+      </CommerceLayer>
+    )
+    const button = screen.getByTestId(`add-to-cart-button`)
+    const count = screen.getByTestId(`line-items-count`)
+    expect(button).toBeDefined()
+    expect(count).toBeDefined()
+    expect(count.textContent).toBe('0')
+    fireEvent.click(button)
+    await waitFor(async () => await screen.findByText('3'), { timeout: 5000 })
+    expect(count.textContent).toBe('3')
+    const frequency = screen.getByTestId(`line-item-frequency`)
+    expect(frequency).toBeDefined()
+    expect(frequency.textContent).toBe('monthly')
+  })
   it<AddToCartContext>('Add SKU to the order with quantity and check CartLink href', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
