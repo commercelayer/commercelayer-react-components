@@ -37,7 +37,6 @@ export async function getAccessToken(
         break
       case 'sales_channel':
       default:
-        console.log('accessToken', accessToken)
         if (accessToken != null) {
           return {
             accessToken,
