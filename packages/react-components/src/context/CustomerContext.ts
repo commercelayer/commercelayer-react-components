@@ -5,7 +5,9 @@ import {
   type getCustomerPaymentSources,
   type setCustomerEmail,
   type TCustomerAddress,
-  type getCustomerAddresses
+  type getCustomerAddresses,
+  type getCustomerOrders,
+  type getCustomerSubscriptions
 } from '#reducers/CustomerReducer'
 import { createContext } from 'react'
 
@@ -18,6 +20,12 @@ export type InitialCustomerContext = Partial<
     deleteCustomerAddress: typeof deleteCustomerAddress
     getCustomerAddresses: typeof getCustomerAddresses
     createCustomerAddress: (address: TCustomerAddress) => Promise<void>
+    getCustomerOrders: (
+      props: Partial<Parameters<typeof getCustomerOrders>[0]>
+    ) => Promise<void>
+    getCustomerSubscriptions: (
+      props: Partial<Parameters<typeof getCustomerSubscriptions>[0]>
+    ) => Promise<void>
   } & CustomerState
 >
 

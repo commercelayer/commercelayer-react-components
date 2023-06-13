@@ -10,7 +10,8 @@ import customerReducer, {
   createCustomerAddress,
   type TCustomerAddress,
   saveCustomerUser,
-  getCustomerPayments
+  getCustomerPayments,
+  getCustomerSubscriptions
 } from '#reducers/CustomerReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
@@ -76,8 +77,12 @@ export function CustomerContainer(props: Props): JSX.Element {
       includeLoaded == null &&
       !isGuest
     ) {
-      void getCustomerOrders({ config, dispatch })
-      void getCustomerPayments({ config, dispatch })
+      async function getCustomerData(): Promise<void> {
+        await getCustomerOrders({ config, dispatch })
+        await getCustomerSubscriptions({ config, dispatch })
+        await getCustomerPayments({ config, dispatch })
+      }
+      void getCustomerData()
     }
   }, [config.accessToken, order, isGuest])
   const contextValue = useMemo(() => {
@@ -116,6 +121,20 @@ export function CustomerContainer(props: Props): JSX.Element {
       },
       createCustomerAddress: async (address: TCustomerAddress) => {
         await createCustomerAddress({ address, config, dispatch, state })
+      },
+      getCustomerOrders: async ({
+        pageNumber,
+        pageSize
+      }: {
+        pageNumber?: number
+        pageSize?: number
+      }) => {
+        await getCustomerOrders({
+          config,
+          dispatch,
+          pageNumber,
+          pageSize
+        })
       }
     }
   }, [state, isGuest])

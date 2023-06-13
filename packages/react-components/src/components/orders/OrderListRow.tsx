@@ -1,32 +1,29 @@
 import { useContext } from 'react'
 import Parent from '#components/utils/Parent'
-import OrderListChildrenContext from '#context/OrderListChildrenContext'
+import OrderListChildrenContext, {
+  type TOrderList,
+  type OrderListContent,
+  type TableAccessor
+} from '#context/OrderListChildrenContext'
 import isDate from '#utils/isDate'
 import last from 'lodash/last'
-import type { Cell, Row } from 'react-table'
-import type { Order } from '@commercelayer/sdk'
+import { flexRender, type Row } from '@tanstack/react-table'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   /**
    * The order resource
    */
-  order: Order
+  order: OrderListContent<TOrderList>
   /**
    * The current row
    */
-  row: Row
+  row: Row<OrderListContent<TOrderList>>
   /**
    * The current cell
    */
-  cell: Cell[]
-  /**
-   * All table cells
-   */
-  cells: Cell[]
-  /**
-   * Infinite scroll enabled
-   */
-  infiniteScroll: boolean
+  cell: Array<
+    ReturnType<Row<OrderListContent<TOrderList>>['getVisibleCells']>[number]
+  >
 }
 
 interface Props extends Omit<JSX.IntrinsicElements['td'], 'children'> {
@@ -34,7 +31,7 @@ interface Props extends Omit<JSX.IntrinsicElements['td'], 'children'> {
   /**
    * The order field to show
    */
-  field: keyof Order
+  field: TableAccessor<TOrderList>
 }
 
 export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
@@ -43,14 +40,11 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
     row,
     showActions,
     actionsComponent,
-    actionsContainerClassName,
-    infiniteScroll
+    actionsContainerClassName
   } = useContext(OrderListChildrenContext)
-  const cell: Array<Cell<Order, string>> | undefined = row?.cells.filter(
-    (cell) => cell.column.id === field
-  )
-  const isLastRow = last(row?.cells)?.column.id === field
-  const As = infiniteScroll ? 'div' : 'td'
+  const cell = row?.getVisibleCells().filter((cell) => cell.column.id === field)
+  const isLastRow = last(row?.getVisibleCells())?.column.id === field
+  const As = 'td'
   const ActionRow = (): JSX.Element | null => {
     return (
       (showActions && isLastRow && actionsComponent && (
@@ -70,23 +64,22 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
     field,
     order,
     row,
-    cell,
-    infiniteScroll
+    cell
   }
   return children ? (
-    <>
+    <As>
       <Parent {...parentProps}>{children}</Parent>
       <ActionRow />
-    </>
+    </As>
   ) : (
     <>
       {cell?.map((cell, k) => {
-        const cellValue = cell.value
+        const cellValue = cell.getValue<string>()
         const value = isDate(cellValue)
           ? new Date(Date.parse(cellValue)).toLocaleString()
-          : cell.render('Cell')
+          : flexRender(cell.column.columnDef.cell, cell.getContext())
         return (
-          <As data-testid={`cell-${k}`} {...p} {...cell.getCellProps()} key={k}>
+          <As data-testid={`cell-${k}`} {...p} key={cell.id}>
             {value}
           </As>
         )

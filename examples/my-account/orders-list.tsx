@@ -76,7 +76,7 @@ const OrdersList = () => {
             {({ cell, order, ...p }) => {
               return <>{cell?.map((cell) => {
                 return (
-                  <td {...p} {...cell.getCellProps()} className="py-5 border-b">
+                  <td {...p} className="py-5 border-b">
                     <p className="font-bold">Order # {cell.render('Cell')}</p>
                     <p className="text-xs text-gray-500">
                       contains {order.skus_count} items
