@@ -123,7 +123,8 @@ function StripePaymentForm({
           payment_method_data: {
             billing_details: billingDetails
           }
-        }
+        },
+        redirect: 'if_required'
       })
       if (error) {
         console.error(error)

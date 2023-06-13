@@ -1,20 +1,31 @@
-import type { Order } from '@commercelayer/sdk'
+import type { Order, OrderSubscription } from '@commercelayer/sdk'
+import { type Row } from '@tanstack/react-table'
 import { createContext } from 'react'
-import { type Row } from 'react-table'
+
+export type TOrderList = 'orders' | 'subscriptions'
+
+export type TableAccessor<T extends TOrderList> = T extends 'orders'
+  ? keyof Order
+  : keyof OrderSubscription
+
+export type OrderListContent<T extends TOrderList> = T extends 'orders'
+  ? Order
+  : OrderSubscription
 
 export type InitialOrderListContext = Partial<{
+  type: TOrderList
   /**
    * The current order
    */
-  order: Order | null
+  order: OrderListContent<TOrderList> | null
   /**
    * The list of orders
    */
-  orders: Order[] | null
+  orders: Array<OrderListContent<TOrderList>> | null | undefined
   /**
    * The current row
    */
-  row: Row<Order>
+  row: Row<OrderListContent<TOrderList>>
   /**
    * Show the row actions
    */
@@ -22,7 +33,9 @@ export type InitialOrderListContext = Partial<{
   /**
    * Function to assign as custom row renderer
    */
-  actionsComponent: (props: { order: Order }) => JSX.Element
+  actionsComponent: (props: {
+    order: OrderListContent<TOrderList>
+  }) => JSX.Element
   /**
    * Class name to assign as custom row renderer
    */

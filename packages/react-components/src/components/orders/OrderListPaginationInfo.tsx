@@ -37,7 +37,7 @@ export function OrderListPaginationInfo<A extends TAsComponent = 'span'>({
     context: OrderListPaginationContext,
     contextComponentName: 'OrderList',
     currentComponentName: 'OrderListPaginationInfo',
-    key: 'page'
+    key: 'totalRows'
   })
   const TagElement = as
   const totRows = ctx?.totalRows ?? 0

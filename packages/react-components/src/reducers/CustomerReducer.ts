@@ -8,6 +8,7 @@ import type {
   Customer,
   CustomerPaymentSource,
   Order,
+  OrderSubscription,
   OrderUpdate
 } from '@commercelayer/sdk'
 import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
@@ -15,6 +16,7 @@ import { type updateOrder } from './OrderReducer'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
 import jwtDecode from '#utils/jwt'
+import { type ListResponse } from '@commercelayer/sdk/lib/cjs/resource'
 
 export type CustomerActionType =
   | 'setErrors'
@@ -22,13 +24,15 @@ export type CustomerActionType =
   | 'setAddresses'
   | 'setPayments'
   | 'setOrders'
+  | 'setSubscriptions'
 
 export interface CustomerActionPayload {
   addresses: Address[] | null
   payments: CustomerPaymentSource[] | null
   customerEmail: string
   errors: BaseError[]
-  orders: Order[]
+  orders: ListResponse<Order>
+  subscriptions: ListResponse<OrderSubscription> | null
   isGuest: boolean
   customers: Customer
 }
@@ -248,25 +252,56 @@ interface GetCustomerOrdersProps {
    * The Customer dispatch function
    */
   dispatch: Dispatch<CustomerAction>
+  /**
+   * The page size
+   */
+  pageSize?: number
+  /**
+   * The page number
+   */
+  pageNumber?: number
 }
 
 export async function getCustomerOrders({
   config,
-  dispatch
+  dispatch,
+  pageSize = 10,
+  pageNumber = 1
 }: GetCustomerOrdersProps): Promise<void> {
   if (config.accessToken) {
     const { owner } = jwtDecode(config.accessToken)
     if (owner?.id) {
       const sdk = getSdk(config)
-      const customers = await sdk.customers.retrieve(owner.id, {
-        include: ['orders']
+      const orders = await sdk.customers.orders(owner.id, {
+        filters: { status_not_in: 'draft,pending' },
+        pageSize,
+        pageNumber
       })
-      const orders = customers.orders?.filter(
-        (order) => order.status !== 'pending' && order.status !== 'draft'
-      )
       dispatch({
         type: 'setOrders',
-        payload: { orders, customers }
+        payload: { orders }
+      })
+    }
+  }
+}
+
+export async function getCustomerSubscriptions({
+  config,
+  dispatch,
+  pageSize = 10,
+  pageNumber = 1
+}: GetCustomerOrdersProps): Promise<void> {
+  if (config.accessToken) {
+    const { owner } = jwtDecode(config.accessToken)
+    if (owner?.id) {
+      const sdk = getSdk(config)
+      const subscriptions = await sdk.customers.order_subscriptions(owner.id, {
+        pageSize,
+        pageNumber
+      })
+      dispatch({
+        type: 'setSubscriptions',
+        payload: { subscriptions }
       })
     }
   }
@@ -372,7 +407,8 @@ const type: CustomerActionType[] = [
   'setCustomerEmail',
   'setAddresses',
   'setPayments',
-  'setOrders'
+  'setOrders',
+  'setSubscriptions'
 ]
 
 const customerReducer = (

@@ -79,7 +79,7 @@ const OrdersListInfiniteScroll = () => {
               const As = infiniteScroll ? 'div' : 'td'
               return cell.map((cell) => {
                 return (
-                  <As {...p} {...cell.getCellProps()} className="py-5 border-b">
+                  <As {...p} className="py-5 border-b">
                     <p className="font-bold">Order # {cell.render('Cell')}</p>
                     <p className="text-xs text-gray-500">
                       contains {order.skus_count} items

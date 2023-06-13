@@ -77,7 +77,6 @@ export function OrderContainer(props: Props): JSX.Element {
   }
   useEffect(() => {
     if (state?.orderId) {
-      console.log('localOrder', localOrder)
       if (localOrder != null && state.orderId !== localOrder) {
         void getOrder()
       } else {

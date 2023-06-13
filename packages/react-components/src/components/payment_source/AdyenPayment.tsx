@@ -13,9 +13,8 @@ import Parent from '#components/utils/Parent'
 import getBrowserInfo, { cleanUrlBy } from '#utils/browserInfo'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import OrderContext from '#context/OrderContext'
-import type Dropin from '@adyen/adyen-web/dist/types/components/Dropin'
-import type Card from '@adyen/adyen-web/dist/types/components/Card'
 import omit from '#utils/omit'
+import type UIElement from '@adyen/adyen-web/dist/types/components/UIElement'
 
 const threeDSConfiguration = {
   challengeWindowSize: '05'
@@ -73,8 +72,6 @@ export interface AdyenPaymentConfig {
   styles?: PaymentMethodsStyle
 }
 
-type AdyenCheckout = Dropin | Card | null
-
 interface Props {
   clientKey?: string
   config?: AdyenPaymentConfig
@@ -97,7 +94,7 @@ export function AdyenPayment({
     ...config
   }
   const [loadAdyen, setLoadAdyen] = useState(false)
-  const [checkout, setCheckout] = useState<AdyenCheckout>(null)
+  const [checkout, setCheckout] = useState<UIElement<any> | undefined>()
   const {
     setPaymentSource,
     paymentSource,
@@ -110,7 +107,7 @@ export function AdyenPayment({
   const ref = useRef<null | HTMLFormElement>(null)
   const handleSubmit = async (
     e: any,
-    component: AdyenCheckout
+    component?: UIElement<any>
   ): Promise<boolean> => {
     const savePaymentSourceToCustomerWallet =
       e?.elements?.save_payment_source_to_customer_wallet?.checked
@@ -126,7 +123,7 @@ export function AdyenPayment({
   }
   const handleChange = async (
     state: any,
-    checkout: AdyenCheckout
+    _component?: UIElement<any>
   ): Promise<void> => {
     if (state.isValid) {
       if (ref.current) {
@@ -160,7 +157,7 @@ export function AdyenPayment({
   }
   const handleOnAdditionalDetails = async (
     state: any,
-    component: AdyenCheckout
+    component?: UIElement<any>
   ): Promise<boolean> => {
     const attributes = {
       payment_request_details: state.data,
@@ -214,7 +211,7 @@ export function AdyenPayment({
   }
   const onSubmit = async (
     state: any,
-    component: AdyenCheckout
+    component: UIElement<any>
   ): Promise<boolean> => {
     const browserInfo = getBrowserInfo()
     const saveCustomer = document.getElementById(
@@ -367,7 +364,7 @@ export function AdyenPayment({
         'Payment methods are not available. Please, check your Adyen configuration.'
       )
     }
-    const options: CoreOptions = {
+    const options = {
       locale,
       environment,
       clientKey,
@@ -391,10 +388,16 @@ export function AdyenPayment({
           holderNameRequired: false
         }
       },
-      onAdditionalDetails: handleOnAdditionalDetails,
-      onChange: handleChange,
-      onSubmit
-    }
+      onAdditionalDetails: (state, element) => {
+        void handleOnAdditionalDetails(state, element)
+      },
+      onChange: (state, element) => {
+        void handleChange(state, element)
+      },
+      onSubmit: (state, element) => {
+        void onSubmit(state, element)
+      }
+    } satisfies CoreOptions
     if (!ref && clientKey)
       setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'false')
     if (clientKey && !loadAdyen && window && !checkout) {

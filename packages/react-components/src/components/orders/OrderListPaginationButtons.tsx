@@ -66,7 +66,7 @@ export function OrderListPaginationButtons({
     context: OrderListPaginationContext,
     contextComponentName: 'OrderList',
     currentComponentName: 'OrderListPaginationButtons',
-    key: 'page'
+    key: 'totalRows'
   })
   const PrevButton = prevButton.show ? (
     prevButton.hideWhenDisabled === true &&

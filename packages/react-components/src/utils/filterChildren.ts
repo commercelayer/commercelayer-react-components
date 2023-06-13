@@ -6,6 +6,9 @@ interface Props<T> {
   componentName: string
 }
 
+/**
+ * Filter children by component display name
+ */
 export default function filterChildren<T = string>({
   children,
   filterBy,
