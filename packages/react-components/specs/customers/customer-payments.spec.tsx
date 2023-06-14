@@ -16,6 +16,7 @@ import getToken from '../utils/getToken'
 describe('Customer payments', () => {
   let token: string | undefined
   let domain: string | undefined
+  const timeout = 5000
   beforeAll(async () => {
     const { accessToken, endpoint } = await getToken('customer')
     if (accessToken !== undefined) {
@@ -64,7 +65,9 @@ describe('Customer payments', () => {
       </CommerceLayer>
     )
     expect(screen.getByText('Loading...'))
-    await waitForElementToBeRemoved(() => screen.getByText('Loading...'))
+    await waitForElementToBeRemoved(() => screen.getByText('Loading...'), {
+      timeout
+    })
     const brandIcons = screen.getAllByTestId('payment-source-brand-icon')
     const brandNames = screen.getAllByTestId('payment-source-brand-name')
     const last4Numbers = screen.getAllByTestId('payment-source-last4')
@@ -167,7 +170,9 @@ describe('Customer payments', () => {
       </CommerceLayer>
     )
     expect(screen.getByText('Caricamento...'))
-    await waitForElementToBeRemoved(() => screen.getByText('Caricamento...'))
+    await waitForElementToBeRemoved(() => screen.getByText('Caricamento...'), {
+      timeout
+    })
     const [brandIcon] = screen.getAllByTestId('payment-source-brand-icon')
     const [brandName] = screen.getAllByTestId('payment-source-brand-name')
     const [last4] = screen.getAllByTestId('payment-source-last4')
