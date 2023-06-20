@@ -1,3 +1,5 @@
+import { getDomain } from './getDomain'
+
 interface ReturnObj {
   organization: string
   domain: string
@@ -10,10 +12,9 @@ export default function getOrganizationSlug<E extends string>(
     organization: '',
     domain: 'commercelayer.io'
   }
-  if (endpoint.search('commercelayer.io') === -1)
-    org.domain = 'commercelayer.co'
-  org.organization = endpoint
-    .replace('https://', '')
-    .replace(`.${org.domain}`, '')
-  return org
+  const { domain, slug } = getDomain(endpoint)
+  return {
+    organization: slug,
+    domain: domain || org.domain
+  }
 }
