@@ -377,6 +377,7 @@ export interface CustomLineItem {
     | 'four-month'
     | 'six-month'
     | 'yearly'
+  externalPrice?: boolean
 }
 
 export type AddToCartParams = Partial<{
@@ -423,6 +424,7 @@ export async function addToCart(
         const imageUrl = lineItem?.imageUrl as string
         const metadata = lineItem?.metadata
         const frequency = lineItem?.frequency
+        const externalPrice = lineItem?.externalPrice
         if (buyNowMode) {
           if (!state?.order?.line_items) {
             const { line_items: lineItems } = await sdk.orders.retrieve(id, {
@@ -454,6 +456,9 @@ export async function addToCart(
           bundle_code: bundleCode,
           metadata,
           frequency
+        }
+        if (externalPrice === true) {
+          attrs._external_price = externalPrice
         }
         const newLineItem = await sdk.line_items.create(attrs)
         if (lineItemOption != null) {

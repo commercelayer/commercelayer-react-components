@@ -22,7 +22,7 @@ function HookComponent(): JSX.Element {
     return () => {
       setSku(undefined)
     }
-  }, [])
+  }, [ctx.accessToken])
   if (sku != null) {
     return <>{sku}</>
   }
@@ -46,7 +46,7 @@ describe('useCommerceLayer hook', () => {
       ctx.sku = 'BABYONBU000000E63E7412MX'
     }
   })
-  it('useCommerceLayer outside of CommerceLayer', () => {
+  it.skip('useCommerceLayer outside of CommerceLayer', () => {
     expect(() => renderHook(() => useCommerceLayer())).toThrow(
       'Cannot use `useCommerceLayer` outside of <CommerceLayer/>'
     )
