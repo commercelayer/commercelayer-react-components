@@ -17,13 +17,26 @@ import type { BaseError } from '#typings/errors'
 import type { Order } from '@commercelayer/sdk'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
+  /**
+   * Callback function to place the order
+   */
   handleClick: () => Promise<void>
 }
 
 interface Props
   extends Omit<JSX.IntrinsicElements['button'], 'children' | 'onClick'> {
   children?: ChildrenFunction<ChildrenProps>
+  /**
+   * The label of the button
+   */
   label?: string | ReactNode
+  /**
+   * If false, the button doesn't place the order automatically. Default: true
+   */
+  autoPlaceOrder?: boolean
+  /**
+   * Callback function that is fired when the button is clicked
+   */
   onClick?: (response: {
     placed: boolean
     order?: Order
@@ -33,7 +46,14 @@ interface Props
 
 export function PlaceOrderButton(props: Props): JSX.Element {
   const ref = useRef(null)
-  const { children, label = 'Place order', disabled, onClick, ...p } = props
+  const {
+    children,
+    label = 'Place order',
+    autoPlaceOrder = true,
+    disabled,
+    onClick,
+    ...p
+  } = props
   const { isPermitted, setPlaceOrder, options, paymentType, setButtonRef } =
     useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
@@ -87,7 +107,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       paymentType === 'paypal_payments' &&
       options?.paypalPayerId &&
       order?.status &&
-      ['draft', 'pending'].includes(order?.status)
+      ['draft', 'pending'].includes(order?.status) &&
+      autoPlaceOrder
     ) {
       void handleClick()
     }
@@ -97,7 +118,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       paymentType === 'stripe_payments' &&
       options?.stripe?.redirectStatus === 'succeeded' &&
       order?.status &&
-      ['draft', 'pending'].includes(order?.status)
+      ['draft', 'pending'].includes(order?.status) &&
+      autoPlaceOrder
     ) {
       void handleClick()
     }
@@ -128,7 +150,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           const errorCode = res?.payment_response?.errorCode
           // @ts-expect-error no type
           const message = res?.payment_response?.message
-          if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
+          if (
+            ['Authorised', 'Pending', 'Received'].includes(resultCode) &&
+            autoPlaceOrder
+          ) {
             void handleClick()
           } else if (errorCode != null) {
             setPaymentMethodErrors([
@@ -144,7 +169,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       } else if (
         paymentType === 'adyen_payments' &&
         options?.adyen?.MD &&
-        options?.adyen?.PaRes
+        options?.adyen?.PaRes &&
+        autoPlaceOrder
       ) {
         void handleClick()
       } else if (
@@ -152,7 +178,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         // @ts-expect-error no type
         order?.payment_source?.payment_response?.resultCode === 'Authorised' &&
         // @ts-expect-error no type
-        ref?.current?.disabled === false
+        ref?.current?.disabled === false &&
+        autoPlaceOrder
       ) {
         void handleClick()
       }
@@ -168,7 +195,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       paymentType === 'checkout_com_payments' &&
       options?.checkoutCom?.session_id &&
       order?.status &&
-      ['draft', 'pending'].includes(order?.status)
+      ['draft', 'pending'].includes(order?.status) &&
+      autoPlaceOrder
     ) {
       void handleClick()
     }

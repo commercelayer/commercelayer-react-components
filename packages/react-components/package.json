@@ -185,9 +185,11 @@
     "@stripe/react-stripe-js": "^2.1.0",
     "@stripe/stripe-js": "^1.54.0",
     "@tanstack/react-table": "^8.9.2",
+    "@types/iframe-resizer": "^3.5.9",
     "axios": "^1.4.0",
     "braintree-web": "^3.94.0",
     "frames-react": "^1.1.0",
+    "iframe-resizer": "^4.3.6",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "rapid-form": "^2.1.0"

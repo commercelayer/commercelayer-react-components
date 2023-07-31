@@ -10,10 +10,11 @@ import {
 import SkuListsContext from '#context/SkuListsContext'
 import ExternalFunctionContext from '#context/ExternalFunctionContext'
 import SkuChildrenContext from '#context/SkuChildrenContext'
-import getCartLink from '#utils/getCartLink'
+import { getApplicationLink } from '#utils/getApplicationLink'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import { getDomain } from '#utils/getDomain'
+import { publish } from '#utils/events'
 
 interface TAddToCartButton extends Omit<Props, 'children'> {
   handleClick: () => AddToCartReturn
@@ -145,6 +146,7 @@ export function AddToCartButton(props: Props): JSX.Element {
         })
           .then(async (res) => {
             getOrder && orderId && (await getOrder(orderId))
+            publish('open-cart')
             return res
           })
           .catch(({ response }) => {
@@ -169,9 +171,16 @@ export function AddToCartButton(props: Props): JSX.Element {
         if (hostedCartUrl && orderId) {
           location.href = `https://${hostedCartUrl}/${orderId}?accessToken=${accessToken}`
         } else if (orderId && slug) {
-          location.href = getCartLink({ orderId, slug, accessToken, domain })
+          location.href = getApplicationLink({
+            orderId,
+            slug,
+            accessToken,
+            domain,
+            applicationType: 'cart'
+          })
         }
       }
+      publish('open-cart')
       return res
     } else if (url) {
       return await callExternalFunction({
@@ -188,6 +197,7 @@ export function AddToCartButton(props: Props): JSX.Element {
       })
         .then(async (res) => {
           getOrder && orderId && (await getOrder(orderId))
+          publish('open-cart')
           return res
         })
         .catch(({ response }) => {
