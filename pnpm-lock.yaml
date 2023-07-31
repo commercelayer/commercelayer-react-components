@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -126,6 +126,9 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.9.2
         version: 8.9.2(react-dom@18.2.0)(react@18.2.0)
+      '@types/iframe-resizer':
+        specifier: ^3.5.9
+        version: 3.5.9
       axios:
         specifier: ^1.4.0
         version: 1.4.0
@@ -135,6 +138,9 @@ importers:
       frames-react:
         specifier: ^1.1.0
         version: 1.1.0(react@18.2.0)
+      iframe-resizer:
+        specifier: ^4.3.6
+        version: 4.3.6
       jwt-decode:
         specifier: ^3.1.2
         version: 3.1.2
@@ -5236,6 +5242,10 @@ packages:
   /@types/html-minifier-terser@5.1.2:
     resolution: {integrity: sha512-h4lTMgMJctJybDp8CQrxTUiiYmedihHWkjnF/8Pxseu2S6Nlfcy8kwboQ8yejh456rP2yWoEVm1sS/FVsfM48w==}
     dev: true
+
+  /@types/iframe-resizer@3.5.9:
+    resolution: {integrity: sha512-RQUBI75F+uXruB95BFpC/8V8lPgJg4MQ6HxOCtAZYBB/h0FNCfrFfb4I+u2pZJIV7sKeszZbFqy1UnGeBMrvsA==}
+    dev: false
 
   /@types/is-function@1.0.1:
     resolution: {integrity: sha512-A79HEEiwXTFtfY+Bcbo58M2GRYzCr9itHWzbzHVFNEYCcoU/MMGwYYf721gBrnhpj1s6RGVVha/IgNFnR0Iw/Q==}
@@ -11163,6 +11173,11 @@ packages:
   /iferr@0.1.5:
     resolution: {integrity: sha512-DUNFN5j7Tln0D+TxzloUjKB+CtVu6myn0JEFak6dG18mNt9YkQ6lzGCdafwofISZ1lLF3xRHJ98VKy9ynkcFaA==}
     dev: true
+
+  /iframe-resizer@4.3.6:
+    resolution: {integrity: sha512-wz0WodRIF6eP0oGQa5NIP1yrITAZ59ZJvVaVJqJRjaeCtfm461vy2C3us6CKx0e7pooqpIGLpVMSTzrfAjX9Sg==}
+    engines: {node: '>=0.8.0'}
+    dev: false
 
   /ignore-walk@5.0.1:
     resolution: {integrity: sha512-yemi4pMf51WKT7khInJqAvsIGzoqYXblnsz0ql8tM+yi1EKYTY1evX4NAbJrLL/Aanr2HyZeluqU+Oi7MGHokw==}

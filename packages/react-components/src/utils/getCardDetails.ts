@@ -63,6 +63,10 @@ export default function getCardDetails({
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
       const source = ps?.payment_request_data?.payment_method
       const authorized = ps?.payment_response?.resultCode === 'Authorised'
+      const last4 =
+        ps?.payment_response?.['additionalData']?.cardSummary ??
+        ps?.payment_instrument?.['card_last_digits'] ??
+        '****'
       if (source && authorized) {
         const brand =
           source.type === 'scheme'
@@ -70,6 +74,7 @@ export default function getCardDetails({
             : source.type.replace('_account', '')
         return {
           ...source,
+          last4,
           brand
         }
       }

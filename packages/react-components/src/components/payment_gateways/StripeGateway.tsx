@@ -47,8 +47,9 @@ export function StripeGateway(props: Props): JSX.Element | null {
   const clientSecret = paymentSource?.client_secret
   const paymentSourceId = order?.payment_source?.id || paymentSource?.id
   const stripeConfig = config
-    ? getPaymentConfig<'stripe_payments'>(paymentResource, config)
+    ? getPaymentConfig<'stripe_payments'>(paymentResource, config).stripePayment
     : {}
+  console.log('stripeConfig', stripeConfig)
   const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {

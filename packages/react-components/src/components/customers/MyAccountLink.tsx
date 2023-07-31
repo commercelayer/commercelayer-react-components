@@ -1,53 +1,64 @@
 import { useContext } from 'react'
-import OrderContext from '#context/OrderContext'
 import Parent from '../utils/Parent'
 import { type ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { getApplicationLink } from '#utils/getApplicationLink'
 import { getDomain } from '#utils/getDomain'
+import jwt from '#utils/jwt'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
-  checkoutUrl: string
+  /**
+   * The link href
+   */
   href: string
+  /**
+   * The link status
+   */
+  disabled: boolean
 }
 
 interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
+  /**
+   * A render function to render your own custom component
+   */
   children?: ChildrenFunction<ChildrenProps>
+  /**
+   * The label of the link
+   */
   label?: string
-  hostedCheckout?: boolean
 }
 
-export function CheckoutLink(props: Props): JSX.Element {
-  const { label, hostedCheckout = true, children, ...p } = props
-  const { order } = useContext(OrderContext)
+export function MyAccountLink(props: Props): JSX.Element {
+  const { label = 'Go to my account', children, ...p } = props
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
   if (accessToken == null || endpoint == null)
-    throw new Error('Cannot use `CheckoutLink` outside of `CommerceLayer`')
+    throw new Error('Cannot use `MyAccountLink` outside of `CommerceLayer`')
   const { domain, slug } = getDomain(endpoint)
-  const href =
-    hostedCheckout && order?.id
-      ? getApplicationLink({
-          slug,
-          orderId: order?.id,
-          accessToken,
-          applicationType: 'checkout',
-          domain
-        })
-      : order?.checkout_url ?? ''
+  const disabled = !('owner' in jwt(accessToken))
+  const href = getApplicationLink({
+    slug,
+    accessToken,
+    applicationType: 'my-account',
+    domain
+  })
   const parentProps = {
-    checkoutUrl: order?.checkout_url,
-    hostedCheckout,
+    disabled,
     label,
     href,
     ...p
   }
+  function handleClick(
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ): void {
+    if (disabled) e.preventDefault()
+  }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a href={href} {...p}>
+    <a aria-disabled={disabled} onClick={handleClick} href={href} {...p}>
       {label}
     </a>
   )
 }
 
-export default CheckoutLink
+export default MyAccountLink
