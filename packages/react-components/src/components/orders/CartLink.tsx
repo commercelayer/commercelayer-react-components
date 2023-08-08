@@ -18,6 +18,14 @@ interface ChildrenProps extends Omit<Props, 'children'> {
    * @returns Promise<void>
    */
   handleClick?: (e: MouseEvent<HTMLAnchorElement>) => Promise<void>
+  /**
+   * The order id
+   */
+  orderId?: string
+  /**
+   * The access token
+   */
+  accessToken?: string
 }
 
 interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
@@ -77,6 +85,8 @@ export function CartLink(props: Props): JSX.Element | null {
     handleClick,
     label,
     href,
+    orderId: order?.id,
+    accessToken,
     ...p
   }
   if (!accessToken) return null

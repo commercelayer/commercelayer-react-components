@@ -353,6 +353,7 @@ export async function createCustomerAddress({
       } else {
         const newAddress = await sdk.addresses.create(address)
         if (state?.customers?.id && newAddress?.id) {
+          // @ts-expect-error Expected customer_email
           const newCustomerAddress = await sdk.customer_addresses.create({
             customer: sdk.customers.relationship(state?.customers?.id),
             address: sdk.addresses.relationship(newAddress.id)

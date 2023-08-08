@@ -59,6 +59,7 @@ export function Shipment({
     return () => {
       setLoading(true)
     }
+    // @ts-expect-error deprecate `gift_card_or_coupon_code`
   }, [shipments != null, shipments?.length, order?.gift_card_or_coupon_code])
   const components = shipments?.map((shipment, k) => {
     const shipmentLineItems = shipment.stock_line_items
