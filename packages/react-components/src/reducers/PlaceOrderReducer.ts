@@ -236,12 +236,6 @@ export async function setPlaceOrder({
           })
           if (setOrder) setOrder(orderUpdated)
           if (setOrderErrors) setOrderErrors([])
-          if (hasSubscriptions(orderUpdated)) {
-            await sdk.orders.update({
-              id: order.id,
-              _create_subscriptions: true
-            })
-          }
           return {
             placed: true,
             order: orderUpdated
