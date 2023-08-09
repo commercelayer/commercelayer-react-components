@@ -16,7 +16,6 @@ import {
 } from '#utils/customerOrderOptions'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
-import { hasSubscriptions } from '#utils/hasSubscriptions'
 
 export type PlaceOrderActionType =
   | 'setErrors'
@@ -253,12 +252,6 @@ export async function setPlaceOrder({
             })
           }
           if (setOrderErrors) setOrderErrors([])
-          if (hasSubscriptions(orderUpdated)) {
-            await sdk.orders.update({
-              id: order.id,
-              _create_subscriptions: true
-            })
-          }
           return {
             placed: true,
             order: orderUpdated
