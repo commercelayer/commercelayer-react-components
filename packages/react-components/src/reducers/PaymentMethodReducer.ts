@@ -297,6 +297,7 @@ export async function setPaymentSource({
     if (config && order) {
       let paymentSource: PaymentSourceType
       const sdk = getSdk(config)
+      console.log('customerPaymentSourceId', customerPaymentSourceId)
       if (!customerPaymentSourceId) {
         if (!paymentSourceId) {
           const attrs: any = {
@@ -323,13 +324,14 @@ export async function setPaymentSource({
         }
         return paymentSource
       } else {
-        updateOrder &&
-          (await updateOrder({
+        if (updateOrder != null) {
+          await updateOrder({
             id: order.id,
             attributes: {
               _customer_payment_source_id: customerPaymentSourceId
             }
-          }))
+          })
+        }
       }
     }
   } catch (error: any) {

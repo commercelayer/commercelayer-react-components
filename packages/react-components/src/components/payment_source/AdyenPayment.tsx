@@ -123,12 +123,12 @@ export function AdyenPayment({
   }
   const handleChange = async (
     state: any,
-    _component?: UIElement<any>
+    component?: UIElement<any>
   ): Promise<void> => {
     if (state.isValid) {
       if (ref.current) {
         ref.current.onsubmit = async () =>
-          await handleSubmit(ref.current as any, checkout)
+          await handleSubmit(ref.current as any, component)
         setPaymentRef({ ref })
       }
       const browserInfo = getBrowserInfo()
