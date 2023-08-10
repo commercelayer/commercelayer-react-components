@@ -11,3 +11,5 @@ export type TRange<F extends number, T extends number> = Exclude<
   Enumerate<T>,
   Enumerate<F>
 >
+
+export type LooseAutocomplete<T extends string> = T | Omit<string, T>

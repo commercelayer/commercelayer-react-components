@@ -21,6 +21,7 @@ import type {
   QueryParamsRetrieve
 } from '@commercelayer/sdk'
 import getOrganizationSlug from '#utils/organization'
+import { type LooseAutocomplete } from '#typings/globals'
 
 export type GetOrderParams = Partial<{
   clearWhenPlaced: boolean
@@ -259,6 +260,9 @@ export async function updateOrder({
     await sdk.orders.update(resource, { include })
     // NOTE: Retrieve doesn't response with attributes updated
     const order = await getApiOrder({ id, config, dispatch, state })
+    console.log('order', order)
+    console.log('order payment_source', order?.payment_source)
+    // debugger
     dispatch && order && dispatch({ type: 'setOrder', payload: { order } })
     return { success: true, order }
   } catch (error: any) {
@@ -363,20 +367,22 @@ export interface LineItemOption {
   quantity?: number
 }
 
+type TFrequency =
+  | 'hourly'
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
+  | 'two-month'
+  | 'three-month'
+  | 'four-month'
+  | 'six-month'
+  | 'yearly'
+
 export interface CustomLineItem {
   name?: string
   imageUrl?: string | null
   metadata?: Record<string, string>
-  frequency?:
-    | 'hourly'
-    | 'daily'
-    | 'weekly'
-    | 'monthly'
-    | 'two-month'
-    | 'three-month'
-    | 'four-month'
-    | 'six-month'
-    | 'yearly'
+  frequency?: LooseAutocomplete<TFrequency>
   externalPrice?: boolean
 }
 
@@ -455,7 +461,7 @@ export async function addToCart(
           _update_quantity: true,
           bundle_code: bundleCode,
           metadata,
-          frequency
+          frequency: frequency as string
         }
         if (externalPrice === true) {
           attrs._external_price = externalPrice
