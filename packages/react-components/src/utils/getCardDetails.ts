@@ -39,7 +39,15 @@ export default function getCardDetails({
     case 'stripe_payments': {
       const ps =
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
-      const source = ps?.options?.card ?? ps?.payment_method?.card
+      const source =
+        ps?.options?.card ?? ps?.payment_method?.card ?? ps?.payment_instrument
+          ? {
+              brand: ps?.payment_instrument?.['card_type'],
+              exp_month: ps?.payment_instrument?.['card_expiry_month'],
+              exp_year: ps?.payment_instrument?.['card_expiry_year'],
+              last4: ps?.payment_instrument?.['card_last_digits']
+            }
+          : undefined
       if (source) {
         return {
           ...source
