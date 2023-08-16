@@ -40,6 +40,8 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
   const [showCard, setShowCard] = useState(false)
 
   useEffect(() => {
+    console.log('payment?.id', payment?.id)
+    console.log('currentPaymentMethodId', currentPaymentMethodId)
     if (readonly) {
       setShow(true)
       setShowCard(true)

@@ -260,9 +260,6 @@ export async function updateOrder({
     await sdk.orders.update(resource, { include })
     // NOTE: Retrieve doesn't response with attributes updated
     const order = await getApiOrder({ id, config, dispatch, state })
-    console.log('order', order)
-    console.log('order payment_source', order?.payment_source)
-    // debugger
     dispatch && order && dispatch({ type: 'setOrder', payload: { order } })
     return { success: true, order }
   } catch (error: any) {

@@ -81,7 +81,6 @@ export function PaymentGateway({
           attributes['return_url'] = window.location.href
         }
       }
-      console.log('paymentSource', paymentSource)
       const setPaymentSources = async (): Promise<void> => {
         await setPaymentSource({
           paymentResource,
