@@ -116,7 +116,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   useEffect(() => {
     if (
       paymentType === 'stripe_payments' &&
-      options?.stripe?.redirectStatus === 'succeeded' &&
+      ['succeeded', 'pending'].includes(
+        options?.stripe?.redirectStatus ?? ''
+      ) &&
       order?.status &&
       ['draft', 'pending'].includes(order?.status) &&
       autoPlaceOrder

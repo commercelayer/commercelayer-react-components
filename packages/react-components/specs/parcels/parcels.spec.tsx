@@ -33,7 +33,6 @@ describe('Parcels components', () => {
     }
   })
   it<ParcelContext>('Show a parcel', async (ctx) => {
-    console.log('accessToken', ctx)
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <OrderContainer orderId={ctx.orderId}>

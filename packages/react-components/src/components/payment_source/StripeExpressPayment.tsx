@@ -49,7 +49,6 @@ export function StripeExpressPayment({
     })
     pr.canMakePayment()
       .then((result) => {
-        console.log('available payment:', result)
         if (result) {
           setPaymentRequest(pr)
         }

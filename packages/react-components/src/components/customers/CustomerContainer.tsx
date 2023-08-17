@@ -85,7 +85,7 @@ export function CustomerContainer(props: Props): JSX.Element {
       }
       void getCustomerData()
     }
-  }, [config.accessToken, order != null, isGuest])
+  }, [config.accessToken, order?.payment_source != null, isGuest])
   const contextValue = useMemo(() => {
     return {
       isGuest,

@@ -10,6 +10,7 @@ interface CardDetails {
   last4: string
   exp_month: number | string
   exp_year: number | string
+  issuer_type?: string
 }
 
 interface Args {
@@ -45,7 +46,8 @@ export default function getCardDetails({
               brand: ps?.payment_instrument?.['card_type'],
               exp_month: ps?.payment_instrument?.['card_expiry_month'],
               exp_year: ps?.payment_instrument?.['card_expiry_year'],
-              last4: ps?.payment_instrument?.['card_last_digits']
+              last4: ps?.payment_instrument?.['card_last_digits'],
+              issuer_type: ps?.payment_instrument?.['issuer_type']
             }
           : undefined
       if (source) {
@@ -104,6 +106,7 @@ export default function getCardDetails({
     brand: '',
     exp_month: '**',
     exp_year: '**',
-    last4: '****'
+    last4: '****',
+    issuer_type: ''
   }
 }

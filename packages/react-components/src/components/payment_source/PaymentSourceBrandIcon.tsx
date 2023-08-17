@@ -23,9 +23,11 @@ export function PaymentSourceBrandIcon({
   children,
   ...p
 }: Props): JSX.Element {
-  const { brand } = useContext(PaymentSourceContext)
-  const { brand: customerCardBrand } = useContext(CustomerPaymentSourceContext)
-  const cardBrand = brand ?? customerCardBrand
+  const { brand, issuer_type: issuerType } = useContext(PaymentSourceContext)
+  const { brand: customerCardBrand, issuer_type: customerIssuerType } =
+    useContext(CustomerPaymentSourceContext)
+  const cardBrand =
+    brand ?? customerCardBrand ?? issuerType ?? customerIssuerType
   const ref = useRef<HTMLImageElement>(null)
   const defaultSrc =
     '//data.commercelayer.app/assets/images/icons/credit-cards/color/credit-card.svg'
