@@ -75,6 +75,7 @@ export function CustomerContainer(props: Props): JSX.Element {
       order == null &&
       include == null &&
       includeLoaded == null &&
+      withoutIncludes === undefined &&
       !isGuest
     ) {
       async function getCustomerData(): Promise<void> {
@@ -84,7 +85,7 @@ export function CustomerContainer(props: Props): JSX.Element {
       }
       void getCustomerData()
     }
-  }, [config.accessToken, order, isGuest])
+  }, [config.accessToken, order != null, isGuest])
   const contextValue = useMemo(() => {
     return {
       isGuest,

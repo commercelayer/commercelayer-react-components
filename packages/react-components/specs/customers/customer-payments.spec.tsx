@@ -83,7 +83,6 @@ describe('Customer payments', () => {
     }
     for (const last4 of last4Numbers) {
       expect(last4).toBeDefined()
-      console.log('last4?.textContent', last4?.textContent)
       expect(last4?.textContent).not.toBe('')
       expect(last4?.textContent).toMatch(/[0-9]{4}|[*]{4}/gm)
     }
