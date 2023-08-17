@@ -198,6 +198,7 @@ export interface BaseAmountComponent
   children?: ChildrenFunction<BaseAmountComponentChildren>
   format?: BaseFormatPrice
   price?: string
+  scheme?: string
   priceCents?: number
   labelFree?: string
 }

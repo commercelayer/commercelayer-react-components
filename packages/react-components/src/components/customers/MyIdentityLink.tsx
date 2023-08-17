@@ -55,7 +55,6 @@ export function MyIdentityLink(props: Props): JSX.Element {
     scope,
     returnUrl: returnUrl ?? window.location.href
   })
-  console.log('href', href)
   const parentProps = {
     label,
     href,

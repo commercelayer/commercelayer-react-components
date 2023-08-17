@@ -66,8 +66,7 @@ describe('Line items components', () => {
                 resource='line_items'
                 field='quantity'
               >
-                {(props) => {
-                  console.log('error component props', props)
+                {() => {
                   return <span data-testid='errors'>Errors</span>
                 }}
               </Errors>

@@ -5,7 +5,14 @@ import Parent from '#components/utils/Parent'
 import { type BaseAmountComponent } from '#typings/index'
 
 type Props = BaseAmountComponent & {
+  /**
+   * The label to show when the price is free
+   */
   labelFreeOver?: string
+  /**
+   * The label to show when the price is external
+   */
+  labelExternal?: string
 } & (
     | {
         type?: 'amount'
@@ -23,11 +30,13 @@ export function ShippingMethodPrice(props: Props): JSX.Element {
     type = 'for_shipment',
     format = 'formatted',
     labelFreeOver = 'Free',
+    labelExternal = 'Price estimates after the shipping method selection',
     ...p
   } = props
   const { shippingMethod } = useContext(ShippingMethodChildrenContext)
   const [price, setPrice] = useState('')
   const [priceCents, setPriceCents] = useState(0)
+  const scheme = shippingMethod?.scheme
   useEffect(() => {
     if (shippingMethod) {
       const p = getAmount({
@@ -52,13 +61,14 @@ export function ShippingMethodPrice(props: Props): JSX.Element {
   }, [shippingMethod])
   const parentProps = {
     price,
+    scheme,
     ...p
   }
   const finalPrice = priceCents === 0 ? labelFreeOver : price
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <span {...p}>{finalPrice}</span>
+    <span {...p}>{scheme === 'external' ? labelExternal : finalPrice}</span>
   )
 }
 

@@ -161,7 +161,6 @@ export function HostedCart({
     }
     if (openAdd && type === 'mini') {
       subscribe('open-cart', () => {
-        console.log('open-cart by event', src, order?.id, orderId)
         if (src == null && order?.id == null && orderId == null) {
           void setOrder(true)
         } else {

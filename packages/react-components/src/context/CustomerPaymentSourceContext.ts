@@ -6,6 +6,7 @@ interface DefaultContext {
   exp_month?: number | string
   exp_year?: number | string
   last4?: string
+  issuer_type?: string
 }
 
 export const defaultCustomerPaymentSourceContext = {}

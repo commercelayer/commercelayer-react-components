@@ -26,7 +26,11 @@ export function PaymentSourceDetail({
   const customerCard = useContext(CustomerPaymentSourceContext)
   const cardObj = Object.keys(card).length > 0 ? card : customerCard
   const text =
-    type in cardObj ? cardObj[type] : type === 'last4' ? '****' : '**'
+    type in cardObj && cardObj[type] != null
+      ? cardObj[type]
+      : type === 'last4'
+      ? '****'
+      : '**'
   const parentProps = {
     type,
     text,
