@@ -183,7 +183,11 @@ export function HostedCart({
       isOpen
     ) {
       void setOrder()
-    } else if (src == null && (order?.id != null || orderId != null)) {
+    } else if (
+      src == null &&
+      (order?.id != null || orderId != null) &&
+      accessToken != null
+    ) {
       setSrc(
         getApplicationLink({
           slug,
@@ -203,7 +207,7 @@ export function HostedCart({
         unsubscribe('open-cart', () => {})
       }
     }
-  }, [src, open, order?.id])
+  }, [src, open, order?.id, accessToken != null])
   useEffect(() => {
     if (ref.current == null) return
     iframeResizer(
