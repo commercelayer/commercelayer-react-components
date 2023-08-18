@@ -76,7 +76,9 @@ export function PaymentGateway({
       }
       if (config != null && paymentResource === 'stripe_payments') {
         attributes = {
-          off_session: false
+          options: {
+            off_session: false
+          }
         }
       }
       const setPaymentSources = async (): Promise<void> => {
