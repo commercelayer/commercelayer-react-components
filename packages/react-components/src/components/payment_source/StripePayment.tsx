@@ -26,7 +26,6 @@ export interface StripeConfig {
   name?: string
   options?: StripePaymentElementOptions
   appearance?: StripeElementsOptions['appearance']
-  return_url?: string
   [key: string]: any
 }
 
