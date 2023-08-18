@@ -2,7 +2,7 @@ import baseReducer from '#utils/baseReducer'
 import type { Dispatch, RefObject } from 'react'
 import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import type { BaseError } from '#typings/errors'
-import type { Order, OrderUpdate, StripePayment } from '@commercelayer/sdk'
+import type { Order, OrderUpdate } from '@commercelayer/sdk'
 import isEmpty from 'lodash/isEmpty'
 import { isDoNotShip, shipmentsFilled } from '#utils/shipments'
 import {
@@ -204,19 +204,6 @@ export async function setPlaceOrder({
           ]
           // eslint-disable-next-line @typescript-eslint/no-throw-literal
           throw { errors }
-        }
-      }
-      if (paymentType === 'stripe_payments' && paymentSource != null) {
-        const ps = paymentSource as StripePayment
-        const currentUrl = window.location.href
-        const returnUrl = ps?.options?.['return_url']
-        if (currentUrl !== returnUrl) {
-          await sdk[paymentType].update({
-            id: paymentSource.id,
-            options: {
-              return_url: currentUrl
-            }
-          })
         }
       }
       const updateAttributes: OrderUpdate = {

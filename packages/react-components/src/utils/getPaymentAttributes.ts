@@ -8,7 +8,6 @@ import { type ExternalPayment } from '@commercelayer/sdk'
 import { pick } from './pick'
 import { replace, type StringReplace } from './replace'
 import { type SnakeToCamelCase, snakeToCamelCase } from './snakeToCamelCase'
-import { type StripeConfig } from '#components/payment_source/StripePayment'
 
 interface Params<R extends PaymentResource, C extends PaymentMethodConfig> {
   resource: R
@@ -57,20 +56,6 @@ export function getPaypalAttributes(
   })
   return attributes?.paypalPayment != null && 'paypalPayment' in attributes
     ? pick(attributes?.paypalPayment, ['return_url', 'cancel_url'])
-    : undefined
-}
-
-export function getStripeAttributes(
-  paymentResource: PaymentResource,
-  config: PaymentMethodConfig
-): Pick<StripeConfig, 'return_url'> | undefined {
-  const attributes = getPaymentAttributes({
-    resource: paymentResource,
-    config,
-    keys: ['stripe_payments']
-  })
-  return attributes?.stripePayment != null && 'stripePayment' in attributes
-    ? pick(attributes?.stripePayment, ['return_url'])
     : undefined
 }
 
