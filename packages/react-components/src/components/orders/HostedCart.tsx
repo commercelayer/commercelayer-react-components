@@ -39,7 +39,7 @@ const defaultIframeStyle = {
   width: '1px',
   minWidth: '100%',
   minHeight: '100%',
-  border: 'none',
+  border: 'none'
 } satisfies CSSProperties
 
 const defaultContainerStyle = {
@@ -246,7 +246,7 @@ export function HostedCart({
         <iframe
           title='Cart'
           ref={ref}
-          style={{ ...defaultStyle.cart, ...style?.cart}}
+          style={{ ...defaultStyle.cart, ...style?.cart }}
           src={src}
           width='100%'
           height='100%'
@@ -257,7 +257,7 @@ export function HostedCart({
     <iframe
       title='Cart'
       ref={ref}
-      style={{ ...defaultStyle.cart, ...style?.cart}}
+      style={{ ...defaultStyle.cart, ...style?.cart }}
       src={src}
       width='100%'
       height='100%'
