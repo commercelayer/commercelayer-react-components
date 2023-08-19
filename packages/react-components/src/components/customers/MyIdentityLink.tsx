@@ -20,7 +20,7 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
   /**
    * The label of the link
    */
-  label: string
+  label: string | JSX.Element
   /**
    * The type of the link
    */
