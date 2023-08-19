@@ -39,7 +39,7 @@ const defaultIframeStyle = {
   width: '1px',
   minWidth: '100%',
   minHeight: '100%',
-  border: 'none'
+  border: 'none',
 } satisfies CSSProperties
 
 const defaultContainerStyle = {
@@ -97,7 +97,7 @@ interface Props
 export function HostedCart({
   type,
   openAdd = false,
-  style = defaultStyle,
+  style,
   open = false,
   handleOpen,
   ...props
@@ -117,7 +117,7 @@ export function HostedCart({
   const { domain, slug } = getDomain(endpoint)
   async function setOrder(openCart?: boolean): Promise<void> {
     const orderId = localStorage.getItem(persistKey) ?? (await createOrder())
-    if (orderId != null && accessToken != null) {
+    if (orderId != null && accessToken) {
       setSrc(
         getApplicationLink({
           slug,
@@ -186,7 +186,7 @@ export function HostedCart({
     } else if (
       src == null &&
       (order?.id != null || orderId != null) &&
-      accessToken != null
+      accessToken
     ) {
       setSrc(
         getApplicationLink({
@@ -207,7 +207,7 @@ export function HostedCart({
         unsubscribe('open-cart', () => {})
       }
     }
-  }, [src, open, order?.id, accessToken != null])
+  }, [src, open, order?.id, accessToken])
   useEffect(() => {
     if (ref.current == null) return
     iframeResizer(
@@ -224,9 +224,10 @@ export function HostedCart({
     <>
       <div
         style={{
-          ...style.background,
-          opacity: isOpen ? '0.5' : style.background?.opacity,
-          zIndex: isOpen ? '1' : style.background?.zIndex
+          ...defaultStyle.background,
+          ...style?.background,
+          opacity: isOpen ? '0.5' : defaultStyle.background?.opacity,
+          zIndex: isOpen ? '1' : defaultStyle.background?.zIndex
         }}
         onClick={() => {
           if (handleOpen != null) handleOpen()
@@ -235,16 +236,17 @@ export function HostedCart({
       />
       <div
         style={{
-          ...style.container,
-          right: isOpen ? '0' : style.container?.right,
-          zIndex: isOpen ? '10' : style.container?.zIndex
+          ...defaultStyle.container,
+          ...style?.container,
+          right: isOpen ? '0' : defaultStyle.container?.right,
+          zIndex: isOpen ? '100' : defaultStyle.container?.zIndex
         }}
         {...props}
       >
         <iframe
           title='Cart'
           ref={ref}
-          style={style.cart}
+          style={{ ...defaultStyle.cart, ...style?.cart}}
           src={src}
           width='100%'
           height='100%'
@@ -255,7 +257,7 @@ export function HostedCart({
     <iframe
       title='Cart'
       ref={ref}
-      style={style.cart}
+      style={{ ...defaultStyle.cart, ...style?.cart}}
       src={src}
       width='100%'
       height='100%'
