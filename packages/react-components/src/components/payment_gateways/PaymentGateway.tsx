@@ -16,7 +16,8 @@ import CheckoutComGateway from './CheckoutComGateway'
 import KlarnaGateway from './KlarnaGateway'
 import {
   getExternalPaymentAttributes,
-  getPaypalAttributes
+  getPaypalAttributes,
+  getStripeAttributes
 } from '#utils/getPaymentAttributes'
 import ExternalGateway from './ExternalGateway'
 
@@ -75,10 +76,9 @@ export function PaymentGateway({
         attributes = getExternalPaymentAttributes(paymentResource, config)
       }
       if (config != null && paymentResource === 'stripe_payments') {
-        attributes = {
-          options: {
-            off_session: false
-          }
+        attributes = getStripeAttributes(paymentResource, config)
+        if (attributes != null && attributes['return_url'] == null) {
+          attributes['return_url'] = window.location.href
         }
       }
       const setPaymentSources = async (): Promise<void> => {
