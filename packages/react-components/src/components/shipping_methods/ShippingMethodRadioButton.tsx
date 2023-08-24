@@ -37,7 +37,7 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
     return () => {
       setChecked(false)
     }
-  }, [currentShippingMethodId])
+  }, [currentShippingMethodId, shippingMethodId])
 
   const handleOnChange = async (): Promise<void> => {
     if (shipmentId) {
@@ -68,7 +68,8 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
       type='radio'
       name={name}
       id={id}
-      onChange={() => {
+      onChange={(e) => {
+        e.stopPropagation()
         void handleOnChange()
       }}
       checked={checked}

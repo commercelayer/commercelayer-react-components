@@ -11,7 +11,7 @@ import type {
 export interface InitialShipmentContext {
   currentShippingMethodId?: string
   deliveryLeadTimes?: DeliveryLeadTime[] | null | undefined
-  keyNumber: number
+  keyNumber: number | string
   lineItems?: Array<LineItem | null | undefined>
   parcels?: Parcel[] | null | undefined
   shipment?: Shipment

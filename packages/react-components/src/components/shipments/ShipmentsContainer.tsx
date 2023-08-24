@@ -54,10 +54,11 @@ export function ShipmentsContainer(props: Props): JSX.Element {
     }
   }, [include?.length, includeLoaded != null])
   useEffect(() => {
+    console.log('order?.shipments', order?.shipments)
     if (order != null && !isEmpty(config) && order.shipments) {
       void getShipments({ order, dispatch, config })
     }
-  }, [order != null, order?.shipments?.length])
+  }, [order?.shipments])
   useEffect(() => {
     if (order) {
       if (order.shipments && order.shipments.length > 0) {
