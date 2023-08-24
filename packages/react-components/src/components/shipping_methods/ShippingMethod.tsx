@@ -48,6 +48,9 @@ export function ShippingMethod(props: Props): JSX.Element {
         )
       })
     if (methods) setItems(methods)
+    return () => {
+      setItems([])
+    }
   }, [currentShippingMethodId, deliveryLeadTimes, shippingMethods])
   const components = (!isEmpty(items) && items) || emptyText
   return <>{components}</>
