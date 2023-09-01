@@ -2,7 +2,6 @@ import { createContext } from 'react'
 import { type Order } from '@commercelayer/sdk'
 import {
   type OrderState,
-  type CreateOrder,
   type SaveAddressToCustomerAddressBook,
   createOrder,
   setGiftCardOrCouponCode,
@@ -16,7 +15,7 @@ import {
 import { type BaseError } from '#typings/errors'
 
 interface DefaultContext extends OrderState {
-  createOrder: CreateOrder
+  createOrder: typeof createOrder
   addToCart?: typeof addToCart
   setOrderErrors: (errors: BaseError[]) => void
   setGiftCardOrCouponCode?: typeof setGiftCardOrCouponCode

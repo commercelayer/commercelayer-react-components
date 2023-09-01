@@ -46,8 +46,6 @@ type CreateOrderParams = Pick<
   | 'setLocalOrder'
 >
 
-export type CreateOrder = (params?: CreateOrderParams) => Promise<string>
-
 export interface AddToCartImportParams
   extends Omit<
     AddToCartParams,
@@ -132,7 +130,7 @@ const actionType: OrderActionType[] = [
   'setIncludesResource'
 ]
 
-export const createOrder: CreateOrder = async (params) => {
+export async function createOrder(params: CreateOrderParams): Promise<string> {
   if (params) {
     const {
       persistKey,
