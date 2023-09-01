@@ -116,7 +116,7 @@ export function HostedCart({
   const { persistKey } = useContext(OrderStorageContext)
   const { domain, slug } = getDomain(endpoint)
   async function setOrder(openCart?: boolean): Promise<void> {
-    const orderId = localStorage.getItem(persistKey) ?? (await createOrder())
+    const orderId = localStorage.getItem(persistKey) ?? (await createOrder({}))
     if (orderId != null && accessToken) {
       setSrc(
         getApplicationLink({

@@ -67,7 +67,7 @@ export function CartLink(props: Props): JSX.Element | null {
       if (order?.id) {
         location.href = href
       } else {
-        const orderId = await createOrder()
+        const orderId = await createOrder({})
         if (slug)
           location.href = getApplicationLink({
             slug,
