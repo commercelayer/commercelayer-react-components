@@ -14,7 +14,10 @@ import isEmpty from 'lodash/isEmpty'
 import { type BaseError } from '#typings/errors'
 import getErrors from '#utils/getErrors'
 import getSdk from '#utils/getSdk'
-import { type CreateOrder, type getOrderContext } from '#reducers/OrderReducer'
+import {
+  type createOrder as makeOrder,
+  type getOrderContext
+} from '#reducers/OrderReducer'
 
 export type GiftCardActionType =
   | 'setAvailability'
@@ -131,7 +134,7 @@ export async function addGiftCard<V extends GiftCardI>(
     order
   }: {
     getOrder?: getOrderContext
-    createOrder?: CreateOrder
+    createOrder?: typeof makeOrder
     config: CommerceLayerConfig
     dispatch: Dispatch<GiftCardAction>
     order?: Order
@@ -158,7 +161,7 @@ export async function addGiftCard<V extends GiftCardI>(
       await sdk.gift_card_recipients.update(recipientValues)
     }
     if (createOrder && getOrder) {
-      const id = order ? order.id : await createOrder()
+      const id = order ? order.id : await createOrder({})
       if (id) {
         const order = sdk.orders.relationship(id)
         const item = sdk.gift_cards.relationship(giftCard.id)
