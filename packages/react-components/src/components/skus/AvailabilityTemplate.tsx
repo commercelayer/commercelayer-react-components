@@ -39,6 +39,11 @@ type FormatRules =
 
 type Props = {
   children?: ChildrenFunction<AvailabilityTemplateChildrenProps>
+  labels?: {
+    available?: string
+    outOfStock?: string
+    negativeStock?: string
+  }
 } & Omit<JSX.IntrinsicElements['span'], 'children'> &
   FormatRules
 
@@ -48,6 +53,7 @@ export function AvailabilityTemplate(props: Props): JSX.Element {
     showShippingMethodName,
     showShippingMethodPrice,
     children,
+    labels,
     ...p
   } = props
   const {
@@ -73,13 +79,19 @@ export function AvailabilityTemplate(props: Props): JSX.Element {
     showShippingMethodName && shippingMethod
       ? `with ${shippingMethod.name}`
       : ''
-  if (quantity && quantity > 0) {
-    text.push('Available')
-    if (mn && mx && timeFormat) {
-      text.push(`in ${mn} - ${mx} ${timeFormat} ${name} ${shippingMethodPrice}`)
+  if (quantity != null) {
+    if (quantity > 0) {
+      text.push(labels?.available ?? 'Available')
+      if (mn && mx && timeFormat) {
+        text.push(
+          `in ${mn} - ${mx} ${timeFormat} ${name} ${shippingMethodPrice}`
+        )
+      }
+    } else if (quantity === 0) {
+      text.push(labels?.outOfStock ?? 'Out of stock')
+    } else if (quantity < 0) {
+      text.push(labels?.negativeStock ?? 'Out of stock')
     }
-  } else if (quantity === 0) {
-    text.push('Out of stock')
   }
   const parentProps = {
     min,

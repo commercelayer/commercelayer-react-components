@@ -5,7 +5,7 @@ import { type PaymentSourceProps } from './PaymentSource'
 import OrderContext from '#context/OrderContext'
 import useExternalScript from '#utils/hooks/useExternalScript'
 import { type LineItem } from '@commercelayer/sdk'
-import PlaceOrderContext from '#context/PlaceOrderContext'
+// import PlaceOrderContext from '#context/PlaceOrderContext'
 
 interface KlarnaResponse {
   show_form: boolean
@@ -73,11 +73,11 @@ export default function KlarnaPayment({
     paymentSource,
     currentPaymentMethodType,
     setPaymentRef,
-    setPaymentSource,
+    // setPaymentSource,
     setPaymentMethodErrors
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
-  const { setPlaceOrder } = useContext(PlaceOrderContext)
+  // const { setPlaceOrder } = useContext(PlaceOrderContext)
   const loaded = useExternalScript('https://x.klarnacdn.net/kp/lib/v1/api.js')
   const [klarna, setKlarna] = useState<any>()
   const { containerClassName, ...divProps } = p
@@ -165,27 +165,31 @@ export default function KlarnaPayment({
                 },
                 klarnaData,
                 async function (res: KlarnaResponse) {
-                  if (
-                    res.approved &&
-                    paymentSource &&
-                    currentPaymentMethodType
-                  ) {
-                    const ps = await setPaymentSource({
-                      paymentSourceId: paymentSource.id,
-                      paymentResource: currentPaymentMethodType,
-                      attributes: {
-                        auth_token: res.authorization_token as string
-                      }
-                    })
-                    const { placed } = (setPlaceOrder &&
-                      ps &&
-                      (await setPlaceOrder({
-                        paymentSource: ps
-                      }))) || { placed: false }
-                    placed &&
-                      placeOrderCallback &&
-                      placeOrderCallback({ placed })
-                  }
+                  console.log('res', res)
+                  console.log('paymentSource', paymentSource)
+                  console.log('order', order)
+                  // debugger
+                  // if (
+                  //   res.approved &&
+                  //   paymentSource &&
+                  //   currentPaymentMethodType
+                  // ) {
+                  //   const ps = await setPaymentSource({
+                  //     paymentSourceId: paymentSource.id,
+                  //     paymentResource: currentPaymentMethodType,
+                  //     attributes: {
+                  //       auth_token: res.authorization_token as string
+                  //     }
+                  //   })
+                  //   const { placed } = (setPlaceOrder &&
+                  //     ps &&
+                  //     (await setPlaceOrder({
+                  //       paymentSource: ps
+                  //     }))) || { placed: false }
+                  //   placed &&
+                  //     placeOrderCallback &&
+                  //     placeOrderCallback({ placed })
+                  // }
                 }
               )
             } catch (e) {
