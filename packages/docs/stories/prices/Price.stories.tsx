@@ -1,44 +1,70 @@
-import { ComponentMeta, type ComponentStory } from '@storybook/react'
-
+import type { Meta, StoryObj } from '@storybook/react'
 import CommerceLayer from '@commercelayer/react-components/auth/CommerceLayer'
+import Price from '@commercelayer/react-components/prices/Price'
 import PricesContainer from '@commercelayer/react-components/prices/PricesContainer'
-import { Price as PriceComponent } from '@commercelayer/react-components/prices/Price'
 import useGetToken from '../hooks/useGetToken'
-import { skus } from '../assets/config'
+import React from 'react'
 
-const Story: ComponentMeta<typeof PriceComponent> = {
-  title: 'Components/Prices/Price',
-  component: PriceComponent,
+interface MetaProps {
+  /**
+   * The skuCode of the price to be fetched
+   */
+  skuCode: string
+  accessToken?: string
+  endpoint?: string
+}
+
+const meta: Meta<MetaProps> = {
+  /* 👇 The title prop is optional.
+   * Seehttps://storybook.js.org/docs/react/configure/overview#configure-story-loading
+   * to learn how to generate automatic titles
+   */
+  title: 'Components/Price',
+  args: {
+    skuCode: 'BABYONBU000000E63E7412MX',
+    accessToken: undefined,
+    endpoint: undefined
+  },
   argTypes: {
     skuCode: {
-      description: 'SKU is a unique identifier, meaning Stock Keeping Unit.',
-      type: { name: 'string', required: false },
-      table: {
-        category: 'attributes'
-      }
+      description: 'The skuCode of the price to be fetched',
+      type: { name: 'string', required: true },
+      defaultValue: 'BABYONBU000000E63E7412MX'
     },
-    showCompare: {
-      description: 'SKU is a unique identifier, meaning Stock Keeping Unit.',
-      type: { name: 'boolean', required: false },
-      table: {
-        category: 'attributes'
-      }
+    accessToken: {
+      description: 'The access token to be used for the API calls',
+      type: { name: 'string', required: false },
+      defaultValue: undefined
+    },
+    endpoint: {
+      description: 'The endpoint to be used for the API calls',
+      type: { name: 'string', required: false },
+      defaultValue: undefined
     }
   }
 }
 
-export default Story
+export default meta
+type Story = StoryObj<MetaProps>
 
-const Template: ComponentStory<typeof PriceComponent> = (arg) => {
-  const config = useGetToken()
-  return (
-    <CommerceLayer {...config}>
-      <PricesContainer>
-        <PriceComponent {...arg} />
-      </PricesContainer>
-    </CommerceLayer>
-  )
+// 👇 The PriceTemplate construct will be spread to the existing stories.
+const PriceTemplate: Story = {
+  render: ({ skuCode, accessToken, endpoint }) => {
+    const { accessToken: defaultToken, endpoint: defaultEndpoint } =
+      useGetToken()
+    return (
+      <CommerceLayer
+        accessToken={accessToken ?? defaultToken}
+        endpoint={endpoint ?? defaultEndpoint}
+      >
+        <PricesContainer>
+          <Price skuCode={skuCode} />
+        </PricesContainer>
+      </CommerceLayer>
+    )
+  }
 }
 
-export const Price = Template.bind({})
-Price.args = { skuCode: skus.withAvailabilities, showCompare: false }
+export const GetSinglePrice = {
+  ...PriceTemplate
+}
