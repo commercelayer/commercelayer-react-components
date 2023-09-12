@@ -37,7 +37,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\"",
     "start": "start-storybook -p 6006",
-    "build": "build-storybook -s ./public --docs",
+    "build-stories": "build-storybook -s ./public --docs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
