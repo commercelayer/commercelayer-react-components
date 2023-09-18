@@ -33,6 +33,8 @@ interface Styles {
   cart?: CSSProperties
   container?: CSSProperties
   background?: CSSProperties
+  icon?: CSSProperties
+  iconContainer?: CSSProperties
 }
 
 const defaultIframeStyle = {
@@ -65,10 +67,25 @@ const defaultBackgroundStyle = {
   backgroundColor: 'black'
 } satisfies CSSProperties
 
+const defaultIconStyle = {
+  width: '1.25rem',
+  height: '1.25rem'
+} satisfies CSSProperties
+
+const defaultIconContainer = {
+  textAlign: 'left',
+  paddingLeft: '20px',
+  paddingTop: '20px',
+  background: '#ffffff',
+  color: '#686E6E'
+} satisfies CSSProperties
+
 const defaultStyle = {
   cart: defaultIframeStyle,
   container: defaultContainerStyle,
-  background: defaultBackgroundStyle
+  background: defaultBackgroundStyle,
+  icon: defaultIconStyle,
+  iconContainer: defaultIconContainer
 } satisfies Styles
 
 interface Props
@@ -222,6 +239,14 @@ export function HostedCart({
       ref.current
     )
   }, [ref.current != null])
+  /**
+   * Close the cart.
+   */
+  function onCloseCart(): void {
+    window.document.body.style.removeProperty('overflow')
+    if (handleOpen != null) handleOpen()
+    else setOpen(false)
+  }
   return src == null ? null : type === 'mini' ? (
     <>
       <div
@@ -231,11 +256,7 @@ export function HostedCart({
           opacity: isOpen ? '0.5' : defaultStyle.background?.opacity,
           zIndex: isOpen ? '1' : defaultStyle.background?.zIndex
         }}
-        onClick={() => {
-          window.document.body.style.removeProperty('overflow')
-          if (handleOpen != null) handleOpen()
-          else setOpen(false)
-        }}
+        onClick={onCloseCart}
       />
       <div
         style={{
@@ -246,6 +267,23 @@ export function HostedCart({
         }}
         {...props}
       >
+        <div style={{ ...defaultStyle.iconContainer, ...style?.iconContainer }}>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            fill='none'
+            viewBox='0 0 24 24'
+            strokeWidth={1.5}
+            stroke='currentColor'
+            style={{ ...defaultStyle.icon, ...style?.icon }}
+            onClick={onCloseCart}
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              d='M6 18L18 6M6 6l12 12'
+            />
+          </svg>
+        </div>
         <iframe
           title='Cart'
           ref={ref}
