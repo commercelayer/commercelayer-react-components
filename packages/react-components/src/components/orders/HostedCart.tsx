@@ -49,7 +49,8 @@ const defaultContainerStyle = {
   height: '100%',
   width: '23rem',
   transition: 'right 0.5s ease-in-out',
-  zIndex: '0'
+  zIndex: '0',
+  overflow: 'auto'
 } satisfies CSSProperties
 
 const defaultBackgroundStyle = {
@@ -161,6 +162,7 @@ export function HostedCart({
     }
     if (openAdd && type === 'mini') {
       subscribe('open-cart', () => {
+        window.document.body.style.overflow = 'hidden'
         if (src == null && order?.id == null && orderId == null) {
           void setOrder(true)
         } else {
@@ -230,6 +232,7 @@ export function HostedCart({
           zIndex: isOpen ? '1' : defaultStyle.background?.zIndex
         }}
         onClick={() => {
+          window.document.body.style.removeProperty('overflow')
           if (handleOpen != null) handleOpen()
           else setOpen(false)
         }}
