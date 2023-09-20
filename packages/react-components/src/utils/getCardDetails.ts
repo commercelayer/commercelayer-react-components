@@ -15,7 +15,7 @@ interface CardDetails {
 
 interface Args {
   paymentType: PaymentResource
-  customerPayment: Partial<CustomerPaymentSource>
+  customerPayment: CustomerPaymentSource
 }
 
 export default function getCardDetails({
@@ -50,6 +50,25 @@ export default function getCardDetails({
               issuer_type: ps?.payment_instrument?.['issuer_type']
             }
           : undefined
+      if (source) {
+        return {
+          ...source
+        }
+      }
+      break
+    }
+    case 'klarna_payments': {
+      const ps =
+        customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
+      const source = ps?.payment_instrument
+        ? {
+            brand: 'klarna',
+            exp_month: '',
+            exp_year: '',
+            last4: '',
+            issuer_type: ps?.payment_instrument?.['issuer_type']
+          }
+        : undefined
       if (source) {
         return {
           ...source

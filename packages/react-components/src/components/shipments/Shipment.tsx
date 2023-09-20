@@ -75,8 +75,6 @@ export function Shipment({
       shippingMethods.length === 1
         ? shippingMethods[0]?.id
         : shipment.shipping_method?.id
-    // console.log('currentShippingMethodId', currentShippingMethodId)
-    console.table([{ shippingMethods }, { shipment }])
     const stockTransfers = shipment.stock_transfers
     const parcels = shipment.parcels
     const times = deliveryLeadTimes?.filter(
