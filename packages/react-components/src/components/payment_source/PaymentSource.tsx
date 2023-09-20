@@ -48,6 +48,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
       const card = getCardDetails({
         paymentType: payment?.payment_source_type as PaymentResource,
         customerPayment: {
+          // @ts-expect-error missing type
           payment_source: paymentSource
         }
       })

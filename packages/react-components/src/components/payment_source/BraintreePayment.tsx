@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { type FormEvent, useContext, useEffect, useRef, useState } from 'react'
-import {
-  type HostedFieldFieldOptions,
-  type HostedFieldsHostedFieldsFieldName
-} from 'braintree-web/modules/hosted-fields'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isEmpty from 'lodash/isEmpty'
 import OrderContext from '#context/OrderContext'
@@ -11,9 +7,10 @@ import Parent from '#components/utils/Parent'
 import { type PaymentSourceProps } from './PaymentSource'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import promisify from '#utils/promisify'
-import { type ThreeDSecure } from 'braintree-web'
+import { type HostedFieldFieldOptions, type ThreeDSecure } from 'braintree-web'
 import { type BraintreePayment as BraintreePaymentType } from '@commercelayer/sdk'
-import { type ThreeDSecureVerifyOptions } from 'braintree-web/modules/three-d-secure'
+import { type HostedFieldsHostedFieldsFieldName } from 'braintree-web/hosted-fields'
+import { type ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure'
 type BraintreeHostedFields<Type> = {
   [Property in keyof Type]: {
     label?: string
@@ -152,7 +149,7 @@ export function BraintreePayment({
         } = {
           nonce: payload.nonce,
           bin: payload.details.bin,
-          amount: order?.total_amount_with_taxes_float as number,
+          amount: `${order?.total_amount_with_taxes_float}`,
           email: order?.customer_email ?? '',
           billingAddress: {
             givenName: billingAddress?.first_name ?? '',

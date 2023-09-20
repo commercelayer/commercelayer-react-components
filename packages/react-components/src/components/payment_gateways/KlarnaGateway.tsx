@@ -12,6 +12,7 @@ import {
 } from '#reducers/PaymentMethodReducer'
 import isEmpty from 'lodash/isEmpty'
 import PaymentCardsTemplate from '#components/utils/PaymentCardsTemplate'
+import getCardDetails from '#utils/getCardDetails'
 
 type Props = GatewayBaseType
 
@@ -48,8 +49,13 @@ export function KlarnaGateway(props: Props): JSX.Element | null {
       : []
 
   if (readonly || showCard) {
-    // @ts-expect-error no type
-    const card = paymentSource?.options?.card
+    const card = getCardDetails({
+      customerPayment: {
+        // @ts-expect-error missing type
+        payment_source: paymentSource
+      },
+      paymentType: paymentResource
+    })
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (
       <PaymentSourceContext.Provider value={value}>

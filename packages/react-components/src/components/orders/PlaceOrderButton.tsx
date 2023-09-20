@@ -73,7 +73,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     else {
       if (paymentType === currentPaymentMethodType && paymentType) {
         const card = getCardDetails({
-          customerPayment: { payment_source: paymentSource },
+          customerPayment: {
+            // @ts-expect-error missing type
+            payment_source: paymentSource
+          },
           paymentType
         })
         if (
@@ -225,6 +228,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       paymentType &&
       getCardDetails({
         paymentType,
+        // @ts-expect-error missing type
         customerPayment: { payment_source: checkPaymentSource }
       })
     if (
@@ -235,10 +239,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         !options?.checkoutCom?.session_id
       ].every(Boolean)
     ) {
-      isValid = (await currentPaymentMethodRef.current?.onsubmit(
+      isValid = (await currentPaymentMethodRef.current?.onsubmit({
         // @ts-expect-error no type
-        checkPaymentSource
-      )) as boolean
+        paymentSource: checkPaymentSource,
+        setPlaceOrder,
+        onclickCallback: onClick
+      })) as boolean
       if (
         !isValid &&
         // @ts-expect-error no type

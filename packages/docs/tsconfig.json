@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
     "jsx": "react",
-    "jsx": "react",
-    "jsx": "react",
     "target": "es5",
     "lib": [
       "dom",
@@ -18,7 +16,13 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "baseUrl": "./",
+    "paths": {
+      "#components/*": [
+        "../react-components/src/components/*"
+      ]
+    }
   },
   "include": [
     "stories/**/*",

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CommerceLayer from '@commercelayer/react-components/auth/CommerceLayer'
 import Price from '@commercelayer/react-components/prices/Price'
-import PricesContainer from '@commercelayer/react-components/prices/PricesContainer'
+import PricesContainer from '#components/prices/PricesContainer'
 import useGetToken from '../hooks/useGetToken'
 import React from 'react'
 
@@ -20,6 +20,9 @@ const meta: Meta<MetaProps> = {
    * to learn how to generate automatic titles
    */
   title: 'Components/Price',
+  parameters: {
+    layout: 'padded'
+  },
   args: {
     skuCode: 'BABYONBU000000E63E7412MX',
     accessToken: undefined,
@@ -47,7 +50,9 @@ const meta: Meta<MetaProps> = {
 export default meta
 type Story = StoryObj<MetaProps>
 
-// 👇 The PriceTemplate construct will be spread to the existing stories.
+/**
+ * Basic Price
+ */
 const PriceTemplate: Story = {
   render: ({ skuCode, accessToken, endpoint }) => {
     const { accessToken: defaultToken, endpoint: defaultEndpoint } =
