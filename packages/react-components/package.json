@@ -143,9 +143,9 @@
     "access": "public"
   },
   "scripts": {
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
-    "test": "pnpm run lint && vitest run --silent",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "test": "pnpm lint && vitest run --silent",
     "coverage": "vitest run --coverage",
     "test:e2e": "NODE_ENV=test playwright test",
     "test:e2e:coverage": "nyc pnpm test:e2e && pnpm coverage:report",
