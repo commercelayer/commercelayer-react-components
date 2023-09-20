@@ -10,7 +10,9 @@ import { type AddressCreate } from '@commercelayer/sdk'
 import { type AddressInputName } from '#typings'
 import { type TResourceError } from '#components/errors/Errors'
 
-const EMAIL_PATTERN = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$/
+const EMAIL_PATTERN =
+  // eslint-disable-next-line no-useless-escape
+  /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
 type FormField = HTMLInputElement | HTMLSelectElement
 
@@ -99,7 +101,7 @@ export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
     )
     return required.length > validAddress.length
   } else {
-    const required = without(schema, 'first_name', 'last_name')
+    const required = without(schema, 'first_name', 'last_name', 'line_2')
     const validAddress = keys(address).filter((k) =>
       required.includes(k as any)
     )
