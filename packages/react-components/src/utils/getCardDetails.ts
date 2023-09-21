@@ -60,15 +60,16 @@ export default function getCardDetails({
     case 'klarna_payments': {
       const ps =
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
-      const source = ps?.payment_instrument
-        ? {
-            brand: 'klarna',
-            exp_month: '',
-            exp_year: '',
-            last4: '',
-            issuer_type: ps?.payment_instrument?.['issuer_type']
-          }
-        : undefined
+      const source =
+        ps?.auth_token != null && ps?.payment_instrument != null
+          ? {
+              brand: 'klarna',
+              exp_month: '',
+              exp_year: '',
+              last4: '',
+              issuer_type: ps?.payment_instrument?.['issuer_type']
+            }
+          : undefined
       if (source) {
         return {
           ...source
