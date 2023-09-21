@@ -180,6 +180,8 @@ export async function saveAddresses({
     const sdk = getSdk(config)
     if (order) {
       const currentBillingAddressRef = order?.billing_address?.reference
+      console.log('billingAddress', billingAddress)
+      console.log('shippingAddress', shippingAddress)
       const orderAttributes: OrderUpdate = {
         id: order?.id,
         _billing_address_clone_id: billingAddressId,
