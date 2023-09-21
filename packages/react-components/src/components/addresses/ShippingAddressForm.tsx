@@ -4,10 +4,8 @@ import { type ReactNode, useContext, useEffect, useRef } from 'react'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'
 import { type BaseError, type CodeErrorType } from '#typings/errors'
-import { type AddressInputName } from '#typings'
 import OrderContext from '#context/OrderContext'
 import { getSaveShippingAddressToAddressBook } from '#utils/localStorage'
-import { businessMandatoryField } from '#utils/validateFormFields'
 
 interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
   children: ReactNode
@@ -74,12 +72,6 @@ export function ShippingAddressForm(props: Props): JSX.Element {
       setAddressErrors([], 'shipping_address')
       for (const name in values) {
         const field = values[name]
-        const mandatory = businessMandatoryField(
-          name as AddressInputName,
-          isBusiness
-        )
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        if (!mandatory) delete values[name]
         if (
           field?.value ||
           (field?.required === false && field?.type !== 'checkbox')

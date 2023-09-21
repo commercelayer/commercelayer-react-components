@@ -7,10 +7,8 @@ import BillingAddressFormContext, {
 } from '#context/BillingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'
 import { type BaseError, type CodeErrorType } from '#typings/errors'
-import type { AddressInputName } from '#typings'
 import OrderContext from '#context/OrderContext'
 import { getSaveBillingAddressToAddressBook } from '#utils/localStorage'
-import { businessMandatoryField } from '#utils/validateFormFields'
 
 type Props = {
   children: ReactNode
@@ -78,12 +76,6 @@ export function BillingAddressForm(props: Props): JSX.Element {
       setAddressErrors([], 'billing_address')
       for (const name in values) {
         const field = values[name]
-        const mandatory = businessMandatoryField(
-          name as AddressInputName,
-          isBusiness
-        )
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        if (!mandatory) delete values[name]
         if (
           field?.value ||
           (field?.required === false && field?.type !== 'checkbox')
@@ -116,12 +108,12 @@ export function BillingAddressForm(props: Props): JSX.Element {
         // @ts-expect-error no type no types
       )?.checked || getSaveBillingAddressToAddressBook()
     if (reset && (!isEmpty(values) || !isEmpty(errors) || checkboxChecked)) {
-      // if (saveAddressToCustomerAddressBook) {
-      //   saveAddressToCustomerAddressBook({
-      //     type: 'billing_address',
-      //     value: false
-      //   })
-      // }
+      if (saveAddressToCustomerAddressBook) {
+        saveAddressToCustomerAddressBook({
+          type: 'billing_address',
+          value: false
+        })
+      }
       if (ref) {
         ref.current?.reset()
         resetForm({ target: ref.current } as any)
