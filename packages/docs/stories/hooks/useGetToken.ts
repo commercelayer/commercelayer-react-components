@@ -17,12 +17,13 @@ export default function useGetToken<T extends UseGetTokenOptions>(
   const slug = salesChannel.slug
   const scope = salesChannel.scope
   const domain = salesChannel.domain
-  const user = options?.userMode
-    ? {
-        username: customer.username,
-        password: customer.password
-      }
-    : undefined
+  const user =
+    options?.userMode != null
+      ? {
+          username: customer.username,
+          password: customer.password
+        }
+      : undefined
   useEffect(() => {
     const getToken = async (): Promise<void> => {
       const token =
@@ -40,7 +41,7 @@ export default function useGetToken<T extends UseGetTokenOptions>(
               domain,
               ...user
             })
-      if (token) setToken(token.accessToken)
+      setToken(token.accessToken)
     }
     void getToken()
   }, [])

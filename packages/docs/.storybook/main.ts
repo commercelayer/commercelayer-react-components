@@ -5,19 +5,29 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 const viteOverrides: UserConfig = {
   base: process.env.VITE_BASE_URL,
-  plugins: [tsconfigPaths({
-    projects: [resolve(__dirname, '../../react-components/tsconfig.json'), resolve(__dirname, '../tsconfig.json')]
-  })]
+  plugins: [
+    tsconfigPaths({
+      projects: [
+        resolve(__dirname, '../../react-components/tsconfig.json'),
+        resolve(__dirname, '../tsconfig.json')
+      ]
+    })
+  ]
 }
 
 const storybookConfig: StorybookConfig = {
   async viteFinal(config) {
     return mergeConfig(config, viteOverrides)
   },
-  stories: ['../stories/*.stories.mdx', '../stories/**/*.stories.@(mdx|js|jsx|ts|tsx)'],
-  addons: ['@storybook/addon-links', '@storybook/addon-essentials', '@storybook/addon-interactions'],
-  // @ts-expect-error This 'managerEntries' exists.
-  managerEntries: [require.resolve('./addon-container/manager.tsx')],
+  stories: [
+    '../stories/*.stories.mdx',
+    '../stories/**/*.stories.@(mdx|js|jsx|ts|tsx)'
+  ],
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions'
+  ],
   framework: {
     name: '@storybook/react-vite',
     options: {}

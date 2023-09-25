@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-    "jsx": "react",
-    "target": "es5",
+    "jsx": "react-jsx",
+    "target": "ESNext",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": false,
+    "allowJs": true,
     "skipLibCheck": true,
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -17,15 +17,42 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "noEmit": true,
     "baseUrl": "./",
     "paths": {
       "#components/*": [
         "../react-components/src/components/*"
+      ],
+      "#components-utils/*": [
+        "../react-components/src/components/utils/*"
+      ],
+      "#reducers/*": [
+        "../react-components/src/reducers/*"
+      ],
+      "#context/*": [
+        "../react-components/src/context/*"
+      ],
+      "#typings/*": [
+        "../react-components/src/typings/*"
+      ],
+      "#typings": [
+        "../react-components/src/typings/index"
+      ],
+      "#utils/*": [
+        "../react-components/src/utils/*"
+      ],
+      "#config/*": [
+        "../react-components/src/config/*"
+      ],
+      "#hooks/*": [
+        "../react-components/src/hooks/*"
       ]
     }
   },
   "include": [
-    "stories/**/*",
-    ".storybook/**/*"
+    ".storybook/**/*",
+    "stories",
+    "mocks",
+    ".eslintrc.cjs"
   ]
 }

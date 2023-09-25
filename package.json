@@ -9,7 +9,9 @@
     "preinstall": "npx only-allow pnpm",
     "build": "pnpm -r build",
     "prepare": "husky install",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "docs:dev": "pnpm --filter docs storybook",
+    "docs:build": "pnpm --filter docs build-storybook"
   },
   "devDependencies": {
     "@commercelayer/eslint-config-ts-react": "^1.1.0",
