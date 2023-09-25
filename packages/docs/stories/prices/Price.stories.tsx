@@ -1,75 +1,92 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import CommerceLayer from '@commercelayer/react-components/auth/CommerceLayer'
-import Price from '@commercelayer/react-components/prices/Price'
+import type { Meta, StoryFn } from '@storybook/react'
+import CommerceLayer from '#components/auth/CommerceLayer'
+import Price from '#components/prices/Price'
 import PricesContainer from '#components/prices/PricesContainer'
 import useGetToken from '../hooks/useGetToken'
-import React from 'react'
 
-interface MetaProps {
-  /**
-   * The skuCode of the price to be fetched
-   */
-  skuCode: string
-  accessToken?: string
-  endpoint?: string
-}
-
-const meta: Meta<MetaProps> = {
-  /* 👇 The title prop is optional.
-   * Seehttps://storybook.js.org/docs/react/configure/overview#configure-story-loading
-   * to learn how to generate automatic titles
-   */
+const setup: Meta<typeof Price> = {
   title: 'Components/Price',
-  parameters: {
-    layout: 'padded'
-  },
-  args: {
-    skuCode: 'BABYONBU000000E63E7412MX',
-    accessToken: undefined,
-    endpoint: undefined
-  },
-  argTypes: {
-    skuCode: {
-      description: 'The skuCode of the price to be fetched',
-      type: { name: 'string', required: true },
-      defaultValue: 'BABYONBU000000E63E7412MX'
-    },
-    accessToken: {
-      description: 'The access token to be used for the API calls',
-      type: { name: 'string', required: false },
-      defaultValue: undefined
-    },
-    endpoint: {
-      description: 'The endpoint to be used for the API calls',
-      type: { name: 'string', required: false },
-      defaultValue: undefined
-    }
-  }
+  component: Price
 }
 
-export default meta
-type Story = StoryObj<MetaProps>
+export default setup
+
+const Template: StoryFn<typeof Price> = (args) => {
+  const { accessToken, endpoint } = useGetToken()
+
+  return (
+    <CommerceLayer accessToken={accessToken} endpoint={endpoint}>
+      <PricesContainer>
+        <Price {...args} />
+      </PricesContainer>
+    </CommerceLayer>
+  )
+}
+
+export const Default = Template.bind({})
+Default.args = {
+  skuCode: 'BABYONBU000000E63E7412MX'
+}
 
 /**
- * Basic Price
+ * You can hide the `compare_at_amount` using the prop `showCompare`.
+ * <span type='info'>
+ * By default the prop is `true` and the `formatted_compare_at_amount` will always be displayed, when available.
+ * </span>
  */
-const PriceTemplate: Story = {
-  render: ({ skuCode, accessToken, endpoint }) => {
-    const { accessToken: defaultToken, endpoint: defaultEndpoint } =
-      useGetToken()
+export const NoComparePrice = Template.bind({})
+NoComparePrice.args = {
+  skuCode: 'BABYONBU000000E63E7412MX',
+  showCompare: false
+}
+
+/**
+ * You can access the `price` object using the children props, that gives you access to an array of `prices`.
+ * In this way you will be able to apply your own logic when displaying the price.
+ * <span type='info'>
+ * Check the price resource from our [Core API documentation](https://docs.commercelayer.io/core/v/api-reference/prices/object).
+ * </span>
+ */
+export const ChildrenProps: StoryFn<typeof Price> = (args) => {
+  return (
+    <Price {...args}>
+      {(childrenProps) => {
+        if (childrenProps.loading) {
+          return <div>Fetching prices...</div>
+        }
+
+        return (
+          <div>
+            <p>The price object</p>
+            {childrenProps.prices.map((price) => (
+              <pre key={price.id}>{JSON.stringify(price, null, 2)}</pre>
+            ))}
+          </div>
+        )
+      }}
+    </Price>
+  )
+}
+
+ChildrenProps.args = {
+  skuCode: 'BABYONBU000000E63E7412MX'
+}
+ChildrenProps.decorators = [
+  (Story) => {
+    const { accessToken, endpoint } = useGetToken()
     return (
-      <CommerceLayer
-        accessToken={accessToken ?? defaultToken}
-        endpoint={endpoint ?? defaultEndpoint}
-      >
+      <CommerceLayer accessToken={accessToken} endpoint={endpoint}>
         <PricesContainer>
-          <Price skuCode={skuCode} />
+          <Story />
         </PricesContainer>
       </CommerceLayer>
     )
   }
-}
-
-export const GetSinglePrice = {
-  ...PriceTemplate
+]
+ChildrenProps.parameters = {
+  docs: {
+    source: {
+      type: 'code'
+    }
+  }
 }
