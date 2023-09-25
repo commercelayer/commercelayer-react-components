@@ -1,6 +1,6 @@
-import { addons } from '@storybook/addons'
-import theme from './theme'
+import { addons } from '@storybook/manager-api'
+import commercelayerTheme from './commercelayer.theme'
 
 addons.setConfig({
-  theme
+  theme: commercelayerTheme,
 })
