@@ -1,8 +1,7 @@
 import type { Meta, StoryFn } from '@storybook/react'
-import CommerceLayer from '#components/auth/CommerceLayer'
+import CommerceLayer from '../_internals/CommerceLayer'
 import Price from '#components/prices/Price'
 import PricesContainer from '#components/prices/PricesContainer'
-import useGetToken from '../hooks/useGetToken'
 
 const setup: Meta<typeof Price> = {
   title: 'Components/Price',
@@ -12,9 +11,11 @@ const setup: Meta<typeof Price> = {
 export default setup
 
 const Template: StoryFn<typeof Price> = (args) => {
-  const { accessToken, endpoint } = useGetToken()
   return (
-    <CommerceLayer accessToken={accessToken} endpoint={endpoint}>
+    <CommerceLayer
+      accessToken='my-access-token'
+      endpoint='https://demo-store.commercelayer.io'
+    >
       <PricesContainer>
         <Price {...args} />
       </PricesContainer>
@@ -74,9 +75,11 @@ ChildrenProps.args = {
 }
 ChildrenProps.decorators = [
   (Story) => {
-    const { accessToken, endpoint } = useGetToken()
     return (
-      <CommerceLayer accessToken={accessToken} endpoint={endpoint}>
+      <CommerceLayer
+        accessToken='my-access-token'
+        endpoint='https://demo-store.commercelayer.io'
+      >
         <PricesContainer>
           <Story />
         </PricesContainer>
