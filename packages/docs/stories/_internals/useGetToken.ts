@@ -1,12 +1,23 @@
 import { authentication } from '@commercelayer/js-auth'
 import { useEffect, useState } from 'react'
-import { customer, salesChannel } from '../assets/config'
 
 interface UseGetTokenOptions {
   userMode?: boolean
 }
 
-export default function useGetToken<T extends UseGetTokenOptions>(
+const salesChannel = {
+  clientId: '48ee4802f8227b04951645a9b7c8af1e3943efec7edd1dcfd04b5661bf1da5db',
+  slug: 'the-blue-brand-3',
+  scope: 'market:58',
+  domain: 'commercelayer.co'
+}
+
+const customer = {
+  username: 'bruce@wayne.com',
+  password: '123456'
+}
+
+export function useGetToken<T extends UseGetTokenOptions>(
   options?: T
 ): {
   accessToken: string
