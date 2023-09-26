@@ -13,6 +13,9 @@ function HookComponent(): JSX.Element {
     if (customerCtx.addresses != null) {
       setLoaded(true)
     }
+    if (customerCtx.customers != null) {
+      setLoaded(true)
+    }
   }, [customerCtx.addresses])
   if (loaded) {
     return <>loaded</>
@@ -41,7 +44,7 @@ describe('useCustomerContainer hook', () => {
       'Cannot use `useCustomerContainer` outside of <CustomerContainer/>'
     )
   })
-  it<LocalContext>('reload order by hook', async (ctx) => {
+  it<LocalContext>('Load customer data by hook', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <CustomerContainer>

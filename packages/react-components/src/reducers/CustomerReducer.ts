@@ -17,6 +17,7 @@ import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
 import jwtDecode from '#utils/jwt'
 import { type ListResponse } from '@commercelayer/sdk/lib/cjs/resource'
+import { getCustomerIdByToken } from '#utils/getCustomerIdByToken'
 
 export type CustomerActionType =
   | 'setErrors'
@@ -25,6 +26,7 @@ export type CustomerActionType =
   | 'setPayments'
   | 'setOrders'
   | 'setSubscriptions'
+  | 'setCustomers'
 
 export interface CustomerActionPayload {
   addresses: Address[] | null
@@ -397,6 +399,25 @@ export async function getCustomerPayments({
   }
 }
 
+export async function getCustomerInfo({
+  config,
+  dispatch
+}: GetCustomerPaymentsParams): Promise<void> {
+  if (config.accessToken && dispatch != null) {
+    const sdk = getSdk(config)
+    const customerId = getCustomerIdByToken(config.accessToken)
+    if (customerId) {
+      const customers = await sdk.customers.retrieve(customerId)
+      dispatch({
+        type: 'setCustomers',
+        payload: {
+          customers
+        }
+      })
+    }
+  }
+}
+
 export const customerInitialState: CustomerState = {
   errors: [],
   addresses: null,
@@ -409,7 +430,8 @@ const type: CustomerActionType[] = [
   'setAddresses',
   'setPayments',
   'setOrders',
-  'setSubscriptions'
+  'setSubscriptions',
+  'setCustomers'
 ]
 
 const customerReducer = (
