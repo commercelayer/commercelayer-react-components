@@ -15,6 +15,7 @@
     "@storybook/addon-essentials": "^7.4.5",
     "@storybook/addon-interactions": "^7.4.5",
     "@storybook/addon-links": "^7.4.5",
+    "@storybook/addon-mdx-gfm": "^7.4.5",
     "@storybook/addon-measure": "^7.4.5",
     "@storybook/addon-outline": "^7.4.5",
     "@storybook/addons": "^7.4.5",
