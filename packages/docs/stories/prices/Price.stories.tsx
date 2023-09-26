@@ -13,7 +13,6 @@ export default setup
 
 const Template: StoryFn<typeof Price> = (args) => {
   const { accessToken, endpoint } = useGetToken()
-
   return (
     <CommerceLayer accessToken={accessToken} endpoint={endpoint}>
       <PricesContainer>
@@ -25,7 +24,9 @@ const Template: StoryFn<typeof Price> = (args) => {
 
 export const Default = Template.bind({})
 Default.args = {
-  skuCode: 'BABYONBU000000E63E7412MX'
+  skuCode: 'BABYONBU000000E63E7412MX',
+  compareClassName: 'line-through ml-2',
+  className: 'font-bold'
 }
 
 /**

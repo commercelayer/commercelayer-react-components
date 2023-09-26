@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference types="vite/client" />
 
-import type { Parameters } from '@storybook/react'
+import type { Parameters, Preview } from '@storybook/react'
 import { worker } from '../mocks/browser'
 import {
   Controls,
@@ -12,7 +12,7 @@ import {
   Title
 } from '@storybook/addon-docs'
 
-export const parameters: Parameters = {
+const parameters: Parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
   layout: 'padded',
   controls: {
@@ -60,4 +60,25 @@ if (typeof global.process === 'undefined') {
         }
       : () => {}
   })
+}
+
+const argTypesEnhancers: Preview['argTypesEnhancers'] = [
+  (context) => {
+    // when the className prop comes from `JSX.IntrinsicElements['div' | 'span']`
+    // and is not documented, we add a default description
+    if (
+      'className' in context.argTypes &&
+      context.argTypes.className.description === ''
+    ) {
+      context.argTypes.className.description =
+        'CSS class name for the base component'
+    }
+
+    return context.argTypes
+  }
+]
+
+export default {
+  parameters,
+  argTypesEnhancers
 }

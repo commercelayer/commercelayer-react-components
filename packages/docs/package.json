@@ -2,12 +2,11 @@
   "private": true,
   "name": "docs",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "devDependencies": {
     "@babel/core": "^7.23.0",
     "@babel/preset-env": "^7.22.20",
     "@commercelayer/eslint-config-ts-react": "^1.1.0",
+    "@commercelayer/js-auth": "^4.0.0",
     "@mdx-js/react": "^2.3.0",
     "@storybook/addon-actions": "^7.4.5",
     "@storybook/addon-backgrounds": "^7.4.5",
@@ -15,10 +14,12 @@
     "@storybook/addon-essentials": "^7.4.5",
     "@storybook/addon-interactions": "^7.4.5",
     "@storybook/addon-links": "^7.4.5",
+    "@storybook/manager-api": "^7.4.5",
     "@storybook/addon-mdx-gfm": "^7.4.5",
     "@storybook/addon-measure": "^7.4.5",
     "@storybook/addon-outline": "^7.4.5",
     "@storybook/addons": "^7.4.5",
+    "@storybook/api": "^7.4.5",
     "@storybook/blocks": "^7.4.5",
     "@storybook/client-api": "^7.4.5",
     "@storybook/client-logger": "^7.4.5",
@@ -38,7 +39,7 @@
     "storybook": "^7.4.5",
     "typescript": "^5.0.4",
     "vite": "^4.4.9",
-    "vite-tsconfig-paths": "^4.2.0"
+    "vite-tsconfig-paths": "^4.2.1"
   },
   "scripts": {
     "lint": "eslint src --ext .ts,.tsx",
@@ -57,13 +58,7 @@
     "url": "https://github.com/commercelayer/commercelayer-react-components/issues"
   },
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
-  "dependencies": {
-    "@commercelayer/js-auth": "^4.0.0",
-    "@commercelayer/react-components": "workspace:*",
-    "@storybook/api": "^7.4.5",
-    "@storybook/components": "^7.4.5",
-    "@storybook/manager-api": "^7.4.5",
-    "vite": "^4.4.9",
-    "vite-tsconfig-paths": "^4.2.1"
+  "msw": {
+    "workerDirectory": "public"
   }
 }

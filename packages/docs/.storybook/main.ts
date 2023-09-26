@@ -39,6 +39,25 @@ const storybookConfig: StorybookConfig = {
   docs: {
     autodocs: true,
     docsMode: true
+  },
+  typescript: {
+    check: false,
+    reactDocgen: 'react-docgen-typescript',
+    reactDocgenTypescriptOptions: {
+      propFilter: (prop) => {
+        if (['children', 'className'].includes(prop.name)) {
+          return true
+        }
+
+        if (prop.parent != null) {
+          return (
+            !prop.parent.fileName.includes('@types/react') &&
+            !prop.parent.fileName.includes('@emotion')
+          )
+        }
+        return true
+      }
+    }
   }
 }
 
