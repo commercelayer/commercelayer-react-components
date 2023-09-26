@@ -11,13 +11,15 @@ import customerReducer, {
   type TCustomerAddress,
   saveCustomerUser,
   getCustomerPayments,
-  getCustomerSubscriptions
+  getCustomerSubscriptions,
+  getCustomerInfo
 } from '#reducers/CustomerReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import CustomerContext from '#context/CustomerContext'
 import type { BaseError } from '#typings/errors'
 import type { DefaultChildrenType } from '#typings/globals'
+import { isGuestToken } from '#utils/isGuestToken'
 
 interface Props {
   children: DefaultChildrenType
@@ -27,8 +29,11 @@ interface Props {
   isGuest?: boolean
 }
 
+/**
+ * The CustomerContainer component manages the customer state.
+ */
 export function CustomerContainer(props: Props): JSX.Element {
-  const { children, isGuest = false } = props
+  const { children, isGuest } = props
   const [state, dispatch] = useReducer(customerReducer, customerInitialState)
   const {
     order,
@@ -40,50 +45,68 @@ export function CustomerContainer(props: Props): JSX.Element {
   } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
-    if (
-      !include?.includes('available_customer_payment_sources.payment_source') &&
-      !isGuest
-    ) {
-      addResourceToInclude({
-        newResource: 'available_customer_payment_sources.payment_source'
-      })
-    } else if (
-      !includeLoaded?.['available_customer_payment_sources.payment_source'] &&
-      !isGuest
-    ) {
-      addResourceToInclude({
-        newResourceLoaded: {
-          'available_customer_payment_sources.payment_source': true
-        }
-      })
+    if (config.accessToken) {
+      const guestToken =
+        isGuest == null ? isGuestToken(config.accessToken) : isGuest
+      if (guestToken) {
+        return
+      }
+      if (
+        !include?.includes('available_customer_payment_sources.payment_source')
+      ) {
+        addResourceToInclude({
+          newResource: 'available_customer_payment_sources.payment_source'
+        })
+      } else if (
+        !includeLoaded?.['available_customer_payment_sources.payment_source']
+      ) {
+        addResourceToInclude({
+          newResourceLoaded: {
+            'available_customer_payment_sources.payment_source': true
+          }
+        })
+      }
     }
-  }, [include?.length, Object.keys(includeLoaded ?? {}).length])
+  }, [
+    config.accessToken,
+    include?.length,
+    Object.keys(includeLoaded ?? {}).length
+  ])
 
   useEffect(() => {
-    if (config.accessToken && state.addresses == null && !isGuest) {
-      void getCustomerAddresses({
-        config,
-        dispatch,
-        isOrderAvailable: withoutIncludes != null
-      })
-    }
-    if (order?.available_customer_payment_sources && !isGuest) {
-      getCustomerPaymentSources({ dispatch, order })
-    }
-    if (
-      config.accessToken &&
-      order == null &&
-      include == null &&
-      includeLoaded == null &&
-      withoutIncludes === undefined &&
-      !isGuest
-    ) {
-      async function getCustomerData(): Promise<void> {
-        await getCustomerOrders({ config, dispatch })
-        await getCustomerSubscriptions({ config, dispatch })
-        await getCustomerPayments({ config, dispatch })
+    if (config.accessToken) {
+      const guestToken =
+        isGuest == null ? isGuestToken(config.accessToken) : isGuest
+      if (guestToken) {
+        return
       }
-      void getCustomerData()
+      if (state.customers == null) {
+        void getCustomerInfo({ config, dispatch })
+      }
+      if (state.addresses == null) {
+        void getCustomerAddresses({
+          config,
+          dispatch,
+          isOrderAvailable: withoutIncludes != null
+        })
+      }
+      if (order?.available_customer_payment_sources) {
+        getCustomerPaymentSources({ dispatch, order })
+      }
+      if (
+        config.accessToken &&
+        order == null &&
+        include == null &&
+        includeLoaded == null &&
+        withoutIncludes === undefined
+      ) {
+        async function getCustomerData(): Promise<void> {
+          await getCustomerOrders({ config, dispatch })
+          await getCustomerSubscriptions({ config, dispatch })
+          await getCustomerPayments({ config, dispatch })
+        }
+        void getCustomerData()
+      }
     }
   }, [config.accessToken, order?.payment_source != null, isGuest])
   const contextValue = useMemo(() => {
