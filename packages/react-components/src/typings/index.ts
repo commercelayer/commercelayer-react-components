@@ -102,17 +102,7 @@ export type AddressInputName =
   | 'billing_address_zip_code'
   | 'billing_address_billing_info'
   | 'billing_address_save_to_customer_book'
-  // | 'customer_address_city'
-  // | 'customer_address_company'
-  // | 'customer_address_first_name'
-  // | 'customer_address_email'
-  // | 'customer_address_last_name'
-  // | 'customer_address_line_1'
-  // | 'customer_address_line_2'
-  // | 'customer_address_phone'
-  // | 'customer_address_state_code'
-  // | 'customer_address_zip_code'
-  // | 'customer_address_billing_info'
+  | `billing_address_${`metadata_${string}`}`
   | 'shipping_address_city'
   | 'shipping_address_company'
   | 'shipping_address_email'
@@ -128,12 +118,10 @@ export type AddressInputName =
 export type AddressCountrySelectName =
   | 'billing_address_country_code'
   | 'shipping_address_country_code'
-// | 'customer_address_country_code'
 
 export type AddressStateSelectName =
   | 'billing_address_state_code'
   | 'shipping_address_state_code'
-// | 'customer_address_state_code'
 
 export type LoaderType = string | JSX.Element
 

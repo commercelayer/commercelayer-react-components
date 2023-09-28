@@ -5,6 +5,7 @@ export type AddressValuesKeys =
   | `${keyof Address}`
   | `billing_address_${keyof Address}`
   | `shipping_address_${keyof Address}`
+  | `billing_address_${`metadata_${string}`}`
 
 export interface DefaultContextAddress {
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
