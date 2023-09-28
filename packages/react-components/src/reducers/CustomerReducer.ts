@@ -309,7 +309,9 @@ export async function getCustomerSubscriptions({
   }
 }
 
-export type TCustomerAddress = AddressCreate & AddressUpdate
+export type TCustomerAddress = AddressCreate &
+  AddressUpdate &
+  Record<string, string | null | undefined>
 
 interface TCreateCustomerAddress {
   /**
