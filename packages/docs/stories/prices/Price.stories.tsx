@@ -4,7 +4,7 @@ import Price from '#components/prices/Price'
 import PricesContainer from '#components/prices/PricesContainer'
 
 const setup: Meta<typeof Price> = {
-  title: 'Components/Price',
+  title: 'Components/Prices/Price',
   component: Price
 }
 
@@ -41,6 +41,26 @@ NoComparePrice.args = {
   skuCode: 'BABYONBU000000E63E7412MX',
   showCompare: false
 }
+
+/**
+ * In case you need to show a list of prices, you can add them in single `PricesContainer` component.
+ */
+export const MultiplePrices: StoryFn<typeof Price> = (args) => {
+  return (
+    <CommerceLayer
+      accessToken='my-access-token'
+      endpoint='https://demo-store.commercelayer.io'
+    >
+      <PricesContainer>
+        <div className='grid'>
+          <Price skuCode='BABYONBU000000E63E7412MX' showCompare={false} />
+          <Price skuCode='CANVASAU000000FFFFFF1824' showCompare={false} />
+        </div>
+      </PricesContainer>
+    </CommerceLayer>
+  )
+}
+MultiplePrices.args = {}
 
 /**
  * You can access the `price` object using the children props, that gives you access to an array of `prices`.
