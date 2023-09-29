@@ -23,7 +23,7 @@ const parameters: Parameters = {
   },
   options: {
     storySort: {
-      order: ['Getting Started', 'Components']
+      order: ['Getting Started', 'Components', ['Prices', ['PricesContainer']]]
     }
   },
   docs: {

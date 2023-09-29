@@ -10,13 +10,42 @@ import { type LoaderType } from '#typings'
 import SkuContext from '#context/SkuContext'
 
 interface Props {
+  /**
+   * Any valid JSX.Element(s).
+   * A single `<Price>` component or a list of them is expected to render the prices.
+   */
   children: JSX.Element | JSX.Element[]
+  /**
+   * SDK query filter to fetch the prices when multiple prices are requested.
+   */
   filters?: object
+  /**
+   * Loader component or string to be rendered while the prices are being fetched.
+   * @default 'Loading...'
+   */
   loader?: LoaderType
+  /**
+   * Prices per page to be fetched
+   */
   perPage?: number
+  /**
+   * SKU code to fetch the prices for. If not provided, the `sku_code` will be retrieved from the `<Price>` component(s) nested as children.
+   */
   skuCode?: string
 }
 
+/**
+ * Main container for the Prices components. It stores the prices context.
+ *
+ * It can be used to fetch the prices for a specific `sku_code` passed as prop
+ * or for the `sku_code` retrieved from all `<Price>` components nested as children.
+ * <span title='Requirements' type='warning'>
+ * Must be a child of the `<CommerceLayer>` component.
+ * </span>
+ * <span title='Children' type='info'>
+ * `<Price>`
+ * </span>
+ */
 export function PricesContainer(props: Props): JSX.Element {
   const {
     children,
