@@ -32,6 +32,7 @@ interface TArgs {
   accessToken: string
   slug: string
   domain: string
+  customDomain?: string
 }
 
 type Props = ApplicationTypeProps & TArgs
@@ -45,15 +46,18 @@ export function getApplicationLink({
   modeType,
   clientId,
   scope,
-  returnUrl
+  returnUrl,
+  customDomain
 }: Props): string {
   const env = domain === 'commercelayer.io' ? '' : 'stg.'
-  const t = modeType === 'login' ? '' : 'signup'
+  const t =
+    applicationType === 'identity' ? (modeType === 'login' ? '' : 'signup') : ''
   const c = clientId ? `&clientId=${clientId}` : ''
   const s = scope ? `&scope=${scope}` : ''
   const r = returnUrl ? `&returnUrl=${returnUrl}` : ''
   const params = applicationType === 'identity' ? `${c}${s}${r}` : ''
-  return `https://${slug}.${env}commercelayer.app/${applicationType.toString()}/${
+  const domainName = customDomain ?? `${slug}.${env}commercelayer.app`
+  return `https://${domainName}/${applicationType.toString()}/${
     orderId ?? t ?? ''
   }?accessToken=${accessToken}${params}`
 }
