@@ -26,7 +26,7 @@ type TCreateCartParams = Pick<
 interface TReturnOrder
   extends Omit<
     OrderState,
-    'loading' | 'include' | 'includeLoaded' | 'withoutIncludes'
+    'loading' | 'include' | 'includeLoaded' | 'withoutIncludes' | 'orderId'
   > {
   reloadOrder: () => Promise<OrderState['order']>
   addToCart: (params: TAddToCartParams) => ReturnType<typeof addToCart>

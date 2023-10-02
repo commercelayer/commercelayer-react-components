@@ -26,10 +26,14 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
    * The label of the link
    */
   label?: string | JSX.Element
+  /**
+   * The domain of your forked application
+   */
+  customDomain?: string
 }
 
 export function MyAccountLink(props: Props): JSX.Element {
-  const { label = 'Go to my account', children, ...p } = props
+  const { label = 'Go to my account', children, customDomain, ...p } = props
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
   if (accessToken == null || endpoint == null)
     throw new Error('Cannot use `MyAccountLink` outside of `CommerceLayer`')
@@ -39,7 +43,8 @@ export function MyAccountLink(props: Props): JSX.Element {
     slug,
     accessToken,
     applicationType: 'my-account',
-    domain
+    domain,
+    customDomain
   })
   const parentProps = {
     disabled,

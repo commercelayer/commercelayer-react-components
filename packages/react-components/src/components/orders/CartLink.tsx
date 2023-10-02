@@ -38,10 +38,14 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
    * The type of the cart. Defaults to undefined. If set to 'mini', the cart will open in a modal.
    */
   type?: 'mini'
+  /**
+   * The domain of your forked application
+   */
+  customDomain?: string
 }
 
 export function CartLink(props: Props): JSX.Element | null {
-  const { label, children, type, ...p } = props
+  const { label, children, type, customDomain, ...p } = props
   const { order, createOrder } = useContext(OrderContext)
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
   if (accessToken == null)
@@ -56,7 +60,8 @@ export function CartLink(props: Props): JSX.Element | null {
           orderId: order?.id,
           accessToken,
           domain,
-          applicationType: 'cart'
+          applicationType: 'cart',
+          customDomain
         })
       : ''
   const handleClick = async (
@@ -74,7 +79,8 @@ export function CartLink(props: Props): JSX.Element | null {
             orderId,
             accessToken,
             domain,
-            applicationType: 'cart'
+            applicationType: 'cart',
+            customDomain
           })
       }
     } else {

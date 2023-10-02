@@ -37,10 +37,23 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
    * The return url to redirect the user after the login/signup
    */
   returnUrl?: string
+  /**
+   * The domain of your forked application
+   */
+  customDomain?: string
 }
 
 export function MyIdentityLink(props: Props): JSX.Element {
-  const { label, children, type, clientId, scope, returnUrl, ...p } = props
+  const {
+    label,
+    children,
+    type,
+    clientId,
+    scope,
+    returnUrl,
+    customDomain,
+    ...p
+  } = props
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
   if (accessToken == null || endpoint == null)
     throw new Error('Cannot use `MyIdentityLink` outside of `CommerceLayer`')
@@ -53,7 +66,8 @@ export function MyIdentityLink(props: Props): JSX.Element {
     modeType: type,
     clientId,
     scope,
-    returnUrl: returnUrl ?? window.location.href
+    returnUrl: returnUrl ?? window.location.href,
+    customDomain
   })
   const parentProps = {
     label,

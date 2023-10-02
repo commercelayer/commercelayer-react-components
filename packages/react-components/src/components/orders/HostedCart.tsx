@@ -110,6 +110,10 @@ interface Props
    * A function that will be called when the cart is open and the background is clicked.
    */
   handleOpen?: () => void
+  /**
+   * The domain of your forked application.
+   */
+  customDomain?: string
 }
 
 export function HostedCart({
@@ -118,6 +122,7 @@ export function HostedCart({
   style,
   open = false,
   handleOpen,
+  customDomain,
   ...props
 }: Props): JSX.Element | null {
   const [isOpen, setOpen] = useState(false)
@@ -142,7 +147,8 @@ export function HostedCart({
           orderId,
           accessToken,
           domain,
-          applicationType: 'cart'
+          applicationType: 'cart',
+          customDomain
         })
       )
       if (openCart) {
