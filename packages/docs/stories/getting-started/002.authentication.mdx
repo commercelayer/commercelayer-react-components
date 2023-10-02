@@ -35,7 +35,7 @@ Otherwise, if you need to get it from a **web application**, you can use the Com
 
 
 ## Configure the `CommerceLayer` component
-Once you got it, you can pass it as prop — together with the endpoint of your Commerce Layer organization — to the `CommerceLayer` component, as follow:
+Once you got it, you can pass it as prop to the `CommerceLayer` component, as follow:
 
 <Source
   language="jsx"
@@ -44,13 +44,8 @@ Once you got it, you can pass it as prop — together with the endpoint of your 
 import { CommerceLayer } from '@commercelayer/react-components'
 
 const App = () => (
-  <CommerceLayer
-    accessToken="your-access-token"
-    endpoint="https://yourdomain.commercelayer.io"
-  >
-
+  <CommerceLayer accessToken="your-access-token">
     {/* ... child components */}
-
   </CommerceLayer>
 )
 `}
