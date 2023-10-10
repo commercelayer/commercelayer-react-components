@@ -114,6 +114,8 @@ export type AddressInputName =
   | 'shipping_address_state_code'
   | 'shipping_address_zip_code'
   | 'shipping_address_save_to_customer_book'
+  | 'shipping_address_billing_info'
+  | `shipping_address_${`metadata_${string}`}`
 
 export type AddressCountrySelectName =
   | 'billing_address_country_code'

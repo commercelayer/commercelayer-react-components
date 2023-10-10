@@ -3,9 +3,8 @@ import Parent from '#components/utils/Parent'
 import { type ChildrenFunction } from '#typings/index'
 import AddressContext from '#context/AddressContext'
 import {
-  shippingAddressController,
   countryLockController,
-  billingAddressController
+  addressesController
 } from '#utils/addressesManager'
 import OrderContext from '#context/OrderContext'
 import CustomerContext from '#context/CustomerContext'
@@ -46,8 +45,10 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     shipping_address: shippingAddress,
     saveAddresses,
     billingAddressId,
-    shippingAddressId
+    shippingAddressId,
+    invertAddresses
   } = useContext(AddressContext)
+  console.log('invertAddresses', invertAddresses)
   const { order } = useContext(OrderContext)
   const {
     customerEmail: email,
@@ -69,18 +70,13 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     )
     customerEmail = Object.keys(isValidEmail).length > 0
   }
-  const billingDisable = billingAddressController({
+  const { billingDisable, shippingDisable } = addressesController({
+    invertAddresses,
     billing_address: billingAddress,
-    errors,
-    billingAddressId,
-    requiresBillingInfo: order?.requires_billing_info
-  })
-  const shippingDisable = shippingAddressController({
-    billingDisable,
-    errors,
-    shipToDifferentAddress,
     shipping_address: shippingAddress,
-    shippingAddressId
+    shippingAddressId,
+    billingAddressId,
+    errors
   })
   const countryLockDisable = countryLockController({
     countryCodeLock: order?.shipping_country_code_lock,
