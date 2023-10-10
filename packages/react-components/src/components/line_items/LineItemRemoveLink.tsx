@@ -4,10 +4,12 @@ import LineItemContext from '#context/LineItemContext'
 import Parent from '#components/utils/Parent'
 import { type ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
+import { type LineItem } from '@commercelayer/sdk'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   handleRemove: (event: React.MouseEvent<HTMLAnchorElement>) => void
   label?: string
+  lineItem?: LineItem
 }
 
 interface Props
@@ -33,6 +35,7 @@ export function LineItemRemoveLink(props: Props): JSX.Element {
   }
   const parentProps = {
     handleRemove,
+    lineItem,
     ...props
   }
   return props.children ? (
