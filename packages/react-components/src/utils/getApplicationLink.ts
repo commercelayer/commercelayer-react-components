@@ -57,7 +57,8 @@ export function getApplicationLink({
   const r = returnUrl ? `&returnUrl=${returnUrl}` : ''
   const params = applicationType === 'identity' ? `${c}${s}${r}` : ''
   const domainName = customDomain ?? `${slug}.${env}commercelayer.app`
-  return `https://${domainName}/${applicationType.toString()}/${
+  const application = customDomain ? '' : `/${applicationType.toString()}`
+  return `https://${domainName}${application}/${
     orderId ?? t ?? ''
   }?accessToken=${accessToken}${params}`
 }
