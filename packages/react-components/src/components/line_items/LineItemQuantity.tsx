@@ -3,10 +3,12 @@ import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
 import Parent from '#components/utils/Parent'
 import { type ChildrenFunction } from '#typings'
+import { type LineItem } from '@commercelayer/sdk'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   quantity: number
   handleChange: (event: React.MouseEvent<HTMLSelectElement>) => void
+  lineItem?: LineItem
 }
 
 type Props = {
@@ -37,6 +39,7 @@ export function LineItemQuantity(props: Props): JSX.Element {
   const parentProps = {
     handleChange,
     quantity,
+    lineItem,
     ...props
   }
   return props.children ? (
