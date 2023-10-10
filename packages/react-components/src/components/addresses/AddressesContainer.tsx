@@ -17,11 +17,27 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 
 interface Props {
   children: ReactNode
+  /**
+   * If true, the shipping address will be considered. Default is false.
+   */
   shipToDifferentAddress?: boolean
+  /**
+   * If true, the address will be considered a business address.
+   */
   isBusiness?: boolean
+  /**
+   * If true, the shipping address will be considered as primary address. Default is false.
+   */
+  invertAddresses?: boolean
 }
+
 export function AddressesContainer(props: Props): JSX.Element {
-  const { children, shipToDifferentAddress = false, isBusiness } = props
+  const {
+    children,
+    shipToDifferentAddress = false,
+    isBusiness,
+    invertAddresses = false
+  } = props
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
   const { order, orderId, updateOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
@@ -30,7 +46,8 @@ export function AddressesContainer(props: Props): JSX.Element {
       type: 'setShipToDifferentAddress',
       payload: {
         shipToDifferentAddress,
-        isBusiness
+        isBusiness,
+        invertAddresses
       }
     })
     return () => {
@@ -39,7 +56,7 @@ export function AddressesContainer(props: Props): JSX.Element {
         payload: {}
       })
     }
-  }, [shipToDifferentAddress, isBusiness])
+  }, [shipToDifferentAddress, isBusiness, invertAddresses])
   const contextValue = {
     ...state,
     setAddressErrors: (errors: BaseError[], resource: AddressResource) => {
