@@ -10,7 +10,14 @@ import { businessMandatoryField } from '#utils/validateFormFields'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
 
 type Props = {
+  /**
+   * The name of the input.
+   */
   name: Extract<AddressValuesKeys, AddressInputName>
+  /**
+   * Used to add a custom validation rule.
+   */
+  pattern?: RegExp | string
 } & Omit<BaseInputComponentProps, 'name'> &
   JSX.IntrinsicElements['input'] &
   Omit<JSX.IntrinsicElements['textarea'], 'children'>
