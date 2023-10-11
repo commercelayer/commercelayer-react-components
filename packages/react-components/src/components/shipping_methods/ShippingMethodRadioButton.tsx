@@ -42,7 +42,6 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
   const handleOnChange = async (): Promise<void> => {
     if (shipmentId) {
       if (shippingMethodId && setShippingMethod != null) {
-        setChecked(true)
         const { order } = await setShippingMethod(shipmentId, shippingMethodId)
         if (shippingMethod && onChange != null)
           onChange({
