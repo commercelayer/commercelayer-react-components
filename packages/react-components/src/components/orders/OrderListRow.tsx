@@ -67,10 +67,12 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
     cell
   }
   return children ? (
-    <As>
-      <Parent {...parentProps}>{children}</Parent>
+    <>
+      <As>
+        <Parent {...parentProps}>{children}</Parent>
+      </As>
       <ActionRow />
-    </As>
+    </>
   ) : (
     <>
       {cell?.map((cell, k) => {
