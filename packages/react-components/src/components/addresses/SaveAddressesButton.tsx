@@ -70,10 +70,24 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     )
     customerEmail = Object.keys(isValidEmail).length > 0
   }
+
+  const shippingAddressCleaned: any = Object.keys(shippingAddress ?? {}).reduce(
+    (acc, key) => {
+      return {
+        ...acc,
+        // @ts-expect-error type mismatch
+        [key.replace(`shipping_address_`, '')]: shippingAddress[key].value
+      }
+    },
+    {}
+  )
+
   const { billingDisable, shippingDisable } = addressesController({
     invertAddresses,
+    requiresBillingInfo: order?.requires_billing_info,
     billing_address: billingAddress,
-    shipping_address: shippingAddress,
+    shipping_address: shippingAddressCleaned,
+    shipToDifferentAddress,
     shippingAddressId,
     billingAddressId,
     errors
