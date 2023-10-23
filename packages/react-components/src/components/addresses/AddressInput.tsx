@@ -29,7 +29,7 @@ export function AddressInput(props: Props): JSX.Element | null {
     if (value && customerAddress?.setValue) {
       customerAddress.setValue(p.name, value)
     }
-  }, [value, billingAddress, shippingAddress, customerAddress])
+  }, [value])
 
   const hasError = useMemo(() => {
     if (billingAddress?.errors?.[p.name]?.error) {
