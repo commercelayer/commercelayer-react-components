@@ -279,7 +279,7 @@ export function OrderList({
   if (loading && (orders == null || subscriptions == null)) {
     return <>{LoadingComponent}</>
   }
-  return orders?.length === 0 || subscriptions?.length === 0 ? (
+  return (type === 'orders' ? orders : subscriptions)?.length === 0 ? (
     <OrderListChildrenContext.Provider
       value={{ orders: type === 'orders' ? orders : subscriptions }}
     >
