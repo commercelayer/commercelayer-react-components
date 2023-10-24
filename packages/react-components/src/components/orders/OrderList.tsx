@@ -198,7 +198,7 @@ export function OrderList({
   }, [orders, subscriptions])
   const LoadingComponent = loadingElement || <div>Loading...</div>
   const headerComponent = table.getHeaderGroups().map((headerGroup) => {
-    const columns = headerGroup.headers.map((header, k) => {
+    const columnsComponents = headerGroup.headers.map((header, k) => {
       const sortLabel =
         header.column.getIsSorted() !== false ? header.column.getIsSorted() : ''
       return (
@@ -206,12 +206,13 @@ export function OrderList({
           data-testid={`thead-${k}`}
           data-sort={`${sortLabel || ''}`}
           key={header.id}
+          className={columns[k]?.className}
         >
           <span
             {...{
-              className: header.column.getCanSort()
-                ? 'cursor-pointer select-none'
-                : '',
+              className: `${columns[k]?.titleClassName ?? ''} ${
+                header.column.getCanSort() ? 'cursor-pointer select-none' : ''
+              }`,
               onClick: header.column.getToggleSortingHandler()
             }}
           >
@@ -224,7 +225,9 @@ export function OrderList({
         </ThHtmlElement>
       )
     })
-    return <TrHtmlElement key={headerGroup.id}>{columns}</TrHtmlElement>
+    return (
+      <TrHtmlElement key={headerGroup.id}>{columnsComponents}</TrHtmlElement>
+    )
   })
   const rowsComponents = filterChildren({
     children,
