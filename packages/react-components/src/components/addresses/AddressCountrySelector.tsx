@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo } from 'react'
 import BaseSelect from '../utils/BaseSelect'
 import { type BaseSelectComponentProps } from '#typings'
 import BillingAddressFormContext, {
@@ -26,7 +26,6 @@ export function AddressCountrySelector(props: Props): JSX.Element {
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
   const customerAddress = useContext(CustomerAddressFormContext)
-  const [hasError, setHasError] = useState(false)
   useEffect(() => {
     if (value && billingAddress?.setValue) {
       billingAddress.setValue(name, value)
@@ -37,24 +36,19 @@ export function AddressCountrySelector(props: Props): JSX.Element {
     if (value && customerAddress?.setValue) {
       customerAddress.setValue(name, value)
     }
+  }, [value])
 
-    if (billingAddress.errors && billingAddress?.errors?.[name]?.error) {
-      setHasError(true)
+  const hasError = useMemo(() => {
+    if (billingAddress?.errors?.[name]?.error) {
+      return true
     }
-    if (billingAddress?.errors?.[name] && hasError) setHasError(false)
-    if (customerAddress.errors && customerAddress?.errors?.[name]?.error) {
-      setHasError(true)
+    if (shippingAddress?.errors?.[name]?.error) {
+      return true
     }
-    if (customerAddress?.errors?.[name] && hasError) setHasError(false)
-
-    if (shippingAddress.errors && shippingAddress?.errors?.[name]?.error) {
-      setHasError(true)
+    if (customerAddress?.errors?.[name]?.error) {
+      return true
     }
-    if (shippingAddress?.errors?.[name] && hasError) setHasError(false)
-
-    return () => {
-      setHasError(false)
-    }
+    return false
   }, [
     value,
     billingAddress?.errors,
