@@ -410,10 +410,12 @@ export async function getCustomerInfo({
     const customerId = getCustomerIdByToken(config.accessToken)
     if (customerId) {
       const customers = await sdk.customers.retrieve(customerId)
+      const customerEmail = customers.email
       dispatch({
         type: 'setCustomers',
         payload: {
-          customers
+          customers,
+          customerEmail
         }
       })
     }

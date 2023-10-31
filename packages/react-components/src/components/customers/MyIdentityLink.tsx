@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import Parent from '../utils/Parent'
 import { type ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
@@ -55,20 +55,28 @@ export function MyIdentityLink(props: Props): JSX.Element {
     ...p
   } = props
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
+  const [href, setHref] = useState<string | undefined>(undefined)
   if (accessToken == null || endpoint == null)
     throw new Error('Cannot use `MyIdentityLink` outside of `CommerceLayer`')
   const { domain, slug } = getDomain(endpoint)
-  const href = getApplicationLink({
-    slug,
-    accessToken,
-    applicationType: 'identity',
-    domain,
-    modeType: type,
-    clientId,
-    scope,
-    returnUrl: returnUrl ?? window.location.href,
-    customDomain
-  })
+  useEffect(() => {
+    const link = getApplicationLink({
+      slug,
+      accessToken,
+      applicationType: 'identity',
+      domain,
+      modeType: type,
+      clientId,
+      scope,
+      returnUrl: returnUrl ?? window.location.href,
+      customDomain
+    })
+    setHref(link)
+    return () => {
+      setHref(undefined)
+    }
+  }, [])
+
   const parentProps = {
     label,
     href,

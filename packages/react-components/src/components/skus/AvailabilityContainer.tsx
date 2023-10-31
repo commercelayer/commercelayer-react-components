@@ -16,14 +16,28 @@ import SkuChildrenContext from '#context/SkuChildrenContext'
 import useCustomContext from '#utils/hooks/useCustomContext'
 
 interface Props {
+  /**
+   * The children component
+   */
   children: ReactNode
+  /**
+   * The sku code
+   */
   skuCode?: string
+  /**
+   * The sku id. If you use this prop, the skuCode will be ignored and the sku will be fetched by id improving the performance
+   */
+  skuId?: string
+  /**
+   * Callback called when the quantity is updated
+   */
   getQuantity?: (quantity: number) => void
 }
 
 export function AvailabilityContainer({
   children,
   skuCode,
+  skuId,
   getQuantity
 }: Props): JSX.Element {
   const { lineItem } = useContext(LineItemChildrenContext)
@@ -43,7 +57,7 @@ export function AvailabilityContainer({
     if (accessToken != null && accessToken !== '') {
       const config = { accessToken, endpoint }
       if (sCode) {
-        void getAvailability({ skuCode: sCode, config, dispatch })
+        void getAvailability({ skuCode: sCode, skuId, config, dispatch })
       }
     }
     return (): void => {
@@ -52,7 +66,7 @@ export function AvailabilityContainer({
         payload: {}
       })
     }
-  }, [accessToken, sCode])
+  }, [accessToken, sCode, skuId])
   useEffect(() => {
     if (getQuantity != null && state?.quantity != null)
       getQuantity(state?.quantity)

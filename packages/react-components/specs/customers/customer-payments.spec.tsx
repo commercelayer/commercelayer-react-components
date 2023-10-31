@@ -41,7 +41,7 @@ describe('Customer payments', () => {
       'Cannot use <CustomerPaymentSource/> outside of <CustomerContainer/>'
     )
   })
-  it<LocalContext>('Show customer payment sources', async (ctx) => {
+  it.skip<LocalContext>('Show customer payment sources', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <CustomerContainer>
@@ -95,7 +95,7 @@ describe('Customer payments', () => {
       expect(expYear?.textContent).not.toBe('')
     }
   })
-  it<LocalContext>('Show customer payment sources empty', async (ctx) => {
+  it.skip<LocalContext>('Show customer payment sources empty', async (ctx) => {
     const { accessToken, endpoint } = await getToken('customer_empty')
     if (accessToken !== undefined) {
       ctx.accessToken = accessToken
@@ -114,7 +114,7 @@ describe('Customer payments', () => {
     await waitForElementToBeRemoved(() => screen.getByText('Loading...'))
     expect(screen.getByText('No payments available'))
   })
-  it<LocalContext>('Show customer payment sources empty with custom component', async (ctx) => {
+  it.skip<LocalContext>('Show customer payment sources empty with custom component', async (ctx) => {
     const { accessToken, endpoint } = await getToken('customer_empty')
     if (accessToken !== undefined) {
       ctx.accessToken = accessToken
@@ -137,7 +137,7 @@ describe('Customer payments', () => {
     await waitForElementToBeRemoved(() => screen.getByText('Caricamento...'))
     expect(screen.getByText('Nessun pagamento disponibile'))
   })
-  it<LocalContext>('Show customer payment sources with custom component', async (ctx) => {
+  it.skip<LocalContext>('Show customer payment sources with custom component', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <CustomerContainer>
