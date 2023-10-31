@@ -61,8 +61,7 @@ export function OrderContainer(props: Props): JSX.Element {
     setLocalOrder,
     deleteLocalOrder
   } = useContext(OrderStorageContext)
-  const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
-  const getOrder = async (): Promise<void> => {
+  const getOrder = async (localOrder?: string | null): Promise<void> => {
     const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
     localOrder &&
       (await getApiOrder({
@@ -76,9 +75,10 @@ export function OrderContainer(props: Props): JSX.Element {
       }))
   }
   useEffect(() => {
+    const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
     if (state?.orderId) {
       if (localOrder != null && state.orderId !== localOrder) {
-        void getOrder()
+        void getOrder(localOrder)
       } else {
         dispatch({
           type: 'setOrderId',
@@ -132,6 +132,7 @@ export function OrderContainer(props: Props): JSX.Element {
     }
   }, [attributes, state?.order, lock])
   useEffect(() => {
+    const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
     const startRequest = Object.keys(state?.includeLoaded || {}).filter(
       (key) => state?.includeLoaded?.[key as ResourceIncluded] === true
     )
@@ -143,13 +144,13 @@ export function OrderContainer(props: Props): JSX.Element {
         !state.withoutIncludes &&
         !lockOrder
       ) {
-        void getOrder()
+        void getOrder(localOrder)
       } else if (
         state.withoutIncludes &&
         !state.include?.length &&
         startRequest.length === 0
       ) {
-        void getOrder()
+        void getOrder(localOrder)
       }
     } else if (
       [
