@@ -137,13 +137,13 @@ export function OrderList({
   useEffect(() => {
     if (type === 'orders' && getCustomerOrders != null) {
       void getCustomerOrders({
-        pageNumber: pageIndex,
+        pageNumber: pageIndex + 1,
         pageSize: currentPageSize
       })
     }
     if (type === 'subscriptions' && getCustomerSubscriptions != null) {
       void getCustomerSubscriptions({
-        pageNumber: pageIndex,
+        pageNumber: pageIndex + 1,
         pageSize: currentPageSize
       })
     }
