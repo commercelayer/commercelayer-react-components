@@ -178,6 +178,10 @@ export async function saveAddresses({
   try {
     const sdk = getSdk(config)
     if (order) {
+      const doNotShipItems = order?.line_items?.every(
+        // @ts-expect-error no type for do_not_ship on SDK
+        (lineItem) => lineItem?.item?.do_not_ship === true
+      )
       const currentBillingAddressRef = order?.billing_address?.reference
       const orderAttributes: OrderUpdate = {
         id: order?.id,
@@ -192,7 +196,9 @@ export async function saveAddresses({
       if (billingAddress != null && Object.keys(billingAddress).length > 0) {
         delete orderAttributes._billing_address_clone_id
         delete orderAttributes._shipping_address_clone_id
-        orderAttributes._shipping_address_same_as_billing = true
+        if (!doNotShipItems) {
+          orderAttributes._shipping_address_same_as_billing = true
+        }
         const hasMetadata = Object.keys(billingAddress).filter((key) => {
           if (key.startsWith('metadata_')) {
             return true
