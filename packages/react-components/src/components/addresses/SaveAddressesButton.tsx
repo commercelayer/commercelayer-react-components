@@ -82,7 +82,8 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     billingAddressId,
     billing_address: billingAddress,
     shipping_address: shippingAddress,
-    shippingAddressId
+    shippingAddressId,
+    lineItems: order?.line_items
   })
   const disable =
     disabled ||

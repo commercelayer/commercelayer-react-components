@@ -3,7 +3,11 @@ import isEmpty from 'lodash/isEmpty'
 import { fieldsExist } from '#utils/validateFormFields'
 import { type BaseError } from '#typings/errors'
 import { addressFields } from '#reducers/AddressReducer'
-import { type Address, type AddressCreate } from '@commercelayer/sdk'
+import {
+  type LineItem,
+  type Address,
+  type AddressCreate
+} from '@commercelayer/sdk'
 import { type TCustomerAddress } from '#reducers/CustomerReducer'
 
 type BillingAddressController = (params: {
@@ -66,7 +70,7 @@ export const shippingAddressController: ShippingAddressController = ({
   return shippingDisable
 }
 
-type CountryLockController = (params: {
+interface CountryLockControllerProps {
   addresses?: Address[] | null
   billing_address?: TCustomerAddress
   billingAddressId?: string
@@ -74,17 +78,24 @@ type CountryLockController = (params: {
   shipToDifferentAddress?: boolean
   shipping_address?: AddressCreate
   shippingAddressId?: string
-}) => boolean
+  lineItems?: LineItem[] | null
+}
 
-export const countryLockController: CountryLockController = ({
+export function countryLockController({
   addresses,
   billing_address,
   billingAddressId,
   countryCodeLock,
   shipToDifferentAddress,
   shipping_address,
-  shippingAddressId
-}) => {
+  shippingAddressId,
+  lineItems
+}: CountryLockControllerProps): boolean {
+  const doNotShipItems = lineItems?.every(
+    // @ts-expect-error no type for do_not_ship on SDK
+    (lineItem) => lineItem?.item?.do_not_ship === true
+  )
+  if (doNotShipItems) return false
   if (
     countryCodeLock &&
     !isEmpty(addresses) &&
