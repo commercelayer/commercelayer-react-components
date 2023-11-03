@@ -91,10 +91,17 @@ export function countryLockController({
   shippingAddressId,
   lineItems
 }: CountryLockControllerProps): boolean {
-  const doNotShipItems = lineItems?.every(
-    // @ts-expect-error no type for do_not_ship on SDK
-    (lineItem) => lineItem?.item?.do_not_ship === true
-  )
+  const doNotShipItems = lineItems
+    ?.filter(
+      (lineItem) =>
+        lineItem?.item?.type != null &&
+        ['skus', 'bundles'].includes(lineItem?.item?.type)
+    )
+    ?.every(
+      (lineItem) =>
+        // @ts-expect-error no type for do_not_ship on SDK
+        lineItem?.item?.do_not_ship === true
+    )
   if (doNotShipItems) return false
   if (
     countryCodeLock &&
