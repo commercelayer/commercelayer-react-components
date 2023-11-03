@@ -109,7 +109,7 @@ export function PaymentGateway({
       }
       setLoading(false)
     }
-    if (expressPayments) setLoading(false)
+    if (expressPayments && show) setLoading(false)
     return () => {
       setLoading(true)
     }
