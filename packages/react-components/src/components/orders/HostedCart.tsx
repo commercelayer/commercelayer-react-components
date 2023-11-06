@@ -51,7 +51,8 @@ const defaultContainerStyle = {
   height: '100%',
   width: '23rem',
   transition: 'right 0.5s ease-in-out',
-  zIndex: '0',
+  // zIndex: '0',
+  pointerEvents: 'none',
   overflow: 'auto'
 } satisfies CSSProperties
 
@@ -63,7 +64,8 @@ const defaultBackgroundStyle = {
   height: '100%',
   width: '100vw',
   transition: 'opacity 0.5s ease-in-out',
-  zIndex: '-10',
+  // zIndex: '-10',
+  pointerEvents: 'none',
   backgroundColor: 'black'
 } satisfies CSSProperties
 
@@ -135,7 +137,7 @@ export function HostedCart({
   })
   const [src, setSrc] = useState<string | undefined>()
   if (accessToken == null || endpoint == null) return null
-  const { order, createOrder } = useContext(OrderContext)
+  const { order, createOrder, getOrder } = useContext(OrderContext)
   const { persistKey } = useContext(OrderStorageContext)
   const { domain, slug } = getDomain(endpoint)
   async function setOrder(openCart?: boolean): Promise<void> {
@@ -162,6 +164,9 @@ export function HostedCart({
   function onMessage(data: IframeData): void {
     switch (data.message.type) {
       case 'update':
+        if (data.message.payload != null) {
+          void getOrder(data.message.payload.id)
+        }
         break
       case 'close':
         if (type === 'mini') {
@@ -256,11 +261,14 @@ export function HostedCart({
   return src == null ? null : type === 'mini' ? (
     <>
       <div
+        aria-hidden='true'
         style={{
           ...defaultStyle.background,
           ...style?.background,
           opacity: isOpen ? '0.5' : defaultStyle.background?.opacity,
-          zIndex: isOpen ? '1' : defaultStyle.background?.zIndex
+          pointerEvents: isOpen
+            ? 'initial'
+            : defaultStyle.background?.pointerEvents
         }}
         onClick={onCloseCart}
       />
@@ -269,7 +277,9 @@ export function HostedCart({
           ...defaultStyle.container,
           ...style?.container,
           right: isOpen ? '0' : defaultStyle.container?.right,
-          zIndex: isOpen ? '100' : defaultStyle.container?.zIndex
+          pointerEvents: isOpen
+            ? 'initial'
+            : defaultStyle.container?.pointerEvents
         }}
         {...props}
       >
