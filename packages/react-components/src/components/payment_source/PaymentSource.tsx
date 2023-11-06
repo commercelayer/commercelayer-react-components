@@ -34,8 +34,12 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
   const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
   const { payments } = useContext(CustomerContext)
-  const { currentPaymentMethodId, paymentSource, destroyPaymentSource } =
-    useContext(PaymentMethodContext)
+  const {
+    currentPaymentMethodId,
+    paymentSource,
+    destroyPaymentSource,
+    currentPaymentMethodType
+  } = useContext(PaymentMethodContext)
   const [show, setShow] = useState(false)
   const [showCard, setShowCard] = useState(false)
 
@@ -43,7 +47,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
     if (readonly) {
       setShow(true)
       setShowCard(true)
-    } else if (payment?.id === currentPaymentMethodId) {
+    } else if (payment?.id === currentPaymentMethodId && !expressPayments) {
       setShow(true)
       const card = getCardDetails({
         paymentType: payment?.payment_source_type as PaymentResource,
@@ -53,7 +57,10 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
         }
       })
       if (card.brand) setShowCard(true)
-    } else if (expressPayments) {
+    } else if (
+      expressPayments &&
+      currentPaymentMethodType === 'stripe_payments'
+    ) {
       setShow(true)
     } else setShow(false)
     return () => {
@@ -66,7 +73,8 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
     payments,
     payment,
     readonly,
-    order
+    order,
+    expressPayments
   ])
   const handleEditClick = async (e: MouseEvent): Promise<void> => {
     e.stopPropagation()
