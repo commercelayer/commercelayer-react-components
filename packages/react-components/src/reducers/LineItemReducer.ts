@@ -168,7 +168,8 @@ export const deleteLineItem: DeleteLineItem = async (params) => {
 
 export const lineItemInitialState: LineItemState = {
   loading: false,
-  errors: []
+  errors: [],
+  lineItems: []
 }
 
 export type LineItemActionType = 'setLineItems' | 'setErrors' | 'setLoading'

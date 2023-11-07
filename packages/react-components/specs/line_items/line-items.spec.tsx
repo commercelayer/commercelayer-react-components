@@ -41,6 +41,15 @@ describe('Line items components', () => {
       }
     }
   })
+  it<AddToCartContext>('LineItemsCount outside of CustomerContainer', (ctx) => {
+    expect(() =>
+      render(
+        <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+          <LineItemsCount />
+        </CommerceLayer>
+      )
+    ).toThrow('Cannot use <LineItemsCount/> outside of <LineItemsContainer/>')
+  })
   it<AddToCartContext>('Show out of stock error changing quantity', async (ctx) => {
     const skuWithoutStock = 'BABYONBU000000FFFFFFNBXX'
     render(

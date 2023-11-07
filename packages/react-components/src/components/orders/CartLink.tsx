@@ -63,14 +63,14 @@ export function CartLink(props: Props): JSX.Element | null {
           applicationType: 'cart',
           customDomain
         })
-      : ''
+      : undefined
   const handleClick = async (
     event: MouseEvent<HTMLAnchorElement>
   ): Promise<void> => {
     event.preventDefault()
     if (type !== 'mini') {
       if (order?.id) {
-        location.href = href
+        location.href = href ?? ''
       } else {
         const orderId = await createOrder({})
         if (slug)

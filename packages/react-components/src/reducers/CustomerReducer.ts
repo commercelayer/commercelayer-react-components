@@ -385,19 +385,26 @@ interface GetCustomerPaymentsParams extends GetCustomerOrdersProps {}
 
 export async function getCustomerPayments({
   config,
-  dispatch
+  dispatch,
+  pageSize = 10,
+  pageNumber = 1
 }: GetCustomerPaymentsParams): Promise<void> {
-  if (config != null && dispatch != null) {
+  if (config?.accessToken != null && dispatch != null) {
     const sdk = getSdk(config)
-    const payments = await sdk.customer_payment_sources.list({
-      include: ['payment_source']
-    })
-    dispatch({
-      type: 'setPayments',
-      payload: {
-        payments
-      }
-    })
+    const { owner } = jwtDecode(config.accessToken)
+    if (owner?.id) {
+      const payments = await sdk.customer_payment_sources.list({
+        include: ['payment_source'],
+        pageNumber,
+        pageSize
+      })
+      dispatch({
+        type: 'setPayments',
+        payload: {
+          payments
+        }
+      })
+    }
   }
 }
 
