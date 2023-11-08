@@ -22,7 +22,6 @@ export function LineItemsCount(props: Props): JSX.Element {
     currentComponentName: 'LineItemsCount',
     key: 'lineItems'
   })
-  console.log('lineItems', lineItems)
   const [quantity, setQuantity] = useState(0)
   useEffect(() => {
     if (lineItems && lineItems.length > 0) {
