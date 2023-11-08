@@ -15,6 +15,7 @@ describe('AvailabilityContainer component', () => {
       ctx.accessToken = accessToken
       ctx.endpoint = endpoint
       ctx.sku = 'BABYONBU000000E63E7412MX'
+      ctx.skuId = 'wZeDdSamqn'
       ctx.skus = ['BABYONBU000000E63E7412MX', 'BABYONBU000000FFFFFF12MX']
     }
   })
@@ -36,6 +37,23 @@ describe('AvailabilityContainer component', () => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <AvailabilityContainer skuCode={ctx.sku}>
+          <AvailabilityTemplate data-testid='availability-template' />
+        </AvailabilityContainer>
+      </CommerceLayer>
+    )
+    await waitFor(
+      async () => await screen.findByText(`Available`, { exact: false }),
+      {
+        timeout: 5000
+      }
+    )
+    const template = screen.getByTestId('availability-template')
+    expect(template.textContent).toContain('Available')
+  })
+  it<SkusContext>('Show SKU availability by SKU Id', async (ctx) => {
+    render(
+      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+        <AvailabilityContainer skuId={ctx.skuId}>
           <AvailabilityTemplate data-testid='availability-template' />
         </AvailabilityContainer>
       </CommerceLayer>

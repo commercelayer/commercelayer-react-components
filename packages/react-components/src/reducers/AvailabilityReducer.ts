@@ -60,7 +60,7 @@ export async function getAvailability({
   dispatch,
   config
 }: {
-  skuCode: string
+  skuCode?: string
   skuId?: string
   dispatch: Dispatch<AvailabilityAction>
   config: CommerceLayerConfig
@@ -70,10 +70,12 @@ export async function getAvailability({
     const [sku] =
       skuId != null
         ? [{ id: skuId }]
-        : await sdk.skus.list({
+        : skuCode != null
+        ? await sdk.skus.list({
             fields: { skus: ['id'] },
             filters: { code_in: skuCode }
           })
+        : []
     if (sku) {
       const skuInventory = (await sdk.skus.retrieve(sku.id, {
         fields: { skus: ['inventory'] }
