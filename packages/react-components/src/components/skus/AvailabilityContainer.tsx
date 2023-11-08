@@ -56,7 +56,7 @@ export function AvailabilityContainer({
   useEffect(() => {
     if (accessToken != null && accessToken !== '') {
       const config = { accessToken, endpoint }
-      if (sCode) {
+      if (sCode != null || skuId != null) {
         void getAvailability({ skuCode: sCode, skuId, config, dispatch })
       }
     }

@@ -12,4 +12,5 @@ export interface OrderContext extends LocalContext {
 export interface SkusContext extends LocalContext {
   sku: string
   skus: string[]
+  skuId: string
 }
