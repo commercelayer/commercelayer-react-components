@@ -12,10 +12,7 @@ export default setup
 
 const Template: StoryFn<typeof Price> = (args) => {
   return (
-    <CommerceLayer
-      accessToken='my-access-token'
-      endpoint='https://demo-store.commercelayer.io'
-    >
+    <CommerceLayer accessToken='my-access-token'>
       <PricesContainer>
         <Price {...args} />
       </PricesContainer>
@@ -25,7 +22,7 @@ const Template: StoryFn<typeof Price> = (args) => {
 
 export const Default = Template.bind({})
 Default.args = {
-  skuCode: 'BABYONBU000000E63E7412MX',
+  skuCode: 'POST6191FFFFFF000000XXXX',
   compareClassName: 'line-through ml-2',
   className: 'font-bold'
 }
@@ -38,7 +35,7 @@ Default.args = {
  */
 export const NoComparePrice = Template.bind({})
 NoComparePrice.args = {
-  skuCode: 'BABYONBU000000E63E7412MX',
+  skuCode: 'POST6191FFFFFF000000XXXX',
   showCompare: false
 }
 
@@ -53,8 +50,8 @@ export const MultiplePrices: StoryFn<typeof Price> = (args) => {
     >
       <PricesContainer>
         <div className='grid'>
-          <Price skuCode='BABYONBU000000E63E7412MX' showCompare={false} />
-          <Price skuCode='CANVASAU000000FFFFFF1824' showCompare={false} />
+          <Price skuCode='POST6191FFFFFF000000XXXX' showCompare={false} />
+          <Price skuCode='POLOMXXX000000FFFFFFLXXX' showCompare={false} />
         </div>
       </PricesContainer>
     </CommerceLayer>
@@ -91,7 +88,7 @@ export const ChildrenProps: StoryFn<typeof Price> = (args) => {
 }
 
 ChildrenProps.args = {
-  skuCode: 'BABYONBU000000E63E7412MX'
+  skuCode: 'POST6191FFFFFF000000XXXX'
 }
 ChildrenProps.decorators = [
   (Story) => {

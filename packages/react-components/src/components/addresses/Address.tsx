@@ -24,6 +24,23 @@ interface Props
   deselect?: boolean
 }
 
+/**
+ * The Address component is aimed to read from active context the list of available addresses to generate for each of them a suitable and interactive wrapper ready to deal with addresses data.
+ *
+ * It accept:
+ * - a `selectedClassName` prop to define the className of selected generated address wrapper.
+ * - a `disabledClassName` prop to define the className of disabled generated address wrapper.
+ * - an `onSelect` prop to define a custom method triggered when an address wrapper is clicked.
+ * - an `addresses` prop to define a list of addresses to be used instead of the ones available from active context.
+ * - a `deselect` prop to define if the current address is deselected through a custom logic.
+ *
+ * <span title='Requirements' type='warning'>
+ * Must be a child of the `<AddressesContainer>` component.
+ * </span>
+ * <span title='Children' type='info'>
+ * `<AddressField>`,
+ * </span>
+ */
 export function Address(props: Props): JSX.Element {
   const {
     children,

@@ -1,0 +1,36 @@
+import { Meta, Source, Canvas } from '@storybook/addon-docs';
+import * as Stories from './CustomerAddresses.stories.tsx'
+
+
+<Meta of={Stories} />
+
+# Customer Addresses
+
+This guide will explain how to create a `customer addresses management` page using the Commerce Layer components.
+The page will be made by two parts: an `addresses list` and an `address form`.
+At first they will share some high-level components and then the page will split into dedicated parts for each demanded functionality.
+
+The addresses list will be rendered as a grid of cards showing address data and management actions.
+Below the address cards there will be a rounded `+` button demanded to add a new address.
+Once the `+` action or an address `Edit` action is clicked a form will appear giving the opportunity to create a new address or edit an existing one.
+
+### Full example - Shared components
+The page will be usining these shared components: `CommerceLayer`, `CustomerContainer` and `AddressesContainer`.
+The main `CommerceLayer` component will need to be setup with a valid customer access token in order to be able to read customer information.
+Then thanks to the `CustomerContainer` it will be possible to initialize and access the customer context to provide it to children components.
+At last the `AddressesContainer` is demanded to setup the addresses related provider and context enabling required management states and methods.
+
+### Full example - List
+The list is composed by these components:  `AddressesEmpty` (optional), `Address` and `AddressField`.
+The `AddressesEmpty` component is demanded to show a default or custom message in case any customer address is available.
+The `Address` component will read customer addresses from the context and will loop over to generate a list of elements to enable their children the ability to focus on one single address object.
+Inside the `Address` it will be possible to use some `AddressField` components to render any requested attribute of an `address` resource.
+
+### Full example - Form
+The form is composed by these components: `BillingAddressForm`, `AddressInput`, `AddressCountrySelector`, `AddressStateSelector`, `Errors` and `SaveAddressesButton`.
+The `BillingAddressForm` component is demanded to setup the form related provider and context enabling children components to interact with them.
+For each address field that needs to be saved there will be a form field component along with its related `Errors` block.
+In this example there are multiple kind of address form fields used to save customer address data: `AddressInput` (good for any text attribute), `AddressCountrySelector` and `AddressStateSelector` (dedicated to a guided selection of a country and a state).
+
+<Canvas of={Stories.Default} />
+

@@ -1,0 +1,48 @@
+import { Meta, Source, Canvas } from '@storybook/addon-docs';
+import * as Stories from './004.payment.stories.tsx'
+
+<Meta of={Stories} />
+
+## Payment method and order placing
+
+In this step we will describe how to complete the checkout page with payment methods. The selection of a payment method enables the placing of the order.
+
+
+
+<span title='Before proceeding' type='info'>
+To display payment methods you need to configure all payment gateways you want to use.
+This is a step that needs to be done when you set up your organization.
+
+We encourage you to read the [Payments](https://docs.commercelayer.io/core/v/how-tos/placing-orders/payments) section of our documentation.
+</span>
+
+To render payment methods and the place order button, we need to use the `<PaymentMethodsContainer>` and `<PlaceOrderContainer>` components.
+They need to be children of our `<OrderContainer>`.
+
+
+All available payment methods will be listed using the `<PaymentMethod>` component that will be rendered for each payment method found.
+
+The action to place the order is handled by the `<PlaceOrderButton>` that will be enabled only if all previous steps are completed and the order can be placed.
+
+<span title='Privacy and terms checkbox' type='info'>
+You can also force your customer to accept your privacy and terms conditions by passing the `privacy_url` and `terms_url` attributes to the `<OrderContainer>` component
+and add the `<PrivacyAndTermsCheckbox>` component to your checkout page, inside the `PlaceOrderContainer` context.
+</span>
+
+Our library will take care of the rest, including the creation of the payment session and all the redirects to the payment gateway and back for all supported payment gateways.
+
+As extra step, you will need to pass some configuration to both `<PaymentMethodsContainer>` and `<PlaceOrderContainer>` components in order to style some UI elements
+or to specify the redirect urls for the payment gateway.
+ 
+Below you can find the code for this step.
+<span title='Important notes' type='warning'>
+- The order can be placed only if all previous steps are completed
+- Place order button is disable is order is not ready to be placed (eg: either a valid address and a shipping method have not been set).
+- If you don't see payment methods listed below, go back and check if you have set a valid address and a shipping method.
+- `PrivacyAndTermsCheckbox` component only works if `privacy_url` and `terms_url` are set on the `order` resource.
+</span>
+
+
+
+
+<Canvas of={Stories.PaymentMethods} />

@@ -16,6 +16,23 @@ type Props = {
   errorClassName?: string
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
+/**
+ * Form container for creating or editing an order related billing address or a customer address, depending on the context in use.
+ *
+ * It accept:
+ * - a `reset` prop to define if current form needs to be reset over a defined boolean condition.
+ * - a `errorClassName` prop to define children input and select classnames assigned in case of validation error.
+ *
+ * <span title='Requirements' type='warning'>
+ * Must be a child of the `<AddressesContainer>` component.
+ * </span>
+ * <span title='Children' type='info'>
+ * `<AddressInput>`,
+ * `<AddressCountrySelector>`,
+ * `<AddressStateSelector>`,
+ * `<SaveAddressesButton>`
+ * </span>
+ */
 export function BillingAddressForm(props: Props): JSX.Element {
   const {
     children,

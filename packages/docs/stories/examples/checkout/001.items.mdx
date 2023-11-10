@@ -1,0 +1,26 @@
+import { Meta, Source, Canvas } from '@storybook/addon-docs';
+import * as Stories from './001.items.stories.tsx'
+
+<Meta of={Stories} />
+
+## List of items to purchase
+The list of items follows the same concept as the cart page, so we can use the same components to display the items except that we don't want to allow the user to change the quantities or remove the items.
+
+<Canvas of={Stories.ListOfItems} />
+
+
+
+## Coupon code and order totals
+It's possible to add coupons or show totals in the checkout page using the same components as seen for the cart page, 
+since cart and checkout operate on the same resource: the `order`. 
+Any changes made to the order in the cart page will be reflected in the checkout page and vice-versa.
+
+<span type="info">
+Use `TEST-COUPON` to add a 10% discount code and see how the totals change.
+</span>
+
+
+<Canvas of={Stories.Coupons} />
+
+ 
+ 

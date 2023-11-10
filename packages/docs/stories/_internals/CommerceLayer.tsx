@@ -5,15 +5,17 @@ import { useGetToken } from './useGetToken'
 interface Props {
   children: DefaultChildrenType
   accessToken: string
-  endpoint: string
+  endpoint?: string
 }
 
 /**
  * Custom setup for the `CommerceLayer` component that can be used in Storybook.
  * without exposing the `accessToken` and `endpoint` props.
  */
-function CommerceLayer({ children }: Props): JSX.Element {
-  const { accessToken, endpoint } = useGetToken()
+function CommerceLayer({ children, ...props }: Props): JSX.Element {
+  const { accessToken, endpoint } = useGetToken({
+    userMode: props.accessToken === 'customer-access-token'
+  })
 
   return (
     <CommerceLayerComponent accessToken={accessToken} endpoint={endpoint}>

@@ -1,0 +1,56 @@
+import { Meta, Source, Canvas } from '@storybook/addon-docs';
+import * as Stories from './MiniCart.stories.tsx'
+
+<Meta of={Stories} />
+
+
+# Mini Cart
+We can combine the two components just described (`<HostedCart>` and `<CartLink>`) to create a mini cart
+that will open as a modal on top of the page.
+
+To do so, we need to set the prop `type='mini'` to both components. Try to click the link below to open the mini cart.
+<Canvas of={Stories.Basic} />
+
+
+### Advanced usage
+In the previous example we used as `label` prop a simple string, but it can accept any React component (`ReactNode`).
+
+This means we can be creative and mix other components to create a more complex label, like a shopping bag icon
+that previews the number of items in the cart.
+
+This icon component can be built using `<LineItemsContainer>` and `<LineItemsCount>` and a custom svg icon.
+
+<Source dark code={`
+const MyCartIcon = () => (
+  <div className='relative inline-block cursor-pointer text-xs font-bold'>
+    <LineItemsContainer>
+
+     {/* static icon */}
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        width='36'
+        height='36'
+        fill='currentColor'
+        viewBox='0 0 256 256'
+      >
+        <path d='M216,64H176a48,48,0,0,0-96,0H40A16,16,0,0,0,24,80V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64ZM128,32a32,32,0,0,1,32,32H96A32,32,0,0,1,128,32Zm88,168H40V80H80V96a8,8,0,0,0,16,0V80h64V96a8,8,0,0,0,16,0V80h40Z' />
+      </svg>
+
+      {/* total number of cart items */}
+      <LineItemsCount className='absolute bottom-2 left-1/2 transform -translate-x-1/2' />
+      
+    </LineItemsContainer>
+  </div>
+)
+`} language='jsx' />
+ 
+Now we can use our custom component as `label` prop of `<CartLink>` to create a mini cart that can be 
+placed in the top navigation of your site.
+
+<span title='One context' type='info'>
+This works because `LineItemsContainer` and `HostedCart` are both using the same order context: 
+they are both inside the same `<OrderContainer>` component.
+</span>
+
+Click on the icon to show the side cart modal.
+<Canvas of={Stories.WithCartIcon} />

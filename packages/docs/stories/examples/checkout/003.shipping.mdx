@@ -1,0 +1,24 @@
+import { Meta, Source, Canvas } from '@storybook/addon-docs';
+import * as Stories from './003.shipping.stories.tsx'
+
+<Meta of={Stories} />
+
+## Shipping method selection
+Once we have the customer shipping address we can display the available shipping methods.
+The components will only display the available shipping methods for the matched zones found in the customer shipping address.
+
+If the inventory model is configured to split the order into multiple shipments (examples: items available from different warehouses), 
+the user will be able to select a shipping method for each shipment and we can use the `<LineItemsContainer>` component
+nested inside a `<ShipmentContainer>` component to list the order `line_items` for each shipment.
+
+When a `<LineItemsContainer>` is used inside a shipment context, the list will be filtered based on the items that will be included in that shipment.
+
+<span title='Requirement' type='warning'>
+To display shipping methods, the order must have been updated with a shipping address.
+Remember that a you can set the shipping address the same as billing (the address will be cloned) or define a different address.
+
+If you are not seeing any shipping methods in the box below, reach the previous step and set a proper address.
+In this demo, shipping methods are only available for the following countries: IT, DE, ES, FR, ES and NL.
+</span>
+
+<Canvas of={Stories.ShipmentMethods} />

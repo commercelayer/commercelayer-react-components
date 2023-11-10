@@ -13,6 +13,23 @@ interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
   errorClassName?: string
 }
 
+/**
+ * Form container for creating or editing an order related shipping address.
+ *
+ * It accept:
+ * - a `reset` prop to define if current form needs to be reset over a defined boolean condition.
+ * - a `errorClassName` prop to define children input and select classnames assigned in case of validation error.
+ *
+ * <span title='Requirements' type='warning'>
+ * Must be a child of the `<AddressesContainer>` component.
+ * </span>
+ * <span title='Children' type='info'>
+ * `<AddressInput>`,
+ * `<AddressCountrySelector>`,
+ * `<AddressStateSelector>`,
+ * `<SaveAddressesButton>`
+ * </span>
+ */
 export function ShippingAddressForm(props: Props): JSX.Element {
   const {
     children,

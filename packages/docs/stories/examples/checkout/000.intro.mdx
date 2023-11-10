@@ -1,0 +1,30 @@
+import { Meta, Source, Canvas } from '@storybook/addon-docs';
+ 
+<Meta title="Examples/Checkout Page/Introdution"></Meta>
+
+# Building a checkout page
+
+This guide will show you how to create a checkout cart page using this library.
+
+Usually a checkout page is structured will the following sections:
+- list of items to purchase
+- customer details (billing and shipping address forms)
+- shipping method selection
+- payment method selection
+- place order button
+
+You might decide to split the checkout process into multiple pages, but the general it follows the same concept.
+
+We will try to split this guide into pieces and show you how to create each section, but it's important to understand that even if each section is a separate block of components, 
+they are all connected to the same `OrderContainer`.
+
+It's also important to understand that shipping methods can't be selected if we don't know the customer shipping address (might be different from the billing address), 
+and payment methods can't be selected if we don't know the selected shipping method, since it might affect the total amount of the order.
+So the order of the sections is important.
+
+
+<span title="Important" type="info">
+Before jumping to the next section and see how our `react-components` can be used to build a checkout page, we recommend you to read the following article on
+<a href="https://docs.commercelayer.io/core/v/how-tos/placing-orders/checkout" target="_blank">how to checkout an order as guest or logged customer</a> to have 
+a better understanding of all the requirments that come from our Core API.
+</span> 

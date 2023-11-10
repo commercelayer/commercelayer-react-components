@@ -12,10 +12,7 @@ export default setup
 
 const Template: StoryFn<typeof PricesContainer> = (args) => {
   return (
-    <CommerceLayer
-      accessToken='my-access-token'
-      endpoint='https://demo-store.commercelayer.io'
-    >
+    <CommerceLayer accessToken='my-access-token'>
       <PricesContainer {...args}>
         <Price />
       </PricesContainer>
@@ -25,5 +22,5 @@ const Template: StoryFn<typeof PricesContainer> = (args) => {
 
 export const Default = Template.bind({})
 Default.args = {
-  skuCode: 'BABYONBU000000E63E7412MX'
+  skuCode: 'POST6191FFFFFF000000XXXX'
 }
