@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import BaseSelect from '#components/utils/BaseSelect'
 import {
   type AddressStateSelectName,
@@ -7,8 +7,11 @@ import {
 import BillingAddressFormContext from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
 import isEmpty from 'lodash/isEmpty'
-import { getStateOfCountry, isValidState } from '#utils/countryStateCity'
-import isEmptyStates from '#utils/isEmptyStates'
+import {
+  getStateOfCountry,
+  isValidState,
+  type States
+} from '#utils/countryStateCity'
 import AddressesContext from '#context/AddressContext'
 import BaseInput from '#components/utils/BaseInput'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
@@ -19,6 +22,12 @@ type Props = Omit<BaseSelectComponentProps, 'options' | 'name'> & {
   disabled?: boolean
   inputClassName?: string
   selectClassName?: string
+  /**
+   * Optional states list to extend the default one.
+   * This component will try to render a select getting as options the states found for the selected country.
+   * If the country has no states, it will render a text input field instead.
+   */
+  states?: States
 } & Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'>
 
 export function AddressStateSelector(props: Props): JSX.Element {
@@ -29,6 +38,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
     className = '',
     inputClassName = '',
     selectClassName = '',
+    states,
     ...p
   } = props
   const billingAddress = useContext(BillingAddressFormContext)
@@ -38,6 +48,22 @@ export function AddressStateSelector(props: Props): JSX.Element {
   const [hasError, setHasError] = useState(false)
   const [countryCode, setCountryCode] = useState('')
   const [val, setVal] = useState(value || '')
+
+  const stateOptions = useMemo(() => {
+    if (isEmpty(countryCode)) {
+      return []
+    }
+    return getStateOfCountry({
+      countryCode,
+      states
+    })
+  }, [states, countryCode])
+
+  const isEmptyStates = useMemo(
+    () => () => isEmpty(stateOptions),
+    [stateOptions]
+  )
+
   useEffect(() => {
     const billingCountryCode =
       typeof billingAddress?.values?.billing_address_country_code === 'string'
@@ -59,8 +85,12 @@ export function AddressStateSelector(props: Props): JSX.Element {
     if (
       changeBillingCountry &&
       billingCountryCode &&
-      !isValidState(val, billingCountryCode) &&
-      !isEmptyStates(billingCountryCode)
+      !isValidState({
+        stateCode: val,
+        countryCode: billingCountryCode,
+        states
+      }) &&
+      !isEmptyStates()
     ) {
       if (billingAddress.resetField) billingAddress?.resetField(name)
       setVal('')
@@ -73,8 +103,12 @@ export function AddressStateSelector(props: Props): JSX.Element {
     if (
       changeShippingCountry &&
       shippingCountryCode &&
-      !isValidState(val, shippingCountryCode) &&
-      !isEmptyStates(shippingCountryCode)
+      !isValidState({
+        stateCode: val,
+        countryCode: shippingCountryCode,
+        states
+      }) &&
+      !isEmptyStates()
     ) {
       if (shippingAddress.resetField) shippingAddress?.resetField(name)
       setVal('')
@@ -103,10 +137,11 @@ export function AddressStateSelector(props: Props): JSX.Element {
     shippingAddress?.errorClassName ||
     customerAddress?.errorClassName ||
     ''
-  const classNameComputed = !isEmptyStates(countryCode)
+  const classNameComputed = !isEmptyStates()
     ? `${className} ${selectClassName} ${hasError ? errorClassName : ''}`
     : `${className} ${inputClassName} ${hasError ? errorClassName : ''}`
-  return !isEmptyStates(countryCode) ? (
+
+  return !isEmptyStates() ? (
     <BaseSelect
       {...p}
       className={classNameComputed}
@@ -116,7 +151,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
         customerAddress?.validation
       }
       required={required}
-      options={getStateOfCountry(countryCode)}
+      options={stateOptions}
       name={name}
       value={val}
     />
