@@ -4,6 +4,7 @@ import { type ChildrenFunction } from '#typings/index'
 import type { StripeElementLocale } from '@stripe/stripe-js'
 import { useContext, useEffect, useRef } from 'react'
 import { type PaymentSourceProps } from './PaymentSource'
+import OrderContext from '#context/OrderContext'
 
 export interface ExternalPaymentConfig {
   /**
@@ -29,19 +30,24 @@ interface Props
 
 export function ExternalPayment(props: Props): JSX.Element | null {
   const { setPaymentRef } = useContext(PaymentMethodContext)
+  const { order, updateOrder } = useContext(OrderContext)
   const ref = useRef<null | HTMLFormElement>(null)
   useEffect(() => {
-    if (ref !== null) {
-      // @ts-expect-error no type
+    if (ref?.current != null) {
       ref.current.onsubmit = async () => {
         return true
       }
       setPaymentRef({ ref })
     }
   }, [ref])
+  const parentProps = {
+    ...props,
+    order,
+    updateOrder
+  }
   return props?.customComponent != null && props.show ? (
     <form ref={ref}>
-      <Parent>{props.customComponent}</Parent>
+      <Parent {...parentProps}>{props.customComponent}</Parent>
       {props?.templateCustomerSaveToWallet != null && (
         <Parent {...{ name: 'save_payment_source_to_customer_wallet' }}>
           {props.templateCustomerSaveToWallet}
