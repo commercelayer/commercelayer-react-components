@@ -4,7 +4,10 @@ import { useGetToken } from './useGetToken'
 
 interface Props {
   children: DefaultChildrenType
-  accessToken: string
+  accessToken:
+    | 'customer-access-token'
+    | 'customer-orders-access-token'
+    | 'my-access-token' // guest token
   endpoint?: string
 }
 
@@ -14,7 +17,12 @@ interface Props {
  */
 function CommerceLayer({ children, ...props }: Props): JSX.Element {
   const { accessToken, endpoint } = useGetToken({
-    userMode: props.accessToken === 'customer-access-token'
+    mode:
+      props.accessToken === 'customer-access-token'
+        ? 'customer'
+        : props.accessToken === 'customer-orders-access-token'
+        ? 'customer-orders'
+        : 'guest'
   })
 
   return (
