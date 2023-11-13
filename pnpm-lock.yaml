@@ -137,12 +137,6 @@ importers:
 
   packages/react-components:
     dependencies:
-      '@ac-dev/countries-service':
-        specifier: ^1.2.0
-        version: 1.2.0
-      '@ac-dev/states-service':
-        specifier: ^1.1.1
-        version: 1.1.1
       '@adyen/adyen-web':
         specifier: ^5.51.0
         version: 5.51.0
@@ -268,16 +262,6 @@ packages:
     resolution: {integrity: sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==}
     engines: {node: '>=0.10.0'}
     dev: true
-
-  /@ac-dev/countries-service@1.2.0:
-    resolution: {integrity: sha512-9+LUUTALFa17EKL7l93ExcjYgHdkcHWlOyvAqMdrVWie6/105eGryQqaba0yIwM4rBYfvs/b/KJHkbcAdSFD2Q==}
-    engines: {node: '>=10'}
-    dev: false
-
-  /@ac-dev/states-service@1.1.1:
-    resolution: {integrity: sha512-a4oOWncXicfEMT4E9RSzZ4uzSSa8GYcCGNReoD15m5Upz7brL+8UKBg6/DjTfPTQ5Rwh7PDVcyigBm8FsnVHYA==}
-    engines: {node: '>=10'}
-    dev: false
 
   /@adyen/adyen-web@5.51.0:
     resolution: {integrity: sha512-jH3Us9k57AhdOrwBL444EQdQ+xTgg4BTD/9/RSOmldw9EM1LzX1+6AKkX/7QioJoYO6L7gI5DUu5iq915ju0IA==}

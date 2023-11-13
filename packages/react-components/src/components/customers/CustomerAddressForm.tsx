@@ -6,13 +6,18 @@ import { type BaseError, type CodeErrorType } from '#typings/errors'
 import { type AddressField } from '#reducers/AddressReducer'
 import { type AddressCountrySelectName, type AddressInputName } from '#typings'
 import OrderContext from '#context/OrderContext'
-import isEmptyStates from '#utils/isEmptyStates'
+import { isEmptyStates } from '#utils/countryStateCity'
 import type { Address } from '@commercelayer/sdk'
 
 interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
   children: ReactNode
   reset?: boolean
   errorClassName?: string
+  /**
+   * Array of countries that have states has select options. Ignore this if you are not overriding the default states list.
+   * If you are overriding the default states list, you must pass the countries that have states as select options.
+   */
+  countriesWithPredefinedStateOptions?: string[]
 }
 
 export function CustomerAddressForm(props: Props): JSX.Element {
@@ -21,6 +26,7 @@ export function CustomerAddressForm(props: Props): JSX.Element {
     errorClassName,
     autoComplete = 'on',
     reset = false,
+    countriesWithPredefinedStateOptions,
     ...p
   } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
@@ -67,7 +73,13 @@ export function CustomerAddressForm(props: Props): JSX.Element {
         if (['billing_address_state_code'].includes(name)) {
           const countryCode = (values['billing_address_country_code']?.value ||
             values['country_code']) as string
-          if (!isEmptyStates(countryCode) && !field.value) {
+          if (
+            !isEmptyStates({
+              countryCode,
+              countriesWithPredefinedStateOptions
+            }) &&
+            !field.value
+          ) {
             // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete values['billing_address_state_code']
           }

@@ -5,7 +5,7 @@ import BillingAddressFormContext, {
   type AddressValuesKeys
 } from '#context/BillingAddressFormContext'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
-import { getCountries } from '#utils/countryStateCity'
+import { getCountries, type Country } from '#utils/countryStateCity'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
 
 type TCountryFieldName =
@@ -19,10 +19,14 @@ interface Props
   name: Extract<AddressValuesKeys, TCountryFieldName>
   required?: boolean
   disabled?: boolean
+  /**
+   * Optional country list to override default ones.
+   */
+  countries?: Country[]
 }
 
 export function AddressCountrySelector(props: Props): JSX.Element {
-  const { required = true, value, name, className, ...p } = props
+  const { required = true, value, name, className, countries, ...p } = props
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
   const customerAddress = useContext(CustomerAddressFormContext)
@@ -71,7 +75,7 @@ export function AddressCountrySelector(props: Props): JSX.Element {
         customerAddress?.validation
       }
       required={required}
-      options={getCountries()}
+      options={getCountries(countries)}
       name={name}
       value={value}
       {...p}
