@@ -1,5 +1,5 @@
 import type { Meta, StoryFn } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
+import CommerceLayer from '../../_internals/CommerceLayer'
 import CustomerContainer from '#components/customers/CustomerContainer'
 import OrderList from '#components/orders/OrderList'
 import OrderListEmpty from '#components/orders/OrderListEmpty'
@@ -8,7 +8,7 @@ import OrderListPaginationButtons from '#components/orders/OrderListPaginationBu
 import OrderListPaginationInfo from '#components/orders/OrderListPaginationInfo'
 
 const setup: Meta = {
-  title: 'Examples/Customer Orders'
+  title: 'Examples/My Account/Order list'
 }
 
 export default setup

@@ -1,6 +1,5 @@
 import { Meta, Source, Canvas } from '@storybook/addon-docs';
-import * as Stories from './ListingPage.stories.tsx'
-
+import * as Stories from './000.ListingPage.stories.tsx'
 
 <Meta of={Stories} />
 
@@ -72,10 +71,3 @@ In this way you will be able to see a full interaction between nested contexts (
 Here you can see the final example that applies the block explained above, ready to be used in your application.
 
 <Canvas of={Stories.Default} />
-
-
-### Using mini cart
-
-From the example above, we can replace the cart-recap gray block at the bottom of the page, with the `<HostedCart type="mini" openAdd />` component to open a mini cart every time a new item is added.
-
-<Canvas of={Stories.WithMiniCart} />

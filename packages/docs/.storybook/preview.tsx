@@ -39,7 +39,7 @@ const parameters: Parameters = {
           ['AddToCartButton', 'HostedCart', 'CartLink', 'MiniCart']
         ],
         'Examples',
-        ['Listing Page', 'Cart Page']
+        ['Listing Page', 'Shopping Cart', 'Checkout Page', 'My Account']
       ]
     }
   },

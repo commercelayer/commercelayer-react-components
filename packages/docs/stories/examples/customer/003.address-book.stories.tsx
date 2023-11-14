@@ -1,5 +1,5 @@
 import type { Meta, StoryFn } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
+import CommerceLayer from '../../_internals/CommerceLayer'
 import CustomerContainer from '#components/customers/CustomerContainer'
 import AddressesContainer from '#components/addresses/AddressesContainer'
 import { AddressesEmpty } from '#components/addresses/AddressesEmpty'
@@ -14,7 +14,7 @@ import AddressStateSelector from '#components/addresses/AddressStateSelector'
 import SaveAddressesButton from '#components/addresses/SaveAddressesButton'
 
 const setup: Meta = {
-  title: 'Examples/Customer Addresses'
+  title: 'Examples/My Account/Address book'
 }
 
 export default setup
@@ -434,12 +434,4 @@ export const Default: StoryFn = () => {
       </CustomerContainer>
     </CommerceLayer>
   )
-}
-
-Default.parameters = {
-  docs: {
-    source: {
-      type: 'code'
-    }
-  }
 }

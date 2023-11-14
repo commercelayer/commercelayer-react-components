@@ -1,5 +1,5 @@
 import type { Meta, StoryFn } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
+import CommerceLayer from '../../_internals/CommerceLayer'
 import OrderContainer from '#components/orders/OrderContainer'
 import LineItemsContainer from '#components/line_items/LineItemsContainer'
 import LineItemsCount from '#components/line_items/LineItemsCount'
@@ -20,10 +20,10 @@ import GiftCardOrCouponSubmit from '#components/gift_cards/GiftCardOrCouponSubmi
 import GiftCardOrCouponInput from '#components/gift_cards/GiftCardOrCouponInput'
 import GiftCardOrCouponCode from '#components/gift_cards/GiftCardOrCouponCode'
 import GiftCardOrCouponRemoveButton from '#components/gift_cards/GiftCardOrCouponRemoveButton'
-import { OrderStorage, AddSampleItems } from '../_internals/OrderStorage'
+import { OrderStorage, AddSampleItems } from '../../_internals/OrderStorage'
 
 const setup: Meta = {
-  title: 'Examples/Cart Page'
+  title: 'Examples/Shopping Cart/Cart page'
 }
 
 export default setup

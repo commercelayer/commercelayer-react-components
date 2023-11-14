@@ -1,5 +1,5 @@
 import type { Meta, StoryFn } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
+import CommerceLayer from '../../_internals/CommerceLayer'
 import { Skus } from '#components/skus/Skus'
 import { SkusContainer } from '#components/skus/SkusContainer'
 import { SkuField } from '#components/skus/SkuField'
@@ -20,7 +20,7 @@ import LineItemRemoveLink from '#components/line_items/LineItemRemoveLink'
 import LineItemsEmpty from '#components/line_items/LineItemsEmpty'
 
 const setup: Meta = {
-  title: 'Examples/Listing Page'
+  title: 'Examples/Listing Page/Introduction'
 }
 
 export default setup

@@ -1,8 +1,6 @@
-import { Meta, Source, Canvas } from '@storybook/addon-docs';
-import * as Stories from './CartPage.stories.tsx'
+import { Meta, Source } from '@storybook/addon-docs';
 
-
-<Meta of={Stories} />
+<Meta title='Examples/Shopping Cart/Introduction' />
 
 # Shopping cart
 
@@ -17,9 +15,7 @@ Our Core API defines the cart as `draft order`. Before proceeding, make sure you
 - <a href="https://docs.commercelayer.io/core/v/how-tos/placing-orders/shopping-cart/create-a-shopping-cart" target="_blank">The Shopping cart</a>.
 </span>
 
-
-
-### Code implementation
+## Code implementation
 
 - Since the cart is an `order` with `draft` status, we need to start with the `<OrderContainer>` components as it will hold the order context.
 - The `<OrderContainer>` needs to receive the `orderId` as prop, but when wrapped inside the `<OrderStorage>` component it will receive it automatically from the latter by reading it from the `localStorage`.
@@ -46,21 +42,4 @@ It's possible to add gift cards and coupons to the cart (order) using the follow
  
 </span>
 
-
-
-### Full example
-The following example shows how to create a shopping cart page using the components described above.
-
-To better remark the concepts just described, we grouped the components in 3 different sections:
-- Line items
-- Gift cards and coupons
-- Totals
-
-Again, all sections are wrapped inside the same `<OrderContainer>` component, which is the main order context.
-
-<span title="Coupon" type="info">
-Use `TEST-COUPON` to add a 10% discount code and see how the totals change.
-</span>
-
-<Canvas of={Stories.Default} />
 

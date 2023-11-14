@@ -1,0 +1,20 @@
+
+import { Meta, Canvas } from '@storybook/addon-docs';
+import * as Stories from './003.address-book.stories.tsx'
+
+<Meta of={Stories} />
+
+### Full example - Shared components
+The page will be usining these shared components: `CommerceLayer`, `CustomerContainer` and `AddressesContainer`.
+The main `CommerceLayer` component will need to be setup with a valid customer access token in order to be able to read customer information.
+Then thanks to the `CustomerContainer` it will be possible to initialize and access the customer context to provide it to children components.
+At last the `AddressesContainer` is demanded to setup the addresses related provider and context enabling required management states and methods.
+
+### Full example - List
+The list is composed by these components:  `AddressesEmpty` (optional), `Address` and `AddressField`.
+The `AddressesEmpty` component is demanded to show a default or custom message in case any customer address is available.
+The `Address` component will read customer addresses from the context and will loop over to generate a list of elements to enable their children the ability to focus on one single address object.
+Inside the `Address` it will be possible to use some `AddressField` components to render any requested attribute of an `address` resource.
+
+
+<Canvas of={Stories.Default} />
