@@ -16,7 +16,6 @@ const Template: StoryFn<typeof AddressesEmpty> = (args) => {
     <CommerceLayer accessToken='customer-access-token'>
       <CustomerContainer>
         <AddressesContainer>
-          <h1 className='text-xl mb-2'>Customer Addresses</h1>
           <AddressesEmpty emptyText='No saved address for current customer' />
         </AddressesContainer>
       </CustomerContainer>

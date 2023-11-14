@@ -8,7 +8,7 @@ import OrderListPaginationButtons from '#components/orders/OrderListPaginationBu
 import OrderListPaginationInfo from '#components/orders/OrderListPaginationInfo'
 
 const setup: Meta = {
-  title: 'Examples/My Account/Order list'
+  title: 'Examples/Customer Account/Order list'
 }
 
 export default setup

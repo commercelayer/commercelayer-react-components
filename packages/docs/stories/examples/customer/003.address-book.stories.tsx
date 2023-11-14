@@ -14,7 +14,7 @@ import AddressStateSelector from '#components/addresses/AddressStateSelector'
 import SaveAddressesButton from '#components/addresses/SaveAddressesButton'
 
 const setup: Meta = {
-  title: 'Examples/My Account/Address book'
+  title: 'Examples/Customer Account/Address book'
 }
 
 export default setup
@@ -33,7 +33,7 @@ export const Default: StoryFn = () => {
     <CommerceLayer accessToken='customer-access-token'>
       <CustomerContainer>
         <AddressesContainer>
-          <AddressesEmpty />
+          <AddressesEmpty emptyText='No addresses found' />
           <div className='w-full p-5'>
             <div className='flex flex-wrap mx-auto w-full'>
               <Address className='w-1/3 p-2 border hover:border-blue-500 rounded m-2 shadow-sm'>

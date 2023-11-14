@@ -25,10 +25,6 @@ interface Props {
    * If true, the address will be considered a business address.
    */
   isBusiness?: boolean
-  /**
-   * If true, the shipping address will be considered as primary address. Default is false.
-   */
-  invertAddresses?: boolean
 }
 
 /**
@@ -39,7 +35,6 @@ interface Props {
  * It accept:
  * - a `shipToDifferentAddress` prop to define if the order related shipping address will be different from the billing one.
  * - a `isBusiness` prop to define if the current address needs to be threated as a `business` address during creation/update.
- * - a `invertAddresses` prop to define if the order related billing / shipping addresses need to be shown in an inverted order.
  *
  * <span title='Requirements' type='warning'>
  * Must be a child of the `<CommerceLayer>` component.

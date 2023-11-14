@@ -4,7 +4,7 @@ import { CustomerContainer } from '#components/customers/CustomerContainer'
 import { CustomerField } from '#components/customers/CustomerField'
 
 const setup: Meta<typeof CustomerField> = {
-  title: 'Components/Customers/CustomerField',
+  title: 'Components/Addresses/CustomerField',
   component: CustomerField,
   argTypes: {
     attribute: {

@@ -14,7 +14,7 @@ import { AddressField } from '#components/addresses/AddressField'
 import { Address } from '#components/addresses/Address'
 
 const setup: Meta = {
-  title: 'Examples/My Account/Address form'
+  title: 'Examples/Customer Account/Address form'
 }
 
 export default setup

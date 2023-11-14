@@ -36,7 +36,17 @@ const parameters: Parameters = {
           'Orders',
           ['OrderStorage', 'OrderContainer'],
           'Cart',
-          ['AddToCartButton', 'HostedCart', 'CartLink', 'MiniCart']
+          ['AddToCartButton', 'HostedCart', 'CartLink', 'MiniCart'],
+          'Addresses',
+          [
+            'CustomerContainer',
+            'CustomerField',
+            'AddressesContainer',
+            'AddressesEmpty',
+            'Address',
+            'AddressField',
+            'BillingAddressForm'
+          ]
         ],
         'Examples',
         ['Listing Page', 'Shopping Cart', 'Checkout Page', 'My Account']
