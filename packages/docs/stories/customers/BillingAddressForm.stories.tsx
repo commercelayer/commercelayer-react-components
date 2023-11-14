@@ -5,7 +5,7 @@ import AddressesContainer from '#components/addresses/AddressesContainer'
 import { BillingAddressForm } from '#components/addresses/BillingAddressForm'
 
 const setup: Meta<typeof BillingAddressForm> = {
-  title: 'Components/Addresses/BillingAddressForm',
+  title: 'Components/Customers/BillingAddressForm',
   component: BillingAddressForm
 }
 

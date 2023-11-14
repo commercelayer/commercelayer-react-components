@@ -7,7 +7,7 @@ import { Address } from '#components/addresses/Address'
 import { AddressField } from '#components/addresses/AddressField'
 
 const setup: Meta<typeof Address> = {
-  title: 'Components/Addresses/Address',
+  title: 'Components/Customers/Address',
   component: Address
 }
 

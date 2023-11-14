@@ -4,7 +4,7 @@ import { CustomerContainer } from '#components/customers/CustomerContainer'
 import { CustomerField } from '#components/customers/CustomerField'
 
 const setup: Meta<typeof CustomerField> = {
-  title: 'Components/Addresses/CustomerField',
+  title: 'Components/Customers/CustomerField',
   component: CustomerField,
   argTypes: {
     attribute: {
@@ -24,13 +24,7 @@ const setup: Meta<typeof CustomerField> = {
 export default setup
 
 const Template: StoryFn<typeof CustomerField> = (args) => {
-  return (
-    <CommerceLayer accessToken='customer-access-token'>
-      <CustomerContainer>
-        <CustomerField {...args} />
-      </CustomerContainer>
-    </CommerceLayer>
-  )
+  return <CustomerField {...args} />
 }
 
 export const Default = Template.bind({})
@@ -38,3 +32,13 @@ Default.args = {
   attribute: 'email',
   tagElement: 'p'
 }
+
+Default.decorators = [
+  (Story) => (
+    <CommerceLayer accessToken='customer-access-token'>
+      <CustomerContainer>
+        <Story />
+      </CustomerContainer>
+    </CommerceLayer>
+  )
+]

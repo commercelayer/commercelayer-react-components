@@ -3,23 +3,20 @@ import CommerceLayer from '../_internals/CommerceLayer'
 import CustomerContainer from '#components/customers/CustomerContainer'
 import AddressesContainer from '#components/addresses/AddressesContainer'
 import { AddressesEmpty } from '#components/addresses/AddressesEmpty'
-import { Address as AddressComponent } from '#components/addresses/Address'
-import { AddressField } from '#components/addresses/AddressField'
 
-const setup: Meta<typeof AddressesContainer> = {
-  title: 'Components/Addresses/AddressesContainer',
-  component: AddressesContainer
+const setup: Meta<typeof AddressesEmpty> = {
+  title: 'Components/Customers/AddressesEmpty',
+  component: AddressesEmpty
 }
 
 export default setup
 
-const Template: StoryFn<typeof AddressesContainer> = (args) => {
+const Template: StoryFn<typeof AddressesEmpty> = (args) => {
   return (
     <CommerceLayer accessToken='customer-access-token'>
       <CustomerContainer>
         <AddressesContainer>
           <AddressesEmpty emptyText='No saved address for current customer' />
-          <Address />
         </AddressesContainer>
       </CustomerContainer>
     </CommerceLayer>
@@ -34,15 +31,4 @@ Default.parameters = {
       sourceState: 'shown'
     }
   }
-}
-
-const Address: React.FC = () => {
-  return (
-    <AddressComponent>
-      <div className='grid gap-2'>
-        <AddressField name='full_name' />
-        <AddressField name='full_address' />
-      </div>
-    </AddressComponent>
-  )
 }

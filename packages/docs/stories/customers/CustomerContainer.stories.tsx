@@ -4,7 +4,7 @@ import CustomerContainer from '#components/customers/CustomerContainer'
 import { CustomerField } from '#components/customers/CustomerField'
 
 const setup: Meta<typeof CustomerContainer> = {
-  title: 'Components/Addresses/CustomerContainer',
+  title: 'Components/Customers/CustomerContainer',
   component: CustomerContainer
 }
 

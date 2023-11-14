@@ -4,14 +4,23 @@ import { AddressesContainer } from '#components/addresses/AddressesContainer'
 import { Address } from '#components/addresses/Address'
 import { AddressField } from '#components/addresses/AddressField'
 import CustomerContainer from '#components/customers/CustomerContainer'
+import AddressesEmpty from '#components/addresses/AddressesEmpty'
 
 const setup: Meta<typeof AddressField> = {
-  title: 'Components/Addresses/AddressField',
+  title: 'Components/Customers/AddressField',
   component: AddressField,
   argTypes: {
     name: {
       control: 'select',
-      options: ['first_name', 'last_name'],
+      options: [
+        'first_name',
+        'last_name',
+        'full_name',
+        'full_address',
+        'email',
+        'phone',
+        'line_1'
+      ],
       description: 'Resource attribute to be displayed.'
     },
     type: {
@@ -31,17 +40,7 @@ const setup: Meta<typeof AddressField> = {
 export default setup
 
 const Template: StoryFn<typeof AddressField> = (args) => {
-  return (
-    <CommerceLayer accessToken='customer-access-token'>
-      <CustomerContainer>
-        <AddressesContainer>
-          <Address>
-            <AddressField {...args} />
-          </Address>
-        </AddressesContainer>
-      </CustomerContainer>
-    </CommerceLayer>
-  )
+  return <AddressField {...args} />
 }
 
 export const Default = Template.bind({})
@@ -49,3 +48,21 @@ Default.args = {
   name: 'first_name',
   type: 'field'
 }
+
+Default.decorators = [
+  (Story) => (
+    <CommerceLayer accessToken='customer-access-token'>
+      <CustomerContainer>
+        <AddressesContainer>
+          <AddressesEmpty
+            className='text-small'
+            emptyText='No addresses to list. Add an address to print here the relative <AddressField> content'
+          />
+          <Address>
+            <Story />
+          </Address>
+        </AddressesContainer>
+      </CustomerContainer>
+    </CommerceLayer>
+  )
+]

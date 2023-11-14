@@ -37,7 +37,7 @@ const parameters: Parameters = {
           ['OrderStorage', 'OrderContainer'],
           'Cart',
           ['AddToCartButton', 'HostedCart', 'CartLink', 'MiniCart'],
-          'Addresses',
+          'Customers',
           [
             'CustomerContainer',
             'CustomerField',
@@ -45,7 +45,8 @@ const parameters: Parameters = {
             'AddressesEmpty',
             'Address',
             'AddressField',
-            'BillingAddressForm'
+            'BillingAddressForm',
+            'MyAccountLink'
           ]
         ],
         'Examples',
