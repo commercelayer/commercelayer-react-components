@@ -21,7 +21,9 @@ export default setup
 
 type PartialAddress = Partial<TAddress>
 
-export const Default: StoryFn<{ address: PartialAddress }> = (args) => {
+export const SampleAddressForm: StoryFn<{ address: PartialAddress }> = (
+  args
+) => {
   const labelClassNames = 'block text-sm font-medium'
   const inputClassNames = 'border border-gray-300 p-2 rounded-md w-full'
   const errorClassNames = 'mt-1 text-sm text-red-600'
@@ -203,11 +205,11 @@ export const Default: StoryFn<{ address: PartialAddress }> = (args) => {
           </BillingAddressForm>
           <SaveAddressesButton
             label='Save Address'
-            className='px-3 py-2 rounded bg-green-500 text-white disabled:opacity-50'
+            className='px-3 py-2 rounded bg-green-600 text-white disabled:opacity-50'
             onClick={() => {
               alert('Address saved')
             }}
-            id={address?.id}
+            addressId={address?.id}
           />
         </AddressesContainer>
 
@@ -228,4 +230,4 @@ export const Default: StoryFn<{ address: PartialAddress }> = (args) => {
   )
 }
 
-Default.args = {}
+SampleAddressForm.args = {}
