@@ -184,7 +184,7 @@
     "@stripe/stripe-js": "^2.1.6",
     "@tanstack/react-table": "^8.10.3",
     "@types/iframe-resizer": "^3.5.10",
-    "axios": "^1.5.0",
+    "axios": "^1.6.2",
     "braintree-web": "^3.97.2",
     "frames-react": "^1.1.0",
     "iframe-resizer": "^4.3.7",

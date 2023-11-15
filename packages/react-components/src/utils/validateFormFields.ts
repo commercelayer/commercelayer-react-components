@@ -50,7 +50,7 @@ export const validateValue: ValidateValue = (val, name, type, resourceType) => {
     return {
       field: name,
       code: 'VALIDATION_ERROR',
-      message: `${name} - is not valid`,
+      message: `Please enter a valid email format`,
       resourceType
     }
   }
