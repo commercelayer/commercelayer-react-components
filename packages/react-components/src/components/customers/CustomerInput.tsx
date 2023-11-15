@@ -29,7 +29,7 @@ export function CustomerInput(props: Props): JSX.Element {
     errorClassName,
     ...p
   } = props
-  const { validation, values, errors } = useRapidForm({
+  const { validation, values, errors, setError } = useRapidForm({
     fieldEvent: 'blur'
   })
   const { saveCustomerUser, setCustomerErrors, setCustomerEmail } =
@@ -51,9 +51,11 @@ export function CustomerInput(props: Props): JSX.Element {
         if (setCustomerErrors) setCustomerErrors([])
       }
     } else {
-      // @ts-expect-error different types
-      if (setCustomerErrors) setCustomerErrors([checkValue])
-      setHasError(true)
+      const currentError = {
+        ...checkValue,
+        name: checkValue?.field
+      }
+      setError(currentError)
     }
   }
   useEffect(() => {
