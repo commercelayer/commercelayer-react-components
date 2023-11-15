@@ -4,6 +4,7 @@ import { type BaseInputComponentProps } from '#typings'
 import { useRapidForm } from 'rapid-form'
 import CustomerContext from '#context/CustomerContext'
 import { type BaseError, type CodeErrorType } from '#typings/errors'
+import { validateValue } from '#utils/validateFormFields'
 
 type Props = {
   name?: 'customer_email' | string
@@ -28,20 +29,27 @@ export function CustomerInput(props: Props): JSX.Element {
     errorClassName,
     ...p
   } = props
-  const { validation, values, errors } = useRapidForm({ fieldEvent: 'blur' })
+  const { validation, values, errors, setError } = useRapidForm({
+    fieldEvent: 'blur'
+  })
   const { saveCustomerUser, setCustomerErrors, setCustomerEmail } =
     useContext(CustomerContext)
   const [hasError, setHasError] = useState(false)
-  const handleOnBlur = async (): Promise<void> => {
-    if (
-      saveOnBlur &&
-      Object.keys(errors).length === 0 &&
-      Object.keys(values).length > 0
-    ) {
+  const handleOnBlur = async (
+    e:
+      | React.FocusEvent<HTMLInputElement, Element>
+      | React.FocusEvent<HTMLTextAreaElement, Element>
+  ): Promise<void> => {
+    const v = e?.target?.value
+    const checkValue = validateValue(v, name, type, 'customer_address')
+    const isValid = Object.keys(checkValue).length === 0
+    if (saveOnBlur && isValid && Object.keys(values).length > 0) {
       if (saveCustomerUser != null) {
         await saveCustomerUser(values[name].value)
         if (onBlur) onBlur(values[name].value)
       }
+    } else {
+      setError(checkValue)
     }
   }
   useEffect(() => {
@@ -81,8 +89,8 @@ export function CustomerInput(props: Props): JSX.Element {
       required={required}
       placeholder={placeholder}
       defaultValue={value}
-      onBlur={() => {
-        void handleOnBlur()
+      onBlur={(e) => {
+        void handleOnBlur(e)
       }}
       className={classNameComputed}
       {...p}
