@@ -29,7 +29,7 @@ export function CustomerInput(props: Props): JSX.Element {
     errorClassName,
     ...p
   } = props
-  const { validation, values, errors, setError } = useRapidForm({
+  const { validation, values, errors } = useRapidForm({
     fieldEvent: 'blur'
   })
   const { saveCustomerUser, setCustomerErrors, setCustomerEmail } =
@@ -41,15 +41,19 @@ export function CustomerInput(props: Props): JSX.Element {
       | React.FocusEvent<HTMLTextAreaElement, Element>
   ): Promise<void> => {
     const v = e?.target?.value
-    const checkValue = validateValue(v, name, type, 'customer_address')
+    const checkValue = validateValue(v, name, type, 'orders')
     const isValid = Object.keys(checkValue).length === 0
     if (saveOnBlur && isValid && Object.keys(values).length > 0) {
       if (saveCustomerUser != null) {
         await saveCustomerUser(values[name].value)
         if (onBlur) onBlur(values[name].value)
+        setHasError(false)
+        if (setCustomerErrors) setCustomerErrors([])
       }
     } else {
-      setError(checkValue)
+      // @ts-expect-error different types
+      if (setCustomerErrors) setCustomerErrors([checkValue])
+      setHasError(true)
     }
   }
   useEffect(() => {
