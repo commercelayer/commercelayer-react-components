@@ -34,24 +34,24 @@ export type ValidateValue = <
   val: V,
   name: N,
   type: T,
-  resourceType: B
+  resource: B
 ) => BaseError | Record<string, any>
 
-export const validateValue: ValidateValue = (val, name, type, resourceType) => {
+export const validateValue: ValidateValue = (val, name, type, resource) => {
   if (!val) {
     return {
       field: name,
       code: 'VALIDATION_ERROR',
       message: `${name} - is required`,
-      resourceType
+      resource
     }
   }
   if (type === 'email' && isString(val) && !val.match(EMAIL_PATTERN)) {
     return {
       field: name,
       code: 'VALIDATION_ERROR',
-      message: `Please enter a valid email format`,
-      resourceType
+      message: `please enter a valid format`,
+      resource
     }
   }
   return {}
