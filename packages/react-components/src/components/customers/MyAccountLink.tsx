@@ -39,6 +39,8 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
  * <span title="Requirement" type="warning">
  * Must be a child of the `<CustomerContainer>` component. <br />
  * </span>
+ *
+ * @link https://github.com/commercelayer/mfe-my-account
  */
 export function MyAccountLink(props: Props): JSX.Element {
   const { label = 'Go to my account', children, customDomain, ...p } = props

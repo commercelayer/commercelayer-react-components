@@ -25,5 +25,5 @@ Default.args = {
   label: 'Go to cart',
   target: '_blank',
   onClick: () => {},
-  className: 'underline hover:text-blue-500'
+  className: 'text-blue-500 hover:underline'
 }
