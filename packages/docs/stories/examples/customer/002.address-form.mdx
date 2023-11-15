@@ -1,0 +1,91 @@
+import { Meta, Canvas, Source } from '@storybook/addon-docs';
+import * as Stories from './002.address-form.stories.tsx'
+
+<Meta of={Stories} />
+
+## The new address form
+
+To allow the customer to add a new `customer_address`, we can build an `Add new address` form, using the following components:
+
+- `BillingAddressForm`
+- `AddressInput`
+- `AddressCountrySelector`
+- `AddressStateSelector`
+- `SaveAddressesButton`
+
+<span title="Core API" type="info">
+  The form will create a new resource `address` and a new `customer_address` relationship with the `customer` resource.
+
+  To better understand the logic behind the form, be sure to be familiar with the following resources:
+  - [Customers](https://docs.commercelayer.io/api/resources/customers/object)
+  - [Addresses](https://docs.commercelayer.io/api/resources/addresses/object)
+  - [Customer Addresses](https://docs.commercelayer.io/core/v/api-reference/customer_addresses/object)
+</span>
+
+The `BillingAddressForm` component is demanded to setup the form related provider and context, enabling children components to interact with them.
+<span title="Requirements" type="warning">
+  It needs to be wrapped inside an `<AddressesContainer>` component so it will know where to save the address data.
+
+  This means the our form will be structured as follows:
+  <Source dark code={`
+  <CommerceLayer accessToken='customer-orders-access-token'>
+    <CustomerContainer>
+      <AddressesContainer>
+        <BillingAddressForm>
+          // ...fields
+        </BillingAddressForm>
+        <SaveAddressesButton />
+      </AddressesContainer>
+    <CustomerContainer />
+  </CommerceLayer>
+    `} language='jsx' /> 
+</span>
+
+For each address field that needs to be saved there will be a form field component along with its related `Errors` block.
+
+To render the field inputs we will use the following components: `AddressInput`, `AddressCountrySelector` and `AddressStateSelector`
+
+### Code implementation
+The following block of code implements all the components described above and is ready to be used in your project.
+
+Every time submit the form, a new `address` will be created and listed in the recap underneath (the `<Address>` component).
+
+<Canvas of={Stories.SampleAddressForm} />
+
+
+<span title="The &lt;Errors&gt; component" type="info">
+  As you might notice, every input has a correspondant `Errors` component that is used to print validation error during form submition.
+
+  This component is tied up to a specific resource and field, so it will print the error only if the field is invalid, for that specific resource.
+
+  For example `<Errors resource='billing_address' field='billing_address_phone' />` will print the error messages only if the `billing_address_phone` field is invalid.
+  <br /> 
+  It's possibile to customize/localize the error message by passing a `messages` prop to the component, as the following example shows:
+
+  <Source dark code={`
+  <Errors
+    resource='billing_address'
+    field='billing_address_phone'
+    messages={[
+      {
+        code: 'EMPTY_ERROR',
+        resource: 'billing_address',
+        field: 'billing_address_phone',
+        message: 'Cannot be blank'
+      },
+      {
+        code: 'VALIDATION_ERROR',
+        resource: 'billing_address',
+        field: 'billing_address_phone',
+        message: 'Must be valid email'
+      }
+    ]}
+  />
+  `} language='jsx' />
+
+  This logic is applied to all fields that need to be validated, for both `EMPTY_ERROR` and `VALIDATION_ERROR` code.
+  <br />
+  <strong>
+  To simplify the form example in this page, we omitted the `messages` prop for all `<Errors>`, but you can just copy the example above and implement it for every field.
+  </strong>
+</span>

@@ -30,6 +30,24 @@ type Props = Omit<BaseSelectComponentProps, 'options' | 'name'> & {
   states?: States
 } & Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'>
 
+/**
+ * The AddressInput component creates a form `select` related to the `state_code` attribute of the `address` object.
+ *
+ * It requires a `name` prop to define the field name associated with the select and accepts most of HTML `select` tag standard props.
+ *
+ * <span title="Name prop" type="info">
+ * The `name` prop must respect the convention of mentioning one of the available addresses forms (`billing_address` or `shipping_address`) concatenated to the `state_code` address attribute with a `_` separator. Eg.: `billing_address_state_code`.
+ * </span>
+ *
+ * <span title="Requirement" type="warning">
+ * It must to be used inside either the `<BillingAddressForm>` or the `<ShippingAddressForm>` component.
+ * </span>
+ *
+ * <span title="Fields" type="info">
+ * Check the `addresses` resource from our [Core API documentation](https://docs.commercelayer.io/core/v/api-reference/addresses/object)
+ * for more details about the available attributes to render.
+ * </span>
+ */
 export function AddressStateSelector(props: Props): JSX.Element {
   const {
     required = true,

@@ -43,6 +43,21 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
   customDomain?: string
 }
 
+/**
+ * This component generates a link to the hosted mfe-identity application.
+ *
+ * In this way you can connect your shop application with our hosted micro-frontend and let your customers manage their account with zero code.
+ *
+ * <span title="Requirement" type="warning">
+ * Must be a child of the `<CommerceLayer>` component.
+ * </span>
+ *
+ * <span title="My Identity" type="info">
+ * The Commerce Layer Identity micro frontend (React) provides you with an application, powered by Commerce Layer APIs, handling customer login and sign-up functionalities
+ * </span>
+ *
+ * @link https://github.com/commercelayer/mfe-identity
+ */
 export function MyIdentityLink(props: Props): JSX.Element {
   const {
     label,

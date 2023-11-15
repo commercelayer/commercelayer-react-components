@@ -26,6 +26,8 @@ const storybookConfig: StorybookConfig = {
     '@storybook/addon-interactions',
     '@storybook/addon-mdx-gfm'
   ],
+  // @ts-expect-error This 'managerEntries' exists.
+  managerEntries: [require.resolve('./addon-gh-repository/manager.tsx')],
   framework: {
     name: '@storybook/react-vite',
     options: {}

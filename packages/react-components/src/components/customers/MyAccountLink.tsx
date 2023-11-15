@@ -32,6 +32,16 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
   customDomain?: string
 }
 
+/**
+ * This component generates a link to the hosted mfe-my-account application.
+ * In this way you can connect your shop application with our hosted micro-frontend and let your customers manage their account with zero code.
+ *
+ * <span title="Requirement" type="warning">
+ * Must be a child of the `<CustomerContainer>` component. <br />
+ * </span>
+ *
+ * @link https://github.com/commercelayer/mfe-my-account
+ */
 export function MyAccountLink(props: Props): JSX.Element {
   const { label = 'Go to my account', children, customDomain, ...p } = props
   const { accessToken, endpoint } = useContext(CommerceLayerContext)

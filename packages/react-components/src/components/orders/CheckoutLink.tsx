@@ -13,10 +13,25 @@ interface ChildrenProps extends Omit<Props, 'children'> {
 
 interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
   children?: ChildrenFunction<ChildrenProps>
+  /**
+   * Label for the checkout link
+   */
   label?: string
+  /**
+   * Ignores `order.checkout_url` and redirects to the hosted checkout micro-frontend.
+   * @default true
+   */
   hostedCheckout?: boolean
 }
 
+/**
+ * This component generates a link to the hosted mfe-checkout application.
+ * In this way you can connect your shop application with our hosted micro-frontend.
+ *
+ * By default it will takes the customer to our hosted checkout micro-frontend,
+ * but if `hostedCheckout` is set as `false` it will use the `checkout_url` attribute
+ * found in the `order` object.
+ */
 export function CheckoutLink(props: Props): JSX.Element {
   const { label, hostedCheckout = true, children, ...p } = props
   const { order } = useContext(OrderContext)

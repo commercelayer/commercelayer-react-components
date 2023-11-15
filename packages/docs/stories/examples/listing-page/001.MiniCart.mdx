@@ -1,0 +1,10 @@
+import { Meta, Canvas } from '@storybook/addon-docs';
+import * as Stories from './001.MiniCart.stories.tsx'
+
+<Meta of={Stories} />
+
+## Using mini cart
+From the previous example, we can replace the cart-recap gray block at the bottom of the page 
+with the `<HostedCart type="mini" openAdd />` component to open a mini cart every time a new item is added.
+
+<Canvas of={Stories.WithMiniCart} />

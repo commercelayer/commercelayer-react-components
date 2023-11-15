@@ -30,7 +30,25 @@ interface Props {
 }
 
 /**
- * The CustomerContainer component manages the customer state.
+ * Main container for the Customers components.
+ * It stores - in its context - the details of an active customer, if present.
+ *
+ * It also accept a `isGuest` prop to define if no customer is currently set as active.
+ *
+ * <span title='Requirements' type='warning'>
+ * Must be a child of the `<CommerceLayer>` component.
+ * </span>
+ * <span title='Children' type='info'>
+ * `<CustomerField>`,
+ * `<CustomerInput>`,
+ * `<SaveCustomerButton>`,
+ * `<AddressesContainer>`,
+ * `<AddressesEmpty>`,
+ * `<CustomerPaymentSource>`,
+ * `<CustomerPaymentSourceEmpty>`,
+ * `<PaymentMethodsContainer>`,
+ * `<OrdersList>`
+ * </span>
  */
 export function CustomerContainer(props: Props): JSX.Element {
   const { children, isGuest } = props

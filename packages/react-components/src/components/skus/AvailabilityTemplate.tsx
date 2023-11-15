@@ -14,15 +14,16 @@ interface AvailabilityTemplateChildrenProps
 type FormatRules =
   | {
       /**
-       * Set time format for shipping method
+       * Set time format for shipping method. When not set, ``delivery_lead_times`` will not be displayed.
+       * When set, `delivery_lead_times` for the first shipping method found in the inventory model, will be displayed in the format specified.
        */
       timeFormat?: TimeFormat
       /**
-       * Show shipping method name
+       * Show shipping method name. Requires `timeFormat` to be set.
        */
       showShippingMethodName?: false
       /**
-       * Show shipping method price
+       * Show shipping method price. Requires `timeFormat` to be set.
        */
       showShippingMethodPrice?: false
     }
@@ -47,6 +48,18 @@ type Props = {
 } & Omit<JSX.IntrinsicElements['span'], 'children'> &
   FormatRules
 
+/**
+ * The AvailabilityTemplate component displays the availability of the SKU specified
+ * in the parent `<AvailabilityContainer>` component.
+ *
+ * It is possible to customize the text displayed in case of `available`, `outOfStock` or `negativeStock.
+ * It is also possible to show delivery lead time and either shipping method name and/or price.
+ * This information will be retrieve from the first shipping method found in the inventory model.
+ *
+ * <span type="Requirement" type="info">
+ * It must to be used inside the `<AvailabilityContainer>` component.
+ * </span>
+ */
 export function AvailabilityTemplate(props: Props): JSX.Element {
   const {
     timeFormat,

@@ -13,9 +13,21 @@ type TCondition = ConditionalElement<Exclude<TResources['Sku'], 'resource'>>
 type Props = {
   children?: (props: SkuFieldChildrenProps) => JSX.Element
 } & TCondition
+
 /**
- * @param props {@link Props}
- * @returns
+ * The SkuField component displays any attribute of the `sku` specified in the parent `<SkusContainer>` component.
+ *
+ * It also accepts a `tagElement` props to enable specific tag-related props.
+ * For examples, when `tagElement` is set to `img` it will also accept props related to `<img>` tag such as `height` and `width`.
+ *
+ * <span title="Requirement" type="warning">
+ * It must to be used inside the `<SkusContainer>` component.
+ * </span>
+ *
+ * <span title="Fields" type="info">
+ * Check the `skus` resource from our [Core API documentation](https://docs.commercelayer.io/core/v/api-reference/skus/object)
+ * for more details about the available attributes to render.
+ * </span>
  */
 export function SkuField<P extends Props>(props: P): JSX.Element {
   const { attribute, tagElement = 'span', children, ...p } = props

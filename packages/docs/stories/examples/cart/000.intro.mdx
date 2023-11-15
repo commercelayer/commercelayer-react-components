@@ -1,0 +1,45 @@
+import { Meta, Source } from '@storybook/addon-docs';
+
+<Meta title='Examples/Shopping Cart/Introduction' />
+
+# Shopping cart
+
+This guide will show you how to create a shopping cart page using this library.
+
+Usually a cart page is structured with a first section dedicated to the **list of items** and a second section dedicated to the **totals**.
+
+<span title="Before proceeding" type="warning">
+Our Core API defines the cart as `draft order`. Before proceeding, make sure you understand the following concepts:
+
+- <a href="https://commercelayer.io/docs/data-model/anatomy-of-an-order" target="_blank">Anatomy of an order</a>.
+- <a href="https://docs.commercelayer.io/core/v/how-tos/placing-orders/shopping-cart/create-a-shopping-cart" target="_blank">The Shopping cart</a>.
+</span>
+
+## Code implementation
+
+- Since the cart is an `order` with `draft` status, we need to start with the `<OrderContainer>` components as it will hold the order context.
+- The `<OrderContainer>` needs to receive the `orderId` as prop, but when wrapped inside the `<OrderStorage>` component it will receive it automatically from the latter by reading it from the `localStorage`.
+- Inside the main order context (`<OrderContainer>`), we can mount the components to list the `line_items` and the totals.
+- To list the `line_items` we can use the `<LineItemsContainer>` and the `<LineItem>` component to render each line item.
+
+
+
+<span title="<LineItem>" type="info">
+There is no need to iterate over the `line_items`, the `<LineItemsContainer>` will do it for you 
+and will render a `<LineItem>` component for each line item found in the order.
+So consider this component as a template for each line item.
+</span>
+
+
+<span title="Gift cards and Coupons" type="info">
+It's possible to add gift cards and coupons to the cart (order) using the following components: 
+  <Source dark code={`
+<GiftCardOrCouponForm>
+  <GiftCardOrCouponInput />
+  <GiftCardOrCouponSubmit />
+</GiftCardOrCouponForm>
+  `} language='jsx' />
+ 
+</span>
+
+

@@ -13,6 +13,9 @@
   "[typescriptreact]": {
     "editor.formatOnSave": false
   },
+  "[mdx]": {
+    "editor.formatOnSave": false
+  },
   "javascript.format.enable": true,
   "eslint.workingDirectories": [
     "packages/react-components",

@@ -17,9 +17,38 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 
 interface Props {
   children: ReactNode
+  /**
+   * If true, the shipping address will be considered. Default is false.
+   */
   shipToDifferentAddress?: boolean
+  /**
+   * If true, the address will be considered a business address.
+   */
   isBusiness?: boolean
 }
+
+/**
+ * Main container for the Addresses components.
+ * It provides demanded functionalities to show/manage an address or a series of addresses depending on the context in use.
+ * In addition it provides order oriented functionalities to manage billing and shipping addresses.
+ *
+ * It accept:
+ * - a `shipToDifferentAddress` prop to define if the order related shipping address will be different from the billing one.
+ * - a `isBusiness` prop to define if the current address needs to be threated as a `business` address during creation/update.
+ *
+ * <span title='Requirements' type='warning'>
+ * Must be a child of the `<CommerceLayer>` component.
+ * </span>
+ * <span title='Children' type='info'>
+ * `<BillingAddressContainer>`,
+ * `<BillingAddressForm>`,
+ * `<ShippingAddressContainer>`,
+ * `<ShippingAddressForm>`,
+ * `<CustomerAddressForm>`,
+ * `<AddressesEmpty>`,
+ * `<Addresses>`
+ * </span>
+ */
 export function AddressesContainer(props: Props): JSX.Element {
   const { children, shipToDifferentAddress = false, isBusiness } = props
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)

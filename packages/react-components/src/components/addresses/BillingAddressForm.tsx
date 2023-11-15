@@ -12,10 +12,30 @@ import { getSaveBillingAddressToAddressBook } from '#utils/localStorage'
 
 type Props = {
   children: ReactNode
+  /**
+   * Define if current form needs to be reset over a defined boolean condition
+   */
   reset?: boolean
+  /**
+   * Define children input and select classnames assigned in case of validation error.
+   */
   errorClassName?: string
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
+/**
+ * Form container for creating or editing an order related billing address or a customer address, depending on the context in use.
+ *
+ * <span title='Requirements' type='warning'>
+ * Must be a child of the `<AddressesContainer>` component.
+ * Can optionally be a child of the `<OrderContainer>` component, when it needs to be used in the checkout process and store the billing address in the order object.
+ * </span>
+ * <span title='Children' type='info'>
+ * `<AddressInput>`,
+ * `<AddressCountrySelector>`,
+ * `<AddressStateSelector>`,
+ * `<SaveAddressesButton>`
+ * </span>
+ */
 export function BillingAddressForm(props: Props): JSX.Element {
   const {
     children,

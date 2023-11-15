@@ -9,11 +9,36 @@ import { businessMandatoryField } from '#utils/validateFormFields'
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
 
 type Props = {
+  /**
+   * The name of the input.
+   */
   name: Extract<AddressValuesKeys, AddressInputName>
+  /**
+   * Used to add a custom validation rule.
+   */
+  pattern?: RegExp | string
 } & Omit<BaseInputComponentProps, 'name'> &
   JSX.IntrinsicElements['input'] &
   Omit<JSX.IntrinsicElements['textarea'], 'children'>
 
+/**
+ * The AddressInput component creates a form `input` related to a particular address attribute.
+ *
+ * It requires a `name` prop to define the field name associated with the input and accepts most of HTML `input` tag standard props.
+ *
+ * <span title="Name prop" type="info">
+ * The `name` prop must respect the convention of mentioning one of the available addresses forms (`billing_address` or `shipping_address` or `customer_address`) concatenated to the address attribute name with a `_` separator. Eg.: `billing_address_first_name`.
+ * </span>
+ *
+ * <span title="Requirement" type="warning">
+ * It must to be used inside either the `<BillingAddressForm>` or the `<ShippingAddressForm>` component.
+ * </span>
+ *
+ * <span title="Fields" type="info">
+ * Check the `addresses` resource from our [Core API documentation](https://docs.commercelayer.io/core/v/api-reference/addresses/object)
+ * for more details about the available attributes to render.
+ * </span>
+ */
 export function AddressInput(props: Props): JSX.Element | null {
   const { placeholder = '', required, value, className, ...p } = props
   const billingAddress = useContext(BillingAddressFormContext)

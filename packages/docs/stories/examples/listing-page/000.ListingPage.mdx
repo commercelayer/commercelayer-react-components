@@ -1,0 +1,73 @@
+import { Meta, Source, Canvas } from '@storybook/addon-docs';
+import * as Stories from './000.ListingPage.stories.tsx'
+
+<Meta of={Stories} />
+
+# Listing Page
+
+This guide will explain how to render a list of skus with prices, availability, and add to cart buttons.
+
+As first thing, it uses both `<OrderStorage>` and `<OrderContainer>` to manage the state of the cart (remember that for us, the cart is a draft order).
+In this way the `<AddToCartButton>` knows to which order it should add the sku.
+
+<Source language='jsx' dark code={`
+<OrderStorage persistKey='my-localStorage-key'>
+  <OrderContainer>
+    // ...rest of the app
+  </OrderContainer>
+</OrderStorage>
+`} />
+
+
+The presentational part of the skus is handled with `<SkusContainer>` and `<Skus>` components.
+<Source language='jsx' dark code={`
+<OrderStorage>
+  <OrderContainer>
+
+    <SkusContainer skus=[...skusToShow]>
+      <Skus>
+        <div>
+          // template used to render each sku
+        </div>
+      </Skus>
+    </SkusContainer>
+
+  </OrderContainer>
+</OrderStorage>
+`} />
+
+
+Inside the `<Skus>` component we load all other components that are needed to render the skus,
+including the `<AvailabilityContainer>`, the `<PricesContainer>` and the `<AddToCartButton>`.
+
+<span title='Notice' type='info'>
+Please note that we don't need to loop though the `skus` array. The content will be rendered for each sku passed to our `SkusContainer`.
+</span>
+
+<Source language='jsx' dark code={`
+<Skus>
+  <SkuField attribute="image_url">
+  <SkuField attribute="name">
+
+  <PricesContainer> // <-- gets current sku_code from <SkusContainer>
+    <Price/>
+  </PricesContainer>
+  
+  <AvailabilityContainer> // <-- gets current sku_code from <SkusContainer>
+    <AvailabilityTemplate/>
+  </AvailabilityContainer>
+  
+  <AddToCardButton /> // <-- gets current sku_code from <SkusContainer> and will add new line_items to the <OrderContainer>
+</Skus>
+`} />
+
+
+To complete the example, we added a final block to the page that rapresent the items added to the cart (using `<LineItemsContainer>`).
+In this way you will be able to see a full interaction between nested contexts (OrderContainer and SkuContainer).
+
+
+### Full page example
+
+Here you can see the final example that applies the block explained above, ready to be used in your application.
+
+<Canvas of={Stories.Default} />

@@ -93,31 +93,53 @@ const defaultStyle = {
 interface Props
   extends Omit<JSX.IntrinsicElements['div'], 'children' | 'style'> {
   /**
+   * The style of the cart.
+   */
+  style?: Styles
+  /**
+   * The domain of your forked application.
+   */
+  customDomain?: string
+  /**
    * The type of the cart. Defaults to undefined.
    */
   type?: 'mini'
   /**
    * If true, the cart will open when a line item is added to the order clicking the add to cart button. Defaults to false.
+   * Works only with the `type` prop set to `mini`.
    */
   openAdd?: boolean
   /**
-   * The style of the cart.
-   */
-  style?: Styles
-  /**
    * If true, the cart will be open. Defaults to false.
+   * Works only with the `type` prop set to `mini`.
    */
   open?: boolean
   /**
    * A function that will be called when the cart is open and the background is clicked.
+   * Works only with the `type` prop set to `mini`.
    */
   handleOpen?: () => void
-  /**
-   * The domain of your forked application.
-   */
-  customDomain?: string
 }
 
+/**
+ * This component allows to embed the cart application in your page as an `<iframe>`.
+ *
+ * By default, it will be rendered as inline cart and its content will fit the available container width
+ * while the height will be automatically adjusted to the content.
+ *
+ * Or it can work as mini cart - when `type` prop is set to `mini` - and it will be opened in a modal (popup).
+ *
+ * <span title="Requirement" type="warning">
+ * Must be a child of the `<OrderContainer>` component.
+ * </span>
+ *
+ * <span title="Mini cart" type="info">
+ * When set as `mini` cart, it requires the `<CartLink type='mini' />` component to be on the same page,
+ * to show the cart when clicked. <br />
+ * View the `<CartLink />` component documentation for more details and examples.
+ * </span>
+ *
+ */
 export function HostedCart({
   type,
   openAdd = false,

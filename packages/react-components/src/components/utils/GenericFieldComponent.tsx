@@ -54,7 +54,13 @@ type GenericContext<K extends keyof ResourceContext> = Context<
 interface Props<E extends TResources[keyof TResources]> {
   children?: (props: TGenericChildrenProps<E>) => JSX.Element
   resource: E['resource']
+  /**
+   * Resource attribute to display.
+   */
   attribute: keyof E
+  /**
+   * Html tag to render. When tag is `img` the value will be used to fill the `src` attribute.
+   */
   tagElement: keyof JSX.IntrinsicElements
   context: GenericContext<E['resource']>
 }

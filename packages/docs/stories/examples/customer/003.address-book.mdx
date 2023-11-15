@@ -1,0 +1,110 @@
+
+import { Meta, Canvas, Source } from '@storybook/addon-docs';
+import * as Stories from './003.address-book.stories.tsx'
+
+<Meta of={Stories} />
+
+## The customer address book
+
+The customer address book is a page that allows to list, create, update and delete addresses related to a customer.
+It uses some components we have already seen in the previous examples, such as `CommerceLayer`, `CustomerContainer` and `AddressesContainer`.
+
+The main `CommerceLayer` component is needed to be setup with a valid customer access token in order to be able to read customer information.
+
+Then thanks to the `CustomerContainer` it will be possible to initialize and access the customer context to provide it to children components.
+
+At last the `AddressesContainer` is demanded to setup the addresses related provider and context enabling required management states and methods.
+
+<Source dark code={`
+<CommerceLayer accessToken='customer-orders-access-token'>
+  <CustomerContainer>
+    <AddressesContainer>
+      - list of addresses or empty state  (create / edit / delete buttons)
+      - address form (for edit and create actions)
+    </AddressesContainer>
+  <CustomerContainer />
+</CommerceLayer>
+  `} language='jsx' /> 
+
+
+### The list of addresses
+The list is composed by these components:  `<AddressesEmpty>` (optional), `Address` and `AddressField`.
+
+The `<AddressesEmpty>` component is demanded to show a default or custom message in case any customer address is available.
+
+The `<Address>` component will read customer addresses from the context and will loop over to generate a list of elements to enable their children the ability to focus on one single address object.
+
+Inside the `<Address>` it will be possible to use some `<AddressField>` components to render any requested attribute of an `address` resource.
+
+<span title='Notice' type='info'>
+Please note that we don't need to loop though the `addresses` array. The content will be rendered for each address passed to our `<Address>` component.
+</span>
+
+To build the list of all saved address, we will use the following structure.
+<Source dark code={`
+<CommerceLayer accessToken='customer-orders-access-token'>
+  <CustomerContainer>
+    <AddressesContainer>
+      <AddressesEmpty emptyText='No addresses found' />
+      <Address>
+        // the elements used as children of '<Address>' will be used as template 
+        // to list all customer_addresses found in the context
+        <AddressField name='first_name' />
+        <AddressField name='last_name' />
+        <AddressField name='full_address' />
+        <AddressField type='edit' label='Edit address' onClick={handleEditAddressForm} />
+        <AddressField type='delete' label='Delete address' />
+      </Address>
+    </AddressesContainer>
+  <CustomerContainer />
+</CommerceLayer>
+  `} language='jsx' /> 
+
+
+### The address form
+The address form is composed by the same set of component we have already seen in the previous step,
+with the only difference that it will be used not only to create a new address but also to edit an existing one.
+
+We have already seen how to create a new address.
+
+<span title='Notice' type='info'>
+  To edit an existing address we just need to retrieve the `address` object we want to edit 
+  and pass each attribute as value for the corresponding `<AddressField>` component.
+  Then, to allow the `<SaveAddressesButton>` to update the address we just need to pass the `address.id` as value for the `addressId` prop.
+  <br />
+  We can get the `address` object to edit from the `<AddressField type='edit' />` component. It will be returned as argument of the `onClick` callback, 
+  ready to be stored in an internal React state.
+</span>
+
+Example:
+<Source dark code={`
+const [address, setAddress] = useState<Address | null>(null)
+
+return (
+  <AddressesContainer>
+    <Address>
+      // the onClick will return the address object to edit, so we can store it in an internal state
+      <AddressField type='edit' label='Edit address' onClick={(address) => setAddress(address)} />
+    </Address>
+    {address != null && (
+      // form is rendered once we have a valid address in our internal state, so we can pass values to our components 
+      <BillingAddressForm>
+        <AddressInput name='billing_address_first_name' value={address.first_name} />
+        <AddressInput name='billing_address_line_1' value={address.line_1} />
+
+        // addressId will be used to update the address instead of creating a new one
+        <SaveAddressesButton label='Save Address' addressId={address.id} /> 
+      </BillingAddressForm>
+    )}
+  </AddressesContainer>
+)
+`} language='tsx' /> 
+
+
+### Full code implementation
+The example below contains the full working code of the address book page connecting together 
+all the blocks described above.
+
+Feel free to add, remove or edit addresses as you are impersonating your customer.
+
+<Canvas of={Stories.Default} />

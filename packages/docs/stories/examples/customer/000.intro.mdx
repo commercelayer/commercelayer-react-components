@@ -1,0 +1,28 @@
+import { Meta } from '@storybook/addon-docs';
+ 
+<Meta title="Examples/Customer Account/Introdution"></Meta>
+
+# Building a customer account page
+
+This guide will show you how to create a customer `My Account` page using our `react-components` library.
+
+In general, the customer account page is a page where your customers can see and manage theirs personal information, addresses, orders, and so on.
+
+In order to access these info, the customer will need to be logged in. This means that you need to authenticate the `<CommerceLayer>` component with an access token
+that belogs to an user. 
+
+You can find more information about how to authenticate the `<CommerceLayer>` component in the [Authentication](/docs/getting-started-authentication--docs) section.
+
+In your project you might want to have everything related to the customer in one single page, in different sections of the same page, or even in different pages.
+But to better showcase the components we are going to use, we divided the customer account page in 3 sections:
+
+- Order list
+- Add new address form
+- Address address book
+
+<span title="Important" type="info">
+  Before jumping to the details for each section and see how our `react-components` can be used to build the customer account page, we recommend you to 
+  check our API reference and read more about the <a href="https://docs.commercelayer.io/core/v/api-reference/customers" target="_blank">customer object</a> 
+  and <a href="https://docs.commercelayer.io/core/v/api-reference/customers/list#relationships" target="_blank">its relationships</a>
+</span>
+

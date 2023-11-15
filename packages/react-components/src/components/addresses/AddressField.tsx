@@ -46,6 +46,28 @@ type Props =
       className?: string
     }
 
+/**
+ * The AddressField component displays any attribute of the `address` object set in the state of the parent `<Address>` component.
+ *
+ * It accepts a `name` prop to define the attribute to be shown.
+ * It also accepts:
+ * - a `type` props to enable different kind of behaviors like `field` (default), `edit` or `delete`.
+ * - a `label` props to show a custom label if chosen `type` is `edit` or `delete`.
+ * - an `onClick` props to define a custom click behavior.
+ *
+ * <span title="Type `delete`" type="info">
+ * Only in case `type` is set to `delete` a default `onClick` behavior will be set to manage current address removal.
+ * </span>
+ *
+ * <span title="Requirement" type="warning">
+ * It must to be used inside the `<Address>` component.
+ * </span>
+ *
+ * <span title="Fields" type="info">
+ * Check the `addresses` resource from our [Core API documentation](https://docs.commercelayer.io/core/v/api-reference/addresses/object)
+ * for more details about the available attributes to render.
+ * </span>
+ */
 export function AddressField(props: Props): JSX.Element {
   const { name, type = 'field', label, onClick, ...p } = props
   const { address } = useContext(AddressChildrenContext)

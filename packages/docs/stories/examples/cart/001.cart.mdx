@@ -1,0 +1,21 @@
+
+import { Meta, Canvas } from '@storybook/addon-docs';
+import * as Stories from './001.cart.stories.tsx'
+
+<Meta of={Stories} />
+
+## The cart page
+The following example shows how to create a shopping cart page using the components described above.
+
+To better remark the concepts just described, we grouped the components in 3 different sections:
+- Line items
+- Gift cards and coupons
+- Totals
+
+Again, all sections are wrapped inside the same `<OrderContainer>` component, which is the main order context.
+
+<span title="Coupon" type="info">
+Use `TEST-COUPON` to add a 10% discount code and see how the totals change.
+</span>
+
+<Canvas of={Stories.Default} />

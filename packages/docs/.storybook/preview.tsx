@@ -23,7 +23,35 @@ const parameters: Parameters = {
   },
   options: {
     storySort: {
-      order: ['Getting Started', 'Components', ['Prices', ['PricesContainer']]]
+      order: [
+        'Getting Started',
+        'Components',
+        [
+          'Skus',
+          ['SkusContainer', 'Skus'],
+          'Prices',
+          ['PricesContainer'],
+          'Availability',
+          ['AvailabilityContainer'],
+          'Orders',
+          ['OrderStorage', 'OrderContainer'],
+          'Cart',
+          ['AddToCartButton', 'HostedCart', 'CartLink', 'MiniCart'],
+          'Customers',
+          [
+            'CustomerContainer',
+            'CustomerField',
+            'AddressesContainer',
+            'AddressesEmpty',
+            'Address',
+            'AddressField',
+            'BillingAddressForm',
+            'MyAccountLink'
+          ]
+        ],
+        'Examples',
+        ['Listing Page', 'Shopping Cart', 'Checkout Page', 'My Account']
+      ]
     }
   },
   docs: {
