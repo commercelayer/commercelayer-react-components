@@ -43,14 +43,13 @@ export function CustomerInput(props: Props): JSX.Element {
     const v = e?.target?.value
     const checkValue = validateValue(v, name, type, 'orders')
     const isValid = Object.keys(checkValue).length === 0
-    if (saveOnBlur && isValid && Object.keys(values).length > 0) {
+    if (saveOnBlur && Object.keys(values).length > 0) {
       if (saveCustomerUser != null) {
         await saveCustomerUser(values[name].value)
         if (onBlur) onBlur(values[name].value)
-        setHasError(false)
-        if (setCustomerErrors) setCustomerErrors([])
       }
-    } else {
+    }
+    if (!isValid) {
       const currentError = {
         ...checkValue,
         name: checkValue?.field
@@ -75,10 +74,12 @@ export function CustomerInput(props: Props): JSX.Element {
         setHasError(true)
         if (setCustomerErrors) setCustomerErrors(formErrors)
       }
-    } else if (Object.keys(values).length > 0) {
+    } else {
       if (setCustomerErrors) setCustomerErrors([])
-      if (setCustomerEmail) setCustomerEmail(values[name].value)
       setHasError(false)
+    }
+    if (Object.keys(values).length > 0) {
+      if (setCustomerEmail) setCustomerEmail(values[name].value)
     }
     return () => {
       setHasError(false)
