@@ -6,10 +6,8 @@ import { type BaseError } from '#typings/errors'
 import { addressFields } from '#reducers/AddressReducer'
 import {
   type OrderUpdate,
-  type Address,
-  type AddressCreate,
   type Order,
-  type CommerceLayerClient
+  type CommerceLayerClient,
   type LineItem,
   type Address,
   type AddressCreate

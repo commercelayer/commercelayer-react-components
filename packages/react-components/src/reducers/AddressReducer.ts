@@ -192,34 +192,12 @@ export async function saveAddresses({
           shippingAddress,
           shippingAddressId,
           sdk
-      const doNotShipItems = order?.line_items?.every(
-        // @ts-expect-error no type for do_not_ship on SDK
-        (lineItem) => lineItem?.item?.do_not_ship === true
-      )
-      const currentBillingAddressRef = order?.billing_address?.reference
-      const orderAttributes: OrderUpdate = {
-        id: order?.id,
-        _billing_address_clone_id: billingAddressId,
-        _shipping_address_clone_id: billingAddressId,
-        customer_email: customerEmail
-      }
-      if (currentBillingAddressRef === billingAddressId) {
-        orderAttributes._billing_address_clone_id = order?.billing_address?.id
-        orderAttributes._shipping_address_clone_id = order?.shipping_address?.id
-      }
-      if (billingAddress != null && Object.keys(billingAddress).length > 0) {
-        delete orderAttributes._billing_address_clone_id
-        delete orderAttributes._shipping_address_clone_id
-        if (!doNotShipItems) {
-          orderAttributes._shipping_address_same_as_billing = true
-        }
-        const hasMetadata = Object.keys(billingAddress).filter((key) => {
-          if (key.startsWith('metadata_')) {
-            return true
-          }
-          return false
         })
       } else {
+        const doNotShipItems = order?.line_items?.every(
+          // @ts-expect-error no type for do_not_ship on SDK
+          (lineItem) => lineItem?.item?.do_not_ship === true
+        )
         const currentBillingAddressRef = order?.billing_address?.reference
         orderAttributes = {
           id: order?.id,
@@ -235,39 +213,31 @@ export async function saveAddresses({
         if (billingAddress != null && Object.keys(billingAddress).length > 0) {
           delete orderAttributes._billing_address_clone_id
           delete orderAttributes._shipping_address_clone_id
-          orderAttributes._shipping_address_same_as_billing = true
-          const hasMetadata = Object.keys(billingAddress).filter((key) => {
-            if (key.startsWith('metadata_')) {
-              return true
-            }
-            return false
-          })
-          if (hasMetadata?.length > 0) {
-            hasMetadata.forEach((key) => {
-              const metadataKey = key.replace('metadata_', '')
-              billingAddress.metadata = {
-                ...(billingAddress.metadata || {}),
-                [metadataKey]: billingAddress[key]
-              }
-              // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-              delete billingAddress[key]
-            })
+          if (!doNotShipItems) {
+            orderAttributes._shipping_address_same_as_billing = true
           }
-          const address = await sdk.addresses.create(billingAddress)
-          orderAttributes.billing_address = sdk.addresses.relationship(
-            address.id
-          )
-        }
-        if (shipToDifferentAddress) {
-          delete orderAttributes._shipping_address_same_as_billing
-          if (shippingAddressId)
-            orderAttributes._shipping_address_clone_id = shippingAddressId
+        } else {
+          const currentBillingAddressRef = order?.billing_address?.reference
+          orderAttributes = {
+            id: order?.id,
+            _billing_address_clone_id: billingAddressId,
+            _shipping_address_clone_id: billingAddressId,
+            customer_email: customerEmail
+          }
+          if (currentBillingAddressRef === billingAddressId) {
+            orderAttributes._billing_address_clone_id =
+              order?.billing_address?.id
+            orderAttributes._shipping_address_clone_id =
+              order?.shipping_address?.id
+          }
           if (
-            shippingAddress != null &&
-            Object.keys(shippingAddress).length > 0
+            billingAddress != null &&
+            Object.keys(billingAddress).length > 0
           ) {
+            delete orderAttributes._billing_address_clone_id
             delete orderAttributes._shipping_address_clone_id
-            const hasMetadata = Object.keys(shippingAddress).filter((key) => {
+            orderAttributes._shipping_address_same_as_billing = true
+            const hasMetadata = Object.keys(billingAddress).filter((key) => {
               if (key.startsWith('metadata_')) {
                 return true
               }
@@ -276,18 +246,50 @@ export async function saveAddresses({
             if (hasMetadata?.length > 0) {
               hasMetadata.forEach((key) => {
                 const metadataKey = key.replace('metadata_', '')
-                shippingAddress.metadata = {
-                  ...(shippingAddress.metadata || {}),
-                  [metadataKey]: shippingAddress[key]
+                billingAddress.metadata = {
+                  ...(billingAddress.metadata || {}),
+                  [metadataKey]: billingAddress[key]
                 }
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                delete shippingAddress[key]
+                delete billingAddress[key]
               })
             }
-            const address = await sdk.addresses.create(shippingAddress)
-            orderAttributes.shipping_address = sdk.addresses.relationship(
+            const address = await sdk.addresses.create(billingAddress)
+            orderAttributes.billing_address = sdk.addresses.relationship(
               address.id
             )
+          }
+          if (shipToDifferentAddress) {
+            delete orderAttributes._shipping_address_same_as_billing
+            if (shippingAddressId)
+              orderAttributes._shipping_address_clone_id = shippingAddressId
+            if (
+              shippingAddress != null &&
+              Object.keys(shippingAddress).length > 0
+            ) {
+              delete orderAttributes._shipping_address_clone_id
+              const hasMetadata = Object.keys(shippingAddress).filter((key) => {
+                if (key.startsWith('metadata_')) {
+                  return true
+                }
+                return false
+              })
+              if (hasMetadata?.length > 0) {
+                hasMetadata.forEach((key) => {
+                  const metadataKey = key.replace('metadata_', '')
+                  shippingAddress.metadata = {
+                    ...(shippingAddress.metadata || {}),
+                    [metadataKey]: shippingAddress[key]
+                  }
+                  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                  delete shippingAddress[key]
+                })
+              }
+              const address = await sdk.addresses.create(shippingAddress)
+              orderAttributes.shipping_address = sdk.addresses.relationship(
+                address.id
+              )
+            }
           }
         }
       }
