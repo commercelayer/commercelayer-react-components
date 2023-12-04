@@ -3,6 +3,7 @@ import getAmount from '#utils/getAmount'
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import Parent from '#components/utils/Parent'
 import { type BaseAmountComponent, type BasePriceType } from '#typings/index'
+import LineItemBundleChildrenContext from '#context/LineItemBundleChildrenContext'
 
 type Props = BaseAmountComponent & {
   type?: BasePriceType
@@ -11,21 +12,23 @@ type Props = BaseAmountComponent & {
 export function LineItemAmount(props: Props): JSX.Element {
   const { format = 'formatted', type = 'total', ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
+  const { lineItem: lineItemBundle } = useContext(LineItemBundleChildrenContext)
   const [price, setPrice] = useState('')
+  const item = lineItem ?? lineItemBundle
   useEffect(() => {
-    if (lineItem) {
+    if (item) {
       const p = getAmount({
         base: 'amount',
         type,
         format,
-        obj: lineItem
+        obj: item
       })
       setPrice(p)
     }
     return (): void => {
       setPrice('')
     }
-  }, [lineItem])
+  }, [item])
   const parentProps = {
     price,
     ...p

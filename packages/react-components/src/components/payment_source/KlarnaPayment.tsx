@@ -103,7 +103,6 @@ export default function KlarnaPayment({
     }
   }, [ref, paymentSource, currentPaymentMethodType, loaded, klarna])
   const handleClick = (kl: any, props: any): void => {
-    console.log('props', props)
     // @ts-expect-error no type
     const [first] = paymentSource?.payment_methods || undefined
     const paymentMethodCategories = first?.identifier
@@ -150,7 +149,6 @@ export default function KlarnaPayment({
         ...klarnaData
       },
       async function (res: KlarnaResponse) {
-        console.log('res', res)
         if (res.approved && paymentSource && currentPaymentMethodType) {
           const ps = await setPaymentSource({
             paymentSourceId: paymentSource.id,

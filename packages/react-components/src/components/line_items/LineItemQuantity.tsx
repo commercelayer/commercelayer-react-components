@@ -4,6 +4,7 @@ import LineItemContext from '#context/LineItemContext'
 import Parent from '#components/utils/Parent'
 import { type ChildrenFunction } from '#typings'
 import { type LineItem } from '@commercelayer/sdk'
+import LineItemBundleChildrenContext from '#context/LineItemBundleChildrenContext'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   quantity: number
@@ -27,7 +28,9 @@ type Props = {
 export function LineItemQuantity(props: Props): JSX.Element {
   const { max = 50, readonly = false, hasExternalPrice, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
+  const { lineItem: lineItemBundle } = useContext(LineItemBundleChildrenContext)
   const { updateLineItem } = useContext(LineItemContext)
+  const item = lineItem ?? lineItemBundle
   const options: ReactNode[] = []
   for (let i = 1; i <= max; i++) {
     options.push(
@@ -38,15 +41,15 @@ export function LineItemQuantity(props: Props): JSX.Element {
   }
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const quantity = Number(e.target.value)
-    if (updateLineItem && lineItem) {
-      void updateLineItem(lineItem.id, quantity, hasExternalPrice)
+    if (updateLineItem && item) {
+      void updateLineItem(item.id, quantity, hasExternalPrice)
     }
   }
-  const quantity = lineItem?.quantity
+  const quantity = item?.quantity
   const parentProps = {
     handleChange,
     quantity,
-    lineItem,
+    lineItem: item,
     ...props
   }
   return props.children ? (
@@ -55,8 +58,8 @@ export function LineItemQuantity(props: Props): JSX.Element {
     <span {...p}>{quantity}</span>
   ) : (
     <select
-      data-testid={lineItem?.sku_code}
-      title={lineItem?.name ?? ''}
+      data-testid={item?.sku_code}
+      title={item?.name ?? ''}
       value={quantity}
       onChange={handleChange}
       {...p}

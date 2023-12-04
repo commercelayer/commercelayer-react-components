@@ -68,6 +68,8 @@ export type ResourceIncluded =
   | 'shipping_address'
   | 'line_items.line_item_options.sku_option'
   | 'line_items.item'
+  | 'line_items.bundle.sku_list.sku_list_items'
+  | 'line_items.bundle.sku_list.sku_list_items.sku'
   | 'available_customer_payment_sources.payment_source'
   | 'shipments.available_shipping_methods'
   | 'shipments.stock_transfers'

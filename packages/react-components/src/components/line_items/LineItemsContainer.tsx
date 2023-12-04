@@ -52,6 +52,21 @@ export function LineItemsContainer(props: Props): JSX.Element {
         }
       })
     }
+    if (!include?.includes('line_items.bundle.sku_list.sku_list_items')) {
+      addResourceToInclude({
+        newResource: [
+          'line_items.bundle.sku_list.sku_list_items',
+          'line_items.bundle.sku_list.sku_list_items.sku'
+        ]
+      })
+    } else if (!includeLoaded?.['line_items.bundle.sku_list.sku_list_items']) {
+      addResourceToInclude({
+        newResourceLoaded: {
+          'line_items.bundle.sku_list.sku_list_items': true,
+          'line_items.bundle.sku_list.sku_list_items.sku': true
+        }
+      })
+    }
   }, [include, includeLoaded])
   useEffect(() => {
     if (order?.line_items) {
