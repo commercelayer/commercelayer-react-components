@@ -3,6 +3,7 @@ import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import Parent from '#components/utils/Parent'
 import { type LineItem } from '@commercelayer/sdk'
 import { type ChildrenFunction } from '#typings/index'
+import LineItemBundleChildrenContext from '#context/LineItemBundleChildrenContext'
 
 export interface TLineItemCode extends Omit<Props, 'children'> {
   lineItem: LineItem
@@ -20,7 +21,8 @@ export function LineItemCode({
   ...p
 }: Props): JSX.Element {
   const { lineItem } = useContext(LineItemChildrenContext)
-  const labelName = lineItem?.[type]
+  const { lineItem: lineItemBundle } = useContext(LineItemBundleChildrenContext)
+  const labelName = lineItem?.[type] ?? lineItemBundle?.[type]
   const parentProps = {
     lineItem,
     skuCode: labelName,

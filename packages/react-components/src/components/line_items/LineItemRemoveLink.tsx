@@ -5,6 +5,7 @@ import Parent from '#components/utils/Parent'
 import { type ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import { type LineItem } from '@commercelayer/sdk'
+import LineItemBundleChildrenContext from '#context/LineItemBundleChildrenContext'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   handleRemove: (event: React.MouseEvent<HTMLAnchorElement>) => void
@@ -26,23 +27,26 @@ export function LineItemRemoveLink(props: Props): JSX.Element {
     currentComponentName: 'LineItemRemoveLink',
     key: 'lineItem'
   })
+  const { lineItem: lineItemBundle } = useContext(LineItemBundleChildrenContext)
   const { deleteLineItem } = useContext(LineItemContext)
+  const item = lineItem ?? lineItemBundle
+  const lineItemId = item?.id
   const handleRemove = (e: React.MouseEvent<HTMLAnchorElement>): void => {
     e.preventDefault()
-    if (deleteLineItem != null && lineItem != null)
-      void deleteLineItem(lineItem.id)
+    if (deleteLineItem != null && lineItemId != null)
+      void deleteLineItem(lineItemId)
     if (onClick != null) onClick(e)
   }
   const parentProps = {
     handleRemove,
-    lineItem,
+    lineItem: item,
     ...props
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
     <a
-      data-testid={`line-item-remove-link-${lineItem?.sku_code ?? ''}`}
+      data-testid={`line-item-remove-link-${item?.sku_code ?? ''}`}
       {...props}
       href='#'
       onClick={handleRemove}

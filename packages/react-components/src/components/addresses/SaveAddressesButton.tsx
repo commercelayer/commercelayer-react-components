@@ -48,7 +48,6 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     shippingAddressId,
     invertAddresses
   } = useContext(AddressContext)
-  console.log('invertAddresses', invertAddresses)
   const { order } = useContext(OrderContext)
   const {
     customerEmail: email,

@@ -4,6 +4,9 @@ import LineItemChildrenContext, {
   type InitialLineItemChildrenContext
 } from '#context/LineItemChildrenContext'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
+import LineItemBundleChildrenContext, {
+  type InitialLineItemBundleChildrenContext
+} from '#context/LineItemBundleChildrenContext'
 
 export type TLineItem =
   | 'gift_cards'
@@ -29,19 +32,29 @@ export function LineItem(props: Props): JSX.Element {
       : lineItems
   const components = items
     ?.filter((l) => l?.item_type === type)
-    .map((lineItem, k, check) => {
-      if (
-        lineItem?.item_type === 'bundles' &&
-        k > 0 &&
-        check[k - 1]?.bundle_code === lineItem.bundle_code
-      )
-        return null
+    .map((lineItem) => {
+      if (lineItem?.item_type === 'bundles') {
+        const skuListItems = lineItem?.bundle?.sku_list?.sku_list_items
+        const skuListItemsProps: InitialLineItemBundleChildrenContext = {
+          skuListItems,
+          lineItem
+        }
+        return (
+          <LineItemBundleChildrenContext.Provider
+            key={lineItem?.id}
+            value={skuListItemsProps}
+          >
+            {children}
+          </LineItemBundleChildrenContext.Provider>
+        )
+      }
       if (
         lineItem?.item_type === 'gift_cards' &&
         lineItem?.total_amount_cents &&
         lineItem?.total_amount_cents <= 0
-      )
+      ) {
         return null
+      }
       const lineProps: InitialLineItemChildrenContext = {
         lineItem
       }
