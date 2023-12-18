@@ -16,6 +16,8 @@ import {
 } from '#utils/customerOrderOptions'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
+import { isGuestToken } from 'lib/cjs/utils/isGuestToken'
+import { setCustomerOrderParam } from '#utils/localStorage'
 
 export type PlaceOrderActionType =
   | 'setErrors'
@@ -234,6 +236,20 @@ export async function setPlaceOrder({
             }
           })
         }
+      }
+      const hasSubscriptions =
+        order.line_items?.some((item) => {
+          return item.frequency && item.frequency?.length > 0
+        }) ||
+        order.subscription_created_at !== null ||
+        false
+
+      if (
+        hasSubscriptions &&
+        config?.accessToken != null &&
+        isGuestToken(config.accessToken)
+      ) {
+        setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'true')
       }
       switch (paymentType) {
         case 'braintree_payments': {
