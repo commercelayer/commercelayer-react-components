@@ -95,6 +95,7 @@ export interface PaymentMethodActionPayload {
   currentPaymentMethodType: PaymentResource
   currentPaymentMethodId: string
   currentPaymentMethodRef: PaymentRef
+  currentCustomerPaymentSourceId: string | null
   config: PaymentMethodConfig
   paymentSource: Order['payment_source'] | null
   loading: boolean
@@ -318,18 +319,31 @@ export async function setPaymentSource({
         if (dispatch) {
           dispatch({
             type: 'setPaymentSource',
-            payload: { paymentSource, errors: [] }
+            payload: {
+              paymentSource,
+              errors: [],
+              currentCustomerPaymentSourceId: null
+            }
           })
         }
         return paymentSource
       } else {
         if (updateOrder != null) {
-          await updateOrder({
+          const { order: orderUpdated } = await updateOrder({
             id: order.id,
             attributes: {
               _customer_payment_source_id: customerPaymentSourceId
             }
           })
+          if (dispatch != null && orderUpdated != null) {
+            dispatch({
+              type: 'setPaymentSource',
+              payload: {
+                paymentSource: orderUpdated.payment_source,
+                currentCustomerPaymentSourceId: orderUpdated.payment_source?.id
+              }
+            })
+          }
         }
       }
     }

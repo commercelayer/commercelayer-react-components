@@ -46,10 +46,15 @@ type THostedCart =
        * If you have a self-hosted cart, you can pass the url to redirect to it.
        */
       hostedCartUrl?: string
+      /**
+       * If you have a self-hosted cart, you can pass the protocol to redirect to it.
+       */
+      protocol?: 'http' | 'https'
     }
   | {
       redirectToHostedCart?: false
       hostedCartUrl?: never
+      protocol?: never
     }
 
 type TButton = PropsWithoutRef<
@@ -128,6 +133,7 @@ export function AddToCartButton(props: Props): JSX.Element {
     hostedCartUrl,
     quantity,
     lineItemOption,
+    protocol = 'https',
     ...p
   } = props
   const { accessToken, endpoint } = useCustomContext({
@@ -201,7 +207,7 @@ export function AddToCartButton(props: Props): JSX.Element {
         const { slug, domain } = getDomain(endpoint)
         const orderId = res?.orderId
         if (hostedCartUrl && orderId) {
-          location.href = `https://${hostedCartUrl}/${orderId}?accessToken=${accessToken}`
+          location.href = `${protocol}://${hostedCartUrl}/${orderId}?accessToken=${accessToken}`
         } else if (orderId && slug) {
           location.href = getApplicationLink({
             orderId,

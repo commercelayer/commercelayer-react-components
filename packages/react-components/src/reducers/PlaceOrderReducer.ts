@@ -16,7 +16,7 @@ import {
 } from '#utils/customerOrderOptions'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
-import { isGuestToken } from 'lib/cjs/utils/isGuestToken'
+import { isGuestToken } from '#utils/isGuestToken'
 import { setCustomerOrderParam } from '#utils/localStorage'
 
 export type PlaceOrderActionType =

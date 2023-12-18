@@ -73,14 +73,18 @@ export function CustomerContainer(props: Props): JSX.Element {
         !include?.includes('available_customer_payment_sources.payment_source')
       ) {
         addResourceToInclude({
-          newResource: 'available_customer_payment_sources.payment_source'
+          newResource: [
+            'available_customer_payment_sources.payment_source',
+            'available_customer_payment_sources.payment_method'
+          ]
         })
       } else if (
         !includeLoaded?.['available_customer_payment_sources.payment_source']
       ) {
         addResourceToInclude({
           newResourceLoaded: {
-            'available_customer_payment_sources.payment_source': true
+            'available_customer_payment_sources.payment_source': true,
+            'available_customer_payment_sources.payment_method': true
           }
         })
       }

@@ -52,10 +52,13 @@ export function AdyenGateway(props: Props): JSX.Element | null {
   const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {
-          return customerPayment.payment_source?.type === 'adyen_payments'
+          return (
+            customerPayment.payment_source?.type === 'adyen_payments' ||
+            // @ts-expect-error missing type
+            customerPayment.payment_method != null
+          )
         })
       : []
-
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {

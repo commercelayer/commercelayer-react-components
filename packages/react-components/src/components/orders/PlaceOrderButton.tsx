@@ -64,7 +64,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     currentPaymentMethodType,
     paymentSource,
     setPaymentSource,
-    setPaymentMethodErrors
+    setPaymentMethodErrors,
+    currentCustomerPaymentSourceId
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
@@ -79,6 +80,13 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           },
           paymentType
         })
+        if (
+          paymentSource?.id === currentCustomerPaymentSourceId &&
+          card.brand === ''
+        ) {
+          // Force creadit card icon for customer payment source imported by API
+          card.brand = 'credit-card'
+        }
         if (
           ((isFree && isPermitted) ||
             currentPaymentMethodRef?.current?.onsubmit ||
@@ -182,6 +190,14 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         paymentType === 'adyen_payments' &&
         // @ts-expect-error no type
         order?.payment_source?.payment_response?.resultCode === 'Authorised' &&
+        // @ts-expect-error no type
+        ref?.current?.disabled === false &&
+        autoPlaceOrder
+      ) {
+        void handleClick()
+      } else if (
+        paymentType === 'adyen_payments' &&
+        paymentSource?.id === currentCustomerPaymentSourceId &&
         // @ts-expect-error no type
         ref?.current?.disabled === false &&
         autoPlaceOrder
