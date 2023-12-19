@@ -147,6 +147,7 @@ interface TSetPlaceOrderParams {
   paymentSource?: PaymentSourceType
   include?: string[]
   setOrder?: (order: Order) => void
+  currentCustomerPaymentSourceId?: string | null
 }
 
 export async function setPlaceOrder({
@@ -156,7 +157,8 @@ export async function setPlaceOrder({
   setOrderErrors,
   paymentSource,
   setOrder,
-  include
+  include,
+  currentCustomerPaymentSourceId
 }: TSetPlaceOrderParams): Promise<{
   placed: boolean
   errors?: BaseError[]
@@ -247,7 +249,8 @@ export async function setPlaceOrder({
       if (
         hasSubscriptions &&
         config?.accessToken != null &&
-        isGuestToken(config.accessToken)
+        !isGuestToken(config.accessToken) &&
+        currentCustomerPaymentSourceId == null
       ) {
         setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'true')
       }

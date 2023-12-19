@@ -275,7 +275,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       isValid &&
       setPlaceOrder &&
       (checkPaymentSource || isFree) &&
-      (await setPlaceOrder({ paymentSource: checkPaymentSource }))
+      (await setPlaceOrder({
+        paymentSource: checkPaymentSource,
+        currentCustomerPaymentSourceId
+      }))
     setForceDisable(false)
     onClick && placed && onClick(placed)
   }
