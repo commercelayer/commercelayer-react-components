@@ -195,14 +195,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         autoPlaceOrder
       ) {
         void handleClick()
-      } else if (
-        paymentType === 'adyen_payments' &&
-        paymentSource?.id === currentCustomerPaymentSourceId &&
-        // @ts-expect-error no type
-        ref?.current?.disabled === false &&
-        autoPlaceOrder
-      ) {
-        void handleClick()
       }
     }
   }, [

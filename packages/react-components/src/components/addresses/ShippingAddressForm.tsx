@@ -39,8 +39,13 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     ...p
   } = props
   const { validation, values, errors, reset: resetForm } = useRapidForm()
-  const { setAddressErrors, setAddress, shipToDifferentAddress, isBusiness } =
-    useContext(AddressesContext)
+  const {
+    setAddressErrors,
+    setAddress,
+    shipToDifferentAddress,
+    isBusiness,
+    invertAddresses
+  } = useContext(AddressesContext)
   const {
     saveAddressToCustomerAddressBook,
     include,
@@ -84,8 +89,13 @@ export function ShippingAddressForm(props: Props): JSX.Element {
           })
         }
       }
-      shipToDifferentAddress && setAddressErrors(formErrors, 'shipping_address')
-    } else if (!isEmpty(values) && shipToDifferentAddress) {
+      if (shipToDifferentAddress || invertAddresses) {
+        setAddressErrors(formErrors, 'shipping_address')
+      }
+    } else if (
+      !isEmpty(values) &&
+      (shipToDifferentAddress || invertAddresses)
+    ) {
       setAddressErrors([], 'shipping_address')
       for (const name in values) {
         const field = values[name]

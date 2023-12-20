@@ -288,7 +288,8 @@ export function addressesController({
       shipToDifferentAddress,
       shipping_address,
       shippingAddressId,
-      invertAddresses
+      invertAddresses,
+      requiresBillingInfo
     })
     const billingDisable = billingAddressController({
       shippingDisable,

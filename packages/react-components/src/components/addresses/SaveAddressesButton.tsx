@@ -81,7 +81,8 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     },
     {}
   )
-
+  console.log('billingAddress', billingAddress)
+  console.log('shippingAddress', shippingAddress)
   const { billingDisable, shippingDisable } = addressesController({
     invertAddresses,
     requiresBillingInfo: order?.requires_billing_info,
@@ -108,6 +109,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     billingDisable ||
     shippingDisable ||
     countryLockDisable
+  console.log('disable', disable, billingAddress, shippingAddress)
   const handleClick = async (): Promise<void> => {
     if (errors && Object.keys(errors).length === 0 && !disable) {
       let response: {
@@ -121,6 +123,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
         response = await saveAddresses(email)
       } else if (createCustomerAddress && billingAddress) {
         const address = { ...billingAddress }
+        console.log('address', address)
         if (addressId) address.id = addressId
         void createCustomerAddress(address as TCustomerAddress)
         response = {
