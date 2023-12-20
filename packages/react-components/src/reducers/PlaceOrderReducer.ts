@@ -16,6 +16,8 @@ import {
 } from '#utils/customerOrderOptions'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
+import { isGuestToken } from '#utils/isGuestToken'
+import { setCustomerOrderParam } from '#utils/localStorage'
 
 export type PlaceOrderActionType =
   | 'setErrors'
@@ -145,6 +147,7 @@ interface TSetPlaceOrderParams {
   paymentSource?: PaymentSourceType
   include?: string[]
   setOrder?: (order: Order) => void
+  currentCustomerPaymentSourceId?: string | null
 }
 
 export async function setPlaceOrder({
@@ -154,7 +157,8 @@ export async function setPlaceOrder({
   setOrderErrors,
   paymentSource,
   setOrder,
-  include
+  include,
+  currentCustomerPaymentSourceId
 }: TSetPlaceOrderParams): Promise<{
   placed: boolean
   errors?: BaseError[]
@@ -234,6 +238,21 @@ export async function setPlaceOrder({
             }
           })
         }
+      }
+      const hasSubscriptions =
+        order.line_items?.some((item) => {
+          return item.frequency && item.frequency?.length > 0
+        }) ||
+        order.subscription_created_at !== null ||
+        false
+
+      if (
+        hasSubscriptions &&
+        config?.accessToken != null &&
+        !isGuestToken(config.accessToken) &&
+        currentCustomerPaymentSourceId == null
+      ) {
+        setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'true')
       }
       switch (paymentType) {
         case 'braintree_payments': {

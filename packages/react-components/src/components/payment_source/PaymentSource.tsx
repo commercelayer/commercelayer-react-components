@@ -38,16 +38,22 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
     currentPaymentMethodId,
     paymentSource,
     destroyPaymentSource,
-    currentPaymentMethodType
+    currentPaymentMethodType,
+    currentCustomerPaymentSourceId
   } = useContext(PaymentMethodContext)
   const [show, setShow] = useState(false)
   const [showCard, setShowCard] = useState(false)
 
   useEffect(() => {
+    const isCustomerPaymentSource =
+      currentCustomerPaymentSourceId === paymentSource?.id
     if (readonly) {
       setShow(true)
       setShowCard(true)
-    } else if (payment?.id === currentPaymentMethodId && !expressPayments) {
+    } else if (
+      (payment?.id === currentPaymentMethodId || isCustomerPaymentSource) &&
+      !expressPayments
+    ) {
       setShow(true)
       const card = getCardDetails({
         paymentType: payment?.payment_source_type as PaymentResource,
@@ -56,6 +62,10 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
           payment_source: paymentSource
         }
       })
+      if (isCustomerPaymentSource && card.brand === '') {
+        // Force creadit card icon for customer payment source imported by API
+        card.brand = 'credit-card'
+      }
       if (card.brand) setShowCard(true)
     } else if (
       expressPayments &&

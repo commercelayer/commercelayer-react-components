@@ -89,6 +89,12 @@ export function AddressInput(props: Props): JSX.Element | null {
     required === undefined
   )
     return null
+  if (
+    p.name === 'shipping_address_billing_info' &&
+    shippingAddress.requiresBillingInfo === false &&
+    required === undefined
+  )
+    return null
   return (
     <BaseInput
       ref={

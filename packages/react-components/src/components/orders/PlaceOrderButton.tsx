@@ -64,7 +64,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     currentPaymentMethodType,
     paymentSource,
     setPaymentSource,
-    setPaymentMethodErrors
+    setPaymentMethodErrors,
+    currentCustomerPaymentSourceId
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
@@ -79,6 +80,13 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           },
           paymentType
         })
+        if (
+          paymentSource?.id === currentCustomerPaymentSourceId &&
+          card.brand === ''
+        ) {
+          // Force creadit card icon for customer payment source imported by API
+          card.brand = 'credit-card'
+        }
         if (
           ((isFree && isPermitted) ||
             currentPaymentMethodRef?.current?.onsubmit ||
@@ -259,7 +267,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       isValid &&
       setPlaceOrder &&
       (checkPaymentSource || isFree) &&
-      (await setPlaceOrder({ paymentSource: checkPaymentSource }))
+      (await setPlaceOrder({
+        paymentSource: checkPaymentSource,
+        currentCustomerPaymentSourceId
+      }))
     setForceDisable(false)
     onClick && placed && onClick(placed)
   }
