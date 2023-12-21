@@ -81,6 +81,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           paymentType
         })
         if (
+          currentCustomerPaymentSourceId != null &&
           paymentSource?.id === currentCustomerPaymentSourceId &&
           card.brand === ''
         ) {

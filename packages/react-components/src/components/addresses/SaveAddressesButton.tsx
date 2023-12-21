@@ -106,7 +106,6 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     billingDisable ||
     shippingDisable ||
     countryLockDisable
-  console.log('disable', disable, billingAddress, shippingAddress)
   const handleClick = async (): Promise<void> => {
     if (errors && Object.keys(errors).length === 0 && !disable) {
       let response: {
