@@ -46,6 +46,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
 
   useEffect(() => {
     const isCustomerPaymentSource =
+      currentCustomerPaymentSourceId != null &&
       currentCustomerPaymentSourceId === paymentSource?.id
     if (readonly) {
       setShow(true)
