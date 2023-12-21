@@ -87,7 +87,8 @@ export function shippingAddressController({
       shippingDisable = !!(
         shipping_address && fieldsExist(shipping_address, billingInfo)
       )
-    } else {
+    } else if (shipToDifferentAddress) {
+      delete shipping_address?.billing_info
       shippingDisable = !!(shipping_address && fieldsExist(shipping_address))
     }
   }
