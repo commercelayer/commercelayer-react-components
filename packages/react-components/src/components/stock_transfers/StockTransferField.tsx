@@ -22,7 +22,7 @@ export function StockTransferField<P extends Props>(props: P): JSX.Element {
   const { attribute, tagElement = 'span', children, ...p } = props
   return (
     <GenericFieldComponent<TResourceKey['StockTransfer']>
-      resource='stock_transfers'
+      resource='stockTransfer'
       attribute={attribute}
       tagElement={tagElement}
       context={StockTransferChildrenContext}

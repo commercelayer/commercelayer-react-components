@@ -193,6 +193,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         order?.payment_source?.payment_response?.resultCode === 'Authorised' &&
         // @ts-expect-error no type
         ref?.current?.disabled === false &&
+        currentCustomerPaymentSourceId == null &&
         autoPlaceOrder
       ) {
         void handleClick()
