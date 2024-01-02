@@ -4,6 +4,9 @@ import { useContext } from 'react'
 
 interface TReturnCustomer extends Omit<CustomerState, 'errors' | 'isGuest'> {}
 
+/**
+ * React Hook that provides access to the order context stored in the `<CustomerContainer>` component.
+ **/
 export function useCustomerContainer(): TReturnCustomer {
   const ctx = useContext(CustomerContext)
   if ('addresses' in ctx) {

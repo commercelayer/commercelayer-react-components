@@ -50,7 +50,8 @@ const parameters: Parameters = {
           ]
         ],
         'Examples',
-        ['Listing Page', 'Shopping Cart', 'Checkout Page', 'My Account']
+        ['Listing Page', 'Shopping Cart', 'Checkout Page', 'My Account'],
+        'Hooks'
       ]
     }
   },
