@@ -221,7 +221,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       setButtonRef(ref)
     }
   }, [ref])
-
   const handleClick = async (
     e?: MouseEvent<HTMLButtonElement>
   ): Promise<void> => {

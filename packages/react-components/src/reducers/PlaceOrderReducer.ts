@@ -245,7 +245,6 @@ export async function setPlaceOrder({
         }) ||
         order?.subscription_created_at != null ||
         false
-
       if (
         hasSubscriptions &&
         config?.accessToken != null &&
