@@ -178,7 +178,7 @@
   },
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
-    "@adyen/adyen-web": "^5.51.0",
+    "@adyen/adyen-web": "^5.55.1",
     "@commercelayer/sdk": "^5.14.0",
     "@stripe/react-stripe-js": "^2.3.0",
     "@stripe/stripe-js": "^2.1.6",

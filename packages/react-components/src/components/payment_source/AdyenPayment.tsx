@@ -16,16 +16,6 @@ import OrderContext from '#context/OrderContext'
 import omit from '#utils/omit'
 import type UIElement from '@adyen/adyen-web/dist/types/components/UIElement'
 
-const threeDSConfiguration = {
-  challengeWindowSize: '05'
-  // Set to any of the following:
-  // '02': ['390px', '400px'] -  The default window size
-  // '01': ['250px', '400px']
-  // '03': ['500px', '600px']
-  // '04': ['600px', '400px']
-  // '05': ['100%', '100%']
-}
-
 type Styles = Partial<{
   base: CSSProperties
   error: CSSProperties
@@ -303,7 +293,7 @@ export function AdyenPayment({
         }
         return true
       }
-      if (['Cancelled'].includes(resultCode)) {
+      if (['Cancelled', 'Refused'].includes(resultCode)) {
         // @ts-expect-error no type
         const message = res?.payment_response?.refusalReason
         setPaymentMethodErrors([
@@ -314,6 +304,9 @@ export function AdyenPayment({
             message
           }
         ])
+        if (component) {
+          component.mount('#adyen-dropin')
+        }
       }
       // @ts-expect-error no type
       const errorType = res?.payment_response?.errorType
@@ -348,6 +341,7 @@ export function AdyenPayment({
       return false
     }
   }
+
   useEffect(() => {
     // @ts-expect-error no type
     const paymentMethodsResponse = paymentSource?.payment_methods
@@ -378,7 +372,6 @@ export function AdyenPayment({
       },
       showPayButton: false,
       paymentMethodsConfiguration: {
-        threeDS2: threeDSConfiguration,
         paypal: {
           showPayButton: true,
           style: styles?.paypal
@@ -433,7 +426,7 @@ export function AdyenPayment({
       setPaymentRef({ ref: { current: null } })
       setLoadAdyen(false)
     }
-  }, [clientKey, ref])
+  }, [clientKey, ref != null])
   return !clientKey && !loadAdyen && !checkout ? null : (
     <form
       ref={ref}
