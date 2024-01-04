@@ -40,7 +40,10 @@ It accepts the following parameters:
 - `skuCode`: the code of the SKU you want to add to the order
 - `bundleCode`: the code of the Bundle you want to add to the order
 - `quantity`: the quantity of the SKU or Bundle for the line_item that will be created
+- `lineItem`: an object containing the line_item attributes that will be created
 
+
+_Standard usage:_
 <Source dark code={`
 import { useOrderContainer } from "@commercelayer/react-components"
 
@@ -52,6 +55,31 @@ return (
         addToCart({
           skuCode: "SKU_CODE",
           quantity: 2,
+        })
+      }}
+    >
+      Add to cart
+    </button>
+)
+`} language='jsx' />
+
+
+_Using custom `line_item` attributes, such as name or external_price:_
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { addToCart } = useOrderContainer()
+
+return (
+    <button
+      onClick={() => {
+        addToCart({
+          skuCode: 'SKU_CODE',
+          lineItem: {
+            name: 'Custom name',
+            imageUrl: 'https://example.com/image.jpg',
+            externalPrice: true
+          }
         })
       }}
     >
