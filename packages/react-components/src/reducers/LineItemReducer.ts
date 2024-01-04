@@ -11,7 +11,6 @@ import getErrors from '#utils/getErrors'
 export interface UpdateLineItemParams {
   lineItemId: string
   quantity?: number
-  hasExternalPrice?: boolean
   dispatch: Dispatch<LineItemAction>
   config: CommerceLayerConfig
   getOrder: getOrderContext | undefined
@@ -42,11 +41,7 @@ export interface LineItemPayload {
 }
 
 export interface LineItemState extends LineItemPayload {
-  updateLineItem?: (
-    lineItemId: string,
-    quantity?: number,
-    hasExternalPrice?: boolean
-  ) => Promise<void>
+  updateLineItem?: (lineItemId: string, quantity?: number) => Promise<void>
   deleteLineItem?: (lineItemId: string) => Promise<void>
 }
 
@@ -100,22 +95,10 @@ export const getLineItems: GetLineItems = (params) => {
 export async function updateLineItem(
   params: UpdateLineItemParams
 ): Promise<void> {
-  const {
-    config,
-    lineItemId,
-    quantity,
-    hasExternalPrice,
-    getOrder,
-    orderId,
-    dispatch
-  } = params
+  const { config, lineItemId, quantity, getOrder, orderId, dispatch } = params
   const sdk = getSdk(config)
   try {
-    await sdk.line_items.update({
-      id: lineItemId,
-      quantity,
-      _external_price: hasExternalPrice
-    })
+    await sdk.line_items.update({ id: lineItemId, quantity })
     getOrder && (await getOrder(orderId))
     dispatch({
       type: 'setErrors',
