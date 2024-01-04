@@ -1,0 +1,68 @@
+import { Meta, Source } from '@storybook/addon-docs';
+
+<Meta title='Hooks/useCommerceLayer' />
+
+# useCommerceLayer
+
+The `useCommerceLayer` hook is a React hook that provides access to the CommerceLayer JS SDK,
+giving you the opportunity to use an already initialized instance of our official SDK client in your React application.
+
+
+<span title="What is the Commerce Layer JS SDK?" type="info">
+It is a JavaScript Library wrapper that makes it quick and easy to interact with the Commerce Layer API.
+You can read more about this and see some examples by checking its [official documentation](https://github.com/commercelayer/commercelayer-sdk) on GitHub.
+</span>
+
+By accessing the SDK instance through the hook, you can fetch resources, create new ones, update or delete them, and so on.
+Of course it will be limited to the scope of the `accessToken` used to initialize the main `<CommerceLayer>` component.
+
+**Example**: if you are using an access token for a `sales_channel` (guest) that has access to a single market, you will be able to fetch only resources (like prices) related to that market.
+Or if your access token belongs to a signed-in customer (customer token), you will be able to update only the addresses associated to that customer.
+
+<span title="Requirements" type="warning">
+Must be used inside a `<CommerceLayer>` component.
+</span>
+
+
+## Usage
+
+This hook returns an object that can be destructured to access an instance of the `sdkClient` function.
+
+You can then use it to call the CommerceLayer JS SDK methods, such as:
+- `sdkClient().skus.list()`
+- `sdkClient().skus.retrieve('BABYONBU000000E63E7412MX')`
+- `sdkClient().addresses.update({ id: 'abcdefgh', first_name: 'John' })`
+
+Please note that the `sdkClient()` function might not always exist, this because it needs to access the React context that could also be `undefined`.
+So it's always better to check if the returned function is defined before using it.
+
+<Source dark code={`
+if (sdkClient != null) {
+  sdkClient().skus.list()
+} 
+// or
+sdkClient()?.skus.list()
+`} />
+
+
+The following example shows how to use the hook to fetch a filtered list of SKUs. 
+<Source dark code={`
+import { useCommerceLayer } from "@commercelayer/react-components"
+
+const { sdkClient } = useCommerceLayer()
+
+if (sdkClient == null) {
+  return null
+}
+
+return (
+  <button onClick={async () => { 
+      const skus = await sdkClient().skus.list({ filters: { code_cont: 'TSHIRT000' } })
+    }}
+  >
+    Fetch specific SKU code
+  </button>
+)
+`} language='jsx' />
+ 
+As you can see, the `sdkClient` methods to list, retrieve, update or delete a resource are all async functions that return always a Promise.

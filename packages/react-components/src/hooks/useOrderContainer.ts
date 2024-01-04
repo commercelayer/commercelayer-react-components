@@ -28,11 +28,17 @@ interface TReturnOrder
     OrderState,
     'loading' | 'include' | 'includeLoaded' | 'withoutIncludes' | 'orderId'
   > {
+  /** Refetch the current order and update the context */
   reloadOrder: () => Promise<OrderState['order']>
+  /** Allow to add a SKU or a Bundle to the order stored in the context */
   addToCart: (params: TAddToCartParams) => ReturnType<typeof addToCart>
+  /** Allow to create a new order and store it in the OrderContainer context */
   createOrder: (params: TCreateCartParams) => Promise<string | undefined>
 }
 
+/**
+ * React Hook that provides access to the order context stored in the `<OrderContainer>` component.
+ **/
 export function useOrderContainer(): TReturnOrder {
   const ctx = useContext(OrderContext)
   if ('order' in ctx) {

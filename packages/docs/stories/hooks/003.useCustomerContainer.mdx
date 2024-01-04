@@ -1,0 +1,150 @@
+import { Meta, Source } from '@storybook/addon-docs';
+
+<Meta title='Hooks/useCustomerContainer' />
+
+# useCustomerContainer
+
+The `useCustomerContainer` hook is a React hook that provides access to the customer context stored in the `<CustomerContainer>` component.
+
+It gives you access to the following properties and methods:
+- orders
+- addresses
+- customerEmail
+- customers
+- payments
+- subscriptions
+
+<span title="Requirements" type="warning">
+Must be used inside a `<CustomerContainer>` component.
+</span>
+
+## The orders array
+You can access to all orders of the current customer using the `orders` property returned from this hook.
+
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { orders } = useCustomerContainer()
+
+return (
+  <div>
+    <h1>Your orders</h1>
+    {orders.map((order) => (
+      <div key={order.id}>
+        <h2>{order.number}</h2> 
+      </div>
+    ))}
+  </div>
+)
+`} language='jsx' />
+ 
+## The addresses array
+This property contains all saved addresses of the current customer.
+
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { addresses } = useCustomerContainer()
+
+return (
+  <div>
+    <h1>Your addresses</h1>
+    {addresses.map((address) => (
+      <div key={address.id}>
+        <h2>{address.line_1}</h2> 
+      </div>
+    ))}
+  </div>
+)
+`} language='jsx' />
+
+## The customerEmail string
+This property can be accessed to display the customer email address.
+
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { customerEmail } = useCustomerContainer()
+
+return (
+  <div>Your email address is {customerEmail}</div>
+)
+`} language='jsx' />
+
+## The customers property
+This property contains the data of the current customer or might return multiple `customers` in case you are authenticating the request with a token of `kind integration`.
+
+In all standard cases described in this documentation, you will always get a single `Customer` object since we are using an access token for a signed-in customer.
+
+<span title="Core API" type="info">
+If you need to know more about `customers` object and its attributes, please check our [Core API documentation](https://docs.commercelayer.io/core/v/api-reference/customers).
+</span>
+
+
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { customers } = useCustomerContainer()
+
+if (customers.status === 'repeat') {
+  return (
+    <div>Welcome back, you have {customer.total_orders_count} orders</div>
+  )
+}
+
+return (
+  <div>Welcome, place your first order</div>
+)
+`} language='jsx' />
+
+## The payments array
+This property contains all saved `customer_payment_sources` for the current customer.
+
+<span title="Core API" type="info">
+If you need to know more about `customer_payment_sources` please check its entry 
+in our [Core API documentation](https://docs.commercelayer.io/core/v/api-reference/customer_payment_sources).
+</span>
+
+
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { addresses } = useCustomerContainer()
+
+return (
+  <div>
+    <h1>Your addresses</h1>
+    {addresses.map((address) => (
+      <div key={address.id}>
+        <h2>{address.line_1}</h2> 
+      </div>
+    ))}
+  </div>
+)
+`} language='jsx' />
+
+## The subscriptions array
+This property contains all customer `order_subscriptions` or an empty array in case customer has no subscriptions.
+
+<span title="Core API" type="info">
+If you need to know more about `order_subscriptions` please check our [Core API documentation](https://docs.commercelayer.io/core/v/api-reference/order_subscriptions).
+</span>
+
+
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { subscriptions } = useCustomerContainer()
+
+return (
+  <div>
+    <h1>Your subscriptions</h1>
+    {subscriptions?.map((s) => (
+      <div key={s.id}>
+        <p>created at {s.created_at}</p>
+        <p>renews at {s.next_run_at}</p>
+      </div>
+    ))}
+  </div>
+)
+`} language='jsx' />

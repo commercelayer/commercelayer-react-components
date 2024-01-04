@@ -90,6 +90,37 @@ export const DisabledWhenOutOfStock: StoryObj = () => {
 DisabledWhenOutOfStock.args = {}
 
 /**
+ * The add to cart button will automatically create a new `line_item` (or update an existing one), but it is also possible to
+ * customize the line_item attributes by passing a `lineItem` prop.
+ * In this way we can pass a custom name (`line_item.name`) or forcing the usage of external prices (`line_item._external_price`).
+ * Other attributes such as imageUrl, metadata and frequency are also supported.
+ *
+ * <span title="Core API" type="info">
+ * To read more about the `line_item` attributes, see the [API reference](https://docs.commercelayer.io/core/v/api-reference/line_items/object).
+ * </span>
+ */
+export const UseCustomAttributesOrExternalPrice: StoryObj = () => {
+  return (
+    <CommerceLayer accessToken='my-access-token'>
+      <OrderStorage persistKey='cl-examples-addToCart'>
+        <OrderContainer>
+          <AddToCartButton
+            label='Add with custom name'
+            skuCode='SWEATWCX000000FFFFFFXSXX'
+            className='px-3 py-2 bg-black text-white rounded disabled:opacity-50'
+            lineItem={{
+              name: 'My custom item name',
+              externalPrice: false // set as true if your market supports external prices
+            }}
+          />
+        </OrderContainer>
+      </OrderStorage>
+    </CommerceLayer>
+  )
+}
+UseCustomAttributesOrExternalPrice.args = {}
+
+/**
  * You can access the component children props to customize the button or use a different tag.
  *
  * In the following example we use a custom `div` tag with an `onClick` handler to add the item to the cart

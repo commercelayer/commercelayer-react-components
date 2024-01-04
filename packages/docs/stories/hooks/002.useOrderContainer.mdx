@@ -1,0 +1,149 @@
+import { Meta, Source } from '@storybook/addon-docs';
+
+<Meta title='Hooks/useOrderContainer' />
+
+# useOrderContainer
+
+The `useOrderContainer` hook is a React hook that provides access to the order context stored in the `<OrderContainer>` component.
+
+It gives you access to the following properties and methods:
+- order
+- addToCart
+- createOrder
+- reloadOrder 
+
+<span title="Requirements" type="warning">
+Must be used inside an `<OrderContainer>` component.
+</span>
+
+## The order object
+You can read the order object using the `order` property returned from this hook.
+
+This means, that you can access all the order data in any component that is a child of `<OrderContainer>`.
+
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { order } = useOrderContainer()
+
+return (
+  <div>
+    <h1>Order number: {order.number}</h1>
+    <p>Order status: {order.status}</p>
+  </div>
+)
+`} language='jsx' />
+ 
+## The addToCart method
+With this method you can add a line item to the order.
+It accepts the following parameters:
+- `skuCode`: the code of the SKU you want to add to the order
+- `bundleCode`: the code of the Bundle you want to add to the order
+- `quantity`: the quantity of the SKU or Bundle for the line_item that will be created
+- `lineItem`: an object containing the line_item attributes that will be created
+
+
+_Standard usage:_
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { addToCart } = useOrderContainer()
+
+return (
+    <button
+      onClick={() => {
+        addToCart({
+          skuCode: "SKU_CODE",
+          quantity: 2,
+        })
+      }}
+    >
+      Add to cart
+    </button>
+)
+`} language='jsx' />
+
+
+_Using custom `line_item` attributes, such as name or external_price:_
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { addToCart } = useOrderContainer()
+
+return (
+    <button
+      onClick={() => {
+        addToCart({
+          skuCode: 'SKU_CODE',
+          lineItem: {
+            name: 'Custom name',
+            imageUrl: 'https://example.com/image.jpg',
+            externalPrice: true
+          }
+        })
+      }}
+    >
+      Add to cart
+    </button>
+)
+`} language='jsx' />
+
+
+Once the `line_item` is added to the order, the `order` object in the `<OrderContainer>` context will be updated 
+and all the components that are children of the `<OrderContainer>` component will be re-rendered with the new data.
+
+## The reloadOrder method
+In case you need to reload the order data stored in the `<OrderContainer>` context, you can use the `reloadOrder` method.
+This method will trigger a new request to the Commerce Layer API to fetch the order data and update the `order` object in the `<OrderContainer>` context.
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { reloadOrder } = useOrderContainer()
+
+return (
+    <button
+      onClick={() => {
+        reloadOrder()
+      }}
+    >
+      Refresh order
+    </button>
+)
+`} language='jsx' />
+
+Once the new data have been fetched, all components that are children of the `<OrderContainer>` component will be re-rendered showing the new data.
+
+## The createOrder method
+In case you need to create a new order, you can use the `createOrder` method.
+
+This method will trigger a new request to the Commerce Layer API to create a new order and will update the `order` object in the `<OrderContainer>` context.
+<Source dark code={`
+import { useOrderContainer } from "@commercelayer/react-components"
+
+const { createOrder, addToCart } = useOrderContainer()
+
+return (
+    <button
+      onClick={() => {
+        createOrder().then((newOrderId) => {
+          addToCart({ skuCode: "SKU_CODE" }})
+        })
+      }}
+    >
+      Create order
+    </button>
+)
+`} language='jsx' />
+
+The methods retuns a promise that can be awaited to concatenate other actions after the order creation.
+
+This is useful since we discourage the creation of empty orders, but they should be created only when the user adds a line item to the cart.
+In this ways you can perform an `addToCart` action after the `createOrder` promise has been fulfilled and the order has been successfully created.
+
+<span title="Important notes" type="info">
+We always suggest to use the `<OrderStorage>`, `<OrderContainer>` and the `<AddToCartButton>` components to handle the creation of the `order` 
+and the addition of the `line_items`, instead of using methods provided by the `useOrderContainer` hook.
+<br />
+This because these components are already optimized to handles all standard workflows, so you should use the `createOrder` method 
+only to cover edge cases not fully supported by the standard components described in this guide.
+</span>
