@@ -8,6 +8,7 @@ import { CustomerContainer } from '#components/customers/CustomerContainer'
 import { CustomerInput } from '#components/customers/CustomerInput'
 import Errors from '#components/errors/Errors'
 import { BillingAddressForm } from '#components/addresses/BillingAddressForm'
+import { ShippingAddressForm } from '#components/addresses/ShippingAddressForm'
 import { AddressesContainer } from '#components/addresses/AddressesContainer'
 import { AddressInput } from '#components/addresses/AddressInput'
 import { AddressCountrySelector } from '#components/addresses/AddressCountrySelector'
@@ -219,6 +220,217 @@ export const CustomerAddresses: StoryFn = (args) => {
                     />
                   </div>
                 </BillingAddressForm>
+
+                <SaveAddressesButton
+                  className='p-4 bg-black text-white rounded disabled:opacity-50'
+                  label='Save address'
+                  onClick={() => {
+                    alert('Address updated')
+                  }}
+                />
+              </AddressesContainer>
+            </CustomerContainer>
+          </section>
+        </OrderContainer>
+      </OrderStorage>
+    </CommerceLayer>
+  )
+}
+
+export const CustomerInvertAddresses: StoryFn = (args) => {
+  const [order, setOrder] = useState<Order | null>(null)
+
+  const shippingAddress = useMemo(
+    () => makeAddressWithRequired(order?.shipping_address),
+    [order?.shipping_address]
+  )
+
+  return (
+    <CommerceLayer accessToken='my-access-token'>
+      <OrderStorage persistKey={persistKey}>
+        <OrderContainer fetchOrder={setOrder}>
+          <section title='Checkout Address' className='max-w-xl'>
+            <CustomerContainer isGuest>
+              <AddressesContainer
+                shipToDifferentAddress={false}
+                invertAddresses
+              >
+                <div className='mb-4'>
+                  <label htmlFor='customer_email'>Customer email</label>
+                  <CustomerInput
+                    id='customer_email'
+                    className={inputCss}
+                    placeholder='email'
+                    errorClassName='border-red-600'
+                    value={order?.customer_email ?? ''}
+                  />
+                  <Errors resource='orders' field='customer_email' />
+                </div>
+
+                {/*  Use `key` to re-render the ShippingAddressForm once we have the order from  `fetchOrder`. */}
+                {/*  When you are in your own project, you can retrieve the order before rendering the form. */}
+                <ShippingAddressForm key={shippingAddress?.id}>
+                  <fieldset className='flex gap-4 w-full mb-4'>
+                    <div className='flex-1'>
+                      <label htmlFor='shipping_address_first_name'>
+                        First name
+                      </label>
+                      <AddressInput
+                        id='shipping_address_first_name'
+                        name='shipping_address_first_name'
+                        type='text'
+                        className={inputCss}
+                        value={shippingAddress?.first_name}
+                      />
+                      <Errors
+                        resource='shipping_address'
+                        field='shipping_address_first_name'
+                      />
+                    </div>
+
+                    <div className='flex-1'>
+                      <label htmlFor='shipping_address_last_name'>
+                        Last name
+                      </label>
+                      <AddressInput
+                        id='shipping_address_last_name'
+                        name='shipping_address_last_name'
+                        type='text'
+                        className={inputCss}
+                        value={shippingAddress?.last_name}
+                      />
+                      <Errors
+                        resource='shipping_address'
+                        field='shipping_address_last_name'
+                      />
+                    </div>
+                  </fieldset>
+
+                  <div className='mb-4'>
+                    <label htmlFor='shipping_address_line_1'>
+                      Address line 1
+                    </label>
+                    <AddressInput
+                      id='shipping_address_line_1'
+                      name='shipping_address_line_1'
+                      type='text'
+                      className={inputCss}
+                      value={shippingAddress?.line_1}
+                    />
+                    <Errors
+                      resource='shipping_address'
+                      field='shipping_address_line_1'
+                    />
+                  </div>
+
+                  <div className='mb-4'>
+                    <label htmlFor='shipping_address_line_2'>
+                      Address line 2
+                    </label>
+                    <AddressInput
+                      id='shipping_address_line_2'
+                      name='shipping_address_line_2'
+                      type='text'
+                      className={inputCss}
+                      value={shippingAddress?.line_2}
+                    />
+                    <Errors
+                      resource='shipping_address'
+                      field='shipping_address_line_2'
+                    />
+                  </div>
+
+                  <fieldset className='flex gap-4 w-full mb-4'>
+                    <div className='flex-1'>
+                      <label htmlFor='shipping_address_city'>City</label>
+                      <AddressInput
+                        id='shipping_address_city'
+                        name='shipping_address_city'
+                        type='text'
+                        className={inputCss}
+                        value={shippingAddress?.city}
+                      />
+                      <Errors
+                        resource='shipping_address'
+                        field='shipping_address_city'
+                      />
+                    </div>
+
+                    <div className='flex-1'>
+                      <label htmlFor='shipping_address_country_code'>
+                        Country
+                      </label>
+                      <AddressCountrySelector
+                        data-cy='shipping_address_country_code'
+                        name='shipping_address_country_code'
+                        className={inputCss}
+                        placeholder={{
+                          value: '',
+                          label: 'Country',
+                          disabled: true
+                        }}
+                        value={shippingAddress?.country_code}
+                      />
+                      <Errors
+                        resource='shipping_address'
+                        field='shipping_address_country_code'
+                      />
+                    </div>
+                  </fieldset>
+
+                  <fieldset className='flex gap-4 w-full mb-4'>
+                    <div className='flex-1'>
+                      <label htmlFor='shipping_address_state_code'>State</label>
+                      <AddressStateSelector
+                        id='shipping_address_state_code'
+                        name='shipping_address_state_code'
+                        placeholder={{
+                          value: '',
+                          label: 'Select a state',
+                          disabled: true
+                        }}
+                        className={inputCss}
+                        value={shippingAddress?.state_code}
+                      />
+                      <Errors
+                        resource='shipping_address'
+                        field='shipping_address_state_code'
+                      />
+                    </div>
+
+                    <div className='flex-1'>
+                      <label htmlFor='shipping_address_zip_code'>
+                        Zip Code
+                      </label>
+                      <AddressInput
+                        id='shipping_address_zip_code'
+                        name='shipping_address_zip_code'
+                        type='text'
+                        className={inputCss}
+                        value={shippingAddress?.zip_code}
+                      />
+                      <Errors
+                        resource='shipping_address'
+                        field='shipping_address_zip_code'
+                      />
+                    </div>
+                  </fieldset>
+
+                  <div className='mb-4'>
+                    <label htmlFor='shipping_address_phone'>Phone number</label>
+                    <AddressInput
+                      id='shipping_address_phone'
+                      name='shipping_address_phone'
+                      type='tel'
+                      className={inputCss}
+                      value={shippingAddress?.phone}
+                    />
+                    <Errors
+                      resource='shipping_address'
+                      field='shipping_address_phone'
+                    />
+                  </div>
+                </ShippingAddressForm>
 
                 <SaveAddressesButton
                   className='p-4 bg-black text-white rounded disabled:opacity-50'

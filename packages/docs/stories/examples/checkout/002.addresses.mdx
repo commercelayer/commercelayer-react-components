@@ -20,6 +20,18 @@ The example below shows how to use the `<AddressesContainer>` and its `CustomerI
 
 <Canvas of={Stories.CustomerAddresses} />
 
+<span title='Invert Billing and Shipping addresses' type='info'>
+To simplify the guide we will use the shipping address as same address for billing and we will only consider guest customers.
+To do so we have to set `<CustomerContainer isGuest={true}>` and inside `<AddressesContainer shipToDifferentAddress={false} invertAddresses={true}>`, but you can easily adapt the code to your needs
+and add a button to toggle between the `shipToDifferentAddress` flag and conditionally render the shipping address form using the `<BillingAddressForm>` the same way the example
+below uses the `<ShippingAddressForm>` component.
+</span>
+
+
+The example below shows how to use the `<AddressesContainer>` and its `CustomerInput` children within the `<OrderContainer>`.
+
+<Canvas of={Stories.CustomerInvertAddresses} />
+
 <span title='Tip' type='info'>
 Customer email address can also be saved without a billing or shipping address form, using the `saveOnBlur` prop.
 
