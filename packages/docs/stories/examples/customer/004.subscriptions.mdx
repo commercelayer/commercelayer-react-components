@@ -1,0 +1,41 @@
+import { Meta, Canvas, Source } from '@storybook/addon-docs';
+import * as Stories from './004.subscriptions.stories.tsx'
+
+<Meta of={Stories} />
+
+## Customer Subscriptions
+This guide will explain how to create a customer subscriptions listing page using the Commerce Layer components.
+
+The subscription list will be rendered as a sortable table, depending on the data you want to display and use as columuns.
+You might want to use components shown in this example to render a list of user's subscriptions in their account page.
+
+<span title="Requirements" type="warning">
+To access the customer scope, we will need to pass to our main `<CommerceLayer>` component the `accessToken` for a logged-in user.
+
+Also, all our components will need to stay inside the `<CustomerContainer>` that will hold the customer context.
+  <Source dark code={`
+<CommerceLayer accessToken='customer-orders-access-token'>
+  <CustomerContainer>
+    // customer components that will access the customer context here
+  <CustomerContainer />
+</CommerceLayer>
+  `} language='jsx' />
+</span>
+
+### Full example
+The list is mainly composed by two components: `OrderList` and `OrderListRow` and works around the `order subscription` object.
+
+- The `OrderList` component provides a `type` prop to specify which kind of resources are to be listed (`orders` or `subscriptions`). You need to set this prop as `subscriptions` in this case.
+- You can specify the `columns` you need to handle using the relative props in `<OrderList>`. Each columns is linked to an attribute of the `order subscription` object.
+- Each value is then rendered with a `<OrderListRow>` component, which is a `<td>` element attached to a specific `field` of the `order subscription` object.
+
+<span title="Rendering custom cell value" type="info">
+  `<OrderListRow>` works out the box by automatically render the value of the field in a `<td>` tag, 
+  but you can also use `children` prop to customize the output that will be rendered inside the `<td>` tag.
+  Just remember that you don't have to write the `<td>` tag, **but only the inner content**.
+  <br /><br />
+  In the following example you can notice that the `<OrderListRow field='number'>` cell uses a custom children render,
+  while content of other cells is rendered with the default values.
+</span>
+
+<Canvas of={Stories.Default} />
