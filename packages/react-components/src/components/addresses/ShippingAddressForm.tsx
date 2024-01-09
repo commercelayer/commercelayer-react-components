@@ -6,6 +6,7 @@ import isEmpty from 'lodash/isEmpty'
 import { type BaseError, type CodeErrorType } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import { getSaveShippingAddressToAddressBook } from '#utils/localStorage'
+import { type AddressValuesKeys } from '#context/BillingAddressFormContext'
 
 interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
   children: ReactNode
@@ -38,7 +39,13 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     reset = false,
     ...p
   } = props
-  const { validation, values, errors, reset: resetForm } = useRapidForm()
+  const {
+    validation,
+    values,
+    errors,
+    reset: resetForm,
+    setValue: setValueForm
+  } = useRapidForm()
   const {
     setAddressErrors,
     setAddress,
@@ -154,7 +161,11 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     includeLoaded,
     isBusiness
   ])
-  const setValue = (name: any, value: any): void => {
+  const setValue = (
+    name: AddressValuesKeys,
+    value: string | number | readonly string[]
+  ): void => {
+    setValueForm(name, value as string)
     const field: any = {
       [name.replace('shipping_address_', '')]: value
     }

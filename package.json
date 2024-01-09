@@ -11,7 +11,10 @@
     "prepare": "husky install",
     "test": "pnpm -r test",
     "docs:dev": "pnpm --filter docs storybook",
-    "docs:build": "pnpm --filter docs build-storybook"
+    "docs:build": "pnpm --filter docs build-storybook",
+    "components:build:dev": "pnpm --filter react-components build:dev",
+    "make:version": "lerna version --no-private",
+    "make:version:force": "lerna version --no-private --force-publish"
   },
   "devDependencies": {
     "@commercelayer/eslint-config-ts-react": "^1.1.0",

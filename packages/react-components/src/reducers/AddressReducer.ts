@@ -93,11 +93,8 @@ export interface SetAddressParams<V extends AddressSchema> {
   values: V
   resource: AddressResource
   dispatch?: Dispatch<AddressAction>
+  state?: AddressState
 }
-
-export type SetAddress = <V extends AddressSchema>(
-  params: SetAddressParams<V>
-) => void
 
 export const setAddressErrors: SetAddressErrors = ({
   errors,
@@ -123,13 +120,22 @@ export const setAddressErrors: SetAddressErrors = ({
     })
 }
 
-export const setAddress: SetAddress = ({ values, resource, dispatch }) => {
+export function setAddress<V extends AddressSchema>({
+  values,
+  resource,
+  dispatch,
+  state
+}: SetAddressParams<V>): void {
+  const payload = {
+    [`${resource}`]: {
+      ...state?.[resource],
+      ...values
+    }
+  }
   if (dispatch)
     dispatch({
       type: 'setAddress',
-      payload: {
-        [`${resource}`]: values
-      }
+      payload
     })
 }
 

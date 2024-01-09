@@ -62,7 +62,8 @@ export function AddressStateSelector(props: Props): JSX.Element {
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
   const customerAddress = useContext(CustomerAddressFormContext)
-  const { errors: addressErrors } = useContext(AddressesContext)
+  const { errors: addressErrors, billing_address: bAddress } =
+    useContext(AddressesContext)
   const [hasError, setHasError] = useState(false)
   const [countryCode, setCountryCode] = useState('')
   const [val, setVal] = useState(value || '')
@@ -86,7 +87,8 @@ export function AddressStateSelector(props: Props): JSX.Element {
     const billingCountryCode =
       typeof billingAddress?.values?.billing_address_country_code === 'string'
         ? billingAddress?.values?.billing_address_country_code
-        : billingAddress?.values?.billing_address_country_code?.value
+        : billingAddress?.values?.billing_address_country_code?.value ??
+          bAddress?.country_code
     if (billingCountryCode && billingCountryCode !== countryCode)
       setCountryCode(billingCountryCode)
     const shippingCountryCode =
@@ -100,6 +102,12 @@ export function AddressStateSelector(props: Props): JSX.Element {
       billingCountryCode,
       countryCode !== billingCountryCode
     ].every(Boolean)
+    if (!changeBillingCountry && value != null && value !== val) {
+      if (billingAddress.setValue != null) {
+        billingAddress?.setValue(name, value)
+      }
+      setVal(value)
+    }
     if (
       changeBillingCountry &&
       billingCountryCode &&
@@ -118,6 +126,12 @@ export function AddressStateSelector(props: Props): JSX.Element {
       shippingCountryCode,
       countryCode !== shippingCountryCode
     ].every(Boolean)
+    if (!changeShippingCountry && value != null && value !== val) {
+      if (shippingAddress.setValue != null) {
+        shippingAddress?.setValue(name, value)
+      }
+      setVal(value)
+    }
     if (
       changeShippingCountry &&
       shippingCountryCode &&
@@ -149,7 +163,14 @@ export function AddressStateSelector(props: Props): JSX.Element {
     return () => {
       setHasError(false)
     }
-  }, [value, billingAddress, shippingAddress, addressErrors, customerAddress])
+  }, [
+    value,
+    billingAddress?.values?.billing_address_country_code,
+    shippingAddress?.values?.shipping_address_country_code,
+    bAddress?.country_code,
+    addressErrors,
+    customerAddress
+  ])
   const errorClassName =
     billingAddress?.errorClassName ||
     shippingAddress?.errorClassName ||

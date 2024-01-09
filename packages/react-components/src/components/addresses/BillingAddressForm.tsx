@@ -44,7 +44,13 @@ export function BillingAddressForm(props: Props): JSX.Element {
     reset = false,
     ...p
   } = props
-  const { validation, values, errors, reset: resetForm } = useRapidForm()
+  const {
+    validation,
+    values,
+    errors,
+    reset: resetForm,
+    setValue: setValueForm
+  } = useRapidForm()
   const { setAddressErrors, setAddress, isBusiness } =
     useContext(AddressesContext)
   const {
@@ -147,6 +153,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     name: AddressValuesKeys,
     value: string | number | readonly string[]
   ): void => {
+    setValueForm(name, value as string)
     const field: any = {
       [name.replace('billing_address_', '')]: value
     }
