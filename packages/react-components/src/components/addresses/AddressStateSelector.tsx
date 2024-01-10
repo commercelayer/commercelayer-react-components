@@ -62,8 +62,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
   const customerAddress = useContext(CustomerAddressFormContext)
-  const { errors: addressErrors, billing_address: bAddress } =
-    useContext(AddressesContext)
+  const { errors: addressErrors } = useContext(AddressesContext)
   const [hasError, setHasError] = useState(false)
   const [countryCode, setCountryCode] = useState('')
   const [val, setVal] = useState(value || '')
@@ -87,8 +86,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
     const billingCountryCode =
       typeof billingAddress?.values?.billing_address_country_code === 'string'
         ? billingAddress?.values?.billing_address_country_code
-        : billingAddress?.values?.billing_address_country_code?.value ??
-          bAddress?.country_code
+        : billingAddress?.values?.billing_address_country_code?.value
     if (billingCountryCode && billingCountryCode !== countryCode)
       setCountryCode(billingCountryCode)
     const shippingCountryCode =
@@ -167,7 +165,6 @@ export function AddressStateSelector(props: Props): JSX.Element {
     value,
     billingAddress?.values?.billing_address_country_code,
     shippingAddress?.values?.shipping_address_country_code,
-    bAddress?.country_code,
     addressErrors,
     customerAddress
   ])

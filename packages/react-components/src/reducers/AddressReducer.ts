@@ -14,6 +14,7 @@ import camelCase from 'lodash/camelCase'
 import { type TCustomerAddress } from './CustomerReducer'
 import { type TResourceError } from '#components/errors/Errors'
 import { invertedAddressesHandler } from '#utils/addressesManager'
+import { formCleaner } from '#utils/formCleaner'
 
 export type AddressActionType =
   | 'setErrors'
@@ -129,7 +130,7 @@ export function setAddress<V extends AddressSchema>({
   const payload = {
     [`${resource}`]: {
       ...state?.[resource],
-      ...values
+      ...formCleaner(values)
     }
   }
   if (dispatch)
@@ -186,6 +187,8 @@ export async function saveAddresses({
   } = state
   try {
     const sdk = getSdk(config)
+    console.log('billingAddress', billingAddress)
+    console.log('shippingAddress', shippingAddress)
     if (order) {
       let orderAttributes: OrderUpdate | null = null
       if (invertAddresses) {
