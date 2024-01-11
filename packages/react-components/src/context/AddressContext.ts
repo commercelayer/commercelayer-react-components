@@ -1,7 +1,6 @@
 import { createContext } from 'react'
 import {
   type AddressState,
-  type SetAddress,
   setAddress,
   type AddressResource,
   type saveAddresses
@@ -11,7 +10,7 @@ import { type BaseError } from '#typings/errors'
 type DefaultContext = {
   saveAddresses?: (customerEmail?: string) => ReturnType<typeof saveAddresses>
   setCloneAddress: (id: string, resource: AddressResource) => void
-  setAddress: SetAddress
+  setAddress: typeof setAddress
   setAddressErrors: (errors: BaseError[], resource: AddressResource) => void
 } & AddressState
 

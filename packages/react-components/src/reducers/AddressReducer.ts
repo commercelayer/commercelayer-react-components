@@ -14,6 +14,7 @@ import camelCase from 'lodash/camelCase'
 import { type TCustomerAddress } from './CustomerReducer'
 import { type TResourceError } from '#components/errors/Errors'
 import { invertedAddressesHandler } from '#utils/addressesManager'
+import { formCleaner } from '#utils/formCleaner'
 
 export type AddressActionType =
   | 'setErrors'
@@ -95,10 +96,6 @@ export interface SetAddressParams<V extends AddressSchema> {
   dispatch?: Dispatch<AddressAction>
 }
 
-export type SetAddress = <V extends AddressSchema>(
-  params: SetAddressParams<V>
-) => void
-
 export const setAddressErrors: SetAddressErrors = ({
   errors,
   dispatch,
@@ -123,13 +120,20 @@ export const setAddressErrors: SetAddressErrors = ({
     })
 }
 
-export const setAddress: SetAddress = ({ values, resource, dispatch }) => {
+export function setAddress<V extends AddressSchema>({
+  values,
+  resource,
+  dispatch
+}: SetAddressParams<V>): void {
+  const payload = {
+    [`${resource}`]: {
+      ...formCleaner(values)
+    }
+  }
   if (dispatch)
     dispatch({
       type: 'setAddress',
-      payload: {
-        [`${resource}`]: values
-      }
+      payload
     })
 }
 

@@ -100,6 +100,12 @@ export function AddressStateSelector(props: Props): JSX.Element {
       billingCountryCode,
       countryCode !== billingCountryCode
     ].every(Boolean)
+    if (!changeBillingCountry && value != null && value !== val) {
+      if (billingAddress.setValue != null) {
+        billingAddress?.setValue(name, value)
+      }
+      setVal(value)
+    }
     if (
       changeBillingCountry &&
       billingCountryCode &&
@@ -118,6 +124,12 @@ export function AddressStateSelector(props: Props): JSX.Element {
       shippingCountryCode,
       countryCode !== shippingCountryCode
     ].every(Boolean)
+    if (!changeShippingCountry && value != null && value !== val) {
+      if (shippingAddress.setValue != null) {
+        shippingAddress?.setValue(name, value)
+      }
+      setVal(value)
+    }
     if (
       changeShippingCountry &&
       shippingCountryCode &&
@@ -149,7 +161,13 @@ export function AddressStateSelector(props: Props): JSX.Element {
     return () => {
       setHasError(false)
     }
-  }, [value, billingAddress, shippingAddress, addressErrors, customerAddress])
+  }, [
+    value,
+    billingAddress?.values?.billing_address_country_code,
+    shippingAddress?.values?.shipping_address_country_code,
+    addressErrors,
+    customerAddress
+  ])
   const errorClassName =
     billingAddress?.errorClassName ||
     shippingAddress?.errorClassName ||
