@@ -90,7 +90,7 @@ export function AddressesContainer(props: Props): JSX.Element {
       })
     },
     setAddress: (params: SetAddressParams<AddressSchema>) => {
-      defaultAddressContext.setAddress({ ...params, dispatch, state })
+      defaultAddressContext.setAddress({ ...params, dispatch })
     },
     saveAddresses: async (
       customerEmail?: string

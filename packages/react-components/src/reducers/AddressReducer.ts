@@ -94,7 +94,6 @@ export interface SetAddressParams<V extends AddressSchema> {
   values: V
   resource: AddressResource
   dispatch?: Dispatch<AddressAction>
-  state?: AddressState
 }
 
 export const setAddressErrors: SetAddressErrors = ({
@@ -124,12 +123,10 @@ export const setAddressErrors: SetAddressErrors = ({
 export function setAddress<V extends AddressSchema>({
   values,
   resource,
-  dispatch,
-  state
+  dispatch
 }: SetAddressParams<V>): void {
   const payload = {
     [`${resource}`]: {
-      ...state?.[resource],
       ...formCleaner(values)
     }
   }
@@ -187,8 +184,6 @@ export async function saveAddresses({
   } = state
   try {
     const sdk = getSdk(config)
-    console.log('billingAddress', billingAddress)
-    console.log('shippingAddress', shippingAddress)
     if (order) {
       let orderAttributes: OrderUpdate | null = null
       if (invertAddresses) {
