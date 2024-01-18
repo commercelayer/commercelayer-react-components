@@ -277,10 +277,20 @@ export async function setPlaceOrder({
           })
           if (setOrder) setOrder(orderUpdated)
           if (saveToWallet()) {
-            await sdk.orders.update({
-              id: order.id,
-              _save_payment_source_to_customer_wallet: true
-            })
+            sdk.orders
+              .update({
+                id: order.id,
+                _save_payment_source_to_customer_wallet: true
+              })
+              .catch((error) => {
+                // Avoid to interrupt the process if the order is already placed
+                const errors = getErrors({
+                  error,
+                  resource: 'orders',
+                  field: paymentType
+                })
+                if (setOrderErrors) setOrderErrors(errors)
+              })
           }
           if (setOrderErrors) setOrderErrors([])
           return {

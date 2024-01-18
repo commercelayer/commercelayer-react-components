@@ -21,6 +21,7 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 import { type BaseError } from '#typings/errors'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import { isEmpty } from '#utils/isEmpty'
+import { setCustomerOrderParam } from '#utils/localStorage'
 
 interface Props {
   children: ReactNode
@@ -86,6 +87,8 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
       })
     }
     if (order?.payment_source === null) {
+      // Reset save customer payment source to wallet param if the payment source is null
+      setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'false')
       dispatch({
         type: 'setPaymentSource',
         payload: {
