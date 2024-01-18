@@ -18,6 +18,10 @@ import getErrors from '#utils/getErrors'
 import jwtDecode from '#utils/jwt'
 import { type ListResponse } from '@commercelayer/sdk/lib/cjs/resource'
 import { getCustomerIdByToken } from '#utils/getCustomerIdByToken'
+import {
+  type TriggerAttributeHelper,
+  triggerAttributeHelper
+} from '#utils/triggerAttributeHelper'
 
 export type CustomerActionType =
   | 'setErrors'
@@ -427,6 +431,77 @@ export async function getCustomerInfo({
       })
     }
   }
+}
+
+export type SetResourceTriggerParams = {
+  /**
+   * The CommerceLayer config
+   */
+  config?: CommerceLayerConfig
+  /**
+   * The dispatch function
+   */
+  dispatch?: Dispatch<CustomerAction>
+  /**
+   * The page size
+   */
+  pageSize?: number
+  /**
+   * The page number
+   */
+  pageNumber?: number
+} & TriggerAttributeHelper
+
+/**
+ * Helper to trigger and activate an attribute on a resource
+ */
+export async function setResourceTrigger({
+  config,
+  dispatch,
+  resource,
+  attribute,
+  id,
+  pageSize = 10,
+  pageNumber = 1
+}: SetResourceTriggerParams): Promise<boolean> {
+  if (config.accessToken) {
+    const { owner } = jwtDecode(config.accessToken)
+    if (owner?.id) {
+      const params = {
+        config,
+        resource,
+        attribute,
+        id
+      }
+      const response = await triggerAttributeHelper(
+        params as TriggerAttributeHelper
+      )
+      if (response != null && dispatch != null) {
+        switch (resource) {
+          case 'orders':
+            await getCustomerOrders({
+              config,
+              dispatch,
+              pageSize,
+              pageNumber
+            })
+            break
+          case 'order_subscriptions':
+            await getCustomerSubscriptions({
+              config,
+              dispatch,
+              pageSize,
+              pageNumber
+            })
+            break
+          default:
+            return false
+        }
+        return true
+      }
+    }
+  }
+  return false
 }
 
 export const customerInitialState: CustomerState = {

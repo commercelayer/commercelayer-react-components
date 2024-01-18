@@ -12,7 +12,9 @@ import customerReducer, {
   saveCustomerUser,
   getCustomerPayments,
   getCustomerSubscriptions,
-  getCustomerInfo
+  getCustomerInfo,
+  type SetResourceTriggerParams,
+  setResourceTrigger
 } from '#reducers/CustomerReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
@@ -163,6 +165,16 @@ export function CustomerContainer(props: Props): JSX.Element {
           dispatch,
           config,
           addresses: state.addresses
+        })
+      },
+      setResourceTrigger: async (
+        props: Omit<SetResourceTriggerParams, 'dispatch' | 'config'>
+      ): Promise<boolean> => {
+        // @ts-expect-error strange type error
+        return await setResourceTrigger({
+          ...props,
+          dispatch,
+          config
         })
       },
       createCustomerAddress: async (address: TCustomerAddress) => {
