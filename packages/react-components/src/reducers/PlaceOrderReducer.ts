@@ -255,7 +255,8 @@ export async function setPlaceOrder({
       }
       switch (paymentType) {
         case 'braintree_payments': {
-          if (saveToWallet()) {
+          const total = order?.total_amount_cents ?? 0
+          if (saveToWallet() && total > 0) {
             await sdk.orders.update({
               id: order.id,
               _save_payment_source_to_customer_wallet: true
@@ -275,12 +276,23 @@ export async function setPlaceOrder({
           const orderUpdated = await sdk.orders.update(updateAttributes, {
             include
           })
+          const total = orderUpdated?.total_amount_cents ?? 0
           if (setOrder) setOrder(orderUpdated)
-          if (saveToWallet()) {
-            await sdk.orders.update({
-              id: order.id,
-              _save_payment_source_to_customer_wallet: true
-            })
+          if (saveToWallet() && total > 0) {
+            sdk.orders
+              .update({
+                id: order.id,
+                _save_payment_source_to_customer_wallet: true
+              })
+              .catch((error) => {
+                // Avoid to interrupt the process if the order is already placed
+                const errors = getErrors({
+                  error,
+                  resource: 'orders',
+                  field: paymentType
+                })
+                if (setOrderErrors) setOrderErrors(errors)
+              })
           }
           if (setOrderErrors) setOrderErrors([])
           return {
