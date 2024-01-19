@@ -450,6 +450,10 @@ export type SetResourceTriggerParams = {
    * The page number
    */
   pageNumber?: number
+  /**
+   *  Reload the list of orders or subscriptions if the trigger is successful. Default: false
+   */
+  reloadList?: boolean
 } & TriggerAttributeHelper
 
 /**
@@ -462,7 +466,8 @@ export async function setResourceTrigger({
   attribute,
   id,
   pageSize = 10,
-  pageNumber = 1
+  pageNumber = 1,
+  reloadList = false
 }: SetResourceTriggerParams): Promise<boolean> {
   if (config.accessToken) {
     const { owner } = jwtDecode(config.accessToken)
@@ -476,7 +481,7 @@ export async function setResourceTrigger({
       const response = await triggerAttributeHelper(
         params as TriggerAttributeHelper
       )
-      if (response != null && dispatch != null) {
+      if (response != null && dispatch != null && reloadList) {
         switch (resource) {
           case 'orders':
             await getCustomerOrders({
