@@ -32,13 +32,14 @@ const getAllErrors: GetAllErrors = (params) => {
       const objMsg = customMessages(messages, v)
       let text =
         v?.title && v?.detail != null && !v.detail?.includes(v.title)
-          ? `${v.title} - ${v.detail}`
-          : `${v?.detail || v.message}`
-      if (objMsg?.message) text = objMsg?.message
+          ? `${v.title} - ${v.detail}`.trim()
+          : `${v?.detail || v.message}`.trim()
+      if (objMsg?.message) text = objMsg?.message.trim()
+      const isEmpty = text.length === 0
       if (field) {
         if (v.resource === 'line_items') {
           if (lineItem && v.id === lineItem.id) {
-            return returnHtml ? (
+            return isEmpty ? undefined : returnHtml ? (
               <span key={k} {...props}>
                 {text}
               </span>
@@ -48,7 +49,7 @@ const getAllErrors: GetAllErrors = (params) => {
           }
         }
         if (field === v.field && resource === v.resource) {
-          return returnHtml ? (
+          return isEmpty ? undefined : returnHtml ? (
             <span key={k} {...props}>
               {text}
             </span>
@@ -58,7 +59,7 @@ const getAllErrors: GetAllErrors = (params) => {
         }
       }
       if (resource === v.resource && !field) {
-        return returnHtml ? (
+        return isEmpty ? undefined : returnHtml ? (
           <span key={k} {...props}>
             {text}
           </span>
