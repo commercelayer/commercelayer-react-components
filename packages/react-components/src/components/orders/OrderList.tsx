@@ -59,6 +59,19 @@ type PaginationProps =
       pageSize?: never
     }
 
+type SubscriptionFields =
+  | {
+      /**
+       * Subscriptions id - Use to fetch subscriptions and shows its orders
+       */
+      number?: string
+      type?: 'subscriptions'
+    }
+  | {
+      number?: never
+      type?: 'orders'
+    }
+
 type Props = {
   /**
    * Type of list to render
@@ -107,9 +120,11 @@ type Props = {
    */
   rowTrClassName?: string
 } & Omit<JSX.IntrinsicElements['table'], 'children'> &
-  PaginationProps
+  PaginationProps &
+  SubscriptionFields
 
 export function OrderList({
+  number,
   type = 'orders',
   children,
   columns,
@@ -144,10 +159,11 @@ export function OrderList({
     if (type === 'subscriptions' && getCustomerSubscriptions != null) {
       void getCustomerSubscriptions({
         pageNumber: pageIndex + 1,
-        pageSize: currentPageSize
+        pageSize: currentPageSize,
+        number
       })
     }
-  }, [pageIndex, currentPageSize])
+  }, [pageIndex, currentPageSize, number != null])
   const data = useMemo(() => {
     if (type === 'subscriptions') return subscriptions ?? []
     return orders ?? []

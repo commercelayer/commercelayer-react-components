@@ -38,7 +38,7 @@ export interface CustomerActionPayload {
   customerEmail: string
   errors: BaseError[]
   orders: ListResponse<Order>
-  subscriptions: ListResponse<OrderSubscription> | null
+  subscriptions: ListResponse<OrderSubscription> | ListResponse<Order> | null
   isGuest: boolean
   customers: Customer
 }
@@ -266,6 +266,10 @@ interface GetCustomerOrdersProps {
    * The page number
    */
   pageNumber?: number
+  /**
+   * Retrieve a specific subscription or order by number
+   */
+  number?: string
 }
 
 export async function getCustomerOrders({
@@ -292,6 +296,7 @@ export async function getCustomerOrders({
 }
 
 export async function getCustomerSubscriptions({
+  number,
   config,
   dispatch,
   pageSize = 10,
@@ -301,14 +306,29 @@ export async function getCustomerSubscriptions({
     const { owner } = jwtDecode(config.accessToken)
     if (owner?.id) {
       const sdk = getSdk(config)
-      const subscriptions = await sdk.customers.order_subscriptions(owner.id, {
-        pageSize,
-        pageNumber
-      })
-      dispatch({
-        type: 'setSubscriptions',
-        payload: { subscriptions }
-      })
+      if (number != null) {
+        const subscriptions = await sdk.customers.orders(owner.id, {
+          filters: { order_subscription_number_eq: number },
+          pageSize,
+          pageNumber
+        })
+        dispatch({
+          type: 'setSubscriptions',
+          payload: { subscriptions }
+        })
+      } else {
+        const subscriptions = await sdk.customers.order_subscriptions(
+          owner.id,
+          {
+            pageSize,
+            pageNumber
+          }
+        )
+        dispatch({
+          type: 'setSubscriptions',
+          payload: { subscriptions }
+        })
+      }
     }
   }
 }
