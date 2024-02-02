@@ -65,7 +65,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
   const { errors: addressErrors } = useContext(AddressesContext)
   const [hasError, setHasError] = useState(false)
   const [countryCode, setCountryCode] = useState('')
-  const [val, setVal] = useState(value || '')
+  const [val, setVal] = useState(value ?? '')
 
   const stateOptions = useMemo(() => {
     if (isEmpty(countryCode)) {
@@ -100,7 +100,12 @@ export function AddressStateSelector(props: Props): JSX.Element {
       billingCountryCode,
       countryCode !== billingCountryCode
     ].every(Boolean)
-    if (!changeBillingCountry && value != null && value !== val) {
+    if (
+      !changeBillingCountry &&
+      value != null &&
+      value !== '' &&
+      value !== val
+    ) {
       if (billingAddress.setValue != null) {
         billingAddress?.setValue(name, value)
       }
@@ -110,7 +115,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
       changeBillingCountry &&
       billingCountryCode &&
       !isValidState({
-        stateCode: val,
+        stateCode: val ?? '',
         countryCode: billingCountryCode,
         states
       }) &&
@@ -124,7 +129,12 @@ export function AddressStateSelector(props: Props): JSX.Element {
       shippingCountryCode,
       countryCode !== shippingCountryCode
     ].every(Boolean)
-    if (!changeShippingCountry && value != null && value !== val) {
+    if (
+      !changeShippingCountry &&
+      value != null &&
+      value !== '' &&
+      value !== val
+    ) {
       if (shippingAddress.setValue != null) {
         shippingAddress?.setValue(name, value)
       }
@@ -134,7 +144,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
       changeShippingCountry &&
       shippingCountryCode &&
       !isValidState({
-        stateCode: val,
+        stateCode: val ?? '',
         countryCode: shippingCountryCode,
         states
       }) &&

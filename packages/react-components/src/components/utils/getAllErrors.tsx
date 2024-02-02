@@ -48,7 +48,10 @@ const getAllErrors: GetAllErrors = (params) => {
             )
           }
         }
-        if (field === v.field && resource === v.resource) {
+        if (
+          (field === v.field || v.detail?.includes(field)) &&
+          resource === v.resource
+        ) {
           return isEmpty ? undefined : returnHtml ? (
             <span key={k} {...props}>
               {text}
