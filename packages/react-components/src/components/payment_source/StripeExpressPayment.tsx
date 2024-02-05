@@ -262,7 +262,13 @@ export function StripeExpressPayment({
       }
     })
     return (
-      <PaymentRequestButtonElement className='' options={{ paymentRequest }} />
+      <>
+        {/* @ts-expect-error Legacy React Node type */}
+        <PaymentRequestButtonElement
+          className=''
+          options={{ paymentRequest }}
+        />
+      </>
     )
   }
 

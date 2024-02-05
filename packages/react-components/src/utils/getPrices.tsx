@@ -23,6 +23,7 @@ export function getPricesComponent(
   return skuPrices.map((p, k) => {
     const showCompare =
       (typeof props.showCompare === 'undefined' &&
+        p?.compare_at_amount_cents != null &&
         p?.compare_at_amount_cents > p?.amount_cents) ||
       props.showCompare
     return (
@@ -44,7 +45,7 @@ export default function getPrices<P extends Price>(
   const obj: Record<string, any> = {}
   if (isArray(prices)) {
     prices.forEach((p) => {
-      const sku = p.sku_code as string
+      const sku = p?.sku_code ?? ''
       if (has(obj, sku)) {
         obj[sku].push(p)
       } else {

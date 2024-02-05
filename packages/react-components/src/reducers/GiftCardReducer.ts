@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import baseReducer from '#utils/baseReducer'
 import {
   type Customer,
@@ -153,7 +154,7 @@ export async function addGiftCard<V extends GiftCardI>(
       include: ['gift_card_recipient']
     })
     const recipientValues: GiftCardRecipientUpdate = {
-      id: giftCard.gift_card_recipient?.id as string
+      id: giftCard.gift_card_recipient?.id ?? ''
     }
     if (firstName) recipientValues.first_name = firstName
     if (lastName) recipientValues.last_name = lastName

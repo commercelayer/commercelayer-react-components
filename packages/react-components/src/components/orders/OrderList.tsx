@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState, useEffect } from 'react'
+import { useContext, useMemo, useState, useEffect, type ReactNode } from 'react'
 import CustomerContext from '#context/CustomerContext'
 import OrderListChildrenContext, {
   type TOrderList,
@@ -232,7 +232,12 @@ export function OrderList({
               onClick: header.column.getToggleSortingHandler()
             }}
           >
-            {flexRender(header.column.columnDef.header, header.getContext())}
+            {
+              flexRender(
+                header.column.columnDef.header,
+                header.getContext()
+              ) as ReactNode
+            }
             {{
               asc: sortAscIcon,
               desc: sortDescIcon

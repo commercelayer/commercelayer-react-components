@@ -15,7 +15,7 @@ import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { type updateOrder } from './OrderReducer'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
-import jwtDecode from '#utils/jwt'
+import { jwt } from '#utils/jwt'
 import { type ListResponse } from '@commercelayer/sdk/lib/cjs/resource'
 import { getCustomerIdByToken } from '#utils/getCustomerIdByToken'
 import {
@@ -279,7 +279,7 @@ export async function getCustomerOrders({
   pageNumber = 1
 }: GetCustomerOrdersProps): Promise<void> {
   if (config.accessToken) {
-    const { owner } = jwtDecode(config.accessToken)
+    const { owner } = jwt(config.accessToken)
     if (owner?.id) {
       const sdk = getSdk(config)
       const orders = await sdk.customers.orders(owner.id, {
@@ -303,7 +303,7 @@ export async function getCustomerSubscriptions({
   pageNumber = 1
 }: GetCustomerOrdersProps): Promise<void> {
   if (config.accessToken) {
-    const { owner } = jwtDecode(config.accessToken)
+    const { owner } = jwt(config.accessToken)
     if (owner?.id) {
       const sdk = getSdk(config)
       if (number != null) {
@@ -415,7 +415,7 @@ export async function getCustomerPayments({
 }: GetCustomerPaymentsParams): Promise<void> {
   if (config?.accessToken != null && dispatch != null) {
     const sdk = getSdk(config)
-    const { owner } = jwtDecode(config.accessToken)
+    const { owner } = jwt(config.accessToken)
     if (owner?.id) {
       const payments = await sdk.customer_payment_sources.list({
         include: ['payment_source'],
@@ -490,7 +490,7 @@ export async function setResourceTrigger({
   reloadList = false
 }: SetResourceTriggerParams): Promise<boolean> {
   if (config.accessToken) {
-    const { owner } = jwtDecode(config.accessToken)
+    const { owner } = jwt(config.accessToken)
     if (owner?.id) {
       const params = {
         config,

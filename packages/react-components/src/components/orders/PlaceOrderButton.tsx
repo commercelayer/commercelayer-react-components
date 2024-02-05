@@ -159,7 +159,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           attributes
         }).then((res) => {
           // @ts-expect-error no type
-          const resultCode = res?.payment_response?.resultCode
+          const resultCode: string = res?.payment_response?.resultCode
           // @ts-expect-error no type
           const errorCode = res?.payment_response?.errorCode
           // @ts-expect-error no type

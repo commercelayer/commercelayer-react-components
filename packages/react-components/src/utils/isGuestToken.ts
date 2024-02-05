@@ -1,4 +1,4 @@
-import jwt from './jwt'
+import { jwt } from './jwt'
 
 /**
  * Check if the token is a sales channel token

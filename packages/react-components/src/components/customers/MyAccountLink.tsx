@@ -4,7 +4,7 @@ import { type ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { getApplicationLink } from '#utils/getApplicationLink'
 import { getDomain } from '#utils/getDomain'
-import jwt from '#utils/jwt'
+import { jwt } from '#utils/jwt'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   /**

@@ -2,7 +2,6 @@ import { useContext, type ReactNode, useEffect, useState } from 'react'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import isEmpty from 'lodash/isEmpty'
-import type { DeliveryLeadTime } from '@commercelayer/sdk'
 
 interface Props {
   children: ReactNode
@@ -29,12 +28,11 @@ export function ShippingMethod(props: Props): JSX.Element {
         return true
       })
       .map((shippingMethod, k) => {
-        const [deliveryLeadTimeForShipment] = deliveryLeadTimes?.filter(
-          (delivery) => {
+        const [deliveryLeadTimeForShipment] =
+          deliveryLeadTimes?.filter((delivery) => {
             const deliveryShippingMethodId = delivery.shipping_method?.id
             return shippingMethod.id === deliveryShippingMethodId
-          }
-        ) as DeliveryLeadTime[]
+          }) ?? []
         const shippingProps = {
           shipmentId: shipment?.id,
           shippingMethod,

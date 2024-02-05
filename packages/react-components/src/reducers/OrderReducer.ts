@@ -143,8 +143,9 @@ export async function createOrder(params: CreateOrderParams): Promise<string> {
       setLocalOrder
     } = params
     if (state?.orderId) return state.orderId
-    const sdk = getSdk(config as CommerceLayerConfig)
+    const sdk = config != null ? getSdk(config) : undefined
     try {
+      if (sdk == null) return ''
       const o = await sdk?.orders.create({ metadata, ...orderAttributes })
       if (dispatch) {
         dispatch({
@@ -185,13 +186,14 @@ export const getApiOrder: GetOrder = async (
     deleteLocalOrder,
     state
   } = params
-  const sdk = getSdk(config as CommerceLayerConfig)
+  const sdk = config != null ? getSdk(config) : undefined
   try {
+    if (sdk == null) return undefined
     const options: QueryParamsRetrieve = {}
     if (state?.include && state.include.length > 0) {
       options.include = state.include
     }
-    const order = await sdk.orders.retrieve(id as string, options)
+    const order = await sdk.orders.retrieve(id ?? '', options)
     if (clearWhenPlaced && order.editable === false) {
       persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
       if (dispatch) {
@@ -252,8 +254,9 @@ export async function updateOrder({
   error?: unknown
   order?: Order
 }> {
-  const sdk = getSdk(config as CommerceLayerConfig)
+  const sdk = config != null ? getSdk(config) : undefined
   try {
+    if (sdk == null) return { success: false }
     const resource = { ...attributes, id }
     // const order = await sdk.orders.update(resource, { include })
     await sdk.orders.update(resource, { include })
@@ -423,7 +426,7 @@ export async function addToCart(
       if (id) {
         const order = sdk.orders.relationship(id)
         const name = lineItem?.name
-        const imageUrl = lineItem?.imageUrl as string
+        const imageUrl = lineItem?.imageUrl
         const metadata = lineItem?.metadata
         const frequency = lineItem?.frequency
         const externalPrice = lineItem?.externalPrice

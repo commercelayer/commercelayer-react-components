@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { useContext, useEffect, useState } from 'react'
 import BaseInput from '#components-utils/BaseInput'
 import { type BaseInputComponentProps } from '#typings'

@@ -240,7 +240,7 @@ export async function setExpressPlaceOrder({
     await sdk[paymentResource].update({
       id: paymentSourceId,
       order: sdk.orders.relationship(orderId)
-    } as any)
+    })
     await sdk.orders.update({
       id: orderId,
       payment_source: sdk[paymentResource].relationship(paymentSourceId)
@@ -248,7 +248,7 @@ export async function setExpressPlaceOrder({
     await sdk[paymentResource].update({
       id: paymentSourceId,
       _update: true
-    } as any)
+    })
     return await sdk.orders.retrieve(orderId, {
       include
     })

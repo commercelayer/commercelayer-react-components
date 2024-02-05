@@ -1,4 +1,4 @@
-import jwtDecode from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 
 interface JWT {
   application: {
@@ -23,6 +23,6 @@ interface JWT {
   test: boolean
 }
 
-export default function jwt(accessToken: string): JWT {
+export function jwt(accessToken: string): JWT {
   return jwtDecode<JWT>(accessToken)
 }

@@ -16,9 +16,9 @@ const BaseField: FunctionComponent<BaseFieldProps> = ({
   ...p
 }) => {
   const { order } = useContext(OrderContext)
-  const [field, setField] = useState('')
+  const [field, setField] = useState<string | undefined | null>('')
   useEffect(() => {
-    if (order && attribute in order) setField(order[attribute] as string)
+    if (order && attribute in order) setField(order[attribute])
     return () => {
       setField('')
     }

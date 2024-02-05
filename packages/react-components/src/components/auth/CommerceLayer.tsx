@@ -1,7 +1,7 @@
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import ErrorBoundary from '#components/utils/ErrorBoundary'
 import type { DefaultChildrenType } from '#typings/globals'
-import jwt from '#utils/jwt'
+import { jwt } from '#utils/jwt'
 
 interface Props {
   /**

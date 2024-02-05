@@ -51,7 +51,7 @@ export function Price(props: PriceProps): JSX.Element {
   } = useContext(PricesContext)
   const { sku } = useContext(SkuChildrenContext)
   const [skuPrices, setSkuPrices] = useState<PriceType[]>([])
-  const sCode = pricesSkuCode || skuCode || (sku?.code as string)
+  const sCode = pricesSkuCode || skuCode || sku?.code || ''
   useEffect(() => {
     if (prices != null && `${sCode}` in prices) {
       setSkuPrices(prices[sCode] as PriceType[])

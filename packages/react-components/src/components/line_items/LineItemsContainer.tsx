@@ -73,7 +73,7 @@ export function LineItemsContainer(props: Props): JSX.Element {
         dispatch,
         config,
         getOrder,
-        orderId: orderId as string,
+        orderId: orderId ?? '',
         errors: state.errors
       })
     },
@@ -83,7 +83,7 @@ export function LineItemsContainer(props: Props): JSX.Element {
         dispatch,
         config,
         getOrder,
-        orderId: orderId as string,
+        orderId: orderId ?? '',
         errors: state.errors
       })
     }
