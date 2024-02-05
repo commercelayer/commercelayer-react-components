@@ -23,6 +23,7 @@ export default function filterChildren<T = string>({
     )
   }
   if (Array.isArray(children)) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return children.filter((child) => filterBy.includes(child.type.displayName))
   }
   return children

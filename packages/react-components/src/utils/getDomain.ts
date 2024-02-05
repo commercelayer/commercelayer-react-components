@@ -4,6 +4,6 @@ export function getDomain(endpoint: string): { slug: string; domain: string } {
   const domain = url.hostname.replace(`${slug ?? ''}.`, '')
   return {
     domain,
-    slug: slug as string
+    slug: slug ?? ''
   }
 }

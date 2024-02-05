@@ -1,3 +1,4 @@
+// TODO: Remove lodash
 import isEmpty from 'lodash/isEmpty'
 import isString from 'lodash/isString'
 import without from 'lodash/without'
@@ -96,15 +97,13 @@ export type FieldsExist = (
 export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
   if (!address.business) {
     const required = without(schema, 'line_2', 'company')
-    const validAddress = keys(address).filter((k) =>
-      required.includes(k as any)
-    )
+    // @ts-expect-error string
+    const validAddress = keys(address).filter((k) => required.includes(k))
     return required.length > validAddress.length
   } else {
     const required = without(schema, 'first_name', 'last_name', 'line_2')
-    const validAddress = keys(address).filter((k) =>
-      required.includes(k as any)
-    )
+    // @ts-expect-error string
+    const validAddress = keys(address).filter((k) => required.includes(k))
     return required.length > validAddress.length
   }
 }

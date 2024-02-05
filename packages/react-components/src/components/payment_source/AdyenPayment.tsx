@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
   type CSSProperties,
   useContext,
@@ -99,7 +100,7 @@ export function AdyenPayment({
     e: any,
     component?: UIElement<any>
   ): Promise<boolean> => {
-    const savePaymentSourceToCustomerWallet =
+    const savePaymentSourceToCustomerWallet: string =
       e?.elements?.save_payment_source_to_customer_wallet?.checked
     if (savePaymentSourceToCustomerWallet)
       setCustomerOrderParam(

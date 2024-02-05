@@ -146,7 +146,8 @@ export function ShippingAddressForm(props: Props): JSX.Element {
       }
       if (ref) {
         ref.current?.reset()
-        resetForm({ target: ref.current } as any)
+        // @ts-expect-error no type
+        resetForm({ target: ref.current })
         setAddressErrors([], 'shipping_address')
         // @ts-expect-error no type
         setAddress({ values: {}, resource: 'shipping_address' })
@@ -185,7 +186,8 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     errorClassName,
     errors: errors as any,
     resetField: (name: string) => {
-      resetForm({ currentTarget: ref.current } as any, name)
+      // @ts-expect-error no type
+      resetForm({ currentTarget: ref.current }, name)
     }
   } as any
   return (

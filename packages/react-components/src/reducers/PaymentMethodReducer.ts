@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { type AdyenPaymentConfig } from '#components/payment_source/AdyenPayment'
 import { type BraintreeConfig } from '#components/payment_source/BraintreePayment'
 import { type PaypalConfig } from '#components/payment_source/PaypalPayment'

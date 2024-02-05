@@ -121,7 +121,8 @@ export function CustomerAddressForm(props: Props): JSX.Element {
     requiresBillingInfo: order?.requires_billing_info || false,
     errors: errors as any,
     resetField: (name: string) => {
-      resetForm({ currentTarget: ref.current } as any, name)
+      // @ts-expect-error no type
+      resetForm({ currentTarget: ref.current }, name)
     }
   }
   return (

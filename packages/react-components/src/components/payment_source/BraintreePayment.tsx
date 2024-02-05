@@ -130,7 +130,7 @@ export function BraintreePayment({
     hostedFieldsInstance,
     threeDSInstance
   }: SubmitProps): Promise<boolean> => {
-    const savePaymentSourceToCustomerWallet =
+    const savePaymentSourceToCustomerWallet: string =
       // @ts-expect-error no type
       event?.elements?.save_payment_source_to_customer_wallet?.checked
     if (savePaymentSourceToCustomerWallet)

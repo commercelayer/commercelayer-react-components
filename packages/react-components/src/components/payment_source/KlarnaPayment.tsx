@@ -154,7 +154,7 @@ export default function KlarnaPayment({
             paymentSourceId: paymentSource.id,
             paymentResource: currentPaymentMethodType,
             attributes: {
-              auth_token: res.authorization_token as string
+              auth_token: res.authorization_token
             }
           })
           if (props.setPlaceOrder != null) {

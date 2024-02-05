@@ -97,7 +97,8 @@
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "vitest.config.ts"
   ],
   "exclude": [
     "node_modules"

@@ -106,7 +106,7 @@ export function CheckoutComPayment({
     ...divProps
   } = p
   const handleSubmit = async (): Promise<boolean> => {
-    const savePaymentSourceToCustomerWallet =
+    const savePaymentSourceToCustomerWallet: string =
       // @ts-expect-error no type
       ref?.current?.elements?.save_payment_source_to_customer_wallet?.checked
     if (savePaymentSourceToCustomerWallet) {
@@ -166,6 +166,7 @@ export function CheckoutComPayment({
   return loaded && show ? (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
+        {/* @ts-expect-error Legacy React Node type */}
         <Frames
           config={{
             debug: true,
@@ -181,8 +182,11 @@ export function CheckoutComPayment({
           }}
           cardTokenized={(data) => data}
         >
+          {/* @ts-expect-error Legacy React Node type */}
           <CardNumber />
+          {/* @ts-expect-error Legacy React Node type */}
           <ExpiryDate />
+          {/* @ts-expect-error Legacy React Node type */}
           <Cvv />
         </Frames>
       </div>

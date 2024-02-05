@@ -20,8 +20,8 @@ export function SaveCustomerButton(props: Props): JSX.Element {
     useContext(CustomerContext)
   const disable = disabled || !isEmpty(errors) || isEmpty(customerEmail)
   const handleClick = async (): Promise<void> => {
-    if (isEmpty(errors) && !disable) {
-      saveCustomerUser && (await saveCustomerUser(customerEmail as string))
+    if (isEmpty(errors) && !disable && customerEmail != null) {
+      saveCustomerUser && (await saveCustomerUser(customerEmail))
       if (onClick) onClick()
     }
   }

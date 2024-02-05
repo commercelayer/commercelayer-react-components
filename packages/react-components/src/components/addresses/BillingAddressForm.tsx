@@ -142,7 +142,8 @@ export function BillingAddressForm(props: Props): JSX.Element {
       }
       if (ref) {
         ref.current?.reset()
-        resetForm({ target: ref.current } as any)
+        // @ts-expect-error no type
+        resetForm({ target: ref.current })
         setAddressErrors([], 'billing_address')
         // @ts-expect-error no type
         setAddress({ values: {}, resource: 'billing_address' })
@@ -175,7 +176,8 @@ export function BillingAddressForm(props: Props): JSX.Element {
     requiresBillingInfo: order?.requires_billing_info || false,
     errors: errors as any,
     resetField: (name: string) => {
-      resetForm({ currentTarget: ref.current } as any, name)
+      // @ts-expect-error no type
+      resetForm({ currentTarget: ref.current }, name)
     }
   }
   return (

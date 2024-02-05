@@ -36,7 +36,7 @@ export function PaymentMethodRadioButton(props: Props): JSX.Element {
   const { setPaymentMethod, setLoading } = useContext(PaymentMethodContext)
   const orderId = order?.id || ''
   const paymentResource = payment?.payment_source_type as PaymentResource
-  const paymentMethodId = payment?.id as string
+  const paymentMethodId = payment?.id ?? ''
   const name = `payment-${orderId}`
   const checked = paymentSelected === payment?.id
   const handleOnChange = async (

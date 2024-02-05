@@ -21,8 +21,9 @@ export function GiftCard(props: Props): JSX.Element {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
     const currentForm = ref.current
-    const elements = currentForm?.elements as HTMLFormControlsCollection
+    const elements = currentForm?.elements
     const { errors, values } = validateFormFields<RequiredFields[]>(
+      // @ts-expect-error type undefined
       elements,
       ['currencyCode', 'balanceCents'],
       'gift_cards'

@@ -1,4 +1,4 @@
-import jwt from './jwt'
+import { jwt } from './jwt'
 
 /**
  * Get the customer id from the token

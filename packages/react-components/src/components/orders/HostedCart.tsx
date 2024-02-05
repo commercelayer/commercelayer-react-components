@@ -243,7 +243,7 @@ export function HostedCart({
       setSrc(
         getApplicationLink({
           slug,
-          orderId: (order?.id ?? orderId) as string,
+          orderId: order?.id ?? orderId ?? '',
           accessToken,
           domain,
           applicationType: 'cart'

@@ -75,18 +75,28 @@ export function Address(props: Props): JSX.Element {
             setSelected(k)
           }
         }
-        if (!billingAddressId && k === selected && setBillingAddress) {
+        if (
+          !billingAddressId &&
+          k === selected &&
+          setBillingAddress &&
+          address.reference != null
+        ) {
           void setBillingAddress(address.id, {
-            customerAddressId: address.reference as string
+            customerAddressId: address.reference
           })
         }
         if (shippingCustomerAddressId) {
           const preselected = address.reference === shippingCustomerAddressId
           preselected && selected === null && setSelected(k)
         }
-        if (!shippingAddressId && k === selected && setShippingAddress) {
+        if (
+          !shippingAddressId &&
+          k === selected &&
+          setShippingAddress &&
+          address.reference != null
+        ) {
           void setShippingAddress(address.id, {
-            customerAddressId: address.reference as string
+            customerAddressId: address.reference
           })
         }
       })

@@ -3,7 +3,7 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 import InStockSubscriptionContext from '#context/InStockSubscriptionContext'
 import { type ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
-import jwt from '#utils/jwt'
+import { jwt } from '#utils/jwt'
 import { useContext, useState } from 'react'
 
 interface Props

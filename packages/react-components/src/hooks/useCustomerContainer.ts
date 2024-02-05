@@ -1,8 +1,15 @@
 import CustomerContext from '#context/CustomerContext'
-import { type CustomerState } from '#reducers/CustomerReducer'
+import {
+  type setResourceTrigger,
+  type CustomerState
+} from '#reducers/CustomerReducer'
 import { useContext } from 'react'
 
-interface TReturnCustomer extends Omit<CustomerState, 'errors' | 'isGuest'> {}
+type TCustomer = Omit<CustomerState, 'errors' | 'isGuest'> & {
+  setResourceTrigger?: typeof setResourceTrigger
+}
+
+interface TReturnCustomer extends Omit<TCustomer, 'errors' | 'isGuest'> {}
 
 /**
  * React Hook that provides access to the order context stored in the `<CustomerContainer>` component.
@@ -16,7 +23,8 @@ export function useCustomerContainer(): TReturnCustomer {
       orders: ctx.orders,
       subscriptions: ctx.subscriptions,
       customerEmail: ctx.customerEmail,
-      customers: ctx.customers
+      customers: ctx.customers,
+      setResourceTrigger: ctx.setResourceTrigger
     }
   }
   throw new Error(

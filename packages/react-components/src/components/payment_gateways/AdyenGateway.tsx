@@ -11,7 +11,7 @@ import isEmpty from 'lodash/isEmpty'
 import { useContext } from 'react'
 import AdyenPayment from '#components/payment_source/AdyenPayment'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
-import jwt from '#utils/jwt'
+import { jwt } from '#utils/jwt'
 import getCardDetails from '#utils/getCardDetails'
 import { getPaymentAttributes } from '#utils/getPaymentAttributes'
 
@@ -54,7 +54,6 @@ export function AdyenGateway(props: Props): JSX.Element | null {
       ? payments.filter((customerPayment) => {
           return (
             customerPayment.payment_source?.type === 'adyen_payments' ||
-            // @ts-expect-error missing type
             customerPayment.payment_method != null
           )
         })

@@ -1,8 +1,8 @@
 import { type PriceProps } from '#components/prices/Price'
 
 export type PTemplateProps = {
-  formattedAmount?: string
-  formattedCompare?: string
+  formattedAmount?: string | null
+  formattedCompare?: string | null
 } & Omit<PriceProps, 'children'>
 
 export function PriceTemplate(props: PTemplateProps): JSX.Element {

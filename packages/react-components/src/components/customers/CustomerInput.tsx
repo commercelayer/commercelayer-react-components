@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { useContext, useEffect, useState } from 'react'
 import BaseInput from '#components-utils/BaseInput'
 import { type BaseInputComponentProps } from '#typings'
@@ -5,6 +6,7 @@ import { useRapidForm } from 'rapid-form'
 import CustomerContext from '#context/CustomerContext'
 import { type BaseError, type CodeErrorType } from '#typings/errors'
 import { validateValue } from '#utils/validateFormFields'
+import OrderContext from '#context/OrderContext'
 
 type Props = {
   name?: 'customer_email' | string
@@ -34,6 +36,7 @@ export function CustomerInput(props: Props): JSX.Element {
   })
   const { saveCustomerUser, setCustomerErrors, setCustomerEmail } =
     useContext(CustomerContext)
+  const { setOrderErrors } = useContext(OrderContext)
   const [hasError, setHasError] = useState(false)
   const handleOnBlur = async (
     e:
@@ -76,6 +79,7 @@ export function CustomerInput(props: Props): JSX.Element {
       }
     } else {
       if (setCustomerErrors) setCustomerErrors([])
+      if (setOrderErrors) setOrderErrors([])
       setHasError(false)
     }
     if (Object.keys(values).length > 0) {
