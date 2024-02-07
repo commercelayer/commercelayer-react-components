@@ -1,6 +1,6 @@
 import baseReducer from '#utils/baseReducer'
 import { type Dispatch } from 'react'
-import { type BaseError } from '#typings/errors'
+import { type CodeErrorType, type BaseError } from '#typings/errors'
 import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
 import {
   type OrderUpdate,
@@ -15,6 +15,16 @@ import { type TCustomerAddress } from './CustomerReducer'
 import { type TResourceError } from '#components/errors/Errors'
 import { invertedAddressesHandler } from '#utils/addressesManager'
 import { formCleaner } from '#utils/formCleaner'
+import { type AddressValuesKeys } from '#context/BillingAddressFormContext'
+import { type AddressInputName } from '#typings/index'
+
+// TODO: Move in the future
+export type CustomFieldMessageError = (props: {
+  field: Extract<AddressValuesKeys, AddressInputName> | string
+  code: Extract<CodeErrorType, 'EMPTY_ERROR' | 'VALIDATION_ERROR'> | undefined
+  message: string | undefined
+  value: string
+}) => string | null
 
 export type AddressActionType =
   | 'setErrors'
