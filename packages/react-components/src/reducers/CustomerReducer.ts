@@ -309,6 +309,7 @@ export async function getCustomerSubscriptions({
       if (id != null) {
         const subscriptions = await sdk.customers.orders(owner.id, {
           filters: { order_subscription_id_eq: id },
+          include: ['authorizations'],
           pageSize,
           pageNumber
         })
