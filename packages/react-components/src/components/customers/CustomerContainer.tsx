@@ -197,18 +197,18 @@ export function CustomerContainer(props: Props): JSX.Element {
       getCustomerSubscriptions: async ({
         pageNumber,
         pageSize,
-        number
+        id
       }: {
         pageNumber?: number
         pageSize?: number
-        number?: string
+        id?: string
       }) => {
         await getCustomerSubscriptions({
           config,
           dispatch,
           pageNumber,
           pageSize,
-          number
+          id
         })
       }
     }

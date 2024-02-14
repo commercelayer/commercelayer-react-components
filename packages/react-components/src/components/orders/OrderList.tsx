@@ -64,11 +64,11 @@ type SubscriptionFields =
       /**
        * Subscriptions id - Use to fetch subscriptions and shows its orders
        */
-      number?: string
+      id?: string
       type?: 'subscriptions'
     }
   | {
-      number?: never
+      id?: never
       type?: 'orders'
     }
 
@@ -124,7 +124,7 @@ type Props = {
   SubscriptionFields
 
 export function OrderList({
-  number,
+  id,
   type = 'orders',
   children,
   columns,
@@ -160,10 +160,10 @@ export function OrderList({
       void getCustomerSubscriptions({
         pageNumber: pageIndex + 1,
         pageSize: currentPageSize,
-        number
+        id
       })
     }
-  }, [pageIndex, currentPageSize, number != null])
+  }, [pageIndex, currentPageSize, id != null])
   const data = useMemo(() => {
     if (type === 'subscriptions') return subscriptions ?? []
     return orders ?? []

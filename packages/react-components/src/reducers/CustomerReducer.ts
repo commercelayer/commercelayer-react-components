@@ -267,9 +267,9 @@ interface GetCustomerOrdersProps {
    */
   pageNumber?: number
   /**
-   * Retrieve a specific subscription or order by number
+   * Retrieve a specific subscription or order by id
    */
-  number?: string
+  id?: string
 }
 
 export async function getCustomerOrders({
@@ -296,7 +296,7 @@ export async function getCustomerOrders({
 }
 
 export async function getCustomerSubscriptions({
-  number,
+  id,
   config,
   dispatch,
   pageSize = 10,
@@ -306,9 +306,9 @@ export async function getCustomerSubscriptions({
     const { owner } = jwt(config.accessToken)
     if (owner?.id) {
       const sdk = getSdk(config)
-      if (number != null) {
+      if (id != null) {
         const subscriptions = await sdk.customers.orders(owner.id, {
-          filters: { order_subscription_number_eq: number },
+          filters: { order_subscription_id_eq: id },
           pageSize,
           pageNumber
         })
