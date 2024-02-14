@@ -203,7 +203,7 @@ export function CustomerContainer(props: Props): JSX.Element {
         pageSize?: number
         number?: string
       }) => {
-        await getCustomerOrders({
+        await getCustomerSubscriptions({
           config,
           dispatch,
           pageNumber,
