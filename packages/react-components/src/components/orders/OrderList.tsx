@@ -279,7 +279,10 @@ export function OrderList({
     componentName: 'OrderList'
   })
   const totalRows =
-    orders?.meta.recordCount ?? subscriptions?.meta.recordCount ?? 0
+    type === 'orders'
+      ? orders?.meta.recordCount ?? 0
+      : subscriptions?.meta.recordCount ?? 0
+
   const Pagination = (): JSX.Element | null =>
     !showPagination ? null : (
       <OrderListPagination.Provider
