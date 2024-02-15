@@ -24,7 +24,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install 📦
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build 🛠
         run: pnpm build
