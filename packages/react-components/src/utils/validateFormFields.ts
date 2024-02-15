@@ -89,12 +89,10 @@ const validateFormFields: ValidateFormFields = (
   return { errors, values }
 }
 
-export type FieldsExist = (
+export function fieldsExist(
   address: AddressCreate,
-  schema?: AddressField[]
-) => boolean
-
-export const fieldsExist: FieldsExist = (address, schema = addressFields) => {
+  schema: AddressField[] = addressFields
+): boolean {
   if (!address.business) {
     const required = without(schema, 'line_2', 'company')
     // @ts-expect-error string

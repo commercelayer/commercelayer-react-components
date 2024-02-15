@@ -9,6 +9,7 @@ import isEmpty from 'lodash/isEmpty'
 import { type BaseError, type CodeErrorType } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import { getSaveBillingAddressToAddressBook } from '#utils/localStorage'
+import { type CustomFieldMessageError } from '#reducers/AddressReducer'
 
 type Props = {
   children: ReactNode
@@ -20,6 +21,10 @@ type Props = {
    * Define children input and select classnames assigned in case of validation error.
    */
   errorClassName?: string
+  /**
+   * Callback to customize the error message for a specific field. Called for each error in the form.
+   */
+  customFieldMessageError?: CustomFieldMessageError
 } & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
 
 /**
@@ -42,6 +47,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     errorClassName,
     autoComplete = 'on',
     reset = false,
+    customFieldMessageError,
     ...p
   } = props
   const {
@@ -89,9 +95,18 @@ export function BillingAddressForm(props: Props): JSX.Element {
             })
           }
         } else {
+          const customMessage =
+            customFieldMessageError != null
+              ? customFieldMessageError({
+                  field: fieldName,
+                  code,
+                  message,
+                  value: values[fieldName].value
+                })
+              : null
           formErrors.push({
             code: code as CodeErrorType,
-            message: message || '',
+            message: customMessage ?? message ?? '',
             resource: 'billing_address',
             field: fieldName
           })

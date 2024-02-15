@@ -166,7 +166,6 @@ export function CheckoutComPayment({
   return loaded && show ? (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
-        {/* @ts-expect-error Legacy React Node type */}
         <Frames
           config={{
             debug: true,
@@ -182,11 +181,10 @@ export function CheckoutComPayment({
           }}
           cardTokenized={(data) => data}
         >
-          {/* @ts-expect-error Legacy React Node type */}
           <CardNumber />
-          {/* @ts-expect-error Legacy React Node type */}
+
           <ExpiryDate />
-          {/* @ts-expect-error Legacy React Node type */}
+
           <Cvv />
         </Frames>
       </div>
