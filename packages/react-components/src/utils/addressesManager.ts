@@ -192,14 +192,13 @@ export async function invertedAddressesHandler({
   sdk
 }: InvertedAddressesHandlerParams): Promise<OrderUpdate | null> {
   const currentShippingAddressRef = order?.shipping_address?.reference
-  // const currentBillingAddressRef = order?.billing_address?.reference
   const orderAttributes: OrderUpdate = {
     id: order?.id,
     _billing_address_clone_id: shippingAddressId,
     _shipping_address_clone_id: shippingAddressId,
     customer_email: customerEmail
   }
-  if (currentShippingAddressRef === billingAddressId) {
+  if (currentShippingAddressRef === shippingAddressId) {
     orderAttributes._billing_address_clone_id = order?.billing_address?.id
     orderAttributes._shipping_address_clone_id = order?.shipping_address?.id
   }
