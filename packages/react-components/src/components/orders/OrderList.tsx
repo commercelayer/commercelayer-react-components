@@ -169,7 +169,7 @@ export function OrderList({
       return orders ?? []
     }
 
-    if (id === null) {
+    if (id == null) {
       return subscriptions ?? []
     }
 
