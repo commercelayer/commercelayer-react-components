@@ -165,8 +165,19 @@ export function OrderList({
     }
   }, [pageIndex, currentPageSize, id != null])
   const data = useMemo(() => {
-    if (type === 'subscriptions') return subscriptions ?? []
-    return orders ?? []
+    if (type === 'orders') {
+      return orders ?? []
+    }
+
+    if (id === null) {
+      return subscriptions ?? []
+    }
+
+    if (subscriptions?.[0]?.type === 'orders') {
+      return subscriptions
+    }
+
+    return []
   }, [orders, subscriptions])
   const cols = useMemo<Array<ColumnDef<OrderListContent<TOrderList>>>>(
     () => columns,
