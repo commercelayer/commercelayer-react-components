@@ -53,6 +53,40 @@ Every time submit the form, a new `address` will be created and listed in the re
 <Canvas of={Stories.SampleAddressForm} />
 
 
+### Customize the Country and State list of options
+The `AddressCountrySelector` and `AddressStateSelector` components are used to render an input `<select>` with a default list of countries and states.
+While the library offers a comprehensive list of countries, it specifically includes state options only for the `United States` and `Italy`.
+
+If a country is selected and no state options are available, the `AddressStateSelector` component will render a simple input field instead of a dropdown menu, allowing users to manually input the state.
+
+You can customize both the lists of countries and states by passing the `countries` and `states` props to their respective components, as demonstrated in the following example:
+
+<Source dark code={`
+// shows only FR, IT, US with localized labels as selectable countries
+<AddressCountrySelector
+  name='billing_address_country_code'
+  countries={[
+    { value: 'ES', label: 'Espana' },
+    { value: 'IT', label: 'Italia' },
+    { value: 'US', label: 'Unites States of America' }
+  ]}
+/>
+
+// shows states as select with predefined options for France
+<AddressStateSelector
+  name='billing_address_state_code'
+  states={{
+    FR: [
+      { values: 'PA', label: 'Paris' },
+      { values: 'LY', label: 'Lyon' },
+      { values: 'NI', label: 'Nice' },
+      { values: 'MA', label: 'Marseille' },
+      { values: 'BO', label: 'Bordeaux' }
+    ]
+  }}
+/>
+`} language='jsx' /> 
+
 <span title="The &lt;Errors&gt; component" type="info">
   As you might notice, every input has a correspondant `Errors` component that is used to print validation error during form submition.
 
