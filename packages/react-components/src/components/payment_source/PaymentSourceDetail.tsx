@@ -29,8 +29,8 @@ export function PaymentSourceDetail({
     type in cardObj && cardObj[type] != null
       ? cardObj[type]
       : type === 'last4'
-      ? '****'
-      : '**'
+        ? '****'
+        : '**'
   const parentProps = {
     type,
     text,

@@ -71,11 +71,11 @@ export async function getAvailability({
       skuId != null
         ? [{ id: skuId }]
         : skuCode != null
-        ? await sdk.skus.list({
-            fields: { skus: ['id'] },
-            filters: { code_in: skuCode }
-          })
-        : []
+          ? await sdk.skus.list({
+              fields: { skus: ['id'] },
+              filters: { code_in: skuCode }
+            })
+          : []
     if (sku) {
       const skuInventory = (await sdk.skus.retrieve(sku.id, {
         fields: { skus: ['inventory'] }

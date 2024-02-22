@@ -98,12 +98,12 @@ export function OrderListPaginationButtons({
     ctx?.canPreviousPage === false
       ? ctx?.pageOptions.slice(0, 3).map((v) => v + 1)
       : ctx?.canNextPage === false
-      ? ctx?.pageOptions
-          .slice(ctx?.pageOptions.length - 3, ctx?.pageOptions.length)
-          .map((v) => v + 1)
-      : ctx?.pageOptions
-          .slice(ctx?.pageIndex - 1, ctx?.pageIndex + 2)
-          .map((v) => v + 1)
+        ? ctx?.pageOptions
+            .slice(ctx?.pageOptions.length - 3, ctx?.pageOptions.length)
+            .map((v) => v + 1)
+        : ctx?.pageOptions
+            .slice(ctx?.pageIndex - 1, ctx?.pageIndex + 2)
+            .map((v) => v + 1)
   const NavButtons = navButton.show
     ? pagesToShow?.map((v) => {
         const currentPage = ctx?.pageIndex != null ? ctx?.pageIndex + 1 : 1

@@ -11,22 +11,22 @@ type ApplicationTypeProps<T extends ApplicationType = ApplicationType> =
         returnUrl?: string
       }
     : T extends 'identity'
-    ? {
-        applicationType: T
-        orderId?: string
-        modeType: 'login' | 'signup'
-        clientId: string
-        scope: string
-        returnUrl: string
-      }
-    : {
-        applicationType: Omit<T, 'my-account' | 'identity'>
-        orderId: string
-        modeType?: 'login' | 'signup'
-        clientId?: string
-        scope?: string
-        returnUrl?: string
-      }
+      ? {
+          applicationType: T
+          orderId?: string
+          modeType: 'login' | 'signup'
+          clientId: string
+          scope: string
+          returnUrl: string
+        }
+      : {
+          applicationType: Omit<T, 'my-account' | 'identity'>
+          orderId: string
+          modeType?: 'login' | 'signup'
+          clientId?: string
+          scope?: string
+          returnUrl?: string
+        }
 
 interface TArgs {
   accessToken: string

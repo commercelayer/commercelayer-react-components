@@ -166,7 +166,6 @@ export function CheckoutComPayment({
   return loaded && show ? (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
-        {/* @ts-expect-error React type error */}
         <Frames
           config={{
             debug: true,
@@ -182,11 +181,8 @@ export function CheckoutComPayment({
           }}
           cardTokenized={(data) => data}
         >
-          {/* @ts-expect-error React type error */}
           <CardNumber />
-          {/* @ts-expect-error React type error */}
           <ExpiryDate />
-          {/* @ts-expect-error React type error */}
           <Cvv />
         </Frames>
       </div>
