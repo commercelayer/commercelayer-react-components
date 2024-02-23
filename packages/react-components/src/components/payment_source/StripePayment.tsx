@@ -147,7 +147,6 @@ function StripePaymentForm({
   return (
     <form ref={ref}>
       {/* <CardElement options={{ ...defaultOptions, ...options }} /> */}
-      {/* @ts-expect-error React type error */}
       <PaymentElement
         id='payment-element'
         options={{ ...defaultOptions, ...options }}
@@ -215,7 +214,6 @@ export function StripePayment({
   }
   return isLoaded && stripe != null && clientSecret != null ? (
     <div className={containerClassName} {...divProps}>
-      {/* @ts-expect-error React type error */}
       <Elements stripe={stripe} options={elementsOptions}>
         {expressPayments ? (
           <StripeExpressPayment clientSecret={clientSecret} />
