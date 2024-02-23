@@ -2,7 +2,7 @@ import { authentication } from '@commercelayer/js-auth'
 import { useEffect, useMemo, useState } from 'react'
 import Cookie from 'js-cookie'
 import { type TBaseReturn } from '@commercelayer/js-auth/lib/esm/types'
-import jwtDecode from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 
 const salesChannel = {
   clientId: 'Z5ypiDlsqgV8twWRz0GabrJvTKXad4U-PMoVAU-XvV0',
