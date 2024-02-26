@@ -1,4 +1,4 @@
-import { rest } from 'msw'
+import { http } from 'msw'
 
 const order = {
   id: 'NMWYhbGorj',
@@ -343,10 +343,10 @@ const order = {
   meta: { mode: 'test', organization_id: 'WXlEOFrjnr' }
 }
 
-const orderDetail = rest.get(
+const orderDetail = http.get(
   'https://mock.localhost/api/orders/NMWYhbGorj?include=shipments,transactions,payment_method,payment_source,attachments',
   async (req, res, ctx) => {
-    return new Promise((resolve) => {
+    return await new Promise((resolve) => {
       setTimeout(() => {
         resolve(
           res(
@@ -2031,7 +2031,7 @@ function getRandomOrderStatus() {
   return statues[Math.floor(Math.random() * statues.length)]
 }
 
-const orderList = rest.get(
+const orderList = http.get(
   'https://mock.localhost/api/orders',
   async (req, res, ctx) => {
     const currentPage = parseInt(

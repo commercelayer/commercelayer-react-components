@@ -477,3 +477,76 @@ export const CustomerEmailSaveOnBlur: StoryFn = (args) => {
     </CommerceLayer>
   )
 }
+
+export const CustomErrorMessages: StoryFn = () => {
+  const [order, setOrder] = useState<Order | null>(null)
+
+  const billingAddress = useMemo(
+    () => makeAddressWithRequired(order?.billing_address),
+    [order?.billing_address]
+  )
+  const regex = /[a-zA-Z]+/g
+  return (
+    <CommerceLayer accessToken='my-access-token'>
+      <OrderStorage persistKey={persistKey}>
+        <OrderContainer fetchOrder={setOrder}>
+          <section title='Checkout Address' className='max-w-xl'>
+            <CustomerContainer isGuest>
+              <AddressesContainer shipToDifferentAddress={false}>
+                <BillingAddressForm
+                  key={billingAddress?.id}
+                  customFieldMessageError={(props) => {
+                    const regex = /[a-zA-Z]+/g
+                    if (
+                      props.field === 'billing_address_first_name' &&
+                      !regex.test(props.value)
+                    ) {
+                      return 'Validation error - only characters are allowed - this is a custom message'
+                    }
+                    return null
+                  }}
+                >
+                  <fieldset className='flex gap-4 w-full mb-4'>
+                    <div className='flex-1'>
+                      <label htmlFor='billing_address_first_name'>
+                        First name
+                      </label>
+                      <AddressInput
+                        id='billing_address_first_name'
+                        name='billing_address_first_name'
+                        type='text'
+                        pattern={regex}
+                        className={inputCss}
+                      />
+                      <Errors
+                        resource='billing_address'
+                        field='billing_address_first_name'
+                      />
+                    </div>
+
+                    <div className='flex-1'>
+                      <label htmlFor='billing_address_last_name'>
+                        Last name
+                      </label>
+                      <AddressInput
+                        id='billing_address_last_name'
+                        name='billing_address_last_name'
+                        type='text'
+                        className={inputCss}
+                        value={billingAddress?.last_name}
+                      />
+                      <Errors
+                        resource='billing_address'
+                        field='billing_address_last_name'
+                      />
+                    </div>
+                  </fieldset>
+                </BillingAddressForm>
+              </AddressesContainer>
+            </CustomerContainer>
+          </section>
+        </OrderContainer>
+      </OrderStorage>
+    </CommerceLayer>
+  )
+}

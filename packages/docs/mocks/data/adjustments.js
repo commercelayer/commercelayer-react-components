@@ -1,9 +1,9 @@
-import { rest } from 'msw'
+import { http } from 'msw'
 
-const restPost = rest.post(
+const restPost = http.post(
   `https://mock.localhost/api/adjustments`,
   async (req, res, ctx) => {
-    return new Promise((resolve) => {
+    return await new Promise((resolve) => {
       setTimeout(() => {
         resolve(
           res(

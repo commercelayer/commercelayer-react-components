@@ -1,9 +1,9 @@
-import { rest } from 'msw'
+import { http } from 'msw'
 
-const restPatch = rest.patch(
+const restPatch = http.patch(
   `https://mock.localhost/api/line_items/:id`,
   async (req, res, ctx) => {
-    return new Promise((resolve) => {
+    return await new Promise((resolve) => {
       setTimeout(() => {
         resolve(res(ctx.status(200), ctx.body(`Update ${req.params.id}`)))
       }, 1000)
@@ -11,10 +11,10 @@ const restPatch = rest.patch(
   }
 )
 
-const restDelete = rest.delete(
+const restDelete = http.delete(
   `https://mock.localhost/api/line_items/:id`,
   async (req, res, ctx) => {
-    return new Promise((resolve) => {
+    return await new Promise((resolve) => {
       setTimeout(() => {
         resolve(res(ctx.status(200), ctx.body(`Removed ${req.params.id}`)))
       }, 1000)
@@ -22,10 +22,10 @@ const restDelete = rest.delete(
   }
 )
 
-const restPost = rest.post(
+const restPost = http.post(
   `https://mock.localhost/api/line_items`,
   async (req, res, ctx) => {
-    return new Promise((resolve) => {
+    return await new Promise((resolve) => {
       setTimeout(() => {
         resolve(
           res(
