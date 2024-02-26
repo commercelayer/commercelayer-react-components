@@ -14,9 +14,9 @@ type Props = {
    */
   name: Extract<AddressValuesKeys, AddressInputName>
   /**
-   * Used to add a custom validation rule.
+   * Used to add a custom validation rule. Accept a regex as param.
    */
-  pattern?: RegExp | string
+  pattern?: RegExp
 } & Omit<BaseInputComponentProps, 'name'> &
   JSX.IntrinsicElements['input'] &
   Omit<JSX.IntrinsicElements['textarea'], 'children'>
