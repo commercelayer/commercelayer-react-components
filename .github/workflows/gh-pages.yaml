@@ -35,7 +35,7 @@ jobs:
       - name: Node 🧰
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: 'latest'
           cache: "pnpm"
 
       - name: Install 📦
