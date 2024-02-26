@@ -39,3 +39,13 @@ Try to set an email address and to click outside the input field to see the emai
 </span>
 
 <Canvas of={Stories.CustomerEmailSaveOnBlur} />
+
+<span title='Customize input field validation and error message' type='info'>
+  There is the possibility to customize the error messages and the validation for each input field.
+
+  Combine `pattern` prop on the `AddressInput`, and `customFieldMessageError` on addresses form (`BillingAddressForm`, `ShippingAddressForm`).
+
+  Try to set a number on the first name input field and see the custom error message being displayed.
+</span>
+
+<Canvas of={Stories.CustomErrorMessages} />

@@ -1,7 +1,7 @@
-import { rest } from 'msw'
+import { http } from 'msw'
 
 // used in HookedInputResourceGroup
-const someMarkets = rest.get(
+const someMarkets = http.get(
   'https://mock.localhost/api/markets?fields[markets]=id,name&sort=name&page[size]=3',
   (req, res, ctx) => {
     return res(
@@ -49,7 +49,7 @@ const someMarkets = rest.get(
 )
 
 // used in HookedInputResourceGroup
-const allMarkets = rest.get(
+const allMarkets = http.get(
   'https://mock.localhost/api/markets?sort=name&page[number]=1&page[size]=25',
   (req, res, ctx) => {
     return res(

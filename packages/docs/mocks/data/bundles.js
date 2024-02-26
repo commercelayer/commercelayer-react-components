@@ -1,6 +1,6 @@
-import { rest } from 'msw'
+import { http } from 'msw'
 
-const bundles = rest.get(
+const bundles = http.get(
   'https://mock.localhost/api/bundles?include=sku_list.sku_list_items.sku&filter[q][code_in]=WELCOME_KIT_001',
   (req, res, ctx) => {
     return res(

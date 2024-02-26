@@ -103,6 +103,13 @@ export function ShippingAddressForm(props: Props): JSX.Element {
                   value: values[fieldName].value
                 })
               : null
+          if (
+            customFieldMessageError != null &&
+            code === 'VALIDATION_ERROR' &&
+            !customMessage
+          ) {
+            continue
+          }
           formErrors.push({
             code: code as CodeErrorType,
             message: customMessage ?? message ?? '',

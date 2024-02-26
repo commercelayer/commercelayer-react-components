@@ -6,14 +6,10 @@ export const Tool = () => {
   return (
     <>
       <Separator />
-      <IconButton
-        key={TOOL_ID}
-        active={false}
-        title={ADDON_NAME}
-      >
-        
+      <IconButton key={TOOL_ID} active={false} title={ADDON_NAME}>
         <A target='_blank' href={REPOSITORY_URL}>
-          <Icons icon="github" />&nbsp;&nbsp;repository
+          <Icons icon='github' />
+          &nbsp;&nbsp;repository
         </A>
       </IconButton>
     </>

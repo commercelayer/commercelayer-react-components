@@ -53,8 +53,8 @@ export function useGetToken<T extends UseGetTokenOptions>(
               mode
             })
           : mode === 'customer-orders'
-          ? savedCustomerWithOrders
-          : undefined
+            ? savedCustomerWithOrders
+            : undefined
 
       await generateNewToken({
         clientId,

@@ -1,4 +1,4 @@
-import { rest } from 'msw'
+import { HttpResponse, http } from 'msw'
 
 const mockedTags = Array(15)
   .fill(null)
@@ -13,28 +13,28 @@ const mockedTags = Array(15)
     meta: { mode: 'test', organization_id: 'WXlEOFrjnr' }
   }))
 
-const customerTags = rest.get(
+const customerTags = http.get(
   `https://mock.localhost/api/customers/NMWYhbGorj/tags`,
-  async (req, res, ctx) => {
-    return await res(
-      ctx.status(200),
-      ctx.json({
+  async () => {
+    return HttpResponse.json(
+      {
         data: mockedTags.slice(0, 2),
         meta: { record_count: 2, page_count: 1 }
-      })
+      },
+      { status: 200 }
     )
   }
 )
 
-const organizationTags = rest.get(
+const organizationTags = http.get(
   `https://mock.localhost/api/tags`,
-  async (req, res, ctx) => {
-    return await res(
-      ctx.status(200),
-      ctx.json({
+  async () => {
+    return HttpResponse.json(
+      {
         data: mockedTags,
         meta: { record_count: 100, page_count: 10 }
-      })
+      },
+      { status: 200 }
     )
   }
 )
