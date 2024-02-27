@@ -9,6 +9,7 @@ To allow the customer to add a new `customer_address`, we can build an `Add new 
 
 - `BillingAddressForm`
 - `AddressInput`
+- `AddressInputSelect`
 - `AddressCountrySelector`
 - `AddressStateSelector`
 - `SaveAddressesButton`
@@ -84,6 +85,31 @@ You can customize both the lists of countries and states by passing the `countri
       { values: 'BO', label: 'Bordeaux' }
     ]
   }}
+/>
+`} language='jsx' /> 
+
+### Add metadata field to the address
+You can add a metadata field to the address by using the `AddressInput` or `AddressInputSelect` component setting your key in the `name` prop adding the prefix `metadata_`.
+
+If you want to set a metadata field as required, you have to set the `requiredMetadataFields` prop to the `SaveAddressesButton` component, passing an array of the required metadata fields keys as strings,
+as shown in the following example:
+
+<Source dark code={`
+// Add a metadata field to the address
+<AddressInputSelect
+  name='billing_address_metadata_type'
+  options={[
+    { value: 'Mr.', label: 'Mr.' },
+    { value: 'Mrs.', label: 'Mrs.' }
+  ]}
+/>
+// or
+<AddressInput name='billing_address_metadata_type' />
+
+// Set metadata fields required
+<SaveAddressesButton
+  label='Save Address'
+  requiredMetadataFields={['metadata_type']}
 />
 `} language='jsx' /> 
 
