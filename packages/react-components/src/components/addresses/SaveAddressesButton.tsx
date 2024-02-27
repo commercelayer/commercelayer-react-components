@@ -26,6 +26,7 @@ interface Props
   label?: string | ReactNode
   onClick?: (params: TOnClick) => void
   addressId?: string
+  requiredMetadataFields?: string[]
 }
 
 export function SaveAddressesButton(props: Props): JSX.Element {
@@ -35,6 +36,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     resource,
     disabled = false,
     addressId,
+    requiredMetadataFields,
     onClick,
     ...p
   } = props
@@ -88,7 +90,8 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     shipToDifferentAddress,
     shippingAddressId,
     billingAddressId,
-    errors
+    errors,
+    requiredMetadataFields
   })
   const countryLockDisable = countryLockController({
     countryCodeLock: order?.shipping_country_code_lock,
