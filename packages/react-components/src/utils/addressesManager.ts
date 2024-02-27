@@ -3,7 +3,7 @@
 import isEmpty from 'lodash/isEmpty'
 import { fieldsExist } from '#utils/validateFormFields'
 import { type BaseError } from '#typings/errors'
-import { addressFields } from '#reducers/AddressReducer'
+import { type AddressField, addressFields } from '#reducers/AddressReducer'
 import {
   type OrderUpdate,
   type Order,
@@ -22,6 +22,7 @@ interface BillingAddressControllerProps {
   invertAddresses?: boolean
   shippingDisable?: boolean
   shipToDifferentAddress?: boolean
+  requiredMetadataFields?: string[]
 }
 
 export function billingAddressController({
@@ -31,19 +32,26 @@ export function billingAddressController({
   requiresBillingInfo = false,
   invertAddresses = false,
   shipToDifferentAddress,
-  shippingDisable
+  shippingDisable,
+  requiredMetadataFields
 }: BillingAddressControllerProps): boolean {
+  console.log('requiredMetadataFields', requiredMetadataFields)
   let billingDisable = invertAddresses
     ? !!(!shippingDisable && shipToDifferentAddress)
     : !isEmpty(errors) || isEmpty(billing_address)
   if (isEmpty(errors) && !isEmpty(billing_address)) {
+    let formFields: Array<AddressField | string> = [...addressFields]
+    if (requiredMetadataFields != null && requiredMetadataFields.length > 0)
+      formFields = [...formFields, ...requiredMetadataFields]
     if (invertAddresses) {
-      billingDisable = !!(billing_address && fieldsExist(billing_address))
-    } else {
-      let billingInfo = [...addressFields]
-      if (requiresBillingInfo) billingInfo = [...billingInfo, 'billing_info']
       billingDisable = !!(
-        billing_address && fieldsExist(billing_address, billingInfo)
+        billing_address && fieldsExist(billing_address, formFields)
+      )
+    } else {
+      if (requiresBillingInfo) formFields = [...formFields, 'billing_info']
+      console.log('formFields', formFields)
+      billingDisable = !!(
+        billing_address && fieldsExist(billing_address, formFields)
       )
     }
   }
@@ -65,6 +73,7 @@ interface ShippingAddressControllerProps {
   shipping_address?: AddressCreate
   shippingAddressId?: string
   invertAddresses?: boolean
+  requiredMetadataFields?: string[]
 }
 
 export function shippingAddressController({
@@ -74,22 +83,27 @@ export function shippingAddressController({
   shipping_address,
   shippingAddressId,
   invertAddresses = false,
-  requiresBillingInfo = false
+  requiresBillingInfo = false,
+  requiredMetadataFields
 }: ShippingAddressControllerProps): boolean {
   let shippingDisable = invertAddresses
     ? !isEmpty(errors) || isEmpty(shipping_address)
     : !!(!billingDisable && shipToDifferentAddress)
 
   if (isEmpty(errors) && !isEmpty(shipping_address)) {
+    let formField: Array<AddressField | string> = [...addressFields]
+    if (requiredMetadataFields != null && requiredMetadataFields.length > 0)
+      formField = [...formField, ...requiredMetadataFields]
     if (invertAddresses) {
-      let billingInfo = [...addressFields]
-      if (requiresBillingInfo) billingInfo = [...billingInfo, 'billing_info']
+      if (requiresBillingInfo) formField = [...formField, 'billing_info']
       shippingDisable = !!(
-        shipping_address && fieldsExist(shipping_address, billingInfo)
+        shipping_address && fieldsExist(shipping_address, formField)
       )
     } else if (shipToDifferentAddress) {
       delete shipping_address?.billing_info
-      shippingDisable = !!(shipping_address && fieldsExist(shipping_address))
+      shippingDisable = !!(
+        shipping_address && fieldsExist(shipping_address, formField)
+      )
     }
   }
   if (
@@ -267,6 +281,7 @@ interface AddressControllerProps {
   errors?: BaseError[]
   requiresBillingInfo?: boolean | null
   invertAddresses?: boolean
+  requiredMetadataFields?: string[]
 }
 
 export function addressesController({
@@ -277,7 +292,8 @@ export function addressesController({
   shippingAddressId,
   errors,
   requiresBillingInfo,
-  invertAddresses
+  invertAddresses,
+  requiredMetadataFields
 }: AddressControllerProps): {
   billingDisable: boolean
   shippingDisable: boolean
@@ -289,7 +305,8 @@ export function addressesController({
       shipping_address,
       shippingAddressId,
       invertAddresses,
-      requiresBillingInfo
+      requiresBillingInfo,
+      requiredMetadataFields
     })
     const billingDisable = billingAddressController({
       shippingDisable,
@@ -297,7 +314,8 @@ export function addressesController({
       billingAddressId,
       errors,
       requiresBillingInfo,
-      invertAddresses
+      invertAddresses,
+      requiredMetadataFields
     })
     return {
       shippingDisable,
@@ -308,14 +326,16 @@ export function addressesController({
     billing_address,
     billingAddressId,
     errors,
-    requiresBillingInfo
+    requiresBillingInfo,
+    requiredMetadataFields
   })
   const shippingDisable = shippingAddressController({
     billingDisable,
     errors,
     shipToDifferentAddress,
     shipping_address,
-    shippingAddressId
+    shippingAddressId,
+    requiredMetadataFields
   })
   return {
     billingDisable,

@@ -91,16 +91,15 @@ const validateFormFields: ValidateFormFields = (
 
 export function fieldsExist(
   address: AddressCreate,
-  schema: AddressField[] = addressFields
+  schema: Array<AddressField | string> = addressFields
 ): boolean {
+  console.log('address', address)
   if (!address.business) {
     const required = without(schema, 'line_2', 'company')
-    // @ts-expect-error string
     const validAddress = keys(address).filter((k) => required.includes(k))
     return required.length > validAddress.length
   } else {
     const required = without(schema, 'first_name', 'last_name', 'line_2')
-    // @ts-expect-error string
     const validAddress = keys(address).filter((k) => required.includes(k))
     return required.length > validAddress.length
   }

@@ -79,7 +79,6 @@ export function BillingAddressForm(props: Props): JSX.Element {
     }
     if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
-      console.log('errors', errors)
       for (const fieldName in errors) {
         const code = errors[fieldName]?.code
         const message = errors[fieldName]?.message
