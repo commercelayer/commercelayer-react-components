@@ -1,3 +1,4 @@
+import OrderContext from '#context/OrderContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { useContext, useEffect, useRef } from 'react'
 
@@ -25,7 +26,7 @@ export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
   } = useContext(PaymentMethodContext)
   useEffect(() => {
     if (ref.current && paymentSource && currentPaymentMethodType) {
-      ref.current.onsubmit = async () => await handleClick()
+      ref.current.onsubmit = async () => handleClick
       setPaymentRef({ ref })
     }
     return () => {

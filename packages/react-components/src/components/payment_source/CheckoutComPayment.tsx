@@ -175,7 +175,7 @@ export function CheckoutComPayment({
           }}
           cardValidationChanged={(e) => {
             if (e.isValid && ref.current) {
-              ref.current.onsubmit = async () => await handleSubmit()
+              ref.current.onsubmit = async () => handleSubmit
               setPaymentRef({ ref })
             }
           }}

@@ -255,13 +255,14 @@ export function BraintreePayment({
                     ])
                   }
                   if (ref.current) {
-                    ref.current.onsubmit = async (paymentSource: any) =>
-                      await handleSubmitForm({
+                    ref.current.onsubmit = async (paymentSource: any) => {
+                      return await handleSubmitForm({
                         event: ref.current as any,
                         hostedFieldsInstance,
                         threeDSInstance,
                         paymentSource
                       })
+                    }
                     setPaymentRef({ ref })
                   }
                 }

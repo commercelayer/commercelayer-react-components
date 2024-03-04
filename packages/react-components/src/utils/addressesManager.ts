@@ -35,7 +35,6 @@ export function billingAddressController({
   shippingDisable,
   requiredMetadataFields
 }: BillingAddressControllerProps): boolean {
-  console.log('requiredMetadataFields', requiredMetadataFields)
   let billingDisable = invertAddresses
     ? !!(!shippingDisable && shipToDifferentAddress)
     : !isEmpty(errors) || isEmpty(billing_address)
@@ -49,7 +48,6 @@ export function billingAddressController({
       )
     } else {
       if (requiresBillingInfo) formFields = [...formFields, 'billing_info']
-      console.log('formFields', formFields)
       billingDisable = !!(
         billing_address && fieldsExist(billing_address, formFields)
       )
