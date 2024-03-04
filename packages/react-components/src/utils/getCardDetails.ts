@@ -113,7 +113,12 @@ export default function getCardDetails({
     default: {
       const ps =
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
-      const source = ps?.metadata?.['card']
+      const source = {
+        brand: ps?.payment_instrument?.['issuer_type'].replace('_', '-') ?? '',
+        exp_month: ps?.payment_instrument?.['card_expiry_month'] ?? '',
+        exp_year: ps?.payment_instrument?.['card_expiry_year'] ?? '',
+        last4: ps?.payment_instrument?.['card_last_digits'] ?? ''
+      }
       if (source) {
         return {
           ...source
