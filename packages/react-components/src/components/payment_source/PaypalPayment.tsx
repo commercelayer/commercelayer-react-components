@@ -35,7 +35,9 @@ export function PaypalPayment({
       // @ts-expect-error no type
       paymentSource?.approval_url
     ) {
-      ref.current.onsubmit = async () => await handleClick()
+      ref.current.onsubmit = async () => {
+        return await handleClick()
+      }
       setPaymentRef({ ref })
     }
     return () => {

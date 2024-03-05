@@ -118,8 +118,9 @@ export function AdyenPayment({
   ): Promise<void> => {
     if (state.isValid) {
       if (ref.current) {
-        ref.current.onsubmit = async () =>
-          await handleSubmit(ref.current as any, component)
+        ref.current.onsubmit = async () => {
+          return await handleSubmit(ref.current as any, component)
+        }
         setPaymentRef({ ref })
       }
       const browserInfo = getBrowserInfo()
@@ -405,8 +406,12 @@ export function AdyenPayment({
                 if (id.search('scheme') === -1) {
                   if (ref.current) {
                     if (id.search('paypal') === -1) {
-                      ref.current.onsubmit = async () =>
-                        await handleSubmit(ref.current as any, component as any)
+                      ref.current.onsubmit = async () => {
+                        return await handleSubmit(
+                          ref.current as any,
+                          component as any
+                        )
+                      }
                     } else {
                       ref.current.onsubmit = null
                     }

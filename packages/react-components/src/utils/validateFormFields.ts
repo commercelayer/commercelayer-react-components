@@ -93,7 +93,6 @@ export function fieldsExist(
   address: AddressCreate,
   schema: Array<AddressField | string> = addressFields
 ): boolean {
-  console.log('address', address)
   if (!address.business) {
     const required = without(schema, 'line_2', 'company')
     const validAddress = keys(address).filter((k) => required.includes(k))
