@@ -18,6 +18,7 @@ import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
 import { isGuestToken } from '#utils/isGuestToken'
 import { setCustomerOrderParam } from '#utils/localStorage'
+import { updateSubscriptionCustomerPaymentSource } from '#utils/hasSubscriptions'
 
 export type PlaceOrderActionType =
   | 'setErrors'
@@ -267,6 +268,7 @@ export async function setPlaceOrder({
           })
           if (setOrder) setOrder(orderUpdated)
           if (setOrderErrors) setOrderErrors([])
+          updateSubscriptionCustomerPaymentSource(orderUpdated, sdk)
           return {
             placed: true,
             order: orderUpdated
@@ -295,6 +297,7 @@ export async function setPlaceOrder({
               })
           }
           if (setOrderErrors) setOrderErrors([])
+          updateSubscriptionCustomerPaymentSource(orderUpdated, sdk)
           return {
             placed: true,
             order: orderUpdated
