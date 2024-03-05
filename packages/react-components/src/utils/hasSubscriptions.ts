@@ -10,7 +10,7 @@ export function hasSubscriptions(order: Order): boolean {
 }
 
 /**
- * Check if the given `order` has a linked `order_subscription` with an empty `customer_payment_source` relationship to replace it with the updated `order`'s `payment_source`.
+ * Check if the given `order` has a linked `order_subscription` to replace its `customer_payment_source` with the updated `order`'s `payment_source`.
  * @param order Order
  * @returns void
  */
@@ -18,7 +18,7 @@ export function updateSubscriptionCustomerPaymentSource(
   order: Order,
   sdk: CommerceLayerClient
 ): void {
-  if (hasSubscriptions(order)) {
+  if (order.subscription_created_at != null) {
     void sdk.orders
       .retrieve(order.id, {
         include: [
@@ -28,11 +28,7 @@ export function updateSubscriptionCustomerPaymentSource(
         ]
       })
       .then((order) => {
-        if (
-          order.payment_source != null &&
-          order.order_subscription != null &&
-          order.order_subscription.customer_payment_source == null
-        ) {
+        if (order.payment_source != null && order.order_subscription != null) {
           void sdk.customer_payment_sources
             .list({
               filters: {
