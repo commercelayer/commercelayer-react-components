@@ -18,8 +18,8 @@ type Props = {
    */
   pattern?: RegExp
 } & Omit<BaseInputComponentProps, 'name'> &
-  JSX.IntrinsicElements['input'] &
-  Omit<JSX.IntrinsicElements['textarea'], 'children'>
+  Omit<JSX.IntrinsicElements['input'], 'pattern'> &
+  Omit<JSX.IntrinsicElements['textarea'], 'children' | 'pattern'>
 
 /**
  * The AddressInput component creates a form `input` related to a particular address attribute.

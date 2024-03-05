@@ -3,8 +3,8 @@ import { type BaseInputComponentProps } from '#typings/index'
 import Parent from './Parent'
 
 export type BaseInputProps = BaseInputComponentProps &
-  Omit<JSX.IntrinsicElements['input'], 'children'> &
-  Omit<JSX.IntrinsicElements['textarea'], 'children'>
+  Omit<JSX.IntrinsicElements['input'], 'children' | 'pattern'> &
+  Omit<JSX.IntrinsicElements['textarea'], 'children' | 'pattern'>
 
 const BaseInput: ForwardRefRenderFunction<any, BaseInputProps> = (
   props,
