@@ -82,7 +82,7 @@ export function PaymentGateway({
         }
       }
       const setPaymentSources = async (): Promise<void> => {
-        if (order != null && ['draft', 'pending'].includes(order.status)) {
+        if (order != null) {
           await setPaymentSource({
             paymentResource,
             order,
