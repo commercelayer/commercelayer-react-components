@@ -22,36 +22,50 @@ export function updateSubscriptionCustomerPaymentSource(
     void sdk.orders
       .retrieve(order.id, {
         include: [
-          'payment_source',
           'order_subscription',
           'order_subscription.customer_payment_source'
         ]
       })
       .then((order) => {
-        if (order.payment_source != null && order.order_subscription != null) {
-          void sdk.customer_payment_sources
-            .list({
-              filters: {
-                payment_source_id_eq: order.payment_source.id
+        if (
+          order.payment_source_details != null &&
+          order.order_subscription != null
+        ) {
+          // const filteredCustomerPaymentSources =
+          //   sdk.customer_payment_sources.list({
+          //     filters: {
+          //       payment_source_token_eq:
+          //         order.payment_source_details['payment_method_id']
+          //     }
+          //   })
+
+          const customerPaymentSources = sdk.customer_payment_sources.list({
+            pageSize: 25
+          })
+
+          // void filteredCustomerPaymentSources.then((customerPaymentSources) => {
+          void customerPaymentSources.then((customerPaymentSources) => {
+            if (
+              customerPaymentSources.length > 0 &&
+              order.payment_source_details != null &&
+              order.order_subscription != null
+            ) {
+              const details = order.payment_source_details
+              const customerPaymentSource = customerPaymentSources.find(
+                (cps) =>
+                  cps.payment_source_token === details['payment_method_id']
+              )
+              if (customerPaymentSource != null) {
+                void sdk.order_subscriptions.update({
+                  id: order.order_subscription?.id,
+                  customer_payment_source:
+                    sdk.customer_payment_sources.relationship(
+                      customerPaymentSource?.id
+                    )
+                })
               }
-            })
-            .then((customerPaymentSources) => {
-              if (
-                customerPaymentSources.length > 0 &&
-                order.order_subscription != null
-              ) {
-                const customerPaymentSource = customerPaymentSources[0]
-                if (customerPaymentSource != null) {
-                  void sdk.order_subscriptions.update({
-                    id: order.order_subscription?.id,
-                    customer_payment_source:
-                      sdk.customer_payment_sources.relationship(
-                        customerPaymentSource.id
-                      )
-                  })
-                }
-              }
-            })
+            }
+          })
         }
       })
   }
