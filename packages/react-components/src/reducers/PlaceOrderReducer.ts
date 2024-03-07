@@ -265,7 +265,11 @@ export async function setPlaceOrder({
           })
           if (setOrder) setOrder(orderUpdated)
           if (setOrderErrors) setOrderErrors([])
-          updateOrderSubscriptionCustomerPaymentSource(orderUpdated, sdk)
+          updateOrderSubscriptionCustomerPaymentSource(
+            orderUpdated,
+            paymentType,
+            sdk
+          )
           return {
             placed: true,
             order: orderUpdated
@@ -295,7 +299,11 @@ export async function setPlaceOrder({
                   if (setOrderErrors) setOrderErrors(errors)
                 })
           ]).then(() => {
-            updateOrderSubscriptionCustomerPaymentSource(orderUpdated, sdk)
+            updateOrderSubscriptionCustomerPaymentSource(
+              orderUpdated,
+              paymentType,
+              sdk
+            )
           })
           return {
             placed: true,
