@@ -122,8 +122,10 @@ export function BillingAddressForm(props: Props): JSX.Element {
       setAddressErrors(formErrors, 'billing_address')
     } else if (values && Object.keys(values).length > 0) {
       setAddressErrors([], 'billing_address')
+      const formErrors: BaseError[] = []
       for (const name in values) {
         const field = values[name]
+        const fieldName = field.name
         if (
           field?.value ||
           (field?.required === false && field?.type !== 'checkbox')
@@ -140,15 +142,38 @@ export function BillingAddressForm(props: Props): JSX.Element {
             value: field.checked
           })
         }
+        if (
+          customFieldMessageError != null &&
+          field.name != null &&
+          field.value != null
+        ) {
+          const customMessage = customFieldMessageError({
+            field: fieldName,
+            value: field.value
+          })
+          console.log('customMessage', customMessage)
+          if (customMessage != null) {
+            formErrors.push({
+              code: 'VALIDATION_ERROR',
+              message: customMessage,
+              resource: 'billing_address',
+              field: fieldName
+            })
+          }
+        }
       }
-      setAddress({
-        // @ts-expect-error no type
-        values: {
-          ...values,
-          ...(isBusiness && { business: isBusiness })
-        },
-        resource: 'billing_address'
-      })
+      if (formErrors.length > 0) {
+        setAddressErrors(formErrors, 'billing_address')
+      } else {
+        setAddress({
+          // @ts-expect-error no type
+          values: {
+            ...values,
+            ...(isBusiness && { business: isBusiness })
+          },
+          resource: 'billing_address'
+        })
+      }
     }
     const checkboxChecked =
       ref.current?.querySelector(

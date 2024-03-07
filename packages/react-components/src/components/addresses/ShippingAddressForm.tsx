@@ -126,8 +126,10 @@ export function ShippingAddressForm(props: Props): JSX.Element {
       (shipToDifferentAddress || invertAddresses)
     ) {
       setAddressErrors([], 'shipping_address')
+      const formErrors: BaseError[] = []
       for (const name in values) {
         const field = values[name]
+        const fieldName = field.name
         if (
           field?.value ||
           (field?.required === false && field?.type !== 'checkbox')
@@ -144,15 +146,38 @@ export function ShippingAddressForm(props: Props): JSX.Element {
             value: field.checked
           })
         }
+        if (
+          customFieldMessageError != null &&
+          field.name != null &&
+          field.value != null
+        ) {
+          const customMessage = customFieldMessageError({
+            field: fieldName,
+            value: field.value
+          })
+          console.log('customMessage', customMessage)
+          if (customMessage != null) {
+            formErrors.push({
+              code: 'VALIDATION_ERROR',
+              message: customMessage,
+              resource: 'shipping_address',
+              field: fieldName
+            })
+          }
+        }
       }
-      setAddress({
-        // @ts-expect-error no type
-        values: {
-          ...values,
-          ...(isBusiness && { business: isBusiness })
-        },
-        resource: 'shipping_address'
-      })
+      if (formErrors.length > 0) {
+        setAddressErrors(formErrors, 'shipping_address')
+      } else {
+        setAddress({
+          // @ts-expect-error no type
+          values: {
+            ...values,
+            ...(isBusiness && { business: isBusiness })
+          },
+          resource: 'shipping_address'
+        })
+      }
     }
     const checkboxChecked =
       ref.current?.querySelector(
