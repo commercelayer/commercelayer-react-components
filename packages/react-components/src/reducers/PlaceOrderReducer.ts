@@ -252,22 +252,17 @@ export async function setPlaceOrder({
       switch (paymentType) {
         case 'braintree_payments': {
           const total = order?.total_amount_cents ?? 0
-          const promises = [
-            sdk.orders.update(updateAttributes, {
-              include
-            }),
+          await Promise.all([
             saveToWallet() &&
               total > 0 &&
               sdk.orders.update({
                 id: order.id,
                 _save_payment_source_to_customer_wallet: true
               })
-          ]
-          const orderUpdated = await Promise.all(promises).then(
-            (res) =>
-              // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
-              res[0] as Order
-          )
+          ])
+          const orderUpdated = await sdk.orders.update(updateAttributes, {
+            include
+          })
           if (setOrder) setOrder(orderUpdated)
           if (setOrderErrors) setOrderErrors([])
           updateOrderSubscriptionCustomerPaymentSource(orderUpdated, sdk)
@@ -282,7 +277,7 @@ export async function setPlaceOrder({
           })
           const total = orderUpdated?.total_amount_cents ?? 0
           if (setOrder) setOrder(orderUpdated)
-          const promises = [
+          await Promise.all([
             saveToWallet() &&
               total > 0 &&
               sdk.orders
@@ -299,9 +294,7 @@ export async function setPlaceOrder({
                   })
                   if (setOrderErrors) setOrderErrors(errors)
                 })
-          ]
-          if (setOrderErrors) setOrderErrors([])
-          await Promise.all(promises).then(() => {
+          ]).then(() => {
             updateOrderSubscriptionCustomerPaymentSource(orderUpdated, sdk)
           })
           return {
