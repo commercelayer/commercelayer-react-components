@@ -14,10 +14,7 @@ export function updateOrderSubscriptionCustomerPaymentSource(
   if (order.subscription_created_at != null) {
     void sdk.orders
       .retrieve(order.id, {
-        include: [
-          'order_subscription',
-          'order_subscription.customer_payment_source'
-        ]
+        include: ['order_subscription', 'payment_source']
       })
       .then((order) => {
         if (
