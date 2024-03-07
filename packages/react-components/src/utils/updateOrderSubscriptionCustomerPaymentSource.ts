@@ -22,30 +22,19 @@ export function updateOrderSubscriptionCustomerPaymentSource(
           order.payment_source_details != null &&
           order.order_subscription != null
         ) {
-          // const filteredCustomerPaymentSources =
-          //   sdk.customer_payment_sources.list({
-          //     filters: {
-          //       payment_source_token_eq:
-          //         order.payment_source_details['payment_method_id']
-          //     }
-          //   })
-
           const customerPaymentSources = sdk.customer_payment_sources.list({
-            pageSize: 25
+            filters: {
+              payment_source_token_eq:
+                order.payment_source_details['payment_method_id']
+            }
           })
 
-          // void filteredCustomerPaymentSources.then((customerPaymentSources) => {
           void customerPaymentSources.then((customerPaymentSources) => {
             if (
               customerPaymentSources.length > 0 &&
-              order.payment_source_details != null &&
               order.order_subscription != null
             ) {
-              const details = order.payment_source_details
-              const customerPaymentSource = customerPaymentSources.find(
-                (cps) =>
-                  cps.payment_source_token === details['payment_method_id']
-              )
+              const customerPaymentSource = customerPaymentSources[0]
               if (customerPaymentSource != null) {
                 void sdk.order_subscriptions.update({
                   id: order.order_subscription?.id,
