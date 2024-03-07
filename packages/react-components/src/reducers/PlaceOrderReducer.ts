@@ -18,7 +18,8 @@ import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
 import { isGuestToken } from '#utils/isGuestToken'
 import { setCustomerOrderParam } from '#utils/localStorage'
-import { updateSubscriptionCustomerPaymentSource } from '#utils/hasSubscriptions'
+import { hasSubscriptions } from '#utils/hasSubscriptions'
+import { updateOrderSubscriptionCustomerPaymentSource } from '#utils/updateOrderSubscriptionCustomerPaymentSource'
 
 export type PlaceOrderActionType =
   | 'setErrors'
@@ -240,14 +241,8 @@ export async function setPlaceOrder({
           })
         }
       }
-      const hasSubscriptions =
-        order.line_items?.some((item) => {
-          return item.frequency && item.frequency?.length > 0
-        }) ||
-        order?.subscription_created_at != null ||
-        false
       if (
-        hasSubscriptions &&
+        hasSubscriptions(order) &&
         config?.accessToken != null &&
         !isGuestToken(config.accessToken) &&
         currentCustomerPaymentSourceId == null
@@ -268,7 +263,7 @@ export async function setPlaceOrder({
           })
           if (setOrder) setOrder(orderUpdated)
           if (setOrderErrors) setOrderErrors([])
-          updateSubscriptionCustomerPaymentSource(orderUpdated, sdk)
+          updateOrderSubscriptionCustomerPaymentSource(orderUpdated, sdk)
           return {
             placed: true,
             order: orderUpdated
@@ -297,7 +292,7 @@ export async function setPlaceOrder({
               })
           }
           if (setOrderErrors) setOrderErrors([])
-          updateSubscriptionCustomerPaymentSource(orderUpdated, sdk)
+          updateOrderSubscriptionCustomerPaymentSource(orderUpdated, sdk)
           return {
             placed: true,
             order: orderUpdated

@@ -1,72 +1,16 @@
-import { type CommerceLayerClient, type Order } from '@commercelayer/sdk'
+import { type Order } from '@commercelayer/sdk'
 
 /**
- * Check if the order has subscriptions reading the frequency attribute of the line items
+ * Check if a given `order` has subscriptions by checking the `frequency` attribute of the `line_items` (in case of brand new `order_subscription`) or the `subscription_created_at` attribute of the `order` itself (in case `order_subscription` is already existing)
  * @param order Order
  * @returns boolean
  */
 export function hasSubscriptions(order: Order): boolean {
-  return order?.line_items?.some((li) => li.frequency != null) != null
-}
-
-/**
- * Check if the given `order` has a linked `order_subscription` to replace its `customer_payment_source` with the updated `order`'s `payment_source`.
- * @param order Order
- * @returns void
- */
-export function updateSubscriptionCustomerPaymentSource(
-  order: Order,
-  sdk: CommerceLayerClient
-): void {
-  if (order.subscription_created_at != null) {
-    void sdk.orders
-      .retrieve(order.id, {
-        include: [
-          'order_subscription',
-          'order_subscription.customer_payment_source'
-        ]
-      })
-      .then((order) => {
-        if (
-          order.payment_source_details != null &&
-          order.order_subscription != null
-        ) {
-          // const filteredCustomerPaymentSources =
-          //   sdk.customer_payment_sources.list({
-          //     filters: {
-          //       payment_source_token_eq:
-          //         order.payment_source_details['payment_method_id']
-          //     }
-          //   })
-
-          const customerPaymentSources = sdk.customer_payment_sources.list({
-            pageSize: 25
-          })
-
-          // void filteredCustomerPaymentSources.then((customerPaymentSources) => {
-          void customerPaymentSources.then((customerPaymentSources) => {
-            if (
-              customerPaymentSources.length > 0 &&
-              order.payment_source_details != null &&
-              order.order_subscription != null
-            ) {
-              const details = order.payment_source_details
-              const customerPaymentSource = customerPaymentSources.find(
-                (cps) =>
-                  cps.payment_source_token === details['payment_method_id']
-              )
-              if (customerPaymentSource != null) {
-                void sdk.order_subscriptions.update({
-                  id: order.order_subscription?.id,
-                  customer_payment_source:
-                    sdk.customer_payment_sources.relationship(
-                      customerPaymentSource?.id
-                    )
-                })
-              }
-            }
-          })
-        }
-      })
-  }
+  return (
+    order.line_items?.some((item) => {
+      return item.frequency && item.frequency?.length > 0
+    }) ||
+    order?.subscription_created_at != null ||
+    false
+  )
 }
