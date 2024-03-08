@@ -497,11 +497,19 @@ export const CustomErrorMessages: StoryFn = () => {
                   key={billingAddress?.id}
                   customFieldMessageError={(props) => {
                     const regex = /[a-zA-Z]+/g
+                    const phoneRegex = /\d/g
+                    console.log('props', props)
                     if (
                       props.field === 'billing_address_first_name' &&
                       !regex.test(props.value)
                     ) {
                       return 'Validation error - only characters are allowed - this is a custom message'
+                    }
+                    if (
+                      props.field === 'billing_address_phone' &&
+                      !phoneRegex.test(props.value)
+                    ) {
+                      return 'Validation error - only numbers are allowed - this is a custom message'
                     }
                     return null
                   }}
@@ -538,6 +546,23 @@ export const CustomErrorMessages: StoryFn = () => {
                       <Errors
                         resource='billing_address'
                         field='billing_address_last_name'
+                      />
+                    </div>
+                  </fieldset>
+                  <fieldset className='flex gap-4 w-full mb-4'>
+                    <div className='flex-1'>
+                      <label htmlFor='billing_address_first_name'>
+                        Phone number
+                      </label>
+                      <AddressInput
+                        id='billing_address_phone'
+                        name='billing_address_phone'
+                        type='text'
+                        className={inputCss}
+                      />
+                      <Errors
+                        resource='billing_address'
+                        field='billing_address_phone'
                       />
                     </div>
                   </fieldset>

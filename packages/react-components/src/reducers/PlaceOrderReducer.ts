@@ -18,6 +18,8 @@ import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
 import { isGuestToken } from '#utils/isGuestToken'
 import { setCustomerOrderParam } from '#utils/localStorage'
+import { hasSubscriptions } from '#utils/hasSubscriptions'
+import { updateOrderSubscriptionCustomerPaymentSource } from '#utils/updateOrderSubscriptionCustomerPaymentSource'
 
 export type PlaceOrderActionType =
   | 'setErrors'
@@ -239,14 +241,8 @@ export async function setPlaceOrder({
           })
         }
       }
-      const hasSubscriptions =
-        order.line_items?.some((item) => {
-          return item.frequency && item.frequency?.length > 0
-        }) ||
-        order?.subscription_created_at != null ||
-        false
       if (
-        hasSubscriptions &&
+        hasSubscriptions(order) &&
         config?.accessToken != null &&
         !isGuestToken(config.accessToken) &&
         currentCustomerPaymentSourceId == null
@@ -256,17 +252,24 @@ export async function setPlaceOrder({
       switch (paymentType) {
         case 'braintree_payments': {
           const total = order?.total_amount_cents ?? 0
-          if (saveToWallet() && total > 0) {
-            await sdk.orders.update({
-              id: order.id,
-              _save_payment_source_to_customer_wallet: true
-            })
-          }
+          await Promise.all([
+            saveToWallet() &&
+              total > 0 &&
+              sdk.orders.update({
+                id: order.id,
+                _save_payment_source_to_customer_wallet: true
+              })
+          ])
           const orderUpdated = await sdk.orders.update(updateAttributes, {
             include
           })
           if (setOrder) setOrder(orderUpdated)
           if (setOrderErrors) setOrderErrors([])
+          updateOrderSubscriptionCustomerPaymentSource(
+            orderUpdated,
+            paymentType,
+            sdk
+          )
           return {
             placed: true,
             order: orderUpdated
@@ -278,23 +281,30 @@ export async function setPlaceOrder({
           })
           const total = orderUpdated?.total_amount_cents ?? 0
           if (setOrder) setOrder(orderUpdated)
-          if (saveToWallet() && total > 0) {
-            sdk.orders
-              .update({
-                id: order.id,
-                _save_payment_source_to_customer_wallet: true
-              })
-              .catch((error) => {
-                // Avoid to interrupt the process if the order is already placed
-                const errors = getErrors({
-                  error,
-                  resource: 'orders',
-                  field: paymentType
+          await Promise.all([
+            saveToWallet() &&
+              total > 0 &&
+              sdk.orders
+                .update({
+                  id: order.id,
+                  _save_payment_source_to_customer_wallet: true
                 })
-                if (setOrderErrors) setOrderErrors(errors)
-              })
-          }
-          if (setOrderErrors) setOrderErrors([])
+                .catch((error) => {
+                  // Avoid to interrupt the process if the order is already placed
+                  const errors = getErrors({
+                    error,
+                    resource: 'orders',
+                    field: paymentType
+                  })
+                  if (setOrderErrors) setOrderErrors(errors)
+                })
+          ]).then(() => {
+            updateOrderSubscriptionCustomerPaymentSource(
+              orderUpdated,
+              paymentType,
+              sdk
+            )
+          })
           return {
             placed: true,
             order: orderUpdated

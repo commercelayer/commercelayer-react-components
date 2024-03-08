@@ -21,8 +21,8 @@ import { type AddressInputName } from '#typings/index'
 // TODO: Move in the future
 export type CustomFieldMessageError = (props: {
   field: Extract<AddressValuesKeys, AddressInputName> | string
-  code: Extract<CodeErrorType, 'EMPTY_ERROR' | 'VALIDATION_ERROR'> | undefined
-  message: string | undefined
+  code?: Extract<CodeErrorType, 'EMPTY_ERROR' | 'VALIDATION_ERROR'> | undefined
+  message?: string | undefined
   value: string
 }) => string | null
 
