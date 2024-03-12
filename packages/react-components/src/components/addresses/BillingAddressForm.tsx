@@ -121,50 +121,55 @@ export function BillingAddressForm(props: Props): JSX.Element {
       }
       setAddressErrors(formErrors, 'billing_address')
     } else if (values && Object.keys(values).length > 0) {
-      setAddressErrors([], 'billing_address')
       const formErrors: BaseError[] = []
       for (const name in values) {
-        const field = values[name]
-        const fieldName = field.name
-        if (
-          field?.value ||
-          (field?.required === false && field?.type !== 'checkbox')
-        ) {
-          values[name.replace('billing_address_', '')] = field.value
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-          delete values[name]
-        }
-        if (field?.type === 'checkbox') {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-          delete values[name]
-          saveAddressToCustomerAddressBook({
-            type: 'billing_address',
-            value: field.checked
-          })
-        }
-        if (
-          customFieldMessageError != null &&
-          field.name != null &&
-          field.value != null
-        ) {
-          const customMessage = customFieldMessageError({
-            field: fieldName,
-            value: field.value
-          })
-          console.log('customMessage', customMessage)
-          if (customMessage != null) {
-            formErrors.push({
-              code: 'VALIDATION_ERROR',
-              message: customMessage,
-              resource: 'billing_address',
-              field: fieldName
+        if (Object.prototype.hasOwnProperty.call(values, name)) {
+          const field = values[name]
+          const fieldName = field.name
+          const value = field.value
+          if (
+            customFieldMessageError != null &&
+            fieldName != null &&
+            value != null
+          ) {
+            const customMessage = customFieldMessageError({
+              field: fieldName,
+              value
             })
+            if (customMessage != null) {
+              formErrors.push({
+                code: 'VALIDATION_ERROR',
+                message: customMessage,
+                resource: 'billing_address',
+                field: fieldName
+              })
+            }
           }
         }
       }
       if (formErrors.length > 0) {
         setAddressErrors(formErrors, 'billing_address')
       } else {
+        setAddressErrors([], 'billing_address')
+        for (const name in values) {
+          const field = values[name]
+          if (
+            field?.value ||
+            (field?.required === false && field?.type !== 'checkbox')
+          ) {
+            values[name.replace('billing_address_', '')] = field.value
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete values[name]
+          }
+          if (field?.type === 'checkbox') {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete values[name]
+            saveAddressToCustomerAddressBook({
+              type: 'billing_address',
+              value: field.checked
+            })
+          }
+        }
         setAddress({
           // @ts-expect-error no type
           values: {

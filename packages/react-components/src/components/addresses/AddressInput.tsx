@@ -14,6 +14,7 @@ type Props = {
    */
   name: Extract<AddressValuesKeys, AddressInputName>
   /**
+   * @deprecated
    * Used to add a custom validation rule. Accept a regex as param.
    */
   pattern?: RegExp
