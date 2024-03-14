@@ -493,16 +493,16 @@ export const CustomErrorMessages: StoryFn = () => {
             <CustomerContainer isGuest>
               <AddressesContainer shipToDifferentAddress={false}>
                 <BillingAddressForm
+                  errorClassName='border-red-600'
                   key={billingAddress?.id}
                   customFieldMessageError={(props) => {
-                    const regex = /^[a-zA-Z0-9\s]{1,32}$/gm
+                    const regex = /[a-zA-Z]+/g
                     const phoneRegex = /\d/g
-                    console.log('props', props)
                     if (
                       props.field === 'billing_address_first_name' &&
                       !regex.test(props.value)
                     ) {
-                      return 'Validation error - max 32 characters are allowed - this is a custom message'
+                      return 'Validation error - only characters are allowed - this is a custom message'
                     }
                     if (props.field === 'billing_address_metadata_phone') {
                       return props.value === ''

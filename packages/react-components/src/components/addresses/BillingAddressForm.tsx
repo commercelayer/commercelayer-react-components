@@ -55,7 +55,8 @@ export function BillingAddressForm(props: Props): JSX.Element {
     values,
     errors,
     reset: resetForm,
-    setValue: setValueForm
+    setValue: setValueForm,
+    setError: setErrorForm
   } = useRapidForm()
   const { setAddressErrors, setAddress, isBusiness } =
     useContext(AddressesContext)
@@ -77,6 +78,35 @@ export function BillingAddressForm(props: Props): JSX.Element {
         newResourceLoaded: { billing_address: true }
       })
     }
+    if (customFieldMessageError != null && Object.keys(values).length > 0) {
+      for (const name in values) {
+        if (Object.prototype.hasOwnProperty.call(values, name)) {
+          const field = values[name]
+          const fieldName = field.name
+          const value = field.value
+          const inError = errors[fieldName] != null
+          console.log('inError', inError)
+          if (
+            customFieldMessageError != null &&
+            fieldName != null &&
+            value != null &&
+            !inError
+          ) {
+            const customMessage = customFieldMessageError({
+              field: fieldName,
+              value
+            })
+            if (customMessage != null) {
+              setErrorForm({
+                name: fieldName,
+                code: 'VALIDATION_ERROR',
+                message: customMessage
+              })
+            }
+          }
+        }
+      }
+    }
     if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
@@ -95,25 +125,9 @@ export function BillingAddressForm(props: Props): JSX.Element {
             })
           }
         } else {
-          const customMessage =
-            customFieldMessageError != null
-              ? customFieldMessageError({
-                  field: fieldName,
-                  code,
-                  message,
-                  value: values[fieldName].value
-                })
-              : null
-          if (
-            customFieldMessageError != null &&
-            code === 'VALIDATION_ERROR' &&
-            !customMessage
-          ) {
-            continue
-          }
           formErrors.push({
             code: code as CodeErrorType,
-            message: customMessage ?? message ?? '',
+            message: message ?? '',
             resource: 'billing_address',
             field: fieldName
           })
@@ -121,64 +135,34 @@ export function BillingAddressForm(props: Props): JSX.Element {
       }
       setAddressErrors(formErrors, 'billing_address')
     } else if (values && Object.keys(values).length > 0) {
-      const formErrors: BaseError[] = []
+      setAddressErrors([], 'billing_address')
       for (const name in values) {
-        if (Object.prototype.hasOwnProperty.call(values, name)) {
-          const field = values[name]
-          const fieldName = field.name
-          const value = field.value
-          if (
-            customFieldMessageError != null &&
-            fieldName != null &&
-            value != null
-          ) {
-            const customMessage = customFieldMessageError({
-              field: fieldName,
-              value
-            })
-            if (customMessage != null) {
-              formErrors.push({
-                code: 'VALIDATION_ERROR',
-                message: customMessage,
-                resource: 'billing_address',
-                field: fieldName
-              })
-            }
-          }
+        const field = values[name]
+        if (
+          field?.value ||
+          (field?.required === false && field?.type !== 'checkbox')
+        ) {
+          values[name.replace('billing_address_', '')] = field.value
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete values[name]
+        }
+        if (field?.type === 'checkbox') {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete values[name]
+          saveAddressToCustomerAddressBook({
+            type: 'billing_address',
+            value: field.checked
+          })
         }
       }
-      if (formErrors.length > 0) {
-        setAddressErrors(formErrors, 'billing_address')
-      } else {
-        setAddressErrors([], 'billing_address')
-        for (const name in values) {
-          const field = values[name]
-          if (
-            field?.value ||
-            (field?.required === false && field?.type !== 'checkbox')
-          ) {
-            values[name.replace('billing_address_', '')] = field.value
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-            delete values[name]
-          }
-          if (field?.type === 'checkbox') {
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-            delete values[name]
-            saveAddressToCustomerAddressBook({
-              type: 'billing_address',
-              value: field.checked
-            })
-          }
-        }
-        setAddress({
-          // @ts-expect-error no type
-          values: {
-            ...values,
-            ...(isBusiness && { business: isBusiness })
-          },
-          resource: 'billing_address'
-        })
-      }
+      setAddress({
+        // @ts-expect-error no type
+        values: {
+          ...values,
+          ...(isBusiness && { business: isBusiness })
+        },
+        resource: 'billing_address'
+      })
     }
     const checkboxChecked =
       ref.current?.querySelector(
