@@ -485,7 +485,6 @@ export const CustomErrorMessages: StoryFn = () => {
     () => makeAddressWithRequired(order?.billing_address),
     [order?.billing_address]
   )
-  const regex = /[a-zA-Z]+/g
   return (
     <CommerceLayer accessToken='my-access-token'>
       <OrderStorage persistKey={persistKey}>
@@ -494,22 +493,23 @@ export const CustomErrorMessages: StoryFn = () => {
             <CustomerContainer isGuest>
               <AddressesContainer shipToDifferentAddress={false}>
                 <BillingAddressForm
+                  errorClassName='border-red-600'
                   key={billingAddress?.id}
                   customFieldMessageError={(props) => {
                     const regex = /[a-zA-Z]+/g
                     const phoneRegex = /\d/g
-                    console.log('props', props)
                     if (
                       props.field === 'billing_address_first_name' &&
                       !regex.test(props.value)
                     ) {
                       return 'Validation error - only characters are allowed - this is a custom message'
                     }
-                    if (
-                      props.field === 'billing_address_phone' &&
-                      !phoneRegex.test(props.value)
-                    ) {
-                      return 'Validation error - only numbers are allowed - this is a custom message'
+                    if (props.field === 'billing_address_metadata_phone') {
+                      return props.value === ''
+                        ? null
+                        : !phoneRegex.test(props.value)
+                          ? 'Validation error - only numbers are allowed - this is a custom message'
+                          : null
                     }
                     return null
                   }}
@@ -523,7 +523,6 @@ export const CustomErrorMessages: StoryFn = () => {
                         id='billing_address_first_name'
                         name='billing_address_first_name'
                         type='text'
-                        pattern={regex}
                         className={inputCss}
                       />
                       <Errors
@@ -551,18 +550,19 @@ export const CustomErrorMessages: StoryFn = () => {
                   </fieldset>
                   <fieldset className='flex gap-4 w-full mb-4'>
                     <div className='flex-1'>
-                      <label htmlFor='billing_address_first_name'>
-                        Phone number
+                      <label htmlFor='billing_address_metadata_phone'>
+                        Phone number (metadata field - not required)
                       </label>
                       <AddressInput
-                        id='billing_address_phone'
-                        name='billing_address_phone'
+                        id='billing_address_metadata_phone'
+                        name='billing_address_metadata_phone'
                         type='text'
                         className={inputCss}
+                        required={false}
                       />
                       <Errors
                         resource='billing_address'
-                        field='billing_address_phone'
+                        field='billing_address_metadata_phone'
                       />
                     </div>
                   </fieldset>

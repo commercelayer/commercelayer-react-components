@@ -50,7 +50,8 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     values,
     errors,
     reset: resetForm,
-    setValue: setValueForm
+    setValue: setValueForm,
+    setError: setErrorForm
   } = useRapidForm()
   const {
     setAddressErrors,
@@ -76,6 +77,34 @@ export function ShippingAddressForm(props: Props): JSX.Element {
         newResourceLoaded: { shipping_address: true }
       })
     }
+    if (customFieldMessageError != null && Object.keys(values).length > 0) {
+      for (const name in values) {
+        if (Object.prototype.hasOwnProperty.call(values, name)) {
+          const field = values[name]
+          const fieldName = field.name
+          const value = field.value
+          const inError = errors[fieldName] != null
+          if (
+            customFieldMessageError != null &&
+            fieldName != null &&
+            value != null &&
+            !inError
+          ) {
+            const customMessage = customFieldMessageError({
+              field: fieldName,
+              value
+            })
+            if (customMessage != null) {
+              setErrorForm({
+                name: fieldName,
+                code: 'VALIDATION_ERROR',
+                message: customMessage
+              })
+            }
+          }
+        }
+      }
+    }
     if (!isEmpty(errors)) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
@@ -94,25 +123,9 @@ export function ShippingAddressForm(props: Props): JSX.Element {
             })
           }
         } else {
-          const customMessage =
-            customFieldMessageError != null
-              ? customFieldMessageError({
-                  field: fieldName,
-                  code,
-                  message,
-                  value: values[fieldName].value
-                })
-              : null
-          if (
-            customFieldMessageError != null &&
-            code === 'VALIDATION_ERROR' &&
-            !customMessage
-          ) {
-            continue
-          }
           formErrors.push({
             code: code as CodeErrorType,
-            message: customMessage ?? message ?? '',
+            message: message ?? '',
             resource: 'shipping_address',
             field: fieldName
           })
@@ -126,10 +139,8 @@ export function ShippingAddressForm(props: Props): JSX.Element {
       (shipToDifferentAddress || invertAddresses)
     ) {
       setAddressErrors([], 'shipping_address')
-      const formErrors: BaseError[] = []
       for (const name in values) {
         const field = values[name]
-        const fieldName = field.name
         if (
           field?.value ||
           (field?.required === false && field?.type !== 'checkbox')
@@ -146,38 +157,15 @@ export function ShippingAddressForm(props: Props): JSX.Element {
             value: field.checked
           })
         }
-        if (
-          customFieldMessageError != null &&
-          field.name != null &&
-          field.value != null
-        ) {
-          const customMessage = customFieldMessageError({
-            field: fieldName,
-            value: field.value
-          })
-          console.log('customMessage', customMessage)
-          if (customMessage != null) {
-            formErrors.push({
-              code: 'VALIDATION_ERROR',
-              message: customMessage,
-              resource: 'shipping_address',
-              field: fieldName
-            })
-          }
-        }
       }
-      if (formErrors.length > 0) {
-        setAddressErrors(formErrors, 'shipping_address')
-      } else {
-        setAddress({
-          // @ts-expect-error no type
-          values: {
-            ...values,
-            ...(isBusiness && { business: isBusiness })
-          },
-          resource: 'shipping_address'
-        })
-      }
+      setAddress({
+        // @ts-expect-error no type
+        values: {
+          ...values,
+          ...(isBusiness && { business: isBusiness })
+        },
+        resource: 'shipping_address'
+      })
     }
     const checkboxChecked =
       ref.current?.querySelector(
