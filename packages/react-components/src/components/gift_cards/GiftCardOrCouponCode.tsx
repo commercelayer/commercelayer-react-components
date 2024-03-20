@@ -6,7 +6,7 @@ import type { CodeType } from '#reducers/OrderReducer'
 import has from 'lodash/has'
 import isEmpty from 'lodash/isEmpty'
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+interface ChildrenProps extends Omit<Props, 'children' | 'type'> {
   code?: string | null
   hide?: boolean
   discountAmountCents?: number | null
@@ -34,7 +34,6 @@ export function GiftCardOrCouponCode({
   )
     codeType = 'coupon_code'
   else if (!type) codeType = 'gift_card_code'
-  // @ts-expect-error deprecate `gift_card_or_coupon_code`
   const code = order && codeType ? order[codeType] : ''
   const hide = !(order && code)
   const parentProps: ChildrenProps = {

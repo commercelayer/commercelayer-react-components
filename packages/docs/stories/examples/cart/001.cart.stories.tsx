@@ -64,8 +64,22 @@ export const Default: StoryFn = (args) => {
           </section>
 
           <section className='p-6 border rounded-lg mb-4'>
-            <legend className='text-lg font-bold'>Gift cart or coupon</legend>
-            <GiftCardOrCouponForm>
+            <legend className='text-lg font-bold'>Coupon</legend>
+            <GiftCardOrCouponForm codeType='coupon_code'>
+              <GiftCardOrCouponInput className='border p-2' />
+              <GiftCardOrCouponSubmit className='px-4 py-2 bg-black border text-white' />
+            </GiftCardOrCouponForm>
+            <div className='flex'>
+              <GiftCardOrCouponCode type='coupon' />
+              <GiftCardOrCouponRemoveButton
+                type='coupon'
+                className='px-4 py-2 bg-black border text-white'
+              />
+            </div>
+          </section>
+          <section className='p-6 border rounded-lg mb-4'>
+            <legend className='text-lg font-bold'>Gift Card</legend>
+            <GiftCardOrCouponForm codeType='gift_card_code'>
               <GiftCardOrCouponInput className='border p-2' />
               <GiftCardOrCouponSubmit className='px-4 py-2 bg-black border text-white' />
             </GiftCardOrCouponForm>

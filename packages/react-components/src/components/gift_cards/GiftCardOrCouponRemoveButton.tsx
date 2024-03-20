@@ -22,10 +22,9 @@ export function GiftCardOrCouponRemoveButton(props: Props): JSX.Element | null {
   const { children, label = 'Remove', onClick, type, ...p } = props
   const { order, removeGiftCardOrCouponCode } = useContext(OrderContext)
   let codeType = type ? (`${type}_code` as const) : undefined
-  if (!type && order && 'coupon_code' in order && order.coupon_code != null)
+  if (!type && order && 'coupon_code' in order && order.coupon_code !== '')
     codeType = 'coupon_code'
   else if (!type) codeType = 'gift_card_code'
-  // @ts-expect-error deprecate `gift_card_or_coupon_code`
   const code = order && codeType ? order[codeType] : ''
   const hide = !(order && code)
   const handleClick = async (): Promise<void> => {

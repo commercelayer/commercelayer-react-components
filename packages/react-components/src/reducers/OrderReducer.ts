@@ -629,7 +629,7 @@ export async function setGiftCardOrCouponCode({
   }
 }
 
-export type CodeType = 'coupon' | 'gift_card' | 'gift_card_or_coupon'
+export type CodeType = 'coupon' | 'gift_card'
 export type OrderCodeType = `${CodeType}_code`
 
 interface TRemoveGiftCardOrCouponCodeParams {

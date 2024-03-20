@@ -1,17 +1,13 @@
 import { useRapidForm } from 'rapid-form'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import OrderContext from '#context/OrderContext'
-import isEmpty from 'lodash/isEmpty'
-import camelCase from 'lodash/camelCase'
-import dropWhile from 'lodash/dropWhile'
-import has from 'lodash/has'
-import findIndex from 'lodash/findIndex'
 import type { OrderCodeType } from '#reducers/OrderReducer'
 import type { Order } from '@commercelayer/sdk'
 import type { DefaultChildrenType } from '#typings/globals'
 
 interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
+  codeType?: OrderCodeType
   children: DefaultChildrenType
   onSubmit?: (response: {
     success: boolean
@@ -21,57 +17,45 @@ interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
 }
 
 export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
-  const { children, autoComplete = 'on', onSubmit, ...p } = props
+  const {
+    children,
+    codeType = 'gift_card_or_coupon_code',
+    autoComplete = 'on',
+    onSubmit,
+    ...p
+  } = props
   const { validation, values, reset } = useRapidForm()
-  const [codeType, setCodeType] = useState<OrderCodeType>(
-    'gift_card_or_coupon_code'
-  )
   const { setGiftCardOrCouponCode, order, errors, setOrderErrors } =
     useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
-  const inputName = 'gift_card_or_coupon_code'
   useEffect(() => {
-    if (
-      values[inputName]?.value === '' &&
-      findIndex(errors, { field: camelCase(inputName) }) !== -1
-    ) {
-      const err = dropWhile(errors, (i) => i.field === camelCase(inputName))
+    if (values[codeType]?.value === '' && errors != null && errors.length > 0) {
+      const err = errors.filter((e) => e.field === codeType)
       setOrderErrors(err)
       if (onSubmit) {
-        onSubmit({ value: values[inputName]?.value, success: false })
+        onSubmit({ value: values[codeType]?.value, success: false })
       }
     }
-    if (values[inputName]?.value === '') {
+    if (values[codeType]?.value === '') {
       setOrderErrors([])
       if (onSubmit) {
-        onSubmit({ value: values[inputName]?.value, success: false })
+        onSubmit({ value: values[codeType]?.value, success: false })
       }
     }
   }, [values])
-
-  useEffect(() => {
-    if (order?.gift_card_code && !order?.coupon_code) {
-      setCodeType('coupon_code')
-    }
-    if (!order?.gift_card_code && order?.coupon_code) {
-      setCodeType('gift_card_code')
-    }
-    if (!order?.gift_card_code && !order?.coupon_code) {
-      setCodeType('gift_card_or_coupon_code')
-    }
-  }, [order])
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
     e.preventDefault()
-    const code = has(values, inputName) ? values[inputName].value : undefined
-    if (code != null && setGiftCardOrCouponCode != null) {
+    const code = values[codeType] != null ? values[codeType].value : undefined
+    if (code != null && setGiftCardOrCouponCode != null && codeType != null) {
       const { success, order } = await setGiftCardOrCouponCode({
         code,
-        codeType
+        // TODO: Remove the `as` assertion
+        codeType: codeType as OrderCodeType
       })
-      const value = values[inputName]?.value
+      const value = values[codeType]?.value
       if (onSubmit) {
         onSubmit({
           success,
@@ -82,9 +66,10 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
       if (success) reset(e)
     }
   }
-  return (order?.gift_card_code && order?.coupon_code) ||
-    isEmpty(order) ? null : (
-    <CouponAndGiftCardFormContext.Provider value={{ validation, codeType }}>
+  return order?.[codeType as OrderCodeType] || order == null ? null : (
+    <CouponAndGiftCardFormContext.Provider
+      value={{ validation, codeType: codeType as OrderCodeType }}
+    >
       <form
         ref={ref}
         autoComplete={autoComplete}
