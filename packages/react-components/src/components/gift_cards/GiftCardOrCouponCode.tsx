@@ -3,8 +3,6 @@ import { type ChildrenFunction } from '#typings'
 import Parent from '#components/utils/Parent'
 import OrderContext from '#context/OrderContext'
 import type { CodeType } from '#reducers/OrderReducer'
-import has from 'lodash/has'
-import isEmpty from 'lodash/isEmpty'
 
 interface ChildrenProps extends Omit<Props, 'children' | 'type'> {
   code?: string | null
@@ -25,13 +23,8 @@ export function GiftCardOrCouponCode({
   ...props
 }: Props): JSX.Element | null {
   const { order } = useContext(OrderContext)
-  let codeType = type && (`${type}_code` as const)
-  if (
-    !type &&
-    order &&
-    has(order, 'coupon_code') &&
-    !isEmpty(order.coupon_code)
-  )
+  let codeType = type ? (`${type}_code` as const) : undefined
+  if (!type && order && 'coupon_code' in order && order.coupon_code !== '')
     codeType = 'coupon_code'
   else if (!type) codeType = 'gift_card_code'
   const code = order && codeType ? order[codeType] : ''

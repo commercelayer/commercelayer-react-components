@@ -87,7 +87,6 @@ export function BillingAddressForm(props: Props): JSX.Element {
           const fieldName = field.name
           const value = field.value
           const inError = errors[fieldName] != null
-          console.log('inError', inError)
           if (
             customFieldMessageError != null &&
             fieldName != null &&
