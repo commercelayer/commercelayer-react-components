@@ -31,7 +31,7 @@ interface Props
    */
   label?: string | ReactNode
   /**
-   * The label of the button
+   * The label of the button when it's loading
    */
   loadingLabel?: string | ReactNode
   /**
