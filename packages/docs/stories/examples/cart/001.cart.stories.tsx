@@ -84,8 +84,11 @@ export const Default: StoryFn = (args) => {
               <GiftCardOrCouponSubmit className='px-4 py-2 bg-black border text-white' />
             </GiftCardOrCouponForm>
             <div className='flex'>
-              <GiftCardOrCouponCode />
-              <GiftCardOrCouponRemoveButton className='px-4 py-2 bg-black border text-white' />
+              <GiftCardOrCouponCode type='gift_card' />
+              <GiftCardOrCouponRemoveButton
+                type='gift_card'
+                className='px-4 py-2 bg-black border text-white'
+              />
             </div>
           </section>
 

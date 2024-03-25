@@ -17,27 +17,26 @@ interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
 }
 
 export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
-  const {
-    children,
-    codeType = 'gift_card_or_coupon_code',
-    autoComplete = 'on',
-    onSubmit,
-    ...p
-  } = props
+  const { children, codeType, autoComplete = 'on', onSubmit, ...p } = props
   const { validation, values, reset } = useRapidForm()
   const { setGiftCardOrCouponCode, order, errors, setOrderErrors } =
     useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
   const [type, setType] = useState(codeType)
   useEffect(() => {
-    if (values[type]?.value === '' && errors != null && errors.length > 0) {
+    if (
+      type != null &&
+      values[type]?.value === '' &&
+      errors != null &&
+      errors.length > 0
+    ) {
       const err = errors.filter((e) => e.field === type)
       setOrderErrors(err)
       if (onSubmit) {
         onSubmit({ value: values[type]?.value, success: false })
       }
     }
-    if (values[type]?.value === '') {
+    if (type != null && values[type]?.value === '') {
       setOrderErrors([])
       if (onSubmit) {
         onSubmit({ value: values[type]?.value, success: false })
@@ -46,14 +45,19 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
   }, [values])
 
   useEffect(() => {
-    if (order?.gift_card_code && !order?.coupon_code) {
-      setType('coupon_code')
-    }
-    if (!order?.gift_card_code && order?.coupon_code) {
-      setType('gift_card_code')
-    }
-    if (!order?.gift_card_code && !order?.coupon_code) {
-      setType('gift_card_or_coupon_code')
+    if (codeType == null) {
+      if (order?.gift_card_code && !order?.coupon_code) {
+        setType('coupon_code')
+      }
+      if (!order?.gift_card_code && order?.coupon_code) {
+        setType('gift_card_code')
+      }
+      if (!order?.gift_card_code && !order?.coupon_code) {
+        // TODO: Remove the `as` assertion
+        setType('gift_card_or_coupon_code' as OrderCodeType)
+      }
+    } else {
+      setType(codeType)
     }
   }, [order])
 
@@ -61,7 +65,8 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
     e.preventDefault()
-    const code = values[type] != null ? values[type].value : undefined
+    const code =
+      type != null && values[type] != null ? values[type].value : undefined
     if (code != null && setGiftCardOrCouponCode != null && type != null) {
       const { success, order } = await setGiftCardOrCouponCode({
         code,
@@ -79,10 +84,17 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
       if (success) reset(e)
     }
   }
+  if (
+    codeType != null &&
+    order?.[codeType] != null &&
+    order?.[codeType] !== ''
+  ) {
+    return null
+  }
   return (order?.gift_card_code && order?.coupon_code) ||
     order == null ? null : (
     <CouponAndGiftCardFormContext.Provider
-      value={{ validation, codeType: type as OrderCodeType }}
+      value={{ validation, codeType: type }}
     >
       <form
         ref={ref}
