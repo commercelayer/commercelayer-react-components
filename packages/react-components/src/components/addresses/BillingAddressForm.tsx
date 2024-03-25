@@ -21,6 +21,7 @@ type Props = {
    * Define children input and select classnames assigned in case of validation error.
    */
   errorClassName?: string
+  fieldEvent?: 'blur' | 'change'
   /**
    * Callback to customize the error message for a specific field. Called for each error in the form.
    */
@@ -48,6 +49,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     autoComplete = 'on',
     reset = false,
     customFieldMessageError,
+    fieldEvent = 'change',
     ...p
   } = props
   const {
@@ -57,7 +59,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     reset: resetForm,
     setValue: setValueForm,
     setError: setErrorForm
-  } = useRapidForm()
+  } = useRapidForm({ fieldEvent })
   const { setAddressErrors, setAddress, isBusiness } =
     useContext(AddressesContext)
   const {
@@ -85,7 +87,6 @@ export function BillingAddressForm(props: Props): JSX.Element {
           const fieldName = field.name
           const value = field.value
           const inError = errors[fieldName] != null
-          console.log('inError', inError)
           if (
             customFieldMessageError != null &&
             fieldName != null &&

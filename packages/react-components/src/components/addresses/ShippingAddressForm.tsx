@@ -13,6 +13,7 @@ interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
   children: ReactNode
   reset?: boolean
   errorClassName?: string
+  fieldEvent?: 'blur' | 'change'
   /**
    * Callback to customize the error message for a specific field. Called for each error in the form.
    */
@@ -41,6 +42,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     children,
     errorClassName,
     autoComplete = 'on',
+    fieldEvent = 'change',
     reset = false,
     customFieldMessageError,
     ...p
@@ -52,7 +54,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     reset: resetForm,
     setValue: setValueForm,
     setError: setErrorForm
-  } = useRapidForm()
+  } = useRapidForm({ fieldEvent })
   const {
     setAddressErrors,
     setAddress,
