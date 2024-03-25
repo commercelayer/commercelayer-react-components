@@ -31,6 +31,10 @@ interface Props
    */
   label?: string | ReactNode
   /**
+   * The label of the button
+   */
+  loadingLabel?: string | ReactNode
+  /**
    * If false, the button doesn't place the order automatically. Default: true
    */
   autoPlaceOrder?: boolean
@@ -49,6 +53,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const {
     children,
     label = 'Place order',
+    loadingLabel = 'Placing...',
     autoPlaceOrder = true,
     disabled,
     onClick,
@@ -58,6 +63,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
+  const [isLoading, setIsLoading] = useState(false)
   const {
     currentPaymentMethodRef,
     loading,
@@ -226,6 +232,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   ): Promise<void> => {
     e?.preventDefault()
     e?.stopPropagation()
+    setIsLoading(true)
     let isValid = true
     setForceDisable(true)
     const checkPaymentSource = await setPaymentSource({
@@ -274,14 +281,21 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       }))
     setForceDisable(false)
     onClick && placed && onClick(placed)
+    setIsLoading(false)
   }
   const disabledButton = disabled !== undefined ? disabled : notPermitted
+  const labelButton = isLoading
+    ? loadingLabel
+    : isFunction(label)
+      ? label()
+      : label
   const parentProps = {
     ...p,
     label,
     disabled: disabledButton,
     handleClick,
-    ref
+    parentRef: ref,
+    isLoading
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -295,7 +309,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       }}
       {...p}
     >
-      {isFunction(label) ? label() : label}
+      {labelButton}
     </button>
   )
 }
