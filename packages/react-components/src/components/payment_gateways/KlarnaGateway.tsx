@@ -82,14 +82,12 @@ export function KlarnaGateway(props: Props): JSX.Element | null {
     )
   }
 
-  return clientToken && !loading ? (
+  return (
     <KlarnaPayment
       clientToken={clientToken}
       locale={locale}
       {...klarnaConfig}
     />
-  ) : (
-    loaderComponent
   )
 }
 

@@ -66,7 +66,7 @@ export function BraintreeGateway(props: Props): JSX.Element | null {
     )
   }
   if (!isGuest && templateCustomerCards) {
-    return authorization && !loading ? (
+    return (
       <>
         {isEmpty(customerPayments) ? null : (
           <div className={p.className}>
@@ -82,18 +82,14 @@ export function BraintreeGateway(props: Props): JSX.Element | null {
           config={paymentConfig}
         />
       </>
-    ) : (
-      loaderComponent
     )
   }
-  return authorization && !loading ? (
+  return (
     <BraintreePayment
       locale={locale}
       authorization={authorization}
       config={paymentConfig}
     />
-  ) : (
-    loaderComponent
   )
 }
 

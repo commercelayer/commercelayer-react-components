@@ -41,7 +41,6 @@ export function ExternalGateway(props: Props): JSX.Element | null {
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
   // @ts-expect-error no type
   const paymentSourceToken = paymentSource?.payment_source_token
-  const paymentSourceId = order?.payment_source?.id || paymentSource?.id
   const getConfig = config
     ? getPaymentConfig<'external_payments'>(paymentResource, config)
     : {}
@@ -88,15 +87,13 @@ export function ExternalGateway(props: Props): JSX.Element | null {
       </>
     )
   }
-  return paymentSourceToken && !loading && paymentSourceId ? (
+  return (
     <ExternalPayment
       show={show}
       paymentSourceToken={paymentSourceToken}
       locale={locale}
       {...paymentConfig}
     />
-  ) : (
-    loaderComponent
   )
 }
 

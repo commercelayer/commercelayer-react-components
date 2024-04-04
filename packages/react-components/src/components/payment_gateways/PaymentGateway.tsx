@@ -109,9 +109,19 @@ export function PaymentGateway({
       if (paymentSource?.mismatched_amounts && show) {
         void setPaymentSources()
       }
-      setLoading(false)
+      if (order?.payment_source?.id != null) {
+        setLoading(false)
+      }
     }
     if (expressPayments && show) setLoading(false)
+    if (
+      order?.status != null &&
+      !['draft', 'pending'].includes(order?.status) &&
+      show &&
+      order?.payment_source?.id != null
+    ) {
+      setLoading(false)
+    }
     return () => {
       setLoading(true)
     }
@@ -129,6 +139,7 @@ export function PaymentGateway({
     templateCustomerSaveToWallet,
     ...p
   }
+  if (loading) return loaderComponent
   switch (paymentResource) {
     case 'adyen_payments':
       return <AdyenGateway {...gatewayConfig}>{children}</AdyenGateway>

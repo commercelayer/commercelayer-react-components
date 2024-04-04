@@ -66,7 +66,7 @@ export function CheckoutComGateway(props: Props): JSX.Element | null {
     )
   }
   if (!isGuest && templateCustomerCards) {
-    return publicKey && !loading ? (
+    return (
       <>
         {isEmpty(customerPayments) ? null : (
           <div className={p.className}>
@@ -83,20 +83,16 @@ export function CheckoutComGateway(props: Props): JSX.Element | null {
           {...paymentConfig}
         />
       </>
-    ) : (
-      loaderComponent
     )
   }
 
-  return publicKey && !loading ? (
+  return (
     <CheckoutComPayment
       show={show}
       publicKey={publicKey}
       locale={locale}
       {...paymentConfig}
     />
-  ) : (
-    loaderComponent
   )
 }
 

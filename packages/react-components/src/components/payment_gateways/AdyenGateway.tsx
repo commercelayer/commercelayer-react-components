@@ -37,8 +37,6 @@ export function AdyenGateway(props: Props): JSX.Element | null {
     useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = 'adyen_payments'
   const locale = order?.language_code as StripeElementLocale
-  // @ts-expect-error no type
-  const paymentMethods = paymentSource?.payment_methods
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
   // @ts-expect-error no type
   const clientKey = paymentSource?.public_key
@@ -73,9 +71,8 @@ export function AdyenGateway(props: Props): JSX.Element | null {
       </PaymentSourceContext.Provider>
     )
   }
-
   if (!isGuest && templateCustomerCards) {
-    return clientKey && !loading && paymentMethods ? (
+    return (
       <>
         {isEmpty(customerPayments) ? null : (
           <div className={p.className}>
@@ -92,19 +89,15 @@ export function AdyenGateway(props: Props): JSX.Element | null {
           config={paymentConfig}
         />
       </>
-    ) : (
-      loaderComponent
     )
   }
-  return clientKey && !loading && paymentMethods ? (
+  return (
     <AdyenPayment
       clientKey={clientKey}
       locale={locale}
       config={paymentConfig}
       environment={environment}
     />
-  ) : (
-    loaderComponent
   )
 }
 
