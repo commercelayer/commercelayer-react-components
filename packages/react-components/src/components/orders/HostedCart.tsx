@@ -14,6 +14,7 @@ import {
 import { iframeResizer } from 'iframe-resizer'
 import type { Order } from '@commercelayer/sdk'
 import { subscribe, unsubscribe } from '#utils/events'
+import { getOrganizationConfig } from '#utils/organization'
 
 interface IframeData {
   message:
@@ -164,16 +165,25 @@ export function HostedCart({
   const { domain, slug } = getDomain(endpoint)
   async function setOrder(openCart?: boolean): Promise<void> {
     const orderId = localStorage.getItem(persistKey) ?? (await createOrder({}))
-    if (orderId != null && accessToken) {
+    if (orderId != null && accessToken && endpoint) {
+      const config = await getOrganizationConfig({
+        accessToken,
+        endpoint,
+        params: {
+          orderId: order?.id,
+          accessToken
+        }
+      })
       setSrc(
-        getApplicationLink({
-          slug,
-          orderId,
-          accessToken,
-          domain,
-          applicationType: 'cart',
-          customDomain
-        })
+        config?.links?.cart ??
+          getApplicationLink({
+            slug,
+            orderId,
+            accessToken,
+            domain,
+            applicationType: 'cart',
+            customDomain
+          })
       )
       if (openCart) {
         setTimeout(() => {
@@ -240,15 +250,25 @@ export function HostedCart({
       (order?.id != null || orderId != null) &&
       accessToken
     ) {
-      setSrc(
-        getApplicationLink({
-          slug,
-          orderId: order?.id ?? orderId ?? '',
-          accessToken,
-          domain,
-          applicationType: 'cart'
-        })
-      )
+      void getOrganizationConfig({
+        accessToken,
+        endpoint,
+        params: {
+          orderId: order?.id,
+          accessToken
+        }
+      }).then((config) => {
+        setSrc(
+          config?.links?.cart ??
+            getApplicationLink({
+              slug,
+              orderId: order?.id ?? orderId ?? '',
+              accessToken,
+              domain,
+              applicationType: 'cart'
+            })
+        )
+      })
     }
     if (src != null && ref.current != null) {
       ref.current.src = src

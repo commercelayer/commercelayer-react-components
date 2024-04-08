@@ -1,4 +1,4 @@
-import getOrganizationSlug from './organization'
+import { getOrganizationSlug } from './organization'
 import Sdk from '@commercelayer/sdk'
 import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
 

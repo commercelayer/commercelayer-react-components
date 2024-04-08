@@ -2,7 +2,7 @@ import { useState, useEffect, type MouseEvent, useContext } from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import type { LoaderType } from '#typings'
-import getLoaderComponent from '../../utils/getLoaderComponent'
+import getLoaderComponent from '#utils/getLoaderComponent'
 import type {
   Order,
   PaymentMethod as PaymentMethodType

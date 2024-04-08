@@ -4,6 +4,7 @@ import { type ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { getApplicationLink } from '#utils/getApplicationLink'
 import { getDomain } from '#utils/getDomain'
+import { getOrganizationConfig } from '#utils/organization'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   /**
@@ -75,18 +76,30 @@ export function MyIdentityLink(props: Props): JSX.Element {
     throw new Error('Cannot use `MyIdentityLink` outside of `CommerceLayer`')
   const { domain, slug } = getDomain(endpoint)
   useEffect(() => {
-    const link = getApplicationLink({
-      slug,
+    void getOrganizationConfig({
       accessToken,
-      applicationType: 'identity',
-      domain,
-      modeType: type,
-      clientId,
-      scope,
-      returnUrl: returnUrl ?? window.location.href,
-      customDomain
+      endpoint,
+      params: {
+        accessToken
+      }
+    }).then((config) => {
+      if (config?.links?.identity) {
+        setHref(config.links.identity)
+      } else {
+        const link = getApplicationLink({
+          slug,
+          accessToken,
+          applicationType: 'identity',
+          domain,
+          modeType: type,
+          clientId,
+          scope,
+          returnUrl: returnUrl ?? window.location.href,
+          customDomain
+        })
+        setHref(link)
+      }
     })
-    setHref(link)
     return () => {
       setHref(undefined)
     }

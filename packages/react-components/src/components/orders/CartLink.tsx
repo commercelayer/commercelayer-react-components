@@ -6,6 +6,7 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 import { getApplicationLink } from '#utils/getApplicationLink'
 import { getDomain } from '#utils/getDomain'
 import { publish } from '#utils/events'
+import { getOrganizationConfig } from '#utils/organization'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   /**
@@ -78,18 +79,37 @@ export function CartLink(props: Props): JSX.Element | null {
     event.preventDefault()
     if (type !== 'mini') {
       if (order?.id) {
-        location.href = href ?? ''
+        const config = await getOrganizationConfig({
+          accessToken,
+          endpoint,
+          params: {
+            orderId: order?.id,
+            accessToken
+          }
+        })
+        location.href = config?.links?.cart ?? href ?? ''
       } else {
         const orderId = await createOrder({})
-        if (slug)
-          location.href = getApplicationLink({
-            slug,
-            orderId,
-            accessToken,
-            domain,
-            applicationType: 'cart',
-            customDomain
-          })
+        const config = await getOrganizationConfig({
+          accessToken,
+          endpoint,
+          params: {
+            orderId: order?.id,
+            accessToken
+          }
+        })
+        if (slug) {
+          location.href =
+            config?.links?.cart ??
+            getApplicationLink({
+              slug,
+              orderId,
+              accessToken,
+              domain,
+              applicationType: 'cart',
+              customDomain
+            })
+        }
       }
     } else {
       publish('open-cart')

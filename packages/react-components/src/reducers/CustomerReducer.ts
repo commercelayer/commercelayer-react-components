@@ -240,10 +240,11 @@ export function getCustomerPaymentSources(
 ): void {
   if (params) {
     const { order, dispatch } = params
-    if (order?.available_customer_payment_sources && dispatch) {
+    const payments = order?.available_customer_payment_sources
+    if (payments != null && payments.length > 0 && dispatch) {
       dispatch({
         type: 'setPayments',
-        payload: { payments: order.available_customer_payment_sources }
+        payload: { payments }
       })
     }
   }
