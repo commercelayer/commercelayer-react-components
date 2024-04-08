@@ -20,7 +20,7 @@ import type {
   OrderUpdate,
   QueryParamsRetrieve
 } from '@commercelayer/sdk'
-import getOrganizationSlug from '#utils/organization'
+import { getOrganizationSlug } from '#utils/organization'
 import { type LooseAutocomplete } from '#typings/globals'
 
 export type GetOrderParams = Partial<{

@@ -185,7 +185,9 @@ export function AddToCartButton(props: Props): JSX.Element {
         })
           .then(async (res) => {
             getOrder && orderId && (await getOrder(orderId))
-            publish('open-cart')
+            if (!buyNowMode) {
+              publish('open-cart')
+            }
             return res
           })
           .catch(({ response }) => {
@@ -219,7 +221,9 @@ export function AddToCartButton(props: Props): JSX.Element {
           })
         }
       }
-      publish('open-cart')
+      if (!buyNowMode) {
+        publish('open-cart')
+      }
       return res
     } else if (url) {
       return await callExternalFunction({
@@ -236,7 +240,9 @@ export function AddToCartButton(props: Props): JSX.Element {
       })
         .then(async (res) => {
           getOrder && orderId && (await getOrder(orderId))
-          publish('open-cart')
+          if (!buyNowMode) {
+            publish('open-cart')
+          }
           return res
         })
         .catch(({ response }) => {

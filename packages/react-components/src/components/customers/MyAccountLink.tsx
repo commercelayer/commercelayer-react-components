@@ -5,6 +5,7 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 import { getApplicationLink } from '#utils/getApplicationLink'
 import { getDomain } from '#utils/getDomain'
 import { jwt } from '#utils/jwt'
+import { getOrganizationConfig } from '#utils/organization'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   /**
@@ -65,7 +66,21 @@ export function MyAccountLink(props: Props): JSX.Element {
   function handleClick(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ): void {
-    if (disabled) e.preventDefault()
+    e.preventDefault()
+    if (!disabled && accessToken && endpoint) {
+      void getOrganizationConfig({
+        accessToken,
+        endpoint,
+        params: {
+          accessToken
+        }
+      }).then((config) => {
+        if (config?.links?.my_account) {
+          e.preventDefault()
+          location.href = config.links.my_account
+        }
+      })
+    }
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
