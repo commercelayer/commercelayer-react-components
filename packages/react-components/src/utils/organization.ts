@@ -52,16 +52,6 @@ export async function getOrganizationConfig(
   })
 }
 
-// export interface ReplaceOrganizationLinksParams {
-//   link: string
-//   accessToken: string
-//   orderId: string
-// }
-
-// export function replaceOrganizationLinks(params): string {
-
-// }
-
 export function useOrganizationConfig({
   accessToken,
   endpoint,
