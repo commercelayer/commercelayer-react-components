@@ -15,7 +15,7 @@ jobs:
       - name: pnpm 🧰
         uses: pnpm/action-setup@v2.2.2
         with:
-          version: 7
+          version: 8
 
       - name: Node 🧰
         uses: actions/setup-node@v3
@@ -60,7 +60,7 @@ jobs:
 
       - name: Post to a Slack channel
         id: slack
-        uses: slackapi/slack-github-action@v1.22.0
+        uses: slackapi/slack-github-action@v1.25.0
         with:
           # Slack channel id, channel name, or user id to post message.
           # See also: https://api.slack.com/methods/chat.postMessage#channels
