@@ -19,9 +19,10 @@ import {
 import { isEmpty } from '#utils/isEmpty'
 import { getAvailableExpressPayments } from '#utils/expressPaymentHelper'
 
-interface TOnClickParams {
+export interface PaymentMethodOnClickParams {
   payment?: PaymentMethodType | Record<string, any>
   order?: Order
+  paymentSource?: Order['payment_source']
 }
 
 type Props = {
@@ -50,7 +51,7 @@ type Props = {
   (
     | {
         clickableContainer: true
-        onClick?: (params?: TOnClickParams) => void
+        onClick?: (params?: PaymentMethodOnClickParams) => void
       }
     | {
         clickableContainer?: never
@@ -104,7 +105,7 @@ export function PaymentMethod({
             order
           })
           if (ps && paymentMethod && onClick != null) {
-            onClick({ payment: paymentMethod, order })
+            onClick({ payment: paymentMethod, order, paymentSource: ps })
             setTimeout(() => {
               setLoading(false)
             }, 200)
@@ -145,7 +146,7 @@ export function PaymentMethod({
                 attributes
               })
               if (ps && paymentMethod && onClick != null) {
-                onClick({ payment: paymentMethod, order })
+                onClick({ payment: paymentMethod, order, paymentSource: ps })
                 setTimeout(() => {
                   setLoading(false)
                 }, 200)
