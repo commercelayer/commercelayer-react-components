@@ -8,6 +8,7 @@ import priceReducer, {
 import PricesContext, { type PricesContextValue } from '#context/PricesContext'
 import { type LoaderType } from '#typings'
 import SkuContext from '#context/SkuContext'
+import { type QueryPageSize } from '@commercelayer/sdk'
 
 interface Props {
   /**
@@ -27,7 +28,7 @@ interface Props {
   /**
    * Prices per page to be fetched
    */
-  perPage?: number
+  perPage?: QueryPageSize
   /**
    * SKU code to fetch the prices for. If not provided, the `sku_code` will be retrieved from the `<Price>` component(s) nested as children.
    */

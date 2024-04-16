@@ -1,5 +1,5 @@
 import { type BaseAction, type LoaderType } from '#typings'
-import { type Price } from '@commercelayer/sdk'
+import { type QueryPageSize, type Price } from '@commercelayer/sdk'
 import getPrices from '#utils/getPrices'
 import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { type Dispatch } from 'react'
@@ -58,7 +58,7 @@ export function getSkusPrice(
   }: {
     config: CommerceLayerConfig
     dispatch: Dispatch<PriceAction>
-    perPage: number
+    perPage: QueryPageSize
     filters: Record<string, any>
   }
 ): void {
