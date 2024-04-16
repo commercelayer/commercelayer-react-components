@@ -38,6 +38,21 @@ importers:
         specifier: ^5.8.2
         version: 5.8.2
 
+  packages/core:
+    devDependencies:
+      tsup:
+        specifier: ^8.0.2
+        version: 8.0.2(typescript@5.4.5)
+      typescript:
+        specifier: ^5.4.5
+        version: 5.4.5
+      vite-tsconfig-paths:
+        specifier: ^4.3.2
+        version: 4.3.2(typescript@5.4.5)
+      vitest:
+        specifier: ^1.5.0
+        version: 1.5.0
+
   packages/docs:
     devDependencies:
       '@babel/core':
@@ -11354,6 +11369,7 @@ snapshots:
       minimatch: 3.1.2
       once: 1.4.0
       path-is-absolute: 1.0.1
+    dev: true
 
   glob@9.3.5:
     dependencies:
@@ -11512,6 +11528,7 @@ snapshots:
     dependencies:
       once: 1.4.0
       wrappy: 1.0.2
+    dev: true
 
   inherits@2.0.4: {}
 
@@ -12886,6 +12903,7 @@ snapshots:
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
+    dev: true
 
   onetime@5.1.2:
     dependencies:
@@ -13564,6 +13582,7 @@ snapshots:
   rimraf@3.0.2:
     dependencies:
       glob: 7.2.3
+    dev: true
 
   rimraf@4.4.1:
     dependencies:
