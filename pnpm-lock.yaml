@@ -80,6 +80,21 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1(@types/debug@4.1.12)(@types/node@22.13.14)(jsdom@26.0.0)(msw@2.7.4(@types/node@22.13.14)(typescript@5.8.3))(terser@5.39.0)(yaml@2.7.0)
 
+  packages/core:
+    devDependencies:
+      tsup:
+        specifier: ^8.0.2
+        version: 8.0.2(typescript@5.4.5)
+      typescript:
+        specifier: ^5.4.5
+        version: 5.4.5
+      vite-tsconfig-paths:
+        specifier: ^4.3.2
+        version: 4.3.2(typescript@5.4.5)
+      vitest:
+        specifier: ^1.5.0
+        version: 1.5.0
+
   packages/docs:
     devDependencies:
       '@babel/core':
@@ -14260,6 +14275,7 @@ snapshots:
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
+    dev: true
 
   onetime@5.1.2:
     dependencies:
