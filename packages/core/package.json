@@ -1,0 +1,42 @@
+{
+  "name": "@commercelayer/core",
+  "version": "1.0.0",
+  "description": "Commerce Layer Components Core SDK",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "keywords": [
+    "jamstack",
+    "headless",
+    "ecommerce",
+    "api",
+    "components"
+  ],
+  "scripts": {
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "test": "pnpm run lint && vitest run --silent",
+    "test:watch": "vitest --silent",
+    "build": "tsup"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "Alessandro Casazza",
+    "email": "alessandro@commercelayer.io"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^1.5.0"
+  }
+}
