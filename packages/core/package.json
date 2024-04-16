@@ -5,22 +5,25 @@
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
-    "./package.json": "./package.json",
     ".": {
       "import": "./dist/index.js",
-      "default": "./dist/index.cjs"
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
     }
   },
-  "keywords": ["jamstack", "headless", "ecommerce", "api", "components"],
+  "keywords": [
+    "jamstack",
+    "headless",
+    "ecommerce",
+    "api",
+    "components"
+  ],
   "scripts": {
-    "check-exports": "attw --pack .",
-    "lint": "biome lint --error-on-warnings ./src && tsc",
-    "lint:fix": "pnpm biome lint --write ./src",
-    "test": "pnpm run lint && vitest --silent",
-    "test:watch": "vitest",
-    "coverage": "vitest run --coverage",
-    "build": "tsup",
-    "ci": "pnpm  build && pnpm check-exports && pnpm lint"
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "test": "pnpm run lint && vitest run --silent",
+    "test:watch": "vitest --silent",
+    "build": "tsup"
   },
   "publishConfig": {
     "access": "public"
@@ -31,15 +34,9 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.17.4",
-    "@vitest/coverage-v8": "^3.1.1",
-    "tsup": "^8.4.0",
-    "typescript": "^5.8.3",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.1"
-  },
-  "dependencies": {
-    "@commercelayer/js-auth": "^6.7.2",
-    "@commercelayer/sdk": "6.39.0"
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^1.5.0"
   }
 }
