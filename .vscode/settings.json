@@ -1,6 +1,20 @@
 {
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "biomejs.biome",
+  "javascript.format.enable": true,
+  "eslint.workingDirectories": [
+    "packages/react-components",
+    "packages/docs",
+    "packages/core"
+  ],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
   "editor.codeActionsOnSave": {
     "quickfix.biome": "explicit",
     "source.organizeImports.biome": "explicit"

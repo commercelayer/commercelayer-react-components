@@ -52,19 +52,26 @@ importers:
         version: 5.9.2
 
   packages/core:
+    dependencies:
+      '@commercelayer/sdk':
+        specifier: 6.0.0-rc.2
+        version: 6.0.0-rc.2
+      jwt-decode:
+        specifier: ^4.0.0
+        version: 4.0.0
     devDependencies:
       tsup:
         specifier: ^8.0.2
-        version: 8.0.2(typescript@5.4.5)
+        version: 8.0.2(postcss@8.4.38)(typescript@5.4.5)
       typescript:
         specifier: ^5.4.5
         version: 5.4.5
       vite-tsconfig-paths:
         specifier: ^4.3.2
-        version: 4.3.2(typescript@5.4.5)
+        version: 4.3.2(typescript@5.4.5)(vite@5.2.8(@types/node@20.12.7)(terser@5.30.3))
       vitest:
         specifier: ^1.5.0
-        version: 1.5.0
+        version: 1.5.0(@types/node@20.12.7)(jsdom@24.0.0)(terser@5.30.3)
 
   packages/docs:
     devDependencies:
