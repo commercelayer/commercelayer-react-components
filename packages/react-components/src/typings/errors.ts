@@ -46,6 +46,7 @@ export interface BaseError {
   id?: string
   title?: string
   detail?: string
+  status?: string
 }
 
 export interface TAPIError {

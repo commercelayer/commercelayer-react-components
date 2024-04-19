@@ -51,7 +51,7 @@ type Props = {
   (
     | {
         clickableContainer: true
-        onClick?: (params?: PaymentMethodOnClickParams) => void
+        onClick?: (params: PaymentMethodOnClickParams) => void
       }
     | {
         clickableContainer?: never
