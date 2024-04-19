@@ -358,7 +358,10 @@ export async function setPaymentSource({
       const [error] = errors
       if (error?.status === '401' && getOrder != null && order != null) {
         const currentOrder = await getOrder(order?.id)
-        if (currentOrder?.status !== 'placed') {
+        if (
+          currentOrder?.status != null &&
+          !['placed', 'approved'].includes(currentOrder.status)
+        ) {
           console.error('Set payment source:', errors)
           setErrors({
             currentErrors,
