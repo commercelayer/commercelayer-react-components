@@ -208,6 +208,7 @@
     "@types/react-window": "^1.8.8",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitest/coverage-c8": "^0.33.0",
+    "eslint": "8.45",
     "jsdom": "^24.0.0",
     "minimize-js": "^1.4.0",
     "msw": "^2.2.13",
