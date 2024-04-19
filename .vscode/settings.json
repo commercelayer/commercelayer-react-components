@@ -20,6 +20,7 @@
   "eslint.workingDirectories": [
     "packages/react-components",
     "packages/docs",
+    "packages/core",
   ],
   "eslint.validate": [
     "javascript",
