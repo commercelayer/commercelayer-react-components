@@ -38,5 +38,9 @@
     "typescript": "^5.4.5",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.5.0"
+  },
+  "dependencies": {
+    "@commercelayer/sdk": "6.0.0-rc.2",
+    "jwt-decode": "^4.0.0"
   }
 }
