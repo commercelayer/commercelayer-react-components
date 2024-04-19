@@ -1,32 +1,27 @@
 {
   "compilerOptions": {
-    /* Base Options: */
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "target": "es2022",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "moduleDetection": "force",
-    "isolatedModules": true,
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+    /* Module Resolution Options */
+    "module": "Node16",
+    "target": "ES2022",
+    "moduleResolution": "Node16",
     "verbatimModuleSyntax": true,
-    "lib": ["es2022"],
-    "noEmit": true,
-
-    /* Strictness */
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-
-    /* If transpiling with TypeScript: */
-    "module": "Preserve",
-
-    /* Relative Paths */
-    "baseUrl": ".",
-    "paths": {
-      "#sdk": ["src/sdk/index.ts"],
-      "#types": ["src/types/index.ts"],
-      "#extender": ["extender.ts"]
-    }
+    /* Other Options */
+    "resolveJsonModule": true,
+    "declaration": true /* Generates corresponding '.d.ts' file. */,
+    "strict": true /* Enable all strict type-checking options. */,
+    "noUnusedLocals": true /* Report errors on unused locals. */,
+    "noUnusedParameters": true /* Report errors on unused parameters. */,
+    "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
+    "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */,
+    "noUncheckedIndexedAccess": true /* Include 'undefined' in index signature results */,
+    "noPropertyAccessFromIndexSignature": true /* Require undeclared properties from index signatures to use element accesses. */,
+    "types": ["vitest/globals"],
+    "baseUrl": "." /* Base directory to resolve non-absolute module names. */,
+    "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
+    "skipLibCheck": true /* Skip type checking of declaration files. */,
+    "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
   },
-  "exclude": ["node_modules", "dist", "coverage", "*.spec.ts"]
+  "include": ["**/*.ts", ".eslintrc.cjs"],
+  "exclude": ["node_modules"]
 }
