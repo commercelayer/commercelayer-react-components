@@ -354,7 +354,7 @@ export async function setPaymentSource({
       resource: 'payment_methods',
       field: paymentResource
     })
-    if (errors.length > 0) {
+    if (errors != null && errors?.length > 0) {
       const [error] = errors
       if (error?.status === '401' && getOrder != null && order != null) {
         const currentOrder = await getOrder(order?.id)
