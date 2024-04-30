@@ -98,6 +98,9 @@ importers:
       '@storybook/manager-api':
         specifier: ^7.6.17
         version: 7.6.17(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@storybook/node-logger':
+        specifier: ^8.0.9
+        version: 8.0.9
       '@storybook/react':
         specifier: ^7.6.17
         version: 7.6.17(encoding@0.1.13)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(typescript@5.3.3)
@@ -2384,6 +2387,9 @@ packages:
 
   '@storybook/node-logger@7.6.17':
     resolution: {integrity: sha512-w59MQuXhhUNrUVmVkXhMwIg2nvFWjdDczLTwYLorhfsE36CWeUOY5QCZWQy0Qf/h+jz8Uo7Evy64qn18v9C4wA==}
+
+  '@storybook/node-logger@8.0.9':
+    resolution: {integrity: sha512-5ajMdZFrYrjGLJOVDq7dlEQNFsgeLHymt4dCK9MulL/ciXykmXUZXE3Bye0wFy+I2qqDVvrvR8uzCvSFvm5MAQ==}
 
   '@storybook/postinstall@7.6.17':
     resolution: {integrity: sha512-WaWqB8o9vUc9aaVls+povQSVirf1Xd1LZcVhUKfAocAF3mzYUsnJsVqvnbjRj/F96UFVihOyDt9Zjl/9OvrCvQ==}
@@ -10653,6 +10659,8 @@ snapshots:
   '@storybook/mdx2-csf@1.1.0': {}
 
   '@storybook/node-logger@7.6.17': {}
+
+  '@storybook/node-logger@8.0.9': {}
 
   '@storybook/postinstall@7.6.17': {}
 

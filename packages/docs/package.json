@@ -24,6 +24,7 @@
     "@storybook/client-api": "^7.6.17",
     "@storybook/client-logger": "^7.6.17",
     "@storybook/manager-api": "^7.6.17",
+    "@storybook/node-logger": "^8.0.9",
     "@storybook/react": "^7.6.17",
     "@storybook/react-vite": "^7.6.17",
     "@storybook/testing-library": "^0.2.2",
