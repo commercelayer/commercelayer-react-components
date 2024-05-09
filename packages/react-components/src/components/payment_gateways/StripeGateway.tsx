@@ -12,7 +12,7 @@ import {
 import getCardDetails from '#utils/getCardDetails'
 import { type StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
 type Props = GatewayBaseType
@@ -30,7 +30,7 @@ export function StripeGateway(props: Props): JSX.Element | null {
     templateCustomerSaveToWallet,
     ...p
   } = props
-  const { order, getOrder } = useContext(OrderContext)
+  const { order } = useContext(OrderContext)
   const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { payments, isGuest } = useContext(CustomerContext)
   const { currentPaymentMethodId, config, paymentSource } =
@@ -52,23 +52,6 @@ export function StripeGateway(props: Props): JSX.Element | null {
           return customerPayment.payment_source?.type === paymentResource
         })
       : []
-  useEffect(() => {
-    const card = getCardDetails({
-      customerPayment: {
-        // @ts-expect-error missing type
-        payment_source: paymentSource
-      },
-      paymentType: paymentResource
-    })
-    if (
-      order?.status === 'placed' &&
-      order?.payment_status === 'unpaid' &&
-      card.brand == null
-    ) {
-      void getOrder(order?.id)
-    }
-  }, [order?.status])
-
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
@@ -77,12 +60,7 @@ export function StripeGateway(props: Props): JSX.Element | null {
       },
       paymentType: paymentResource
     })
-    const showLoader =
-      order?.status === 'placed' &&
-      order?.payment_status === 'unpaid' &&
-      card?.brand == null
     const value = { ...card, showCard, handleEditClick, readonly }
-    if (showLoader) return loaderComponent
     return card?.brand == null ? null : (
       <PaymentSourceContext.Provider value={value}>
         {children}

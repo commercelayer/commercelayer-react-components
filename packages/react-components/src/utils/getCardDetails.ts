@@ -50,7 +50,7 @@ export default function getCardDetails({
               issuer_type: ps?.payment_instrument?.['issuer_type']
             }
           : undefined
-      if (source) {
+      if (source?.brand != null) {
         return {
           ...source
         }
