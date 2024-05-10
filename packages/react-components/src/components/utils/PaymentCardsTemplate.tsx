@@ -59,6 +59,12 @@ export default function PaymentCardsTemplate({
       customerPayment,
       paymentType: paymentResource
     })
+    if (card.brand === '') {
+      card.brand =
+        // @ts-expect-error missing type
+        customerPayment.payment_source?.payment_instrument?.issuer_type ??
+        'credit-card'
+    }
     const handleClick = async (e: MouseEvent): Promise<void> => {
       e.stopPropagation()
       await setPaymentSource({
