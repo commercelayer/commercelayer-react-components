@@ -3,7 +3,6 @@ import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContex
 import Parent from '#components/utils/Parent'
 import ShipmentContext from '#context/ShipmentContext'
 import type { Order, ShippingMethod } from '@commercelayer/sdk'
-import { set } from 'lodash'
 
 interface ShippingMethodRadioButtonType extends Omit<Props, 'children'> {
   shippingMethod: ShippingMethod
