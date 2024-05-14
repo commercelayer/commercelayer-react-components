@@ -7,16 +7,17 @@ import type {
   AddressUpdate,
   Customer,
   CustomerPaymentSource,
+  ListResponse,
   Order,
   OrderSubscription,
-  OrderUpdate
+  OrderUpdate,
+  QueryPageSize
 } from '@commercelayer/sdk'
 import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { type updateOrder } from './OrderReducer'
 import getSdk from '#utils/getSdk'
 import getErrors from '#utils/getErrors'
 import { jwt } from '#utils/jwt'
-import { type ListResponse } from '@commercelayer/sdk/lib/cjs/resource'
 import { getCustomerIdByToken } from '#utils/getCustomerIdByToken'
 import {
   type TriggerAttributeHelper,
@@ -262,7 +263,7 @@ interface GetCustomerOrdersProps {
   /**
    * The page size
    */
-  pageSize?: number
+  pageSize?: QueryPageSize
   /**
    * The page number
    */
@@ -467,7 +468,7 @@ export type SetResourceTriggerParams = {
   /**
    * The page size
    */
-  pageSize?: number
+  pageSize?: QueryPageSize
   /**
    * The page number
    */

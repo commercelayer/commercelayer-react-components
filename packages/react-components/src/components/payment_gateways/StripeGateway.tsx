@@ -52,7 +52,6 @@ export function StripeGateway(props: Props): JSX.Element | null {
           return customerPayment.payment_source?.type === paymentResource
         })
       : []
-
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
@@ -61,8 +60,19 @@ export function StripeGateway(props: Props): JSX.Element | null {
       },
       paymentType: paymentResource
     })
-    const value = { ...card, showCard, handleEditClick, readonly }
-    return isEmpty(card) ? null : (
+    if (card?.brand === '') {
+      card.brand =
+        // @ts-expect-error missing type
+        paymentSource?.payment_instrument?.issuer_type ?? 'credit-card'
+    }
+    const value = {
+      ...card,
+      showCard,
+      handleEditClick,
+      readonly,
+      paymentSource
+    }
+    return card?.brand == null ? null : (
       <PaymentSourceContext.Provider value={value}>
         {children}
       </PaymentSourceContext.Provider>

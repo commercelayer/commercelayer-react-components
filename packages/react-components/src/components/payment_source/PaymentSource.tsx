@@ -65,9 +65,14 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
       })
       if (isCustomerPaymentSource && card.brand === '') {
         // Force creadit card icon for customer payment source imported by API
-        card.brand = 'credit-card'
+        card.brand =
+          card.issuer_type != null && card.issuer_type !== ''
+            ? card.issuer_type
+            : 'credit-card'
       }
-      if (card.brand) setShowCard(true)
+      if (card.brand) {
+        setShowCard(true)
+      }
     } else if (
       expressPayments &&
       currentPaymentMethodType === 'stripe_payments'
@@ -80,11 +85,11 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
     }
   }, [
     currentPaymentMethodId,
-    paymentSource,
-    payments,
-    payment,
+    paymentSource?.id,
+    payments != null,
+    payment != null,
     readonly,
-    order,
+    order?.status,
     expressPayments
   ])
   const handleEditClick = async (e: MouseEvent): Promise<void> => {

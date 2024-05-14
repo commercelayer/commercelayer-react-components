@@ -22,6 +22,7 @@ import CustomerContext from '#context/CustomerContext'
 import type { BaseError } from '#typings/errors'
 import type { DefaultChildrenType } from '#typings/globals'
 import { isGuestToken } from '#utils/isGuestToken'
+import { type QueryPageSize } from '@commercelayer/sdk'
 
 interface Props {
   children: DefaultChildrenType
@@ -185,7 +186,7 @@ export function CustomerContainer(props: Props): JSX.Element {
         pageSize
       }: {
         pageNumber?: number
-        pageSize?: number
+        pageSize?: QueryPageSize
       }) => {
         await getCustomerOrders({
           config,
@@ -200,7 +201,7 @@ export function CustomerContainer(props: Props): JSX.Element {
         id
       }: {
         pageNumber?: number
-        pageSize?: number
+        pageSize?: QueryPageSize
         id?: string
       }) => {
         await getCustomerSubscriptions({

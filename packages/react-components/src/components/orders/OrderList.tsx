@@ -19,6 +19,7 @@ import {
 import { sortDescIcon, sortAscIcon } from '#utils/icons'
 import filterChildren from '#utils/filterChildren'
 import type { DefaultChildrenType, TRange } from '#typings/globals'
+import { type QueryPageSize } from '@commercelayer/sdk'
 
 type RowComponent = 'OrderListRow' | 'OrderListEmpty'
 type PaginationComponent =
@@ -153,13 +154,13 @@ export function OrderList({
     if (type === 'orders' && getCustomerOrders != null) {
       void getCustomerOrders({
         pageNumber: pageIndex + 1,
-        pageSize: currentPageSize
+        pageSize: currentPageSize as QueryPageSize
       })
     }
     if (type === 'subscriptions' && getCustomerSubscriptions != null) {
       void getCustomerSubscriptions({
         pageNumber: pageIndex + 1,
-        pageSize: currentPageSize,
+        pageSize: currentPageSize as QueryPageSize,
         id
       })
     }

@@ -50,7 +50,7 @@ export default function getCardDetails({
               issuer_type: ps?.payment_instrument?.['issuer_type']
             }
           : undefined
-      if (source) {
+      if (source?.brand != null) {
         return {
           ...source
         }
@@ -113,7 +113,12 @@ export default function getCardDetails({
     default: {
       const ps =
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
-      const source = ps?.metadata?.['card']
+      const source = ps?.metadata?.['card'] ?? {
+        brand: ps?.payment_instrument?.['issuer_type'].replace('_', '-') ?? '',
+        last4: ps?.metadata?.['last4'] ?? '',
+        exp_month: ps?.metadata?.['exp_month'] ?? '',
+        exp_year: ps?.metadata?.['exp_year'] ?? ''
+      }
       if (source) {
         return {
           ...source

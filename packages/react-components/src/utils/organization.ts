@@ -44,23 +44,12 @@ export async function getOrganizationConfig(
       organization: ['id', 'config']
     }
   })
-  console.log('params', config.params)
   return getConfig({
     jsonConfig: organization.config ?? {},
     market: `market:id:${market.id.join(',')}`,
     params: config.params
   })
 }
-
-// export interface ReplaceOrganizationLinksParams {
-//   link: string
-//   accessToken: string
-//   orderId: string
-// }
-
-// export function replaceOrganizationLinks(params): string {
-
-// }
 
 export function useOrganizationConfig({
   accessToken,
