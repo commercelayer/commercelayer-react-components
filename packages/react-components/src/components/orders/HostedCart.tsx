@@ -44,7 +44,7 @@ const defaultIframeStyle = {
   minHeight: '100%',
   border: 'none',
   paddingLeft: '20px',
-  paddingRight: '20px',
+  paddingRight: '20px'
 } satisfies CSSProperties
 
 const defaultContainerStyle = {
@@ -287,7 +287,7 @@ export function HostedCart({
     iframeResizer(
       {
         checkOrigin: false,
-         // @ts-expect-error No types available
+        // @ts-expect-error No types available
         onMessage
       },
       ref.current

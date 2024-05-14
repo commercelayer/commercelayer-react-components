@@ -180,7 +180,7 @@
   "dependencies": {
     "@adyen/adyen-web": "^5.58.0",
     "@commercelayer/organization-config": "^1.4.5",
-    "@commercelayer/sdk": "6.0.0-rc.2",
+    "@commercelayer/sdk": "6.0.2",
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^3.0.5",
     "@tanstack/react-table": "^8.11.8",
@@ -194,11 +194,11 @@
     "rapid-form": "^2.1.0"
   },
   "devDependencies": {
-    "@commercelayer/js-auth": "^4.2.0",
+    "@commercelayer/js-auth": "^6.2.1",
     "@faker-js/faker": "^8.4.0",
     "@playwright/test": "^1.43.0",
-    "@testing-library/dom": "^9.3.4",
-    "@testing-library/react": "^14.2.2",
+    "@testing-library/dom": "^10.1.0",
+    "@testing-library/react": "^15.0.7",
     "@types/braintree-web": "^3.96.10",
     "@types/lodash": "^4.17.0",
     "@types/node": "^20.12.4",
@@ -207,7 +207,7 @@
     "@types/react-test-renderer": "^18.0.7",
     "@types/react-window": "^1.8.8",
     "@vitejs/plugin-react": "^4.2.1",
-    "@vitest/coverage-c8": "^0.33.0",
+    "@vitest/coverage-v8": "^1.6.0",
     "eslint": "8.45",
     "jsdom": "^24.0.0",
     "minimize-js": "^1.4.0",

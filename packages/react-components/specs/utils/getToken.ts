@@ -1,4 +1,4 @@
-import { authentication } from '@commercelayer/js-auth'
+import { authenticate } from '@commercelayer/js-auth'
 
 export type TokenType =
   | 'sales_channel'
@@ -20,27 +20,25 @@ export default async function getToken(
           password: process.env['VITE_TEST_PASSWORD'] ?? ''
         }
       : type === 'customer_empty'
-      ? {
-          username: process.env['VITE_TEST_USERNAME_EMPTY'] ?? '',
-          password: process.env['VITE_TEST_PASSWORD_EMPTY'] ?? ''
-        }
-      : type === 'customer_with_low_data'
-      ? {
-          username: process.env['VITE_TEST_USERNAME_WITH_LOW_DATA'] ?? '',
-          password: process.env['VITE_TEST_PASSWORD_WITH_LOW_DATA'] ?? ''
-        }
-      : undefined
+        ? {
+            username: process.env['VITE_TEST_USERNAME_EMPTY'] ?? '',
+            password: process.env['VITE_TEST_PASSWORD_EMPTY'] ?? ''
+          }
+        : type === 'customer_with_low_data'
+          ? {
+              username: process.env['VITE_TEST_USERNAME_WITH_LOW_DATA'] ?? '',
+              password: process.env['VITE_TEST_PASSWORD_WITH_LOW_DATA'] ?? ''
+            }
+          : undefined
   const { accessToken } =
     user == null
-      ? await authentication('client_credentials', {
+      ? await authenticate('client_credentials', {
           clientId,
-          slug,
           domain,
           scope
         })
-      : await authentication('password', {
+      : await authenticate('password', {
           clientId,
-          slug,
           domain,
           scope,
           ...user
