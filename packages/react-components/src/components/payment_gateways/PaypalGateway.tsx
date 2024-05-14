@@ -21,7 +21,7 @@ export function PaypalGateway(props: Props): JSX.Element | null {
   const paymentResource: PaymentResource = 'paypal_payments'
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
-  if (readonly || showCard) {
+  if (readonly) {
     const card = getCardDetails({
       customerPayment: {
         // @ts-expect-error missing type
