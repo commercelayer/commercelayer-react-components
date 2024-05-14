@@ -139,6 +139,7 @@ export function PaymentGateway({
     templateCustomerSaveToWallet,
     ...p
   }
+  if (currentPaymentMethodType !== paymentResource) return null
   if (loading) return loaderComponent
   switch (paymentResource) {
     case 'adyen_payments':
