@@ -169,7 +169,7 @@ export function BraintreePayment({
           verifyCardOptions
         )) as any
         if (
-          response.rawCardinalSDKVerificationData.Validated &&
+          response.threeDSecureInfo.status === 'authenticate_successful' &&
           paymentSource
         ) {
           paymentSource &&
