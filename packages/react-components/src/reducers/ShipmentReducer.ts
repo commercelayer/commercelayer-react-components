@@ -65,14 +65,23 @@ export const getShipments: GetShipments = async ({
   try {
     const sdk = getSdk(config)
     const shipments = order.shipments
-    const deliveryLeadTimes = await sdk.delivery_lead_times.list({
-      include: ['shipping_method', 'stock_location']
-    })
+    let allDeliveryLeadTimes: DeliveryLeadTime[] = []
+    let currentPage = 1
+    let totalPages = 1
+    do {
+      const response = await sdk.delivery_lead_times.list({
+        include: ['shipping_method', 'stock_location'],
+        pageNumber: currentPage
+      })
+      allDeliveryLeadTimes = allDeliveryLeadTimes.concat(response)
+      totalPages = response.meta.pageCount
+      currentPage++
+    } while (currentPage <= totalPages)
     dispatch({
       type: 'setShipments',
       payload: {
         shipments,
-        deliveryLeadTimes
+        deliveryLeadTimes: allDeliveryLeadTimes
       }
     })
   } catch (error) {
