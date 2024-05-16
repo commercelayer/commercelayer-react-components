@@ -5,7 +5,6 @@ import BillingAddressFormContext, {
   type AddressValuesKeys,
   type DefaultContextAddress
 } from '#context/BillingAddressFormContext'
-import isEmpty from 'lodash/isEmpty'
 import { type BaseError, type CodeErrorType } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import { getSaveBillingAddressToAddressBook } from '#utils/localStorage'
@@ -90,25 +89,32 @@ export function BillingAddressForm(props: Props): JSX.Element {
           if (
             customFieldMessageError != null &&
             fieldName != null &&
-            value != null &&
-            !inError
+            value != null
           ) {
             const customMessage = customFieldMessageError({
               field: fieldName,
               value
             })
             if (customMessage != null) {
-              setErrorForm({
-                name: fieldName,
-                code: 'VALIDATION_ERROR',
-                message: customMessage
-              })
+              if (inError) {
+                const errorMsg = errors[fieldName]?.message
+                if (errorMsg != null && errorMsg !== customMessage) {
+                  // @ts-expect-error no type
+                  errors[fieldName].message = customMessage
+                }
+              } else {
+                setErrorForm({
+                  name: fieldName,
+                  code: 'VALIDATION_ERROR',
+                  message: customMessage
+                })
+              }
             }
           }
         }
       }
     }
-    if (!isEmpty(errors)) {
+    if (errors != null && Object.keys(errors).length > 0) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
         const code = errors[fieldName]?.code
@@ -170,7 +176,12 @@ export function BillingAddressForm(props: Props): JSX.Element {
         '[name="billing_address_save_to_customer_book"]'
         // @ts-expect-error no type no types
       )?.checked || getSaveBillingAddressToAddressBook()
-    if (reset && (!isEmpty(values) || !isEmpty(errors) || checkboxChecked)) {
+    if (
+      reset &&
+      ((values != null && Object.keys(values).length > 0) ||
+        (errors != null && Object.keys(errors).length > 0) ||
+        checkboxChecked)
+    ) {
       if (saveAddressToCustomerAddressBook) {
         saveAddressToCustomerAddressBook({
           type: 'billing_address',

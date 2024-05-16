@@ -2,7 +2,6 @@ import AddressesContext from '#context/AddressContext'
 import { useRapidForm } from 'rapid-form'
 import { type ReactNode, useContext, useEffect, useRef } from 'react'
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
-import isEmpty from 'lodash/isEmpty'
 import { type BaseError, type CodeErrorType } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import { getSaveShippingAddressToAddressBook } from '#utils/localStorage'
@@ -89,31 +88,38 @@ export function ShippingAddressForm(props: Props): JSX.Element {
           if (
             customFieldMessageError != null &&
             fieldName != null &&
-            value != null &&
-            !inError
+            value != null
           ) {
             const customMessage = customFieldMessageError({
               field: fieldName,
               value
             })
             if (customMessage != null) {
-              setErrorForm({
-                name: fieldName,
-                code: 'VALIDATION_ERROR',
-                message: customMessage
-              })
+              if (inError) {
+                const errorMsg = errors[fieldName]?.message
+                if (errorMsg != null && errorMsg !== customMessage) {
+                  // @ts-expect-error no type
+                  errors[fieldName].message = customMessage
+                }
+              } else {
+                setErrorForm({
+                  name: fieldName,
+                  code: 'VALIDATION_ERROR',
+                  message: customMessage
+                })
+              }
             }
           }
         }
       }
     }
-    if (!isEmpty(errors)) {
+    if (errors != null && Object.keys(errors).length > 0) {
       const formErrors: BaseError[] = []
       for (const fieldName in errors) {
         const code = errors[fieldName]?.code
         const message = errors[fieldName]?.message
         if (['shipping_address_state_code'].includes(fieldName)) {
-          if (isEmpty(values['state_code'])) {
+          if (!values['state_code']) {
             // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete errors[fieldName]
           } else {
@@ -137,7 +143,8 @@ export function ShippingAddressForm(props: Props): JSX.Element {
         setAddressErrors(formErrors, 'shipping_address')
       }
     } else if (
-      !isEmpty(values) &&
+      values &&
+      Object.keys(values).length > 0 &&
       (shipToDifferentAddress || invertAddresses)
     ) {
       setAddressErrors([], 'shipping_address')
@@ -174,7 +181,12 @@ export function ShippingAddressForm(props: Props): JSX.Element {
         '[name="shipping_address_save_to_customer_book"]'
         // @ts-expect-error no type
       )?.checked || getSaveShippingAddressToAddressBook()
-    if (reset && (!isEmpty(values) || !isEmpty(errors) || checkboxChecked)) {
+    if (
+      reset &&
+      ((values != null && Object.keys(values).length > 0) ||
+        (errors != null && Object.keys(errors).length > 0) ||
+        checkboxChecked)
+    ) {
       if (saveAddressToCustomerAddressBook) {
         saveAddressToCustomerAddressBook({
           type: 'shipping_address',
