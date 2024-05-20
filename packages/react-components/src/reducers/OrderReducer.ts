@@ -402,6 +402,7 @@ export type AddToCartParams = Partial<{
   setLocalOrder: SetLocalOrder
   buyNowMode: boolean
   checkoutUrl: string
+  openMiniCart: boolean
 }>
 
 export async function addToCart(
@@ -418,7 +419,8 @@ export async function addToCart(
     errors = [],
     buyNowMode,
     checkoutUrl,
-    lineItemOption
+    lineItemOption,
+    openMiniCart = true
   } = params
   try {
     if (config) {
@@ -497,7 +499,7 @@ export async function addToCart(
             ? `${checkoutUrl}/${params}`
             : `https://${organization}.checkout.commercelayer.app/${params}`
           location.href = redirectUrl
-        } else {
+        } else if (openMiniCart) {
           publish('open-cart')
         }
         return { success: true, orderId: id }
