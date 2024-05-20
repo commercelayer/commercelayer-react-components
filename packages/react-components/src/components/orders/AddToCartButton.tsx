@@ -221,9 +221,6 @@ export function AddToCartButton(props: Props): JSX.Element {
           })
         }
       }
-      if (!buyNowMode) {
-        publish('open-cart')
-      }
       return res
     } else if (url) {
       return await callExternalFunction({

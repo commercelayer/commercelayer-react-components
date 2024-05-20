@@ -22,6 +22,7 @@ import type {
 } from '@commercelayer/sdk'
 import { getOrganizationSlug } from '#utils/organization'
 import { type LooseAutocomplete } from '#typings/globals'
+import { publish } from '#utils/events'
 
 export type GetOrderParams = Partial<{
   clearWhenPlaced: boolean
@@ -496,6 +497,8 @@ export async function addToCart(
             ? `${checkoutUrl}/${params}`
             : `https://${organization}.checkout.commercelayer.app/${params}`
           location.href = redirectUrl
+        } else {
+          publish('open-cart')
         }
         return { success: true, orderId: id }
       }
