@@ -269,7 +269,20 @@ export const CustomerInvertAddresses: StoryFn = (args) => {
 
                 {/*  Use `key` to re-render the ShippingAddressForm once we have the order from  `fetchOrder`. */}
                 {/*  When you are in your own project, you can retrieve the order before rendering the form. */}
-                <ShippingAddressForm key={shippingAddress?.id}>
+                <ShippingAddressForm
+                  key={shippingAddress?.id}
+                  customFieldMessageError={(props) => {
+                    const textWithSpace = /^[a-zA-Z0-9\s]{1,20}$/
+                    console.log('props.value', props.value)
+                    if (
+                      props.field === 'shipping_address_line_1' &&
+                      !textWithSpace.test(props.value)
+                    ) {
+                      return 'Validation error - The address should be 1-20 characters long - this is a custom message'
+                    }
+                    return null
+                  }}
+                >
                   <fieldset className='flex gap-4 w-full mb-4'>
                     <div className='flex-1'>
                       <label htmlFor='shipping_address_first_name'>
@@ -497,7 +510,9 @@ export const CustomErrorMessages: StoryFn = () => {
                   key={billingAddress?.id}
                   customFieldMessageError={(props) => {
                     const regex = /[a-zA-Z]+/g
-                    const phoneRegex = /\d/g
+                    const phoneRegex = /^\d+$/
+                    const textWithSpace = /^[a-zA-Z0-9\s]{1,20}$/
+                    console.log('props.value billing', props.value)
                     if (
                       props.field === 'billing_address_first_name' &&
                       !regex.test(props.value)
@@ -510,6 +525,12 @@ export const CustomErrorMessages: StoryFn = () => {
                         : !phoneRegex.test(props.value)
                           ? 'Validation error - only numbers are allowed - this is a custom message'
                           : null
+                    }
+                    if (
+                      props.field === 'billing_address_line_1' &&
+                      !textWithSpace.test(props.value)
+                    ) {
+                      return 'Validation error - The address should be 1-20 characters long - this is a custom message'
                     }
                     return null
                   }}
@@ -563,6 +584,22 @@ export const CustomErrorMessages: StoryFn = () => {
                       <Errors
                         resource='billing_address'
                         field='billing_address_metadata_phone'
+                      />
+                    </div>
+                  </fieldset>
+                  <fieldset className='flex gap-4 w-full mb-4'>
+                    <div className='flex-1'>
+                      <label htmlFor='billing_address_line_1'>Address</label>
+                      <AddressInput
+                        id='billing_address_line_1'
+                        name='billing_address_line_1'
+                        type='text'
+                        className={inputCss}
+                        required={false}
+                      />
+                      <Errors
+                        resource='billing_address'
+                        field='billing_address_line_1'
                       />
                     </div>
                   </fieldset>

@@ -22,6 +22,7 @@ import type {
 } from '@commercelayer/sdk'
 import { getOrganizationSlug } from '#utils/organization'
 import { type LooseAutocomplete } from '#typings/globals'
+import { publish } from '#utils/events'
 
 export type GetOrderParams = Partial<{
   clearWhenPlaced: boolean
@@ -401,6 +402,7 @@ export type AddToCartParams = Partial<{
   setLocalOrder: SetLocalOrder
   buyNowMode: boolean
   checkoutUrl: string
+  openMiniCart: boolean
 }>
 
 export async function addToCart(
@@ -417,7 +419,8 @@ export async function addToCart(
     errors = [],
     buyNowMode,
     checkoutUrl,
-    lineItemOption
+    lineItemOption,
+    openMiniCart = true
   } = params
   try {
     if (config) {
@@ -496,6 +499,8 @@ export async function addToCart(
             ? `${checkoutUrl}/${params}`
             : `https://${organization}.checkout.commercelayer.app/${params}`
           location.href = redirectUrl
+        } else if (openMiniCart) {
+          publish('open-cart')
         }
         return { success: true, orderId: id }
       }
