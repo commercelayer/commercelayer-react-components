@@ -1,4 +1,4 @@
-import { useContext, type ChangeEvent } from 'react'
+import { useContext, useEffect, useState, type ChangeEvent } from 'react'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components/utils/Parent'
 import PaymentMethodContext from '#context/PaymentMethodContext'
@@ -7,6 +7,7 @@ import { type PaymentResource } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import { type ChildrenFunction } from '#typings/index'
+import PlaceOrderContext from '#context/PlaceOrderContext'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   checked: boolean
@@ -34,15 +35,26 @@ export function PaymentMethodRadioButton(props: Props): JSX.Element {
     })
   const { order } = useContext(OrderContext)
   const { setPaymentMethod, setLoading } = useContext(PaymentMethodContext)
+  const { status } = useContext(PlaceOrderContext)
+  const [disabled, setDisabled] = useState(false)
   const orderId = order?.id || ''
   const paymentResource = payment?.payment_source_type as PaymentResource
   const paymentMethodId = payment?.id ?? ''
   const name = `payment-${orderId}`
   const checked = paymentSelected === payment?.id
+  useEffect(() => {
+    if (status === 'placing') {
+      setDisabled(true)
+    } else {
+      setDisabled(false)
+    }
+  }, [status])
+
   const handleOnChange = async (
     e: ChangeEvent<HTMLInputElement>
   ): Promise<void> => {
     e.stopPropagation()
+    if (checked) return
     if (setPaymentSelected) setPaymentSelected(paymentMethodId)
     setLoading({ loading: true })
     if (!clickableContainer) {
@@ -60,6 +72,7 @@ export function PaymentMethodRadioButton(props: Props): JSX.Element {
     checked,
     id,
     name,
+    disabled,
     ...props
   }
   return props.children ? (
@@ -73,6 +86,7 @@ export function PaymentMethodRadioButton(props: Props): JSX.Element {
         void handleOnChange(e)
       }}
       checked={checked}
+      disabled={disabled}
       {...p}
     />
   )

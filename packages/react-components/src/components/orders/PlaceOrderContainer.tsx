@@ -10,7 +10,8 @@ import placeOrderReducer, {
   placeOrderInitialState,
   type PlaceOrderOptions,
   placeOrderPermitted,
-  setButtonRef
+  setButtonRef,
+  setPlaceOrderStatus
 } from '#reducers/PlaceOrderReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
@@ -114,6 +115,11 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
         setOrder,
         currentCustomerPaymentSourceId
       }),
+    setPlaceOrderStatus: ({
+      status
+    }: Parameters<typeof setPlaceOrderStatus>[0]) => {
+      setPlaceOrderStatus({ status, dispatch })
+    },
     placeOrderPermitted: () => {
       placeOrderPermitted({
         config,
