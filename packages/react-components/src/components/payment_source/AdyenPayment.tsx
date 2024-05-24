@@ -14,7 +14,7 @@ import Parent from '#components/utils/Parent'
 import getBrowserInfo, { cleanUrlBy } from '#utils/browserInfo'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import OrderContext from '#context/OrderContext'
-import omit from '#utils/omit'
+// import omit from '#utils/omit'
 import type UIElement from '@adyen/adyen-web/dist/types/components/UIElement'
 
 type Styles = Partial<{
@@ -80,6 +80,8 @@ export function AdyenPayment({
   environment = 'test',
   locale = 'en_US'
 }: Props): JSX.Element | null {
+  console.log(clientKey)
+  console.log(config)
   const { cardContainerClassName, threeDSecureContainerClassName, styles } = {
     ...defaultConfig,
     ...config
@@ -205,6 +207,8 @@ export function AdyenPayment({
     state: any,
     component: UIElement<any>
   ): Promise<boolean> => {
+    console.log('state')
+    console.log(state)
     const browserInfo = getBrowserInfo()
     const saveCustomer = document.getElementById(
       'save_payment_source_to_customer_wallet'
@@ -214,25 +218,41 @@ export function AdyenPayment({
       paymentSourceId: paymentSource?.id,
       paymentResource: 'adyen_payments'
     })
+    console.log('control')
+    console.log(control)
     // @ts-expect-error no type
     const controlCode = control?.payment_response?.resultCode
     if (controlCode === 'Authorised') {
       return true
     }
+
+    console.log('state.data.paymentMethod')
+    console.log(state.data.paymentMethod)
     const paymentDataAvailable =
       // @ts-expect-error no type
       Object.keys(control?.payment_request_data).length > 0
     const paymentMethodSelected =
       // @ts-expect-error no type
       control?.payment_request_data?.payment_method?.type
-    const paymentMethod = !saveCustomer?.checked
-      ? omit(state.data.paymentMethod, [
-          'encryptedCardNumber',
-          'encryptedExpiryMonth',
-          'encryptedExpiryYear',
-          'encryptedSecurityCode'
-        ])
-      : state.data.paymentMethod
+    const paymentMethod = state.data.paymentMethod
+    
+
+    console.log(saveCustomer)
+    // !saveCustomer?.checked
+    //   ? omit(state.data.paymentMethod, [
+    //       'encryptedCardNumber',
+    //       'encryptedExpiryMonth',
+    //       'encryptedExpiryYear',
+    //       'encryptedSecurityCode'
+    //     ])
+    //   : state.data.paymentMethod
+
+    console.log('paymentMethod')
+    console.log(paymentMethod)
+    console.log('!paymentDataAvailable')
+    console.log(!paymentDataAvailable)
+    console.log('state.data.paymentMethod.type')
+    console.log(state.data.paymentMethod.type)
     if (
       !paymentDataAvailable ||
       paymentMethodSelected !== state.data.paymentMethod.type
@@ -271,6 +291,8 @@ export function AdyenPayment({
       },
       _authorize: 1
     }
+    console.log('attributes')
+    console.log(attributes)
     delete attributes.payment_request_data.paymentMethod
     try {
       const res = await setPaymentSource({
@@ -351,6 +373,12 @@ export function AdyenPayment({
       ? // @ts-expect-error no type
         paymentSource?.payment_methods.paymentMethods
       : []
+      // @ts-expect-error no type
+      const storedPaymentMethodsResponse = paymentSource?.payment_methods
+      ?.storedPaymentMethods
+      ? // @ts-expect-error no type
+        paymentSource?.payment_methods.storedPaymentMethods
+      : []
     const [firstPaymentMethod] = paymentMethodsResponse
     const isOnlyCard =
       paymentMethodsResponse?.length === 1 &&
@@ -360,6 +388,7 @@ export function AdyenPayment({
         'Payment methods are not available. Please, check your Adyen configuration.'
       )
     }
+    console.log("test 123")
     const options = {
       locale,
       environment,
@@ -370,15 +399,18 @@ export function AdyenPayment({
       },
       countryCode: order?.country_code || '',
       paymentMethodsResponse: {
-        paymentMethods: paymentMethodsResponse
+        paymentMethods: paymentMethodsResponse,
+        storedPaymentMethods: storedPaymentMethodsResponse
       },
       showPayButton: false,
       paymentMethodsConfiguration: {
+        showStoredPaymentMethods: true,
         paypal: {
           showPayButton: true,
           style: styles?.paypal
         },
         card: {
+          enableStoreDetails: true,
           styles: styles?.card,
           holderNameRequired: false
         }
@@ -393,6 +425,7 @@ export function AdyenPayment({
         void onSubmit(state, element)
       }
     } satisfies CoreOptions
+    console.log(options)
     if (!ref && clientKey)
       setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'false')
     if (clientKey && !loadAdyen && window && !checkout) {
