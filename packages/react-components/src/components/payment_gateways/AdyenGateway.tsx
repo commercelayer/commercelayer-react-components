@@ -71,10 +71,15 @@ export function AdyenGateway(props: Props): JSX.Element | null {
       </PaymentSourceContext.Provider>
     )
   }
+  const hasStoredPaymentMethods =
+    // @ts-expect-error missing type
+    paymentSource?.payment_methods?.storedPaymentMethods != null &&
+    // @ts-expect-error missing type
+    paymentSource?.payment_methods?.storedPaymentMethods.length > 0
   if (!isGuest && templateCustomerCards) {
     return (
       <>
-        {isEmpty(customerPayments) ? null : (
+        {hasStoredPaymentMethods || isEmpty(customerPayments) ? null : (
           <div className={p.className}>
             <PaymentCardsTemplate {...{ paymentResource, customerPayments }}>
               {templateCustomerCards}
