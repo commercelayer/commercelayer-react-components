@@ -14,7 +14,7 @@ import Parent from '#components/utils/Parent'
 import getBrowserInfo, { cleanUrlBy } from '#utils/browserInfo'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import OrderContext from '#context/OrderContext'
-// import omit from '#utils/omit'
+import omit from '#utils/omit'
 import type UIElement from '@adyen/adyen-web/dist/types/components/UIElement'
 
 type Styles = Partial<{
@@ -207,9 +207,6 @@ export function AdyenPayment({
     state: any,
     component: UIElement<any>
   ): Promise<boolean> => {
-    console.log('state')
-    console.log(state)
-    const browserInfo = getBrowserInfo()
     const saveCustomer = document.getElementById(
       'save_payment_source_to_customer_wallet'
     ) as HTMLInputElement
@@ -234,25 +231,15 @@ export function AdyenPayment({
     const paymentMethodSelected =
       // @ts-expect-error no type
       control?.payment_request_data?.payment_method?.type
-    const paymentMethod = state.data.paymentMethod
-    
+    // const paymentMethod = state.data.paymentMethod
+    const paymentMethod = !saveCustomer?.checked
+      ? omit(state.data.paymentMethod, [
+          'encryptedCardNumber',
+          'encryptedExpiryMonth',
+          'encryptedExpiryYear'
+        ])
+      : state.data.paymentMethod
 
-    console.log(saveCustomer)
-    // !saveCustomer?.checked
-    //   ? omit(state.data.paymentMethod, [
-    //       'encryptedCardNumber',
-    //       'encryptedExpiryMonth',
-    //       'encryptedExpiryYear',
-    //       'encryptedSecurityCode'
-    //     ])
-    //   : state.data.paymentMethod
-
-    console.log('paymentMethod')
-    console.log(paymentMethod)
-    console.log('!paymentDataAvailable')
-    console.log(!paymentDataAvailable)
-    console.log('state.data.paymentMethod.type')
-    console.log(state.data.paymentMethod.type)
     if (
       !paymentDataAvailable ||
       paymentMethodSelected !== state.data.paymentMethod.type
@@ -266,12 +253,7 @@ export function AdyenPayment({
             payment_method: paymentMethod,
             return_url: url,
             origin: window.location.origin,
-            redirect_from_issuer_method: 'GET',
-            browser_info: {
-              acceptHeader:
-                'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-              ...browserInfo
-            }
+            redirect_from_issuer_method: 'GET'
           }
         }
       })
@@ -282,17 +264,10 @@ export function AdyenPayment({
         payment_method: paymentMethod,
         return_url: url,
         origin: window.location.origin,
-        redirect_from_issuer_method: 'GET',
-        browser_info: {
-          acceptHeader:
-            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-          ...browserInfo
-        }
+        redirect_from_issuer_method: 'GET'
       },
       _authorize: 1
     }
-    console.log('attributes')
-    console.log(attributes)
     delete attributes.payment_request_data.paymentMethod
     try {
       const res = await setPaymentSource({
@@ -367,28 +342,28 @@ export function AdyenPayment({
   }
 
   useEffect(() => {
-    // @ts-expect-error no type
-    const paymentMethodsResponse = paymentSource?.payment_methods
-      ?.paymentMethods
-      ? // @ts-expect-error no type
-        paymentSource?.payment_methods.paymentMethods
-      : []
+    const paymentMethodsResponse = {
       // @ts-expect-error no type
-      const storedPaymentMethodsResponse = paymentSource?.payment_methods
-      ?.storedPaymentMethods
-      ? // @ts-expect-error no type
-        paymentSource?.payment_methods.storedPaymentMethods
-      : []
-    const [firstPaymentMethod] = paymentMethodsResponse
+      paymentMethods: paymentSource?.payment_methods?.paymentMethods
+        ? // @ts-expect-error no type
+          paymentSource?.payment_methods.paymentMethods
+        : [],
+      // @ts-expect-error no type
+      storedPaymentMethods: paymentSource?.payment_methods?.storedPaymentMethods
+        ? // @ts-expect-error no type
+          paymentSource?.payment_methods.storedPaymentMethods
+        : []
+    }
+    const [firstPaymentMethod] = paymentMethodsResponse.paymentMethods
     const isOnlyCard =
-      paymentMethodsResponse?.length === 1 &&
+      paymentMethodsResponse.paymentMethods?.length === 1 &&
       firstPaymentMethod.type === 'scheme'
-    if (paymentMethodsResponse.length === 0) {
+    if (paymentMethodsResponse.paymentMethods.length === 0) {
       console.error(
         'Payment methods are not available. Please, check your Adyen configuration.'
       )
     }
-    console.log("test 123")
+
     const options = {
       locale,
       environment,
@@ -398,10 +373,7 @@ export function AdyenPayment({
         value: order?.total_amount_with_taxes_cents || 0
       },
       countryCode: order?.country_code || '',
-      paymentMethodsResponse: {
-        paymentMethods: paymentMethodsResponse,
-        storedPaymentMethods: storedPaymentMethodsResponse
-      },
+      paymentMethodsResponse,
       showPayButton: false,
       paymentMethodsConfiguration: {
         showStoredPaymentMethods: true,
