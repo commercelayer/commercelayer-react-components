@@ -18,6 +18,7 @@ import {
 } from '#utils/getPaymentAttributes'
 import { isEmpty } from '#utils/isEmpty'
 import { getAvailableExpressPayments } from '#utils/expressPaymentHelper'
+import PlaceOrderContext from '#context/PlaceOrderContext'
 
 export interface PaymentMethodOnClickParams {
   payment?: PaymentMethodType | Record<string, any>
@@ -89,6 +90,7 @@ export function PaymentMethod({
   })
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
+  const { status } = useContext(PlaceOrderContext)
   useEffect(() => {
     if (paymentMethods != null && !isEmpty(paymentMethods) && expressPayments) {
       const [paymentMethod] = getAvailableExpressPayments(paymentMethods)
@@ -211,14 +213,17 @@ export function PaymentMethod({
         ? undefined
         : async (e: MouseEvent<HTMLDivElement>) => {
             e.stopPropagation()
+            const paymentMethodId = payment?.id
+            const currentPaymentMethodId = order?.payment_method?.id
+            if (paymentMethodId === currentPaymentMethodId) return
+            if (status === 'placing') return
             setLoadingPlaceOrder({ loading: true })
             setPaymentSelected(payment.id)
-            const paymentMethodId = payment?.id
-            const { order } = await setPaymentMethod({
+            const { order: updatedOrder } = await setPaymentMethod({
               paymentResource,
               paymentMethodId
             })
-            if (onClick) onClick({ payment, order })
+            if (onClick) onClick({ payment, order: updatedOrder })
             setLoadingPlaceOrder({ loading: false })
           }
       return (

@@ -25,6 +25,7 @@ export type PlaceOrderActionType =
   | 'setErrors'
   | 'setPlaceOrderPermitted'
   | 'setButtonRef'
+  | 'setStatus'
 
 export interface PlaceOrderOptions {
   paypalPayerId?: string
@@ -50,6 +51,7 @@ export interface PlaceOrderActionPayload {
   paymentSource: PaymentSourceType
   options?: PlaceOrderOptions
   placeOrderButtonRef?: RefObject<HTMLButtonElement>
+  status: 'placing' | 'standby'
 }
 
 export function setButtonRef(
@@ -75,7 +77,8 @@ export interface PlaceOrderAction {
 
 export const placeOrderInitialState: PlaceOrderState = {
   errors: [],
-  isPermitted: false
+  isPermitted: false,
+  status: 'standby'
 }
 
 export function setPlaceOrderErrors<V extends BaseError[]>(
@@ -327,10 +330,28 @@ export async function setPlaceOrder({
   return response
 }
 
+export function setPlaceOrderStatus({
+  status,
+  dispatch
+}: {
+  status: 'placing' | 'standby'
+  dispatch?: Dispatch<PlaceOrderAction>
+}): void {
+  if (dispatch != null) {
+    dispatch({
+      type: 'setStatus',
+      payload: {
+        status
+      }
+    })
+  }
+}
+
 const type: PlaceOrderActionType[] = [
   'setErrors',
   'setPlaceOrderPermitted',
-  'setButtonRef'
+  'setButtonRef',
+  'setStatus'
 ]
 
 const placeOrderReducer = (

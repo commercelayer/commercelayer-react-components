@@ -20,6 +20,7 @@ import {
   getStripeAttributes
 } from '#utils/getPaymentAttributes'
 import ExternalGateway from './ExternalGateway'
+import PlaceOrderContext from '#context/PlaceOrderContext'
 
 export type GatewayBaseType = Props & {
   show: boolean
@@ -51,6 +52,7 @@ export function PaymentGateway({
   const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
+  const { status } = useContext(PlaceOrderContext)
   const {
     currentPaymentMethodId,
     config,
@@ -126,6 +128,10 @@ export function PaymentGateway({
       setLoading(true)
     }
   }, [order?.payment_method?.id, show, paymentSource])
+  useEffect(() => {
+    if (status === 'placing' && !loading) setLoading(true)
+  }, [status])
+  
   const gatewayConfig = {
     readonly,
     showCard,

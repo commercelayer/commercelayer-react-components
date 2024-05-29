@@ -59,8 +59,14 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     onClick,
     ...p
   } = props
-  const { isPermitted, setPlaceOrder, options, paymentType, setButtonRef } =
-    useContext(PlaceOrderContext)
+  const {
+    isPermitted,
+    setPlaceOrder,
+    options,
+    paymentType,
+    setButtonRef,
+    setPlaceOrderStatus
+  } = useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
   const [isLoading, setIsLoading] = useState(false)
@@ -279,6 +285,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     } else if (card?.brand) {
       isValid = true
     }
+    if (setPlaceOrderStatus != null) {
+      setPlaceOrderStatus({ status: 'placing' })
+    }
     const placed =
       isValid &&
       setPlaceOrder &&
@@ -290,6 +299,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     setForceDisable(false)
     onClick && placed && onClick(placed)
     setIsLoading(false)
+    if (setPlaceOrderStatus != null) {
+      setPlaceOrderStatus({ status: 'standby' })
+    }
   }
   const disabledButton = disabled !== undefined ? disabled : notPermitted
   const labelButton = isLoading
