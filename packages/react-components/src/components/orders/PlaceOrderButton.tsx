@@ -247,9 +247,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     e?.preventDefault()
     e?.stopPropagation()
     setIsLoading(true)
-    if (setPlaceOrderStatus != null) {
-      setPlaceOrderStatus({ status: 'placing' })
-    }
     let isValid = true
     setForceDisable(true)
     const checkPaymentSource = await setPaymentSource({
@@ -287,6 +284,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       }
     } else if (card?.brand) {
       isValid = true
+    }
+    if (setPlaceOrderStatus != null) {
+      setPlaceOrderStatus({ status: 'placing' })
     }
     const placed =
       isValid &&
