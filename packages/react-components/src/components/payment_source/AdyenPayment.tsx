@@ -80,8 +80,6 @@ export function AdyenPayment({
   environment = 'test',
   locale = 'en_US'
 }: Props): JSX.Element | null {
-  console.log(clientKey)
-  console.log(config)
   const { cardContainerClassName, threeDSecureContainerClassName, styles } = {
     ...defaultConfig,
     ...config
@@ -215,23 +213,18 @@ export function AdyenPayment({
       paymentSourceId: paymentSource?.id,
       paymentResource: 'adyen_payments'
     })
-    console.log('control')
-    console.log(control)
     // @ts-expect-error no type
     const controlCode = control?.payment_response?.resultCode
     if (controlCode === 'Authorised') {
       return true
     }
 
-    console.log('state.data.paymentMethod')
-    console.log(state.data.paymentMethod)
     const paymentDataAvailable =
       // @ts-expect-error no type
       Object.keys(control?.payment_request_data).length > 0
     const paymentMethodSelected =
       // @ts-expect-error no type
       control?.payment_request_data?.payment_method?.type
-    // const paymentMethod = state.data.paymentMethod
     const paymentMethod = !saveCustomer?.checked
       ? omit(state.data.paymentMethod, [
           'encryptedCardNumber',
@@ -397,7 +390,6 @@ export function AdyenPayment({
         void onSubmit(state, element)
       }
     } satisfies CoreOptions
-    console.log(options)
     if (!ref && clientKey)
       setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'false')
     if (clientKey && !loadAdyen && window && !checkout) {
