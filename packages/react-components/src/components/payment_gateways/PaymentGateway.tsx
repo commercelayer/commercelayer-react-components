@@ -131,6 +131,7 @@ export function PaymentGateway({
 
   useEffect(() => {
     if (status === 'placing') setLoading(true)
+    if (status === 'standby' && loading) setLoading(false)
     return () => {
       setLoading(true)
     }
