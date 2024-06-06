@@ -261,6 +261,17 @@ export const CustomerInvertAddresses: StoryFn = (args) => {
                 shipToDifferentAddress={shipToDifferentAddress}
                 invertAddresses
               >
+                <div className='mb-4'>
+                  <label htmlFor='customer_email'>Customer email</label>
+                  <CustomerInput
+                    id='customer_email'
+                    className={inputCss}
+                    placeholder='email'
+                    errorClassName='border-red-600'
+                    value={order?.customer_email ?? ''}
+                  />
+                  <Errors resource='orders' field='customer_email' />
+                </div>
                 {/*  Use `key` to re-render the ShippingAddressForm once we have the order from  `fetchOrder`. */}
                 {/*  When you are in your own project, you can retrieve the order before rendering the form. */}
                 <ShippingAddressForm
