@@ -128,10 +128,15 @@ export function PaymentGateway({
       setLoading(true)
     }
   }, [order?.payment_method?.id, show, paymentSource])
+
   useEffect(() => {
-    if (status === 'placing' && !loading) setLoading(true)
+    if (status === 'placing') setLoading(true)
+    if (status === 'standby' && loading) setLoading(false)
+    return () => {
+      setLoading(true)
+    }
   }, [status])
-  
+
   const gatewayConfig = {
     readonly,
     showCard,

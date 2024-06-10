@@ -285,7 +285,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     } else if (card?.brand) {
       isValid = true
     }
-    if (setPlaceOrderStatus != null) {
+    if (isValid && setPlaceOrderStatus != null) {
       setPlaceOrderStatus({ status: 'placing' })
     }
     const placed =
