@@ -149,3 +149,12 @@ as shown in the following example:
   To simplify the form example in this page, we omitted the `messages` prop for all `<Errors>`, but you can just copy the example above and implement it for every field.
   </strong>
 </span>
+
+
+
+### Usage with 3rd party UI libraries (eg: Material UI)
+The address components can be easily integrated with 3rd party UI libraries, such as Material UI via children by setting the `props.parentRef` as React ref to the final input element that will be rendered.
+
+The following example shows how to use the `AddressInput` component with Material UI's `TextField` component. 
+
+<Canvas of={Stories.MaterialUiAddressForm} />
