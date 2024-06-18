@@ -9,6 +9,7 @@ type ApplicationTypeProps<T extends ApplicationType = ApplicationType> =
         clientId?: string
         scope?: string
         returnUrl?: string
+        resetPasswordUrl?: string
       }
     : T extends 'identity'
       ? {
@@ -18,6 +19,7 @@ type ApplicationTypeProps<T extends ApplicationType = ApplicationType> =
           clientId: string
           scope: string
           returnUrl: string
+          resetPasswordUrl?: string
         }
       : {
           applicationType: Omit<T, 'my-account' | 'identity'>
@@ -26,6 +28,7 @@ type ApplicationTypeProps<T extends ApplicationType = ApplicationType> =
           clientId?: string
           scope?: string
           returnUrl?: string
+          resetPasswordUrl?: string
         }
 
 interface TArgs {
@@ -47,6 +50,7 @@ export function getApplicationLink({
   clientId,
   scope,
   returnUrl,
+  resetPasswordUrl,
   customDomain
 }: Props): string {
   const env = domain === 'commercelayer.io' ? '' : 'stg.'
@@ -55,7 +59,8 @@ export function getApplicationLink({
   const c = clientId ? `&clientId=${clientId}` : ''
   const s = scope ? `&scope=${scope}` : ''
   const r = returnUrl ? `&returnUrl=${returnUrl}` : ''
-  const params = applicationType === 'identity' ? `${c}${s}${r}` : ''
+  const p = resetPasswordUrl ? `&resetPasswordUrl=${resetPasswordUrl}` : ''
+  const params = applicationType === 'identity' ? `${c}${s}${r}${p}` : ''
   const domainName = customDomain ?? `${slug}.${env}commercelayer.app`
   const application = customDomain ? '' : `/${applicationType.toString()}`
   return `https://${domainName}${application}/${

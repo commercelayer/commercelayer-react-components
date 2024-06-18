@@ -42,6 +42,10 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
    * The domain of your forked application
    */
   customDomain?: string
+  /**
+   * The reset password url
+   */
+  resetPasswordUrl?: string
 }
 
 /**
@@ -68,6 +72,7 @@ export function MyIdentityLink(props: Props): JSX.Element {
     scope,
     returnUrl,
     customDomain,
+    resetPasswordUrl,
     ...p
   } = props
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
@@ -95,6 +100,7 @@ export function MyIdentityLink(props: Props): JSX.Element {
           clientId,
           scope,
           returnUrl: returnUrl ?? window.location.href,
+          resetPasswordUrl,
           customDomain
         })
         setHref(link)

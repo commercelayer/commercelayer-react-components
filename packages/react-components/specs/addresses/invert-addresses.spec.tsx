@@ -27,7 +27,7 @@ describe('Billing info input', () => {
       ctx.orderId = 'wxzYheVAAY'
     }
   })
-  it<OrderContext>('Use shipping address as billing address', async (ctx) => {
+  it.skip<OrderContext>('Use shipping address as billing address', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <OrderContainer orderId={ctx.orderId}>

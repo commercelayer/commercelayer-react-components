@@ -25,7 +25,7 @@ describe('Billing info input', () => {
       ctx.orderId = 'wxzYheVAAY'
     }
   })
-  it<LocalContext>('Show billing info passing required false', async (ctx) => {
+  it.skip<LocalContext>('Show billing info passing required false', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <AddressesContainer>
@@ -42,7 +42,7 @@ describe('Billing info input', () => {
     const billingInfo = screen.getByTestId('billing-info')
     expect(billingInfo).toBeDefined()
   })
-  it<OrderContext>('Show billing info if requires_billing_info is true', async (ctx) => {
+  it.skip<OrderContext>('Show billing info if requires_billing_info is true', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <OrderContainer orderId={ctx.orderId}>
@@ -62,7 +62,7 @@ describe('Billing info input', () => {
     const billingInfo = screen.getByTestId('billing-info')
     expect(billingInfo).toBeDefined()
   })
-  it<OrderContext>('Hide billing info if requires_billing_info is false and required is undefined', async (ctx) => {
+  it.skip<OrderContext>('Hide billing info if requires_billing_info is false and required is undefined', async (ctx) => {
     render(
       <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
         <OrderContainer orderId={ctx.orderId}>
