@@ -384,6 +384,7 @@ export interface CustomLineItem {
   metadata?: Record<string, string>
   frequency?: LooseAutocomplete<TFrequency>
   externalPrice?: boolean
+  _update_quantity?: boolean
 }
 
 export type AddToCartParams = Partial<{
@@ -460,7 +461,7 @@ export async function addToCart(
           name,
           image_url: imageUrl,
           quantity: quantity ?? 1,
-          _update_quantity: true,
+          _update_quantity: lineItem?._update_quantity ?? true,
           bundle_code: bundleCode,
           metadata,
           frequency: frequency as string
