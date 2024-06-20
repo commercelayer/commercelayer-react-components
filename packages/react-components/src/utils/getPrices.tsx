@@ -49,7 +49,6 @@ export default function getPrices<P extends Price>(
       if (has(obj, sku)) {
         obj[sku].push(p)
       } else {
-        // @ts-expect-error type issue
         obj[sku] = [p]
       }
     })
