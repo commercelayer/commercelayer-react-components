@@ -211,6 +211,13 @@ export function CustomerContainer(props: Props): JSX.Element {
           pageSize,
           id
         })
+      },
+      reloadCustomerAddresses: async () => {
+        await getCustomerAddresses({
+          config,
+          dispatch,
+          isOrderAvailable: withoutIncludes != null
+        })
       }
     }
   }, [state, isGuest])

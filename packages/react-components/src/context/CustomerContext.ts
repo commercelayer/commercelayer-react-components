@@ -28,6 +28,7 @@ export type InitialCustomerContext = Partial<
     getCustomerSubscriptions: (
       props: Partial<Parameters<typeof getCustomerSubscriptions>[0]>
     ) => Promise<void>
+    reloadCustomerAddresses: () => Promise<void>
   } & CustomerState
 >
 

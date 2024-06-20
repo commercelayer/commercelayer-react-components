@@ -1,4 +1,6 @@
-import CustomerContext from '#context/CustomerContext'
+import CustomerContext, {
+  type InitialCustomerContext
+} from '#context/CustomerContext'
 import {
   type setResourceTrigger,
   type CustomerState
@@ -7,7 +9,7 @@ import { useContext } from 'react'
 
 type TCustomer = Omit<CustomerState, 'errors' | 'isGuest'> & {
   setResourceTrigger?: typeof setResourceTrigger
-}
+} & Pick<InitialCustomerContext, 'reloadCustomerAddresses'>
 
 interface TReturnCustomer extends Omit<TCustomer, 'errors' | 'isGuest'> {}
 
@@ -24,7 +26,8 @@ export function useCustomerContainer(): TReturnCustomer {
       subscriptions: ctx.subscriptions,
       customerEmail: ctx.customerEmail,
       customers: ctx.customers,
-      setResourceTrigger: ctx.setResourceTrigger
+      setResourceTrigger: ctx.setResourceTrigger,
+      reloadCustomerAddresses: ctx.reloadCustomerAddresses
     }
   }
   throw new Error(
