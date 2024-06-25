@@ -173,6 +173,13 @@ export async function setPlaceOrder({
     placed: false
   }
   if (state && config && order) {
+    const isAlreadyPlaced = order?.status === 'placed'
+    if (isAlreadyPlaced) {
+      return {
+        placed: true,
+        order
+      }
+    }
     const sdk = getSdk(config)
     const { options, paymentType } = state
     try {
