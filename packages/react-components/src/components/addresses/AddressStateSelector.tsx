@@ -50,7 +50,7 @@ type Props = Omit<BaseSelectComponentProps, 'options' | 'name'> & {
  */
 export function AddressStateSelector(props: Props): JSX.Element {
   const {
-    required = true,
+    required = false,
     value,
     name,
     className = '',
