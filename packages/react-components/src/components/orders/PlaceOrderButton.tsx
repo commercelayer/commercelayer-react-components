@@ -152,10 +152,14 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   }, [options?.stripe?.redirectStatus, paymentType])
   useEffect(() => {
     if (order?.status != null && ['draft', 'pending'].includes(order?.status)) {
+      // @ts-expect-error no type
+      const resultCode = order?.payment_source?.payment_response?.resultCode === 'Authorised'
+      // @ts-expect-error no type
+      const paymentDetails = order?.payment_source?.payment_request_details?.details != null
       if (
         paymentType === 'adyen_payments' &&
         options?.adyen?.redirectResult &&
-        paymentSource != null
+        !paymentDetails
       ) {
         const attributes = {
           payment_request_details: {
@@ -201,8 +205,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         void handleClick()
       } else if (
         paymentType === 'adyen_payments' &&
-        // @ts-expect-error no type
-        order?.payment_source?.payment_response?.resultCode === 'Authorised' &&
+        resultCode &&
         // @ts-expect-error no type
         ref?.current?.disabled === false &&
         currentCustomerPaymentSourceId == null &&
