@@ -94,11 +94,11 @@ export function fieldsExist(
   schema: Array<AddressField | string> = addressFields
 ): boolean {
   if (!address.business) {
-    const required = without(schema, 'line_2', 'company')
+    const required = without(schema, 'line_2', 'company', 'state_code')
     const validAddress = keys(address).filter((k) => required.includes(k))
     return required.length > validAddress.length
   } else {
-    const required = without(schema, 'first_name', 'last_name', 'line_2')
+    const required = without(schema, 'first_name', 'last_name', 'line_2', 'state_code')
     const validAddress = keys(address).filter((k) => required.includes(k))
     return required.length > validAddress.length
   }
