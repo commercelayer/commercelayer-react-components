@@ -297,8 +297,6 @@ export async function setPaymentSource({
 }: SetPaymentSourceParams): Promise<PaymentSourceType | undefined | null> {
   try {
     const isAlreadyPlaced = order?.status === 'placed'
-    console.log('setPaymentSource', order)
-    console.log('isAlreadyPlaced', isAlreadyPlaced)
     if (config && order && !isAlreadyPlaced) {
       let paymentSource: PaymentSourceType
       const sdk = getSdk(config)
