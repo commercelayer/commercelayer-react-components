@@ -65,11 +65,10 @@ export function LineItemsContainer(props: Props): JSX.Element {
   const lineItemValue: LineItemContextValue = {
     ...state,
     loader,
-    updateLineItem: async (lineItemId, quantity = 1, hasExternalPrice) => {
+    updateLineItem: async (lineItemId, quantity = 1) => {
       await updateLineItem({
         lineItemId,
         quantity,
-        hasExternalPrice,
         dispatch,
         config,
         getOrder,
