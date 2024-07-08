@@ -369,13 +369,15 @@ export function AdyenPayment({
       paymentMethodsResponse,
       showPayButton: false,
       paymentMethodsConfiguration: {
-        showStoredPaymentMethods: true,
+        // @ts-expect-error no type
+        showStoredPaymentMethods: paymentSource?.payment_methods?.storedPaymentMethods?.lenght > 0 ?? false,
         paypal: {
           showPayButton: true,
           style: styles?.paypal
         },
         card: {
-          enableStoreDetails: true,
+          // @ts-expect-error no type
+          enableStoreDetails: paymentSource?.payment_methods?.storedPaymentMethods?.lenght > 0 ?? false,
           styles: styles?.card,
           holderNameRequired: false
         }
