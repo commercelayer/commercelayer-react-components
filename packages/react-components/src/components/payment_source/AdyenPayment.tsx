@@ -356,9 +356,8 @@ export function AdyenPayment({
         'Payment methods are not available. Please, check your Adyen configuration.'
       )
     }
-
     const options = {
-      locale,
+      locale: order?.language_code ?? locale,
       environment,
       clientKey,
       amount: {
@@ -369,13 +368,15 @@ export function AdyenPayment({
       paymentMethodsResponse,
       showPayButton: false,
       paymentMethodsConfiguration: {
-        showStoredPaymentMethods: true,
+        // @ts-expect-error no type
+        showStoredPaymentMethods: paymentSource?.payment_methods?.storedPaymentMethods != null ?? false,
         paypal: {
           showPayButton: true,
           style: styles?.paypal
         },
         card: {
-          enableStoreDetails: true,
+          // @ts-expect-error no type
+          enableStoreDetails: paymentSource?.payment_methods?.storedPaymentMethods != null ?? false,
           styles: styles?.card,
           holderNameRequired: false
         }
