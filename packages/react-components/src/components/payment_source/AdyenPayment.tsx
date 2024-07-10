@@ -356,9 +356,8 @@ export function AdyenPayment({
         'Payment methods are not available. Please, check your Adyen configuration.'
       )
     }
-    console.log('order?.country_code', order?.country_code)
     const options = {
-      locale: order?.country_code != null ? `${order?.country_code?.toLowerCase()}_${order?.country_code}` : locale,
+      locale: order?.language_code ?? locale,
       environment,
       clientKey,
       amount: {
