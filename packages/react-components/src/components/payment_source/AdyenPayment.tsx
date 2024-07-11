@@ -356,6 +356,8 @@ export function AdyenPayment({
         'Payment methods are not available. Please, check your Adyen configuration.'
       )
     }
+    // @ts-expect-error no type
+    const showStoredPaymentMethods = paymentSource?.payment_methods?.storedPaymentMethods != null ?? false
     const options = {
       locale: order?.language_code ?? locale,
       environment,
@@ -368,15 +370,14 @@ export function AdyenPayment({
       paymentMethodsResponse,
       showPayButton: false,
       paymentMethodsConfiguration: {
-        // @ts-expect-error no type
-        showStoredPaymentMethods: paymentSource?.payment_methods?.storedPaymentMethods != null ?? false,
+        showStoredPaymentMethods,
+        showRemovePaymentMethodButton: showStoredPaymentMethods,
         paypal: {
           showPayButton: true,
           style: styles?.paypal
         },
         card: {
-          // @ts-expect-error no type
-          enableStoreDetails: paymentSource?.payment_methods?.storedPaymentMethods != null ?? false,
+          enableStoreDetails: showStoredPaymentMethods,
           styles: styles?.card,
           holderNameRequired: false
         }
