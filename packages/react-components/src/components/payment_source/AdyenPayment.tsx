@@ -371,7 +371,6 @@ export function AdyenPayment({
       showPayButton: false,
       paymentMethodsConfiguration: {
         showStoredPaymentMethods,
-        showRemovePaymentMethodButton: showStoredPaymentMethods,
         paypal: {
           showPayButton: true,
           style: styles?.paypal
@@ -400,6 +399,7 @@ export function AdyenPayment({
         void AdyenCheckout(options).then((adyenCheckout) => {
           const component = adyenCheckout
             .create(type, {
+              showRemovePaymentMethodButton: showStoredPaymentMethods,
               onSelect: (component) => {
                 const id: string = component._id
                 if (id.search('scheme') === -1) {
