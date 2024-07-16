@@ -93,20 +93,49 @@ export function BillingAddressForm(props: Props): JSX.Element {
           ) {
             const customMessage = customFieldMessageError({
               field: fieldName,
-              value
+              value,
+              values
             })
             if (customMessage != null) {
-              if (inError) {
-                const errorMsg = errors[fieldName]?.message
-                if (errorMsg != null && errorMsg !== customMessage) {
-                  // @ts-expect-error no type
-                  errors[fieldName].message = customMessage
+              if (typeof customMessage === 'string') {
+                if (inError) {
+                  const errorMsg = errors[fieldName]?.message
+                  if (errorMsg != null && errorMsg !== customMessage) {
+                    // @ts-expect-error no type
+                    errors[fieldName].message = customMessage
+                  }
+                } else {
+                  setErrorForm({
+                    name: fieldName,
+                    code: 'VALIDATION_ERROR',
+                    message: customMessage
+                  })
                 }
               } else {
-                setErrorForm({
-                  name: fieldName,
-                  code: 'VALIDATION_ERROR',
-                  message: customMessage
+                const elements = customMessage
+                elements.forEach((element) => {
+                  const { field, value, isValid, message } = element
+                  const fieldInError = errors[field] != null
+                  if (!isValid) {
+                    if (fieldInError) {
+                      const errorMsg = errors[field]?.message
+                      if (errorMsg != null && errorMsg !== message) {
+                        // @ts-expect-error no type
+                        errors[field].message = message
+                      }
+                    } else {
+                      setErrorForm({
+                        name: field,
+                        code: 'VALIDATION_ERROR',
+                        message: message
+                      })
+                    }
+                  } else {
+                    if (fieldInError) {
+                      delete errors[field]
+                      setValueForm(field, value ?? '')
+                    }
+                  }
                 })
               }
             }

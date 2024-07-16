@@ -24,7 +24,13 @@ export type CustomFieldMessageError = (props: {
   code?: Extract<CodeErrorType, 'EMPTY_ERROR' | 'VALIDATION_ERROR'> | undefined
   message?: string | undefined
   value: string
-}) => string | null
+  values?: Record<string, any>
+}) => string | null | {
+    field: Extract<AddressValuesKeys, AddressInputName> | string
+    value: string
+    isValid: boolean
+    message?: string
+}[]
 
 export type AddressActionType =
   | 'setErrors'

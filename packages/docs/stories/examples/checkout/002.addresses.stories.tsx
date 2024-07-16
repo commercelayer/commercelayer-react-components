@@ -720,6 +720,37 @@ export const CustomErrorMessages: StoryFn = () => {
                     ) {
                       return 'Validation error - The address should be 1-20 characters long - this is a custom message'
                     }
+                    if (props.field === 'billing_address_line_1') {
+                      const country = props.values?.country_code
+                      if (country === 'IT' && props.value !== 'Via Roma') {
+                        return 'The address should be Via Roma'
+                      }
+                      return null
+                    }
+                    if (props.field === 'billing_address_country_code') {
+                      const address = props.values?.line_1
+                      if (props.value === 'IT') {
+                        if (address !== 'Via Roma') {
+                          return [
+                            {
+                              field: 'billing_address_line_1',
+                              isValid: false,
+                              message: 'The address should be Via Roma',
+                              value: address
+                            }
+                          ]
+                        }
+                      } else {
+                        return [
+                          {
+                            field: 'billing_address_line_1',
+                            isValid: true,
+                            value: address
+                          }
+                        ]
+                      }
+                      return null
+                    }
                     return null
                   }}
                 >
@@ -788,6 +819,43 @@ export const CustomErrorMessages: StoryFn = () => {
                       <Errors
                         resource='billing_address'
                         field='billing_address_line_1'
+                      />
+                    </div>
+                  </fieldset>
+                  <fieldset className='flex gap-4 w-full mb-4'>
+                    <div className='flex-1'>
+                      <label htmlFor='billing_address_city'>City</label>
+                      <AddressInput
+                        id='billing_address_city'
+                        name='billing_address_city'
+                        type='text'
+                        className={inputCss}
+                        value={billingAddress?.city}
+                      />
+                      <Errors
+                        resource='billing_address'
+                        field='billing_address_city'
+                      />
+                    </div>
+
+                    <div className='flex-1'>
+                      <label htmlFor='billing_address_country_code'>
+                        Country
+                      </label>
+                      <AddressCountrySelector
+                        data-cy='billing_address_country_code'
+                        name='billing_address_country_code'
+                        className={inputCss}
+                        placeholder={{
+                          value: '',
+                          label: 'Country',
+                          disabled: true
+                        }}
+                        value={billingAddress?.country_code}
+                      />
+                      <Errors
+                        resource='billing_address'
+                        field='billing_address_country_code'
                       />
                     </div>
                   </fieldset>
