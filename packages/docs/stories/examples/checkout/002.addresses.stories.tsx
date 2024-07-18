@@ -699,8 +699,8 @@ export const CustomErrorMessages: StoryFn = () => {
                   customFieldMessageError={(props) => {
                     const regex = /[a-zA-Z]+/g
                     const phoneRegex = /^\d+$/
-                    const textWithSpace = /^[a-zA-Z0-9\s]{1,20}$/
-                    console.log('props.value billing', props.value)
+                    // const textWithSpace = /^[a-zA-Z0-9\s]{1,20}$/
+                    console.log('props', props)
                     if (
                       props.field === 'billing_address_first_name' &&
                       !regex.test(props.value)
@@ -714,42 +714,22 @@ export const CustomErrorMessages: StoryFn = () => {
                           ? 'Validation error - only numbers are allowed - this is a custom message'
                           : null
                     }
-                    if (
-                      props.field === 'billing_address_line_1' &&
-                      !textWithSpace.test(props.value)
-                    ) {
-                      return 'Validation error - The address should be 1-20 characters long - this is a custom message'
-                    }
-                    if (props.field === 'billing_address_line_1') {
-                      const country = props.values?.country_code
-                      if (country === 'IT' && props.value !== 'Via Roma') {
-                        return 'The address should be Via Roma'
-                      }
-                      return null
-                    }
                     if (props.field === 'billing_address_country_code') {
-                      const address = props.values?.line_1
-                      if (props.value === 'IT') {
-                        if (address !== 'Via Roma') {
-                          return [
-                            {
-                              field: 'billing_address_line_1',
-                              isValid: false,
-                              message: 'The address should be Via Roma',
-                              value: address
-                            }
-                          ]
-                        }
-                      } else {
+                      const state = props.values?.state_code as string
+                      console.log('state', state)
+                      if (
+                        ['US', 'CN', 'JP', 'AU', 'CA'].includes(props.value) &&
+                        !state
+                      ) {
                         return [
                           {
-                            field: 'billing_address_line_1',
-                            isValid: true,
-                            value: address
+                            field: 'billing_address_state_code',
+                            value: state,
+                            isValid: false,
+                            message: 'State is required for this country'
                           }
                         ]
                       }
-                      return null
                     }
                     return null
                   }}
@@ -856,6 +836,40 @@ export const CustomErrorMessages: StoryFn = () => {
                       <Errors
                         resource='billing_address'
                         field='billing_address_country_code'
+                      />
+                    </div>
+                  </fieldset>
+                  <fieldset className='flex gap-4 w-full mb-4'>
+                    <div className='flex-1'>
+                      <label htmlFor='billing_address_state_code'>State</label>
+                      <AddressStateSelector
+                        id='billing_address_state_code'
+                        name='billing_address_state_code'
+                        placeholder={{
+                          value: '',
+                          label: 'Select a state',
+                          disabled: true
+                        }}
+                        className={inputCss}
+                      />
+                      <Errors
+                        resource='billing_address'
+                        field='billing_address_state_code'
+                      />
+                    </div>
+
+                    <div className='flex-1'>
+                      <label htmlFor='billing_address_zip_code'>Zip Code</label>
+                      <AddressInput
+                        id='billing_address_zip_code'
+                        name='billing_address_zip_code'
+                        type='text'
+                        className={inputCss}
+                        value={billingAddress?.zip_code}
+                      />
+                      <Errors
+                        resource='billing_address'
+                        field='billing_address_zip_code'
                       />
                     </div>
                   </fieldset>

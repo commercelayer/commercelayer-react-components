@@ -147,26 +147,12 @@ export function ShippingAddressForm(props: Props): JSX.Element {
       for (const fieldName in errors) {
         const code = errors[fieldName]?.code
         const message = errors[fieldName]?.message
-        if (['shipping_address_state_code'].includes(fieldName)) {
-          if (!values['state_code']) {
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-            delete errors[fieldName]
-          } else {
-            formErrors.push({
-              code: code as CodeErrorType,
-              message: message || '',
-              resource: 'shipping_address',
-              field: fieldName
-            })
-          }
-        } else {
-          formErrors.push({
-            code: code as CodeErrorType,
-            message: message ?? '',
-            resource: 'shipping_address',
-            field: fieldName
-          })
-        }
+        formErrors.push({
+          code: code as CodeErrorType,
+          message: message ?? '',
+          resource: 'shipping_address',
+          field: fieldName
+        })
       }
       if (shipToDifferentAddress || invertAddresses) {
         setAddressErrors(formErrors, 'shipping_address')

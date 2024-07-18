@@ -115,6 +115,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
                 const elements = customMessage
                 elements.forEach((element) => {
                   const { field, value, isValid, message } = element
+                  console.log('element', element)
                   const fieldInError = errors[field] != null
                   if (!isValid) {
                     if (fieldInError) {
@@ -148,26 +149,12 @@ export function BillingAddressForm(props: Props): JSX.Element {
       for (const fieldName in errors) {
         const code = errors[fieldName]?.code
         const message = errors[fieldName]?.message
-        if (['billing_address_state_code'].includes(fieldName)) {
-          if (!values?.['state_code']) {
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-            delete errors[fieldName]
-          } else {
-            formErrors.push({
-              code: code as CodeErrorType,
-              message: message || '',
-              resource: 'billing_address',
-              field: fieldName
-            })
-          }
-        } else {
-          formErrors.push({
-            code: code as CodeErrorType,
-            message: message ?? '',
-            resource: 'billing_address',
-            field: fieldName
-          })
-        }
+        formErrors.push({
+          code: code as CodeErrorType,
+          message: message ?? '',
+          resource: 'billing_address',
+          field: fieldName
+        })
       }
       setAddressErrors(formErrors, 'billing_address')
     } else if (values && Object.keys(values).length > 0) {
