@@ -726,29 +726,6 @@ export const CustomErrorMessages: StoryFn = () => {
                         ]
                       }
                     }
-                    // if (props.field === 'billing_address_state_code') {
-                    //   const countryCode = props.values?.country_code as string
-                    //   if (
-                    //     ['US', 'CN', 'JP', 'AU', 'CA'].includes(countryCode) &&
-                    //     (props.value == null || props.value === '')
-                    //   ) {
-                    //     return [
-                    //       {
-                    //         field: 'billing_address_state_code',
-                    //         value: props.value,
-                    //         isValid: false,
-                    //         message: 'State is required for this country'
-                    //       }
-                    //     ]
-                    //   }
-                    //   return [
-                    //     {
-                    //       field: 'billing_address_state_code',
-                    //       value: props.value,
-                    //       isValid: true
-                    //     }
-                    //   ]
-                    // }
                     return null
                   }}
                 >
