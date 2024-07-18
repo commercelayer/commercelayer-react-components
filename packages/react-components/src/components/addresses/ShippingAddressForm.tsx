@@ -121,6 +121,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
                       if (errorMsg != null && errorMsg !== message) {
                         // @ts-expect-error no type
                         errors[field].message = message
+                        setValueForm(field, value ?? '')
                       }
                     } else {
                       setErrorForm({

@@ -274,20 +274,7 @@ export const CustomerInvertAddresses: StoryFn = (args) => {
                 </div>
                 {/*  Use `key` to re-render the ShippingAddressForm once we have the order from  `fetchOrder`. */}
                 {/*  When you are in your own project, you can retrieve the order before rendering the form. */}
-                <ShippingAddressForm
-                  key={shippingAddress?.id}
-                  customFieldMessageError={(props) => {
-                    const textWithSpace = /^[a-zA-Z0-9\s]{1,20}$/
-                    console.log('props.value', props.value)
-                    if (
-                      props.field === 'shipping_address_line_1' &&
-                      !textWithSpace.test(props.value)
-                    ) {
-                      return 'Validation error - The address should be 1-20 characters long - this is a custom message'
-                    }
-                    return null
-                  }}
-                >
+                <ShippingAddressForm key={shippingAddress?.id}>
                   <fieldset className='flex gap-4 w-full mb-4'>
                     <div className='flex-1'>
                       <label htmlFor='shipping_address_first_name'>
@@ -717,20 +704,51 @@ export const CustomErrorMessages: StoryFn = () => {
                     if (props.field === 'billing_address_country_code') {
                       const state = props.values?.state_code as string
                       console.log('state', state)
+                      console.log('props.value', props.value)
                       if (
-                        ['US', 'CN', 'JP', 'AU', 'CA'].includes(props.value) &&
-                        !state
+                        ['US', 'CN', 'JP', 'AU', 'CA'].includes(props.value)
                       ) {
                         return [
                           {
                             field: 'billing_address_state_code',
-                            value: state,
+                            value: undefined,
                             isValid: false,
                             message: 'State is required for this country'
                           }
                         ]
+                      } else {
+                        return [
+                          {
+                            field: 'billing_address_state_code',
+                            value: state,
+                            isValid: true
+                          }
+                        ]
                       }
                     }
+                    // if (props.field === 'billing_address_state_code') {
+                    //   const countryCode = props.values?.country_code as string
+                    //   if (
+                    //     ['US', 'CN', 'JP', 'AU', 'CA'].includes(countryCode) &&
+                    //     (props.value == null || props.value === '')
+                    //   ) {
+                    //     return [
+                    //       {
+                    //         field: 'billing_address_state_code',
+                    //         value: props.value,
+                    //         isValid: false,
+                    //         message: 'State is required for this country'
+                    //       }
+                    //     ]
+                    //   }
+                    //   return [
+                    //     {
+                    //       field: 'billing_address_state_code',
+                    //       value: props.value,
+                    //       isValid: true
+                    //     }
+                    //   ]
+                    // }
                     return null
                   }}
                 >

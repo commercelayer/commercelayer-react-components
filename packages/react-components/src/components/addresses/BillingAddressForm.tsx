@@ -123,6 +123,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
                       if (errorMsg != null && errorMsg !== message) {
                         // @ts-expect-error no type
                         errors[field].message = message
+                        setValueForm(field, value ?? '')
                       }
                     } else {
                       setErrorForm({
