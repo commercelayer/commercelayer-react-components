@@ -91,6 +91,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
             fieldName != null &&
             value != null
           ) {
+            values[fieldName.replace('shipping_address_', '')] = value
             const customMessage = customFieldMessageError({
               field: fieldName,
               value,
@@ -115,7 +116,6 @@ export function BillingAddressForm(props: Props): JSX.Element {
                 const elements = customMessage
                 elements.forEach((element) => {
                   const { field, value, isValid, message } = element
-                  console.log('element', element)
                   const fieldInError = errors[field] != null
                   if (!isValid) {
                     if (fieldInError) {
