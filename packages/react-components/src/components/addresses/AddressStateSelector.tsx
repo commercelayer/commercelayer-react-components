@@ -203,18 +203,27 @@ export function AddressStateSelector(props: Props): JSX.Element {
     />
   ) : (
     <BaseInput
-      {...(p as any)}
-      name={name}
-      ref={
-        (billingAddress?.validation as any) ||
-        shippingAddress?.validation ||
-        customerAddress?.validation
-      }
-      className={classNameComputed}
-      required={required}
-      placeholder={p.placeholder?.label || ''}
-      defaultValue={val}
-      type='text'
+        {...(p as any)}
+        name={name}
+        ref={
+          (billingAddress?.validation as any) ||
+          shippingAddress?.validation ||
+          customerAddress?.validation
+        }
+        className={classNameComputed}
+        required={required}
+        placeholder={p.placeholder?.label || ''}
+        defaultValue={val}
+        type='text'
+        onChange={(e) => {
+          setVal(e.target.value)
+          if (billingAddress.setValue != null) {
+            billingAddress.setValue(name, e.target.value)
+          }
+          if (shippingAddress.setValue != null) {
+            shippingAddress.setValue(name, e.target.value)
+          }
+        }}
     />
   )
 }

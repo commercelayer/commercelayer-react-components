@@ -91,22 +91,53 @@ export function BillingAddressForm(props: Props): JSX.Element {
             fieldName != null &&
             value != null
           ) {
+            values[fieldName.replace('shipping_address_', '')] = value
             const customMessage = customFieldMessageError({
               field: fieldName,
-              value
+              value,
+              values
             })
             if (customMessage != null) {
-              if (inError) {
-                const errorMsg = errors[fieldName]?.message
-                if (errorMsg != null && errorMsg !== customMessage) {
-                  // @ts-expect-error no type
-                  errors[fieldName].message = customMessage
+              if (typeof customMessage === 'string') {
+                if (inError) {
+                  const errorMsg = errors[fieldName]?.message
+                  if (errorMsg != null && errorMsg !== customMessage) {
+                    // @ts-expect-error no type
+                    errors[fieldName].message = customMessage
+                  }
+                } else {
+                  setErrorForm({
+                    name: fieldName,
+                    code: 'VALIDATION_ERROR',
+                    message: customMessage
+                  })
                 }
               } else {
-                setErrorForm({
-                  name: fieldName,
-                  code: 'VALIDATION_ERROR',
-                  message: customMessage
+                const elements = customMessage
+                elements.forEach((element) => {
+                  const { field, value, isValid, message } = element
+                  const fieldInError = errors[field] != null
+                  if (!isValid) {
+                    if (fieldInError) {
+                      const errorMsg = errors[field]?.message
+                      if (errorMsg != null && errorMsg !== message) {
+                        // @ts-expect-error no type
+                        errors[field].message = message
+                        setValueForm(field, value ?? '')
+                      }
+                    } else {
+                      setErrorForm({
+                        name: field,
+                        code: 'VALIDATION_ERROR',
+                        message: message
+                      })
+                    }
+                  } else {
+                    if (fieldInError) {
+                      delete errors[field]
+                      setValueForm(field, value ?? '')
+                    }
+                  }
                 })
               }
             }
@@ -119,26 +150,12 @@ export function BillingAddressForm(props: Props): JSX.Element {
       for (const fieldName in errors) {
         const code = errors[fieldName]?.code
         const message = errors[fieldName]?.message
-        if (['billing_address_state_code'].includes(fieldName)) {
-          if (!values?.['state_code']) {
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-            delete errors[fieldName]
-          } else {
-            formErrors.push({
-              code: code as CodeErrorType,
-              message: message || '',
-              resource: 'billing_address',
-              field: fieldName
-            })
-          }
-        } else {
-          formErrors.push({
-            code: code as CodeErrorType,
-            message: message ?? '',
-            resource: 'billing_address',
-            field: fieldName
-          })
-        }
+        formErrors.push({
+          code: code as CodeErrorType,
+          message: message ?? '',
+          resource: 'billing_address',
+          field: fieldName
+        })
       }
       setAddressErrors(formErrors, 'billing_address')
     } else if (values && Object.keys(values).length > 0) {
