@@ -162,7 +162,6 @@ export async function getCustomerAddresses({
     const customerAddresses = await sdk.customer_addresses.list({
       include: ['address']
     })
-    console.log('customerAddresses', customerAddresses)
     customerAddresses.forEach((customerAddress) => {
       if (customerAddress.address) {
         if (customerAddress.address.reference == null) {
