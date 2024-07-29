@@ -16,6 +16,7 @@ import PlaceOrderContext from '#context/PlaceOrderContext'
 import OrderContext from '#context/OrderContext'
 import omit from '#utils/omit'
 import type UIElement from '@adyen/adyen-web/dist/types/components/UIElement'
+import { getPublicIP } from '#utils/getPublicIp'
 
 type Styles = Partial<{
   base: CSSProperties
@@ -124,6 +125,7 @@ export function AdyenPayment({
         setPaymentRef({ ref })
       }
       const browserInfo = getBrowserInfo()
+      const shopperIp = await getPublicIP()
       const attributes: any = {
         payment_request_data: {
           payment_method: state.data.paymentMethod,
@@ -132,6 +134,7 @@ export function AdyenPayment({
           origin: window.location.origin,
           return_url: window.location.href,
           redirect_from_issuer_method: 'GET',
+          shopper_ip: shopperIp,
           browser_info: {
             acceptHeader:
               'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
