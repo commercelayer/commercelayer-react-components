@@ -66,7 +66,6 @@ export function MyAccountLink(props: Props): JSX.Element {
   function handleClick(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ): void {
-    e.preventDefault()
     if (!disabled && accessToken && endpoint) {
       void getOrganizationConfig({
         accessToken,

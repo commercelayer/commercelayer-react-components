@@ -60,7 +60,6 @@ export function CheckoutLink(props: Props): JSX.Element {
   function handleClick(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ): void {
-    e.preventDefault()
     if (accessToken && endpoint) {
       void getOrganizationConfig({
         accessToken,
