@@ -62,6 +62,8 @@ export function CheckoutLink(props: Props): JSX.Element {
   ): void {
     e.preventDefault()
     e.stopPropagation()
+    console.log('e.currentTarget.href', e.currentTarget.href)
+    const currentHref = e.currentTarget.href
     if (accessToken && endpoint && order?.id) {
       void getOrganizationConfig({
         accessToken,
@@ -74,11 +76,11 @@ export function CheckoutLink(props: Props): JSX.Element {
         if (config?.links?.checkout) {
           location.href = config.links.checkout
         } else {
-          location.href = e.currentTarget.href
+          location.href = currentHref
         }
       })
     } else {
-      location.href = e.currentTarget.href
+      location.href = currentHref
     }
   }
   return children ? (
