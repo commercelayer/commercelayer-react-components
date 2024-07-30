@@ -212,6 +212,7 @@ export function AdyenPayment({
       'save_payment_source_to_customer_wallet'
     ) as HTMLInputElement
     const url = cleanUrlBy()
+    const shopperIp = await getPublicIP()
     let control = await setPaymentSource({
       paymentSourceId: paymentSource?.id,
       paymentResource: 'adyen_payments'
@@ -249,7 +250,8 @@ export function AdyenPayment({
             payment_method: paymentMethod,
             return_url: url,
             origin: window.location.origin,
-            redirect_from_issuer_method: 'GET'
+            redirect_from_issuer_method: 'GET',
+            shopper_id: shopperIp
           }
         }
       })
@@ -260,7 +262,8 @@ export function AdyenPayment({
         payment_method: paymentMethod,
         return_url: url,
         origin: window.location.origin,
-        redirect_from_issuer_method: 'GET'
+        redirect_from_issuer_method: 'GET',
+        shopper_id: shopperIp
       },
       _authorize: 1
     }
