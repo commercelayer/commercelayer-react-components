@@ -60,19 +60,25 @@ export function CheckoutLink(props: Props): JSX.Element {
   function handleClick(
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ): void {
-    if (accessToken && endpoint) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (accessToken && endpoint && order?.id) {
       void getOrganizationConfig({
         accessToken,
         endpoint,
         params: {
-          accessToken
+          accessToken,
+          orderId: order?.id
         }
       }).then((config) => {
         if (config?.links?.checkout) {
-          e.preventDefault()
           location.href = config.links.checkout
+        } else {
+          location.href = e.currentTarget.href
         }
       })
+    } else {
+      location.href = e.currentTarget.href
     }
   }
   return children ? (
