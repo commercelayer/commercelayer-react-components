@@ -5,6 +5,7 @@ import { type ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { getApplicationLink } from '#utils/getApplicationLink'
 import { getDomain } from '#utils/getDomain'
+import { getOrganizationConfig } from '#utils/organization'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   checkoutUrl: string
@@ -33,7 +34,7 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
  * found in the `order` object.
  */
 export function CheckoutLink(props: Props): JSX.Element {
-  const { label, hostedCheckout = true, children, ...p } = props
+  const { label, hostedCheckout = true, children, onClick, ...p } = props
   const { order } = useContext(OrderContext)
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
   if (accessToken == null || endpoint == null)
@@ -56,10 +57,36 @@ export function CheckoutLink(props: Props): JSX.Element {
     href,
     ...p
   }
+  function handleClick(
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ): void {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log('e.currentTarget.href', e.currentTarget.href)
+    const currentHref = e.currentTarget.href
+    if (accessToken && endpoint && order?.id) {
+      void getOrganizationConfig({
+        accessToken,
+        endpoint,
+        params: {
+          accessToken,
+          orderId: order?.id
+        }
+      }).then((config) => {
+        if (config?.links?.checkout) {
+          location.href = config.links.checkout
+        } else {
+          location.href = currentHref
+        }
+      })
+    } else {
+      location.href = currentHref
+    }
+  }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a href={href} {...p}>
+    <a href={href} onClick={handleClick} {...p}>
       {label}
     </a>
   )
