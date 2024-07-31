@@ -251,7 +251,7 @@ export function AdyenPayment({
             return_url: url,
             origin: window.location.origin,
             redirect_from_issuer_method: 'GET',
-            shopper_id: shopperIp
+            shopper_ip: shopperIp
           }
         }
       })
@@ -263,7 +263,7 @@ export function AdyenPayment({
         return_url: url,
         origin: window.location.origin,
         redirect_from_issuer_method: 'GET',
-        shopper_id: shopperIp
+        shopper_ip: shopperIp
       },
       _authorize: 1
     }
