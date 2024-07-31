@@ -120,8 +120,8 @@ export function SaveAddressesButton(props: Props): JSX.Element {
       setForceDisable(true)
       if (order && saveAddresses != null) {
         response = await saveAddresses(email)
-      } else if (createCustomerAddress && billingAddress) {
-        const address = { ...billingAddress }
+      } else if (createCustomerAddress) {
+        const address = invertAddresses ? { ...shippingAddress } : { ...billingAddress }
         if (addressId) address.id = addressId
         void createCustomerAddress(address as TCustomerAddress)
         response = {
