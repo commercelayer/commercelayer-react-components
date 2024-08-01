@@ -1,7 +1,6 @@
-import { authentication } from '@commercelayer/js-auth'
+import { authenticate } from '@commercelayer/js-auth'
 import { useEffect, useMemo, useState } from 'react'
 import Cookie from 'js-cookie'
-import { type TBaseReturn } from '@commercelayer/js-auth/lib/esm/types'
 import { jwtDecode } from 'jwt-decode'
 
 const salesChannel = {
@@ -142,6 +141,7 @@ async function retrieveCustomerData({
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 async function generateNewToken({
   clientId,
   slug,
@@ -156,17 +156,15 @@ async function generateNewToken({
   domain: string
   user?: { username: string; password: string }
   mode: UserMode
-}): Promise<TBaseReturn> {
+}) {
   return user == null
-    ? await authentication('client_credentials', {
+    ? await authenticate('client_credentials', {
         clientId,
-        slug,
         scope,
         domain
       })
-    : await authentication('password', {
+    : await authenticate('password', {
         clientId,
-        slug,
         scope,
         domain,
         ...user
