@@ -301,9 +301,11 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       }))
     setForceDisable(false)
     onClick && placed && onClick(placed)
-    setIsLoading(false)
     if (setPlaceOrderStatus != null) {
       setPlaceOrderStatus({ status: 'standby' })
+    }
+    if (placed) {
+      setIsLoading(false)
     }
   }
   const disabledButton = disabled !== undefined ? disabled : notPermitted
@@ -326,7 +328,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     <button
       ref={ref}
       type='button'
-      disabled={disabledButton || forceDisable}
+        disabled={isLoading || disabledButton || forceDisable}
       onClick={(e) => {
         void handleClick(e)
       }}
