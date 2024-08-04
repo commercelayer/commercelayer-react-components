@@ -62,7 +62,6 @@ export function CheckoutLink(props: Props): JSX.Element {
   ): void {
     e.preventDefault()
     e.stopPropagation()
-    console.log('e.currentTarget.href', e.currentTarget.href)
     const currentHref = e.currentTarget.href
     if (accessToken && endpoint && order?.id) {
       void getOrganizationConfig({

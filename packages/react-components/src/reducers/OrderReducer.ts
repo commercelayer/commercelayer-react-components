@@ -498,7 +498,7 @@ export async function addToCart(
           const params = `${id}?accessToken=${config.accessToken ?? ''}`
           const redirectUrl = checkoutUrl
             ? `${checkoutUrl}/${params}`
-            : `https://${organization}.checkout.commercelayer.app/${params}`
+            : `https://${organization}.commercelayer.app/checkout/${params}`
           location.href = redirectUrl
         } else if (openMiniCart) {
           publish('open-cart')
