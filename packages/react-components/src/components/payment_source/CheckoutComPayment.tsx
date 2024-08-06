@@ -37,7 +37,7 @@ const systemLanguages: FramesLanguages[] = [
   'ES-ES',
   'FR-FR',
   'IT-IT',
-  'KR-KR',
+  'KO-KR',
   'NL-NL'
 ]
 
