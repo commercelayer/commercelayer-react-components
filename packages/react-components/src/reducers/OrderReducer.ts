@@ -20,9 +20,11 @@ import type {
   OrderUpdate,
   QueryParamsRetrieve
 } from '@commercelayer/sdk'
-import { getOrganizationSlug } from '#utils/organization'
+import { getOrganizationConfig } from '#utils/organization'
 import { type LooseAutocomplete } from '#typings/globals'
 import { publish } from '#utils/events'
+import { getDomain } from '#utils/getDomain'
+import { getApplicationLink } from '#utils/getApplicationLink'
 
 export type GetOrderParams = Partial<{
   clearWhenPlaced: boolean
@@ -493,12 +495,27 @@ export async function addToCart(
             }
           })
         }
-        if (buyNowMode) {
-          const { organization } = getOrganizationSlug(config.endpoint ?? '')
+        if (buyNowMode && id && config?.accessToken != null && config?.endpoint != null) {
           const params = `${id}?accessToken=${config.accessToken ?? ''}`
+          const { domain, slug } = getDomain(config.endpoint)
+          const href = getApplicationLink({
+            slug,
+            orderId: id,
+            accessToken: config.accessToken,
+            applicationType: 'checkout',
+            domain
+          })
+          const organizationConfig = await getOrganizationConfig({
+            accessToken: config.accessToken,
+            endpoint: config.endpoint,
+            params: {
+              accessToken: config.accessToken,
+              orderId: order?.id
+            }
+          })
           const redirectUrl = checkoutUrl
             ? `${checkoutUrl}/${params}`
-            : `https://${organization}.commercelayer.app/checkout/${params}`
+            : organizationConfig?.links?.checkout ?? href
           location.href = redirectUrl
         } else if (openMiniCart) {
           publish('open-cart')
