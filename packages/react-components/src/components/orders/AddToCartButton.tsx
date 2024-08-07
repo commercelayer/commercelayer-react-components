@@ -16,6 +16,7 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import { getDomain } from '#utils/getDomain'
 import { publish } from '#utils/events'
+import { getOrganizationConfig } from '#utils/organization'
 
 interface TAddToCartButton extends Omit<Props, 'children'> {
   handleClick: () => AddToCartReturn
@@ -23,40 +24,40 @@ interface TAddToCartButton extends Omit<Props, 'children'> {
 
 type BuyNowMode =
   | {
-      /**
-       * Once item has been added, it redirects to the hosted checkout micro-frontend.
-       */
-      buyNowMode: true
-      /**
-       * If you have a self-hosted checkout, you can pass the url to redirect to it.
-       */
-      checkoutUrl?: string
-    }
+    /**
+     * Once item has been added, it redirects to the hosted checkout micro-frontend.
+     */
+    buyNowMode: true
+    /**
+     * If you have a self-hosted checkout, you can pass the url to redirect to it.
+     */
+    checkoutUrl?: string
+  }
   | {
-      buyNowMode?: false
-      checkoutUrl?: never
-    }
+    buyNowMode?: false
+    checkoutUrl?: never
+  }
 
 type THostedCart =
   | {
-      /**
-       * Once item has been added, it redirects to the hosted cart micro-frontend.
-       */
-      redirectToHostedCart: true
-      /**
-       * If you have a self-hosted cart, you can pass the url to redirect to it.
-       */
-      hostedCartUrl?: string
-      /**
-       * If you have a self-hosted cart, you can pass the protocol to redirect to it.
-       */
-      protocol?: 'http' | 'https'
-    }
+    /**
+     * Once item has been added, it redirects to the hosted cart micro-frontend.
+     */
+    redirectToHostedCart: true
+    /**
+     * If you have a self-hosted cart, you can pass the url to redirect to it.
+     */
+    hostedCartUrl?: string
+    /**
+     * If you have a self-hosted cart, you can pass the protocol to redirect to it.
+     */
+    protocol?: 'http' | 'https'
+  }
   | {
-      redirectToHostedCart?: false
-      hostedCartUrl?: never
-      protocol?: never
-    }
+    redirectToHostedCart?: false
+    hostedCartUrl?: never
+    protocol?: never
+  }
 
 type TButton = PropsWithoutRef<
   Omit<JSX.IntrinsicElements['button'], 'children'>
@@ -155,9 +156,9 @@ export function AddToCartButton(props: Props): JSX.Element {
   const sCode = sku?.code ?? skuCode
   const handleClick = async (): Promise<
     | {
-        success: boolean
-        orderId?: string
-      }
+      success: boolean
+      orderId?: string
+    }
     | Record<string, any>
     | undefined
   > => {
@@ -212,7 +213,15 @@ export function AddToCartButton(props: Props): JSX.Element {
         if (hostedCartUrl && orderId) {
           location.href = `${protocol}://${hostedCartUrl}/${orderId}?accessToken=${accessToken}`
         } else if (orderId && slug) {
-          location.href = getApplicationLink({
+          const config = await getOrganizationConfig({
+            accessToken,
+            endpoint,
+            params: {
+              orderId,
+              accessToken
+            }
+          })
+          location.href = config?.links?.cart ?? getApplicationLink({
             orderId,
             slug,
             accessToken,

@@ -51,7 +51,6 @@ export function KlarnaGateway(props: Props): JSX.Element | null {
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
-        // @ts-expect-error missing type
         payment_source: paymentSource
       },
       paymentType: paymentResource

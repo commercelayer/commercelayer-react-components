@@ -15,7 +15,7 @@ interface CardDetails {
 
 interface Args {
   paymentType: PaymentResource
-  customerPayment: CustomerPaymentSource
+  customerPayment: Partial<CustomerPaymentSource>
 }
 
 export default function getCardDetails({

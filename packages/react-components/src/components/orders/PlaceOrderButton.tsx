@@ -87,7 +87,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       if (paymentType === currentPaymentMethodType && paymentType) {
         const card = getCardDetails({
           customerPayment: {
-            // @ts-expect-error missing type
             payment_source: paymentSource
           },
           paymentType
@@ -261,7 +260,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       paymentType &&
       getCardDetails({
         paymentType,
-        // @ts-expect-error missing type
         customerPayment: { payment_source: checkPaymentSource }
       })
     if (

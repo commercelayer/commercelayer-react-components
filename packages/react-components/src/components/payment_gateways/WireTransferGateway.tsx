@@ -26,7 +26,6 @@ export function WireTransferGateway(props: Props): JSX.Element | null {
   if (readonly) {
     const card = getCardDetails({
       customerPayment: {
-        // @ts-expect-error no type
         payment_source: order?.payment_source || paymentSource
       },
       paymentType: paymentResource

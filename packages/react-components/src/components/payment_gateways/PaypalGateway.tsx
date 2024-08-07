@@ -24,7 +24,6 @@ export function PaypalGateway(props: Props): JSX.Element | null {
   if (readonly) {
     const card = getCardDetails({
       customerPayment: {
-        // @ts-expect-error missing type
         payment_source: order?.payment_source || paymentSource
       },
       paymentType: paymentResource
