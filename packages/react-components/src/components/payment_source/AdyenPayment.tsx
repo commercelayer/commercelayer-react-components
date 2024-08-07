@@ -62,6 +62,7 @@ export interface AdyenPaymentConfig {
   threeDSecureContainerClassName?: string
   placeOrderCallback?: (response: { placed: boolean }) => void
   styles?: PaymentMethodsStyle
+  paymentMethodsConfiguration?: CoreOptions['paymentMethodsConfiguration']
 }
 
 interface Props {
@@ -379,13 +380,16 @@ export function AdyenPayment({
         showStoredPaymentMethods,
         paypal: {
           showPayButton: true,
-          style: styles?.paypal
+          style: styles?.paypal,
+          ...config?.paymentMethodsConfiguration?.paypal
         },
         card: {
           enableStoreDetails: showStoredPaymentMethods,
           styles: styles?.card,
-          holderNameRequired: false
-        }
+          holderNameRequired: false,
+          ...config?.paymentMethodsConfiguration?.card
+        },
+        ...config?.paymentMethodsConfiguration
       },
       onAdditionalDetails: (state, element) => {
         void handleOnAdditionalDetails(state, element)
