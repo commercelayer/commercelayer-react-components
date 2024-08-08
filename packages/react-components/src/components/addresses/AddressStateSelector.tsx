@@ -186,7 +186,6 @@ export function AddressStateSelector(props: Props): JSX.Element {
   const classNameComputed = !isEmptyStates()
     ? `${className} ${selectClassName} ${hasError ? errorClassName : ''}`
     : `${className} ${inputClassName} ${hasError ? errorClassName : ''}`
-
   return !isEmptyStates() ? (
     <BaseSelect
       {...p}
