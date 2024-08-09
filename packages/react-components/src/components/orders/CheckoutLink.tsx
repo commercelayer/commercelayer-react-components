@@ -73,13 +73,13 @@ export function CheckoutLink(props: Props): JSX.Element {
         }
       }).then((config) => {
         if (config?.links?.checkout) {
-          location.href = config.links.checkout
+          window.open(config.links.checkout, '_top')
         } else {
-          location.href = currentHref
+          window.open(currentHref, '_top')
         }
       })
     } else {
-      location.href = currentHref
+      window.open(currentHref, '_top')
     }
   }
   return children ? (
