@@ -182,7 +182,7 @@
     "@commercelayer/organization-config": "^1.4.8",
     "@commercelayer/sdk": "6.11.0",
     "@stripe/react-stripe-js": "^2.7.3",
-    "@stripe/stripe-js": "^4.1.0",
+    "@stripe/stripe-js": "^4.2.0",
     "@tanstack/react-table": "^8.17.3",
     "@types/iframe-resizer": "^3.5.13",
     "axios": "^1.7.3",
