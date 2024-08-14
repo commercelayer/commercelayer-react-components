@@ -71,7 +71,6 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     )
     customerEmail = Object.keys(isValidEmail).length > 0
   }
-
   const shippingAddressCleaned: any = Object.keys(shippingAddress ?? {}).reduce(
     (acc, key) => {
       return {
@@ -103,11 +102,13 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     shippingAddressId,
     lineItems: order?.line_items
   })
+  // NOTE: This is a temporary fix to avoid the button to be disabled when the user is editing an address
+  const invertAddressesDisable = invertAddresses && shippingAddressId ? false : shippingDisable
   const disable =
     disabled ||
     customerEmail ||
     billingDisable ||
-    shippingDisable ||
+    invertAddressesDisable ||
     countryLockDisable
 
   const handleClick = async (): Promise<void> => {
