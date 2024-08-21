@@ -210,11 +210,13 @@ export async function invertedAddressesHandler({
     _shipping_address_clone_id: shippingAddressId,
     customer_email: customerEmail
   }
+  console.log('--- shippingAddress ---', shippingAddress)
+  console.log('orderAttributes', orderAttributes)
   if (currentShippingAddressRef === shippingAddressId) {
     orderAttributes._billing_address_clone_id = order?.billing_address?.id
     orderAttributes._shipping_address_clone_id = order?.shipping_address?.id
   }
-  if (shippingAddress != null && Object.keys(shippingAddress).length > 0) {
+  if (shippingAddress != null && Object.keys(shippingAddress).length > 0 && !shippingAddressId) {
     delete orderAttributes._billing_address_clone_id
     delete orderAttributes._shipping_address_clone_id
     orderAttributes._billing_address_same_as_shipping = true
@@ -339,4 +341,24 @@ export function addressesController({
     billingDisable,
     shippingDisable
   }
+}
+
+export function sanitizeMetadataFields(address: AddressCreate): AddressCreate {
+  const hasMetadata = Object.keys(address).filter((key) => {
+    if (key.startsWith('metadata_')) {
+      return true
+    }
+    return false
+  })
+  if (hasMetadata?.length > 0) {
+    hasMetadata.forEach((key) => {
+      const metadataKey = key.replace('metadata_', '')
+      address.metadata = {
+        ...(address.metadata || {}),
+        [metadataKey]: address[key as keyof AddressCreate]
+      }
+      delete address[key as keyof AddressCreate]
+    })
+  }
+  return address
 }

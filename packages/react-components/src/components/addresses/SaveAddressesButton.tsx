@@ -120,15 +120,32 @@ export function SaveAddressesButton(props: Props): JSX.Element {
         success: false
       }
       setForceDisable(true)
-      if (order && saveAddresses != null) {
-        response = await saveAddresses(email)
-      } else if (createCustomerAddress) {
-        const address = invertAddresses ? {...shippingAddress} : { ...billingAddress }
-        if (addressId) address.id = addressId
-        void createCustomerAddress(address as TCustomerAddress)
-        response = {
-          success: true
-        }
+      switch (true) {
+        case order != null && addressId != null && createCustomerAddress != null && saveAddresses != null:
+          console.log('----- createCustomerAddress and saveAddresses with order ----')
+          response = await saveAddresses({
+            customerEmail: email,
+            customerAddress: {
+              resource: invertAddresses ? 'shipping_address' : 'billing_address',
+              id: addressId
+            }
+          })
+          break;
+        case order != null && saveAddresses != null:
+          response = await saveAddresses({
+            customerEmail: email,
+          })
+          break;
+        case createCustomerAddress != null:
+          console.log('----- createCustomerAddress ----')
+          const address = invertAddresses ? { ...shippingAddress } : { ...billingAddress }
+          if (addressId) address.id = addressId
+          console.log('address', address)
+          void createCustomerAddress(address as TCustomerAddress)
+          response = {
+            success: true
+          }
+          break;
       }
       setForceDisable(false)
       if (onClick && response.success) onClick(response)

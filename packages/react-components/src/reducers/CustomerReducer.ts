@@ -23,6 +23,7 @@ import {
   type TriggerAttributeHelper,
   triggerAttributeHelper
 } from '#utils/triggerAttributeHelper'
+import { sanitizeMetadataFields } from '#utils/addressesManager'
 
 export type CustomerActionType =
   | 'setErrors'
@@ -373,7 +374,8 @@ export async function createCustomerAddress({
     const { id } = address
     try {
       if (id) {
-        const upAddress = await sdk.addresses.update(address)
+        const addressWithMeta = sanitizeMetadataFields(address) as AddressUpdate
+        const upAddress = await sdk.addresses.update(addressWithMeta)
         const updatedAddresses = state?.addresses?.map((a) => {
           if (a.id === upAddress.id) return upAddress
           return a
@@ -385,7 +387,8 @@ export async function createCustomerAddress({
           })
         }
       } else {
-        const newAddress = await sdk.addresses.create(address)
+        const addressWithMeta = sanitizeMetadataFields(address)
+        const newAddress = await sdk.addresses.create(addressWithMeta)
         if (state?.customers?.id && newAddress?.id) {
           // @ts-expect-error Expected customer_email
           const newCustomerAddress = await sdk.customer_addresses.create({
