@@ -210,8 +210,6 @@ export async function invertedAddressesHandler({
     _shipping_address_clone_id: shippingAddressId,
     customer_email: customerEmail
   }
-  console.log('--- shippingAddress ---', shippingAddress)
-  console.log('orderAttributes', orderAttributes)
   if (currentShippingAddressRef === shippingAddressId) {
     orderAttributes._billing_address_clone_id = order?.billing_address?.id
     orderAttributes._shipping_address_clone_id = order?.shipping_address?.id

@@ -211,9 +211,6 @@ export async function saveAddresses({
       let orderAttributes: OrderUpdate | null = null
       const billingAddressCloneId = customerAddress?.resource === 'billing_address' ? customerAddress?.id : billingAddressId
       const shippingAddressCloneId = customerAddress?.resource === 'shipping_address' ? customerAddress?.id : shippingAddressId
-      console.log('billingAddressCloneId', billingAddressCloneId)
-      console.log('shippingAddressCloneId', shippingAddressCloneId)
-      console.log('invertAddresses', invertAddresses)
       if (invertAddresses) {
         orderAttributes = await invertedAddressesHandler({
           billingAddress,

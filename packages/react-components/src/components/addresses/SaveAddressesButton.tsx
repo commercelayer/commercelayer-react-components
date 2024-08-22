@@ -122,7 +122,6 @@ export function SaveAddressesButton(props: Props): JSX.Element {
       setForceDisable(true)
       switch (true) {
         case order != null && addressId != null && createCustomerAddress != null && saveAddresses != null:
-          console.log('----- createCustomerAddress and saveAddresses with order ----')
           response = await saveAddresses({
             customerEmail: email,
             customerAddress: {
@@ -137,10 +136,8 @@ export function SaveAddressesButton(props: Props): JSX.Element {
           })
           break;
         case createCustomerAddress != null:
-          console.log('----- createCustomerAddress ----')
           const address = invertAddresses ? { ...shippingAddress } : { ...billingAddress }
           if (addressId) address.id = addressId
-          console.log('address', address)
           void createCustomerAddress(address as TCustomerAddress)
           response = {
             success: true
