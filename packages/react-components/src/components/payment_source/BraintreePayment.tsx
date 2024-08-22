@@ -168,30 +168,33 @@ export function BraintreePayment({
         const response = (await threeDSInstance.verifyCard(
           verifyCardOptions
         )) as any
-        if (
-          response.threeDSecureInfo.status === 'authenticate_successful' &&
-          paymentSource
-        ) {
-          paymentSource &&
-            (await setPaymentSource({
-              paymentSourceId: paymentSource.id,
-              paymentResource: 'braintree_payments',
-              attributes: {
-                payment_method_nonce: response.nonce,
-                options: {
-                  id: response.nonce,
-                  card: {
-                    last4: response.details.lastFour,
-                    exp_year: response.details.expirationYear,
-                    exp_month: response.details.expirationMonth,
-                    brand: response.details.cardType.toLowerCase()
-                  }
+        const validStatus =
+          response?.liabilityShiftPossible === true &&
+          response?.liabilityShifted === true
+        console.log('validStatus', validStatus)
+        if (validStatus && paymentSource != null) {
+          await setPaymentSource({
+            paymentSourceId: paymentSource.id,
+            paymentResource: 'braintree_payments',
+            attributes: {
+              payment_method_nonce: response.nonce,
+              options: {
+                id: response.nonce,
+                card: {
+                  last4: response.details.lastFour,
+                  exp_year: response.details.expirationYear,
+                  exp_month: response.details.expirationMonth,
+                  brand: response.details.cardType.toLowerCase()
                 }
               }
-            }))
+            }
+          })
           return true
+        } else {
+          throw new Error(
+            `3D Secure authentication failed - ${response?.threeDSecureInfo?.status}`
+          )
         }
-        return false
       } catch (error: any) {
         console.error(error)
         setPaymentMethodErrors([
