@@ -71,7 +71,6 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     )
     customerEmail = Object.keys(isValidEmail).length > 0
   }
-
   const shippingAddressCleaned: any = Object.keys(shippingAddress ?? {}).reduce(
     (acc, key) => {
       return {
@@ -103,12 +102,15 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     shippingAddressId,
     lineItems: order?.line_items
   })
+  // NOTE: This is a temporary fix to avoid the button to be disabled when the user is editing an address
+  const invertAddressesDisable = invertAddresses && shippingAddressId ? false : shippingDisable
   const disable =
     disabled ||
     customerEmail ||
     billingDisable ||
-    shippingDisable ||
+    invertAddressesDisable ||
     countryLockDisable
+
   const handleClick = async (): Promise<void> => {
     if (errors && Object.keys(errors).length === 0 && !disable) {
       let response: {
@@ -118,15 +120,29 @@ export function SaveAddressesButton(props: Props): JSX.Element {
         success: false
       }
       setForceDisable(true)
-      if (order && saveAddresses != null) {
-        response = await saveAddresses(email)
-      } else if (createCustomerAddress && billingAddress) {
-        const address = { ...billingAddress }
-        if (addressId) address.id = addressId
-        void createCustomerAddress(address as TCustomerAddress)
-        response = {
-          success: true
-        }
+      switch (true) {
+        case order != null && addressId != null && createCustomerAddress != null && saveAddresses != null:
+          response = await saveAddresses({
+            customerEmail: email,
+            customerAddress: {
+              resource: invertAddresses ? 'shipping_address' : 'billing_address',
+              id: addressId
+            }
+          })
+          break;
+        case order != null && saveAddresses != null:
+          response = await saveAddresses({
+            customerEmail: email,
+          })
+          break;
+        case createCustomerAddress != null:
+          const address = invertAddresses ? { ...shippingAddress } : { ...billingAddress }
+          if (addressId) address.id = addressId
+          void createCustomerAddress(address as TCustomerAddress)
+          response = {
+            success: true
+          }
+          break;
       }
       setForceDisable(false)
       if (onClick && response.success) onClick(response)

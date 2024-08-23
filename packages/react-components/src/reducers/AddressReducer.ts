@@ -13,7 +13,7 @@ import { type updateOrder } from './OrderReducer'
 import camelCase from 'lodash/camelCase'
 import { type TCustomerAddress } from './CustomerReducer'
 import { type TResourceError } from '#components/errors/Errors'
-import { invertedAddressesHandler } from '#utils/addressesManager'
+import { invertedAddressesHandler, sanitizeMetadataFields } from '#utils/addressesManager'
 import { formCleaner } from '#utils/formCleaner'
 import { type AddressValuesKeys } from '#context/BillingAddressFormContext'
 import { type AddressInputName } from '#typings/index'
@@ -168,6 +168,11 @@ export const setCloneAddress: SetCloneAddress = (id, resource, dispatch) => {
   })
 }
 
+export interface ICustomerAddress {
+  id: string | undefined
+  resource: AddressResource
+}
+
 interface TSaveAddressesParams {
   orderId?: string
   order?: Order | null
@@ -177,6 +182,7 @@ interface TSaveAddressesParams {
   dispatch: Dispatch<AddressAction>
   getCustomerAddresses?: () => Promise<void>
   customerEmail?: string
+  customerAddress?: ICustomerAddress
 }
 
 export async function saveAddresses({
@@ -184,11 +190,12 @@ export async function saveAddresses({
   updateOrder,
   order,
   state,
-  customerEmail
+  customerEmail,
+  customerAddress
 }: TSaveAddressesParams): Promise<{
   success: boolean
   order?: Order
-  error?: unknown
+  error?: unknown,
 }> {
   const {
     shipToDifferentAddress,
@@ -202,15 +209,17 @@ export async function saveAddresses({
     const sdk = getSdk(config)
     if (order) {
       let orderAttributes: OrderUpdate | null = null
+      const billingAddressCloneId = customerAddress?.resource === 'billing_address' ? customerAddress?.id : billingAddressId
+      const shippingAddressCloneId = customerAddress?.resource === 'shipping_address' ? customerAddress?.id : shippingAddressId
       if (invertAddresses) {
         orderAttributes = await invertedAddressesHandler({
           billingAddress,
-          billingAddressId,
+          billingAddressId: billingAddressCloneId,
           customerEmail,
           order,
           shipToDifferentAddress,
           shippingAddress,
-          shippingAddressId,
+          shippingAddressId: shippingAddressCloneId,
           sdk
         })
       } else {
@@ -221,70 +230,38 @@ export async function saveAddresses({
         const currentBillingAddressRef = order?.billing_address?.reference
         orderAttributes = {
           id: order?.id,
-          _billing_address_clone_id: billingAddressId,
-          _shipping_address_clone_id: billingAddressId,
+          _billing_address_clone_id: billingAddressCloneId,
+          _shipping_address_clone_id: billingAddressCloneId,
           customer_email: customerEmail
         }
-        if (currentBillingAddressRef === billingAddressId) {
+        if (currentBillingAddressRef === billingAddressCloneId) {
           orderAttributes._billing_address_clone_id = order?.billing_address?.id
           orderAttributes._shipping_address_clone_id =
             order?.shipping_address?.id
         }
-        if (billingAddress != null && Object.keys(billingAddress).length > 0) {
+        if (billingAddress != null && Object.keys(billingAddress).length > 0 && !billingAddressCloneId) {
           delete orderAttributes._billing_address_clone_id
           delete orderAttributes._shipping_address_clone_id
           if (!doNotShipItems) {
             orderAttributes._shipping_address_same_as_billing = true
           }
-          const hasMetadata = Object.keys(billingAddress).filter((key) => {
-            if (key.startsWith('metadata_')) {
-              return true
-            }
-            return false
-          })
-          if (hasMetadata?.length > 0) {
-            hasMetadata.forEach((key) => {
-              const metadataKey = key.replace('metadata_', '')
-              billingAddress.metadata = {
-                ...(billingAddress.metadata || {}),
-                [metadataKey]: billingAddress[key]
-              }
-              // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-              delete billingAddress[key]
-            })
-          }
-          const address = await sdk.addresses.create(billingAddress)
+          const billingAddressWithMeta = sanitizeMetadataFields(billingAddress)
+          const address = await sdk.addresses.create(billingAddressWithMeta)
           orderAttributes.billing_address = sdk.addresses.relationship(
             address.id
           )
         }
         if (shipToDifferentAddress) {
           delete orderAttributes._shipping_address_same_as_billing
-          if (shippingAddressId)
-            orderAttributes._shipping_address_clone_id = shippingAddressId
+          if (shippingAddressCloneId)
+            orderAttributes._shipping_address_clone_id = shippingAddressCloneId
           if (
             shippingAddress != null &&
             Object.keys(shippingAddress).length > 0
           ) {
             delete orderAttributes._shipping_address_clone_id
-            const hasMetadata = Object.keys(shippingAddress).filter((key) => {
-              if (key.startsWith('metadata_')) {
-                return true
-              }
-              return false
-            })
-            if (hasMetadata?.length > 0) {
-              hasMetadata.forEach((key) => {
-                const metadataKey = key.replace('metadata_', '')
-                shippingAddress.metadata = {
-                  ...(shippingAddress.metadata || {}),
-                  [metadataKey]: shippingAddress[key]
-                }
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                delete shippingAddress[key]
-              })
-            }
-            const address = await sdk.addresses.create(shippingAddress)
+            const shippingAddressWithMeta = sanitizeMetadataFields(shippingAddress)
+            const address = await sdk.addresses.create(shippingAddressWithMeta)
             orderAttributes.shipping_address = sdk.addresses.relationship(
               address.id
             )
