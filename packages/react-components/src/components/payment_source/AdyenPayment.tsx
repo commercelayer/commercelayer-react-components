@@ -363,8 +363,10 @@ export function AdyenPayment({
         'Payment methods are not available. Please, check your Adyen configuration.'
       )
     }
-    // @ts-expect-error no type
-    const showStoredPaymentMethods = paymentSource?.payment_methods?.storedPaymentMethods != null ?? false
+    const showStoredPaymentMethods =
+      // @ts-expect-error no type
+      paymentSource?.payment_methods?.storedPaymentMethods != null ?? false
+
     const options = {
       locale: order?.language_code ?? locale,
       environment,
@@ -409,6 +411,7 @@ export function AdyenPayment({
         void AdyenCheckout(options).then((adyenCheckout) => {
           const component = adyenCheckout
             .create(type, {
+              instantPaymentTypes: ['applepay'],
               showRemovePaymentMethodButton: showStoredPaymentMethods,
               onSelect: (component) => {
                 const id: string = component._id
