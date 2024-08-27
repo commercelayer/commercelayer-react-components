@@ -1,5 +1,4 @@
 import { createContext } from 'react'
-import axios from 'axios'
 
 interface Context {
   url: string | null
@@ -14,7 +13,21 @@ type CallExternalFunction = (params: {
 export const callExternalFunction: CallExternalFunction = async ({
   url,
   data
-}) => await axios.post(url, data)
+}) => {
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to call external function')
+  }
+
+  return await response.json()
+}
 
 const ExternalFunctionContext = createContext<Context>({
   url: null,

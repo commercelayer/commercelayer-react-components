@@ -7,7 +7,6 @@ settings:
 overrides:
   postcss@<8.4.31: '>=8.4.31'
   graphql@>=16.3.0 <16.8.1: '>=16.8.1'
-  axios@>=0.8.1 <1.6.0: '>=1.6.0'
   vite@>=4.4.0 <4.4.12: '>=4.4.12'
   '@babel/traverse@<7.23.2': '>=7.23.2'
   vite@>=4.0.0 <=4.5.1: '>=4.5.2'
@@ -192,9 +191,6 @@ importers:
       '@types/iframe-resizer':
         specifier: ^3.5.13
         version: 3.5.13
-      axios:
-        specifier: ^1.7.3
-        version: 1.7.4
       braintree-web:
         specifier: ^3.106.0
         version: 3.106.0
@@ -1518,7 +1514,7 @@ packages:
     resolution: {integrity: sha512-2D6y7fNvFmsLmRt6UCOFJPvFoPMJGT0Uh1Wg0RaigUp7kdQPs6yYn8Dmx6GZkOH/NW0yMTwRz/p0SRMMRo50vA==}
     peerDependencies:
       typescript: '>= 4.3.x'
-      vite: '>=5.1.7'
+      vite: '>=4.5.2'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -2954,13 +2950,13 @@ packages:
     resolution: {integrity: sha512-AfgcRL8ZBhAlc3BFdigClmTUMISmmzHn7sB2h9U1odvc5U/MjWXsAaz18b/WoppUTDBzxOJwo2VdClfUcItu9g==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
-      vite: '>=5.1.7'
+      vite: '>=4.5.2'
 
   '@vitejs/plugin-react@4.3.1':
     resolution: {integrity: sha512-m/V2syj5CuVnaxcUJOQRel/Wr31FFXRFlnOoq1TVtkCxsY5veGMTEmpWHndrhB2U8ScHtCQB1e+4hWYExQc6Lg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
-      vite: '>=4.5.2'
+      vite: '>=5.1.7'
 
   '@vitest/coverage-v8@2.0.5':
     resolution: {integrity: sha512-qeFcySCg5FLO2bHHSa0tAZAOnAUbp4L6/A5JDuj9+bt53JREl8hpLjLHEWF0e/gWc8INVpJaqA7+Ene2rclpZg==}
