@@ -411,8 +411,8 @@ export function AdyenPayment({
         void AdyenCheckout(options).then((adyenCheckout) => {
           const component = adyenCheckout
             .create(type, {
-              instantPaymentTypes: ['applepay'],
               showRemovePaymentMethodButton: showStoredPaymentMethods,
+              instantPaymentTypes: ['applepay', 'googlepay'],
               onSelect: (component) => {
                 const id: string = component._id
                 if (id.search('scheme') === -1) {

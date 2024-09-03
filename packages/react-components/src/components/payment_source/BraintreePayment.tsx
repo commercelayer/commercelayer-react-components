@@ -28,6 +28,10 @@ export interface BraintreeConfig {
   inputWrapperClassName?: string
   fields?: BraintreeHostedFields<HostedFieldFieldOptions>
   styles?: Record<string, Record<string, string>>
+  /**
+   * Force challenge request for 3D Secure authentication. Default is true.
+   */
+  challengeRequested?: boolean
 }
 
 interface Props {
@@ -218,7 +222,10 @@ export function BraintreePayment({
       const hostedFields = require('braintree-web/hosted-fields')
       const threeDSecure = require('braintree-web/three-d-secure')
       braintreeClient.create(
-        { authorization },
+        {
+          authorization,
+          challengeRequested: config?.challengeRequested ?? true
+        },
         (clientErr: any, clientInstance: any) => {
           if (clientErr) {
             console.error(clientErr)
