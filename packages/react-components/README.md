@@ -8,7 +8,7 @@ A collection of reusable React components that makes it super fast and simple to
 
 # Getting started
 
-For a constantly updated list of the available and soon-to-come micro frontends provided by Commerce Layer's react componente, please refer to [this interactive documentation](https://commercelayer.github.io/commercelayer-react-components/?path=/docs/getting-started-introdution--docs) that will provide you with all the necessary information about the involved web components and help you get started in a snap.
+For a constantly updated list of the available and soon-to-come micro frontends provided by Commerce Layer's react componente, please refer to [this interactive documentation](https://commercelayer.github.io/commercelayer-react-components) that will provide you with all the necessary information about the involved web components and help you get started in a snap.
 
 ## Installation
 
