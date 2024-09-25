@@ -214,7 +214,11 @@ export async function invertedAddressesHandler({
     orderAttributes._billing_address_clone_id = order?.billing_address?.id
     orderAttributes._shipping_address_clone_id = order?.shipping_address?.id
   }
-  if (shippingAddress != null && Object.keys(shippingAddress).length > 0 && !shippingAddressId) {
+  if (
+    shippingAddress != null &&
+    Object.keys(shippingAddress).length > 0 &&
+    !shippingAddressId
+  ) {
     delete orderAttributes._billing_address_clone_id
     delete orderAttributes._shipping_address_clone_id
     orderAttributes._billing_address_same_as_shipping = true

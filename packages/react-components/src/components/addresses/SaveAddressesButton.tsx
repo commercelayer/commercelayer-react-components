@@ -103,7 +103,8 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     lineItems: order?.line_items
   })
   // NOTE: This is a temporary fix to avoid the button to be disabled when the user is editing an address
-  const invertAddressesDisable = invertAddresses && shippingAddressId ? false : shippingDisable
+  const invertAddressesDisable =
+    invertAddresses && shippingAddressId ? false : shippingDisable
   const disable =
     disabled ||
     customerEmail ||
@@ -121,28 +122,35 @@ export function SaveAddressesButton(props: Props): JSX.Element {
       }
       setForceDisable(true)
       switch (true) {
-        case order != null && addressId != null && createCustomerAddress != null && saveAddresses != null:
+        case order != null &&
+          addressId != null &&
+          createCustomerAddress != null &&
+          saveAddresses != null:
           response = await saveAddresses({
             customerEmail: email,
             customerAddress: {
-              resource: invertAddresses ? 'shipping_address' : 'billing_address',
+              resource: invertAddresses
+                ? 'shipping_address'
+                : 'billing_address',
               id: addressId
             }
           })
-          break;
+          break
         case order != null && saveAddresses != null:
           response = await saveAddresses({
-            customerEmail: email,
+            customerEmail: email
           })
-          break;
+          break
         case createCustomerAddress != null:
-          const address = invertAddresses ? { ...shippingAddress } : { ...billingAddress }
+          const address = invertAddresses
+            ? { ...shippingAddress }
+            : { ...billingAddress }
           if (addressId) address.id = addressId
           void createCustomerAddress(address as TCustomerAddress)
           response = {
             success: true
           }
-          break;
+          break
       }
       setForceDisable(false)
       if (onClick && response.success) onClick(response)
