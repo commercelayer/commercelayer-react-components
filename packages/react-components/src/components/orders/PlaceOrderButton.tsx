@@ -151,10 +151,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   }, [options?.stripe?.redirectStatus, paymentType])
   useEffect(() => {
     if (order?.status != null && ['draft', 'pending'].includes(order?.status)) {
-      // @ts-expect-error no type
-      const resultCode = order?.payment_source?.payment_response?.resultCode === 'Authorised'
-      // @ts-expect-error no type
-      const paymentDetails = order?.payment_source?.payment_request_details?.details != null
+      const resultCode =
+        // @ts-expect-error no type
+        order?.payment_source?.payment_response?.resultCode === 'Authorised'
+      const paymentDetails =
+        // @ts-expect-error no type
+        order?.payment_source?.payment_request_details?.details != null
       if (
         paymentType === 'adyen_payments' &&
         options?.adyen?.redirectResult &&
@@ -251,11 +253,14 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     setIsLoading(true)
     let isValid = true
     setForceDisable(true)
-    const checkPaymentSource = await setPaymentSource({
-      // @ts-expect-error no type not be undefined
-      paymentResource: paymentType,
-      paymentSourceId: paymentSource?.id
-    })
+    const checkPaymentSource =
+      paymentType !== 'stripe_payments'
+        ? await setPaymentSource({
+            // @ts-expect-error no type not be undefined
+            paymentResource: paymentType,
+            paymentSourceId: paymentSource?.id
+          })
+        : paymentSource
     const card =
       paymentType &&
       getCardDetails({
