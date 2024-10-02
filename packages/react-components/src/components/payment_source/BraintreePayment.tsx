@@ -175,7 +175,6 @@ export function BraintreePayment({
         const validStatus =
           response?.liabilityShiftPossible === true &&
           response?.liabilityShifted === true
-        console.log('validStatus', validStatus)
         if (validStatus && paymentSource != null) {
           await setPaymentSource({
             paymentSourceId: paymentSource.id,

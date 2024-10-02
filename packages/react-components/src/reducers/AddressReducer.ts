@@ -13,7 +13,10 @@ import { type updateOrder } from './OrderReducer'
 import camelCase from 'lodash/camelCase'
 import { type TCustomerAddress } from './CustomerReducer'
 import { type TResourceError } from '#components/errors/Errors'
-import { invertedAddressesHandler, sanitizeMetadataFields } from '#utils/addressesManager'
+import {
+  invertedAddressesHandler,
+  sanitizeMetadataFields
+} from '#utils/addressesManager'
 import { formCleaner } from '#utils/formCleaner'
 import { type AddressValuesKeys } from '#context/BillingAddressFormContext'
 import { type AddressInputName } from '#typings/index'
@@ -25,12 +28,15 @@ export type CustomFieldMessageError = (props: {
   message?: string | undefined
   value: string
   values?: Record<string, any>
-}) => string | null | {
-    field: Extract<AddressValuesKeys, AddressInputName> | string
-    value: string
-    isValid: boolean
-    message?: string
-}[]
+}) =>
+  | string
+  | null
+  | Array<{
+      field: Extract<AddressValuesKeys, AddressInputName> | string
+      value: string
+      isValid: boolean
+      message?: string
+    }>
 
 export type AddressActionType =
   | 'setErrors'
@@ -195,7 +201,7 @@ export async function saveAddresses({
 }: TSaveAddressesParams): Promise<{
   success: boolean
   order?: Order
-  error?: unknown,
+  error?: unknown
 }> {
   const {
     shipToDifferentAddress,
@@ -209,8 +215,14 @@ export async function saveAddresses({
     const sdk = getSdk(config)
     if (order) {
       let orderAttributes: OrderUpdate | null = null
-      const billingAddressCloneId = customerAddress?.resource === 'billing_address' ? customerAddress?.id : billingAddressId
-      const shippingAddressCloneId = customerAddress?.resource === 'shipping_address' ? customerAddress?.id : shippingAddressId
+      const billingAddressCloneId =
+        customerAddress?.resource === 'billing_address'
+          ? customerAddress?.id
+          : billingAddressId
+      const shippingAddressCloneId =
+        customerAddress?.resource === 'shipping_address'
+          ? customerAddress?.id
+          : shippingAddressId
       if (invertAddresses) {
         orderAttributes = await invertedAddressesHandler({
           billingAddress,
@@ -239,7 +251,11 @@ export async function saveAddresses({
           orderAttributes._shipping_address_clone_id =
             order?.shipping_address?.id
         }
-        if (billingAddress != null && Object.keys(billingAddress).length > 0 && !billingAddressCloneId) {
+        if (
+          billingAddress != null &&
+          Object.keys(billingAddress).length > 0 &&
+          !billingAddressCloneId
+        ) {
           delete orderAttributes._billing_address_clone_id
           delete orderAttributes._shipping_address_clone_id
           if (!doNotShipItems) {
@@ -260,7 +276,8 @@ export async function saveAddresses({
             Object.keys(shippingAddress).length > 0
           ) {
             delete orderAttributes._shipping_address_clone_id
-            const shippingAddressWithMeta = sanitizeMetadataFields(shippingAddress)
+            const shippingAddressWithMeta =
+              sanitizeMetadataFields(shippingAddress)
             const address = await sdk.addresses.create(shippingAddressWithMeta)
             orderAttributes.shipping_address = sdk.addresses.relationship(
               address.id
