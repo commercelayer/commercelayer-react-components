@@ -10,7 +10,7 @@ import addressReducer, {
   type SetAddressParams,
   setCloneAddress,
   saveAddresses,
-  ICustomerAddress
+  type ICustomerAddress
 } from '#reducers/AddressReducer'
 import { type BaseError } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
@@ -94,7 +94,7 @@ export function AddressesContainer(props: Props): JSX.Element {
       defaultAddressContext.setAddress({ ...params, dispatch })
     },
     saveAddresses: async (params: {
-      customerEmail?: string,
+      customerEmail?: string
       customerAddress?: ICustomerAddress
     }): ReturnType<typeof saveAddresses> =>
       await saveAddresses({

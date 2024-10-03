@@ -129,7 +129,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
                       setErrorForm({
                         name: field,
                         code: 'VALIDATION_ERROR',
-                        message: message
+                        message
                       })
                     }
                   } else {
