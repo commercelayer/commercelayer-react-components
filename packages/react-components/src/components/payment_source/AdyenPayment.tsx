@@ -11,7 +11,7 @@ import { type PaymentSourceProps } from './PaymentSource'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import type { CoreOptions } from '@adyen/adyen-web/dist/types/core/types'
 import Parent from '#components/utils/Parent'
-import { cleanUrlBy } from '#utils/browserInfo'
+import browserInfo, { cleanUrlBy } from '#utils/browserInfo'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import OrderContext from '#context/OrderContext'
 // import omit from '#utils/omit'
@@ -206,7 +206,12 @@ export function AdyenPayment({
         redirect_from_issuer_method: 'GET',
         shopper_ip: shopperIp,
         shopperInteraction: 'Ecommerce',
-        recurringProcessingModel: 'CardOnFile'
+        recurringProcessingModel: 'CardOnFile',
+        browser_info: {
+          acceptHeader:
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+          ...browserInfo()
+        }
       }
     }
     delete attributes.payment_request_data.paymentMethod

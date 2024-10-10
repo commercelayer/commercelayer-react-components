@@ -244,7 +244,11 @@ export function PaymentMethod({
           className={`${className ?? ''} ${
             isActive && activeClass != null ? activeClass : ''
           }`}
-          onClick={onClickable}
+          onClick={(e) => {
+            if (onClickable != null) {
+              void onClickable(e)
+            }
+          }}
           {...p}
         >
           <PaymentMethodChildrenContext.Provider value={paymentMethodProps}>
