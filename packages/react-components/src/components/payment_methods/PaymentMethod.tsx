@@ -180,10 +180,6 @@ export function PaymentMethod({
         void autoSelect()
       }
     }
-    return () => {
-      setPaymentSourceCreated(false)
-      setLoading(true)
-    }
   }, [order?.payment_source != null])
   useEffect(() => {
     if (paymentMethods) {
