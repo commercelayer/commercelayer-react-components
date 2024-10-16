@@ -11,10 +11,10 @@ import { type PaymentSourceProps } from './PaymentSource'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import type { CoreOptions } from '@adyen/adyen-web/dist/types/core/types'
 import Parent from '#components/utils/Parent'
-import getBrowserInfo, { cleanUrlBy } from '#utils/browserInfo'
+import browserInfo, { cleanUrlBy } from '#utils/browserInfo'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import OrderContext from '#context/OrderContext'
-import omit from '#utils/omit'
+// import omit from '#utils/omit'
 import type UIElement from '@adyen/adyen-web/dist/types/components/UIElement'
 import { getPublicIP } from '#utils/getPublicIp'
 
@@ -88,15 +88,17 @@ export function AdyenPayment({
   }
   const [loadAdyen, setLoadAdyen] = useState(false)
   const [checkout, setCheckout] = useState<UIElement<any> | undefined>()
+  // const [showSaveToWallet, setShowSaveToWallet] = useState(true)
   const {
     setPaymentSource,
     paymentSource,
     setPaymentMethodErrors,
     currentPaymentMethodType,
-    setPaymentRef
+    setPaymentRef,
+    currentCustomerPaymentSourceId
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
-  const { placeOrderButtonRef } = useContext(PlaceOrderContext)
+  const { placeOrderButtonRef, setPlaceOrder } = useContext(PlaceOrderContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const handleSubmit = async (
     e: any,
@@ -125,30 +127,6 @@ export function AdyenPayment({
         }
         setPaymentRef({ ref })
       }
-      const browserInfo = getBrowserInfo()
-      const shopperIp = await getPublicIP()
-      const attributes: any = {
-        payment_request_data: {
-          payment_method: state.data.paymentMethod,
-          shopperInteraction: 'Ecommerce',
-          recurringProcessingModel: 'CardOnFile',
-          origin: window.location.origin,
-          return_url: window.location.href,
-          redirect_from_issuer_method: 'GET',
-          shopper_ip: shopperIp,
-          browser_info: {
-            acceptHeader:
-              'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            ...browserInfo
-          }
-        }
-      }
-      paymentSource &&
-        (await setPaymentSource({
-          paymentSourceId: paymentSource.id,
-          paymentResource: 'adyen_payments',
-          attributes
-        }))
     }
   }
   const handleOnAdditionalDetails = async (
@@ -209,12 +187,9 @@ export function AdyenPayment({
     state: any,
     component: UIElement<any>
   ): Promise<boolean> => {
-    const saveCustomer = document.getElementById(
-      'save_payment_source_to_customer_wallet'
-    ) as HTMLInputElement
     const url = cleanUrlBy()
     const shopperIp = await getPublicIP()
-    let control = await setPaymentSource({
+    const control = await setPaymentSource({
       paymentSourceId: paymentSource?.id,
       paymentResource: 'adyen_payments'
     })
@@ -223,57 +198,34 @@ export function AdyenPayment({
     if (controlCode === 'Authorised') {
       return true
     }
-
-    const paymentDataAvailable =
-      // @ts-expect-error no type
-      Object.keys(control?.payment_request_data).length > 0
-    const paymentMethodSelected =
-      // @ts-expect-error no type
-      control?.payment_request_data?.payment_method?.type
-    const paymentMethod = !saveCustomer?.checked
-      ? omit(state.data.paymentMethod, [
-          'encryptedCardNumber',
-          'encryptedExpiryMonth',
-          'encryptedExpiryYear'
-        ])
-      : state.data.paymentMethod
-
-    if (
-      !paymentDataAvailable ||
-      paymentMethodSelected !== state.data.paymentMethod.type
-    ) {
-      control = await setPaymentSource({
-        paymentSourceId: paymentSource?.id,
-        paymentResource: 'adyen_payments',
-        attributes: {
-          payment_request_data: {
-            ...state.data,
-            payment_method: paymentMethod,
-            return_url: url,
-            origin: window.location.origin,
-            redirect_from_issuer_method: 'GET',
-            shopper_ip: shopperIp
-          }
-        }
-      })
-    }
     const attributes: any = {
       payment_request_data: {
         ...state.data,
-        payment_method: paymentMethod,
+        payment_method: state.data.paymentMethod,
         return_url: url,
         origin: window.location.origin,
         redirect_from_issuer_method: 'GET',
-        shopper_ip: shopperIp
-      },
-      _authorize: 1
+        shopper_ip: shopperIp,
+        shopperInteraction: 'Ecommerce',
+        recurringProcessingModel: 'CardOnFile',
+        browser_info: {
+          ...browserInfo()
+        }
+      }
     }
     delete attributes.payment_request_data.paymentMethod
     try {
-      const res = await setPaymentSource({
+      await setPaymentSource({
         paymentSourceId: paymentSource?.id,
         paymentResource: 'adyen_payments',
         attributes
+      })
+      const res = await setPaymentSource({
+        paymentSourceId: paymentSource?.id,
+        paymentResource: 'adyen_payments',
+        attributes: {
+          _authorize: 1
+        }
       })
       // @ts-expect-error no type
       const action = res?.payment_response?.action
@@ -283,8 +235,19 @@ export function AdyenPayment({
       }
       // @ts-expect-error no type
       const resultCode = res?.payment_response?.resultCode
+      // @ts-expect-error no type
+      const issuerType = res?.payment_instrument?.issuer_type
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-        if (placeOrderButtonRef?.current != null) {
+        if (
+          ['apple pay', 'google pay'].includes(issuerType) &&
+          setPlaceOrder != null
+        ) {
+          await setPlaceOrder({
+            paymentSource: res,
+            currentCustomerPaymentSourceId
+          })
+          return true
+        } else if (placeOrderButtonRef?.current != null) {
           if (placeOrderButtonRef.current.disabled) {
             placeOrderButtonRef.current.disabled = false
           }

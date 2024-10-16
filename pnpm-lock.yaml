@@ -177,7 +177,7 @@ importers:
         specifier: ^1.4.8
         version: 1.4.8(eslint@8.57.0)(typescript@5.5.4)
       '@commercelayer/sdk':
-        specifier: 6.13.0
+        specifier: ^6.13.0
         version: 6.13.0
       '@stripe/react-stripe-js':
         specifier: ^2.8.0
@@ -1514,7 +1514,7 @@ packages:
     resolution: {integrity: sha512-2D6y7fNvFmsLmRt6UCOFJPvFoPMJGT0Uh1Wg0RaigUp7kdQPs6yYn8Dmx6GZkOH/NW0yMTwRz/p0SRMMRo50vA==}
     peerDependencies:
       typescript: '>= 4.3.x'
-      vite: '>=4.5.2'
+      vite: '>=5.1.7'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -2950,13 +2950,13 @@ packages:
     resolution: {integrity: sha512-AfgcRL8ZBhAlc3BFdigClmTUMISmmzHn7sB2h9U1odvc5U/MjWXsAaz18b/WoppUTDBzxOJwo2VdClfUcItu9g==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
-      vite: '>=4.5.2'
+      vite: '>=5.1.7'
 
   '@vitejs/plugin-react@4.3.1':
     resolution: {integrity: sha512-m/V2syj5CuVnaxcUJOQRel/Wr31FFXRFlnOoq1TVtkCxsY5veGMTEmpWHndrhB2U8ScHtCQB1e+4hWYExQc6Lg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
-      vite: '>=5.1.7'
+      vite: '>=4.5.2'
 
   '@vitest/coverage-v8@2.0.5':
     resolution: {integrity: sha512-qeFcySCg5FLO2bHHSa0tAZAOnAUbp4L6/A5JDuj9+bt53JREl8hpLjLHEWF0e/gWc8INVpJaqA7+Ene2rclpZg==}
