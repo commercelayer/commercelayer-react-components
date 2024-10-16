@@ -94,10 +94,11 @@ export function AdyenPayment({
     paymentSource,
     setPaymentMethodErrors,
     currentPaymentMethodType,
-    setPaymentRef
+    setPaymentRef,
+    currentCustomerPaymentSourceId
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
-  const { placeOrderButtonRef } = useContext(PlaceOrderContext)
+  const { placeOrderButtonRef, setPlaceOrder } = useContext(PlaceOrderContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const handleSubmit = async (
     e: any,
@@ -208,8 +209,6 @@ export function AdyenPayment({
         shopperInteraction: 'Ecommerce',
         recurringProcessingModel: 'CardOnFile',
         browser_info: {
-          acceptHeader:
-            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
           ...browserInfo()
         }
       }
@@ -236,8 +235,19 @@ export function AdyenPayment({
       }
       // @ts-expect-error no type
       const resultCode = res?.payment_response?.resultCode
+      // @ts-expect-error no type
+      const issuerType = res?.payment_instrument?.issuer_type
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
-        if (placeOrderButtonRef?.current != null) {
+        if (
+          ['apple pay', 'google pay'].includes(issuerType) &&
+          setPlaceOrder != null
+        ) {
+          await setPlaceOrder({
+            paymentSource: res,
+            currentCustomerPaymentSourceId
+          })
+          return true
+        } else if (placeOrderButtonRef?.current != null) {
           if (placeOrderButtonRef.current.disabled) {
             placeOrderButtonRef.current.disabled = false
           }
