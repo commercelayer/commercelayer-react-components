@@ -495,7 +495,12 @@ export async function addToCart(
             }
           })
         }
-        if (buyNowMode && id && config?.accessToken != null && config?.endpoint != null) {
+        if (
+          buyNowMode &&
+          id &&
+          config?.accessToken != null &&
+          config?.endpoint != null
+        ) {
           const params = `${id}?accessToken=${config.accessToken ?? ''}`
           const { domain, slug } = getDomain(config.endpoint)
           const href = getApplicationLink({

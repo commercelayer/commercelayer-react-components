@@ -14,6 +14,8 @@ export default function getBrowserInfo(): TReturn {
   const colorDepth = window?.screen ? window.screen.colorDepth : ''
   const userAgent = window?.navigator ? window.navigator.userAgent : ''
   const javaEnabled = window?.navigator ? navigator.javaEnabled() : false
+  const acceptHeader =
+    'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
 
   let language = ''
   if (window?.navigator) language = window.navigator.language
@@ -28,7 +30,8 @@ export default function getBrowserInfo(): TReturn {
     userAgent,
     timeZoneOffset,
     language,
-    javaEnabled
+    javaEnabled,
+    acceptHeader
   }
 
   return browserInfo

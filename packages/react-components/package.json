@@ -1,6 +1,6 @@
 {
   "name": "@commercelayer/react-components",
-  "version": "4.15.11",
+  "version": "4.15.12-beta.4",
   "description": "The Official Commerce Layer React Components",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
@@ -180,7 +180,7 @@
   "dependencies": {
     "@adyen/adyen-web": "^5.66.1",
     "@commercelayer/organization-config": "^1.4.8",
-    "@commercelayer/sdk": "6.13.0",
+    "@commercelayer/sdk": "^6.13.0",
     "@stripe/react-stripe-js": "^2.8.0",
     "@stripe/stripe-js": "^4.3.0",
     "@tanstack/react-table": "^8.17.3",
