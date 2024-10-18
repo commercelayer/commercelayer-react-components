@@ -150,18 +150,25 @@ export interface GetCustomerAddresses {
    * Order details
    */
   isOrderAvailable?: boolean
+  /**
+   * The page size
+   * default: 10
+   */
+  pageSize?: QueryPageSize
 }
 
 export async function getCustomerAddresses({
   config,
   dispatch,
-  isOrderAvailable
+  isOrderAvailable,
+  pageSize = 10
 }: GetCustomerAddresses): Promise<void> {
   try {
     const addresses = [] as Address[]
     const sdk = getSdk(config)
     const customerAddresses = await sdk.customer_addresses.list({
-      include: ['address']
+      include: ['address'],
+      pageSize
     })
     customerAddresses.forEach((customerAddress) => {
       if (customerAddress.address) {
