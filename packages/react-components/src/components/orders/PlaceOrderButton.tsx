@@ -284,7 +284,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       if (
         !isValid &&
         // @ts-expect-error no type
-        checkPaymentSource.payment_response?.resultCode === 'Authorised'
+        checkPaymentSource?.payment_response?.resultCode === 'Authorised'
       ) {
         isValid = true
       }
