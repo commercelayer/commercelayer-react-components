@@ -15,6 +15,7 @@ import addressReducer, {
 import { type BaseError } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
+import { setCustomerOrderParam } from '#utils/localStorage'
 
 interface Props {
   children: ReactNode
@@ -64,6 +65,16 @@ export function AddressesContainer(props: Props): JSX.Element {
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
   const { order, orderId, updateOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
+  useEffect(() => {
+    setCustomerOrderParam(
+      '_save_billing_address_to_customer_address_book',
+      'false'
+    )
+    setCustomerOrderParam(
+      '_save_shipping_address_to_customer_address_book',
+      'false'
+    )
+  }, [])
   useEffect(() => {
     dispatch({
       type: 'setShipToDifferentAddress',

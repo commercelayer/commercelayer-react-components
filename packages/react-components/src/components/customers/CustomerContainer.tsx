@@ -30,6 +30,11 @@ interface Props {
    * Customer type
    */
   isGuest?: boolean
+  /**
+   * The page size
+   * default: 10
+   */
+  addressesPageSize?: QueryPageSize
 }
 
 /**
@@ -54,7 +59,7 @@ interface Props {
  * </span>
  */
 export function CustomerContainer(props: Props): JSX.Element {
-  const { children, isGuest } = props
+  const { children, isGuest, addressesPageSize: pageSize } = props
   const [state, dispatch] = useReducer(customerReducer, customerInitialState)
   const {
     order,
@@ -112,7 +117,8 @@ export function CustomerContainer(props: Props): JSX.Element {
         void getCustomerAddresses({
           config,
           dispatch,
-          isOrderAvailable: withoutIncludes != null
+          isOrderAvailable: withoutIncludes != null,
+          pageSize
         })
       }
       if (order?.available_customer_payment_sources) {
@@ -216,7 +222,8 @@ export function CustomerContainer(props: Props): JSX.Element {
         await getCustomerAddresses({
           config,
           dispatch,
-          isOrderAvailable: withoutIncludes != null
+          isOrderAvailable: withoutIncludes != null,
+          pageSize
         })
       }
     }

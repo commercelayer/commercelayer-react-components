@@ -60,6 +60,8 @@ type Props = {
       }
   )
 
+let loadingResource = false
+
 export function PaymentMethod({
   children,
   className,
@@ -74,6 +76,7 @@ export function PaymentMethod({
 }: Props): JSX.Element {
   const [loading, setLoading] = useState(true)
   const [paymentSelected, setPaymentSelected] = useState('')
+  const [paymentSourceCreated, setPaymentSourceCreated] = useState(false)
   const {
     paymentMethods,
     currentPaymentMethodId,
@@ -119,7 +122,13 @@ export function PaymentMethod({
     }
   }, [!isEmpty(paymentMethods), expressPayments])
   useEffect(() => {
-    if (paymentMethods != null) {
+    if (
+      paymentMethods != null &&
+      !paymentSourceCreated &&
+      !loadingResource &&
+      !isEmpty(paymentMethods)
+    ) {
+      loadingResource = true
       if (autoSelectSinglePaymentMethod != null && !expressPayments) {
         const autoSelect = async (): Promise<void> => {
           const isSingle = paymentMethods.length === 1
@@ -148,6 +157,7 @@ export function PaymentMethod({
                 attributes
               })
               if (ps && paymentMethod && onClick != null) {
+                setPaymentSourceCreated(true)
                 onClick({ payment: paymentMethod, order, paymentSource: ps })
                 setTimeout(() => {
                   setLoading(false)
@@ -170,7 +180,7 @@ export function PaymentMethod({
         void autoSelect()
       }
     }
-  }, [paymentMethods, expressPayments])
+  }, [order?.payment_source != null])
   useEffect(() => {
     if (paymentMethods) {
       const isSingle = paymentMethods.length === 1
@@ -187,6 +197,7 @@ export function PaymentMethod({
     if (currentPaymentMethodId) setPaymentSelected(currentPaymentMethodId)
     return () => {
       setLoading(true)
+      setPaymentSelected('')
     }
   }, [paymentMethods, currentPaymentMethodId])
   const components = paymentMethods
@@ -233,7 +244,11 @@ export function PaymentMethod({
           className={`${className ?? ''} ${
             isActive && activeClass != null ? activeClass : ''
           }`}
-          onClick={onClickable}
+          onClick={(e) => {
+            if (onClickable != null) {
+              void onClickable(e)
+            }
+          }}
           {...p}
         >
           <PaymentMethodChildrenContext.Provider value={paymentMethodProps}>
