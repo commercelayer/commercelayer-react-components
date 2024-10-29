@@ -38,7 +38,12 @@ export interface PlaceOrderOptions {
     session_id: string
   }
   stripe?: {
-    redirectStatus: string
+    /**
+     * @deprecated
+     * Use `paymentIntentClientSecret` instead
+     */
+    redirectStatus?: string
+    paymentIntentClientSecret: string
   }
 }
 

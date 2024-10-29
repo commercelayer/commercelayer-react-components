@@ -15,6 +15,7 @@ import OrderContext from '#context/OrderContext'
 import getCardDetails from '#utils/getCardDetails'
 import type { BaseError } from '#typings/errors'
 import type { Order } from '@commercelayer/sdk'
+import { retrievePaymentIntent } from '#utils/stripe/retrievePaymentIntent'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   /**
@@ -126,6 +127,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     paymentSource
   ])
   useEffect(() => {
+    // PayPal redirect flow
     if (
       paymentType === 'paypal_payments' &&
       options?.paypalPayerId &&
@@ -137,19 +139,64 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     }
   }, [options?.paypalPayerId, paymentType])
   useEffect(() => {
+    // Stripe redirect flow
     if (
       paymentType === 'stripe_payments' &&
-      ['succeeded', 'pending'].includes(
-        options?.stripe?.redirectStatus ?? ''
-      ) &&
+      options?.stripe?.paymentIntentClientSecret &&
+      // @ts-expect-error no type
+      order?.payment_source?.publishable_key &&
       order?.status &&
       ['draft', 'pending'].includes(order?.status) &&
       autoPlaceOrder
     ) {
-      void handleClick()
+      // @ts-expect-error no type
+      const publicApiKey = order?.payment_source?.publishable_key
+      const paymentIntentClientSecret =
+        options?.stripe?.paymentIntentClientSecret
+      retrievePaymentIntent({
+        publicApiKey,
+        paymentIntentClientSecret
+      })
+        .then((paymentIntentResult) => {
+          if (paymentIntentResult != null) {
+            if (paymentIntentResult.error == null) {
+              const status = paymentIntentResult.paymentIntent.status
+              if (status != null) {
+                void handleClick()
+              }
+            } else {
+              setPaymentMethodErrors([
+                {
+                  code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+                  resource: 'payment_methods',
+                  field: currentPaymentMethodType,
+                  message:
+                    paymentIntentResult?.error?.message ??
+                    'Payment intent verification error'
+                }
+              ])
+            }
+          }
+        })
+        .catch((error) => {
+          console.error('Error retrieving payment intent:', error)
+          setPaymentMethodErrors([
+            {
+              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+              resource: 'payment_methods',
+              field: currentPaymentMethodType,
+              message: error?.message ?? 'Payment intent verification error'
+            }
+          ])
+        })
     }
-  }, [options?.stripe?.redirectStatus, paymentType])
+  }, [
+    options?.stripe?.paymentIntentClientSecret != null,
+    paymentType != null,
+    order?.payment_source != null
+  ])
   useEffect(() => {
+    // Adyen redirect flow
     if (order?.status != null && ['draft', 'pending'].includes(order?.status)) {
       const resultCode =
         // @ts-expect-error no type
@@ -230,6 +277,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     order?.payment_source?.payment_response?.resultCode
   ])
   useEffect(() => {
+    // Checkout.com redirect flow
     if (
       paymentType === 'checkout_com_payments' &&
       options?.checkoutCom?.session_id &&
