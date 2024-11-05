@@ -116,10 +116,12 @@ function StripePaymentForm({
           state: billingInfo?.state_code
         }
       }
+      const url = new URL(window.location.href)
+      const cleanUrl = `${url.origin}${url.pathname}?accessToken=${url.searchParams.get('accessToken')}`
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: window.location.href,
+          return_url: cleanUrl,
           payment_method_data: {
             billing_details: billingDetails
           }

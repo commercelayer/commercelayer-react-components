@@ -15,7 +15,7 @@ import OrderContext from '#context/OrderContext'
 import getCardDetails from '#utils/getCardDetails'
 import type { BaseError } from '#typings/errors'
 import type { Order } from '@commercelayer/sdk'
-import { retrievePaymentIntent } from '#utils/stripe/retrievePaymentIntent'
+import { checkPaymentIntent } from '#utils/stripe/retrievePaymentIntent'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   /**
@@ -153,42 +153,35 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       const publicApiKey = order?.payment_source?.publishable_key
       const paymentIntentClientSecret =
         options?.stripe?.paymentIntentClientSecret
-      retrievePaymentIntent({
-        publicApiKey,
-        paymentIntentClientSecret
-      })
-        .then((paymentIntentResult) => {
-          if (paymentIntentResult != null) {
-            if (paymentIntentResult.error == null) {
-              const status = paymentIntentResult.paymentIntent.status
-              if (status != null) {
-                void handleClick()
+
+      const getPaymentIntent = async (): Promise<void> => {
+        const paymentIntentResult = await checkPaymentIntent({
+          publicApiKey,
+          paymentIntentClientSecret
+        })
+        switch (paymentIntentResult.status) {
+          case 'valid':
+            void handleClick()
+            break
+          case 'processing':
+            // Set a timeout to check the payment intent status again
+            setTimeout(() => {
+              void getPaymentIntent()
+            }, 1000)
+            break
+          case 'invalid':
+            setPaymentMethodErrors([
+              {
+                code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
+                resource: 'payment_methods',
+                field: currentPaymentMethodType,
+                message: paymentIntentResult.message
               }
-            } else {
-              setPaymentMethodErrors([
-                {
-                  code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-                  resource: 'payment_methods',
-                  field: currentPaymentMethodType,
-                  message:
-                    paymentIntentResult?.error?.message ??
-                    'Payment intent verification error'
-                }
-              ])
-            }
-          }
-        })
-        .catch((error) => {
-          console.error('Error retrieving payment intent:', error)
-          setPaymentMethodErrors([
-            {
-              code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-              resource: 'payment_methods',
-              field: currentPaymentMethodType,
-              message: error?.message ?? 'Payment intent verification error'
-            }
-          ])
-        })
+            ])
+            break
+        }
+      }
+      void getPaymentIntent()
     }
   }, [
     options?.stripe?.paymentIntentClientSecret != null,
