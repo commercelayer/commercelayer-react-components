@@ -13,6 +13,10 @@ export function formCleaner(address: AddressSchema): AddressSchema {
       address[keyCleaned] = address[key]
       // @ts-expect-error type error
       delete address[key]
+      if (keyCleaned === 'save_to_customer_book') {
+        // @ts-expect-error type error
+        delete address[keyCleaned]
+      }
     }
   })
   return address
