@@ -2,12 +2,7 @@ import baseReducer from '#utils/baseReducer'
 import { type Dispatch } from 'react'
 import { type CodeErrorType, type BaseError } from '#typings/errors'
 import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
-import {
-  type OrderUpdate,
-  type Address,
-  type AddressCreate,
-  type Order
-} from '@commercelayer/sdk'
+import { type OrderUpdate, type Address, type Order } from '@commercelayer/sdk'
 import getSdk from '#utils/getSdk'
 import { type updateOrder } from './OrderReducer'
 import camelCase from 'lodash/camelCase'
@@ -86,7 +81,7 @@ export type AddressSchema = Omit<
 export interface AddressActionPayload {
   errors: BaseError[]
   billing_address: TCustomerAddress
-  shipping_address: AddressCreate & Record<string, string | null | undefined>
+  shipping_address: TCustomerAddress
   shipToDifferentAddress: boolean
   billingAddressId: string
   shippingAddressId: string
@@ -112,7 +107,7 @@ export type SetAddressErrors = <V extends BaseError[]>(args: {
   currentErrors?: V
 }) => void
 
-export interface SetAddressParams<V extends AddressSchema> {
+export interface SetAddressParams<V extends TCustomerAddress> {
   values: V
   resource: AddressResource
   dispatch?: Dispatch<AddressAction>
@@ -142,7 +137,7 @@ export const setAddressErrors: SetAddressErrors = ({
     })
 }
 
-export function setAddress<V extends AddressSchema>({
+export function setAddress<V extends TCustomerAddress>({
   values,
   resource,
   dispatch
@@ -206,13 +201,15 @@ export async function saveAddresses({
   const {
     shipToDifferentAddress,
     invertAddresses,
-    billing_address: billingAddress,
-    shipping_address: shippingAddress,
+    billing_address: billingAddressForm,
+    shipping_address: shippingAddressForm,
     billingAddressId,
     shippingAddressId
   } = state
   try {
     const sdk = getSdk(config)
+    const billingAddress = formCleaner(billingAddressForm)
+    const shippingAddress = formCleaner(shippingAddressForm)
     if (order) {
       let orderAttributes: OrderUpdate | null = null
       const billingAddressCloneId =

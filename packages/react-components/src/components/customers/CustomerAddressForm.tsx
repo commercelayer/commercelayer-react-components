@@ -7,7 +7,7 @@ import { type AddressField } from '#reducers/AddressReducer'
 import { type AddressCountrySelectName, type AddressInputName } from '#typings'
 import OrderContext from '#context/OrderContext'
 import { isEmptyStates } from '#utils/countryStateCity'
-import type { Address } from '@commercelayer/sdk'
+import { type TCustomerAddress } from '#reducers/CustomerReducer'
 
 interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
   children: ReactNode
@@ -85,7 +85,10 @@ export function CustomerAddressForm(props: Props): JSX.Element {
           }
         }
       }
-      setAddress({ values: values as Address, resource: 'billing_address' })
+      setAddress({
+        values: values as TCustomerAddress,
+        resource: 'billing_address'
+      })
     }
     if (
       reset &&
@@ -109,7 +112,7 @@ export function CustomerAddressForm(props: Props): JSX.Element {
       [name.replace('billing_address_', '')]: value
     }
     setAddress({
-      values: { ...(values as Address), ...field },
+      values: { ...(values as TCustomerAddress), ...field },
       resource: 'billing_address'
     })
   }

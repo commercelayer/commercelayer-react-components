@@ -12,6 +12,7 @@ import isFunction from 'lodash/isFunction'
 import { type TCustomerAddress } from '#reducers/CustomerReducer'
 import type { Order } from '@commercelayer/sdk'
 import { validateValue } from '#utils/validateFormFields'
+import { formCleaner } from '#utils/formCleaner'
 
 interface TOnClick {
   success: boolean
@@ -146,8 +147,8 @@ export function SaveAddressesButton(props: Props): JSX.Element {
         }
         case createCustomerAddress != null: {
           const address = invertAddresses
-            ? { ...shippingAddress }
-            : { ...billingAddress }
+            ? { ...formCleaner(shippingAddress) }
+            : { ...formCleaner(billingAddress) }
           if (addressId) address.id = addressId
           void createCustomerAddress(address as TCustomerAddress)
           response = {

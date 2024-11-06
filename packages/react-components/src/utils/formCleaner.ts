@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
-import { type AddressSchema } from '#reducers/AddressReducer'
+import { type TCustomerAddress } from '#reducers/CustomerReducer'
 
-export function formCleaner(address: AddressSchema): AddressSchema {
+type CombinedAddressType = TCustomerAddress | undefined
+
+export function formCleaner(address: CombinedAddressType): CombinedAddressType {
+  if (!address) {
+    return address
+  }
   Object.keys(address).forEach((key) => {
     const keyCleaned = key
       .replace('shipping_address_', '')
@@ -9,14 +14,11 @@ export function formCleaner(address: AddressSchema): AddressSchema {
     const isNotCleaned =
       key.startsWith('shipping_address_') || key.startsWith('billing_address_')
     if (isNotCleaned) {
-      // @ts-expect-error type error
       address[keyCleaned] = address[key]
-      // @ts-expect-error type error
       delete address[key]
-      if (keyCleaned === 'save_to_customer_book') {
-        // @ts-expect-error type error
-        delete address[keyCleaned]
-      }
+    }
+    if (keyCleaned === 'save_to_customer_book') {
+      delete address[keyCleaned]
     }
   })
   return address
