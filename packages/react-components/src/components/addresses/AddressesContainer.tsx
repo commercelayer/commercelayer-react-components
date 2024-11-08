@@ -5,7 +5,6 @@ import { type ReactNode, useContext, useEffect, useReducer } from 'react'
 import addressReducer, {
   addressInitialState,
   type AddressResource,
-  type AddressSchema,
   setAddressErrors,
   type SetAddressParams,
   setCloneAddress,
@@ -16,6 +15,7 @@ import { type BaseError } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { setCustomerOrderParam } from '#utils/localStorage'
+import { type TCustomerAddress } from '#reducers/CustomerReducer'
 
 interface Props {
   children: ReactNode
@@ -101,7 +101,7 @@ export function AddressesContainer(props: Props): JSX.Element {
         currentErrors: state.errors
       })
     },
-    setAddress: (params: SetAddressParams<AddressSchema>) => {
+    setAddress: (params: SetAddressParams<TCustomerAddress>) => {
       defaultAddressContext.setAddress({ ...params, dispatch })
     },
     saveAddresses: async (params: {

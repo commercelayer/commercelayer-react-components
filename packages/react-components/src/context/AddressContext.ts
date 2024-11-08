@@ -4,13 +4,13 @@ import {
   setAddress,
   type AddressResource,
   type saveAddresses,
-  ICustomerAddress
+  type ICustomerAddress
 } from '#reducers/AddressReducer'
 import { type BaseError } from '#typings/errors'
 
 type DefaultContext = {
   saveAddresses?: (params: {
-    customerEmail?: string,
+    customerEmail?: string
     customerAddress?: ICustomerAddress
   }) => ReturnType<typeof saveAddresses>
   setCloneAddress: (id: string, resource: AddressResource) => void
