@@ -16,16 +16,11 @@ type Props = {
   max?: number
   disabled?: boolean
   readonly?: boolean
-  /**
-   * force the update of the line item price using `_external_price: true` attribute
-   * @link https://docs.commercelayer.io/core/external-resources/external-prices
-   */
-  hasExternalPrice?: boolean
 } & (Omit<JSX.IntrinsicElements['select'], 'children'> &
   Omit<JSX.IntrinsicElements['span'], 'children'>)
 
 export function LineItemQuantity(props: Props): JSX.Element {
-  const { max = 50, readonly = false, hasExternalPrice, ...p } = props
+  const { max = 50, readonly = false, ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const { updateLineItem } = useContext(LineItemContext)
   const options: ReactNode[] = []
@@ -39,7 +34,7 @@ export function LineItemQuantity(props: Props): JSX.Element {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const quantity = Number(e.target.value)
     if (updateLineItem && lineItem) {
-      void updateLineItem(lineItem.id, quantity, hasExternalPrice)
+      void updateLineItem(lineItem.id, quantity)
     }
   }
   const quantity = lineItem?.quantity
