@@ -47,9 +47,9 @@ You can check [our documentation](https://docs.commercelayer.io/api/authenticati
 
 ## Need help?
 
-- Join [Commerce Layer's Slack community](https://slack.commercelayer.app).
+- Join [Commerce Layer's Discord community](https://discord.gg/commercelayer).
 - Open a new [Q&A discussion](https://github.com/commercelayer/commercelayer-react-components/discussions/categories/q-a)
-- Ping us [on Twitter](https://twitter.com/commercelayer).
+- Ping us on [Bluesky](https://bsky.app/profile/commercelayer.io), [X (formerly Twitter)](https://x.com/commercelayer), or [LinkedIn](https://www.linkedin.com/company/commerce-layer).
 - Is there a bug? Create an [issue](https://github.com/commercelayer/commercelayer-react-components/issues) on this repository.
 
 ### License
