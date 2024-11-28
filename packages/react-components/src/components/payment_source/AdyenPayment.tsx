@@ -376,6 +376,9 @@ export function AdyenPayment({
             .create(type, {
               showRemovePaymentMethodButton: showStoredPaymentMethods,
               instantPaymentTypes: ['applepay', 'googlepay'],
+              onDisableStoredPaymentMethod: (state) => {
+                console.log('onDisableStoredPaymentMethod', state)
+              },
               onSelect: (component) => {
                 const id: string = component._id
                 if (id.search('scheme') === -1) {

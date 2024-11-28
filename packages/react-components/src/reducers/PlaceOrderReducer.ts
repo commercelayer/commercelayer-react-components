@@ -188,6 +188,16 @@ export async function setPlaceOrder({
     const sdk = getSdk(config)
     const { options, paymentType } = state
     try {
+      // Prevent extra place order
+      const lastOrderStatus = await sdk.orders.retrieve(order.id, {
+        fields: { orders: ['status'] }
+      })
+      if (lastOrderStatus.status === 'placed') {
+        return {
+          placed: true,
+          order
+        }
+      }
       if (
         paymentType === 'paypal_payments' &&
         paymentSource?.type === 'paypal_payments'
