@@ -14,6 +14,7 @@ import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 import { jwt } from '#utils/jwt'
 import getCardDetails from '#utils/getCardDetails'
 import { getPaymentAttributes } from '#utils/getPaymentAttributes'
+import { canPlaceOrder } from '#utils/canPlaceOrder'
 
 type Props = GatewayBaseType
 
@@ -37,7 +38,7 @@ export function AdyenGateway(props: Props): JSX.Element | null {
     useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = 'adyen_payments'
   const locale = order?.language_code as StripeElementLocale
-  if (!readonly && payment?.id !== currentPaymentMethodId) return null
+  if (!readonly && payment?.id !== currentPaymentMethodId && order != null && !canPlaceOrder(order)) return null
   // @ts-expect-error no type
   const clientKey = paymentSource?.public_key
   const environment = accessToken && jwt(accessToken).test ? 'test' : 'live'
