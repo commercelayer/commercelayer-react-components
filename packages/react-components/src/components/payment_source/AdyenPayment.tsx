@@ -17,6 +17,7 @@ import OrderContext from '#context/OrderContext'
 // import omit from '#utils/omit'
 import type UIElement from '@adyen/adyen-web/dist/types/components/UIElement'
 import { getPublicIP } from '#utils/getPublicIp'
+import CustomerContext from '#context/CustomerContext'
 
 type Styles = Partial<{
   base: CSSProperties
@@ -57,12 +58,45 @@ interface PaymentMethodsStyle {
   paypal?: PaypalStyle
 }
 
+/**
+ * Configuration options for the Adyen payment component.
+ */
 export interface AdyenPaymentConfig {
-  cardContainerClassName?: string
-  threeDSecureContainerClassName?: string
-  placeOrderCallback?: (response: { placed: boolean }) => void
-  styles?: PaymentMethodsStyle
-  paymentMethodsConfiguration?: CoreOptions['paymentMethodsConfiguration']
+  /**
+   * Optional CSS class name for the card container.
+   */
+  cardContainerClassName?: string;
+
+  /**
+   * Optional CSS class name for the 3D Secure container.
+   */
+  threeDSecureContainerClassName?: string;
+
+  /**
+   * Callback function to be called when an order is placed.
+   * @param response - An object containing the placement status.
+   */
+  placeOrderCallback?: (response: { placed: boolean }) => void;
+
+  /**
+   * Optional styles for the payment methods.
+   */
+  styles?: PaymentMethodsStyle;
+
+  /**
+   * Configuration options for the payment methods.
+   */
+  paymentMethodsConfiguration?: CoreOptions['paymentMethodsConfiguration'];
+
+  /**
+   * Callback function to disable a stored payment method.
+   * @param props - An object containing the recurring detail reference and shopper reference.
+   * @returns A promise that resolves to a boolean indicating whether the stored payment method was disabled.
+   */
+  onDisableStoredPaymentMethod?: (props: {
+    recurringDetailReference: string;
+    shopperReference: string | undefined;
+  }) => Promise<boolean>;
 }
 
 interface Props {
@@ -82,13 +116,12 @@ export function AdyenPayment({
   environment = 'test',
   locale = 'en_US'
 }: Props): JSX.Element | null {
-  const { cardContainerClassName, threeDSecureContainerClassName, styles } = {
+  const { cardContainerClassName, threeDSecureContainerClassName, styles, onDisableStoredPaymentMethod } = {
     ...defaultConfig,
     ...config
   }
   const [loadAdyen, setLoadAdyen] = useState(false)
   const [checkout, setCheckout] = useState<UIElement<any> | undefined>()
-  // const [showSaveToWallet, setShowSaveToWallet] = useState(true)
   const {
     setPaymentSource,
     paymentSource,
@@ -99,6 +132,7 @@ export function AdyenPayment({
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const { placeOrderButtonRef, setPlaceOrder } = useContext(PlaceOrderContext)
+  const { customers } = useContext(CustomerContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const handleSubmit = async (
     e: any,
@@ -220,6 +254,10 @@ export function AdyenPayment({
         paymentResource: 'adyen_payments',
         attributes
       })
+      if (order?.id == null) {
+        console.error('Order id is missing')
+        return false
+      }
       const res = await setPaymentSource({
         paymentSourceId: paymentSource?.id,
         paymentResource: 'adyen_payments',
@@ -377,7 +415,24 @@ export function AdyenPayment({
               showRemovePaymentMethodButton: showStoredPaymentMethods,
               instantPaymentTypes: ['applepay', 'googlepay'],
               onDisableStoredPaymentMethod: (state) => {
-                console.log('onDisableStoredPaymentMethod', state)
+                const recurringDetailReference = state
+                const shopperReference = customers?.shopper_reference ?? undefined
+                if (onDisableStoredPaymentMethod != null) {
+                  onDisableStoredPaymentMethod({
+                    recurringDetailReference,
+                    shopperReference
+                  }).then((response) => {
+                    if (response) {
+                      setPaymentSource({
+                        paymentResource: 'adyen_payments',
+                        order,
+                        attributes: {}
+                      })
+                    } else {
+                      console.error('onDisableStoredPaymentMethod error')
+                    }
+                  })
+                }
               },
               onSelect: (component) => {
                 const id: string = component._id
