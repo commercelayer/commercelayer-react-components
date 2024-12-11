@@ -10,6 +10,7 @@ import {
 import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { type getOrderContext } from './OrderReducer'
 import getSdk from '#utils/getSdk'
+import { canPlaceOrder } from '#utils/canPlaceOrder'
 
 export type ShipmentActionType =
   | 'setErrors'
@@ -105,6 +106,9 @@ export async function setShippingMethod({
   order
 }: TSetShippingMethodParams): Promise<{ success: boolean; order?: Order }> {
   try {
+    if (order != null && !canPlaceOrder(order)) {
+      return { success: false, order }
+    }
     if (shippingMethodId) {
       const sdk = getSdk(config)
       await sdk.shipments.update({
