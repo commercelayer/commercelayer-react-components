@@ -41,6 +41,7 @@ export async function getOrganizationConfig(
   const sdk = getSdk(config)
   const organization = await sdk.organization.retrieve({
     fields: {
+      // @ts-expect-error typing fails here?
       organization: ['id', 'config']
     }
   })
