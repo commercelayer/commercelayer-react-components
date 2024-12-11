@@ -515,7 +515,8 @@ export async function addToCart(
             endpoint: config.endpoint,
             params: {
               accessToken: config.accessToken,
-              orderId: order?.id
+              orderId: order?.id,
+              slug
             }
           })
           const redirectUrl = checkoutUrl

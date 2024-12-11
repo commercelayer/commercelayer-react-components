@@ -69,6 +69,7 @@ export function CheckoutLink(props: Props): JSX.Element {
         endpoint,
         params: {
           accessToken,
+          slug,
           orderId: order?.id
         }
       }).then((config) => {

@@ -218,7 +218,8 @@ export function AddToCartButton(props: Props): JSX.Element {
             endpoint,
             params: {
               orderId,
-              accessToken
+              accessToken,
+              slug
             }
           })
           location.href = config?.links?.cart ?? getApplicationLink({

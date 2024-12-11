@@ -71,7 +71,8 @@ export function MyAccountLink(props: Props): JSX.Element {
         accessToken,
         endpoint,
         params: {
-          accessToken
+          accessToken,
+          slug
         }
       }).then((config) => {
         if (config?.links?.my_account) {

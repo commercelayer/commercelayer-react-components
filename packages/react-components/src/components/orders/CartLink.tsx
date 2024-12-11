@@ -84,7 +84,8 @@ export function CartLink(props: Props): JSX.Element | null {
           endpoint,
           params: {
             orderId: order?.id,
-            accessToken
+            accessToken,
+            slug
           }
         })
         location.href = config?.links?.cart ?? href ?? ''
@@ -95,7 +96,8 @@ export function CartLink(props: Props): JSX.Element | null {
           endpoint,
           params: {
             orderId: order?.id,
-            accessToken
+            accessToken,
+            slug
           }
         })
         if (slug) {
