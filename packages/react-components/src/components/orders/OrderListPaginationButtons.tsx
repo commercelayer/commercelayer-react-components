@@ -6,6 +6,8 @@ import { type ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import omit from '#utils/omit'
 
+import type { JSX } from "react";
+
 interface PaginationButton
   extends Omit<JSX.IntrinsicElements['button'], 'children' | 'disabled'> {
   /**

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { type FormEvent, useContext, useEffect, useRef, useState } from 'react'
+import { type FormEvent, useContext, useEffect, useRef, useState, type JSX } from 'react';
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isEmpty from 'lodash/isEmpty'
 import OrderContext from '#context/OrderContext'

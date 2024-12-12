@@ -1,4 +1,4 @@
-import { useState, useEffect, type MouseEvent, useContext } from 'react'
+import { useState, useEffect, type MouseEvent, useContext, type JSX } from 'react';
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import type { LoaderType } from '#typings'

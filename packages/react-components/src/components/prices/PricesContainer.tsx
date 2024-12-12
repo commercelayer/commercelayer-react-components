@@ -1,4 +1,4 @@
-import { useEffect, useContext, useReducer } from 'react'
+import { useEffect, useContext, useReducer, type JSX } from 'react';
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import priceReducer, {
   priceInitialState,

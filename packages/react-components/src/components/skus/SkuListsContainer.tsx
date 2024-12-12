@@ -1,4 +1,4 @@
-import { useReducer, useContext, type ReactNode, useEffect } from 'react'
+import { useReducer, useContext, type ReactNode, useEffect, type JSX } from 'react';
 import SkuListsContext from '#context/SkuListsContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import skuListsReducer, {

@@ -1,6 +1,6 @@
 import AddressesContext from '#context/AddressContext'
 import { useRapidForm } from 'rapid-form'
-import { type ReactNode, useContext, useEffect, useRef } from 'react'
+import { type ReactNode, useContext, useEffect, useRef, type JSX } from 'react';
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
 import { type BaseError, type CodeErrorType } from '#typings/errors'
 import { type AddressField } from '#reducers/AddressReducer'

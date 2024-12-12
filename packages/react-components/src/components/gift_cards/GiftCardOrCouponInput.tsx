@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, type JSX } from 'react';
 import BaseInput from '#components/utils/BaseInput'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import { type BaseInputComponentProps } from '#typings'

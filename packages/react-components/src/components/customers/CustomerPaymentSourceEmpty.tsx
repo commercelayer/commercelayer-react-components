@@ -3,6 +3,8 @@ import CustomerContext from '#context/CustomerContext'
 import { type ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
 
+import type { JSX } from "react";
+
 interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
   /**
    * Function allow you to customize the component

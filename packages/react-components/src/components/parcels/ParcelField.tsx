@@ -6,6 +6,8 @@ import GenericFieldComponent, {
 } from '#components/utils/GenericFieldComponent'
 import ParcelChildrenContext from '#context/ParcelChildrenContext'
 
+import type { JSX } from "react";
+
 type ParcelFieldChildrenProps = TGenericChildrenProps<TResources['Parcel']>
 
 type TCondition = ConditionalElement<Exclude<TResources['Parcel'], 'resource'>>

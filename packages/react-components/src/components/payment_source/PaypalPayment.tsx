@@ -1,6 +1,6 @@
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import isFunction from 'lodash/isFunction'
-import { type ReactNode, useContext, useEffect, useRef } from 'react'
+import { type ReactNode, useContext, useEffect, useRef, type JSX } from 'react';
 
 export interface PaypalConfig {
   return_url: string

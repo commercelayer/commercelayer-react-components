@@ -1,7 +1,7 @@
 import ParcelChildrenContext from '#context/ParcelChildrenContext'
 import ParcelLineItemChildrenContext from '#context/ParcelLineItemChildrenContext'
 import type { DefaultChildrenType } from '#typings/globals'
-import { useContext } from 'react'
+import { useContext, type JSX } from 'react';
 
 interface Props {
   children: DefaultChildrenType

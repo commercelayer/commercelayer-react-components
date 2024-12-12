@@ -4,13 +4,7 @@ import OrderStorageContext from '#context/OrderStorageContext'
 import { getApplicationLink } from '#utils/getApplicationLink'
 import { getDomain } from '#utils/getDomain'
 import useCustomContext from '#utils/hooks/useCustomContext'
-import {
-  type CSSProperties,
-  useContext,
-  useEffect,
-  useState,
-  useRef
-} from 'react'
+import { type CSSProperties, useContext, useEffect, useState, useRef, type JSX } from 'react';
 import { iframeResizer } from 'iframe-resizer'
 import type { Order } from '@commercelayer/sdk'
 import { subscribe, unsubscribe } from '#utils/events'

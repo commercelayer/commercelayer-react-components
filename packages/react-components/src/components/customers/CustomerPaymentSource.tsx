@@ -4,7 +4,7 @@ import { type PaymentResource } from '#reducers/PaymentMethodReducer'
 import { type DefaultChildrenType } from '#typings/globals'
 import getCardDetails from '#utils/getCardDetails'
 import useCustomContext from '#utils/hooks/useCustomContext'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type JSX } from 'react';
 
 interface Props {
   children?: DefaultChildrenType

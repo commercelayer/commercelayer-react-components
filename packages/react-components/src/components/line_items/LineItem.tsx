@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, type JSX } from 'react';
 import LineItemContext from '#context/LineItemContext'
 import LineItemChildrenContext, {
   type InitialLineItemChildrenContext

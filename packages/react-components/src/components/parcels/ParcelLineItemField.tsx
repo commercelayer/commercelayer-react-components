@@ -6,6 +6,8 @@ import GenericFieldComponent, {
 } from '#components/utils/GenericFieldComponent'
 import ParcelLineItemChildrenContext from '#context/ParcelLineItemChildrenContext'
 
+import type { JSX } from "react";
+
 type ParcelLineItemFieldChildrenProps = TGenericChildrenProps<
   TResources['ParcelLineItem']
 >

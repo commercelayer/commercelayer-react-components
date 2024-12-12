@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type JSX } from 'react';
 import Parent from '#components/utils/Parent'
 import getLineItemsCount, { type TypeAccepted } from '#utils/getLineItemsCount'
 import LineItemContext from '#context/LineItemContext'

@@ -1,6 +1,6 @@
 import OrderContext from '#context/OrderContext'
 import PlaceOrderContext from '#context/PlaceOrderContext'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, type JSX } from 'react';
 import BaseInput, { type BaseInputProps } from '../utils/BaseInput'
 
 export function PrivacyAndTermsCheckbox(

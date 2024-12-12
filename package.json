@@ -8,7 +8,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "pnpm -r build",
-    "prepare": "husky install",
+    "prepare": "husky",
     "test": "pnpm -r test",
     "docs:dev": "pnpm --filter docs storybook",
     "docs:build": "pnpm --filter docs build-storybook",
@@ -19,9 +19,9 @@
   },
   "devDependencies": {
     "@commercelayer/eslint-config-ts-react": "^1.4.5",
-    "husky": "^9.1.6",
+    "husky": "^9.1.7",
     "lerna": "^8.1.9",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.2"
   },
   "pnpm": {
     "overrides": {
@@ -37,7 +37,10 @@
       "ejs@<3.1.10": ">=3.1.10",
       "braces@<3.0.3": ">=3.0.3",
       "ws@>=8.0.0 <8.17.1": ">=8.17.1",
-      "ws@>=6.0.0 <6.2.3": ">=6.2.3"
+      "micromatch@<4.0.8": ">=4.0.8",
+      "rollup@>=4.0.0 <4.22.4": ">=4.22.4",
+      "cross-spawn@>=7.0.0 <7.0.5": ">=7.0.5",
+      "@eslint/plugin-kit@<0.2.3": ">=0.2.3"
     }
   }
 }

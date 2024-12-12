@@ -41,7 +41,7 @@ export async function getOrganizationConfig(
   const sdk = getSdk(config)
   const organization = await sdk.organization.retrieve({
     fields: {
-      organization: ['id', 'config']
+      organizations: ['id', 'config']
     }
   })
   return getConfig({

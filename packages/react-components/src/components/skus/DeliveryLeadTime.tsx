@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect, type JSX } from 'react';
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from '../utils/Parent'
 
@@ -8,9 +8,9 @@ export type DeliveryLeadTimeField =
   | 'min_days'
   | 'max_days'
 
-export type DeliveryLeadTimeComponentChildren = Omit<Props, 'children'>
+export type DeliveryLeadTimeComponentChildren = Omit<Props, 'children' | 'ref'>
 
-type Props = Partial<JSX.IntrinsicElements['span']> & {
+type Props = Partial<Omit<JSX.IntrinsicElements['span'], 'ref'>> & {
   children?: (props: DeliveryLeadTimeComponentChildren) => JSX.Element
   type: DeliveryLeadTimeField
   text?: string

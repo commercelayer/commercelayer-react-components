@@ -4,6 +4,8 @@ import { type ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import type { Shipment } from '@commercelayer/sdk'
 
+import type { JSX } from "react";
+
 interface ChildrenProps extends Omit<Props, 'children'> {
   /**
    * Shipments of the current order
@@ -15,7 +17,7 @@ interface ChildrenProps extends Omit<Props, 'children'> {
   quantity: number
 }
 
-interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements['span'], 'children' | 'ref'> {
   children?: ChildrenFunction<ChildrenProps>
 }
 

@@ -9,7 +9,7 @@ import type {
 } from '@commercelayer/sdk'
 import Parent from './Parent'
 import { type InitialLineItemChildrenContext } from '#context/LineItemChildrenContext'
-import { type Context, useContext } from 'react'
+import { type Context, useContext, type JSX } from 'react';
 import { defaultImgUrl } from '#utils/placeholderImages'
 import { type InitialCustomerContext } from '#context/CustomerContext'
 import { type InitialParcelContext } from '#context/ParcelChildrenContext'
@@ -84,7 +84,7 @@ export default function GenericFieldComponent<R extends keyof TResources>(
   if (Tag === 'img' && !children) {
     const src = attributeValue || defaultImgUrl
     const name = ''
-    return <img alt={name} src={src} {...(p as JSX.IntrinsicElements['img'])} />
+    return <img alt={name} src={src} {...(p as Omit<JSX.IntrinsicElements['img'], 'ref' | 'children'>)} />
   }
   const parentProps = {
     attributeValue,

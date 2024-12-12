@@ -2,13 +2,7 @@ import CommerceLayerContext from '#context/CommerceLayerContext'
 import SkuContext from '#context/SkuContext'
 import skuReducer, { getSku, skuInitialState } from '#reducers/SkuReducer'
 import type { QueryParamsList } from '@commercelayer/sdk'
-import {
-  type ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer
-} from 'react'
+import { type ReactNode, useContext, useEffect, useMemo, useReducer, type JSX } from 'react';
 
 interface Props {
   /**

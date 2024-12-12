@@ -1,5 +1,5 @@
 import { useRapidForm } from 'rapid-form'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState, type JSX } from 'react';
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
 import OrderContext from '#context/OrderContext'
 import type { OrderCodeType } from '#reducers/OrderReducer'

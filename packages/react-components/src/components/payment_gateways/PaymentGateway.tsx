@@ -3,7 +3,7 @@ import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { type PaymentResource } from '#reducers/PaymentMethodReducer'
 import { type LoaderType } from '#typings'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, type JSX } from 'react';
 import { type PaymentSourceProps } from '../payment_source/PaymentSource'
 import getLoaderComponent from '#utils/getLoaderComponent'
 import AdyenGateway from './AdyenGateway'

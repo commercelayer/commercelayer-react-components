@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 export type DefaultChildrenType = JSX.Element[] | JSX.Element | null
 
 type Enumerate<

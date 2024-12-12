@@ -8,7 +8,7 @@ import inStockSubscriptionReducer, {
 } from '#reducers/InStockSubscriptionReducer'
 import { type DefaultChildrenType } from '#typings/globals'
 import useCustomContext from '#utils/hooks/useCustomContext'
-import { useReducer } from 'react'
+import { useReducer, type JSX } from 'react';
 
 interface Props {
   /**

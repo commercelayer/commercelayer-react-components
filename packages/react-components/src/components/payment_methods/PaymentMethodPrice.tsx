@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type JSX } from 'react';
 import getAmount from '#utils/getAmount'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components/utils/Parent'

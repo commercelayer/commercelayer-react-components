@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState, type JSX } from 'react';
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import {
   Elements,
@@ -163,7 +163,7 @@ function StripePaymentForm({
 }
 
 type Props = PaymentMethodConfig['stripePayment'] &
-  JSX.IntrinsicElements['div'] &
+  Omit<JSX.IntrinsicElements['div'], 'ref'> &
   Partial<PaymentSourceProps['templateCustomerSaveToWallet']> & {
     show?: boolean
     publishableKey: string

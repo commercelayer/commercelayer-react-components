@@ -1,5 +1,5 @@
 import ShippingAddressContext from '#context/ShippingAddressContext'
-import { useContext, useEffect, useReducer } from 'react'
+import { useContext, useEffect, useReducer, type JSX } from 'react';
 import shippingAddressReducer, {
   setShippingAddress,
   shippingAddressInitialState,

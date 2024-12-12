@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, type JSX } from 'react';
 import Parent from '#components/utils/Parent'
 import get from 'lodash/get'
 import { type Shipment } from '@commercelayer/sdk'
@@ -17,7 +17,7 @@ export type ShipmentAttribute =
   | 'formatted_cost_amount'
   | 'key_number'
 
-interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements['span'], 'children' | 'ref'> {
   children?: (props: ShipmentFieldChildrenProps) => JSX.Element
   name: ShipmentAttribute
 }

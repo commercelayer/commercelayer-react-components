@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, type JSX } from 'react';
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import StockTransferChildrenContext, {
   type InitialStockTransferContext

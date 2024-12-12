@@ -12,7 +12,7 @@ import {
 import getCardDetails from '#utils/getCardDetails'
 import { type StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
-import { useContext } from 'react'
+import { useContext, type JSX } from 'react';
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 
 type Props = GatewayBaseType

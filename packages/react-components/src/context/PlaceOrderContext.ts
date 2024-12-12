@@ -10,7 +10,7 @@ type DefaultContext = {
   setPlaceOrderErrors?: typeof setPlaceOrderErrors
   setPlaceOrder?: typeof setPlaceOrder
   placeOrderPermitted?: () => void
-  setButtonRef?: (ref: RefObject<HTMLButtonElement>) => void
+  setButtonRef?: (ref: RefObject<HTMLButtonElement | null>) => void
   setPlaceOrderStatus?: typeof setPlaceOrderStatus
 } & PlaceOrderState
 

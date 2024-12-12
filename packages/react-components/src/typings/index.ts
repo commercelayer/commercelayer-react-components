@@ -1,4 +1,4 @@
-import { type Dispatch, type ForwardedRef, type Ref } from 'react'
+import { type Dispatch, type ForwardedRef, type Ref, type JSX } from 'react';
 import PropTypes, { type InferProps } from 'prop-types'
 import { type BaseError } from './errors'
 
@@ -184,7 +184,7 @@ export type BaseSelectorType = 'select' | 'radio'
 export type BaseAmountComponentChildren = Omit<BaseAmountComponent, 'children'>
 
 export interface BaseAmountComponent
-  extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+  extends Omit<JSX.IntrinsicElements['span'], 'children' | 'ref'> {
   children?: ChildrenFunction<BaseAmountComponentChildren>
   format?: BaseFormatPrice
   price?: string

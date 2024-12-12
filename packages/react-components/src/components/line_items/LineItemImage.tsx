@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, type JSX } from 'react';
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import { type LineItem } from '@commercelayer/sdk'
 import type { ChildrenFunction } from '#typings'

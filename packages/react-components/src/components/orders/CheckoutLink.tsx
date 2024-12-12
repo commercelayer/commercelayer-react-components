@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, type JSX } from 'react';
 import OrderContext from '#context/OrderContext'
 import Parent from '../utils/Parent'
 import { type ChildrenFunction } from '#typings/index'

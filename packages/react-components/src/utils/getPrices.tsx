@@ -4,6 +4,8 @@ import PriceTemplate, {
   type PTemplateProps
 } from '#components/utils/PriceTemplate'
 
+import type { JSX } from "react";
+
 export function getPriceByCode(
   skuPrices: Price[],
   code: string = ''

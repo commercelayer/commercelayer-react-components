@@ -1,6 +1,6 @@
 import Parent from '#components/utils/Parent'
 import PricesContext from '#context/PricesContext'
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, type JSX } from 'react';
 import { getPricesComponent } from '#utils/getPrices'
 import { type Price as PriceType } from '@commercelayer/sdk'
 import { type ChildrenFunction, type LoaderType } from '#typings/index'
@@ -13,7 +13,7 @@ interface PriceChildrenProps extends Omit<PriceProps, 'children'> {
 }
 
 export interface PriceProps
-  extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+  extends Omit<JSX.IntrinsicElements['span'], 'children' | 'ref'> {
   children?: ChildrenFunction<PriceChildrenProps>
   /**
    * CSS class name to be added for the compare price

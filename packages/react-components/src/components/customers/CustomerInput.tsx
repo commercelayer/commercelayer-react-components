@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, type JSX } from 'react';
 import BaseInput from '#components-utils/BaseInput'
 import { type BaseInputComponentProps } from '#typings'
 import { useRapidForm } from 'rapid-form'
