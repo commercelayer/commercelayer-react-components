@@ -6,6 +6,8 @@ import GenericFieldComponent, {
   type TResources
 } from '#components-utils/GenericFieldComponent'
 
+import type { JSX } from "react";
+
 type SkuFieldChildrenProps = TGenericChildrenProps<TResources['Sku']>
 
 type TCondition = ConditionalElement<Exclude<TResources['Sku'], 'resource'>>

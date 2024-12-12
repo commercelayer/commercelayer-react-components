@@ -1,6 +1,6 @@
 import type { Order, OrderSubscription } from '@commercelayer/sdk'
 import { type Row } from '@tanstack/react-table'
-import { createContext } from 'react'
+import { createContext, type JSX } from 'react';
 
 export type TOrderList = 'orders' | 'subscriptions'
 

@@ -3,11 +3,13 @@ import { type LineItem } from '@commercelayer/sdk'
 import { type BaseError } from '#typings/errors'
 import { type TResourceError } from '#components/errors/Errors'
 
+import type { JSX } from "react";
+
 export interface AllErrorsParams {
   allErrors: BaseError[]
   messages: BaseError[]
   field?: string
-  props: JSX.IntrinsicElements['span']
+  props: Omit<JSX.IntrinsicElements['span'], 'ref'>
   lineItem?: LineItem | null
   resource?: TResourceError
   returnHtml?: boolean

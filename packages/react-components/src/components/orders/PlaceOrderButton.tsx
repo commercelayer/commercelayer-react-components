@@ -4,8 +4,9 @@ import {
   useEffect,
   useRef,
   useState,
-  type MouseEvent
-} from 'react'
+  type MouseEvent,
+  type JSX,
+} from 'react';
 import Parent from '../utils/Parent'
 import { type ChildrenFunction } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'

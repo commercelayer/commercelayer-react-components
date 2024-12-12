@@ -1,7 +1,7 @@
 import ExternalFunctionContext, {
   callExternalFunction
 } from '#context/ExternalFunctionContext'
-import { type ReactNode } from 'react'
+import { type ReactNode, type JSX } from 'react';
 
 interface Props {
   children: ReactNode

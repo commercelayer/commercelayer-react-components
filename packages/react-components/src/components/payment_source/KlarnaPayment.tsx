@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState, type JSX } from 'react';
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { type PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
 import { type PaymentSourceProps } from './PaymentSource'

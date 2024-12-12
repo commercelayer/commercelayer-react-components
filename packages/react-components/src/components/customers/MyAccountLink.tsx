@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, type JSX } from 'react';
 import Parent from '../utils/Parent'
 import { type ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'

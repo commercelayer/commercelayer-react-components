@@ -1,4 +1,4 @@
-import { useContext, useRef } from 'react'
+import { useContext, useRef, type JSX } from 'react';
 import {
   type PaymentMethodConfig,
   type PaymentSourceObject

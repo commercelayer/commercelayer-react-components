@@ -1,6 +1,6 @@
 import SkuChildrenContext from '#context/SkuChildrenContext'
 import SkuContext from '#context/SkuContext'
-import { type ReactNode, useContext } from 'react'
+import { type ReactNode, useContext, type JSX } from 'react';
 
 interface Props {
   children: ReactNode

@@ -1,4 +1,4 @@
-import { useReducer, useContext, type ReactNode } from 'react'
+import { useReducer, useContext, type ReactNode, type JSX } from 'react';
 import GiftCardContext from '#context/GiftCardContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import giftCardReducer, {

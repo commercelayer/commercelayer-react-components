@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react'
+import { type ReactNode, type JSX } from 'react';
 import Parent from '#components/utils/Parent'
 import { type ChildrenFunction } from '#typings/index'
 

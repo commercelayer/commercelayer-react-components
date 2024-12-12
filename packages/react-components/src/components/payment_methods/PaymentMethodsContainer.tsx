@@ -2,13 +2,7 @@
 import PaymentMethodContext, {
   defaultPaymentMethodContext
 } from '#context/PaymentMethodContext'
-import {
-  type ReactNode,
-  useContext,
-  useEffect,
-  useReducer,
-  useMemo
-} from 'react'
+import { type ReactNode, useContext, useEffect, useReducer, useMemo, type JSX } from 'react';
 import paymentMethodReducer, {
   paymentMethodInitialState,
   getPaymentMethods,

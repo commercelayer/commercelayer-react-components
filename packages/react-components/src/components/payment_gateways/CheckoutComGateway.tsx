@@ -11,7 +11,7 @@ import {
 } from '#reducers/PaymentMethodReducer'
 import { type StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
-import React from 'react'
+import React, { type JSX } from 'react';
 import PaymentCardsTemplate from '#components/utils/PaymentCardsTemplate'
 import getCardDetails from '#utils/getCardDetails'
 

@@ -4,7 +4,7 @@ import InStockSubscriptionContext from '#context/InStockSubscriptionContext'
 import { type ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import { jwt } from '#utils/jwt'
-import { useContext, useState } from 'react'
+import { useContext, useState, type JSX } from 'react';
 
 interface Props
   extends Omit<JSX.IntrinsicElements['button'], 'children' | 'onClick'> {

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { useContext, type PropsWithoutRef } from 'react'
+import { useContext, type PropsWithoutRef, type JSX } from 'react';
 import Parent from '../utils/Parent'
 import OrderContext from '#context/OrderContext'
 import { type ChildrenFunction } from '#typings/index'

@@ -1,4 +1,4 @@
-import React, { type ForwardRefRenderFunction } from 'react'
+import React, { type ForwardRefRenderFunction, type JSX } from 'react';
 import { type BaseInputComponentProps } from '#typings/index'
 import Parent from './Parent'
 

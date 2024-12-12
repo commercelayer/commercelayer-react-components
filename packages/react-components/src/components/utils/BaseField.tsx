@@ -1,11 +1,11 @@
 import OrderContext from '#context/OrderContext'
-import { type FunctionComponent, useContext, useEffect, useState } from 'react'
+import { type FunctionComponent, useContext, useEffect, useState, type JSX } from 'react';
 import Parent from './Parent'
 
 type BaseFieldChildren = Omit<BaseFieldProps, 'children'>
 
 export interface BaseFieldProps
-  extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+  extends Omit<JSX.IntrinsicElements['span'], 'children' | 'ref'> {
   attribute: 'number' | 'id'
   children?: (props: BaseFieldChildren) => JSX.Element
 }

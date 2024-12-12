@@ -1,4 +1,4 @@
-import { useContext, useMemo } from 'react'
+import { useContext, useMemo, type JSX } from 'react';
 import Parent from '#components/utils/Parent'
 import GiftCardContext from '#context/GiftCardContext'
 import OrderContext from '#context/OrderContext'

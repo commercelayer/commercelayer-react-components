@@ -8,7 +8,7 @@ import PaymentSourceContext from '#context/PaymentSourceContext'
 import { type PaymentResource } from '#reducers/PaymentMethodReducer'
 import { type StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
-import { useContext } from 'react'
+import { useContext, type JSX } from 'react';
 import AdyenPayment from '#components/payment_source/AdyenPayment'
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 import { jwt } from '#utils/jwt'

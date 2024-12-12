@@ -8,7 +8,7 @@ import { type PaymentResource } from '#reducers/PaymentMethodReducer'
 import getCardDetails from '#utils/getCardDetails'
 import { getPaymentAttributes } from '#utils/getPaymentAttributes'
 import isEmpty from 'lodash/isEmpty'
-import { useContext } from 'react'
+import { useContext, type JSX } from 'react';
 
 type Props = Partial<GatewayBaseType>
 

@@ -55,12 +55,12 @@ export interface PlaceOrderActionPayload {
   paymentId: string
   paymentSource: PaymentSourceType
   options?: PlaceOrderOptions
-  placeOrderButtonRef?: RefObject<HTMLButtonElement>
+  placeOrderButtonRef?: RefObject<HTMLButtonElement | null>
   status: 'placing' | 'standby'
 }
 
 export function setButtonRef(
-  ref: RefObject<HTMLButtonElement>,
+  ref: RefObject<HTMLButtonElement | null>,
   dispatch: Dispatch<PlaceOrderAction>
 ): void {
   if (ref?.current != null) {

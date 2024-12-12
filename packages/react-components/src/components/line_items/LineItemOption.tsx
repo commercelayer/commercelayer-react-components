@@ -1,4 +1,4 @@
-import { useContext, type CSSProperties } from 'react'
+import { useContext, type CSSProperties, type JSX } from 'react';
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
 import map from 'lodash/map'
 import Parent from '#components/utils/Parent'

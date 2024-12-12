@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useContext, useMemo, useState } from 'react'
+import { useEffect, useReducer, useContext, useMemo, useState, type JSX } from 'react';
 import orderReducer, {
   createOrder,
   getApiOrder,

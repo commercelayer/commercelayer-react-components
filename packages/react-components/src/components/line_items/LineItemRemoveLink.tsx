@@ -1,4 +1,4 @@
-import { useContext, type PropsWithoutRef } from 'react'
+import { useContext, type PropsWithoutRef, type JSX } from 'react';
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
 import Parent from '#components/utils/Parent'

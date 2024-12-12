@@ -1,7 +1,7 @@
 import AddressesContext, {
   defaultAddressContext
 } from '#context/AddressContext'
-import { type ReactNode, useContext, useEffect, useReducer } from 'react'
+import { type ReactNode, useContext, useEffect, useReducer, type JSX } from 'react';
 import addressReducer, {
   addressInitialState,
   type AddressResource,

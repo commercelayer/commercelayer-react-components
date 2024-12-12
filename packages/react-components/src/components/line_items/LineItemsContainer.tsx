@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useContext } from 'react'
+import { useEffect, useReducer, useContext, type JSX } from 'react';
 import lineItemReducer, {
   lineItemInitialState,
   updateLineItem,

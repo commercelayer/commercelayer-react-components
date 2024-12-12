@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState, type JSX } from 'react';
 import BaseSelect from '#components/utils/BaseSelect'
 import {
   type AddressStateSelectName,

@@ -1,5 +1,7 @@
 import { type DefaultChildrenType } from '#typings/globals'
 
+import type { JSX } from "react";
+
 interface Props<T> {
   children: DefaultChildrenType
   filterBy: T[]

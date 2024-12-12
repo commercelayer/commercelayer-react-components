@@ -8,7 +8,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "pnpm -r build",
-    "prepare": "husky install",
+    "prepare": "husky",
     "test": "pnpm -r test",
     "docs:dev": "pnpm --filter docs storybook",
     "docs:build": "pnpm --filter docs build-storybook",

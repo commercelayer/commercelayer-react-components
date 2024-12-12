@@ -4,8 +4,9 @@ import {
   type RefObject,
   useContext,
   useEffect,
-  useReducer
-} from 'react'
+  useReducer,
+  type JSX,
+} from 'react';
 import placeOrderReducer, {
   placeOrderInitialState,
   type PlaceOrderOptions,
@@ -130,7 +131,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
         }
       })
     },
-    setButtonRef: (ref: RefObject<HTMLButtonElement>) => {
+    setButtonRef: (ref: RefObject<HTMLButtonElement | null>) => {
       setButtonRef(ref, dispatch)
     }
   }

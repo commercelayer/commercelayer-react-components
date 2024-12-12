@@ -6,6 +6,8 @@ import GenericFieldComponent, {
 } from '#components/utils/GenericFieldComponent'
 import CustomerContext from '#context/CustomerContext'
 
+import type { JSX } from "react";
+
 type StockTransferFieldChildrenProps = TGenericChildrenProps<
   TResources['Customer']
 >

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, type JSX } from 'react';
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from '#components/utils/Parent'
 import ShipmentContext from '#context/ShipmentContext'
@@ -18,10 +18,10 @@ interface TOnChange {
 type Props = {
   children?: (props: ShippingMethodRadioButtonType) => JSX.Element
   onChange?: (params: TOnChange) => void
-} & Omit<JSX.IntrinsicElements['input'], 'onChange'>
+} & Omit<JSX.IntrinsicElements['input'], 'onChange' | 'ref' | 'children'>
 
 export function ShippingMethodRadioButton(props: Props): JSX.Element {
-  const { onChange, ...p } = props
+  const { onChange, children, ...p } = props
   const [checked, setChecked] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const { shippingMethod, currentShippingMethodId, shipmentId } = useContext(
@@ -64,8 +64,8 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
     disabled,
     ...props
   }
-  return props.children ? (
-    <Parent {...parentProps}>{props.children}</Parent>
+  return children ? (
+    <Parent {...parentProps}>{children}</Parent>
   ) : (
     <input
       disabled={disabled}

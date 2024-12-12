@@ -1,11 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import {
-  type CSSProperties,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from 'react'
+import { type CSSProperties, useContext, useEffect, useRef, useState, type JSX } from 'react';
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { type PaymentSourceProps } from './PaymentSource'
 import { setCustomerOrderParam } from '#utils/localStorage'

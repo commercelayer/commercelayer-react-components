@@ -4,6 +4,8 @@ import { type TimeFormat, type ChildrenFunction } from '#typings/index'
 import { type DeliveryLeadTime } from '#reducers/AvailabilityReducer'
 import useCustomContext from '#utils/hooks/useCustomContext'
 
+import type { JSX } from "react";
+
 interface AvailabilityTemplateChildrenProps
   extends Omit<Props, 'children'>,
     DeliveryLeadTime {
@@ -45,7 +47,7 @@ type Props = {
     outOfStock?: string
     negativeStock?: string
   }
-} & Omit<JSX.IntrinsicElements['span'], 'children'> &
+} & Omit<JSX.IntrinsicElements['span'], 'children' | 'ref'> &
   FormatRules
 
 /**

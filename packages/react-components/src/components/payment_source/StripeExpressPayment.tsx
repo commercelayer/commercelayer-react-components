@@ -14,7 +14,7 @@ import {
 import { isEmpty } from '#utils/isEmpty'
 import { PaymentRequestButtonElement, useStripe } from '@stripe/react-stripe-js'
 import { type PaymentRequest } from '@stripe/stripe-js'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, type JSX } from 'react';
 
 interface Props {
   clientSecret: string

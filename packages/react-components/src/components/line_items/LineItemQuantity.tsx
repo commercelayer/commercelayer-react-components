@@ -1,4 +1,4 @@
-import { useContext, type ReactNode } from 'react'
+import { useContext, type ReactNode, type JSX } from 'react';
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
 import Parent from '#components/utils/Parent'

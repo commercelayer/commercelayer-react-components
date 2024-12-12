@@ -1,4 +1,4 @@
-import { type MouseEvent, type ReactNode, useContext } from 'react'
+import { type MouseEvent, type ReactNode, useContext, type JSX } from 'react';
 import OrderContext from '#context/OrderContext'
 import Parent from '../utils/Parent'
 import { type ChildrenFunction } from '#typings/index'

@@ -1,5 +1,5 @@
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import { useContext, useEffect, useRef } from 'react'
+import { useContext, useEffect, useRef, type JSX } from 'react';
 
 export interface WireTransferConfig {
   infoMessage?: {

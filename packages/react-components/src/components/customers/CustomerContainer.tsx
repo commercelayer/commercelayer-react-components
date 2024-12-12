@@ -1,4 +1,4 @@
-import { useContext, useEffect, useReducer, useMemo } from 'react'
+import { useContext, useEffect, useReducer, useMemo, type JSX } from 'react';
 import customerReducer, {
   customerInitialState,
   getCustomerAddresses,
