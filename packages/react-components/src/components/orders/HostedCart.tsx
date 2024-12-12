@@ -173,7 +173,8 @@ export function HostedCart({
         endpoint,
         params: {
           orderId: order?.id,
-          accessToken
+          accessToken,
+          slug
         }
       })
       setSrc(
@@ -257,7 +258,8 @@ export function HostedCart({
         endpoint,
         params: {
           orderId: order?.id,
-          accessToken
+          accessToken,
+          slug
         }
       }).then((config) => {
         setSrc(

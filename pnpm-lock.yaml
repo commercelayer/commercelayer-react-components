@@ -174,8 +174,8 @@ importers:
         specifier: ^5.66.1
         version: 5.71.0
       '@commercelayer/organization-config':
-        specifier: ^1.4.8
-        version: 1.4.11
+        specifier: ^1.4.12
+        version: 1.4.12
       '@commercelayer/sdk':
         specifier: ^6.25.0
         version: 6.25.0
@@ -949,8 +949,8 @@ packages:
     resolution: {integrity: sha512-Eh4v00OVvz0w1iYqz6PTVptNl/ipVs6nBG9NUzYKRSI/8Nnd+qU0MYfiogQYjm4sSoX5+4j0BsJW+9N/6s9Jjw==}
     engines: {node: '>=18.0.0'}
 
-  '@commercelayer/organization-config@1.4.11':
-    resolution: {integrity: sha512-yh96gmOaY31P4Y6ycUCapJiQYRAqrkKmbZLa7q0hso51mQHuij13B/3Ox2jXdSlf4SuUh+K8iCK+Ccv2gBVA3w==}
+  '@commercelayer/organization-config@1.4.12':
+    resolution: {integrity: sha512-tGSKEg8X3LjPaFbahYt8vXSbaOmAE5toR6VGOt6aCO6oRdlkJAeKUuNur8A6531Peth7sAuxOXg54I1UMp5iqA==}
     engines: {node: '>=18', pnpm: '>=7'}
 
   '@commercelayer/sdk@6.25.0':
@@ -8645,7 +8645,7 @@ snapshots:
 
   '@commercelayer/js-auth@6.7.0': {}
 
-  '@commercelayer/organization-config@1.4.11':
+  '@commercelayer/organization-config@1.4.12':
     dependencies:
       merge-anything: 5.1.7
 
