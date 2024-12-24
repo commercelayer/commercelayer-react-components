@@ -15,7 +15,9 @@
     "components:build:dev": "pnpm --filter react-components build:dev",
     "components:build": "pnpm --filter react-components build",
     "make:version": "lerna version --no-private",
-    "make:version:force": "lerna version --no-private --force-publish"
+    "make:version:force": "lerna version --no-private --force-publish",
+    "dep:major": "pnpm dlx npm-check-updates --packageFile '**/package.json' -u -i",
+    "dep:minor": "pnpm dep:major -t minor -i"
   },
   "devDependencies": {
     "@commercelayer/eslint-config-ts-react": "^1.4.5",

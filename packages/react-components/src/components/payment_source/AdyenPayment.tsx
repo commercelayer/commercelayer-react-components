@@ -1,24 +1,55 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { type CSSProperties, useContext, useEffect, useRef, useState, type JSX } from 'react';
+import { FormEvent, useContext, useEffect, useRef, useState, type JSX } from 'react';
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import { type PaymentSourceProps } from './PaymentSource'
 import { setCustomerOrderParam } from '#utils/localStorage'
-import type { CoreOptions } from '@adyen/adyen-web/dist/types/core/types'
+import { AdditionalDetailsData, AdyenCheckout, CheckoutAdvancedFlowResponse, CoreConfiguration, Dropin, DropinConfiguration, OnChangeData, SubmitData, UIElement, UIElementProps } from '@adyen/adyen-web/auto';
 import Parent from '#components/utils/Parent'
 import browserInfo, { cleanUrlBy } from '#utils/browserInfo'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import OrderContext from '#context/OrderContext'
-// import omit from '#utils/omit'
-import type UIElement from '@adyen/adyen-web/dist/types/components/UIElement'
 import { getPublicIP } from '#utils/getPublicIp'
 import CustomerContext from '#context/CustomerContext'
 
-type Styles = Partial<{
-  base: CSSProperties
-  error: CSSProperties
-  placeholder: CSSProperties
-  validated: CSSProperties
-}>
+interface StyleDefinitions {
+  background?: string;
+  caretColor?: string;
+  color?: string;
+  display?: string;
+  font?: string;
+  fontFamily?: string;
+  fontSize?: string;
+  fontSizeAdjust?: string;
+  fontSmoothing?: string;
+  fontStretch?: string;
+  fontStyle?: string;
+  fontVariant?: string;
+  fontVariantAlternates?: string;
+  fontVariantCaps?: string;
+  fontVariantEastAsian?: string;
+  fontVariantLigatures?: string;
+  fontVariantNumeric?: string;
+  fontWeight?: string;
+  letterSpacing?: string;
+  lineHeight?: string;
+  mozOsxFontSmoothing?: string;
+  mozTransition?: string;
+  outline?: string;
+  opacity?: string;
+  padding?: string;
+  textAlign?: string;
+  textShadow?: string;
+  transition?: string;
+  webkitFontSmoothing?: string;
+  webkitTransition?: string;
+  wordSpacing?: string;
+}
+
+interface Styles {
+  error?: StyleDefinitions
+  placeholder?: StyleDefinitions
+  validated?: StyleDefinitions
+}
 
 type PaypalStyle = Partial<{
   /**
@@ -63,6 +94,7 @@ export interface AdyenPaymentConfig {
 
   /**
    * Optional CSS class name for the 3D Secure container.
+   * @deprecated
    */
   threeDSecureContainerClassName?: string;
 
@@ -80,7 +112,7 @@ export interface AdyenPaymentConfig {
   /**
    * Configuration options for the payment methods.
    */
-  paymentMethodsConfiguration?: CoreOptions['paymentMethodsConfiguration'];
+  paymentMethodsConfiguration?: DropinConfiguration['paymentMethodsConfiguration']
 
   /**
    * Callback function to disable a stored payment method.
@@ -97,8 +129,8 @@ interface Props {
   clientKey?: string
   config?: AdyenPaymentConfig
   templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
-  locale?: string
-  environment?: string
+  locale?: CoreConfiguration['locale']
+  environment?: CoreConfiguration['environment']
 }
 
 const defaultConfig: AdyenPaymentConfig = {}
@@ -110,12 +142,12 @@ export function AdyenPayment({
   environment = 'test',
   locale = 'en_US'
 }: Props): JSX.Element | null {
-  const { cardContainerClassName, threeDSecureContainerClassName, styles, onDisableStoredPaymentMethod } = {
+  const { cardContainerClassName, styles, onDisableStoredPaymentMethod } = {
     ...defaultConfig,
     ...config
   }
   const [loadAdyen, setLoadAdyen] = useState(false)
-  const [checkout, setCheckout] = useState<UIElement<any> | undefined>()
+  const [checkout, setCheckout] = useState<UIElement<UIElementProps> | undefined>()
   const {
     setPaymentSource,
     paymentSource,
@@ -128,39 +160,42 @@ export function AdyenPayment({
   const { placeOrderButtonRef, setPlaceOrder } = useContext(PlaceOrderContext)
   const { customers } = useContext(CustomerContext)
   const ref = useRef<null | HTMLFormElement>(null)
+  const dropinRef = useRef<Dropin | null>(null);
+  
   const handleSubmit = async (
-    e: any,
-    component?: UIElement<any>
-  ): Promise<boolean> => {
+    e: FormEvent<HTMLFormElement>,
+    ): Promise<boolean> => {
     const savePaymentSourceToCustomerWallet: string =
+      // @ts-expect-error no type
       e?.elements?.save_payment_source_to_customer_wallet?.checked
     if (savePaymentSourceToCustomerWallet)
       setCustomerOrderParam(
         '_save_payment_source_to_customer_wallet',
         savePaymentSourceToCustomerWallet
       )
-    if (component?.submit) {
-      component.submit()
+    console.log('Adyen handleSubmit', dropinRef.current)
+    if (dropinRef.current) {
+      console.log('Fire adyen submit')
+      dropinRef.current.submit()
     }
     return false
   }
   const handleChange = async (
-    state: any,
-    component?: UIElement<any>
+    state: OnChangeData
   ): Promise<void> => {
     if (state.isValid) {
       if (ref.current) {
         ref.current.onsubmit = async () => {
-          return await handleSubmit(ref.current as any, component)
+          return await handleSubmit(ref.current as any)
         }
         setPaymentRef({ ref })
       }
     }
   }
   const handleOnAdditionalDetails = async (
-    state: any,
-    component?: UIElement<any>
-  ): Promise<boolean> => {
+    state: AdditionalDetailsData,
+    component?: UIElement<UIElementProps>
+  ): Promise<CheckoutAdvancedFlowResponse> => {
     const attributes = {
       payment_request_details: state.data,
       _details: 1
@@ -173,14 +208,13 @@ export function AdyenPayment({
           paymentResource: 'adyen_payments',
           attributes
         }))
-      // @ts-expect-error no type
-      const adyenAction = pSource?.payment_response?.action
+      // const adyenAction = pSource?.payment_response?.action
       // @ts-expect-error no type
       const resultCode = pSource?.payment_response?.resultCode
-      if (adyenAction && component) {
-        component.handleAction(adyenAction)
-        return false
-      }
+      // if (adyenAction && component) {
+      //   component.handleAction(adyenAction)
+      //   return false
+      // }
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
         if (placeOrderButtonRef?.current != null) {
           if (placeOrderButtonRef.current.disabled) {
@@ -188,7 +222,9 @@ export function AdyenPayment({
           }
           placeOrderButtonRef.current.click()
         }
-        return true
+        return {
+          resultCode
+        }
       }
       if (['Cancelled', 'Refused'].includes(resultCode)) {
         // @ts-expect-error no type
@@ -205,16 +241,20 @@ export function AdyenPayment({
           component.mount('#adyen-dropin')
         }
       }
-      return false
+      return {
+        resultCode
+      }
     } catch (error) {
       console.error('Adyen additional details error:', error)
-      return false
+      return {
+        resultCode: 'Error'
+      }
     }
   }
   const onSubmit = async (
-    state: any,
-    component: UIElement<any>
-  ): Promise<boolean> => {
+    state: SubmitData,
+    component: UIElement<UIElementProps>
+  ): Promise<CheckoutAdvancedFlowResponse> => {
     const url = cleanUrlBy()
     const shopperIp = await getPublicIP()
     const control = await setPaymentSource({
@@ -224,7 +264,9 @@ export function AdyenPayment({
     // @ts-expect-error no type
     const controlCode = control?.payment_response?.resultCode
     if (controlCode === 'Authorised') {
-      return true
+      return {
+        resultCode: controlCode
+      }
     }
     const attributes: any = {
       payment_request_data: {
@@ -250,7 +292,9 @@ export function AdyenPayment({
       })
       if (order?.id == null) {
         console.error('Order id is missing')
-        return false
+        return {
+          resultCode: 'Error'
+        }
       }
       const res = await setPaymentSource({
         paymentSourceId: paymentSource?.id,
@@ -261,12 +305,16 @@ export function AdyenPayment({
       })
       // @ts-expect-error no type
       const action = res?.payment_response?.action
-      if (component && action) {
-        component.handleAction(action)
-        return false
-      }
       // @ts-expect-error no type
       const resultCode = res?.payment_response?.resultCode
+      if (action != null) {
+        console.log('Request 3DSecure action')
+        return {
+          resultCode,
+          action
+        }
+      }
+      
       // @ts-expect-error no type
       const issuerType = res?.payment_instrument?.issuer_type
       if (['Authorised', 'Pending', 'Received'].includes(resultCode)) {
@@ -278,14 +326,18 @@ export function AdyenPayment({
             paymentSource: res,
             currentCustomerPaymentSourceId
           })
-          return true
+          return {
+            resultCode
+          }
         } else if (placeOrderButtonRef?.current != null) {
           if (placeOrderButtonRef.current.disabled) {
             placeOrderButtonRef.current.disabled = false
           }
           placeOrderButtonRef.current.click()
         }
-        return true
+        return {
+          resultCode
+        }
       }
       if (['Cancelled', 'Refused'].includes(resultCode)) {
         // @ts-expect-error no type
@@ -322,7 +374,9 @@ export function AdyenPayment({
           ])
         }
       }
-      return false
+      return {
+        resultCode
+      }
     } catch (error: any) {
       setPaymentMethodErrors([
         {
@@ -332,7 +386,9 @@ export function AdyenPayment({
           message: error.message as string
         }
       ])
-      return false
+      return {
+        resultCode: `Error`
+      }
     }
   }
 
@@ -341,18 +397,14 @@ export function AdyenPayment({
       // @ts-expect-error no type
       paymentMethods: paymentSource?.payment_methods?.paymentMethods
         ? // @ts-expect-error no type
-          paymentSource?.payment_methods.paymentMethods
+        paymentSource?.payment_methods.paymentMethods
         : [],
       // @ts-expect-error no type
       storedPaymentMethods: paymentSource?.payment_methods?.storedPaymentMethods
         ? // @ts-expect-error no type
-          paymentSource?.payment_methods.storedPaymentMethods
+        paymentSource?.payment_methods.storedPaymentMethods
         : []
     }
-    const [firstPaymentMethod] = paymentMethodsResponse.paymentMethods
-    const isOnlyCard =
-      paymentMethodsResponse.paymentMethods?.length === 1 &&
-      firstPaymentMethod.type === 'scheme'
     if (paymentMethodsResponse.paymentMethods.length === 0) {
       console.error(
         'Payment methods are not available. Please, check your Adyen configuration.'
@@ -373,87 +425,113 @@ export function AdyenPayment({
       countryCode: order?.country_code || '',
       paymentMethodsResponse,
       showPayButton: false,
-      paymentMethodsConfiguration: {
-        showStoredPaymentMethods,
-        paypal: {
-          showPayButton: true,
-          style: styles?.paypal,
-          ...config?.paymentMethodsConfiguration?.paypal
-        },
-        card: {
-          enableStoreDetails: showStoredPaymentMethods,
-          styles: styles?.card,
-          holderNameRequired: false,
-          ...config?.paymentMethodsConfiguration?.card
-        },
-        ...config?.paymentMethodsConfiguration
+      onAdditionalDetails: async (state, element, actions) => {
+        const { resultCode } = await handleOnAdditionalDetails(state, element)
+        if (['Cancelled', 'Refused'].includes(resultCode)) {
+          actions.reject()
+        } else {
+          console.log('Adyen onSubmit res', resultCode)
+          console.log('Payment with 3DS successful')
+          actions.resolve({
+            resultCode
+          })
+        }
       },
-      onAdditionalDetails: (state, element) => {
-        void handleOnAdditionalDetails(state, element)
+      onChange: (state) => {
+        void handleChange(state)
       },
-      onChange: (state, element) => {
-        void handleChange(state, element)
-      },
-      onSubmit: (state, element) => {
-        void onSubmit(state, element)
+      onSubmit: async (state, element, actions) => {
+        const { resultCode, action } = await onSubmit(state, element)
+        if (['Cancelled', 'Refused'].includes(resultCode)) {
+          actions.reject()
+        } else if (action != null) {
+          console.log('Adyen 3DS request', resultCode)
+          console.log('action', action)
+          dropinRef.current?.handleAction(action)
+          // actions.resolve({
+          //   resultCode,
+          //   action
+          // })
+        } else {
+          console.log('Adyen onSubmit res', resultCode)
+          console.log('Payment successful')
+          actions.resolve({
+            resultCode
+          })
+        }
       }
-    } satisfies CoreOptions
+    } satisfies CoreConfiguration
     if (!ref && clientKey)
       setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'false')
     if (clientKey && !loadAdyen && window && !checkout) {
-      void import('@adyen/adyen-web').then(({ default: AdyenCheckout }) => {
-        const type = isOnlyCard ? 'card' : 'dropin'
-        void AdyenCheckout(options).then((adyenCheckout) => {
-          const component = adyenCheckout
-            .create(type, {
-              showRemovePaymentMethodButton: showStoredPaymentMethods,
-              instantPaymentTypes: ['applepay', 'googlepay'],
-              onDisableStoredPaymentMethod: (state) => {
-                const recurringDetailReference = state
-                const shopperReference = customers?.shopper_reference ?? undefined
-                if (onDisableStoredPaymentMethod != null) {
-                  onDisableStoredPaymentMethod({
-                    recurringDetailReference,
-                    shopperReference
-                  }).then((response) => {
-                    if (response) {
-                      setPaymentSource({
-                        paymentResource: 'adyen_payments',
-                        order,
-                        attributes: {}
-                      })
-                    } else {
-                      console.error('onDisableStoredPaymentMethod error')
-                    }
+      const initializeAdyen = async () => {
+        const checkout = await AdyenCheckout(options)
+        const dropin = new Dropin(checkout, {
+          disableFinalAnimation: true,
+          showRemovePaymentMethodButton: showStoredPaymentMethods,
+          instantPaymentTypes: ['applepay', 'googlepay'],
+          paymentMethodsConfiguration: {
+            showStoredPaymentMethods,
+            paypal: {
+              showPayButton: true,
+              style: styles?.paypal,
+              ...config?.paymentMethodsConfiguration?.paypal
+            },
+            card: {
+              enableStoreDetails: showStoredPaymentMethods,
+              styles: styles?.card,
+              holderNameRequired: false,
+              ...config?.paymentMethodsConfiguration?.card
+            },
+            ...config?.paymentMethodsConfiguration
+          },
+          onDisableStoredPaymentMethod: (state) => {
+            const recurringDetailReference = state
+            const shopperReference = customers?.shopper_reference ?? undefined
+            if (onDisableStoredPaymentMethod != null) {
+              onDisableStoredPaymentMethod({
+                recurringDetailReference,
+                shopperReference
+              }).then((response) => {
+                if (response) {
+                  setPaymentSource({
+                    paymentResource: 'adyen_payments',
+                    order,
+                    attributes: {}
                   })
+                } else {
+                  console.error('onDisableStoredPaymentMethod error')
                 }
-              },
-              onSelect: (component) => {
-                const id: string = component._id
-                if (id.search('scheme') === -1) {
-                  if (ref.current) {
-                    if (id.search('paypal') === -1) {
-                      ref.current.onsubmit = async () => {
-                        return await handleSubmit(
-                          ref.current as any,
-                          component as any
-                        )
-                      }
-                    } else {
-                      ref.current.onsubmit = null
-                    }
-                    setPaymentRef({ ref })
+              })
+            }
+          },
+          onSelect: (component) => {
+            const id: string = component._id
+            if (id.search('scheme') === -1) {
+              if (ref.current) {
+                if (id.search('paypal') === -1) {
+                  ref.current.onsubmit = async () => {
+                    return await handleSubmit(
+                      ref.current as any)
                   }
+                } else {
+                  ref.current.onsubmit = null
                 }
+                setPaymentRef({ ref })
               }
-            })
-            .mount('#adyen-dropin')
-          if (component) {
-            setCheckout(component)
-            setLoadAdyen(true)
+            }
           }
-        })
-      })
+        }).mount('#adyen-dropin')
+        if (dropin && checkout) {
+          dropinRef.current = dropin
+          console.log('Adyen dropin mounted')
+          setCheckout(dropin)
+          setLoadAdyen(true)
+        }
+      }
+      if (!dropinRef.current) {
+        void initializeAdyen()
+      }
     }
     return () => {
       setPaymentRef({ ref: { current: null } })
@@ -464,7 +542,7 @@ export function AdyenPayment({
     <form
       ref={ref}
       onSubmit={(e) => {
-        void handleSubmit(e, checkout)
+        void handleSubmit(e)
       }}
     >
       <div className={cardContainerClassName} id='adyen-dropin' />
@@ -473,7 +551,6 @@ export function AdyenPayment({
           {templateCustomerSaveToWallet}
         </Parent>
       )}
-      <div className={threeDSecureContainerClassName} id='adyen-action' />
     </form>
   )
 }

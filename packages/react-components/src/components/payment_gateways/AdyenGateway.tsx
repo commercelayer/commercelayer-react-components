@@ -38,7 +38,9 @@ export function AdyenGateway(props: Props): JSX.Element | null {
     useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = 'adyen_payments'
   const locale = order?.language_code as StripeElementLocale
-  if (!readonly && payment?.id !== currentPaymentMethodId && order != null && !canPlaceOrder(order)) return null
+  console.log('AdyenGateway order', order, order?.status)
+  console.log('AdyenGateway order can place? --- ', order && canPlaceOrder(order))
+  if (!readonly && payment?.id !== currentPaymentMethodId) return null
   // @ts-expect-error no type
   const clientKey = paymentSource?.public_key
   const environment = accessToken && jwt(accessToken).test ? 'test' : 'live'
