@@ -189,13 +189,11 @@ export async function setPlaceOrder({
     const { options, paymentType } = state
     try {
       // Prevent extra place order
-      const lastOrderStatus = await sdk.orders.retrieve(order.id, {
-        fields: { orders: ['status'] }
-      })
+      const lastOrderStatus = await sdk.orders.retrieve(order.id)
       if (lastOrderStatus.status === 'placed') {
         return {
           placed: true,
-          order
+          order: lastOrderStatus
         }
       }
       if (

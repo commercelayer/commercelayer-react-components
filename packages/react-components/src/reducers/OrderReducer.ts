@@ -521,7 +521,7 @@ export async function addToCart(
           })
           const redirectUrl = checkoutUrl
             ? `${checkoutUrl}/${params}`
-            : organizationConfig?.links?.checkout ?? href
+            : (organizationConfig?.links?.checkout ?? href)
           location.href = redirectUrl
         } else if (openMiniCart) {
           publish('open-cart')
