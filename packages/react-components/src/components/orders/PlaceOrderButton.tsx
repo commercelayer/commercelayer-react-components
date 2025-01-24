@@ -5,8 +5,8 @@ import {
   useRef,
   useState,
   type MouseEvent,
-  type JSX,
-} from 'react';
+  type JSX
+} from 'react'
 import Parent from '../utils/Parent'
 import { type ChildrenFunction } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
@@ -67,7 +67,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     options,
     paymentType,
     setButtonRef,
-    setPlaceOrderStatus
+    setPlaceOrderStatus,
+    status
   } = useContext(PlaceOrderContext)
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
@@ -251,7 +252,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         // @ts-expect-error no type
         ref?.current?.disabled === false &&
         currentCustomerPaymentSourceId == null &&
-        autoPlaceOrder
+        autoPlaceOrder &&
+        status === 'standby'
       ) {
         // NOTE: This is a workaround for the case when the user reloads the page after selecting a customer payment source
         if (
@@ -344,11 +346,19 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         paymentSource: checkPaymentSource,
         currentCustomerPaymentSourceId
       }))
-    setForceDisable(false)
-    onClick && placed && onClick(placed)
-    setIsLoading(false)
-    if (setPlaceOrderStatus != null) {
-      setPlaceOrderStatus({ status: 'standby' })
+    if (placed && setPlaceOrderStatus != null) {
+      if (placed.placed) {
+        setPlaceOrderStatus({ status: 'placing' })
+        onClick && placed && onClick(placed)
+      } else {
+        setForceDisable(false)
+        onClick && placed && onClick(placed)
+        setIsLoading(false)
+        setPlaceOrderStatus({ status: 'standby' })
+      }
+    } else {
+      setForceDisable(false)
+      setIsLoading(false)
     }
   }
   const disabledButton = disabled !== undefined ? disabled : notPermitted

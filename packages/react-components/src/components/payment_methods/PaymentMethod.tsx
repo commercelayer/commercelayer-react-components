@@ -1,4 +1,10 @@
-import { useState, useEffect, type MouseEvent, useContext, type JSX } from 'react';
+import {
+  useState,
+  useEffect,
+  type MouseEvent,
+  useContext,
+  type JSX
+} from 'react'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import type { LoaderType } from '#typings'
@@ -19,6 +25,7 @@ import {
 import { isEmpty } from '#utils/isEmpty'
 import { getAvailableExpressPayments } from '#utils/expressPaymentHelper'
 import PlaceOrderContext from '#context/PlaceOrderContext'
+import { sortPaymentMethods } from '#utils/payment-methods/sortPaymentMethods'
 
 export interface PaymentMethodOnClickParams {
   payment?: PaymentMethodType | Record<string, any>
@@ -48,6 +55,10 @@ type Props = {
    * Enable express payment. Other payment methods will be disabled.
    */
   expressPayments?: boolean
+  /**
+   * Sort payment methods by an array of strings
+   */
+  sortBy?: Array<PaymentMethodType['payment_source_type']>
 } & Omit<JSX.IntrinsicElements['div'], 'onClick' | 'children'> &
   (
     | {
@@ -72,6 +83,7 @@ export function PaymentMethod({
   expressPayments,
   hide,
   onClick,
+  sortBy,
   ...p
 }: Props): JSX.Element {
   const [loading, setLoading] = useState(true)
@@ -180,7 +192,7 @@ export function PaymentMethod({
         void autoSelect()
       }
     }
-  }, [order?.payment_source != null])
+  }, [!isEmpty(paymentMethods), order?.payment_source != null])
   useEffect(() => {
     if (paymentMethods) {
       const isSingle = paymentMethods.length === 1
@@ -200,7 +212,13 @@ export function PaymentMethod({
       setPaymentSelected('')
     }
   }, [paymentMethods, currentPaymentMethodId])
-  const components = paymentMethods
+
+  const sortedPaymentMethods =
+    paymentMethods != null && sortBy != null
+      ? sortPaymentMethods(paymentMethods, sortBy)
+      : paymentMethods
+
+  const components = sortedPaymentMethods
     ?.filter((payment) => {
       if (Array.isArray(hide)) {
         const source = payment?.payment_source_type as PaymentResource
