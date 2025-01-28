@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, type JSX } from 'react';
 import BaseSelect from '../utils/BaseSelect'
-import { type BaseSelectComponentProps } from '#typings'
+import type { BaseSelectComponentProps } from '#typings'
 import BillingAddressFormContext, {
   type AddressValuesKeys
 } from '#context/BillingAddressFormContext'

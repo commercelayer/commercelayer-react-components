@@ -1,6 +1,6 @@
-import {
-  type setInStockSubscription,
-  type InStockSubscriptionState
+import type {
+  setInStockSubscription,
+  InStockSubscriptionState
 } from '#reducers/InStockSubscriptionReducer'
 import { createContext } from 'react'
 

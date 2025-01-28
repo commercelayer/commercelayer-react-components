@@ -2,11 +2,11 @@
 import { useContext, type PropsWithoutRef, type JSX } from 'react';
 import Parent from '../utils/Parent'
 import OrderContext from '#context/OrderContext'
-import { type ChildrenFunction } from '#typings/index'
-import {
-  type AddToCartReturn,
-  type CustomLineItem,
-  type LineItemOption
+import type { ChildrenFunction } from '#typings/index'
+import type {
+  AddToCartReturn,
+  CustomLineItem,
+  LineItemOption
 } from '#reducers/OrderReducer'
 import SkuListsContext from '#context/SkuListsContext'
 import ExternalFunctionContext from '#context/ExternalFunctionContext'
@@ -270,7 +270,7 @@ export function AddToCartButton(props: Props): JSX.Element {
     <button
       {...p}
       onClick={() => {
-        void handleClick()
+        handleClick()
       }}
     >
       {label}

@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { type ShippingAddressState } from '#reducers/ShippingAddressReducer'
+import type { ShippingAddressState } from '#reducers/ShippingAddressReducer'
 
 type DefaultContext = {
   setShippingAddress?: (

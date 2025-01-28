@@ -2,7 +2,7 @@ import Parent from '#components/utils/Parent'
 import OrderListPaginationContext, {
   type OrderListPaginationContext as TOrderListPaginationContext
 } from '#context/OrderListPaginationContext'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import omit from '#utils/omit'
 

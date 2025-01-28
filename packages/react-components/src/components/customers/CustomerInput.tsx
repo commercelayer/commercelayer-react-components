@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { useContext, useEffect, useState, type JSX } from 'react';
 import BaseInput from '#components-utils/BaseInput'
-import { type BaseInputComponentProps } from '#typings'
+import type { BaseInputComponentProps } from '#typings'
 import { useRapidForm } from 'rapid-form'
 import CustomerContext from '#context/CustomerContext'
-import { type BaseError, type CodeErrorType } from '#typings/errors'
+import type { BaseError, CodeErrorType } from '#typings/errors'
 import { validateValue } from '#utils/validateFormFields'
 import OrderContext from '#context/OrderContext'
 
@@ -101,7 +101,7 @@ export function CustomerInput(props: Props): JSX.Element {
       placeholder={placeholder}
       defaultValue={value}
       onBlur={(e) => {
-        void handleOnBlur(e)
+        handleOnBlur(e)
       }}
       className={classNameComputed}
       {...p}

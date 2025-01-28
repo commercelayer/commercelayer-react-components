@@ -1,10 +1,10 @@
 import { useContext, type ReactNode, type JSX } from 'react';
 import AddressChildrenContext from '#context/AddressChildrenContext'
 import Parent from '#components/utils/Parent'
-import { type AddressFieldView } from '#reducers/AddressReducer'
+import type { AddressFieldView } from '#reducers/AddressReducer'
 import type { Address } from '@commercelayer/sdk'
 import CustomerContext from '#context/CustomerContext'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 
 interface ChildrenProps extends Omit<Props, 'children' | 'name'> {
   address: Address
@@ -77,7 +77,7 @@ export function AddressField(props: Props): JSX.Element {
     e.stopPropagation()
     e.preventDefault()
     if (type === 'delete' && deleteCustomerAddress && address?.reference) {
-      void deleteCustomerAddress({ customerAddressId: address?.reference })
+      deleteCustomerAddress({ customerAddressId: address?.reference })
     }
     address && onClick && onClick(address)
   }

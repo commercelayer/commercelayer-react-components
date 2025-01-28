@@ -1,5 +1,5 @@
-import { type PaymentResource } from '#reducers/PaymentMethodReducer'
-import { type CommerceLayerClient, type Order } from '@commercelayer/sdk'
+import type { PaymentResource } from '#reducers/PaymentMethodReducer'
+import type { CommerceLayerClient, Order } from '@commercelayer/sdk'
 
 /**
  * Check if a given `order` has a linked `order_subscription` to replace its `customer_payment_source` with the `order`'s `payment_source`.
@@ -12,7 +12,7 @@ export function updateOrderSubscriptionCustomerPaymentSource(
   sdk: CommerceLayerClient
 ): void {
   if (order.subscription_created_at != null) {
-    void sdk.orders
+    sdk.orders
       .retrieve(order.id, {
         include: ['order_subscription', 'payment_source']
       })
@@ -28,14 +28,14 @@ export function updateOrderSubscriptionCustomerPaymentSource(
                 payment_source_token_eq: paymentSourceToken
               }
             })
-            void customerPaymentSources.then((customerPaymentSources) => {
+            customerPaymentSources.then((customerPaymentSources) => {
               if (
                 customerPaymentSources.length > 0 &&
                 order.order_subscription != null
               ) {
                 const customerPaymentSource = customerPaymentSources[0]
                 if (customerPaymentSource != null) {
-                  void sdk.order_subscriptions.update({
+                  sdk.order_subscriptions.update({
                     id: order.order_subscription?.id,
                     customer_payment_source:
                       sdk.customer_payment_sources.relationship(

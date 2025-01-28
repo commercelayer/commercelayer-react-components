@@ -64,7 +64,7 @@ export function AvailabilityContainer({
     if (accessToken != null && accessToken !== '') {
       const config = { accessToken, endpoint }
       if (sCode != null || skuId != null) {
-        void getAvailability({ skuCode: sCode, skuId, config, dispatch })
+        getAvailability({ skuCode: sCode, skuId, config, dispatch })
       }
     }
     return (): void => {

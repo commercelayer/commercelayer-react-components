@@ -4,12 +4,12 @@ import isString from 'lodash/isString'
 import without from 'lodash/without'
 import keys from 'lodash/keys'
 import map from 'lodash/map'
-import { type BaseState } from '#typings/index'
-import { type BaseError } from '#typings/errors'
+import type { BaseState } from '#typings/index'
+import type { BaseError } from '#typings/errors'
 import { type AddressField, addressFields } from '#reducers/AddressReducer'
-import { type AddressCreate } from '@commercelayer/sdk'
-import { type AddressInputName } from '#typings'
-import { type TResourceError } from '#components/errors/Errors'
+import type { AddressCreate } from '@commercelayer/sdk'
+import type { AddressInputName } from '#typings'
+import type { TResourceError } from '#components/errors/Errors'
 
 const EMAIL_PATTERN =
   // eslint-disable-next-line no-useless-escape

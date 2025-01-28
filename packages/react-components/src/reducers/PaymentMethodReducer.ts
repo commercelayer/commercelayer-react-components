@@ -1,34 +1,34 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { type AdyenPaymentConfig } from '#components/payment_source/AdyenPayment'
-import { type BraintreeConfig } from '#components/payment_source/BraintreePayment'
-import { type PaypalConfig } from '#components/payment_source/PaypalPayment'
-import { type StripeConfig } from '#components/payment_source/StripePayment'
-import { type WireTransferConfig } from '#components/payment_source/WireTransferPayment'
-import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { type getOrderContext, type updateOrder } from '#reducers/OrderReducer'
+import type { AdyenPaymentConfig } from '#components/payment_source/AdyenPayment'
+import type { BraintreeConfig } from '#components/payment_source/BraintreePayment'
+import type { PaypalConfig } from '#components/payment_source/PaypalPayment'
+import type { StripeConfig } from '#components/payment_source/StripePayment'
+import type { WireTransferConfig } from '#components/payment_source/WireTransferPayment'
+import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import type { getOrderContext, updateOrder } from '#reducers/OrderReducer'
 import type { BaseError } from '#typings/errors'
 import baseReducer from '#utils/baseReducer'
 import getErrors, { setErrors } from '#utils/getErrors'
 import getSdk from '#utils/getSdk'
-import {
-  type Order,
-  type PaymentMethod,
-  type StripePayment,
-  type WireTransfer,
-  type AdyenPayment,
-  type BraintreePayment,
-  type CheckoutComPayment,
-  type ExternalPayment,
-  type PaypalPayment,
-  type KlarnaPayment
+import type {
+  Order,
+  PaymentMethod,
+  StripePayment,
+  WireTransfer,
+  AdyenPayment,
+  BraintreePayment,
+  CheckoutComPayment,
+  ExternalPayment,
+  PaypalPayment,
+  KlarnaPayment
 } from '@commercelayer/sdk'
-import { type Dispatch, type MutableRefObject } from 'react'
-import { type CheckoutComConfig } from '#components/payment_source/CheckoutComPayment'
-import { type ExternalPaymentConfig } from '#components/payment_source/ExternalPayment'
+import type { Dispatch, MutableRefObject } from 'react'
+import type { CheckoutComConfig } from '#components/payment_source/CheckoutComPayment'
+import type { ExternalPaymentConfig } from '#components/payment_source/ExternalPayment'
 import { snakeToCamelCase } from '#utils/snakeToCamelCase'
 import { replace } from '#utils/replace'
 import { pick } from '#utils/pick'
-import { type ResourceKeys } from '#utils/getPaymentAttributes'
+import type { ResourceKeys } from '#utils/getPaymentAttributes'
 
 export type PaymentSourceType = Order['payment_source']
 

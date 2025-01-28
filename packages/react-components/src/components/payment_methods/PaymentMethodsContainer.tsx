@@ -20,7 +20,7 @@ import paymentMethodReducer, {
 } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import { type BaseError } from '#typings/errors'
+import type { BaseError } from '#typings/errors'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import { isEmpty } from '#utils/isEmpty'
 import { setCustomerOrderParam } from '#utils/localStorage'
@@ -78,7 +78,7 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     if (config && isEmpty(state.config))
       setPaymentMethodConfig(config, dispatch)
     if (credentials && order && !state.paymentMethods) {
-      void getPayMethods()
+      getPayMethods()
     }
     if (order?.payment_source) {
       dispatch({

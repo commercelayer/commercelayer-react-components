@@ -1,7 +1,7 @@
 import { useContext, type JSX } from 'react';
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from '#components/utils/Parent'
-import { type ShippingMethod } from '@commercelayer/sdk'
+import type { ShippingMethod } from '@commercelayer/sdk'
 
 type ChildrenProps = Omit<Props, 'children'> & {
   label: string

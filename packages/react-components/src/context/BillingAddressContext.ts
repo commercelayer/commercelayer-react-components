@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { type BillingAddressState } from '#reducers/BillingAddressReducer'
+import type { BillingAddressState } from '#reducers/BillingAddressReducer'
 
 type DefaultContext = {
   setBillingAddress?: (

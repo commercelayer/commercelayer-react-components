@@ -129,7 +129,7 @@ export function PaymentMethod({
           }
           setLoadingPlaceOrder({ loading: false })
         }
-        void selectExpressPayment()
+        selectExpressPayment()
       }
     }
   }, [!isEmpty(paymentMethods), expressPayments])
@@ -189,7 +189,7 @@ export function PaymentMethod({
             }, 200)
           }
         }
-        void autoSelect()
+        autoSelect()
       }
     }
   }, [!isEmpty(paymentMethods), order?.payment_source != null])
@@ -264,7 +264,7 @@ export function PaymentMethod({
           }`}
           onClick={(e) => {
             if (onClickable != null) {
-              void onClickable(e)
+              onClickable(e)
             }
           }}
           {...p}

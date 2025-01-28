@@ -2,8 +2,8 @@ import OrderContext from '#context/OrderContext'
 import getAmount from '#utils/getAmount'
 import Parent from './Parent'
 import { useState, useEffect, useContext, type JSX } from 'react';
-import { type PropsType } from '#utils/PropsType'
-import { type baseOrderPricePropTypes } from '#typings'
+import type { PropsType } from '#utils/PropsType'
+import type { baseOrderPricePropTypes } from '#typings'
 import isEmpty from 'lodash/isEmpty'
 
 export type BaseOrderPriceProps = PropsType<

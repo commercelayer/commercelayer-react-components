@@ -100,7 +100,7 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
         ref={ref}
         autoComplete={autoComplete}
         onSubmit={(e) => {
-          void handleSubmit(e)
+          handleSubmit(e)
         }}
         {...p}
       >

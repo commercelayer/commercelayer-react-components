@@ -1,14 +1,14 @@
-import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
-import {
-  type OrderUpdate,
-  type Order,
-  type PaymentMethod,
-  type QueryParamsRetrieve,
-  type AddressCreate
+import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import type {
+  OrderUpdate,
+  Order,
+  PaymentMethod,
+  QueryParamsRetrieve,
+  AddressCreate
 } from '@commercelayer/sdk'
 import getSdk from './getSdk'
-import { type PaymentRequestShippingOption } from '@stripe/stripe-js'
-import { type PaymentResource } from '#reducers/PaymentMethodReducer'
+import type { PaymentRequestShippingOption } from '@stripe/stripe-js'
+import type { PaymentResource } from '#reducers/PaymentMethodReducer'
 import { getDomain } from './getDomain'
 
 const availablePaymentMethods = ['stripe_payments']

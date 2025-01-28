@@ -1,9 +1,9 @@
 import { useContext, useRef, type JSX } from 'react';
-import {
-  type PaymentMethodConfig,
-  type PaymentSourceObject
+import type {
+  PaymentMethodConfig,
+  PaymentSourceObject
 } from '#reducers/PaymentMethodReducer'
-import { type PaymentSourceProps } from './PaymentSource'
+import type { PaymentSourceProps } from './PaymentSource'
 import useExternalScript from '#utils/hooks/useExternalScript'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import {

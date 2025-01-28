@@ -1,7 +1,7 @@
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components/utils/Parent'
 import useCustomContext from '#utils/hooks/useCustomContext'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 
 import type { JSX } from "react";
 

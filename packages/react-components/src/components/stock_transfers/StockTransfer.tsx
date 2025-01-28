@@ -3,9 +3,9 @@ import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 import StockTransferChildrenContext, {
   type InitialStockTransferContext
 } from '#context/StockTransferChildrenContext'
-import {
-  type LineItem,
-  type StockTransfer as TStockTransfer
+import type {
+  LineItem,
+  StockTransfer as TStockTransfer
 } from '@commercelayer/sdk'
 import type { DefaultChildrenType } from '#typings/globals'
 

@@ -1,6 +1,6 @@
 import Parent from '#components/utils/Parent'
 import ShipmentContext from '#context/ShipmentContext'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import type { Shipment } from '@commercelayer/sdk'
 

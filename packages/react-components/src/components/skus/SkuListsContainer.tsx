@@ -16,7 +16,7 @@ export function SkuListsContainer(props: Props): JSX.Element {
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     if (state.listIds && state.listIds.length > 0 && config.accessToken) {
-      void getSkuList({ listIds: state.listIds, dispatch, config, state })
+      getSkuList({ listIds: state.listIds, dispatch, config, state })
     }
   }, [config.accessToken])
   return (

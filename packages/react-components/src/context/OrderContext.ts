@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { type Order } from '@commercelayer/sdk'
+import type { Order } from '@commercelayer/sdk'
 import {
   type OrderState,
   type SaveAddressToCustomerAddressBook,
@@ -12,7 +12,7 @@ import {
   type getOrderContext,
   type addToCart
 } from '#reducers/OrderReducer'
-import { type BaseError } from '#typings/errors'
+import type { BaseError } from '#typings/errors'
 
 interface DefaultContext extends OrderState {
   createOrder: typeof createOrder

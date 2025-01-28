@@ -1,5 +1,5 @@
 import SkuChildrenContext from '#context/SkuChildrenContext'
-import { type ConditionalElement } from '#typings'
+import type { ConditionalElement } from '#typings'
 import GenericFieldComponent, {
   type TGenericChildrenProps,
   type TResourceKey,

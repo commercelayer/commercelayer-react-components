@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, type JSX } from 'react';
 import getAmount from '#utils/getAmount'
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import Parent from '#components/utils/Parent'
-import { type BaseAmountComponent } from '#typings/index'
+import type { BaseAmountComponent } from '#typings/index'
 
 type Props = BaseAmountComponent & {
   /**

@@ -1,18 +1,18 @@
-import { type Dispatch } from 'react'
+import type { Dispatch } from 'react'
 import {
   type SetLocalOrder,
   type DeleteLocalOrder,
   setCustomerOrderParam,
   type CustomerOrderParams
 } from '#utils/localStorage'
-import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
+import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import baseReducer from '#utils/baseReducer'
 import isEmpty from 'lodash/isEmpty'
-import { type BaseMetadataObject } from '#typings/index'
-import { type BaseError } from '#typings/errors'
+import type { BaseMetadataObject } from '#typings/index'
+import type { BaseError } from '#typings/errors'
 import getSdk from '#utils/getSdk'
 import getErrors, { setErrors } from '../utils/getErrors'
-import { type AddressResource } from './AddressReducer'
+import type { AddressResource } from './AddressReducer'
 import type {
   Order,
   LineItemCreate,
@@ -21,7 +21,7 @@ import type {
   QueryParamsRetrieve
 } from '@commercelayer/sdk'
 import { getOrganizationConfig } from '#utils/organization'
-import { type LooseAutocomplete } from '#typings/globals'
+import type { LooseAutocomplete } from '#typings/globals'
 import { publish } from '#utils/events'
 import { getDomain } from '#utils/getDomain'
 import { getApplicationLink } from '#utils/getApplicationLink'

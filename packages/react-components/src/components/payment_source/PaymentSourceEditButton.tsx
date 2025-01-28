@@ -1,7 +1,7 @@
 import PaymentSourceContext from '#context/PaymentSourceContext'
 import { type ReactNode, useContext, type JSX } from 'react';
 import Parent from '#components/utils/Parent'
-import { type ChildrenFunction } from '#typings'
+import type { ChildrenFunction } from '#typings'
 
 interface CustomComponent extends Omit<Props, 'children'> {}
 

@@ -1,6 +1,6 @@
 import BaseSelect from '#components/utils/BaseSelect'
 import currencyOptions from '#config/currency'
-import { type BaseSelectComponentProps } from '#typings'
+import type { BaseSelectComponentProps } from '#typings'
 
 import type { JSX } from "react";
 

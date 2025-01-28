@@ -1,5 +1,5 @@
 import StockTransferChildrenContext from '#context/StockTransferChildrenContext'
-import { type ConditionalElement } from '#typings'
+import type { ConditionalElement } from '#typings'
 import GenericFieldComponent, {
   type TGenericChildrenProps,
   type TResourceKey,

@@ -1,4 +1,4 @@
-import { type ResourceIncluded } from '#reducers/OrderReducer'
+import type { ResourceIncluded } from '#reducers/OrderReducer'
 import type { Order } from '@commercelayer/sdk'
 
 interface Params {

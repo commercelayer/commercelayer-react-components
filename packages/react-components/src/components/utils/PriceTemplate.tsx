@@ -1,4 +1,4 @@
-import { type PriceProps } from '#components/prices/Price'
+import type { PriceProps } from '#components/prices/Price'
 
 import type { JSX } from "react";
 

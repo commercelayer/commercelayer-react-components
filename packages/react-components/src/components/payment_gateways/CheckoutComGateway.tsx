@@ -1,5 +1,5 @@
 import CheckoutComPayment from '#components/payment_source/CheckoutComPayment'
-import { type GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
+import type { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
@@ -9,7 +9,7 @@ import {
   getPaymentConfig,
   type PaymentResource
 } from '#reducers/PaymentMethodReducer'
-import { type StripeElementLocale } from '@stripe/stripe-js'
+import type { StripeElementLocale } from '@stripe/stripe-js'
 import isEmpty from 'lodash/isEmpty'
 import React, { type JSX } from 'react';
 import PaymentCardsTemplate from '#components/utils/PaymentCardsTemplate'

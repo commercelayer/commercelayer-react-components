@@ -4,11 +4,11 @@ import {
   type PaymentMethodConfig,
   type PaymentResource
 } from '#reducers/PaymentMethodReducer'
-import { type ExternalPayment } from '@commercelayer/sdk'
+import type { ExternalPayment } from '@commercelayer/sdk'
 import { pick } from './pick'
 import { replace, type StringReplace } from './replace'
 import { type SnakeToCamelCase, snakeToCamelCase } from './snakeToCamelCase'
-import { type StripeConfig } from '#components/payment_source/StripePayment'
+import type { StripeConfig } from '#components/payment_source/StripePayment'
 
 interface Params<R extends PaymentResource, C extends PaymentMethodConfig> {
   resource: R
@@ -30,7 +30,7 @@ export function getPaymentAttributes<
 >(params: Params<R, C>): Pick<C, ResourceKeys<R>> | undefined {
   const { resource, config, keys } = params
   const attributes = getPaymentConfig(resource, config)
-  const keysCamelCase: Array<ResourceKeys<R>> = keys.map((key) => {
+  const keysCamelCase: ResourceKeys<R>[] = keys.map((key) => {
     const k = replace(
       replace(key, 'payments', 'payment'),
       'transfers',

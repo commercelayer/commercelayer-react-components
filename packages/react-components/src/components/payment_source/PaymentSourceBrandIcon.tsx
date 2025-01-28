@@ -3,7 +3,7 @@ import PaymentSourceContext, {
 } from '#context/PaymentSourceContext'
 import { useContext, useRef, type JSX } from 'react';
 import Parent from '#components/utils/Parent'
-import { type ChildrenFunction } from '#typings'
+import type { ChildrenFunction } from '#typings'
 import CustomerPaymentSourceContext from '#context/CustomerPaymentSourceContext'
 
 interface ChildrenProps extends Omit<Props, 'children'> {

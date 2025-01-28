@@ -75,7 +75,7 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
       onChange={(e) => {
         e.preventDefault()
         e.stopPropagation()
-        void handleOnChange()
+        handleOnChange()
       }}
       checked={checked}
       {...p}

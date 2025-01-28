@@ -1,5 +1,5 @@
 import type { Order, OrderSubscription } from '@commercelayer/sdk'
-import { type Row } from '@tanstack/react-table'
+import type { Row } from '@tanstack/react-table'
 import { createContext, type JSX } from 'react';
 
 export type TOrderList = 'orders' | 'subscriptions'
@@ -21,7 +21,7 @@ export type InitialOrderListContext = Partial<{
   /**
    * The list of orders
    */
-  orders: Array<OrderListContent<TOrderList>> | null | undefined
+  orders: OrderListContent<TOrderList>[] | null | undefined
   /**
    * The current row
    */

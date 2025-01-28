@@ -22,7 +22,7 @@ import CustomerContext from '#context/CustomerContext'
 import type { BaseError } from '#typings/errors'
 import type { DefaultChildrenType } from '#typings/globals'
 import { isGuestToken } from '#utils/isGuestToken'
-import { type QueryPageSize } from '@commercelayer/sdk'
+import type { QueryPageSize } from '@commercelayer/sdk'
 
 interface Props {
   children: DefaultChildrenType
@@ -111,10 +111,10 @@ export function CustomerContainer(props: Props): JSX.Element {
         return
       }
       if (state.customers == null) {
-        void getCustomerInfo({ config, dispatch })
+        getCustomerInfo({ config, dispatch })
       }
       if (state.addresses == null) {
-        void getCustomerAddresses({
+        getCustomerAddresses({
           config,
           dispatch,
           isOrderAvailable: withoutIncludes != null,
@@ -136,7 +136,7 @@ export function CustomerContainer(props: Props): JSX.Element {
           await getCustomerSubscriptions({ config, dispatch })
           await getCustomerPayments({ config, dispatch })
         }
-        void getCustomerData()
+        getCustomerData()
       }
     }
   }, [config.accessToken, order?.payment_source != null, isGuest])

@@ -42,7 +42,7 @@ export function SkusContainer<P extends Props>(props: P): JSX.Element {
   useEffect(() => {
     if (config.accessToken && state?.skus) {
       if (state?.skus.length === 0) {
-        void loadSkus()
+        loadSkus()
       }
     }
     return () => {

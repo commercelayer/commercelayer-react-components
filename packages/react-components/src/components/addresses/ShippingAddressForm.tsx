@@ -2,11 +2,11 @@ import AddressesContext from '#context/AddressContext'
 import { useRapidForm } from 'rapid-form'
 import { type ReactNode, useContext, useEffect, useRef, type JSX } from 'react';
 import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
-import { type BaseError, type CodeErrorType } from '#typings/errors'
+import type { BaseError, CodeErrorType } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import { getSaveShippingAddressToAddressBook } from '#utils/localStorage'
-import { type AddressValuesKeys } from '#context/BillingAddressFormContext'
-import { type CustomFieldMessageError } from '#reducers/AddressReducer'
+import type { AddressValuesKeys } from '#context/BillingAddressFormContext'
+import type { CustomFieldMessageError } from '#reducers/AddressReducer'
 
 interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
   children: ReactNode
@@ -172,11 +172,9 @@ export function ShippingAddressForm(props: Props): JSX.Element {
           (field?.required === false && field?.type !== 'checkbox')
         ) {
           values[name.replace('shipping_address_', '')] = field.value
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete values[name]
         }
         if (field?.type === 'checkbox') {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete values[name]
           saveAddressToCustomerAddressBook({
             type: 'shipping_address',

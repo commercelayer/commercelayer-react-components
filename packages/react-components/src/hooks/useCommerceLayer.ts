@@ -1,6 +1,6 @@
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import getSdk from '#utils/getSdk'
-import { type CommerceLayerClient } from '@commercelayer/sdk'
+import type { CommerceLayerClient } from '@commercelayer/sdk'
 import { useContext } from 'react'
 
 interface ReturnProps {

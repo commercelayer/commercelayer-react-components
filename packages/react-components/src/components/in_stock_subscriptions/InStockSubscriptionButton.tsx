@@ -1,7 +1,7 @@
 import Parent from '#components/utils/Parent'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import InStockSubscriptionContext from '#context/InStockSubscriptionContext'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import { jwt } from '#utils/jwt'
 import { useContext, useState, type JSX } from 'react';
@@ -93,7 +93,7 @@ export function InStockSubscriptionButton({
   return !show ? null : (
     <button
       onClick={() => {
-        void handleClick()
+        handleClick()
       }}
       disabled={loading}
       {...props}

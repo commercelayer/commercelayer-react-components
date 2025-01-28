@@ -1,5 +1,5 @@
 import React, { type ForwardRefRenderFunction, type JSX } from 'react';
-import { type BaseInputComponentProps } from '#typings/index'
+import type { BaseInputComponentProps } from '#typings/index'
 import Parent from './Parent'
 
 export type BaseInputProps = BaseInputComponentProps &

@@ -1,6 +1,6 @@
 import baseReducer from '#utils/baseReducer'
-import { type Dispatch } from 'react'
-import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
+import type { Dispatch } from 'react'
+import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import getSdk from '#utils/getSdk'
 
 type SkuListsActionType = 'getSkuList' | 'setSkuList'

@@ -3,7 +3,7 @@ import AddressChildrenContext from '#context/AddressChildrenContext'
 import CustomerContext from '#context/CustomerContext'
 import BillingAddressContext from '#context/BillingAddressContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
-import { type Address as AddressType } from '@commercelayer/sdk'
+import type { Address as AddressType } from '@commercelayer/sdk'
 import isEmpty from 'lodash/isEmpty'
 import AddressContext from '#context/AddressContext'
 import OrderContext from '#context/OrderContext'
@@ -81,7 +81,7 @@ export function Address(props: Props): JSX.Element {
           setBillingAddress &&
           address.reference != null
         ) {
-          void setBillingAddress(address.id, {
+          setBillingAddress(address.id, {
             customerAddressId: address.reference
           })
         }
@@ -95,7 +95,7 @@ export function Address(props: Props): JSX.Element {
           setShippingAddress &&
           address.reference != null
         ) {
-          void setShippingAddress(address.id, {
+          setShippingAddress(address.id, {
             customerAddressId: address.reference
           })
         }
@@ -106,7 +106,7 @@ export function Address(props: Props): JSX.Element {
         setBillingAddress && (await setBillingAddress(''))
         setShippingAddress && (await setShippingAddress(''))
       }
-      void disabledSaveButton()
+      disabledSaveButton()
     }
   }, [
     deselect,
@@ -166,7 +166,7 @@ export function Address(props: Props): JSX.Element {
                 <div
                   className={finalClassName}
                   onClick={() => {
-                    void handleSelect(
+                    handleSelect(
                       k,
                       address.id,
                       customerAddressId,

@@ -1,7 +1,7 @@
 import AvailabilityContext from '#context/AvailabilityContext'
 import Parent from '#components/utils/Parent'
-import { type TimeFormat, type ChildrenFunction } from '#typings/index'
-import { type DeliveryLeadTime } from '#reducers/AvailabilityReducer'
+import type { TimeFormat, ChildrenFunction } from '#typings/index'
+import type { DeliveryLeadTime } from '#reducers/AvailabilityReducer'
 import useCustomContext from '#utils/hooks/useCustomContext'
 
 import type { JSX } from "react";

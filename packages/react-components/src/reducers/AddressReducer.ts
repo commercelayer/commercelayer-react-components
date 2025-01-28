@@ -1,20 +1,20 @@
 import baseReducer from '#utils/baseReducer'
-import { type Dispatch } from 'react'
-import { type CodeErrorType, type BaseError } from '#typings/errors'
-import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { type OrderUpdate, type Address, type Order } from '@commercelayer/sdk'
+import type { Dispatch } from 'react'
+import type { CodeErrorType, BaseError } from '#typings/errors'
+import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import type { OrderUpdate, Address, Order } from '@commercelayer/sdk'
 import getSdk from '#utils/getSdk'
-import { type updateOrder } from './OrderReducer'
+import type { updateOrder } from './OrderReducer'
 import camelCase from 'lodash/camelCase'
-import { type TCustomerAddress } from './CustomerReducer'
-import { type TResourceError } from '#components/errors/Errors'
+import type { TCustomerAddress } from './CustomerReducer'
+import type { TResourceError } from '#components/errors/Errors'
 import {
   invertedAddressesHandler,
   sanitizeMetadataFields
 } from '#utils/addressesManager'
 import { formCleaner } from '#utils/formCleaner'
-import { type AddressValuesKeys } from '#context/BillingAddressFormContext'
-import { type AddressInputName } from '#typings/index'
+import type { AddressValuesKeys } from '#context/BillingAddressFormContext'
+import type { AddressInputName } from '#typings/index'
 
 // TODO: Move in the future
 export type CustomFieldMessageError = (props: {

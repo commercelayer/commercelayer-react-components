@@ -1,14 +1,14 @@
-import {
-  type SetCustomerErrors,
-  type deleteCustomerAddress,
-  type CustomerState,
-  type getCustomerPaymentSources,
-  type setCustomerEmail,
-  type TCustomerAddress,
-  type getCustomerAddresses,
-  type getCustomerOrders,
-  type getCustomerSubscriptions,
-  type setResourceTrigger
+import type {
+  SetCustomerErrors,
+  deleteCustomerAddress,
+  CustomerState,
+  getCustomerPaymentSources,
+  setCustomerEmail,
+  TCustomerAddress,
+  getCustomerAddresses,
+  getCustomerOrders,
+  getCustomerSubscriptions,
+  setResourceTrigger
 } from '#reducers/CustomerReducer'
 import { createContext } from 'react'
 

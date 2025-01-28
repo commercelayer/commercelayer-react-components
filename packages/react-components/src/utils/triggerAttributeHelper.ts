@@ -1,5 +1,5 @@
-import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { type Order, type OrderSubscription } from '@commercelayer/sdk'
+import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import type { Order, OrderSubscription } from '@commercelayer/sdk'
 import getSdk from './getSdk'
 
 export type HelperRequestResource = 'orders' | 'order_subscriptions'
