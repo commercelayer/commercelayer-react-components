@@ -1,8 +1,8 @@
 import { type ReactNode, useContext, type JSX } from 'react';
 import Parent from '#components/utils/Parent'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import OrderContext from '#context/OrderContext'
-import { type CodeType, type OrderCodeType } from '#reducers/OrderReducer'
+import type { CodeType, OrderCodeType } from '#reducers/OrderReducer'
 import type { Order } from '@commercelayer/sdk'
 
 interface ChildrenProps extends Omit<Props, 'children' | 'onClick'> {
@@ -45,7 +45,7 @@ export function GiftCardOrCouponRemoveButton(props: Props): JSX.Element | null {
     <button
       type='button'
       onClick={() => {
-        void handleClick()
+        handleClick()
       }}
       {...p}
     >

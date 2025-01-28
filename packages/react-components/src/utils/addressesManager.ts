@@ -2,17 +2,17 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import isEmpty from 'lodash/isEmpty'
 import { fieldsExist } from '#utils/validateFormFields'
-import { type BaseError } from '#typings/errors'
+import type { BaseError } from '#typings/errors'
 import { type AddressField, addressFields } from '#reducers/AddressReducer'
-import {
-  type OrderUpdate,
-  type Order,
-  type CommerceLayerClient,
-  type LineItem,
-  type Address,
-  type AddressCreate
+import type {
+  OrderUpdate,
+  Order,
+  CommerceLayerClient,
+  LineItem,
+  Address,
+  AddressCreate
 } from '@commercelayer/sdk'
-import { type TCustomerAddress } from '#reducers/CustomerReducer'
+import type { TCustomerAddress } from '#reducers/CustomerReducer'
 
 interface BillingAddressControllerProps {
   billing_address?: AddressCreate

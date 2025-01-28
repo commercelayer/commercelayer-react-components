@@ -1,4 +1,4 @@
-import { type LoaderType } from '#typings'
+import type { LoaderType } from '#typings'
 
 import type { JSX } from "react";
 

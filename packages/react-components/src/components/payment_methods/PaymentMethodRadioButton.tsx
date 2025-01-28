@@ -3,10 +3,10 @@ import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
 import Parent from '#components/utils/Parent'
 import PaymentMethodContext from '#context/PaymentMethodContext'
 import type { Order, PaymentMethod } from '@commercelayer/sdk'
-import { type PaymentResource } from '#reducers/PaymentMethodReducer'
+import type { PaymentResource } from '#reducers/PaymentMethodReducer'
 import OrderContext from '#context/OrderContext'
 import useCustomContext from '#utils/hooks/useCustomContext'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
@@ -83,7 +83,7 @@ export function PaymentMethodRadioButton(props: Props): JSX.Element {
       type='radio'
       id={id}
       onChange={(e) => {
-        void handleOnChange(e)
+        handleOnChange(e)
       }}
       checked={checked}
       disabled={disabled}

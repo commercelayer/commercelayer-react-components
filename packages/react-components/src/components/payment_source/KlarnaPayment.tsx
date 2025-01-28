@@ -1,10 +1,10 @@
 import { useContext, useEffect, useRef, useState, type JSX } from 'react';
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import { type PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
-import { type PaymentSourceProps } from './PaymentSource'
+import type { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
+import type { PaymentSourceProps } from './PaymentSource'
 import OrderContext from '#context/OrderContext'
 import useExternalScript from '#utils/hooks/useExternalScript'
-import { type LineItem } from '@commercelayer/sdk'
+import type { LineItem } from '@commercelayer/sdk'
 // import PlaceOrderContext from '#context/PlaceOrderContext'
 // import { tr } from '@faker-js/faker'
 

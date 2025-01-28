@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import baseReducer from '#utils/baseReducer'
-import {
-  type Customer,
-  type Market,
-  type GiftCardRecipient,
-  type GiftCardRecipientCreate,
-  type Order,
-  type GiftCardRecipientUpdate
+import type {
+  Customer,
+  Market,
+  GiftCardRecipient,
+  GiftCardRecipientCreate,
+  Order,
+  GiftCardRecipientUpdate
 } from '@commercelayer/sdk'
-import { type BaseMetadata } from '#typings'
-import { type Dispatch } from 'react'
-import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
+import type { BaseMetadata } from '#typings'
+import type { Dispatch } from 'react'
+import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import isEmpty from 'lodash/isEmpty'
-import { type BaseError } from '#typings/errors'
+import type { BaseError } from '#typings/errors'
 import getErrors from '#utils/getErrors'
 import getSdk from '#utils/getSdk'
-import {
-  type createOrder as makeOrder,
-  type getOrderContext
+import type {
+  createOrder as makeOrder,
+  getOrderContext
 } from '#reducers/OrderReducer'
 
 export type GiftCardActionType =

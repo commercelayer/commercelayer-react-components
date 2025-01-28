@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { type PaymentMethod } from '@commercelayer/sdk'
+import type { PaymentMethod } from '@commercelayer/sdk'
 
 export interface InitialPaymentMethodChildrenContext {
   payment?: PaymentMethod

@@ -11,11 +11,11 @@ import addressReducer, {
   saveAddresses,
   type ICustomerAddress
 } from '#reducers/AddressReducer'
-import { type BaseError } from '#typings/errors'
+import type { BaseError } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { setCustomerOrderParam } from '#utils/localStorage'
-import { type TCustomerAddress } from '#reducers/CustomerReducer'
+import type { TCustomerAddress } from '#reducers/CustomerReducer'
 
 interface Props {
   children: ReactNode

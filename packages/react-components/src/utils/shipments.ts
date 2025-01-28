@@ -1,4 +1,4 @@
-import { type LineItem, type Shipment } from '@commercelayer/sdk'
+import type { LineItem, Shipment } from '@commercelayer/sdk'
 import compact from 'lodash/compact'
 import isEmpty from 'lodash/isEmpty'
 

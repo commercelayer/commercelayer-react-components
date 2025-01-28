@@ -4,13 +4,13 @@ import PaymentMethodContext from '#context/PaymentMethodContext'
 import isEmpty from 'lodash/isEmpty'
 import OrderContext from '#context/OrderContext'
 import Parent from '#components/utils/Parent'
-import { type PaymentSourceProps } from './PaymentSource'
+import type { PaymentSourceProps } from './PaymentSource'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import promisify from '#utils/promisify'
-import { type HostedFieldFieldOptions, type ThreeDSecure } from 'braintree-web'
-import { type BraintreePayment as BraintreePaymentType } from '@commercelayer/sdk'
-import { type HostedFieldsHostedFieldsFieldName } from 'braintree-web/hosted-fields'
-import { type ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure'
+import type { HostedFieldFieldOptions, ThreeDSecure } from 'braintree-web'
+import type { BraintreePayment as BraintreePaymentType } from '@commercelayer/sdk'
+import type { HostedFieldsHostedFieldsFieldName } from 'braintree-web/hosted-fields'
+import type { ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure'
 type BraintreeHostedFields<Type> = {
   [Property in keyof Type]: {
     label?: string

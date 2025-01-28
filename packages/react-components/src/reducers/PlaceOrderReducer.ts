@@ -5,9 +5,9 @@ import type { BaseError } from '#typings/errors'
 import type { Order, OrderUpdate, StripePayment } from '@commercelayer/sdk'
 import isEmpty from 'lodash/isEmpty'
 import { isDoNotShip, shipmentsFilled } from '#utils/shipments'
-import {
-  type PaymentResource,
-  type PaymentSourceType
+import type {
+  PaymentResource,
+  PaymentSourceType
 } from './PaymentMethodReducer'
 import {
   saveBillingAddress,

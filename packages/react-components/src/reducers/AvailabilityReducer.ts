@@ -1,8 +1,8 @@
 import baseReducer from '#utils/baseReducer'
-import { type BaseError } from '#typings/errors'
-import { type Sku } from '@commercelayer/sdk'
-import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { type Dispatch } from 'react'
+import type { BaseError } from '#typings/errors'
+import type { Sku } from '@commercelayer/sdk'
+import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import type { Dispatch } from 'react'
 import getSdk from '#utils/getSdk'
 
 export interface DeliveryLeadTime {
@@ -19,7 +19,7 @@ export interface DeliveryLeadTime {
 }
 
 interface Level {
-  delivery_lead_times: Array<Partial<DeliveryLeadTime>>
+  delivery_lead_times: Partial<DeliveryLeadTime>[]
   quantity: number
 }
 

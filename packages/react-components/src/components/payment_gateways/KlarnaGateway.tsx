@@ -1,6 +1,6 @@
 import React, { type JSX } from 'react';
 import KlarnaPayment from '#components/payment_source/KlarnaPayment'
-import { type GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
+import type { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
 import CustomerContext from '#context/CustomerContext'
 import OrderContext from '#context/OrderContext'
 import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'

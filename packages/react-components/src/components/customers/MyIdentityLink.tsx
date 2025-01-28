@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState, type JSX } from 'react';
 import Parent from '../utils/Parent'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { getApplicationLink } from '#utils/getApplicationLink'
 import { getDomain } from '#utils/getDomain'
@@ -82,7 +82,7 @@ export function MyIdentityLink(props: Props): JSX.Element {
   const { domain, slug } = getDomain(endpoint)
   useEffect(() => {
     if (accessToken && endpoint) {
-      void getOrganizationConfig({
+      getOrganizationConfig({
         accessToken,
         endpoint,
         params: {

@@ -1,7 +1,7 @@
 import { useContext, type JSX } from 'react';
 import OrderContext from '#context/OrderContext'
 import Parent from '../utils/Parent'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { getApplicationLink } from '#utils/getApplicationLink'
 import { getDomain } from '#utils/getDomain'
@@ -64,7 +64,7 @@ export function CheckoutLink(props: Props): JSX.Element {
     e.stopPropagation()
     const currentHref = e.currentTarget.href
     if (accessToken && endpoint && order?.id) {
-      void getOrganizationConfig({
+      getOrganizationConfig({
         accessToken,
         endpoint,
         params: {

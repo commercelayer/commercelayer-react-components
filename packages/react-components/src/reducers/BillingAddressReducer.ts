@@ -1,9 +1,9 @@
 import baseReducer from '#utils/baseReducer'
-import { type Dispatch } from 'react'
-import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { type AddressUpdate, type Order } from '@commercelayer/sdk'
+import type { Dispatch } from 'react'
+import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import type { AddressUpdate, Order } from '@commercelayer/sdk'
 import getSdk from '#utils/getSdk'
-import { type AddressResource } from './AddressReducer'
+import type { AddressResource } from './AddressReducer'
 
 export type BillingAddressActionType =
   | 'setBillingAddress'

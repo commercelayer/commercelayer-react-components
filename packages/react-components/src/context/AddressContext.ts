@@ -6,7 +6,7 @@ import {
   type saveAddresses,
   type ICustomerAddress
 } from '#reducers/AddressReducer'
-import { type BaseError } from '#typings/errors'
+import type { BaseError } from '#typings/errors'
 
 type DefaultContext = {
   saveAddresses?: (params: {

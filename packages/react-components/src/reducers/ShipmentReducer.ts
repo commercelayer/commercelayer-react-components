@@ -1,14 +1,14 @@
 import baseReducer from '#utils/baseReducer'
-import { type Dispatch } from 'react'
-import { type BaseError } from '#typings/errors'
-import {
-  type DeliveryLeadTime,
-  type LineItem,
-  type Order,
-  type Shipment
+import type { Dispatch } from 'react'
+import type { BaseError } from '#typings/errors'
+import type {
+  DeliveryLeadTime,
+  LineItem,
+  Order,
+  Shipment
 } from '@commercelayer/sdk'
-import { type CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { type getOrderContext } from './OrderReducer'
+import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import type { getOrderContext } from './OrderReducer'
 import getSdk from '#utils/getSdk'
 import { canPlaceOrder } from '#utils/canPlaceOrder'
 

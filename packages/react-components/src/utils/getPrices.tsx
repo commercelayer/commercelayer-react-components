@@ -1,5 +1,5 @@
 import { isEmpty, first, isArray, has } from 'lodash'
-import { type Price } from '@commercelayer/sdk'
+import type { Price } from '@commercelayer/sdk'
 import PriceTemplate, {
   type PTemplateProps
 } from '#components/utils/PriceTemplate'

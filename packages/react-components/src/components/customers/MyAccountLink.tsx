@@ -1,6 +1,6 @@
 import { useContext, type JSX } from 'react';
 import Parent from '../utils/Parent'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { getApplicationLink } from '#utils/getApplicationLink'
 import { getDomain } from '#utils/getDomain'
@@ -67,7 +67,7 @@ export function MyAccountLink(props: Props): JSX.Element {
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ): void {
     if (!disabled && accessToken && endpoint) {
-      void getOrganizationConfig({
+      getOrganizationConfig({
         accessToken,
         endpoint,
         params: {

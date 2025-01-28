@@ -2,12 +2,12 @@ import AddressesContext from '#context/AddressContext'
 import { useRapidForm } from 'rapid-form'
 import { type ReactNode, useContext, useEffect, useRef, type JSX } from 'react';
 import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
-import { type BaseError, type CodeErrorType } from '#typings/errors'
-import { type AddressField } from '#reducers/AddressReducer'
-import { type AddressCountrySelectName, type AddressInputName } from '#typings'
+import type { BaseError, CodeErrorType } from '#typings/errors'
+import type { AddressField } from '#reducers/AddressReducer'
+import type { AddressCountrySelectName, AddressInputName } from '#typings'
 import OrderContext from '#context/OrderContext'
 import { isEmptyStates } from '#utils/countryStateCity'
-import { type TCustomerAddress } from '#reducers/CustomerReducer'
+import type { TCustomerAddress } from '#reducers/CustomerReducer'
 
 interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
   children: ReactNode
@@ -41,7 +41,7 @@ export function CustomerAddressForm(props: Props): JSX.Element {
         const message = errors[fieldName]?.message || ''
         if (fieldName === 'billing_address_state_code') {
           if (values['state_code']) {
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            
             delete errors[fieldName]
           } else {
             formErrors.push({
@@ -67,7 +67,7 @@ export function CustomerAddressForm(props: Props): JSX.Element {
         const field = values[name]
         if (field?.value) {
           values[name.replace('billing_address_', '')] = field.value
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          
           delete values[name]
         }
         if (['billing_address_state_code'].includes(name)) {
@@ -80,7 +80,7 @@ export function CustomerAddressForm(props: Props): JSX.Element {
             }) &&
             !field.value
           ) {
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            
             delete values['billing_address_state_code']
           }
         }

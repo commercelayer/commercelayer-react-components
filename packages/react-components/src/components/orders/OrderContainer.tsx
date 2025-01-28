@@ -15,10 +15,10 @@ import orderReducer, {
 } from '#reducers/OrderReducer'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import OrderContext, { defaultOrderContext } from '#context/OrderContext'
-import { type BaseMetadataObject } from '#typings'
+import type { BaseMetadataObject } from '#typings'
 import OrderStorageContext from '#context/OrderStorageContext'
 import type { OrderCreate, Order } from '@commercelayer/sdk'
-import { type BaseError } from '#typings/errors'
+import type { BaseError } from '#typings/errors'
 import compareObjAttribute from '#utils/compareObjAttribute'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import type { DefaultChildrenType } from '#typings/globals'
@@ -111,7 +111,7 @@ export function OrderContainer(props: Props): JSX.Element {
     const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
     if (state?.orderId) {
       if (localOrder != null && state.orderId !== localOrder) {
-        void getOrder(localOrder)
+        getOrder(localOrder)
       } else {
         dispatch({
           type: 'setOrderId',
@@ -141,7 +141,7 @@ export function OrderContainer(props: Props): JSX.Element {
         object: state.order
       })
       if (Object.keys(updateAttributes).length > 0) {
-        void updateOrder({
+        updateOrder({
           id: state.order.id,
           attributes: updateAttributes,
           dispatch,
@@ -177,13 +177,13 @@ export function OrderContainer(props: Props): JSX.Element {
         !state.withoutIncludes &&
         !lockOrder
       ) {
-        void getOrder(localOrder)
+        getOrder(localOrder)
       } else if (
         state.withoutIncludes &&
         !state.include?.length &&
         startRequest.length === 0
       ) {
-        void getOrder(localOrder)
+        getOrder(localOrder)
       }
     } else if (
       [

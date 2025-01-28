@@ -194,7 +194,7 @@ export function HostedCart({
     switch (data.message.type) {
       case 'update':
         if (data.message.payload != null) {
-          void getOrder(data.message.payload.id)
+          getOrder(data.message.payload.id)
         }
         break
       case 'close':
@@ -221,7 +221,7 @@ export function HostedCart({
       subscribe('open-cart', () => {
         window.document.body.style.overflow = 'hidden'
         if (src == null && order?.id == null && orderId == null) {
-          void setOrder(true)
+          setOrder(true)
         } else {
           if (src != null && ref.current != null) {
             ref.current.src = src
@@ -241,13 +241,13 @@ export function HostedCart({
       !ignore &&
       isOpen
     ) {
-      void setOrder()
+      setOrder()
     } else if (
       src == null &&
       (order?.id != null || orderId != null) &&
       accessToken
     ) {
-      void getOrganizationConfig({
+      getOrganizationConfig({
         accessToken,
         endpoint,
         params: {
@@ -274,6 +274,7 @@ export function HostedCart({
     return (): void => {
       ignore = true
       if (openAdd && type === 'mini') {
+        // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
         unsubscribe('open-cart', () => {})
       }
     }

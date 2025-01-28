@@ -1,7 +1,7 @@
 import customMessages from '#utils/customMessages'
-import { type LineItem } from '@commercelayer/sdk'
-import { type BaseError } from '#typings/errors'
-import { type TResourceError } from '#components/errors/Errors'
+import type { LineItem } from '@commercelayer/sdk'
+import type { BaseError } from '#typings/errors'
+import type { TResourceError } from '#components/errors/Errors'
 
 import type { JSX } from "react";
 

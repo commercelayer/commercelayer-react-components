@@ -1,4 +1,4 @@
-import { type DefaultChildrenType } from '#typings/globals'
+import type { DefaultChildrenType } from '#typings/globals'
 
 import type { JSX } from "react";
 

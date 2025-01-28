@@ -6,9 +6,9 @@ import priceReducer, {
   setSkuCodes
 } from '#reducers/PriceReducer'
 import PricesContext, { type PricesContextValue } from '#context/PricesContext'
-import { type LoaderType } from '#typings'
+import type { LoaderType } from '#typings'
 import SkuContext from '#context/SkuContext'
-import { type QueryPageSize } from '@commercelayer/sdk'
+import type { QueryPageSize } from '@commercelayer/sdk'
 
 interface Props {
   /**

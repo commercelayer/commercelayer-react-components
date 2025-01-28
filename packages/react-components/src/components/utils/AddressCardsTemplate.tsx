@@ -3,7 +3,7 @@ import { useContext, type JSX } from 'react';
 import type { Address } from '@commercelayer/sdk'
 import AddressChildrenContext from '#context/AddressChildrenContext'
 import ShippingAddressContext from '#context/ShippingAddressContext'
-import { type ChildrenFunction } from '#typings'
+import type { ChildrenFunction } from '#typings'
 
 export interface TAddressCards
   extends Pick<Props, 'customerAddresses' | 'className'> {

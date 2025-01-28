@@ -19,7 +19,7 @@ import {
 import { sortDescIcon, sortAscIcon } from '#utils/icons'
 import filterChildren from '#utils/filterChildren'
 import type { DefaultChildrenType, TRange } from '#typings/globals'
-import { type QueryPageSize } from '@commercelayer/sdk'
+import type { QueryPageSize } from '@commercelayer/sdk'
 
 type RowComponent = 'OrderListRow' | 'OrderListEmpty'
 type PaginationComponent =
@@ -85,7 +85,7 @@ type Props = {
   /**
    * Columns to show
    */
-  columns: Array<OrderListColumn<TOrderList>>
+  columns: OrderListColumn<TOrderList>[]
   /**
    * Custom loader component
    */
@@ -152,13 +152,13 @@ export function OrderList({
     useContext(CustomerContext)
   useEffect(() => {
     if (type === 'orders' && getCustomerOrders != null) {
-      void getCustomerOrders({
+      getCustomerOrders({
         pageNumber: pageIndex + 1,
         pageSize: currentPageSize as QueryPageSize
       })
     }
     if (type === 'subscriptions' && getCustomerSubscriptions != null) {
-      void getCustomerSubscriptions({
+      getCustomerSubscriptions({
         pageNumber: pageIndex + 1,
         pageSize: currentPageSize as QueryPageSize,
         id
@@ -180,7 +180,7 @@ export function OrderList({
 
     return []
   }, [orders, subscriptions])
-  const cols = useMemo<Array<ColumnDef<OrderListContent<TOrderList>>>>(
+  const cols = useMemo<ColumnDef<OrderListContent<TOrderList>>[]>(
     () => columns,
     [columns]
   )

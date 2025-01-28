@@ -1,6 +1,6 @@
 import { type ReactNode, useContext, type JSX } from 'react';
 import Parent from '#components/utils/Parent'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import isEmpty from 'lodash/isEmpty'
 import CustomerContext from '#context/CustomerContext'
 
@@ -39,7 +39,7 @@ export function SaveCustomerButton(props: Props): JSX.Element {
       type='button'
       disabled={disable}
       onClick={() => {
-        void handleClick()
+        handleClick()
       }}
       {...p}
     >

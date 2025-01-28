@@ -6,15 +6,15 @@ import {
   useElements,
   useStripe
 } from '@stripe/react-stripe-js'
-import {
-  type Stripe,
-  type StripeElementLocale,
-  type StripeElements,
-  type StripeElementsOptions,
-  type StripePaymentElementOptions
+import type {
+  Stripe,
+  StripeElementLocale,
+  StripeElements,
+  StripeElementsOptions,
+  StripePaymentElementOptions
 } from '@stripe/stripe-js'
-import { type PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
-import { type PaymentSourceProps } from './PaymentSource'
+import type { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
+import type { PaymentSourceProps } from './PaymentSource'
 import Parent from '#components/utils/Parent'
 import { setCustomerOrderParam } from '#utils/localStorage'
 import OrderContext from '#context/OrderContext'
@@ -192,7 +192,7 @@ export function StripePayment({
   } = p
   useEffect(() => {
     if (show && publishableKey) {
-      void import('@stripe/stripe-js').then(({ loadStripe }) => {
+      import('@stripe/stripe-js').then(({ loadStripe }) => {
         const getStripe = async (): Promise<void> => {
           const res = await loadStripe(publishableKey, {
             locale
@@ -202,7 +202,7 @@ export function StripePayment({
             setIsLoaded(true)
           }
         }
-        void getStripe()
+        getStripe()
       })
     }
     return () => {

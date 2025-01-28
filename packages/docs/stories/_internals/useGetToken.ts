@@ -75,7 +75,7 @@ export function useGetToken<T extends UseGetTokenOptions>(
       accessToken === '' ||
       isTokenExpired({ accessToken, compareTo: new Date() })
     ) {
-      void initToken()
+      initToken()
     }
   }, [accessToken])
 

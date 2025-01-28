@@ -51,7 +51,7 @@ export function Shipment({
             }
           }
         }
-        void autoSelect()
+        autoSelect()
       } else {
         setLoading(false)
       }

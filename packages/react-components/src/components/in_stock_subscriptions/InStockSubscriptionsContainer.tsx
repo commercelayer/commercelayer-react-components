@@ -6,7 +6,7 @@ import inStockSubscriptionReducer, {
   inStockSubscriptionInitialState,
   setInStockSubscription
 } from '#reducers/InStockSubscriptionReducer'
-import { type DefaultChildrenType } from '#typings/globals'
+import type { DefaultChildrenType } from '#typings/globals'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import { useReducer, type JSX } from 'react';
 

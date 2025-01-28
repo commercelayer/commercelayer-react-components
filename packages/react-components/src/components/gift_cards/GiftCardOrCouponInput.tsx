@@ -1,8 +1,8 @@
 import { useContext, type JSX } from 'react';
 import BaseInput from '#components/utils/BaseInput'
 import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
-import { type BaseInputComponentProps } from '#typings'
-import { type OrderCodeType } from '#reducers/OrderReducer'
+import type { BaseInputComponentProps } from '#typings'
+import type { OrderCodeType } from '#reducers/OrderReducer'
 
 type FieldName = 'gift_card_code' | 'coupon_code'
 

@@ -10,7 +10,7 @@ import shipmentReducer, {
 } from '#reducers/ShipmentReducer'
 import OrderContext from '#context/OrderContext'
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import { type BaseError } from '#typings/errors'
+import type { BaseError } from '#typings/errors'
 import isEmpty from 'lodash/isEmpty'
 
 interface Props {
@@ -49,7 +49,7 @@ export function ShipmentsContainer(props: Props): JSX.Element {
   }, [include?.length, includeLoaded != null])
   useEffect(() => {
     if (order != null && !isEmpty(config) && order.shipments) {
-      void getShipments({ order, dispatch, config })
+      getShipments({ order, dispatch, config })
     }
   }, [order?.shipments])
   useEffect(() => {

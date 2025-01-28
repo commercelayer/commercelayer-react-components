@@ -1,5 +1,5 @@
 import BaseOrderPrice from '../utils/BaseOrderPrice'
-import { type BaseAmountComponent } from '#typings'
+import type { BaseAmountComponent } from '#typings'
 
 import type { JSX } from "react";
 

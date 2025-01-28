@@ -1,5 +1,5 @@
-import { type InitialSkuContext } from '#context/SkuChildrenContext'
-import { type InitialStockTransferContext } from '#context/StockTransferChildrenContext'
+import type { InitialSkuContext } from '#context/SkuChildrenContext'
+import type { InitialStockTransferContext } from '#context/StockTransferChildrenContext'
 import type {
   Customer,
   LineItem,
@@ -8,12 +8,12 @@ import type {
   ParcelLineItem
 } from '@commercelayer/sdk'
 import Parent from './Parent'
-import { type InitialLineItemChildrenContext } from '#context/LineItemChildrenContext'
+import type { InitialLineItemChildrenContext } from '#context/LineItemChildrenContext'
 import { type Context, useContext, type JSX } from 'react';
 import { defaultImgUrl } from '#utils/placeholderImages'
-import { type InitialCustomerContext } from '#context/CustomerContext'
-import { type InitialParcelContext } from '#context/ParcelChildrenContext'
-import { type InitialParcelLineItemContext } from '#context/ParcelLineItemChildrenContext'
+import type { InitialCustomerContext } from '#context/CustomerContext'
+import type { InitialParcelContext } from '#context/ParcelChildrenContext'
+import type { InitialParcelLineItemContext } from '#context/ParcelLineItemChildrenContext'
 
 export interface TResources {
   StockTransfer: LineItem & { resource: 'stockTransfer' }

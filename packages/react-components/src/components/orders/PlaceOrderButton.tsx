@@ -8,7 +8,7 @@ import {
   type JSX
 } from 'react'
 import Parent from '../utils/Parent'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import PlaceOrderContext from '#context/PlaceOrderContext'
 import isFunction from 'lodash/isFunction'
 import PaymentMethodContext from '#context/PaymentMethodContext'
@@ -137,7 +137,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ['draft', 'pending'].includes(order?.status) &&
       autoPlaceOrder
     ) {
-      void handleClick()
+      handleClick()
     }
   }, [options?.paypalPayerId, paymentType])
   useEffect(() => {
@@ -163,12 +163,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         })
         switch (paymentIntentResult.status) {
           case 'valid':
-            void handleClick()
+            handleClick()
             break
           case 'processing':
             // Set a timeout to check the payment intent status again
             setTimeout(() => {
-              void getPaymentIntent()
+              getPaymentIntent()
             }, 1000)
             break
           case 'invalid':
@@ -183,7 +183,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
             break
         }
       }
-      void getPaymentIntent()
+      getPaymentIntent()
     }
   }, [
     options?.stripe?.paymentIntentClientSecret != null,
@@ -212,7 +212,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           },
           _details: 1
         }
-        void setPaymentSource({
+        setPaymentSource({
           paymentSourceId: paymentSource?.id,
           paymentResource: 'adyen_payments',
           attributes
@@ -227,7 +227,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
             ['Authorised', 'Pending', 'Received'].includes(resultCode) &&
             autoPlaceOrder
           ) {
-            void handleClick()
+            handleClick()
           } else if (errorCode != null) {
             setPaymentMethodErrors([
               {
@@ -245,7 +245,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         options?.adyen?.PaRes &&
         autoPlaceOrder
       ) {
-        void handleClick()
+        handleClick()
       } else if (
         paymentType === 'adyen_payments' &&
         resultCode &&
@@ -262,7 +262,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
             order?.number
           )
         ) {
-          void handleClick()
+          handleClick()
         }
       }
     }
@@ -281,7 +281,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ['draft', 'pending'].includes(order?.status) &&
       autoPlaceOrder
     ) {
-      void handleClick()
+      handleClick()
     }
   }, [options?.checkoutCom, paymentType])
   useEffect(() => {
@@ -383,7 +383,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       type='button'
       disabled={disabledButton || forceDisable}
       onClick={(e) => {
-        void handleClick(e)
+        handleClick(e)
       }}
       {...p}
     >

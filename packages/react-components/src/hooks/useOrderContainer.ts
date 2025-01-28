@@ -1,8 +1,8 @@
 import OrderContext from '#context/OrderContext'
-import {
-  type createOrder,
-  type OrderState,
-  type addToCart
+import type {
+  createOrder,
+  OrderState,
+  addToCart
 } from '#reducers/OrderReducer'
 import { useContext } from 'react'
 

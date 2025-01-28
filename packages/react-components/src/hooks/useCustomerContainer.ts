@@ -1,9 +1,9 @@
 import CustomerContext, {
   type InitialCustomerContext
 } from '#context/CustomerContext'
-import {
-  type setResourceTrigger,
-  type CustomerState
+import type {
+  setResourceTrigger,
+  CustomerState
 } from '#reducers/CustomerReducer'
 import { useContext } from 'react'
 

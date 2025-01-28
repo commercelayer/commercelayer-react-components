@@ -2,8 +2,8 @@ import { useContext, type CSSProperties, type JSX } from 'react';
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
 import map from 'lodash/map'
 import Parent from '#components/utils/Parent'
-import { type LineItemOption as LineItemOptionType } from '@commercelayer/sdk'
-import { type ChildrenFunction } from '#typings/index'
+import type { LineItemOption as LineItemOptionType } from '@commercelayer/sdk'
+import type { ChildrenFunction } from '#typings/index'
 import isJSON from '#utils/isJSON'
 
 export interface TLineItemOption extends Omit<Props, 'children'> {

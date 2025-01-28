@@ -1,4 +1,4 @@
-import { type Order } from '@commercelayer/sdk'
+import type { Order } from '@commercelayer/sdk'
 
 /**
  *  Check if the order can be placed

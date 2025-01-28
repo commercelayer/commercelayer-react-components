@@ -1,8 +1,8 @@
-import { type PaymentMethod } from '@commercelayer/sdk'
+import type { PaymentMethod } from '@commercelayer/sdk'
 
 export function sortPaymentMethods(
   methods: PaymentMethod[],
-  labels: Array<PaymentMethod['payment_source_type']>
+  labels: PaymentMethod['payment_source_type'][]
 ): PaymentMethod[] {
   return methods.sort((a, b) => {
     const indexA = labels.indexOf(a.payment_source_type)

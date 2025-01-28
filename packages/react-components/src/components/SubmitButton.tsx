@@ -1,6 +1,6 @@
-import { type ReactNode, type JSX } from 'react';
+import type { ReactNode, JSX } from 'react';
 import Parent from '#components/utils/Parent'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import isFunction from 'lodash/isFunction'
 
 interface ChildrenProps extends Omit<Props, 'children'> {}

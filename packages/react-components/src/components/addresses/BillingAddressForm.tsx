@@ -5,10 +5,10 @@ import BillingAddressFormContext, {
   type AddressValuesKeys,
   type DefaultContextAddress
 } from '#context/BillingAddressFormContext'
-import { type BaseError, type CodeErrorType } from '#typings/errors'
+import type { BaseError, CodeErrorType } from '#typings/errors'
 import OrderContext from '#context/OrderContext'
 import { getSaveBillingAddressToAddressBook } from '#utils/localStorage'
-import { type CustomFieldMessageError } from '#reducers/AddressReducer'
+import type { CustomFieldMessageError } from '#reducers/AddressReducer'
 
 type Props = {
   children: ReactNode
@@ -167,11 +167,11 @@ export function BillingAddressForm(props: Props): JSX.Element {
           (field?.required === false && field?.type !== 'checkbox')
         ) {
           values[name.replace('billing_address_', '')] = field.value
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          
           delete values[name]
         }
         if (field?.type === 'checkbox') {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          
           delete values[name]
           saveAddressToCustomerAddressBook({
             type: 'billing_address',

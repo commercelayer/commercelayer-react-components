@@ -2,8 +2,8 @@ import { useContext, type ReactNode, type JSX } from 'react';
 import LineItemChildrenContext from '#context/LineItemChildrenContext'
 import LineItemContext from '#context/LineItemContext'
 import Parent from '#components/utils/Parent'
-import { type ChildrenFunction } from '#typings'
-import { type LineItem } from '@commercelayer/sdk'
+import type { ChildrenFunction } from '#typings'
+import type { LineItem } from '@commercelayer/sdk'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
   quantity: number
@@ -39,7 +39,7 @@ export function LineItemQuantity(props: Props): JSX.Element {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     const quantity = Number(e.target.value)
     if (updateLineItem && lineItem) {
-      void updateLineItem(lineItem.id, quantity, hasExternalPrice)
+      updateLineItem(lineItem.id, quantity, hasExternalPrice)
     }
   }
   const quantity = lineItem?.quantity

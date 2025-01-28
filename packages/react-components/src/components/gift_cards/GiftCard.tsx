@@ -2,8 +2,8 @@ import { useRef, useContext, type RefObject, type JSX } from 'react';
 import validateFormFields from '#utils/validateFormFields'
 import isEmpty from 'lodash/isEmpty'
 import GiftCardContext from '#context/GiftCardContext'
-import { type GiftCardI } from '#reducers/GiftCardReducer'
-import { type BaseState } from '#typings/index'
+import type { GiftCardI } from '#reducers/GiftCardReducer'
+import type { BaseState } from '#typings/index'
 import type { DefaultChildrenType } from '#typings/globals'
 
 type RequiredFields = 'currencyCode' | 'balanceCents'

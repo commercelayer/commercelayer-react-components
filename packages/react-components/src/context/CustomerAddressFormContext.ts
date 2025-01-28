@@ -1,10 +1,10 @@
 import { createContext } from 'react'
-import { type AddressCountrySelectName, type AddressInputName } from '#typings'
-import { type AddressField } from '#reducers/AddressReducer'
+import type { AddressCountrySelectName, AddressInputName } from '#typings'
+import type { AddressField } from '#reducers/AddressReducer'
 
 export interface DefaultContextAddress {
-  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  validation?: void
+  // biome-ignore lint/suspicious/noConfusingVoidType: <explanation>
+    validation?: void
   setValue?: (
     name: AddressField | AddressInputName | AddressCountrySelectName,
     value: any

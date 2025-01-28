@@ -1,4 +1,4 @@
-import { type BaseError } from '#typings/errors'
+import type { BaseError } from '#typings/errors'
 import { pick } from './pick'
 
 export default function customMessages(

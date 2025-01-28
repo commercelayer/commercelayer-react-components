@@ -1,13 +1,13 @@
 import Parent from '#components/utils/Parent'
 import { useContext, type JSX } from 'react';
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import { type PaymentResource } from '#reducers/PaymentMethodReducer'
+import type { PaymentResource } from '#reducers/PaymentMethodReducer'
 import PaymentSourceContext, {
   type IconBrand
 } from '#context/PaymentSourceContext'
-import { type ChildrenFunction } from '#typings'
+import type { ChildrenFunction } from '#typings'
 import getCardDetails from '#utils/getCardDetails'
-import { type CustomerPaymentSource } from '@commercelayer/sdk'
+import type { CustomerPaymentSource } from '@commercelayer/sdk'
 
 interface ChildrenProps extends Pick<Props, 'customerPayments'> {
   PaymentSourceProvider: typeof PaymentSourceContext.Provider

@@ -1,6 +1,6 @@
 import { type ReactNode, useContext, useState, type JSX } from 'react';
 import Parent from '#components/utils/Parent'
-import { type ChildrenFunction } from '#typings/index'
+import type { ChildrenFunction } from '#typings/index'
 import AddressContext from '#context/AddressContext'
 import {
   countryLockController,
@@ -9,7 +9,7 @@ import {
 import OrderContext from '#context/OrderContext'
 import CustomerContext from '#context/CustomerContext'
 import isFunction from 'lodash/isFunction'
-import { type TCustomerAddress } from '#reducers/CustomerReducer'
+import type { TCustomerAddress } from '#reducers/CustomerReducer'
 import type { Order } from '@commercelayer/sdk'
 import { validateValue } from '#utils/validateFormFields'
 import { formCleaner } from '#utils/formCleaner'
@@ -150,7 +150,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
             ? { ...formCleaner(shippingAddress) }
             : { ...formCleaner(billingAddress) }
           if (addressId) address.id = addressId
-          void createCustomerAddress(address as TCustomerAddress)
+          createCustomerAddress(address as TCustomerAddress)
           response = {
             success: true
           }
@@ -176,7 +176,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
       type='button'
       disabled={disable || forceDisable}
       onClick={() => {
-        void handleClick()
+        handleClick()
       }}
       {...p}
     >

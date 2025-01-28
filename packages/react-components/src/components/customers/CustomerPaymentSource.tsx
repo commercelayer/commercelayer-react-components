@@ -1,7 +1,7 @@
 import CustomerContext from '#context/CustomerContext'
 import CustomerPaymentSourceContext from '#context/CustomerPaymentSourceContext'
-import { type PaymentResource } from '#reducers/PaymentMethodReducer'
-import { type DefaultChildrenType } from '#typings/globals'
+import type { PaymentResource } from '#reducers/PaymentMethodReducer'
+import type { DefaultChildrenType } from '#typings/globals'
 import getCardDetails from '#utils/getCardDetails'
 import useCustomContext from '#utils/hooks/useCustomContext'
 import { useEffect, useState, type JSX } from 'react';

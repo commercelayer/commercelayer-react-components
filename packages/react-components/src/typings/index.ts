@@ -1,6 +1,6 @@
-import { type Dispatch, type ForwardedRef, type Ref, type JSX } from 'react';
+import type { Dispatch, ForwardedRef, Ref, JSX } from 'react';
 import PropTypes, { type InferProps } from 'prop-types'
-import { type BaseError } from './errors'
+import type { BaseError } from './errors'
 
 export const BC = {
   id: PropTypes.string,

@@ -1,4 +1,4 @@
-import { type ReactNode, type JSX } from 'react';
+import type { ReactNode, JSX } from 'react';
 import OrderStorageContext from '#context/OrderStorageContext'
 import {
   getLocalOrder,

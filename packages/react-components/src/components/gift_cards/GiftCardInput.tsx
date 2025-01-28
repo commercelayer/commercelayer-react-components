@@ -1,5 +1,5 @@
 import BaseInput from '#components/utils/BaseInput'
-import { type BaseInputComponentProps, type GiftCardInputName } from '#typings'
+import type { BaseInputComponentProps, GiftCardInputName } from '#typings'
 
 import type { JSX } from "react";
 
