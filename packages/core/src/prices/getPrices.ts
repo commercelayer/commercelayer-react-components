@@ -1,6 +1,6 @@
-import type { ListResponse, Price, QueryParamsList } from '@commercelayer/sdk'
-import { getSdk } from 'src/sdk/index.js'
-import type { RequestConfig } from 'src/types/index.js'
+import type { ListResponse, Price, QueryParamsList } from "@commercelayer/sdk"
+import { getSdk } from "../sdk/index.js"
+import type { RequestConfig } from "../types/index.js"
 
 type GetPricesParams = RequestConfig & QueryParamsList<Price>
 
