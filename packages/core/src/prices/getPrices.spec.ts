@@ -1,6 +1,6 @@
-import type { Price, QueryParamsList } from "@commercelayer/sdk"
+import type { QueryFilter } from "@commercelayer/sdk"
 import { describe, expect } from "vitest"
-import { coreTest } from "#extender"
+import { coreTest } from "../../extender.js"
 import { getPrices } from "./getPrices.js"
 
 describe("getPrices", () => {
@@ -12,13 +12,14 @@ describe("getPrices", () => {
 
   coreTest("should return a single price", async ({ accessToken }) => {
     const token = accessToken?.accessToken
-    const params = {
+    const params: QueryFilter = {
       filters: {
         sku_code_eq: "DIGITALPRODUCT",
       },
-    } satisfies QueryParamsList<Price>
+    }
+
     // Call the getPrices function
-    const result = await getPrices({ accessToken: token, params })
+    const result = await getPrices({ accessToken: token, ...params })
     // Assert the expected result
     expect(result).toBeDefined()
     expect(result.getRecordCount()).toBe(1)

@@ -1,7 +1,7 @@
 import { authenticate } from "@commercelayer/js-auth"
 import { describe, expect, vi } from "vitest"
-import { coreTest } from "#extender"
-import { getAccessToken } from "./getAccessToken"
+import { coreTest } from "../../extender.js"
+import { getAccessToken } from "./getAccessToken.js"
 
 vi.mock("@commercelayer/js-auth", () => ({
   authenticate: vi.fn(),
@@ -14,7 +14,6 @@ describe("getAccessToken", () => {
       const token = accessToken?.accessToken
       const grantType = "client_credentials"
       const mockToken = { accessToken: token }
-      // @ts-expect-error No types for this function
       authenticate.mockResolvedValue(mockToken)
       const result = await getAccessToken({ grantType, config })
       await expect(authenticate).toHaveBeenCalledWith(grantType, config)
@@ -31,7 +30,6 @@ describe("getAccessToken", () => {
       clientSecret: "test-client-secret",
     }
     const mockError = new Error("Authentication failed")
-    // @ts-expect-error No types for this function
     authenticate.mockRejectedValue(mockError)
     await expect(getAccessToken({ grantType, config })).rejects.toThrow(
       "Authentication failed",

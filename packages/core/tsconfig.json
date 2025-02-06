@@ -22,6 +22,6 @@
     "skipLibCheck": true /* Skip type checking of declaration files. */,
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
   },
-  "include": ["**/*.ts", ".eslintrc.cjs"],
+  "include": ["**/*.ts", ".eslintrc.cjs", "src/hooks/useAuthenticate.tsx"],
   "exclude": ["node_modules"]
 }

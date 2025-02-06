@@ -4,5 +4,5 @@ import type { Jwt, RequestConfig } from "src/types/index.js"
 
 export function getSdk({ accessToken }: RequestConfig): CommerceLayerClient {
   const organization = jwtDecode<Jwt>(accessToken).organization.slug
-  return sdk.default({ accessToken, organization })
+  return sdk({ accessToken, organization })
 }

@@ -8,8 +8,9 @@ interface AuthenticateProps {
 /**
  * Retrieves an access token using the provided grant type and configuration.
  *
- * @param {AuthenticateProps['grantType']} grantType - The type of grant to use for authentication.
- * @param {AuthenticateProps['config']} config - The configuration object for authentication.
+ * @param {AuthenticateProps} params - The parameters for authentication.
+ * @param {string} params.grantType - The type of grant to use for authentication.
+ * @param {object} params.config - The configuration object for authentication.
  * @returns {Promise<ReturnType<typeof authenticate>>} A promise that resolves to the access token.
  */
 export async function getAccessToken({
