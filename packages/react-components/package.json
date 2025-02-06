@@ -211,7 +211,7 @@
     "iframe-resizer": "^4.3.6",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
-    "rapid-form": "2.1.0"
+    "rapid-form": "3.1.0"
   },
   "devDependencies": {
     "@commercelayer/js-auth": "^6.7.2",
