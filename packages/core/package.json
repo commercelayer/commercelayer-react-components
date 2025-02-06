@@ -11,13 +11,7 @@
       "default": "./dist/index.cjs"
     }
   },
-  "keywords": [
-    "jamstack",
-    "headless",
-    "ecommerce",
-    "api",
-    "components"
-  ],
+  "keywords": ["jamstack", "headless", "ecommerce", "api", "components"],
   "scripts": {
     "check-exports": "attw --pack .",
     "lint": "biome lint --error-on-warnings ./src && tsc",
