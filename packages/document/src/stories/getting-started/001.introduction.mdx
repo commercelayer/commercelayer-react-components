@@ -1,0 +1,55 @@
+import { Meta, Source } from '@storybook/addon-docs';
+
+    <Meta title="Getting Started/Introduction"></Meta>
+
+![App Element splashscreen](welcome-hero.png)
+
+A collection of reusable React components that makes it super fast and simple to build your own custom commerce UI, leveraging Commerce Layer API.
+
+Under the hood, our React components are built on top of [Commerce Layer JS SDK](https://github.com/commercelayer/commercelayer-sdk) — feel free to use it if you want to develop your custom ones.
+
+
+## Installation
+
+This library is [open sourced](https://github.com/commercelayer/commercelayer-react-components/) and served as [npm package](https://www.npmjs.com/package/@commercelayer/react-components) and need to be installed as dependency inside your project.
+
+
+    <Source
+          language="bash"
+          dark
+          code={`
+// npm
+npm install @commercelayer/react-components
+
+// yarn
+yarn add @commercelayer/react-components
+
+// pnpm
+pnpm add @commercelayer/react-components
+`}
+        />
+
+
+## Import components into your project
+
+You can use ES6 named import with every single component you plan to use (in addition to `CommerceLayer` one), as follow:
+
+    <Source
+          language="jsx"
+          dark
+          code={`
+import { CommerceLayer, ...otherComponents } from '@commercelayer/react-components'
+`}
+        />
+
+But you can also leverage treeshaking by importing only the components you need from its folder using either default or named export, as follow:
+
+    <Source
+          language="jsx"
+          dark
+          code={`
+import OrderContainer from '@commercelayer/react-components/orders/OrderContainer'
+// or
+import { OrderContainer } from '@commercelayer/react-components/orders/OrderContainer'
+`}
+        />
