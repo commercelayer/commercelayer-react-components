@@ -1,0 +1,36 @@
+import { Meta, Source } from '@storybook/addon-docs'; 
+
+<Meta title="Getting Started/Containers"></Meta>
+
+# Containers
+
+Getting used to the components hierarchy is important to understand how to use this library.
+
+All components need to be wrapped inside the main `<CommerceLayer>` context that handles the authentication with the API layer.
+**It needs to be placed at the top of the application**.
+
+Other components need to be wrapped inside their own containers in order to access to their specific context.
+As example the `<Price>` component needs to be wrapped inside the `<PriceContainer>` or it won't work.
+At the same time, the `<PriceContainer>` will not render any HTML since it just holds the data for the `<Price>` component.
+
+<span type="info">
+To amultiple requests to the API, the library uses a cache system that stores the data in React contexts that we refer as containers.<br />
+Less re-rendering of those containers means better performance and less requests to the API.
+</span>
+
+
+## Hierarchy
+Each container documentend in the Components section of this guide, highlights a list of **Requirements** and **Children** that are needed to make it work.
+
+Example:
+
+<span title="Requirements" type="warning">
+Must be a child of `<CommerceLayer>` component.
+</span>
+
+
+<span title="Children" type="info">
+`<OrderNumber>`
+`<TotalAmount>`
+`<PlaceOrderButton>`
+</span>

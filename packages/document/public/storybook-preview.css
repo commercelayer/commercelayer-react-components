@@ -1,0 +1,38 @@
+/* Global */
+.sbdocs-wrapper ol {
+  list-style: decimal;
+}
+
+/** Blockquote */
+span[type] {
+  display: block;
+  padding: 16px !important;
+  font-size: 14px !important;
+  color: #2e3438 !important;
+  margin: 16px 0;
+  border-left: 4px solid;
+}
+span[type]::before {
+  content: attr(title);
+  display: block;
+  font-weight: bold;
+}
+span[type] > p {
+  margin: 0;
+}
+span[type='info'] {
+  border-color: #3b82f6;
+  background-color: #dbebfe;
+}
+span[type='warning'] {
+  border-color: #f97317;
+  background-color: #ffedd5;
+}
+span[type='success'] {
+  border-color: #22c55f;
+  background-color: #ddfce7;
+}
+span[type='danger'] {
+  border-color: #ef4544;
+  background-color: #fee2e3;
+}

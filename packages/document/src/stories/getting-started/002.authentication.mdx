@@ -1,0 +1,61 @@
+import { Meta, Source } from '@storybook/addon-docs';
+
+<Meta title="Getting Started/Authentication"></Meta>
+
+# Authentication
+
+To get started with **Commerce Layer React Components** you need get the credentials that will allow you to perform the API calls they wrap.
+
+All requests to Commerce Layer API must be authenticated with an [OAuth2](https://oauth.net/2/) bearer token. 
+Hence, to use these components, you need to get a valid access token. 
+
+
+## Getting an access token
+<span title="Important note" type="warning">
+If you are new to Commerce Layer, we suggest you to read the [Overview of Commerce Layer's OAuth 2.0](https://docs.commercelayer.io/core/applications) guide.
+</span>
+
+There are many ways to get an access token and the one you choose depends on your specific needs.
+
+You can get an access token by using one of the following methods:
+- [API/OAuth requests](https://docs.commercelayer.io/core/authentication/client-credentials#getting-an-access-token) (i.e. `curl` or `postman`)
+- [Commerce Layer CLI](https://github.com/commercelayer/commercelayer-cli)
+- [Commerce Layer JS Auth Library](https://github.com/commercelayer/commercelayer-js-auth)
+
+<span title="Suggestion" type="info">
+If you want to retrieve the access token from the **command line**, we suggest you to use the [Commerce Layer CLI](https://github.com/commercelayer/commercelayer-cli) 
+using the `commercelayer application:login` command ([view example](https://github.com/commercelayer/commercelayer-cli/blob/main/docs/applications.md#commercelayer-applicationslogin)), 
+followed by `commercelayer application:token`
+
+<hr />
+Otherwise, if you need to get it from a **web application**, you can use the Commerce Layer JS Auth library that works both in the browser and in Node.js environments.
+</span>
+
+
+
+
+## Configure the `CommerceLayer` component
+Once you got it, you can pass it as prop to the `CommerceLayer` component, as follow:
+
+<Source
+  language="jsx"
+  dark
+  code={`
+import { CommerceLayer } from '@commercelayer/react-components'
+
+const App = () => (
+  <CommerceLayer accessToken="your-access-token">
+    {/* ... child components */}
+  </CommerceLayer>
+)
+`}
+/>
+
+
+This token will be used to authorize the API calls of all its child components. 
+That's why the presence of (at least) one `CommerceLayer` component is mandatory — it must wrap every other component you need to use.
+
+<span title="Multiples tokens" type="info">
+In case you need to fetch data with different tokens (i.e. from different organizations or using apps with different roles and permissions) 
+— nothing prevents you from putting as many `<CommerceLayer>` components you want in the same page.
+</span>
