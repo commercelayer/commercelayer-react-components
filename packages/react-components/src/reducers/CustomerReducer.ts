@@ -11,7 +11,8 @@ import type {
   Order,
   OrderSubscription,
   OrderUpdate,
-  QueryPageSize
+  QueryPageSize,
+  QuerySort,
 } from '@commercelayer/sdk'
 import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import type { updateOrder } from './OrderReducer'
@@ -283,13 +284,19 @@ interface GetCustomerOrdersProps {
    * Retrieve a specific subscription or order by id
    */
   id?: string
+  /**
+   * Sorting parameter for the orders
+   * @example 'created_at' | '-created_at' | 'updated_at' | '-updated_at'
+   */
+  sort?: QuerySort<Order>
 }
 
 export async function getCustomerOrders({
   config,
   dispatch,
   pageSize = 10,
-  pageNumber = 1
+  pageNumber = 1,
+  sort = { created_at: 'desc' }
 }: GetCustomerOrdersProps): Promise<void> {
   if (config.accessToken) {
     const { owner } = jwt(config.accessToken)
@@ -298,7 +305,8 @@ export async function getCustomerOrders({
       const orders = await sdk.customers.orders(owner.id, {
         filters: { status_not_in: 'draft,pending' },
         pageSize,
-        pageNumber
+        pageNumber,
+        sort
       })
       dispatch({
         type: 'setOrders',
@@ -313,29 +321,35 @@ export async function getCustomerSubscriptions({
   config,
   dispatch,
   pageSize = 10,
-  pageNumber = 1
+  pageNumber = 1,
+  sort = { created_at: 'desc' }
 }: GetCustomerOrdersProps): Promise<void> {
   if (config.accessToken) {
     const { owner } = jwt(config.accessToken)
     if (owner?.id) {
       const sdk = getSdk(config)
       if (id != null) {
+        // When fetching orders with subscription_id, we need to use Order sort type
+        // because this endpoint returns orders related to a subscription
         const subscriptions = await sdk.customers.orders(owner.id, {
           filters: { order_subscription_id_eq: id },
           include: ['authorizations'],
           pageSize,
-          pageNumber
+          pageNumber,
+          sort
         })
         dispatch({
           type: 'setSubscriptions',
           payload: { subscriptions }
         })
       } else {
+        // When fetching order_subscriptions directly, we use OrderSubscription sort type
         const subscriptions = await sdk.customers.order_subscriptions(
           owner.id,
           {
             pageSize,
-            pageNumber
+            pageNumber,
+            sort: sort as QuerySort<OrderSubscription>
           }
         )
         dispatch({
