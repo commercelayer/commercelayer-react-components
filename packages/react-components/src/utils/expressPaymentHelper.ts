@@ -1,20 +1,20 @@
-import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type {
   OrderUpdate,
   Order,
   PaymentMethod,
   QueryParamsRetrieve,
-  AddressCreate
-} from '@commercelayer/sdk'
-import getSdk from './getSdk'
-import type { PaymentRequestShippingOption } from '@stripe/stripe-js'
-import type { PaymentResource } from '#reducers/PaymentMethodReducer'
-import { getDomain } from './getDomain'
+  AddressCreate,
+} from "@commercelayer/sdk"
+import getSdk from "./getSdk"
+import type { PaymentRequestShippingOption } from "@stripe/stripe-js"
+import type { PaymentResource } from "#reducers/PaymentMethodReducer"
+import { getDomain } from "./getDomain"
 
-const availablePaymentMethods = ['stripe_payments']
+const availablePaymentMethods = ["stripe_payments"]
 
 export function getAvailableExpressPayments(
-  paymentMethods: PaymentMethod[]
+  paymentMethods: PaymentMethod[],
 ): PaymentMethod[] {
   return paymentMethods.filter((payment) => {
     if (!payment.payment_source_type) return false
@@ -45,17 +45,17 @@ export async function setExpressFakeAddress({
   orderId,
   config,
   address,
-  email
+  email,
 }: TFakeAddressParams): Promise<Order> {
   const params: QueryParamsRetrieve = {
-    include: ['shipments.available_shipping_methods']
+    include: ["shipments.available_shipping_methods"],
   }
   const sdk = getSdk(config)
   const fakeAddress = await sdk.addresses.create(address)
   const resource: OrderUpdate = {
     id: orderId,
     billing_address: sdk.addresses.relationship(fakeAddress.id),
-    _shipping_address_same_as_billing: true
+    _shipping_address_same_as_billing: true,
   }
   if (email != null) resource.customer_email = email
   await sdk.orders.update(resource, params)
@@ -63,46 +63,46 @@ export async function setExpressFakeAddress({
 }
 
 export function getExpressShippingMethods(
-  order: Order
+  order: Order,
 ): PaymentRequestShippingOption[] | null {
   const isSingleShipment = order?.shipments?.length === 1
   const shippingMethods = order?.shipments?.map(
-    (shipment) => shipment.available_shipping_methods
+    (shipment) => shipment.available_shipping_methods,
   )
   if (isSingleShipment) {
     if (shippingMethods == null) return null
     return shippingMethods.flat().map((method) => {
       const shippingOption: PaymentRequestShippingOption = {
-        id: method?.id ?? '',
-        label: method?.name ?? '',
+        id: method?.id ?? "",
+        label: method?.name ?? "",
         amount: method?.price_amount_for_shipment_cents ?? 0,
-        detail: ''
+        detail: "",
       }
       return shippingOption
     })
-  } else {
-    if (shippingMethods == null) return null
-    const shippingOptionsAmount: number[] = []
-    shippingMethods.forEach((methods) => {
-      if (methods != null) {
-        const [firstMethod] = methods
-        if (firstMethod != null) {
-          shippingOptionsAmount.push(
-            firstMethod.price_amount_for_shipment_cents ?? 0
-          )
-        }
-      }
-    })
-    const shippingOptions: PaymentRequestShippingOption[] = [
-      {
-        id: 'shipping',
-        label: 'Shipping',
-        amount: shippingOptionsAmount.reduce((a, b) => a + b, 0),
-        detail: ''
-      }
-    ]
-    return shippingOptions
   }
+  if (shippingMethods == null) return null
+  const shippingOptionsAmount: number[] = []
+  // biome-ignore lint/complexity/noForEach: Need to refactor
+  shippingMethods.forEach((methods) => {
+    if (methods != null) {
+      const [firstMethod] = methods
+      if (firstMethod != null) {
+        shippingOptionsAmount.push(
+          firstMethod.price_amount_for_shipment_cents ?? 0,
+        )
+      }
+    }
+  })
+  const shippingOptions: PaymentRequestShippingOption[] = [
+    {
+      id: "shipping",
+      label: "Shipping",
+      amount: shippingOptionsAmount.reduce((a, b) => a + b, 0),
+      detail: "",
+    },
+  ]
+  return shippingOptions
 }
 
 type TSetExpressShippingMethodParams = {
@@ -140,17 +140,17 @@ export async function setExpressShippingMethod({
   orderId,
   selectFirst = true,
   selectedShippingMethodId,
-  params
+  params,
 }: TSetExpressShippingMethodParams): Promise<Order> {
   const sdk = getSdk(config)
   const order = await sdk.orders.retrieve(orderId, params)
   const shippingMethods = getExpressShippingMethods(order)
-  if (order?.shipments == null) throw new Error('No shipments found')
+  if (order?.shipments == null) throw new Error("No shipments found")
   const isSingleShipment = order.shipments.length === 1
   const [shipmentId] = order.shipments.map((shipment) => shipment.id)
-  if (shipmentId == null) throw new Error('No shipment found')
+  if (shipmentId == null) throw new Error("No shipment found")
   if (shippingMethods == null || shippingMethods?.length === 0)
-    throw new Error('No shipping methods found')
+    throw new Error("No shipping methods found")
   if (isSingleShipment) {
     if (selectFirst) {
       const [firstShippingMethodId] = shippingMethods.map((method) => method.id)
@@ -158,8 +158,8 @@ export async function setExpressShippingMethod({
         await sdk.shipments.update({
           id: shipmentId,
           shipping_method: sdk.shipping_methods.relationship(
-            firstShippingMethodId
-          )
+            firstShippingMethodId,
+          ),
         })
       }
     } else {
@@ -167,8 +167,8 @@ export async function setExpressShippingMethod({
         await sdk.shipments.update({
           id: shipmentId,
           shipping_method: sdk.shipping_methods.relationship(
-            selectedShippingMethodId
-          )
+            selectedShippingMethodId,
+          ),
         })
       }
     }
@@ -180,8 +180,8 @@ export async function setExpressShippingMethod({
         await sdk.shipments.update({
           id: shipment.id,
           shipping_method: sdk.shipping_methods.relationship(
-            firstShippingMethodId
-          )
+            firstShippingMethodId,
+          ),
         })
       }
     }
@@ -225,37 +225,37 @@ export async function setExpressPlaceOrder({
   orderId,
   paymentResource,
   paymentSourceId,
-  placeTheOrder = false
+  placeTheOrder = false,
 }: TSetExpressPlaceOrderParams): Promise<Order> {
   const sdk = getSdk(config)
   if (!placeTheOrder && paymentResource != null && paymentSourceId != null) {
     const include = [
-      'shipments.shipping_method',
-      'payment_source',
-      'payment_method'
+      "shipments.shipping_method",
+      "payment_source",
+      "payment_method",
     ]
     await sdk.orders.retrieve(orderId, {
-      include
+      include,
     })
     await sdk[paymentResource].update({
       id: paymentSourceId,
-      order: sdk.orders.relationship(orderId)
+      order: sdk.orders.relationship(orderId),
     })
     await sdk.orders.update({
       id: orderId,
-      payment_source: sdk[paymentResource].relationship(paymentSourceId)
+      payment_source: sdk[paymentResource].relationship(paymentSourceId),
     })
     await sdk[paymentResource].update({
       id: paymentSourceId,
-      _update: true
+      _update: true,
     })
     return await sdk.orders.retrieve(orderId, {
-      include
+      include,
     })
   }
   return await sdk.orders.update({
     id: orderId,
-    _place: true
+    _place: true,
   })
 }
 
@@ -272,22 +272,22 @@ interface TExpressRedirectUrlParams {
 
 export function expressRedirectUrl({
   order,
-  config: { accessToken, endpoint }
+  config: { accessToken, endpoint },
 }: TExpressRedirectUrlParams): void {
-  if (accessToken == null) throw new Error('No access token found')
-  if (endpoint == null) throw new Error('No endpoint found')
+  if (accessToken == null) throw new Error("No access token found")
+  if (endpoint == null) throw new Error("No endpoint found")
   const { slug } = getDomain(endpoint)
-  if (slug == null) throw new Error('No slug found')
+  if (slug == null) throw new Error("No slug found")
   const href =
     order?.checkout_url != null
       ? order?.checkout_url
       : `https://${slug}.commercelayer.app/checkout/${order.id}?accessToken=${accessToken}`
-  const isOnTheCheckout =
-    window.location.pathname.includes(`/checkout`) ||
-    window.location.pathname.includes(`/${order.id}`)
+  const isOnTheCheckout = !window.location.pathname.includes("/cart")
   if (isOnTheCheckout) {
     window.location.reload()
   } else {
-    window.location.href = href
+    if (window.top != null) {
+      window.top.location.href = href
+    }
   }
 }

@@ -1,31 +1,28 @@
-import baseReducer from '#utils/baseReducer'
-import type { Dispatch, RefObject } from 'react'
-import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import type { BaseError } from '#typings/errors'
-import type { Order, OrderUpdate, StripePayment } from '@commercelayer/sdk'
-import isEmpty from 'lodash/isEmpty'
-import { isDoNotShip, shipmentsFilled } from '#utils/shipments'
-import type {
-  PaymentResource,
-  PaymentSourceType
-} from './PaymentMethodReducer'
+import baseReducer from "#utils/baseReducer"
+import type { Dispatch, RefObject } from "react"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
+import type { BaseError } from "#typings/errors"
+import type { Order, OrderUpdate, StripePayment } from "@commercelayer/sdk"
+import isEmpty from "lodash/isEmpty"
+import { isDoNotShip, shipmentsFilled } from "#utils/shipments"
+import type { PaymentResource, PaymentSourceType } from "./PaymentMethodReducer"
 import {
   saveBillingAddress,
   saveShippingAddress,
-  saveToWallet
-} from '#utils/customerOrderOptions'
-import getSdk from '#utils/getSdk'
-import getErrors from '#utils/getErrors'
-import { isGuestToken } from '#utils/isGuestToken'
-import { setCustomerOrderParam } from '#utils/localStorage'
-import { hasSubscriptions } from '#utils/hasSubscriptions'
-import { updateOrderSubscriptionCustomerPaymentSource } from '#utils/updateOrderSubscriptionCustomerPaymentSource'
+  saveToWallet,
+} from "#utils/customerOrderOptions"
+import getSdk from "#utils/getSdk"
+import getErrors from "#utils/getErrors"
+import { isGuestToken } from "#utils/isGuestToken"
+import { setCustomerOrderParam } from "#utils/localStorage"
+import { hasSubscriptions } from "#utils/hasSubscriptions"
+import { updateOrderSubscriptionCustomerPaymentSource } from "#utils/updateOrderSubscriptionCustomerPaymentSource"
 
 export type PlaceOrderActionType =
-  | 'setErrors'
-  | 'setPlaceOrderPermitted'
-  | 'setButtonRef'
-  | 'setStatus'
+  | "setErrors"
+  | "setPlaceOrderPermitted"
+  | "setButtonRef"
+  | "setStatus"
 
 export interface PlaceOrderOptions {
   paypalPayerId?: string
@@ -56,19 +53,19 @@ export interface PlaceOrderActionPayload {
   paymentSource: PaymentSourceType
   options?: PlaceOrderOptions
   placeOrderButtonRef?: RefObject<HTMLButtonElement | null>
-  status: 'placing' | 'standby'
+  status: "placing" | "standby"
 }
 
 export function setButtonRef(
   ref: RefObject<HTMLButtonElement | null>,
-  dispatch: Dispatch<PlaceOrderAction>
+  dispatch: Dispatch<PlaceOrderAction>,
 ): void {
   if (ref?.current != null) {
     dispatch({
-      type: 'setButtonRef',
+      type: "setButtonRef",
       payload: {
-        placeOrderButtonRef: ref
-      }
+        placeOrderButtonRef: ref,
+      },
     })
   }
 }
@@ -83,19 +80,19 @@ export interface PlaceOrderAction {
 export const placeOrderInitialState: PlaceOrderState = {
   errors: [],
   isPermitted: false,
-  status: 'standby'
+  status: "standby",
 }
 
 export function setPlaceOrderErrors<V extends BaseError[]>(
   errors: V,
-  dispatch: Dispatch<PlaceOrderAction>
+  dispatch: Dispatch<PlaceOrderAction>,
 ): void {
   if (dispatch) {
     dispatch({
-      type: 'setErrors',
+      type: "setErrors",
       payload: {
-        errors
-      }
+        errors,
+      },
     })
   }
 }
@@ -112,12 +109,12 @@ export function placeOrderPermitted({
   config,
   order,
   dispatch,
-  options
+  options,
 }: TPlaceOrderPermittedParams): void {
   if (order && config) {
     let isPermitted = true
     if (order.privacy_url && order.terms_url) {
-      isPermitted = localStorage.getItem('privacy-terms') === 'true'
+      isPermitted = localStorage.getItem("privacy-terms") === "true"
     }
     const billingAddress = order.billing_address
     const shippingAddress = order.shipping_address
@@ -134,7 +131,7 @@ export function placeOrderPermitted({
     // @ts-expect-error no type
     if (paymentSource?.mismatched_amounts) isPermitted = false
     dispatch({
-      type: 'setPlaceOrderPermitted',
+      type: "setPlaceOrderPermitted",
       payload: {
         isPermitted,
         paymentType: paymentMethod?.payment_source_type as PaymentResource,
@@ -143,8 +140,8 @@ export function placeOrderPermitted({
         // @ts-expect-error no type
         paymentId: paymentSource?.options?.id,
         paymentSource,
-        options
-      }
+        options,
+      },
     })
   }
 }
@@ -168,21 +165,21 @@ export async function setPlaceOrder({
   paymentSource,
   setOrder,
   include,
-  currentCustomerPaymentSourceId
+  currentCustomerPaymentSourceId,
 }: TSetPlaceOrderParams): Promise<{
   placed: boolean
   errors?: BaseError[]
   order?: Order
 }> {
   const response = {
-    placed: false
+    placed: false,
   }
   if (state && config && order) {
-    const isAlreadyPlaced = order?.status === 'placed'
+    const isAlreadyPlaced = order?.status === "placed"
     if (isAlreadyPlaced) {
       return {
         placed: true,
-        order
+        order,
       }
     }
     const sdk = getSdk(config)
@@ -190,15 +187,15 @@ export async function setPlaceOrder({
     try {
       // Prevent extra place order
       const lastOrderStatus = await sdk.orders.retrieve(order.id)
-      if (lastOrderStatus.status === 'placed') {
+      if (lastOrderStatus.status === "placed") {
         return {
           placed: true,
-          order: lastOrderStatus
+          order: lastOrderStatus,
         }
       }
       if (
-        paymentType === 'paypal_payments' &&
-        paymentSource?.type === 'paypal_payments'
+        paymentType === "paypal_payments" &&
+        paymentSource?.type === "paypal_payments"
       ) {
         if (!options?.paypalPayerId && paymentSource?.approval_url) {
           window.location.href = paymentSource?.approval_url
@@ -206,30 +203,30 @@ export async function setPlaceOrder({
         }
         await sdk[paymentType].update({
           id: paymentSource.id,
-          paypal_payer_id: options?.paypalPayerId
+          paypal_payer_id: options?.paypalPayerId,
         })
       }
       if (
-        paymentType === 'checkout_com_payments' &&
+        paymentType === "checkout_com_payments" &&
         paymentSource &&
         options?.checkoutCom?.session_id
       ) {
         const payment = await sdk[paymentType].update({
           id: paymentSource.id,
           _details: true,
-          session_id: options?.checkoutCom?.session_id
+          session_id: options?.checkoutCom?.session_id,
         })
         // @ts-expect-error no type
-        if (payment?.payment_response?.status !== 'Authorized') {
+        if (payment?.payment_response?.status !== "Authorized") {
           // @ts-expect-error no type
-          const [action] = payment?.payment_response?.actions || ['']
+          const [action] = payment?.payment_response?.actions || [""]
           const errors: BaseError[] = [
             {
-              code: 'PAYMENT_NOT_APPROVED_FOR_EXECUTION',
+              code: "PAYMENT_NOT_APPROVED_FOR_EXECUTION",
               message: action?.response_summary,
-              resource: 'orders',
-              field: 'checkout_com_payments'
-            }
+              resource: "orders",
+              field: "checkout_com_payments",
+            },
           ]
           // eslint-disable-next-line @typescript-eslint/no-throw-literal
           throw { errors }
@@ -237,30 +234,31 @@ export async function setPlaceOrder({
       }
       const updateAttributes: OrderUpdate = {
         id: order.id,
-        _place: true
+        _place: true,
       }
       if (saveBillingAddress()) {
         await sdk.orders.update({
           id: order.id,
-          _save_billing_address_to_customer_address_book: true
+          _save_billing_address_to_customer_address_book: true,
         })
       }
       if (saveShippingAddress()) {
         await sdk.orders.update({
           id: order.id,
-          _save_shipping_address_to_customer_address_book: true
+          _save_shipping_address_to_customer_address_book: true,
         })
       }
-      if (paymentType === 'stripe_payments' && paymentSource != null) {
+      if (paymentType === "stripe_payments" && paymentSource != null) {
         const ps = paymentSource as StripePayment
         const currentUrl = window.location.href
-        const returnUrl = ps?.options?.['return_url']
+        // @ts-expect-error no type
+        const returnUrl = ps?.options?.return_url
         if (currentUrl !== returnUrl) {
           await sdk[paymentType].update({
             id: paymentSource.id,
             options: {
-              return_url: currentUrl
-            }
+              return_url: currentUrl,
+            },
           })
         }
       }
@@ -270,37 +268,37 @@ export async function setPlaceOrder({
         !isGuestToken(config.accessToken) &&
         currentCustomerPaymentSourceId == null
       ) {
-        setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'true')
+        setCustomerOrderParam("_save_payment_source_to_customer_wallet", "true")
       }
       switch (paymentType) {
-        case 'braintree_payments': {
+        case "braintree_payments": {
           const total = order?.total_amount_cents ?? 0
           await Promise.all([
             saveToWallet() &&
               total > 0 &&
               sdk.orders.update({
                 id: order.id,
-                _save_payment_source_to_customer_wallet: true
-              })
+                _save_payment_source_to_customer_wallet: true,
+              }),
           ])
           const orderUpdated = await sdk.orders.update(updateAttributes, {
-            include
+            include,
           })
           if (setOrder) setOrder(orderUpdated)
           if (setOrderErrors) setOrderErrors([])
           updateOrderSubscriptionCustomerPaymentSource(
             orderUpdated,
             paymentType,
-            sdk
+            sdk,
           )
           return {
             placed: true,
-            order: orderUpdated
+            order: orderUpdated,
           }
         }
         default: {
           const orderUpdated = await sdk.orders.update(updateAttributes, {
-            include
+            include,
           })
           const total = orderUpdated?.total_amount_cents ?? 0
           if (setOrder) setOrder(orderUpdated)
@@ -310,40 +308,41 @@ export async function setPlaceOrder({
               sdk.orders
                 .update({
                   id: order.id,
-                  _save_payment_source_to_customer_wallet: true
+                  _save_payment_source_to_customer_wallet: true,
                 })
                 .catch((error) => {
                   // Avoid to interrupt the process if the order is already placed
                   const errors = getErrors({
                     error,
-                    resource: 'orders',
-                    field: paymentType
+                    resource: "orders",
+                    field: paymentType,
                   })
                   if (setOrderErrors) setOrderErrors(errors)
-                })
+                }),
           ]).then(() => {
             updateOrderSubscriptionCustomerPaymentSource(
               orderUpdated,
               paymentType,
-              sdk
+              sdk,
             )
           })
           return {
             placed: true,
-            order: orderUpdated
+            order: orderUpdated,
           }
         }
       }
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     } catch (error: any) {
       const errors = getErrors({
         error,
-        resource: 'orders',
-        field: paymentType
+        resource: "orders",
+        field: paymentType,
       })
       if (setOrderErrors) setOrderErrors(errors)
       return {
         ...response,
-        errors
+        errors,
       }
     }
   }
@@ -352,36 +351,36 @@ export async function setPlaceOrder({
 
 export function setPlaceOrderStatus({
   status,
-  dispatch
+  dispatch,
 }: {
-  status: 'placing' | 'standby'
+  status: "placing" | "standby"
   dispatch?: Dispatch<PlaceOrderAction>
 }): void {
   if (dispatch != null) {
     dispatch({
-      type: 'setStatus',
+      type: "setStatus",
       payload: {
-        status
-      }
+        status,
+      },
     })
   }
 }
 
 const type: PlaceOrderActionType[] = [
-  'setErrors',
-  'setPlaceOrderPermitted',
-  'setButtonRef',
-  'setStatus'
+  "setErrors",
+  "setPlaceOrderPermitted",
+  "setButtonRef",
+  "setStatus",
 ]
 
 const placeOrderReducer = (
   state: PlaceOrderState,
-  reducer: PlaceOrderAction
+  reducer: PlaceOrderAction,
 ): PlaceOrderState =>
   baseReducer<PlaceOrderState, PlaceOrderAction, PlaceOrderActionType[]>(
     state,
     reducer,
-    type
+    type,
   )
 
 export default placeOrderReducer
