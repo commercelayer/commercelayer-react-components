@@ -1,66 +1,66 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { useContext, type PropsWithoutRef, type JSX } from 'react';
-import Parent from '../utils/Parent'
-import OrderContext from '#context/OrderContext'
-import type { ChildrenFunction } from '#typings/index'
+import { useContext, type PropsWithoutRef, type JSX } from "react"
+import Parent from "../utils/Parent"
+import OrderContext from "#context/OrderContext"
+import type { ChildrenFunction } from "#typings/index"
 import type {
   AddToCartReturn,
   CustomLineItem,
-  LineItemOption
-} from '#reducers/OrderReducer'
-import SkuListsContext from '#context/SkuListsContext'
-import ExternalFunctionContext from '#context/ExternalFunctionContext'
-import SkuChildrenContext from '#context/SkuChildrenContext'
-import { getApplicationLink } from '#utils/getApplicationLink'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import useCustomContext from '#utils/hooks/useCustomContext'
-import { getDomain } from '#utils/getDomain'
-import { publish } from '#utils/events'
-import { getOrganizationConfig } from '#utils/organization'
+  LineItemOption,
+} from "#reducers/OrderReducer"
+import SkuListsContext from "#context/SkuListsContext"
+import ExternalFunctionContext from "#context/ExternalFunctionContext"
+import SkuChildrenContext from "#context/SkuChildrenContext"
+import { getApplicationLink } from "#utils/getApplicationLink"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import useCustomContext from "#utils/hooks/useCustomContext"
+import { getDomain } from "#utils/getDomain"
+import { publish } from "#utils/events"
+import { getOrganizationConfig } from "#utils/organization"
 
-interface TAddToCartButton extends Omit<Props, 'children'> {
+interface TAddToCartButton extends Omit<Props, "children"> {
   handleClick: () => AddToCartReturn
 }
 
 type BuyNowMode =
   | {
-    /**
-     * Once item has been added, it redirects to the hosted checkout micro-frontend.
-     */
-    buyNowMode: true
-    /**
-     * If you have a self-hosted checkout, you can pass the url to redirect to it.
-     */
-    checkoutUrl?: string
-  }
+      /**
+       * Once item has been added, it redirects to the hosted checkout micro-frontend.
+       */
+      buyNowMode: true
+      /**
+       * If you have a self-hosted checkout, you can pass the url to redirect to it.
+       */
+      checkoutUrl?: string
+    }
   | {
-    buyNowMode?: false
-    checkoutUrl?: never
-  }
+      buyNowMode?: false
+      checkoutUrl?: never
+    }
 
 type THostedCart =
   | {
-    /**
-     * Once item has been added, it redirects to the hosted cart micro-frontend.
-     */
-    redirectToHostedCart: true
-    /**
-     * If you have a self-hosted cart, you can pass the url to redirect to it.
-     */
-    hostedCartUrl?: string
-    /**
-     * If you have a self-hosted cart, you can pass the protocol to redirect to it.
-     */
-    protocol?: 'http' | 'https'
-  }
+      /**
+       * Once item has been added, it redirects to the hosted cart micro-frontend.
+       */
+      redirectToHostedCart: true
+      /**
+       * If you have a self-hosted cart, you can pass the url to redirect to it.
+       */
+      hostedCartUrl?: string
+      /**
+       * If you have a self-hosted cart, you can pass the protocol to redirect to it.
+       */
+      protocol?: "http" | "https"
+    }
   | {
-    redirectToHostedCart?: false
-    hostedCartUrl?: never
-    protocol?: never
-  }
+      redirectToHostedCart?: false
+      hostedCartUrl?: never
+      protocol?: never
+    }
 
 type TButton = PropsWithoutRef<
-  Omit<JSX.IntrinsicElements['button'], 'children'>
+  Omit<JSX.IntrinsicElements["button"], "children">
 >
 
 type Props = {
@@ -123,7 +123,7 @@ type Props = {
  */
 export function AddToCartButton(props: Props): JSX.Element {
   const {
-    label = 'Add to cart',
+    label = "Add to cart",
     children,
     skuCode,
     bundleCode,
@@ -135,20 +135,20 @@ export function AddToCartButton(props: Props): JSX.Element {
     hostedCartUrl,
     quantity,
     lineItemOption,
-    protocol = 'https',
+    protocol = "https",
     ...p
   } = props
   const { accessToken, endpoint } = useCustomContext({
     context: CommerceLayerContext,
-    contextComponentName: 'CommerceLayer',
-    currentComponentName: 'AddToCartButton',
-    key: 'accessToken'
+    contextComponentName: "CommerceLayer",
+    currentComponentName: "AddToCartButton",
+    key: "accessToken",
   })
   const { addToCart, orderId, getOrder, setOrderErrors } = useCustomContext({
     context: OrderContext,
-    contextComponentName: 'OrderContainer',
-    currentComponentName: 'AddToCartButton',
-    key: 'addToCart'
+    contextComponentName: "OrderContainer",
+    currentComponentName: "AddToCartButton",
+    key: "addToCart",
   })
   const { url, callExternalFunction } = useContext(ExternalFunctionContext)
   const { skuLists } = useContext(SkuListsContext)
@@ -156,38 +156,38 @@ export function AddToCartButton(props: Props): JSX.Element {
   const sCode = sku?.code ?? skuCode
   const handleClick = async (): Promise<
     | {
-      success: boolean
-      orderId?: string
-    }
+        success: boolean
+        orderId?: string
+      }
     | Record<string, any>
     | undefined
   > => {
-    const qty: number = quantity != null ? parseInt(quantity) : 1
+    const qty: number = quantity != null ? Number.parseInt(quantity) : 1
     if (skuLists != null && skuListId && url) {
       if (skuListId in skuLists) {
         const lineItems = skuLists?.[skuListId]?.map((skuCode: string) => {
           return {
             skuCode,
             quantity: qty,
-            _update_quantity: 1
+            _update_quantity: 1,
           }
         })
         return await callExternalFunction({
           url,
           data: {
-            resourceType: 'orders',
+            resourceType: "orders",
             inputs: [
               {
                 id: orderId,
-                lineItems
-              }
-            ]
-          }
+                lineItems,
+              },
+            ],
+          },
         })
           .then(async (res) => {
             getOrder && orderId && (await getOrder(orderId))
             if (!buyNowMode) {
-              publish('open-cart')
+              publish("open-cart")
             }
             return res
           })
@@ -205,7 +205,7 @@ export function AddToCartButton(props: Props): JSX.Element {
         lineItemOption,
         lineItem,
         buyNowMode,
-        checkoutUrl
+        checkoutUrl,
       })
       if (redirectToHostedCart && accessToken != null && endpoint != null) {
         const { slug, domain } = getDomain(endpoint)
@@ -219,16 +219,18 @@ export function AddToCartButton(props: Props): JSX.Element {
             params: {
               orderId,
               accessToken,
-              slug
-            }
+              slug,
+            },
           })
-          location.href = config?.links?.cart ?? getApplicationLink({
-            orderId,
-            slug,
-            accessToken,
-            domain,
-            applicationType: 'cart'
-          })
+          location.href =
+            config?.links?.cart ??
+            getApplicationLink({
+              orderId,
+              slug,
+              accessToken,
+              domain,
+              applicationType: "cart",
+            })
         }
       }
       return res
@@ -242,13 +244,13 @@ export function AddToCartButton(props: Props): JSX.Element {
           lineItemOption,
           lineItem,
           buyNowMode,
-          checkoutUrl
-        }
+          checkoutUrl,
+        },
       })
         .then(async (res) => {
           getOrder && orderId && (await getOrder(orderId))
           if (!buyNowMode) {
-            publish('open-cart')
+            publish("open-cart")
           }
           return res
         })
@@ -262,7 +264,7 @@ export function AddToCartButton(props: Props): JSX.Element {
   const parentProps = {
     handleClick,
     label,
-    ...props
+    ...props,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
