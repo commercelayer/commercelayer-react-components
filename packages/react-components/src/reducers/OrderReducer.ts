@@ -1,30 +1,30 @@
-import type { Dispatch } from 'react'
+import type { Dispatch } from "react"
 import {
   type SetLocalOrder,
   type DeleteLocalOrder,
   setCustomerOrderParam,
-  type CustomerOrderParams
-} from '#utils/localStorage'
-import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import baseReducer from '#utils/baseReducer'
-import isEmpty from 'lodash/isEmpty'
-import type { BaseMetadataObject } from '#typings/index'
-import type { BaseError } from '#typings/errors'
-import getSdk from '#utils/getSdk'
-import getErrors, { setErrors } from '../utils/getErrors'
-import type { AddressResource } from './AddressReducer'
+  type CustomerOrderParams,
+} from "#utils/localStorage"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
+import baseReducer from "#utils/baseReducer"
+import isEmpty from "lodash-es/isEmpty"
+import type { BaseMetadataObject } from "#typings/index"
+import type { BaseError } from "#typings/errors"
+import getSdk from "#utils/getSdk"
+import getErrors, { setErrors } from "../utils/getErrors"
+import type { AddressResource } from "./AddressReducer"
 import type {
   Order,
   LineItemCreate,
   LineItemOptionCreate,
   OrderUpdate,
-  QueryParamsRetrieve
-} from '@commercelayer/sdk'
-import { getOrganizationConfig } from '#utils/organization'
-import type { LooseAutocomplete } from '#typings/globals'
-import { publish } from '#utils/events'
-import { getDomain } from '#utils/getDomain'
-import { getApplicationLink } from '#utils/getApplicationLink'
+  QueryParamsRetrieve,
+} from "@commercelayer/sdk"
+import { getOrganizationConfig } from "#utils/organization"
+import type { LooseAutocomplete } from "#typings/globals"
+import { publish } from "#utils/events"
+import { getDomain } from "#utils/getDomain"
+import { getApplicationLink } from "#utils/getApplicationLink"
 
 export type GetOrderParams = Partial<{
   clearWhenPlaced: boolean
@@ -40,19 +40,19 @@ export type GetOrder = (params: GetOrderParams) => Promise<undefined | Order>
 
 type CreateOrderParams = Pick<
   AddToCartParams,
-  | 'config'
-  | 'dispatch'
-  | 'persistKey'
-  | 'state'
-  | 'orderMetadata'
-  | 'orderAttributes'
-  | 'setLocalOrder'
+  | "config"
+  | "dispatch"
+  | "persistKey"
+  | "state"
+  | "orderMetadata"
+  | "orderAttributes"
+  | "setLocalOrder"
 >
 
 export interface AddToCartImportParams
   extends Omit<
     AddToCartParams,
-    'skuCode' | 'skuId' | 'quantity' | 'option' | 'lineItem'
+    "skuCode" | "skuId" | "quantity" | "option" | "lineItem"
   > {
   lineItems: CustomLineItem[]
 }
@@ -67,23 +67,23 @@ export type AddToCartImport = (params: AddToCartImportParams) => AddToCartReturn
 export type UnsetOrderState = (dispatch: Dispatch<OrderActions>) => void
 
 export type ResourceIncluded =
-  | 'billing_address'
-  | 'shipping_address'
-  | 'line_items.line_item_options.sku_option'
-  | 'line_items.item'
-  | 'available_customer_payment_sources.payment_source'
-  | 'available_customer_payment_sources.payment_method'
-  | 'shipments.available_shipping_methods'
-  | 'shipments.stock_transfers'
-  | 'shipments.stock_transfers.line_item'
-  | 'shipments.stock_line_items.line_item'
-  | 'shipments.shipping_method'
-  | 'shipments.stock_location'
-  | 'shipments.parcels'
-  | 'shipments.parcels.parcel_line_items'
-  | 'payment_source'
-  | 'available_payment_methods'
-  | 'payment_method'
+  | "billing_address"
+  | "shipping_address"
+  | "line_items.line_item_options.sku_option"
+  | "line_items.item"
+  | "available_customer_payment_sources.payment_source"
+  | "available_customer_payment_sources.payment_method"
+  | "shipments.available_shipping_methods"
+  | "shipments.stock_transfers"
+  | "shipments.stock_transfers.line_item"
+  | "shipments.stock_line_items.line_item"
+  | "shipments.shipping_method"
+  | "shipments.stock_location"
+  | "shipments.parcels"
+  | "shipments.parcels.parcel_line_items"
+  | "payment_source"
+  | "available_payment_methods"
+  | "payment_method"
 
 type ResourceIncludedLoaded = Partial<Record<ResourceIncluded, boolean>>
 
@@ -97,7 +97,7 @@ export interface OrderPayload {
   withoutIncludes?: boolean
 }
 
-export type AddToCartImportValues = Pick<AddToCartImportParams, 'lineItems'>
+export type AddToCartImportValues = Pick<AddToCartImportParams, "lineItems">
 
 export type getOrderContext = (id: string) => Promise<undefined | Order>
 
@@ -109,29 +109,29 @@ export interface OrderActions {
 }
 
 export type OrderActionType =
-  | 'setLoading'
-  | 'setOrderId'
-  | 'setOrder'
-  | 'setSingleQuantity'
-  | 'setCurrentSkuCodes'
-  | 'setCurrentSkuPrices'
-  | 'setCurrentItem'
-  | 'setErrors'
-  | 'setSaveAddressToCustomerAddressBook'
-  | 'setGiftCardOrCouponCode'
-  | 'setIncludesResource'
+  | "setLoading"
+  | "setOrderId"
+  | "setOrder"
+  | "setSingleQuantity"
+  | "setCurrentSkuCodes"
+  | "setCurrentSkuPrices"
+  | "setCurrentItem"
+  | "setErrors"
+  | "setSaveAddressToCustomerAddressBook"
+  | "setGiftCardOrCouponCode"
+  | "setIncludesResource"
 
 const actionType: OrderActionType[] = [
-  'setLoading',
-  'setOrderId',
-  'setOrder',
-  'setSingleQuantity',
-  'setCurrentSkuCodes',
-  'setCurrentSkuPrices',
-  'setErrors',
-  'setCurrentItem',
-  'setSaveAddressToCustomerAddressBook',
-  'setIncludesResource'
+  "setLoading",
+  "setOrderId",
+  "setOrder",
+  "setSingleQuantity",
+  "setCurrentSkuCodes",
+  "setCurrentSkuPrices",
+  "setErrors",
+  "setCurrentItem",
+  "setSaveAddressToCustomerAddressBook",
+  "setIncludesResource",
 ]
 
 export async function createOrder(params: CreateOrderParams): Promise<string> {
@@ -143,19 +143,19 @@ export async function createOrder(params: CreateOrderParams): Promise<string> {
       config,
       orderMetadata: metadata,
       orderAttributes = {},
-      setLocalOrder
+      setLocalOrder,
     } = params
     if (state?.orderId) return state.orderId
     const sdk = config != null ? getSdk(config) : undefined
     try {
-      if (sdk == null) return ''
+      if (sdk == null) return ""
       const o = await sdk?.orders.create({ metadata, ...orderAttributes })
       if (dispatch) {
         dispatch({
-          type: 'setOrderId',
+          type: "setOrderId",
           payload: {
-            orderId: o?.id
-          }
+            orderId: o?.id,
+          },
         })
       }
       persistKey && setLocalOrder && setLocalOrder(persistKey, o.id)
@@ -163,22 +163,22 @@ export async function createOrder(params: CreateOrderParams): Promise<string> {
     } catch (error: any) {
       const errors = getErrors({
         error,
-        resource: 'orders'
+        resource: "orders",
       })
-      console.error('Create order', errors)
+      console.error("Create order", errors)
       if (dispatch)
         setErrors({
           currentErrors: state?.errors,
           newErrors: errors,
-          dispatch
+          dispatch,
         })
     }
   }
-  return ''
+  return ""
 }
 
 export const getApiOrder: GetOrder = async (
-  params
+  params,
 ): Promise<Order | undefined> => {
   const {
     id,
@@ -187,7 +187,7 @@ export const getApiOrder: GetOrder = async (
     clearWhenPlaced,
     persistKey,
     deleteLocalOrder,
-    state
+    state,
   } = params
   const sdk = config != null ? getSdk(config) : undefined
   try {
@@ -196,26 +196,26 @@ export const getApiOrder: GetOrder = async (
     if (state?.include && state.include.length > 0) {
       options.include = state.include
     }
-    const order = await sdk.orders.retrieve(id ?? '', options)
+    const order = await sdk.orders.retrieve(id ?? "", options)
     if (clearWhenPlaced && order.editable === false) {
       persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
       if (dispatch) {
         dispatch({
-          type: 'setOrder',
+          type: "setOrder",
           payload: {
             order: undefined,
-            orderId: ''
-          }
+            orderId: "",
+          },
         })
       }
     } else {
       if (dispatch) {
         dispatch({
-          type: 'setOrder',
+          type: "setOrder",
           payload: {
             order,
-            orderId: order.id
-          }
+            orderId: order.id,
+          },
         })
       }
     }
@@ -223,14 +223,14 @@ export const getApiOrder: GetOrder = async (
   } catch (error: any) {
     const errors = getErrors({
       error,
-      resource: 'orders'
+      resource: "orders",
     })
-    console.error('Retrieve order', errors)
+    console.error("Retrieve order", errors)
     if (dispatch)
       setErrors({
         currentErrors: state?.errors,
         newErrors: errors,
-        dispatch
+        dispatch,
       })
     return undefined
   }
@@ -238,7 +238,7 @@ export const getApiOrder: GetOrder = async (
 
 export interface UpdateOrderArgs {
   id: string
-  attributes: Omit<OrderUpdate, 'id'>
+  attributes: Omit<OrderUpdate, "id">
   dispatch?: Dispatch<OrderActions>
   include?: string[]
   config?: CommerceLayerConfig
@@ -251,7 +251,7 @@ export async function updateOrder({
   dispatch,
   config,
   include,
-  state
+  state,
 }: UpdateOrderArgs): Promise<{
   success: boolean
   error?: unknown
@@ -265,20 +265,20 @@ export async function updateOrder({
     await sdk.orders.update(resource, { include })
     // NOTE: Retrieve doesn't response with attributes updated
     const order = await getApiOrder({ id, config, dispatch, state })
-    dispatch && order && dispatch({ type: 'setOrder', payload: { order } })
+    dispatch && order && dispatch({ type: "setOrder", payload: { order } })
     return { success: true, order }
   } catch (error: any) {
     const errors = getErrors({
       error,
-      resource: 'orders'
+      resource: "orders",
     })
     if (dispatch) {
       setOrderErrors({ errors, dispatch })
       dispatch({
-        type: 'setErrors',
+        type: "setErrors",
         payload: {
-          errors
-        }
+          errors,
+        },
       })
     }
     return { success: false, error }
@@ -287,14 +287,14 @@ export async function updateOrder({
 
 export const setOrder = (
   order: Order,
-  dispatch?: Dispatch<OrderActions>
+  dispatch?: Dispatch<OrderActions>,
 ): void => {
   if (dispatch) {
     dispatch({
-      type: 'setOrder',
+      type: "setOrder",
       payload: {
-        order
-      }
+        order,
+      },
     })
   }
 }
@@ -321,20 +321,20 @@ export function addResourceToInclude({
   dispatch,
   newResource,
   newResourceLoaded,
-  resourceIncludedLoaded
+  resourceIncludedLoaded,
 }: AddResourceToInclude): void {
   const payload: IncludesType = {
     include: undefined,
-    includeLoaded: undefined
+    includeLoaded: undefined,
   }
   if (newResource) {
     const resources =
-      typeof newResource === 'string' ? [newResource] : newResource
+      typeof newResource === "string" ? [newResource] : newResource
     payload.include = [...new Set([...resourcesIncluded, ...resources])]
     resources.forEach((resource) => {
       const includeLoaded = {
         ...payload.includeLoaded,
-        ...{ [resource]: true }
+        ...{ [resource]: true },
       }
       payload.includeLoaded = includeLoaded
     })
@@ -344,16 +344,16 @@ export function addResourceToInclude({
   const payloadIncludeLoaded = {
     ...resourceIncludedLoaded,
     ...newResourceLoaded,
-    ...(payload.includeLoaded && payload.includeLoaded)
+    ...(payload.includeLoaded && payload.includeLoaded),
   }
   payload.includeLoaded = payloadIncludeLoaded
   if (dispatch)
     dispatch({
-      type: 'setIncludesResource',
+      type: "setIncludesResource",
       payload: {
         ...payload,
-        withoutIncludes: false
-      }
+        withoutIncludes: false,
+      },
     })
 }
 
@@ -370,15 +370,15 @@ export interface LineItemOption {
 }
 
 type TFrequency =
-  | 'hourly'
-  | 'daily'
-  | 'weekly'
-  | 'monthly'
-  | 'two-month'
-  | 'three-month'
-  | 'four-month'
-  | 'six-month'
-  | 'yearly'
+  | "hourly"
+  | "daily"
+  | "weekly"
+  | "monthly"
+  | "two-month"
+  | "three-month"
+  | "four-month"
+  | "six-month"
+  | "yearly"
 
 export interface CustomLineItem {
   name?: string
@@ -409,7 +409,7 @@ export type AddToCartParams = Partial<{
 }>
 
 export async function addToCart(
-  params: AddToCartParams
+  params: AddToCartParams,
 ): Promise<{ success: boolean; orderId?: string }> {
   const {
     skuCode,
@@ -423,7 +423,7 @@ export async function addToCart(
     buyNowMode,
     checkoutUrl,
     lineItemOption,
-    openMiniCart = true
+    openMiniCart = true,
   } = params
   try {
     if (config) {
@@ -439,21 +439,21 @@ export async function addToCart(
         if (buyNowMode) {
           if (!state?.order?.line_items) {
             const { line_items: lineItems } = await sdk.orders.retrieve(id, {
-              fields: ['line_items'],
-              include: ['line_items']
+              fields: ["line_items"],
+              include: ["line_items"],
             })
             if (lineItems && lineItems?.length > 0) {
               await Promise.all(
                 lineItems.map(async (lineItem) => {
                   await sdk.line_items.delete(lineItem.id)
-                })
+                }),
               )
             }
           } else {
             await Promise.all(
               state?.order?.line_items.map(async (lineItem) => {
                 await sdk.line_items.delete(lineItem.id)
-              })
+              }),
             )
           }
         }
@@ -466,7 +466,7 @@ export async function addToCart(
           _update_quantity: lineItem?._update_quantity ?? true,
           bundle_code: bundleCode,
           metadata,
-          frequency: frequency as string
+          frequency: frequency as string,
         }
         if (externalPrice === true) {
           attrs._external_price = externalPrice
@@ -480,7 +480,7 @@ export async function addToCart(
             quantity: quantity ?? 1,
             options,
             sku_option: skuOption,
-            line_item: lineItemRel
+            line_item: lineItemRel,
           }
           await sdk.line_item_options.create(lineItemOptionsAttributes)
           await getApiOrder({ id, ...params })
@@ -489,10 +489,10 @@ export async function addToCart(
         }
         if (!isEmpty(errors) && dispatch) {
           dispatch({
-            type: 'setErrors',
+            type: "setErrors",
             payload: {
-              errors: []
-            }
+              errors: [],
+            },
           })
         }
         if (
@@ -501,14 +501,14 @@ export async function addToCart(
           config?.accessToken != null &&
           config?.endpoint != null
         ) {
-          const params = `${id}?accessToken=${config.accessToken ?? ''}`
+          const params = `${id}?accessToken=${config.accessToken ?? ""}`
           const { domain, slug } = getDomain(config.endpoint)
           const href = getApplicationLink({
             slug,
             orderId: id,
             accessToken: config.accessToken,
-            applicationType: 'checkout',
-            domain
+            applicationType: "checkout",
+            domain,
           })
           const organizationConfig = await getOrganizationConfig({
             accessToken: config.accessToken,
@@ -516,15 +516,15 @@ export async function addToCart(
             params: {
               accessToken: config.accessToken,
               orderId: order?.id,
-              slug
-            }
+              slug,
+            },
           })
           const redirectUrl = checkoutUrl
             ? `${checkoutUrl}/${params}`
             : (organizationConfig?.links?.checkout ?? href)
           location.href = redirectUrl
         } else if (openMiniCart) {
-          publish('open-cart')
+          publish("open-cart")
         }
         return { success: true, orderId: id }
       }
@@ -533,14 +533,14 @@ export async function addToCart(
   } catch (error: any) {
     const errors = getErrors({
       error,
-      resource: 'orders'
+      resource: "orders",
     })
-    console.error('Add to cart', errors)
+    console.error("Add to cart", errors)
     if (dispatch)
       setErrors({
         currentErrors: state?.errors,
         newErrors: errors,
-        dispatch
+        dispatch,
       })
     return { success: false }
   }
@@ -548,16 +548,16 @@ export async function addToCart(
 
 export const unsetOrderState: UnsetOrderState = (dispatch) => {
   dispatch({
-    type: 'setOrderId',
+    type: "setOrderId",
     payload: {
-      orderId: ''
-    }
+      orderId: "",
+    },
   })
   dispatch({
-    type: 'setOrder',
+    type: "setOrder",
     payload: {
-      order: undefined
-    }
+      order: undefined,
+    },
   })
 }
 
@@ -571,10 +571,10 @@ export function setOrderErrors({ dispatch, errors = [] }: OrderErrors): {
 } {
   if (dispatch)
     dispatch({
-      type: 'setErrors',
+      type: "setErrors",
       payload: {
-        errors
-      }
+        errors,
+      },
     })
   return { success: false }
 }
@@ -591,10 +591,10 @@ export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook 
     setCustomerOrderParam(k, v)
     if (dispatch)
       dispatch({
-        type: 'setSaveAddressToCustomerAddressBook',
+        type: "setSaveAddressToCustomerAddressBook",
         payload: {
-          [k]: v
-        }
+          [k]: v,
+        },
       })
   }
 
@@ -615,34 +615,34 @@ export async function setGiftCardOrCouponCode({
   config,
   order,
   include,
-  state
+  state,
 }: TSetGiftCardOrCouponCodeParams): Promise<{
   success: boolean
   order?: Order
 }> {
   try {
     if (config && order && code && dispatch) {
-      const attributes: Omit<OrderUpdate, 'id'> = {
-        [codeType]: code
+      const attributes: Omit<OrderUpdate, "id"> = {
+        [codeType]: code,
       }
       const {
         success,
         order: currentOrder,
-        error
+        error,
       } = await updateOrder({
         id: order.id,
         attributes,
         config,
         include,
         dispatch,
-        state
+        state,
       })
       if (!success) throw error
       dispatch({
-        type: 'setErrors',
+        type: "setErrors",
         payload: {
-          errors: []
-        }
+          errors: [],
+        },
       })
       return { success, order: currentOrder }
     }
@@ -650,15 +650,15 @@ export async function setGiftCardOrCouponCode({
   } catch (error: any) {
     const errors = getErrors({
       error,
-      resource: 'orders',
-      field: codeType
+      resource: "orders",
+      field: codeType,
     })
     dispatch && setOrderErrors({ errors, dispatch })
     return { success: false }
   }
 }
 
-export type CodeType = 'coupon' | 'gift_card'
+export type CodeType = "coupon" | "gift_card"
 export type OrderCodeType = `${CodeType}_code`
 
 interface TRemoveGiftCardOrCouponCodeParams {
@@ -676,15 +676,15 @@ export async function removeGiftCardOrCouponCode({
   config,
   order,
   include,
-  state
+  state,
 }: TRemoveGiftCardOrCouponCodeParams): Promise<{
   success: boolean
   order?: Order
 }> {
   try {
     if (config && order && dispatch) {
-      const attributes: Omit<OrderUpdate, 'id'> = {
-        [codeType]: ''
+      const attributes: Omit<OrderUpdate, "id"> = {
+        [codeType]: "",
       }
       const orderUpdated = await updateOrder({
         id: order.id,
@@ -692,20 +692,20 @@ export async function removeGiftCardOrCouponCode({
         config,
         include,
         dispatch,
-        state
+        state,
       })
       dispatch({
-        type: 'setErrors',
+        type: "setErrors",
         payload: {
-          errors: []
-        }
+          errors: [],
+        },
       })
       return { success: true, order: orderUpdated?.order }
     }
     return { success: false }
   } catch (error: any) {
-    const errors = getErrors({ error, resource: 'orders', field: codeType })
-    console.error('Remove gift card o coupon code', errors)
+    const errors = getErrors({ error, resource: "orders", field: codeType })
+    console.error("Remove gift card o coupon code", errors)
     dispatch && setOrderErrors({ errors, dispatch })
     return { success: false }
   }
@@ -713,18 +713,18 @@ export async function removeGiftCardOrCouponCode({
 
 export const orderInitialState: Partial<OrderState> = {
   loading: true,
-  orderId: '',
+  orderId: "",
   order: undefined,
   errors: [],
   include: undefined,
-  withoutIncludes: true
+  withoutIncludes: true,
 }
 
 const orderReducer = (state: OrderState, reducer: OrderActions): OrderState =>
   baseReducer<OrderState, OrderActions, OrderActionType[]>(
     state,
     reducer,
-    actionType
+    actionType,
   )
 
 export default orderReducer

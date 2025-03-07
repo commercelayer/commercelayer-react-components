@@ -1,21 +1,21 @@
-import { type ReactNode, useContext, type JSX } from 'react';
-import Parent from '#components/utils/Parent'
-import type { ChildrenFunction } from '#typings/index'
-import isEmpty from 'lodash/isEmpty'
-import CustomerContext from '#context/CustomerContext'
+import { type ReactNode, useContext, type JSX } from "react"
+import Parent from "#components/utils/Parent"
+import type { ChildrenFunction } from "#typings/index"
+import isEmpty from "lodash-es/isEmpty"
+import CustomerContext from "#context/CustomerContext"
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+interface ChildrenProps extends Omit<Props, "children"> {
   handleClick: () => void
 }
 
-interface Props extends Omit<JSX.IntrinsicElements['button'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements["button"], "children"> {
   children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
   onClick?: () => void
 }
 
 export function SaveCustomerButton(props: Props): JSX.Element {
-  const { children, label = 'Save', resource, disabled, onClick, ...p } = props
+  const { children, label = "Save", resource, disabled, onClick, ...p } = props
   const { errors, saveCustomerUser, customerEmail } =
     useContext(CustomerContext)
   const disable = disabled || !isEmpty(errors) || isEmpty(customerEmail)
@@ -30,13 +30,13 @@ export function SaveCustomerButton(props: Props): JSX.Element {
     label,
     resource,
     handleClick,
-    disabled: disable
+    disabled: disable,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <button
-      type='button'
+      type="button"
       disabled={disable}
       onClick={() => {
         handleClick()

@@ -1,6 +1,6 @@
-import PaymentMethodContext from '#context/PaymentMethodContext'
-import isFunction from 'lodash/isFunction'
-import { type ReactNode, useContext, useEffect, useRef, type JSX } from 'react';
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import isFunction from "lodash-es/isFunction"
+import { type ReactNode, useContext, useEffect, useRef, type JSX } from "react"
 
 export interface PaypalConfig {
   return_url: string
@@ -12,10 +12,10 @@ export interface PaypalConfig {
 }
 
 const defaultMessage =
-  'by placing the order, you will be redirected to the PayPal website to sign in and authorize the payment'
+  "by placing the order, you will be redirected to the PayPal website to sign in and authorize the payment"
 
-type Props = Omit<PaypalConfig, 'return_url' | 'cancel_url'> &
-  JSX.IntrinsicElements['div']
+type Props = Omit<PaypalConfig, "return_url" | "cancel_url"> &
+  JSX.IntrinsicElements["div"]
 export function PaypalPayment({
   infoMessage,
   ...p
@@ -25,7 +25,7 @@ export function PaypalPayment({
     setPaymentSource,
     paymentSource,
     currentPaymentMethodType,
-    setPaymentRef
+    setPaymentRef,
   } = useContext(PaymentMethodContext)
   useEffect(() => {
     if (
@@ -54,11 +54,11 @@ export function PaypalPayment({
             metadata: {
               card: {
                 id: paymentSource.id,
-                brand: 'paypal',
-                last4: ''
-              }
-            }
-          }
+                brand: "paypal",
+                last4: "",
+              },
+            },
+          },
         })
         return true
       } catch (e) {
