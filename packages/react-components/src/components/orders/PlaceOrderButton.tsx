@@ -10,7 +10,6 @@ import {
 import Parent from "../utils/Parent"
 import type { ChildrenFunction } from "#typings/index"
 import PlaceOrderContext from "#context/PlaceOrderContext"
-import isFunction from "lodash/isFunction"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import OrderContext from "#context/OrderContext"
 import getCardDetails from "#utils/getCardDetails"
@@ -31,7 +30,7 @@ interface Props
   /**
    * The label of the button
    */
-  label?: string | ReactNode
+  label?: string | ReactNode | (() => ReactNode)
   /**
    * The label of the button when it's loading
    */
@@ -383,7 +382,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const disabledButton = disabled !== undefined ? disabled : notPermitted
   const labelButton = isLoading
     ? loadingLabel
-    : isFunction(label)
+    : typeof label === "function"
       ? label()
       : label
   const parentProps = {

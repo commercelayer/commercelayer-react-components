@@ -1,17 +1,17 @@
-import BraintreePayment from '#components/payment_source/BraintreePayment'
-import type { GatewayBaseType } from '#components/payment_gateways/PaymentGateway'
-import CustomerContext from '#context/CustomerContext'
-import OrderContext from '#context/OrderContext'
-import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
-import PaymentMethodContext from '#context/PaymentMethodContext'
-import PaymentSourceContext from '#context/PaymentSourceContext'
-import type { PaymentResource } from '#reducers/PaymentMethodReducer'
-import getCardDetails from '#utils/getCardDetails'
-import type { StripeElementLocale } from '@stripe/stripe-js'
-import isEmpty from 'lodash/isEmpty'
-import { useContext, type JSX } from 'react';
-import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
-import { getPaymentAttributes } from '#utils/getPaymentAttributes'
+import BraintreePayment from "#components/payment_source/BraintreePayment"
+import type { GatewayBaseType } from "#components/payment_gateways/PaymentGateway"
+import CustomerContext from "#context/CustomerContext"
+import OrderContext from "#context/OrderContext"
+import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import PaymentSourceContext from "#context/PaymentSourceContext"
+import type { PaymentResource } from "#reducers/PaymentMethodReducer"
+import getCardDetails from "#utils/getCardDetails"
+import type { StripeElementLocale } from "@stripe/stripe-js"
+import isEmpty from "lodash-es/isEmpty"
+import { useContext, type JSX } from "react"
+import PaymentCardsTemplate from "../utils/PaymentCardsTemplate"
+import { getPaymentAttributes } from "#utils/getPaymentAttributes"
 
 type Props = GatewayBaseType
 
@@ -32,7 +32,7 @@ export function BraintreeGateway(props: Props): JSX.Element | null {
   const { payments, isGuest } = useContext(CustomerContext)
   const { currentPaymentMethodId, config, paymentSource } =
     useContext(PaymentMethodContext)
-  const paymentResource: PaymentResource = 'braintree_payments'
+  const paymentResource: PaymentResource = "braintree_payments"
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
@@ -41,21 +41,21 @@ export function BraintreeGateway(props: Props): JSX.Element | null {
   const braintreeConfig = getPaymentAttributes({
     resource: paymentResource,
     config: config ?? {},
-    keys: ['braintree_payments']
+    keys: ["braintree_payments"],
   })
   const paymentConfig = braintreeConfig?.braintreePayment
   const customerPayments =
     !isEmpty(payments) && payments
       ? payments.filter((customerPayment) => {
-          return customerPayment.payment_source?.type === 'braintree_payments'
+          return customerPayment.payment_source?.type === "braintree_payments"
         })
       : []
   if (readonly || showCard) {
     const card = getCardDetails({
       customerPayment: {
-        payment_source: paymentSource
+        payment_source: paymentSource,
       },
-      paymentType: paymentResource
+      paymentType: paymentResource,
     })
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (

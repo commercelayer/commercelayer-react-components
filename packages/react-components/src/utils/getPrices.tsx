@@ -1,30 +1,27 @@
-import { isEmpty, first, isArray, has } from 'lodash'
-import type { Price } from '@commercelayer/sdk'
+import type { Price } from "@commercelayer/sdk"
 import PriceTemplate, {
-  type PTemplateProps
-} from '#components/utils/PriceTemplate'
+  type PTemplateProps,
+} from "#components/utils/PriceTemplate"
 
-import type { JSX } from "react";
+import type { JSX } from "react"
 
 export function getPriceByCode(
   skuPrices: Price[],
-  code: string = ''
+  code = "",
 ): Price | undefined {
-  return code
-    ? first(skuPrices.filter((p) => p.currency_code === code))
-    : first(skuPrices)
+  return code ? skuPrices.find((p) => p.currency_code === code) : skuPrices[0]
 }
 
 export function getPricesComponent(
   skuPrices: Price[],
-  props: PTemplateProps
+  props: PTemplateProps,
 ): JSX.Element[] | JSX.Element {
-  if (isEmpty(skuPrices)) {
+  if (!skuPrices || skuPrices.length === 0) {
     return <PriceTemplate {...props} />
   }
   return skuPrices.map((p, k) => {
     const showCompare =
-      (typeof props.showCompare === 'undefined' &&
+      (typeof props.showCompare === "undefined" &&
         p?.compare_at_amount_cents != null &&
         p?.compare_at_amount_cents > p?.amount_cents) ||
       props.showCompare
@@ -42,18 +39,18 @@ export function getPricesComponent(
 }
 
 export default function getPrices<P extends Price>(
-  prices: P[]
+  prices: P[],
 ): Record<string, P[]> {
   const obj: Record<string, any> = {}
-  if (isArray(prices)) {
-    prices.forEach((p) => {
-      const sku = p?.sku_code ?? ''
-      if (has(obj, sku)) {
+  if (Array.isArray(prices)) {
+    for (const p of prices) {
+      const sku = p?.sku_code ?? ""
+      if (sku in obj) {
         obj[sku].push(p)
       } else {
         obj[sku] = [p]
       }
-    })
+    }
   }
   return obj
 }

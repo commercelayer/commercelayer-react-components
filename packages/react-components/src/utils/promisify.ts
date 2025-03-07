@@ -1,5 +1,5 @@
 /* eslint-disable n/no-callback-literal */
-import isFunction from 'lodash/isFunction'
+import isFunction from "lodash-es/isFunction"
 
 export default async function promisify(cb: any, params?: any): Promise<any> {
   return await new Promise<any>((resolve, reject) => {
