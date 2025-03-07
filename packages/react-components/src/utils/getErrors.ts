@@ -1,8 +1,7 @@
-import type { TResourceError } from '#components/errors/Errors'
-import type { BaseError, TAPIError } from '#typings/errors'
-import type { ValueIteratee } from 'lodash'
-import differenceBy from 'lodash/differenceBy'
-import type { Dispatch } from 'react'
+import type { TResourceError } from "#components/errors/Errors"
+import type { BaseError, TAPIError } from "#typings/errors"
+import differenceBy from "lodash/differenceBy"
+import type { Dispatch } from "react"
 
 interface GetErrorsParams {
   error: TAPIError
@@ -15,14 +14,14 @@ export default function getErrors({
   error,
   resource,
   field,
-  attributes
+  attributes,
 }: GetErrorsParams): BaseError[] {
   return error?.errors?.map((e: any) => {
     return {
       ...e,
       resource,
-      ...(field != null && field !== '' && { field }),
-      ...(attributes != null && attributes)
+      ...(field != null && field !== "" && { field }),
+      ...(attributes != null && attributes),
     }
   })
 }
@@ -31,24 +30,24 @@ interface SetErrorsArgs<D> {
   currentErrors?: BaseError[]
   newErrors?: BaseError[]
   dispatch?: D
-  filterBy?: ValueIteratee<BaseError>
+  filterBy?: keyof BaseError
 }
 
 export function setErrors<D extends Dispatch<any>>({
   currentErrors = [],
   newErrors = [],
   dispatch,
-  filterBy = 'code'
+  filterBy = "code",
 }: SetErrorsArgs<D>): BaseError[] {
   const errorsDifference = differenceBy(currentErrors, newErrors, filterBy)
   const mergeErrors = currentErrors?.length === 0 ? newErrors : errorsDifference
   const errors = [...(currentErrors || []), ...mergeErrors]
   if (dispatch != null) {
     dispatch({
-      type: 'setErrors',
+      type: "setErrors",
       payload: {
-        errors
-      }
+        errors,
+      },
     })
   }
   return errors
