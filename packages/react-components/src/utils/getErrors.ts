@@ -1,6 +1,6 @@
 import type { TResourceError } from "#components/errors/Errors"
 import type { BaseError, TAPIError } from "#typings/errors"
-import differenceBy from "lodash/differenceBy"
+import differenceBy from "lodash-es/differenceBy"
 import type { Dispatch } from "react"
 
 interface GetErrorsParams {
