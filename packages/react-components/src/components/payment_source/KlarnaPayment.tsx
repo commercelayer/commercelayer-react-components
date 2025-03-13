@@ -1,10 +1,10 @@
-import { useContext, useEffect, useRef, useState, type JSX } from 'react';
-import PaymentMethodContext from '#context/PaymentMethodContext'
-import type { PaymentMethodConfig } from '#reducers/PaymentMethodReducer'
-import type { PaymentSourceProps } from './PaymentSource'
-import OrderContext from '#context/OrderContext'
-import useExternalScript from '#utils/hooks/useExternalScript'
-import type { LineItem } from '@commercelayer/sdk'
+import { useContext, useEffect, useRef, useState, type JSX } from "react"
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
+import type { PaymentSourceProps } from "./PaymentSource"
+import OrderContext from "#context/OrderContext"
+import useExternalScript from "#utils/hooks/useExternalScript"
+import type { LineItem } from "@commercelayer/sdk"
 // import PlaceOrderContext from '#context/PlaceOrderContext'
 // import { tr } from '@faker-js/faker'
 
@@ -15,25 +15,25 @@ interface KlarnaResponse {
   Error?: { invalid_fields: string[] }
 }
 
-type KlarnaPaymentProps = PaymentMethodConfig['klarnaPayment'] &
-  JSX.IntrinsicElements['div'] &
-  Partial<PaymentSourceProps['templateCustomerSaveToWallet']> & {
+type KlarnaPaymentProps = PaymentMethodConfig["klarnaPayment"] &
+  JSX.IntrinsicElements["div"] &
+  Partial<PaymentSourceProps["templateCustomerSaveToWallet"]> & {
     show?: boolean
     clientToken: string
     locale?: string | null
   }
 
 function typeOfLine(
-  lineItemType: string | null | undefined
-): OrderLine['type'] {
+  lineItemType: string | null | undefined,
+): OrderLine["type"] {
   switch (lineItemType) {
-    case 'percentage_discount_promotions':
-      return 'discount'
-    case 'shipments':
-      return 'shipping_fee'
-    case 'skus':
-      return 'physical'
-    case 'payment_methods':
+    case "percentage_discount_promotions":
+      return "discount"
+    case "shipments":
+      return "shipping_fee"
+    case "skus":
+      return "physical"
+    case "payment_methods":
     default:
       return null
   }
@@ -44,20 +44,20 @@ type OrderLine = Partial<{
   quantity: number
   total_amount: number
   unit_price: number
-  type: 'discount' | 'physical' | 'shipping_fee' | null
+  type: "discount" | "physical" | "shipping_fee" | null
 }>
 
 function klarnaOrderLines(lineItems?: LineItem[] | null): OrderLine[] {
-  // @ts-expect-error check types
   return lineItems
-    ? lineItems?.map((item) => {
+    ? // @ts-expect-error no type
+      lineItems?.map((item) => {
         const type = item.item_type ? typeOfLine(item.item_type) : null
         return {
           // name: item.name,
           quantity: item.quantity,
           total_amount: item.total_amount_cents,
           unit_price: item.unit_amount_cents,
-          type
+          type,
         }
       })
     : []
@@ -66,7 +66,7 @@ function klarnaOrderLines(lineItems?: LineItem[] | null): OrderLine[] {
 export default function KlarnaPayment({
   clientToken,
   placeOrderCallback,
-  locale = 'EN',
+  locale = "EN",
   ...p
 }: KlarnaPaymentProps): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
@@ -74,10 +74,10 @@ export default function KlarnaPayment({
     paymentSource,
     currentPaymentMethodType,
     setPaymentRef,
-    setPaymentSource
+    setPaymentSource,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
-  const loaded = useExternalScript('https://x.klarnacdn.net/kp/lib/v1/api.js')
+  const loaded = useExternalScript("https://x.klarnacdn.net/kp/lib/v1/api.js")
   const [klarna, setKlarna] = useState<any>()
   const { containerClassName, ...divProps } = p
   useEffect(() => {
@@ -117,7 +117,7 @@ export default function KlarnaPayment({
       city: order?.billing_address?.city,
       region: order?.billing_address?.state_code,
       phone: order?.billing_address?.phone,
-      country: order?.billing_address?.country_code
+      country: order?.billing_address?.country_code,
     }
     const shippingAddress = {
       given_name: order?.shipping_address?.first_name,
@@ -130,7 +130,7 @@ export default function KlarnaPayment({
       city: order?.shipping_address?.city,
       region: order?.shipping_address?.state_code,
       phone: order?.shipping_address?.phone,
-      country: order?.shipping_address?.country_code
+      country: order?.shipping_address?.country_code,
     }
     const klarnaData = {
       merchant_data: order?.id,
@@ -141,21 +141,21 @@ export default function KlarnaPayment({
       billing_address: billingAddress,
       order_amount: order?.total_amount_cents,
       order_lines: klarnaOrderLines(order?.line_items),
-      order_tax_amount: order?.total_tax_amount_cents
+      order_tax_amount: order?.total_tax_amount_cents,
     }
     kl.Payments.authorize(
       {
         payment_method_category: paymentMethodCategories,
-        ...klarnaData
+        ...klarnaData,
       },
-      async function (res: KlarnaResponse) {
+      async (res: KlarnaResponse) => {
         if (res.approved && paymentSource && currentPaymentMethodType) {
           const ps = await setPaymentSource({
             paymentSourceId: paymentSource.id,
             paymentResource: currentPaymentMethodType,
             attributes: {
-              auth_token: res.authorization_token
-            }
+              auth_token: res.authorization_token,
+            },
           })
           if (props.setPlaceOrder != null) {
             const placed = await props.setPlaceOrder({ paymentSource: ps })
@@ -164,24 +164,24 @@ export default function KlarnaPayment({
             }
           }
         }
-      }
+      },
     )
   }
   if (klarna && clientToken) {
     // @ts-expect-error no type
     const [first] = paymentSource?.payment_methods || undefined
     klarna.Payments.init({
-      client_token: clientToken
+      client_token: clientToken,
     })
     klarna.Payments.load({
-      container: '#klarna-payments-container',
-      payment_method_category: first?.identifier
+      container: "#klarna-payments-container",
+      payment_method_category: first?.identifier,
     })
   }
   return (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
-        <div id='klarna-payments-container' />
+        <div id="klarna-payments-container" />
       </div>
     </form>
   )

@@ -1,18 +1,19 @@
-import { createContext } from 'react'
-import type { Order } from '@commercelayer/sdk'
+import { createContext } from "react"
+import type { Order } from "@commercelayer/sdk"
 import {
   type OrderState,
   type SaveAddressToCustomerAddressBook,
   createOrder,
+  paymentSourceRequest,
   setGiftCardOrCouponCode,
   removeGiftCardOrCouponCode,
   saveAddressToCustomerAddressBook,
   addResourceToInclude,
   updateOrder,
   type getOrderContext,
-  type addToCart
-} from '#reducers/OrderReducer'
-import type { BaseError } from '#typings/errors'
+  type addToCart,
+} from "#reducers/OrderReducer"
+import type { BaseError } from "#typings/errors"
 
 interface DefaultContext extends OrderState {
   createOrder: typeof createOrder
@@ -25,6 +26,7 @@ interface DefaultContext extends OrderState {
   getOrder: getOrderContext
   updateOrder: typeof updateOrder
   setOrder: (order: Order) => void
+  paymentSourceRequest: typeof paymentSourceRequest
 }
 
 export const defaultOrderContext = {
@@ -36,7 +38,8 @@ export const defaultOrderContext = {
   saveAddressToCustomerAddressBook,
   addResourceToInclude,
   getOrder: async () => undefined,
-  updateOrder
+  updateOrder,
+  paymentSourceRequest,
 }
 
 const OrderContext = createContext<DefaultContext>(defaultOrderContext)
