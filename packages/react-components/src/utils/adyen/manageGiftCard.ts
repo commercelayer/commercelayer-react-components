@@ -31,7 +31,7 @@ export function manageGiftCard({ order }: Props): ReturnTypes | null {
   // @ts-expect-error No type for payment_response additionalData
   const additionalData = getPaymentSource?.payment_response?.additionalData
   // @ts-expect-error No type for payment_response amount
-  const amount = getPaymentSource?.payment_response?.amount.value as number
+  const amount = getPaymentSource?.payment_response?.amount?.value as number
   const giftCardData: GiftCardData = {
     cardSummary: additionalData?.cardSummary,
     currentBalanceValue:
