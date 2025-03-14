@@ -296,8 +296,6 @@ export async function expressRedirectUrl({
   if (isOnTheCheckout) {
     window.location.reload()
   } else {
-    if (window.top != null) {
-      window.top.location.href = href
-    }
+    window.open(href, "_top")
   }
 }
