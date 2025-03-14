@@ -1,4 +1,11 @@
-import { useEffect, useReducer, useContext, useMemo, useState, type JSX } from 'react';
+import {
+  useEffect,
+  useReducer,
+  useContext,
+  useMemo,
+  useState,
+  type JSX,
+} from "react"
 import orderReducer, {
   createOrder,
   getApiOrder,
@@ -11,17 +18,18 @@ import orderReducer, {
   type SaveAddressToCustomerAddressBook,
   updateOrder,
   type ResourceIncluded,
-  addToCart
-} from '#reducers/OrderReducer'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import OrderContext, { defaultOrderContext } from '#context/OrderContext'
-import type { BaseMetadataObject } from '#typings'
-import OrderStorageContext from '#context/OrderStorageContext'
-import type { OrderCreate, Order } from '@commercelayer/sdk'
-import type { BaseError } from '#typings/errors'
-import compareObjAttribute from '#utils/compareObjAttribute'
-import useCustomContext from '#utils/hooks/useCustomContext'
-import type { DefaultChildrenType } from '#typings/globals'
+  addToCart,
+  paymentSourceRequest,
+} from "#reducers/OrderReducer"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import type { BaseMetadataObject } from "#typings"
+import OrderStorageContext from "#context/OrderStorageContext"
+import type { OrderCreate, Order } from "@commercelayer/sdk"
+import type { BaseError } from "#typings/errors"
+import compareObjAttribute from "#utils/compareObjAttribute"
+import useCustomContext from "#utils/hooks/useCustomContext"
+import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
   children: DefaultChildrenType
@@ -41,6 +49,10 @@ interface Props {
    * Callback called when the order is updated
    */
   fetchOrder?: (order: Order) => void
+  /**
+   * Indicate if Adyen gift card management is enabled
+   */
+  manageAdyenGiftCard?: boolean
 }
 
 /**
@@ -77,22 +89,29 @@ interface Props {
  * </span>
  */
 export function OrderContainer(props: Props): JSX.Element {
-  const { orderId, children, metadata, attributes, fetchOrder } = props
+  const {
+    orderId,
+    children,
+    metadata,
+    attributes,
+    fetchOrder,
+    manageAdyenGiftCard,
+  } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const [lock, setLock] = useState(false)
   const [lockOrder, setLockOrder] = useState(true)
   const config = useCustomContext({
     context: CommerceLayerContext,
-    contextComponentName: 'CommerceLayer',
-    currentComponentName: 'OrderContainer',
-    key: 'accessToken'
+    contextComponentName: "CommerceLayer",
+    currentComponentName: "OrderContainer",
+    key: "accessToken",
   })
   const {
     persistKey,
     clearWhenPlaced,
     getLocalOrder,
     setLocalOrder,
-    deleteLocalOrder
+    deleteLocalOrder,
   } = useContext(OrderStorageContext)
   const getOrder = async (localOrder?: string | null): Promise<void> => {
     const removeOrderPlaced = !!(persistKey && clearWhenPlaced)
@@ -104,7 +123,7 @@ export function OrderContainer(props: Props): JSX.Element {
         persistKey,
         clearWhenPlaced: removeOrderPlaced,
         deleteLocalOrder,
-        state
+        state,
       }))
   }
   useEffect(() => {
@@ -114,11 +133,11 @@ export function OrderContainer(props: Props): JSX.Element {
         getOrder(localOrder)
       } else {
         dispatch({
-          type: 'setOrderId',
+          type: "setOrderId",
           payload: {
             orderId: undefined,
-            order: undefined
-          }
+            order: undefined,
+          },
         })
       }
     }
@@ -126,10 +145,10 @@ export function OrderContainer(props: Props): JSX.Element {
   useEffect(() => {
     if (!state.withoutIncludes) {
       dispatch({
-        type: 'setLoading',
+        type: "setLoading",
         payload: {
-          loading: true
-        }
+          loading: true,
+        },
       })
     }
   }, [state.withoutIncludes])
@@ -138,7 +157,7 @@ export function OrderContainer(props: Props): JSX.Element {
     if (attributes && state?.order && !lock) {
       const updateAttributes = compareObjAttribute({
         attributes,
-        object: state.order
+        object: state.order,
       })
       if (Object.keys(updateAttributes).length > 0) {
         updateOrder({
@@ -147,7 +166,7 @@ export function OrderContainer(props: Props): JSX.Element {
           dispatch,
           config,
           include: state.include,
-          state
+          state,
         })
         setLock(true)
       }
@@ -156,7 +175,7 @@ export function OrderContainer(props: Props): JSX.Element {
       if (attributes && state?.order) {
         const updateAttributes = compareObjAttribute({
           attributes,
-          object: state.order
+          object: state.order,
         })
         if (state.order && Object.keys(updateAttributes).length === 0) {
           setLock(false)
@@ -167,7 +186,7 @@ export function OrderContainer(props: Props): JSX.Element {
   useEffect(() => {
     const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
     const startRequest = Object.keys(state?.includeLoaded || {}).filter(
-      (key) => state?.includeLoaded?.[key as ResourceIncluded] === true
+      (key) => state?.includeLoaded?.[key as ResourceIncluded] === true,
     )
     if (config.accessToken && state.loading === false && state?.order == null) {
       if (
@@ -190,28 +209,28 @@ export function OrderContainer(props: Props): JSX.Element {
         config.accessToken,
         state.order == null,
         state.loading,
-        state.withoutIncludes
+        state.withoutIncludes,
       ].every(Boolean)
     ) {
       dispatch({
-        type: 'setLoading',
+        type: "setLoading",
         payload: {
-          loading: false
-        }
+          loading: false,
+        },
       })
     } else if (
       [
         config.accessToken,
         state.order == null,
         state.loading,
-        state.withoutIncludes === false
+        state.withoutIncludes === false,
       ].every(Boolean)
     ) {
       dispatch({
-        type: 'setLoading',
+        type: "setLoading",
         payload: {
-          loading: false
-        }
+          loading: false,
+        },
       })
     }
     return () => {
@@ -222,17 +241,17 @@ export function OrderContainer(props: Props): JSX.Element {
       ) {
         if (state.include?.length === 0 && startRequest.length > 0) {
           dispatch({
-            type: 'setLoading',
+            type: "setLoading",
             payload: {
-              loading: false
-            }
+              loading: false,
+            },
           })
         } else if (state.include && state.include?.length > 0) {
           dispatch({
-            type: 'setIncludesResource',
+            type: "setIncludesResource",
             payload: {
-              include: []
-            }
+              include: [],
+            },
           })
           setLockOrder(false)
         }
@@ -246,7 +265,7 @@ export function OrderContainer(props: Props): JSX.Element {
     Object.keys(state?.order ?? {}).length,
     state.loading,
     state.withoutIncludes,
-    lockOrder
+    lockOrder,
   ])
   const orderValue = useMemo(() => {
     if (fetchOrder != null && state?.order != null) {
@@ -254,6 +273,11 @@ export function OrderContainer(props: Props): JSX.Element {
     }
     return {
       ...state,
+      manageAdyenGiftCard,
+      paymentSourceRequest: async (
+        params: Parameters<typeof paymentSourceRequest>[number],
+      ): ReturnType<typeof paymentSourceRequest> =>
+        await paymentSourceRequest({ ...params, dispatch, state, config }),
       setOrder: (order: Order) => {
         setOrder(order, dispatch)
       },
@@ -269,10 +293,10 @@ export function OrderContainer(props: Props): JSX.Element {
           state,
           orderMetadata: metadata,
           orderAttributes: attributes,
-          setLocalOrder
+          setLocalOrder,
         }),
       addToCart: async (
-        params: Parameters<typeof addToCart>[number]
+        params: Parameters<typeof addToCart>[number],
       ): ReturnType<typeof addToCart> =>
         await addToCart({
           ...params,
@@ -283,19 +307,19 @@ export function OrderContainer(props: Props): JSX.Element {
           errors: state.errors,
           orderMetadata: metadata || {},
           orderAttributes: attributes,
-          setLocalOrder
+          setLocalOrder,
         }),
       saveAddressToCustomerAddressBook: (
-        args: Parameters<SaveAddressToCustomerAddressBook>[0]
+        args: Parameters<SaveAddressToCustomerAddressBook>[0],
       ) => {
         defaultOrderContext.saveAddressToCustomerAddressBook({
           ...args,
-          dispatch
+          dispatch,
         })
       },
       setGiftCardOrCouponCode: async ({
         code,
-        codeType
+        codeType,
       }: {
         code: string
         codeType: OrderCodeType
@@ -307,10 +331,10 @@ export function OrderContainer(props: Props): JSX.Element {
           order: state.order,
           config,
           include: state.include,
-          state
+          state,
         }),
       removeGiftCardOrCouponCode: async ({
-        codeType
+        codeType,
       }: {
         codeType: OrderCodeType
       }) =>
@@ -320,14 +344,14 @@ export function OrderContainer(props: Props): JSX.Element {
           order: state.order,
           config,
           include: state.include,
-          state
+          state,
         }),
       addResourceToInclude: (args: AddResourceToInclude) => {
         defaultOrderContext.addResourceToInclude({
           ...args,
           dispatch,
           resourcesIncluded: state.include,
-          resourceIncludedLoaded: state.includeLoaded
+          resourceIncludedLoaded: state.includeLoaded,
         })
       },
       updateOrder: async (args: UpdateOrderArgs) =>
@@ -336,8 +360,8 @@ export function OrderContainer(props: Props): JSX.Element {
           dispatch,
           config,
           include: state.include,
-          state
-        })
+          state,
+        }),
     }
   }, [state, config.accessToken, persistKey])
   return (
