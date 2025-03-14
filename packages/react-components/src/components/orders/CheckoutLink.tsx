@@ -1,18 +1,18 @@
-import { useContext, type JSX } from 'react';
-import OrderContext from '#context/OrderContext'
-import Parent from '../utils/Parent'
-import type { ChildrenFunction } from '#typings/index'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import { getApplicationLink } from '#utils/getApplicationLink'
-import { getDomain } from '#utils/getDomain'
-import { getOrganizationConfig } from '#utils/organization'
+import { useContext, type JSX } from "react"
+import OrderContext from "#context/OrderContext"
+import Parent from "../utils/Parent"
+import type { ChildrenFunction } from "#typings/index"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import { getApplicationLink } from "#utils/getApplicationLink"
+import { getDomain } from "#utils/getDomain"
+import { getOrganizationConfig } from "#utils/organization"
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+interface ChildrenProps extends Omit<Props, "children"> {
   checkoutUrl: string
   href: string
 }
 
-interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements["a"], "children"> {
   children?: ChildrenFunction<ChildrenProps>
   /**
    * Label for the checkout link
@@ -38,7 +38,7 @@ export function CheckoutLink(props: Props): JSX.Element {
   const { order } = useContext(OrderContext)
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
   if (accessToken == null || endpoint == null)
-    throw new Error('Cannot use `CheckoutLink` outside of `CommerceLayer`')
+    throw new Error("Cannot use `CheckoutLink` outside of `CommerceLayer`")
   const { domain, slug } = getDomain(endpoint)
   const href =
     hostedCheckout && order?.id
@@ -46,19 +46,19 @@ export function CheckoutLink(props: Props): JSX.Element {
           slug,
           orderId: order?.id,
           accessToken,
-          applicationType: 'checkout',
-          domain
+          applicationType: "checkout",
+          domain,
         })
-      : order?.checkout_url ?? ''
+      : (order?.checkout_url ?? "")
   const parentProps = {
     checkoutUrl: order?.checkout_url,
     hostedCheckout,
     label,
     href,
-    ...p
+    ...p,
   }
   function handleClick(
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ): void {
     e.preventDefault()
     e.stopPropagation()
@@ -70,17 +70,17 @@ export function CheckoutLink(props: Props): JSX.Element {
         params: {
           accessToken,
           slug,
-          orderId: order?.id
-        }
+          orderId: order?.id,
+        },
       }).then((config) => {
         if (config?.links?.checkout) {
-          window.open(config.links.checkout, '_top')
+          window.open(config.links.checkout, "_top")
         } else {
-          window.open(currentHref, '_top')
+          window.open(currentHref, "_top")
         }
       })
     } else {
-      window.open(currentHref, '_top')
+      window.open(currentHref, "_top")
     }
   }
   return children ? (

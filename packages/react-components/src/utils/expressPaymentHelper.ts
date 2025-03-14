@@ -11,6 +11,7 @@ import type { PaymentRequestShippingOption } from "@stripe/stripe-js"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import { getDomain } from "./getDomain"
 import { getOrganizationConfig } from "./organization"
+import { getApplicationLink } from "./getApplicationLink"
 
 const availablePaymentMethods = ["stripe_payments"]
 
@@ -277,7 +278,7 @@ export async function expressRedirectUrl({
 }: TExpressRedirectUrlParams): Promise<void> {
   if (accessToken == null) throw new Error("No access token found")
   if (endpoint == null) throw new Error("No endpoint found")
-  const { slug } = getDomain(endpoint)
+  const { slug, domain } = getDomain(endpoint)
   if (slug == null) throw new Error("No slug found")
   const config = await getOrganizationConfig({
     accessToken,
@@ -291,7 +292,13 @@ export async function expressRedirectUrl({
   const href =
     config?.links?.checkout != null
       ? config?.links?.checkout
-      : `https://${slug}.commercelayer.app/checkout/${order.id}?accessToken=${accessToken}`
+      : getApplicationLink({
+          slug,
+          orderId: order?.id,
+          accessToken,
+          applicationType: "checkout",
+          domain,
+        })
   const isOnTheCheckout = !window.location.pathname.includes("/cart")
   if (isOnTheCheckout) {
     window.location.reload()
