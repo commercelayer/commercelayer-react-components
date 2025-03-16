@@ -14,6 +14,5 @@ export default defineConfig(() => ({
   entry: ["src/index.ts"],
   external: ["react", "react-dom"], // specify external dependencies
   splitting: true, // enable code splitting
-  outDir: "lib", // specify output directory for build
   treeshake: true, // enable treeshaking
 }))

@@ -3,13 +3,14 @@
   "version": "4.21.0-beta.1",
   "description": "The Official Commerce Layer React Components",
   "type": "module",
-  "module": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "files": ["lib", "package.json", "README.md"],
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "package.json", "README.md"],
   "exports": {
+    "./package.json": "./package.json",
     ".": {
-      "require": "./lib/index.cjs",
-      "import": "./lib/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.cjs"
     }
   },
   "engines": {
@@ -22,14 +23,16 @@
   "scripts": {
     "lint": "biome lint --error-on-warnings ./src",
     "lint:fix": "pnpm biome lint --write ./src",
+    "lint:tsc": "tsc",
     "test": "pnpm audit --audit-level high && (pnpm audit || exit 0) && pnpm lint && vitest run --silent",
     "coverage": "vitest run --coverage",
     "test:e2e": "NODE_ENV=test playwright test",
     "test:e2e:coverage": "nyc pnpm test:e2e && pnpm coverage:report",
     "coverage:report": "nyc report --reporter=html",
-    "build": "tsup",
+    "build": "tsup && pnpm lint:tsc",
     "build:dev": "tsc -b tsconfig.prod.json tsconfig.prod.esm.json --verbose && tsc-alias -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.esm.json",
-    "dev": "NODE_OPTIONS='--inspect' next dev"
+    "dev": "NODE_OPTIONS='--inspect' next dev",
+    "check-exports": "attw --pack ."
   },
   "repository": {
     "type": "git",
@@ -69,6 +72,7 @@
     "rapid-form": "2.1.0"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.17.4",
     "@commercelayer/js-auth": "^6.7.1",
     "@faker-js/faker": "^9.5.1",
     "@playwright/test": "^1.50.1",
