@@ -1,16 +1,23 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { type FormEvent, useContext, useEffect, useRef, useState, type JSX } from 'react';
-import PaymentMethodContext from '#context/PaymentMethodContext'
-import isEmpty from 'lodash/isEmpty'
-import OrderContext from '#context/OrderContext'
-import Parent from '#components/utils/Parent'
-import type { PaymentSourceProps } from './PaymentSource'
-import { setCustomerOrderParam } from '#utils/localStorage'
-import promisify from '#utils/promisify'
-import type { HostedFieldFieldOptions, ThreeDSecure } from 'braintree-web'
-import type { BraintreePayment as BraintreePaymentType } from '@commercelayer/sdk'
-import type { HostedFieldsHostedFieldsFieldName } from 'braintree-web/hosted-fields'
-import type { ThreeDSecureVerifyOptions } from 'braintree-web/three-d-secure'
+import {
+  type FormEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type JSX,
+} from "react"
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import isEmpty from "lodash-es/isEmpty"
+import OrderContext from "#context/OrderContext"
+import Parent from "#components/utils/Parent"
+import type { PaymentSourceProps } from "./PaymentSource"
+import { setCustomerOrderParam } from "#utils/localStorage"
+import promisify from "#utils/promisify"
+import type { HostedFieldFieldOptions, ThreeDSecure } from "braintree-web"
+import type { BraintreePayment as BraintreePaymentType } from "@commercelayer/sdk"
+import type { HostedFieldsHostedFieldsFieldName } from "braintree-web/hosted-fields"
+import type { ThreeDSecureVerifyOptions } from "braintree-web/three-d-secure"
 type BraintreeHostedFields<Type> = {
   [Property in keyof Type]: {
     label?: string
@@ -37,7 +44,7 @@ export interface BraintreeConfig {
 interface Props {
   authorization: string
   config?: BraintreeConfig
-  templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
+  templateCustomerSaveToWallet?: PaymentSourceProps["templateCustomerSaveToWallet"]
   locale?: string
 }
 
@@ -52,60 +59,60 @@ const defaultConfig: BraintreeConfig = {
   styles: {
     // Style all elements
     input: {
-      'font-size': '16px',
-      color: '#3A3A3A'
+      "font-size": "16px",
+      color: "#3A3A3A",
     },
 
     // Styling a specific field
     // Custom web fonts are not supported. Only use system installed fonts.
-    '.number': {
-      'font-family': 'monospace'
+    ".number": {
+      "font-family": "monospace",
     },
 
     // Styling element state
-    ':focus': {
-      color: 'blue'
+    ":focus": {
+      color: "blue",
     },
-    '.valid': {
-      color: 'green'
+    ".valid": {
+      color: "green",
     },
-    '.invalid': {
-      color: 'red'
+    ".invalid": {
+      color: "red",
     },
 
     // Media queries
     // Note that these apply to the iframe, not the root window.
-    '@media screen and (max-width: 700px)': {
+    "@media screen and (max-width: 700px)": {
       // @ts-expect-error no type
       input: {
-        'font-size': '14px'
-      }
-    }
+        "font-size": "14px",
+      },
+    },
   },
   fields: {
     number: {
-      label: 'Card Number',
-      selector: '#card-number',
-      placeholder: '4111 1111 1111 1111'
+      label: "Card Number",
+      selector: "#card-number",
+      placeholder: "4111 1111 1111 1111",
     },
     cvv: {
-      label: 'CVV',
-      selector: '#cvv',
-      placeholder: '123'
+      label: "CVV",
+      selector: "#cvv",
+      placeholder: "123",
     },
     expirationDate: {
-      label: 'Expiration Date',
-      selector: '#expiration-date',
-      placeholder: '10/2022'
-    }
+      label: "Expiration Date",
+      selector: "#expiration-date",
+      placeholder: "10/2022",
+    },
   },
-  submitLabel: 'Set payment method'
+  submitLabel: "Set payment method",
 }
 
 export function BraintreePayment({
   authorization,
   config,
-  templateCustomerSaveToWallet
+  templateCustomerSaveToWallet,
 }: Props): JSX.Element | null {
   const {
     fields,
@@ -117,7 +124,7 @@ export function BraintreePayment({
     fieldLabelClassName,
     cvvContainerClassName,
     inputWrapperClassName,
-    cardDetailsContainerClassName
+    cardDetailsContainerClassName,
   } = { ...defaultConfig, ...config }
   const [loadBraintree, setLoadBraintree] = useState(false)
   const {
@@ -125,27 +132,27 @@ export function BraintreePayment({
     paymentSource,
     setPaymentMethodErrors,
     currentPaymentMethodType,
-    setPaymentRef
+    setPaymentRef,
   } = useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const handleSubmitForm = async ({
     event,
     hostedFieldsInstance,
-    threeDSInstance
+    threeDSInstance,
   }: SubmitProps): Promise<boolean> => {
     const savePaymentSourceToCustomerWallet: string =
       // @ts-expect-error no type
       event?.elements?.save_payment_source_to_customer_wallet?.checked
     if (savePaymentSourceToCustomerWallet)
       setCustomerOrderParam(
-        '_save_payment_source_to_customer_wallet',
-        savePaymentSourceToCustomerWallet
+        "_save_payment_source_to_customer_wallet",
+        savePaymentSourceToCustomerWallet,
       )
     if (hostedFieldsInstance) {
       try {
         const payload = await promisify(hostedFieldsInstance).then(
-          (payload) => payload
+          (payload) => payload,
         )
         const billingAddress = order?.billing_address
         const verifyCardOptions: ThreeDSecureVerifyOptions & {
@@ -154,23 +161,23 @@ export function BraintreePayment({
           nonce: payload.nonce,
           bin: payload.details.bin,
           amount: `${order?.total_amount_with_taxes_float}`,
-          email: order?.customer_email ?? '',
+          email: order?.customer_email ?? "",
           billingAddress: {
-            givenName: billingAddress?.first_name ?? '',
-            surname: billingAddress?.last_name ?? '',
+            givenName: billingAddress?.first_name ?? "",
+            surname: billingAddress?.last_name ?? "",
             phoneNumber: billingAddress?.phone,
             streetAddress: billingAddress?.line_1,
             countryCodeAlpha2: billingAddress?.country_code,
-            postalCode: billingAddress?.zip_code ?? '',
+            postalCode: billingAddress?.zip_code ?? "",
             region: billingAddress?.state_code,
-            locality: billingAddress?.city
+            locality: billingAddress?.city,
           },
           onLookupComplete: (_data: any, next: any) => {
             next()
-          }
+          },
         }
         const response = (await threeDSInstance.verifyCard(
-          verifyCardOptions
+          verifyCardOptions,
         )) as any
         const validStatus =
           response?.liabilityShiftPossible === true &&
@@ -178,7 +185,7 @@ export function BraintreePayment({
         if (validStatus && paymentSource != null) {
           await setPaymentSource({
             paymentSourceId: paymentSource.id,
-            paymentResource: 'braintree_payments',
+            paymentResource: "braintree_payments",
             attributes: {
               payment_method_nonce: response.nonce,
               options: {
@@ -187,26 +194,26 @@ export function BraintreePayment({
                   last4: response.details.lastFour,
                   exp_year: response.details.expirationYear,
                   exp_month: response.details.expirationMonth,
-                  brand: response.details.cardType.toLowerCase()
-                }
-              }
-            }
+                  brand: response.details.cardType.toLowerCase(),
+                },
+              },
+            },
           })
           return true
         } else {
           throw new Error(
-            `3D Secure authentication failed - ${response?.threeDSecureInfo?.status}`
+            `3D Secure authentication failed - ${response?.threeDSecureInfo?.status}`,
           )
         }
       } catch (error: any) {
         console.error(error)
         setPaymentMethodErrors([
           {
-            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-            resource: 'payment_methods',
+            code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
+            resource: "payment_methods",
             field: currentPaymentMethodType,
-            message: error.message as string
-          }
+            message: error.message as string,
+          },
         ])
         return false
       }
@@ -215,15 +222,15 @@ export function BraintreePayment({
   }
   useEffect(() => {
     if (!ref && authorization)
-      setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'false')
+      setCustomerOrderParam("_save_payment_source_to_customer_wallet", "false")
     if (authorization && !loadBraintree && !isEmpty(window)) {
-      const braintreeClient = require('braintree-web/client')
-      const hostedFields = require('braintree-web/hosted-fields')
-      const threeDSecure = require('braintree-web/three-d-secure')
+      const braintreeClient = require("braintree-web/client")
+      const hostedFields = require("braintree-web/hosted-fields")
+      const threeDSecure = require("braintree-web/three-d-secure")
       braintreeClient.create(
         {
           authorization,
-          challengeRequested: config?.challengeRequested ?? true
+          challengeRequested: config?.challengeRequested ?? true,
         },
         (clientErr: any, clientInstance: any) => {
           if (clientErr) {
@@ -234,11 +241,11 @@ export function BraintreePayment({
             {
               client: clientInstance,
               fields: fields as HostedFieldFieldOptions,
-              styles
+              styles,
             },
             (
               hostedFieldsErr: any,
-              hostedFieldsInstance: HostedFieldsHostedFieldsFieldName
+              hostedFieldsInstance: HostedFieldsHostedFieldsFieldName,
             ) => {
               if (hostedFieldsErr) {
                 console.error(hostedFieldsErr)
@@ -248,19 +255,19 @@ export function BraintreePayment({
               threeDSecure.create(
                 {
                   authorization,
-                  version: 2
+                  version: 2,
                 },
                 (threeDSecureErr: any, threeDSInstance: ThreeDSecure) => {
                   if (threeDSecureErr) {
                     // Handle error in 3D Secure component creation
-                    console.error('3DSecure error', threeDSecureErr)
+                    console.error("3DSecure error", threeDSecureErr)
                     setPaymentMethodErrors([
                       {
-                        code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-                        resource: 'payment_methods',
+                        code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
+                        resource: "payment_methods",
                         field: currentPaymentMethodType,
-                        message: threeDSecureErr.message as string
-                      }
+                        message: threeDSecureErr.message as string,
+                      },
                     ])
                   }
                   if (ref.current) {
@@ -269,16 +276,16 @@ export function BraintreePayment({
                         event: ref.current as any,
                         hostedFieldsInstance,
                         threeDSInstance,
-                        paymentSource
+                        paymentSource,
                       })
                     }
                     setPaymentRef({ ref })
                   }
-                }
+                },
               )
-            }
+            },
           )
-        }
+        },
       )
     }
     return () => {
@@ -290,35 +297,35 @@ export function BraintreePayment({
     <div className={containerClassName}>
       <form
         ref={ref}
-        id='braintree-form'
+        id="braintree-form"
         onSubmit={handleSubmitForm as any}
         className={containerClassName}
       >
         <div className={fieldsContainerClassName}>
           <div className={cardContainerClassName}>
-            <label className={fieldLabelClassName} htmlFor='card-number'>
+            <label className={fieldLabelClassName} htmlFor="card-number">
               {fields?.number?.label}
             </label>
-            <div className={inputWrapperClassName} id='card-number' />
+            <div className={inputWrapperClassName} id="card-number" />
           </div>
           <div className={cardDetailsContainerClassName}>
             <div className={expDateContainerClassName}>
-              <label className={fieldLabelClassName} htmlFor='expiration-date'>
+              <label className={fieldLabelClassName} htmlFor="expiration-date">
                 {fields?.expirationDate?.label}
               </label>
-              <div className={inputWrapperClassName} id='expiration-date' />
+              <div className={inputWrapperClassName} id="expiration-date" />
             </div>
             <div className={cvvContainerClassName}>
-              <label className={fieldLabelClassName} htmlFor='cvv'>
+              <label className={fieldLabelClassName} htmlFor="cvv">
                 {fields?.cvv?.label}
               </label>
-              <div className={inputWrapperClassName} id='cvv' />
+              <div className={inputWrapperClassName} id="cvv" />
             </div>
           </div>
         </div>
         <div className={fieldsContainerClassName}>
           {templateCustomerSaveToWallet && (
-            <Parent {...{ name: 'save_payment_source_to_customer_wallet' }}>
+            <Parent {...{ name: "save_payment_source_to_customer_wallet" }}>
               {templateCustomerSaveToWallet}
             </Parent>
           )}

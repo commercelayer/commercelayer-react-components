@@ -7,7 +7,7 @@ import {
 } from "#utils/localStorage"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import baseReducer from "#utils/baseReducer"
-import isEmpty from "lodash/isEmpty"
+import isEmpty from "lodash-es/isEmpty"
 import type { BaseMetadataObject } from "#typings/index"
 import type { BaseError } from "#typings/errors"
 import getSdk from "#utils/getSdk"

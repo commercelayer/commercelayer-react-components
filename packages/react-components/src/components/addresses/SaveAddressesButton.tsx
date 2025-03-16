@@ -1,28 +1,28 @@
-import { type ReactNode, useContext, useState, type JSX } from 'react';
-import Parent from '#components/utils/Parent'
-import type { ChildrenFunction } from '#typings/index'
-import AddressContext from '#context/AddressContext'
+import { type ReactNode, useContext, useState, type JSX } from "react"
+import Parent from "#components/utils/Parent"
+import type { ChildrenFunction } from "#typings/index"
+import AddressContext from "#context/AddressContext"
 import {
   countryLockController,
-  addressesController
-} from '#utils/addressesManager'
-import OrderContext from '#context/OrderContext'
-import CustomerContext from '#context/CustomerContext'
-import isFunction from 'lodash/isFunction'
-import type { TCustomerAddress } from '#reducers/CustomerReducer'
-import type { Order } from '@commercelayer/sdk'
-import { validateValue } from '#utils/validateFormFields'
-import { formCleaner } from '#utils/formCleaner'
+  addressesController,
+} from "#utils/addressesManager"
+import OrderContext from "#context/OrderContext"
+import CustomerContext from "#context/CustomerContext"
+import isFunction from "lodash-es/isFunction"
+import type { TCustomerAddress } from "#reducers/CustomerReducer"
+import type { Order } from "@commercelayer/sdk"
+import { validateValue } from "#utils/validateFormFields"
+import { formCleaner } from "#utils/formCleaner"
 
 interface TOnClick {
   success: boolean
   order?: Order
 }
 
-interface ChildrenProps extends Omit<Props, 'children'> {}
+interface ChildrenProps extends Omit<Props, "children"> {}
 
 interface Props
-  extends Omit<JSX.IntrinsicElements['button'], 'children' | 'onClick'> {
+  extends Omit<JSX.IntrinsicElements["button"], "children" | "onClick"> {
   children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode
   onClick?: (params: TOnClick) => void
@@ -33,7 +33,7 @@ interface Props
 export function SaveAddressesButton(props: Props): JSX.Element {
   const {
     children,
-    label = 'Continue to delivery',
+    label = "Continue to delivery",
     resource,
     disabled = false,
     addressId,
@@ -49,26 +49,26 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     saveAddresses,
     billingAddressId,
     shippingAddressId,
-    invertAddresses
+    invertAddresses,
   } = useContext(AddressContext)
   const { order } = useContext(OrderContext)
   const {
     customerEmail: email,
     addresses,
     isGuest,
-    createCustomerAddress
+    createCustomerAddress,
   } = useContext(CustomerContext)
   const [forceDisable, setForceDisable] = useState(disabled)
   let customerEmail = !!(
-    !!(isGuest === true || typeof isGuest === 'undefined') &&
+    !!(isGuest === true || typeof isGuest === "undefined") &&
     !order?.customer_email
   )
-  if (email != null && email !== '') {
+  if (email != null && email !== "") {
     const isValidEmail = validateValue(
       email,
-      'customer_email',
-      'email',
-      'orders'
+      "customer_email",
+      "email",
+      "orders",
     )
     customerEmail = Object.keys(isValidEmail).length > 0
   }
@@ -77,10 +77,10 @@ export function SaveAddressesButton(props: Props): JSX.Element {
       return {
         ...acc,
         // @ts-expect-error type mismatch
-        [key.replace(`shipping_address_`, '')]: shippingAddress[key].value
+        [key.replace(`shipping_address_`, "")]: shippingAddress[key].value,
       }
     },
-    {}
+    {},
   )
   const { billingDisable, shippingDisable } = addressesController({
     invertAddresses,
@@ -91,7 +91,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     shippingAddressId,
     billingAddressId,
     errors,
-    requiredMetadataFields
+    requiredMetadataFields,
   })
   const countryLockDisable = countryLockController({
     countryCodeLock: order?.shipping_country_code_lock,
@@ -101,7 +101,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     billing_address: billingAddress,
     shipping_address: shippingAddress,
     shippingAddressId,
-    lineItems: order?.line_items
+    lineItems: order?.line_items,
   })
   // NOTE: This is a temporary fix to avoid the button to be disabled when the user is editing an address
   const invertAddressesDisable =
@@ -119,7 +119,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
         success: boolean
         order?: Order
       } = {
-        success: false
+        success: false,
       }
       setForceDisable(true)
       // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
@@ -132,16 +132,16 @@ export function SaveAddressesButton(props: Props): JSX.Element {
             customerEmail: email,
             customerAddress: {
               resource: invertAddresses
-                ? 'shipping_address'
-                : 'billing_address',
-              id: addressId
-            }
+                ? "shipping_address"
+                : "billing_address",
+              id: addressId,
+            },
           })
           break
         }
         case order != null && saveAddresses != null: {
           response = await saveAddresses({
-            customerEmail: email
+            customerEmail: email,
           })
           break
         }
@@ -152,7 +152,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
           if (addressId) address.id = addressId
           createCustomerAddress(address as TCustomerAddress)
           response = {
-            success: true
+            success: true,
           }
           break
         }
@@ -167,13 +167,13 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     label,
     resource,
     handleClick,
-    disabled: disable
+    disabled: disable,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <button
-      type='button'
+      type="button"
       disabled={disable || forceDisable}
       onClick={() => {
         handleClick()
