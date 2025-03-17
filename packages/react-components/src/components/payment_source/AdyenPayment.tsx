@@ -111,7 +111,7 @@ export function AdyenPayment({
     setPaymentRef,
     currentCustomerPaymentSourceId,
   } = useContext(PaymentMethodContext)
-  const { order, updateOrder } = useContext(OrderContext)
+  const { order, updateOrder, setOrderErrors } = useContext(OrderContext)
   const { placeOrderButtonRef, setPlaceOrder } = useContext(PlaceOrderContext)
   const { customers } = useContext(CustomerContext)
   const ref = useRef<null | HTMLFormElement>(null)
@@ -209,7 +209,6 @@ export function AdyenPayment({
       paymentSourceId: paymentSource?.id,
       paymentResource: "adyen_payments",
     })
-    console.log("Control", control)
     // @ts-expect-error no type
     const controlCode = control?.payment_response?.resultCode
     const paymentMethodType =
@@ -252,8 +251,6 @@ export function AdyenPayment({
           resultCode: "Error",
         }
       }
-      console.log("Control code", controlCode)
-      console.log("Payment method type", paymentMethodType)
       // Authorize remaining amount with other payment method after gift card
       if (
         ["Cancelled", "Refused"].includes(controlCode) &&
@@ -270,7 +267,6 @@ export function AdyenPayment({
           availableGiftCardAmount != null
             ? order?.total_amount_with_taxes_cents - availableGiftCardAmount
             : 0
-        console.log("totalPartialAmount", totalPartialAmount)
         await updateOrder({
           id: order.id,
           attributes: {
@@ -278,7 +274,6 @@ export function AdyenPayment({
             _place: true,
           },
         })
-        console.log("Authorize first credit card amount")
         await setPaymentSource({
           paymentSourceId: paymentSource?.id,
           paymentResource: "adyen_payments",
@@ -308,36 +303,29 @@ export function AdyenPayment({
             _authorize: 1,
           },
         })
-        console.log("First gift card authorization", firstAuthorization)
-        // if (
-        //   ["Cancelled", "Refused"].includes(
-        //     // @ts-expect-error no type
-        //     firstAuthorization?.payment_response?.resultCode,
-        //   )
-        // ) {
-        //   const availableGiftCardAmount =
-        //     // @ts-expect-error no type
-        //     firstAuthorization?.payment_response?.additionalData
-        //       ?.currentBalanceValue as string
-        //   setCurrentGiftCard({
-        //     availableGiftCardAmount: Number.parseInt(availableGiftCardAmount),
-        //     paymentMethodAttributes: attributes,
-        //   })
-        //   console.log("Save gift card amount", availableGiftCardAmount)
-        //   // await updateOrder({
-        //   //   id: order.id,
-        //   //   attributes: {
-        //   //     _authorization_amount_cents: Number.parseInt(
-        //   //       availableGiftCardAmount,
-        //   //     ),
-        //   //     _place: true,
-        //   //   },
-        //   // })
-        //   return {
-        //     resultCode: "Authorised",
-        //     paymentMethodType: currentPaymentMethodType,
-        //   }
-        // }
+        // @ts-expect-error no type
+        const resultCode = firstAuthorization?.payment_response?.resultCode
+        const refusalReasonCode =
+          // @ts-expect-error no type
+          firstAuthorization?.payment_response?.refusalReasonCode
+        if (
+          ["Cancelled", "Refused"].includes(resultCode) &&
+          refusalReasonCode === "8"
+        ) {
+          // @ts-expect-error no type
+          const message = firstAuthorization?.payment_response?.refusalReason
+          setOrderErrors([
+            {
+              code: "VALIDATION_ERROR",
+              resource: "orders",
+              field: "gift_card_code",
+              message,
+            },
+          ])
+          return {
+            resultCode,
+          }
+        }
         return {
           resultCode: "Authorised",
           paymentMethodType: currentPaymentMethodType,
