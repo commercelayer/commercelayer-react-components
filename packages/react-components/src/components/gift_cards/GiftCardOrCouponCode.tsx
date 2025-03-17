@@ -32,8 +32,6 @@ export function GiftCardOrCouponCode({
   let hide = !(order && code)
   if (manageAdyenGiftCard && type === "gift_card") {
     const giftCardData = manageGiftCard({ order })
-    console.log("order", order)
-    console.log("giftCardData", giftCardData)
     if (!giftCardData) return null
     hide = false
     const parentProps: ChildrenProps = {

@@ -35,9 +35,7 @@ export function GiftCardOrCouponRemoveButton(props: Props): JSX.Element | null {
   let hide = !(order && code)
   const handleClick = async (): Promise<void> => {
     if (manageAdyenGiftCard && codeType === "gift_card_code" && order != null) {
-      console.log("handle click gift card")
       const id = order?.payment_source?.id
-      console.log("id", id)
       if (id != null) {
         const res = await paymentSourceRequest({
           resource: "adyen_payments",
