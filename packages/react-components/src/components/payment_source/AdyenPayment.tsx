@@ -76,6 +76,7 @@ export interface AdyenPaymentConfig {
     recurringDetailReference: string
     shopperReference: string | undefined
   }) => Promise<boolean>
+  giftcardErrorComponent?: (message: string) => JSX.Element
 }
 
 interface Props {
@@ -95,7 +96,12 @@ export function AdyenPayment({
   environment = "test",
   locale = "en_US",
 }: Props): JSX.Element | null {
-  const { cardContainerClassName, styles, onDisableStoredPaymentMethod } = {
+  const {
+    cardContainerClassName,
+    styles,
+    onDisableStoredPaymentMethod,
+    giftcardErrorComponent,
+  } = {
     ...defaultConfig,
     ...config,
   }
@@ -103,6 +109,7 @@ export function AdyenPayment({
   const [checkout, setCheckout] = useState<
     UIElement<UIElementProps> | undefined
   >()
+  const [giftcardError, setGiftcardError] = useState<string | null>(null)
   const {
     setPaymentSource,
     paymentSource,
@@ -111,7 +118,7 @@ export function AdyenPayment({
     setPaymentRef,
     currentCustomerPaymentSourceId,
   } = useContext(PaymentMethodContext)
-  const { order, updateOrder, setOrderErrors } = useContext(OrderContext)
+  const { order, updateOrder } = useContext(OrderContext)
   const { placeOrderButtonRef, setPlaceOrder } = useContext(PlaceOrderContext)
   const { customers } = useContext(CustomerContext)
   const ref = useRef<null | HTMLFormElement>(null)
@@ -201,7 +208,12 @@ export function AdyenPayment({
   const onSubmit = async (
     state: SubmitData,
     component: UIElement<UIElementProps>,
-  ): Promise<CheckoutAdvancedFlowResponse & { paymentMethodType?: string }> => {
+  ): Promise<
+    CheckoutAdvancedFlowResponse & {
+      paymentMethodType?: string
+      message?: string
+    }
+  > => {
     const url = cleanUrlBy()
     const { type: currentPaymentMethodType } = state.data.paymentMethod
     const shopperIp = await getPublicIP()
@@ -310,20 +322,13 @@ export function AdyenPayment({
           firstAuthorization?.payment_response?.refusalReasonCode
         if (
           ["Cancelled", "Refused"].includes(resultCode) &&
-          refusalReasonCode === "8"
+          refusalReasonCode !== "12"
         ) {
           // @ts-expect-error no type
           const message = firstAuthorization?.payment_response?.refusalReason
-          setOrderErrors([
-            {
-              code: "VALIDATION_ERROR",
-              resource: "orders",
-              field: "gift_card_code",
-              message,
-            },
-          ])
           return {
             resultCode,
+            message,
           }
         }
         return {
@@ -481,9 +486,12 @@ export function AdyenPayment({
       },
       onSubmit: (state, element, actions) => {
         const handleSubmit = async (): Promise<void> => {
-          const { resultCode, action } = await onSubmit(state, element)
+          const { resultCode, action, message } = await onSubmit(state, element)
           if (["Cancelled", "Refused"].includes(resultCode)) {
             actions.reject()
+            if (message) {
+              setGiftcardError(message)
+            }
           } else if (action != null) {
             dropinRef.current?.handleAction(action)
           } else {
@@ -491,6 +499,7 @@ export function AdyenPayment({
               resultCode,
             })
             dropinRef.current?.mount("#adyen-dropin")
+            setGiftcardError(null)
           }
         }
         handleSubmit()
@@ -589,6 +598,9 @@ export function AdyenPayment({
       }}
     >
       <div className={cardContainerClassName} id="adyen-dropin" />
+      {giftcardError != null && giftcardErrorComponent
+        ? giftcardErrorComponent(giftcardError)
+        : null}
       {templateCustomerSaveToWallet && (
         <Parent {...{ name: "save_payment_source_to_customer_wallet" }}>
           {templateCustomerSaveToWallet}

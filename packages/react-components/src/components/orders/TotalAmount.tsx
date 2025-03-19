@@ -10,7 +10,8 @@ export function TotalAmount(props: BaseAmountComponent): JSX.Element | null {
   const { manageAdyenGiftCard, order } = useContext(OrderContext)
   if (manageAdyenGiftCard) {
     const giftCardData = manageGiftCard({ order })
-    if (!giftCardData) return null
+    if (!giftCardData)
+      return <BaseOrderPrice base="total_amount" type="with_taxes" {...props} />
     const parentProps = {
       price: `${giftCardData?.formattedOrderTotal}`,
       ...props,
