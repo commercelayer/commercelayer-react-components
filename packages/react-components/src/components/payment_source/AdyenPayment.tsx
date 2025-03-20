@@ -320,14 +320,21 @@ export function AdyenPayment({
         const refusalReasonCode =
           // @ts-expect-error no type
           firstAuthorization?.payment_response?.refusalReasonCode
+        // @ts-expect-error no type
+        const errorCode = firstAuthorization?.payment_response?.errorCode
         if (
-          ["Cancelled", "Refused"].includes(resultCode) &&
-          refusalReasonCode !== "12"
+          (["Cancelled", "Refused"].includes(resultCode) &&
+            refusalReasonCode !== "12") ||
+          errorCode
         ) {
-          // @ts-expect-error no type
-          const message = firstAuthorization?.payment_response?.refusalReason
+          const message =
+            // @ts-expect-error no type
+            firstAuthorization?.payment_response?.refusalReason ??
+            // @ts-expect-error no type
+            firstAuthorization?.payment_response?.message
+
           return {
-            resultCode,
+            resultCode: errorCode ? "Refused" : resultCode,
             message,
           }
         }
