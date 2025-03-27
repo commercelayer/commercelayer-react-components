@@ -5,20 +5,22 @@
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
+    "./package.json": "./package.json",
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "default": "./dist/index.cjs"
     }
   },
   "keywords": ["jamstack", "headless", "ecommerce", "api", "components"],
   "scripts": {
-    "lint": "biome lint --error-on-warnings ./src",
+    "check-exports": "attw --pack .",
+    "lint": "biome lint --error-on-warnings ./src && tsc",
     "lint:fix": "pnpm biome lint --write ./src",
     "test": "pnpm run lint && vitest --silent",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
-    "build": "tsup"
+    "build": "tsup",
+    "ci": "pnpm  build && pnpm check-exports && pnpm lint"
   },
   "publishConfig": {
     "access": "public"
@@ -29,15 +31,16 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@vitest/coverage-v8": "^3.0.4",
-    "tsup": "^8.3.6",
-    "typescript": "^5.7.3",
+    "@arethetypeswrong/cli": "^0.17.4",
+    "@vitest/coverage-v8": "^3.0.9",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.0.4"
+    "vitest": "^3.0.9"
   },
   "dependencies": {
-    "@commercelayer/js-auth": "^6.7.0",
-    "@commercelayer/sdk": "6.29.2",
+    "@commercelayer/js-auth": "^6.7.1",
+    "@commercelayer/sdk": "6.36.0",
     "jwt-decode": "^4.0.0"
   }
 }
