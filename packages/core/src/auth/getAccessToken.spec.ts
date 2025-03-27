@@ -1,7 +1,7 @@
 import { authenticate } from "@commercelayer/js-auth"
 import { describe, expect, vi } from "vitest"
-import { coreTest } from "../../extender.js"
-import { getAccessToken } from "./getAccessToken.js"
+import { coreTest } from "../../extender"
+import { getAccessToken } from "./getAccessToken"
 
 vi.mock("@commercelayer/js-auth", () => ({
   authenticate: vi.fn(),

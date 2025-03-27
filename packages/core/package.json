@@ -5,10 +5,10 @@
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
+    "./package.json": "./package.json",
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "default": "./dist/index.cjs"
     }
   },
   "keywords": ["jamstack", "headless", "ecommerce", "api", "components"],
