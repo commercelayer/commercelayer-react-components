@@ -23,7 +23,8 @@
     "baseUrl": ".",
     "paths": {
       "#sdk": ["src/sdk/index.ts"],
-      "#types": ["src/types/index.ts"]
+      "#types": ["src/types/index.ts"],
+      "#extender": ["extender.ts"]
     }
   },
   "exclude": ["node_modules", "dist", "coverage", "*.spec.ts"]
