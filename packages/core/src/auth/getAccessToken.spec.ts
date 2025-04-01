@@ -14,7 +14,6 @@ describe("getAccessToken", () => {
       const token = accessToken?.accessToken
       const grantType = "client_credentials"
       const mockToken = { accessToken: token }
-      // @ts-expect-error mockResolvedValue is not defined
       authenticate.mockResolvedValue(mockToken)
       const result = await getAccessToken({ grantType, config })
       await expect(authenticate).toHaveBeenCalledWith(grantType, config)
@@ -33,7 +32,6 @@ describe("getAccessToken", () => {
         clientSecret: "test-client-secret",
       }
       const mockError = new Error("Authentication failed")
-      // @ts-expect-error mockResolvedValue is not defined
       authenticate.mockRejectedValue(mockError)
       await expect(getAccessToken({ grantType, config })).rejects.toThrow(
         "Authentication failed",
