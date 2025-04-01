@@ -1,6 +1,6 @@
 import { authenticate } from "@commercelayer/js-auth"
 import { describe, expect, vi } from "vitest"
-import { coreTest } from "../../extender"
+import { type CoreTestInterface, coreTest } from "#extender"
 import { getAccessToken } from "./getAccessToken"
 
 vi.mock("@commercelayer/js-auth", () => ({
@@ -8,7 +8,7 @@ vi.mock("@commercelayer/js-auth", () => ({
 }))
 
 describe("getAccessToken", () => {
-  coreTest(
+  coreTest<CoreTestInterface>(
     "should call authenticate with the correct parameters",
     async ({ accessToken, config }) => {
       const token = accessToken?.accessToken
@@ -23,16 +23,19 @@ describe("getAccessToken", () => {
     },
   )
 
-  coreTest("should throw an error if authenticate fails", async () => {
-    const grantType = "client_credentials"
-    const config = {
-      clientId: "test-client-id",
-      clientSecret: "test-client-secret",
-    }
-    const mockError = new Error("Authentication failed")
-    authenticate.mockRejectedValue(mockError)
-    await expect(getAccessToken({ grantType, config })).rejects.toThrow(
-      "Authentication failed",
-    )
-  })
+  coreTest<CoreTestInterface>(
+    "should throw an error if authenticate fails",
+    async () => {
+      const grantType = "client_credentials"
+      const config = {
+        clientId: "test-client-id",
+        clientSecret: "test-client-secret",
+      }
+      const mockError = new Error("Authentication failed")
+      authenticate.mockRejectedValue(mockError)
+      await expect(getAccessToken({ grantType, config })).rejects.toThrow(
+        "Authentication failed",
+      )
+    },
+  )
 })
