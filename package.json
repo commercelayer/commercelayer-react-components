@@ -1,52 +1,54 @@
 {
-  "name": "root",
-  "private": true,
-  "author": {
-    "name": "Alessandro Casazza",
-    "email": "alessandro@commercelayer.io"
-  },
-  "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "build": "pnpm -r build",
-    "prepare": "husky",
-    "test": "pnpm -r test",
-    "docs:dev": "pnpm --filter docs storybook",
-    "docs:build": "pnpm --filter docs build-storybook",
-    "components:build:dev": "pnpm --filter react-components build:dev",
-    "components:build": "pnpm --filter react-components build",
-    "make:version": "lerna version --no-private",
-    "make:version:force": "lerna version --no-private --force-publish",
-    "dep:major": "pnpm dlx npm-check-updates --packageFile '**/package.json' -u -i",
-    "dep:minor": "pnpm dep:major -t minor -i"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "husky": "^9.1.7",
-    "lerna": "^8.2.2",
-    "typescript": "^5.8.3",
-    "vitest": "^3.1.1"
-  },
-  "pnpm": {
-    "overrides": {
-      "postcss@<8.4.31": ">=8.4.31",
-      "graphql@>=16.3.0 <16.8.1": ">=16.8.1",
-      "vite@>=4.4.0 <4.4.12": ">=4.4.12",
-      "@babel/traverse@<7.23.2": ">=7.23.2",
-      "vite@>=4.0.0 <=4.5.1": ">=4.5.2",
-      "follow-redirects@<1.15.4": ">=1.15.4",
-      "express@<4.19.2": ">=4.19.2",
-      "vite@>=5.1.0 <=5.1.6": ">=5.1.7",
-      "tar@<6.2.1": ">=6.2.1",
-      "ejs@<3.1.10": ">=3.1.10",
-      "braces@<3.0.3": ">=3.0.3",
-      "ws@>=8.0.0 <8.17.1": ">=8.17.1",
-      "micromatch@<4.0.8": ">=4.0.8",
-      "rollup@>=4.0.0 <4.22.4": ">=4.22.4",
-      "cross-spawn@>=7.0.0 <7.0.5": ">=7.0.5"
-    },
-    "onlyBuiltDependencies": [
-      "msw",
-      "nx"
-    ]
-  }
+	"name": "root",
+	"private": true,
+	"author": {
+		"name": "Alessandro Casazza",
+		"email": "alessandro@commercelayer.io"
+	},
+	"scripts": {
+		"preinstall": "npx only-allow pnpm",
+		"build": "pnpm -r build",
+		"prepare": "husky",
+		"test": "pnpm -r test",
+		"docs:dev": "pnpm --filter docs storybook",
+		"docs:build": "pnpm --filter docs build-storybook",
+		"components:build:dev": "pnpm --filter react-components build:dev",
+		"components:build": "pnpm --filter react-components build",
+		"make:version": "lerna version --no-private",
+		"make:version:force": "lerna version --no-private --force-publish",
+		"dep:major": "pnpm dlx npm-check-updates --packageFile '**/package.json' -u -i",
+		"dep:minor": "pnpm dep:major -t minor -i"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"husky": "^9.1.7",
+		"lerna": "^8.2.1",
+		"typescript": "^5.8.2"
+	},
+	"pnpm": {
+		"overrides": {
+			"postcss@<8.4.31": ">=8.4.31",
+			"graphql@>=16.3.0 <16.8.1": ">=16.8.1",
+			"vite@>=4.4.0 <4.4.12": ">=4.4.12",
+			"@babel/traverse@<7.23.2": ">=7.23.2",
+			"vite@>=4.0.0 <=4.5.1": ">=4.5.2",
+			"follow-redirects@<1.15.4": ">=1.15.4",
+			"express@<4.19.2": ">=4.19.2",
+			"vite@>=5.1.0 <=5.1.6": ">=5.1.7",
+			"tar@<6.2.1": ">=6.2.1",
+			"ejs@<3.1.10": ">=3.1.10",
+			"braces@<3.0.3": ">=3.0.3",
+			"ws@>=8.0.0 <8.17.1": ">=8.17.1",
+			"micromatch@<4.0.8": ">=4.0.8",
+			"rollup@>=4.0.0 <4.22.4": ">=4.22.4",
+			"cross-spawn@>=7.0.0 <7.0.5": ">=7.0.5"
+		},
+		"onlyBuiltDependencies": [
+			"@biomejs/biome",
+			"esbuild",
+			"iframe-resizer",
+			"msw",
+			"nx"
+		]
+	}
 }
