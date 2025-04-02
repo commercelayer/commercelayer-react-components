@@ -76,6 +76,17 @@ export interface AdyenPaymentConfig {
     recurringDetailReference: string
     shopperReference: string | undefined
   }) => Promise<boolean>
+  /**
+   * Callback function to be called when the Adyen component is ready.
+   * @returns void.
+   */
+  onReady?: () => void
+  /**
+   * onSelect callback function to be called when a payment method is selected.
+   * @param component - The selected payment method component.
+   * @returns void.
+   */
+  onSelect?: (component: UIElement<UIElementProps>) => void
   giftcardErrorComponent?: (message: string) => JSX.Element
 }
 
@@ -101,6 +112,8 @@ export function AdyenPayment({
     styles,
     onDisableStoredPaymentMethod,
     giftcardErrorComponent,
+    onReady,
+    onSelect,
   } = {
     ...defaultConfig,
     ...config,
@@ -580,6 +593,12 @@ export function AdyenPayment({
                 setPaymentRef({ ref })
               }
             }
+            if (onSelect) {
+              onSelect(component)
+            }
+          },
+          onReady() {
+            if (onReady) onReady()
           },
         }).mount("#adyen-dropin")
         if (dropin && checkout) {
