@@ -10,6 +10,7 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "lib": ["es2022"],
+    "noEmit": true,
 
     /* Strictness */
     "strict": true,
