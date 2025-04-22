@@ -22,9 +22,9 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "husky": "^9.1.7",
-    "lerna": "^8.2.1",
-    "typescript": "^5.8.2",
-    "vitest": "^3.0.9"
+    "lerna": "^8.2.2",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
   },
   "pnpm": {
     "overrides": {
@@ -43,6 +43,10 @@
       "micromatch@<4.0.8": ">=4.0.8",
       "rollup@>=4.0.0 <4.22.4": ">=4.22.4",
       "cross-spawn@>=7.0.0 <7.0.5": ">=7.0.5"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "msw",
+      "nx"
+    ]
   }
 }
