@@ -32,15 +32,14 @@
   "license": "MIT",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.4",
-    "@vitest/coverage-v8": "^3.0.9",
+    "@vitest/coverage-v8": "^3.1.1",
     "tsup": "^8.4.0",
-    "typescript": "^5.8.2",
+    "typescript": "^5.8.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.0.9"
+    "vitest": "^3.1.1"
   },
   "dependencies": {
-    "@commercelayer/js-auth": "^6.7.1",
-    "@commercelayer/sdk": "6.36.0",
-    "jwt-decode": "^4.0.0"
+    "@commercelayer/js-auth": "^6.7.2",
+    "@commercelayer/sdk": "6.39.0"
   }
 }
