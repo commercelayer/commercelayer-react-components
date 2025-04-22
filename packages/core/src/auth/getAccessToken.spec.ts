@@ -8,7 +8,7 @@ vi.mock("@commercelayer/js-auth", () => ({
 }))
 
 describe("getAccessToken", () => {
-  coreTest<CoreTestInterface>(
+  coreTest(
     "should call authenticate with the correct parameters",
     async ({ accessToken, config }) => {
       const token = accessToken?.accessToken

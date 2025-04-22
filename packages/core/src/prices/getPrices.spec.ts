@@ -4,14 +4,11 @@ import { coreTest } from "#extender"
 import { getPrices } from "./getPrices.js"
 
 describe("getPrices", () => {
-  coreTest<CoreTestInterface>(
-    "should return a list of prices",
-    async ({ accessToken }) => {
-      const token = accessToken?.accessToken
-      const result = await getPrices({ accessToken: token })
-      expect(result).toBeDefined()
-    },
-  )
+  coreTest("should return a list of prices", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const result = await getPrices({ accessToken: token })
+    expect(result).toBeDefined()
+  })
 
   coreTest("should return a single price", async ({ accessToken }) => {
     const token = accessToken?.accessToken
