@@ -1,102 +1,135 @@
-import { useContext, useRef, type JSX } from 'react';
-import type {
-  PaymentMethodConfig,
-  PaymentSourceObject
-} from '#reducers/PaymentMethodReducer'
-import type { PaymentSourceProps } from './PaymentSource'
-import useExternalScript from '#utils/hooks/useExternalScript'
-import PaymentMethodContext from '#context/PaymentMethodContext'
-import {
-  Frames,
-  CardNumber,
-  ExpiryDate,
-  Cvv,
-  type FramesLanguages,
-  type FramesStyle
-} from 'frames-react'
-import OrderContext from '#context/OrderContext'
-import Parent from '#components/utils/Parent'
-import { setCustomerOrderParam } from '#utils/localStorage'
-const scriptUrl = 'https://cdn.checkout.com/js/framesv2.min.js'
+import { useContext, useEffect, useRef, type JSX } from "react"
+import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
+import type { PaymentSourceProps } from "./PaymentSource"
+import useExternalScript from "#utils/hooks/useExternalScript"
+import OrderContext from "#context/OrderContext"
+import Parent from "#components/utils/Parent"
+import { jwt } from "#utils/jwt"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import { setCustomerOrderParam } from "#utils/localStorage"
+
+const scriptUrl = "https://checkout-web-components.checkout.com/index.js"
+
+interface Appearance {
+  colorAction: string
+  colorBackground: string
+  colorBorder: string
+  colorDisabled: string
+  colorError: string
+  colorFormBackground: string
+  colorFormBorder: string
+  colorInverse: string
+  colorOutline: string
+  colorPrimary: string
+  colorSecondary: string
+  colorSuccess: string
+  button: {
+    fontFamily: string
+    fontSize: string
+    fontWeight: number
+    letterSpacing: number
+    lineHeight: string
+  }
+  footnote: {
+    fontFamily: string
+    fontSize: string
+    fontWeight: number
+    letterSpacing: number
+    lineHeight: string
+  }
+  label: {
+    fontFamily: string
+    fontSize: string
+    fontWeight: number
+    letterSpacing: number
+    lineHeight: string
+  }
+  subheading: {
+    fontFamily: string
+    fontSize: string
+    fontWeight: number
+    letterSpacing: number
+    lineHeight: string
+  }
+  borderRadius: [string, string]
+}
+
+interface Component {
+  isValid: () => boolean
+  type: string
+  submit: () => unknown
+  tokenize: () => Promise<{
+    data: {
+      token: string
+    }
+  }>
+}
+
+interface CheckoutWebComponent {
+  appearance?: Partial<Appearance>
+  showPayButton?: boolean
+  publicKey: string
+  environment: "sandbox" | "production"
+  locale?: string
+  paymentSession: string
+  onReady?: () => void
+  submit?: () => unknown
+  onPaymentCompleted?: (
+    component: Component,
+    paymentResponse: {
+      status: string
+      id: string
+      type: string
+    },
+  ) => Promise<void>
+  onChange?: (component: Component) => void
+  onError?: (component: Component, error: unknown) => void
+  create?: (type: "flow") => {
+    mount: (element: HTMLElement | null) => void
+  }
+  componentOptions?: {
+    card?: {
+      displayCardholderName?: "hidden" | "top" | "bottom"
+    }
+  }
+}
 
 export interface CheckoutComConfig {
   containerClassName?: string
   hintLabel?: string
   name?: string
-  success_url?: string
-  failure_url?: string
+  success_url: string
+  failure_url: string
   options?: {
-    style: FramesStyle
+    appearance: Partial<Appearance>
   }
   [key: string]: unknown
 }
 
-const systemLanguages: FramesLanguages[] = [
-  'DE-DE',
-  'EN-GB',
-  'ES-ES',
-  'FR-FR',
-  'IT-IT',
-  'KO-KR',
-  'NL-NL'
-]
-
-const defaultOptions = {
-  style: {
-    base: {
-      color: 'black',
-      fontSize: '18px'
-    },
-    autofill: {
-      backgroundColor: 'yellow'
-    },
-    hover: {
-      color: 'blue'
-    },
-    focus: {
-      color: 'blue'
-    },
-    valid: {
-      color: 'green'
-    },
-    invalid: {
-      color: 'red'
-    },
-    placeholder: {
-      base: {
-        color: 'gray'
-      },
-      focus: {
-        border: 'solid 1px blue'
-      }
-    }
-  }
-}
-
-type Props = PaymentMethodConfig['checkoutComPayment'] &
-  JSX.IntrinsicElements['div'] & {
+type Props = Partial<PaymentMethodConfig["checkoutComPayment"]> &
+  JSX.IntrinsicElements["div"] & {
     show?: boolean
     publicKey: string
     locale?: string
-    templateCustomerSaveToWallet?: PaymentSourceProps['templateCustomerSaveToWallet']
+    templateCustomerSaveToWallet?: PaymentSourceProps["templateCustomerSaveToWallet"]
   }
 
 export function CheckoutComPayment({
   publicKey,
-  options = defaultOptions,
-  locale = 'EN-GB',
+  options,
   ...p
 }: Props): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
   const loaded = useExternalScript(scriptUrl)
   const {
     setPaymentRef,
-    currentPaymentMethodType,
-    paymentSource,
     setPaymentSource,
-    setPaymentMethodErrors
+    // setPaymentMethodErrors,
   } = useContext(PaymentMethodContext)
+  const { accessToken } = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
+  // const { setPlaceOrder } = useContext(PlaceOrderContext)
   const {
     containerClassName,
     templateCustomerSaveToWallet,
@@ -105,91 +138,94 @@ export function CheckoutComPayment({
     show,
     ...divProps
   } = p
-  const handleSubmit = async (): Promise<boolean> => {
-    const savePaymentSourceToCustomerWallet: string =
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Infinite loop
+  useEffect(() => {
+    const ps = order?.payment_source
+    if (loaded && window && ps && accessToken) {
       // @ts-expect-error no type
-      ref?.current?.elements?.save_payment_source_to_customer_wallet?.checked
-    if (savePaymentSourceToCustomerWallet) {
-      setCustomerOrderParam(
-        '_save_payment_source_to_customer_wallet',
-        savePaymentSourceToCustomerWallet
-      )
-    }
-    if (window.Frames) {
-      window.Frames.cardholder = {
-        name: order?.billing_address?.full_name,
-        billingAddress: {
-          addressLine1: order?.billing_address?.line_1,
-          addressLine2: order?.billing_address?.line_2 ?? '',
-          zip: order?.billing_address?.zip_code ?? '',
-          city: order?.billing_address?.city,
-          state: order?.billing_address?.state_code,
-          country: order?.billing_address?.country_code
-        },
-        phone: order?.billing_address?.phone
-      }
-      try {
-        const data = await window.Frames.submitCard()
-        if (data.token && paymentSource && currentPaymentMethodType) {
-          const ps = (await setPaymentSource({
-            paymentSourceId: paymentSource.id,
-            paymentResource: currentPaymentMethodType,
-            attributes: {
-              token: data.token,
-              payment_type: 'token',
-              success_url: successUrl,
-              failure_url: failureUrl,
-              _authorize: true
-            }
-          })) as PaymentSourceObject['checkout_com_payments']
-          if (ps?.redirect_uri) {
-            window.location.href = ps.redirect_uri
-          }
+      const publicKey = ps.public_key
+      // @ts-expect-error no type
+      const paymentSession = ps.payment_session
+      // @ts-expect-error no type
+      if (window?.CheckoutWebComponents) {
+        const environment = jwt(accessToken).test ? "sandbox" : "production"
+        const locale = order?.language_code ?? "en"
+        const loadFlow = async () => {
+          // @ts-expect-error no type
+          const checkout = await window.CheckoutWebComponents({
+            appearance: {
+              ...options?.appearance,
+            },
+            showPayButton: false,
+            publicKey,
+            environment,
+            locale,
+            paymentSession,
+            componentOptions: {
+              card: {
+                displayCardholderName: "hidden",
+              },
+            },
+            onChange: (component) => {
+              if (component.isValid()) {
+                if (ref.current) {
+                  ref.current.onsubmit = async (): Promise<boolean> => {
+                    const element = ref.current?.elements
+                    const savePaymentSourceToCustomerWallet =
+                      // @ts-expect-error no type
+                      element?.save_payment_source_to_customer_wallet?.checked
+                    if (savePaymentSourceToCustomerWallet)
+                      setCustomerOrderParam(
+                        "_save_payment_source_to_customer_wallet",
+                        savePaymentSourceToCustomerWallet,
+                      )
+                    const { data } = await component.tokenize()
+                    const token = data?.token
+                    const paymentSource = await setPaymentSource({
+                      paymentSourceId: ps.id,
+                      paymentResource: "checkout_com_payments",
+                      attributes: {
+                        token,
+                        _authorize: true,
+                      },
+                    })
+                    if (paymentSource) {
+                      // @ts-expect-error no type
+                      const response = paymentSource.payment_response
+                      // @ts-expect-error no type
+                      const securityRedirect = paymentSource?.redirect_uri
+                      const isStatusPending =
+                        response?.status.toLowerCase() === "pending"
+                      if (isStatusPending && securityRedirect) {
+                        window.location.href = securityRedirect
+                        return false
+                      }
+                      return true
+                    }
+                    return false
+                  }
+                  setPaymentRef?.({ ref })
+                }
+              }
+            },
+            onError: (component, error) => {
+              console.error("onError", error, "Component", component.type)
+            },
+          } satisfies CheckoutWebComponent)
+          const flowComponent = checkout.create("flow")
+          flowComponent.mount(document.getElementById("flow-container"))
         }
-      } catch (error: any) {
-        console.error(error)
-        setPaymentMethodErrors([
-          {
-            code: 'PAYMENT_INTENT_AUTHENTICATION_FAILURE',
-            resource: 'payment_methods',
-            field: currentPaymentMethodType,
-            message: error?.message as string
-          }
-        ])
+        loadFlow()
       }
     }
-    return false
-  }
-  const lang =
-    `${locale.toUpperCase()}-${locale.toUpperCase()}` as FramesLanguages
-  const localization = systemLanguages.includes(lang) ? lang : 'EN-GB'
+  }, [loaded, order?.payment_source?.id, accessToken])
   return loaded && show ? (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
-        <Frames
-          config={{
-            debug: true,
-            publicKey,
-            localization,
-            ...options
-          }}
-          cardValidationChanged={(e) => {
-            if (e.isValid && ref.current) {
-              ref.current.onsubmit = async () => {
-                return await handleSubmit()
-              }
-              setPaymentRef({ ref })
-            }
-          }}
-          cardTokenized={(data) => data}
-        >
-          <CardNumber />
-          <ExpiryDate />
-          <Cvv />
-        </Frames>
+        <div id="flow-container" />
       </div>
       {templateCustomerSaveToWallet && (
-        <Parent {...{ name: 'save_payment_source_to_customer_wallet' }}>
+        <Parent {...{ name: "save_payment_source_to_customer_wallet" }}>
           {templateCustomerSaveToWallet}
         </Parent>
       )}

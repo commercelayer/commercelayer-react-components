@@ -1,4 +1,4 @@
-import PlaceOrderContext from '#context/PlaceOrderContext'
+import PlaceOrderContext from "#context/PlaceOrderContext"
 import {
   type ReactNode,
   type RefObject,
@@ -6,18 +6,18 @@ import {
   useEffect,
   useReducer,
   type JSX,
-} from 'react';
+} from "react"
 import placeOrderReducer, {
   placeOrderInitialState,
   type PlaceOrderOptions,
   placeOrderPermitted,
   setButtonRef,
-  setPlaceOrderStatus
-} from '#reducers/PlaceOrderReducer'
-import OrderContext from '#context/OrderContext'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import { setPlaceOrder } from '../../reducers/PlaceOrderReducer'
-import useCustomContext from '#utils/hooks/useCustomContext'
+  setPlaceOrderStatus,
+} from "#reducers/PlaceOrderReducer"
+import OrderContext from "#context/OrderContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import { setPlaceOrder } from "../../reducers/PlaceOrderReducer"
+import useCustomContext from "#utils/hooks/useCustomContext"
 
 interface Props {
   children: ReactNode
@@ -27,7 +27,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
   const { children, options } = props
   const [state, dispatch] = useReducer(
     placeOrderReducer,
-    placeOrderInitialState
+    placeOrderInitialState,
   )
   const {
     order,
@@ -35,53 +35,54 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
     setOrderErrors,
     include,
     addResourceToInclude,
-    includeLoaded
+    includeLoaded,
   } = useCustomContext({
     context: OrderContext,
-    contextComponentName: 'OrderContainer',
-    currentComponentName: 'PlaceOrderContainer',
-    key: 'order'
+    contextComponentName: "OrderContainer",
+    currentComponentName: "PlaceOrderContainer",
+    key: "order",
   })
   const config = useContext(CommerceLayerContext)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Infinite loop
   useEffect(() => {
-    if (!include?.includes('shipments.available_shipping_methods')) {
+    if (!include?.includes("shipments.available_shipping_methods")) {
       addResourceToInclude({
         newResource: [
-          'shipments.available_shipping_methods',
-          'shipments.stock_line_items.line_item',
-          'shipments.shipping_method',
-          'shipments.stock_transfers.line_item',
-          'shipments.stock_location'
-        ]
+          "shipments.available_shipping_methods",
+          "shipments.stock_line_items.line_item",
+          "shipments.shipping_method",
+          "shipments.stock_transfers.line_item",
+          "shipments.stock_location",
+        ],
       })
-    } else if (!includeLoaded?.['shipments.available_shipping_methods']) {
+    } else if (!includeLoaded?.["shipments.available_shipping_methods"]) {
       addResourceToInclude({
         newResourceLoaded: {
-          'shipments.available_shipping_methods': true,
-          'shipments.stock_line_items.line_item': true,
-          'shipments.shipping_method': true,
-          'shipments.stock_transfers.line_item': true,
-          'shipments.stock_location': true
-        }
+          "shipments.available_shipping_methods": true,
+          "shipments.stock_line_items.line_item": true,
+          "shipments.shipping_method": true,
+          "shipments.stock_transfers.line_item": true,
+          "shipments.stock_location": true,
+        },
       })
     }
-    if (!include?.includes('billing_address')) {
+    if (!include?.includes("billing_address")) {
       addResourceToInclude({
-        newResource: 'billing_address'
+        newResource: "billing_address",
       })
     } else if (!includeLoaded?.billing_address) {
       addResourceToInclude({
-        newResourceLoaded: { billing_address: true }
+        newResourceLoaded: { billing_address: true },
       })
     }
-    if (!include?.includes('shipping_address')) {
+    if (!include?.includes("shipping_address")) {
       addResourceToInclude({
-        newResource: 'shipping_address',
-        resourcesIncluded: include
+        newResource: "shipping_address",
+        resourcesIncluded: include,
       })
     } else if (!includeLoaded?.shipping_address) {
       addResourceToInclude({
-        newResourceLoaded: { shipping_address: true }
+        newResourceLoaded: { shipping_address: true },
       })
     }
     if (order) {
@@ -90,8 +91,8 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
         dispatch,
         order,
         options: {
-          ...options
-        }
+          ...options,
+        },
       })
     }
   }, [order, include, includeLoaded])
@@ -99,12 +100,12 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
     ...state,
     setPlaceOrder: async ({
       paymentSource,
-      currentCustomerPaymentSourceId
+      currentCustomerPaymentSourceId,
     }: {
-      paymentSource?: Parameters<typeof setPlaceOrder>['0']['paymentSource']
+      paymentSource?: Parameters<typeof setPlaceOrder>["0"]["paymentSource"]
       currentCustomerPaymentSourceId?: Parameters<
         typeof setPlaceOrder
-      >['0']['currentCustomerPaymentSourceId']
+      >["0"]["currentCustomerPaymentSourceId"]
     }) =>
       await setPlaceOrder({
         config,
@@ -114,10 +115,10 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
         paymentSource,
         include,
         setOrder,
-        currentCustomerPaymentSourceId
+        currentCustomerPaymentSourceId,
       }),
     setPlaceOrderStatus: ({
-      status
+      status,
     }: Parameters<typeof setPlaceOrderStatus>[0]) => {
       setPlaceOrderStatus({ status, dispatch })
     },
@@ -127,13 +128,13 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
         dispatch,
         order,
         options: {
-          ...options
-        }
+          ...options,
+        },
       })
     },
     setButtonRef: (ref: RefObject<HTMLButtonElement | null>) => {
       setButtonRef(ref, dispatch)
-    }
+    },
   }
   return (
     <PlaceOrderContext.Provider value={contextValue}>
