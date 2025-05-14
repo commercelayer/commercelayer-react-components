@@ -166,9 +166,6 @@ importers:
       '@adyen/adyen-web':
         specifier: ^6.11.0
         version: 6.11.0
-      '@checkout.com/checkout-web-components':
-        specifier: 0.6.0-beta
-        version: 0.6.0-beta
       '@commercelayer/organization-config':
         specifier: ^2.2.0
         version: 2.2.0
@@ -959,9 +956,6 @@ packages:
 
   '@bundled-es-modules/tough-cookie@0.1.6':
     resolution: {integrity: sha512-dvMHbL464C0zI+Yqxbz6kZ5TOEp7GLW+pry/RWndAR8MJQAXZ2rPmIs8tziTZjeIyhSNZgZbCePtfSbdWqStJw==}
-
-  '@checkout.com/checkout-web-components@0.6.0-beta':
-    resolution: {integrity: sha512-dj5745XGQdgmv0/RdyepXM+ghlWXJx5Z+BHNUKjQrw43kMWOsuuHiKBu9gSSnwVT60iW9sXlLvZ83nlilfwoJg==}
 
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -8733,8 +8727,6 @@ snapshots:
     dependencies:
       '@types/tough-cookie': 4.0.5
       tough-cookie: 4.1.4
-
-  '@checkout.com/checkout-web-components@0.6.0-beta': {}
 
   '@colors/colors@1.5.0':
     optional: true
