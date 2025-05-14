@@ -214,7 +214,6 @@ export async function setPlaceOrder({
         const payment = await sdk[paymentType].update({
           id: paymentSource.id,
           _details: true,
-          session_id: options?.checkoutCom?.session_id,
         })
         // @ts-expect-error no type
         if (payment?.payment_response?.status !== "Authorized") {
