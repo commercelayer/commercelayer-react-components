@@ -117,7 +117,7 @@ export default function getCardDetails({
         customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
       if (ps?.type !== paymentType) break
       const source = ps?.metadata?.["card"] ?? {
-        brand: ps?.payment_instrument?.["issuer_type"].replace("_", "-") ?? "",
+        brand: ps?.payment_instrument?.["issuer_type"]?.replace("_", "-") ?? "",
         last4: ps?.metadata?.["last4"] ?? "",
         exp_month: ps?.metadata?.["exp_month"] ?? "",
         exp_year: ps?.metadata?.["exp_year"] ?? "",

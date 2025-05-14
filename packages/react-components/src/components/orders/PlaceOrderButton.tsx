@@ -313,6 +313,15 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   ): Promise<void> => {
     e?.preventDefault()
     e?.stopPropagation()
+    const isAlreadyPlaced = order?.status === "placed"
+    if (isAlreadyPlaced) {
+      setPlaceOrderStatus?.({ status: "placing" })
+      onClick?.({
+        placed: true,
+        order: order,
+      })
+      return
+    }
     setIsLoading(true)
     let isValid = true
     setForceDisable(true)
