@@ -122,11 +122,7 @@ export function CheckoutComPayment({
 }: Props): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
   const loaded = useExternalScript(scriptUrl)
-  const {
-    setPaymentRef,
-    setPaymentSource,
-    // setPaymentMethodErrors,
-  } = useContext(PaymentMethodContext)
+  const { setPaymentRef, setPaymentSource } = useContext(PaymentMethodContext)
   const { accessToken } = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
   // const { setPlaceOrder } = useContext(PlaceOrderContext)
