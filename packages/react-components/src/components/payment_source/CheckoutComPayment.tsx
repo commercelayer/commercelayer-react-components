@@ -11,48 +11,33 @@ import { setCustomerOrderParam } from "#utils/localStorage"
 
 const scriptUrl = "https://checkout-web-components.checkout.com/index.js"
 
+interface ElementAppearance {
+  fontFamily?: string
+  fontSize?: string
+  fontWeight?: number
+  letterSpacing?: number
+  lineHeight?: string
+}
+
 interface Appearance {
-  colorAction: string
-  colorBackground: string
-  colorBorder: string
-  colorDisabled: string
-  colorError: string
-  colorFormBackground: string
-  colorFormBorder: string
-  colorInverse: string
-  colorOutline: string
-  colorPrimary: string
-  colorSecondary: string
-  colorSuccess: string
-  button: {
-    fontFamily: string
-    fontSize: string
-    fontWeight: number
-    letterSpacing: number
-    lineHeight: string
-  }
-  footnote: {
-    fontFamily: string
-    fontSize: string
-    fontWeight: number
-    letterSpacing: number
-    lineHeight: string
-  }
-  label: {
-    fontFamily: string
-    fontSize: string
-    fontWeight: number
-    letterSpacing: number
-    lineHeight: string
-  }
-  subheading: {
-    fontFamily: string
-    fontSize: string
-    fontWeight: number
-    letterSpacing: number
-    lineHeight: string
-  }
-  borderRadius: [string, string]
+  colorAction?: string
+  colorBackground?: string
+  colorBorder?: string
+  colorDisabled?: string
+  colorError?: string
+  colorFormBackground?: string
+  colorFormBorder?: string
+  colorInverse?: string
+  colorOutline?: string
+  colorPrimary?: string
+  colorSecondary?: string
+  colorSuccess?: string
+  borderRadius?: [string, string]
+  button?: ElementAppearance
+  footnote?: ElementAppearance
+  label?: ElementAppearance
+  input?: ElementAppearance
+  subheading?: ElementAppearance
 }
 
 interface Component {
@@ -102,7 +87,7 @@ export interface CheckoutComConfig {
   success_url: string
   failure_url: string
   options?: {
-    appearance: Partial<Appearance>
+    appearance: Appearance
   }
   [key: string]: unknown
 }
