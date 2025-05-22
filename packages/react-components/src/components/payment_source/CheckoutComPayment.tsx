@@ -190,7 +190,23 @@ export function CheckoutComPayment({
               }
             },
             onError: (component, error) => {
-              console.error("onError", error, "Component", component.type)
+              console.error("onError", { error }, "Component", component.type)
+            },
+            onPaymentCompleted: async (component, paymentResponse) => {
+              console.log("onPaymentCompleted -----", {
+                paymentResponse,
+                component,
+                ps,
+              })
+              const paymentSource = await setPaymentSource({
+                paymentSourceId: ps.id,
+                paymentResource: "checkout_com_payments",
+                attributes: {
+                  token: paymentResponse.id,
+                  _authorize: true,
+                },
+              })
+              console.log("paymentSource", { paymentSource })
             },
           } satisfies CheckoutWebComponent)
           const flowComponent = checkout.create("flow")

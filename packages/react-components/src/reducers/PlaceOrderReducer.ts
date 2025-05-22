@@ -32,7 +32,7 @@ export interface PlaceOrderOptions {
     redirectResult?: string
   }
   checkoutCom?: {
-    session_id: string
+    session_id: string | undefined
   }
   stripe?: {
     /**
@@ -205,31 +205,6 @@ export async function setPlaceOrder({
           id: paymentSource.id,
           paypal_payer_id: options?.paypalPayerId,
         })
-      }
-      if (
-        paymentType === "checkout_com_payments" &&
-        paymentSource &&
-        options?.checkoutCom?.session_id
-      ) {
-        const payment = await sdk[paymentType].update({
-          id: paymentSource.id,
-          _details: true,
-        })
-        // @ts-expect-error no type
-        if (payment?.payment_response?.status !== "Authorized") {
-          // @ts-expect-error no type
-          const [action] = payment?.payment_response?.actions || [""]
-          const errors: BaseError[] = [
-            {
-              code: "PAYMENT_NOT_APPROVED_FOR_EXECUTION",
-              message: action?.response_summary,
-              resource: "orders",
-              field: "checkout_com_payments",
-            },
-          ]
-          // eslint-disable-next-line @typescript-eslint/no-throw-literal
-          throw { errors }
-        }
       }
       const updateAttributes: OrderUpdate = {
         id: order.id,
