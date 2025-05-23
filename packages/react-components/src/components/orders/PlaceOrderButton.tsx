@@ -17,6 +17,7 @@ import getCardDetails from "#utils/getCardDetails"
 import type { BaseError } from "#typings/errors"
 import type { Order } from "@commercelayer/sdk"
 import { checkPaymentIntent } from "#utils/stripe/retrievePaymentIntent"
+import useCommerceLayer from "#hooks/useCommerceLayer"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   /**
@@ -73,6 +74,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
   const [isLoading, setIsLoading] = useState(false)
+  const { sdkClient } = useCommerceLayer()
   const {
     currentPaymentMethodRef,
     loading,
@@ -82,7 +84,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     setPaymentMethodErrors,
     currentCustomerPaymentSourceId,
   } = useContext(PaymentMethodContext)
-  const { order } = useContext(OrderContext)
+  const { order, setOrderErrors } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
@@ -342,8 +344,19 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   ): Promise<void> => {
     e?.preventDefault()
     e?.stopPropagation()
-    const isAlreadyPlaced = order?.status === "placed"
-    const isDraftOrder = order?.status === "draft"
+    const sdk = sdkClient()
+    if (sdk == null) return
+    if (order == null) return
+    /**
+     * Check if the order is already placed or in draft status to avoid placing it again
+     * and to prevent placing a draft order
+     * @see https://docs.commercelayer.io/core/how-tos/placing-orders/checkout/placing-the-order
+     */
+    const { status } = await sdk.orders.retrieve(order?.id, {
+      fields: ["status"],
+    })
+    const isAlreadyPlaced = status === "placed"
+    const isDraftOrder = status === "draft"
     if (isAlreadyPlaced) {
       /**
        * Order already placed
@@ -371,6 +384,13 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           },
         ],
       })
+      setOrderErrors([
+        {
+          code: "VALIDATION_ERROR",
+          resource: "orders",
+          message: "Draft order cannot be placed",
+        },
+      ])
       return
     }
     setIsLoading(true)

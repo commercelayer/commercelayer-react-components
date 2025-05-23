@@ -37,6 +37,7 @@ export type GetOrderParams = Partial<{
   id: string
   persistKey: string
   state: OrderState
+  options: QueryParamsRetrieve
 }>
 
 export type GetOrder = (params: GetOrderParams) => Promise<undefined | Order>
@@ -192,11 +193,11 @@ export const getApiOrder: GetOrder = async (
     persistKey,
     deleteLocalOrder,
     state,
+    options = {},
   } = params
   const sdk = config != null ? getSdk(config) : undefined
   try {
     if (sdk == null) return undefined
-    const options: QueryParamsRetrieve = {}
     if (state?.include && state.include.length > 0) {
       options.include = state.include
     }
