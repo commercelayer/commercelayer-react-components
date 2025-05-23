@@ -227,8 +227,12 @@ export function CheckoutComPayment({
               }
             },
           } satisfies CheckoutWebComponent)
-          const flowComponent = checkout.create("flow")
-          flowComponent.mount(document.getElementById("flow-container"))
+          // const flowComponent = checkout.create("flow")
+          const flowComponent = checkout.create("card")
+          if (await flowComponent.isAvailable()) {
+            flowComponent.mount(document.getElementById("flow-container"))
+          }
+          // flowComponent.mount(document.getElementById("flow-container"))
         }
         loadFlow()
       }
