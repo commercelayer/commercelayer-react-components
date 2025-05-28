@@ -17,6 +17,7 @@ import getCardDetails from "#utils/getCardDetails"
 import type { BaseError } from "#typings/errors"
 import type { Order } from "@commercelayer/sdk"
 import { checkPaymentIntent } from "#utils/stripe/retrievePaymentIntent"
+import useCommerceLayer from "#hooks/useCommerceLayer"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   /**
@@ -73,6 +74,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
   const [isLoading, setIsLoading] = useState(false)
+  const { sdkClient } = useCommerceLayer()
   const {
     currentPaymentMethodRef,
     loading,
@@ -82,7 +84,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     setPaymentMethodErrors,
     currentCustomerPaymentSourceId,
   } = useContext(PaymentMethodContext)
-  const { order } = useContext(OrderContext)
+  const { order, setOrderErrors } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
@@ -299,9 +301,38 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ["draft", "pending"].includes(order?.status) &&
       autoPlaceOrder
     ) {
-      handleClick()
+      // @ts-expect-error no type
+      const paymentResponse = order?.payment_source?.payment_response
+      const paymentStatus = paymentResponse?.status?.toLowerCase()
+      if (paymentStatus === "pending") {
+        setPaymentSource({
+          paymentSourceId: paymentSource?.id,
+          paymentResource: "checkout_com_payments",
+          attributes: {
+            _details: 1,
+          },
+        }).then((res) => {
+          // @ts-expect-error no type
+          const paymentStatus: string = res?.payment_response?.status
+          if (paymentStatus.toLowerCase() === "authorized") {
+            handleClick()
+          } else {
+            if (options?.checkoutCom) {
+              options.checkoutCom.session_id = undefined
+            }
+            setPaymentMethodErrors([
+              {
+                code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
+                resource: "payment_methods",
+                field: currentPaymentMethodType,
+                message: paymentStatus,
+              },
+            ])
+          }
+        })
+      }
     }
-  }, [options?.checkoutCom, paymentType])
+  }, [options?.checkoutCom, paymentType, order?.payment_source?.id])
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     if (ref?.current != null && setButtonRef != null) {
@@ -313,13 +344,53 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   ): Promise<void> => {
     e?.preventDefault()
     e?.stopPropagation()
-    const isAlreadyPlaced = order?.status === "placed"
+    const sdk = sdkClient()
+    if (sdk == null) return
+    if (order == null) return
+    /**
+     * Check if the order is already placed or in draft status to avoid placing it again
+     * and to prevent placing a draft order
+     * @see https://docs.commercelayer.io/core/how-tos/placing-orders/checkout/placing-the-order
+     */
+    const { status } = await sdk.orders.retrieve(order?.id, {
+      fields: ["status"],
+    })
+    const isAlreadyPlaced = status === "placed"
+    const isDraftOrder = status === "draft"
     if (isAlreadyPlaced) {
+      /**
+       * Order already placed
+       */
       setPlaceOrderStatus?.({ status: "placing" })
       onClick?.({
         placed: true,
         order: order,
       })
+      return
+    }
+    if (isDraftOrder) {
+      /**
+       * Draft order cannot be placed
+       */
+      setPlaceOrderStatus?.({ status: "standby" })
+      onClick?.({
+        placed: false,
+        order: order,
+        errors: [
+          {
+            code: "VALIDATION_ERROR",
+            resource: "orders",
+            message: "Draft order cannot be placed",
+          },
+        ],
+      })
+      setOrderErrors([
+        {
+          code: "VALIDATION_ERROR",
+          resource: "orders",
+          message: "Draft order cannot be placed",
+        },
+      ])
       return
     }
     setIsLoading(true)
@@ -360,6 +431,21 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ) {
         isValid = true
       }
+    } else if (
+      currentPaymentMethodRef?.current?.onsubmit &&
+      options?.checkoutCom?.session_id &&
+      // @ts-expect-error no type
+      checkPaymentSource?.payment_response?.status?.toLowerCase() === "declined"
+    ) {
+      /**
+       * Permit to place order with declined payment using Checkout.com
+       */
+      isValid = (await currentPaymentMethodRef.current?.onsubmit({
+        // @ts-expect-error no type
+        paymentSource: checkPaymentSource,
+        setPlaceOrder,
+        onclickCallback: onClick,
+      })) as boolean
     } else if (card?.brand) {
       isValid = true
     }
