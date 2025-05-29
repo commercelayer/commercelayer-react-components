@@ -7,6 +7,7 @@ import type {
   StripeElementLocale,
   StripeElements,
   StripeElementsOptions,
+  StripePaymentElementChangeEvent,
   StripePaymentElementOptions,
 } from "@stripe/stripe-js"
 import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
@@ -15,6 +16,7 @@ import Parent from "#components/utils/Parent"
 import { setCustomerOrderParam } from "#utils/localStorage"
 import OrderContext from "#context/OrderContext"
 import { StripeExpressPayment } from "./StripeExpressPayment"
+import useCommerceLayer from "#hooks/useCommerceLayer"
 
 export interface StripeConfig {
   containerClassName?: string
@@ -64,7 +66,8 @@ function StripePaymentForm({
   const ref = useRef<null | HTMLFormElement>(null)
   const { currentPaymentMethodType, setPaymentMethodErrors, setPaymentRef } =
     useContext(PaymentMethodContext)
-  const { order } = useContext(OrderContext)
+  const { order, setOrderErrors } = useContext(OrderContext)
+  const { sdkClient } = useCommerceLayer()
   const elements = useElements()
   // biome-ignore lint/correctness/useExhaustiveDependencies: Avoid rerendering the form
   useEffect(() => {
@@ -142,12 +145,39 @@ function StripePaymentForm({
     return false
   }
 
+  async function handleChange(event: StripePaymentElementChangeEvent) {
+    // Handle change events from the PaymentElement
+    if (event.complete) {
+      const sdk = sdkClient()
+      if (sdk == null) return
+      if (order == null) return
+      const { status } = await sdk.orders.retrieve(order?.id, {
+        fields: ["status"],
+      })
+      const isDraftOrder = status === "draft"
+      if (isDraftOrder) {
+        /**
+         * Draft order cannot be placed
+         */
+        setOrderErrors([
+          {
+            code: "VALIDATION_ERROR",
+            resource: "orders",
+            message: "Draft order cannot be placed",
+          },
+        ])
+        return
+      }
+    }
+  }
+
   return (
     <form ref={ref}>
       {/* <CardElement options={{ ...defaultOptions, ...options }} /> */}
       <PaymentElement
         id="payment-element"
         options={{ ...defaultOptions, ...options }}
+        onChange={handleChange}
       />
       {templateCustomerSaveToWallet && (
         <Parent {...{ name: "save_payment_source_to_customer_wallet" }}>
