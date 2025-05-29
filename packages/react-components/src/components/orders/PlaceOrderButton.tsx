@@ -491,16 +491,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
             resource: "orders",
             message: "Draft order cannot be placed",
           },
-        ],
-      })
-      setOrderErrors([
-        {
-          code: "VALIDATION_ERROR",
-          resource: "orders",
-          message: "Draft order cannot be placed",
-        },
-      ])
-      return
+        ])
+        return
+      }
     }
     setIsLoading(true)
     // setForceDisable(true)

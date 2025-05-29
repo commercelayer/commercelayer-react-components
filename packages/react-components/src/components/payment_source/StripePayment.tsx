@@ -18,6 +18,7 @@ import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
 import { setCustomerOrderParam } from "#utils/localStorage"
 import type { PaymentSourceProps } from "./PaymentSource"
 import { StripeExpressPayment } from "./StripeExpressPayment"
+import useCommerceLayer from "#hooks/useCommerceLayer"
 
 export interface StripeConfig {
   containerClassName?: string
