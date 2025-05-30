@@ -30,6 +30,7 @@ import PlaceOrderContext from "#context/PlaceOrderContext"
 import OrderContext from "#context/OrderContext"
 import { getPublicIP } from "#utils/getPublicIp"
 import CustomerContext from "#context/CustomerContext"
+import { hasSubscriptions } from "#utils/hasSubscriptions"
 
 interface PaymentMethodsStyle {
   card?: CardConfiguration["styles"]
@@ -227,6 +228,10 @@ export function AdyenPayment({
       message?: string
     }
   > => {
+    let recurringProcessingModel = "CardOnFile"
+    if (order && hasSubscriptions(order)) {
+      recurringProcessingModel = "Subscription"
+    }
     const url = cleanUrlBy()
     const { type: currentPaymentMethodType } = state.data.paymentMethod
     const shopperIp = await getPublicIP()
@@ -256,7 +261,7 @@ export function AdyenPayment({
         redirect_from_issuer_method: "GET",
         shopper_ip: shopperIp,
         shopperInteraction: "Ecommerce",
-        recurringProcessingModel: "CardOnFile",
+        recurringProcessingModel,
         browser_info: {
           ...browserInfo(),
         },
