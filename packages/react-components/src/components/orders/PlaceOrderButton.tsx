@@ -347,51 +347,55 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     const sdk = sdkClient()
     if (sdk == null) return
     if (order == null) return
-    /**
-     * Check if the order is already placed or in draft status to avoid placing it again
-     * and to prevent placing a draft order
-     * @see https://docs.commercelayer.io/core/how-tos/placing-orders/checkout/placing-the-order
-     */
-    const { status } = await sdk.orders.retrieve(order?.id, {
-      fields: ["status"],
-    })
-    const isAlreadyPlaced = status === "placed"
-    const isDraftOrder = status === "draft"
-    if (isAlreadyPlaced) {
+
+    const isStripePayment = paymentType === "stripe_payments"
+    if (!isStripePayment) {
       /**
-       * Order already placed
+       * Check if the order is already placed or in draft status to avoid placing it again
+       * and to prevent placing a draft order
+       * @see https://docs.commercelayer.io/core/how-tos/placing-orders/checkout/placing-the-order
        */
-      setPlaceOrderStatus?.({ status: "placing" })
-      onClick?.({
-        placed: true,
-        order: order,
+      const { status } = await sdk.orders.retrieve(order?.id, {
+        fields: ["status"],
       })
-      return
-    }
-    if (isDraftOrder) {
-      /**
-       * Draft order cannot be placed
-       */
-      setPlaceOrderStatus?.({ status: "standby" })
-      onClick?.({
-        placed: false,
-        order: order,
-        errors: [
+      const isAlreadyPlaced = status === "placed"
+      const isDraftOrder = status === "draft"
+      if (isAlreadyPlaced) {
+        /**
+         * Order already placed
+         */
+        setPlaceOrderStatus?.({ status: "placing" })
+        onClick?.({
+          placed: true,
+          order: order,
+        })
+        return
+      }
+      if (isDraftOrder) {
+        /**
+         * Draft order cannot be placed
+         */
+        setPlaceOrderStatus?.({ status: "standby" })
+        onClick?.({
+          placed: false,
+          order: order,
+          errors: [
+            {
+              code: "VALIDATION_ERROR",
+              resource: "orders",
+              message: "Draft order cannot be placed",
+            },
+          ],
+        })
+        setOrderErrors([
           {
             code: "VALIDATION_ERROR",
             resource: "orders",
             message: "Draft order cannot be placed",
           },
-        ],
-      })
-      setOrderErrors([
-        {
-          code: "VALIDATION_ERROR",
-          resource: "orders",
-          message: "Draft order cannot be placed",
-        },
-      ])
-      return
+        ])
+        return
+      }
     }
     setIsLoading(true)
     let isValid = true
