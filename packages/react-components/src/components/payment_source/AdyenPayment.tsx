@@ -228,10 +228,6 @@ export function AdyenPayment({
       message?: string
     }
   > => {
-    let recurringProcessingModel = "CardOnFile"
-    if (order && hasSubscriptions(order)) {
-      recurringProcessingModel = "Subscription"
-    }
     const url = cleanUrlBy()
     const { type: currentPaymentMethodType } = state.data.paymentMethod
     const shopperIp = await getPublicIP()
@@ -261,7 +257,6 @@ export function AdyenPayment({
         redirect_from_issuer_method: "GET",
         shopper_ip: shopperIp,
         shopperInteraction: "Ecommerce",
-        recurringProcessingModel,
         browser_info: {
           ...browserInfo(),
         },
@@ -459,7 +454,7 @@ export function AdyenPayment({
     }
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Infite loop
   useEffect(() => {
     const paymentMethodsResponse = {
       // @ts-expect-error no type
@@ -478,10 +473,12 @@ export function AdyenPayment({
         "Payment methods are not available. Please, check your Adyen configuration.",
       )
     }
-    const showStoredPaymentMethods =
+    let showStoredPaymentMethods =
       // @ts-expect-error no type
       paymentSource?.payment_methods?.storedPaymentMethods != null ?? false
-
+    if (order && hasSubscriptions(order)) {
+      showStoredPaymentMethods = false
+    }
     const options = {
       locale: order?.language_code ?? locale,
       environment,
