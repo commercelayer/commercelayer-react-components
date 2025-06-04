@@ -254,10 +254,6 @@ export function AdyenPayment({
       paymentStatus?: Order["payment_status"]
     }
   > => {
-    let recurringProcessingModel = "CardOnFile"
-    if (order && hasSubscriptions(order)) {
-      recurringProcessingModel = "Subscription"
-    }
     const url = cleanUrlBy()
     const { type: currentPaymentMethodType } = state.data.paymentMethod
     const shopperIp = await getPublicIP()
