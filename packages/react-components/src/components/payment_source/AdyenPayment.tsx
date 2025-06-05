@@ -37,10 +37,26 @@ interface PaymentMethodsStyle {
   paypal?: PayPalConfiguration["style"]
 }
 
+type PaymentMethodType =
+  | "scheme"
+  | "giftcard"
+  | "paypal"
+  | "applepay"
+  | "googlepay"
+  | (string & {})
+
 /**
  * Configuration options for the Adyen payment component.
  */
 export interface AdyenPaymentConfig {
+  /**
+   * Payment methods to be used for subscriptions.
+   * This is an array of payment method types that are supported for subscription payments.
+   * For example, it can include "scheme" for card payments.
+   * @default all available payment methods
+   * @example ["scheme"]
+   */
+  subscriptionPaymentMethods?: PaymentMethodType[]
   /**
    * Optional CSS class name for the card container.
    */
@@ -115,6 +131,7 @@ export function AdyenPayment({
     giftcardErrorComponent,
     onReady,
     onSelect,
+    subscriptionPaymentMethods,
   } = {
     ...defaultConfig,
     ...config,
@@ -486,6 +503,18 @@ export function AdyenPayment({
        * to avoid showing them when the order has subscriptions
        */
       paymentMethodsResponse.storedPaymentMethods = []
+      /**
+       * Remove scheme payment methods
+       * because they are not supported in subscriptions
+       */
+      paymentMethodsResponse.paymentMethods =
+        subscriptionPaymentMethods != null &&
+        subscriptionPaymentMethods.length > 0
+          ? paymentMethodsResponse.paymentMethods.filter(
+              (pm: { type: "scheme" }) =>
+                subscriptionPaymentMethods.includes(pm.type),
+            )
+          : paymentMethodsResponse.paymentMethods
     }
     const options = {
       locale: order?.language_code ?? locale,
