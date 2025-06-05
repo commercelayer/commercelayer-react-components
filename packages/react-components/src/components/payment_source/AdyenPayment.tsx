@@ -477,7 +477,15 @@ export function AdyenPayment({
       // @ts-expect-error no type
       paymentSource?.payment_methods?.storedPaymentMethods != null ?? false
     if (order && hasSubscriptions(order)) {
+      /**
+       * If the order has subscriptions, we don't show stored payment methods
+       */
       showStoredPaymentMethods = false
+      /**
+       * Need to reset stored payment methods
+       * to avoid showing them when the order has subscriptions
+       */
+      paymentMethodsResponse.storedPaymentMethods = []
     }
     const options = {
       locale: order?.language_code ?? locale,
