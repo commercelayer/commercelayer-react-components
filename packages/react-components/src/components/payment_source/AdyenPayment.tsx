@@ -30,16 +30,33 @@ import PlaceOrderContext from "#context/PlaceOrderContext"
 import OrderContext from "#context/OrderContext"
 import { getPublicIP } from "#utils/getPublicIp"
 import CustomerContext from "#context/CustomerContext"
+import { hasSubscriptions } from "#utils/hasSubscriptions"
 
 interface PaymentMethodsStyle {
   card?: CardConfiguration["styles"]
   paypal?: PayPalConfiguration["style"]
 }
 
+type PaymentMethodType =
+  | "scheme"
+  | "giftcard"
+  | "paypal"
+  | "applepay"
+  | "googlepay"
+  | (string & {})
+
 /**
  * Configuration options for the Adyen payment component.
  */
 export interface AdyenPaymentConfig {
+  /**
+   * Payment methods to be used for subscriptions.
+   * This is an array of payment method types that are supported for subscription payments.
+   * For example, it can include "scheme" for card payments.
+   * @default all available payment methods
+   * @example ["scheme"]
+   */
+  subscriptionPaymentMethods?: PaymentMethodType[]
   /**
    * Optional CSS class name for the card container.
    */
@@ -114,6 +131,7 @@ export function AdyenPayment({
     giftcardErrorComponent,
     onReady,
     onSelect,
+    subscriptionPaymentMethods,
   } = {
     ...defaultConfig,
     ...config,
@@ -256,7 +274,6 @@ export function AdyenPayment({
         redirect_from_issuer_method: "GET",
         shopper_ip: shopperIp,
         shopperInteraction: "Ecommerce",
-        recurringProcessingModel: "CardOnFile",
         browser_info: {
           ...browserInfo(),
         },
@@ -454,7 +471,7 @@ export function AdyenPayment({
     }
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Infinite loop
   useEffect(() => {
     const paymentMethodsResponse = {
       // @ts-expect-error no type
@@ -473,10 +490,32 @@ export function AdyenPayment({
         "Payment methods are not available. Please, check your Adyen configuration.",
       )
     }
-    const showStoredPaymentMethods =
+    let showStoredPaymentMethods =
       // @ts-expect-error no type
       paymentSource?.payment_methods?.storedPaymentMethods != null ?? false
-
+    if (order && hasSubscriptions(order)) {
+      /**
+       * If the order has subscriptions, we don't show stored payment methods
+       */
+      showStoredPaymentMethods = false
+      /**
+       * Need to reset stored payment methods
+       * to avoid showing them when the order has subscriptions
+       */
+      paymentMethodsResponse.storedPaymentMethods = []
+      /**
+       * Remove scheme payment methods
+       * because they are not supported in subscriptions
+       */
+      paymentMethodsResponse.paymentMethods =
+        subscriptionPaymentMethods != null &&
+        subscriptionPaymentMethods.length > 0
+          ? paymentMethodsResponse.paymentMethods.filter(
+              (pm: { type: PaymentMethodType }) =>
+                subscriptionPaymentMethods.includes(pm.type),
+            )
+          : paymentMethodsResponse.paymentMethods
+    }
     const options = {
       locale: order?.language_code ?? locale,
       environment,
