@@ -471,7 +471,7 @@ export function AdyenPayment({
     }
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Infite loop
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Infinite loop
   useEffect(() => {
     const paymentMethodsResponse = {
       // @ts-expect-error no type
@@ -511,7 +511,7 @@ export function AdyenPayment({
         subscriptionPaymentMethods != null &&
         subscriptionPaymentMethods.length > 0
           ? paymentMethodsResponse.paymentMethods.filter(
-              (pm: { type: "scheme" }) =>
+              (pm: { type: PaymentMethodType }) =>
                 subscriptionPaymentMethods.includes(pm.type),
             )
           : paymentMethodsResponse.paymentMethods
