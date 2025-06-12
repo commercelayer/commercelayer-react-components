@@ -332,13 +332,51 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         })
       }
     }
-  }, [options?.checkoutCom, paymentType, order?.payment_source?.id])
+    if (
+      paymentType === "checkout_com_payments" &&
+      order?.status &&
+      status &&
+      ["pending"].includes(order?.status) &&
+      ["placing"].includes(status) &&
+      autoPlaceOrder
+    ) {
+      /**
+       * Place order with Checkout.com using express payments
+       */
+      const paymentSourceStatus =
+        // @ts-expect-error no type
+        order?.payment_source?.payment_response?.status.toLowerCase()
+      if (["captured", "authorized"].includes(paymentSourceStatus)) {
+        setPlaceOrder?.({
+          paymentSource,
+        }).then((placed) => {
+          if (placed?.placed) {
+            onClick?.(placed)
+            setPlaceOrderStatus?.({ status: "placing" })
+          } else {
+            setPlaceOrderStatus?.({ status: "standby" })
+          }
+        })
+      }
+    }
+  }, [options?.checkoutCom, paymentType, order?.payment_source?.id, status])
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     if (ref?.current != null && setButtonRef != null) {
       setButtonRef(ref)
     }
   }, [ref])
+  useEffect(() => {
+    switch (status) {
+      case "disabled":
+      case "placing":
+        setNotPermitted(true)
+        break
+      default:
+        setNotPermitted(false)
+        break
+    }
+  }, [status])
   const handleClick = async (
     e?: MouseEvent<HTMLButtonElement>,
   ): Promise<void> => {

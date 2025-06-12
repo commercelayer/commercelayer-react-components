@@ -44,6 +44,8 @@ export interface PlaceOrderOptions {
   }
 }
 
+type PlaceOrderStatus = "placing" | "standby" | "disabled"
+
 export interface PlaceOrderActionPayload {
   errors: BaseError[]
   isPermitted: boolean
@@ -53,7 +55,7 @@ export interface PlaceOrderActionPayload {
   paymentSource: PaymentSourceType
   options?: PlaceOrderOptions
   placeOrderButtonRef?: RefObject<HTMLButtonElement | null>
-  status: "placing" | "standby"
+  status: PlaceOrderStatus
 }
 
 export function setButtonRef(
@@ -327,7 +329,7 @@ export function setPlaceOrderStatus({
   status,
   dispatch,
 }: {
-  status: "placing" | "standby"
+  status: PlaceOrderStatus
   dispatch?: Dispatch<PlaceOrderAction>
 }): void {
   if (dispatch != null) {
