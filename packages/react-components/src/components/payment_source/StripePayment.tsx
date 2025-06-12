@@ -17,6 +17,7 @@ import { setCustomerOrderParam } from "#utils/localStorage"
 import OrderContext from "#context/OrderContext"
 import { StripeExpressPayment } from "./StripeExpressPayment"
 import useCommerceLayer from "#hooks/useCommerceLayer"
+import PlaceOrderContext from "#context/PlaceOrderContext"
 
 export interface StripeConfig {
   containerClassName?: string
@@ -68,6 +69,7 @@ function StripePaymentForm({
     useContext(PaymentMethodContext)
   const { order, setOrderErrors } = useContext(OrderContext)
   const { sdkClient } = useCommerceLayer()
+  const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
   const elements = useElements()
   // biome-ignore lint/correctness/useExhaustiveDependencies: Avoid rerendering the form
   useEffect(() => {
@@ -166,6 +168,9 @@ function StripePaymentForm({
             message: "Draft order cannot be placed",
           },
         ])
+        setPlaceOrderStatus?.({
+          status: "disabled",
+        })
         return
       }
     }
@@ -231,6 +236,9 @@ export function StripePayment({
           if (res != null) {
             setStripe(res)
             setIsLoaded(true)
+          } else {
+            console.error("Stripe failed to load")
+            setIsLoaded(false)
           }
         }
         getStripe()

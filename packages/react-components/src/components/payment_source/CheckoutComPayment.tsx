@@ -8,6 +8,7 @@ import { jwt } from "#utils/jwt"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import { setCustomerOrderParam } from "#utils/localStorage"
+import PlaceOrderContext from "#context/PlaceOrderContext"
 
 const scriptUrl = "https://checkout-web-components.checkout.com/index.js"
 
@@ -110,7 +111,7 @@ export function CheckoutComPayment({
   const { setPaymentRef, setPaymentSource } = useContext(PaymentMethodContext)
   const { accessToken } = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
-  // const { setPlaceOrder } = useContext(PlaceOrderContext)
+  const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
   const {
     containerClassName,
     templateCustomerSaveToWallet,
@@ -192,21 +193,21 @@ export function CheckoutComPayment({
             onError: (component, error) => {
               console.error("onError", { error }, "Component", component.type)
             },
-            onPaymentCompleted: async (component, paymentResponse) => {
-              console.log("onPaymentCompleted -----", {
-                paymentResponse,
-                component,
-                ps,
-              })
-              // const paymentSource = await setPaymentSource({
-              //   paymentSourceId: ps.id,
-              //   paymentResource: "checkout_com_payments",
-              //   attributes: {
-              //     token: paymentResponse.id,
-              //     _authorize: true,
-              //   },
-              // })
-              // console.log("paymentSource", { paymentSource })
+            onPaymentCompleted: async (_component, paymentResponse) => {
+              if (paymentResponse.status.toLowerCase() === "approved") {
+                const paymentSource = await setPaymentSource({
+                  paymentSourceId: ps.id,
+                  paymentResource: "checkout_com_payments",
+                  attributes: {
+                    token: paymentResponse.id,
+                    _authorize: true,
+                  },
+                })
+                setPlaceOrderStatus?.({
+                  status: "placing",
+                })
+                console.log("Payment source set", paymentSource)
+              }
             },
           } satisfies CheckoutWebComponent)
           const flowComponent = checkout.create("flow")
