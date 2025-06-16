@@ -206,7 +206,6 @@ export function CheckoutComPayment({
                 setPlaceOrderStatus?.({
                   status: "placing",
                 })
-                console.log("Payment source set", paymentSource)
               }
             },
           } satisfies CheckoutWebComponent)
