@@ -1,29 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import PaymentMethodContext, {
-  defaultPaymentMethodContext
-} from '#context/PaymentMethodContext'
+  defaultPaymentMethodContext,
+} from "#context/PaymentMethodContext"
 import {
   type ReactNode,
   useContext,
   useEffect,
   useReducer,
   useMemo,
-  type JSX
-} from 'react'
+  type JSX,
+} from "react"
 import paymentMethodReducer, {
   paymentMethodInitialState,
   getPaymentMethods,
   type PaymentMethodConfig,
   setPaymentMethodConfig,
   type PaymentRef,
-  setPaymentRef
-} from '#reducers/PaymentMethodReducer'
-import OrderContext from '#context/OrderContext'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import type { BaseError } from '#typings/errors'
-import useCustomContext from '#utils/hooks/useCustomContext'
-import { isEmpty } from '#utils/isEmpty'
-import { setCustomerOrderParam } from '#utils/localStorage'
+  setPaymentRef,
+} from "#reducers/PaymentMethodReducer"
+import OrderContext from "#context/OrderContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import type { BaseError } from "#typings/errors"
+import useCustomContext from "#utils/hooks/useCustomContext"
+import { isEmpty } from "#utils/isEmpty"
+import { setCustomerOrderParam } from "#utils/localStorage"
 
 interface Props {
   children: ReactNode
@@ -33,7 +33,7 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
   const { children, config } = props
   const [state, dispatch] = useReducer(
     paymentMethodReducer,
-    paymentMethodInitialState
+    paymentMethodInitialState,
   )
   const {
     order,
@@ -42,27 +42,27 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     include,
     addResourceToInclude,
     updateOrder,
-    includeLoaded
+    includeLoaded,
   } = useCustomContext({
     context: OrderContext,
-    contextComponentName: 'OrderContainer',
-    currentComponentName: 'PaymentMethodsContainer',
-    key: 'order'
+    contextComponentName: "OrderContainer",
+    currentComponentName: "PaymentMethodsContainer",
+    key: "order",
   })
   const credentials = useContext(CommerceLayerContext)
   async function getPayMethods(): Promise<void> {
     order && (await getPaymentMethods({ order, dispatch }))
   }
   useEffect(() => {
-    if (!include?.includes('available_payment_methods')) {
+    if (!include?.includes("available_payment_methods")) {
       addResourceToInclude({
         newResource: [
-          'available_payment_methods',
-          'payment_source',
-          'payment_method',
-          'line_items.line_item_options.sku_option',
-          'line_items.item'
-        ]
+          "available_payment_methods",
+          "payment_source",
+          "payment_method",
+          "line_items.line_item_options.sku_option",
+          "line_items.item",
+        ],
       })
     } else if (!includeLoaded?.available_payment_methods) {
       addResourceToInclude({
@@ -70,9 +70,9 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
           available_payment_methods: true,
           payment_source: true,
           payment_method: true,
-          'line_items.line_item_options.sku_option': true,
-          'line_items.item': true
-        }
+          "line_items.line_item_options.sku_option": true,
+          "line_items.item": true,
+        },
       })
     }
     if (config && isEmpty(state.config))
@@ -82,27 +82,28 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     }
     if (order?.payment_source) {
       dispatch({
-        type: 'setPaymentSource',
+        type: "setPaymentSource",
         payload: {
-          paymentSource: order?.payment_source
-        }
+          paymentSource: order?.payment_source,
+        },
       })
     }
     if (order?.payment_source === null) {
       // Reset save customer payment source to wallet param if the payment source is null
-      setCustomerOrderParam('_save_payment_source_to_customer_wallet', 'false')
+      setCustomerOrderParam("_save_payment_source_to_customer_wallet", "false")
       dispatch({
-        type: 'setPaymentSource',
+        type: "setPaymentSource",
         payload: {
-          paymentSource: undefined
-        }
+          paymentSource: undefined,
+        },
       })
     }
   }, [
     order,
+    order?.payment_source,
     credentials,
     include?.length,
-    Object.keys(includeLoaded ?? []).length
+    Object.keys(includeLoaded ?? []).length,
   ])
   const contextValue = useMemo(() => {
     return {
@@ -123,7 +124,7 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
           updateOrder,
           order,
           dispatch,
-          setOrderErrors
+          setOrderErrors,
         }),
       setPaymentSource: async (args: any) =>
         await defaultPaymentMethodContext.setPaymentSource({
@@ -133,13 +134,13 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
           dispatch,
           getOrder,
           updateOrder,
-          order
+          order,
         }),
       updatePaymentSource: async (args: any) => {
         await defaultPaymentMethodContext.updatePaymentSource({
           ...args,
           config: credentials,
-          dispatch
+          dispatch,
         })
       },
       destroyPaymentSource: async (args: any) => {
@@ -148,9 +149,9 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
           dispatch,
           config: credentials,
           updateOrder,
-          orderId: order?.id
+          orderId: order?.id,
         })
-      }
+      },
     }
   }, [state])
   return (
