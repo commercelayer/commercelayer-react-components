@@ -195,7 +195,7 @@ export function CheckoutComPayment({
             },
             onPaymentCompleted: async (_component, paymentResponse) => {
               if (paymentResponse.status.toLowerCase() === "approved") {
-                const paymentSource = await setPaymentSource({
+                await setPaymentSource({
                   paymentSourceId: ps.id,
                   paymentResource: "checkout_com_payments",
                   attributes: {
