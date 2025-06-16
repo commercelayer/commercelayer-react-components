@@ -80,14 +80,6 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     if (credentials && order && !state.paymentMethods) {
       getPayMethods()
     }
-    if (order?.payment_source) {
-      dispatch({
-        type: "setPaymentSource",
-        payload: {
-          paymentSource: order?.payment_source,
-        },
-      })
-    }
     if (order?.payment_source === null) {
       // Reset save customer payment source to wallet param if the payment source is null
       setCustomerOrderParam("_save_payment_source_to_customer_wallet", "false")
@@ -98,9 +90,16 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
         },
       })
     }
+    if (
+      order?.id &&
+      order?.payment_source == null &&
+      !["draft", "pending"].includes(order?.status) &&
+      !state.paymentMethods
+    ) {
+      getOrder(order.id)
+    }
   }, [
     order,
-    order?.payment_source,
     credentials,
     include?.length,
     Object.keys(includeLoaded ?? []).length,
