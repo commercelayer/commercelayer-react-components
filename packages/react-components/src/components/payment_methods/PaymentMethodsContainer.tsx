@@ -105,7 +105,6 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     }
   }, [
     order,
-    order?.payment_source,
     credentials,
     include?.length,
     Object.keys(includeLoaded ?? []).length,
