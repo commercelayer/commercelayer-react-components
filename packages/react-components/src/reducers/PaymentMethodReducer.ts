@@ -370,6 +370,7 @@ export async function setPaymentSource({
       resource: "payment_methods",
       field: paymentResource,
     })
+    console.error("Set payment source:", errors)
     if (errors != null && errors?.length > 0) {
       const expiredErrors = errors.filter((v) => v?.meta?.error === "expired")
       if (expiredErrors.length > 0 && order && config) {
