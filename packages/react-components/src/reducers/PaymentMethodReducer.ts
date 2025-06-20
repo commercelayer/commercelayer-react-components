@@ -355,6 +355,7 @@ export async function setPaymentSource({
       resource: "payment_methods",
       field: paymentResource,
     })
+    console.error("Set payment source:", errors)
     if (errors != null && errors?.length > 0) {
       const [error] = errors
       if (error?.status === "401" && getOrder != null && order != null) {
@@ -370,6 +371,12 @@ export async function setPaymentSource({
             dispatch,
           })
         }
+      } else {
+        setErrors({
+          currentErrors,
+          newErrors: errors,
+          dispatch,
+        })
       }
     } else {
       setErrors({

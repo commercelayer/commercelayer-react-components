@@ -17,6 +17,7 @@ import { setCustomerOrderParam } from "#utils/localStorage"
 import OrderContext from "#context/OrderContext"
 import { StripeExpressPayment } from "./StripeExpressPayment"
 import useCommerceLayer from "#hooks/useCommerceLayer"
+import PlaceOrderContext from "#context/PlaceOrderContext"
 
 export interface StripeConfig {
   containerClassName?: string
@@ -68,6 +69,7 @@ function StripePaymentForm({
     useContext(PaymentMethodContext)
   const { order, setOrderErrors } = useContext(OrderContext)
   const { sdkClient } = useCommerceLayer()
+  const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
   const elements = useElements()
   // biome-ignore lint/correctness/useExhaustiveDependencies: Avoid rerendering the form
   useEffect(() => {
@@ -91,7 +93,29 @@ function StripePaymentForm({
     elements,
   }: OnSubmitArgs): Promise<boolean> => {
     if (!stripe) return false
-
+    const sdk = sdkClient()
+    if (sdk == null) return false
+    if (order == null) return false
+    const { status } = await sdk.orders.retrieve(order?.id, {
+      fields: ["status"],
+    })
+    const isDraftOrder = status === "draft"
+    if (isDraftOrder) {
+      /**
+       * Draft order cannot be placed
+       */
+      setOrderErrors([
+        {
+          code: "VALIDATION_ERROR",
+          resource: "orders",
+          message: "Draft order cannot be placed",
+        },
+      ])
+      setPlaceOrderStatus?.({
+        status: "disabled",
+      })
+      return false
+    }
     const savePaymentSourceToCustomerWallet: string =
       // @ts-expect-error no type
       event?.elements?.save_payment_source_to_customer_wallet?.checked
@@ -146,8 +170,12 @@ function StripePaymentForm({
   }
 
   async function handleChange(event: StripePaymentElementChangeEvent) {
+    console.debug("StripePaymentElement onChange event", { event })
     // Handle change events from the PaymentElement
-    if (event.complete) {
+    if (
+      event.complete &&
+      ["applepay", "googlepay"].includes(event.value.type)
+    ) {
       const sdk = sdkClient()
       if (sdk == null) return
       if (order == null) return
@@ -166,6 +194,9 @@ function StripePaymentForm({
             message: "Draft order cannot be placed",
           },
         ])
+        setPlaceOrderStatus?.({
+          status: "disabled",
+        })
         return
       }
     }
@@ -231,6 +262,9 @@ export function StripePayment({
           if (res != null) {
             setStripe(res)
             setIsLoaded(true)
+          } else {
+            console.error("Stripe failed to load")
+            setIsLoaded(false)
           }
         }
         getStripe()
