@@ -19,6 +19,7 @@ import type { DefaultChildrenType } from "#typings/globals"
 import OrderContext from "#context/OrderContext"
 import CustomerContext from "#context/CustomerContext"
 import {
+  getCkoAttributes,
   getExternalPaymentAttributes,
   getPaypalAttributes,
 } from "#utils/getPaymentAttributes"
@@ -162,6 +163,12 @@ export function PaymentMethod({
                   paymentResource,
                   config,
                 )
+              }
+              if (
+                config != null &&
+                paymentResource === "checkout_com_payments"
+              ) {
+                attributes = getCkoAttributes(paymentResource, config)
               }
               const ps = await setPaymentSource({
                 paymentResource,
