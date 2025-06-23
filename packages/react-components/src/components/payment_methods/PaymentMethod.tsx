@@ -1,31 +1,31 @@
-import {
-  useState,
-  useEffect,
-  type MouseEvent,
-  useContext,
-  type JSX,
-} from "react"
-import PaymentMethodContext from "#context/PaymentMethodContext"
-import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
-import type { LoaderType } from "#typings"
-import getLoaderComponent from "#utils/getLoaderComponent"
 import type {
   Order,
   PaymentMethod as PaymentMethodType,
 } from "@commercelayer/sdk"
-import type { PaymentResource } from "#reducers/PaymentMethodReducer"
-import useCustomContext from "#utils/hooks/useCustomContext"
-import type { DefaultChildrenType } from "#typings/globals"
-import OrderContext from "#context/OrderContext"
+import {
+  type JSX,
+  type MouseEvent,
+  useContext,
+  useEffect,
+  useState,
+} from "react"
 import CustomerContext from "#context/CustomerContext"
+import OrderContext from "#context/OrderContext"
+import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import PlaceOrderContext from "#context/PlaceOrderContext"
+import type { PaymentResource } from "#reducers/PaymentMethodReducer"
+import type { LoaderType } from "#typings"
+import type { DefaultChildrenType } from "#typings/globals"
+import { getAvailableExpressPayments } from "#utils/expressPaymentHelper"
+import getLoaderComponent from "#utils/getLoaderComponent"
 import {
   getCkoAttributes,
   getExternalPaymentAttributes,
   getPaypalAttributes,
 } from "#utils/getPaymentAttributes"
+import useCustomContext from "#utils/hooks/useCustomContext"
 import { isEmpty } from "#utils/isEmpty"
-import { getAvailableExpressPayments } from "#utils/expressPaymentHelper"
-import PlaceOrderContext from "#context/PlaceOrderContext"
 import { sortPaymentMethods } from "#utils/payment-methods/sortPaymentMethods"
 
 export interface PaymentMethodOnClickParams {
@@ -48,6 +48,11 @@ type Props = {
    * Customize the loader component
    */
   loader?: LoaderType
+  /**
+   * Show loader while fetching payment methods
+   * @default undefined
+   */
+  showLoader?: boolean
   /**
    * Auto select the payment method when there is only one available
    */
@@ -82,6 +87,7 @@ export function PaymentMethod({
   clickableContainer,
   autoSelectSinglePaymentMethod,
   expressPayments,
+  showLoader,
   hide,
   onClick,
   sortBy,
@@ -98,6 +104,7 @@ export function PaymentMethod({
     paymentSource,
     setPaymentSource,
     config,
+    errors,
   } = useCustomContext({
     context: PaymentMethodContext,
     contextComponentName: "PaymentMethodsContainer",
@@ -219,7 +226,18 @@ export function PaymentMethod({
       setPaymentSelected("")
     }
   }, [paymentMethods, currentPaymentMethodId])
-
+  useEffect(() => {
+    console.log("showLoader", { showLoader })
+    // If showLoader is undefined, we don't change the loading
+    if (showLoader !== undefined) {
+      if (showLoader && errors?.length === 0) {
+        console.log("showLoader is true")
+        setLoading(true)
+      } else {
+        setLoading(false)
+      }
+    }
+  }, [showLoader, errors?.length])
   const sortedPaymentMethods =
     paymentMethods != null && sortBy != null
       ? sortPaymentMethods(paymentMethods, sortBy)
