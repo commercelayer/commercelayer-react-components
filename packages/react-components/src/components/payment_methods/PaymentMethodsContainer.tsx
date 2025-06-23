@@ -1,32 +1,37 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import PaymentMethodContext, {
-  defaultPaymentMethodContext,
-} from "#context/PaymentMethodContext"
 import {
+  type JSX,
   type ReactNode,
   useContext,
   useEffect,
-  useReducer,
   useMemo,
-  type JSX,
+  useReducer,
 } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
+import PaymentMethodContext, {
+  defaultPaymentMethodContext,
+} from "#context/PaymentMethodContext"
 import paymentMethodReducer, {
-  paymentMethodInitialState,
   getPaymentMethods,
   type PaymentMethodConfig,
-  setPaymentMethodConfig,
   type PaymentRef,
+  paymentMethodInitialState,
+  setPaymentMethodConfig,
   setPaymentRef,
 } from "#reducers/PaymentMethodReducer"
-import OrderContext from "#context/OrderContext"
-import CommerceLayerContext from "#context/CommerceLayerContext"
 import type { BaseError } from "#typings/errors"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import { isEmpty } from "#utils/isEmpty"
 import { setCustomerOrderParam } from "#utils/localStorage"
 
 interface Props {
+  /**
+   * The children components to render inside the PaymentMethodsContainer.
+   */
   children: ReactNode
+  /**
+   * Optional configuration for payment methods.
+   */
   config?: PaymentMethodConfig
 }
 export function PaymentMethodsContainer(props: Props): JSX.Element {
