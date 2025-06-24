@@ -132,7 +132,11 @@ export function PaymentMethod({
           if (ps && paymentMethod && onClick != null) {
             onClick({ payment: paymentMethod, order, paymentSource: ps })
             setTimeout(() => {
-              setLoading(false)
+              if (showLoader) {
+                setLoading(showLoader)
+              } else {
+                setLoading(false)
+              }
             }, 200)
           }
           setLoadingPlaceOrder({ loading: false })
@@ -186,7 +190,11 @@ export function PaymentMethod({
                 setPaymentSourceCreated(true)
                 onClick({ payment: paymentMethod, order, paymentSource: ps })
                 setTimeout(() => {
-                  setLoading(false)
+                  if (showLoader) {
+                    setLoading(showLoader)
+                  } else {
+                    setLoading(false)
+                  }
                 }, 200)
               }
               if (getCustomerPaymentSources) {
@@ -199,7 +207,11 @@ export function PaymentMethod({
             }
           } else {
             setTimeout(() => {
-              setLoading(false)
+              if (showLoader) {
+                setLoading(showLoader)
+              } else {
+                setLoading(false)
+              }
             }, 200)
           }
         }
@@ -213,11 +225,19 @@ export function PaymentMethod({
       if (isSingle && autoSelectSinglePaymentMethod) {
         if (paymentSource) {
           setTimeout(() => {
-            setLoading(false)
+            if (showLoader) {
+              setLoading(showLoader)
+            } else {
+              setLoading(false)
+            }
           }, 200)
         }
       } else {
-        setLoading(false)
+        if (showLoader) {
+          setLoading(showLoader)
+        } else {
+          setLoading(false)
+        }
       }
     }
     if (currentPaymentMethodId) setPaymentSelected(currentPaymentMethodId)
