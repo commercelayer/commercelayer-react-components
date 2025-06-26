@@ -1,23 +1,23 @@
+import type { Order } from "@commercelayer/sdk"
+import isFunction from "lodash/isFunction"
 import {
+  type JSX,
+  type MouseEvent,
   type ReactNode,
   useContext,
   useEffect,
   useRef,
   useState,
-  type MouseEvent,
-  type JSX,
 } from "react"
-import Parent from "../utils/Parent"
-import type { ChildrenFunction } from "#typings/index"
-import PlaceOrderContext from "#context/PlaceOrderContext"
-import isFunction from "lodash/isFunction"
-import PaymentMethodContext from "#context/PaymentMethodContext"
 import OrderContext from "#context/OrderContext"
-import getCardDetails from "#utils/getCardDetails"
-import type { BaseError } from "#typings/errors"
-import type { Order } from "@commercelayer/sdk"
-import { checkPaymentIntent } from "#utils/stripe/retrievePaymentIntent"
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import PlaceOrderContext from "#context/PlaceOrderContext"
 import useCommerceLayer from "#hooks/useCommerceLayer"
+import type { BaseError } from "#typings/errors"
+import type { ChildrenFunction } from "#typings/index"
+import getCardDetails from "#utils/getCardDetails"
+import { checkPaymentIntent } from "#utils/stripe/retrievePaymentIntent"
+import Parent from "../utils/Parent"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   /**
@@ -291,7 +291,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       })
     }
   }, [order, order?.payment_status, order?.status, paymentType, onClick])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     // Checkout.com redirect flow
     if (
@@ -303,8 +302,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     ) {
       // @ts-expect-error no type
       const paymentResponse = order?.payment_source?.payment_response
-      const paymentStatus = paymentResponse?.status?.toLowerCase()
-      if (paymentStatus === "pending") {
+      const paymentStatus = paymentResponse?.status
+      if (paymentStatus && paymentStatus.toLowerCase() === "pending") {
         setPaymentSource({
           paymentSourceId: paymentSource?.id,
           paymentResource: "checkout_com_payments",
@@ -314,7 +313,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         }).then((res) => {
           // @ts-expect-error no type
           const paymentStatus: string = res?.payment_response?.status
-          if (paymentStatus.toLowerCase() === "authorized") {
+          if (paymentStatus && paymentStatus.toLowerCase() === "authorized") {
             handleClick()
           } else {
             if (options?.checkoutCom) {
@@ -345,8 +344,11 @@ export function PlaceOrderButton(props: Props): JSX.Element {
        */
       const paymentSourceStatus =
         // @ts-expect-error no type
-        order?.payment_source?.payment_response?.status.toLowerCase()
-      if (["captured", "authorized"].includes(paymentSourceStatus)) {
+        order?.payment_source?.payment_response?.status
+      if (
+        paymentSourceStatus &&
+        ["captured", "authorized"].includes(paymentSourceStatus.toLowerCase())
+      ) {
         setPlaceOrder?.({
           paymentSource,
         }).then((placed) => {
@@ -360,7 +362,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       }
     }
   }, [options?.checkoutCom, paymentType, order?.payment_source?.id, status])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     if (ref?.current != null && setButtonRef != null) {
       setButtonRef(ref)
@@ -476,6 +477,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     } else if (
       currentPaymentMethodRef?.current?.onsubmit &&
       options?.checkoutCom?.session_id &&
+      // @ts-expect-error no type
+      checkPaymentSource?.payment_response?.status &&
       // @ts-expect-error no type
       checkPaymentSource?.payment_response?.status?.toLowerCase() === "declined"
     ) {

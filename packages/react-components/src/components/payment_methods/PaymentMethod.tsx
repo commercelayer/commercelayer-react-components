@@ -114,6 +114,9 @@ export function PaymentMethod({
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
   const { status } = useContext(PlaceOrderContext)
+  console.log("PaymentMethod", {
+    errors,
+  })
   useEffect(() => {
     if (paymentMethods != null && !isEmpty(paymentMethods) && expressPayments) {
       const [paymentMethod] = getAvailableExpressPayments(paymentMethods)
@@ -132,7 +135,7 @@ export function PaymentMethod({
           if (ps && paymentMethod && onClick != null) {
             onClick({ payment: paymentMethod, order, paymentSource: ps })
             setTimeout(() => {
-              if (showLoader) {
+              if (showLoader && errors?.length === 0) {
                 setLoading(showLoader)
               } else {
                 setLoading(false)
@@ -144,7 +147,7 @@ export function PaymentMethod({
         selectExpressPayment()
       }
     }
-  }, [!isEmpty(paymentMethods), expressPayments])
+  }, [!isEmpty(paymentMethods), expressPayments, errors?.length])
   useEffect(() => {
     if (
       paymentMethods != null &&
@@ -190,7 +193,7 @@ export function PaymentMethod({
                 setPaymentSourceCreated(true)
                 onClick({ payment: paymentMethod, order, paymentSource: ps })
                 setTimeout(() => {
-                  if (showLoader) {
+                  if (showLoader && errors?.length === 0) {
                     setLoading(showLoader)
                   } else {
                     setLoading(false)
@@ -207,7 +210,7 @@ export function PaymentMethod({
             }
           } else {
             setTimeout(() => {
-              if (showLoader) {
+              if (showLoader && errors?.length === 0) {
                 setLoading(showLoader)
               } else {
                 setLoading(false)
@@ -218,14 +221,14 @@ export function PaymentMethod({
         autoSelect()
       }
     }
-  }, [!isEmpty(paymentMethods), order?.payment_source != null])
+  }, [!isEmpty(paymentMethods), order?.payment_source != null, errors?.length])
   useEffect(() => {
     if (paymentMethods) {
       const isSingle = paymentMethods.length === 1
       if (isSingle && autoSelectSinglePaymentMethod) {
         if (paymentSource) {
           setTimeout(() => {
-            if (showLoader) {
+            if (showLoader && errors?.length === 0) {
               setLoading(showLoader)
             } else {
               setLoading(false)
@@ -233,7 +236,7 @@ export function PaymentMethod({
           }, 200)
         }
       } else {
-        if (showLoader) {
+        if (showLoader && errors?.length === 0) {
           setLoading(showLoader)
         } else {
           setLoading(false)
@@ -245,19 +248,23 @@ export function PaymentMethod({
       setLoading(true)
       setPaymentSelected("")
     }
-  }, [paymentMethods, currentPaymentMethodId])
+  }, [paymentMethods, currentPaymentMethodId, errors?.length])
   useEffect(() => {
-    console.log("showLoader", { showLoader })
+    // @ts-expect-error no type
+    const status = order?.payment_source?.payment_response?.status
     // If showLoader is undefined, we don't change the loading
     if (showLoader !== undefined) {
-      if (showLoader && errors?.length === 0) {
-        console.log("showLoader is true")
-        setLoading(true)
+      if (showLoader && status) {
+        if (status.toLowerCase() === "declined") {
+          setLoading(false)
+        } else {
+          setLoading(true)
+        }
       } else {
         setLoading(false)
       }
     }
-  }, [showLoader, errors?.length])
+  }, [showLoader, order?.payment_source])
   const sortedPaymentMethods =
     paymentMethods != null && sortBy != null
       ? sortPaymentMethods(paymentMethods, sortBy)
