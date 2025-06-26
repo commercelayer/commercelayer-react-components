@@ -20,6 +20,11 @@ import type { PaymentSourceProps } from "./PaymentSource"
 import { StripeExpressPayment } from "./StripeExpressPayment"
 import useCommerceLayer from "#hooks/useCommerceLayer"
 import PlaceOrderContext from "#context/PlaceOrderContext"
+import useCommerceLayer from "#hooks/useCommerceLayer"
+import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
+import { setCustomerOrderParam } from "#utils/localStorage"
+import type { PaymentSourceProps } from "./PaymentSource"
+import { StripeExpressPayment } from "./StripeExpressPayment"
 
 export interface StripeConfig {
   containerClassName?: string
@@ -79,7 +84,6 @@ function StripePaymentForm({
   const { sdkClient } = useCommerceLayer()
   const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
   const elements = useElements()
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Avoid rerendering the form
   useEffect(() => {
     if (ref.current && stripe && elements) {
       ref.current.onsubmit = async () => {
@@ -268,7 +272,6 @@ export function StripePayment({
     appearance,
     ...divProps
   } = p
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Avoid refreshing the stripe object
   useEffect(() => {
     if (show && publishableKey) {
       import("@stripe/stripe-js").then(({ loadStripe }) => {
