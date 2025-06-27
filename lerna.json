@@ -2,7 +2,7 @@
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "useNx": false,
   "npmClient": "pnpm",
-  "version": "4.25.1-beta.0",
+  "version": "4.25.1",
   "command": {
     "version": {
       "preid": "beta"
