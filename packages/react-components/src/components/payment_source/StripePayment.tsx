@@ -1,5 +1,3 @@
-import { useContext, useEffect, useRef, useState, type JSX } from "react"
-import PaymentMethodContext from "#context/PaymentMethodContext"
 import { Elements, PaymentElement, useElements } from "@stripe/react-stripe-js"
 import type {
   Stripe,
@@ -10,14 +8,16 @@ import type {
   StripePaymentElementChangeEvent,
   StripePaymentElementOptions,
 } from "@stripe/stripe-js"
-import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
-import type { PaymentSourceProps } from "./PaymentSource"
+import { type JSX, useContext, useEffect, useRef, useState } from "react"
 import Parent from "#components/utils/Parent"
-import { setCustomerOrderParam } from "#utils/localStorage"
 import OrderContext from "#context/OrderContext"
-import { StripeExpressPayment } from "./StripeExpressPayment"
-import useCommerceLayer from "#hooks/useCommerceLayer"
+import PaymentMethodContext from "#context/PaymentMethodContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
+import useCommerceLayer from "#hooks/useCommerceLayer"
+import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
+import { setCustomerOrderParam } from "#utils/localStorage"
+import type { PaymentSourceProps } from "./PaymentSource"
+import { StripeExpressPayment } from "./StripeExpressPayment"
 
 export interface StripeConfig {
   containerClassName?: string
@@ -59,6 +59,8 @@ const defaultAppearance: StripeElementsOptions["appearance"] = {
   },
 }
 
+let selectedPaymentMethodType: string | null = null
+
 function StripePaymentForm({
   options = defaultOptions,
   templateCustomerSaveToWallet,
@@ -71,7 +73,6 @@ function StripePaymentForm({
   const { sdkClient } = useCommerceLayer()
   const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
   const elements = useElements()
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Avoid rerendering the form
   useEffect(() => {
     if (ref.current && stripe && elements) {
       ref.current.onsubmit = async () => {
@@ -96,25 +97,30 @@ function StripePaymentForm({
     const sdk = sdkClient()
     if (sdk == null) return false
     if (order == null) return false
-    const { status } = await sdk.orders.retrieve(order?.id, {
-      fields: ["status"],
-    })
-    const isDraftOrder = status === "draft"
-    if (isDraftOrder) {
-      /**
-       * Draft order cannot be placed
-       */
-      setOrderErrors([
-        {
-          code: "VALIDATION_ERROR",
-          resource: "orders",
-          message: "Draft order cannot be placed",
-        },
-      ])
-      setPlaceOrderStatus?.({
-        status: "disabled",
+    if (
+      selectedPaymentMethodType &&
+      !["apple_pay", "google_pay"].includes(selectedPaymentMethodType)
+    ) {
+      const { status } = await sdk.orders.retrieve(order?.id, {
+        fields: ["status"],
       })
-      return false
+      const isDraftOrder = status === "draft"
+      if (isDraftOrder) {
+        /**
+         * Draft order cannot be placed
+         */
+        setOrderErrors([
+          {
+            code: "VALIDATION_ERROR",
+            resource: "orders",
+            message: "Draft order cannot be placed",
+          },
+        ])
+        setPlaceOrderStatus?.({
+          status: "disabled",
+        })
+        return false
+      }
     }
     const savePaymentSourceToCustomerWallet: string =
       // @ts-expect-error no type
@@ -171,10 +177,11 @@ function StripePaymentForm({
 
   async function handleChange(event: StripePaymentElementChangeEvent) {
     console.debug("StripePaymentElement onChange event", { event })
+    selectedPaymentMethodType = event.value.type
     // Handle change events from the PaymentElement
     if (
       event.complete &&
-      ["applepay", "googlepay"].includes(event.value.type)
+      ["apple_pay", "google_pay"].includes(event.value.type)
     ) {
       const sdk = sdkClient()
       if (sdk == null) return
@@ -249,7 +256,6 @@ export function StripePayment({
     appearance,
     ...divProps
   } = p
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Avoid refreshing the stripe object
   useEffect(() => {
     if (show && publishableKey) {
       import("@stripe/stripe-js").then(({ loadStripe }) => {
