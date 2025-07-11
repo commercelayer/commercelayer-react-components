@@ -1,25 +1,25 @@
-import baseReducer from '#utils/baseReducer'
-import type { Dispatch } from 'react'
-import type { CodeErrorType, BaseError } from '#typings/errors'
-import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import type { OrderUpdate, Address, Order } from '@commercelayer/sdk'
-import getSdk from '#utils/getSdk'
-import type { updateOrder } from './OrderReducer'
-import camelCase from 'lodash/camelCase'
-import type { TCustomerAddress } from './CustomerReducer'
-import type { TResourceError } from '#components/errors/Errors'
+import type { Address, Order, OrderUpdate } from "@commercelayer/sdk"
+import camelCase from "lodash/camelCase"
+import type { Dispatch } from "react"
+import type { TResourceError } from "#components/errors/Errors"
+import type { AddressValuesKeys } from "#context/BillingAddressFormContext"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
+import type { BaseError, CodeErrorType } from "#typings/errors"
+import type { AddressInputName } from "#typings/index"
 import {
   invertedAddressesHandler,
-  sanitizeMetadataFields
-} from '#utils/addressesManager'
-import { formCleaner } from '#utils/formCleaner'
-import type { AddressValuesKeys } from '#context/BillingAddressFormContext'
-import type { AddressInputName } from '#typings/index'
+  sanitizeMetadataFields,
+} from "#utils/addressesManager"
+import baseReducer from "#utils/baseReducer"
+import { formCleaner } from "#utils/formCleaner"
+import getSdk from "#utils/getSdk"
+import type { TCustomerAddress } from "./CustomerReducer"
+import type { updateOrder } from "./OrderReducer"
 
 // TODO: Move in the future
 export type CustomFieldMessageError = (props: {
   field: Extract<AddressValuesKeys, AddressInputName> | string
-  code?: Extract<CodeErrorType, 'EMPTY_ERROR' | 'VALIDATION_ERROR'> | undefined
+  code?: Extract<CodeErrorType, "EMPTY_ERROR" | "VALIDATION_ERROR"> | undefined
   message?: string | undefined
   value: string
   values?: Record<string, any>
@@ -34,48 +34,48 @@ export type CustomFieldMessageError = (props: {
     }>
 
 export type AddressActionType =
-  | 'setErrors'
-  | 'setAddress'
-  | 'setShipToDifferentAddress'
-  | 'setCloneAddress'
-  | 'cleanup'
+  | "setErrors"
+  | "setAddress"
+  | "setShipToDifferentAddress"
+  | "setCloneAddress"
+  | "cleanup"
 
 export type AddressField =
-  | 'city'
-  | 'company'
-  | 'country_code'
-  | 'first_name'
-  | 'last_name'
-  | 'line_1'
-  | 'line_2'
-  | 'phone'
-  | 'state_code'
-  | 'zip_code'
-  | 'billing_info'
+  | "city"
+  | "company"
+  | "country_code"
+  | "first_name"
+  | "last_name"
+  | "line_1"
+  | "line_2"
+  | "phone"
+  | "state_code"
+  | "zip_code"
+  | "billing_info"
 
-export type AddressFieldView = AddressField | 'full_address' | 'full_name'
+export type AddressFieldView = AddressField | "full_address" | "full_name"
 
 export const addressFields: AddressField[] = [
-  'city',
-  'company',
-  'country_code',
-  'first_name',
-  'last_name',
-  'line_1',
-  'line_2',
-  'phone',
-  'state_code',
-  'zip_code'
+  "city",
+  "company",
+  "country_code",
+  "first_name",
+  "last_name",
+  "line_1",
+  "line_2",
+  "phone",
+  "state_code",
+  "zip_code",
 ]
 
 export type AddressResource = Extract<
   TResourceError,
-  'billing_address' | 'shipping_address'
+  "billing_address" | "shipping_address"
 >
 
 export type AddressSchema = Omit<
   Address,
-  'created_at' | 'updated_at' | 'id' | 'type'
+  "created_at" | "updated_at" | "id" | "type"
 >
 
 export interface AddressActionPayload {
@@ -97,12 +97,12 @@ export interface AddressAction {
 }
 
 export const addressInitialState: AddressState = {
-  errors: []
+  errors: [],
 }
 
 export type SetAddressErrors = <V extends BaseError[]>(args: {
   errors: V
-  resource: Extract<TResourceError, 'billing_address' | 'shipping_address'>
+  resource: Extract<TResourceError, "billing_address" | "shipping_address">
   dispatch?: Dispatch<AddressAction>
   currentErrors?: V
 }) => void
@@ -117,55 +117,55 @@ export const setAddressErrors: SetAddressErrors = ({
   errors,
   dispatch,
   currentErrors = [],
-  resource
+  resource,
 }) => {
   const billingErrors =
-    resource === 'billing_address'
+    resource === "billing_address"
       ? errors.filter((e) => e.resource === resource)
-      : currentErrors.filter((e) => e.resource === 'billing_address')
+      : currentErrors.filter((e) => e.resource === "billing_address")
   const shippingErrors =
-    resource === 'shipping_address'
+    resource === "shipping_address"
       ? errors.filter((e) => e.resource === resource)
-      : currentErrors.filter((e) => e.resource === 'shipping_address')
+      : currentErrors.filter((e) => e.resource === "shipping_address")
   const finalErrors = [...billingErrors, ...shippingErrors]
   if (dispatch)
     dispatch({
-      type: 'setErrors',
+      type: "setErrors",
       payload: {
-        errors: finalErrors
-      }
+        errors: finalErrors,
+      },
     })
 }
 
 export function setAddress<V extends TCustomerAddress>({
   values,
   resource,
-  dispatch
+  dispatch,
 }: SetAddressParams<V>): void {
   const payload = {
     [`${resource}`]: {
-      ...formCleaner(values)
-    }
+      ...formCleaner(values),
+    },
   }
   if (dispatch)
     dispatch({
-      type: 'setAddress',
-      payload
+      type: "setAddress",
+      payload,
     })
 }
 
 type SetCloneAddress = (
   id: string,
   resource: AddressResource,
-  dispatch: Dispatch<AddressAction>
+  dispatch: Dispatch<AddressAction>,
 ) => void
 
 export const setCloneAddress: SetCloneAddress = (id, resource, dispatch) => {
   dispatch({
-    type: 'setCloneAddress',
+    type: "setCloneAddress",
     payload: {
-      [`${camelCase(resource)}Id`]: id
-    }
+      [`${camelCase(resource)}Id`]: id,
+    },
   })
 }
 
@@ -192,7 +192,7 @@ export async function saveAddresses({
   order,
   state,
   customerEmail,
-  customerAddress
+  customerAddress,
 }: TSaveAddressesParams): Promise<{
   success: boolean
   order?: Order
@@ -204,7 +204,7 @@ export async function saveAddresses({
     billing_address: billingAddressForm,
     shipping_address: shippingAddressForm,
     billingAddressId,
-    shippingAddressId
+    shippingAddressId,
   } = state
   try {
     const sdk = getSdk(config)
@@ -213,11 +213,11 @@ export async function saveAddresses({
     if (order) {
       let orderAttributes: OrderUpdate | null = null
       const billingAddressCloneId =
-        customerAddress?.resource === 'billing_address'
+        customerAddress?.resource === "billing_address"
           ? customerAddress?.id
           : billingAddressId
       const shippingAddressCloneId =
-        customerAddress?.resource === 'shipping_address'
+        customerAddress?.resource === "shipping_address"
           ? customerAddress?.id
           : shippingAddressId
       if (invertAddresses) {
@@ -229,19 +229,22 @@ export async function saveAddresses({
           shipToDifferentAddress,
           shippingAddress,
           shippingAddressId: shippingAddressCloneId,
-          sdk
+          sdk,
         })
       } else {
         const doNotShipItems = order?.line_items?.every(
           // @ts-expect-error no type for do_not_ship on SDK
-          (lineItem) => lineItem?.item?.do_not_ship === true
+          (lineItem) => lineItem?.item?.do_not_ship === true,
         )
         const currentBillingAddressRef = order?.billing_address?.reference
         orderAttributes = {
           id: order?.id,
           _billing_address_clone_id: billingAddressCloneId,
           _shipping_address_clone_id: billingAddressCloneId,
-          customer_email: customerEmail
+          customer_email: customerEmail,
+        }
+        if (order.customer_email) {
+          delete orderAttributes.customer_email
         }
         if (currentBillingAddressRef === billingAddressCloneId) {
           orderAttributes._billing_address_clone_id = order?.billing_address?.id
@@ -259,9 +262,17 @@ export async function saveAddresses({
             orderAttributes._shipping_address_same_as_billing = true
           }
           const billingAddressWithMeta = sanitizeMetadataFields(billingAddress)
-          const address = await sdk.addresses.create(billingAddressWithMeta)
+          let address: Address | undefined
+          if (order?.billing_address?.id) {
+            address = await sdk.addresses.update({
+              id: order.billing_address.id,
+              ...billingAddressWithMeta,
+            })
+          } else {
+            address = await sdk.addresses.create(billingAddressWithMeta)
+          }
           orderAttributes.billing_address = sdk.addresses.relationship(
-            address.id
+            address.id,
           )
         }
         if (shipToDifferentAddress) {
@@ -275,9 +286,17 @@ export async function saveAddresses({
             delete orderAttributes._shipping_address_clone_id
             const shippingAddressWithMeta =
               sanitizeMetadataFields(shippingAddress)
-            const address = await sdk.addresses.create(shippingAddressWithMeta)
+            let address: Address | undefined
+            if (order?.billing_address?.id) {
+              address = await sdk.addresses.update({
+                id: order.billing_address.id,
+                ...shippingAddressWithMeta,
+              })
+            } else {
+              address = await sdk.addresses.create(shippingAddressWithMeta)
+            }
             orderAttributes.shipping_address = sdk.addresses.relationship(
-              address.id
+              address.id,
             )
           }
         }
@@ -285,7 +304,7 @@ export async function saveAddresses({
       if (orderAttributes != null && updateOrder) {
         const orderUpdated = await updateOrder({
           id: order.id,
-          attributes: orderAttributes
+          attributes: orderAttributes,
         })
         return { success: true, order: orderUpdated?.order }
       }
@@ -298,21 +317,21 @@ export async function saveAddresses({
 }
 
 const type: AddressActionType[] = [
-  'setErrors',
-  'setAddress',
-  'setShipToDifferentAddress',
-  'setCloneAddress',
-  'cleanup'
+  "setErrors",
+  "setAddress",
+  "setShipToDifferentAddress",
+  "setCloneAddress",
+  "cleanup",
 ]
 
 const addressReducer = (
   state: AddressState,
-  reducer: AddressAction
+  reducer: AddressAction,
 ): AddressState =>
   baseReducer<AddressState, AddressAction, AddressActionType[]>(
     state,
     reducer,
-    type
+    type,
   )
 
 export default addressReducer

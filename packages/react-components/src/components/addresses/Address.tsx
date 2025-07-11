@@ -1,21 +1,21 @@
-import { useContext, useState, useEffect, type JSX } from 'react';
-import AddressChildrenContext from '#context/AddressChildrenContext'
-import CustomerContext from '#context/CustomerContext'
-import BillingAddressContext from '#context/BillingAddressContext'
-import ShippingAddressContext from '#context/ShippingAddressContext'
-import type { Address as AddressType } from '@commercelayer/sdk'
-import isEmpty from 'lodash/isEmpty'
-import AddressContext from '#context/AddressContext'
-import OrderContext from '#context/OrderContext'
+import type { Address as AddressType } from "@commercelayer/sdk"
+import isEmpty from "lodash/isEmpty"
+import { type JSX, useContext, useEffect, useState } from "react"
 import AddressCardsTemplate, {
   type AddressCardsTemplateChildren,
   type CustomerAddress,
-  type HandleSelect
-} from '#components/utils/AddressCardsTemplate'
-import type { DefaultChildrenType } from '#typings/globals'
+  type HandleSelect,
+} from "#components/utils/AddressCardsTemplate"
+import AddressChildrenContext from "#context/AddressChildrenContext"
+import AddressContext from "#context/AddressContext"
+import BillingAddressContext from "#context/BillingAddressContext"
+import CustomerContext from "#context/CustomerContext"
+import OrderContext from "#context/OrderContext"
+import ShippingAddressContext from "#context/ShippingAddressContext"
+import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props
-  extends Omit<JSX.IntrinsicElements['div'], 'children' | 'onSelect'> {
+  extends Omit<JSX.IntrinsicElements["div"], "children" | "onSelect"> {
   children: DefaultChildrenType | AddressCardsTemplateChildren
   selectedClassName?: string
   disabledClassName?: string
@@ -45,8 +45,8 @@ export function Address(props: Props): JSX.Element {
   const {
     children,
     className,
-    selectedClassName = '',
-    disabledClassName = '',
+    selectedClassName = "",
+    disabledClassName = "",
     onSelect,
     addresses = [],
     deselect = false,
@@ -54,10 +54,10 @@ export function Address(props: Props): JSX.Element {
   } = props
   const { addresses: addressesContext } = useContext(CustomerContext)
   const { setBillingAddress, billingCustomerAddressId } = useContext(
-    BillingAddressContext
+    BillingAddressContext,
   )
   const { setShippingAddress, shippingCustomerAddressId } = useContext(
-    ShippingAddressContext
+    ShippingAddressContext,
   )
   const { shipToDifferentAddress, billingAddressId, shippingAddressId } =
     useContext(AddressContext)
@@ -82,7 +82,7 @@ export function Address(props: Props): JSX.Element {
           address.reference != null
         ) {
           setBillingAddress(address.id, {
-            customerAddressId: address.reference
+            customerAddressId: address.reference,
           })
         }
         if (shippingCustomerAddressId) {
@@ -96,15 +96,15 @@ export function Address(props: Props): JSX.Element {
           address.reference != null
         ) {
           setShippingAddress(address.id, {
-            customerAddressId: address.reference
+            customerAddressId: address.reference,
           })
         }
       })
     }
     if (deselect) {
       const disabledSaveButton = async (): Promise<void> => {
-        setBillingAddress && (await setBillingAddress(''))
-        setShippingAddress && (await setShippingAddress(''))
+        setBillingAddress && (await setBillingAddress(""))
+        setShippingAddress && (await setShippingAddress(""))
       }
       disabledSaveButton()
     }
@@ -113,14 +113,14 @@ export function Address(props: Props): JSX.Element {
     billingCustomerAddressId,
     shippingCustomerAddressId,
     addressesContext,
-    shipToDifferentAddress
+    shipToDifferentAddress,
   ])
   const handleSelect: HandleSelect = async (
     k,
     addressId,
     customerAddressId,
     disabled,
-    address
+    address,
   ) => {
     !disabled && setSelected(k)
     setBillingAddress &&
@@ -132,7 +132,7 @@ export function Address(props: Props): JSX.Element {
   }
   const countryLock = order?.shipping_country_code_lock
   const components =
-    typeof children === 'function'
+    typeof children === "function"
       ? []
       : items
           .filter((address) => {
@@ -147,19 +147,19 @@ export function Address(props: Props): JSX.Element {
           })
           .map((address, k) => {
             const addressProps = {
-              address
+              address,
             }
             const disabled =
               (setShippingAddress &&
                 countryLock &&
                 countryLock !== address.country_code) ||
               false
-            const selectedClass = deselect ? '' : selectedClassName
+            const selectedClass = deselect ? "" : selectedClassName
             const addressSelectedClass =
-              selected === k ? `${className || ''} ${selectedClass}` : className
-            const customerAddressId: string = address?.reference || ''
+              selected === k ? `${className || ""} ${selectedClass}` : className
+            const customerAddressId: string = address?.reference || ""
             const finalClassName = disabled
-              ? `${className || ''} ${disabledClassName}`
+              ? `${className || ""} ${disabledClassName}`
               : addressSelectedClass
             return (
               <AddressChildrenContext.Provider key={k} value={addressProps}>
@@ -171,7 +171,7 @@ export function Address(props: Props): JSX.Element {
                       address.id,
                       customerAddressId,
                       disabled,
-                      address
+                      address,
                     )
                   }}
                   data-disabled={disabled}
@@ -187,9 +187,9 @@ export function Address(props: Props): JSX.Element {
     selected,
     handleSelect,
     countryLock,
-    ...props
+    ...props,
   }
-  return typeof children === 'function' ? (
+  return typeof children === "function" ? (
     <AddressCardsTemplate {...parentProps}>{children}</AddressCardsTemplate>
   ) : (
     <>{components}</>

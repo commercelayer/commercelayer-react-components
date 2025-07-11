@@ -1,6 +1,6 @@
 {
   "name": "@commercelayer/react-components",
-  "version": "4.25.1",
+  "version": "4.25.2-beta.0",
   "description": "The Official Commerce Layer React Components",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
