@@ -1,22 +1,22 @@
-import baseReducer from "#utils/baseReducer"
+import type { Order, OrderUpdate, StripePayment } from "@commercelayer/sdk"
+import isEmpty from "lodash/isEmpty"
 import type { Dispatch, RefObject } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { BaseError } from "#typings/errors"
-import type { Order, OrderUpdate, StripePayment } from "@commercelayer/sdk"
-import isEmpty from "lodash/isEmpty"
-import { isDoNotShip, shipmentsFilled } from "#utils/shipments"
-import type { PaymentResource, PaymentSourceType } from "./PaymentMethodReducer"
+import baseReducer from "#utils/baseReducer"
 import {
   saveBillingAddress,
   saveShippingAddress,
   saveToWallet,
 } from "#utils/customerOrderOptions"
-import getSdk from "#utils/getSdk"
 import getErrors from "#utils/getErrors"
+import getSdk from "#utils/getSdk"
+import { hasSubscriptions } from "#utils/hasSubscriptions"
 import { isGuestToken } from "#utils/isGuestToken"
 import { setCustomerOrderParam } from "#utils/localStorage"
-import { hasSubscriptions } from "#utils/hasSubscriptions"
+import { isDoNotShip, shipmentsFilled } from "#utils/shipments"
 import { updateOrderSubscriptionCustomerPaymentSource } from "#utils/updateOrderSubscriptionCustomerPaymentSource"
+import type { PaymentResource, PaymentSourceType } from "./PaymentMethodReducer"
 
 export type PlaceOrderActionType =
   | "setErrors"
