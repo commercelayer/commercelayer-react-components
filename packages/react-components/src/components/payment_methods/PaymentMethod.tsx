@@ -114,9 +114,6 @@ export function PaymentMethod({
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
   const { status } = useContext(PlaceOrderContext)
-  console.log("PaymentMethod", {
-    errors,
-  })
   useEffect(() => {
     if (paymentMethods != null && !isEmpty(paymentMethods) && expressPayments) {
       const [paymentMethod] = getAvailableExpressPayments(paymentMethods)
