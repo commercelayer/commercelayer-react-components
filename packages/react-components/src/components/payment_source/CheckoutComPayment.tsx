@@ -202,10 +202,11 @@ export function CheckoutComPayment({
                       }
                       if (paymentStatus === "declined") return false
                     }
-                    return false
+                    return true
                   }
-                  setPaymentRef?.({ ref })
+                  return false
                 }
+                setPaymentRef?.({ ref })
               }
             },
             onError: (component, error) => {
