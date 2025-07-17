@@ -1,27 +1,27 @@
+import { type JSX, useContext, useEffect, useState } from "react"
+import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
+import PlaceOrderContext from "#context/PlaceOrderContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { LoaderType } from "#typings"
-import { useContext, useEffect, useState, type JSX } from "react"
-import type { PaymentSourceProps } from "../payment_source/PaymentSource"
 import getLoaderComponent from "#utils/getLoaderComponent"
-import AdyenGateway from "./AdyenGateway"
-import StripeGateway from "./StripeGateway"
-import BraintreeGateway from "./BraintreeGateway"
-import PaypalGateway from "./PaypalGateway"
-import WireTransferGateway from "./WireTransferGateway"
-import CustomerContext from "#context/CustomerContext"
-import CheckoutComGateway from "./CheckoutComGateway"
-import KlarnaGateway from "./KlarnaGateway"
 import {
   getCkoAttributes,
   getExternalPaymentAttributes,
   getPaypalAttributes,
   getStripeAttributes,
 } from "#utils/getPaymentAttributes"
+import type { PaymentSourceProps } from "../payment_source/PaymentSource"
+import AdyenGateway from "./AdyenGateway"
+import BraintreeGateway from "./BraintreeGateway"
+import CheckoutComGateway from "./CheckoutComGateway"
 import ExternalGateway from "./ExternalGateway"
-import PlaceOrderContext from "#context/PlaceOrderContext"
+import KlarnaGateway from "./KlarnaGateway"
+import PaypalGateway from "./PaypalGateway"
+import StripeGateway from "./StripeGateway"
+import WireTransferGateway from "./WireTransferGateway"
 
 export type GatewayBaseType = Props & {
   show: boolean
@@ -136,10 +136,13 @@ export function PaymentGateway({
   useEffect(() => {
     if (status === "placing") setLoading(true)
     if (status === "standby" && loading) setLoading(false)
+    if (order && order.status === "placed" && loading) {
+      setLoading(false)
+    }
     return () => {
       setLoading(true)
     }
-  }, [status])
+  }, [status, order?.status])
 
   const gatewayConfig = {
     readonly,

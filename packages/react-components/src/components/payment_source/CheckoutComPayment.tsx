@@ -1,14 +1,14 @@
-import { useContext, useEffect, useRef, type JSX } from "react"
-import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
-import type { PaymentSourceProps } from "./PaymentSource"
-import useExternalScript from "#utils/hooks/useExternalScript"
-import OrderContext from "#context/OrderContext"
+import { type JSX, useContext, useEffect, useRef } from "react"
 import Parent from "#components/utils/Parent"
-import { jwt } from "#utils/jwt"
 import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import { setCustomerOrderParam } from "#utils/localStorage"
 import PlaceOrderContext from "#context/PlaceOrderContext"
+import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
+import useExternalScript from "#utils/hooks/useExternalScript"
+import { jwt } from "#utils/jwt"
+import { setCustomerOrderParam } from "#utils/localStorage"
+import type { PaymentSourceProps } from "./PaymentSource"
 
 const scriptUrl = "https://checkout-web-components.checkout.com/index.js"
 
@@ -115,12 +115,9 @@ export function CheckoutComPayment({
   const {
     containerClassName,
     templateCustomerSaveToWallet,
-    successUrl = window.location.href,
-    failureUrl = window.location.href,
     show,
     ...divProps
   } = p
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Infinite loop
   useEffect(() => {
     const ps = order?.payment_source
     if (loaded && window && ps && accessToken) {
@@ -149,45 +146,43 @@ export function CheckoutComPayment({
               },
             },
             onChange: (component) => {
-              if (component.isValid()) {
-                if (ref.current) {
-                  ref.current.onsubmit = async (): Promise<boolean> => {
-                    const element = ref.current?.elements
-                    const savePaymentSourceToCustomerWallet =
-                      // @ts-expect-error no type
-                      element?.save_payment_source_to_customer_wallet?.checked
-                    if (savePaymentSourceToCustomerWallet)
-                      setCustomerOrderParam(
-                        "_save_payment_source_to_customer_wallet",
-                        savePaymentSourceToCustomerWallet,
-                      )
-                    const { data } = await component.tokenize()
-                    const token = data?.token
-                    const paymentSource = await setPaymentSource({
-                      paymentSourceId: ps.id,
-                      paymentResource: "checkout_com_payments",
-                      attributes: {
-                        token,
-                        _authorize: true,
-                      },
-                    })
-                    if (paymentSource) {
-                      // @ts-expect-error no type
-                      const response = paymentSource.payment_response
-                      // @ts-expect-error no type
-                      const securityRedirect = paymentSource?.redirect_uri
-                      const isStatusPending =
-                        response?.status.toLowerCase() === "pending"
-                      if (isStatusPending && securityRedirect) {
-                        window.location.href = securityRedirect
-                        return false
-                      }
-                      return true
+              if (ref.current) {
+                ref.current.onsubmit = async (): Promise<boolean> => {
+                  const element = ref.current?.elements
+                  const savePaymentSourceToCustomerWallet =
+                    // @ts-expect-error no type
+                    element?.save_payment_source_to_customer_wallet?.checked
+                  if (savePaymentSourceToCustomerWallet)
+                    setCustomerOrderParam(
+                      "_save_payment_source_to_customer_wallet",
+                      savePaymentSourceToCustomerWallet,
+                    )
+                  const { data } = await component.tokenize()
+                  const token = data?.token
+                  const paymentSource = await setPaymentSource({
+                    paymentSourceId: ps.id,
+                    paymentResource: "checkout_com_payments",
+                    attributes: {
+                      token,
+                      _authorize: true,
+                    },
+                  })
+                  if (paymentSource) {
+                    // @ts-expect-error no type
+                    const response = paymentSource.payment_response
+                    // @ts-expect-error no type
+                    const securityRedirect = paymentSource?.redirect_uri
+                    const isStatusPending =
+                      response?.status.toLowerCase() === "pending"
+                    if (isStatusPending && securityRedirect) {
+                      window.location.href = securityRedirect
+                      return false
                     }
-                    return false
+                    return true
                   }
-                  setPaymentRef?.({ ref })
+                  return false
                 }
+                setPaymentRef?.({ ref })
               }
             },
             onError: (component, error) => {

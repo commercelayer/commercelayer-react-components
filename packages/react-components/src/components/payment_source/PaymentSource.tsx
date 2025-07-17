@@ -1,13 +1,13 @@
-import { useContext, useState, useEffect, type JSX } from "react"
+import { type JSX, useContext, useEffect, useState } from "react"
+import CustomerContext from "#context/CustomerContext"
+import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import CustomerContext from "#context/CustomerContext"
-import PaymentGateway from "../payment_gateways/PaymentGateway"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { LoaderType } from "#typings/index"
-import type { CustomerCardsTemplateChildren } from "../utils/PaymentCardsTemplate"
 import getCardDetails from "#utils/getCardDetails"
-import OrderContext from "#context/OrderContext"
+import PaymentGateway from "../payment_gateways/PaymentGateway"
+import type { CustomerCardsTemplateChildren } from "../utils/PaymentCardsTemplate"
 
 export interface CustomerCardsProps {
   handleClick: () => void
@@ -58,7 +58,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
       const card = getCardDetails({
         paymentType: payment?.payment_source_type as PaymentResource,
         customerPayment: {
-          payment_source: paymentSource,
+          payment_source: paymentSource ?? order?.payment_source,
         },
       })
       if (isCustomerPaymentSource && card.brand === "") {
