@@ -1,14 +1,14 @@
-import { useContext, useEffect, useRef, type JSX } from "react"
-import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
-import type { PaymentSourceProps } from "./PaymentSource"
-import useExternalScript from "#utils/hooks/useExternalScript"
-import OrderContext from "#context/OrderContext"
+import { type JSX, useContext, useEffect, useRef } from "react"
 import Parent from "#components/utils/Parent"
-import { jwt } from "#utils/jwt"
 import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import { setCustomerOrderParam } from "#utils/localStorage"
 import PlaceOrderContext from "#context/PlaceOrderContext"
+import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
+import useExternalScript from "#utils/hooks/useExternalScript"
+import { jwt } from "#utils/jwt"
+import { setCustomerOrderParam } from "#utils/localStorage"
+import type { PaymentSourceProps } from "./PaymentSource"
 
 const scriptUrl = "https://checkout-web-components.checkout.com/index.js"
 
@@ -115,12 +115,9 @@ export function CheckoutComPayment({
   const {
     containerClassName,
     templateCustomerSaveToWallet,
-    successUrl = window.location.href,
-    failureUrl = window.location.href,
     show,
     ...divProps
   } = p
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Infinite loop
   useEffect(() => {
     const ps = order?.payment_source
     if (loaded && window && ps && accessToken) {
@@ -149,8 +146,8 @@ export function CheckoutComPayment({
               },
             },
             onChange: (component) => {
-              if (component.isValid()) {
-                if (ref.current) {
+              if (ref.current) {
+                if (component.isValid()) {
                   ref.current.onsubmit = async (): Promise<boolean> => {
                     const element = ref.current?.elements
                     const savePaymentSourceToCustomerWallet =
@@ -215,7 +212,7 @@ export function CheckoutComPayment({
         loadFlow()
       }
     }
-  }, [loaded, order?.payment_source?.id, accessToken])
+  }, [loaded, order?.payment_source?.id, accessToken, ref.current])
   return loaded && show ? (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
