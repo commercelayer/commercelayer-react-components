@@ -35,6 +35,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
   const { order } = useContext(OrderContext)
   const { payments } = useContext(CustomerContext)
   const {
+    errors,
     currentPaymentMethodId,
     paymentSource,
     destroyPaymentSource,
@@ -68,7 +69,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
             ? card.issuer_type
             : "credit-card"
       }
-      if (card.brand) {
+      if (card.brand && errors?.length === 0) {
         setShowCard(true)
       }
       setShow(true)
@@ -90,6 +91,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
     readonly,
     order?.status,
     expressPayments,
+    errors?.length,
   ])
   const handleEditClick = async (e: MouseEvent): Promise<void> => {
     e.stopPropagation()
