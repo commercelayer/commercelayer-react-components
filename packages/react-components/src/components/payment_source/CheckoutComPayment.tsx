@@ -202,11 +202,10 @@ export function CheckoutComPayment({
                       }
                       if (paymentStatus === "declined") return false
                     }
-                    return true
+                    return false
                   }
-                  return false
+                  setPaymentRef?.({ ref })
                 }
-                setPaymentRef?.({ ref })
               }
             },
             onError: (component, error) => {
@@ -234,7 +233,7 @@ export function CheckoutComPayment({
         loadFlow()
       }
     }
-  }, [loaded, order?.payment_source?.id, accessToken])
+  }, [loaded, order?.payment_source?.id, accessToken, ref.current])
   return loaded && show ? (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
