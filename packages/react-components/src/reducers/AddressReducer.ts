@@ -243,9 +243,6 @@ export async function saveAddresses({
           _shipping_address_clone_id: billingAddressCloneId,
           customer_email: customerEmail,
         }
-        if (order.customer_email) {
-          delete orderAttributes.customer_email
-        }
         if (currentBillingAddressRef === billingAddressCloneId) {
           orderAttributes._billing_address_clone_id = order?.billing_address?.id
           orderAttributes._shipping_address_clone_id =
