@@ -27,11 +27,11 @@ export type CustomFieldMessageError = (props: {
   | string
   | null
   | Array<{
-      field: Extract<AddressValuesKeys, AddressInputName> | string
-      value: string
-      isValid: boolean
-      message?: string
-    }>
+    field: Extract<AddressValuesKeys, AddressInputName> | string
+    value: string
+    isValid: boolean
+    message?: string
+  }>
 
 export type AddressActionType =
   | "setErrors"
@@ -284,9 +284,9 @@ export async function saveAddresses({
             const shippingAddressWithMeta =
               sanitizeMetadataFields(shippingAddress)
             let address: Address | undefined
-            if (order?.billing_address?.id) {
+            if (order?.shipping_address?.id) {
               address = await sdk.addresses.update({
-                id: order.billing_address.id,
+                id: order.shipping_address.id,
                 ...shippingAddressWithMeta,
               })
             } else {
