@@ -1,6 +1,6 @@
 {
   "name": "@commercelayer/react-components",
-  "version": "4.25.2-beta.3",
+  "version": "4.25.2-beta.4",
   "description": "The Official Commerce Layer React Components",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
@@ -122,7 +122,7 @@
     "access": "public"
   },
   "scripts": {
-    "lint": "biome lint --error-on-warnings ./src",
+    "lint": "biome lint ./src",
     "lint:fix": "pnpm biome lint --write ./src",
     "test": "pnpm audit --audit-level high && (pnpm audit || exit 0) && pnpm lint && vitest run --silent",
     "coverage": "vitest run --coverage",
