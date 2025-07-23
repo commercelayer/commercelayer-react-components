@@ -260,7 +260,7 @@ export async function saveAddresses({
           }
           const billingAddressWithMeta = sanitizeMetadataFields(billingAddress)
           let address: Address | undefined
-          if (order?.billing_address?.id) {
+          if (order?.billing_address?.id && order?.billing_address?.reference == null) {
             address = await sdk.addresses.update({
               id: order.billing_address.id,
               ...billingAddressWithMeta,
@@ -284,7 +284,7 @@ export async function saveAddresses({
             const shippingAddressWithMeta =
               sanitizeMetadataFields(shippingAddress)
             let address: Address | undefined
-            if (order?.shipping_address?.id) {
+            if (order?.shipping_address?.id && order?.shipping_address?.reference == null) {
               address = await sdk.addresses.update({
                 id: order.shipping_address.id,
                 ...shippingAddressWithMeta,
