@@ -1,0 +1,1294 @@
+{
+  "version": "6.0",
+  "nxVersion": "20.6.0",
+  "pathMappings": {
+    "@commercelayer/react-components": [
+      "src/index"
+    ],
+    "#components/*": [
+      "src/components/*"
+    ],
+    "#components-utils/*": [
+      "src/components/utils/*"
+    ],
+    "#reducers/*": [
+      "src/reducers/*"
+    ],
+    "#context/*": [
+      "src/context/*"
+    ],
+    "#typings/*": [
+      "src/typings/*"
+    ],
+    "#typings": [
+      "src/typings/index"
+    ],
+    "#utils/*": [
+      "src/utils/*"
+    ],
+    "#config/*": [
+      "src/config/*"
+    ],
+    "#hooks/*": [
+      "src/hooks/*"
+    ]
+  },
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {},
+    "nonProjectFiles": [
+      {
+        "file": ".env.example",
+        "hash": "4313029761429702267"
+      },
+      {
+        "file": "README.md",
+        "hash": "17997768238606553932"
+      },
+      {
+        "file": "mocks/getAccessToken.ts",
+        "hash": "12394074708125995039"
+      },
+      {
+        "file": "mocks/handlers.ts",
+        "hash": "12499954882246532125"
+      },
+      {
+        "file": "mocks/resources/orders/customer-addresses.ts",
+        "hash": "3062159261834948446"
+      },
+      {
+        "file": "mocks/resources/orders/customer-orders-empty.ts",
+        "hash": "14798830139086094535"
+      },
+      {
+        "file": "mocks/resources/orders/customer-orders-full.ts",
+        "hash": "2746152752625492171"
+      },
+      {
+        "file": "mocks/resources/orders/customer-orders.ts",
+        "hash": "7113058641369650579"
+      },
+      {
+        "file": "mocks/server.ts",
+        "hash": "5934955616392598718"
+      },
+      {
+        "file": "mocks/setup.ts",
+        "hash": "9665122635233125102"
+      },
+      {
+        "file": "package.json",
+        "hash": "13978673939301467867"
+      },
+      {
+        "file": "specs/addresses/billing-info.spec.tsx",
+        "hash": "1329772878926531560"
+      },
+      {
+        "file": "specs/addresses/invert-addresses.spec.tsx",
+        "hash": "12910851511072962599"
+      },
+      {
+        "file": "specs/customers/customer-payments.spec.tsx",
+        "hash": "16011431952026699603"
+      },
+      {
+        "file": "specs/e2e/baseFixtures.ts",
+        "hash": "5966017349827799637"
+      },
+      {
+        "file": "specs/e2e/checkout/customer/addresses-country-lock.spec.ts",
+        "hash": "13575317123409741076"
+      },
+      {
+        "file": "specs/e2e/config/dotenv-config.ts",
+        "hash": "903216459456041707"
+      },
+      {
+        "file": "specs/e2e/fixtures/checkout/customer/addresses-country-lock.json",
+        "hash": "6717452309496923667"
+      },
+      {
+        "file": "specs/e2e/fixtures/prices-requests.json",
+        "hash": "12516045920807400121"
+      },
+      {
+        "file": "specs/e2e/mocks/address-country-lock.mock.json",
+        "hash": "13756285913762296322"
+      },
+      {
+        "file": "specs/e2e/mocks/addresses.mock.json",
+        "hash": "7617941259751412934"
+      },
+      {
+        "file": "specs/e2e/mocks/order.mock.json",
+        "hash": "6435175570995894477"
+      },
+      {
+        "file": "specs/e2e/mocks/prices.mock.json",
+        "hash": "4949507237215436627"
+      },
+      {
+        "file": "specs/e2e/mocks/single-price.mock.json",
+        "hash": "4329131441327390305"
+      },
+      {
+        "file": "specs/e2e/models/OrderPage.ts",
+        "hash": "3160458359685251848"
+      },
+      {
+        "file": "specs/e2e/models/Page.ts",
+        "hash": "8486912129113750548"
+      },
+      {
+        "file": "specs/e2e/models/index.ts",
+        "hash": "1144923561822805068"
+      },
+      {
+        "file": "specs/e2e/order.spec.ts",
+        "hash": "10661459600053402015"
+      },
+      {
+        "file": "specs/e2e/order/add-item-to-hosted-cart.spec.ts",
+        "hash": "12529622105556346770"
+      },
+      {
+        "file": "specs/e2e/order/buy-now-mode.spec.ts",
+        "hash": "13435485510194444651"
+      },
+      {
+        "file": "specs/e2e/order/order-with-cart-link.spec.ts",
+        "hash": "90406908587255769"
+      },
+      {
+        "file": "specs/e2e/prices.spec.ts",
+        "hash": "14970813890567701275"
+      },
+      {
+        "file": "specs/e2e/screenshots/customer-addresses-country-lock.jpg",
+        "hash": "2376972036097758791"
+      },
+      {
+        "file": "specs/e2e/screenshots/prices.jpg",
+        "hash": "14921800750174088622"
+      },
+      {
+        "file": "specs/e2e/single-price.spec.ts",
+        "hash": "8128018829751989849"
+      },
+      {
+        "file": "specs/e2e/utils/response.ts",
+        "hash": "16768066419708606889"
+      },
+      {
+        "file": "specs/hooks/useCommerceLayer.spec.tsx",
+        "hash": "5255740947498241186"
+      },
+      {
+        "file": "specs/hooks/useCustomerContainer.spec.tsx",
+        "hash": "2956608637327102395"
+      },
+      {
+        "file": "specs/hooks/useOrderContainer.spec.tsx",
+        "hash": "4841849676300839338"
+      },
+      {
+        "file": "specs/in_stock_subscriptions/in_stock_subscriptions.spec.tsx",
+        "hash": "3648386706013150014"
+      },
+      {
+        "file": "specs/line_items/line-items.spec.tsx",
+        "hash": "13577400116202707751"
+      },
+      {
+        "file": "specs/orders/add-to-cart-button.spec.tsx",
+        "hash": "17442009357151417635"
+      },
+      {
+        "file": "specs/orders/order-container.spec.tsx",
+        "hash": "10048970658837370586"
+      },
+      {
+        "file": "specs/orders/order-list.spec.tsx",
+        "hash": "13032779152115423651"
+      },
+      {
+        "file": "specs/orders/place-order-container.spec.tsx",
+        "hash": "2159970326140207071"
+      },
+      {
+        "file": "specs/parcels/parcels.spec.tsx",
+        "hash": "501863664702650867"
+      },
+      {
+        "file": "specs/payment_methods/payment-method-name.spec.tsx",
+        "hash": "9455765861786092585"
+      },
+      {
+        "file": "specs/payment_methods/payment-method-price.spec.tsx",
+        "hash": "11078079749800575153"
+      },
+      {
+        "file": "specs/payment_methods/payment-method-radio-button.spec.tsx",
+        "hash": "739442231147644608"
+      },
+      {
+        "file": "specs/payment_methods/payment-method.spec.tsx",
+        "hash": "10146114709999176352"
+      },
+      {
+        "file": "specs/payment_methods/payment-methods-container.spec.tsx",
+        "hash": "12292742260027627609"
+      },
+      {
+        "file": "specs/prices/prices.spec.tsx",
+        "hash": "2032479475979980682"
+      },
+      {
+        "file": "specs/skus/availability.spec.tsx",
+        "hash": "10565394385586815790"
+      },
+      {
+        "file": "specs/utils/context.ts",
+        "hash": "5256172478999498743"
+      },
+      {
+        "file": "specs/utils/getToken.ts",
+        "hash": "8369412372642327795"
+      },
+      {
+        "file": "specs/utils/toJSON.ts",
+        "hash": "6885329302962511159"
+      },
+      {
+        "file": "src/components/ExternalFunction.tsx",
+        "hash": "4477278072570244890"
+      },
+      {
+        "file": "src/components/MetadataInput.tsx",
+        "hash": "3009322514610858965"
+      },
+      {
+        "file": "src/components/SubmitButton.tsx",
+        "hash": "8959877522409022898"
+      },
+      {
+        "file": "src/components/addresses/Address.tsx",
+        "hash": "15364651165636173963"
+      },
+      {
+        "file": "src/components/addresses/AddressCountrySelector.tsx",
+        "hash": "8339440043301423595"
+      },
+      {
+        "file": "src/components/addresses/AddressField.tsx",
+        "hash": "16019301195478346117"
+      },
+      {
+        "file": "src/components/addresses/AddressInput.tsx",
+        "hash": "14453554145221127058"
+      },
+      {
+        "file": "src/components/addresses/AddressInputSelect.tsx",
+        "hash": "6505723214910101143"
+      },
+      {
+        "file": "src/components/addresses/AddressStateSelector.tsx",
+        "hash": "12980215710326524078"
+      },
+      {
+        "file": "src/components/addresses/AddressesContainer.tsx",
+        "hash": "17685111080688659894"
+      },
+      {
+        "file": "src/components/addresses/AddressesEmpty.tsx",
+        "hash": "6838612261011283606"
+      },
+      {
+        "file": "src/components/addresses/BillingAddressContainer.tsx",
+        "hash": "6516385403048719979"
+      },
+      {
+        "file": "src/components/addresses/BillingAddressForm.tsx",
+        "hash": "16185306904812096694"
+      },
+      {
+        "file": "src/components/addresses/SaveAddressesButton.tsx",
+        "hash": "13070472713349944290"
+      },
+      {
+        "file": "src/components/addresses/ShippingAddressContainer.tsx",
+        "hash": "16681788586621074600"
+      },
+      {
+        "file": "src/components/addresses/ShippingAddressForm.tsx",
+        "hash": "2149393492430096940"
+      },
+      {
+        "file": "src/components/auth/CommerceLayer.tsx",
+        "hash": "13773260306148143112"
+      },
+      {
+        "file": "src/components/customers/CustomerAddressForm.tsx",
+        "hash": "17670718970088594809"
+      },
+      {
+        "file": "src/components/customers/CustomerContainer.tsx",
+        "hash": "6407439278442348556"
+      },
+      {
+        "file": "src/components/customers/CustomerField.tsx",
+        "hash": "5568030077763803345"
+      },
+      {
+        "file": "src/components/customers/CustomerInput.tsx",
+        "hash": "16236670929091576965"
+      },
+      {
+        "file": "src/components/customers/CustomerPaymentSource.tsx",
+        "hash": "15301389394150783684"
+      },
+      {
+        "file": "src/components/customers/CustomerPaymentSourceEmpty.tsx",
+        "hash": "13743687361403023162"
+      },
+      {
+        "file": "src/components/customers/MyAccountLink.tsx",
+        "hash": "9564335873632279592"
+      },
+      {
+        "file": "src/components/customers/MyIdentityLink.tsx",
+        "hash": "7387508386037102847"
+      },
+      {
+        "file": "src/components/customers/SaveCustomerButton.tsx",
+        "hash": "3594851557839765150"
+      },
+      {
+        "file": "src/components/errors/Errors.tsx",
+        "hash": "13949650875176726820"
+      },
+      {
+        "file": "src/components/gift_cards/GiftCard.tsx",
+        "hash": "12313159795374386063"
+      },
+      {
+        "file": "src/components/gift_cards/GiftCardContainer.tsx",
+        "hash": "3565825021664629282"
+      },
+      {
+        "file": "src/components/gift_cards/GiftCardCurrencySelector.tsx",
+        "hash": "7872564585062773479"
+      },
+      {
+        "file": "src/components/gift_cards/GiftCardInput.tsx",
+        "hash": "1613870506874450967"
+      },
+      {
+        "file": "src/components/gift_cards/GiftCardOrCouponCode.tsx",
+        "hash": "800573932215005956"
+      },
+      {
+        "file": "src/components/gift_cards/GiftCardOrCouponForm.tsx",
+        "hash": "13930520297501639295"
+      },
+      {
+        "file": "src/components/gift_cards/GiftCardOrCouponInput.tsx",
+        "hash": "11416851489139077966"
+      },
+      {
+        "file": "src/components/gift_cards/GiftCardOrCouponRemoveButton.tsx",
+        "hash": "2286148500692455618"
+      },
+      {
+        "file": "src/components/gift_cards/GiftCardOrCouponSubmit.tsx",
+        "hash": "3929377468372385293"
+      },
+      {
+        "file": "src/components/gift_cards/GiftCardRecipientInput.tsx",
+        "hash": "6369159382540769604"
+      },
+      {
+        "file": "src/components/in_stock_subscriptions/InStockSubscriptionButton.tsx",
+        "hash": "32425730784673875"
+      },
+      {
+        "file": "src/components/in_stock_subscriptions/InStockSubscriptionsContainer.tsx",
+        "hash": "13410873681323980307"
+      },
+      {
+        "file": "src/components/line_items/LineItem.tsx",
+        "hash": "17107016746429034503"
+      },
+      {
+        "file": "src/components/line_items/LineItemAmount.tsx",
+        "hash": "8813336253569359075"
+      },
+      {
+        "file": "src/components/line_items/LineItemCode.tsx",
+        "hash": "4946784237911184186"
+      },
+      {
+        "file": "src/components/line_items/LineItemField.tsx",
+        "hash": "1466906360145479301"
+      },
+      {
+        "file": "src/components/line_items/LineItemImage.tsx",
+        "hash": "15682861097708502129"
+      },
+      {
+        "file": "src/components/line_items/LineItemName.tsx",
+        "hash": "16722426750166957036"
+      },
+      {
+        "file": "src/components/line_items/LineItemOption.tsx",
+        "hash": "9984518596299688993"
+      },
+      {
+        "file": "src/components/line_items/LineItemOptions.tsx",
+        "hash": "14116714877090361002"
+      },
+      {
+        "file": "src/components/line_items/LineItemQuantity.tsx",
+        "hash": "1714932053770710084"
+      },
+      {
+        "file": "src/components/line_items/LineItemRemoveLink.tsx",
+        "hash": "5180150913237420716"
+      },
+      {
+        "file": "src/components/line_items/LineItemsContainer.tsx",
+        "hash": "10354553078967764066"
+      },
+      {
+        "file": "src/components/line_items/LineItemsCount.tsx",
+        "hash": "1245337282786114933"
+      },
+      {
+        "file": "src/components/line_items/LineItemsEmpty.tsx",
+        "hash": "5384899333827251448"
+      },
+      {
+        "file": "src/components/orders/AddToCartButton.tsx",
+        "hash": "9990828973612428191"
+      },
+      {
+        "file": "src/components/orders/AdjustmentAmount.tsx",
+        "hash": "18270415583907987064"
+      },
+      {
+        "file": "src/components/orders/CartLink.tsx",
+        "hash": "3117387206060697879"
+      },
+      {
+        "file": "src/components/orders/CheckoutLink.tsx",
+        "hash": "5133862105475549883"
+      },
+      {
+        "file": "src/components/orders/DiscountAmount.tsx",
+        "hash": "15282429434595140888"
+      },
+      {
+        "file": "src/components/orders/GiftCardAmount.tsx",
+        "hash": "15191158686912663696"
+      },
+      {
+        "file": "src/components/orders/HostedCart.tsx",
+        "hash": "14904768400976156662"
+      },
+      {
+        "file": "src/components/orders/OrderContainer.tsx",
+        "hash": "10989150616923109263"
+      },
+      {
+        "file": "src/components/orders/OrderList.tsx",
+        "hash": "16459616392111329151"
+      },
+      {
+        "file": "src/components/orders/OrderListEmpty.tsx",
+        "hash": "12209930124406137334"
+      },
+      {
+        "file": "src/components/orders/OrderListPaginationButtons.tsx",
+        "hash": "14622128680582977291"
+      },
+      {
+        "file": "src/components/orders/OrderListPaginationInfo.tsx",
+        "hash": "2637848658216855353"
+      },
+      {
+        "file": "src/components/orders/OrderListRow.tsx",
+        "hash": "10500306453179847948"
+      },
+      {
+        "file": "src/components/orders/OrderNumber.tsx",
+        "hash": "11415925160821920264"
+      },
+      {
+        "file": "src/components/orders/OrderStorage.tsx",
+        "hash": "15001346066689031815"
+      },
+      {
+        "file": "src/components/orders/PaymentMethodAmount.tsx",
+        "hash": "10586312689512234665"
+      },
+      {
+        "file": "src/components/orders/PlaceOrderButton.tsx",
+        "hash": "7477810057224650180"
+      },
+      {
+        "file": "src/components/orders/PlaceOrderContainer.tsx",
+        "hash": "5850057881748931599"
+      },
+      {
+        "file": "src/components/orders/PrivacyAndTermsCheckbox.tsx",
+        "hash": "6054253585851060667"
+      },
+      {
+        "file": "src/components/orders/ShippingAmount.tsx",
+        "hash": "2553816200103060650"
+      },
+      {
+        "file": "src/components/orders/SubTotalAmount.tsx",
+        "hash": "13216732528526896146"
+      },
+      {
+        "file": "src/components/orders/TaxesAmount.tsx",
+        "hash": "5772480629577127513"
+      },
+      {
+        "file": "src/components/orders/TotalAmount.tsx",
+        "hash": "2569744579897020632"
+      },
+      {
+        "file": "src/components/parcels/ParcelField.tsx",
+        "hash": "2479022267528224017"
+      },
+      {
+        "file": "src/components/parcels/ParcelLineItem.tsx",
+        "hash": "13557646371192171614"
+      },
+      {
+        "file": "src/components/parcels/ParcelLineItemField.tsx",
+        "hash": "6591360600051537567"
+      },
+      {
+        "file": "src/components/parcels/ParcelLineItemsCount.tsx",
+        "hash": "6499096300952272106"
+      },
+      {
+        "file": "src/components/parcels/Parcels.tsx",
+        "hash": "17864277209855903368"
+      },
+      {
+        "file": "src/components/parcels/ParcelsCount.tsx",
+        "hash": "16707798467882903599"
+      },
+      {
+        "file": "src/components/payment_gateways/AdyenGateway.tsx",
+        "hash": "4289580452088608518"
+      },
+      {
+        "file": "src/components/payment_gateways/BraintreeGateway.tsx",
+        "hash": "3370504121648747448"
+      },
+      {
+        "file": "src/components/payment_gateways/CheckoutComGateway.tsx",
+        "hash": "10124889903251835095"
+      },
+      {
+        "file": "src/components/payment_gateways/ExternalGateway.tsx",
+        "hash": "6375439034708402163"
+      },
+      {
+        "file": "src/components/payment_gateways/KlarnaGateway.tsx",
+        "hash": "8857221062271961174"
+      },
+      {
+        "file": "src/components/payment_gateways/PaymentGateway.tsx",
+        "hash": "1634593290070982525"
+      },
+      {
+        "file": "src/components/payment_gateways/PaypalGateway.tsx",
+        "hash": "943086920234617698"
+      },
+      {
+        "file": "src/components/payment_gateways/StripeGateway.tsx",
+        "hash": "7490981033971540846"
+      },
+      {
+        "file": "src/components/payment_gateways/WireTransferGateway.tsx",
+        "hash": "14613623917034259673"
+      },
+      {
+        "file": "src/components/payment_methods/PaymentMethod.tsx",
+        "hash": "1234769459800219497"
+      },
+      {
+        "file": "src/components/payment_methods/PaymentMethodName.tsx",
+        "hash": "1428813489789016037"
+      },
+      {
+        "file": "src/components/payment_methods/PaymentMethodPrice.tsx",
+        "hash": "3262543958209802289"
+      },
+      {
+        "file": "src/components/payment_methods/PaymentMethodRadioButton.tsx",
+        "hash": "6120765113012241650"
+      },
+      {
+        "file": "src/components/payment_methods/PaymentMethodsContainer.tsx",
+        "hash": "13500720427041608545"
+      },
+      {
+        "file": "src/components/payment_source/AdyenPayment.tsx",
+        "hash": "12304069213235388152"
+      },
+      {
+        "file": "src/components/payment_source/BraintreePayment.tsx",
+        "hash": "2141999897177105813"
+      },
+      {
+        "file": "src/components/payment_source/CheckoutComPayment.tsx",
+        "hash": "16025663780874855145"
+      },
+      {
+        "file": "src/components/payment_source/ExternalPayment.tsx",
+        "hash": "5694198029386622542"
+      },
+      {
+        "file": "src/components/payment_source/KlarnaPayment.tsx",
+        "hash": "6194417480293791944"
+      },
+      {
+        "file": "src/components/payment_source/PaymentSource.tsx",
+        "hash": "3131980522562763301"
+      },
+      {
+        "file": "src/components/payment_source/PaymentSourceBrandIcon.tsx",
+        "hash": "7694197736077644383"
+      },
+      {
+        "file": "src/components/payment_source/PaymentSourceBrandName.tsx",
+        "hash": "13242878935075524294"
+      },
+      {
+        "file": "src/components/payment_source/PaymentSourceDetail.tsx",
+        "hash": "2700871439050675681"
+      },
+      {
+        "file": "src/components/payment_source/PaymentSourceEditButton.tsx",
+        "hash": "5724414500297371534"
+      },
+      {
+        "file": "src/components/payment_source/PaypalPayment.tsx",
+        "hash": "16635726432020900236"
+      },
+      {
+        "file": "src/components/payment_source/StripeExpressPayment.tsx",
+        "hash": "5224980357473895994"
+      },
+      {
+        "file": "src/components/payment_source/StripePayment.tsx",
+        "hash": "3151020703764682005"
+      },
+      {
+        "file": "src/components/payment_source/WireTransferPayment.tsx",
+        "hash": "1758339138210204062"
+      },
+      {
+        "file": "src/components/prices/Price.tsx",
+        "hash": "13354606172557409688"
+      },
+      {
+        "file": "src/components/prices/PricesContainer.tsx",
+        "hash": "1803311102870345717"
+      },
+      {
+        "file": "src/components/shipments/Shipment.tsx",
+        "hash": "8673990529443199199"
+      },
+      {
+        "file": "src/components/shipments/ShipmentField.tsx",
+        "hash": "11047884690646347554"
+      },
+      {
+        "file": "src/components/shipments/ShipmentsContainer.tsx",
+        "hash": "5525041679044453630"
+      },
+      {
+        "file": "src/components/shipments/ShipmentsCount.tsx",
+        "hash": "16071767696779541334"
+      },
+      {
+        "file": "src/components/shipping_methods/ShippingMethod.tsx",
+        "hash": "4150518205127715913"
+      },
+      {
+        "file": "src/components/shipping_methods/ShippingMethodName.tsx",
+        "hash": "62804487225418935"
+      },
+      {
+        "file": "src/components/shipping_methods/ShippingMethodPrice.tsx",
+        "hash": "8131114196466290345"
+      },
+      {
+        "file": "src/components/shipping_methods/ShippingMethodRadioButton.tsx",
+        "hash": "7370105366477516681"
+      },
+      {
+        "file": "src/components/skus/AvailabilityContainer.tsx",
+        "hash": "8493837441386870299"
+      },
+      {
+        "file": "src/components/skus/AvailabilityTemplate.tsx",
+        "hash": "13905481633188154652"
+      },
+      {
+        "file": "src/components/skus/DeliveryLeadTime.tsx",
+        "hash": "15234788942791890249"
+      },
+      {
+        "file": "src/components/skus/SkuField.tsx",
+        "hash": "16726109204886334920"
+      },
+      {
+        "file": "src/components/skus/SkuList.tsx",
+        "hash": "18282669346665222185"
+      },
+      {
+        "file": "src/components/skus/SkuListsContainer.tsx",
+        "hash": "12646808348406002892"
+      },
+      {
+        "file": "src/components/skus/Skus.tsx",
+        "hash": "2894623678508952544"
+      },
+      {
+        "file": "src/components/skus/SkusContainer.tsx",
+        "hash": "2621260794687905962"
+      },
+      {
+        "file": "src/components/stock_transfers/StockTransfer.tsx",
+        "hash": "10075257827178763569"
+      },
+      {
+        "file": "src/components/stock_transfers/StockTransferField.tsx",
+        "hash": "17895276919683398519"
+      },
+      {
+        "file": "src/components/utils/AddressCardsTemplate.tsx",
+        "hash": "9139095990809993770"
+      },
+      {
+        "file": "src/components/utils/BaseField.tsx",
+        "hash": "1671775551318462295"
+      },
+      {
+        "file": "src/components/utils/BaseInput.tsx",
+        "hash": "373373923192740002"
+      },
+      {
+        "file": "src/components/utils/BaseOrderPrice.tsx",
+        "hash": "15544993476466576367"
+      },
+      {
+        "file": "src/components/utils/BaseSelect.tsx",
+        "hash": "7898328333096358043"
+      },
+      {
+        "file": "src/components/utils/ErrorBoundary.tsx",
+        "hash": "10375724623529426467"
+      },
+      {
+        "file": "src/components/utils/GenericFieldComponent.tsx",
+        "hash": "11104367537637121366"
+      },
+      {
+        "file": "src/components/utils/Parent.tsx",
+        "hash": "18071932662043446601"
+      },
+      {
+        "file": "src/components/utils/PaymentCardsTemplate.tsx",
+        "hash": "12877596280376839012"
+      },
+      {
+        "file": "src/components/utils/PriceTemplate.tsx",
+        "hash": "16834136221672670621"
+      },
+      {
+        "file": "src/components/utils/getAllErrors.tsx",
+        "hash": "4937860445902786071"
+      },
+      {
+        "file": "src/config/currency.ts",
+        "hash": "7590018339509175542"
+      },
+      {
+        "file": "src/config/orders.json",
+        "hash": "5810265018806251716"
+      },
+      {
+        "file": "src/context/AddressChildrenContext.ts",
+        "hash": "11370219895958502800"
+      },
+      {
+        "file": "src/context/AddressContext.ts",
+        "hash": "7106796041241273252"
+      },
+      {
+        "file": "src/context/AvailabilityContext.ts",
+        "hash": "10573215499552092852"
+      },
+      {
+        "file": "src/context/BillingAddressContext.ts",
+        "hash": "18314463872326897698"
+      },
+      {
+        "file": "src/context/BillingAddressFormContext.ts",
+        "hash": "1745047929843375379"
+      },
+      {
+        "file": "src/context/CommerceLayerContext.ts",
+        "hash": "17536073353578081739"
+      },
+      {
+        "file": "src/context/CouponAndGiftCardFormContext.ts",
+        "hash": "6254790486855579477"
+      },
+      {
+        "file": "src/context/CustomerAddressFormContext.ts",
+        "hash": "8473942556290708804"
+      },
+      {
+        "file": "src/context/CustomerContext.ts",
+        "hash": "7733788254357684413"
+      },
+      {
+        "file": "src/context/CustomerPaymentSourceContext.ts",
+        "hash": "8528577098597819954"
+      },
+      {
+        "file": "src/context/ExternalFunctionContext.ts",
+        "hash": "17056658114274960650"
+      },
+      {
+        "file": "src/context/GiftCardContext.ts",
+        "hash": "549293836646478064"
+      },
+      {
+        "file": "src/context/InStockSubscriptionContext.ts",
+        "hash": "11291144030411681848"
+      },
+      {
+        "file": "src/context/LineItemChildrenContext.ts",
+        "hash": "16488573770344719995"
+      },
+      {
+        "file": "src/context/LineItemContext.ts",
+        "hash": "17339068972471553791"
+      },
+      {
+        "file": "src/context/LineItemOptionChildrenContext.ts",
+        "hash": "3783592903715978551"
+      },
+      {
+        "file": "src/context/OrderContext.ts",
+        "hash": "2838145240785047761"
+      },
+      {
+        "file": "src/context/OrderListChildrenContext.ts",
+        "hash": "6885009484177260980"
+      },
+      {
+        "file": "src/context/OrderListPaginationContext.ts",
+        "hash": "2127638373883872740"
+      },
+      {
+        "file": "src/context/OrderStorageContext.ts",
+        "hash": "6999106712689868738"
+      },
+      {
+        "file": "src/context/ParcelChildrenContext.ts",
+        "hash": "1699753540805625598"
+      },
+      {
+        "file": "src/context/ParcelLineItemChildrenContext.ts",
+        "hash": "6286274595084272914"
+      },
+      {
+        "file": "src/context/PaymentMethodChildrenContext.ts",
+        "hash": "11042249994537222885"
+      },
+      {
+        "file": "src/context/PaymentMethodContext.ts",
+        "hash": "276518954990775408"
+      },
+      {
+        "file": "src/context/PaymentSourceContext.ts",
+        "hash": "9144348834623034090"
+      },
+      {
+        "file": "src/context/PlaceOrderContext.ts",
+        "hash": "12250739473525995720"
+      },
+      {
+        "file": "src/context/PricesContext.ts",
+        "hash": "5206007700284273420"
+      },
+      {
+        "file": "src/context/ShipmentChildrenContext.ts",
+        "hash": "13662940779135847654"
+      },
+      {
+        "file": "src/context/ShipmentContext.ts",
+        "hash": "4827157931244165805"
+      },
+      {
+        "file": "src/context/ShippingAddressContext.ts",
+        "hash": "9755139573855278061"
+      },
+      {
+        "file": "src/context/ShippingAddressFormContext.ts",
+        "hash": "15828573789241022125"
+      },
+      {
+        "file": "src/context/ShippingMethodChildrenContext.ts",
+        "hash": "15940626102898090755"
+      },
+      {
+        "file": "src/context/SkuChildrenContext.ts",
+        "hash": "17728031729788170290"
+      },
+      {
+        "file": "src/context/SkuContext.ts",
+        "hash": "6112515363351810279"
+      },
+      {
+        "file": "src/context/SkuListsContext.ts",
+        "hash": "7610524741852781950"
+      },
+      {
+        "file": "src/context/StockTransferChildrenContext.ts",
+        "hash": "8660039927288633476"
+      },
+      {
+        "file": "src/hooks/useCommerceLayer.ts",
+        "hash": "17530374019718574596"
+      },
+      {
+        "file": "src/hooks/useCustomerContainer.ts",
+        "hash": "1148596126380467126"
+      },
+      {
+        "file": "src/hooks/useOrderContainer.ts",
+        "hash": "18124636516255691831"
+      },
+      {
+        "file": "src/index.ts",
+        "hash": "8889727909280837596"
+      },
+      {
+        "file": "src/reducers/AddressReducer.ts",
+        "hash": "5788385017160200272"
+      },
+      {
+        "file": "src/reducers/AvailabilityReducer.ts",
+        "hash": "10633714196778689143"
+      },
+      {
+        "file": "src/reducers/BillingAddressReducer.ts",
+        "hash": "6971061421560561159"
+      },
+      {
+        "file": "src/reducers/CustomerReducer.ts",
+        "hash": "6078762931636995855"
+      },
+      {
+        "file": "src/reducers/GiftCardReducer.ts",
+        "hash": "4924997460068021350"
+      },
+      {
+        "file": "src/reducers/InStockSubscriptionReducer.ts",
+        "hash": "2805715265769667085"
+      },
+      {
+        "file": "src/reducers/LineItemReducer.ts",
+        "hash": "13382048063966633067"
+      },
+      {
+        "file": "src/reducers/OrderReducer.ts",
+        "hash": "583910089631752616"
+      },
+      {
+        "file": "src/reducers/PaymentMethodReducer.ts",
+        "hash": "16985550059132669934"
+      },
+      {
+        "file": "src/reducers/PlaceOrderReducer.ts",
+        "hash": "10015541307429491949"
+      },
+      {
+        "file": "src/reducers/PriceReducer.ts",
+        "hash": "5772692655245253230"
+      },
+      {
+        "file": "src/reducers/ShipmentReducer.ts",
+        "hash": "2069561022111067454"
+      },
+      {
+        "file": "src/reducers/ShippingAddressReducer.ts",
+        "hash": "12805605603443736104"
+      },
+      {
+        "file": "src/reducers/SkuListsReducer.ts",
+        "hash": "15488063052326472611"
+      },
+      {
+        "file": "src/reducers/SkuReducer.ts",
+        "hash": "2206557443888352390"
+      },
+      {
+        "file": "src/typings/environment.d.ts",
+        "hash": "480632733005836266"
+      },
+      {
+        "file": "src/typings/errors.ts",
+        "hash": "17845706484672150999"
+      },
+      {
+        "file": "src/typings/globals.ts",
+        "hash": "8105832499387190147"
+      },
+      {
+        "file": "src/typings/index.ts",
+        "hash": "15306025869318985613"
+      },
+      {
+        "file": "src/utils/PropsType.ts",
+        "hash": "12716844381350644279"
+      },
+      {
+        "file": "src/utils/addressesManager.ts",
+        "hash": "11319450380500188349"
+      },
+      {
+        "file": "src/utils/adyen/manageGiftCard.ts",
+        "hash": "2422236668445414487"
+      },
+      {
+        "file": "src/utils/baseReducer.ts",
+        "hash": "8837257405067094769"
+      },
+      {
+        "file": "src/utils/browserInfo.ts",
+        "hash": "17224495239215810382"
+      },
+      {
+        "file": "src/utils/canPlaceOrder.ts",
+        "hash": "13554448490417217856"
+      },
+      {
+        "file": "src/utils/checkIncludeResource.ts",
+        "hash": "6357196086689645168"
+      },
+      {
+        "file": "src/utils/compareObjAttribute.ts",
+        "hash": "1027986662675735691"
+      },
+      {
+        "file": "src/utils/countryStateCity.ts",
+        "hash": "12140652270984813757"
+      },
+      {
+        "file": "src/utils/customMessages.ts",
+        "hash": "3876281094742821885"
+      },
+      {
+        "file": "src/utils/customerOrderOptions.ts",
+        "hash": "4716866351915835543"
+      },
+      {
+        "file": "src/utils/events.ts",
+        "hash": "7344184284433653427"
+      },
+      {
+        "file": "src/utils/expressPaymentHelper.ts",
+        "hash": "203104313203952287"
+      },
+      {
+        "file": "src/utils/filterChildren.ts",
+        "hash": "15893840755093237411"
+      },
+      {
+        "file": "src/utils/formCleaner.ts",
+        "hash": "16018511934335652365"
+      },
+      {
+        "file": "src/utils/getAmount.ts",
+        "hash": "1725196146749370621"
+      },
+      {
+        "file": "src/utils/getApplicationLink.ts",
+        "hash": "2028712277244910906"
+      },
+      {
+        "file": "src/utils/getCardDetails.ts",
+        "hash": "17398849329508394523"
+      },
+      {
+        "file": "src/utils/getCustomerIdByToken.ts",
+        "hash": "504314895394395895"
+      },
+      {
+        "file": "src/utils/getDomain.ts",
+        "hash": "12184591448689403424"
+      },
+      {
+        "file": "src/utils/getErrors.ts",
+        "hash": "13433878503495784626"
+      },
+      {
+        "file": "src/utils/getLineItemsCount.ts",
+        "hash": "13764781773290138444"
+      },
+      {
+        "file": "src/utils/getLoaderComponent.tsx",
+        "hash": "12563108746465658643"
+      },
+      {
+        "file": "src/utils/getPaymentAttributes.ts",
+        "hash": "3871586142824889187"
+      },
+      {
+        "file": "src/utils/getPrices.tsx",
+        "hash": "11823698463708396210"
+      },
+      {
+        "file": "src/utils/getPublicIp.ts",
+        "hash": "4135149096604135562"
+      },
+      {
+        "file": "src/utils/getSdk.ts",
+        "hash": "14858560611756738780"
+      },
+      {
+        "file": "src/utils/getSkus.ts",
+        "hash": "17794536032626350327"
+      },
+      {
+        "file": "src/utils/hasSubscriptions.ts",
+        "hash": "3201784536693855584"
+      },
+      {
+        "file": "src/utils/hooks/useCustomContext.ts",
+        "hash": "6085075008193176284"
+      },
+      {
+        "file": "src/utils/hooks/useExternalScript.ts",
+        "hash": "3239315212182631321"
+      },
+      {
+        "file": "src/utils/icons.tsx",
+        "hash": "17662992595528022917"
+      },
+      {
+        "file": "src/utils/isDate.ts",
+        "hash": "14904609653068475292"
+      },
+      {
+        "file": "src/utils/isEmpty.ts",
+        "hash": "6596929891731412946"
+      },
+      {
+        "file": "src/utils/isGuestToken.ts",
+        "hash": "10747875669908100831"
+      },
+      {
+        "file": "src/utils/isJSON.ts",
+        "hash": "270589554382302633"
+      },
+      {
+        "file": "src/utils/jwt.ts",
+        "hash": "6821300073816394066"
+      },
+      {
+        "file": "src/utils/localStorage.ts",
+        "hash": "15441199968808322264"
+      },
+      {
+        "file": "src/utils/omit.ts",
+        "hash": "7962313321808423937"
+      },
+      {
+        "file": "src/utils/organization.ts",
+        "hash": "4463847555061258292"
+      },
+      {
+        "file": "src/utils/payment-methods/sortPaymentMethods.ts",
+        "hash": "8704942629495668396"
+      },
+      {
+        "file": "src/utils/pick.ts",
+        "hash": "3369689051388190515"
+      },
+      {
+        "file": "src/utils/placeholderImages.ts",
+        "hash": "15800282338272295866"
+      },
+      {
+        "file": "src/utils/promisify.ts",
+        "hash": "5670248357101562571"
+      },
+      {
+        "file": "src/utils/replace.ts",
+        "hash": "13814783648155632525"
+      },
+      {
+        "file": "src/utils/scrollbarWidth.ts",
+        "hash": "5126381275733394663"
+      },
+      {
+        "file": "src/utils/shipments.ts",
+        "hash": "13105025196817319713"
+      },
+      {
+        "file": "src/utils/snakeToCamelCase.ts",
+        "hash": "15108300771933465369"
+      },
+      {
+        "file": "src/utils/stripe/retrievePaymentIntent.ts",
+        "hash": "5820528781726234251"
+      },
+      {
+        "file": "src/utils/triggerAttributeHelper.ts",
+        "hash": "4378938554354686730"
+      },
+      {
+        "file": "src/utils/updateOrderSubscriptionCustomerPaymentSource.ts",
+        "hash": "4884887114524879370"
+      },
+      {
+        "file": "src/utils/validateFormFields.ts",
+        "hash": "8595516885740042112"
+      },
+      {
+        "file": "tsconfig.json",
+        "hash": "15033548596562235298"
+      },
+      {
+        "file": "tsconfig.prod.esm.json",
+        "hash": "12651144163998481872"
+      },
+      {
+        "file": "tsconfig.prod.json",
+        "hash": "15350800236315528219"
+      },
+      {
+        "file": "vitest.config.mts",
+        "hash": "678457360611212538"
+      }
+    ]
+  }
+}
