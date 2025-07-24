@@ -212,7 +212,7 @@ export function CheckoutComPayment({
         loadFlow()
       }
     }
-  }, [loaded, order?.payment_source?.id, accessToken, ref.current])
+  }, [loaded, order?.payment_source?.id, accessToken])
   return loaded && show ? (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
