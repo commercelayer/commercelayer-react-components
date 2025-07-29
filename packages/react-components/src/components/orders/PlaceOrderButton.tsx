@@ -313,7 +313,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         }).then((res) => {
           // @ts-expect-error no type
           const paymentStatus: string = res?.payment_response?.status
-          if (paymentStatus && paymentStatus.toLowerCase() === "authorized") {
+          const isValidStatus = ["authorized", "captured"].includes(
+            paymentStatus?.toLowerCase(),
+          )
+          if (paymentStatus && isValidStatus) {
             handleClick()
           } else {
             if (options?.checkoutCom) {
