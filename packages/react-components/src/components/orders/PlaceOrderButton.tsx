@@ -303,6 +303,25 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ) {
         handleClick()
       }
+      // if (
+      //   paymentType === "adyen_payments" &&
+      //   isAuthorized &&
+      //   // @ts-expect-error no type
+      //   ref?.current?.disabled === false &&
+      //   currentCustomerPaymentSourceId == null &&
+      //   autoPlaceOrder &&
+      //   status === "standby"
+      // ) {
+      //   // NOTE: This is a workaround for the case when the user reloads the page after selecting a customer payment source
+      //   if (
+      //     // @ts-expect-error no type
+      //     order?.payment_source?.payment_response?.merchantReference?.includes(
+      //       order?.number,
+      //     )
+      //   ) {
+      //     handleClick()
+      //   }
+      // }
     }
   }, [
     options?.adyen?.redirectResult != null,
