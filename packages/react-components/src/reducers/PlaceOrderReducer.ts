@@ -213,12 +213,18 @@ export async function setPlaceOrder({
         _place: true,
       }
       if (saveBillingAddress()) {
+        console.log("Saving billing address to customer address book", {
+          order,
+        })
         await sdk.orders.update({
           id: order.id,
           _save_billing_address_to_customer_address_book: true,
         })
       }
       if (saveShippingAddress()) {
+        console.log("Saving shipping address to customer address book", {
+          order,
+        })
         await sdk.orders.update({
           id: order.id,
           _save_shipping_address_to_customer_address_book: true,
@@ -308,7 +314,7 @@ export async function setPlaceOrder({
           }
         }
       }
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      // biome-ignore lint/suspicious/noExplicitAny: No type for error
     } catch (error: any) {
       const errors = getErrors({
         error,

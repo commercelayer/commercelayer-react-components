@@ -124,12 +124,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     }
   }, [
     isPermitted,
-    paymentType,
-    currentPaymentMethodRef?.current?.onsubmit,
+    paymentType != null,
+    currentPaymentMethodRef?.current?.onsubmit != null,
     loading,
     currentPaymentMethodType,
-    order,
-    paymentSource,
+    order?.id,
+    paymentSource?.id,
   ])
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
@@ -143,7 +143,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     ) {
       handleClick()
     }
-  }, [options?.paypalPayerId, paymentType])
+  }, [options?.paypalPayerId, paymentType != null])
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     // Stripe redirect flow
@@ -199,9 +199,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   useEffect(() => {
     // Adyen redirect flow
     if (order?.status != null && ["draft", "pending"].includes(order?.status)) {
-      const resultCode =
-        // @ts-expect-error no type
-        order?.payment_source?.payment_response?.resultCode === "Authorised"
+      // const isAuthorized =
+      // order?.payment_source?.payment_response?.resultCode === "Authorised"
       const paymentDetails =
         // @ts-expect-error no type
         order?.payment_source?.payment_request_details?.details != null
@@ -252,29 +251,30 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         autoPlaceOrder
       ) {
         handleClick()
-      } else if (
-        paymentType === "adyen_payments" &&
-        resultCode &&
-        // @ts-expect-error no type
-        ref?.current?.disabled === false &&
-        currentCustomerPaymentSourceId == null &&
-        autoPlaceOrder &&
-        status === "standby"
-      ) {
-        // NOTE: This is a workaround for the case when the user reloads the page after selecting a customer payment source
-        if (
-          // @ts-expect-error no type
-          order?.payment_source?.payment_response?.merchantReference?.includes(
-            order?.number,
-          )
-        ) {
-          handleClick()
-        }
       }
+      // if (
+      //   paymentType === "adyen_payments" &&
+      //   isAuthorized &&
+      //   // @ts-expect-error no type
+      //   ref?.current?.disabled === false &&
+      //   currentCustomerPaymentSourceId == null &&
+      //   autoPlaceOrder &&
+      //   status === "standby"
+      // ) {
+      //   // NOTE: This is a workaround for the case when the user reloads the page after selecting a customer payment source
+      //   if (
+      //     // @ts-expect-error no type
+      //     order?.payment_source?.payment_response?.merchantReference?.includes(
+      //       order?.number,
+      //     )
+      //   ) {
+      //     handleClick()
+      //   }
+      // }
     }
   }, [
-    options?.adyen,
-    paymentType,
+    options?.adyen?.MD != null,
+    paymentType != null,
     // @ts-expect-error no type
     order?.payment_source?.payment_response?.resultCode,
   ])
@@ -290,7 +290,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         order: order,
       })
     }
-  }, [order, order?.payment_status, order?.status, paymentType, onClick])
+  }, [order?.id, order?.payment_status, order?.status, paymentType != null])
   useEffect(() => {
     // Checkout.com redirect flow
     if (
@@ -304,13 +304,14 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       const paymentResponse = order?.payment_source?.payment_response
       const paymentStatus = paymentResponse?.status
       if (paymentStatus && paymentStatus.toLowerCase() === "pending") {
-        setPaymentSource({
-          paymentSourceId: paymentSource?.id,
-          paymentResource: "checkout_com_payments",
-          attributes: {
-            _details: 1,
-          },
-        }).then((res) => {
+        async function placingOrder(): Promise<void> {
+          const res = await setPaymentSource({
+            paymentSourceId: paymentSource?.id,
+            paymentResource: "checkout_com_payments",
+            attributes: {
+              _details: 1,
+            },
+          })
           // @ts-expect-error no type
           const paymentStatus: string = res?.payment_response?.status
           const isValidStatus = ["authorized", "captured"].includes(
@@ -331,10 +332,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
               },
             ])
           }
-        })
+        }
+        placingOrder()
       }
-    }
-    if (
+    } else if (
       paymentType === "checkout_com_payments" &&
       order?.status &&
       status &&
@@ -364,12 +365,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         })
       }
     }
-  }, [options?.checkoutCom, paymentType, order?.payment_source?.id, status])
+  }, [options?.checkoutCom?.session_id, order?.payment_source?.id])
   useEffect(() => {
     if (ref?.current != null && setButtonRef != null) {
       setButtonRef(ref)
     }
-  }, [ref])
+  }, [ref?.current])
   useEffect(() => {
     switch (status) {
       case "disabled":
@@ -380,7 +381,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         setNotPermitted(false)
         break
     }
-  }, [status])
+  }, [status != null])
   const handleClick = async (
     e?: MouseEvent<HTMLButtonElement>,
   ): Promise<void> => {
