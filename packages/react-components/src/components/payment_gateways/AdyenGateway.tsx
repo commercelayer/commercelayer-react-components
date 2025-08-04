@@ -1,4 +1,8 @@
+import type { StripeElementLocale } from "@stripe/stripe-js"
+import isEmpty from "lodash/isEmpty"
+import { type JSX, useContext } from "react"
 import type { GatewayBaseType } from "#components/payment_gateways/PaymentGateway"
+import AdyenPayment from "#components/payment_source/AdyenPayment"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
@@ -6,15 +10,11 @@ import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PaymentSourceContext from "#context/PaymentSourceContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
-import type { StripeElementLocale } from "@stripe/stripe-js"
-import isEmpty from "lodash/isEmpty"
-import { useContext, type JSX } from "react"
-import AdyenPayment from "#components/payment_source/AdyenPayment"
-import PaymentCardsTemplate from "../utils/PaymentCardsTemplate"
-import { jwt } from "#utils/jwt"
 import getCardDetails from "#utils/getCardDetails"
 import { getPaymentAttributes } from "#utils/getPaymentAttributes"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
+import { jwt } from "#utils/jwt"
+import PaymentCardsTemplate from "../utils/PaymentCardsTemplate"
 
 type Props = GatewayBaseType
 
@@ -25,8 +25,6 @@ export function AdyenGateway(props: Props): JSX.Element | null {
     handleEditClick,
     children,
     templateCustomerCards,
-    loading,
-    loaderComponent,
     templateCustomerSaveToWallet,
     ...p
   } = props
