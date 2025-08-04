@@ -197,10 +197,11 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   ])
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
-    // Adyen redirect flow
     if (order?.status != null && ["draft", "pending"].includes(order?.status)) {
-      // const isAuthorized =
-      // order?.payment_source?.payment_response?.resultCode === "Authorised"
+      // Adyen redirect flow
+      const isAuthorized =
+        // @ts-expect-error no type
+        order?.payment_source?.payment_response?.resultCode === "Authorised"
       const paymentDetails =
         // @ts-expect-error no type
         order?.payment_source?.payment_request_details?.details != null
@@ -246,35 +247,34 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         })
       } else if (
         paymentType === "adyen_payments" &&
-        options?.adyen?.MD &&
-        options?.adyen?.PaRes &&
-        autoPlaceOrder
+        isAuthorized &&
+        paymentDetails &&
+        autoPlaceOrder &&
+        status === "standby" &&
+        !options?.adyen?.redirectResult
       ) {
-        handleClick()
+        // NOTE: This is a workaround for the case when the user reloads the page after selecting a customer payment source
+        if (
+          // @ts-expect-error no type
+          order?.payment_source?.payment_response?.merchantReference?.includes(
+            order?.number,
+          )
+        ) {
+          handleClick()
+        }
       }
-      // if (
+      // else if (
       //   paymentType === "adyen_payments" &&
-      //   isAuthorized &&
-      //   // @ts-expect-error no type
-      //   ref?.current?.disabled === false &&
-      //   currentCustomerPaymentSourceId == null &&
-      //   autoPlaceOrder &&
-      //   status === "standby"
+      //   options?.adyen?.MD &&
+      //   options?.adyen?.PaRes &&
+      //   autoPlaceOrder
       // ) {
-      //   // NOTE: This is a workaround for the case when the user reloads the page after selecting a customer payment source
-      //   if (
-      //     // @ts-expect-error no type
-      //     order?.payment_source?.payment_response?.merchantReference?.includes(
-      //       order?.number,
-      //     )
-      //   ) {
-      //     handleClick()
-      //   }
+      //   console.log("Adyen MD and PaRes detected, placing order...")
+      //   handleClick()
       // }
     }
   }, [
-    options?.adyen?.MD != null,
-    paymentType != null,
+    options?.adyen?.redirectResult != null,
     // @ts-expect-error no type
     order?.payment_source?.payment_response?.resultCode,
   ])
