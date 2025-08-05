@@ -1,15 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import {
-  type FormEvent,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type JSX,
-} from "react"
-import PaymentMethodContext from "#context/PaymentMethodContext"
-import type { PaymentSourceProps } from "./PaymentSource"
-import { setCustomerOrderParam } from "#utils/localStorage"
+
 import {
   type AdditionalDetailsData,
   AdyenCheckout,
@@ -24,13 +14,24 @@ import {
   type UIElement,
   type UIElementProps,
 } from "@adyen/adyen-web/auto"
+import {
+  type FormEvent,
+  type JSX,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import Parent from "#components/utils/Parent"
-import browserInfo, { cleanUrlBy } from "#utils/browserInfo"
-import PlaceOrderContext from "#context/PlaceOrderContext"
-import OrderContext from "#context/OrderContext"
-import { getPublicIP } from "#utils/getPublicIp"
 import CustomerContext from "#context/CustomerContext"
+import OrderContext from "#context/OrderContext"
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import PlaceOrderContext from "#context/PlaceOrderContext"
+import browserInfo, { cleanUrlBy } from "#utils/browserInfo"
+import { getPublicIP } from "#utils/getPublicIp"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
+import { setCustomerOrderParam } from "#utils/localStorage"
+import type { PaymentSourceProps } from "./PaymentSource"
 
 interface PaymentMethodsStyle {
   card?: CardConfiguration["styles"]
@@ -150,7 +151,8 @@ export function AdyenPayment({
     currentCustomerPaymentSourceId,
   } = useContext(PaymentMethodContext)
   const { order, updateOrder } = useContext(OrderContext)
-  const { placeOrderButtonRef, setPlaceOrder } = useContext(PlaceOrderContext)
+  const { placeOrderButtonRef, setPlaceOrder, status } =
+    useContext(PlaceOrderContext)
   const { customers } = useContext(CustomerContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const dropinRef = useRef<Dropin | null>(null)
@@ -279,7 +281,6 @@ export function AdyenPayment({
         },
       },
     }
-    // biome-ignore lint/performance/noDelete: Need to test
     delete attributes.payment_request_data.paymentMethod
     try {
       await setPaymentSource({
@@ -646,7 +647,8 @@ export function AdyenPayment({
           setLoadAdyen(true)
         }
       }
-      if (!dropinRef.current) {
+      const html = document.getElementById("adyen-dropin")
+      if (!dropinRef.current && status === "standby" && html) {
         initializeAdyen()
       }
     }
@@ -654,7 +656,7 @@ export function AdyenPayment({
       setPaymentRef({ ref: { current: null } })
       setLoadAdyen(false)
     }
-  }, [clientKey, ref != null])
+  }, [clientKey, ref != null, status])
   return !clientKey && !loadAdyen && !checkout ? null : (
     <form
       ref={ref}
