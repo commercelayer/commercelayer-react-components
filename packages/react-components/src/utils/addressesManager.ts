@@ -12,6 +12,7 @@ import type {
 import isEmpty from "lodash/isEmpty"
 import { type AddressField, addressFields } from "#reducers/AddressReducer"
 import type { TCustomerAddress } from "#reducers/CustomerReducer"
+import { updateOrder } from "#reducers/OrderReducer"
 import type { BaseError } from "#typings/errors"
 import { fieldsExist } from "#utils/validateFormFields"
 
@@ -247,6 +248,12 @@ export async function invertedAddressesHandler({
         id: order.shipping_address.id,
         ...shippingAddress,
       })
+      updateOrder?.({
+        id: order.id,
+        attributes: {
+          _refresh: true,
+        },
+      })
     } else {
       address = await sdk.addresses.create(shippingAddress)
     }
@@ -281,6 +288,12 @@ export async function invertedAddressesHandler({
         address = await sdk.addresses.update({
           id: order.billing_address.id,
           ...billingAddress,
+        })
+        updateOrder?.({
+          id: order.id,
+          attributes: {
+            _refresh: true,
+          },
         })
       } else {
         address = await sdk.addresses.create(billingAddress)
