@@ -305,12 +305,6 @@ export async function saveAddresses({
         }
       }
       if (orderAttributes != null && updateOrder) {
-        if (
-          orderAttributes._shipping_address_same_as_billing &&
-          orderAttributes.customer_email
-        ) {
-          delete orderAttributes.customer_email
-        }
         const orderUpdated = await updateOrder({
           id: order.id,
           attributes: orderAttributes,
