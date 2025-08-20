@@ -12,7 +12,6 @@ import type {
 import isEmpty from "lodash/isEmpty"
 import { type AddressField, addressFields } from "#reducers/AddressReducer"
 import type { TCustomerAddress } from "#reducers/CustomerReducer"
-import { updateOrder } from "#reducers/OrderReducer"
 import type { BaseError } from "#typings/errors"
 import { fieldsExist } from "#utils/validateFormFields"
 
@@ -248,16 +247,10 @@ export async function invertedAddressesHandler({
         id: order.shipping_address.id,
         ...shippingAddress,
       })
-      updateOrder?.({
-        id: order.id,
-        attributes: {
-          _refresh: true,
-        },
-      })
     } else {
       address = await sdk.addresses.create(shippingAddress)
+      orderAttributes.shipping_address = sdk.addresses.relationship(address.id)
     }
-    orderAttributes.shipping_address = sdk.addresses.relationship(address.id)
   }
   if (shipToDifferentAddress) {
     delete orderAttributes._billing_address_same_as_shipping
@@ -289,16 +282,10 @@ export async function invertedAddressesHandler({
           id: order.billing_address.id,
           ...billingAddress,
         })
-        updateOrder?.({
-          id: order.id,
-          attributes: {
-            _refresh: true,
-          },
-        })
       } else {
         address = await sdk.addresses.create(billingAddress)
+        orderAttributes.billing_address = sdk.addresses.relationship(address.id)
       }
-      orderAttributes.billing_address = sdk.addresses.relationship(address.id)
     }
   }
   return orderAttributes
