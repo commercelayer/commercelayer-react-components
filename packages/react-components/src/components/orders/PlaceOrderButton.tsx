@@ -84,7 +84,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     setPaymentMethodErrors,
     currentCustomerPaymentSourceId,
   } = useContext(PaymentMethodContext)
-  const { order, setOrderErrors } = useContext(OrderContext)
+  const { order, setOrderErrors, errors } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
@@ -131,6 +131,13 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     order?.id,
     paymentSource?.id,
   ])
+  useEffect(() => {
+    if (errors && errors.length > 0) {
+      setNotPermitted(true)
+      setIsLoading(false)
+      setForceDisable(false)
+    }
+  }, [errors])
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     // PayPal redirect flow
@@ -442,7 +449,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     }
     setIsLoading(true)
     let isValid = true
-    setForceDisable(true)
+    // setForceDisable(true)
     const checkPaymentSource =
       paymentType !== "stripe_payments"
         ? await setPaymentSource({
@@ -500,6 +507,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     }
     if (isValid && setPlaceOrderStatus != null) {
       setPlaceOrderStatus({ status: "placing" })
+      setForceDisable(true)
     }
     const placed =
       isValid &&
@@ -519,9 +527,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         setIsLoading(false)
         setPlaceOrderStatus({ status: "standby" })
       }
-    } else {
-      setForceDisable(false)
-      setIsLoading(false)
     }
   }
   const disabledButton = disabled !== undefined ? disabled : notPermitted
