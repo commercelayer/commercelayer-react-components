@@ -249,8 +249,8 @@ export async function invertedAddressesHandler({
       })
     } else {
       address = await sdk.addresses.create(shippingAddress)
+      orderAttributes.shipping_address = sdk.addresses.relationship(address.id)
     }
-    orderAttributes.shipping_address = sdk.addresses.relationship(address.id)
   }
   if (shipToDifferentAddress) {
     delete orderAttributes._billing_address_same_as_shipping
@@ -284,8 +284,8 @@ export async function invertedAddressesHandler({
         })
       } else {
         address = await sdk.addresses.create(billingAddress)
+        orderAttributes.billing_address = sdk.addresses.relationship(address.id)
       }
-      orderAttributes.billing_address = sdk.addresses.relationship(address.id)
     }
   }
   return orderAttributes

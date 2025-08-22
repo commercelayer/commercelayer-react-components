@@ -27,11 +27,11 @@ export type CustomFieldMessageError = (props: {
   | string
   | null
   | Array<{
-    field: Extract<AddressValuesKeys, AddressInputName> | string
-    value: string
-    isValid: boolean
-    message?: string
-  }>
+      field: Extract<AddressValuesKeys, AddressInputName> | string
+      value: string
+      isValid: boolean
+      message?: string
+    }>
 
 export type AddressActionType =
   | "setErrors"
@@ -260,17 +260,20 @@ export async function saveAddresses({
           }
           const billingAddressWithMeta = sanitizeMetadataFields(billingAddress)
           let address: Address | undefined
-          if (order?.billing_address?.id && order?.billing_address?.reference == null) {
+          if (
+            order?.billing_address?.id &&
+            order?.billing_address?.reference == null
+          ) {
             address = await sdk.addresses.update({
               id: order.billing_address.id,
               ...billingAddressWithMeta,
             })
           } else {
             address = await sdk.addresses.create(billingAddressWithMeta)
+            orderAttributes.billing_address = sdk.addresses.relationship(
+              address.id,
+            )
           }
-          orderAttributes.billing_address = sdk.addresses.relationship(
-            address.id,
-          )
         }
         if (shipToDifferentAddress) {
           delete orderAttributes._shipping_address_same_as_billing
@@ -284,17 +287,20 @@ export async function saveAddresses({
             const shippingAddressWithMeta =
               sanitizeMetadataFields(shippingAddress)
             let address: Address | undefined
-            if (order?.shipping_address?.id && order?.shipping_address?.reference == null) {
+            if (
+              order?.shipping_address?.id &&
+              order?.shipping_address?.reference == null
+            ) {
               address = await sdk.addresses.update({
                 id: order.shipping_address.id,
                 ...shippingAddressWithMeta,
               })
             } else {
               address = await sdk.addresses.create(shippingAddressWithMeta)
+              orderAttributes.shipping_address = sdk.addresses.relationship(
+                address.id,
+              )
             }
-            orderAttributes.shipping_address = sdk.addresses.relationship(
-              address.id,
-            )
           }
         }
       }
@@ -303,6 +309,19 @@ export async function saveAddresses({
           id: order.id,
           attributes: orderAttributes,
         })
+        if (
+          (order?.billing_address?.id &&
+            order?.billing_address?.reference == null) ||
+          (order?.shipping_address?.id &&
+            order?.shipping_address?.reference == null)
+        ) {
+          await updateOrder({
+            id: order.id,
+            attributes: {
+              _refresh: true,
+            },
+          })
+        }
         return { success: true, order: orderUpdated?.order }
       }
     }
