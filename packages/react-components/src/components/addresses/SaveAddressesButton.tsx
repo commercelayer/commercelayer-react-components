@@ -51,7 +51,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     shippingAddressId,
     invertAddresses,
   } = useContext(AddressContext)
-  const { order } = useContext(OrderContext)
+  const { order, setOrderErrors } = useContext(OrderContext)
   const {
     customerEmail: email,
     addresses,
@@ -115,6 +115,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
 
   const handleClick = async (): Promise<void> => {
     if (errors && Object.keys(errors).length === 0 && !disable) {
+      setOrderErrors?.([])
       let response: {
         success: boolean
         order?: Order

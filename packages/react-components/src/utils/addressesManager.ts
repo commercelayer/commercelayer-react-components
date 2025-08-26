@@ -30,7 +30,7 @@ export function billingAddressController({
   billing_address,
   billingAddressId,
   errors,
-  requiresBillingInfo = false,
+  // requiresBillingInfo = false,
   invertAddresses = false,
   shipToDifferentAddress,
   shippingDisable,
@@ -48,7 +48,7 @@ export function billingAddressController({
         billing_address && fieldsExist(billing_address, formFields)
       )
     } else {
-      if (requiresBillingInfo) formFields = [...formFields, "billing_info"]
+      // if (requiresBillingInfo) formFields = [...formFields, "billing_info"]
       billingDisable = !!(
         billing_address && fieldsExist(billing_address, formFields)
       )
@@ -82,7 +82,7 @@ export function shippingAddressController({
   shipping_address,
   shippingAddressId,
   invertAddresses = false,
-  requiresBillingInfo = false,
+  // requiresBillingInfo = false,
   requiredMetadataFields,
 }: ShippingAddressControllerProps): boolean {
   let shippingDisable = invertAddresses
@@ -94,7 +94,7 @@ export function shippingAddressController({
     if (requiredMetadataFields != null && requiredMetadataFields.length > 0)
       formField = [...formField, ...requiredMetadataFields]
     if (invertAddresses) {
-      if (requiresBillingInfo) formField = [...formField, "billing_info"]
+      // if (requiresBillingInfo) formField = [...formField, "billing_info"]
       shippingDisable = !!(
         shipping_address && fieldsExist(shipping_address, formField)
       )
