@@ -191,6 +191,7 @@ export function CheckoutComPayment({
               console.error("onError", { error }, "Component", component.type)
             },
             onPaymentCompleted: async (_component, paymentResponse) => {
+              console.log("onPaymentCompleted", { paymentResponse })
               if (paymentResponse.status.toLowerCase() === "approved") {
                 await setPaymentSource({
                   paymentSourceId: ps.id,
