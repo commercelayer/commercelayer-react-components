@@ -263,7 +263,9 @@ export function getCustomerPaymentSources(
   }
 }
 
-interface GetCustomerOrdersProps {
+type GetCustomerOrdersResource = Order | OrderSubscription
+
+interface GetCustomerOrdersProps<T extends GetCustomerOrdersResource> {
   /**
    * The Commerce Layer config
    */
@@ -431,7 +433,7 @@ export async function createCustomerAddress({
   }
 }
 
-interface GetCustomerPaymentsParams extends GetCustomerOrdersProps {}
+interface GetCustomerPaymentsParams extends GetCustomerOrdersProps<Order> {}
 
 export async function getCustomerPayments({
   config,
