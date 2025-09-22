@@ -22,7 +22,7 @@ import CustomerContext from '#context/CustomerContext'
 import type { BaseError } from '#typings/errors'
 import type { DefaultChildrenType } from '#typings/globals'
 import { isGuestToken } from '#utils/isGuestToken'
-import type { QueryPageSize } from '@commercelayer/sdk'
+import type { Order, QueryPageSize, QuerySort } from '@commercelayer/sdk'
 
 interface Props {
   children: DefaultChildrenType
@@ -189,16 +189,19 @@ export function CustomerContainer(props: Props): JSX.Element {
       },
       getCustomerOrders: async ({
         pageNumber,
-        pageSize
+        pageSize,
+        sortBy
       }: {
         pageNumber?: number
         pageSize?: QueryPageSize
+        sortBy?: QuerySort<Order>
       }) => {
         await getCustomerOrders({
           config,
           dispatch,
           pageNumber,
-          pageSize
+          pageSize,
+          sortBy
         })
       },
       getCustomerSubscriptions: async ({
