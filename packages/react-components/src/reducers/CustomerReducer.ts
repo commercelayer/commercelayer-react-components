@@ -11,7 +11,8 @@ import type {
   Order,
   OrderSubscription,
   OrderUpdate,
-  QueryPageSize
+  QueryPageSize,
+  QuerySort
 } from '@commercelayer/sdk'
 import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import type { updateOrder } from './OrderReducer'
@@ -262,7 +263,9 @@ export function getCustomerPaymentSources(
   }
 }
 
-interface GetCustomerOrdersProps {
+type GetCustomerOrdersResource = Order | OrderSubscription
+
+interface GetCustomerOrdersProps<T extends GetCustomerOrdersResource> {
   /**
    * The Commerce Layer config
    */
@@ -280,6 +283,10 @@ interface GetCustomerOrdersProps {
    */
   pageNumber?: number
   /**
+   * The sort order
+   */
+  sortBy?: QuerySort<T>
+  /**
    * Retrieve a specific subscription or order by id
    */
   id?: string
@@ -289,14 +296,16 @@ export async function getCustomerOrders({
   config,
   dispatch,
   pageSize = 10,
-  pageNumber = 1
-}: GetCustomerOrdersProps): Promise<void> {
+  pageNumber = 1,
+  sortBy
+}: GetCustomerOrdersProps<Order>): Promise<void> {
   if (config.accessToken) {
     const { owner } = jwt(config.accessToken)
     if (owner?.id) {
       const sdk = getSdk(config)
       const orders = await sdk.customers.orders(owner.id, {
         filters: { status_not_in: 'draft,pending' },
+        sort: sortBy ?? { number: 'desc'},
         pageSize,
         pageNumber
       })
@@ -314,7 +323,7 @@ export async function getCustomerSubscriptions({
   dispatch,
   pageSize = 10,
   pageNumber = 1
-}: GetCustomerOrdersProps): Promise<void> {
+}: GetCustomerOrdersProps<OrderSubscription>): Promise<void> {
   if (config.accessToken) {
     const { owner } = jwt(config.accessToken)
     if (owner?.id) {
@@ -421,7 +430,7 @@ export async function createCustomerAddress({
   }
 }
 
-interface GetCustomerPaymentsParams extends GetCustomerOrdersProps {}
+interface GetCustomerPaymentsParams extends GetCustomerOrdersProps<Order> {}
 
 export async function getCustomerPayments({
   config,
