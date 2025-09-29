@@ -159,7 +159,7 @@ function StripePaymentForm({
       }
       const url = new URL(window.location.href)
       const cleanUrl = `${url.origin}${url.pathname}?accessToken=${url.searchParams.get("accessToken")}`
-      const { error, paymentIntent } = await stripe.confirmPayment({
+      const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: cleanUrl,
@@ -169,7 +169,6 @@ function StripePaymentForm({
         },
         redirect: "if_required",
       })
-      console.log({ paymentIntent })
       if (error) {
         console.error(error)
         setPaymentMethodErrors([
