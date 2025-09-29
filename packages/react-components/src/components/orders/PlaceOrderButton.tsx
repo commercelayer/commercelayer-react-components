@@ -163,7 +163,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ["draft", "pending"].includes(order?.status) &&
       autoPlaceOrder
     ) {
-      console.log("Stripe redirect flow")
       // @ts-expect-error no type
       const publicApiKey = order?.payment_source?.publishable_key
       const paymentIntentClientSecret =
@@ -301,7 +300,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   }, [order?.id, order?.payment_status, order?.status, paymentType != null])
   useEffect(() => {
     // Checkout.com redirect flow
-    console.log("Checkout.com redirect flow", { order, status })
     if (
       paymentType === "checkout_com_payments" &&
       options?.checkoutCom?.session_id &&
@@ -352,14 +350,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ["placing"].includes(status) &&
       autoPlaceOrder
     ) {
-      console.log("Placing order with Checkout.com express payments")
       /**
        * Place order with Checkout.com using express payments
        */
       const paymentSourceStatus =
         // @ts-expect-error no type
         order?.payment_source?.payment_response?.status
-      console.log("Payment source status:", paymentSourceStatus)
       if (
         paymentSourceStatus &&
         ["captured", "authorized"].includes(paymentSourceStatus.toLowerCase())
