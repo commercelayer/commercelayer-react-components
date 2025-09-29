@@ -309,19 +309,19 @@ export async function saveAddresses({
           id: order.id,
           attributes: orderAttributes,
         })
-        if (
-          (order?.billing_address?.id &&
-            order?.billing_address?.reference == null) ||
-          (order?.shipping_address?.id &&
-            order?.shipping_address?.reference == null)
-        ) {
-          await updateOrder({
-            id: order.id,
-            attributes: {
-              _refresh: true,
-            },
-          })
-        }
+        // if (
+        //   (order?.billing_address?.id &&
+        //     order?.billing_address?.reference == null) ||
+        //   (order?.shipping_address?.id &&
+        //     order?.shipping_address?.reference == null)
+        // ) {
+        //   await updateOrder({
+        //     id: order.id,
+        //     attributes: {
+        //       _refresh: true,
+        //     },
+        //   })
+        // }
         return { success: true, order: orderUpdated?.order }
       }
     }
