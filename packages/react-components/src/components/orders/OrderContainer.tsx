@@ -1,35 +1,35 @@
+import type { Order, OrderCreate } from "@commercelayer/sdk"
 import {
-  useEffect,
-  useReducer,
-  useContext,
-  useMemo,
-  useState,
   type JSX,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
 } from "react"
-import orderReducer, {
-  createOrder,
-  getApiOrder,
-  setOrderErrors,
-  setOrder,
-  type OrderCodeType,
-  type AddResourceToInclude,
-  orderInitialState,
-  type UpdateOrderArgs,
-  type SaveAddressToCustomerAddressBook,
-  updateOrder,
-  type ResourceIncluded,
-  addToCart,
-  paymentSourceRequest,
-} from "#reducers/OrderReducer"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
-import type { BaseMetadataObject } from "#typings"
 import OrderStorageContext from "#context/OrderStorageContext"
-import type { OrderCreate, Order } from "@commercelayer/sdk"
+import orderReducer, {
+  type AddResourceToInclude,
+  addToCart,
+  createOrder,
+  getApiOrder,
+  type OrderCodeType,
+  orderInitialState,
+  paymentSourceRequest,
+  type ResourceIncluded,
+  type SaveAddressToCustomerAddressBook,
+  setOrder,
+  setOrderErrors,
+  type UpdateOrderArgs,
+  updateOrder,
+} from "#reducers/OrderReducer"
+import type { BaseMetadataObject } from "#typings"
 import type { BaseError } from "#typings/errors"
+import type { DefaultChildrenType } from "#typings/globals"
 import compareObjAttribute from "#utils/compareObjAttribute"
 import useCustomContext from "#utils/hooks/useCustomContext"
-import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
   children: DefaultChildrenType
@@ -269,6 +269,7 @@ export function OrderContainer(props: Props): JSX.Element {
   ])
   const orderValue = useMemo(() => {
     if (fetchOrder != null && state?.order != null) {
+      console.log("OrderContainer: triggering fetchOrder callback", state.order)
       fetchOrder(state.order)
     }
     return {
