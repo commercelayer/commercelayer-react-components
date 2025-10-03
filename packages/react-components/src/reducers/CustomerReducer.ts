@@ -263,9 +263,7 @@ export function getCustomerPaymentSources(
   }
 }
 
-type GetCustomerOrdersResource = Order | OrderSubscription
-
-interface GetCustomerOrdersProps<T extends GetCustomerOrdersResource> {
+interface GetCustomerOrdersProps {
   /**
    * The Commerce Layer config
    */
@@ -285,7 +283,7 @@ interface GetCustomerOrdersProps<T extends GetCustomerOrdersResource> {
   /**
    * The sort order
    */
-  sortBy?: QuerySort<T>
+  sortBy?: QuerySort<Order>
   /**
    * Retrieve a specific subscription or order by id
    */
@@ -298,7 +296,7 @@ export async function getCustomerOrders({
   pageSize = 10,
   pageNumber = 1,
   sortBy
-}: GetCustomerOrdersProps<Order>): Promise<void> {
+}: GetCustomerOrdersProps): Promise<void> {
   if (config.accessToken) {
     const { owner } = jwt(config.accessToken)
     if (owner?.id) {
@@ -322,8 +320,9 @@ export async function getCustomerSubscriptions({
   config,
   dispatch,
   pageSize = 10,
-  pageNumber = 1
-}: GetCustomerOrdersProps<OrderSubscription>): Promise<void> {
+  pageNumber = 1,
+  sortBy
+}: GetCustomerOrdersProps): Promise<void> {
   if (config.accessToken) {
     const { owner } = jwt(config.accessToken)
     if (owner?.id) {
@@ -331,6 +330,7 @@ export async function getCustomerSubscriptions({
       if (id != null) {
         const subscriptions = await sdk.customers.orders(owner.id, {
           filters: { order_subscription_id_eq: id },
+          sort: sortBy ?? { number: 'desc'},
           include: ['authorizations'],
           pageSize,
           pageNumber
@@ -343,6 +343,7 @@ export async function getCustomerSubscriptions({
         const subscriptions = await sdk.customers.order_subscriptions(
           owner.id,
           {
+            sort: (sortBy ?? { starts_at: 'desc'}) as QuerySort<OrderSubscription>,
             pageSize,
             pageNumber
           }
@@ -430,7 +431,7 @@ export async function createCustomerAddress({
   }
 }
 
-interface GetCustomerPaymentsParams extends GetCustomerOrdersProps<Order> {}
+interface GetCustomerPaymentsParams extends GetCustomerOrdersProps {}
 
 export async function getCustomerPayments({
   config,

@@ -168,6 +168,7 @@ export function OrderList({
       getCustomerSubscriptions({
         pageNumber: pageIndex + 1,
         pageSize: currentPageSize as QueryPageSize,
+        sortBy: sdkSorting as QuerySort<Order>,
         id
       })
     }

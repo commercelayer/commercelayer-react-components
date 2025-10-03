@@ -207,10 +207,12 @@ export function CustomerContainer(props: Props): JSX.Element {
       getCustomerSubscriptions: async ({
         pageNumber,
         pageSize,
+        sortBy,
         id
       }: {
         pageNumber?: number
         pageSize?: QueryPageSize
+        sortBy?: QuerySort<Order>
         id?: string
       }) => {
         await getCustomerSubscriptions({
@@ -218,6 +220,7 @@ export function CustomerContainer(props: Props): JSX.Element {
           dispatch,
           pageNumber,
           pageSize,
+          sortBy,
           id
         })
       },
