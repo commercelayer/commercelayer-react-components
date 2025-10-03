@@ -445,6 +445,7 @@ export async function getCustomerPayments({
     if (owner?.id) {
       const payments = await sdk.customer_payment_sources.list({
         include: ['payment_source'],
+        sort: { updated_at: 'desc' },
         pageNumber,
         pageSize
       })

@@ -125,18 +125,12 @@ export function CustomerContainer(props: Props): JSX.Element {
         getCustomerPaymentSources({ dispatch, order })
       }
       if (
-        config.accessToken &&
         order == null &&
         include == null &&
         includeLoaded == null &&
         withoutIncludes === undefined
       ) {
-        async function getCustomerData(): Promise<void> {
-          await getCustomerOrders({ config, dispatch })
-          await getCustomerSubscriptions({ config, dispatch })
-          await getCustomerPayments({ config, dispatch })
-        }
-        getCustomerData()
+        getCustomerPayments({ config, dispatch })
       }
     }
   }, [config.accessToken, order?.payment_source != null, isGuest])
