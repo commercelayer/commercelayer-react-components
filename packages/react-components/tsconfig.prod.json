@@ -4,7 +4,7 @@
     /* Basic Options */
     "resolveJsonModule": true,
     "incremental": false /* Enable incremental compilation */,
-    "target": "ES6" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */,
+    "target": "esnext" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */,
     "module": "CommonJS" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */,
     // "lib": [],                                   /* Specify library files to be included in the compilation. */
     // "allowJs": true,                             /* Allow javascript files to be compiled. */
@@ -43,36 +43,16 @@
     "moduleResolution": "Node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
     "baseUrl": "./" /* Base directory to resolve non-absolute module names. */,
     "paths": {
-      "@commercelayer/react-components": [
-        "src/index"
-      ],
-      "#components/*": [
-        "src/components/*"
-      ],
-      "#components-utils/*": [
-        "src/components/utils/*"
-      ],
-      "#reducers/*": [
-        "src/reducers/*"
-      ],
-      "#context/*": [
-        "src/context/*"
-      ],
-      "#typings/*": [
-        "src/typings/*"
-      ],
-      "#typings": [
-        "src/typings/index"
-      ],
-      "#utils/*": [
-        "src/utils/*"
-      ],
-      "#config/*": [
-        "src/config/*"
-      ],
-      "#hooks/*": [
-        "src/hooks/*"
-      ]
+      "@commercelayer/react-components": ["src/index"],
+      "#components/*": ["src/components/*"],
+      "#components-utils/*": ["src/components/utils/*"],
+      "#reducers/*": ["src/reducers/*"],
+      "#context/*": ["src/context/*"],
+      "#typings/*": ["src/typings/*"],
+      "#typings": ["src/typings/index"],
+      "#utils/*": ["src/utils/*"],
+      "#config/*": ["src/config/*"],
+      "#hooks/*": ["src/hooks/*"]
     } /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */,
     // "rootDirs": [],                              /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                             /* List of folders to include type definitions from. */
@@ -93,10 +73,6 @@
     "skipLibCheck": true /* Skip type checking of declaration files. */,
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

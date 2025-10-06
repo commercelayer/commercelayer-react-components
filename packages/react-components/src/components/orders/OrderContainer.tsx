@@ -269,7 +269,6 @@ export function OrderContainer(props: Props): JSX.Element {
   ])
   const orderValue = useMemo(() => {
     if (fetchOrder != null && state?.order != null) {
-      console.log("OrderContainer: triggering fetchOrder callback", state.order)
       fetchOrder(state.order)
     }
     return {
