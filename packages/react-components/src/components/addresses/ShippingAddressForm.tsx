@@ -1,18 +1,18 @@
-import AddressesContext from '#context/AddressContext'
-import { useRapidForm } from 'rapid-form'
-import { type ReactNode, useContext, useEffect, useRef, type JSX } from 'react';
-import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
-import type { BaseError, CodeErrorType } from '#typings/errors'
-import OrderContext from '#context/OrderContext'
-import { getSaveShippingAddressToAddressBook } from '#utils/localStorage'
-import type { AddressValuesKeys } from '#context/BillingAddressFormContext'
-import type { CustomFieldMessageError } from '#reducers/AddressReducer'
+import { useRapidForm } from "rapid-form"
+import { type JSX, type ReactNode, useContext, useEffect, useRef } from "react"
+import AddressesContext from "#context/AddressContext"
+import type { AddressValuesKeys } from "#context/BillingAddressFormContext"
+import OrderContext from "#context/OrderContext"
+import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
+import type { CustomFieldMessageError } from "#reducers/AddressReducer"
+import type { BaseError, CodeErrorType } from "#typings/errors"
+import { getSaveShippingAddressToAddressBook } from "#utils/localStorage"
 
-interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
+interface Props extends Omit<JSX.IntrinsicElements["form"], "onSubmit"> {
   children: ReactNode
   reset?: boolean
   errorClassName?: string
-  fieldEvent?: 'blur' | 'change'
+  fieldEvent?: "blur" | "change"
   /**
    * Callback to customize the error message for a specific field. Called for each error in the form.
    */
@@ -40,8 +40,8 @@ export function ShippingAddressForm(props: Props): JSX.Element {
   const {
     children,
     errorClassName,
-    autoComplete = 'on',
-    fieldEvent = 'change',
+    autoComplete = "on",
+    fieldEvent = "change",
     reset = false,
     customFieldMessageError,
     ...p
@@ -52,35 +52,35 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     errors,
     reset: resetForm,
     setValue: setValueForm,
-    setError: setErrorForm
+    setError: setErrorForm,
   } = useRapidForm({ fieldEvent })
   const {
     setAddressErrors,
     setAddress,
     shipToDifferentAddress,
     isBusiness,
-    invertAddresses
+    invertAddresses,
   } = useContext(AddressesContext)
   const {
     saveAddressToCustomerAddressBook,
     include,
     addResourceToInclude,
-    includeLoaded
+    includeLoaded,
   } = useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
-    if (!include?.includes('shipping_address')) {
+    if (!include?.includes("shipping_address")) {
       addResourceToInclude({
-        newResource: 'shipping_address'
+        newResource: "shipping_address",
       })
     } else if (!includeLoaded?.shipping_address) {
       addResourceToInclude({
-        newResourceLoaded: { shipping_address: true }
+        newResourceLoaded: { shipping_address: true },
       })
     }
     if (customFieldMessageError != null && Object.keys(values).length > 0) {
       for (const name in values) {
-        if (Object.prototype.hasOwnProperty.call(values, name)) {
+        if (Object.hasOwn(values, name)) {
           const field = values[name]
           const fieldName = field.name
           const value = field.value
@@ -90,14 +90,14 @@ export function ShippingAddressForm(props: Props): JSX.Element {
             fieldName != null &&
             value != null
           ) {
-            values[fieldName.replace('shipping_address_', '')] = value
+            values[fieldName.replace("shipping_address_", "")] = value
             const customMessage = customFieldMessageError({
               field: fieldName,
               value,
-              values
+              values,
             })
             if (customMessage != null) {
-              if (typeof customMessage === 'string') {
+              if (typeof customMessage === "string") {
                 if (inError) {
                   const errorMsg = errors[fieldName]?.message
                   if (errorMsg != null && errorMsg !== customMessage) {
@@ -107,8 +107,8 @@ export function ShippingAddressForm(props: Props): JSX.Element {
                 } else {
                   setErrorForm({
                     name: fieldName,
-                    code: 'VALIDATION_ERROR',
-                    message: customMessage
+                    code: "VALIDATION_ERROR",
+                    message: customMessage,
                   })
                 }
               } else {
@@ -122,19 +122,19 @@ export function ShippingAddressForm(props: Props): JSX.Element {
                       if (errorMsg != null && errorMsg !== message) {
                         // @ts-expect-error no type
                         errors[field].message = message
-                        setValueForm(field, value ?? '')
+                        setValueForm(field, value ?? "")
                       }
                     } else {
                       setErrorForm({
                         name: field,
-                        code: 'VALIDATION_ERROR',
-                        message: message
+                        code: "VALIDATION_ERROR",
+                        message: message,
                       })
                     }
                   } else {
                     if (fieldInError) {
                       delete errors[field]
-                      setValueForm(field, value ?? '')
+                      setValueForm(field, value ?? "")
                     }
                   }
                 })
@@ -151,34 +151,34 @@ export function ShippingAddressForm(props: Props): JSX.Element {
         const message = errors[fieldName]?.message
         formErrors.push({
           code: code as CodeErrorType,
-          message: message ?? '',
-          resource: 'shipping_address',
-          field: fieldName
+          message: message ?? "",
+          resource: "shipping_address",
+          field: fieldName,
         })
       }
       if (shipToDifferentAddress || invertAddresses) {
-        setAddressErrors(formErrors, 'shipping_address')
+        setAddressErrors(formErrors, "shipping_address")
       }
     } else if (
       values &&
       Object.keys(values).length > 0 &&
       (shipToDifferentAddress || invertAddresses)
     ) {
-      setAddressErrors([], 'shipping_address')
+      setAddressErrors([], "shipping_address")
       for (const name in values) {
         const field = values[name]
         if (
           field?.value ||
-          (field?.required === false && field?.type !== 'checkbox')
+          (field?.required === false && field?.type !== "checkbox")
         ) {
-          values[name.replace('shipping_address_', '')] = field.value
+          values[name.replace("shipping_address_", "")] = field.value
           delete values[name]
         }
-        if (field?.type === 'checkbox') {
+        if (field?.type === "checkbox") {
           delete values[name]
           saveAddressToCustomerAddressBook({
-            type: 'shipping_address',
-            value: field.checked
+            type: "shipping_address",
+            value: field.checked,
           })
         }
       }
@@ -186,16 +186,21 @@ export function ShippingAddressForm(props: Props): JSX.Element {
         // @ts-expect-error no type
         values: {
           ...values,
-          ...(isBusiness && { business: isBusiness })
+          ...(isBusiness && { business: isBusiness }),
         },
-        resource: 'shipping_address'
+        resource: "shipping_address",
       })
     }
     const checkboxChecked =
       ref.current?.querySelector(
-        '[name="shipping_address_save_to_customer_book"]'
+        '[name="shipping_address_save_to_customer_book"]',
         // @ts-expect-error no type
       )?.checked || getSaveShippingAddressToAddressBook()
+    if (checkboxChecked) {
+      ref.current
+        ?.querySelector('[name="shipping_address_save_to_customer_book"]')
+        ?.setAttribute("checked", "true")
+    }
     if (
       reset &&
       ((values != null && Object.keys(values).length > 0) ||
@@ -204,17 +209,17 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     ) {
       if (saveAddressToCustomerAddressBook) {
         saveAddressToCustomerAddressBook({
-          type: 'shipping_address',
-          value: false
+          type: "shipping_address",
+          value: false,
         })
       }
       if (ref) {
         ref.current?.reset()
         // @ts-expect-error no type
         resetForm({ target: ref.current })
-        setAddressErrors([], 'shipping_address')
+        setAddressErrors([], "shipping_address")
         // @ts-expect-error no type
-        setAddress({ values: {}, resource: 'shipping_address' })
+        setAddress({ values: {}, resource: "shipping_address" })
       }
     }
   }, [
@@ -224,23 +229,23 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     reset,
     include,
     includeLoaded,
-    isBusiness
+    isBusiness,
   ])
   const setValue = (
     name: AddressValuesKeys,
-    value: string | number | readonly string[]
+    value: string | number | readonly string[],
   ): void => {
     setValueForm(name, value as string)
     const field: any = {
-      [name.replace('shipping_address_', '')]: value
+      [name.replace("shipping_address_", "")]: value,
     }
     setAddress({
       values: {
         ...values,
         ...field,
-        ...(isBusiness && { business: isBusiness })
+        ...(isBusiness && { business: isBusiness }),
       },
-      resource: 'shipping_address'
+      resource: "shipping_address",
     })
   }
   const providerValues = {
@@ -252,7 +257,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     resetField: (name: string) => {
       // @ts-expect-error no type
       resetForm({ currentTarget: ref.current }, name)
-    }
+    },
   } as any
   return (
     <ShippingAddressFormContext.Provider value={providerValues}>
