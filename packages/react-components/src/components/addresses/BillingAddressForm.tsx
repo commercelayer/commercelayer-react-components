@@ -1,14 +1,14 @@
-import AddressesContext from '#context/AddressContext'
-import { useRapidForm } from 'rapid-form'
-import { type ReactNode, useContext, useEffect, useRef, type JSX } from 'react';
+import { useRapidForm } from "rapid-form"
+import { type JSX, type ReactNode, useContext, useEffect, useRef } from "react"
+import AddressesContext from "#context/AddressContext"
 import BillingAddressFormContext, {
   type AddressValuesKeys,
-  type DefaultContextAddress
-} from '#context/BillingAddressFormContext'
-import type { BaseError, CodeErrorType } from '#typings/errors'
-import OrderContext from '#context/OrderContext'
-import { getSaveBillingAddressToAddressBook } from '#utils/localStorage'
-import type { CustomFieldMessageError } from '#reducers/AddressReducer'
+  type DefaultContextAddress,
+} from "#context/BillingAddressFormContext"
+import OrderContext from "#context/OrderContext"
+import type { CustomFieldMessageError } from "#reducers/AddressReducer"
+import type { BaseError, CodeErrorType } from "#typings/errors"
+import { getSaveBillingAddressToAddressBook } from "#utils/localStorage"
 
 type Props = {
   children: ReactNode
@@ -20,12 +20,12 @@ type Props = {
    * Define children input and select classnames assigned in case of validation error.
    */
   errorClassName?: string
-  fieldEvent?: 'blur' | 'change'
+  fieldEvent?: "blur" | "change"
   /**
    * Callback to customize the error message for a specific field. Called for each error in the form.
    */
   customFieldMessageError?: CustomFieldMessageError
-} & Omit<JSX.IntrinsicElements['form'], 'onSubmit'>
+} & Omit<JSX.IntrinsicElements["form"], "onSubmit">
 
 /**
  * Form container for creating or editing an order related billing address or a customer address, depending on the context in use.
@@ -45,10 +45,10 @@ export function BillingAddressForm(props: Props): JSX.Element {
   const {
     children,
     errorClassName,
-    autoComplete = 'on',
+    autoComplete = "on",
     reset = false,
     customFieldMessageError,
-    fieldEvent = 'change',
+    fieldEvent = "change",
     ...p
   } = props
   const {
@@ -57,7 +57,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     errors,
     reset: resetForm,
     setValue: setValueForm,
-    setError: setErrorForm
+    setError: setErrorForm,
   } = useRapidForm({ fieldEvent })
   const { setAddressErrors, setAddress, isBusiness } =
     useContext(AddressesContext)
@@ -66,22 +66,22 @@ export function BillingAddressForm(props: Props): JSX.Element {
     order,
     include,
     addResourceToInclude,
-    includeLoaded
+    includeLoaded,
   } = useContext(OrderContext)
   const ref = useRef<HTMLFormElement | null>(null)
   useEffect(() => {
-    if (!include?.includes('billing_address')) {
+    if (!include?.includes("billing_address")) {
       addResourceToInclude({
-        newResource: 'billing_address'
+        newResource: "billing_address",
       })
     } else if (!includeLoaded?.billing_address) {
       addResourceToInclude({
-        newResourceLoaded: { billing_address: true }
+        newResourceLoaded: { billing_address: true },
       })
     }
     if (customFieldMessageError != null && Object.keys(values).length > 0) {
       for (const name in values) {
-        if (Object.prototype.hasOwnProperty.call(values, name)) {
+        if (Object.hasOwn(values, name)) {
           const field = values[name]
           const fieldName = field.name
           const value = field.value
@@ -91,14 +91,14 @@ export function BillingAddressForm(props: Props): JSX.Element {
             fieldName != null &&
             value != null
           ) {
-            values[fieldName.replace('shipping_address_', '')] = value
+            values[fieldName.replace("shipping_address_", "")] = value
             const customMessage = customFieldMessageError({
               field: fieldName,
               value,
-              values
+              values,
             })
             if (customMessage != null) {
-              if (typeof customMessage === 'string') {
+              if (typeof customMessage === "string") {
                 if (inError) {
                   const errorMsg = errors[fieldName]?.message
                   if (errorMsg != null && errorMsg !== customMessage) {
@@ -108,8 +108,8 @@ export function BillingAddressForm(props: Props): JSX.Element {
                 } else {
                   setErrorForm({
                     name: fieldName,
-                    code: 'VALIDATION_ERROR',
-                    message: customMessage
+                    code: "VALIDATION_ERROR",
+                    message: customMessage,
                   })
                 }
               } else {
@@ -123,19 +123,19 @@ export function BillingAddressForm(props: Props): JSX.Element {
                       if (errorMsg != null && errorMsg !== message) {
                         // @ts-expect-error no type
                         errors[field].message = message
-                        setValueForm(field, value ?? '')
+                        setValueForm(field, value ?? "")
                       }
                     } else {
                       setErrorForm({
                         name: field,
-                        code: 'VALIDATION_ERROR',
-                        message
+                        code: "VALIDATION_ERROR",
+                        message,
                       })
                     }
                   } else {
                     if (fieldInError) {
                       delete errors[field]
-                      setValueForm(field, value ?? '')
+                      setValueForm(field, value ?? "")
                     }
                   }
                 })
@@ -152,30 +152,29 @@ export function BillingAddressForm(props: Props): JSX.Element {
         const message = errors[fieldName]?.message
         formErrors.push({
           code: code as CodeErrorType,
-          message: message ?? '',
-          resource: 'billing_address',
-          field: fieldName
+          message: message ?? "",
+          resource: "billing_address",
+          field: fieldName,
         })
       }
-      setAddressErrors(formErrors, 'billing_address')
+      setAddressErrors(formErrors, "billing_address")
     } else if (values && Object.keys(values).length > 0) {
-      setAddressErrors([], 'billing_address')
+      setAddressErrors([], "billing_address")
       for (const name in values) {
         const field = values[name]
         if (
           field?.value ||
-          (field?.required === false && field?.type !== 'checkbox')
+          (field?.required === false && field?.type !== "checkbox")
         ) {
-          values[name.replace('billing_address_', '')] = field.value
-          
+          values[name.replace("billing_address_", "")] = field.value
+
           delete values[name]
         }
-        if (field?.type === 'checkbox') {
-          
+        if (field?.type === "checkbox") {
           delete values[name]
           saveAddressToCustomerAddressBook({
-            type: 'billing_address',
-            value: field.checked
+            type: "billing_address",
+            value: field.checked,
           })
         }
       }
@@ -183,16 +182,25 @@ export function BillingAddressForm(props: Props): JSX.Element {
         // @ts-expect-error no type
         values: {
           ...values,
-          ...(isBusiness && { business: isBusiness })
+          ...(isBusiness && { business: isBusiness }),
         },
-        resource: 'billing_address'
+        resource: "billing_address",
       })
     }
     const checkboxChecked =
       ref.current?.querySelector(
-        '[name="billing_address_save_to_customer_book"]'
+        '[name="billing_address_save_to_customer_book"]',
         // @ts-expect-error no type no types
       )?.checked || getSaveBillingAddressToAddressBook()
+    if (checkboxChecked) {
+      ref.current
+        ?.querySelector('[name="billing_address_save_to_customer_book"]')
+        ?.setAttribute("checked", "true")
+      saveAddressToCustomerAddressBook({
+        type: "billing_address",
+        value: true,
+      })
+    }
     if (
       reset &&
       ((values != null && Object.keys(values).length > 0) ||
@@ -200,41 +208,42 @@ export function BillingAddressForm(props: Props): JSX.Element {
         checkboxChecked)
     ) {
       if (saveAddressToCustomerAddressBook) {
+        console.log("Unchecking billing address save to customer book")
         saveAddressToCustomerAddressBook({
-          type: 'billing_address',
-          value: false
+          type: "billing_address",
+          value: false,
         })
       }
       if (ref) {
         ref.current?.reset()
         // @ts-expect-error no type
         resetForm({ target: ref.current })
-        setAddressErrors([], 'billing_address')
+        setAddressErrors([], "billing_address")
         // @ts-expect-error no type
-        setAddress({ values: {}, resource: 'billing_address' })
+        setAddress({ values: {}, resource: "billing_address" })
       }
     }
   }, [errors, values, reset, include, includeLoaded, isBusiness])
   const setValue = (
     name: AddressValuesKeys,
-    value: string | number | readonly string[]
+    value: string | number | readonly string[],
   ): void => {
     setValueForm(name, value as string)
     const field: any = {
-      [name.replace('billing_address_', '')]: value
+      [name.replace("billing_address_", "")]: value,
     }
     setAddress({
       values: {
         ...values,
         ...field,
-        ...(isBusiness && { business: isBusiness })
+        ...(isBusiness && { business: isBusiness }),
       },
-      resource: 'billing_address'
+      resource: "billing_address",
     })
   }
   const providerValues = {
     isBusiness,
-    values: values as DefaultContextAddress['values'],
+    values: values as DefaultContextAddress["values"],
     validation,
     setValue,
     errorClassName,
@@ -243,7 +252,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     resetField: (name: string) => {
       // @ts-expect-error no type
       resetForm({ currentTarget: ref.current }, name)
-    }
+    },
   }
   return (
     <BillingAddressFormContext.Provider value={providerValues}>

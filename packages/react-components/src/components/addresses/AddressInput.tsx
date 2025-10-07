@@ -1,12 +1,12 @@
-import { useContext, useEffect, useMemo, type JSX } from 'react';
-import BaseInput from '#components/utils/BaseInput'
-import type { BaseInputComponentProps, AddressInputName } from '#typings'
+import { type JSX, useContext, useEffect, useMemo } from "react"
+import BaseInput from "#components/utils/BaseInput"
 import BillingAddressFormContext, {
-  type AddressValuesKeys
-} from '#context/BillingAddressFormContext'
-import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
-import { businessMandatoryField } from '#utils/validateFormFields'
-import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
+  type AddressValuesKeys,
+} from "#context/BillingAddressFormContext"
+import CustomerAddressFormContext from "#context/CustomerAddressFormContext"
+import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
+import type { AddressInputName, BaseInputComponentProps } from "#typings"
+import { businessMandatoryField } from "#utils/validateFormFields"
 
 type Props = {
   /**
@@ -18,9 +18,9 @@ type Props = {
    * Used to add a custom validation rule. Accept a regex as param.
    */
   pattern?: RegExp
-} & Omit<BaseInputComponentProps, 'name'> &
-  Omit<JSX.IntrinsicElements['input'], 'pattern'> &
-  Omit<JSX.IntrinsicElements['textarea'], 'children' | 'pattern'>
+} & Omit<BaseInputComponentProps, "name"> &
+  Omit<JSX.IntrinsicElements["input"], "pattern"> &
+  Omit<JSX.IntrinsicElements["textarea"], "children" | "pattern">
 
 /**
  * The AddressInput component creates a form `input` related to a particular address attribute.
@@ -41,7 +41,7 @@ type Props = {
  * </span>
  */
 export function AddressInput(props: Props): JSX.Element | null {
-  const { placeholder = '', required, value, className, ...p } = props
+  const { placeholder = "", required, value, className, ...p } = props
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
   const customerAddress = useContext(CustomerAddressFormContext)
@@ -72,7 +72,7 @@ export function AddressInput(props: Props): JSX.Element | null {
     value,
     billingAddress?.errors,
     shippingAddress?.errors,
-    customerAddress?.errors
+    customerAddress?.errors,
   ])
 
   const mandatoryField = billingAddress?.isBusiness
@@ -81,17 +81,17 @@ export function AddressInput(props: Props): JSX.Element | null {
   const reqField = required !== undefined ? required : mandatoryField
   const errorClassName =
     billingAddress?.errorClassName || shippingAddress?.errorClassName
-  const classNameComputed = `${className || ''} ${
-    hasError && errorClassName ? errorClassName : ''
+  const classNameComputed = `${className || ""} ${
+    hasError && errorClassName ? errorClassName : ""
   }`
   if (
-    p.name === 'billing_address_billing_info' &&
+    p.name === "billing_address_billing_info" &&
     billingAddress.requiresBillingInfo === false &&
     required === undefined
   )
     return null
   if (
-    p.name === 'shipping_address_billing_info' &&
+    p.name === "shipping_address_billing_info" &&
     shippingAddress.requiresBillingInfo === false &&
     required === undefined
   )
