@@ -91,7 +91,6 @@ export function BillingAddressForm(props: Props): JSX.Element {
             fieldName != null &&
             value != null
           ) {
-            values[fieldName.replace("shipping_address_", "")] = value
             const customMessage = customFieldMessageError({
               field: fieldName,
               value,
