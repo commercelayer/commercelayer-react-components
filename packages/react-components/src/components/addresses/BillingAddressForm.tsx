@@ -208,7 +208,6 @@ export function BillingAddressForm(props: Props): JSX.Element {
         checkboxChecked)
     ) {
       if (saveAddressToCustomerAddressBook) {
-        console.log("Unchecking billing address save to customer book")
         saveAddressToCustomerAddressBook({
           type: "billing_address",
           value: false,

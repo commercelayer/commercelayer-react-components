@@ -74,11 +74,9 @@ export function SaveAddressesButton(props: Props): JSX.Element {
   }
   const shippingAddressCleaned: any = Object.keys(shippingAddress ?? {}).reduce(
     (acc, key) => {
-      return {
-        ...acc,
-        // @ts-expect-error type mismatch
-        [key.replace("shipping_address_", "")]: shippingAddress[key].value,
-      }
+      // @ts-expect-error type mismatch
+      acc[key.replace("shipping_address_", "")] = shippingAddress[key].value
+      return acc
     },
     {},
   )
