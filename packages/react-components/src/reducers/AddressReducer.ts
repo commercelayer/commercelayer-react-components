@@ -274,8 +274,13 @@ export async function saveAddresses({
               address.id,
             )
           }
-        } else if (!shipToDifferentAddress && billingAddressCloneId) {
-          delete orderAttributes._shipping_address_same_as_billing
+        }
+        if (!shipToDifferentAddress && billingAddressCloneId) {
+          console.log(
+            "Setting shipping address clone ID to billing address clone ID",
+            orderAttributes,
+          )
+          orderAttributes._shipping_address_same_as_billing = true
           orderAttributes._shipping_address_clone_id = billingAddressCloneId
         }
         if (shipToDifferentAddress) {
@@ -308,7 +313,12 @@ export async function saveAddresses({
         }
       }
       if (orderAttributes != null && updateOrder) {
-        console.log("Updating order with attributes:", orderAttributes)
+        console.log("Updating order with attributes:", {
+          orderAttributes,
+          shipToDifferentAddress,
+          billingAddressCloneId,
+          shippingAddressCloneId,
+        })
         const orderUpdated = await updateOrder({
           id: order.id,
           attributes: orderAttributes,
