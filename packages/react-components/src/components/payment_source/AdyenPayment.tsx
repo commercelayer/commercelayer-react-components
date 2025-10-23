@@ -304,6 +304,7 @@ export function AdyenPayment({
           // @ts-expect-error no type
           control?.payment_response?.additionalData
             ?.currentBalanceValue as string,
+          10,
         )
         const totalPartialAmount =
           order?.total_amount_with_taxes_cents != null &&

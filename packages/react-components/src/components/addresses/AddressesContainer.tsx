@@ -88,7 +88,7 @@ export function AddressesContainer(props: Props): JSX.Element {
     dispatch({
       type: "setShipToDifferentAddress",
       payload: {
-        shipToDifferentAddress,
+        shipToDifferentAddress: shipToDifferentAddress ?? false,
         isBusiness,
         invertAddresses,
       },
@@ -96,7 +96,9 @@ export function AddressesContainer(props: Props): JSX.Element {
     return () => {
       dispatch({
         type: "cleanup",
-        payload: {},
+        payload: {
+          shipToDifferentAddress: false,
+        },
       })
     }
   }, [shipToDifferentAddress, isBusiness, invertAddresses])

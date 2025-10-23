@@ -275,6 +275,14 @@ export async function saveAddresses({
             )
           }
         }
+        if (!shipToDifferentAddress && billingAddressCloneId) {
+          console.log(
+            "Setting shipping address clone ID to billing address clone ID",
+            orderAttributes,
+          )
+          orderAttributes._shipping_address_same_as_billing = true
+          orderAttributes._shipping_address_clone_id = billingAddressCloneId
+        }
         if (shipToDifferentAddress) {
           delete orderAttributes._shipping_address_same_as_billing
           if (shippingAddressCloneId)
@@ -305,23 +313,17 @@ export async function saveAddresses({
         }
       }
       if (orderAttributes != null && updateOrder) {
+        console.log("Updating order with attributes:", {
+          orderAttributes,
+          shipToDifferentAddress,
+          billingAddressCloneId,
+          shippingAddressCloneId,
+        })
         const orderUpdated = await updateOrder({
           id: order.id,
           attributes: orderAttributes,
         })
-        // if (
-        //   (order?.billing_address?.id &&
-        //     order?.billing_address?.reference == null) ||
-        //   (order?.shipping_address?.id &&
-        //     order?.shipping_address?.reference == null)
-        // ) {
-        //   await updateOrder({
-        //     id: order.id,
-        //     attributes: {
-        //       _refresh: true,
-        //     },
-        //   })
-        // }
+        console.log("Order updated:", orderUpdated)
         return { success: true, order: orderUpdated?.order }
       }
     }
