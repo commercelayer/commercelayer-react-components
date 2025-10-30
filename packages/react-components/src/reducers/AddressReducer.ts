@@ -27,11 +27,11 @@ export type CustomFieldMessageError = (props: {
   | string
   | null
   | Array<{
-      field: Extract<AddressValuesKeys, AddressInputName> | string
-      value: string
-      isValid: boolean
-      message?: string
-    }>
+    field: Extract<AddressValuesKeys, AddressInputName> | string
+    value: string
+    isValid: boolean
+    message?: string
+  }>
 
 export type AddressActionType =
   | "setErrors"
