@@ -300,11 +300,12 @@ export function AdyenPayment({
     }
     delete attributes.payment_request_data.paymentMethod
     try {
-      await setPaymentSource({
+      const psUp = await setPaymentSource({
         paymentSourceId: paymentSource?.id,
         paymentResource: "adyen_payments",
         attributes,
       })
+      console.log("Payment source updated:", psUp)
       if (order?.id == null) {
         console.error("Order id is missing")
         return {

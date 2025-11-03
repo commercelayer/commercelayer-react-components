@@ -579,6 +579,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       setPlaceOrderStatus({ status: "placing" })
       setForceDisable(true)
     }
+    console.log("PlaceOrderButton isValid", { isValid, currentPaymentStatus })
     const placed =
       isValid &&
       setPlaceOrder &&
