@@ -15,6 +15,7 @@ import orderReducer, {
   addToCart,
   createOrder,
   getApiOrder,
+  getOrderByFields,
   type OrderCodeType,
   orderInitialState,
   paymentSourceRequest,
@@ -362,6 +363,7 @@ export function OrderContainer(props: Props): JSX.Element {
           include: state.include,
           state,
         }),
+      getOrderByFields,
     }
   }, [state, config.accessToken, persistKey])
   return (
