@@ -382,6 +382,12 @@ export function AdyenPayment({
             message,
           }
         }
+        console.log("Gift card authorized:", {
+          resultCode,
+          action,
+          orderUpdated,
+          paymentStatus,
+        })
         return {
           resultCode: "Authorised",
           paymentMethodType: currentPaymentMethodType,
