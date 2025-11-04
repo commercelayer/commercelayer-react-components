@@ -1,14 +1,13 @@
-import BaseOrderPrice from "../utils/BaseOrderPrice"
-import type { BaseAmountComponent } from "#typings"
-
-import { useContext, type JSX } from "react"
-import OrderContext from "#context/OrderContext"
-import { manageGiftCard } from "#utils/adyen/manageGiftCard"
+import { type JSX, useContext } from "react"
 import Parent from "#components/utils/Parent"
+import OrderContext from "#context/OrderContext"
+import type { BaseAmountComponent } from "#typings"
+import { manageGiftCard } from "#utils/adyen/manageGiftCard"
+import BaseOrderPrice from "../utils/BaseOrderPrice"
 
 export function GiftCardAmount(props: BaseAmountComponent): JSX.Element | null {
-  const { manageAdyenGiftCard, order } = useContext(OrderContext)
-  if (manageAdyenGiftCard) {
+  const { managePaymentProviderGiftCards, order } = useContext(OrderContext)
+  if (managePaymentProviderGiftCards) {
     const giftCardData = manageGiftCard({ order })
     if (!giftCardData) return null
     const parentProps = {

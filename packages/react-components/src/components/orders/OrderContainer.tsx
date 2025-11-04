@@ -50,10 +50,6 @@ interface Props {
    * Callback called when the order is updated
    */
   fetchOrder?: (order: Order) => void
-  /**
-   * Indicate if Adyen gift card management is enabled
-   */
-  manageAdyenGiftCard?: boolean
 }
 
 /**
@@ -90,14 +86,7 @@ interface Props {
  * </span>
  */
 export function OrderContainer(props: Props): JSX.Element {
-  const {
-    orderId,
-    children,
-    metadata,
-    attributes,
-    fetchOrder,
-    manageAdyenGiftCard,
-  } = props
+  const { orderId, children, metadata, attributes, fetchOrder } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const [lock, setLock] = useState(false)
   const [lockOrder, setLockOrder] = useState(true)
@@ -274,7 +263,10 @@ export function OrderContainer(props: Props): JSX.Element {
     }
     return {
       ...state,
-      manageAdyenGiftCard,
+      managePaymentProviderGiftCards:
+        // @ts-expect-error no type
+        state.order?.payment_source?.payment_request_data?.payment_method
+          ?.type === "giftcard",
       paymentSourceRequest: async (
         params: Parameters<typeof paymentSourceRequest>[number],
       ): ReturnType<typeof paymentSourceRequest> =>

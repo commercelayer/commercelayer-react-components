@@ -28,10 +28,6 @@ export function manageGiftCard({ order }: Props): ReturnTypes | null {
     // @ts-expect-error No type for payment_response errorCode
     getPaymentSource?.payment_response?.errorCode
   if (errorCode) return null
-  const refusalReasonCode =
-    // @ts-expect-error No type for payment_response refusalReasonCode
-    getPaymentSource?.payment_response?.refusalReasonCode
-  if (refusalReasonCode !== "12") return null
   const isGiftCard =
     // @ts-expect-error No type for payment_request_data
     getPaymentSource?.payment_request_data?.payment_method?.type === "giftcard"
