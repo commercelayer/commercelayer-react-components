@@ -305,7 +305,6 @@ export function AdyenPayment({
         paymentResource: "adyen_payments",
         attributes,
       })
-      console.log("Payment source updated:", psUp)
       if (order?.id == null) {
         console.error("Order id is missing")
         return {
@@ -382,12 +381,6 @@ export function AdyenPayment({
             message,
           }
         }
-        console.log("Gift card authorized:", {
-          resultCode,
-          action,
-          orderUpdated,
-          paymentStatus,
-        })
         return {
           resultCode: "Authorised",
           paymentMethodType: currentPaymentMethodType,
