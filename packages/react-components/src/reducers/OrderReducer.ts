@@ -99,7 +99,7 @@ export interface OrderPayload {
   include?: ResourceIncluded[] | undefined
   includeLoaded?: ResourceIncludedLoaded
   withoutIncludes?: boolean
-  manageAdyenGiftCard?: boolean
+  managePaymentProviderGiftCards?: boolean
 }
 
 export type AddToCartImportValues = Pick<AddToCartImportParams, "lineItems">

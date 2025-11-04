@@ -274,25 +274,11 @@ export function AdyenPayment({
       config: authConfig,
     })
     const paymentStatus = getOrderStatus?.payment_status
-    console.log("onSubmit controlCode:", {
-      paymentStatus,
-      controlCode,
-      paymentMethodType,
-      currentPaymentMethodType,
-      control,
-      order,
-    })
-
     if (
       controlCode === "Authorised" &&
       paymentMethodType !== "giftcard" &&
       paymentStatus !== "partially_authorized"
     ) {
-      console.log("return resultCode", {
-        controlCode,
-        paymentMethodType,
-        paymentStatus,
-      })
       return {
         resultCode: controlCode,
       }
@@ -319,63 +305,12 @@ export function AdyenPayment({
         paymentResource: "adyen_payments",
         attributes,
       })
-      console.log("Payment source updated:", psUp)
       if (order?.id == null) {
         console.error("Order id is missing")
         return {
           resultCode: "Error",
         }
       }
-      // Authorize remaining amount with other payment method after gift card
-      // if (
-      //   ["Cancelled", "Refused"].includes(controlCode) &&
-      //   paymentMethodType === "giftcard" &&
-      //   currentPaymentMethodType !== "giftcard"
-      // ) {
-      //   console.log(
-      //     "Authorizing remaining amount with other payment method",
-      //     // @ts-expect-error no type
-      //     control?.payment_response?.additionalData,
-      //   )
-      //   const availableGiftCardAmount = Number.parseInt(
-      //     // @ts-expect-error no type
-      //     control?.payment_response?.additionalData
-      //       ?.currentBalanceValue as string,
-      //     10,
-      //   )
-      //   const totalPartialAmount =
-      //     order?.total_amount_with_taxes_cents != null &&
-      //     availableGiftCardAmount != null
-      //       ? order?.total_amount_with_taxes_cents - availableGiftCardAmount
-      //       : 0
-      //   await updateOrder({
-      //     id: order.id,
-      //     attributes: {
-      //       _authorization_amount_cents: totalPartialAmount,
-      //       _place: true,
-      //     },
-      //   })
-      //   await setPaymentSource({
-      //     paymentSourceId: paymentSource?.id,
-      //     paymentResource: "adyen_payments",
-      //     attributes: {
-      //       // @ts-expect-error no type
-      //       payment_request_data: control?.payment_request_data,
-      //     },
-      //   })
-      //   await updateOrder({
-      //     id: order.id,
-      //     attributes: {
-      //       _authorize: true,
-      //     },
-      //   })
-      //   // Add gift card amount as payment method attribute
-      //   return {
-      //     resultCode: "Authorised",
-      //     paymentMethodType: currentPaymentMethodType,
-      //   }
-      // }
-      console.log("Submitting payment with method:", currentPaymentMethodType)
       // First gift card authorization for partial or total amount
       if (currentPaymentMethodType === "giftcard") {
         // Request balance check if the gift card can cover the total amount
@@ -397,22 +332,10 @@ export function AdyenPayment({
                 _authorization_amount_cents: currentBalance,
                 _authorize: true,
               }
-        console.log("Gift card balance check:", {
-          giftCardBalanceCheck,
-          attributes,
-        })
-        // const firstAuthorization = await setPaymentSource({
-        //   paymentSourceId: paymentSource?.id,
-        //   paymentResource: "adyen_payments",
-        //   attributes: {
-        //     _authorize: 1,
-        //   },
-        // })
         const { order: orderUpdated } = await updateOrder({
           id: order.id,
           attributes,
         })
-        console.log("First gift card authorization:", orderUpdated)
         const resultCode =
           // @ts-expect-error no type
           orderUpdated?.payment_source?.payment_response?.resultCode
@@ -442,12 +365,6 @@ export function AdyenPayment({
             message,
           }
         }
-        console.log("Gift card authorized:", {
-          resultCode,
-          action,
-          orderUpdated,
-          paymentStatus,
-        })
         return {
           resultCode: "Authorised",
           paymentMethodType: currentPaymentMethodType,
@@ -631,12 +548,6 @@ export function AdyenPayment({
             state,
             element,
           )
-          console.log("onSubmit resultCode:", {
-            resultCode,
-            action,
-            message,
-            paymentStatus,
-          })
           if (["Cancelled", "Refused"].includes(resultCode)) {
             actions.reject()
             if (message) {

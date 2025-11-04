@@ -213,13 +213,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         // @ts-expect-error no type
         order?.payment_source?.payment_request_details?.details != null
       const paymentStatus = order?.payment_status
-      console.log("Adyen redirect flow check", {
-        isAuthorized,
-        paymentDetails,
-        redirectResult: options?.adyen?.redirectResult,
-        status,
-        paymentStatus: order?.payment_status,
-      })
       if (
         paymentType === "adyen_payments" &&
         options?.adyen?.redirectResult &&
@@ -284,7 +277,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         autoPlaceOrder &&
         status === "standby"
       ) {
-        console.log("Adyen order is authorized, placing order...")
         handleClick()
       }
       // else if (
@@ -428,10 +420,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         await sdk.orders.retrieve(order?.id, {
           fields: ["status", "payment_status"],
         })
-      console.log("PlaceOrderButton order status check", {
-        status,
-        paymentStatus,
-      })
       const isAlreadyPlaced = status === "placed"
       const isDraftOrder = status === "draft"
       currentPaymentStatus = paymentStatus ?? "unpaid"
@@ -537,7 +525,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       setPlaceOrderStatus({ status: "placing" })
       setForceDisable(true)
     }
-    console.log("PlaceOrderButton isValid", { isValid, currentPaymentStatus })
     const placed =
       isValid &&
       setPlaceOrder &&

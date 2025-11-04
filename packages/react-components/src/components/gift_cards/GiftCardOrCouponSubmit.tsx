@@ -1,6 +1,7 @@
-import type { ReactNode, JSX } from "react"
+import type { JSX, ReactNode } from "react"
 import Parent from "#components/utils/Parent"
 import type { ChildrenFunction } from "#typings/index"
+
 // import { useState, useEffect, useContext } from "react"
 // import OrderContext from "#context/OrderContext"
 
