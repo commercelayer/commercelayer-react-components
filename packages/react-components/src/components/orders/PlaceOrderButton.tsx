@@ -212,6 +212,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       const paymentDetails =
         // @ts-expect-error no type
         order?.payment_source?.payment_request_details?.details != null
+      const paymentStatus = order?.payment_status
       if (
         paymentType === "adyen_payments" &&
         options?.adyen?.redirectResult &&
@@ -269,6 +270,14 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         ) {
           handleClick()
         }
+      } else if (
+        paymentType === "adyen_payments" &&
+        isAuthorized &&
+        paymentStatus === "authorized" &&
+        autoPlaceOrder &&
+        status === "standby"
+      ) {
+        handleClick()
       }
       // else if (
       //   paymentType === "adyen_payments" &&
@@ -397,6 +406,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     const sdk = sdkClient()
     if (sdk == null) return
     if (order == null) return
+    let isValid = true
+    let currentPaymentStatus = "unpaid"
 
     const isStripePayment = paymentType === "stripe_payments"
     if (!isStripePayment) {
@@ -405,11 +416,14 @@ export function PlaceOrderButton(props: Props): JSX.Element {
        * and to prevent placing a draft order
        * @see https://docs.commercelayer.io/core/how-tos/placing-orders/checkout/placing-the-order
        */
-      const { status } = await sdk.orders.retrieve(order?.id, {
-        fields: ["status"],
-      })
+      const { status, payment_status: paymentStatus } =
+        await sdk.orders.retrieve(order?.id, {
+          fields: ["status", "payment_status"],
+        })
       const isAlreadyPlaced = status === "placed"
       const isDraftOrder = status === "draft"
+      currentPaymentStatus = paymentStatus ?? "unpaid"
+
       if (isAlreadyPlaced) {
         /**
          * Order already placed
@@ -448,7 +462,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       }
     }
     setIsLoading(true)
-    let isValid = true
     // setForceDisable(true)
     const checkPaymentSource =
       paymentType !== "stripe_payments"
@@ -504,6 +517,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       })) as boolean
     } else if (card?.brand) {
       isValid = true
+    }
+    if (currentPaymentStatus === "partially_authorized") {
+      isValid = false
     }
     if (isValid && setPlaceOrderStatus != null) {
       setPlaceOrderStatus({ status: "placing" })

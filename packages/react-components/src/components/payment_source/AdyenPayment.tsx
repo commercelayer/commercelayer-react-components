@@ -14,6 +14,10 @@ import {
   type UIElement,
   type UIElementProps,
 } from "@adyen/adyen-web/auto"
+import type {
+  AdyenPayment as AdyenPaymentType,
+  Order,
+} from "@commercelayer/sdk"
 import {
   type FormEvent,
   type JSX,
@@ -23,6 +27,7 @@ import {
   useState,
 } from "react"
 import Parent from "#components/utils/Parent"
+import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
@@ -150,7 +155,8 @@ export function AdyenPayment({
     setPaymentRef,
     currentCustomerPaymentSourceId,
   } = useContext(PaymentMethodContext)
-  const { order, updateOrder } = useContext(OrderContext)
+  const { order, updateOrder, getOrderByFields } = useContext(OrderContext)
+  const authConfig = useContext(CommerceLayerContext)
   const { placeOrderButtonRef, setPlaceOrder, status } =
     useContext(PlaceOrderContext)
   const { customers } = useContext(CustomerContext)
@@ -245,6 +251,7 @@ export function AdyenPayment({
     CheckoutAdvancedFlowResponse & {
       paymentMethodType?: string
       message?: string
+      paymentStatus?: Order["payment_status"]
     }
   > => {
     const url = cleanUrlBy()
@@ -261,7 +268,17 @@ export function AdyenPayment({
       control?.payment_response?.paymentMethod?.type ??
       // @ts-expect-error no type
       control?.payment_request_data?.payment_method?.type
-    if (controlCode === "Authorised" && paymentMethodType !== "giftcard") {
+    const getOrderStatus = await getOrderByFields({
+      orderId: order?.id ?? "",
+      fields: ["status", "payment_status"],
+      config: authConfig,
+    })
+    const paymentStatus = getOrderStatus?.payment_status
+    if (
+      controlCode === "Authorised" &&
+      paymentMethodType !== "giftcard" &&
+      paymentStatus !== "partially_authorized"
+    ) {
       return {
         resultCode: controlCode,
       }
@@ -283,7 +300,7 @@ export function AdyenPayment({
     }
     delete attributes.payment_request_data.paymentMethod
     try {
-      await setPaymentSource({
+      const psUp = await setPaymentSource({
         paymentSourceId: paymentSource?.id,
         paymentResource: "adyen_payments",
         attributes,
@@ -294,66 +311,44 @@ export function AdyenPayment({
           resultCode: "Error",
         }
       }
-      // Authorize remaining amount with other payment method after gift card
-      if (
-        ["Cancelled", "Refused"].includes(controlCode) &&
-        paymentMethodType === "giftcard" &&
-        currentPaymentMethodType !== "giftcard"
-      ) {
-        const availableGiftCardAmount = Number.parseInt(
-          // @ts-expect-error no type
-          control?.payment_response?.additionalData
-            ?.currentBalanceValue as string,
-          10,
-        )
-        const totalPartialAmount =
-          order?.total_amount_with_taxes_cents != null &&
-          availableGiftCardAmount != null
-            ? order?.total_amount_with_taxes_cents - availableGiftCardAmount
-            : 0
-        await updateOrder({
-          id: order.id,
-          attributes: {
-            _authorization_amount_cents: totalPartialAmount,
-            _place: true,
-          },
-        })
-        await setPaymentSource({
-          paymentSourceId: paymentSource?.id,
-          paymentResource: "adyen_payments",
-          attributes: {
-            // @ts-expect-error no type
-            payment_request_data: control?.payment_request_data,
-          },
-        })
-        await updateOrder({
-          id: order.id,
-          attributes: {
-            _authorize: true,
-          },
-        })
-        // Add gift card amount as payment method attribute
-        return {
-          resultCode: "Authorised",
-          paymentMethodType: currentPaymentMethodType,
-        }
-      }
       // First gift card authorization for partial or total amount
       if (currentPaymentMethodType === "giftcard") {
-        const firstAuthorization = await setPaymentSource({
+        // Request balance check if the gift card can cover the total amount
+        const giftCardBalanceCheck = (await setPaymentSource({
           paymentSourceId: paymentSource?.id,
           paymentResource: "adyen_payments",
           attributes: {
-            _authorize: 1,
+            _balance: true,
           },
+        })) as AdyenPaymentType
+        const currentBalance = giftCardBalanceCheck?.balance ?? 0
+        const totalAmount = order?.total_amount_with_taxes_cents ?? 0
+        const attributes =
+          currentBalance >= totalAmount
+            ? {
+                _authorize: true,
+              }
+            : {
+                _authorization_amount_cents: currentBalance,
+                _authorize: true,
+              }
+        const { order: orderUpdated } = await updateOrder({
+          id: order.id,
+          attributes,
         })
-        // @ts-expect-error no type
-        const resultCode = firstAuthorization?.payment_response?.resultCode
+        const resultCode =
+          // @ts-expect-error no type
+          orderUpdated?.payment_source?.payment_response?.resultCode
         const refusalReasonCode =
           // @ts-expect-error no type
-          firstAuthorization?.payment_response?.refusalReasonCode
-        // @ts-expect-error no type
-        const errorCode = firstAuthorization?.payment_response?.errorCode
+          orderUpdated?.payment_source?.payment_response?.refusalReasonCode
+        const errorCode =
+          // @ts-expect-error no type
+          orderUpdated?.payment_source?.payment_response?.errorCode
+        const action =
+          // @ts-expect-error no type
+          orderUpdated?.payment_source?.payment_response?.action
+        const paymentStatus = orderUpdated?.payment_status
         if (
           (["Cancelled", "Refused"].includes(resultCode) &&
             refusalReasonCode !== "12") ||
@@ -361,9 +356,9 @@ export function AdyenPayment({
         ) {
           const message =
             // @ts-expect-error no type
-            firstAuthorization?.payment_response?.refusalReason ??
+            orderUpdated?.payment_response?.refusalReason ??
             // @ts-expect-error no type
-            firstAuthorization?.payment_response?.message
+            orderUpdated?.payment_response?.message
 
           return {
             resultCode: errorCode ? "Refused" : resultCode,
@@ -373,6 +368,8 @@ export function AdyenPayment({
         return {
           resultCode: "Authorised",
           paymentMethodType: currentPaymentMethodType,
+          action,
+          paymentStatus,
         }
       }
       const res = await setPaymentSource({
@@ -547,7 +544,10 @@ export function AdyenPayment({
       },
       onSubmit: (state, element, actions) => {
         const handleSubmit = async (): Promise<void> => {
-          const { resultCode, action, message } = await onSubmit(state, element)
+          const { resultCode, action, message, paymentStatus } = await onSubmit(
+            state,
+            element,
+          )
           if (["Cancelled", "Refused"].includes(resultCode)) {
             actions.reject()
             if (message) {
@@ -559,7 +559,9 @@ export function AdyenPayment({
             actions.resolve({
               resultCode,
             })
-            dropinRef.current?.mount("#adyen-dropin")
+            if (paymentStatus === "partially_authorized") {
+              dropinRef.current?.mount("#adyen-dropin")
+            }
             setGiftcardError(null)
           }
         }
