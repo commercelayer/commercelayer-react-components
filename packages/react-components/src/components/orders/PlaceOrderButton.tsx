@@ -212,6 +212,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       const paymentDetails =
         // @ts-expect-error no type
         order?.payment_source?.payment_request_details?.details != null
+      const paymentStatus = order?.payment_status
       console.log("Adyen redirect flow check", {
         isAuthorized,
         paymentDetails,
@@ -276,6 +277,15 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         ) {
           handleClick()
         }
+      } else if (
+        paymentType === "adyen_payments" &&
+        isAuthorized &&
+        paymentStatus === "authorized" &&
+        autoPlaceOrder &&
+        status === "standby"
+      ) {
+        console.log("Adyen order is authorized, placing order...")
+        handleClick()
       }
       // else if (
       //   paymentType === "adyen_payments" &&
