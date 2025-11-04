@@ -300,7 +300,7 @@ export function AdyenPayment({
     }
     delete attributes.payment_request_data.paymentMethod
     try {
-      const psUp = await setPaymentSource({
+      await setPaymentSource({
         paymentSourceId: paymentSource?.id,
         paymentResource: "adyen_payments",
         attributes,
