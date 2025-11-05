@@ -275,7 +275,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         isAuthorized &&
         paymentStatus === "authorized" &&
         autoPlaceOrder &&
-        status === "standby"
+        status === "standby" &&
+        !options?.adyen?.redirectResult
       ) {
         handleClick()
       }
