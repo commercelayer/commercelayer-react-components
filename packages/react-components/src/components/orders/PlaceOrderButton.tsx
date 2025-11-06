@@ -213,6 +213,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         // @ts-expect-error no type
         order?.payment_source?.payment_request_details?.details != null
       const paymentStatus = order?.payment_status
+      const paymentMethodType =
+        // @ts-expect-error no type
+        order?.payment_source?.payment_response?.paymentMethod?.type
+      console.log("paymentMethodType", { paymentMethodType })
       if (
         paymentType === "adyen_payments" &&
         options?.adyen?.redirectResult &&
@@ -274,6 +278,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         paymentType === "adyen_payments" &&
         isAuthorized &&
         paymentStatus === "authorized" &&
+        paymentMethodType === "giftcard" &&
         autoPlaceOrder &&
         status === "standby" &&
         !options?.adyen?.redirectResult
