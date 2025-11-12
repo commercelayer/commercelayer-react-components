@@ -1,4 +1,5 @@
 import type { Order } from "@commercelayer/sdk"
+import { type CurrencyCode, formatCentsToCurrency } from "../currencies"
 
 export interface GiftCardData {
   cardSummary: string
@@ -34,34 +35,32 @@ export function manageGiftCard({ order }: Props): ReturnTypes | null {
   if (!isGiftCard) return null
   // @ts-expect-error No type for payment_response additionalData
   const additionalData = getPaymentSource?.payment_response?.additionalData
-  // @ts-expect-error No type for payment_response amount
-  const amount = getPaymentSource?.payment_response?.amount?.value as number
+  const amount =
+    // @ts-expect-error No type for payment_response amount
+    getPaymentSource?.payment_response?.amount?.value ?? (0 as number)
   const giftCardData: GiftCardData = {
-    cardSummary: additionalData?.cardSummary,
+    cardSummary: additionalData?.cardSummary ?? "",
     currentBalanceValue:
-      amount ?? Number.parseInt(additionalData?.currentBalanceValue),
-    currentBalanceCurrency: additionalData?.currentBalanceCurrency,
+      amount ?? Number.parseInt(additionalData?.currentBalanceValue) ?? 0,
+    currentBalanceCurrency: additionalData?.currentBalanceCurrency ?? "",
     cardBrand:
-      additionalData?.originalSelectedBrand ?? additionalData?.paymentMethod,
-    formattedBalanceValue: additionalData?.currentBalanceValue,
+      additionalData?.originalSelectedBrand ??
+      additionalData?.paymentMethod ??
+      "",
+    formattedBalanceValue: additionalData?.currentBalanceValue ?? "",
   }
   const orderTotal =
     order?.total_amount_with_taxes_cents != null
       ? order?.total_amount_with_taxes_cents - giftCardData.currentBalanceValue
       : 0
-  const formattedOrderTotal = (orderTotal / 100).toLocaleString(
-    order.language_code ?? "en",
-    {
-      style: "currency",
-      currency: order?.currency_code ?? "USD",
-    },
+  const currencyCode =
+    (order?.currency_code as CurrencyCode) ?? ("USD" as CurrencyCode)
+  const formattedOrderTotal = formatCentsToCurrency(orderTotal, currencyCode)
+  const formattedCurrentBalance = formatCentsToCurrency(
+    giftCardData.currentBalanceValue,
+    currencyCode,
   )
-  const formattedCurrentBalance = (
-    giftCardData.currentBalanceValue / 100
-  ).toLocaleString(order.language_code ?? "en", {
-    style: "currency",
-    currency: order?.currency_code ?? "USD",
-  })
   giftCardData.formattedBalanceValue = formattedCurrentBalance
+  if (giftCardData.cardSummary === "") return null
   return { ...giftCardData, formattedOrderTotal }
 }
