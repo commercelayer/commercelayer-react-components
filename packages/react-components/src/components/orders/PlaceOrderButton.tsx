@@ -216,7 +216,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       const paymentMethodType =
         // @ts-expect-error no type
         order?.payment_source?.payment_response?.paymentMethod?.type
-      console.log("paymentMethodType", { paymentMethodType })
       if (
         paymentType === "adyen_payments" &&
         options?.adyen?.redirectResult &&
@@ -285,15 +284,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ) {
         handleClick()
       }
-      // else if (
-      //   paymentType === "adyen_payments" &&
-      //   options?.adyen?.MD &&
-      //   options?.adyen?.PaRes &&
-      //   autoPlaceOrder
-      // ) {
-      //   console.log("Adyen MD and PaRes detected, placing order...")
-      //   handleClick()
-      // }
     }
   }, [
     options?.adyen?.redirectResult != null,
@@ -524,7 +514,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     } else if (card?.brand) {
       isValid = true
     }
-    if (currentPaymentStatus === "partially_authorized") {
+    if (
+      currentPaymentStatus === "partially_authorized" ||
+      currentPaymentStatus === "unpaid"
+    ) {
       isValid = false
     }
     if (isValid && setPlaceOrderStatus != null) {
@@ -549,6 +542,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         setIsLoading(false)
         setPlaceOrderStatus({ status: "standby" })
       }
+    } else {
+      setForceDisable(false)
+      setIsLoading(false)
+      setPlaceOrderStatus?.({ status: "standby" })
     }
   }
   const disabledButton = disabled !== undefined ? disabled : notPermitted
