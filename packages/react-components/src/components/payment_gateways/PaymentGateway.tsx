@@ -151,7 +151,6 @@ export function PaymentGateway({
       setLoading(true)
     }
   }, [status, order?.status, order?.payment_status])
-
   const gatewayConfig = {
     readonly,
     showCard,

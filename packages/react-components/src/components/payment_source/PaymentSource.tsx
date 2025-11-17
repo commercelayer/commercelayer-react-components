@@ -49,12 +49,16 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
     const isCustomerPaymentSource =
       currentCustomerPaymentSourceId != null &&
       currentCustomerPaymentSourceId === paymentSource?.id
+    const paymentStatus =
+      // @ts-expect-error no type
+      order?.payment_source?.payment_response?.status?.toLowerCase()
     if (readonly) {
       setShow(true)
       setShowCard(true)
     } else if (
       (payment?.id === currentPaymentMethodId || isCustomerPaymentSource) &&
-      !expressPayments
+      !expressPayments &&
+      paymentStatus !== "declined"
     ) {
       const card = getCardDetails({
         paymentType: payment?.payment_source_type as PaymentResource,
@@ -78,6 +82,9 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
       currentPaymentMethodType === "stripe_payments"
     ) {
       setShow(true)
+    } else if (paymentStatus === "declined") {
+      setShow(true)
+      setShowCard(false)
     }
     return () => {
       setShow(false)
