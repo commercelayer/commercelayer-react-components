@@ -128,6 +128,9 @@ export function PaymentGateway({
     ) {
       setLoading(false)
     }
+    return () => {
+      setLoading(true)
+    }
   }, [order?.payment_method?.id, show, paymentSource])
 
   useEffect(() => {
@@ -136,7 +139,18 @@ export function PaymentGateway({
     if (order && order.status === "placed" && loading) {
       setLoading(false)
     }
-  }, [status, order?.status])
+    if (
+      order &&
+      ["draft", "pending"].includes(order?.status) &&
+      order.payment_status === "unpaid" &&
+      loading
+    ) {
+      setLoading(false)
+    }
+    return () => {
+      setLoading(true)
+    }
+  }, [status, order?.status, order?.payment_status])
 
   const gatewayConfig = {
     readonly,
