@@ -415,6 +415,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       const { status, payment_status: paymentStatus } =
         await sdk.orders.retrieve(order?.id, {
           fields: ["status", "payment_status"],
+          include: ["payment_source"],
         })
       const isAlreadyPlaced = status === "placed"
       const isDraftOrder = status === "draft"
@@ -516,7 +517,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     }
     if (
       currentPaymentStatus === "partially_authorized" ||
-      currentPaymentStatus === "unpaid"
+      (currentPaymentStatus === "unpaid" &&
+        // @ts-expect-error no type
+        checkPaymentSource?.payment_response?.status?.toLowerCase() ===
+          "declined")
     ) {
       isValid = false
     }

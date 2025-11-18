@@ -67,7 +67,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
         },
       })
       if (isCustomerPaymentSource && card.brand === "") {
-        // Force creadit card icon for customer payment source imported by API
+        // Force credit card icon for customer payment source imported by API
         card.brand =
           card.issuer_type != null && card.issuer_type !== ""
             ? card.issuer_type
