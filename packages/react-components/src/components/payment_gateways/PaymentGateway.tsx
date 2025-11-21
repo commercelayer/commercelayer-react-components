@@ -142,13 +142,11 @@ export function PaymentGateway({
     if (
       order &&
       ["draft", "pending"].includes(order?.status) &&
-      order.payment_status === "unpaid" &&
+      (order.payment_status === "unpaid" ||
+        order.payment_status === "partially_authorized") &&
       loading
     ) {
       setLoading(false)
-    }
-    return () => {
-      setLoading(true)
     }
   }, [status, order?.status, order?.payment_status])
   const gatewayConfig = {
@@ -165,6 +163,7 @@ export function PaymentGateway({
     ...p,
   }
   if (currentPaymentMethodType !== paymentResource) return null
+  console.log({ loading, paymentResource })
   if (loading) return loaderComponent
   switch (paymentResource) {
     case "adyen_payments":
