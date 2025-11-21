@@ -249,10 +249,11 @@ export function PaymentMethod({
   useEffect(() => {
     // @ts-expect-error no type
     const status = order?.payment_source?.payment_response?.status
+    const orderStatus = order?.status
     // If showLoader is undefined, we don't change the loading
     if (showLoader !== undefined) {
-      if (showLoader && status) {
-        if (status.toLowerCase() === "declined") {
+      if (showLoader && status && loading) {
+        if (status.toLowerCase() === "declined" && orderStatus !== "placed") {
           setLoading(false)
         } else {
           setLoading(true)
@@ -261,7 +262,13 @@ export function PaymentMethod({
         setLoading(false)
       }
     }
-  }, [showLoader, order?.payment_source])
+  }, [
+    showLoader,
+    // @ts-expect-error no type
+    order?.payment_source?.payment_response?.status,
+    order?.status,
+    loading,
+  ])
   const sortedPaymentMethods =
     paymentMethods != null && sortBy != null
       ? sortPaymentMethods(paymentMethods, sortBy)

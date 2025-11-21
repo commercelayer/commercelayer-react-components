@@ -49,12 +49,19 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
     const isCustomerPaymentSource =
       currentCustomerPaymentSourceId != null &&
       currentCustomerPaymentSourceId === paymentSource?.id
+    const orderPaymentStatus = order?.payment_status
+    const paymentSourceStatus =
+      // @ts-expect-error no type
+      order?.payment_source?.payment_response?.status?.toLowerCase()
+    console.log({ paymentSourceStatus, orderPaymentStatus })
     if (readonly) {
       setShow(true)
       setShowCard(true)
     } else if (
       (payment?.id === currentPaymentMethodId || isCustomerPaymentSource) &&
-      !expressPayments
+      !expressPayments &&
+      paymentSourceStatus !== "declined" &&
+      orderPaymentStatus !== "partially_authorized"
     ) {
       const card = getCardDetails({
         paymentType: payment?.payment_source_type as PaymentResource,
@@ -63,7 +70,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
         },
       })
       if (isCustomerPaymentSource && card.brand === "") {
-        // Force creadit card icon for customer payment source imported by API
+        // Force credit card icon for customer payment source imported by API
         card.brand =
           card.issuer_type != null && card.issuer_type !== ""
             ? card.issuer_type
@@ -78,6 +85,12 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
       currentPaymentMethodType === "stripe_payments"
     ) {
       setShow(true)
+    } else if (
+      paymentSourceStatus === "declined" ||
+      orderPaymentStatus === "partially_authorized"
+    ) {
+      setShow(true)
+      setShowCard(false)
     }
     return () => {
       setShow(false)
@@ -90,6 +103,9 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
     payment != null,
     readonly,
     order?.status,
+    order?.payment_status,
+    // @ts-expect-error no type
+    order?.payment_source?.payment_response?.status,
     expressPayments,
     errors?.length,
   ])
