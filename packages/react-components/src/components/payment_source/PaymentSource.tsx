@@ -84,6 +84,9 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
       if (checkPaymentSourceStatus === "declined") {
         setShowCard(false)
       }
+      if (checkPaymentSourceStatus === "declined") {
+        setShowCard(false)
+      }
       setShow(true)
     } else if (
       expressPayments &&

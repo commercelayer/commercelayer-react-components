@@ -311,15 +311,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           handleClick()
         }
       }
-      // else if (
-      //   paymentType === "adyen_payments" &&
-      //   options?.adyen?.MD &&
-      //   options?.adyen?.PaRes &&
-      //   autoPlaceOrder
-      // ) {
-      //   console.log("Adyen MD and PaRes detected, placing order...")
-      //   handleClick()
-      // }
     }
   }, [
     options?.adyen?.redirectResult != null,
@@ -438,7 +429,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     const sdk = sdkClient()
     if (sdk == null) return
     if (order == null) return
-    let isValid = true
+    let isValid = false
     let currentPaymentStatus = "unpaid"
 
     const isStripePayment = paymentType === "stripe_payments"
