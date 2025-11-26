@@ -225,7 +225,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       const paymentMethodType =
         // @ts-expect-error no type
         order?.payment_source?.payment_response?.paymentMethod?.type
-      console.log("paymentMethodType", { paymentMethodType })
       if (
         paymentType === "adyen_payments" &&
         options?.adyen?.redirectResult &&
