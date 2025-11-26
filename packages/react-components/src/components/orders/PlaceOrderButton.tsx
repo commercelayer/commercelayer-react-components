@@ -406,7 +406,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     const sdk = sdkClient()
     if (sdk == null) return
     if (order == null) return
-    let isValid = false
+    let isValid = true
     let currentPaymentStatus = "unpaid"
 
     const isStripePayment = paymentType === "stripe_payments"
