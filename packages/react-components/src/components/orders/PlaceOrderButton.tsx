@@ -91,6 +91,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     if (loading) setNotPermitted(loading)
     else {
       if (paymentType === currentPaymentMethodType && paymentType) {
+        const paymentSourceStatus =
+          // @ts-expect-error no type
+          order?.payment_source?.payment_response?.status?.toLowerCase()
         const card = getCardDetails({
           customerPayment: {
             payment_source: paymentSource,
@@ -113,7 +116,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         ) {
           setNotPermitted(false)
         }
-        if (!currentPaymentMethodRef?.current?.onsubmit) {
+        if (
+          !currentPaymentMethodRef?.current?.onsubmit &&
+          paymentSourceStatus === "declined"
+        ) {
           setNotPermitted(true)
         }
       } else if (isFree && isPermitted) {
