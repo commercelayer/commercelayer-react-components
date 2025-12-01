@@ -156,6 +156,10 @@ export function PaymentMethod({
       if (autoSelectSinglePaymentMethod != null && !expressPayments) {
         const autoSelect = async (): Promise<void> => {
           const isSingle = paymentMethods.length === 1
+          const paymentSourceStatus = paymentSource
+            ? // @ts-expect-error no type
+              paymentSource.payment_response?.status?.toLowerCase()
+            : null
           if (isSingle) {
             const [paymentMethod] = paymentMethods ?? []
             if (paymentMethod && !paymentSource) {
@@ -207,7 +211,11 @@ export function PaymentMethod({
             }
           } else {
             setTimeout(() => {
-              if (showLoader && errors?.length === 0) {
+              if (
+                showLoader &&
+                errors?.length === 0 &&
+                paymentSourceStatus !== "declined"
+              ) {
                 setLoading(showLoader)
               } else {
                 setLoading(false)
@@ -222,10 +230,18 @@ export function PaymentMethod({
   useEffect(() => {
     if (paymentMethods) {
       const isSingle = paymentMethods.length === 1
+      const paymentSourceStatus = paymentSource
+        ? // @ts-expect-error no type
+          paymentSource.payment_response?.status?.toLowerCase()
+        : null
       if (isSingle && autoSelectSinglePaymentMethod) {
         if (paymentSource) {
           setTimeout(() => {
-            if (showLoader && errors?.length === 0) {
+            if (
+              showLoader &&
+              errors?.length === 0 &&
+              paymentSourceStatus !== "declined"
+            ) {
               setLoading(showLoader)
             } else {
               setLoading(false)
@@ -233,7 +249,11 @@ export function PaymentMethod({
           }, 200)
         }
       } else {
-        if (showLoader && errors?.length === 0) {
+        if (
+          showLoader &&
+          errors?.length === 0 &&
+          paymentSourceStatus !== "declined"
+        ) {
           setLoading(showLoader)
         } else {
           setLoading(false)
@@ -247,21 +267,21 @@ export function PaymentMethod({
     }
   }, [paymentMethods, currentPaymentMethodId, errors?.length])
   useEffect(() => {
-    // @ts-expect-error no type
-    const status = order?.payment_source?.payment_response?.status
+    const status =
+      // @ts-expect-error no type
+      order?.payment_source?.payment_response?.status?.toLowerCase()
     // If showLoader is undefined, we don't change the loading
-    if (showLoader !== undefined) {
-      if (showLoader && status) {
-        if (status.toLowerCase() === "declined") {
-          setLoading(false)
-        } else {
-          setLoading(true)
-        }
-      } else {
+    if (showLoader && status) {
+      if (status.toLowerCase() === "declined") {
         setLoading(false)
+      } else {
+        setLoading(true)
       }
+    } else {
+      setLoading(false)
     }
-  }, [showLoader, order?.payment_source])
+    // @ts-expect-error no type
+  }, [showLoader, order?.payment_source?.payment_response?.status])
   const sortedPaymentMethods =
     paymentMethods != null && sortBy != null
       ? sortPaymentMethods(paymentMethods, sortBy)

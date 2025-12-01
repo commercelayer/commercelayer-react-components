@@ -49,6 +49,9 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
     const isCustomerPaymentSource =
       currentCustomerPaymentSourceId != null &&
       currentCustomerPaymentSourceId === paymentSource?.id
+    const checkPaymentSourceStatus =
+      // @ts-expect-error no type
+      paymentSource?.payment_response?.status?.toLowerCase()
     if (readonly) {
       setShow(true)
       setShowCard(true)
@@ -69,8 +72,15 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
             ? card.issuer_type
             : "credit-card"
       }
-      if (card.brand && errors?.length === 0) {
+      if (
+        card.brand &&
+        errors?.length === 0 &&
+        checkPaymentSourceStatus !== "declined"
+      ) {
         setShowCard(true)
+      }
+      if (checkPaymentSourceStatus === "declined") {
+        setShowCard(false)
       }
       setShow(true)
     } else if (

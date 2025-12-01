@@ -91,6 +91,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     if (loading) setNotPermitted(loading)
     else {
       if (paymentType === currentPaymentMethodType && paymentType) {
+        const paymentSourceStatus =
+          // @ts-expect-error no type
+          order?.payment_source?.payment_response?.status?.toLowerCase()
         const card = getCardDetails({
           customerPayment: {
             payment_source: paymentSource,
@@ -113,6 +116,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         ) {
           setNotPermitted(false)
         }
+        if (
+          !currentPaymentMethodRef?.current?.onsubmit &&
+          paymentSourceStatus === "declined"
+        ) {
+          setNotPermitted(true)
+        }
       } else if (isFree && isPermitted) {
         setNotPermitted(false)
       } else {
@@ -125,7 +134,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   }, [
     isPermitted,
     paymentType != null,
-    currentPaymentMethodRef?.current?.onsubmit != null,
+    !currentPaymentMethodRef?.current?.onsubmit,
     loading,
     currentPaymentMethodType,
     order?.id,
@@ -216,7 +225,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       const paymentMethodType =
         // @ts-expect-error no type
         order?.payment_source?.payment_response?.paymentMethod?.type
-      console.log("paymentMethodType", { paymentMethodType })
       if (
         paymentType === "adyen_payments" &&
         options?.adyen?.redirectResult &&
@@ -285,15 +293,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ) {
         handleClick()
       }
-      // else if (
-      //   paymentType === "adyen_payments" &&
-      //   options?.adyen?.MD &&
-      //   options?.adyen?.PaRes &&
-      //   autoPlaceOrder
-      // ) {
-      //   console.log("Adyen MD and PaRes detected, placing order...")
-      //   handleClick()
-      // }
     }
   }, [
     options?.adyen?.redirectResult != null,
@@ -424,7 +423,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
        */
       const { status, payment_status: paymentStatus } =
         await sdk.orders.retrieve(order?.id, {
-          fields: ["status", "payment_status"],
+          fields: ["status", "payment_status", "payment_source"],
+          include: ["payment_source"],
         })
       const isAlreadyPlaced = status === "placed"
       const isDraftOrder = status === "draft"
@@ -477,6 +477,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
             paymentSourceId: paymentSource?.id,
           })
         : paymentSource
+    const checkPaymentSourceStatus =
+      // @ts-expect-error no type
+      checkPaymentSource?.payment_response?.status?.toLowerCase()
     const card =
       paymentType &&
       getCardDetails({
@@ -521,7 +524,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         setPlaceOrder,
         onclickCallback: onClick,
       })) as boolean
-    } else if (card?.brand) {
+    } else if (card?.brand && checkPaymentSourceStatus !== "declined") {
       isValid = true
     }
     if (currentPaymentStatus === "partially_authorized") {
@@ -549,6 +552,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         setIsLoading(false)
         setPlaceOrderStatus({ status: "standby" })
       }
+    } else {
+      setIsLoading(false)
+      setPlaceOrderStatus?.({ status: "standby" })
     }
   }
   const disabledButton = disabled !== undefined ? disabled : notPermitted

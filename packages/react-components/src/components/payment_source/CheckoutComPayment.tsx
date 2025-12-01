@@ -171,15 +171,15 @@ export function CheckoutComPayment({
                     if (paymentSource) {
                       // @ts-expect-error no type
                       const response = paymentSource.payment_response
+                      const paymentStatus = response?.status.toLowerCase()
                       // @ts-expect-error no type
                       const securityRedirect = paymentSource?.redirect_uri
-                      const isStatusPending =
-                        response?.status.toLowerCase() === "pending"
+                      const isStatusPending = paymentStatus === "pending"
                       if (isStatusPending && securityRedirect) {
                         window.location.href = securityRedirect
                         return false
                       }
-                      return true
+                      if (paymentStatus === "declined") return false
                     }
                     return false
                   }
