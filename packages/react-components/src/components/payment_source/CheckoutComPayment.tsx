@@ -171,7 +171,7 @@ export function CheckoutComPayment({
                     if (paymentSource) {
                       // @ts-expect-error no type
                       const response = paymentSource.payment_response
-                      const paymentStatus = response?.status.toLowerCase()
+                      const paymentStatus = response?.status?.toLowerCase()
                       // @ts-expect-error no type
                       const securityRedirect = paymentSource?.redirect_uri
                       const isStatusPending = paymentStatus === "pending"
