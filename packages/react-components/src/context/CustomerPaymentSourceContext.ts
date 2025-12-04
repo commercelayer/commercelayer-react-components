@@ -7,6 +7,7 @@ interface DefaultContext {
   exp_year?: number | string
   last4?: string
   issuer_type?: string
+  handleDeleteClick?: (e: MouseEvent) => void
 }
 
 export const defaultCustomerPaymentSourceContext = {}

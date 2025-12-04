@@ -1,10 +1,11 @@
-import CustomerContext from '#context/CustomerContext'
-import CustomerPaymentSourceContext from '#context/CustomerPaymentSourceContext'
-import type { PaymentResource } from '#reducers/PaymentMethodReducer'
-import type { DefaultChildrenType } from '#typings/globals'
-import getCardDetails from '#utils/getCardDetails'
-import useCustomContext from '#utils/hooks/useCustomContext'
-import { useEffect, useState, type JSX } from 'react';
+import { type JSX, useEffect, useState } from "react"
+import CustomerContext from "#context/CustomerContext"
+import CustomerPaymentSourceContext from "#context/CustomerPaymentSourceContext"
+import useCommerceLayer from "#hooks/useCommerceLayer"
+import type { PaymentResource } from "#reducers/PaymentMethodReducer"
+import type { DefaultChildrenType } from "#typings/globals"
+import getCardDetails from "#utils/getCardDetails"
+import useCustomContext from "#utils/hooks/useCustomContext"
 
 interface Props {
   children?: DefaultChildrenType
@@ -16,21 +17,22 @@ interface Props {
 
 export function CustomerPaymentSource({
   children,
-  loader = 'Loading...'
+  loader = "Loading...",
 }: Props): JSX.Element {
+  const { sdkClient } = useCommerceLayer()
   const [loading, setLoading] = useState(true)
-  const { payments } = useCustomContext({
+  const { payments, getCustomerPaymentSources } = useCustomContext({
     context: CustomerContext,
-    contextComponentName: 'CustomerContainer',
-    currentComponentName: 'CustomerPaymentSource',
-    key: 'payments'
+    contextComponentName: "CustomerContainer",
+    currentComponentName: "CustomerPaymentSource",
+    key: "payments",
   })
   useEffect(() => {
     if (payments != null) setLoading(false)
     return () => {
       setLoading(true)
     }
-  }, [payments != null])
+  }, [payments])
 
   const provider = payments
     ?.filter((p) => p?.payment_source != null)
@@ -39,7 +41,18 @@ export function CustomerPaymentSource({
       const customerPayment = p
       const cardDetails = getCardDetails({ paymentType, customerPayment })
       const value = {
-        ...cardDetails
+        ...cardDetails,
+        handleDeleteClick: (e: MouseEvent) => {
+          e?.preventDefault()
+          e?.stopPropagation()
+          const sdk = sdkClient()
+          if (sdk == null) return
+          sdk.customer_payment_sources.delete(p.id).then(() => {
+            if (getCustomerPaymentSources) {
+              getCustomerPaymentSources()
+            }
+          })
+        },
       }
       return (
         <CustomerPaymentSourceContext.Provider key={p.id} value={value}>
