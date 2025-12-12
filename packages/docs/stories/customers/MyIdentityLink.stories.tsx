@@ -1,17 +1,17 @@
-import type { Meta, StoryFn } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
-import MyIdentityLink from '#components/customers/MyIdentityLink'
-import { Code } from 'stories/_internals/Code'
 import {
+  Controls,
   Description,
+  Primary,
   Subtitle,
   Title,
-  Controls,
-  Primary
-} from '@storybook/addon-docs'
+} from "@storybook/addon-docs"
+import type { Meta, StoryFn } from "@storybook/react-vite"
+import { Code } from "stories/_internals/Code"
+import MyIdentityLink from "#components/customers/MyIdentityLink"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof MyIdentityLink> = {
-  title: 'Components/Customers/MyIdentityLink',
+  title: "Components/Customers/MyIdentityLink",
   component: MyIdentityLink,
 
   parameters: {
@@ -25,16 +25,16 @@ const setup: Meta<typeof MyIdentityLink> = {
           <Instructions />
           <Controls />
         </>
-      )
-    }
-  }
+      ),
+    },
+  },
 }
 
 export default setup
 
 const Template: StoryFn<typeof MyIdentityLink> = (args) => {
   return (
-    <CommerceLayer accessToken='my-access-token'>
+    <CommerceLayer accessToken="my-access-token">
       <MyIdentityLink {...args} />
     </CommerceLayer>
   )
@@ -42,14 +42,14 @@ const Template: StoryFn<typeof MyIdentityLink> = (args) => {
 
 export const Default = Template.bind({})
 Default.args = {
-  label: 'Open my-identity app',
-  target: '_blank',
-  onClick: () => {},
-  className: 'text-blue-500 hover:underline',
-  returnUrl: '',
-  clientId: '',
-  type: 'signup',
-  scope: ''
+  label: "Open my-identity app",
+  target: "_blank",
+  onClick: () => { },
+  className: "text-blue-500 hover:underline",
+  returnUrl: "",
+  clientId: "",
+  type: "signup",
+  scope: "",
 }
 
 Default.decorators = [
@@ -59,14 +59,14 @@ Default.decorators = [
         <Story />
       </div>
     )
-  }
+  },
 ]
 
 const Instructions = (): JSX.Element => (
-  <div className='mb-4'>
+  <div className="mb-4">
     {/* @ts-expect-error add a note of type `info` just for documenting the use case */}
-    <span title='How to use' type='warning'>
-      Fill the table of values below with a valid <Code>clientId</Code>,{' '}
+    <span title="How to use" type="warning">
+      Fill the table of values below with a valid <Code>clientId</Code>,{" "}
       <Code>scope</Code> and <Code>returnUrl</Code> from your organization to
       see the link in action. <br />
       <br />

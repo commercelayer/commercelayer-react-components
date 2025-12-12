@@ -20,19 +20,44 @@ span[type]::before {
 span[type] > p {
   margin: 0;
 }
-span[type='info'] {
+span[type="info"] {
   border-color: #3b82f6;
   background-color: #dbebfe;
 }
-span[type='warning'] {
+span[type="warning"] {
   border-color: #f97317;
   background-color: #ffedd5;
 }
-span[type='success'] {
+span[type="success"] {
   border-color: #22c55f;
   background-color: #ddfce7;
 }
-span[type='danger'] {
+span[type="danger"] {
   border-color: #ef4544;
   background-color: #fee2e3;
+}
+
+.embed-responsive {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  max-width: 600px;
+}
+.embed-responsive::before {
+  padding-top: 56.25%;
+}
+.embed-responsive::before {
+  display: block;
+  content: "";
+}
+.embed-responsive iframe {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }

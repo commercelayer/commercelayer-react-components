@@ -1,40 +1,40 @@
-import { type Meta, type StoryFn } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
-import { AddressesContainer } from '#components/addresses/AddressesContainer'
-import { Address } from '#components/addresses/Address'
-import { AddressField } from '#components/addresses/AddressField'
-import CustomerContainer from '#components/customers/CustomerContainer'
-import AddressesEmpty from '#components/addresses/AddressesEmpty'
+import type { Meta, StoryFn } from "@storybook/react-vite"
+import { Address } from "#components/addresses/Address"
+import { AddressesContainer } from "#components/addresses/AddressesContainer"
+import AddressesEmpty from "#components/addresses/AddressesEmpty"
+import { AddressField } from "#components/addresses/AddressField"
+import CustomerContainer from "#components/customers/CustomerContainer"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof AddressField> = {
-  title: 'Components/Customers/AddressField',
+  title: "Components/Customers/AddressField",
   component: AddressField,
   argTypes: {
     name: {
-      control: 'select',
+      control: "select",
       options: [
-        'first_name',
-        'last_name',
-        'full_name',
-        'full_address',
-        'email',
-        'phone',
-        'line_1'
+        "first_name",
+        "last_name",
+        "full_name",
+        "full_address",
+        "email",
+        "phone",
+        "line_1",
       ],
-      description: 'Resource attribute to be displayed.'
+      description: "Resource attribute to be displayed.",
     },
     type: {
-      control: 'select',
-      options: ['field', 'edit', 'delete'],
+      control: "select",
+      options: ["field", "edit", "delete"],
       description:
-        'Behavior requested for current `AddressField`. It could be `field` to show an attribute of an `address` or either `Edit` or `Delete` to generate an action button to interact with current `address`.'
+        "Behavior requested for current `AddressField`. It could be `field` to show an attribute of an `address` or either `Edit` or `Delete` to generate an action button to interact with current `address`.",
     },
     label: {
-      control: 'text',
+      control: "text",
       description:
-        'Label to be displayed in case of `field` is set to either `edit` or `delete`.'
-    }
-  }
+        "Label to be displayed in case of `field` is set to either `edit` or `delete`.",
+    },
+  },
 }
 
 export default setup
@@ -45,18 +45,18 @@ const Template: StoryFn<typeof AddressField> = (args) => {
 
 export const Default = Template.bind({})
 Default.args = {
-  name: 'first_name',
-  type: 'field'
+  name: "first_name",
+  type: "field",
 }
 
 Default.decorators = [
   (Story) => (
-    <CommerceLayer accessToken='customer-access-token'>
+    <CommerceLayer accessToken="customer-access-token">
       <CustomerContainer>
         <AddressesContainer>
           <AddressesEmpty
-            className='text-small'
-            emptyText='No addresses to list. Add an address to print here the relative <AddressField> content'
+            className="text-small"
+            emptyText="No addresses to list. Add an address to print here the relative <AddressField> content"
           />
           <Address>
             <Story />
@@ -64,5 +64,5 @@ Default.decorators = [
         </AddressesContainer>
       </CustomerContainer>
     </CommerceLayer>
-  )
+  ),
 ]

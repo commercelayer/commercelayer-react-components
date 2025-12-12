@@ -1,18 +1,18 @@
-import type { Meta, StoryFn } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
-import Price from '#components/prices/Price'
-import PricesContainer from '#components/prices/PricesContainer'
+import type { Meta, StoryFn } from "@storybook/react-vite"
+import Price from "#components/prices/Price"
+import PricesContainer from "#components/prices/PricesContainer"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof Price> = {
-  title: 'Components/Prices/Price',
-  component: Price
+  title: "Components/Prices/Price",
+  component: Price,
 }
 
 export default setup
 
 const Template: StoryFn<typeof Price> = (args) => {
   return (
-    <CommerceLayer accessToken='my-access-token'>
+    <CommerceLayer accessToken="my-access-token">
       <PricesContainer>
         <Price {...args} />
       </PricesContainer>
@@ -22,9 +22,9 @@ const Template: StoryFn<typeof Price> = (args) => {
 
 export const Default = Template.bind({})
 Default.args = {
-  skuCode: 'POST6191FFFFFF000000XXXX',
-  compareClassName: 'line-through ml-2',
-  className: 'font-bold'
+  skuCode: "POST6191FFFFFF000000XXXX",
+  compareClassName: "line-through ml-2",
+  className: "font-bold",
 }
 
 /**
@@ -35,8 +35,8 @@ Default.args = {
  */
 export const NoComparePrice = Template.bind({})
 NoComparePrice.args = {
-  skuCode: 'POST6191FFFFFF000000XXXX',
-  showCompare: false
+  skuCode: "POST6191FFFFFF000000XXXX",
+  showCompare: false,
 }
 
 /**
@@ -45,13 +45,13 @@ NoComparePrice.args = {
 export const MultiplePrices: StoryFn<typeof Price> = (args) => {
   return (
     <CommerceLayer
-      accessToken='my-access-token'
-      endpoint='https://demo-store.commercelayer.io'
+      accessToken="my-access-token"
+      endpoint="https://demo-store.commercelayer.io"
     >
       <PricesContainer>
-        <div className='grid'>
-          <Price skuCode='POST6191FFFFFF000000XXXX' showCompare={false} />
-          <Price skuCode='POLOMXXX000000FFFFFFLXXX' showCompare={false} />
+        <div className="grid">
+          <Price skuCode="POST6191FFFFFF000000XXXX" showCompare={false} />
+          <Price skuCode="POLOMXXX000000FFFFFFLXXX" showCompare={false} />
         </div>
       </PricesContainer>
     </CommerceLayer>
@@ -88,26 +88,26 @@ export const ChildrenProps: StoryFn<typeof Price> = (args) => {
 }
 
 ChildrenProps.args = {
-  skuCode: 'POST6191FFFFFF000000XXXX'
+  skuCode: "POST6191FFFFFF000000XXXX",
 }
 ChildrenProps.decorators = [
   (Story) => {
     return (
       <CommerceLayer
-        accessToken='my-access-token'
-        endpoint='https://demo-store.commercelayer.io'
+        accessToken="my-access-token"
+        endpoint="https://demo-store.commercelayer.io"
       >
         <PricesContainer>
           <Story />
         </PricesContainer>
       </CommerceLayer>
     )
-  }
+  },
 ]
 ChildrenProps.parameters = {
   docs: {
     source: {
-      type: 'code'
-    }
-  }
+      type: "code",
+    },
+  },
 }

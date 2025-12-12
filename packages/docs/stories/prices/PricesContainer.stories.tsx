@@ -1,18 +1,18 @@
-import type { Meta, StoryFn } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
-import PricesContainer from '#components/prices/PricesContainer'
-import Price from '#components/prices/Price'
+import type { Meta, StoryFn } from "@storybook/react-vite"
+import Price from "#components/prices/Price"
+import PricesContainer from "#components/prices/PricesContainer"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof PricesContainer> = {
-  title: 'Components/Prices/PricesContainer',
-  component: PricesContainer
+  title: "Components/Prices/PricesContainer",
+  component: PricesContainer,
 }
 
 export default setup
 
 const Template: StoryFn<typeof PricesContainer> = (args) => {
   return (
-    <CommerceLayer accessToken='my-access-token'>
+    <CommerceLayer accessToken="my-access-token">
       <PricesContainer {...args}>
         <Price />
       </PricesContainer>
@@ -22,5 +22,5 @@ const Template: StoryFn<typeof PricesContainer> = (args) => {
 
 export const Default = Template.bind({})
 Default.args = {
-  skuCode: 'POST6191FFFFFF000000XXXX'
+  skuCode: "POST6191FFFFFF000000XXXX",
 }
