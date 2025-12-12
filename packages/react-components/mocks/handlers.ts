@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/return-await */
-import { HttpResponse, bypass, http } from 'msw'
+import { bypass, HttpResponse, http } from "msw"
 // import { customerAddresses } from './resources/orders/customer-addresses'
 // import { customerOrdersFull } from './resources/orders/customer-orders-full'
 
-export const baseUrl = 'https://*.commercelayer.*/api'
+export const baseUrl = "https://*.commercelayer.*/api"
 
 const handlerPaths = [
-  `https://*.commercelayer.*/oauth/token`,
+  "https://*.commercelayer.*/oauth/token",
   `${baseUrl}/prices*`,
   `${baseUrl}/skus*`,
   `${baseUrl}/sku_options*`,
@@ -16,7 +16,7 @@ const handlerPaths = [
   `${baseUrl}/delivery_lead_times*`,
   `${baseUrl}/customer_payment_sources*`,
   `${baseUrl}/in_stock_subscriptions*`,
-  `${baseUrl}/customers*`
+  `${baseUrl}/customers*`,
 ].map((path: string) => {
   return http.all(path, async ({ request }) => {
     const response = await fetch(bypass(request))
@@ -35,5 +35,5 @@ export const handlers = [
     const realResponse = await response.json()
     return HttpResponse.json(realResponse)
   }),
-  ...handlerPaths
+  ...handlerPaths,
 ]

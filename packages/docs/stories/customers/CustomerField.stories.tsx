@@ -1,24 +1,24 @@
-import { type Meta, type StoryFn } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
-import { CustomerContainer } from '#components/customers/CustomerContainer'
-import { CustomerField } from '#components/customers/CustomerField'
+import type { Meta, StoryFn } from "@storybook/react-vite"
+import { CustomerContainer } from "#components/customers/CustomerContainer"
+import { CustomerField } from "#components/customers/CustomerField"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof CustomerField> = {
-  title: 'Components/Customers/CustomerField',
+  title: "Components/Customers/CustomerField",
   component: CustomerField,
   argTypes: {
     attribute: {
-      control: 'select',
-      options: ['email', 'status', 'total_orders_count'],
-      description: 'Resource attribute to display'
+      control: "select",
+      options: ["email", "status", "total_orders_count"],
+      description: "Resource attribute to display",
     },
     tagElement: {
-      control: 'select',
-      options: ['div', 'p', 'span', 'section'],
+      control: "select",
+      options: ["div", "p", "span", "section"],
       description:
-        'Resource attribute to displayHtml tag to render. When tag is `img` the value will be used to fill the `src` attribute.'
-    }
-  }
+        "Resource attribute to displayHtml tag to render. When tag is `img` the value will be used to fill the `src` attribute.",
+    },
+  },
 }
 
 export default setup
@@ -29,16 +29,16 @@ const Template: StoryFn<typeof CustomerField> = (args) => {
 
 export const Default = Template.bind({})
 Default.args = {
-  attribute: 'email',
-  tagElement: 'p'
+  attribute: "email",
+  tagElement: "p",
 }
 
 Default.decorators = [
   (Story) => (
-    <CommerceLayer accessToken='customer-access-token'>
+    <CommerceLayer accessToken="customer-access-token">
       <CustomerContainer>
         <Story />
       </CustomerContainer>
     </CommerceLayer>
-  )
+  ),
 ]
