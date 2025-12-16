@@ -155,10 +155,8 @@ export function HostedCart({
     key: 'accessToken'
   })
   const [src, setSrc] = useState<string | undefined>()
-  if (accessToken == null || endpoint == null) return null
   const { order, createOrder, getOrder } = useContext(OrderContext)
   const { persistKey } = useContext(OrderStorageContext)
-  const { domain, slug } = getDomain(endpoint)
   async function setOrder(openCart?: boolean): Promise<void> {
     const orderId = localStorage.getItem(persistKey) ?? (await createOrder({}))
     if (orderId != null && accessToken && endpoint) {
@@ -245,7 +243,8 @@ export function HostedCart({
     } else if (
       src == null &&
       (order?.id != null || orderId != null) &&
-      accessToken
+      accessToken &&
+      endpoint != null
     ) {
       getOrganizationConfig({
         accessToken,
@@ -274,7 +273,6 @@ export function HostedCart({
     return (): void => {
       ignore = true
       if (openAdd && type === 'mini') {
-        // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
         unsubscribe('open-cart', () => {})
       }
     }
@@ -290,6 +288,8 @@ export function HostedCart({
       ref.current
     )
   }, [ref.current != null])
+  if (accessToken == null || endpoint == null) return null
+  const { domain, slug } = getDomain(endpoint)
   /**
    * Close the cart.
    */
@@ -324,21 +324,22 @@ export function HostedCart({
         {...props}
       >
         <div style={{ ...defaultStyle.iconContainer, ...style?.iconContainer }}>
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            fill='none'
-            viewBox='0 0 24 24'
-            strokeWidth={1.5}
-            stroke='currentColor'
-            style={{ ...defaultStyle.icon, ...style?.icon }}
-            onClick={onCloseCart}
-          >
-            <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              d='M6 18L18 6M6 6l12 12'
-            />
-          </svg>
+          <button type="button" aria-label="Close cart" onClick={onCloseCart}>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              fill='none'
+              viewBox='0 0 24 24'
+              strokeWidth={1.5}
+              stroke='currentColor'
+              style={{ ...defaultStyle.icon, ...style?.icon }}
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M6 18L18 6M6 6l12 12'
+              />
+            </svg>
+          </button>
         </div>
         <iframe
           title='Cart'

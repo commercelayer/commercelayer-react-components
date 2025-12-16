@@ -12,7 +12,7 @@ export function ShippingMethod(props: Props): JSX.Element {
   const {
     children,
     readonly,
-    emptyText = `There are not any shipping method available`
+    emptyText = 'There are not any shipping method available'
   } = props
   const {
     shippingMethods,
