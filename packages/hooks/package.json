@@ -1,7 +1,7 @@
 {
-  "name": "@commercelayer/core",
+  "name": "@commercelayer/hooks",
   "version": "1.0.0",
-  "description": "Commerce Layer Core",
+  "description": "Commerce Layer React Hooks",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
@@ -38,14 +38,22 @@
   "license": "MIT",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
+    "@commercelayer/sdk": "^7.4.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@vitest/coverage-v8": "^4.0.15",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.15"
   },
   "dependencies": {
-    "@commercelayer/js-auth": "^7.1.0",
-    "@commercelayer/sdk": "7.4.1"
+    "@commercelayer/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=19.2.1"
   }
 }

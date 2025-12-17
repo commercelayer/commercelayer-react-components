@@ -1,0 +1,1 @@
+export { getAccessToken } from "./getAccessToken"

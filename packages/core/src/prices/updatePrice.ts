@@ -1,7 +1,8 @@
-import type {
-  Price,
-  PriceUpdate,
-  QueryParamsRetrieve,
+import {
+  type Price,
+  type PriceUpdate,
+  prices,
+  type QueryParamsRetrieve,
 } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
@@ -28,6 +29,6 @@ export async function updatePrice({
   params,
   options,
 }: UpdatePriceParams): Promise<Price> {
-  const sdk = getSdk({ accessToken })
-  return await sdk.prices.update(resource, params, options)
+  getSdk({ accessToken })
+  return await prices.update(resource, params, options)
 }

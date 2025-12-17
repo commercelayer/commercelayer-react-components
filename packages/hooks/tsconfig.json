@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    /* Base Options: */
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "lib": ["es2022"],
+    "noEmit": true,
+
+    /* Strictness */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    /* If transpiling with TypeScript: */
+    "module": "Preserve",
+
+    /* Relative Paths */
+    "baseUrl": ".",
+    "paths": {
+      "#sdk": ["src/sdk/index.ts"],
+      "#types": ["src/types/index.ts"],
+      "#extender": ["extender.ts"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "coverage", "*.spec.ts"]
+}

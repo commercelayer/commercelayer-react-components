@@ -1,4 +1,3 @@
-import type { QueryFilter } from "@commercelayer/sdk"
 import { describe, expect } from "vitest"
 import { coreTest } from "#extender"
 import { getPrices } from "./getPrices.js"
