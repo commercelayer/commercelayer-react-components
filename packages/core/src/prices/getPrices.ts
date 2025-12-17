@@ -1,8 +1,9 @@
-import type {
-  ListResponse,
-  Price,
-  QueryParamsList,
-  ResourcesConfig,
+import {
+  type ListResponse,
+  type Price,
+  prices,
+  type QueryParamsList,
+  type ResourcesConfig,
 } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
@@ -27,6 +28,6 @@ export async function getPrices({
   params,
   options,
 }: GetPricesParams): Promise<ListResponse<Price>> {
-  const sdk = getSdk({ accessToken })
-  return await sdk.prices.list(params, options)
+  getSdk({ accessToken })
+  return await prices.list(params, options)
 }
