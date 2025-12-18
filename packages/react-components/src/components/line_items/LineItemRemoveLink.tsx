@@ -13,7 +13,7 @@ interface ChildrenProps extends Omit<Props, 'children'> {
 }
 
 interface Props
-  extends PropsWithoutRef<Omit<JSX.IntrinsicElements['a'], 'children'>> {
+  extends PropsWithoutRef<Omit<JSX.IntrinsicElements['button'], 'children'>> {
   children?: ChildrenFunction<ChildrenProps>
   label?: string
 }
@@ -27,7 +27,7 @@ export function LineItemRemoveLink(props: Props): JSX.Element {
     key: 'lineItem'
   })
   const { deleteLineItem } = useContext(LineItemContext)
-  const handleRemove = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+  const handleRemove = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault()
     if (deleteLineItem != null && lineItem != null)
       deleteLineItem(lineItem.id)
@@ -41,14 +41,14 @@ export function LineItemRemoveLink(props: Props): JSX.Element {
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
   ) : (
-    <a
+    <button
       data-testid={`line-item-remove-link-${lineItem?.sku_code ?? ''}`}
       {...props}
-      href='#'
+      type='button'
       onClick={handleRemove}
     >
       {label}
-    </a>
+    </button>
   )
 }
 

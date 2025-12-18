@@ -25,7 +25,6 @@ export interface StripeConfig {
   name?: string
   options?: StripePaymentElementOptions
   appearance?: StripeElementsOptions["appearance"]
-  // biome-ignore lint/suspicious/noExplicitAny: No type available
   [key: string]: any
 }
 
