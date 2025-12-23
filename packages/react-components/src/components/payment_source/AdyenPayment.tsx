@@ -1,15 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import {
-  type FormEvent,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type JSX,
-} from "react"
-import PaymentMethodContext from "#context/PaymentMethodContext"
-import type { PaymentSourceProps } from "./PaymentSource"
-import { setCustomerOrderParam } from "#utils/localStorage"
+
 import {
   type AdditionalDetailsData,
   AdyenCheckout,
@@ -24,22 +14,55 @@ import {
   type UIElement,
   type UIElementProps,
 } from "@adyen/adyen-web/auto"
+import type {
+  AdyenPayment as AdyenPaymentType,
+  Order,
+} from "@commercelayer/sdk"
+import {
+  type FormEvent,
+  type JSX,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import Parent from "#components/utils/Parent"
-import browserInfo, { cleanUrlBy } from "#utils/browserInfo"
-import PlaceOrderContext from "#context/PlaceOrderContext"
-import OrderContext from "#context/OrderContext"
-import { getPublicIP } from "#utils/getPublicIp"
+import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
+import OrderContext from "#context/OrderContext"
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import PlaceOrderContext from "#context/PlaceOrderContext"
+import browserInfo, { cleanUrlBy } from "#utils/browserInfo"
+import { getPublicIP } from "#utils/getPublicIp"
+import { hasSubscriptions } from "#utils/hasSubscriptions"
+import { setCustomerOrderParam } from "#utils/localStorage"
+import type { PaymentSourceProps } from "./PaymentSource"
 
 interface PaymentMethodsStyle {
   card?: CardConfiguration["styles"]
   paypal?: PayPalConfiguration["style"]
 }
 
+type PaymentMethodType =
+  | "scheme"
+  | "giftcard"
+  | "paypal"
+  | "applepay"
+  | "googlepay"
+  | (string & {})
+
 /**
  * Configuration options for the Adyen payment component.
  */
 export interface AdyenPaymentConfig {
+  /**
+   * Payment methods to be used for subscriptions.
+   * This is an array of payment method types that are supported for subscription payments.
+   * For example, it can include "scheme" for card payments.
+   * @default all available payment methods
+   * @example ["scheme"]
+   */
+  subscriptionPaymentMethods?: PaymentMethodType[]
   /**
    * Optional CSS class name for the card container.
    */
@@ -76,6 +99,17 @@ export interface AdyenPaymentConfig {
     recurringDetailReference: string
     shopperReference: string | undefined
   }) => Promise<boolean>
+  /**
+   * Callback function to be called when the Adyen component is ready.
+   * @returns void.
+   */
+  onReady?: () => void
+  /**
+   * onSelect callback function to be called when a payment method is selected.
+   * @param component - The selected payment method component.
+   * @returns void.
+   */
+  onSelect?: (component: UIElement<UIElementProps>) => void
   giftcardErrorComponent?: (message: string) => JSX.Element
 }
 
@@ -101,6 +135,9 @@ export function AdyenPayment({
     styles,
     onDisableStoredPaymentMethod,
     giftcardErrorComponent,
+    onReady,
+    onSelect,
+    subscriptionPaymentMethods,
   } = {
     ...defaultConfig,
     ...config,
@@ -118,8 +155,10 @@ export function AdyenPayment({
     setPaymentRef,
     currentCustomerPaymentSourceId,
   } = useContext(PaymentMethodContext)
-  const { order, updateOrder } = useContext(OrderContext)
-  const { placeOrderButtonRef, setPlaceOrder } = useContext(PlaceOrderContext)
+  const { order, updateOrder, getOrderByFields } = useContext(OrderContext)
+  const authConfig = useContext(CommerceLayerContext)
+  const { placeOrderButtonRef, setPlaceOrder, status } =
+    useContext(PlaceOrderContext)
   const { customers } = useContext(CustomerContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const dropinRef = useRef<Dropin | null>(null)
@@ -212,6 +251,7 @@ export function AdyenPayment({
     CheckoutAdvancedFlowResponse & {
       paymentMethodType?: string
       message?: string
+      paymentStatus?: Order["payment_status"]
     }
   > => {
     const url = cleanUrlBy()
@@ -228,7 +268,17 @@ export function AdyenPayment({
       control?.payment_response?.paymentMethod?.type ??
       // @ts-expect-error no type
       control?.payment_request_data?.payment_method?.type
-    if (controlCode === "Authorised" && paymentMethodType !== "giftcard") {
+    const getOrderStatus = await getOrderByFields({
+      orderId: order?.id ?? "",
+      fields: ["status", "payment_status"],
+      config: authConfig,
+    })
+    const paymentStatus = getOrderStatus?.payment_status
+    if (
+      controlCode === "Authorised" &&
+      paymentMethodType !== "giftcard" &&
+      paymentStatus !== "partially_authorized"
+    ) {
       return {
         resultCode: controlCode,
       }
@@ -243,13 +293,11 @@ export function AdyenPayment({
         redirect_from_issuer_method: "GET",
         shopper_ip: shopperIp,
         shopperInteraction: "Ecommerce",
-        recurringProcessingModel: "CardOnFile",
         browser_info: {
           ...browserInfo(),
         },
       },
     }
-    // biome-ignore lint/performance/noDelete: Need to test
     delete attributes.payment_request_data.paymentMethod
     try {
       await setPaymentSource({
@@ -263,65 +311,44 @@ export function AdyenPayment({
           resultCode: "Error",
         }
       }
-      // Authorize remaining amount with other payment method after gift card
-      if (
-        ["Cancelled", "Refused"].includes(controlCode) &&
-        paymentMethodType === "giftcard" &&
-        currentPaymentMethodType !== "giftcard"
-      ) {
-        const availableGiftCardAmount = Number.parseInt(
-          // @ts-expect-error no type
-          control?.payment_response?.additionalData
-            ?.currentBalanceValue as string,
-        )
-        const totalPartialAmount =
-          order?.total_amount_with_taxes_cents != null &&
-          availableGiftCardAmount != null
-            ? order?.total_amount_with_taxes_cents - availableGiftCardAmount
-            : 0
-        await updateOrder({
-          id: order.id,
-          attributes: {
-            _authorization_amount_cents: totalPartialAmount,
-            _place: true,
-          },
-        })
-        await setPaymentSource({
-          paymentSourceId: paymentSource?.id,
-          paymentResource: "adyen_payments",
-          attributes: {
-            // @ts-expect-error no type
-            payment_request_data: control?.payment_request_data,
-          },
-        })
-        await updateOrder({
-          id: order.id,
-          attributes: {
-            _authorize: true,
-          },
-        })
-        // Add gift card amount as payment method attribute
-        return {
-          resultCode: "Authorised",
-          paymentMethodType: currentPaymentMethodType,
-        }
-      }
       // First gift card authorization for partial or total amount
       if (currentPaymentMethodType === "giftcard") {
-        const firstAuthorization = await setPaymentSource({
+        // Request balance check if the gift card can cover the total amount
+        const giftCardBalanceCheck = (await setPaymentSource({
           paymentSourceId: paymentSource?.id,
           paymentResource: "adyen_payments",
           attributes: {
-            _authorize: 1,
+            _balance: true,
           },
+        })) as AdyenPaymentType
+        const currentBalance = giftCardBalanceCheck?.balance ?? 0
+        const totalAmount = order?.total_amount_with_taxes_cents ?? 0
+        const attributes =
+          currentBalance >= totalAmount
+            ? {
+                _authorize: true,
+              }
+            : {
+                _authorization_amount_cents: currentBalance,
+                _authorize: true,
+              }
+        const { order: orderUpdated } = await updateOrder({
+          id: order.id,
+          attributes,
         })
-        // @ts-expect-error no type
-        const resultCode = firstAuthorization?.payment_response?.resultCode
+        const resultCode =
+          // @ts-expect-error no type
+          orderUpdated?.payment_source?.payment_response?.resultCode
         const refusalReasonCode =
           // @ts-expect-error no type
-          firstAuthorization?.payment_response?.refusalReasonCode
-        // @ts-expect-error no type
-        const errorCode = firstAuthorization?.payment_response?.errorCode
+          orderUpdated?.payment_source?.payment_response?.refusalReasonCode
+        const errorCode =
+          // @ts-expect-error no type
+          orderUpdated?.payment_source?.payment_response?.errorCode
+        const action =
+          // @ts-expect-error no type
+          orderUpdated?.payment_source?.payment_response?.action
+        const paymentStatus = orderUpdated?.payment_status
         if (
           (["Cancelled", "Refused"].includes(resultCode) &&
             refusalReasonCode !== "12") ||
@@ -329,9 +356,9 @@ export function AdyenPayment({
         ) {
           const message =
             // @ts-expect-error no type
-            firstAuthorization?.payment_response?.refusalReason ??
+            orderUpdated?.payment_response?.refusalReason ??
             // @ts-expect-error no type
-            firstAuthorization?.payment_response?.message
+            orderUpdated?.payment_response?.message
 
           return {
             resultCode: errorCode ? "Refused" : resultCode,
@@ -341,6 +368,8 @@ export function AdyenPayment({
         return {
           resultCode: "Authorised",
           paymentMethodType: currentPaymentMethodType,
+          action,
+          paymentStatus,
         }
       }
       const res = await setPaymentSource({
@@ -441,7 +470,7 @@ export function AdyenPayment({
     }
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Infinite loop
   useEffect(() => {
     const paymentMethodsResponse = {
       // @ts-expect-error no type
@@ -460,10 +489,32 @@ export function AdyenPayment({
         "Payment methods are not available. Please, check your Adyen configuration.",
       )
     }
-    const showStoredPaymentMethods =
+    let showStoredPaymentMethods =
       // @ts-expect-error no type
       paymentSource?.payment_methods?.storedPaymentMethods != null ?? false
-
+    if (order && hasSubscriptions(order)) {
+      /**
+       * If the order has subscriptions, we don't show stored payment methods
+       */
+      showStoredPaymentMethods = false
+      /**
+       * Need to reset stored payment methods
+       * to avoid showing them when the order has subscriptions
+       */
+      paymentMethodsResponse.storedPaymentMethods = []
+      /**
+       * Remove scheme payment methods
+       * because they are not supported in subscriptions
+       */
+      paymentMethodsResponse.paymentMethods =
+        subscriptionPaymentMethods != null &&
+        subscriptionPaymentMethods.length > 0
+          ? paymentMethodsResponse.paymentMethods.filter(
+              (pm: { type: PaymentMethodType }) =>
+                subscriptionPaymentMethods.includes(pm.type),
+            )
+          : paymentMethodsResponse.paymentMethods
+    }
     const options = {
       locale: order?.language_code ?? locale,
       environment,
@@ -493,7 +544,10 @@ export function AdyenPayment({
       },
       onSubmit: (state, element, actions) => {
         const handleSubmit = async (): Promise<void> => {
-          const { resultCode, action, message } = await onSubmit(state, element)
+          const { resultCode, action, message, paymentStatus } = await onSubmit(
+            state,
+            element,
+          )
           if (["Cancelled", "Refused"].includes(resultCode)) {
             actions.reject()
             if (message) {
@@ -505,7 +559,9 @@ export function AdyenPayment({
             actions.resolve({
               resultCode,
             })
-            dropinRef.current?.mount("#adyen-dropin")
+            if (paymentStatus === "partially_authorized") {
+              dropinRef.current?.mount("#adyen-dropin")
+            }
             setGiftcardError(null)
           }
         }
@@ -580,6 +636,12 @@ export function AdyenPayment({
                 setPaymentRef({ ref })
               }
             }
+            if (onSelect) {
+              onSelect(component)
+            }
+          },
+          onReady() {
+            if (onReady) onReady()
           },
         }).mount("#adyen-dropin")
         if (dropin && checkout) {
@@ -588,7 +650,8 @@ export function AdyenPayment({
           setLoadAdyen(true)
         }
       }
-      if (!dropinRef.current) {
+      const html = document.getElementById("adyen-dropin")
+      if (!dropinRef.current && status === "standby" && html) {
         initializeAdyen()
       }
     }
@@ -596,7 +659,7 @@ export function AdyenPayment({
       setPaymentRef({ ref: { current: null } })
       setLoadAdyen(false)
     }
-  }, [clientKey, ref != null])
+  }, [clientKey, ref != null, status])
   return !clientKey && !loadAdyen && !checkout ? null : (
     <form
       ref={ref}

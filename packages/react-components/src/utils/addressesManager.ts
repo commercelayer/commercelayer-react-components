@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 /* eslint-disable @typescript-eslint/naming-convention */
-import isEmpty from 'lodash/isEmpty'
-import { fieldsExist } from '#utils/validateFormFields'
-import type { BaseError } from '#typings/errors'
-import { type AddressField, addressFields } from '#reducers/AddressReducer'
+
 import type {
-  OrderUpdate,
-  Order,
+  Address,
+  AddressCreate,
   CommerceLayerClient,
   LineItem,
-  Address,
-  AddressCreate
-} from '@commercelayer/sdk'
-import type { TCustomerAddress } from '#reducers/CustomerReducer'
+  Order,
+  OrderUpdate,
+} from "@commercelayer/sdk"
+import isEmpty from "lodash/isEmpty"
+import { type AddressField, addressFields } from "#reducers/AddressReducer"
+import type { TCustomerAddress } from "#reducers/CustomerReducer"
+import type { BaseError } from "#typings/errors"
+import { fieldsExist } from "#utils/validateFormFields"
 
 interface BillingAddressControllerProps {
   billing_address?: AddressCreate
@@ -29,11 +30,11 @@ export function billingAddressController({
   billing_address,
   billingAddressId,
   errors,
-  requiresBillingInfo = false,
+  // requiresBillingInfo = false,
   invertAddresses = false,
   shipToDifferentAddress,
   shippingDisable,
-  requiredMetadataFields
+  requiredMetadataFields,
 }: BillingAddressControllerProps): boolean {
   let billingDisable = invertAddresses
     ? !!(!shippingDisable && shipToDifferentAddress)
@@ -47,7 +48,7 @@ export function billingAddressController({
         billing_address && fieldsExist(billing_address, formFields)
       )
     } else {
-      if (requiresBillingInfo) formFields = [...formFields, 'billing_info']
+      // if (requiresBillingInfo) formFields = [...formFields, "billing_info"]
       billingDisable = !!(
         billing_address && fieldsExist(billing_address, formFields)
       )
@@ -81,8 +82,8 @@ export function shippingAddressController({
   shipping_address,
   shippingAddressId,
   invertAddresses = false,
-  requiresBillingInfo = false,
-  requiredMetadataFields
+  // requiresBillingInfo = false,
+  requiredMetadataFields,
 }: ShippingAddressControllerProps): boolean {
   let shippingDisable = invertAddresses
     ? !isEmpty(errors) || isEmpty(shipping_address)
@@ -93,7 +94,7 @@ export function shippingAddressController({
     if (requiredMetadataFields != null && requiredMetadataFields.length > 0)
       formField = [...formField, ...requiredMetadataFields]
     if (invertAddresses) {
-      if (requiresBillingInfo) formField = [...formField, 'billing_info']
+      // if (requiresBillingInfo) formField = [...formField, "billing_info"]
       shippingDisable = !!(
         shipping_address && fieldsExist(shipping_address, formField)
       )
@@ -133,18 +134,18 @@ export function countryLockController({
   shipToDifferentAddress,
   shipping_address,
   shippingAddressId,
-  lineItems
+  lineItems,
 }: CountryLockControllerProps): boolean {
   const doNotShipItems = lineItems
     ?.filter(
       (lineItem) =>
         lineItem?.item?.type != null &&
-        ['skus', 'bundles'].includes(lineItem?.item?.type)
+        ["skus", "bundles"].includes(lineItem?.item?.type),
     )
     ?.every(
       (lineItem) =>
         // @ts-expect-error no type for do_not_ship on SDK
-        lineItem?.item?.do_not_ship === true
+        lineItem?.item?.do_not_ship === true,
     )
   if (doNotShipItems) return false
   if (
@@ -156,7 +157,7 @@ export function countryLockController({
     const addressLocked = addresses?.find(
       (a) =>
         (a?.id === billingAddressId || a?.reference === billingAddressId) &&
-        a?.country_code !== countryCodeLock
+        a?.country_code !== countryCodeLock,
     )
     if (!isEmpty(addressLocked)) return true
   }
@@ -175,7 +176,7 @@ export function countryLockController({
     const addressLocked = addresses?.find(
       (a) =>
         (a?.id === shippingAddressId || a?.reference === shippingAddressId) &&
-        a?.country_code !== countryCodeLock
+        a?.country_code !== countryCodeLock,
     )
     if (!isEmpty(addressLocked)) return true
   }
@@ -201,14 +202,14 @@ export async function invertedAddressesHandler({
   shipToDifferentAddress,
   shippingAddress,
   shippingAddressId,
-  sdk
+  sdk,
 }: InvertedAddressesHandlerParams): Promise<OrderUpdate | null> {
   const currentShippingAddressRef = order?.shipping_address?.reference
   const orderAttributes: OrderUpdate = {
     id: order?.id,
     _billing_address_clone_id: shippingAddressId,
     _shipping_address_clone_id: shippingAddressId,
-    customer_email: customerEmail
+    customer_email: customerEmail,
   }
   if (currentShippingAddressRef === shippingAddressId) {
     orderAttributes._billing_address_clone_id = order?.billing_address?.id
@@ -223,25 +224,33 @@ export async function invertedAddressesHandler({
     delete orderAttributes._shipping_address_clone_id
     orderAttributes._billing_address_same_as_shipping = true
     const hasMetadata = Object.keys(shippingAddress).filter((key) => {
-      if (key.startsWith('metadata_')) {
+      if (key.startsWith("metadata_")) {
         return true
       }
       return false
     })
     if (hasMetadata?.length > 0) {
       hasMetadata.forEach((key) => {
-        const metadataKey = key.replace('metadata_', '')
+        const metadataKey = key.replace("metadata_", "")
         shippingAddress.metadata = {
           ...(shippingAddress.metadata || {}),
           // @ts-expect-error type mismatch
-          [metadataKey]: shippingAddress[key]
+          [metadataKey]: shippingAddress[key],
         }
         // @ts-expect-error type mismatch
         delete shippingAddress[key]
       })
     }
-    const address = await sdk.addresses.create(shippingAddress)
-    orderAttributes.shipping_address = sdk.addresses.relationship(address.id)
+    let address: Address | undefined
+    if (order?.shipping_address?.id) {
+      address = await sdk.addresses.update({
+        id: order.shipping_address.id,
+        ...shippingAddress,
+      })
+    } else {
+      address = await sdk.addresses.create(shippingAddress)
+      orderAttributes.shipping_address = sdk.addresses.relationship(address.id)
+    }
   }
   if (shipToDifferentAddress) {
     delete orderAttributes._billing_address_same_as_shipping
@@ -250,25 +259,33 @@ export async function invertedAddressesHandler({
     if (billingAddress != null && Object.keys(billingAddress).length > 0) {
       delete orderAttributes._billing_address_clone_id
       const hasMetadata = Object.keys(billingAddress).filter((key) => {
-        if (key.startsWith('metadata_')) {
+        if (key.startsWith("metadata_")) {
           return true
         }
         return false
       })
       if (hasMetadata?.length > 0) {
         hasMetadata.forEach((key) => {
-          const metadataKey = key.replace('metadata_', '')
+          const metadataKey = key.replace("metadata_", "")
           billingAddress.metadata = {
             ...(billingAddress.metadata || {}),
             // @ts-expect-error type mismatch
-            [metadataKey]: billingAddress[key]
+            [metadataKey]: billingAddress[key],
           }
           // @ts-expect-error type mismatch
           delete billingAddress[key]
         })
       }
-      const address = await sdk.addresses.create(billingAddress)
-      orderAttributes.billing_address = sdk.addresses.relationship(address.id)
+      let address: Address | undefined
+      if (order?.billing_address?.id) {
+        address = await sdk.addresses.update({
+          id: order.billing_address.id,
+          ...billingAddress,
+        })
+      } else {
+        address = await sdk.addresses.create(billingAddress)
+        orderAttributes.billing_address = sdk.addresses.relationship(address.id)
+      }
     }
   }
   return orderAttributes
@@ -295,7 +312,7 @@ export function addressesController({
   errors,
   requiresBillingInfo,
   invertAddresses,
-  requiredMetadataFields
+  requiredMetadataFields,
 }: AddressControllerProps): {
   billingDisable: boolean
   shippingDisable: boolean
@@ -308,7 +325,7 @@ export function addressesController({
       shippingAddressId,
       invertAddresses,
       requiresBillingInfo,
-      requiredMetadataFields
+      requiredMetadataFields,
     })
     const billingDisable = billingAddressController({
       shippingDisable,
@@ -317,11 +334,11 @@ export function addressesController({
       errors,
       requiresBillingInfo,
       invertAddresses,
-      requiredMetadataFields
+      requiredMetadataFields,
     })
     return {
       shippingDisable,
-      billingDisable
+      billingDisable,
     }
   }
   const billingDisable = billingAddressController({
@@ -329,7 +346,7 @@ export function addressesController({
     billingAddressId,
     errors,
     requiresBillingInfo,
-    requiredMetadataFields
+    requiredMetadataFields,
   })
   const shippingDisable = shippingAddressController({
     billingDisable,
@@ -337,27 +354,27 @@ export function addressesController({
     shipToDifferentAddress,
     shipping_address,
     shippingAddressId,
-    requiredMetadataFields
+    requiredMetadataFields,
   })
   return {
     billingDisable,
-    shippingDisable
+    shippingDisable,
   }
 }
 
 export function sanitizeMetadataFields(address: AddressCreate): AddressCreate {
   const hasMetadata = Object.keys(address).filter((key) => {
-    if (key.startsWith('metadata_')) {
+    if (key.startsWith("metadata_")) {
       return true
     }
     return false
   })
   if (hasMetadata?.length > 0) {
     hasMetadata.forEach((key) => {
-      const metadataKey = key.replace('metadata_', '')
+      const metadataKey = key.replace("metadata_", "")
       address.metadata = {
         ...(address.metadata || {}),
-        [metadataKey]: address[key as keyof AddressCreate]
+        [metadataKey]: address[key as keyof AddressCreate],
       }
       delete address[key as keyof AddressCreate]
     })

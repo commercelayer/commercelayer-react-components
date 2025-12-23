@@ -1,33 +1,33 @@
-import type { Dispatch } from "react"
-import {
-  type SetLocalOrder,
-  type DeleteLocalOrder,
-  setCustomerOrderParam,
-  type CustomerOrderParams,
-} from "#utils/localStorage"
-import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
-import baseReducer from "#utils/baseReducer"
-import isEmpty from "lodash/isEmpty"
-import type { BaseMetadataObject } from "#typings/index"
-import type { BaseError } from "#typings/errors"
-import getSdk from "#utils/getSdk"
-import getErrors, { setErrors } from "../utils/getErrors"
-import type { AddressResource } from "./AddressReducer"
 import type {
-  Order,
+  AdyenPaymentUpdate,
+  CommerceLayerClient,
   LineItemCreate,
   LineItemOptionCreate,
+  Order,
   OrderUpdate,
   QueryParamsRetrieve,
-  CommerceLayerClient,
   ResourceUpdate,
-  AdyenPaymentUpdate,
 } from "@commercelayer/sdk"
-import { getOrganizationConfig } from "#utils/organization"
+import isEmpty from "lodash/isEmpty"
+import type { Dispatch } from "react"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
+import type { BaseError } from "#typings/errors"
 import type { LooseAutocomplete } from "#typings/globals"
+import type { BaseMetadataObject } from "#typings/index"
+import baseReducer from "#utils/baseReducer"
 import { publish } from "#utils/events"
-import { getDomain } from "#utils/getDomain"
 import { getApplicationLink } from "#utils/getApplicationLink"
+import { getDomain } from "#utils/getDomain"
+import getSdk from "#utils/getSdk"
+import {
+  type CustomerOrderParams,
+  type DeleteLocalOrder,
+  type SetLocalOrder,
+  setCustomerOrderParam,
+} from "#utils/localStorage"
+import { getOrganizationConfig } from "#utils/organization"
+import getErrors, { setErrors } from "../utils/getErrors"
+import type { AddressResource } from "./AddressReducer"
 
 export type GetOrderParams = Partial<{
   clearWhenPlaced: boolean
@@ -37,6 +37,7 @@ export type GetOrderParams = Partial<{
   id: string
   persistKey: string
   state: OrderState
+  options: QueryParamsRetrieve
 }>
 
 export type GetOrder = (params: GetOrderParams) => Promise<undefined | Order>
@@ -98,7 +99,7 @@ export interface OrderPayload {
   include?: ResourceIncluded[] | undefined
   includeLoaded?: ResourceIncludedLoaded
   withoutIncludes?: boolean
-  manageAdyenGiftCard?: boolean
+  managePaymentProviderGiftCards?: boolean
 }
 
 export type AddToCartImportValues = Pick<AddToCartImportParams, "lineItems">
@@ -192,11 +193,11 @@ export const getApiOrder: GetOrder = async (
     persistKey,
     deleteLocalOrder,
     state,
+    options = {},
   } = params
   const sdk = config != null ? getSdk(config) : undefined
   try {
     if (sdk == null) return undefined
-    const options: QueryParamsRetrieve = {}
     if (state?.include && state.include.length > 0) {
       options.include = state.include
     }
@@ -247,6 +248,18 @@ export interface UpdateOrderArgs {
   include?: string[]
   config?: CommerceLayerConfig
   state?: OrderState
+}
+
+export async function getOrderByFields(params: {
+  orderId: string
+  fields: (keyof Order)[]
+  config: CommerceLayerConfig
+}): Promise<Order> {
+  const { orderId, fields, config } = params
+  const sdk = config != null ? getSdk(config) : undefined
+  if (sdk == null) throw new Error("SDK not initialized")
+  const order = await sdk.orders.retrieve(orderId, { fields })
+  return order
 }
 
 export async function updateOrder({

@@ -39,6 +39,7 @@ export const Default: StoryFn = (args) => {
     {
       header: 'Amount',
       accessorKey: 'formatted_total_amount_with_taxes',
+      id: 'total_amount_cents',
       className: colClassName,
       titleClassName
     }
@@ -85,7 +86,7 @@ export const Default: StoryFn = (args) => {
             className='align-top py-5 border-b'
           />
           <OrderListRow
-            field='formatted_total_amount_with_taxes'
+            field='total_amount_cents'
             className='align-top py-5 border-b font-bold'
           />
           <OrderListPaginationInfo className='text-sm text-gray-500' />

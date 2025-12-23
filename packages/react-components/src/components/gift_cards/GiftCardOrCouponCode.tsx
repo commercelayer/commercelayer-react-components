@@ -1,8 +1,8 @@
-import { useContext, type JSX } from "react"
-import type { ChildrenFunction } from "#typings"
+import { type JSX, useContext } from "react"
 import Parent from "#components/utils/Parent"
 import OrderContext from "#context/OrderContext"
 import type { CodeType } from "#reducers/OrderReducer"
+import type { ChildrenFunction } from "#typings"
 import { manageGiftCard } from "#utils/adyen/manageGiftCard"
 
 interface ChildrenProps extends Omit<Props, "children" | "type"> {
@@ -23,14 +23,14 @@ export function GiftCardOrCouponCode({
   type,
   ...props
 }: Props): JSX.Element | null {
-  const { order, manageAdyenGiftCard } = useContext(OrderContext)
+  const { order, managePaymentProviderGiftCards } = useContext(OrderContext)
   let codeType = type ? (`${type}_code` as const) : undefined
   if (!type && order && "coupon_code" in order && order.coupon_code !== "")
     codeType = "coupon_code"
   else if (!type) codeType = "gift_card_code"
   const code = order && codeType ? order[codeType] : ""
   let hide = !(order && code)
-  if (manageAdyenGiftCard && type === "gift_card") {
+  if (managePaymentProviderGiftCards && type === "gift_card") {
     const giftCardData = manageGiftCard({ order })
     if (!giftCardData) return null
     hide = false

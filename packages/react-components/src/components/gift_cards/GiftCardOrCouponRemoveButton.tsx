@@ -1,9 +1,9 @@
-import { type ReactNode, useContext, type JSX } from "react"
+import type { Order } from "@commercelayer/sdk"
+import { type JSX, type ReactNode, useContext } from "react"
 import Parent from "#components/utils/Parent"
-import type { ChildrenFunction } from "#typings/index"
 import OrderContext from "#context/OrderContext"
 import type { CodeType, OrderCodeType } from "#reducers/OrderReducer"
-import type { Order } from "@commercelayer/sdk"
+import type { ChildrenFunction } from "#typings/index"
 import { manageGiftCard } from "#utils/adyen/manageGiftCard"
 
 interface ChildrenProps extends Omit<Props, "children" | "onClick"> {
@@ -24,7 +24,7 @@ export function GiftCardOrCouponRemoveButton(props: Props): JSX.Element | null {
   const {
     order,
     removeGiftCardOrCouponCode,
-    manageAdyenGiftCard,
+    managePaymentProviderGiftCards,
     paymentSourceRequest,
   } = useContext(OrderContext)
   let codeType = type ? (`${type}_code` as const) : undefined
@@ -34,7 +34,11 @@ export function GiftCardOrCouponRemoveButton(props: Props): JSX.Element | null {
   const code = order && codeType ? order[codeType] : ""
   let hide = !(order && code)
   const handleClick = async (): Promise<void> => {
-    if (manageAdyenGiftCard && codeType === "gift_card_code" && order != null) {
+    if (
+      managePaymentProviderGiftCards &&
+      codeType === "gift_card_code" &&
+      order != null
+    ) {
       const id = order?.payment_source?.id
       if (id != null) {
         const res = await paymentSourceRequest({
@@ -53,7 +57,7 @@ export function GiftCardOrCouponRemoveButton(props: Props): JSX.Element | null {
       if (onClick != null && response != null) onClick(response)
     }
   }
-  if (manageAdyenGiftCard && type === "gift_card") {
+  if (managePaymentProviderGiftCards && type === "gift_card") {
     const giftCardData = manageGiftCard({ order })
     if (!giftCardData) return null
     hide = false

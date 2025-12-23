@@ -1,22 +1,22 @@
-import baseReducer from "#utils/baseReducer"
+import type { Order, OrderUpdate, StripePayment } from "@commercelayer/sdk"
+import isEmpty from "lodash/isEmpty"
 import type { Dispatch, RefObject } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { BaseError } from "#typings/errors"
-import type { Order, OrderUpdate, StripePayment } from "@commercelayer/sdk"
-import isEmpty from "lodash/isEmpty"
-import { isDoNotShip, shipmentsFilled } from "#utils/shipments"
-import type { PaymentResource, PaymentSourceType } from "./PaymentMethodReducer"
+import baseReducer from "#utils/baseReducer"
 import {
   saveBillingAddress,
   saveShippingAddress,
   saveToWallet,
 } from "#utils/customerOrderOptions"
-import getSdk from "#utils/getSdk"
 import getErrors from "#utils/getErrors"
+import getSdk from "#utils/getSdk"
+import { hasSubscriptions } from "#utils/hasSubscriptions"
 import { isGuestToken } from "#utils/isGuestToken"
 import { setCustomerOrderParam } from "#utils/localStorage"
-import { hasSubscriptions } from "#utils/hasSubscriptions"
+import { isDoNotShip, shipmentsFilled } from "#utils/shipments"
 import { updateOrderSubscriptionCustomerPaymentSource } from "#utils/updateOrderSubscriptionCustomerPaymentSource"
+import type { PaymentResource, PaymentSourceType } from "./PaymentMethodReducer"
 
 export type PlaceOrderActionType =
   | "setErrors"
@@ -32,7 +32,7 @@ export interface PlaceOrderOptions {
     redirectResult?: string
   }
   checkoutCom?: {
-    session_id: string
+    session_id: string | undefined
   }
   stripe?: {
     /**
@@ -44,6 +44,8 @@ export interface PlaceOrderOptions {
   }
 }
 
+type PlaceOrderStatus = "placing" | "standby" | "disabled"
+
 export interface PlaceOrderActionPayload {
   errors: BaseError[]
   isPermitted: boolean
@@ -53,7 +55,7 @@ export interface PlaceOrderActionPayload {
   paymentSource: PaymentSourceType
   options?: PlaceOrderOptions
   placeOrderButtonRef?: RefObject<HTMLButtonElement | null>
-  status: "placing" | "standby"
+  status: PlaceOrderStatus
 }
 
 export function setButtonRef(
@@ -206,32 +208,6 @@ export async function setPlaceOrder({
           paypal_payer_id: options?.paypalPayerId,
         })
       }
-      if (
-        paymentType === "checkout_com_payments" &&
-        paymentSource &&
-        options?.checkoutCom?.session_id
-      ) {
-        const payment = await sdk[paymentType].update({
-          id: paymentSource.id,
-          _details: true,
-          session_id: options?.checkoutCom?.session_id,
-        })
-        // @ts-expect-error no type
-        if (payment?.payment_response?.status !== "Authorized") {
-          // @ts-expect-error no type
-          const [action] = payment?.payment_response?.actions || [""]
-          const errors: BaseError[] = [
-            {
-              code: "PAYMENT_NOT_APPROVED_FOR_EXECUTION",
-              message: action?.response_summary,
-              resource: "orders",
-              field: "checkout_com_payments",
-            },
-          ]
-          // eslint-disable-next-line @typescript-eslint/no-throw-literal
-          throw { errors }
-        }
-      }
       const updateAttributes: OrderUpdate = {
         id: order.id,
         _place: true,
@@ -332,7 +308,7 @@ export async function setPlaceOrder({
           }
         }
       }
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      // biome-ignore lint/suspicious/noExplicitAny: No type for error
     } catch (error: any) {
       const errors = getErrors({
         error,
@@ -353,7 +329,7 @@ export function setPlaceOrderStatus({
   status,
   dispatch,
 }: {
-  status: "placing" | "standby"
+  status: PlaceOrderStatus
   dispatch?: Dispatch<PlaceOrderAction>
 }): void {
   if (dispatch != null) {

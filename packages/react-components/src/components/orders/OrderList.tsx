@@ -19,7 +19,7 @@ import {
 import { sortDescIcon, sortAscIcon } from '#utils/icons'
 import filterChildren from '#utils/filterChildren'
 import type { DefaultChildrenType, TRange } from '#typings/globals'
-import type { QueryPageSize } from '@commercelayer/sdk'
+import type { Order, QueryPageSize, QuerySort } from '@commercelayer/sdk'
 
 type RowComponent = 'OrderListRow' | 'OrderListEmpty'
 type PaginationComponent =
@@ -43,35 +43,35 @@ export type TOrderListColumn<T extends TOrderList = 'orders'> =
 
 type PaginationProps =
   | {
-      /**
-       * Show table pagination. Default is false.
-       */
-      showPagination: true
-      /**
-       * Number of rows per page. Default is 10. Max is 25.
-       */
-      pageSize?: TRange<1, 26>
-    }
+    /**
+     * Show table pagination. Default is false.
+     */
+    showPagination: true
+    /**
+     * Number of rows per page. Default is 10. Max is 25.
+     */
+    pageSize?: TRange<1, 26>
+  }
   | {
-      /**
-       * Show table pagination. Default is false.
-       */
-      showPagination?: false
-      pageSize?: never
-    }
+    /**
+     * Show table pagination. Default is false.
+     */
+    showPagination?: false
+    pageSize?: never
+  }
 
 type SubscriptionFields =
   | {
-      /**
-       * Subscriptions id - Use to fetch subscriptions and shows its orders
-       */
-      id?: string
-      type?: 'subscriptions'
-    }
+    /**
+     * Subscriptions id - Use to fetch subscriptions and shows its orders
+     */
+    id?: string
+    type?: 'subscriptions'
+  }
   | {
-      id?: never
-      type?: 'orders'
-    }
+    id?: never
+    type?: 'orders'
+  }
 
 type Props = {
   /**
@@ -150,21 +150,29 @@ export function OrderList({
     })
   const { orders, subscriptions, getCustomerOrders, getCustomerSubscriptions } =
     useContext(CustomerContext)
+
+  // Calculate default server side sorting value compatible with Commerce Layer SDK if defined in component props
+  const defaultSdkSorting = sortBy.length && sortBy[0] != null ? { [sortBy[0].id]: sortBy[0].desc ? 'desc' : 'asc' } : undefined
+
   useEffect(() => {
+    // Calculate server side sorting value compatible with Commerce Layer SDK following current sorting state
+    const sdkSorting = sorting.length && sorting[0] != null ? { [sorting[0].id]: sorting[0].desc ? 'desc' : 'asc' } : defaultSdkSorting
     if (type === 'orders' && getCustomerOrders != null) {
       getCustomerOrders({
         pageNumber: pageIndex + 1,
-        pageSize: currentPageSize as QueryPageSize
+        pageSize: currentPageSize as QueryPageSize,
+        sortBy: sdkSorting as QuerySort<Order>
       })
     }
     if (type === 'subscriptions' && getCustomerSubscriptions != null) {
       getCustomerSubscriptions({
         pageNumber: pageIndex + 1,
         pageSize: currentPageSize as QueryPageSize,
+        sortBy: sdkSorting as QuerySort<Order>,
         id
       })
     }
-  }, [pageIndex, currentPageSize, id != null])
+  }, [pageIndex, currentPageSize, sorting, id != null])
   const data = useMemo(() => {
     if (type === 'orders') {
       return orders ?? []
@@ -198,7 +206,10 @@ export function OrderList({
     getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    // Server side pagination
     manualPagination: true,
+    // Server side sorting
+    manualSorting: true,
     pageCount,
     state: {
       sorting,
@@ -238,9 +249,8 @@ export function OrderList({
         >
           <span
             {...{
-              className: `${columns[k]?.titleClassName ?? ''} ${
-                header.column.getCanSort() ? 'cursor-pointer select-none' : ''
-              }`,
+              className: `${columns[k]?.titleClassName ?? ''} ${header.column.getCanSort() ? 'cursor-pointer select-none' : ''
+                }`,
               onClick: header.column.getToggleSortingHandler()
             }}
           >

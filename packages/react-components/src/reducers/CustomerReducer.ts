@@ -11,7 +11,8 @@ import type {
   Order,
   OrderSubscription,
   OrderUpdate,
-  QueryPageSize
+  QueryPageSize,
+  QuerySort
 } from '@commercelayer/sdk'
 import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import type { updateOrder } from './OrderReducer'
@@ -280,6 +281,10 @@ interface GetCustomerOrdersProps {
    */
   pageNumber?: number
   /**
+   * The sort order
+   */
+  sortBy?: QuerySort<Order>
+  /**
    * Retrieve a specific subscription or order by id
    */
   id?: string
@@ -289,7 +294,8 @@ export async function getCustomerOrders({
   config,
   dispatch,
   pageSize = 10,
-  pageNumber = 1
+  pageNumber = 1,
+  sortBy
 }: GetCustomerOrdersProps): Promise<void> {
   if (config.accessToken) {
     const { owner } = jwt(config.accessToken)
@@ -297,6 +303,7 @@ export async function getCustomerOrders({
       const sdk = getSdk(config)
       const orders = await sdk.customers.orders(owner.id, {
         filters: { status_not_in: 'draft,pending' },
+        sort: sortBy ?? { number: 'desc'},
         pageSize,
         pageNumber
       })
@@ -313,7 +320,8 @@ export async function getCustomerSubscriptions({
   config,
   dispatch,
   pageSize = 10,
-  pageNumber = 1
+  pageNumber = 1,
+  sortBy
 }: GetCustomerOrdersProps): Promise<void> {
   if (config.accessToken) {
     const { owner } = jwt(config.accessToken)
@@ -322,6 +330,7 @@ export async function getCustomerSubscriptions({
       if (id != null) {
         const subscriptions = await sdk.customers.orders(owner.id, {
           filters: { order_subscription_id_eq: id },
+          sort: sortBy ?? { number: 'desc'},
           include: ['authorizations'],
           pageSize,
           pageNumber
@@ -334,6 +343,7 @@ export async function getCustomerSubscriptions({
         const subscriptions = await sdk.customers.order_subscriptions(
           owner.id,
           {
+            sort: (sortBy ?? { starts_at: 'desc'}) as QuerySort<OrderSubscription>,
             pageSize,
             pageNumber
           }
@@ -435,6 +445,7 @@ export async function getCustomerPayments({
     if (owner?.id) {
       const payments = await sdk.customer_payment_sources.list({
         include: ['payment_source'],
+        sort: { updated_at: 'desc' },
         pageNumber,
         pageSize
       })

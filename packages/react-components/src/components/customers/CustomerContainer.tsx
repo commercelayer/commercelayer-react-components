@@ -22,7 +22,7 @@ import CustomerContext from '#context/CustomerContext'
 import type { BaseError } from '#typings/errors'
 import type { DefaultChildrenType } from '#typings/globals'
 import { isGuestToken } from '#utils/isGuestToken'
-import type { QueryPageSize } from '@commercelayer/sdk'
+import type { Order, QueryPageSize, QuerySort } from '@commercelayer/sdk'
 
 interface Props {
   children: DefaultChildrenType
@@ -125,18 +125,12 @@ export function CustomerContainer(props: Props): JSX.Element {
         getCustomerPaymentSources({ dispatch, order })
       }
       if (
-        config.accessToken &&
         order == null &&
         include == null &&
         includeLoaded == null &&
         withoutIncludes === undefined
       ) {
-        async function getCustomerData(): Promise<void> {
-          await getCustomerOrders({ config, dispatch })
-          await getCustomerSubscriptions({ config, dispatch })
-          await getCustomerPayments({ config, dispatch })
-        }
-        getCustomerData()
+        getCustomerPayments({ config, dispatch })
       }
     }
   }, [config.accessToken, order?.payment_source != null, isGuest])
@@ -189,25 +183,30 @@ export function CustomerContainer(props: Props): JSX.Element {
       },
       getCustomerOrders: async ({
         pageNumber,
-        pageSize
+        pageSize,
+        sortBy
       }: {
         pageNumber?: number
         pageSize?: QueryPageSize
+        sortBy?: QuerySort<Order>
       }) => {
         await getCustomerOrders({
           config,
           dispatch,
           pageNumber,
-          pageSize
+          pageSize,
+          sortBy
         })
       },
       getCustomerSubscriptions: async ({
         pageNumber,
         pageSize,
+        sortBy,
         id
       }: {
         pageNumber?: number
         pageSize?: QueryPageSize
+        sortBy?: QuerySort<Order>
         id?: string
       }) => {
         await getCustomerSubscriptions({
@@ -215,6 +214,7 @@ export function CustomerContainer(props: Props): JSX.Element {
           dispatch,
           pageNumber,
           pageSize,
+          sortBy,
           id
         })
       },

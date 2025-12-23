@@ -1,21 +1,27 @@
+import {
+  type JSX,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react"
 import AddressesContext, {
-  defaultAddressContext
-} from '#context/AddressContext'
-import { type ReactNode, useContext, useEffect, useReducer, type JSX } from 'react';
+  defaultAddressContext,
+} from "#context/AddressContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
 import addressReducer, {
-  addressInitialState,
   type AddressResource,
-  setAddressErrors,
+  addressInitialState,
+  type ICustomerAddress,
   type SetAddressParams,
-  setCloneAddress,
   saveAddresses,
-  type ICustomerAddress
-} from '#reducers/AddressReducer'
-import type { BaseError } from '#typings/errors'
-import OrderContext from '#context/OrderContext'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import { setCustomerOrderParam } from '#utils/localStorage'
-import type { TCustomerAddress } from '#reducers/CustomerReducer'
+  setAddressErrors,
+  setCloneAddress,
+} from "#reducers/AddressReducer"
+import type { TCustomerAddress } from "#reducers/CustomerReducer"
+import type { BaseError } from "#typings/errors"
+import { setCustomerOrderParam } from "#utils/localStorage"
 
 interface Props {
   children: ReactNode
@@ -60,34 +66,39 @@ export function AddressesContainer(props: Props): JSX.Element {
     children,
     shipToDifferentAddress = false,
     isBusiness,
-    invertAddresses = false
+    invertAddresses = false,
   } = props
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
   const { order, orderId, updateOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
-    setCustomerOrderParam(
-      '_save_billing_address_to_customer_address_book',
-      'false'
-    )
-    setCustomerOrderParam(
-      '_save_shipping_address_to_customer_address_book',
-      'false'
-    )
-  }, [])
+    if (order?.status === "draft") {
+      // Set the customer order parameters to false when the order is in draft status
+      setCustomerOrderParam(
+        "_save_billing_address_to_customer_address_book",
+        "false",
+      )
+      setCustomerOrderParam(
+        "_save_shipping_address_to_customer_address_book",
+        "false",
+      )
+    }
+  }, [order?.status])
   useEffect(() => {
     dispatch({
-      type: 'setShipToDifferentAddress',
+      type: "setShipToDifferentAddress",
       payload: {
-        shipToDifferentAddress,
+        shipToDifferentAddress: shipToDifferentAddress ?? false,
         isBusiness,
-        invertAddresses
-      }
+        invertAddresses,
+      },
     })
     return () => {
       dispatch({
-        type: 'cleanup',
-        payload: {}
+        type: "cleanup",
+        payload: {
+          shipToDifferentAddress: false,
+        },
       })
     }
   }, [shipToDifferentAddress, isBusiness, invertAddresses])
@@ -98,7 +109,7 @@ export function AddressesContainer(props: Props): JSX.Element {
         errors,
         resource,
         dispatch,
-        currentErrors: state.errors
+        currentErrors: state.errors,
       })
     },
     setAddress: (params: SetAddressParams<TCustomerAddress>) => {
@@ -115,11 +126,11 @@ export function AddressesContainer(props: Props): JSX.Element {
         order,
         orderId,
         state,
-        ...params
+        ...params,
       }),
     setCloneAddress: (id: string, resource: AddressResource): void => {
       setCloneAddress(id, resource, dispatch)
-    }
+    },
   }
   return (
     <AddressesContext.Provider value={contextValue}>

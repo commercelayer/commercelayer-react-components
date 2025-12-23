@@ -1,11 +1,10 @@
 import { defineConfig } from "tsup"
 
-const env = process.env.NODE_ENV
-
-export default defineConfig((options) => ({
+export default defineConfig(() => ({
   entryPoints: ["src/index.ts"],
   format: ["cjs", "esm"],
   dts: true,
+  splitting: true,
   outDir: "dist",
   clean: true,
   treeshake: true,

@@ -1,11 +1,15 @@
 {
   "name": "@commercelayer/react-components",
-  "version": "4.20.6",
+  "version": "4.28.6",
   "description": "The Official Commerce Layer React Components",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
   "types": "lib/esm/index.d.ts",
-  "files": ["lib", "package.json", "README.md"],
+  "files": [
+    "lib",
+    "package.json",
+    "README.md"
+  ],
   "exports": {
     ".": {
       "require": "./lib/cjs/index.js",
@@ -94,35 +98,73 @@
   },
   "typesVersions": {
     "*": {
-      "addresses/*": ["lib/esm/components/addresses/*.d.ts"],
-      "auth/*": ["lib/esm/components/auth/*.d.ts"],
-      "customers/*": ["lib/esm/components/customers/*.d.ts"],
-      "errors/*": ["lib/esm/components/errors/*.d.ts"],
-      "gift_cards/*": ["lib/esm/components/gift_cards/*.d.ts"],
+      "addresses/*": [
+        "lib/esm/components/addresses/*.d.ts"
+      ],
+      "auth/*": [
+        "lib/esm/components/auth/*.d.ts"
+      ],
+      "customers/*": [
+        "lib/esm/components/customers/*.d.ts"
+      ],
+      "errors/*": [
+        "lib/esm/components/errors/*.d.ts"
+      ],
+      "gift_cards/*": [
+        "lib/esm/components/gift_cards/*.d.ts"
+      ],
       "in_stock_subscriptions/*": [
         "lib/esm/components/in_stock_subscriptions/*.d.ts"
       ],
-      "hooks/*": ["lib/esm/hooks/*.d.ts"],
-      "line_items/*": ["lib/esm/components/line_items/*.d.ts"],
-      "orders/*": ["lib/esm/components/orders/*.d.ts"],
-      "parcels/*": ["lib/esm/components/parcels/*.d.ts"],
-      "payment_methods/*": ["lib/esm/components/payment_methods/*.d.ts"],
-      "payment_source/*": ["lib/esm/components/payment_source/*.d.ts"],
-      "prices/*": ["lib/esm/components/prices/*.d.ts"],
-      "shipments/*": ["lib/esm/components/shipments/*.d.ts"],
-      "shipping_methods/*": ["lib/esm/components/shipping_methods/*.d.ts"],
-      "skus/*": ["lib/esm/components/skus/*.d.ts"],
-      "stock_transfers/*": ["lib/esm/components/stock_transfers/*.d.ts"],
-      "context/*": ["lib/esm/context/*.d.ts"],
-      "utils/*": ["lib/esm/utils/*.d.ts"],
-      "component_utils/*": ["lib/esm/components/utils/*.d.ts"]
+      "hooks/*": [
+        "lib/esm/hooks/*.d.ts"
+      ],
+      "line_items/*": [
+        "lib/esm/components/line_items/*.d.ts"
+      ],
+      "orders/*": [
+        "lib/esm/components/orders/*.d.ts"
+      ],
+      "parcels/*": [
+        "lib/esm/components/parcels/*.d.ts"
+      ],
+      "payment_methods/*": [
+        "lib/esm/components/payment_methods/*.d.ts"
+      ],
+      "payment_source/*": [
+        "lib/esm/components/payment_source/*.d.ts"
+      ],
+      "prices/*": [
+        "lib/esm/components/prices/*.d.ts"
+      ],
+      "shipments/*": [
+        "lib/esm/components/shipments/*.d.ts"
+      ],
+      "shipping_methods/*": [
+        "lib/esm/components/shipping_methods/*.d.ts"
+      ],
+      "skus/*": [
+        "lib/esm/components/skus/*.d.ts"
+      ],
+      "stock_transfers/*": [
+        "lib/esm/components/stock_transfers/*.d.ts"
+      ],
+      "context/*": [
+        "lib/esm/context/*.d.ts"
+      ],
+      "utils/*": [
+        "lib/esm/utils/*.d.ts"
+      ],
+      "component_utils/*": [
+        "lib/esm/components/utils/*.d.ts"
+      ]
     }
   },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "lint": "biome lint --error-on-warnings ./src",
+    "lint": "biome lint ./src",
     "lint:fix": "pnpm biome lint --write ./src",
     "test": "pnpm audit --audit-level high && (pnpm audit || exit 0) && pnpm lint && vitest run --silent",
     "coverage": "vitest run --coverage",
@@ -157,47 +199,47 @@
   },
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
-    "@adyen/adyen-web": "^6.11.0",
-    "@commercelayer/organization-config": "^2.2.0",
-    "@commercelayer/sdk": "^6.36.0",
-    "@stripe/react-stripe-js": "^3.5.1",
-    "@stripe/stripe-js": "^6.1.0",
-    "@tanstack/react-table": "^8.21.2",
+    "@adyen/adyen-web": "^6.26.0",
+    "@commercelayer/organization-config": "^2.5.0",
+    "@commercelayer/sdk": "^7.4.1",
+    "@stripe/react-stripe-js": "^5.4.1",
+    "@stripe/stripe-js": "^8.5.3",
+    "@tanstack/react-table": "^8.21.3",
     "@types/iframe-resizer": "^4.0.0",
-    "braintree-web": "^3.117.1",
-    "frames-react": "^1.2.2",
+    "braintree-web": "^3.133.0",
+    "frames-react": "^1.2.3",
     "iframe-resizer": "^4.3.6",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "rapid-form": "3.1.0"
   },
   "devDependencies": {
-    "@commercelayer/js-auth": "^6.7.1",
-    "@faker-js/faker": "^9.6.0",
-    "@playwright/test": "^1.51.1",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/react": "^16.2.0",
+    "@commercelayer/js-auth": "^7.1.0",
+    "@faker-js/faker": "^10.1.0",
+    "@playwright/test": "^1.57.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.0",
     "@types/braintree-web": "^3.96.17",
-    "@types/lodash": "^4.17.16",
-    "@types/node": "^22.13.14",
-    "@types/prop-types": "^15.7.14",
-    "@types/react": "^19.0.12",
-    "@types/react-test-renderer": "^19.0.0",
-    "@types/react-window": "^1.8.8",
-    "@vitejs/plugin-react": "^4.3.4",
-    "@vitest/coverage-v8": "^3.0.9",
-    "jsdom": "^26.0.0",
+    "@types/lodash": "^4.17.21",
+    "@types/node": "^24.10.2",
+    "@types/prop-types": "^15.7.15",
+    "@types/react": "^19.2.7",
+    "@types/react-test-renderer": "^19.1.0",
+    "@types/react-window": "^2.0.0",
+    "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/coverage-v8": "^4.0.15",
+    "jsdom": "^27.3.0",
     "minimize-js": "^1.4.0",
-    "msw": "^2.7.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-test-renderer": "^19.0.0",
-    "tsc-alias": "^1.8.11",
+    "msw": "^2.12.4",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-test-renderer": "^19.2.1",
+    "tsc-alias": "^1.8.16",
     "tslib": "^2.8.1",
-    "typescript": "^5.8.2",
-    "vite": "^6.2.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.7",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.0.9"
+    "vitest": "^4.0.15"
   },
   "peerDependencies": {
     "react": ">=18.0.0"

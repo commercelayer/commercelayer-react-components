@@ -1,0 +1,59 @@
+{
+  "name": "@commercelayer/hooks",
+  "version": "1.0.0",
+  "description": "Commerce Layer React Hooks",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./dist/index.js",
+      "default": "./dist/index.cjs"
+    }
+  },
+  "keywords": [
+    "jamstack",
+    "headless",
+    "ecommerce",
+    "api",
+    "components"
+  ],
+  "scripts": {
+    "check-exports": "attw --pack .",
+    "lint": "biome lint --error-on-warnings ./src && tsc",
+    "lint:fix": "pnpm biome lint --write ./src",
+    "test": "pnpm run lint && vitest run --silent",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "build": "tsup",
+    "ci": "pnpm  build && pnpm check-exports && pnpm lint"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": {
+    "name": "Alessandro Casazza",
+    "email": "alessandro@commercelayer.io"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@commercelayer/sdk": "^7.4.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.0.15",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.0.15"
+  },
+  "dependencies": {
+    "@commercelayer/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=19.2.1"
+  }
+}

@@ -4,21 +4,22 @@ import {
   type JWTWebApp,
   jwtDecode,
 } from "@commercelayer/js-auth"
-import sdk, { type CommerceLayerClient } from "@commercelayer/sdk"
+import sdk from "@commercelayer/sdk"
 import type { RequestConfig } from "#types"
 
 /**
  * Get the Commerce Layer SDK instance
  *
  * @param {string} accessToken - The access token to use for authentication.
- * @returns {CommerceLayerClient} - The Commerce Layer SDK instance.
+ * @returns {void}
  */
-export function getSdk({ accessToken }: RequestConfig): CommerceLayerClient {
+export function getSdk({ accessToken }: RequestConfig): void {
   const { payload } = jwtDecode(accessToken)
   const { organization } = payload as
     | JWTIntegration
     | JWTWebApp
     | JWTSalesChannel
   const slug = organization.slug
-  return sdk({ accessToken, organization: slug })
+  const cl = sdk({ accessToken, organization: slug })
+  cl.addRawResponseReader()
 }

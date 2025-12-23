@@ -1,35 +1,36 @@
+import type { Order, OrderCreate } from "@commercelayer/sdk"
 import {
-  useEffect,
-  useReducer,
-  useContext,
-  useMemo,
-  useState,
   type JSX,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
 } from "react"
-import orderReducer, {
-  createOrder,
-  getApiOrder,
-  setOrderErrors,
-  setOrder,
-  type OrderCodeType,
-  type AddResourceToInclude,
-  orderInitialState,
-  type UpdateOrderArgs,
-  type SaveAddressToCustomerAddressBook,
-  updateOrder,
-  type ResourceIncluded,
-  addToCart,
-  paymentSourceRequest,
-} from "#reducers/OrderReducer"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
-import type { BaseMetadataObject } from "#typings"
 import OrderStorageContext from "#context/OrderStorageContext"
-import type { OrderCreate, Order } from "@commercelayer/sdk"
+import orderReducer, {
+  type AddResourceToInclude,
+  addToCart,
+  createOrder,
+  getApiOrder,
+  getOrderByFields,
+  type OrderCodeType,
+  orderInitialState,
+  paymentSourceRequest,
+  type ResourceIncluded,
+  type SaveAddressToCustomerAddressBook,
+  setOrder,
+  setOrderErrors,
+  type UpdateOrderArgs,
+  updateOrder,
+} from "#reducers/OrderReducer"
+import type { BaseMetadataObject } from "#typings"
 import type { BaseError } from "#typings/errors"
+import type { DefaultChildrenType } from "#typings/globals"
 import compareObjAttribute from "#utils/compareObjAttribute"
 import useCustomContext from "#utils/hooks/useCustomContext"
-import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
   children: DefaultChildrenType
@@ -49,10 +50,6 @@ interface Props {
    * Callback called when the order is updated
    */
   fetchOrder?: (order: Order) => void
-  /**
-   * Indicate if Adyen gift card management is enabled
-   */
-  manageAdyenGiftCard?: boolean
 }
 
 /**
@@ -89,14 +86,7 @@ interface Props {
  * </span>
  */
 export function OrderContainer(props: Props): JSX.Element {
-  const {
-    orderId,
-    children,
-    metadata,
-    attributes,
-    fetchOrder,
-    manageAdyenGiftCard,
-  } = props
+  const { orderId, children, metadata, attributes, fetchOrder } = props
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
   const [lock, setLock] = useState(false)
   const [lockOrder, setLockOrder] = useState(true)
@@ -273,7 +263,10 @@ export function OrderContainer(props: Props): JSX.Element {
     }
     return {
       ...state,
-      manageAdyenGiftCard,
+      managePaymentProviderGiftCards:
+        // @ts-expect-error no type
+        state.order?.payment_source?.payment_request_data?.payment_method
+          ?.type === "giftcard",
       paymentSourceRequest: async (
         params: Parameters<typeof paymentSourceRequest>[number],
       ): ReturnType<typeof paymentSourceRequest> =>
@@ -362,6 +355,7 @@ export function OrderContainer(props: Props): JSX.Element {
           include: state.include,
           state,
         }),
+      getOrderByFields,
     }
   }, [state, config.accessToken, persistKey])
   return (

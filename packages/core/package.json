@@ -1,7 +1,7 @@
 {
   "name": "@commercelayer/core",
   "version": "1.0.0",
-  "description": "Commerce Layer Components Core SDK",
+  "description": "Commerce Layer Core",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
@@ -11,12 +11,18 @@
       "default": "./dist/index.cjs"
     }
   },
-  "keywords": ["jamstack", "headless", "ecommerce", "api", "components"],
+  "keywords": [
+    "jamstack",
+    "headless",
+    "ecommerce",
+    "api",
+    "components"
+  ],
   "scripts": {
     "check-exports": "attw --pack .",
     "lint": "biome lint --error-on-warnings ./src && tsc",
     "lint:fix": "pnpm biome lint --write ./src",
-    "test": "pnpm run lint && vitest --silent",
+    "test": "pnpm run lint && vitest run --silent",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "build": "tsup",
@@ -31,15 +37,15 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.17.4",
-    "@vitest/coverage-v8": "^3.1.1",
-    "tsup": "^8.4.0",
-    "typescript": "^5.8.3",
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@vitest/coverage-v8": "^4.0.15",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.1"
+    "vitest": "^4.0.15"
   },
   "dependencies": {
-    "@commercelayer/js-auth": "^6.7.2",
-    "@commercelayer/sdk": "6.39.0"
+    "@commercelayer/js-auth": "^7.1.0",
+    "@commercelayer/sdk": "7.4.1"
   }
 }
