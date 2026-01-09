@@ -323,6 +323,22 @@ export function AdyenPayment({
         })) as AdyenPaymentType
         const currentBalance = giftCardBalanceCheck?.balance ?? 0
         const totalAmount = order?.total_amount_with_taxes_cents ?? 0
+        if (currentBalance === 0) {
+          const message =
+            "The gift card has no balance. Please use a different one."
+          setPaymentMethodErrors([
+            {
+              code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
+              resource: "payment_methods",
+              field: currentPaymentMethodType,
+              message,
+            },
+          ])
+          return {
+            resultCode: "Refused",
+            message,
+          }
+        }
         const attributes =
           currentBalance >= totalAmount
             ? {
