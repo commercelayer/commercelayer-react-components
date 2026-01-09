@@ -88,6 +88,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const isFree = order?.total_amount_with_taxes_cents === 0
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
+    if (isFree && !isPermitted) {
+      setNotPermitted(false)
+    }
     if (loading) setNotPermitted(loading)
     else {
       if (paymentType === currentPaymentMethodType && paymentType) {
@@ -139,6 +142,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     currentPaymentMethodType,
     order?.id,
     paymentSource?.id,
+    order?.total_amount_with_taxes_cents
   ])
   useEffect(() => {
     if (errors && errors.length > 0) {
