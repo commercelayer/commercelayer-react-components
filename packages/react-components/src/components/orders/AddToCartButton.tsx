@@ -234,7 +234,8 @@ export function AddToCartButton(props: Props): JSX.Element {
         }
       }
       return res
-    } else if (url) {
+    }
+    if (url) {
       return await callExternalFunction({
         url,
         data: {
