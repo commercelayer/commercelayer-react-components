@@ -39,19 +39,20 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
     "@commercelayer/sdk": "^7.4.1",
-    "@testing-library/react": "^16.3.0",
-    "@types/react": "^19.2.7",
+    "@testing-library/react": "^16.3.1",
+    "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",
-    "@vitest/coverage-v8": "^4.0.15",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
+    "@vitest/coverage-v8": "^4.0.17",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^4.0.15"
+    "vite-tsconfig-paths": "^6.0.4",
+    "vitest": "^4.0.17"
   },
   "dependencies": {
-    "@commercelayer/core": "workspace:*"
+    "@commercelayer/core": "workspace:*",
+    "swr": "^2.3.8"
   },
   "peerDependencies": {
     "react": ">=19.2.1"
