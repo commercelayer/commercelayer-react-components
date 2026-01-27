@@ -83,6 +83,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     setPaymentSource,
     setPaymentMethodErrors,
     currentCustomerPaymentSourceId,
+    errors: paymentMethodErrors,
   } = useContext(PaymentMethodContext)
   const { order, setOrderErrors, errors } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
@@ -142,15 +143,18 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     currentPaymentMethodType,
     order?.id,
     paymentSource?.id,
-    order?.total_amount_with_taxes_cents
+    order?.total_amount_with_taxes_cents,
   ])
   useEffect(() => {
-    if (errors && errors.length > 0) {
+    if (
+      (errors && errors.length > 0) ||
+      (paymentMethodErrors && paymentMethodErrors.length > 0)
+    ) {
       setNotPermitted(true)
       setIsLoading(false)
       setForceDisable(false)
     }
-  }, [errors])
+  }, [errors?.length, paymentMethodErrors?.length])
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     // PayPal redirect flow

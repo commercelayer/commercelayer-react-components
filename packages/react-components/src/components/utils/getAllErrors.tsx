@@ -1,22 +1,21 @@
-import customMessages from '#utils/customMessages'
-import type { LineItem } from '@commercelayer/sdk'
-import type { BaseError } from '#typings/errors'
-import type { TResourceError } from '#components/errors/Errors'
-
-import type { JSX } from "react";
+import type { LineItem } from "@commercelayer/sdk"
+import type { JSX } from "react"
+import type { TResourceError } from "#components/errors/Errors"
+import type { BaseError } from "#typings/errors"
+import customMessages from "#utils/customMessages"
 
 export interface AllErrorsParams {
   allErrors: BaseError[]
   messages: BaseError[]
   field?: string
-  props: Omit<JSX.IntrinsicElements['span'], 'ref'>
+  props: Omit<JSX.IntrinsicElements["span"], "ref">
   lineItem?: LineItem | null
   resource?: TResourceError
   returnHtml?: boolean
 }
 
 export type GetAllErrors = <P extends AllErrorsParams>(
-  params: P
+  params: P,
 ) => Array<JSX.Element | string | undefined>
 
 const getAllErrors: GetAllErrors = (params) => {
@@ -27,7 +26,7 @@ const getAllErrors: GetAllErrors = (params) => {
     props,
     lineItem,
     resource,
-    returnHtml = true
+    returnHtml = true,
   } = params
   return allErrors
     .map((v, k): JSX.Element | string | undefined => {
@@ -39,7 +38,7 @@ const getAllErrors: GetAllErrors = (params) => {
       if (objMsg?.message) text = objMsg?.message.trim()
       const isEmpty = text.length === 0
       if (field) {
-        if (v.resource === 'line_items') {
+        if (v.resource === "line_items") {
           if (lineItem && v.id === lineItem.id) {
             return isEmpty ? undefined : returnHtml ? (
               <span key={k} {...props}>

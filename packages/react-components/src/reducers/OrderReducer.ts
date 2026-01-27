@@ -271,7 +271,7 @@ export async function updateOrder({
   state,
 }: UpdateOrderArgs): Promise<{
   success: boolean
-  error?: unknown
+  error?: { errors: BaseError[] }
   order?: Order
 }> {
   const sdk = config != null ? getSdk(config) : undefined
@@ -289,14 +289,9 @@ export async function updateOrder({
       error,
       resource: "orders",
     })
+    console.error("Update order", errors)
     if (dispatch) {
       setOrderErrors({ errors, dispatch })
-      dispatch({
-        type: "setErrors",
-        payload: {
-          errors,
-        },
-      })
     }
     return { success: false, error }
   }
