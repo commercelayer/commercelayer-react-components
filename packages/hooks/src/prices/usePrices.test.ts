@@ -26,6 +26,66 @@ describe("usePrices", () => {
     })
   })
 
+  coreTest("should retrieve a single price", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+    // First fetch prices
+    act(() => {
+      result.current.fetchPrices()
+    })
+
+    await waitFor(() => {
+      expect(result.current.prices.length).toBeGreaterThan(0)
+    })
+
+    // Get an ID of one of the fetched prices
+    const testPriceId = result.current.prices[0]?.id
+
+    if (!testPriceId) {
+      throw new Error("No price available to retrieve")
+    }
+
+    // Retrieve a specific price
+    await act(async () => {
+      await result.current.retrievePrice(testPriceId)
+    })
+
+    await waitFor(() => {
+      expect(result.current.action).toBe("retrieve")
+    })
+  })
+
+  coreIntegrationTest("should update a price", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+
+    // First fetch prices
+    act(() => {
+      result.current.fetchPrices()
+    })
+
+    await waitFor(() => {
+      expect(result.current.prices.length).toBeGreaterThan(0)
+    })
+    // Get an ID of one of the fetched prices
+    const priceToUpdate = result.current.prices[0]
+
+    if (!priceToUpdate) {
+      throw new Error("No price available to update")
+    }
+
+    // Update the price
+    await act(async () => {
+      await result.current.updatePrice({
+        id: priceToUpdate.id,
+      })
+    })
+
+    await waitFor(() => {
+      expect(result.current.action).toBe("update")
+    })
+  })
+
   coreIntegrationTest(
     "should return a list of prices with an integration token",
     async ({ accessToken }) => {
@@ -190,51 +250,6 @@ describe("usePrices", () => {
     await waitFor(() => {
       expect(result.current.prices).toBeDefined()
       expect(result.current.error).toBeNull()
-    })
-  })
-
-  coreTest("should retrieve a single price", async ({ accessToken }) => {
-    const token = accessToken?.accessToken
-    const { result } = renderHook(() => usePrices(token))
-
-    // Use a known price ID (from the API)
-    const testPriceId = "price_test_id"
-
-    // Retrieve a specific price
-    await act(async () => {
-      await result.current.retrievePrice(testPriceId)
-    })
-
-    await waitFor(() => {
-      expect(result.current.action).toBe("retrieve")
-    })
-  })
-
-  coreTest("should update a price", async ({ accessToken }) => {
-    const token = accessToken?.accessToken
-    const { result } = renderHook(() => usePrices(token))
-
-    // First fetch prices
-    act(() => {
-      result.current.fetchPrices()
-    })
-
-    await waitFor(() => {
-      expect(result.current.prices.length).toBeGreaterThan(0)
-    })
-
-    const priceToUpdate = result.current.prices[0]
-
-    // Update the price
-    await act(async () => {
-      await result.current.updatePrice({
-        id: priceToUpdate.id,
-        type: "prices",
-      })
-    })
-
-    await waitFor(() => {
-      expect(result.current.action).toBe("update")
     })
   })
 
