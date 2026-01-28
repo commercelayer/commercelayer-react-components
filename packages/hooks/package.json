@@ -38,11 +38,13 @@
   "license": "MIT",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
+    "@babel/core": "^7.28.6",
     "@commercelayer/sdk": "^7.4.1",
     "@testing-library/react": "^16.3.1",
     "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",
     "@vitest/coverage-v8": "^4.0.17",
+    "babel-plugin-react-compiler": "^1.0.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "tsup": "^8.5.1",
