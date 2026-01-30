@@ -289,8 +289,14 @@ export async function updateOrder({
     const newTotalAmountWithTaxesCents = order?.total_amount_with_taxes_cents
     if (
       currentTotalAmountWithTaxesCents !== newTotalAmountWithTaxesCents &&
-      order?.payment_source?.id
+      order?.payment_source?.id &&
+      // @ts-expect-error TS2532
+      order?.payment_source?.expires_at <= new Date().toISOString()
     ) {
+      console.log(
+        "Total amount with taxes cents changed, updating payment source...",
+        { old: state?.order, new: order },
+      )
       // If the total amount with taxes cents has changed, we need to update the payment source
       await sdk.orders.update({
         id,
@@ -300,6 +306,7 @@ export async function updateOrder({
     }
     dispatch && order && dispatch({ type: "setOrder", payload: { order } })
     return { success: true, order }
+    // biome-ignore lint/suspicious/noExplicitAny: No types information about the error
   } catch (error: any) {
     const errors = getErrors({
       error,
