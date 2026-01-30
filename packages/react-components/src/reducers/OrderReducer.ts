@@ -165,6 +165,7 @@ export async function createOrder(params: CreateOrderParams): Promise<string> {
       }
       persistKey && setLocalOrder && setLocalOrder(persistKey, o.id)
       return o.id
+      // biome-ignore lint/suspicious/noExplicitAny: No types information about the error
     } catch (error: any) {
       const errors = getErrors({
         error,
@@ -278,10 +279,25 @@ export async function updateOrder({
   try {
     if (sdk == null) return { success: false }
     const resource = { ...attributes, id }
+    // Take note of current total amount with taxes cents (used in some cases like Adyen and the payment source is expired and needs to be updated)
+    const currentTotalAmountWithTaxesCents =
+      state?.order?.total_amount_with_taxes_cents
     // const order = await sdk.orders.update(resource, { include })
     await sdk.orders.update(resource, { include })
     // NOTE: Retrieve doesn't response with attributes updated
-    const order = await getApiOrder({ id, config, dispatch, state })
+    let order = await getApiOrder({ id, config, dispatch, state })
+    const newTotalAmountWithTaxesCents = order?.total_amount_with_taxes_cents
+    if (
+      currentTotalAmountWithTaxesCents !== newTotalAmountWithTaxesCents &&
+      order?.payment_source?.id
+    ) {
+      // If the total amount with taxes cents has changed, we need to update the payment source
+      await sdk.orders.update({
+        id,
+        payment_source: null,
+      })
+      order = await getApiOrder({ id, config, dispatch, state })
+    }
     dispatch && order && dispatch({ type: "setOrder", payload: { order } })
     return { success: true, order }
   } catch (error: any) {
