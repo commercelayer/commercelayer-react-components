@@ -153,6 +153,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       setNotPermitted(true)
       setIsLoading(false)
       setForceDisable(false)
+    } else {
+      setNotPermitted(false)
     }
   }, [errors?.length, paymentMethodErrors?.length])
   // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test

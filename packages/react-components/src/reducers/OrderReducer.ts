@@ -293,10 +293,6 @@ export async function updateOrder({
       // @ts-expect-error TS2532
       order?.payment_source?.expires_at <= new Date().toISOString()
     ) {
-      console.log(
-        "Total amount with taxes cents changed, updating payment source...",
-        { old: state?.order, new: order },
-      )
       // If the total amount with taxes cents has changed, we need to update the payment source
       await sdk.orders.update({
         id,

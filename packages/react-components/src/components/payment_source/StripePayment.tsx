@@ -67,8 +67,12 @@ function StripePaymentForm({
   stripe,
 }: StripePaymentFormProps): JSX.Element {
   const ref = useRef<null | HTMLFormElement>(null)
-  const { currentPaymentMethodType, setPaymentMethodErrors, setPaymentRef } =
-    useContext(PaymentMethodContext)
+  const {
+    errors,
+    currentPaymentMethodType,
+    setPaymentMethodErrors,
+    setPaymentRef,
+  } = useContext(PaymentMethodContext)
   const { order, setOrderErrors } = useContext(OrderContext)
   const { sdkClient } = useCommerceLayer()
   const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
@@ -176,35 +180,38 @@ function StripePaymentForm({
   }
 
   async function handleChange(event: StripePaymentElementChangeEvent) {
-    console.debug("StripePaymentElement onChange event", { event })
     selectedPaymentMethodType = event.value.type
+    console.log("Errors", errors)
     // Handle change events from the PaymentElement
-    if (
-      event.complete &&
-      ["apple_pay", "google_pay"].includes(event.value.type)
-    ) {
-      const sdk = sdkClient()
-      if (sdk == null) return
-      if (order == null) return
-      const { status } = await sdk.orders.retrieve(order?.id, {
-        fields: ["status"],
-      })
-      const isDraftOrder = status === "draft"
-      if (isDraftOrder) {
-        /**
-         * Draft order cannot be placed
-         */
-        setOrderErrors([
-          {
-            code: "VALIDATION_ERROR",
-            resource: "orders",
-            message: "Draft order cannot be placed",
-          },
-        ])
-        setPlaceOrderStatus?.({
-          status: "disabled",
+    if (event.complete) {
+      if (errors && errors.length > 0) {
+        setPaymentMethodErrors([])
+      }
+      if (["apple_pay", "google_pay"].includes(event.value.type)) {
+        const sdk = sdkClient()
+        if (sdk == null) return
+        if (order == null) return
+        // Reset payment method errors
+        const { status } = await sdk.orders.retrieve(order?.id, {
+          fields: ["status"],
         })
-        return
+        const isDraftOrder = status === "draft"
+        if (isDraftOrder) {
+          /**
+           * Draft order cannot be placed
+           */
+          setOrderErrors([
+            {
+              code: "VALIDATION_ERROR",
+              resource: "orders",
+              message: "Draft order cannot be placed",
+            },
+          ])
+          setPlaceOrderStatus?.({
+            status: "disabled",
+          })
+          return
+        }
       }
     }
   }
