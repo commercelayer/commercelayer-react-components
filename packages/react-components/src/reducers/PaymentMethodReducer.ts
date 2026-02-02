@@ -370,23 +370,16 @@ export async function setPaymentSource({
       resource: "payment_methods",
       field: paymentResource,
     })
-    const expiredErrors = errors.filter((v) => v?.meta?.error === "expired")
-    if (expiredErrors.length > 0 && order && config) {
-      console.error("Set payment source - expired:", expiredErrors)
-      destroyPaymentSource({
-        paymentSourceId: order.payment_source?.id || "",
-        paymentResource,
-        dispatch,
-      })
-      // resetPaymentSource({
-      //   orderId: order.id,
-      //   paymentResource,
-      //   config: config,
-      //   getOrder,
-      //   dispatch,
-      // })
-    }
     if (errors != null && errors?.length > 0) {
+      const expiredErrors = errors.filter((v) => v?.meta?.error === "expired")
+      if (expiredErrors.length > 0 && order && config) {
+        console.error("Set payment source - expired:", expiredErrors)
+        destroyPaymentSource({
+          paymentSourceId: order.payment_source?.id || "",
+          paymentResource,
+          dispatch,
+        })
+      }
       const [error] = errors
       if (error?.status === "401" && getOrder != null && order != null) {
         const currentOrder = await getOrder(order?.id)
