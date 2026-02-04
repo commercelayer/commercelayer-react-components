@@ -77,7 +77,9 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
         errors?.length === 0 &&
         checkPaymentSourceStatus !== "declined"
       ) {
-        setShowCard(true)
+        if (card.brand !== "giftcard") {
+          setShowCard(true)
+        }
       }
       if (checkPaymentSourceStatus === "declined") {
         setShowCard(false)

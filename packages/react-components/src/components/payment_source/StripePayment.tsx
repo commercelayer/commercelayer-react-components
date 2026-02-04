@@ -181,9 +181,11 @@ function StripePaymentForm({
 
   async function handleChange(event: StripePaymentElementChangeEvent) {
     selectedPaymentMethodType = event.value.type
-    console.log("Errors", errors)
     // Handle change events from the PaymentElement
     if (event.complete) {
+      /**
+       * Clear payment method errors on complete event
+       */
       if (errors && errors.length > 0) {
         setPaymentMethodErrors([])
       }
