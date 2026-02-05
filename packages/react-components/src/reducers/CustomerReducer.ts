@@ -459,6 +459,31 @@ export async function getCustomerPayments({
   }
 }
 
+export interface DeleteCustomerPayment {
+  customerPaymentSourceId: string
+  dispatch?: Dispatch<CustomerAction>
+  config?: CommerceLayerConfig
+}
+
+export async function deleteCustomerPayment({
+  customerPaymentSourceId,
+  dispatch,
+  config,
+}: DeleteCustomerPayment): Promise<void> {
+  if (config && dispatch) {
+    try {
+      const sdk = getSdk(config)
+      await sdk.customer_payment_sources.delete(customerPaymentSourceId)
+      getCustomerPayments({
+        config,
+        dispatch
+      })
+    } catch (error) {
+      throw new Error("Couldn't delete payment source")
+    }
+  }
+}
+
 export async function getCustomerInfo({
   config,
   dispatch
