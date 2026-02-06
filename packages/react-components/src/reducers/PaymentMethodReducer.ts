@@ -1,6 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
+
+import type {
+  AdyenPayment,
+  BraintreePayment,
+  CheckoutComPayment,
+  ExternalPayment,
+  KlarnaPayment,
+  Order,
+  PaymentMethod,
+  PaypalPayment,
+  StripePayment,
+  WireTransfer,
+} from "@commercelayer/sdk"
+import type { Dispatch, MutableRefObject } from "react"
 import type { AdyenPaymentConfig } from "#components/payment_source/AdyenPayment"
 import type { BraintreeConfig } from "#components/payment_source/BraintreePayment"
+import type { CheckoutComConfig } from "#components/payment_source/CheckoutComPayment"
+import type { ExternalPaymentConfig } from "#components/payment_source/ExternalPayment"
 import type { PaypalConfig } from "#components/payment_source/PaypalPayment"
 import type { StripeConfig } from "#components/payment_source/StripePayment"
 import type { WireTransferConfig } from "#components/payment_source/WireTransferPayment"
@@ -9,26 +25,11 @@ import type { getOrderContext, updateOrder } from "#reducers/OrderReducer"
 import type { BaseError } from "#typings/errors"
 import baseReducer from "#utils/baseReducer"
 import getErrors, { setErrors } from "#utils/getErrors"
-import getSdk from "#utils/getSdk"
-import type {
-  Order,
-  PaymentMethod,
-  StripePayment,
-  WireTransfer,
-  AdyenPayment,
-  BraintreePayment,
-  CheckoutComPayment,
-  ExternalPayment,
-  PaypalPayment,
-  KlarnaPayment,
-} from "@commercelayer/sdk"
-import type { Dispatch, MutableRefObject } from "react"
-import type { CheckoutComConfig } from "#components/payment_source/CheckoutComPayment"
-import type { ExternalPaymentConfig } from "#components/payment_source/ExternalPayment"
-import { snakeToCamelCase } from "#utils/snakeToCamelCase"
-import { replace } from "#utils/replace"
-import { pick } from "#utils/pick"
 import type { ResourceKeys } from "#utils/getPaymentAttributes"
+import getSdk from "#utils/getSdk"
+import { pick } from "#utils/pick"
+import { replace } from "#utils/replace"
+import { snakeToCamelCase } from "#utils/snakeToCamelCase"
 
 export type PaymentSourceType = Order["payment_source"]
 
@@ -224,7 +225,11 @@ export async function setPaymentMethod({
   updateOrder,
   setOrderErrors,
   paymentResource,
-}: TSetPaymentMethodParams): Promise<{ success: boolean; order?: Order }> {
+}: TSetPaymentMethodParams): Promise<{
+  success: boolean
+  order?: Order
+  error?: { errors: BaseError[] }
+}> {
   let response: { success: boolean; order?: Order } = {
     success: false,
   }
@@ -237,6 +242,16 @@ export async function setPaymentMethod({
       }
       if (updateOrder != null) {
         const currentOrder = await updateOrder({ id: order.id, attributes })
+        if (!currentOrder.success && currentOrder.error) {
+          const errors = getErrors({
+            error: currentOrder.error,
+            resource: "orders",
+            field: paymentResource,
+          })
+          console.error("Set payment method", errors)
+          setOrderErrors?.(errors)
+          return response
+        }
         response = currentOrder
       }
       dispatch({
@@ -355,8 +370,16 @@ export async function setPaymentSource({
       resource: "payment_methods",
       field: paymentResource,
     })
-    console.error("Set payment source:", errors)
     if (errors != null && errors?.length > 0) {
+      const expiredErrors = errors.filter((v) => v?.meta?.error === "expired")
+      if (expiredErrors.length > 0 && order && config) {
+        console.error("Set payment source - expired:", expiredErrors)
+        destroyPaymentSource({
+          paymentSourceId: order.payment_source?.id || "",
+          paymentResource,
+          dispatch,
+        })
+      }
       const [error] = errors
       if (error?.status === "401" && getOrder != null && order != null) {
         const currentOrder = await getOrder(order?.id)
@@ -435,21 +458,12 @@ export const destroyPaymentSource: DestroyPaymentSource = async ({
   paymentSourceId,
   paymentResource,
   dispatch,
-  // updateOrder,
-  // orderId,
 }) => {
   if (paymentSourceId && paymentResource) {
-    // await updateOrder({
-    //   id: orderId,
-    //   attributes: {
-    //     payment_source: {},
-    //   },
-    // })
-    if (dispatch)
-      dispatch({
-        type: "setPaymentSource",
-        payload: { paymentSource: undefined },
-      })
+    dispatch?.({
+      type: "setPaymentSource",
+      payload: { paymentSource: undefined },
+    })
   }
 }
 

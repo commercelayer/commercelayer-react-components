@@ -640,7 +640,14 @@ export function AdyenPayment({
             const id: string = component._id
             if (id.search("scheme") === -1) {
               if (ref.current) {
-                if (id.search("paypal") === -1) {
+                /**
+                 * For payment methods different from card, we remove the onsubmit handler
+                 * to manage the submission via Adyen Drop-in and the place order button remains disabled
+                 */
+                if (
+                  id.search("paypal") === -1 &&
+                  id.search("giftcard") === -1
+                ) {
                   ref.current.onsubmit = async () => {
                     return await handleSubmit(
                       ref.current as unknown as FormEvent<HTMLFormElement>,

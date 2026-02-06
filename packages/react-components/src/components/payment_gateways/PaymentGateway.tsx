@@ -118,6 +118,9 @@ export function PaymentGateway({
       if (order?.payment_source?.id != null) {
         setLoading(false)
       }
+      if (!paymentSource) {
+        setLoading(true)
+      }
     }
     if (expressPayments && show) setLoading(false)
     if (
@@ -131,7 +134,7 @@ export function PaymentGateway({
     return () => {
       setLoading(true)
     }
-  }, [order?.payment_method?.id, show, paymentSource])
+  }, [order?.payment_method?.id, show, paymentSource?.id])
 
   useEffect(() => {
     if (status === "placing") setLoading(true)
