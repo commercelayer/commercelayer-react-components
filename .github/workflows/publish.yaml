@@ -40,11 +40,6 @@ jobs:
       - name: Uncommitted changes 🔎
         run: git status
 
-      - name: Publish 🚀 PRODUCTION on JSR.io
-        if: '!github.event.release.prerelease'
-        run: |
-          pnpm --filter '*' jsr:publish
-
       - name: Publish 🚀 PRERELEASE
         if: 'github.event.release.prerelease'
         run: |
