@@ -4,6 +4,7 @@ import customerReducer, {
   getCustomerAddresses,
   getCustomerOrders,
   getCustomerPaymentSources,
+  deleteCustomerPayment,
   setCustomerEmail,
   setCustomerErrors,
   deleteCustomerAddress,
@@ -155,6 +156,17 @@ export function CustomerContainer(props: Props): JSX.Element {
       },
       getCustomerPaymentSources: () => {
         getCustomerPaymentSources({ dispatch, order })
+      },
+      deleteCustomerPayment: async ({
+        customerPaymentSourceId
+      }: {
+        customerPaymentSourceId: string
+      }) => {
+        await deleteCustomerPayment({
+          customerPaymentSourceId,
+          dispatch,
+          config
+        })
       },
       deleteCustomerAddress: async ({
         customerAddressId

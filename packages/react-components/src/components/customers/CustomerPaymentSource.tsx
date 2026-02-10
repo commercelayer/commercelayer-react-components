@@ -1,7 +1,6 @@
 import { type JSX, useEffect, useState } from "react"
 import CustomerContext from "#context/CustomerContext"
 import CustomerPaymentSourceContext from "#context/CustomerPaymentSourceContext"
-import useCommerceLayer from "#hooks/useCommerceLayer"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { DefaultChildrenType } from "#typings/globals"
 import getCardDetails from "#utils/getCardDetails"
@@ -19,9 +18,8 @@ export function CustomerPaymentSource({
   children,
   loader = "Loading...",
 }: Props): JSX.Element {
-  const { sdkClient } = useCommerceLayer()
   const [loading, setLoading] = useState(true)
-  const { payments, getCustomerPaymentSources } = useCustomContext({
+  const { payments, deleteCustomerPayment } = useCustomContext({
     context: CustomerContext,
     contextComponentName: "CustomerContainer",
     currentComponentName: "CustomerPaymentSource",
@@ -45,13 +43,11 @@ export function CustomerPaymentSource({
         handleDeleteClick: (e: MouseEvent) => {
           e?.preventDefault()
           e?.stopPropagation()
-          const sdk = sdkClient()
-          if (sdk == null) return
-          sdk.customer_payment_sources.delete(p.id).then(() => {
-            if (getCustomerPaymentSources) {
-              getCustomerPaymentSources()
-            }
-          })
+          if (deleteCustomerPayment != null) {
+            deleteCustomerPayment({
+              customerPaymentSourceId: p.id
+            })
+          }
         },
       }
       return (
