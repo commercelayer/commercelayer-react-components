@@ -73,7 +73,7 @@ export function AddressField(props: Props): JSX.Element {
   const { address } = useContext(AddressChildrenContext)
   const text = name && address ? address?.[name] : ""
   const { deleteCustomerAddress } = useContext(CustomerContext)
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation()
     e.preventDefault()
     if (type === "delete" && deleteCustomerAddress && address?.reference) {
@@ -92,9 +92,13 @@ export function AddressField(props: Props): JSX.Element {
       {text}
     </p>
   ) : (
-    <a data-testid={`address-field-${name ?? ""}`} {...p} onClick={handleClick}>
+    <button
+      data-testid={`address-field-${name ?? ""}`}
+      {...p}
+      onClick={handleClick}
+    >
       {label}
-    </a>
+    </button>
   )
 }
 

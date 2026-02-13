@@ -1,21 +1,21 @@
-import { useContext, useEffect, useMemo, type JSX } from 'react';
-import BaseSelect from '../utils/BaseSelect'
-import type { BaseSelectComponentProps } from '#typings'
+import { type JSX, useContext, useEffect, useMemo } from "react"
 import BillingAddressFormContext, {
-  type AddressValuesKeys
-} from '#context/BillingAddressFormContext'
-import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
-import { getCountries, type Country } from '#utils/countryStateCity'
-import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
+  type AddressValuesKeys,
+} from "#context/BillingAddressFormContext"
+import CustomerAddressFormContext from "#context/CustomerAddressFormContext"
+import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
+import type { BaseSelectComponentProps } from "#typings"
+import { type Country, getCountries } from "#utils/countryStateCity"
+import BaseSelect from "../utils/BaseSelect"
 
 type TCountryFieldName =
-  | 'billing_address_country_code'
-  | 'shipping_address_country_code'
-  | 'customer_address_country_code'
+  | "billing_address_country_code"
+  | "shipping_address_country_code"
+  | "customer_address_country_code"
 
 interface Props
-  extends Omit<BaseSelectComponentProps, 'options' | 'name'>,
-    Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'> {
+  extends Omit<BaseSelectComponentProps, "options" | "name">,
+    Pick<JSX.IntrinsicElements["select"], "className" | "id" | "style"> {
   name: Extract<AddressValuesKeys, TCountryFieldName>
   required?: boolean
   disabled?: boolean
@@ -48,6 +48,7 @@ export function AddressCountrySelector(props: Props): JSX.Element {
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
   const customerAddress = useContext(CustomerAddressFormContext)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: We want to trigger this effect only on value change, not on billing/shipping/customerAddress change
   useEffect(() => {
     if (value && billingAddress?.setValue) {
       billingAddress.setValue(name, value)
@@ -72,22 +73,23 @@ export function AddressCountrySelector(props: Props): JSX.Element {
     }
     return false
   }, [
-    value,
     billingAddress?.errors,
     shippingAddress?.errors,
-    customerAddress?.errors
+    customerAddress?.errors,
+    name,
   ])
   const errorClassName =
     billingAddress?.errorClassName ||
     shippingAddress?.errorClassName ||
     customerAddress?.errorClassName
-  const classNameComputed = `${className ?? ''} ${
-    hasError && errorClassName ? errorClassName : ''
+  const classNameComputed = `${className ?? ""} ${
+    hasError && errorClassName ? errorClassName : ""
   }`
   return (
     <BaseSelect
       className={classNameComputed}
       ref={
+        // biome-ignore lint/suspicious/noExplicitAny: No type for select ref
         (billingAddress?.validation as any) ||
         shippingAddress?.validation ||
         customerAddress?.validation

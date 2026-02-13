@@ -69,6 +69,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     includeLoaded,
   } = useContext(OrderContext)
   const ref = useRef<HTMLFormElement | null>(null)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: We want to trigger this effect only on errors, values, reset, include, includeLoaded or isBusiness change, not on setAddressErrors, setAddress, saveAddressToCustomerAddressBook, order, addResourceToInclude or setErrorForm change
   useEffect(() => {
     if (!include?.includes("billing_address")) {
       addResourceToInclude({
@@ -183,7 +184,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
         values: {
           ...values,
           ...(isBusiness && { business: isBusiness }),
-        },
+        } as any,
         resource: "billing_address",
       })
     }
@@ -228,7 +229,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     value: string | number | readonly string[],
   ): void => {
     setValueForm(name, value as string)
-    const field: any = {
+    const field = {
       [name.replace("billing_address_", "")]: value,
     }
     setAddress({

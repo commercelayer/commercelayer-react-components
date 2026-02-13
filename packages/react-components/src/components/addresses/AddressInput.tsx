@@ -45,6 +45,7 @@ export function AddressInput(props: Props): JSX.Element | null {
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
   const customerAddress = useContext(CustomerAddressFormContext)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: We want to trigger this effect only on value change, not on billing/shipping/customerAddress change
   useEffect(() => {
     if (value && billingAddress?.setValue) {
       billingAddress.setValue(p.name, value)
@@ -69,10 +70,10 @@ export function AddressInput(props: Props): JSX.Element | null {
     }
     return false
   }, [
-    value,
     billingAddress?.errors,
     shippingAddress?.errors,
     customerAddress?.errors,
+    p.name,
   ])
 
   const mandatoryField = billingAddress?.isBusiness
@@ -99,6 +100,7 @@ export function AddressInput(props: Props): JSX.Element | null {
   return (
     <BaseInput
       ref={
+        // biome-ignore lint/suspicious/noExplicitAny: No type for input ref
         (billingAddress?.validation as any) ||
         shippingAddress?.validation ||
         customerAddress?.validation
