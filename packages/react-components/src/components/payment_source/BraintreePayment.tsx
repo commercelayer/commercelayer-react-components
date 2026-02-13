@@ -162,7 +162,7 @@ export function BraintreePayment({
             streetAddress: billingAddress?.line_1,
             countryCodeAlpha2: billingAddress?.country_code,
             postalCode: billingAddress?.zip_code ?? '',
-            region: billingAddress?.state_code,
+            region: billingAddress?.state_code ?? undefined,
             locality: billingAddress?.city
           },
           onLookupComplete: (_data: any, next: any) => {
