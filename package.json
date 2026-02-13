@@ -17,7 +17,8 @@
     "make:version": "lerna version --no-private",
     "make:version:force": "lerna version --no-private --force-publish",
     "dep:major": "pnpm dlx npm-check-updates --packageFile '**/package.json' -u -i",
-    "dep:minor": "pnpm dep:major -t minor -i"
+    "dep:minor": "pnpm dep:major -t minor -i",
+    "clean": "pnpm dlx rimraf --glob **/node_modules **/pnpm-lock.yaml"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
