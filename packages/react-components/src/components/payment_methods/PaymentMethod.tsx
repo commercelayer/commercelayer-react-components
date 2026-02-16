@@ -185,7 +185,6 @@ export function PaymentMethod({
               ) {
                 attributes = getCkoAttributes(paymentResource, config)
               }
-              console.log("Attributes:", order?.payment_source, attributes)
               const ps = await setPaymentSource({
                 paymentResource,
                 order,
