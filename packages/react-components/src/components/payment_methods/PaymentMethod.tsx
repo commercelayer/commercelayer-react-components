@@ -226,7 +226,7 @@ export function PaymentMethod({
         autoSelect()
       }
     }
-  }, [!isEmpty(paymentMethods), order?.payment_source != null, errors?.length])
+  }, [!isEmpty(paymentMethods), errors?.length])
   useEffect(() => {
     if (paymentMethods) {
       const isSingle = paymentMethods.length === 1

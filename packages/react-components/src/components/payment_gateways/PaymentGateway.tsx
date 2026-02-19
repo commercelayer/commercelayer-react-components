@@ -60,6 +60,8 @@ export function PaymentGateway({
     currentPaymentMethodType,
     setPaymentSource,
     paymentSource,
+    paymentMethods,
+    errors,
   } = useContext(PaymentMethodContext)
   const paymentResource = readonly
     ? currentPaymentMethodType
@@ -88,7 +90,19 @@ export function PaymentGateway({
         attributes = getCkoAttributes(paymentResource, config)
       }
       const setPaymentSources = async (): Promise<void> => {
-        if (order != null) {
+        if (order != null && paymentMethods && paymentMethods?.length > 1) {
+          await setPaymentSource({
+            paymentResource,
+            order,
+            attributes,
+          })
+        }
+        if (
+          ((errors != null && errors?.length > 0) ||
+            order?.payment_source === null) &&
+          paymentMethods &&
+          paymentMethods?.length === 1
+        ) {
           await setPaymentSource({
             paymentResource,
             order,
