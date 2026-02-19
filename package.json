@@ -25,5 +25,10 @@
     "husky": "^9.1.7",
     "lerna": "^9.0.3",
     "typescript": "^5.9.3"
+  },
+  "resolutions": {
+    "tar": ">=7.5.8",
+    "minimatch": ">=10.2.1",
+    "esbuild": ">=0.25.0"
   }
 }
