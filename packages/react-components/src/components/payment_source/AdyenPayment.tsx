@@ -186,7 +186,11 @@ export function AdyenPayment({
             ref.current as unknown as FormEvent<HTMLFormElement>,
           )
         }
+        setPaymentMethodErrors([])
         setPaymentRef({ ref })
+        if (placeOrderButtonRef?.current != null) {
+          placeOrderButtonRef.current.disabled = false
+        }
       }
     }
   }
@@ -682,7 +686,7 @@ export function AdyenPayment({
       setPaymentRef({ ref: { current: null } })
       setLoadAdyen(false)
     }
-  }, [clientKey, ref != null, status])
+  }, [clientKey, ref != null, status, setPaymentMethodErrors != null])
   return !clientKey && !loadAdyen && !checkout ? null : (
     <form
       ref={ref}
