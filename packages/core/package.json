@@ -11,7 +11,13 @@
       "default": "./dist/index.cjs"
     }
   },
-  "keywords": ["jamstack", "headless", "ecommerce", "api", "components"],
+  "keywords": [
+    "jamstack",
+    "headless",
+    "ecommerce",
+    "api",
+    "components"
+  ],
   "scripts": {
     "check-exports": "attw --pack .",
     "lint": "biome lint --error-on-warnings ./src && tsc",
@@ -32,14 +38,14 @@
   "license": "MIT",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
-    "@vitest/coverage-v8": "^4.0.17",
+    "@vitest/coverage-v8": "^4.1.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "vite-tsconfig-paths": "^6.0.4",
-    "vitest": "^4.0.17"
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.0"
   },
   "dependencies": {
-    "@commercelayer/js-auth": "^7.1.2",
-    "@commercelayer/sdk": "7.4.1"
+    "@commercelayer/js-auth": "^7.3.0",
+    "@commercelayer/sdk": "7.9.0"
   }
 }

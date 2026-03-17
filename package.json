@@ -21,9 +21,16 @@
     "clean": "pnpm dlx rimraf --glob **/node_modules **/pnpm-lock.yaml"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.11",
+    "@biomejs/biome": "^2.4.7",
     "husky": "^9.1.7",
-    "lerna": "^9.0.3",
+    "lerna": "^9.0.7",
     "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "rollup": ">=4.59.0",
+      "minimatch@>=5.0.0 <5.1.8": ">=5.1.8",
+      "minimatch@>=10.0.0 <10.2.3": ">=10.2.3"
+    }
   }
 }
