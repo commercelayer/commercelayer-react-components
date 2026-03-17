@@ -49,9 +49,7 @@ export function useSkus(accessToken: string): UseSkusReturn {
   const [action, setAction] = useState<UseAction>(null)
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<Sku[]>(
-    shouldFetch && accessToken
-      ? ["skus", "get", accessToken, params]
-      : null,
+    shouldFetch && accessToken ? ["skus", "get", accessToken, params] : null,
     async (): Promise<Sku[]> => {
       return await getSkus({ accessToken, params })
     },
@@ -88,8 +86,9 @@ export function useSkus(accessToken: string): UseSkusReturn {
       const result = await updateSku({ accessToken, resource })
       await mutate(
         (current) =>
-          current?.map((s: Sku) => (s.id === result.id ? result : s)) ??
-          [result],
+          current?.map((s: Sku) => (s.id === result.id ? result : s)) ?? [
+            result,
+          ],
         { revalidate: false },
       )
       return result
