@@ -49,9 +49,7 @@ export function usePrices(accessToken: string): UsePricesReturn {
   const [action, setAction] = useState<UseAction>(null)
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<Price[]>(
-    shouldFetch && accessToken
-      ? ["prices", "get", accessToken, params]
-      : null,
+    shouldFetch && accessToken ? ["prices", "get", accessToken, params] : null,
     async (): Promise<Price[]> => {
       return await getPrices({ accessToken, params })
     },
@@ -88,8 +86,9 @@ export function usePrices(accessToken: string): UsePricesReturn {
       const result = await updatePrice({ accessToken, resource })
       await mutate(
         (current) =>
-          current?.map((p: Price) => (p.id === result.id ? result : p)) ??
-          [result],
+          current?.map((p: Price) => (p.id === result.id ? result : p)) ?? [
+            result,
+          ],
         { revalidate: false },
       )
       return result
