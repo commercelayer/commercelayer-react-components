@@ -6,6 +6,7 @@ export default defineConfig({
     name: "hooks",
     environment: "jsdom",
     testTimeout: 30000,
+    fileParallelism: false,
     setupFiles: ["./src/vitest.setup.ts"],
     coverage: {
       provider: "v8",

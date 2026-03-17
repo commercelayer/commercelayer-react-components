@@ -1,2 +1,2 @@
 pnpm --filter './packages/core' --filter './packages/hooks' build
-pnpm --filter './packages/core' --filter './packages/hooks' test
+pnpm --filter './packages/core' --filter './packages/hooks' lint

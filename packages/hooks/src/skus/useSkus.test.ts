@@ -3,12 +3,13 @@
  */
 import { act, renderHook, waitFor } from "@testing-library/react"
 import { createElement } from "react"
+import type { ReactNode } from "react"
 import { SWRConfig } from "swr"
 import { describe, expect } from "vitest"
 import { coreIntegrationTest, coreTest } from "#extender"
 import { useSkus } from "./useSkus"
 
-const swrWrapper = ({ children }: { children: React.ReactNode }) =>
+const swrWrapper = ({ children }: { children: ReactNode }) =>
   createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
 
 describe("useSkus", () => {
@@ -53,12 +54,15 @@ describe("useSkus", () => {
         throw new Error("No SKU available to retrieve")
       }
 
+      let retrievedSku: Awaited<ReturnType<typeof result.current.retrieveSku>>
       await act(async () => {
-        await result.current.retrieveSku(testSkuId)
+        retrievedSku = await result.current.retrieveSku(testSkuId)
       })
 
       await waitFor(() => {
         expect(result.current.action).toBe("retrieve")
+        expect(retrievedSku).toBeDefined()
+        expect(retrievedSku?.id).toBe(testSkuId)
       })
     },
   )
@@ -80,14 +84,17 @@ describe("useSkus", () => {
       throw new Error("No SKU available to update")
     }
 
+    let updatedSku: Awaited<ReturnType<typeof result.current.updateSku>>
     await act(async () => {
-      await result.current.updateSku({
+      updatedSku = await result.current.updateSku({
         id: skuToUpdate.id,
       })
     })
 
     await waitFor(() => {
       expect(result.current.action).toBe("update")
+      expect(updatedSku).toBeDefined()
+      expect(updatedSku?.id).toBe(skuToUpdate.id)
     })
   })
 

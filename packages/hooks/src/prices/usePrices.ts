@@ -5,8 +5,8 @@ import {
   retrievePrice,
   updatePrice,
 } from "@commercelayer/core"
-import { useCallback, useEffect, useRef, useState } from "react"
-import useSWR from "swr"
+import { useCallback, useState } from "react"
+import useSWR, { type KeyedMutator } from "swr"
 
 interface UsePricesReturn {
   prices: Price[]
@@ -19,7 +19,7 @@ interface UsePricesReturn {
   updatePrice: (resource: PriceUpdate) => Promise<Price | undefined>
   clearPrices: () => void
   clearError: () => void
-  mutate: () => void
+  mutate: KeyedMutator<Price[]>
 }
 
 type UseAction = "get" | "retrieve" | "update" | null
@@ -47,58 +47,19 @@ export function usePrices(accessToken: string): UsePricesReturn {
     useState<Parameters<typeof getPrices>[0]["params"]>()
   const [shouldFetch, setShouldFetch] = useState(false)
   const [action, setAction] = useState<UseAction>(null)
-  const [priceId, setPriceId] = useState<string | undefined>()
-  const [priceResource, setPriceResource] = useState<PriceUpdate | undefined>()
-  const dataRef = useRef<Price[] | undefined>(undefined)
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<Price[]>(
-    shouldFetch && accessToken && action
-      ? ["prices", action, accessToken, params, priceId, priceResource]
+    shouldFetch && accessToken
+      ? ["prices", "get", accessToken, params]
       : null,
     async (): Promise<Price[]> => {
-      switch (action) {
-        case "get":
-          return await getPrices({
-            accessToken,
-            params,
-          })
-        case "retrieve": {
-          if (priceId == null) return []
-          return [await retrievePrice({ accessToken, id: priceId })]
-        }
-        case "update": {
-          if (priceResource == null) return []
-          const updatedPrice = await updatePrice({
-            accessToken,
-            resource: priceResource,
-          })
-          const currentData = dataRef.current
-          return currentData
-            ? currentData.map((p: Price) =>
-                p.id === updatedPrice.id ? updatedPrice : p,
-              )
-            : [updatedPrice]
-        }
-        // The fetcher only runs when action is non-null (SWR key guard), so this default is unreachable
-        /* v8 ignore next 4 */
-        default:
-          return await getPrices({
-            accessToken,
-            params,
-          })
-      }
+      return await getPrices({ accessToken, params })
     },
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
     },
   )
-
-  useEffect(() => {
-    if (action === "get" && data !== undefined) {
-      dataRef.current = data
-    }
-  }, [data, action])
 
   const fetchPrices = useCallback(
     (newParams?: Parameters<typeof getPrices>[0]["params"]) => {
@@ -112,34 +73,33 @@ export function usePrices(accessToken: string): UsePricesReturn {
   const handleRetrievePrice = useCallback(
     async (id: string): Promise<Price | undefined> => {
       if (!id) throw new Error("Price ID is required for retrieve")
-      setPriceId(id)
       setAction("retrieve")
-      setShouldFetch(true)
-      // Wait for SWR to fetch
-      await mutate()
-      return data?.[0]
+      const result = await retrievePrice({ accessToken, id })
+      return result
     },
-    [mutate, data],
+    [accessToken],
   )
 
   const handleUpdatePrice = useCallback(
     async (resource: PriceUpdate): Promise<Price | undefined> => {
       if (!resource?.id)
         throw new Error("Price resource ID is required for update")
-      setPriceResource(resource)
       setAction("update")
-      setShouldFetch(true)
-      await mutate()
-      return data?.find((p: Price) => p.id === resource.id)
+      const result = await updatePrice({ accessToken, resource })
+      await mutate(
+        (current) =>
+          current?.map((p: Price) => (p.id === result.id ? result : p)) ??
+          [result],
+        { revalidate: false },
+      )
+      return result
     },
-    [mutate, data],
+    [accessToken, mutate],
   )
 
   const clearPrices = useCallback(() => {
     setShouldFetch(false)
     setAction(null)
-    setPriceId(undefined)
-    setPriceResource(undefined)
     mutate(undefined, false)
   }, [mutate])
 
