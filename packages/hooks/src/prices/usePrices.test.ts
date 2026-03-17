@@ -2,9 +2,14 @@
  * @vitest-environment jsdom
  */
 import { act, renderHook, waitFor } from "@testing-library/react"
+import { createElement } from "react"
+import { SWRConfig } from "swr"
 import { describe, expect } from "vitest"
 import { coreIntegrationTest, coreTest } from "#extender"
 import { usePrices } from "./usePrices"
+
+const swrWrapper = ({ children }: { children: React.ReactNode }) =>
+  createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
 
 describe("usePrices", () => {
   coreTest("should return a list of prices", async ({ accessToken }) => {
@@ -275,4 +280,38 @@ describe("usePrices", () => {
       expect(result.current.action).toBeNull()
     })
   })
+
+  coreTest(
+    "should throw error when retrieving price with empty ID",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+      const { result } = renderHook(() => usePrices(token), {
+        wrapper: swrWrapper,
+      })
+
+      await expect(
+        act(async () => {
+          await result.current.retrievePrice("")
+        }),
+      ).rejects.toThrow("Price ID is required for retrieve")
+    },
+  )
+
+  coreTest(
+    "should throw error when updating price without an ID",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+      const { result } = renderHook(() => usePrices(token), {
+        wrapper: swrWrapper,
+      })
+
+      await expect(
+        act(async () => {
+          await result.current.updatePrice(
+            {} as Parameters<typeof result.current.updatePrice>[0],
+          )
+        }),
+      ).rejects.toThrow("Price resource ID is required for update")
+    },
+  )
 })

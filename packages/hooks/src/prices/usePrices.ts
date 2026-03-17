@@ -5,7 +5,7 @@ import {
   retrievePrice,
   updatePrice,
 } from "@commercelayer/core"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import useSWR from "swr"
 
 interface UsePricesReturn {
@@ -49,6 +49,7 @@ export function usePrices(accessToken: string): UsePricesReturn {
   const [action, setAction] = useState<UseAction>(null)
   const [priceId, setPriceId] = useState<string | undefined>()
   const [priceResource, setPriceResource] = useState<PriceUpdate | undefined>()
+  const dataRef = useRef<Price[] | undefined>(undefined)
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<Price[]>(
     shouldFetch && accessToken && action
@@ -62,22 +63,24 @@ export function usePrices(accessToken: string): UsePricesReturn {
             params,
           })
         case "retrieve": {
-          if (!priceId) throw new Error("Price ID is required for retrieve")
+          if (priceId == null) return []
           return [await retrievePrice({ accessToken, id: priceId })]
         }
         case "update": {
-          if (!priceResource)
-            throw new Error("Price resource is required for update")
+          if (priceResource == null) return []
           const updatedPrice = await updatePrice({
             accessToken,
             resource: priceResource,
           })
-          return data
-            ? data.map((p: Price) =>
+          const currentData = dataRef.current
+          return currentData
+            ? currentData.map((p: Price) =>
                 p.id === updatedPrice.id ? updatedPrice : p,
               )
             : [updatedPrice]
         }
+        // The fetcher only runs when action is non-null (SWR key guard), so this default is unreachable
+        /* v8 ignore next 4 */
         default:
           return await getPrices({
             accessToken,
@@ -91,6 +94,12 @@ export function usePrices(accessToken: string): UsePricesReturn {
     },
   )
 
+  useEffect(() => {
+    if (action === "get" && data !== undefined) {
+      dataRef.current = data
+    }
+  }, [data, action])
+
   const fetchPrices = useCallback(
     (newParams?: Parameters<typeof getPrices>[0]["params"]) => {
       setParams(newParams)
@@ -102,6 +111,7 @@ export function usePrices(accessToken: string): UsePricesReturn {
 
   const handleRetrievePrice = useCallback(
     async (id: string): Promise<Price | undefined> => {
+      if (!id) throw new Error("Price ID is required for retrieve")
       setPriceId(id)
       setAction("retrieve")
       setShouldFetch(true)
@@ -114,6 +124,8 @@ export function usePrices(accessToken: string): UsePricesReturn {
 
   const handleUpdatePrice = useCallback(
     async (resource: PriceUpdate): Promise<Price | undefined> => {
+      if (!resource?.id)
+        throw new Error("Price resource ID is required for update")
       setPriceResource(resource)
       setAction("update")
       setShouldFetch(true)

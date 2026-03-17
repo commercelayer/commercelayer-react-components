@@ -6,7 +6,7 @@ const integrationClientId = import.meta.env.VITE_INTEGRATION_CLIENT_ID
 const integrationClientSecret = import.meta.env.VITE_INTEGRATION_CLIENT_SECRET
 const scope = import.meta.env.VITE_SALES_CHANNEL_SCOPE
 const domain = import.meta.env.VITE_DOMAIN
-let accessToken: ReturnType<typeof getAccessToken>
+let accessToken: Awaited<ReturnType<typeof getAccessToken>> | undefined
 
 export interface CoreTestInterface {
   accessToken: Awaited<ReturnType<typeof getAccessToken>>
@@ -33,8 +33,9 @@ export const coreTest = test.extend<CoreTestInterface>({
         },
       })
     }
-    use(accessToken)
+    const token = accessToken
     accessToken = undefined
+    await use(token)
   },
   config: {
     clientId,
@@ -59,8 +60,9 @@ export const coreIntegrationTest = test.extend<CoreTestInterface>({
         },
       })
     }
-    use(accessToken)
+    const token = accessToken
     accessToken = undefined
+    await use(token)
   },
   config: {
     clientId: integrationClientId,
