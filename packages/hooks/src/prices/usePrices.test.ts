@@ -3,12 +3,13 @@
  */
 import { act, renderHook, waitFor } from "@testing-library/react"
 import { createElement } from "react"
+import type { ReactNode } from "react"
 import { SWRConfig } from "swr"
 import { describe, expect } from "vitest"
 import { coreIntegrationTest, coreTest } from "#extender"
 import { usePrices } from "./usePrices"
 
-const swrWrapper = ({ children }: { children: React.ReactNode }) =>
+const swrWrapper = ({ children }: { children: ReactNode }) =>
   createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
 
 describe("usePrices", () => {
@@ -51,12 +52,15 @@ describe("usePrices", () => {
     }
 
     // Retrieve a specific price
+    let retrievedPrice: Awaited<ReturnType<typeof result.current.retrievePrice>>
     await act(async () => {
-      await result.current.retrievePrice(testPriceId)
+      retrievedPrice = await result.current.retrievePrice(testPriceId)
     })
 
     await waitFor(() => {
       expect(result.current.action).toBe("retrieve")
+      expect(retrievedPrice).toBeDefined()
+      expect(retrievedPrice?.id).toBe(testPriceId)
     })
   })
 
@@ -80,14 +84,17 @@ describe("usePrices", () => {
     }
 
     // Update the price
+    let updatedPrice: Awaited<ReturnType<typeof result.current.updatePrice>>
     await act(async () => {
-      await result.current.updatePrice({
+      updatedPrice = await result.current.updatePrice({
         id: priceToUpdate.id,
       })
     })
 
     await waitFor(() => {
       expect(result.current.action).toBe("update")
+      expect(updatedPrice).toBeDefined()
+      expect(updatedPrice?.id).toBe(priceToUpdate.id)
     })
   })
 
