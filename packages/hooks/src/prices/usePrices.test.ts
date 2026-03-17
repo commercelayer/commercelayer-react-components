@@ -2,8 +2,8 @@
  * @vitest-environment jsdom
  */
 import { act, renderHook, waitFor } from "@testing-library/react"
-import { createElement } from "react"
 import type { ReactNode } from "react"
+import { createElement } from "react"
 import { SWRConfig } from "swr"
 import { describe, expect } from "vitest"
 import { coreIntegrationTest, coreTest } from "#extender"
@@ -319,6 +319,44 @@ describe("usePrices", () => {
           )
         }),
       ).rejects.toThrow("Price resource ID is required for update")
+    },
+  )
+
+  coreIntegrationTest(
+    "should update a price without prior fetch (no cached list)",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+
+      // Use an isolated SWR provider so mutate receives undefined as current (covers ?? [result] branch)
+      const { result } = renderHook(() => usePrices(token), {
+        wrapper: swrWrapper,
+      })
+
+      // First fetch to have a valid price ID to use
+      act(() => {
+        result.current.fetchPrices()
+      })
+      await waitFor(() => {
+        expect(result.current.prices.length).toBeGreaterThan(0)
+      })
+      const priceId = result.current.prices[0]?.id
+      if (!priceId) throw new Error("No price available")
+
+      // Clear cache so mutate current will be undefined when updating
+      act(() => {
+        result.current.clearPrices()
+      })
+      await waitFor(() => {
+        expect(result.current.prices).toEqual([])
+      })
+
+      let updatedPrice: Awaited<ReturnType<typeof result.current.updatePrice>>
+      await act(async () => {
+        updatedPrice = await result.current.updatePrice({ id: priceId })
+      })
+
+      expect(updatedPrice).toBeDefined()
+      expect(updatedPrice?.id).toBe(priceId)
     },
   )
 })

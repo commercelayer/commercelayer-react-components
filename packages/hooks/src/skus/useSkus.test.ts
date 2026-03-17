@@ -2,8 +2,8 @@
  * @vitest-environment jsdom
  */
 import { act, renderHook, waitFor } from "@testing-library/react"
-import { createElement } from "react"
 import type { ReactNode } from "react"
+import { createElement } from "react"
 import { SWRConfig } from "swr"
 import { describe, expect } from "vitest"
 import { coreIntegrationTest, coreTest } from "#extender"
@@ -269,6 +269,44 @@ describe("useSkus", () => {
           )
         }),
       ).rejects.toThrow("SKU resource ID is required for update")
+    },
+  )
+
+  coreIntegrationTest(
+    "should update a SKU without prior fetch (no cached list)",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+
+      // Use an isolated SWR provider so mutate receives undefined as current (covers ?? [result] branch)
+      const { result } = renderHook(() => useSkus(token), {
+        wrapper: swrWrapper,
+      })
+
+      // First fetch to have a valid SKU ID to use
+      act(() => {
+        result.current.fetchSkus()
+      })
+      await waitFor(() => {
+        expect(result.current.skus.length).toBeGreaterThan(0)
+      })
+      const skuId = result.current.skus[0]?.id
+      if (!skuId) throw new Error("No SKU available")
+
+      // Clear cache so mutate current will be undefined when updating
+      act(() => {
+        result.current.clearSkus()
+      })
+      await waitFor(() => {
+        expect(result.current.skus).toEqual([])
+      })
+
+      let updatedSku: Awaited<ReturnType<typeof result.current.updateSku>>
+      await act(async () => {
+        updatedSku = await result.current.updateSku({ id: skuId })
+      })
+
+      expect(updatedSku).toBeDefined()
+      expect(updatedSku?.id).toBe(skuId)
     },
   )
 })
