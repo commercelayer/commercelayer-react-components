@@ -19,12 +19,16 @@ export function PrivacyAndTermsCheckbox(
   const privacyUrl = order?.privacy_url ?? organizationConfig?.urls?.privacy
   const termsUrl = order?.terms_url ?? organizationConfig?.urls?.terms
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const v = e.target?.checked
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ): void => {
+    const v = (e.target as HTMLInputElement)?.checked
     setChecked(v)
     localStorage.setItem(fieldName, v.toString())
     if (placeOrderPermitted) placeOrderPermitted()
   }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: If we add checked to the dependencies, it creates an wrong behavior to disable the place order button.
   useEffect(() => {
     if (privacyUrl && termsUrl) setForceDisabled(false)
     if (!checked) localStorage.setItem(fieldName, checked.toString())
@@ -32,7 +36,7 @@ export function PrivacyAndTermsCheckbox(
       setForceDisabled(true)
       localStorage.removeItem(fieldName)
     }
-  }, [privacyUrl, termsUrl, checked])
+  }, [privacyUrl, termsUrl])
   return (
     <BaseInput
       type="checkbox"
