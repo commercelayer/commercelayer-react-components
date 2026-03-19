@@ -146,8 +146,16 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     order?.total_amount_with_taxes_cents,
   ])
   useEffect(() => {
+    const giftCardCouponFields = [
+      "gift_card_code",
+      "coupon_code",
+      "gift_card_or_coupon_code",
+    ]
+    const blockingErrors = errors?.filter(
+      (e) => !giftCardCouponFields.includes(e.field ?? ""),
+    )
     if (
-      (errors && errors.length > 0) ||
+      (blockingErrors && blockingErrors.length > 0) ||
       (paymentMethodErrors && paymentMethodErrors.length > 0)
     ) {
       setNotPermitted(true)
