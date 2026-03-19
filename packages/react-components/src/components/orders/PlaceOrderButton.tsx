@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: Avoid infinite loop */
 import type { Order } from "@commercelayer/sdk"
 import isFunction from "lodash/isFunction"
 import {
@@ -87,7 +88,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   } = useContext(PaymentMethodContext)
   const { order, setOrderErrors, errors } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     if (isFree && !isPermitted) {
       setNotPermitted(false)
@@ -97,7 +97,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       if (paymentType === currentPaymentMethodType && paymentType) {
         const paymentSourceStatus =
           // @ts-expect-error no type
-          order?.payment_source?.payment_response?.status?.toLowerCase()
+          order?.payment_source?.payment_response?.status?.toLowerCase?.()
         const card = getCardDetails({
           customerPayment: {
             payment_source: paymentSource,
@@ -157,7 +157,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       setNotPermitted(false)
     }
   }, [errors?.length, paymentMethodErrors?.length])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     // PayPal redirect flow
     if (
@@ -170,7 +169,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       handleClick()
     }
   }, [options?.paypalPayerId, paymentType != null])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     // Stripe redirect flow
     if (
@@ -221,7 +219,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     paymentType != null,
     order?.payment_source != null,
   ])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     if (order?.status != null && ["draft", "pending"].includes(order?.status)) {
       // Adyen redirect flow
@@ -489,7 +486,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         : paymentSource
     const checkPaymentSourceStatus =
       // @ts-expect-error no type
-      checkPaymentSource?.payment_response?.status?.toLowerCase()
+      checkPaymentSource?.payment_response?.status?.toLowerCase?.()
     const card =
       paymentType &&
       getCardDetails({
