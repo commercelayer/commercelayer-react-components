@@ -17,7 +17,6 @@ import { setCustomerOrderParam } from "#utils/localStorage"
 import { isDoNotShip, shipmentsFilled } from "#utils/shipments"
 import { updateOrderSubscriptionCustomerPaymentSource } from "#utils/updateOrderSubscriptionCustomerPaymentSource"
 import type { PaymentResource, PaymentSourceType } from "./PaymentMethodReducer"
-
 export type PlaceOrderActionType =
   | "setErrors"
   | "setPlaceOrderPermitted"
@@ -105,6 +104,8 @@ interface TPlaceOrderPermittedParams {
   order?: Order
   // TODO: Remove it soon
   options?: PlaceOrderOptions
+  privacyUrl?: string | null
+  termsUrl?: string | null
 }
 
 export function placeOrderPermitted({
@@ -112,10 +113,14 @@ export function placeOrderPermitted({
   order,
   dispatch,
   options,
+  privacyUrl,
+  termsUrl,
 }: TPlaceOrderPermittedParams): void {
   if (order && config) {
     let isPermitted = true
-    if (order.privacy_url && order.terms_url) {
+    const resolvedPrivacyUrl = privacyUrl ?? order.privacy_url
+    const resolvedTermsUrl = termsUrl ?? order.terms_url
+    if (resolvedPrivacyUrl && resolvedTermsUrl) {
       isPermitted = localStorage.getItem("privacy-terms") === "true"
     }
     const billingAddress = order.billing_address

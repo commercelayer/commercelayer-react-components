@@ -186,7 +186,11 @@ export function AdyenPayment({
             ref.current as unknown as FormEvent<HTMLFormElement>,
           )
         }
+        setPaymentMethodErrors([])
         setPaymentRef({ ref })
+        if (placeOrderButtonRef?.current != null) {
+          placeOrderButtonRef.current.disabled = false
+        }
       }
     }
   }
@@ -638,6 +642,7 @@ export function AdyenPayment({
           },
           onSelect: (component) => {
             const id: string = component._id
+            const isValid = component.isValid
             if (id.search("scheme") === -1) {
               if (ref.current) {
                 /**
@@ -657,6 +662,20 @@ export function AdyenPayment({
                   ref.current.onsubmit = null
                 }
                 setPaymentRef({ ref })
+              }
+            }
+            if (isValid) {
+              if (ref.current) {
+                ref.current.onsubmit = async () => {
+                  return await handleSubmit(
+                    ref.current as unknown as FormEvent<HTMLFormElement>,
+                  )
+                }
+                setPaymentMethodErrors([])
+                setPaymentRef({ ref })
+                if (placeOrderButtonRef?.current != null) {
+                  placeOrderButtonRef.current.disabled = false
+                }
               }
             }
             if (onSelect) {
@@ -682,7 +701,7 @@ export function AdyenPayment({
       setPaymentRef({ ref: { current: null } })
       setLoadAdyen(false)
     }
-  }, [clientKey, ref != null, status])
+  }, [clientKey, ref != null, status, setPaymentMethodErrors != null])
   return !clientKey && !loadAdyen && !checkout ? null : (
     <form
       ref={ref}

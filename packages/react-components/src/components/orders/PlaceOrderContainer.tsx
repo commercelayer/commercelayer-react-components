@@ -18,6 +18,7 @@ import OrderContext from "#context/OrderContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import { setPlaceOrder } from "../../reducers/PlaceOrderReducer"
 import useCustomContext from "#utils/hooks/useCustomContext"
+import { useOrganizationConfig } from "#utils/organization"
 
 interface Props {
   children: ReactNode
@@ -43,6 +44,10 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
     key: "order",
   })
   const config = useContext(CommerceLayerContext)
+  const organizationConfig = useOrganizationConfig({
+    accessToken: config.accessToken,
+    endpoint: config.endpoint,
+  })
   // biome-ignore lint/correctness/useExhaustiveDependencies: Infinite loop
   useEffect(() => {
     if (!include?.includes("shipments.available_shipping_methods")) {
@@ -93,9 +98,11 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
         options: {
           ...options,
         },
+        privacyUrl: organizationConfig?.urls?.privacy,
+        termsUrl: organizationConfig?.urls?.terms,
       })
     }
-  }, [order, include, includeLoaded])
+  }, [order, include, includeLoaded, organizationConfig])
   const contextValue = {
     ...state,
     setPlaceOrder: async ({
@@ -130,6 +137,8 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
         options: {
           ...options,
         },
+        privacyUrl: organizationConfig?.urls?.privacy,
+        termsUrl: organizationConfig?.urls?.terms,
       })
     },
     setButtonRef: (ref: RefObject<HTMLButtonElement | null>) => {
