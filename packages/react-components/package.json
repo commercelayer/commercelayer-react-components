@@ -5,7 +5,11 @@
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
   "types": "lib/esm/index.d.ts",
-  "files": ["lib", "package.json", "README.md"],
+  "files": [
+    "lib",
+    "package.json",
+    "README.md"
+  ],
   "exports": {
     ".": {
       "require": "./lib/cjs/index.js",
@@ -94,28 +98,66 @@
   },
   "typesVersions": {
     "*": {
-      "addresses/*": ["lib/esm/components/addresses/*.d.ts"],
-      "auth/*": ["lib/esm/components/auth/*.d.ts"],
-      "customers/*": ["lib/esm/components/customers/*.d.ts"],
-      "errors/*": ["lib/esm/components/errors/*.d.ts"],
-      "gift_cards/*": ["lib/esm/components/gift_cards/*.d.ts"],
+      "addresses/*": [
+        "lib/esm/components/addresses/*.d.ts"
+      ],
+      "auth/*": [
+        "lib/esm/components/auth/*.d.ts"
+      ],
+      "customers/*": [
+        "lib/esm/components/customers/*.d.ts"
+      ],
+      "errors/*": [
+        "lib/esm/components/errors/*.d.ts"
+      ],
+      "gift_cards/*": [
+        "lib/esm/components/gift_cards/*.d.ts"
+      ],
       "in_stock_subscriptions/*": [
         "lib/esm/components/in_stock_subscriptions/*.d.ts"
       ],
-      "hooks/*": ["lib/esm/hooks/*.d.ts"],
-      "line_items/*": ["lib/esm/components/line_items/*.d.ts"],
-      "orders/*": ["lib/esm/components/orders/*.d.ts"],
-      "parcels/*": ["lib/esm/components/parcels/*.d.ts"],
-      "payment_methods/*": ["lib/esm/components/payment_methods/*.d.ts"],
-      "payment_source/*": ["lib/esm/components/payment_source/*.d.ts"],
-      "prices/*": ["lib/esm/components/prices/*.d.ts"],
-      "shipments/*": ["lib/esm/components/shipments/*.d.ts"],
-      "shipping_methods/*": ["lib/esm/components/shipping_methods/*.d.ts"],
-      "skus/*": ["lib/esm/components/skus/*.d.ts"],
-      "stock_transfers/*": ["lib/esm/components/stock_transfers/*.d.ts"],
-      "context/*": ["lib/esm/context/*.d.ts"],
-      "utils/*": ["lib/esm/utils/*.d.ts"],
-      "component_utils/*": ["lib/esm/components/utils/*.d.ts"]
+      "hooks/*": [
+        "lib/esm/hooks/*.d.ts"
+      ],
+      "line_items/*": [
+        "lib/esm/components/line_items/*.d.ts"
+      ],
+      "orders/*": [
+        "lib/esm/components/orders/*.d.ts"
+      ],
+      "parcels/*": [
+        "lib/esm/components/parcels/*.d.ts"
+      ],
+      "payment_methods/*": [
+        "lib/esm/components/payment_methods/*.d.ts"
+      ],
+      "payment_source/*": [
+        "lib/esm/components/payment_source/*.d.ts"
+      ],
+      "prices/*": [
+        "lib/esm/components/prices/*.d.ts"
+      ],
+      "shipments/*": [
+        "lib/esm/components/shipments/*.d.ts"
+      ],
+      "shipping_methods/*": [
+        "lib/esm/components/shipping_methods/*.d.ts"
+      ],
+      "skus/*": [
+        "lib/esm/components/skus/*.d.ts"
+      ],
+      "stock_transfers/*": [
+        "lib/esm/components/stock_transfers/*.d.ts"
+      ],
+      "context/*": [
+        "lib/esm/context/*.d.ts"
+      ],
+      "utils/*": [
+        "lib/esm/utils/*.d.ts"
+      ],
+      "component_utils/*": [
+        "lib/esm/components/utils/*.d.ts"
+      ]
     }
   },
   "publishConfig": {
@@ -185,14 +227,15 @@
     "@types/react-test-renderer": "^19.1.0",
     "@types/react-window": "^2.0.0",
     "@vitejs/plugin-react": "^5.1.2",
-    "babel-plugin-react-compiler": "^1.0.0",
     "@vitest/coverage-v8": "^4.0.17",
+    "babel-plugin-react-compiler": "^1.0.0",
     "jsdom": "^27.4.0",
     "minimize-js": "^1.4.0",
     "msw": "^2.12.7",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-test-renderer": "^19.2.4",
+    "swr": "^2.4.1",
     "tsc-alias": "^1.8.16",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3",
