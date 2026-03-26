@@ -1,10 +1,18 @@
-import { useReducer, useContext, type ReactNode, useEffect, type JSX } from 'react';
-import SkuListsContext from '#context/SkuListsContext'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import skuListsReducer, {
-  skuListsInitialState,
-  getSkuList
-} from '#reducers/SkuListsReducer'
+import { useSkuLists } from "@commercelayer/hooks"
+import type { Sku } from "@commercelayer/sdk"
+import {
+  type JSX,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import SkuListsContext, {
+  type SkuListsContextType,
+} from "#context/SkuListsContext"
 
 interface Props {
   children: ReactNode
@@ -12,15 +20,41 @@ interface Props {
 
 export function SkuListsContainer(props: Props): JSX.Element {
   const { children } = props
-  const [state, dispatch] = useReducer(skuListsReducer, skuListsInitialState)
   const config = useContext(CommerceLayerContext)
+  const { retrieveSkuList } = useSkuLists(config.accessToken ?? "")
+  const [registeredIds, setRegisteredIds] = useState<string[]>([])
+  const [skuLists, setSkuLists] = useState<Record<string, Sku[]>>({})
+
+  const registerListId = useCallback((id: string) => {
+    setRegisteredIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+  }, [])
+
   useEffect(() => {
-    if (state.listIds && state.listIds.length > 0 && config.accessToken) {
-      getSkuList({ listIds: state.listIds, dispatch, config, state })
+    if (config.accessToken != null && registeredIds.length > 0) {
+      void Promise.all(
+        registeredIds.map((id) =>
+          retrieveSkuList(id, {
+            include: ["skus"],
+            fields: { skus: ["code"] },
+          }).then((skuList) => ({ id, skus: (skuList?.skus ?? []) as Sku[] })),
+        ),
+      ).then((results) => {
+        const updated: Record<string, Sku[]> = {}
+        for (const { id, skus } of results) {
+          updated[id] = skus
+        }
+        setSkuLists(updated)
+      })
     }
-  }, [config.accessToken])
+  }, [config.accessToken, registeredIds, retrieveSkuList])
+
+  const contextValue = useMemo<SkuListsContextType>(
+    () => ({ listIds: registeredIds, skuLists, registerListId }),
+    [registeredIds, skuLists, registerListId],
+  )
+
   return (
-    <SkuListsContext.Provider value={state}>
+    <SkuListsContext.Provider value={contextValue}>
       {children}
     </SkuListsContext.Provider>
   )

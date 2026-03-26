@@ -1,6 +1,15 @@
-import { createContext } from 'react'
-import { availabilityInitialState } from '#reducers/AvailabilityReducer'
+import type { DeliveryLeadTime, LeadTimes } from "@commercelayer/core"
+import { createContext } from "react"
 
-const AvailabilityContext = createContext(availabilityInitialState)
+export interface AvailabilityContextType {
+  skuCode?: string
+  quantity?: number
+  min?: LeadTimes
+  max?: LeadTimes
+  shipping_method?: DeliveryLeadTime["shipping_method"]
+  parent?: boolean
+}
+
+const AvailabilityContext = createContext<AvailabilityContextType>({})
 
 export default AvailabilityContext

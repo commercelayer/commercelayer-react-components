@@ -9,6 +9,7 @@ const handlerPaths = [
   `https://*.commercelayer.*/oauth/token`,
   `${baseUrl}/prices*`,
   `${baseUrl}/skus*`,
+  `${baseUrl}/sku_lists*`,
   `${baseUrl}/sku_options*`,
   `${baseUrl}/orders*`,
   `${baseUrl}/line_items*`,

@@ -14,3 +14,11 @@ export interface SkusContext extends LocalContext {
   skus: string[]
   skuId: string
 }
+
+export interface SkuListsContext extends LocalContext {
+  skuListId: string
+}
+
+export interface AvailabilityContext extends LocalContext {
+  skuCode: string
+}
