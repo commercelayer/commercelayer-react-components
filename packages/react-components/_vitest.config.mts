@@ -14,5 +14,12 @@ export default defineConfig({
     setupFiles: ['./mocks/setup.ts'],
     exclude: ['**/e2e/**', '**/node_modules/**']
   },
-  plugins: [tsconfigPaths(), react()]
+  plugins: [
+    tsconfigPaths(),
+    react({
+      babel: {
+        plugins: [['babel-plugin-react-compiler']]
+      }
+    })
+  ]
 })
