@@ -227,6 +227,7 @@
     "@types/react-test-renderer": "^19.1.0",
     "@types/react-window": "^2.0.0",
     "@vitejs/plugin-react": "^5.1.2",
+    "babel-plugin-react-compiler": "^1.0.0",
     "@vitest/coverage-v8": "^4.0.17",
     "jsdom": "^27.4.0",
     "minimize-js": "^1.4.0",
@@ -242,6 +243,6 @@
     "vitest": "^4.0.17"
   },
   "peerDependencies": {
-    "react": ">=18.0.0"
+    "react": ">=19.0.0"
   }
 }
