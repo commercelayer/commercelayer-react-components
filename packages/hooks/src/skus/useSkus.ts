@@ -99,7 +99,9 @@ export function useSkus(accessToken: string): UseSkusReturn {
   const clearSkus = useCallback(() => {
     setShouldFetch(false)
     setAction(null)
-    mutate(undefined, false)
+    mutate(undefined, false)?.catch(() => {
+      // cache may be destroyed (e.g. isolated SWRConfig in tests)
+    })
   }, [mutate])
 
   const clearError = useCallback(() => {
