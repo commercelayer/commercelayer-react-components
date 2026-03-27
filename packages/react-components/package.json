@@ -2,162 +2,20 @@
   "name": "@commercelayer/react-components",
   "version": "4.29.6",
   "description": "The Official Commerce Layer React Components",
-  "main": "lib/cjs/index.js",
-  "module": "lib/esm/index.js",
-  "types": "lib/esm/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "lib",
+    "dist",
     "package.json",
     "README.md"
   ],
   "exports": {
+    "./package.json": "./package.json",
     ".": {
-      "require": "./lib/cjs/index.js",
-      "import": "./lib/esm/index.js"
-    },
-    "./addresses/*": {
-      "require": "./lib/cjs/components/addresses/*.js",
-      "import": "./lib/esm/components/addresses/*.js"
-    },
-    "./auth/*": {
-      "require": "./lib/cjs/components/auth/*.js",
-      "import": "./lib/esm/components/auth/*.js"
-    },
-    "./customers/*": {
-      "require": "./lib/cjs/components/customers/*.js",
-      "import": "./lib/esm/components/customers/*.js"
-    },
-    "./errors/*": {
-      "require": "./lib/cjs/components/errors/*.js",
-      "import": "./lib/esm/components/errors/*.js"
-    },
-    "./gift_cards/*": {
-      "require": "./lib/cjs/components/gift_cards/*.js",
-      "import": "./lib/esm/components/gift_cards/*.js"
-    },
-    "./in_stock_subscriptions/*": {
-      "require": "./lib/cjs/components/in_stock_subscriptions/*.js",
-      "import": "./lib/esm/components/in_stock_subscriptions/*.js"
-    },
-    "./hooks/*": {
-      "require": "./lib/cjs/hooks/*.js",
-      "import": "./lib/esm/hooks/*.js"
-    },
-    "./line_items/*": {
-      "require": "./lib/cjs/components/line_items/*.js",
-      "import": "./lib/esm/components/line_items/*.js"
-    },
-    "./orders/*": {
-      "require": "./lib/cjs/components/orders/*.js",
-      "import": "./lib/esm/components/orders/*.js"
-    },
-    "./parcels/*": {
-      "require": "./lib/cjs/components/parcels/*.js",
-      "import": "./lib/esm/components/parcels/*.js"
-    },
-    "./payment_methods/*": {
-      "require": "./lib/cjs/components/payment_methods/*.js",
-      "import": "./lib/esm/components/payment_methods/*.js"
-    },
-    "./payment_source/*": {
-      "require": "./lib/cjs/components/payment_source/*.js",
-      "import": "./lib/esm/components/payment_source/*.js"
-    },
-    "./prices/*": {
-      "require": "./lib/cjs/components/prices/*.js",
-      "import": "./lib/esm/components/prices/*.js"
-    },
-    "./shipments/*": {
-      "require": "./lib/cjs/components/shipments/*.js",
-      "import": "./lib/esm/components/shipments/*.js"
-    },
-    "./shipping_methods/*": {
-      "require": "./lib/cjs/components/shipping_methods/*.js",
-      "import": "./lib/esm/components/shipping_methods/*.js"
-    },
-    "./skus/*": {
-      "require": "./lib/cjs/components/skus/*.js",
-      "import": "./lib/esm/components/skus/*.js"
-    },
-    "./stock_transfers/*": {
-      "require": "./lib/cjs/components/stock_transfers/*.js",
-      "import": "./lib/esm/components/stock_transfers/*.js"
-    },
-    "./context/*": {
-      "require": "./lib/cjs/context/*.js",
-      "import": "./lib/esm/context/*.js"
-    },
-    "./utils/*": {
-      "require": "./lib/cjs/utils/*.js",
-      "import": "./lib/esm/utils/*.js"
-    },
-    "./component_utils/*": {
-      "require": "./lib/cjs/components/utils/*.js",
-      "import": "./lib/esm/components/utils/*.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "addresses/*": [
-        "lib/esm/components/addresses/*.d.ts"
-      ],
-      "auth/*": [
-        "lib/esm/components/auth/*.d.ts"
-      ],
-      "customers/*": [
-        "lib/esm/components/customers/*.d.ts"
-      ],
-      "errors/*": [
-        "lib/esm/components/errors/*.d.ts"
-      ],
-      "gift_cards/*": [
-        "lib/esm/components/gift_cards/*.d.ts"
-      ],
-      "in_stock_subscriptions/*": [
-        "lib/esm/components/in_stock_subscriptions/*.d.ts"
-      ],
-      "hooks/*": [
-        "lib/esm/hooks/*.d.ts"
-      ],
-      "line_items/*": [
-        "lib/esm/components/line_items/*.d.ts"
-      ],
-      "orders/*": [
-        "lib/esm/components/orders/*.d.ts"
-      ],
-      "parcels/*": [
-        "lib/esm/components/parcels/*.d.ts"
-      ],
-      "payment_methods/*": [
-        "lib/esm/components/payment_methods/*.d.ts"
-      ],
-      "payment_source/*": [
-        "lib/esm/components/payment_source/*.d.ts"
-      ],
-      "prices/*": [
-        "lib/esm/components/prices/*.d.ts"
-      ],
-      "shipments/*": [
-        "lib/esm/components/shipments/*.d.ts"
-      ],
-      "shipping_methods/*": [
-        "lib/esm/components/shipping_methods/*.d.ts"
-      ],
-      "skus/*": [
-        "lib/esm/components/skus/*.d.ts"
-      ],
-      "stock_transfers/*": [
-        "lib/esm/components/stock_transfers/*.d.ts"
-      ],
-      "context/*": [
-        "lib/esm/context/*.d.ts"
-      ],
-      "utils/*": [
-        "lib/esm/utils/*.d.ts"
-      ],
-      "component_utils/*": [
-        "lib/esm/components/utils/*.d.ts"
-      ]
+      "import": "./dist/index.js",
+      "default": "./dist/index.cjs"
     }
   },
   "publishConfig": {
@@ -171,9 +29,7 @@
     "test:e2e": "NODE_ENV=test playwright test",
     "test:e2e:coverage": "nyc pnpm test:e2e && pnpm coverage:report",
     "coverage:report": "nyc report --reporter=html",
-    "build": "tsc -b tsconfig.prod.json tsconfig.prod.esm.json --verbose && pnpm postbuild",
-    "build:dev": "tsc -b tsconfig.prod.json tsconfig.prod.esm.json --verbose && tsc-alias -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.esm.json",
-    "postbuild": "tsc-alias -p tsconfig.prod.json && tsc-alias -p tsconfig.prod.esm.json &&  minimize-js lib -w -s -b '\"use client\";'",
+    "build": "tsup",
     "dev": "NODE_OPTIONS='--inspect' next dev"
   },
   "repository": {
@@ -200,6 +56,8 @@
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
     "@adyen/adyen-web": "^6.28.0",
+    "@commercelayer/core": "workspace:*",
+    "@commercelayer/hooks": "workspace:*",
     "@commercelayer/organization-config": "^2.4.0",
     "@commercelayer/sdk": "^6.46.0",
     "@stripe/react-stripe-js": "^5.4.1",
@@ -214,6 +72,7 @@
     "rapid-form": "3.1.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.0",
     "@commercelayer/js-auth": "^6.7.2",
     "@faker-js/faker": "^10.2.0",
     "@playwright/test": "^1.57.0",
@@ -227,21 +86,20 @@
     "@types/react-test-renderer": "^19.1.0",
     "@types/react-window": "^2.0.0",
     "@vitejs/plugin-react": "^5.1.2",
-    "@vitest/coverage-v8": "^4.0.17",
+    "@vitest/coverage-v8": "^4.1.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "jsdom": "^27.4.0",
-    "minimize-js": "^1.4.0",
     "msw": "^2.12.7",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-test-renderer": "^19.2.4",
     "swr": "^2.4.1",
-    "tsc-alias": "^1.8.16",
     "tslib": "^2.8.1",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-tsconfig-paths": "^6.0.3",
-    "vitest": "^4.0.16"
+    "vitest": "^4.1.0"
   },
   "peerDependencies": {
     "react": ">=19.0.0"

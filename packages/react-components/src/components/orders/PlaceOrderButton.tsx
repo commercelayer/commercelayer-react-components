@@ -490,24 +490,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         return
       }
     }
-    if (isDraftOrder) {
-      /**
-       * Draft order cannot be placed
-       */
-      setPlaceOrderStatus?.({ status: "standby" })
-      onClick?.({
-        placed: false,
-        order: order,
-        errors: [
-          {
-            code: "VALIDATION_ERROR",
-            resource: "orders",
-            message: "Draft order cannot be placed",
-          },
-        ])
-        return
-      }
-    }
     setIsLoading(true)
     // setForceDisable(true)
     const checkPaymentSource =

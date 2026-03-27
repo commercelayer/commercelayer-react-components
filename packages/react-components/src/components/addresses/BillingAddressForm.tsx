@@ -58,7 +58,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     reset: resetForm,
     setValue: setValueForm,
     setError: setErrorForm,
-  } = useRapidForm({ fieldEvent })
+  } = (useRapidForm as any)({ fieldEvent })
   const { setAddressErrors, setAddress, isBusiness } =
     useContext(AddressesContext)
   const {
@@ -102,7 +102,6 @@ export function BillingAddressForm(props: Props): JSX.Element {
                 if (inError) {
                   const errorMsg = errors[fieldName]?.message
                   if (errorMsg != null && errorMsg !== customMessage) {
-                    // @ts-expect-error no type
                     errors[fieldName].message = customMessage
                   }
                 } else {
@@ -121,7 +120,6 @@ export function BillingAddressForm(props: Props): JSX.Element {
                     if (fieldInError) {
                       const errorMsg = errors[field]?.message
                       if (errorMsg != null && errorMsg !== message) {
-                        // @ts-expect-error no type
                         errors[field].message = message
                         setValueForm(field, value ?? "")
                       }
@@ -179,7 +177,6 @@ export function BillingAddressForm(props: Props): JSX.Element {
         }
       }
       setAddress({
-        // @ts-expect-error no type
         values: {
           ...values,
           ...(isBusiness && { business: isBusiness }),
@@ -215,11 +212,9 @@ export function BillingAddressForm(props: Props): JSX.Element {
       }
       if (ref) {
         ref.current?.reset()
-        // @ts-expect-error no type
         resetForm({ target: ref.current })
         setAddressErrors([], "billing_address")
-        // @ts-expect-error no type
-        setAddress({ values: {}, resource: "billing_address" })
+        setAddress({ values: {} as any, resource: "billing_address" })
       }
     }
   }, [errors, values, reset, include, includeLoaded, isBusiness])
@@ -249,7 +244,6 @@ export function BillingAddressForm(props: Props): JSX.Element {
     requiresBillingInfo: order?.requires_billing_info || false,
     errors: errors as any,
     resetField: (name: string) => {
-      // @ts-expect-error no type
       resetForm({ currentTarget: ref.current }, name)
     },
   }
