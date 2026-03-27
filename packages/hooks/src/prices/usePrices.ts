@@ -6,7 +6,7 @@ import {
   updatePrice,
 } from "@commercelayer/core"
 import { useCallback, useState } from "react"
-import useSWR, { type KeyedMutator } from "swr"
+import useSWR from "swr"
 
 interface UsePricesReturn {
   prices: Price[]
@@ -19,7 +19,7 @@ interface UsePricesReturn {
   updatePrice: (resource: PriceUpdate) => Promise<Price | undefined>
   clearPrices: () => void
   clearError: () => void
-  mutate: KeyedMutator<Price[]>
+  mutate: () => void
 }
 
 type UseAction = "get" | "retrieve" | "update" | null
@@ -47,11 +47,43 @@ export function usePrices(accessToken: string): UsePricesReturn {
     useState<Parameters<typeof getPrices>[0]["params"]>()
   const [shouldFetch, setShouldFetch] = useState(false)
   const [action, setAction] = useState<UseAction>(null)
+  const [priceId, setPriceId] = useState<string | undefined>()
+  const [priceResource, setPriceResource] = useState<PriceUpdate | undefined>()
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<Price[]>(
-    shouldFetch && accessToken ? ["prices", "get", accessToken, params] : null,
+    shouldFetch && accessToken && action
+      ? ["prices", action, accessToken, params, priceId, priceResource]
+      : null,
     async (): Promise<Price[]> => {
-      return await getPrices({ accessToken, params })
+      switch (action) {
+        case "get":
+          return await getPrices({
+            accessToken,
+            params,
+          })
+        case "retrieve": {
+          if (!priceId) throw new Error("Price ID is required for retrieve")
+          return [await retrievePrice({ accessToken, id: priceId })]
+        }
+        case "update": {
+          if (!priceResource)
+            throw new Error("Price resource is required for update")
+          const updatedPrice = await updatePrice({
+            accessToken,
+            resource: priceResource,
+          })
+          return data
+            ? data.map((p: Price) =>
+                p.id === updatedPrice.id ? updatedPrice : p,
+              )
+            : [updatedPrice]
+        }
+        default:
+          return await getPrices({
+            accessToken,
+            params,
+          })
+      }
     },
     {
       revalidateOnFocus: false,
@@ -70,35 +102,32 @@ export function usePrices(accessToken: string): UsePricesReturn {
 
   const handleRetrievePrice = useCallback(
     async (id: string): Promise<Price | undefined> => {
-      if (!id) throw new Error("Price ID is required for retrieve")
+      setPriceId(id)
       setAction("retrieve")
-      const result = await retrievePrice({ accessToken, id })
-      return result
+      setShouldFetch(true)
+      // Wait for SWR to fetch
+      await mutate()
+      return data?.[0]
     },
-    [accessToken],
+    [mutate, data],
   )
 
   const handleUpdatePrice = useCallback(
     async (resource: PriceUpdate): Promise<Price | undefined> => {
-      if (!resource?.id)
-        throw new Error("Price resource ID is required for update")
+      setPriceResource(resource)
       setAction("update")
-      const result = await updatePrice({ accessToken, resource })
-      await mutate(
-        (current) =>
-          current?.map((p: Price) => (p.id === result.id ? result : p)) ?? [
-            result,
-          ],
-        { revalidate: false },
-      )
-      return result
+      setShouldFetch(true)
+      await mutate()
+      return data?.find((p: Price) => p.id === resource.id)
     },
-    [accessToken, mutate],
+    [mutate, data],
   )
 
   const clearPrices = useCallback(() => {
     setShouldFetch(false)
     setAction(null)
+    setPriceId(undefined)
+    setPriceResource(undefined)
     mutate(undefined, false)
   }, [mutate])
 

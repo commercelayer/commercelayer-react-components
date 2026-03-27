@@ -33,9 +33,8 @@ export const coreTest = test.extend<CoreTestInterface>({
         },
       })
     }
-    const token = accessToken
+    use(accessToken)
     accessToken = undefined
-    await use(token)
   },
   config: {
     clientId,
@@ -60,9 +59,8 @@ export const coreIntegrationTest = test.extend<CoreTestInterface>({
         },
       })
     }
-    const token = accessToken
+    use(accessToken)
     accessToken = undefined
-    await use(token)
   },
   config: {
     clientId: integrationClientId,
