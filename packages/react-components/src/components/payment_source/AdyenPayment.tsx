@@ -287,7 +287,6 @@ export function AdyenPayment({
         resultCode: controlCode,
       }
     }
-    // biome-ignore lint/suspicious/noExplicitAny: No types
     const attributes: any = {
       payment_request_data: {
         ...state.data,

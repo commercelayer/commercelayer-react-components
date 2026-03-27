@@ -49,7 +49,7 @@ export function PaymentSourceBrandIcon({
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <img ref={ref} src={url} onError={handleError} width={width} {...p} />
+    <img alt={cardBrand ?? "credit card"} ref={ref} src={url} onError={handleError} width={width} {...p} />
   )
 }
 
