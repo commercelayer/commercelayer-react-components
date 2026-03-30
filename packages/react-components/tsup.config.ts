@@ -5,8 +5,10 @@ export default defineConfig({
   format: ["cjs", "esm"],
   dts: {
     // tsconfig.json limits "types" to ["vitest/globals"] for tests;
-    // reset to empty so all @types/* are auto-included for DTS generation
-    compilerOptions: { types: ["node"] },
+    // reset to empty so all @types/* are auto-included for DTS generation.
+    // "bundler" moduleResolution enables package.json exports subpath imports
+    // (e.g. @commercelayer/sdk/bundle) which "node" resolution doesn't support.
+    compilerOptions: { types: ["node"], moduleResolution: "bundler" },
   },
   splitting: true,
   outDir: "dist",
@@ -18,6 +20,7 @@ export default defineConfig({
     "@commercelayer/hooks",
     "@commercelayer/core",
     "@commercelayer/sdk",
+    "@commercelayer/sdk/bundle",
   ],
   banner: {
     js: '"use client";',

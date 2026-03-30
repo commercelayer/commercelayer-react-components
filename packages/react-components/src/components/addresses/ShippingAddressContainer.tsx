@@ -23,6 +23,7 @@ export function ShippingAddressContainer(props: Props): JSX.Element {
   const config = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
   const { setCloneAddress } = useContext(AddressContext)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional effect with stable context refs
   useEffect(() => {
     if (order && config) {
       setShippingCustomerAddressId({

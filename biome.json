@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.9/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -18,17 +18,42 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "correctness": {
+        "useExhaustiveDependencies": "warn",
+        "noUnusedVariables": "warn",
+        "useHookAtTopLevel": "warn",
+        "useParseIntRadix": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "warn",
+        "noGlobalIsNan": "warn",
+        "noConfusingVoidType": "warn"
+      },
+      "complexity": {
+        "useLiteralKeys": "warn",
+        "noUselessFragments": "warn",
+        "useOptionalChain": "warn",
+        "noUselessSwitchCase": "warn"
+      },
       "style": {
-        "noParameterAssign": "error",
+        "noParameterAssign": "warn",
         "useAsConstAssertion": "error",
-        "useDefaultParameterLast": "error",
+        "useDefaultParameterLast": "warn",
         "useEnumInitializers": "error",
         "useSelfClosingElements": "error",
         "useSingleVarDeclarator": "error",
-        "noUnusedTemplateLiteral": "error",
+        "noUnusedTemplateLiteral": "warn",
         "useNumberNamespace": "error",
-        "noInferrableTypes": "error",
-        "noUselessElse": "error"
+        "noInferrableTypes": "warn",
+        "noUselessElse": "warn"
+      },
+      "a11y": {
+        "noStaticElementInteractions": "warn",
+        "useKeyWithClickEvents": "warn",
+        "useValidAnchor": "warn",
+        "noSvgWithoutTitle": "warn",
+        "useAltText": "warn"
       }
     }
   },

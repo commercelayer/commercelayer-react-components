@@ -21,6 +21,7 @@ export function BillingAddressContainer(props: Props): JSX.Element {
   const config = useContext(CommerceLayerContext)
   const { order, include, addResourceToInclude } = useContext(OrderContext)
   const { shipToDifferentAddress, setCloneAddress } = useContext(AddressContext)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional effect with stable context refs
   useEffect(() => {
     if (!include?.includes('billing_address')) {
       addResourceToInclude({

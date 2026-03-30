@@ -1,0 +1,75 @@
+import { defineConfig } from 'vitest/config'
+import tsconfigPaths from 'vite-tsconfig-paths'
+import react from '@vitejs/plugin-react'
+import path from 'node:path'
+
+export default defineConfig({
+  resolve: {
+    dedupe: ['react', 'react-dom', 'swr'],
+    alias: {
+      'react': path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+      'swr': path.resolve(__dirname, 'node_modules/swr'),
+      '@commercelayer/hooks': path.resolve('../hooks/src/index.ts'),
+      '@commercelayer/core': path.resolve('../core/src/index.ts'),
+      '#components': path.resolve(__dirname, 'src/components'),
+      '#components/auth': path.resolve(__dirname, 'src/components/auth'),
+      '#components/auth/*': path.resolve(__dirname, 'src/components/auth/*'),
+      '#components/skus': path.resolve(__dirname, 'src/components/skus'),
+      '#components/skus/*': path.resolve(__dirname, 'src/components/skus/*'),
+      '#components/utils': path.resolve(__dirname, 'src/components/utils'),
+      '#components/utils/*': path.resolve(__dirname, 'src/components/utils/*'),
+      '#components/errors': path.resolve(__dirname, 'src/components/errors'),
+      '#components/errors/*': path.resolve(__dirname, 'src/components/errors/*'),
+      '#components/orders': path.resolve(__dirname, 'src/components/orders'),
+      '#components/orders/*': path.resolve(__dirname, 'src/components/orders/*'),
+      '#components/addresses': path.resolve(__dirname, 'src/components/addresses'),
+      '#components/addresses/*': path.resolve(__dirname, 'src/components/addresses/*'),
+      '#components/gift_cards': path.resolve(__dirname, 'src/components/gift_cards'),
+      '#components/gift_cards/*': path.resolve(__dirname, 'src/components/gift_cards/*'),
+      '#components/payment_methods': path.resolve(__dirname, 'src/components/payment_methods'),
+      '#components/payment_methods/*': path.resolve(__dirname, 'src/components/payment_methods/*'),
+      '#components/payment_source': path.resolve(__dirname, 'src/components/payment_source'),
+      '#components/payment_source/*': path.resolve(__dirname, 'src/components/payment_source/*'),
+      '#components/customers': path.resolve(__dirname, 'src/components/customers'),
+      '#components/customers/*': path.resolve(__dirname, 'src/components/customers/*'),
+      '#components/in_stock_subscriptions': path.resolve(__dirname, 'src/components/in_stock_subscriptions'),
+      '#components/in_stock_subscriptions/*': path.resolve(__dirname, 'src/components/in_stock_subscriptions/*'),
+      '#components/line_items': path.resolve(__dirname, 'src/components/line_items'),
+      '#components/line_items/*': path.resolve(__dirname, 'src/components/line_items/*'),
+      '#components/parcels': path.resolve(__dirname, 'src/components/parcels'),
+      '#components/parcels/*': path.resolve(__dirname, 'src/components/parcels/*'),
+      '#components/stock_items': path.resolve(__dirname, 'src/components/stock_items'),
+      '#components/stock_items/*': path.resolve(__dirname, 'src/components/stock_items/*'),
+      '#components/subscriptions': path.resolve(__dirname, 'src/components/subscriptions'),
+      '#components/subscriptions/*': path.resolve(__dirname, 'src/components/subscriptions/*'),
+      '#components/variants': path.resolve(__dirname, 'src/components/variants'),
+      '#components/variants/*': path.resolve(__dirname, 'src/components/variants/*'),
+      '#components-utils/*': path.resolve(__dirname, 'src/components/utils/*'),
+      '#reducers/*': path.resolve(__dirname, 'src/reducers/*'),
+      '#context/*': path.resolve(__dirname, 'src/context/*'),
+      '#typings/*': path.resolve(__dirname, 'src/typings/*'),
+      '#typings': path.resolve(__dirname, 'src/typings/index'),
+      '#utils/*': path.resolve(__dirname, 'src/utils/*'),
+      '#config/*': path.resolve(__dirname, 'src/config/*'),
+      '#hooks/*': path.resolve(__dirname, 'src/hooks/*')
+    }
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    testTimeout: 30000,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      include: ['src/**'],
+      exclude: ['mocks', 'specs', 'src/**/*.spec.*']
+    },
+    setupFiles: ['./mocks/setup.ts'],
+    exclude: ['**/e2e/**', '**/node_modules/**']
+  },
+  plugins: [
+    tsconfigPaths(),
+    react()
+  ]
+})

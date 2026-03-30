@@ -1,6 +1,5 @@
 import type {
   AdyenPaymentUpdate,
-  CommerceLayerClient,
   LineItemCreate,
   LineItemOptionCreate,
   Order,
@@ -317,7 +316,7 @@ export async function updateOrder({
 }
 
 interface TResourceRequest {
-  resource: Extract<keyof CommerceLayerClient, "adyen_payments">
+  resource: "adyen_payments"
   requestType: "update"
   attributes: TResourceRequest["resource"] extends "adyen_payments"
     ? AdyenPaymentUpdate

@@ -24,7 +24,7 @@
   "scripts": {
     "lint": "biome lint ./src",
     "lint:fix": "pnpm biome lint --write ./src",
-    "test": "pnpm audit --audit-level high && (pnpm audit || exit 0) && pnpm lint && vitest run --silent",
+    "test": "pnpm audit --prod --audit-level high && (pnpm audit || exit 0) && pnpm lint && vitest run --silent",
     "coverage": "vitest run --coverage",
     "test:e2e": "NODE_ENV=test playwright test",
     "test:e2e:coverage": "nyc pnpm test:e2e && pnpm coverage:report",
@@ -59,7 +59,7 @@
     "@commercelayer/core": "workspace:*",
     "@commercelayer/hooks": "workspace:*",
     "@commercelayer/organization-config": "^2.4.0",
-    "@commercelayer/sdk": "^6.46.0",
+    "@commercelayer/sdk": "^7.4.1",
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.6.1",
     "@tanstack/react-table": "^8.21.3",

@@ -79,7 +79,7 @@ export function AddressField(props: Props): JSX.Element {
     if (type === "delete" && deleteCustomerAddress && address?.reference) {
       deleteCustomerAddress({ customerAddressId: address?.reference })
     }
-    address && onClick && onClick(address)
+    address && onClick?.(address)
   }
   const parentProps = {
     address,
@@ -92,6 +92,8 @@ export function AddressField(props: Props): JSX.Element {
       {text}
     </p>
   ) : (
+    // biome-ignore lint/a11y/noStaticElementInteractions: anchor used as action trigger per existing API
+    // biome-ignore lint/a11y/useValidAnchor: href intentionally omitted for action-only anchor
     <a data-testid={`address-field-${name ?? ""}`} {...p} onClick={handleClick}>
       {label}
     </a>

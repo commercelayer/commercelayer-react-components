@@ -47,7 +47,7 @@ export function AddressInputSelect(props: Props): JSX.Element {
     if (value && shippingAddress?.setValue) {
       shippingAddress.setValue(name, value)
     }
-  }, [value])
+  }, [value, billingAddress.setValue, name, shippingAddress.setValue])
 
   const hasError = useMemo(() => {
     if (billingAddress?.errors?.[name]?.error) {
@@ -57,7 +57,7 @@ export function AddressInputSelect(props: Props): JSX.Element {
       return true
     }
     return false
-  }, [value, billingAddress?.errors, shippingAddress?.errors])
+  }, [billingAddress?.errors, shippingAddress?.errors, name])
   const errorClassName =
     billingAddress?.errorClassName || shippingAddress?.errorClassName
   const classNameComputed = `${className ?? ''} ${
@@ -66,6 +66,7 @@ export function AddressInputSelect(props: Props): JSX.Element {
   return (
     <BaseSelect
       className={classNameComputed}
+      // biome-ignore lint/suspicious/noExplicitAny: validation ref type mismatch between address form contexts
       ref={(billingAddress?.validation as any) || shippingAddress?.validation}
       required={required}
       options={options}

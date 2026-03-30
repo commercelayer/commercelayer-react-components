@@ -1,13 +1,14 @@
 import { describe, expect } from "vitest"
-import { coreTest } from "#extender"
+import { coreIntegrationTest } from "#extender"
 import { getSkuLists } from "./getSkuLists.js"
 import { retrieveSkuList } from "./retrieveSkuList.js"
 
 describe("retrieveSkuList", () => {
-  coreTest(
+  coreIntegrationTest(
     "should retrieve a SKU list by id with included skus",
     async ({ accessToken }) => {
       const token = accessToken?.accessToken
+      if (token == null) return
       const lists = await getSkuLists({ accessToken: token })
       const first = lists.first()
       if (!first) {

@@ -9,7 +9,7 @@
     "preinstall": "npx only-allow pnpm",
     "build": "pnpm -r build",
     "prepare": "husky",
-    "test": "pnpm -r test",
+    "test": "pnpm -r --workspace-concurrency=1 --no-bail test",
     "docs:dev": "pnpm --filter docs storybook",
     "docs:build": "pnpm --filter docs build-storybook",
     "components:build:dev": "pnpm --filter react-components build:dev",
@@ -29,8 +29,15 @@
   "pnpm": {
     "overrides": {
       "rollup": ">=4.59.0",
+      "@isaacs/brace-expansion@<=5.0.0": ">=5.0.1",
+      "axios@>=1.0.0 <=1.7.7": ">=1.13.5",
+      "minimatch@<3.1.4": ">=3.1.4",
       "minimatch@>=5.0.0 <5.1.8": ">=5.1.8",
-      "minimatch@>=10.0.0 <10.2.3": ">=10.2.3"
+      "minimatch@>=9.0.0 <9.0.7": ">=9.0.7",
+      "minimatch@>=10.0.0 <10.2.3": ">=10.2.3",
+      "picomatch@<2.3.2": ">=2.3.2",
+      "picomatch@>=4.0.0 <4.0.4": ">=4.0.4",
+      "storybook@>=10.0.0-beta.0 <10.2.10": ">=10.2.10"
     }
   }
 }
