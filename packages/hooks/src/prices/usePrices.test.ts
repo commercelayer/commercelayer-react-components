@@ -2,9 +2,15 @@
  * @vitest-environment jsdom
  */
 import { act, renderHook, waitFor } from "@testing-library/react"
+import type { ReactNode } from "react"
+import { createElement } from "react"
+import { SWRConfig } from "swr"
 import { describe, expect } from "vitest"
 import { coreIntegrationTest, coreTest } from "#extender"
 import { usePrices } from "./usePrices"
+
+const swrWrapper = ({ children }: { children: ReactNode }) =>
+  createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
 
 describe("usePrices", () => {
   coreTest("should return a list of prices", async ({ accessToken }) => {
@@ -46,12 +52,15 @@ describe("usePrices", () => {
     }
 
     // Retrieve a specific price
+    let retrievedPrice: Awaited<ReturnType<typeof result.current.retrievePrice>>
     await act(async () => {
-      await result.current.retrievePrice(testPriceId)
+      retrievedPrice = await result.current.retrievePrice(testPriceId)
     })
 
     await waitFor(() => {
       expect(result.current.action).toBe("retrieve")
+      expect(retrievedPrice).toBeDefined()
+      expect(retrievedPrice?.id).toBe(testPriceId)
     })
   })
 
@@ -75,14 +84,17 @@ describe("usePrices", () => {
     }
 
     // Update the price
+    let updatedPrice: Awaited<ReturnType<typeof result.current.updatePrice>>
     await act(async () => {
-      await result.current.updatePrice({
+      updatedPrice = await result.current.updatePrice({
         id: priceToUpdate.id,
       })
     })
 
     await waitFor(() => {
       expect(result.current.action).toBe("update")
+      expect(updatedPrice).toBeDefined()
+      expect(updatedPrice?.id).toBe(priceToUpdate.id)
     })
   })
 
@@ -275,4 +287,76 @@ describe("usePrices", () => {
       expect(result.current.action).toBeNull()
     })
   })
+
+  coreTest(
+    "should throw error when retrieving price with empty ID",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+      const { result } = renderHook(() => usePrices(token), {
+        wrapper: swrWrapper,
+      })
+
+      await expect(
+        act(async () => {
+          await result.current.retrievePrice("")
+        }),
+      ).rejects.toThrow("Price ID is required for retrieve")
+    },
+  )
+
+  coreTest(
+    "should throw error when updating price without an ID",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+      const { result } = renderHook(() => usePrices(token), {
+        wrapper: swrWrapper,
+      })
+
+      await expect(
+        act(async () => {
+          await result.current.updatePrice(
+            {} as Parameters<typeof result.current.updatePrice>[0],
+          )
+        }),
+      ).rejects.toThrow("Price resource ID is required for update")
+    },
+  )
+
+  coreIntegrationTest(
+    "should update a price without prior fetch (no cached list)",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+
+      // Use an isolated SWR provider so mutate receives undefined as current (covers ?? [result] branch)
+      const { result } = renderHook(() => usePrices(token), {
+        wrapper: swrWrapper,
+      })
+
+      // First fetch to have a valid price ID to use
+      act(() => {
+        result.current.fetchPrices()
+      })
+      await waitFor(() => {
+        expect(result.current.prices.length).toBeGreaterThan(0)
+      })
+      const priceId = result.current.prices[0]?.id
+      if (!priceId) throw new Error("No price available")
+
+      // Clear cache so mutate current will be undefined when updating
+      act(() => {
+        result.current.clearPrices()
+      })
+      await waitFor(() => {
+        expect(result.current.prices).toEqual([])
+      })
+
+      let updatedPrice: Awaited<ReturnType<typeof result.current.updatePrice>>
+      await act(async () => {
+        updatedPrice = await result.current.updatePrice({ id: priceId })
+      })
+
+      expect(updatedPrice).toBeDefined()
+      expect(updatedPrice?.id).toBe(priceId)
+    },
+  )
 })
