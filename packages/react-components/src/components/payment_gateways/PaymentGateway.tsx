@@ -60,6 +60,8 @@ export function PaymentGateway({
     currentPaymentMethodType,
     setPaymentSource,
     paymentSource,
+    paymentMethods,
+    errors,
   } = useContext(PaymentMethodContext)
   const paymentResource = readonly
     ? currentPaymentMethodType
@@ -88,7 +90,19 @@ export function PaymentGateway({
         attributes = getCkoAttributes(paymentResource, config)
       }
       const setPaymentSources = async (): Promise<void> => {
-        if (order != null) {
+        if (order != null && paymentMethods && paymentMethods?.length > 1) {
+          await setPaymentSource({
+            paymentResource,
+            order,
+            attributes,
+          })
+        }
+        if (
+          ((errors != null && errors?.length > 0) ||
+            order?.payment_source === null) &&
+          paymentMethods &&
+          paymentMethods?.length === 1
+        ) {
           await setPaymentSource({
             paymentResource,
             order,
@@ -118,6 +132,9 @@ export function PaymentGateway({
       if (order?.payment_source?.id != null) {
         setLoading(false)
       }
+      if (!paymentSource) {
+        setLoading(true)
+      }
     }
     if (expressPayments && show) setLoading(false)
     if (
@@ -131,7 +148,7 @@ export function PaymentGateway({
     return () => {
       setLoading(true)
     }
-  }, [order?.payment_method?.id, show, paymentSource])
+  }, [order?.payment_method?.id, show, paymentSource?.id])
 
   useEffect(() => {
     if (status === "placing") setLoading(true)

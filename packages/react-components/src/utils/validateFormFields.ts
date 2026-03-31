@@ -37,6 +37,7 @@ export type ValidateValue = <
   name: N,
   type: T,
   resource: B,
+// biome-ignore lint/suspicious/noExplicitAny: generic return type for validation errors
 ) => BaseError | Record<string, any>
 
 export const validateValue: ValidateValue = (val, name, type, resource) => {

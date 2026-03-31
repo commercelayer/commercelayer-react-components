@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: Avoid infinite loop */
 import { type JSX, useContext, useEffect, useState } from "react"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
@@ -51,7 +52,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
       currentCustomerPaymentSourceId === paymentSource?.id
     const checkPaymentSourceStatus =
       // @ts-expect-error no type
-      paymentSource?.payment_response?.status?.toLowerCase()
+      paymentSource?.payment_response?.status?.toLowerCase?.()
     if (readonly) {
       setShow(true)
       setShowCard(true)
@@ -77,7 +78,12 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
         errors?.length === 0 &&
         checkPaymentSourceStatus !== "declined"
       ) {
-        setShowCard(true)
+        if (card.brand !== "giftcard") {
+          setShowCard(true)
+        }
+      }
+      if (checkPaymentSourceStatus === "declined") {
+        setShowCard(false)
       }
       if (checkPaymentSourceStatus === "declined") {
         setShowCard(false)

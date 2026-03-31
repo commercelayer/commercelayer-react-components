@@ -1,5 +1,5 @@
 import { getOrganizationSlug } from './organization'
-import Sdk from '@commercelayer/sdk'
+import { CommerceLayer as Sdk } from '@commercelayer/sdk/bundle'
 import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 
 export default function getSdk({

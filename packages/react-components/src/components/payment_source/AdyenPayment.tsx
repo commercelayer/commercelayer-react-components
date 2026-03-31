@@ -186,7 +186,11 @@ export function AdyenPayment({
             ref.current as unknown as FormEvent<HTMLFormElement>,
           )
         }
+        setPaymentMethodErrors([])
         setPaymentRef({ ref })
+        if (placeOrderButtonRef?.current != null) {
+          placeOrderButtonRef.current.disabled = false
+        }
       }
     }
   }
@@ -323,6 +327,22 @@ export function AdyenPayment({
         })) as AdyenPaymentType
         const currentBalance = giftCardBalanceCheck?.balance ?? 0
         const totalAmount = order?.total_amount_with_taxes_cents ?? 0
+        if (currentBalance === 0) {
+          const message =
+            "The gift card has no balance. Please use a different one."
+          setPaymentMethodErrors([
+            {
+              code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
+              resource: "payment_methods",
+              field: currentPaymentMethodType,
+              message,
+            },
+          ])
+          return {
+            resultCode: "Refused",
+            message,
+          }
+        }
         const attributes =
           currentBalance >= totalAmount
             ? {
@@ -622,9 +642,17 @@ export function AdyenPayment({
           },
           onSelect: (component) => {
             const id: string = component._id
+            const isValid = component.isValid
             if (id.search("scheme") === -1) {
               if (ref.current) {
-                if (id.search("paypal") === -1) {
+                /**
+                 * For payment methods different from card, we remove the onsubmit handler
+                 * to manage the submission via Adyen Drop-in and the place order button remains disabled
+                 */
+                if (
+                  id.search("paypal") === -1 &&
+                  id.search("giftcard") === -1
+                ) {
                   ref.current.onsubmit = async () => {
                     return await handleSubmit(
                       ref.current as unknown as FormEvent<HTMLFormElement>,
@@ -634,6 +662,20 @@ export function AdyenPayment({
                   ref.current.onsubmit = null
                 }
                 setPaymentRef({ ref })
+              }
+            }
+            if (isValid) {
+              if (ref.current) {
+                ref.current.onsubmit = async () => {
+                  return await handleSubmit(
+                    ref.current as unknown as FormEvent<HTMLFormElement>,
+                  )
+                }
+                setPaymentMethodErrors([])
+                setPaymentRef({ ref })
+                if (placeOrderButtonRef?.current != null) {
+                  placeOrderButtonRef.current.disabled = false
+                }
               }
             }
             if (onSelect) {
@@ -659,7 +701,7 @@ export function AdyenPayment({
       setPaymentRef({ ref: { current: null } })
       setLoadAdyen(false)
     }
-  }, [clientKey, ref != null, status])
+  }, [clientKey, ref != null, status, setPaymentMethodErrors != null])
   return !clientKey && !loadAdyen && !checkout ? null : (
     <form
       ref={ref}

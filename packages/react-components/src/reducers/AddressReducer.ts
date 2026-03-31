@@ -280,6 +280,10 @@ export async function saveAddresses({
           orderAttributes._shipping_address_same_as_billing = true
           orderAttributes._shipping_address_clone_id = billingAddressCloneId
         }
+        if (!shipToDifferentAddress && billingAddressCloneId) {
+          orderAttributes._shipping_address_same_as_billing = true
+          orderAttributes._shipping_address_clone_id = billingAddressCloneId
+        }
         if (shipToDifferentAddress) {
           delete orderAttributes._shipping_address_same_as_billing
           if (shippingAddressCloneId)

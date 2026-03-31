@@ -1,13 +1,10 @@
-import { useContext, useReducer, useEffect, type ReactNode, useMemo, type JSX } from 'react';
-import availabilityReducer, {
-  availabilityInitialState,
-  getAvailability
-} from '#reducers/AvailabilityReducer'
-import AvailabilityContext from '#context/AvailabilityContext'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import SkuChildrenContext from '#context/SkuChildrenContext'
-import useCustomContext from '#utils/hooks/useCustomContext'
+import { useAvailability } from "@commercelayer/hooks"
+import { type JSX, type ReactNode, useContext, useEffect, useMemo } from "react"
+import AvailabilityContext from "#context/AvailabilityContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import LineItemChildrenContext from "#context/LineItemChildrenContext"
+import SkuChildrenContext from "#context/SkuChildrenContext"
+import useCustomContext from "#utils/hooks/useCustomContext"
 
 interface Props {
   /**
@@ -45,44 +42,46 @@ export function AvailabilityContainer({
   children,
   skuCode,
   skuId,
-  getQuantity
+  getQuantity,
 }: Props): JSX.Element {
   const { lineItem } = useContext(LineItemChildrenContext)
   const { sku } = useContext(SkuChildrenContext)
-  const { accessToken, endpoint } = useCustomContext({
+  const { accessToken } = useCustomContext({
     context: CommerceLayerContext,
-    contextComponentName: 'CommerceLayer',
-    currentComponentName: 'AvailabilityContainer',
-    key: 'accessToken'
+    contextComponentName: "CommerceLayer",
+    currentComponentName: "AvailabilityContainer",
+    key: "accessToken",
   })
-  const [state, dispatch] = useReducer(
-    availabilityReducer,
-    availabilityInitialState
+  const { availability, fetchAvailability, clearAvailability } =
+    useAvailability(accessToken ?? "")
+  const sCode = skuCode ?? lineItem?.sku_code ?? sku?.code
+
+  useEffect(() => {
+    if (
+      accessToken != null &&
+      accessToken !== "" &&
+      (sCode != null || skuId != null)
+    ) {
+      fetchAvailability({ skuCode: sCode, skuId })
+    }
+    return () => {
+      clearAvailability()
+    }
+  }, [accessToken, sCode, skuId, clearAvailability, fetchAvailability])
+
+  useEffect(() => {
+    if (getQuantity != null && availability?.quantity != null) {
+      getQuantity(availability.quantity)
+    }
+  }, [availability?.quantity, getQuantity])
+
+  const contextValue = useMemo(
+    () => ({ ...availability, parent: true }),
+    [availability],
   )
-  const sCode = skuCode || lineItem?.sku_code || sku?.code
-  useEffect(() => {
-    if (accessToken != null && accessToken !== '') {
-      const config = { accessToken, endpoint }
-      if (sCode != null || skuId != null) {
-        getAvailability({ skuCode: sCode, skuId, config, dispatch })
-      }
-    }
-    return (): void => {
-      dispatch({
-        type: 'setAvailability',
-        payload: {}
-      })
-    }
-  }, [accessToken, sCode, skuId])
-  useEffect(() => {
-    if (getQuantity != null && state?.quantity != null)
-      getQuantity(state?.quantity)
-  }, [state.quantity])
-  const memoized = useMemo(() => {
-    return { ...state, parent: true }
-  }, [state])
+
   return (
-    <AvailabilityContext.Provider value={memoized}>
+    <AvailabilityContext.Provider value={contextValue}>
       {children}
     </AvailabilityContext.Provider>
   )

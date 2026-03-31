@@ -8,55 +8,47 @@ jobs:
   publish:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: pnpm 🧰
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10
 
       - name: Node 🧰
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v5
         with:
-          node-version: 'latest'
+          node-version: 20.x
+          registry-url: https://registry.npmjs.org
           cache: 'pnpm'
 
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: Install 📦
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build 🛠
         run: pnpm build
 
+      - name: Uncommitted changes 🔎
+        run: git status
+
       - name: Publish 🚀 PRERELEASE
         if: 'github.event.release.prerelease'
         run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
           pnpm -r publish --tag next --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish 🚀 PRODUCTION
         if: '!github.event.release.prerelease'
         run: |
-          npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
           pnpm -r publish --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      
-      - name: Trigger deploy to gh-pages 🚀
-        # if: '!github.event.release.prerelease'
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.COMMERCELAYER_CI_TOKEN }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.ref,
-              workflow_id: 'gh-pages.yaml'
-            });
 
       - name: Post to a Slack channel
         id: slack

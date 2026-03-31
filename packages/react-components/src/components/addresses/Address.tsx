@@ -66,6 +66,7 @@ export function Address(props: Props): JSX.Element {
   const items = !isEmpty(addresses)
     ? addresses
     : (addressesContext && addressesContext) || []
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional effect with stable context refs
   useEffect(() => {
     if (items && !deselect) {
       items.forEach((address, k) => {
@@ -162,7 +163,10 @@ export function Address(props: Props): JSX.Element {
               ? `${className || ""} ${disabledClassName}`
               : addressSelectedClass
             return (
+              // biome-ignore lint/suspicious/noArrayIndexKey: address list has no stable unique key other than index
               <AddressChildrenContext.Provider key={k} value={addressProps}>
+                {/* biome-ignore lint/a11y/noStaticElementInteractions: address card uses div for flexible layout */}
+                {/* biome-ignore lint/a11y/useKeyWithClickEvents: address card uses div for flexible layout */}
                 <div
                   className={finalClassName}
                   onClick={() => {

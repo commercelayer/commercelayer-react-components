@@ -158,7 +158,7 @@ export function PaymentMethod({
           const isSingle = paymentMethods.length === 1
           const paymentSourceStatus = paymentSource
             ? // @ts-expect-error no type
-              paymentSource.payment_response?.status?.toLowerCase()
+              paymentSource.payment_response?.status?.toLowerCase?.()
             : null
           if (isSingle) {
             const [paymentMethod] = paymentMethods ?? []
@@ -226,13 +226,13 @@ export function PaymentMethod({
         autoSelect()
       }
     }
-  }, [!isEmpty(paymentMethods), order?.payment_source != null, errors?.length])
+  }, [!isEmpty(paymentMethods), errors?.length])
   useEffect(() => {
     if (paymentMethods) {
       const isSingle = paymentMethods.length === 1
       const paymentSourceStatus = paymentSource
         ? // @ts-expect-error no type
-          paymentSource.payment_response?.status?.toLowerCase()
+          paymentSource.payment_response?.status?.toLowerCase?.()
         : null
       if (isSingle && autoSelectSinglePaymentMethod) {
         if (paymentSource) {
@@ -269,7 +269,7 @@ export function PaymentMethod({
   useEffect(() => {
     const status =
       // @ts-expect-error no type
-      order?.payment_source?.payment_response?.status?.toLowerCase()
+      order?.payment_source?.payment_response?.status
     // If showLoader is undefined, we don't change the loading
     if (showLoader && status) {
       if (status.toLowerCase() === "declined") {

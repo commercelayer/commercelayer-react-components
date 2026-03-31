@@ -18,7 +18,7 @@ interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
 
 export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
   const { children, codeType, autoComplete = 'on', onSubmit, ...p } = props
-  const { validation, values, reset } = useRapidForm()
+  const { validation, values, reset } = (useRapidForm as any)()
   const { setGiftCardOrCouponCode, order, errors, setOrderErrors } =
     useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)

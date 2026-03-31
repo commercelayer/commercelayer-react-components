@@ -90,7 +90,28 @@ export interface CheckoutComConfig {
   options?: {
     appearance: Appearance
   }
-  [key: string]: unknown
+  footnote: {
+    fontFamily: string
+    fontSize: string
+    fontWeight: number
+    letterSpacing: number
+    lineHeight: string
+  }
+  label: {
+    fontFamily: string
+    fontSize: string
+    fontWeight: number
+    letterSpacing: number
+    lineHeight: string
+  }
+  subheading: {
+    fontFamily: string
+    fontSize: string
+    fontWeight: number
+    letterSpacing: number
+    lineHeight: string
+  }
+  borderRadius: [string, string]
 }
 
 type Props = Partial<PaymentMethodConfig["checkoutComPayment"]> &

@@ -165,9 +165,9 @@ export function AddToCartButton(props: Props): JSX.Element {
     const qty: number = quantity != null ? Number.parseInt(quantity) : 1
     if (skuLists != null && skuListId && url) {
       if (skuListId in skuLists) {
-        const lineItems = skuLists?.[skuListId]?.map((skuCode: string) => {
+        const lineItems = skuLists?.[skuListId]?.map((sku) => {
           return {
-            skuCode,
+            skuCode: sku.code,
             quantity: qty,
             _update_quantity: 1,
           }

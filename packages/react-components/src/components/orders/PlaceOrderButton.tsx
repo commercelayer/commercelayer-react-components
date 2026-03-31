@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: Avoid infinite loop */
 import type { Order } from "@commercelayer/sdk"
 import isFunction from "lodash/isFunction"
 import {
@@ -83,17 +84,20 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     setPaymentSource,
     setPaymentMethodErrors,
     currentCustomerPaymentSourceId,
+    errors: paymentMethodErrors,
   } = useContext(PaymentMethodContext)
   const { order, setOrderErrors, errors } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
+    if (isFree && !isPermitted) {
+      setNotPermitted(false)
+    }
     if (loading) setNotPermitted(loading)
     else {
       if (paymentType === currentPaymentMethodType && paymentType) {
         const paymentSourceStatus =
           // @ts-expect-error no type
-          order?.payment_source?.payment_response?.status?.toLowerCase()
+          order?.payment_source?.payment_response?.status?.toLowerCase?.()
         const card = getCardDetails({
           customerPayment: {
             payment_source: paymentSource,
@@ -139,15 +143,28 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     currentPaymentMethodType,
     order?.id,
     paymentSource?.id,
+    order?.total_amount_with_taxes_cents,
   ])
   useEffect(() => {
-    if (errors && errors.length > 0) {
+    const giftCardCouponFields = [
+      "gift_card_code",
+      "coupon_code",
+      "gift_card_or_coupon_code",
+    ]
+    const blockingErrors = errors?.filter(
+      (e) => !giftCardCouponFields.includes(e.field ?? ""),
+    )
+    if (
+      (blockingErrors && blockingErrors.length > 0) ||
+      (paymentMethodErrors && paymentMethodErrors.length > 0)
+    ) {
       setNotPermitted(true)
       setIsLoading(false)
       setForceDisable(false)
+    } else {
+      setNotPermitted(false)
     }
-  }, [errors])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
+  }, [errors?.length, paymentMethodErrors?.length])
   useEffect(() => {
     // PayPal redirect flow
     if (
@@ -160,7 +177,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       handleClick()
     }
   }, [options?.paypalPayerId, paymentType != null])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     // Stripe redirect flow
     if (
@@ -211,7 +227,6 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     paymentType != null,
     order?.payment_source != null,
   ])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Need to test
   useEffect(() => {
     if (order?.status != null && ["draft", "pending"].includes(order?.status)) {
       // Adyen redirect flow
@@ -291,7 +306,15 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         status === "standby" &&
         !options?.adyen?.redirectResult
       ) {
-        handleClick()
+        // NOTE: This is a workaround for the case when the user reloads the page after selecting a customer payment source
+        if (
+          // @ts-expect-error no type
+          order?.payment_source?.payment_response?.merchantReference?.includes(
+            order?.number,
+          )
+        ) {
+          handleClick()
+        }
       }
     }
   }, [
@@ -479,7 +502,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         : paymentSource
     const checkPaymentSourceStatus =
       // @ts-expect-error no type
-      checkPaymentSource?.payment_response?.status?.toLowerCase()
+      checkPaymentSource?.payment_response?.status?.toLowerCase?.()
     const card =
       paymentType &&
       getCardDetails({

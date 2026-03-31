@@ -58,7 +58,7 @@ export function AddressCountrySelector(props: Props): JSX.Element {
     if (value && customerAddress?.setValue) {
       customerAddress.setValue(name, value)
     }
-  }, [value])
+  }, [value, billingAddress.setValue, customerAddress.setValue, name, shippingAddress.setValue])
 
   const hasError = useMemo(() => {
     if (billingAddress?.errors?.[name]?.error) {
@@ -72,10 +72,9 @@ export function AddressCountrySelector(props: Props): JSX.Element {
     }
     return false
   }, [
-    value,
-    billingAddress?.errors,
-    shippingAddress?.errors,
-    customerAddress?.errors
+    billingAddress?.errors, 
+    shippingAddress?.errors, 
+    customerAddress?.errors, name
   ])
   const errorClassName =
     billingAddress?.errorClassName ||
@@ -88,6 +87,7 @@ export function AddressCountrySelector(props: Props): JSX.Element {
     <BaseSelect
       className={classNameComputed}
       ref={
+        // biome-ignore lint/suspicious/noExplicitAny: validation ref type mismatch between address form contexts
         (billingAddress?.validation as any) ||
         shippingAddress?.validation ||
         customerAddress?.validation

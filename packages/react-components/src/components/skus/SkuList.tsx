@@ -1,5 +1,5 @@
-import { useContext, useEffect, type ReactNode, type JSX } from 'react';
-import SkuListsContext from '#context/SkuListsContext'
+import { type JSX, type ReactNode, useContext, useEffect } from "react"
+import SkuListsContext from "#context/SkuListsContext"
 
 interface Props {
   children: ReactNode
@@ -11,12 +11,10 @@ interface Props {
 
 export function SkuList(props: Props): JSX.Element {
   const { id, children } = props
-  const { listIds } = useContext(SkuListsContext)
+  const { registerListId } = useContext(SkuListsContext)
   useEffect(() => {
-    if (listIds && !listIds.includes(id)) {
-      listIds.push(id)
-    }
-  }, [])
+    registerListId(id)
+  }, [id, registerListId])
   return <>{children}</>
 }
 

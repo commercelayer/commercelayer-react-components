@@ -1,40 +1,40 @@
-import { useContext, useMemo, type JSX } from 'react';
-import Parent from '#components/utils/Parent'
-import GiftCardContext from '#context/GiftCardContext'
-import OrderContext from '#context/OrderContext'
-import AddressContext from '#context/AddressContext'
-import getAllErrors from '#components-utils/getAllErrors'
-import LineItemContext from '#context/LineItemContext'
-import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import type { CodeErrorType } from '#typings/errors'
-import CustomerContext from '#context/CustomerContext'
-import PaymentMethodContext from '#context/PaymentMethodContext'
-import PaymentMethodChildrenContext from '#context/PaymentMethodChildrenContext'
-import ShipmentContext from '#context/ShipmentContext'
-import type { ChildrenFunction } from '#typings/index'
-import InStockSubscriptionContext from '#context/InStockSubscriptionContext'
+import { type JSX, useContext, useMemo } from "react"
+import Parent from "#components/utils/Parent"
+import getAllErrors from "#components-utils/getAllErrors"
+import AddressContext from "#context/AddressContext"
+import CustomerContext from "#context/CustomerContext"
+import GiftCardContext from "#context/GiftCardContext"
+import InStockSubscriptionContext from "#context/InStockSubscriptionContext"
+import LineItemChildrenContext from "#context/LineItemChildrenContext"
+import LineItemContext from "#context/LineItemContext"
+import OrderContext from "#context/OrderContext"
+import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import ShipmentContext from "#context/ShipmentContext"
+import type { CodeErrorType } from "#typings/errors"
+import type { ChildrenFunction } from "#typings/index"
 
 export type TResourceError =
-  | 'addresses'
-  | 'billing_address'
-  | 'gift_cards'
-  | 'gift_card_or_coupon_code'
-  | 'line_items'
-  | 'orders'
-  | 'payment_methods'
-  | 'prices'
-  | 'shipments'
-  | 'shipping_address'
-  | 'customer_address'
-  | 'sku_options'
-  | 'variant'
-  | 'in_stock_subscriptions'
+  | "addresses"
+  | "billing_address"
+  | "gift_cards"
+  | "gift_card_or_coupon_code"
+  | "line_items"
+  | "orders"
+  | "payment_methods"
+  | "prices"
+  | "shipments"
+  | "shipping_address"
+  | "customer_address"
+  | "sku_options"
+  | "variant"
+  | "in_stock_subscriptions"
 type ErrorChildrenComponentProps = ChildrenFunction<
-  Omit<TErrorComponent, 'children'> & { errors: string[] }
+  Omit<TErrorComponent, "children"> & { errors: string[] }
 >
 
 export interface TErrorComponent
-  extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+  extends Omit<JSX.IntrinsicElements["span"], "children"> {
   /**
    * Resource which get the error
    */
@@ -68,12 +68,12 @@ export function Errors(props: Props): JSX.Element {
   const { errors: customerErrors } = useContext(CustomerContext)
   const { errors: shipmentErrors } = useContext(ShipmentContext)
   const { errors: inStockSubscriptionErrors } = useContext(
-    InStockSubscriptionContext
+    InStockSubscriptionContext,
   )
   const {
     errors: paymentMethodErrors,
     currentPaymentMethodType,
-    currentPaymentMethodId
+    currentPaymentMethodId,
   } = useContext(PaymentMethodContext)
   const { lineItem } = useContext(LineItemChildrenContext)
   const allErrors = useMemo(
@@ -87,8 +87,8 @@ export function Errors(props: Props): JSX.Element {
       ...(paymentMethodErrors?.filter(
         (v) =>
           v.field === currentPaymentMethodType &&
-          payment?.id === currentPaymentMethodId
-      ) || [])
+          payment?.id === currentPaymentMethodId,
+      ) || []),
     ],
     [
       giftCardErrors,
@@ -97,12 +97,12 @@ export function Errors(props: Props): JSX.Element {
       customerErrors,
       shipmentErrors,
       inStockSubscriptionErrors,
-      paymentMethodErrors
-    ]
+      paymentMethodErrors,
+    ],
   ).filter((v, k, a) => v?.code !== a[k - 1]?.code)
   const addressesErrors = useMemo(
     () => [...(addressErrors || [])],
-    [addressErrors]
+    [addressErrors],
   )
   const msgErrors = getAllErrors({
     allErrors: [...allErrors, ...addressesErrors],
@@ -111,7 +111,7 @@ export function Errors(props: Props): JSX.Element {
     props: p,
     lineItem,
     resource,
-    returnHtml: !children
+    returnHtml: !children,
   })
   const parentProps = { messages, resource, field, errors: msgErrors, ...p }
   return children ? (

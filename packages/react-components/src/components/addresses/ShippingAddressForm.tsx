@@ -53,7 +53,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     reset: resetForm,
     setValue: setValueForm,
     setError: setErrorForm,
-  } = useRapidForm({ fieldEvent })
+  } = (useRapidForm as any)({ fieldEvent })
   const {
     setAddressErrors,
     setAddress,
@@ -101,7 +101,6 @@ export function ShippingAddressForm(props: Props): JSX.Element {
                 if (inError) {
                   const errorMsg = errors[fieldName]?.message
                   if (errorMsg != null && errorMsg !== customMessage) {
-                    // @ts-expect-error no type
                     errors[fieldName].message = customMessage
                   }
                 } else {
@@ -120,7 +119,6 @@ export function ShippingAddressForm(props: Props): JSX.Element {
                     if (fieldInError) {
                       const errorMsg = errors[field]?.message
                       if (errorMsg != null && errorMsg !== message) {
-                        // @ts-expect-error no type
                         errors[field].message = message
                         setValueForm(field, value ?? "")
                       }
@@ -183,7 +181,6 @@ export function ShippingAddressForm(props: Props): JSX.Element {
         }
       }
       setAddress({
-        // @ts-expect-error no type
         values: {
           ...values,
           ...(isBusiness && { business: isBusiness }),
@@ -215,11 +212,9 @@ export function ShippingAddressForm(props: Props): JSX.Element {
       }
       if (ref) {
         ref.current?.reset()
-        // @ts-expect-error no type
         resetForm({ target: ref.current })
         setAddressErrors([], "shipping_address")
-        // @ts-expect-error no type
-        setAddress({ values: {}, resource: "shipping_address" })
+        setAddress({ values: {} as any, resource: "shipping_address" })
       }
     }
   }, [
@@ -255,7 +250,6 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     errorClassName,
     errors: errors as any,
     resetField: (name: string) => {
-      // @ts-expect-error no type
       resetForm({ currentTarget: ref.current }, name)
     },
   } as any

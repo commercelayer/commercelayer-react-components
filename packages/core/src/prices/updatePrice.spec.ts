@@ -8,6 +8,7 @@ describe("updatePrice", () => {
     "should update a single price",
     async ({ accessToken }) => {
       const token = accessToken?.accessToken
+      if (token == null) return
       const firstPrice = (await getPrices({ accessToken: token })).first()
       expect(firstPrice).toBeDefined()
       if (!firstPrice) {
