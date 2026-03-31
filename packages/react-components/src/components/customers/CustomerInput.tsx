@@ -31,7 +31,7 @@ export function CustomerInput(props: Props): JSX.Element {
     errorClassName,
     ...p
   } = props
-  const { validation, values, errors, setError } = useRapidForm({
+  const { validation, values, errors, setError } = (useRapidForm as any)({
     fieldEvent: 'blur'
   })
   const { saveCustomerUser, setCustomerErrors, setCustomerEmail } =

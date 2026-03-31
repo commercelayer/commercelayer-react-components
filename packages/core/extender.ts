@@ -6,7 +6,10 @@ const integrationClientId = import.meta.env.VITE_INTEGRATION_CLIENT_ID
 const integrationClientSecret = import.meta.env.VITE_INTEGRATION_CLIENT_SECRET
 const scope = import.meta.env.VITE_SALES_CHANNEL_SCOPE
 const domain = import.meta.env.VITE_DOMAIN
-let accessToken: Awaited<ReturnType<typeof getAccessToken>> | undefined
+
+// Separate caches per token type to avoid cross-contamination between fixtures
+let salesChannelToken: Awaited<ReturnType<typeof getAccessToken>> | undefined
+let integrationToken: Awaited<ReturnType<typeof getAccessToken>> | undefined
 
 export interface CoreTestInterface {
   accessToken: Awaited<ReturnType<typeof getAccessToken>>
@@ -23,8 +26,8 @@ export interface CoreTestInterface {
 export const coreTest = test.extend<CoreTestInterface>({
   // biome-ignore lint/correctness/noEmptyPattern: need to object destructure as the first argument
   accessToken: async ({}, use) => {
-    if (accessToken == null) {
-      accessToken = await getAccessToken({
+    if (salesChannelToken === undefined) {
+      salesChannelToken = await getAccessToken({
         grantType: "client_credentials",
         config: {
           clientId,
@@ -33,9 +36,7 @@ export const coreTest = test.extend<CoreTestInterface>({
         },
       })
     }
-    const token = accessToken
-    accessToken = undefined
-    await use(token)
+    use(salesChannelToken)
   },
   config: {
     clientId,
@@ -50,8 +51,8 @@ export const coreTest = test.extend<CoreTestInterface>({
 export const coreIntegrationTest = test.extend<CoreTestInterface>({
   // biome-ignore lint/correctness/noEmptyPattern: need to object destructure as the first argument
   accessToken: async ({}, use) => {
-    if (accessToken == null) {
-      accessToken = await getAccessToken({
+    if (integrationToken === undefined) {
+      integrationToken = await getAccessToken({
         grantType: "client_credentials",
         config: {
           clientId: integrationClientId,
@@ -60,9 +61,7 @@ export const coreIntegrationTest = test.extend<CoreTestInterface>({
         },
       })
     }
-    const token = accessToken
-    accessToken = undefined
-    await use(token)
+    use(integrationToken)
   },
   config: {
     clientId: integrationClientId,

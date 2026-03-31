@@ -1,8 +1,8 @@
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import SkuContext from '#context/SkuContext'
-import { useSkus } from '@commercelayer/hooks'
-import type { QueryParamsList } from '@commercelayer/sdk'
-import { type JSX, type ReactNode, useContext, useEffect, useMemo } from 'react'
+import { useSkus } from "@commercelayer/hooks"
+import type { QueryParamsList } from "@commercelayer/sdk"
+import { type JSX, type ReactNode, useContext, useEffect, useMemo } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import SkuContext from "#context/SkuContext"
 
 interface Props {
   /**
@@ -35,15 +35,18 @@ interface Props {
 export function SkusContainer<P extends Props>(props: P): JSX.Element {
   const { skus, children, queryParams } = props
   const config = useContext(CommerceLayerContext)
-  const { skus: skuList, isLoading, fetchSkus, clearSkus } = useSkus(
-    config.accessToken ?? ''
-  )
+  const {
+    skus: skuList,
+    isLoading,
+    fetchSkus,
+    clearSkus,
+  } = useSkus(config.accessToken ?? "")
 
   useEffect(() => {
     if (config.accessToken != null && skus.length > 0) {
       fetchSkus({
         ...queryParams,
-        filters: { ...queryParams?.filters, code_in: skus.join(',') }
+        filters: { ...queryParams?.filters, code_in: skus.join(",") },
       })
     }
     return () => {
@@ -53,7 +56,7 @@ export function SkusContainer<P extends Props>(props: P): JSX.Element {
 
   const contextValue = useMemo(
     () => ({ skus: skuList, loading: isLoading, skuCodes: skus }),
-    [skuList, isLoading, skus]
+    [skuList, isLoading, skus],
   )
 
   return (

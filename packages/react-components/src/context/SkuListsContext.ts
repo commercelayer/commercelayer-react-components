@@ -1,6 +1,19 @@
-import { createContext } from 'react'
-import { skuListsInitialState } from '#reducers/SkuListsReducer'
+import type { Sku } from "@commercelayer/sdk"
+import { createContext } from "react"
 
-export const SkuListsContext = createContext(skuListsInitialState)
+export interface SkuListsContextType {
+  listIds: string[]
+  skuLists: Record<string, Sku[]>
+  registerListId: (id: string) => void
+}
+
+const defaultContext: SkuListsContextType = {
+  listIds: [],
+  skuLists: {},
+  registerListId: () => {},
+}
+
+export const SkuListsContext =
+  createContext<SkuListsContextType>(defaultContext)
 
 export default SkuListsContext

@@ -62,12 +62,12 @@ function getPaymentSourceToken(
         order.payment_source.type === 'braintree_payments' &&
         order.payment_source.options != null
       ) {
-        return order.payment_source.options['payment_method_token']
+        return order.payment_source.options.payment_method_token
       }
       return undefined
     }
     default: {
-      return order?.payment_source_details?.['payment_method_id'] ?? undefined
+      return order?.payment_source_details?.payment_method_id ?? undefined
     }
   }
 }

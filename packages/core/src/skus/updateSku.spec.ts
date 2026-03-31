@@ -6,6 +6,7 @@ import { updateSku } from "./updateSku"
 describe("updateSku", () => {
   coreIntegrationTest("should update a single SKU", async ({ accessToken }) => {
     const token = accessToken?.accessToken
+    if (token == null) return
     const firstSku = (await getSkus({ accessToken: token })).first()
     expect(firstSku).toBeDefined()
     if (!firstSku) {

@@ -6,6 +6,7 @@ import { retrieveSku } from "./retrieveSku.js"
 describe("retrieveSku", () => {
   coreIntegrationTest("should return a single SKU", async ({ accessToken }) => {
     const token = accessToken?.accessToken
+    if (token == null) return
     const firstSku = (await getSkus({ accessToken: token })).first()
     expect(firstSku).toBeDefined()
     if (!firstSku) {

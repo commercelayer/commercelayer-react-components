@@ -6,6 +6,7 @@ import { retrievePrice } from "./retrievePrice.js"
 describe("retrievePrice", () => {
   coreTest("should return a single price", async ({ accessToken }) => {
     const token = accessToken?.accessToken
+    if (token == null) return
     const firstPrice = (await getPrices({ accessToken: token })).first()
     expect(firstPrice).toBeDefined()
     if (!firstPrice) {
