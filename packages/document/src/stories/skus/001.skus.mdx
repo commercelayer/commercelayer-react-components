@@ -1,0 +1,196 @@
+import { Meta, Source } from '@storybook/addon-docs';
+
+<Meta title="Skus/Overview" />
+
+# SKUs
+
+The SKU components let you fetch and display product data from the Commerce Layer API.
+All SKU components must be nested inside the `<CommerceLayer>` context that handles API authentication.
+
+Refer to the [SKUs API reference](https://docs.commercelayer.io/core/v/api-reference/skus/object)
+for the full list of available attributes.
+
+---
+
+## SkusContainer
+
+`SkusContainer` is the main container for SKU data. It accepts an array of SKU codes, fetches the
+corresponding resources from the API, and stores them in a React context for its children.
+
+<span title='Requirements' type='warning'>
+Must be a child of the `<CommerceLayer>` component.
+</span>
+
+<span title='Children' type='info'>
+`<Skus>`
+</span>
+
+**Props**
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `skus` | `string[]` | ✓ | Array of SKU codes to fetch |
+| `queryParams` | `QueryParamsList` | — | Optional SDK query params (pagination, sorting, fields) |
+
+<Source
+  language="jsx"
+  dark
+  code={`
+import { CommerceLayer, SkusContainer } from '@commercelayer/react-components'
+
+<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+  <SkusContainer skus={['TSHIRTMM000000FFFFFFXLXX', 'PANTSMM000000FFFFFFXXXX']}>
+    {/* <Skus> goes here */}
+  </SkusContainer>
+</CommerceLayer>
+`}
+/>
+
+---
+
+## Skus
+
+`Skus` loops through all SKU records stored in the parent `SkusContainer` context and renders
+its children once for each SKU. You do not need to loop manually — the component handles iteration.
+
+<span title='Requirements' type='warning'>
+Must be a child of the `<SkusContainer>` component.
+</span>
+
+<span title='Children' type='info'>
+`<SkuField>`, `<AvailabilityContainer>`
+</span>
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<SkusContainer skus={['TSHIRTMM000000FFFFFFXLXX', 'PANTSMM000000FFFFFFXXXX']}>
+  <Skus>
+    {/* rendered once per SKU */}
+  </Skus>
+</SkusContainer>
+`}
+/>
+
+---
+
+## SkuField
+
+`SkuField` renders any attribute of the current SKU from the parent `SkusContainer` context.
+Use the `attribute` prop to select which field to display and `tagElement` to control the HTML tag
+(defaults to `span`). When `tagElement="img"`, additional `<img>` props such as `width` and `height` are accepted.
+
+<span title='Requirements' type='warning'>
+Must be a descendant of the `<SkusContainer>` component.
+</span>
+
+<span title='Fields' type='info'>
+See the [SKUs API object](https://docs.commercelayer.io/core/v/api-reference/skus/object) for all
+available attributes (e.g. `name`, `description`, `image_url`, `code`).
+</span>
+
+**Props**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `attribute` | `keyof Sku` | — | The SKU attribute to display |
+| `tagElement` | `string` | `"span"` | HTML tag used to render the value |
+
+<Source
+  language="jsx"
+  dark
+  code={`
+import {
+  CommerceLayer,
+  SkusContainer,
+  Skus,
+  SkuField,
+} from '@commercelayer/react-components'
+
+<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+  <SkusContainer skus={['TSHIRTMM000000FFFFFFXLXX', 'PANTSMM000000FFFFFFXXXX']}>
+    <Skus>
+      <SkuField attribute="name" tagElement="h2" />
+      <SkuField attribute="description" tagElement="p" />
+      <SkuField attribute="image_url" tagElement="img" width={200} height={200} />
+    </Skus>
+  </SkusContainer>
+</CommerceLayer>
+`}
+/>
+
+---
+
+## SkuListsContainer
+
+`SkuListsContainer` fetches one or more SKU lists by ID and makes their SKU data available to
+child `<SkuList>` components. Each `<SkuList>` registers its own ID with this container on mount.
+
+<span title='Requirements' type='warning'>
+Must be a child of the `<CommerceLayer>` component.
+</span>
+
+<span title='Children' type='info'>
+`<SkuList>`
+</span>
+
+<Source
+  language="jsx"
+  dark
+  code={`
+import { CommerceLayer, SkuListsContainer } from '@commercelayer/react-components'
+
+<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+  <SkuListsContainer>
+    {/* <SkuList> components go here */}
+  </SkuListsContainer>
+</CommerceLayer>
+`}
+/>
+
+---
+
+## SkuList
+
+`SkuList` registers its `id` with the parent `SkuListsContainer` and renders its children using
+the SKUs that belong to that list. Nest `<Skus>` and `<SkuField>` inside to display list items.
+
+<span title='Requirements' type='warning'>
+Must be a child of the `<SkuListsContainer>` component.
+</span>
+
+<span title='Children' type='info'>
+`<Skus>`, `<SkuField>`
+</span>
+
+**Props**
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | `string` | ✓ | The Commerce Layer ID of the SKU list to fetch |
+
+<Source
+  language="jsx"
+  dark
+  code={`
+import {
+  CommerceLayer,
+  SkuListsContainer,
+  SkuList,
+  Skus,
+  SkuField,
+} from '@commercelayer/react-components'
+
+<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+  <SkuListsContainer>
+    <SkuList id="AbCdEfGhIj">
+      <Skus>
+        <SkuField attribute="name" tagElement="h2" />
+        <SkuField attribute="code" tagElement="p" />
+      </Skus>
+    </SkuList>
+  </SkuListsContainer>
+</CommerceLayer>
+`}
+/>

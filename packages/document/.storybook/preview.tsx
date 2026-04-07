@@ -5,8 +5,8 @@ import {
   Stories,
   Subtitle,
   Title,
-} from "@storybook/blocks"
-import type { Decorator, Parameters } from "@storybook/react"
+} from "@storybook/addon-docs/blocks"
+import type { Decorator, Parameters, Preview } from "@storybook/react-vite"
 import React from "react"
 import { worker } from "../mocks/browser"
 
@@ -19,18 +19,19 @@ export const parameters: Parameters = {
     },
   },
   backgrounds: {
-    values: [
-      {
+    options: {
+      overlay: {
         name: "overlay",
         value: "#F8F8F8",
-      },
-    ],
+      }
+    },
   },
   options: {
     storySort: {
       method: "alphabetical",
       order: [
         "Getting Started",
+        "Skus",
         // [
         //   "Welcome",
         //   "Applications",
@@ -140,4 +141,5 @@ const argTypesEnhancers: Preview["argTypesEnhancers"] = [
 export default {
   parameters,
   argTypesEnhancers,
-}
+  tags: ["autodocs"]
+};

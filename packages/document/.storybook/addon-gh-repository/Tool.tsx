@@ -1,5 +1,5 @@
-import { A, IconButton, Icons, Separator } from '@storybook/components'
-import React from 'react'
+import { GithubIcon } from '@storybook/icons'
+import { A, IconButton, Separator } from 'storybook/internal/components'
 import { ADDON_NAME, REPOSITORY_URL, TOOL_ID } from './constants'
 
 export const Tool = () => {
@@ -8,7 +8,7 @@ export const Tool = () => {
       <Separator />
       <IconButton key={TOOL_ID} active={false} title={ADDON_NAME}>
         <A target='_blank' href={REPOSITORY_URL}>
-          <Icons icon='github' />
+          <GithubIcon />
           &nbsp;&nbsp;repository
         </A>
       </IconButton>
