@@ -21,21 +21,16 @@ const storybookConfig: StorybookConfig = {
     return mergeConfig(config, viteOverrides)
   },
   stories: ["../stories/**/*.mdx", "../stories/**/*.stories.@(js|jsx|ts|tsx)"],
-  addons: [
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@storybook/addon-interactions",
-    {
-      name: "@storybook/addon-docs",
-      options: {
-        mdxPluginOptions: {
-          mdxCompileOptions: {
-            remarkPlugins: [remarkGfm],
-          },
+  addons: ["@storybook/addon-links", {
+    name: "@storybook/addon-docs",
+    options: {
+      mdxPluginOptions: {
+        mdxCompileOptions: {
+          remarkPlugins: [remarkGfm],
         },
       },
     },
-  ],
+  }],
   // @ts-expect-error This 'managerEntries' exists.
   managerEntries: [
     resolve(import.meta.dirname, "./addon-gh-repository/manager.tsx"),
@@ -47,12 +42,8 @@ const storybookConfig: StorybookConfig = {
   core: {
     disableTelemetry: true,
   },
-  features: {
-    storyStoreV7: true,
-  },
   docs: {
-    autodocs: true,
-    docsMode: true,
+    docsMode: true
   },
   typescript: {
     check: false,
