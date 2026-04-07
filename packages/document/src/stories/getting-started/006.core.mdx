@@ -1,0 +1,136 @@
+import { Meta, Source } from '@storybook/addon-docs/blocks';
+
+<Meta title="Getting Started/Core package"></Meta>
+
+# Core package
+
+The `@commercelayer/core` package is a collection of **low-level async functions** that wrap the [Commerce Layer SDK](https://github.com/commercelayer/commercelayer-sdk).
+
+It is the foundation layer used internally by the `@commercelayer/hooks` package and by the React components. You can use it directly if you need to fetch or mutate Commerce Layer resources outside of a React component.
+
+<span type="info">
+This package has no React dependency — it can be used in any JavaScript/TypeScript environment (Node.js, edge functions, plain scripts, etc.).
+</span>
+
+## Installation
+
+The package is published to npm as part of this monorepo and listed as a workspace dependency. To install it in a standalone project:
+
+<Source
+  language="bash"
+  dark
+  code={`
+npm install @commercelayer/core
+# or
+pnpm add @commercelayer/core
+`}
+/>
+
+## All exports
+
+| Function | Description |
+|---|---|
+| `getAccessToken` | Retrieve an OAuth access token via `@commercelayer/js-auth` |
+| `getSkus` | Fetch a paginated list of SKUs |
+| `retrieveSku` | Fetch a single SKU by ID |
+| `updateSku` | Update a single SKU by ID |
+| `getPrices` | Fetch a paginated list of prices |
+| `retrievePrice` | Fetch a single price by ID |
+| `updatePrice` | Update a single price |
+| `getSkuAvailability` | Fetch availability for a given SKU code or ID |
+| `getSkuLists` | Fetch a paginated list of SKU lists |
+| `retrieveSkuList` | Fetch a single SKU list by ID (with optional includes) |
+
+## Function signature
+
+Every function follows the same pattern:
+
+<Source
+  language="typescript"
+  dark
+  code={`
+import { getSkus } from '@commercelayer/core'
+
+const skus = await getSkus({
+  accessToken: 'your-access-token',
+  params: {
+    filters: { code_start: 'TSHIRT' },
+    pageSize: 10,
+  },
+})
+`}
+/>
+
+The first argument is always an object with:
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `accessToken` | `string` | ✅ | Commerce Layer API access token |
+| `params` | `QueryParamsList<Resource>` or `QueryParamsRetrieve<Resource>` | ❌ | Optional SDK query params (filters, fields, include, pagination) |
+| `options` | `ResourcesConfig` | ❌ | Optional SDK request configuration |
+
+## Examples
+
+### Authentication
+
+<Source
+  language="typescript"
+  dark
+  code={`
+import { getAccessToken } from '@commercelayer/core'
+
+const token = await getAccessToken({
+  grantType: 'client_credentials',
+  config: {
+    clientId: 'your-client-id',
+    slug: 'your-org-slug',
+    scope: 'market:id:1234',
+  },
+})
+
+console.log(token.accessToken)
+`}
+/>
+
+### Fetch a filtered list of SKUs
+
+<Source
+  language="typescript"
+  dark
+  code={`
+import { getSkus } from '@commercelayer/core'
+
+const result = await getSkus({
+  accessToken,
+  params: {
+    filters: { code_in: 'TSHIRTWS000000FFFFFFLXXX,TSHIRTWKFFFFFF000000MXXX' },
+    fields: { skus: ['name', 'code', 'image_url'] },
+  },
+})
+
+for (const sku of result) {
+  console.log(sku.code, sku.name)
+}
+`}
+/>
+
+### Retrieve a SKU list with included SKUs
+
+<Source
+  language="typescript"
+  dark
+  code={`
+import { retrieveSkuList } from '@commercelayer/core'
+
+const skuList = await retrieveSkuList({
+  accessToken,
+  id: 'yZjQIDxrly',
+  params: {
+    include: ['skus'],
+    fields: { skus: ['name', 'code', 'image_url'] },
+  },
+})
+
+console.log(skuList.skus)
+`}
+/>

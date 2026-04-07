@@ -1,0 +1,171 @@
+import { Meta, Source } from '@storybook/addon-docs/blocks';
+
+<Meta title="Getting Started/Hooks package"></Meta>
+
+# Hooks package
+
+The `@commercelayer/hooks` package provides **SWR-based React hooks** built on top of the `@commercelayer/core` package.
+
+These hooks handle caching, deduplication, loading states, and error handling automatically. They are used internally by the React components in this library and are available for direct use if you want to build custom UI on top of Commerce Layer data.
+
+<span type="info">
+This package requires React 18+ and depends on `swr` for data fetching and caching.
+</span>
+
+## Installation
+
+<Source
+  language="bash"
+  dark
+  code={`
+npm install @commercelayer/hooks
+# or
+pnpm add @commercelayer/hooks
+`}
+/>
+
+## All exports
+
+| Hook | Description |
+|---|---|
+| `useSkus` | Fetch, retrieve, and update SKUs |
+| `usePrices` | Fetch, retrieve, and update prices |
+| `useSkuLists` | Fetch and retrieve SKU lists |
+| `useAvailability` | Fetch availability for a SKU code or ID |
+
+## Return shape
+
+Every hook returns a consistent object shape:
+
+| Property | Type | Description |
+|---|---|---|
+| `data` (e.g. `skus`, `prices`) | `Resource[]` | The fetched list of resources. Empty array until loaded. |
+| `isLoading` | `boolean` | `true` while the first fetch is in-flight |
+| `isValidating` | `boolean` | `true` during any background revalidation |
+| `error` | `string \| null` | Error message if the last request failed |
+| `fetchXxx` | `(params?) => void` | Triggers the list fetch. Calling it again with new params re-fetches. |
+| `retrieveXxx` | `(id) => Promise<Resource>` | Fetches a single resource by ID |
+| `updateXxx` | `(resource) => Promise<Resource>` | Mutates a resource and updates the local cache |
+| `clearXxx` | `() => void` | Resets the cache and stops auto-revalidation |
+| `mutate` | `KeyedMutator<Resource[]>` | Direct access to the underlying SWR mutate function |
+
+## Caching behaviour
+
+All hooks use [SWR](https://swr.vercel.app/) with `revalidateOnFocus: false` and `revalidateOnReconnect: false` by default. This means:
+
+- Data is cached per `[resource, action, accessToken, params]` key
+- A second call with the same arguments is a no-op (served from cache)
+- Calling `fetchXxx` with different params triggers a new request
+
+## Examples
+
+### useSkus — fetch and render a filtered list
+
+<Source
+  language="tsx"
+  dark
+  code={`
+import { useSkus } from '@commercelayer/hooks'
+
+function SkuList({ accessToken }: { accessToken: string }) {
+  const { skus, isLoading, fetchSkus } = useSkus(accessToken)
+
+  useEffect(() => {
+    fetchSkus({
+      filters: { code_in: 'TSHIRTWS000000FFFFFFLXXX,TSHIRTWKFFFFFF000000MXXX' },
+      fields: { skus: ['name', 'code', 'image_url'] },
+    })
+  }, [])
+
+  if (isLoading) return <p>Loading…</p>
+
+  return (
+    <ul>
+      {skus.map((sku) => (
+        <li key={sku.id}>{sku.name} — {sku.code}</li>
+      ))}
+    </ul>
+  )
+}
+`}
+/>
+
+### useSkuLists — retrieve a SKU list with included SKUs
+
+<Source
+  language="tsx"
+  dark
+  code={`
+import { useSkuLists } from '@commercelayer/hooks'
+
+function SkuListItems({ accessToken }: { accessToken: string }) {
+  const { retrieveSkuList } = useSkuLists(accessToken)
+  const [skus, setSkus] = useState([])
+
+  useEffect(() => {
+    retrieveSkuList('yZjQIDxrly', {
+      include: ['skus'],
+      fields: { skus: ['name', 'code'] },
+    }).then((list) => setSkus(list?.skus ?? []))
+  }, [])
+
+  return (
+    <ul>
+      {skus.map((sku) => (
+        <li key={sku.id}>{sku.name}</li>
+      ))}
+    </ul>
+  )
+}
+`}
+/>
+
+### usePrices — fetch prices for a set of SKU codes
+
+<Source
+  language="tsx"
+  dark
+  code={`
+import { usePrices } from '@commercelayer/hooks'
+
+function PriceList({ accessToken }: { accessToken: string }) {
+  const { prices, isLoading, fetchPrices } = usePrices(accessToken)
+
+  useEffect(() => {
+    fetchPrices({ filters: { sku_code_in: 'TSHIRTWS000000FFFFFFLXXX' } })
+  }, [])
+
+  if (isLoading) return <p>Loading…</p>
+
+  return (
+    <ul>
+      {prices.map((price) => (
+        <li key={price.id}>{price.sku_code} — {price.formatted_amount}</li>
+      ))}
+    </ul>
+  )
+}
+`}
+/>
+
+### useAvailability — check stock for a SKU
+
+<Source
+  language="tsx"
+  dark
+  code={`
+import { useAvailability } from '@commercelayer/hooks'
+
+function StockBadge({ accessToken, skuCode }: { accessToken: string; skuCode: string }) {
+  const { quantity, isLoading, fetchAvailability } = useAvailability(accessToken)
+
+  useEffect(() => {
+    fetchAvailability({ skuCode })
+  }, [skuCode])
+
+  if (isLoading) return null
+
+  return <span>{quantity != null && quantity > 0 ? 'In stock' : 'Out of stock'}</span>
+}
+`}
+/>
