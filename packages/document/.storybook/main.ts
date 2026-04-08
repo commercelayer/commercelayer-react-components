@@ -28,6 +28,9 @@ const viteOverrides: UserConfig = {
       ],
     }),
   ],
+  resolve: {
+    dedupe: ["react", "react-dom"],
+  },
 }
 
 const storybookConfig: StorybookConfig = {

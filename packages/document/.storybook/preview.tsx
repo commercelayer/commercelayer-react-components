@@ -23,7 +23,7 @@ export const parameters: Parameters = {
       overlay: {
         name: "overlay",
         value: "#F8F8F8",
-      }
+      },
     },
   },
   options: {
@@ -141,5 +141,5 @@ const argTypesEnhancers: Preview["argTypesEnhancers"] = [
 export default {
   parameters,
   argTypesEnhancers,
-  tags: ["autodocs"]
-};
+  tags: ["autodocs"],
+}
