@@ -1,19 +1,19 @@
-import { useContext, useEffect, useState, type JSX } from 'react';
-import Parent from '../utils/Parent'
-import type { ChildrenFunction } from '#typings/index'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import { getApplicationLink } from '#utils/getApplicationLink'
-import { getDomain } from '#utils/getDomain'
-import { getOrganizationConfig } from '#utils/organization'
+import { type JSX, useContext, useEffect, useState } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import type { ChildrenFunction } from "#typings/index"
+import { getApplicationLink } from "#utils/getApplicationLink"
+import { getDomain } from "#utils/getDomain"
+import { getOrganizationConfig } from "#utils/organization"
+import Parent from "../utils/Parent"
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+interface ChildrenProps extends Omit<Props, "children"> {
   /**
    * The link href
    */
   href: string
 }
 
-interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements["a"], "children"> {
   /**
    * A render function to render your own custom component
    */
@@ -25,7 +25,7 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
   /**
    * The type of the link
    */
-  type: 'login' | 'signup'
+  type: "login" | "signup"
   /**
    * The client id of the Commerce Layer application
    */
@@ -78,17 +78,20 @@ export function MyIdentityLink(props: Props): JSX.Element {
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
   const [href, setHref] = useState<string | undefined>(undefined)
   if (accessToken == null || endpoint == null)
-    throw new Error('Cannot use `MyIdentityLink` outside of `CommerceLayer`')
-  const { domain, slug } = getDomain(endpoint)
+    throw new Error("Cannot use `MyIdentityLink` outside of `CommerceLayer`")
   useEffect(() => {
     if (accessToken && endpoint) {
+      const { domain, slug } = getDomain(endpoint)
       getOrganizationConfig({
         accessToken,
         endpoint,
         params: {
           accessToken,
-          slug
-        }
+          slug,          identityType: type,
+          clientId,
+          scope,
+          returnUrl: returnUrl ?? window.location.href,
+          resetPasswordUrl,        },
       }).then((config) => {
         if (config?.links?.identity) {
           setHref(config.links.identity)
@@ -96,14 +99,14 @@ export function MyIdentityLink(props: Props): JSX.Element {
           const link = getApplicationLink({
             slug,
             accessToken,
-            applicationType: 'identity',
+            applicationType: "identity",
             domain,
             modeType: type,
             clientId,
             scope,
             returnUrl: returnUrl ?? window.location.href,
             resetPasswordUrl,
-            customDomain
+            customDomain,
           })
           setHref(link)
         }
@@ -112,14 +115,14 @@ export function MyIdentityLink(props: Props): JSX.Element {
     return () => {
       setHref(undefined)
     }
-  }, [accessToken, endpoint])
+  }, [accessToken, endpoint, type, clientId, scope, returnUrl, resetPasswordUrl, customDomain])
 
   const parentProps = {
     label,
     href,
     clientId,
     scope,
-    ...p
+    ...p,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
