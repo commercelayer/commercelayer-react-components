@@ -6,7 +6,7 @@ import {
   Subtitle,
   Title,
 } from "@storybook/addon-docs/blocks"
-import type { Decorator, Parameters, Preview } from "@storybook/react-vite"
+import type { Parameters, Preview } from "@storybook/react-vite"
 import React from "react"
 import { worker } from "../mocks/browser"
 
