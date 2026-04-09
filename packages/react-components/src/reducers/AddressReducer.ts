@@ -1,5 +1,4 @@
 import type { Address, Order, OrderUpdate } from "@commercelayer/sdk"
-import camelCase from "lodash/camelCase"
 import type { Dispatch } from "react"
 import type { TResourceError } from "#components/errors/Errors"
 import type { AddressValuesKeys } from "#context/BillingAddressFormContext"
@@ -164,7 +163,7 @@ export const setCloneAddress: SetCloneAddress = (id, resource, dispatch) => {
   dispatch({
     type: "setCloneAddress",
     payload: {
-      [`${camelCase(resource)}Id`]: id,
+      [`${resource.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())}Id`]: id,
     },
   })
 }

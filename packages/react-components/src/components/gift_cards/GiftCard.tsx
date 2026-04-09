@@ -1,6 +1,6 @@
 import { useRef, useContext, type RefObject, type JSX } from 'react';
 import validateFormFields from '#utils/validateFormFields'
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty } from '#utils/isEmpty'
 import GiftCardContext from '#context/GiftCardContext'
 import type { GiftCardI } from '#reducers/GiftCardReducer'
 import type { BaseState } from '#typings/index'

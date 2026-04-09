@@ -4,7 +4,7 @@ import Parent from './Parent'
 import { useState, useEffect, useContext, type JSX } from 'react';
 import type { PropsType } from '#utils/PropsType'
 import type { baseOrderPricePropTypes } from '#typings'
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty } from '#utils/isEmpty'
 
 export type BaseOrderPriceProps = PropsType<
   typeof baseOrderPricePropTypes,

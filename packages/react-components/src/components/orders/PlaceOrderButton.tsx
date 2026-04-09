@@ -1,6 +1,5 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: Avoid infinite loop */
 import type { Order } from "@commercelayer/sdk"
-import isFunction from "lodash/isFunction"
 import {
   type JSX,
   type MouseEvent,
@@ -33,7 +32,7 @@ interface Props
   /**
    * The label of the button
    */
-  label?: string | ReactNode
+  label?: string | ReactNode | (() => ReactNode)
   /**
    * The label of the button when it's loading
    */
@@ -583,7 +582,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const disabledButton = disabled !== undefined ? disabled : notPermitted
   const labelButton = isLoading
     ? loadingLabel
-    : isFunction(label)
+    : typeof label === 'function'
       ? label()
       : label
   const parentProps = {

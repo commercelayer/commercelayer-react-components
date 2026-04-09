@@ -1,5 +1,4 @@
 import type { Order } from "@commercelayer/sdk"
-import isFunction from "lodash/isFunction"
 import { type JSX, type ReactNode, useContext, useState } from "react"
 import Parent from "#components/utils/Parent"
 import AddressContext from "#context/AddressContext"
@@ -24,7 +23,7 @@ interface ChildrenProps extends Omit<Props, "children"> {}
 interface Props
   extends Omit<JSX.IntrinsicElements["button"], "children" | "onClick"> {
   children?: ChildrenFunction<ChildrenProps>
-  label?: string | ReactNode
+  label?: string | ReactNode | (() => ReactNode)
   onClick?: (params: TOnClick) => void
   addressId?: string
   requiredMetadataFields?: string[]
@@ -179,7 +178,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
       }}
       {...p}
     >
-      {isFunction(label) ? label() : label}
+      {typeof label === 'function' ? label() : label}
     </button>
   )
 }

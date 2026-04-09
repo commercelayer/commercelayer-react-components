@@ -1,5 +1,4 @@
 /* eslint-disable n/no-callback-literal */
-import isFunction from 'lodash/isFunction'
 
 export default async function promisify(cb: any, params?: any): Promise<any> {
   return await new Promise<any>((resolve, reject) => {
@@ -8,7 +7,7 @@ export default async function promisify(cb: any, params?: any): Promise<any> {
         if (err) reject(err)
         resolve(res)
       })
-    else if (isFunction(cb?.tokenize)) {
+    else if (typeof cb?.tokenize === 'function') {
       cb?.tokenize((err: any, payload: any) => {
         if (err) reject(err)
         resolve(payload)

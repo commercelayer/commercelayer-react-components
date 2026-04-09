@@ -1,5 +1,5 @@
 import type { Order, OrderUpdate, StripePayment } from "@commercelayer/sdk"
-import isEmpty from "lodash/isEmpty"
+import { isEmpty } from "#utils/isEmpty"
 import type { Dispatch, RefObject } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { BaseError } from "#typings/errors"

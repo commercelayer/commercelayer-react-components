@@ -9,7 +9,7 @@ import {
   type PaymentResource
 } from '#reducers/PaymentMethodReducer'
 import getCardDetails from '#utils/getCardDetails'
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty } from '#utils/isEmpty'
 import { useContext, type JSX } from 'react';
 
 type Props = GatewayBaseType

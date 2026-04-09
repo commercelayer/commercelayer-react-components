@@ -1,6 +1,5 @@
 import { useContext, type JSX } from 'react';
 import Parent from '#components/utils/Parent'
-import get from 'lodash/get'
 import type { Shipment } from '@commercelayer/sdk'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
 
@@ -26,7 +25,10 @@ export function ShipmentField(props: Props): JSX.Element {
   const { name } = props
   const { shipment, keyNumber } = useContext(ShipmentChildrenContext)
   const key = name
-  const text = key !== 'key_number' ? get(shipment, key) : keyNumber
+  const text =
+    key !== 'key_number'
+      ? (shipment?.[key as keyof Shipment] as string | number | undefined)
+      : keyNumber
   const parentProps = {
     shipment,
     ...props

@@ -1,5 +1,5 @@
 import type { StripeElementLocale } from "@stripe/stripe-js"
-import isEmpty from "lodash/isEmpty"
+import { isEmpty } from "#utils/isEmpty"
 import { type JSX, useContext } from "react"
 import type { GatewayBaseType } from "#components/payment_gateways/PaymentGateway"
 import AdyenPayment from "#components/payment_source/AdyenPayment"

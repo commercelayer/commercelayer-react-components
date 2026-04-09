@@ -7,7 +7,7 @@ import type {
 } from "#typings"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
-import isEmpty from "lodash/isEmpty"
+import { isEmpty } from "#utils/isEmpty"
 import {
   getStateOfCountry,
   isValidState,

@@ -1,5 +1,5 @@
 import type { Address as AddressType } from "@commercelayer/sdk"
-import isEmpty from "lodash/isEmpty"
+import { isEmpty } from "#utils/isEmpty"
 import { type JSX, useContext, useEffect, useState } from "react"
 import AddressCardsTemplate, {
   type AddressCardsTemplateChildren,
