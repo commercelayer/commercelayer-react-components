@@ -220,6 +220,8 @@ export function AddToCartButton(props: Props): JSX.Element {
               orderId,
               accessToken,
               slug,
+              skuListId,
+              skuId: sku?.id,
             },
           })
           location.href =
