@@ -1,20 +1,20 @@
+import type { Order } from "@commercelayer/sdk"
+import { iframeResizer } from "iframe-resizer"
+import {
+  type CSSProperties,
+  type JSX,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import OrderStorageContext from "#context/OrderStorageContext"
+import { subscribe, unsubscribe } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
 import { getDomain } from "#utils/getDomain"
 import useCustomContext from "#utils/hooks/useCustomContext"
-import {
-  type CSSProperties,
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  type JSX,
-} from "react"
-import { iframeResizer } from "iframe-resizer"
-import type { Order } from "@commercelayer/sdk"
-import { subscribe, unsubscribe } from "#utils/events"
 import { getOrganizationConfig } from "#utils/organization"
 
 interface IframeData {
@@ -283,7 +283,6 @@ export function HostedCart({
     return (): void => {
       ignore = true
       if (openAdd && type === "mini") {
-        // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
         unsubscribe("open-cart", () => {})
       }
     }
