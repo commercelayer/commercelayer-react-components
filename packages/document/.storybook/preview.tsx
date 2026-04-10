@@ -99,26 +99,18 @@ export const parameters: Parameters = {
 //   [PARAM_KEY]: true,
 // }
 
-// Storybook executes this module in both bootstap phase (Node)
-// and a story's runtime (browser). However, we cannot call `setupWorker`
-// in Node environment, so need to check if we're in a browser.
-if (typeof global.process === "undefined") {
-  // Start the mocking when each story is loaded.
-  // Repetitive calls to the `.start()` method do not register a new worker,
-  // but check whether there's an existing once, reusing it, if so.
-  worker.start({
+// Start MSW before any story renders — must be awaited via Storybook's beforeAll hook.
+// Using beforeAll guarantees the service worker is registered before components mount
+// and make their first API requests, avoiding the race condition of fire-and-forget start().
+export const beforeAll = async (): Promise<void> => {
+  await worker.start({
     serviceWorker: {
       url: `${import.meta.env.BASE_URL}mockServiceWorker.js`,
     },
-    quiet: import.meta.env.PROD,
-    onUnhandledRequest: !import.meta.env.PROD
-      ? (req, reqPrint) => {
-          const url = new URL(req.url)
-          if (url.hostname === "mock.localhost") {
-            reqPrint.warning()
-          }
-        }
-      : () => {},
+    quiet: true,
+    // Bypass unhandled requests (e.g. auth calls to auth.commercelayer.io)
+    // instead of warning — those intentionally hit the real network.
+    onUnhandledRequest: "bypass",
   })
 }
 
