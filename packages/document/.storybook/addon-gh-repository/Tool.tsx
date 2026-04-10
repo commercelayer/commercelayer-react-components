@@ -1,3 +1,4 @@
+import React from 'react'
 import { GithubIcon } from '@storybook/icons'
 import { A, IconButton, Separator } from 'storybook/internal/components'
 import { ADDON_NAME, REPOSITORY_URL, TOOL_ID } from './constants'
