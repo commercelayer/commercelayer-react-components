@@ -63,6 +63,7 @@ const storybookConfig: StorybookConfig = {
     check: false,
     reactDocgen: "react-docgen-typescript",
     reactDocgenTypescriptOptions: {
+      tsconfigPath: resolve(import.meta.dirname, "../tsconfig.app.json"),
       propFilter: (prop) => {
         if (["children", "className"].includes(prop.name)) {
           return true
