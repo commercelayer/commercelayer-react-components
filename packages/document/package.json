@@ -9,8 +9,7 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "mcp": "storybook mcp",
-    "update-mocks": "msw init public/ --save"
+    "mcp": "storybook mcp"
   },
   "dependencies": {
     "@commercelayer/react-components": "workspace:*",
@@ -33,16 +32,10 @@
     "@vitejs/plugin-react": "^5.1.2",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
-    "msw": "^2.12.7",
     "remark-gfm": "^4.0.1",
     "storybook": "^10.3.5",
     "typescript": "~5.9.3",
     "vite": "^7.3.1",
     "vite-tsconfig-paths": "^6.0.4"
-  },
-  "msw": {
-    "workerDirectory": [
-      "public"
-    ]
   }
 }
