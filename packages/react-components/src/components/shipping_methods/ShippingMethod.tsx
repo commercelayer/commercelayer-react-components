@@ -1,7 +1,7 @@
 import { useContext, type ReactNode, useEffect, useState, type JSX } from 'react';
 import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
 import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty } from '#utils/isEmpty'
 
 interface Props {
   children: ReactNode

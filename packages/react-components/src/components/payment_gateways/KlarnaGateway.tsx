@@ -10,7 +10,7 @@ import {
   getPaymentConfig,
   type PaymentResource
 } from '#reducers/PaymentMethodReducer'
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty } from '#utils/isEmpty'
 import PaymentCardsTemplate from '#components/utils/PaymentCardsTemplate'
 import getCardDetails from '#utils/getCardDetails'
 

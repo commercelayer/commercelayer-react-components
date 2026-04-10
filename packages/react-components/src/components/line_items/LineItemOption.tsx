@@ -1,6 +1,5 @@
 import { useContext, type CSSProperties, type JSX } from 'react';
 import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
-import map from 'lodash/map'
 import Parent from '#components/utils/Parent'
 import type { LineItemOption as LineItemOptionType } from '@commercelayer/sdk'
 import type { ChildrenFunction } from '#typings/index'
@@ -42,11 +41,11 @@ export function LineItemOption(props: Props): JSX.Element {
   const label = name != null ? lineItemOption?.options?.[name] : ''
   const components =
     showAll && isJSON(JSON.stringify(lineItemOption?.options)) ? (
-      map(lineItemOption?.options, (value: string, key) => {
+      Object.entries(lineItemOption?.options ?? {}).map(([key, value]) => {
         return (
           <TagElement key={key} {...p}>
             {`${key}:`}
-            <span className={valueClassName}>{`${value}`}</span>
+            <span className={valueClassName}>{`${value as string}`}</span>
           </TagElement>
         )
       })

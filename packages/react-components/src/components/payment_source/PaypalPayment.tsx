@@ -1,12 +1,11 @@
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import isFunction from 'lodash/isFunction'
 import { type ReactNode, useContext, useEffect, useRef, type JSX } from 'react';
 
 export interface PaypalConfig {
   return_url: string
   cancel_url: string
   infoMessage?: {
-    text?: string | ReactNode
+    text?: string | ReactNode | (() => ReactNode)
     className?: string
   }
 }
@@ -71,7 +70,7 @@ export function PaypalPayment({
     <form ref={ref}>
       <div {...p}>
         <span className={infoMessage?.className}>
-          {isFunction(infoMessage?.text)
+          {typeof infoMessage?.text === 'function'
             ? infoMessage?.text()
             : infoMessage?.text || defaultMessage}
         </span>

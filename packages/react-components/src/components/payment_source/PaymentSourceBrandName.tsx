@@ -1,7 +1,6 @@
 import PaymentSourceContext, {
   type IconBrand
 } from '#context/PaymentSourceContext'
-import capitalize from 'lodash/capitalize'
 import { useContext, type JSX } from 'react';
 import Parent from '#components/utils/Parent'
 import type { ChildrenFunction } from '#typings'
@@ -24,7 +23,9 @@ export function PaymentSourceBrandName({
   const { brand } = useContext(PaymentSourceContext)
   const { brand: customerCardBrand } = useContext(CustomerPaymentSourceContext)
   const cardBrand = brand ?? customerCardBrand
-  const brandName = cardBrand && capitalize(cardBrand.replace(/_|-/gm, ' '))
+  const capitalizeStr = (str?: string): string =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : ''
+  const brandName = cardBrand && capitalizeStr(cardBrand.replace(/_|-/gm, ' '))
   const parentProps = {
     brand: brandName,
     label,
@@ -33,7 +34,7 @@ export function PaymentSourceBrandName({
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <span {...props}>{label || capitalize(brandName)}</span>
+    <span {...props}>{label || capitalizeStr(brandName)}</span>
   )
 }
 

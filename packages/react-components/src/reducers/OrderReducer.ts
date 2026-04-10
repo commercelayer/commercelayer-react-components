@@ -7,7 +7,7 @@ import type {
   QueryParamsRetrieve,
   ResourceUpdate,
 } from "@commercelayer/sdk"
-import isEmpty from "lodash/isEmpty"
+import { isEmpty } from "#utils/isEmpty"
 import type { Dispatch } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { BaseError } from "#typings/errors"

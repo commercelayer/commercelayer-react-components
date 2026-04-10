@@ -9,7 +9,7 @@ import type {
   Order,
   OrderUpdate,
 } from "@commercelayer/sdk"
-import isEmpty from "lodash/isEmpty"
+import { isEmpty } from "#utils/isEmpty"
 import { type AddressField, addressFields } from "#reducers/AddressReducer"
 import type { TCustomerAddress } from "#reducers/CustomerReducer"
 import type { BaseError } from "#typings/errors"

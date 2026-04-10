@@ -1,11 +1,5 @@
-// TODO: Remove lodash
-
 import type { AddressCreate } from "@commercelayer/sdk"
-import isEmpty from "lodash/isEmpty"
-import isString from "lodash/isString"
-import keys from "lodash/keys"
-import map from "lodash/map"
-import without from "lodash/without"
+import { isEmpty } from "#utils/isEmpty"
 import type { TResourceError } from "#components/errors/Errors"
 import { type AddressField, addressFields } from "#reducers/AddressReducer"
 import type { AddressInputName } from "#typings"
@@ -49,7 +43,7 @@ export const validateValue: ValidateValue = (val, name, type, resource) => {
       resource,
     }
   }
-  if (type === "email" && isString(val) && !val.match(EMAIL_PATTERN)) {
+  if (type === "email" && typeof val === 'string' && !val.match(EMAIL_PATTERN)) {
     return {
       field: name,
       code: "VALIDATION_ERROR",
@@ -67,7 +61,7 @@ const validateFormFields: ValidateFormFields = (
 ) => {
   const errors: BaseError[] = []
   let values = { metadata: {} }
-  map(fields, (v: FormField) => {
+  Array.from(fields).forEach((v: FormField) => {
     const isTick = "checked" in v
     const val = isTick || (v.value === "on" ? false : v.value)
     const attrName = v.getAttribute("name")
@@ -96,18 +90,17 @@ export function fieldsExist(
   schema: Array<AddressField | string> = addressFields,
 ): boolean {
   if (!address.business) {
-    const required = without(schema, "line_2", "company", "state_code")
-    const validAddress = keys(address).filter((k) => required.includes(k))
+    const required = schema.filter(
+      (v) => !["line_2", "company", "state_code"].includes(v),
+    )
+    const validAddress = Object.keys(address).filter((k) => required.includes(k))
     return required.length > validAddress.length
   }
-  const required = without(
-    schema,
-    "first_name",
-    "last_name",
-    "line_2",
-    "state_code",
+  const required = schema.filter(
+    (v) =>
+      !["first_name", "last_name", "line_2", "state_code"].includes(v),
   )
-  const validAddress = keys(address).filter((k) => required.includes(k))
+  const validAddress = Object.keys(address).filter((k) => required.includes(k))
   return required.length > validAddress.length
 }
 

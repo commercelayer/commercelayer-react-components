@@ -1,12 +1,9 @@
 import type { LineItem, Shipment } from '@commercelayer/sdk'
-import compact from 'lodash/compact'
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty } from '#utils/isEmpty'
 
 export function shipmentsFilled(shipments: Shipment[]): boolean {
-  const filled = compact(
-    shipments.filter((shipment) => !isEmpty(shipment.shipping_method))
-  )
-  return !isEmpty(filled)
+  const filled = shipments.filter((shipment) => !isEmpty(shipment.shipping_method))
+  return filled.length > 0
 }
 
 export function isDoNotShip(lineItems?: LineItem[] | null): boolean {

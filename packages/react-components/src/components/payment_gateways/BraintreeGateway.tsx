@@ -8,7 +8,7 @@ import PaymentSourceContext from '#context/PaymentSourceContext'
 import type { PaymentResource } from '#reducers/PaymentMethodReducer'
 import getCardDetails from '#utils/getCardDetails'
 import type { StripeElementLocale } from '@stripe/stripe-js'
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty } from '#utils/isEmpty'
 import { useContext, type JSX } from 'react';
 import PaymentCardsTemplate from '../utils/PaymentCardsTemplate'
 import { getPaymentAttributes } from '#utils/getPaymentAttributes'

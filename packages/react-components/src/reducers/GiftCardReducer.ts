@@ -11,7 +11,7 @@ import type {
 import type { BaseMetadata } from '#typings'
 import type { Dispatch } from 'react'
 import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty } from '#utils/isEmpty'
 import type { BaseError } from '#typings/errors'
 import getErrors from '#utils/getErrors'
 import getSdk from '#utils/getSdk'

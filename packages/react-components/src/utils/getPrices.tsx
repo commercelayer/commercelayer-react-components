@@ -1,4 +1,3 @@
-import { isEmpty, first, isArray, has } from 'lodash'
 import type { Price } from '@commercelayer/sdk'
 import PriceTemplate, {
   type PTemplateProps
@@ -11,15 +10,15 @@ export function getPriceByCode(
   code: string = ''
 ): Price | undefined {
   return code
-    ? first(skuPrices.filter((p) => p.currency_code === code))
-    : first(skuPrices)
+    ? skuPrices.filter((p) => p.currency_code === code)[0]
+    : skuPrices[0]
 }
 
 export function getPricesComponent(
   skuPrices: Price[],
   props: PTemplateProps
 ): JSX.Element[] | JSX.Element {
-  if (isEmpty(skuPrices)) {
+  if (skuPrices.length === 0) {
     return <PriceTemplate {...props} />
   }
   return skuPrices.map((p, k) => {
@@ -45,10 +44,10 @@ export default function getPrices<P extends Price>(
   prices: P[]
 ): Record<string, P[]> {
   const obj: Record<string, any> = {}
-  if (isArray(prices)) {
+  if (Array.isArray(prices)) {
     prices.forEach((p) => {
       const sku = p?.sku_code ?? ''
-      if (has(obj, sku)) {
+      if (Object.hasOwn(obj, sku)) {
         obj[sku].push(p)
       } else {
         obj[sku] = [p]

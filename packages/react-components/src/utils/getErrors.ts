@@ -1,7 +1,5 @@
 import type { TResourceError } from '#components/errors/Errors'
 import type { BaseError, TAPIError } from '#typings/errors'
-import type { ValueIteratee } from 'lodash'
-import differenceBy from 'lodash/differenceBy'
 import type { Dispatch } from 'react'
 
 interface GetErrorsParams {
@@ -27,11 +25,13 @@ export default function getErrors({
   })
 }
 
+type FilterBy = keyof BaseError | ((item: BaseError) => unknown)
+
 interface SetErrorsArgs<D> {
   currentErrors?: BaseError[]
   newErrors?: BaseError[]
   dispatch?: D
-  filterBy?: ValueIteratee<BaseError>
+  filterBy?: FilterBy
 }
 
 export function setErrors<D extends Dispatch<any>>({
@@ -40,7 +40,14 @@ export function setErrors<D extends Dispatch<any>>({
   dispatch,
   filterBy = 'code'
 }: SetErrorsArgs<D>): BaseError[] {
-  const errorsDifference = differenceBy(currentErrors, newErrors, filterBy)
+  const getValue =
+    typeof filterBy === 'function'
+      ? filterBy
+      : (item: BaseError) => item[filterBy as keyof BaseError]
+  const excludeValues = new Set(newErrors.map(getValue))
+  const errorsDifference = currentErrors.filter(
+    (item) => !excludeValues.has(getValue(item))
+  )
   const mergeErrors = currentErrors?.length === 0 ? newErrors : errorsDifference
   const errors = [...(currentErrors || []), ...mergeErrors]
   if (dispatch != null) {

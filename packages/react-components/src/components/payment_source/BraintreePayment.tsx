@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { type FormEvent, useContext, useEffect, useRef, useState, type JSX } from 'react';
 import PaymentMethodContext from '#context/PaymentMethodContext'
-import isEmpty from 'lodash/isEmpty'
+import { isEmpty } from '#utils/isEmpty'
 import OrderContext from '#context/OrderContext'
 import Parent from '#components/utils/Parent'
 import type { PaymentSourceProps } from './PaymentSource'

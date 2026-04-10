@@ -1,4 +1,4 @@
-import isEmpty from "lodash/isEmpty"
+import { isEmpty } from "#utils/isEmpty"
 
 /**
  * Validate the list of countries the user can optionally pass or returns our default list

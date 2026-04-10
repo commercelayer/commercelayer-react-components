@@ -6,7 +6,6 @@ import OrderListChildrenContext, {
   type TableAccessor
 } from '#context/OrderListChildrenContext'
 import isDate from '#utils/isDate'
-import last from 'lodash/last'
 import { flexRender, type Row } from '@tanstack/react-table'
 
 interface ChildrenProps extends Omit<Props, 'children'> {
@@ -43,7 +42,7 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
     actionsContainerClassName
   } = useContext(OrderListChildrenContext)
   const cell = row?.getVisibleCells().filter((cell) => cell.column.id === field)
-  const isLastRow = last(row?.getVisibleCells())?.column.id === field
+  const isLastRow = row?.getVisibleCells().at(-1)?.column.id === field
   const As = 'td'
   const ActionRow = (): JSX.Element | null => {
     return (
