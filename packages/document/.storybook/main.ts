@@ -4,8 +4,22 @@ import remarkGfm from "remark-gfm"
 import { type UserConfig, mergeConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
 
+const rcSrc = resolve(import.meta.dirname, "../../react-components/src")
+
 const viteOverrides: UserConfig = {
   base: process.env.VITE_BASE_URL,
+  resolve: {
+    alias: {
+      "#components": `${rcSrc}/components`,
+      "#components-utils": `${rcSrc}/components/utils`,
+      "#context": `${rcSrc}/context`,
+      "#hooks": `${rcSrc}/hooks`,
+      "#typings": `${rcSrc}/typings`,
+      "#utils": `${rcSrc}/utils`,
+      "#config": `${rcSrc}/config`,
+      "#reducers": `${rcSrc}/reducers`,
+    },
+  },
   plugins: [
     tsconfigPaths({
       projects: [
@@ -20,7 +34,7 @@ const storybookConfig: StorybookConfig = {
   async viteFinal(config) {
     return mergeConfig(config, viteOverrides)
   },
-  stories: ["../stories/**/*.mdx", "../stories/**/*.stories.@(js|jsx|ts|tsx)"],
+  stories: ["../src/stories/**/*.mdx", "../src/stories/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: ["@storybook/addon-links", {
     name: "@storybook/addon-docs",
     options: {
