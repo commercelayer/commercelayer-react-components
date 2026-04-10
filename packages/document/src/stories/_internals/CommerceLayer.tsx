@@ -1,6 +1,7 @@
-import { type DefaultChildrenType } from '#typings/globals'
-import CommerceLayerComponent from '#components/auth/CommerceLayer'
+import { CommerceLayer as CommerceLayerComponent } from '@commercelayer/react-components'
 import { useGetToken } from './useGetToken'
+
+type DefaultChildrenType = JSX.Element[] | JSX.Element | null
 
 interface Props {
   children: DefaultChildrenType
