@@ -60,7 +60,7 @@ export function getApplicationLink({
   const s = scope ? `&scope=${scope}` : ''
   const r = returnUrl ? `&returnUrl=${returnUrl}` : ''
   const p = resetPasswordUrl ? `&resetPasswordUrl=${resetPasswordUrl}` : ''
-  const params = applicationType === 'identity' ? `${c}${s}${r}${p}` : ''
+  const params = applicationType === 'identity' ? `${c}${s}${r}${p}` : applicationType === 'my-account' ? r : ''
   const domainName = customDomain ?? `${slug}.${env}commercelayer.app`
   const application = customDomain ? '' : `/${applicationType.toString()}`
   return `https://${domainName}${application}/${
