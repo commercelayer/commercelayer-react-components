@@ -1,4 +1,4 @@
-import { useContext, type JSX } from 'react';
+import { useContext, useEffect, useState, type JSX } from 'react';
 import Parent from '../utils/Parent'
 import type { ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
@@ -51,28 +51,13 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
 export function MyAccountLink(props: Props): JSX.Element {
   const { label = 'Go to my account', children, customDomain, returnUrl, ...p } = props
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
+  const [href, setHref] = useState<string | undefined>(undefined)
   if (accessToken == null || endpoint == null)
     throw new Error('Cannot use `MyAccountLink` outside of `CommerceLayer`')
-  const { domain, slug } = getDomain(endpoint)
   const disabled = !('owner' in jwt(accessToken))
-  const href = getApplicationLink({
-    slug,
-    accessToken,
-    applicationType: 'my-account',
-    domain,
-    customDomain,
-    returnUrl
-  })
-  const parentProps = {
-    disabled,
-    label,
-    href,
-    ...p
-  }
-  function handleClick(
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
-  ): void {
-    if (!disabled && accessToken && endpoint) {
+  useEffect(() => {
+    if (accessToken && endpoint) {
+      const { domain, slug } = getDomain(endpoint)
       getOrganizationConfig({
         accessToken,
         endpoint,
@@ -83,16 +68,33 @@ export function MyAccountLink(props: Props): JSX.Element {
         }
       }).then((config) => {
         if (config?.links?.my_account) {
-          e.preventDefault()
-          location.href = config.links.my_account
+          setHref(config.links.my_account)
+        } else {
+          setHref(getApplicationLink({
+            slug,
+            accessToken,
+            applicationType: 'my-account',
+            domain,
+            customDomain,
+            returnUrl
+          }))
         }
       })
     }
+    return () => {
+      setHref(undefined)
+    }
+  }, [accessToken, endpoint, returnUrl, customDomain])
+  const parentProps = {
+    disabled,
+    label,
+    href,
+    ...p
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a aria-disabled={disabled} onClick={handleClick} href={href} {...p}>
+    <a aria-disabled={disabled} href={href} {...p}>
       {label}
     </a>
   )
