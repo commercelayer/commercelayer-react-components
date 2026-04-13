@@ -156,6 +156,7 @@ export function HostedCart({
   const [isOpen, setOpen] = useState(false)
   const ref = useRef<HTMLIFrameElement>(null)
   const loadedOrderIdRef = useRef<string | null>(null)
+  const prevOpenRef = useRef<boolean | undefined>(undefined)
   const { accessToken, endpoint } = useCustomContext({
     context: CommerceLayerContext,
     contextComponentName: "CommerceLayer",
@@ -223,24 +224,26 @@ export function HostedCart({
   useEffect(() => {
     const resolvedOrderId = order?.id ?? localStorage.getItem(persistKey)
     let ignore = false
-    if (open != null && open !== isOpen) {
+    if (open != null && prevOpenRef.current !== open) {
+      prevOpenRef.current = open
       setOpen(open)
     }
-    if (openAdd && type === "mini") {
-      subscribe("open-cart", () => {
-        window.document.body.style.overflow = "hidden"
-        if (src == null && resolvedOrderId == null) {
-          setOrder(true)
-        } else {
-          if (src != null && ref.current != null) {
-            ref.current.src = src
-          }
-          setTimeout(() => {
-            if (handleOpen != null) handleOpen()
-            else setOpen(true)
-          }, 300)
+    const openCartHandler = (): void => {
+      window.document.body.style.overflow = "hidden"
+      if (src == null && resolvedOrderId == null) {
+        setOrder(true)
+      } else {
+        if (src != null && ref.current != null) {
+          ref.current.src = src
         }
-      })
+        setTimeout(() => {
+          if (handleOpen != null) handleOpen()
+          else setOpen(true)
+        }, 300)
+      }
+    }
+    if (openAdd && type === "mini") {
+      subscribe("open-cart", openCartHandler)
     }
     if (
       src == null &&
@@ -283,7 +286,7 @@ export function HostedCart({
     return (): void => {
       ignore = true
       if (openAdd && type === "mini") {
-        unsubscribe("open-cart", () => {})
+        unsubscribe("open-cart", openCartHandler)
       }
     }
   }, [src, open, order?.id, accessToken, persistKey])
@@ -338,8 +341,14 @@ export function HostedCart({
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            style={{ ...defaultStyle.icon, ...style?.icon }}
+            style={{ ...defaultStyle.icon, ...style?.icon, cursor: "pointer" }}
             onClick={onCloseCart}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                onCloseCart()
+              }
+            }}
+            aria-label="Close cart"
           >
             <path
               strokeLinecap="round"
