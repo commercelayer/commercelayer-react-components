@@ -1,4 +1,4 @@
-import { useContext, type JSX } from 'react';
+import { useContext, useEffect, useState, type JSX } from 'react';
 import Parent from '../utils/Parent'
 import type { ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
@@ -31,6 +31,11 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
    * The domain of your forked application
    */
   customDomain?: string
+  /**
+   * The return URL used by My Account to render the "back to store" link and the logout redirect.
+   * @link https://github.com/commercelayer/mfe-my-account?tab=readme-ov-file#back-to-shop-and-logout
+   */
+  returnUrl?: string
 }
 
 /**
@@ -44,48 +49,52 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
  * @link https://github.com/commercelayer/mfe-my-account
  */
 export function MyAccountLink(props: Props): JSX.Element {
-  const { label = 'Go to my account', children, customDomain, ...p } = props
+  const { label = 'Go to my account', children, customDomain, returnUrl, ...p } = props
   const { accessToken, endpoint } = useContext(CommerceLayerContext)
+  const [href, setHref] = useState<string | undefined>(undefined)
   if (accessToken == null || endpoint == null)
     throw new Error('Cannot use `MyAccountLink` outside of `CommerceLayer`')
-  const { domain, slug } = getDomain(endpoint)
   const disabled = !('owner' in jwt(accessToken))
-  const href = getApplicationLink({
-    slug,
-    accessToken,
-    applicationType: 'my-account',
-    domain,
-    customDomain
-  })
+  useEffect(() => {
+    if (accessToken && endpoint) {
+      const { domain, slug } = getDomain(endpoint)
+      getOrganizationConfig({
+        accessToken,
+        endpoint,
+        params: {
+          accessToken,
+          slug,
+          returnUrl
+        }
+      }).then((config) => {
+        if (config?.links?.my_account) {
+          setHref(config.links.my_account)
+        } else {
+          setHref(getApplicationLink({
+            slug,
+            accessToken,
+            applicationType: 'my-account',
+            domain,
+            customDomain,
+            returnUrl
+          }))
+        }
+      })
+    }
+    return () => {
+      setHref(undefined)
+    }
+  }, [accessToken, endpoint, returnUrl, customDomain])
   const parentProps = {
     disabled,
     label,
     href,
     ...p
   }
-  function handleClick(
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
-  ): void {
-    if (!disabled && accessToken && endpoint) {
-      getOrganizationConfig({
-        accessToken,
-        endpoint,
-        params: {
-          accessToken,
-          slug
-        }
-      }).then((config) => {
-        if (config?.links?.my_account) {
-          e.preventDefault()
-          location.href = config.links.my_account
-        }
-      })
-    }
-  }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a aria-disabled={disabled} onClick={handleClick} href={href} {...p}>
+    <a aria-disabled={disabled} href={href} {...p}>
       {label}
     </a>
   )
