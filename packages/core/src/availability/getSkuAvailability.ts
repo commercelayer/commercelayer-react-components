@@ -62,7 +62,18 @@ export async function getSkuAvailability({
   const skuInventory = await skus.retrieve(sku.id, {
     fields: { skus: ["inventory", "code"] },
   })
-  const inventory = (skuInventory as Sku & { inventory?: { available: boolean; quantity: number; levels: Array<{ quantity: number; delivery_lead_times: DeliveryLeadTime[] }> } }).inventory
+  const inventory = (
+    skuInventory as Sku & {
+      inventory?: {
+        available: boolean
+        quantity: number
+        levels: Array<{
+          quantity: number
+          delivery_lead_times: DeliveryLeadTime[]
+        }>
+      }
+    }
+  ).inventory
   if (inventory == null) return null
   const [level] = inventory.levels ?? []
   const [delivery] = level?.delivery_lead_times ?? []

@@ -50,7 +50,10 @@ describe("getSkus interceptors", () => {
     const onSuccess = vi.fn()
     const interceptors: InterceptorManager = { response: { onSuccess } }
     await getSkus({ accessToken: "fake-token", interceptors })
-    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(onSuccess, undefined)
+    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(
+      onSuccess,
+      undefined,
+    )
     expect(mockAddRequestInterceptor).not.toHaveBeenCalled()
   })
 

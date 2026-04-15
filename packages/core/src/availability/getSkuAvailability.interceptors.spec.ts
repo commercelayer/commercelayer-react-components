@@ -51,7 +51,14 @@ const mockInventory = {
         {
           min: { hours: 24, days: 1 },
           max: { hours: 48, days: 2 },
-          shipping_method: { name: "Standard", reference: "STD", price_amount_cents: 0, free_over_amount_cents: 0, formatted_price_amount: "$0", formatted_free_over_amount: "$0" },
+          shipping_method: {
+            name: "Standard",
+            reference: "STD",
+            price_amount_cents: 0,
+            free_over_amount_cents: 0,
+            formatted_price_amount: "$0",
+            formatted_free_over_amount: "$0",
+          },
         },
       ],
     },
@@ -65,7 +72,11 @@ describe("getSkuAvailability interceptors", () => {
     mockSkusRetrieve.mockResolvedValue({ code: "SKU-1", inventory: null })
     const onSuccess = vi.fn()
     const interceptors: InterceptorManager = { request: { onSuccess } }
-    await getSkuAvailability({ accessToken: "fake-token", skuId: "sku-1", interceptors })
+    await getSkuAvailability({
+      accessToken: "fake-token",
+      skuId: "sku-1",
+      interceptors,
+    })
     expect(mockAddRequestInterceptor).toHaveBeenCalledWith(onSuccess, undefined)
     expect(mockAddResponseInterceptor).not.toHaveBeenCalled()
   })
@@ -74,8 +85,15 @@ describe("getSkuAvailability interceptors", () => {
     mockSkusRetrieve.mockResolvedValue({ code: "SKU-1", inventory: null })
     const onSuccess = vi.fn()
     const interceptors: InterceptorManager = { response: { onSuccess } }
-    await getSkuAvailability({ accessToken: "fake-token", skuId: "sku-1", interceptors })
-    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(onSuccess, undefined)
+    await getSkuAvailability({
+      accessToken: "fake-token",
+      skuId: "sku-1",
+      interceptors,
+    })
+    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(
+      onSuccess,
+      undefined,
+    )
     expect(mockAddRequestInterceptor).not.toHaveBeenCalled()
   })
 
@@ -89,14 +107,23 @@ describe("getSkuAvailability interceptors", () => {
 
   test("should return null when inventory is null (covers inventory == null branch)", async () => {
     mockSkusRetrieve.mockResolvedValue({ code: "SKU-1", inventory: null })
-    const result = await getSkuAvailability({ accessToken: "fake-token", skuId: "sku-1" })
+    const result = await getSkuAvailability({
+      accessToken: "fake-token",
+      skuId: "sku-1",
+    })
     expect(result).toBeNull()
     expect(mockSkusRetrieve).toHaveBeenCalledOnce()
   })
 
   test("should return availability data when inventory is present (covers retrieve + return path)", async () => {
-    mockSkusRetrieve.mockResolvedValue({ code: "SKU-1", inventory: mockInventory })
-    const result = await getSkuAvailability({ accessToken: "fake-token", skuId: "sku-1" })
+    mockSkusRetrieve.mockResolvedValue({
+      code: "SKU-1",
+      inventory: mockInventory,
+    })
+    const result = await getSkuAvailability({
+      accessToken: "fake-token",
+      skuId: "sku-1",
+    })
     expect(result).not.toBeNull()
     expect(result?.skuCode).toBe("SKU-1")
     expect(result?.quantity).toBe(5)
@@ -117,7 +144,10 @@ describe("getSkuAvailability interceptors", () => {
       code: "SKU-1",
       inventory: { quantity: 3, levels: [] },
     })
-    const result = await getSkuAvailability({ accessToken: "fake-token", skuId: "sku-1" })
+    const result = await getSkuAvailability({
+      accessToken: "fake-token",
+      skuId: "sku-1",
+    })
     expect(result).not.toBeNull()
     expect(result?.quantity).toBe(3)
     expect(result?.min).toBeUndefined()
@@ -129,7 +159,10 @@ describe("getSkuAvailability interceptors", () => {
       code: "SKU-1",
       inventory: { quantity: 3 },
     })
-    const result = await getSkuAvailability({ accessToken: "fake-token", skuId: "sku-1" })
+    const result = await getSkuAvailability({
+      accessToken: "fake-token",
+      skuId: "sku-1",
+    })
     expect(result).not.toBeNull()
     expect(result?.quantity).toBe(3)
     expect(result?.min).toBeUndefined()
@@ -139,9 +172,15 @@ describe("getSkuAvailability interceptors", () => {
   test("should return availability with undefined delivery when delivery_lead_times is empty", async () => {
     mockSkusRetrieve.mockResolvedValue({
       code: "SKU-1",
-      inventory: { quantity: 2, levels: [{ quantity: 2, delivery_lead_times: [] }] },
+      inventory: {
+        quantity: 2,
+        levels: [{ quantity: 2, delivery_lead_times: [] }],
+      },
     })
-    const result = await getSkuAvailability({ accessToken: "fake-token", skuId: "sku-1" })
+    const result = await getSkuAvailability({
+      accessToken: "fake-token",
+      skuId: "sku-1",
+    })
     expect(result).not.toBeNull()
     expect(result?.quantity).toBe(2)
     expect(result?.min).toBeUndefined()

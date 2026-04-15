@@ -58,12 +58,18 @@ describe("updatePrice interceptors", () => {
       resource: { id: "price-1" },
       interceptors,
     })
-    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(onSuccess, undefined)
+    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(
+      onSuccess,
+      undefined,
+    )
     expect(mockAddRequestInterceptor).not.toHaveBeenCalled()
   })
 
   test("should not call interceptor methods when no interceptors provided", async () => {
-    await updatePrice({ accessToken: "fake-token", resource: { id: "price-1" } })
+    await updatePrice({
+      accessToken: "fake-token",
+      resource: { id: "price-1" },
+    })
     expect(mockAddRequestInterceptor).not.toHaveBeenCalled()
     expect(mockAddResponseInterceptor).not.toHaveBeenCalled()
     expect(mockAddRawResponseReader).not.toHaveBeenCalled()

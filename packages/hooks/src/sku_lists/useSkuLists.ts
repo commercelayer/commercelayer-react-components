@@ -1,11 +1,12 @@
 import {
   getSkuLists,
+  type InterceptorManager,
   retrieveSkuList,
   type SkuList,
 } from "@commercelayer/core"
+import type { QueryParamsList, QueryParamsRetrieve } from "@commercelayer/sdk"
 import { useCallback, useState } from "react"
 import useSWR, { type KeyedMutator } from "swr"
-import type { QueryParamsList, QueryParamsRetrieve } from "@commercelayer/sdk"
 
 interface UseSkuListsReturn {
   skuLists: SkuList[]
@@ -28,7 +29,10 @@ interface UseSkuListsReturn {
  * @param accessToken - Commerce Layer API access token
  * @returns Object containing SKU lists data, loading states, and action methods
  */
-export function useSkuLists(accessToken: string): UseSkuListsReturn {
+export function useSkuLists(
+  accessToken: string,
+  interceptors?: InterceptorManager,
+): UseSkuListsReturn {
   const [params, setParams] = useState<QueryParamsList<SkuList>>()
   const [shouldFetch, setShouldFetch] = useState(false)
 
@@ -37,7 +41,7 @@ export function useSkuLists(accessToken: string): UseSkuListsReturn {
       ? ["sku_lists", "get", accessToken, params]
       : null,
     async (): Promise<SkuList[]> => {
-      const result = await getSkuLists({ accessToken, params })
+      const result = await getSkuLists({ accessToken, params, interceptors })
       return result
     },
     {
@@ -46,13 +50,10 @@ export function useSkuLists(accessToken: string): UseSkuListsReturn {
     },
   )
 
-  const fetchSkuLists = useCallback(
-    (newParams?: QueryParamsList<SkuList>) => {
-      setParams(newParams)
-      setShouldFetch(true)
-    },
-    [],
-  )
+  const fetchSkuLists = useCallback((newParams?: QueryParamsList<SkuList>) => {
+    setParams(newParams)
+    setShouldFetch(true)
+  }, [])
 
   const handleRetrieveSkuList = useCallback(
     async (
@@ -60,16 +61,18 @@ export function useSkuLists(accessToken: string): UseSkuListsReturn {
       params?: QueryParamsRetrieve<SkuList>,
     ): Promise<SkuList | undefined> => {
       if (!id) throw new Error("SKU list ID is required for retrieve")
-      return await retrieveSkuList({ accessToken, id, params })
+      return await retrieveSkuList({ accessToken, id, params, interceptors })
     },
-    [accessToken],
+    [accessToken, interceptors],
   )
 
   const clearSkuLists = useCallback(() => {
     setShouldFetch(false)
+    // c8 ignore start
     mutate(undefined, false)?.catch(() => {
       // cache may be destroyed (e.g. isolated SWRConfig in tests)
     })
+    // c8 ignore end
   }, [mutate])
 
   return {

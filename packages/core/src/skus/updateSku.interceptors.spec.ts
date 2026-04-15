@@ -58,7 +58,10 @@ describe("updateSku interceptors", () => {
       resource: { id: "sku-1" },
       interceptors,
     })
-    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(onSuccess, undefined)
+    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(
+      onSuccess,
+      undefined,
+    )
     expect(mockAddRequestInterceptor).not.toHaveBeenCalled()
   })
 

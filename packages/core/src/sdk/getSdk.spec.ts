@@ -1,9 +1,13 @@
-import { describe, expect, vi, beforeEach } from "vitest"
-import { test } from "vitest"
-import { getSdk } from "./index.js"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 import type { InterceptorManager } from "./index.js"
+import { getSdk } from "./index.js"
 
-const { mockAddRequestInterceptor, mockAddResponseInterceptor, mockAddRawResponseReader, mockSdkInstance } = vi.hoisted(() => {
+const {
+  mockAddRequestInterceptor,
+  mockAddResponseInterceptor,
+  mockAddRawResponseReader,
+  mockSdkInstance,
+} = vi.hoisted(() => {
   const mockAddRequestInterceptor = vi.fn().mockReturnValue(1)
   const mockAddResponseInterceptor = vi.fn().mockReturnValue(1)
   const mockAddRawResponseReader = vi.fn()
@@ -12,7 +16,12 @@ const { mockAddRequestInterceptor, mockAddResponseInterceptor, mockAddRawRespons
     addResponseInterceptor: mockAddResponseInterceptor,
     addRawResponseReader: mockAddRawResponseReader,
   }
-  return { mockAddRequestInterceptor, mockAddResponseInterceptor, mockAddRawResponseReader, mockSdkInstance }
+  return {
+    mockAddRequestInterceptor,
+    mockAddResponseInterceptor,
+    mockAddRawResponseReader,
+    mockSdkInstance,
+  }
 })
 
 vi.mock("@commercelayer/sdk/bundle", () => ({
@@ -72,7 +81,10 @@ describe("getSdk", () => {
     }
     getSdk({ accessToken: "fake-token", interceptors })
     expect(mockAddResponseInterceptor).toHaveBeenCalledOnce()
-    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(onSuccess, onFailure)
+    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(
+      onSuccess,
+      onFailure,
+    )
     expect(mockAddRequestInterceptor).not.toHaveBeenCalled()
     expect(mockAddRawResponseReader).not.toHaveBeenCalled()
   })
@@ -105,10 +117,7 @@ describe("getSdk", () => {
       request: { onSuccess },
     }
     getSdk({ accessToken: "fake-token", interceptors })
-    expect(mockAddRequestInterceptor).toHaveBeenCalledWith(
-      onSuccess,
-      undefined,
-    )
+    expect(mockAddRequestInterceptor).toHaveBeenCalledWith(onSuccess, undefined)
   })
 
   test("should accept partial interceptor handlers (only onFailure)", () => {

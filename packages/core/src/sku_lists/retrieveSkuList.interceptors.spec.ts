@@ -41,7 +41,11 @@ describe("retrieveSkuList interceptors", () => {
   test("should forward request interceptors to getSdk", async () => {
     const onSuccess = vi.fn()
     const interceptors: InterceptorManager = { request: { onSuccess } }
-    await retrieveSkuList({ accessToken: "fake-token", id: "list-1", interceptors })
+    await retrieveSkuList({
+      accessToken: "fake-token",
+      id: "list-1",
+      interceptors,
+    })
     expect(mockAddRequestInterceptor).toHaveBeenCalledWith(onSuccess, undefined)
     expect(mockAddResponseInterceptor).not.toHaveBeenCalled()
   })
@@ -49,8 +53,15 @@ describe("retrieveSkuList interceptors", () => {
   test("should forward response interceptors to getSdk", async () => {
     const onSuccess = vi.fn()
     const interceptors: InterceptorManager = { response: { onSuccess } }
-    await retrieveSkuList({ accessToken: "fake-token", id: "list-1", interceptors })
-    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(onSuccess, undefined)
+    await retrieveSkuList({
+      accessToken: "fake-token",
+      id: "list-1",
+      interceptors,
+    })
+    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(
+      onSuccess,
+      undefined,
+    )
     expect(mockAddRequestInterceptor).not.toHaveBeenCalled()
   })
 

@@ -1,5 +1,6 @@
 import {
   getSkuAvailability,
+  type InterceptorManager,
   type SkuAvailability,
 } from "@commercelayer/core"
 import { useCallback, useState } from "react"
@@ -22,7 +23,10 @@ interface UseAvailabilityReturn {
  * @param accessToken - Commerce Layer API access token
  * @returns Object containing availability data, loading states, and action methods
  */
-export function useAvailability(accessToken: string): UseAvailabilityReturn {
+export function useAvailability(
+  accessToken: string,
+  interceptors?: InterceptorManager,
+): UseAvailabilityReturn {
   const [fetchParams, setFetchParams] = useState<{
     skuCode?: string
     skuId?: string
@@ -31,18 +35,14 @@ export function useAvailability(accessToken: string): UseAvailabilityReturn {
   const { data, error, isLoading, isValidating, mutate } =
     useSWR<SkuAvailability | null>(
       fetchParams && accessToken
-        ? [
-            "availability",
-            accessToken,
-            fetchParams.skuCode,
-            fetchParams.skuId,
-          ]
+        ? ["availability", accessToken, fetchParams.skuCode, fetchParams.skuId]
         : null,
       async (): Promise<SkuAvailability | null> => {
         return await getSkuAvailability({
           accessToken,
           skuCode: fetchParams?.skuCode,
           skuId: fetchParams?.skuId,
+          interceptors,
         })
       },
       {
@@ -60,9 +60,11 @@ export function useAvailability(accessToken: string): UseAvailabilityReturn {
 
   const clearAvailability = useCallback(() => {
     setFetchParams(null)
+    // c8 ignore start
     mutate(undefined, false)?.catch(() => {
       // cache may be destroyed (e.g. isolated SWRConfig in tests)
     })
+    // c8 ignore end
   }, [mutate])
 
   return {

@@ -1,5 +1,6 @@
 import {
   getPrices,
+  type InterceptorManager,
   type Price,
   type PriceUpdate,
   retrievePrice,
@@ -29,20 +30,13 @@ type UseAction = "get" | "retrieve" | "update" | null
  * Provides methods to fetch, retrieve, update, and clear prices.
  *
  * @param accessToken - Commerce Layer API access token
+ * @param interceptors - Optional SDK interceptors for request/response customization
  * @returns Object containing prices data, loading states, and action methods
- *
- * @example
- * ```typescript
- * const { prices, fetchPrices, updatePrice } = usePrices(accessToken);
- *
- * // Fetch prices with filters
- * fetchPrices({ filters: { currency_code_eq: 'USD' } });
- *
- * // Update a specific price
- * await updatePrice({ id: 'price_123', amount_cents: 1000 });
- * ```
  */
-export function usePrices(accessToken: string): UsePricesReturn {
+export function usePrices(
+  accessToken: string,
+  interceptors?: InterceptorManager,
+): UsePricesReturn {
   const [params, setParams] =
     useState<Parameters<typeof getPrices>[0]["params"]>()
   const [shouldFetch, setShouldFetch] = useState(false)
@@ -51,7 +45,7 @@ export function usePrices(accessToken: string): UsePricesReturn {
   const { data, error, isLoading, isValidating, mutate } = useSWR<Price[]>(
     shouldFetch && accessToken ? ["prices", "get", accessToken, params] : null,
     async (): Promise<Price[]> => {
-      return await getPrices({ accessToken, params })
+      return await getPrices({ accessToken, params, interceptors })
     },
     {
       revalidateOnFocus: false,
@@ -72,10 +66,10 @@ export function usePrices(accessToken: string): UsePricesReturn {
     async (id: string): Promise<Price | undefined> => {
       if (!id) throw new Error("Price ID is required for retrieve")
       setAction("retrieve")
-      const result = await retrievePrice({ accessToken, id })
+      const result = await retrievePrice({ accessToken, id, interceptors })
       return result
     },
-    [accessToken],
+    [accessToken, interceptors],
   )
 
   const handleUpdatePrice = useCallback(
@@ -83,7 +77,7 @@ export function usePrices(accessToken: string): UsePricesReturn {
       if (!resource?.id)
         throw new Error("Price resource ID is required for update")
       setAction("update")
-      const result = await updatePrice({ accessToken, resource })
+      const result = await updatePrice({ accessToken, resource, interceptors })
       await mutate(
         (current) =>
           current?.map((p: Price) => (p.id === result.id ? result : p)) ?? [
@@ -93,7 +87,7 @@ export function usePrices(accessToken: string): UsePricesReturn {
       )
       return result
     },
-    [accessToken, mutate],
+    [accessToken, mutate, interceptors],
   )
 
   const clearPrices = useCallback(() => {
