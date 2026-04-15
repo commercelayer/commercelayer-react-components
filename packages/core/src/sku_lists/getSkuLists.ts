@@ -21,7 +21,8 @@ interface GetSkuLists extends RequestConfig {
 export async function getSkuLists({
   accessToken,
   params,
+  interceptors,
 }: GetSkuLists): Promise<ListResponse<SkuList>> {
-  getSdk({ accessToken })
+  getSdk({ accessToken, interceptors })
   return await sku_lists.list(params)
 }

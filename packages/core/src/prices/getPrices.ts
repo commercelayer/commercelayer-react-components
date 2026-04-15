@@ -27,7 +27,8 @@ export async function getPrices({
   accessToken,
   params,
   options,
+  interceptors,
 }: GetPricesParams): Promise<ListResponse<Price>> {
-  getSdk({ accessToken })
+  getSdk({ accessToken, interceptors })
   return await prices.list(params, options)
 }

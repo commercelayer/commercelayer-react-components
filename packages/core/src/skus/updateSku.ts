@@ -28,7 +28,8 @@ export async function updateSku({
   resource,
   params,
   options,
+  interceptors,
 }: UpdateSkuParams): Promise<Sku> {
-  getSdk({ accessToken })
+  getSdk({ accessToken, interceptors })
   return await skus.update(resource, params, options)
 }

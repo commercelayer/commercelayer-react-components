@@ -46,8 +46,9 @@ export async function getSkuAvailability({
   accessToken,
   skuCode,
   skuId,
+  interceptors,
 }: GetSkuAvailability): Promise<SkuAvailability | null> {
-  getSdk({ accessToken })
+  getSdk({ accessToken, interceptors })
   const [sku] =
     skuId != null
       ? [{ id: skuId } as Sku]

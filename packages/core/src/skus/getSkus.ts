@@ -27,7 +27,8 @@ export async function getSkus({
   accessToken,
   params,
   options,
+  interceptors,
 }: GetSkusParams): Promise<ListResponse<Sku>> {
-  getSdk({ accessToken })
+  getSdk({ accessToken, interceptors })
   return await skus.list(params, options)
 }
