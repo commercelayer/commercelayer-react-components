@@ -46,14 +46,14 @@ export function AvailabilityContainer({
 }: Props): JSX.Element {
   const { lineItem } = useContext(LineItemChildrenContext)
   const { sku } = useContext(SkuChildrenContext)
-  const { accessToken } = useCustomContext({
+  const { accessToken, interceptors } = useCustomContext({
     context: CommerceLayerContext,
     contextComponentName: "CommerceLayer",
     currentComponentName: "AvailabilityContainer",
     key: "accessToken",
   })
   const { availability, fetchAvailability, clearAvailability } =
-    useAvailability(accessToken ?? "")
+    useAvailability(accessToken ?? "", interceptors)
   const sCode = skuCode ?? lineItem?.sku_code ?? sku?.code
 
   useEffect(() => {

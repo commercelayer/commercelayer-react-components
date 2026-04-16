@@ -33,7 +33,7 @@ describe('AvailabilityContainer component', () => {
 
   it<AvailabilityCtx>('renders children', (ctx) => {
     const { container } = render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <AvailabilityContainer skuCode={ctx.skuCode}>
           <span data-testid='child'>availability</span>
         </AvailabilityContainer>
@@ -46,7 +46,7 @@ describe('AvailabilityContainer component', () => {
   it<AvailabilityCtx>('fetches availability and exposes quantity in context', async (ctx) => {
     let capturedQty: number | undefined
     render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <AvailabilityContainer skuCode={ctx.skuCode}>
           <AvailabilityInspector onCapture={(q) => { capturedQty = q }} />
         </AvailabilityContainer>
@@ -62,7 +62,7 @@ describe('AvailabilityContainer component', () => {
 
   it<AvailabilityCtx>('renders AvailabilityTemplate with available or out-of-stock text', async (ctx) => {
     render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <AvailabilityContainer skuCode={ctx.skuCode}>
           <AvailabilityTemplate
             labels={{ available: 'Available', outOfStock: 'Out of stock' }}
@@ -83,7 +83,7 @@ describe('AvailabilityContainer component', () => {
   it<AvailabilityCtx>('calls getQuantity callback when quantity is fetched', async (ctx) => {
     const onQuantity = vi.fn()
     render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <AvailabilityContainer skuCode={ctx.skuCode} getQuantity={onQuantity}>
           <span />
         </AvailabilityContainer>
@@ -98,7 +98,7 @@ describe('AvailabilityContainer component', () => {
 
   it<AvailabilityCtx>('renders nothing meaningful when skuCode is empty', (ctx) => {
     const { container } = render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <AvailabilityContainer>
           <AvailabilityTemplate />
         </AvailabilityContainer>

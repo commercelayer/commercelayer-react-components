@@ -32,7 +32,7 @@ interface TFakeAddressParams {
   /**
    * The Commerce Layer config
    */
-  config: Required<CommerceLayerConfig>
+  config: Required<Pick<CommerceLayerConfig, 'accessToken' | 'endpoint'>>
   /**
    * The address resource
    */

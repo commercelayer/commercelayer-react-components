@@ -24,7 +24,7 @@ describe('SkusContainer component', () => {
 
   it<SkusContext>('renders SKU code fields for all skus', async (ctx) => {
     render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <SkusContainer skus={ctx.skus}>
           <Skus>
             <SkuField attribute='code' tagElement='p' />
@@ -41,7 +41,7 @@ describe('SkusContainer component', () => {
 
   it<SkusContext>('renders correct number of SKU items', async (ctx) => {
     render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <SkusContainer skus={ctx.skus}>
           <Skus>
             <SkuField attribute='code' tagElement='p' />
@@ -58,7 +58,7 @@ describe('SkusContainer component', () => {
 
   it<SkusContext>('renders SKU name field', async (ctx) => {
     render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <SkusContainer skus={[ctx.sku]}>
           <Skus>
             <SkuField attribute='name' tagElement='span' data-testid='sku-name' />
@@ -73,7 +73,7 @@ describe('SkusContainer component', () => {
 
   it<SkusContext>('renders SKU image via image_url field', async (ctx) => {
     const { container } = render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <SkusContainer skus={[ctx.sku]}>
           <Skus>
             <SkuField attribute='image_url' tagElement='img' />
@@ -94,7 +94,7 @@ describe('SkusContainer component', () => {
 
   it<SkusContext>('renders nothing when skus prop is empty', (ctx) => {
     const { container } = render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <SkusContainer skus={[]}>
           <Skus>
             <SkuField attribute='code' tagElement='p' />
@@ -108,7 +108,7 @@ describe('SkusContainer component', () => {
 
   it<SkusContext>('applies queryParams alongside code_in filter', async (ctx) => {
     render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <SkusContainer skus={ctx.skus} queryParams={{ pageSize: 1 }}>
           <Skus>
             <SkuField attribute='code' tagElement='p' />

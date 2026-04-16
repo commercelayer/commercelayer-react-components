@@ -1,8 +1,9 @@
+import type { InterceptorManager } from '@commercelayer/core'
 import { createContext } from 'react'
 
 export interface CommerceLayerConfig {
   accessToken?: string
-  endpoint?: string
+  interceptors?: InterceptorManager
 }
 
 const initial: CommerceLayerConfig = {}

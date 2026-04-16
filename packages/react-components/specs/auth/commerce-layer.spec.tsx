@@ -1,12 +1,12 @@
 import CommerceLayer from '#components/auth/CommerceLayer'
-import CommerceLayerContext from '#context/CommerceLayerContext'
+import CommerceLayerContext, { type CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { render, screen } from '@testing-library/react'
 import { useContext } from 'react'
 
 function ContextInspector({
   onContext
 }: {
-  onContext: (ctx: ReturnType<typeof useContext<typeof CommerceLayerContext>>) => void
+  onContext: (ctx: CommerceLayerConfig) => void
 }) {
   const ctx = useContext(CommerceLayerContext)
   onContext(ctx)
@@ -24,28 +24,30 @@ function makeFakeToken(slug: string): string {
 
 describe('CommerceLayer component', () => {
   it('renders children', () => {
+    const token = makeFakeToken('test-org')
     render(
-      <CommerceLayer accessToken='fake' endpoint='https://test.commercelayer.io'>
+      <CommerceLayer accessToken={token}>
         <span data-testid='child'>hello</span>
       </CommerceLayer>
     )
     expect(screen.getByTestId('child').textContent).toBe('hello')
   })
 
-  it('provides accessToken and endpoint to context', () => {
-    let captured: { accessToken?: string; endpoint?: string } = {}
+  it('provides accessToken and derived endpoint to context', () => {
+    const token = makeFakeToken('my-org')
+    let captured: CommerceLayerConfig = {}
     render(
-      <CommerceLayer accessToken='my-token' endpoint='https://explicit.commercelayer.io'>
+      <CommerceLayer accessToken={token}>
         <ContextInspector onContext={(ctx) => { captured = ctx }} />
       </CommerceLayer>
     )
-    expect(captured.accessToken).toBe('my-token')
-    expect(captured.endpoint).toBe('https://explicit.commercelayer.io')
+    expect(captured.accessToken).toBe(token)
+    expect(captured.endpoint).toBe('https://my-org.commercelayer.io')
   })
 
-  it('derives endpoint from JWT when endpoint is not provided', () => {
+  it('derives endpoint from JWT', () => {
     const token = makeFakeToken('my-org')
-    let captured: { endpoint?: string } = {}
+    let captured: CommerceLayerConfig = {}
     render(
       <CommerceLayer accessToken={token}>
         <ContextInspector onContext={(ctx) => { captured = ctx }} />
@@ -54,26 +56,16 @@ describe('CommerceLayer component', () => {
     expect(captured.endpoint).toBe('https://my-org.commercelayer.io')
   })
 
-  it('uses custom domain with JWT-derived endpoint', () => {
-    const token = makeFakeToken('my-org')
-    let captured: { endpoint?: string } = {}
-    render(
-      <CommerceLayer accessToken={token} domain='custom.domain.io'>
-        <ContextInspector onContext={(ctx) => { captured = ctx }} />
-      </CommerceLayer>
-    )
-    expect(captured.endpoint).toBe('https://my-org.custom.domain.io')
-  })
-
   it('re-renders with same props (cache-hit path)', () => {
+    const token = makeFakeToken('my-org')
     const child = <span data-testid='stable-child'>stable</span>
     const { rerender } = render(
-      <CommerceLayer accessToken='my-token' endpoint='https://explicit.commercelayer.io'>
+      <CommerceLayer accessToken={token}>
         {child}
       </CommerceLayer>
     )
     rerender(
-      <CommerceLayer accessToken='my-token' endpoint='https://explicit.commercelayer.io'>
+      <CommerceLayer accessToken={token}>
         {child}
       </CommerceLayer>
     )

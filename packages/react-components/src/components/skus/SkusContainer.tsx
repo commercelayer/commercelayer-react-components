@@ -40,7 +40,7 @@ export function SkusContainer<P extends Props>(props: P): JSX.Element {
     isLoading,
     fetchSkus,
     clearSkus,
-  } = useSkus(config.accessToken ?? "")
+  } = useSkus(config.accessToken ?? "", config.interceptors)
 
   useEffect(() => {
     if (config.accessToken != null && skus.length > 0) {

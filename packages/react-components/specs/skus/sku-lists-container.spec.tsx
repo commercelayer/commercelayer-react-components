@@ -35,7 +35,7 @@ describe('SkuListsContainer component', () => {
 
   it<SkuListsCtx>('renders children inside SkuListsContainer', (ctx) => {
     const { container } = render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <SkuListsContainer>
           <div data-testid='child'>content</div>
         </SkuListsContainer>
@@ -48,7 +48,7 @@ describe('SkuListsContainer component', () => {
   it<SkuListsCtx>('registers a SkuList id and renders its children', async (ctx) => {
     if (!ctx.skuListId) return
     render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <SkuListsContainer>
           <SkuList id={ctx.skuListId}>
             <span data-testid={`list-${ctx.skuListId}`}>item</span>
@@ -68,7 +68,7 @@ describe('SkuListsContainer component', () => {
     if (!ctx.skuListId) return
     let captured: Record<string, unknown> = {}
     render(
-      <CommerceLayer accessToken={ctx.accessToken} endpoint={ctx.endpoint}>
+      <CommerceLayer accessToken={ctx.accessToken}>
         <SkuListsContainer>
           <SkuList id={ctx.skuListId}>
             <span />

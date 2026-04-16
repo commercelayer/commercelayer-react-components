@@ -1,7 +1,7 @@
+import type { InterceptorManager } from '@commercelayer/core'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import ErrorBoundary from '#components/utils/ErrorBoundary'
 import type { DefaultChildrenType } from '#typings/globals'
-import { jwt } from '#utils/jwt'
 
 import type { JSX } from "react";
 
@@ -15,29 +15,18 @@ interface Props {
    */
   accessToken: string
   /**
-   * The endpoint to make the API calls. e.g. https://yourdomain.commercelayer.io
+   * Optional interceptors to attach to the underlying SDK client.
    */
-  endpoint?: string
-  /**
-   * The domain to make the API calls. e.g. commercelayer.io
-   */
-  domain?: string
+  interceptors?: InterceptorManager
 }
 
 /**
  * CommerceLayer component
  */
-export function CommerceLayer(props: Props): JSX.Element {
-  const { children, ...p } = props
-  if (!p.endpoint) {
-    const { organization } = jwt(p.accessToken)
-    p.endpoint = `https://${organization.slug}.${
-      p.domain ?? 'commercelayer.io'
-    }`
-  }
+export function CommerceLayer({ children, accessToken, interceptors }: Props): JSX.Element {
   return (
     <ErrorBoundary>
-      <CommerceLayerContext.Provider value={{ ...p }}>
+      <CommerceLayerContext.Provider value={{ accessToken, interceptors }}>
         {children}
       </CommerceLayerContext.Provider>
     </ErrorBoundary>
