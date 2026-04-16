@@ -33,7 +33,7 @@ describe('CommerceLayer component', () => {
     expect(screen.getByTestId('child').textContent).toBe('hello')
   })
 
-  it('provides accessToken and derived endpoint to context', () => {
+  it('provides accessToken to context', () => {
     const token = makeFakeToken('my-org')
     let captured: CommerceLayerConfig = {}
     render(
@@ -42,10 +42,9 @@ describe('CommerceLayer component', () => {
       </CommerceLayer>
     )
     expect(captured.accessToken).toBe(token)
-    expect(captured.endpoint).toBe('https://my-org.commercelayer.io')
   })
 
-  it('derives endpoint from JWT', () => {
+  it('does not expose endpoint in context', () => {
     const token = makeFakeToken('my-org')
     let captured: CommerceLayerConfig = {}
     render(
@@ -53,7 +52,7 @@ describe('CommerceLayer component', () => {
         <ContextInspector onContext={(ctx) => { captured = ctx }} />
       </CommerceLayer>
     )
-    expect(captured.endpoint).toBe('https://my-org.commercelayer.io')
+    expect('endpoint' in captured).toBe(false)
   })
 
   it('re-renders with same props (cache-hit path)', () => {
