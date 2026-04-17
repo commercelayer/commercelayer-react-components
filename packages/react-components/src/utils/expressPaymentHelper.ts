@@ -1,17 +1,17 @@
-import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type {
-  OrderUpdate,
+  AddressCreate,
   Order,
+  OrderUpdate,
   PaymentMethod,
   QueryParamsRetrieve,
-  AddressCreate,
 } from "@commercelayer/sdk"
-import getSdk from "./getSdk"
 import type { PaymentRequestShippingOption } from "@stripe/stripe-js"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
-import { getDomain } from "./getDomain"
-import { getOrganizationConfig } from "./organization"
 import { getApplicationLink } from "./getApplicationLink"
+import { getDomain } from "./getDomain"
+import getSdk from "./getSdk"
+import { getOrganizationConfig } from "./organization"
 
 const availablePaymentMethods = ["stripe_payments"]
 
@@ -32,7 +32,7 @@ interface TFakeAddressParams {
   /**
    * The Commerce Layer config
    */
-  config: Required<CommerceLayerConfig>
+  config: Required<Pick<CommerceLayerConfig, "accessToken" | "endpoint">>
   /**
    * The address resource
    */
@@ -85,7 +85,6 @@ export function getExpressShippingMethods(
   }
   if (shippingMethods == null) return null
   const shippingOptionsAmount: number[] = []
-  // biome-ignore lint/complexity/noForEach: Need to refactor
   shippingMethods.forEach((methods) => {
     if (methods != null) {
       const [firstMethod] = methods

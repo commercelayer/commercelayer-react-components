@@ -27,7 +27,8 @@ export async function retrievePrice({
   id,
   params,
   options,
+  interceptors,
 }: RetrievePriceParams): Promise<Price> {
-  getSdk({ accessToken })
+  getSdk({ accessToken, interceptors })
   return await prices.retrieve(id, params, options)
 }

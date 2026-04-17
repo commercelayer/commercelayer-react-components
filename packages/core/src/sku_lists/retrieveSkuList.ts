@@ -23,7 +23,8 @@ export async function retrieveSkuList({
   accessToken,
   id,
   params,
+  interceptors,
 }: RetrieveSkuList): Promise<SkuList> {
-  getSdk({ accessToken })
+  getSdk({ accessToken, interceptors })
   return await sku_lists.retrieve(id, params)
 }

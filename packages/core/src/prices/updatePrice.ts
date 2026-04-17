@@ -28,7 +28,8 @@ export async function updatePrice({
   resource,
   params,
   options,
+  interceptors,
 }: UpdatePriceParams): Promise<Price> {
-  getSdk({ accessToken })
+  getSdk({ accessToken, interceptors })
   return await prices.update(resource, params, options)
 }

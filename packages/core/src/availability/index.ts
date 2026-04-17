@@ -1,6 +1,6 @@
 export type {
-  SkuAvailability,
   DeliveryLeadTime,
   LeadTimes,
+  SkuAvailability,
 } from "./getSkuAvailability"
 export { getSkuAvailability } from "./getSkuAvailability"
