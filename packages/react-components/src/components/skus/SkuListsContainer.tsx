@@ -27,7 +27,10 @@ interface Props {
 export function SkuListsContainer(props: Props): JSX.Element {
   const { children, params } = props
   const config = useContext(CommerceLayerContext)
-  const { retrieveSkuList } = useSkuLists(config.accessToken ?? "", config.interceptors)
+  const { retrieveSkuList } = useSkuLists(
+    config.accessToken ?? "",
+    config.interceptors,
+  )
   const [registeredIds, setRegisteredIds] = useState<string[]>([])
   const [skuLists, setSkuLists] = useState<Record<string, Sku[]>>({})
 

@@ -1,9 +1,8 @@
-import type { InterceptorManager } from '@commercelayer/core'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import ErrorBoundary from '#components/utils/ErrorBoundary'
-import type { DefaultChildrenType } from '#typings/globals'
-
-import type { JSX } from "react";
+import type { InterceptorManager } from "@commercelayer/core"
+import type { JSX } from "react"
+import ErrorBoundary from "#components/utils/ErrorBoundary"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
   /**
@@ -23,7 +22,11 @@ interface Props {
 /**
  * CommerceLayer component
  */
-export function CommerceLayer({ children, accessToken, interceptors }: Props): JSX.Element {
+export function CommerceLayer({
+  children,
+  accessToken,
+  interceptors,
+}: Props): JSX.Element {
   return (
     <ErrorBoundary>
       <CommerceLayerContext.Provider value={{ accessToken, interceptors }}>
