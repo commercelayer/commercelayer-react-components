@@ -26,7 +26,7 @@ import type { BaseError } from "#typings/errors"
 import baseReducer from "#utils/baseReducer"
 import getErrors, { setErrors } from "#utils/getErrors"
 import type { ResourceKeys } from "#utils/getPaymentAttributes"
-import getSdk from "#utils/getSdk"
+import { getSdk } from "@commercelayer/core"
 import { pick } from "#utils/pick"
 import { replace } from "#utils/replace"
 import { snakeToCamelCase } from "#utils/snakeToCamelCase"
@@ -236,7 +236,7 @@ export async function setPaymentMethod({
   try {
     if (config && order && dispatch && paymentResource) {
       localStorage.removeItem("_save_payment_source_to_customer_wallet")
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       const attributes = {
         payment_method: sdk.payment_methods.relationship(paymentMethodId),
       }
@@ -314,7 +314,7 @@ export async function setPaymentSource({
     const isAlreadyPlaced = order?.status === "placed"
     if (config && order && !isAlreadyPlaced) {
       let paymentSource: PaymentSourceType
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       if (!customerPaymentSourceId) {
         if (!paymentSourceId) {
           // biome-ignore lint/suspicious/noExplicitAny: Multiple types
@@ -430,7 +430,7 @@ export const updatePaymentSource: UpdatePaymentSource = async ({
 }) => {
   if (config) {
     try {
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       const paymentSource = await sdk[paymentResource].update({
         id,
         ...attributes,

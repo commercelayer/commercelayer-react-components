@@ -16,7 +16,7 @@ import type {
 } from '@commercelayer/sdk'
 import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import type { updateOrder } from './OrderReducer'
-import getSdk from '#utils/getSdk'
+import { getSdk } from '@commercelayer/core'
 import getErrors from '#utils/getErrors'
 import { jwt } from '#utils/jwt'
 import { getCustomerIdByToken } from '#utils/getCustomerIdByToken'
@@ -166,7 +166,7 @@ export async function getCustomerAddresses({
 }: GetCustomerAddresses): Promise<void> {
   try {
     const addresses = [] as Address[]
-    const sdk = getSdk(config)
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const customerAddresses = await sdk.customer_addresses.list({
       include: ['address'],
       pageSize
@@ -220,7 +220,7 @@ export async function deleteCustomerAddress({
 }: DeleteCustomerAddress): Promise<void> {
   if (config && addresses && dispatch && config) {
     try {
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       await sdk.customer_addresses.delete(customerAddressId)
       const newAddresses = addresses.filter(
         ({ reference }) => reference !== customerAddressId
@@ -300,7 +300,7 @@ export async function getCustomerOrders({
   if (config.accessToken) {
     const { owner } = jwt(config.accessToken)
     if (owner?.id) {
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       const orders = await sdk.customers.orders(owner.id, {
         filters: { status_not_in: 'draft,pending' },
         sort: sortBy ?? { number: 'desc'},
@@ -326,7 +326,7 @@ export async function getCustomerSubscriptions({
   if (config.accessToken) {
     const { owner } = jwt(config.accessToken)
     if (owner?.id) {
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       if (id != null) {
         const subscriptions = await sdk.customers.orders(owner.id, {
           filters: { order_subscription_id_eq: id },
@@ -387,7 +387,7 @@ export async function createCustomerAddress({
   state
 }: TCreateCustomerAddress): Promise<void> {
   if (config && address) {
-    const sdk = getSdk(config)
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const { id } = address
     try {
       if (id) {
@@ -407,7 +407,7 @@ export async function createCustomerAddress({
         const addressWithMeta = sanitizeMetadataFields(address)
         const newAddress = await sdk.addresses.create(addressWithMeta)
         if (state?.customers?.id && newAddress?.id) {
-          // @ts-expect-error Expected customer_email
+          // @ts-ignore customer_email is provided by the customer relationship in the API
           const newCustomerAddress = await sdk.customer_addresses.create({
             customer: sdk.customers.relationship(state?.customers?.id),
             address: sdk.addresses.relationship(newAddress.id)
@@ -440,7 +440,7 @@ export async function getCustomerPayments({
   pageNumber = 1
 }: GetCustomerPaymentsParams): Promise<void> {
   if (config?.accessToken != null && dispatch != null) {
-    const sdk = getSdk(config)
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const { owner } = jwt(config.accessToken)
     if (owner?.id) {
       const payments = await sdk.customer_payment_sources.list({
@@ -472,7 +472,7 @@ export async function deleteCustomerPayment({
 }: DeleteCustomerPayment): Promise<void> {
   if (config && dispatch) {
     try {
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       await sdk.customer_payment_sources.delete(customerPaymentSourceId)
       getCustomerPayments({
         config,
@@ -489,7 +489,7 @@ export async function getCustomerInfo({
   dispatch
 }: GetCustomerPaymentsParams): Promise<void> {
   if (config.accessToken && dispatch != null) {
-    const sdk = getSdk(config)
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const customerId = getCustomerIdByToken(config.accessToken)
     if (customerId) {
       const customers = await sdk.customers.retrieve(customerId)

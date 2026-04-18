@@ -9,7 +9,7 @@ import type {
 } from '@commercelayer/sdk'
 import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import type { getOrderContext } from './OrderReducer'
-import getSdk from '#utils/getSdk'
+import { getSdk } from '@commercelayer/core'
 import { canPlaceOrder } from '#utils/canPlaceOrder'
 
 export type ShipmentActionType =
@@ -64,7 +64,7 @@ export const getShipments: GetShipments = async ({
   config
 }) => {
   try {
-    const sdk = getSdk(config)
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const shipments = order.shipments
     let allDeliveryLeadTimes: DeliveryLeadTime[] = []
     let currentPage = 1
@@ -110,7 +110,7 @@ export async function setShippingMethod({
       return { success: false, order }
     }
     if (shippingMethodId) {
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       await sdk.shipments.update({
         id: shipmentId,
         shipping_method: sdk.shipping_methods.relationship(shippingMethodId)

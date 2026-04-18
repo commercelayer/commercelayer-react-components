@@ -12,6 +12,8 @@
     "test": "pnpm -r --workspace-concurrency=1 --no-bail test",
     "docs:dev": "pnpm --filter docs storybook",
     "docs:build": "pnpm --filter docs build-storybook",
+    "document:dev": "pnpm --filter document storybook",
+    "document:build": "pnpm --filter document build-storybook",
     "components:build:dev": "pnpm --filter react-components build:dev",
     "components:build": "pnpm --filter react-components build",
     "make:version": "lerna version --no-private",
@@ -40,7 +42,8 @@
       "esbuild@<=0.24.2": "^0.25.0",
       "picomatch@<2.3.2": ">=2.3.2",
       "picomatch@>=4.0.0 <4.0.4": ">=4.0.4",
-      "storybook@>=10.0.0-beta.0 <10.2.10": ">=10.2.10"
+      "storybook@>=10.0.0-beta.0 <10.3.5": ">=10.3.5",
+      "@storybook/builder-vite": ">=10.3.5"
     }
   }
 }

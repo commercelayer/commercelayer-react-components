@@ -2,7 +2,7 @@ import baseReducer from '#utils/baseReducer'
 import type { Dispatch } from 'react'
 import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import type { AddressUpdate, Order } from '@commercelayer/sdk'
-import getSdk from '#utils/getSdk'
+import { getSdk } from '@commercelayer/core'
 import type { AddressResource } from './AddressReducer'
 
 export type BillingAddressActionType =
@@ -41,7 +41,7 @@ export const setBillingAddress: SetBillingAddress = async (id, options) => {
   try {
     if (options?.order) {
       if (options.customerAddressId) {
-        const sdk = getSdk(options.config)
+        const sdk = getSdk({ accessToken: options.config.accessToken!, interceptors: options.config.interceptors })
         const attributes: AddressUpdate = {
           id,
           reference: options.customerAddressId

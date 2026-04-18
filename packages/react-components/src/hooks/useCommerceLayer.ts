@@ -1,13 +1,12 @@
 import CommerceLayerContext from '#context/CommerceLayerContext'
-import getSdk from '#utils/getSdk'
-import type { CommerceLayerBundle } from '@commercelayer/sdk/bundle'
+import { getSdk } from '@commercelayer/core'
 import { useContext } from 'react'
 
 interface ReturnProps {
   /** This is the access token used to initialize the sdk client. It need to be set as prop in the main `<CommerceLayer>` component */
   accessToken?: string
   /** This method can be used to initialize an sdk client and perform list, retrieve, update or delete operations on any resource */
-  sdkClient: () => CommerceLayerBundle | undefined
+  sdkClient: () => ReturnType<typeof getSdk> | undefined
 }
 
 /**
@@ -19,10 +18,10 @@ export function useCommerceLayer(): ReturnProps {
     return {
       accessToken: ctx.accessToken,
       sdkClient: () => {
-        if (ctx?.accessToken != null && ctx?.endpoint != null)
+        if (ctx?.accessToken != null)
           return getSdk({
             accessToken: ctx.accessToken,
-            endpoint: ctx.endpoint
+            interceptors: ctx.interceptors
           })
         return undefined
       }

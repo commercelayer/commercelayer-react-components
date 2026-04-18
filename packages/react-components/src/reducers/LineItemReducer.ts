@@ -5,7 +5,7 @@ import type { getOrderContext } from './OrderReducer'
 import type { LoaderType } from '#typings'
 import type { BaseError } from '#typings/errors'
 import type { Order, LineItem } from '@commercelayer/sdk'
-import getSdk from '#utils/getSdk'
+import { getSdk } from '@commercelayer/core'
 import getErrors from '#utils/getErrors'
 
 export interface UpdateLineItemParams {
@@ -57,7 +57,7 @@ export interface LineItemAction {
 
 export const getLineItems: GetLineItems = (params) => {
   const { order, dispatch, config } = params
-  const sdk = getSdk(config)
+  const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   let allLineItems: LineItem[] = []
   order &&
     sdk.orders
@@ -109,7 +109,7 @@ export async function updateLineItem(
     orderId,
     dispatch
   } = params
-  const sdk = getSdk(config)
+  const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   try {
     await sdk.line_items.update({
       id: lineItemId,
@@ -142,7 +142,7 @@ export async function updateLineItem(
 
 export const deleteLineItem: DeleteLineItem = async (params) => {
   const { config, lineItemId, getOrder, orderId, dispatch } = params
-  const sdk = getSdk(config)
+  const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   try {
     await sdk.line_items.delete(lineItemId)
     getOrder && (await getOrder(orderId))

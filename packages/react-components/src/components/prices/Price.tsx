@@ -1,19 +1,19 @@
-import Parent from '#components/utils/Parent'
-import PricesContext from '#context/PricesContext'
-import { useState, useEffect, useContext, type JSX } from 'react';
-import { getPricesComponent } from '#utils/getPrices'
-import type { Price as PriceType } from '@commercelayer/sdk'
-import type { ChildrenFunction, LoaderType } from '#typings/index'
-import SkuChildrenContext from '#context/SkuChildrenContext'
+import type { Price as PriceType } from "@commercelayer/sdk"
+import { type JSX, useContext, useEffect, useState } from "react"
+import Parent from "#components/utils/Parent"
+import PricesContext from "#context/PricesContext"
+import SkuChildrenContext from "#context/SkuChildrenContext"
+import type { ChildrenFunction, LoaderType } from "#typings/index"
+import { getPricesComponent } from "#utils/getPrices"
 
-interface PriceChildrenProps extends Omit<PriceProps, 'children'> {
+interface PriceChildrenProps extends Omit<PriceProps, "children"> {
   loading: boolean
   loader: LoaderType
   prices: PriceType[]
 }
 
 export interface PriceProps
-  extends Omit<JSX.IntrinsicElements['span'], 'children' | 'ref'> {
+  extends Omit<JSX.IntrinsicElements["span"], "children" | "ref"> {
   children?: ChildrenFunction<PriceChildrenProps>
   /**
    * CSS class name to be added for the compare price
@@ -40,25 +40,26 @@ export interface PriceProps
  * </span>
  */
 export function Price(props: PriceProps): JSX.Element {
-  const { children, skuCode = '' } = props
+  const { children, skuCode = "" } = props
   const {
     prices,
     skuCode: pricesSkuCode,
     loading,
     skuCodes,
     setSkuCodes,
-    loader
+    loader,
   } = useContext(PricesContext)
   const { sku } = useContext(SkuChildrenContext)
   const [skuPrices, setSkuPrices] = useState<PriceType[]>([])
-  const sCode = pricesSkuCode || skuCode || sku?.code || ''
+  const sCode = pricesSkuCode || skuCode || sku?.code || ""
+  // biome-ignore lint/correctness/useExhaustiveDependencies: skuCodes intentionally omitted — the !includes check prevents re-registration loops
   useEffect(() => {
     if (prices != null && `${sCode}` in prices) {
       setSkuPrices(prices[sCode] as PriceType[])
     } else {
       if (sCode && !skuCodes.includes(sCode)) {
-        skuCodes.push(sCode)
-        if (setSkuCodes) setSkuCodes({ skuCodes })
+        // Spread into a new array so React detects the reference change and triggers a re-render + fetch
+        if (setSkuCodes) setSkuCodes({ skuCodes: [...skuCodes, sCode] })
       }
     }
     return (): void => {
@@ -69,16 +70,19 @@ export function Price(props: PriceProps): JSX.Element {
     loading,
     loader,
     prices: skuPrices,
-    ...props
+    ...props,
   }
   const pricesComponent =
+    // c8 ignore next — prices and skuPrices are always initialized (never null) with current context
     prices == null || skuPrices == null
       ? null
       : getPricesComponent(skuPrices, props)
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
+  ) : loading || pricesComponent == null ? (
+    <>{loader}</>
   ) : (
-    <>{loading || pricesComponent == null ? loader : pricesComponent}</>
+    <>{pricesComponent}</>
   )
 }
 

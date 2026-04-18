@@ -13,7 +13,7 @@ import OrderContext from "#context/OrderContext"
 import OrderStorageContext from "#context/OrderStorageContext"
 import { subscribe, unsubscribe } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
-import { getDomain } from "#utils/getDomain"
+import { jwt } from "#utils/jwt"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import { getOrganizationConfig } from "#utils/organization"
 
@@ -157,23 +157,24 @@ export function HostedCart({
   const ref = useRef<HTMLIFrameElement>(null)
   const loadedOrderIdRef = useRef<string | null>(null)
   const prevOpenRef = useRef<boolean | undefined>(undefined)
-  const { accessToken, endpoint } = useCustomContext({
+  const { accessToken } = useCustomContext({
     context: CommerceLayerContext,
     contextComponentName: "CommerceLayer",
     currentComponentName: "HostedCart",
     key: "accessToken",
   })
   const [src, setSrc] = useState<string | undefined>()
-  if (accessToken == null || endpoint == null) return null
+  if (accessToken == null) return null
   const { order, createOrder, getOrder } = useContext(OrderContext)
   const { persistKey } = useContext(OrderStorageContext)
-  const { domain, slug } = getDomain(endpoint)
   async function setOrder(openCart?: boolean): Promise<void> {
     const orderId = localStorage.getItem(persistKey) ?? (await createOrder({}))
-    if (orderId != null && accessToken && endpoint) {
+    if (orderId != null && accessToken) {
+      const { organization } = jwt(accessToken)
+      const slug = organization.slug
+      const domain = 'commercelayer.io'
       const config = await getOrganizationConfig({
         accessToken,
-        endpoint,
         params: {
           orderId: order?.id ?? orderId,
           accessToken,
@@ -258,9 +259,11 @@ export function HostedCart({
       accessToken &&
       (src == null || loadedOrderIdRef.current !== resolvedOrderId)
     ) {
+      const { organization } = jwt(accessToken)
+      const slug = organization.slug
+      const domain = 'commercelayer.io'
       getOrganizationConfig({
         accessToken,
-        endpoint,
         params: {
           orderId: resolvedOrderId,
           accessToken,

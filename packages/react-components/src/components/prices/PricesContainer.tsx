@@ -1,14 +1,19 @@
-import { useEffect, useContext, useReducer, type JSX } from 'react';
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import priceReducer, {
-  priceInitialState,
-  getSkusPrice,
-  setSkuCodes
-} from '#reducers/PriceReducer'
-import PricesContext, { type PricesContextValue } from '#context/PricesContext'
-import type { LoaderType } from '#typings'
-import SkuContext from '#context/SkuContext'
-import type { QueryPageSize } from '@commercelayer/sdk'
+import { usePrices } from "@commercelayer/hooks"
+import type { QueryPageSize } from "@commercelayer/sdk"
+import {
+  type JSX,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import PricesContext, { type PricesContextValue } from "#context/PricesContext"
+import SkuContext from "#context/SkuContext"
+import type { LoaderType } from "#typings"
+import getPricesMap from "#utils/getPrices"
 
 interface Props {
   /**
@@ -47,49 +52,89 @@ interface Props {
  * `<Price>`
  * </span>
  */
-export function PricesContainer(props: Props): JSX.Element {
-  const {
-    children,
-    skuCode = '',
-    loader = 'Loading...',
-    perPage = 10,
-    filters = {}
-  } = props
-  const [state, dispatch] = useReducer(priceReducer, priceInitialState)
+export function PricesContainer({
+  children,
+  skuCode = "",
+  loader = "Loading...",
+  perPage = 10,
+  filters = {},
+}: Props): JSX.Element {
   const config = useContext(CommerceLayerContext)
-  const { skuCodes } = useContext(SkuContext)
-  if (!state.skuCodes.includes(skuCode) && skuCode) state.skuCodes.push(skuCode)
-  const sCode = skuCodes && skuCodes?.length > 0 ? '' : skuCode ?? ''
+  const { skuCodes: contextSkuCodes } = useContext(SkuContext)
+  const [skuCodes, setSkuCodesState] = useState<string[]>(
+    skuCode ? [skuCode] : [],
+  )
+  const {
+    prices: pricesList,
+    isLoading,
+    fetchPrices,
+    clearPrices,
+  } = usePrices(config.accessToken ?? "", config.interceptors)
+
+  const sCode =
+    contextSkuCodes != null && contextSkuCodes.length > 0 ? "" : skuCode
+
+  // Sync skuCodes from SkuContext (e.g. when used inside <SkusContainer>)
   useEffect(() => {
-    if (
-      state.skuCodes.length === 0 &&
-      skuCodes != null &&
-      skuCodes.length > 0 &&
-      state.setSkuCodes != null
-    ) {
-      state.setSkuCodes({ skuCodes, dispatch })
+    if (contextSkuCodes != null && contextSkuCodes.length > 0) {
+      setSkuCodesState(contextSkuCodes)
     }
-    if (config.accessToken) {
-      if (state.skuCodes.length > 0 || sCode) {
-        getSkusPrice((sCode && [sCode]) || state.skuCodes, {
-          config,
-          dispatch,
-          perPage,
-          filters
+  }, [contextSkuCodes])
+
+  // Debounce timer ref — batches multiple Price children registrations into one API request
+  const fetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Stabilize filters reference to avoid infinite effect loops (default {} is a new object each render)
+  const filtersKey = JSON.stringify(filters)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: fetchPrices/clearPrices are stable; filtersKey stringifies filters for stable comparison
+  useEffect(() => {
+    const codes =
+      contextSkuCodes != null && contextSkuCodes.length > 0
+        ? contextSkuCodes
+        : skuCodes
+    if (config.accessToken != null && codes.length > 0) {
+      if (fetchTimerRef.current != null) clearTimeout(fetchTimerRef.current)
+      fetchTimerRef.current = setTimeout(() => {
+        fetchPrices({
+          filters: { sku_code_in: codes.join(","), ...filters },
+          pageSize: perPage,
         })
-      }
+      }, 50)
     }
-  }, [config.accessToken, sCode, state.skuCodes.length])
-  const priceValue: PricesContextValue = {
-    ...state,
-    skuCode: sCode,
-    loader,
-    setSkuCodes: (params: Parameters<typeof setSkuCodes>[number]): void => {
-      setSkuCodes({ ...params, dispatch })
+    return () => {
+      if (fetchTimerRef.current != null) clearTimeout(fetchTimerRef.current)
+      clearPrices()
     }
-  }
+  }, [config.accessToken, skuCodes, contextSkuCodes, filtersKey, perPage])
+
+  const setSkuCodes = useCallback(
+    ({ skuCodes: newCodes }: { skuCodes: string[] }) => {
+      // Functional update so concurrent Price children don't overwrite each other
+      setSkuCodesState((prev) => {
+        const merged = Array.from(new Set([...prev, ...newCodes]))
+        return merged.length === prev.length ? prev : merged
+      })
+    },
+    [],
+  )
+
+  const pricesMap = useMemo(() => getPricesMap(pricesList), [pricesList])
+
+  const contextValue = useMemo<PricesContextValue>(
+    () => ({
+      loading: isLoading,
+      prices: pricesMap,
+      skuCodes,
+      errors: [],
+      skuCode: sCode,
+      loader,
+      setSkuCodes,
+    }),
+    [isLoading, pricesMap, skuCodes, sCode, loader, setSkuCodes],
+  )
+
   return (
-    <PricesContext.Provider value={priceValue}>
+    <PricesContext.Provider value={contextValue}>
       {children}
     </PricesContext.Provider>
   )

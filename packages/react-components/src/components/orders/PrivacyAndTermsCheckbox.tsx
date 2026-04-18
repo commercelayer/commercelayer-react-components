@@ -8,13 +8,13 @@ import BaseInput, { type BaseInputProps } from "../utils/BaseInput"
 export function PrivacyAndTermsCheckbox(
   props: Partial<BaseInputProps>,
 ): JSX.Element {
-  const { accessToken, endpoint } = useContext(CommerceLayerContext)
+  const { accessToken } = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
   const { placeOrderPermitted } = useContext(PlaceOrderContext)
   const [forceDisabled, setForceDisabled] = useState(true)
   const [checked, setChecked] = useState(false)
   const fieldName = "privacy-terms"
-  const organizationConfig = useOrganizationConfig({ accessToken, endpoint })
+  const organizationConfig = useOrganizationConfig({ accessToken })
 
   const privacyUrl = order?.privacy_url ?? organizationConfig?.urls?.privacy
   const termsUrl = order?.terms_url ?? organizationConfig?.urls?.terms

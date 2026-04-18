@@ -1,15 +1,17 @@
 import { resolve } from "node:path"
 import type { StorybookConfig } from "@storybook/react-vite"
 import remarkGfm from "remark-gfm"
-import { type UserConfig, mergeConfig } from "vite"
+import { mergeConfig, type UserConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
 
-const rcSrc = resolve(import.meta.dirname, "../../react-components/src")
+const rcRoot = resolve(import.meta.dirname, "../../react-components")
+const rcSrc = `${rcRoot}/src`
 
 const viteOverrides: UserConfig = {
   base: process.env.VITE_BASE_URL,
   resolve: {
     alias: {
+      "@commercelayer/react-components": `${rcSrc}/index.ts`,
       "#components": `${rcSrc}/components`,
       "#components-utils": `${rcSrc}/components/utils`,
       "#context": `${rcSrc}/context`,
@@ -19,35 +21,39 @@ const viteOverrides: UserConfig = {
       "#config": `${rcSrc}/config`,
       "#reducers": `${rcSrc}/reducers`,
     },
+    dedupe: ["react", "react-dom"],
   },
   plugins: [
     tsconfigPaths({
       projects: [
-        resolve(import.meta.dirname, "../../react-components/tsconfig.json"),
+        resolve(rcRoot, "tsconfig.json"),
         resolve(import.meta.dirname, "../tsconfig.json"),
       ],
     }),
   ],
-  resolve: {
-    dedupe: ["react", "react-dom"],
-  },
 }
 
 const storybookConfig: StorybookConfig = {
   async viteFinal(config) {
     return mergeConfig(config, viteOverrides)
   },
-  stories: ["../src/stories/**/*.mdx", "../src/stories/**/*.stories.@(js|jsx|ts|tsx)"],
-  addons: ["@storybook/addon-links", {
-    name: "@storybook/addon-docs",
-    options: {
-      mdxPluginOptions: {
-        mdxCompileOptions: {
-          remarkPlugins: [remarkGfm],
+  stories: [
+    "../src/stories/**/*.mdx",
+    "../src/stories/**/*.stories.@(js|jsx|ts|tsx)",
+  ],
+  addons: [
+    "@storybook/addon-links",
+    {
+      name: "@storybook/addon-docs",
+      options: {
+        mdxPluginOptions: {
+          mdxCompileOptions: {
+            remarkPlugins: [remarkGfm],
+          },
         },
       },
     },
-  }],
+  ],
   // @ts-expect-error This 'managerEntries' exists.
   managerEntries: [
     resolve(import.meta.dirname, "./addon-gh-repository/manager.tsx"),
@@ -60,7 +66,7 @@ const storybookConfig: StorybookConfig = {
     disableTelemetry: true,
   },
   docs: {
-    docsMode: true
+    docsMode: true,
   },
   typescript: {
     check: false,

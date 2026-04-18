@@ -14,7 +14,7 @@ import SkuChildrenContext from "#context/SkuChildrenContext"
 import { getApplicationLink } from "#utils/getApplicationLink"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import useCustomContext from "#utils/hooks/useCustomContext"
-import { getDomain } from "#utils/getDomain"
+import { jwt } from "#utils/jwt"
 import { publish } from "#utils/events"
 import { getOrganizationConfig } from "#utils/organization"
 
@@ -138,7 +138,7 @@ export function AddToCartButton(props: Props): JSX.Element {
     protocol = "https",
     ...p
   } = props
-  const { accessToken, endpoint } = useCustomContext({
+  const { accessToken } = useCustomContext({
     context: CommerceLayerContext,
     contextComponentName: "CommerceLayer",
     currentComponentName: "AddToCartButton",
@@ -207,15 +207,16 @@ export function AddToCartButton(props: Props): JSX.Element {
         buyNowMode,
         checkoutUrl,
       })
-      if (redirectToHostedCart && accessToken != null && endpoint != null) {
-        const { slug, domain } = getDomain(endpoint)
+      if (redirectToHostedCart && accessToken != null) {
+        const { organization } = jwt(accessToken)
+        const slug = organization.slug
+        const domain = 'commercelayer.io'
         const orderId = res?.orderId
         if (hostedCartUrl && orderId) {
           location.href = `${protocol}://${hostedCartUrl}/${orderId}?accessToken=${accessToken}`
         } else if (orderId && slug) {
           const config = await getOrganizationConfig({
             accessToken,
-            endpoint,
             params: {
               orderId,
               accessToken,

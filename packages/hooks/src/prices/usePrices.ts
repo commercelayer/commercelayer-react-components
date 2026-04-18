@@ -93,7 +93,9 @@ export function usePrices(
   const clearPrices = useCallback(() => {
     setShouldFetch(false)
     setAction(null)
-    mutate(undefined, false)
+    // c8 ignore start
+    mutate(undefined, false).catch(() => {})
+    // c8 ignore end
   }, [mutate])
 
   const clearError = useCallback(() => {

@@ -1,6 +1,6 @@
 import baseReducer from '#utils/baseReducer'
 import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import getSdk from '#utils/getSdk'
+import { getSdk } from '@commercelayer/core'
 import type { BaseAction } from '#typings'
 import type { Dispatch } from 'react'
 import type { BaseError } from '#typings/errors'
@@ -50,8 +50,8 @@ export async function setInStockSubscription<
   dispatch
 }: T): Promise<{ success: boolean }> {
   try {
-    if (config == null) throw new Error('Access token and endpoint is required')
-    const sdk = getSdk(config)
+    if (config == null) throw new Error('Access token is required')
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     // @ts-expect-error OpenAPI schema is not updated
     const attributes: InStockSubscriptionCreate = {
       sku_code: skuCode
