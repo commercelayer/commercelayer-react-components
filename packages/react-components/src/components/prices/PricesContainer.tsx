@@ -51,6 +51,10 @@ interface Props {
  * <span title='Children' type='info'>
  * `<Price>`
  * </span>
+ *
+ * @deprecated `PricesContainer` will be removed in a future major release.
+ * Use `<Price skuCode="MY-SKU" />` as a standalone component instead.
+ * For batched prices (multiple SKUs in one request), use the `usePrices` hook directly.
  */
 export function PricesContainer({
   children,
