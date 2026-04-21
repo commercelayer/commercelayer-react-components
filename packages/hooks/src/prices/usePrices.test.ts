@@ -5,7 +5,7 @@ import { act, renderHook, waitFor } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { createElement } from "react"
 import { SWRConfig } from "swr"
-import { describe, expect } from "vitest"
+import { describe, expect, vi } from "vitest"
 import { coreIntegrationTest, coreTest } from "#extender"
 import { usePrices } from "./usePrices"
 
@@ -321,6 +321,117 @@ describe("usePrices", () => {
       ).rejects.toThrow("Price resource ID is required for update")
     },
   )
+
+  coreTest(
+    "should batch-fetch prices via registerSku",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+      const { result } = renderHook(() => usePrices(token))
+
+      act(() => {
+        result.current.registerSku("DIGITALPRODUCT")
+      })
+
+      await waitFor(
+        () => {
+          expect(result.current.prices.length).toBeGreaterThan(0)
+          expect(result.current.action).toBe("get")
+        },
+        { timeout: 10000 },
+      )
+    },
+  )
+
+  coreTest(
+    "should ignore duplicate registerSku calls (idempotent)",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+      const { result } = renderHook(() => usePrices(token))
+
+      act(() => {
+        result.current.registerSku("DIGITALPRODUCT")
+        result.current.registerSku("DIGITALPRODUCT") // duplicate — no-op
+      })
+
+      await waitFor(
+        () => {
+          expect(result.current.prices).toBeDefined()
+          expect(result.current.error).toBeNull()
+        },
+        { timeout: 10000 },
+      )
+    },
+  )
+
+  coreTest(
+    "should cancel pending debounce when a second registerSku fires",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+      const { result } = renderHook(() => usePrices(token))
+
+      // Two different SKUs in rapid succession — second call hits the clearTimeout branch (line 80)
+      act(() => {
+        result.current.registerSku("DIGITALPRODUCT")
+      })
+      act(() => {
+        result.current.registerSku("SHIRT-S")
+      })
+
+      await waitFor(
+        () => {
+          expect(result.current.prices).toBeDefined()
+          expect(result.current.error).toBeNull()
+        },
+        { timeout: 10000 },
+      )
+    },
+  )
+
+  coreTest(
+    "should unregisterSku remove a registered code",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+      const { result } = renderHook(() => usePrices(token))
+
+      act(() => {
+        result.current.registerSku("DIGITALPRODUCT")
+      })
+
+      await waitFor(
+        () => {
+          expect(result.current.prices.length).toBeGreaterThan(0)
+        },
+        { timeout: 10000 },
+      )
+
+      // unregister existing code
+      act(() => {
+        result.current.unregisterSku("DIGITALPRODUCT")
+      })
+
+      // unregister non-existent code — no-op branch
+      act(() => {
+        result.current.unregisterSku("NON-EXISTENT-SKU")
+      })
+    },
+  )
+
+  coreTest("should not fetch when accessToken is empty", async () => {
+    const { result } = renderHook(() => usePrices(""))
+
+    act(() => {
+      result.current.registerSku("DIGITALPRODUCT")
+    })
+
+    // Wait for the 50ms debounce to fire — early-return branch (line 83) is hit
+    await vi.waitFor(
+      () => {
+        expect(result.current.prices).toEqual([])
+        expect(result.current.action).toBeNull()
+      },
+      { timeout: 500 },
+    )
+  })
 
   coreIntegrationTest(
     "should update a price without prior fetch (no cached list)",
