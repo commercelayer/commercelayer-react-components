@@ -99,3 +99,27 @@ export const WithFiltersStory: Story = {
     </CommerceLayer>
   ),
 }
+
+const skuRow = (code: string) => (
+  <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+    <span style={{ width: 240, fontSize: "0.85rem", color: "#666" }}>{code}</span>
+    <Price
+      skuCode={code}
+      style={{ fontWeight: "bold" }}
+      loader={<span style={{ color: "#bbb", fontSize: "0.8rem" }}>…</span>}
+    />
+  </div>
+)
+
+export const StandalonePrice: Story = {
+  name: "Price — standalone (no PricesContainer)",
+  render: () => (
+    <CommerceLayer accessToken="my-access-token">
+      <div style={{ display: "grid", gap: 12 }}>
+        {skuRow("POST6191FFFFFF000000XXXX")}
+        {skuRow("POLOMXXX000000FFFFFFLXXX")}
+        {skuRow("BABYONBU000000E63E7412MX")}
+      </div>
+    </CommerceLayer>
+  ),
+}
