@@ -100,25 +100,35 @@ export const WithFiltersStory: Story = {
   ),
 }
 
-const skuRow = (code: string) => (
-  <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-    <span style={{ width: 240, fontSize: "0.85rem", color: "#666" }}>{code}</span>
-    <Price
-      skuCode={code}
-      style={{ fontWeight: "bold" }}
-      loader={<span style={{ color: "#bbb", fontSize: "0.8rem" }}>…</span>}
-    />
-  </div>
-)
-
 export const StandalonePrice: Story = {
   name: "Price — standalone (no PricesContainer)",
   render: () => (
     <CommerceLayer accessToken="my-access-token">
       <div style={{ display: "grid", gap: 12 }}>
-        {skuRow("POST6191FFFFFF000000XXXX")}
-        {skuRow("POLOMXXX000000FFFFFFLXXX")}
-        {skuRow("BABYONBU000000E63E7412MX")}
+        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <span style={{ width: 240, fontSize: "0.85rem", color: "#666" }}>
+            POST6191FFFFFF000000XXXX
+          </span>
+          <Price
+            skuCode="POST6191FFFFFF000000XXXX"
+            style={{ fontWeight: "bold" }}
+            loader={
+              <span style={{ color: "#bbb", fontSize: "0.8rem" }}>…</span>
+            }
+          />
+        </div>
+        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <span style={{ width: 240, fontSize: "0.85rem", color: "#666" }}>
+            POLOMXXX000000FFFFFFLXXX
+          </span>
+          <Price
+            skuCode="POLOMXXX000000FFFFFFLXXX"
+            style={{ fontWeight: "bold" }}
+            loader={
+              <span style={{ color: "#bbb", fontSize: "0.8rem" }}>…</span>
+            }
+          />
+        </div>
       </div>
     </CommerceLayer>
   ),
