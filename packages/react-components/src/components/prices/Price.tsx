@@ -78,7 +78,10 @@ export function Price(props: PriceProps): JSX.Element {
     isLoading: batchLoading,
     registerSku,
     unregisterSku,
-  } = usePrices(isStandalone ? (accessToken ?? "") : "", isStandalone ? interceptors : undefined)
+  } = usePrices(
+    isStandalone ? (accessToken ?? "") : "",
+    isStandalone ? interceptors : undefined,
+  )
 
   // Standalone: register/unregister this SKU
   useEffect(() => {
@@ -88,7 +91,6 @@ export function Price(props: PriceProps): JSX.Element {
   }, [isStandalone, sCode, registerSku, unregisterSku])
 
   // Standalone: sync prices for this specific SKU from the shared batch result
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional — only re-run when prices or code changes
   useEffect(() => {
     if (!isStandalone) return
     setSkuPrices(batchPrices.filter((p) => p.sku_code === sCode))
