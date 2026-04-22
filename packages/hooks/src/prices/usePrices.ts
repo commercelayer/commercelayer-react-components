@@ -16,6 +16,9 @@ import {
   unregisterSku as storeUnregisterSku,
 } from "./pricesBatchStore"
 
+/** Stable empty array returned when SWR has no data yet — prevents new reference on every render. */
+const EMPTY_PRICES: Price[] = []
+
 interface UsePricesReturn {
   prices: Price[]
   error: string | null
@@ -149,7 +152,7 @@ export function usePrices(
   const clearError = useCallback(() => mutate(data, false), [mutate, data])
 
   return {
-    prices: data ?? [],
+    prices: data ?? EMPTY_PRICES,
     error: error?.message ?? null,
     isLoading,
     isValidating,

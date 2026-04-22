@@ -1,6 +1,6 @@
 import { usePrices } from "@commercelayer/hooks"
 import type { Price as PriceType } from "@commercelayer/sdk"
-import { type JSX, useContext, useEffect, useState } from "react"
+import { type JSX, type ReactNode, useContext, useEffect, useState } from "react"
 import Parent from "#components/utils/Parent"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import PricesContext from "#context/PricesContext"
@@ -48,7 +48,7 @@ export interface PriceProps
  * but it also allows access to the full `Price` object via children props.
  * </span>
  */
-export function Price(props: PriceProps): JSX.Element {
+export function Price(props: PriceProps): ReactNode {
   const { children, skuCode = "", loader: propLoader } = props
 
   // Container context (from PricesContainer)
@@ -122,9 +122,9 @@ export function Price(props: PriceProps): JSX.Element {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : loading || pricesComponent == null ? (
-    <>{loader}</>
+    loader
   ) : (
-    <>{pricesComponent}</>
+    pricesComponent
   )
 }
 

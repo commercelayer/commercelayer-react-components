@@ -1,4 +1,4 @@
-import { type UsePricesReturn, usePrices } from "@commercelayer/hooks"
+import { usePrices } from "@commercelayer/hooks"
 import type { Price as PriceType, Sku } from "@commercelayer/sdk"
 import { render } from "@testing-library/react"
 import { createElement, type ReactNode } from "react"
@@ -22,7 +22,7 @@ const FAKE_TOKEN =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdhbml6YXRpb24iOnsiaWQiOiJvcmctaWQiLCJzbHVnIjoidGVzdC1vcmcifSwibWFya2V0Ijp7ImlkIjpbIjEiXSwicHJpY2VfbGlzdF9pZCI6InBsMSIsInN0b2NrX2xvY2F0aW9uX2lkcyI6W10sImdlb2NvZGVyX2lkIjpudWxsLCJhbGxvd3NfZXh0ZXJuYWxfcHJpY2VzIjpmYWxzZX0sImFwcGxpY2F0aW9uIjp7ImlkIjoiYXBwLWlkIiwia2luZCI6InNhbGVzX2NoYW5uZWwiLCJwdWJsaWMiOnRydWV9LCJleHAiOjk5OTk5OTk5OTksIm93bmVyIjp7ImlkIjoiY3VzLWlkIiwidHlwZSI6IkN1c3RvbWVyIn0sInJhbmQiOjEsInRlc3QiOnRydWV9.fake-sig"
 const SKU_CODE = "BABYONBU000000E63E7412MX"
 
-const EMPTY_HOOK: UsePricesReturn = {
+const EMPTY_HOOK: ReturnType<typeof usePrices> = {
   prices: [],
   error: null,
   isLoading: false,
