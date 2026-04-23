@@ -4,7 +4,7 @@ import Parent from '../utils/Parent'
 import type { ChildrenFunction } from '#typings/index'
 import CommerceLayerContext from '#context/CommerceLayerContext'
 import { getApplicationLink } from '#utils/getApplicationLink'
-import { getDomain } from '#utils/getDomain'
+import { jwt } from '#utils/jwt'
 import { publish } from '#utils/events'
 import { getOrganizationConfig } from '#utils/organization'
 
@@ -56,12 +56,12 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
 export function CartLink(props: Props): JSX.Element | null {
   const { label, children, type, customDomain, ...p } = props
   const { order, createOrder } = useContext(OrderContext)
-  const { accessToken, endpoint } = useContext(CommerceLayerContext)
+  const { accessToken } = useContext(CommerceLayerContext)
   if (accessToken == null)
     throw new Error('Cannot use `CartLink` outside of `CommerceLayer`')
-  if (endpoint == null)
-    throw new Error('Cannot use `CartLink` outside of `CommerceLayer`')
-  const { domain, slug } = getDomain(endpoint)
+  const { organization } = jwt(accessToken)
+  const slug = organization.slug
+  const domain = 'commercelayer.io'
   const href =
     slug && order?.id
       ? getApplicationLink({
@@ -81,7 +81,6 @@ export function CartLink(props: Props): JSX.Element | null {
       if (order?.id) {
         const config = await getOrganizationConfig({
           accessToken,
-          endpoint,
           params: {
             orderId: order?.id,
             accessToken,
@@ -93,7 +92,6 @@ export function CartLink(props: Props): JSX.Element | null {
         const orderId = await createOrder({})
         const config = await getOrganizationConfig({
           accessToken,
-          endpoint,
           params: {
             orderId: order?.id,
             accessToken,

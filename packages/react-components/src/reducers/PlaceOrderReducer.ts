@@ -10,7 +10,7 @@ import {
   saveToWallet,
 } from "#utils/customerOrderOptions"
 import getErrors from "#utils/getErrors"
-import getSdk from "#utils/getSdk"
+import { getSdk } from "@commercelayer/core"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
 import { isGuestToken } from "#utils/isGuestToken"
 import { setCustomerOrderParam } from "#utils/localStorage"
@@ -189,7 +189,7 @@ export async function setPlaceOrder({
         order,
       }
     }
-    const sdk = getSdk(config)
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const { options, paymentType } = state
     try {
       // Prevent extra place order

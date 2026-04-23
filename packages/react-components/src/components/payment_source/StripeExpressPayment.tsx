@@ -27,7 +27,7 @@ export function StripeExpressPayment({
   const [paymentRequest, setPaymentRequest] = useState<null | PaymentRequest>(
     null,
   )
-  const { accessToken, endpoint } = useContext(CommerceLayerContext)
+  const { accessToken } = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
   const { paymentMethods, paymentSource } = useContext(PaymentMethodContext)
 
@@ -60,13 +60,12 @@ export function StripeExpressPayment({
 
   if (paymentRequest != null && stripe != null) {
     paymentRequest.on("shippingaddresschange", async (ev) => {
-      if (order != null && accessToken != null && endpoint != null) {
+      if (order != null && accessToken != null) {
         const requiresBillingInfo = order?.requires_billing_info ?? false
         const orderWithShipments = await setExpressFakeAddress({
           orderId: order.id,
           config: {
             accessToken,
-            endpoint,
           },
           address: {
             first_name: "Fake name",
@@ -102,12 +101,11 @@ export function StripeExpressPayment({
       }
     })
     paymentRequest.on("shippingoptionchange", async (ev) => {
-      if (order != null && accessToken != null && endpoint != null) {
+      if (order != null && accessToken != null) {
         const updatedOrder = await setExpressShippingMethod({
           orderId: order.id,
           config: {
             accessToken,
-            endpoint,
           },
           selectFirst: false,
           selectedShippingMethodId: ev.shippingOption.id,
@@ -137,7 +135,7 @@ export function StripeExpressPayment({
       const requiresBillingInfo = order?.requires_billing_info ?? false
       const paymentResource =
         paymentMethod?.payment_source_type as PaymentResource
-      if (accessToken != null && endpoint != null) {
+      if (accessToken != null) {
         const [firstName, lastName] = ev.payerName?.split(" ") ?? []
         const [line] = ev.shippingAddress?.addressLine ?? ""
         const email = ev.payerEmail ?? ""
@@ -145,7 +143,6 @@ export function StripeExpressPayment({
           orderId: order.id,
           config: {
             accessToken,
-            endpoint,
           },
           address: {
             first_name: firstName ?? "Fake name",
@@ -164,7 +161,6 @@ export function StripeExpressPayment({
           orderId: order.id,
           config: {
             accessToken,
-            endpoint,
           },
           selectFirst: false,
           selectedShippingMethodId: ev?.shippingOption?.id,
@@ -175,7 +171,6 @@ export function StripeExpressPayment({
         const placeOrderParams: TSetExpressPlaceOrderParams = {
           config: {
             accessToken,
-            endpoint,
           },
           orderId: order?.id,
           paymentResource,
@@ -213,7 +208,6 @@ export function StripeExpressPayment({
               const placeOrderParams: TSetExpressPlaceOrderParams = {
                 config: {
                   accessToken,
-                  endpoint,
                 },
                 orderId: order?.id,
                 placeTheOrder: true,
@@ -225,7 +219,6 @@ export function StripeExpressPayment({
                   order,
                   config: {
                     accessToken,
-                    endpoint,
                   },
                 })
               } catch (err) {
@@ -238,7 +231,6 @@ export function StripeExpressPayment({
             const placeOrderParams: TSetExpressPlaceOrderParams = {
               config: {
                 accessToken,
-                endpoint,
               },
               orderId: order?.id,
               placeTheOrder: true,
@@ -250,7 +242,6 @@ export function StripeExpressPayment({
                 order,
                 config: {
                   accessToken,
-                  endpoint,
                 },
               })
             } catch (err) {

@@ -1,6 +1,6 @@
 import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import type { Order, OrderSubscription } from '@commercelayer/sdk'
-import getSdk from './getSdk'
+import { getSdk } from '@commercelayer/core'
 
 export type HelperRequestResource = 'orders' | 'order_subscriptions'
 
@@ -41,7 +41,7 @@ export async function triggerAttributeHelper({
   attribute,
   resource
 }: TriggerAttributeHelper): TriggerAttributeHelperResponse {
-  const sdk = getSdk(config)
+  const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   return await sdk[resource].update({
     id,
     [attribute]: true

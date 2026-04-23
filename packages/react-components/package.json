@@ -59,7 +59,7 @@
     "@commercelayer/core": "workspace:*",
     "@commercelayer/hooks": "workspace:*",
     "@commercelayer/organization-config": "^2.8.4",
-    "@commercelayer/sdk": "^7.4.1",
+    "@commercelayer/sdk": "7.9.0",
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.6.1",
     "@tanstack/react-table": "^8.21.3",

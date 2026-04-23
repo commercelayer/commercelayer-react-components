@@ -9,8 +9,8 @@ import type { PaymentRequestShippingOption } from "@stripe/stripe-js"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import { getApplicationLink } from "./getApplicationLink"
-import { getDomain } from "./getDomain"
-import getSdk from "./getSdk"
+import { jwt } from "./jwt"
+import { getSdk } from '@commercelayer/core'
 import { getOrganizationConfig } from "./organization"
 
 const availablePaymentMethods = ["stripe_payments"]
@@ -32,7 +32,7 @@ interface TFakeAddressParams {
   /**
    * The Commerce Layer config
    */
-  config: Required<Pick<CommerceLayerConfig, "accessToken" | "endpoint">>
+  config: Required<Pick<CommerceLayerConfig, "accessToken">>
   /**
    * The address resource
    */
@@ -52,7 +52,7 @@ export async function setExpressFakeAddress({
   const params: QueryParamsRetrieve = {
     include: ["shipments.available_shipping_methods"],
   }
-  const sdk = getSdk(config)
+  const sdk = getSdk({ accessToken: config.accessToken! })
   const fakeAddress = await sdk.addresses.create(address)
   const resource: OrderUpdate = {
     id: orderId,
@@ -143,7 +143,7 @@ export async function setExpressShippingMethod({
   selectedShippingMethodId,
   params,
 }: TSetExpressShippingMethodParams): Promise<Order> {
-  const sdk = getSdk(config)
+  const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   const order = await sdk.orders.retrieve(orderId, params)
   const shippingMethods = getExpressShippingMethods(order)
   if (order?.shipments == null) throw new Error("No shipments found")
@@ -228,7 +228,7 @@ export async function setExpressPlaceOrder({
   paymentSourceId,
   placeTheOrder = false,
 }: TSetExpressPlaceOrderParams): Promise<Order> {
-  const sdk = getSdk(config)
+  const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   if (!placeTheOrder && paymentResource != null && paymentSourceId != null) {
     const include = [
       "shipments.shipping_method",
@@ -273,15 +273,15 @@ interface TExpressRedirectUrlParams {
 
 export async function expressRedirectUrl({
   order,
-  config: { accessToken, endpoint },
+  config: { accessToken },
 }: TExpressRedirectUrlParams): Promise<void> {
   if (accessToken == null) throw new Error("No access token found")
-  if (endpoint == null) throw new Error("No endpoint found")
-  const { slug, domain } = getDomain(endpoint)
+  const { organization } = jwt(accessToken)
+  const slug = organization.slug
+  const domain = 'commercelayer.io'
   if (slug == null) throw new Error("No slug found")
   const config = await getOrganizationConfig({
     accessToken,
-    endpoint,
     params: {
       accessToken,
       slug,

@@ -4,7 +4,7 @@ import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import type { Order, AddressUpdate } from '@commercelayer/sdk'
 import type { getOrderContext } from '#reducers/OrderReducer'
 import type { AddressResource } from './AddressReducer'
-import getSdk from '#utils/getSdk'
+import { getSdk } from '@commercelayer/core'
 
 export type ShippingAddressActionType =
   | 'setShippingAddress'
@@ -42,7 +42,7 @@ export const setShippingAddress: SetShippingAddress = async (id, options) => {
   try {
     if (options?.order) {
       if (options.customerAddressId) {
-        const sdk = getSdk(options.config)
+        const sdk = getSdk({ accessToken: options.config.accessToken!, interceptors: options.config.interceptors })
         const attributes: AddressUpdate = {
           id,
           reference: options.customerAddressId

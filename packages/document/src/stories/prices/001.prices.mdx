@@ -1,0 +1,150 @@
+import { Meta, Source, Canvas } from '@storybook/addon-docs/blocks';
+import * as Stories from './prices.stories.tsx'
+
+<Meta title="Prices/Overview" />
+
+# Prices
+
+The Prices components let you fetch and display product prices from the Commerce Layer API.
+All price components must be nested inside the `<CommerceLayer>` context that handles API authentication.
+
+Refer to the [Prices API reference](https://docs.commercelayer.io/core/v/api-reference/prices/object)
+for the full list of available attributes.
+
+---
+
+## Price (standalone)
+
+`<Price>` can be used **directly under `<CommerceLayer>`** without any container.
+It automatically registers its `skuCode` in a module-level batch store and a 50 ms debounce
+collects all sibling registrations into **one SWR-deduplicated API request**.
+
+<span title='Info' type='info'>
+No provider or wrapper needed. Drop `<Price skuCode="…" />` anywhere inside `<CommerceLayer>` and batching happens automatically.
+</span>
+
+**Props**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `skuCode` | `string` | — | SKU code of the price to display |
+| `showCompare` | `boolean` | `true` | Whether to show `formatted_compare_at_amount` |
+| `compareClassName` | `string` | — | CSS class applied to the compare-at price element |
+| `loader` | `string \| ReactNode` | `'Loading...'` | Shown while the price is being fetched (standalone mode only) |
+| `children` | `function` | — | Render prop: `({ prices, loading, loader }) => ReactNode` |
+
+<Source
+  language="jsx"
+  dark
+  code={`
+import { CommerceLayer, Price } from '@commercelayer/react-components'
+
+// All three <Price> components are batched into a single API request automatically.
+<CommerceLayer accessToken="...">
+  <Price skuCode="SKU-A" className="font-bold" />
+  <Price skuCode="SKU-B" className="font-bold" />
+  <Price skuCode="SKU-C" className="font-bold" loader={<span>…</span>} />
+</CommerceLayer>
+`}
+/>
+
+<Canvas of={Stories.StandalonePrice} />
+
+---
+
+## Render prop
+
+Use the `children` render prop to access the raw `prices` array and `loading` state
+for a fully custom price UI. Works in both standalone and container modes.
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<CommerceLayer accessToken="...">
+  <Price skuCode="MY-SKU-CODE">
+    {({ prices, loading }) => {
+      if (loading) return <span>Loading…</span>
+      if (prices.length === 0) return <span>No price available</span>
+      const [p] = prices
+      return (
+        <div>
+          <strong>{p.formatted_amount}</strong>
+          {p.formatted_compare_at_amount != null && (
+            <s className="ml-2 text-gray-400">{p.formatted_compare_at_amount}</s>
+          )}
+        </div>
+      )
+    }}
+  </Price>
+</CommerceLayer>
+`}
+/>
+
+<Canvas of={Stories.RenderPropStory} />
+
+---
+
+## PricesContainer (deprecated)
+
+<span title='Deprecated' type='warning'>
+`PricesContainer` is deprecated and will be removed in a future major release.
+Use `<Price skuCode="…" />` as a standalone component instead — it handles batching automatically.
+</span>
+
+`PricesContainer` fetches prices for one or more SKU codes and stores them in a React context
+for its `<Price>` children. Multiple `<Price>` children each register their own `skuCode` —
+the container batches all registrations into a single API request using a 50 ms debounce.
+
+**Props**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `skuCode` | `string` | — | SKU code to fetch price for (shorthand for a single `<Price>`) |
+| `filters` | `object` | `{}` | Commerce Layer price filters (e.g. `{ currency_code_eq: 'EUR' }`) |
+| `perPage` | `number` | `10` | Max prices per page |
+| `loader` | `string \| ReactNode` | `'Loading...'` | Shown while prices are being fetched |
+
+<Source
+  language="jsx"
+  dark
+  code={`
+// Deprecated — prefer standalone <Price> instead
+import { CommerceLayer, PricesContainer, Price } from '@commercelayer/react-components'
+
+<CommerceLayer accessToken="...">
+  <PricesContainer skuCode="MY-SKU-CODE">
+    <Price />
+  </PricesContainer>
+</CommerceLayer>
+`}
+/>
+
+<Canvas of={Stories.SingleSkuStory} />
+
+---
+
+## PricesContainer — batched (deprecated)
+
+Mount multiple `<Price>` components inside `PricesContainer` — each registers its `skuCode`
+and the container debounces all registrations into **one API call**.
+
+<span title='Migration' type='info'>
+This pattern is still supported but deprecated. The same batching now happens automatically
+when you use standalone `<Price>` components without any container.
+</span>
+
+<Source
+  language="jsx"
+  dark
+  code={`
+// Deprecated — prefer standalone <Price> components instead
+<PricesContainer>
+  <Price skuCode="SKU-A" />
+  <Price skuCode="SKU-B" />
+  <Price skuCode="SKU-C" />
+</PricesContainer>
+`}
+/>
+
+<Canvas of={Stories.BatchedPricesStory} />

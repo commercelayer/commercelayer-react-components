@@ -1,4 +1,4 @@
-import { type TestContext } from 'vitest'
+import type { TestContext } from "vitest"
 
 export interface LocalContext extends TestContext {
   accessToken: string
@@ -20,5 +20,9 @@ export interface SkuListsContext extends LocalContext {
 }
 
 export interface AvailabilityContext extends LocalContext {
+  skuCode: string
+}
+
+export interface PricesContext extends LocalContext {
   skuCode: string
 }

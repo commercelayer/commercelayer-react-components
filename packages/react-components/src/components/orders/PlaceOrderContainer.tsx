@@ -46,7 +46,6 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
   const config = useContext(CommerceLayerContext)
   const organizationConfig = useOrganizationConfig({
     accessToken: config.accessToken,
-    endpoint: config.endpoint,
   })
   // biome-ignore lint/correctness/useExhaustiveDependencies: Infinite loop
   useEffect(() => {

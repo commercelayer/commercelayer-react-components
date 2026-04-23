@@ -4,7 +4,7 @@ import Parent from "../utils/Parent"
 import type { ChildrenFunction } from "#typings/index"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import { getApplicationLink } from "#utils/getApplicationLink"
-import { getDomain } from "#utils/getDomain"
+import { jwt } from "#utils/jwt"
 import { getOrganizationConfig } from "#utils/organization"
 
 interface ChildrenProps extends Omit<Props, "children"> {
@@ -36,10 +36,12 @@ interface Props extends Omit<JSX.IntrinsicElements["a"], "children"> {
 export function CheckoutLink(props: Props): JSX.Element {
   const { label, hostedCheckout = true, children, onClick, ...p } = props
   const { order } = useContext(OrderContext)
-  const { accessToken, endpoint } = useContext(CommerceLayerContext)
-  if (accessToken == null || endpoint == null)
+  const { accessToken } = useContext(CommerceLayerContext)
+  if (accessToken == null)
     throw new Error("Cannot use `CheckoutLink` outside of `CommerceLayer`")
-  const { domain, slug } = getDomain(endpoint)
+  const { organization } = jwt(accessToken)
+  const slug = organization.slug
+  const domain = 'commercelayer.io'
   const href =
     hostedCheckout && order?.id
       ? getApplicationLink({
@@ -63,10 +65,9 @@ export function CheckoutLink(props: Props): JSX.Element {
     e.preventDefault()
     e.stopPropagation()
     const currentHref = e.currentTarget.href
-    if (accessToken && endpoint && order?.id) {
+    if (accessToken && order?.id) {
       getOrganizationConfig({
         accessToken,
-        endpoint,
         params: {
           accessToken,
           slug,

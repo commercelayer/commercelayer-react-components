@@ -14,7 +14,7 @@ import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
 import { isEmpty } from '#utils/isEmpty'
 import type { BaseError } from '#typings/errors'
 import getErrors from '#utils/getErrors'
-import getSdk from '#utils/getSdk'
+import { getSdk } from '@commercelayer/core'
 import type {
   createOrder as makeOrder,
   getOrderContext
@@ -103,7 +103,7 @@ export async function addGiftCardRecipient<V extends GiftCardRecipientCreate>(
   dispatch: Dispatch<GiftCardAction>
 ): Promise<void> {
   try {
-    const sdk = getSdk(config)
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const recipient = await sdk.gift_card_recipients.create(values)
     dispatch({
       type: 'setGiftCardRecipient',
@@ -142,7 +142,7 @@ export async function addGiftCard<V extends GiftCardI>(
   }
 ): Promise<void> {
   try {
-    const sdk = getSdk(config)
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     addGiftCardLoading(true, dispatch)
     const { firstName, lastName, email, ...val } = values
     // TODO: Change any type

@@ -16,8 +16,8 @@ import type { BaseMetadataObject } from "#typings/index"
 import baseReducer from "#utils/baseReducer"
 import { publish } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
-import { getDomain } from "#utils/getDomain"
-import getSdk from "#utils/getSdk"
+import { jwt } from "#utils/jwt"
+import { getSdk } from '@commercelayer/core'
 import {
   type CustomerOrderParams,
   type DeleteLocalOrder,
@@ -150,7 +150,7 @@ export async function createOrder(params: CreateOrderParams): Promise<string> {
       setLocalOrder,
     } = params
     if (state?.orderId) return state.orderId
-    const sdk = config != null ? getSdk(config) : undefined
+    const sdk = config != null ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors }) : undefined
     try {
       if (sdk == null) return ""
       const o = await sdk?.orders.create({ metadata, ...orderAttributes })
@@ -195,7 +195,7 @@ export const getApiOrder: GetOrder = async (
     state,
     options = {},
   } = params
-  const sdk = config != null ? getSdk(config) : undefined
+  const sdk = config != null ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors }) : undefined
   try {
     if (sdk == null) return undefined
     if (state?.include && state.include.length > 0) {
@@ -256,7 +256,7 @@ export async function getOrderByFields(params: {
   config: CommerceLayerConfig
 }): Promise<Order> {
   const { orderId, fields, config } = params
-  const sdk = config != null ? getSdk(config) : undefined
+  const sdk = config != null ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors }) : undefined
   if (sdk == null) throw new Error("SDK not initialized")
   const order = await sdk.orders.retrieve(orderId, { fields })
   return order
@@ -274,7 +274,7 @@ export async function updateOrder({
   error?: { errors: BaseError[] }
   order?: Order
 }> {
-  const sdk = config != null ? getSdk(config) : undefined
+  const sdk = config != null ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors }) : undefined
   try {
     if (sdk == null) return { success: false }
     const resource = { ...attributes, id }
@@ -336,7 +336,7 @@ export async function paymentSourceRequest({
   order,
   state,
 }: TResourceRequest): Promise<{ success: boolean; order?: Order }> {
-  const sdk = config != null ? getSdk(config) : undefined
+  const sdk = config != null ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors }) : undefined
   try {
     if (sdk == null) return { success: false }
     const sdkResource = sdk[resource]
@@ -501,7 +501,7 @@ export async function addToCart(
   } = params
   try {
     if (config) {
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       const id = await createOrder(params)
       if (id) {
         const order = sdk.orders.relationship(id)
@@ -572,11 +572,12 @@ export async function addToCart(
         if (
           buyNowMode &&
           id &&
-          config?.accessToken != null &&
-          config?.endpoint != null
+          config?.accessToken != null
         ) {
           const params = `${id}?accessToken=${config.accessToken ?? ""}`
-          const { domain, slug } = getDomain(config.endpoint)
+          const { organization } = jwt(config.accessToken)
+          const slug = organization.slug
+          const domain = 'commercelayer.io'
           const href = getApplicationLink({
             slug,
             orderId: id,
@@ -586,7 +587,6 @@ export async function addToCart(
           })
           const organizationConfig = await getOrganizationConfig({
             accessToken: config.accessToken,
-            endpoint: config.endpoint,
             params: {
               accessToken: config.accessToken,
               orderId: order?.id,

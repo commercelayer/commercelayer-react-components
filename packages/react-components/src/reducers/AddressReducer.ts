@@ -11,7 +11,7 @@ import {
 } from "#utils/addressesManager"
 import baseReducer from "#utils/baseReducer"
 import { formCleaner } from "#utils/formCleaner"
-import getSdk from "#utils/getSdk"
+import { getSdk } from '@commercelayer/core'
 import type { TCustomerAddress } from "./CustomerReducer"
 import type { updateOrder } from "./OrderReducer"
 
@@ -206,7 +206,7 @@ export async function saveAddresses({
     shippingAddressId,
   } = state
   try {
-    const sdk = getSdk(config)
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const billingAddress = formCleaner(billingAddressForm)
     const shippingAddress = formCleaner(shippingAddressForm)
     if (order) {
