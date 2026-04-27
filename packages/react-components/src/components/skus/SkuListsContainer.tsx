@@ -24,6 +24,11 @@ interface Props {
   params?: QueryParamsRetrieve<SkuList>
 }
 
+/**
+ * @deprecated Use `<SkuList>` as a standalone component instead.
+ * `SkuList` now fetches its own data without requiring a container parent.
+ * `SkuListsContainer` remains functional for backwards compatibility.
+ */
 export function SkuListsContainer(props: Props): JSX.Element {
   const { children, params } = props
   const config = useContext(CommerceLayerContext)
@@ -67,7 +72,12 @@ export function SkuListsContainer(props: Props): JSX.Element {
   }, [config.accessToken, registeredIds, retrieveSkuList, params])
 
   const contextValue = useMemo<SkuListsContextType>(
-    () => ({ listIds: registeredIds, skuLists, registerListId }),
+    () => ({
+      listIds: registeredIds,
+      skuLists,
+      registerListId,
+      setListIds: setRegisteredIds,
+    }),
     [registeredIds, skuLists, registerListId],
   )
 

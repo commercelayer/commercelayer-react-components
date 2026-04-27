@@ -1,11 +1,11 @@
 /**
- * Module-level batch store for price SKU codes.
+ * Module-level batch store for SKU codes.
  *
- * Multiple `usePrices` hook instances (one per `<Price>` component) write to
+ * Multiple `useSkus` hook instances (one per `<Sku>` component) write to
  * the same store keyed by `accessToken`. A 50ms debounce collects all codes
  * registered within the same tick and produces a single immutable snapshot.
- * `useSyncExternalStore` in `usePrices` reacts to snapshot changes so all
- * instances call `fetchPrices` with identical params — SWR then deduplicates
+ * `useSyncExternalStore` in `useSkus` reacts to snapshot changes so all
+ * instances call `fetchSkus` with identical params — SWR then deduplicates
  * to exactly one network request.
  */
 

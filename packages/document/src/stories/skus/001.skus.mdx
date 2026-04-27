@@ -12,9 +12,89 @@ for the full list of available attributes.
 
 ---
 
+## Sku (standalone — recommended)
+
+`Sku` is a standalone component that fetches and displays SKU data without requiring a `SkusContainer` parent.
+Multiple sibling `<Sku>` components are automatically batched into a single API request via a module-level
+debounce store, so rendering many SKUs on one page is efficient.
+
+<span title='Requirements' type='warning'>
+Must be a child of the `<CommerceLayer>` component.
+</span>
+
+<span title='Children' type='info'>
+`<SkuField>`, `<AvailabilityContainer>`
+</span>
+
+**Props**
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `skuCode` | `string` | ✓ | The SKU code to fetch |
+| `loader` | `ReactNode` | — | Shown while the SKU is loading (default: `"Loading..."`) |
+
+<Source
+  language="jsx"
+  dark
+  code={`
+import { CommerceLayer, Sku, SkuField } from '@commercelayer/react-components'
+
+<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+  <Sku skuCode="TSHIRTWS000000FFFFFFLXXX">
+    <SkuField attribute="name" tagElement="h2" />
+    <SkuField attribute="description" tagElement="p" />
+  </Sku>
+  <Sku skuCode="TSHIRTWKFFFFFF000000MXXX">
+    <SkuField attribute="name" tagElement="h2" />
+    <SkuField attribute="description" tagElement="p" />
+  </Sku>
+</CommerceLayer>
+`}
+/>
+
+---
+
 ## SkusContainer
 
-`SkusContainer` is the main container for SKU data. It accepts an array of SKU codes, fetches the
+<span title='Deprecated' type='warning'>
+`SkusContainer` is deprecated. Use the standalone `<Sku skuCode="...">` component instead (see above).
+</span>
+
+**Migration guide**
+
+Before (deprecated):
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<SkusContainer skus={["TSHIRTWS000000FFFFFFLXXX", "TSHIRTWKFFFFFF000000MXXX"]}>
+  <Skus>
+    <SkuField attribute="name" tagElement="h2" />
+    <SkuField attribute="description" tagElement="p" />
+  </Skus>
+</SkusContainer>
+`}
+/>
+
+After:
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<Sku skuCode="TSHIRTWS000000FFFFFFLXXX">
+  <SkuField attribute="name" tagElement="h2" />
+  <SkuField attribute="description" tagElement="p" />
+</Sku>
+<Sku skuCode="TSHIRTWKFFFFFF000000MXXX">
+  <SkuField attribute="name" tagElement="h2" />
+  <SkuField attribute="description" tagElement="p" />
+</Sku>
+`}
+/>
+
+`SkusContainer` is the legacy container for SKU data. It accepts an array of SKU codes, fetches the
 corresponding resources from the API, and stores them in a React context for its children.
 
 <span title='Requirements' type='warning'>
@@ -77,12 +157,12 @@ Must be a child of the `<SkusContainer>` component.
 
 ## SkuField
 
-`SkuField` renders any attribute of the current SKU from the parent `SkusContainer` context.
+`SkuField` renders any attribute of the current SKU from the parent `SkusContainer` or `Sku` context.
 Use the `attribute` prop to select which field to display and `tagElement` to control the HTML tag
 (defaults to `span`). When `tagElement="img"`, additional `<img>` props such as `width` and `height` are accepted.
 
 <span title='Requirements' type='warning'>
-Must be a descendant of the `<SkusContainer>` component.
+Must be a descendant of the `<SkusContainer>` or `<Sku>` component.
 </span>
 
 <span title='Fields' type='info'>
@@ -103,19 +183,16 @@ available attributes (e.g. `name`, `description`, `image_url`, `code`).
   code={`
 import {
   CommerceLayer,
-  SkusContainer,
-  Skus,
+  Sku,
   SkuField,
 } from '@commercelayer/react-components'
 
 <CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
-  <SkusContainer skus={["TSHIRTWS000000FFFFFFLXXX", "TSHIRTWKFFFFFF000000MXXX"]}>
-    <Skus>
-      <SkuField attribute="name" tagElement="h2" />
-      <SkuField attribute="description" tagElement="p" />
-      <SkuField attribute="image_url" tagElement="img" width={200} height={200} />
-    </Skus>
-  </SkusContainer>
+  <Sku skuCode="TSHIRTWS000000FFFFFFLXXX">
+    <SkuField attribute="name" tagElement="h2" />
+    <SkuField attribute="description" tagElement="p" />
+    <SkuField attribute="image_url" tagElement="img" width={200} height={200} />
+  </Sku>
 </CommerceLayer>
 `}
 />
