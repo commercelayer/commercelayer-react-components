@@ -31,6 +31,24 @@ interface Props {
  * <span title='Children' type='info'>
  * `<Skus>`
  * </span>
+ *
+ * @deprecated Use the standalone `<Sku skuCode="...">` component instead.
+ *
+ * **Before (deprecated):**
+ * ```tsx
+ * <SkusContainer skus={["TSHIRTWS000000FFFFFFLXXX"]}>
+ *   <Skus>
+ *     <SkuField attribute="name" tagElement="h2" />
+ *   </Skus>
+ * </SkusContainer>
+ * ```
+ *
+ * **After:**
+ * ```tsx
+ * <Sku skuCode="TSHIRTWS000000FFFFFFLXXX">
+ *   <SkuField attribute="name" tagElement="h2" />
+ * </Sku>
+ * ```
  */
 export function SkusContainer<P extends Props>(props: P): JSX.Element {
   const { skus, children, queryParams } = props
@@ -55,7 +73,12 @@ export function SkusContainer<P extends Props>(props: P): JSX.Element {
   }, [config.accessToken, skus, queryParams, fetchSkus, clearSkus])
 
   const contextValue = useMemo(
-    () => ({ skus: skuList, loading: isLoading, skuCodes: skus }),
+    () => ({
+      skus: skuList,
+      loading: isLoading,
+      skuCodes: skus,
+      setSkuCodes: () => {},
+    }),
     [skuList, isLoading, skus],
   )
 

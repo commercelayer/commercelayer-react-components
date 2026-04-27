@@ -20,11 +20,15 @@ const mockUpdatePrice = vi
   .fn()
   .mockResolvedValue({ ...mockPrices[0], amount_cents: 2000 })
 
-vi.mock("@commercelayer/core", () => ({
-  getPrices: (...args: unknown[]) => mockGetPrices(...args),
-  retrievePrice: (...args: unknown[]) => mockRetrievePrice(...args),
-  updatePrice: (...args: unknown[]) => mockUpdatePrice(...args),
-}))
+vi.mock("@commercelayer/core", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@commercelayer/core")>()
+  return {
+    ...actual,
+    getPrices: (...args: unknown[]) => mockGetPrices(...args),
+    retrievePrice: (...args: unknown[]) => mockRetrievePrice(...args),
+    updatePrice: (...args: unknown[]) => mockUpdatePrice(...args),
+  }
+})
 
 describe("usePrices — interceptors", () => {
   const accessToken = "test-token"

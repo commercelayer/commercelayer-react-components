@@ -1,13 +1,14 @@
 /**
  * @vitest-environment jsdom
  */
+
+import type { Sku } from "@commercelayer/core"
 import { act, renderHook, waitFor } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { createElement } from "react"
 import { SWRConfig } from "swr"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { InterceptorManager } from "../index"
-import type { Sku } from "@commercelayer/core"
 import { useSkus } from "./useSkus"
 
 const swrWrapper = ({ children }: { children: ReactNode }) =>
@@ -21,11 +22,15 @@ const mockUpdateSku = vi
   .fn()
   .mockResolvedValue({ ...mockSkus[0], reference: "updated" })
 
-vi.mock("@commercelayer/core", () => ({
-  getSkus: (...args: unknown[]) => mockGetSkus(...args),
-  retrieveSku: (...args: unknown[]) => mockRetrieveSku(...args),
-  updateSku: (...args: unknown[]) => mockUpdateSku(...args),
-}))
+vi.mock("@commercelayer/core", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@commercelayer/core")>()
+  return {
+    ...actual,
+    getSkus: (...args: unknown[]) => mockGetSkus(...args),
+    retrieveSku: (...args: unknown[]) => mockRetrieveSku(...args),
+    updateSku: (...args: unknown[]) => mockUpdateSku(...args),
+  }
+})
 
 describe("useSkus — interceptors", () => {
   const accessToken = "test-token"
@@ -114,7 +119,10 @@ describe("useSkus — interceptors", () => {
 
     // Pre-populate cache with two SKUs via the bound mutate (same key)
     await act(async () => {
-      await result.current.mutate([...mockSkus, sku2] as unknown as Sku[], false)
+      await result.current.mutate(
+        [...mockSkus, sku2] as unknown as Sku[],
+        false,
+      )
     })
 
     await act(async () => {
