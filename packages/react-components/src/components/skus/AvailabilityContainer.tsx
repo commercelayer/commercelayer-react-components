@@ -37,6 +37,10 @@ interface Props {
  * <span title='Children' type='info'>
  * `<AvailabilityTemplate>`
  * </span>
+ *
+ * @deprecated Use `<Availability>` instead. It provides the same functionality
+ * without requiring a "container" wrapper. `AvailabilityContainer` remains
+ * functional for backwards compatibility.
  */
 export function AvailabilityContainer({
   children,
