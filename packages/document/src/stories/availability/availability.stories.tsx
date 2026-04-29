@@ -2,9 +2,8 @@ import {
   Availability,
   AvailabilityContainer,
   AvailabilityTemplate,
+  Sku,
   SkuField,
-  Skus,
-  SkusContainer,
 } from "@commercelayer/react-components"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import CommerceLayer from "../_internals/CommerceLayer"
@@ -32,22 +31,11 @@ export const StandaloneAvailability: Story = {
   ),
 }
 
-export const BasicAvailability: Story = {
-  name: "AvailabilityContainer — basic",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <AvailabilityContainer skuCode="POLOMXXX000000FFFFFFLXXX">
-        <AvailabilityTemplate />
-      </AvailabilityContainer>
-    </CommerceLayer>
-  ),
-}
-
 export const CustomLabels: Story = {
   name: "AvailabilityTemplate — custom labels",
   render: () => (
     <CommerceLayer accessToken="my-access-token">
-      <AvailabilityContainer skuCode="POLOMXXX000000FFFFFFLXXX">
+      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
         <AvailabilityTemplate
           labels={{
             available: "✅ In stock",
@@ -55,7 +43,7 @@ export const CustomLabels: Story = {
             negativeStock: "⚠️ Not available",
           }}
         />
-      </AvailabilityContainer>
+      </Availability>
     </CommerceLayer>
   ),
 }
@@ -64,12 +52,12 @@ export const WithDeliveryLeadTimeDays: Story = {
   name: "AvailabilityTemplate — lead time in days",
   render: () => (
     <CommerceLayer accessToken="my-access-token">
-      <AvailabilityContainer skuCode="POLOMXXX000000FFFFFFLXXX">
+      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
         <AvailabilityTemplate
           labels={{ available: "Available" }}
           timeFormat="days"
         />
-      </AvailabilityContainer>
+      </Availability>
     </CommerceLayer>
   ),
 }
@@ -78,12 +66,12 @@ export const WithDeliveryLeadTimeHours: Story = {
   name: "AvailabilityTemplate — lead time in hours",
   render: () => (
     <CommerceLayer accessToken="my-access-token">
-      <AvailabilityContainer skuCode="POLOMXXX000000FFFFFFLXXX">
+      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
         <AvailabilityTemplate
           labels={{ available: "Available" }}
           timeFormat="hours"
         />
-      </AvailabilityContainer>
+      </Availability>
     </CommerceLayer>
   ),
 }
@@ -92,9 +80,9 @@ export const WithShippingMethodName: Story = {
   name: "AvailabilityTemplate — with shipping method name",
   render: () => (
     <CommerceLayer accessToken="my-access-token">
-      <AvailabilityContainer skuCode="POLOMXXX000000FFFFFFLXXX">
+      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
         <AvailabilityTemplate timeFormat="days" showShippingMethodName />
-      </AvailabilityContainer>
+      </Availability>
     </CommerceLayer>
   ),
 }
@@ -103,29 +91,29 @@ export const WithShippingMethodPrice: Story = {
   name: "AvailabilityTemplate — with shipping method price",
   render: () => (
     <CommerceLayer accessToken="my-access-token">
-      <AvailabilityContainer skuCode="POLOMXXX000000FFFFFFLXXX">
+      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
         <AvailabilityTemplate
           timeFormat="days"
           showShippingMethodName
           showShippingMethodPrice
         />
-      </AvailabilityContainer>
+      </Availability>
     </CommerceLayer>
   ),
 }
 
 export const WithGetQuantityCallback: Story = {
-  name: "AvailabilityContainer — getQuantity callback",
+  name: "Availability — getQuantity callback",
   render: () => (
     <CommerceLayer accessToken="my-access-token">
-      <AvailabilityContainer
+      <Availability
         skuCode="POLOMXXX000000FFFFFFLXXX"
         getQuantity={(quantity) => {
           console.log("quantity updated:", quantity)
         }}
       >
         <AvailabilityTemplate />
-      </AvailabilityContainer>
+      </Availability>
     </CommerceLayer>
   ),
 }
@@ -134,7 +122,7 @@ export const WithChildrenRenderProp: Story = {
   name: "AvailabilityTemplate — children render prop",
   render: () => (
     <CommerceLayer accessToken="my-access-token">
-      <AvailabilityContainer skuCode="POLOMXXX000000FFFFFFLXXX">
+      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
         <AvailabilityTemplate>
           {({ quantity, text, min, max }) => (
             <div style={{ fontFamily: "monospace", fontSize: 14 }}>
@@ -147,31 +135,36 @@ export const WithChildrenRenderProp: Story = {
             </div>
           )}
         </AvailabilityTemplate>
-      </AvailabilityContainer>
+      </Availability>
     </CommerceLayer>
   ),
 }
 
-export const InsideSkusContainer: Story = {
-  name: "AvailabilityContainer — inside SkusContainer",
+export const InsideSku: Story = {
+  name: "Availability — inside Sku (inherits skuCode)",
   render: () => (
     <CommerceLayer accessToken="my-access-token">
-      <SkusContainer
-        skus={["POLOMXXX000000FFFFFFLXXX", "TSHIRTMM000000FFFFFFXLXX"]}
-      >
-        <Skus>
-          <div style={{ marginBottom: 16 }}>
-            <SkuField
-              attribute="name"
-              tagElement="h3"
-              style={{ marginBottom: 4 }}
-            />
-            <AvailabilityContainer>
-              <AvailabilityTemplate />
-            </AvailabilityContainer>
-          </div>
-        </Skus>
-      </SkusContainer>
+      <Sku skuCode="POLOMXXX000000FFFFFFLXXX">
+        <SkuField
+          attribute="name"
+          tagElement="h3"
+          style={{ marginBottom: 4 }}
+        />
+        <Availability>
+          <AvailabilityTemplate />
+        </Availability>
+      </Sku>
+    </CommerceLayer>
+  ),
+}
+
+export const DeprecatedContainer: Story = {
+  name: "AvailabilityContainer — deprecated (legacy)",
+  render: () => (
+    <CommerceLayer accessToken="my-access-token">
+      <AvailabilityContainer skuCode="POLOMXXX000000FFFFFFLXXX">
+        <AvailabilityTemplate />
+      </AvailabilityContainer>
     </CommerceLayer>
   ),
 }
