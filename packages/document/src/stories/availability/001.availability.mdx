@@ -12,15 +12,13 @@ All Availability components must be nested inside the `<CommerceLayer>` context.
 
 ---
 
-## AvailabilityContainer
+## Availability (standalone)
 
-`AvailabilityContainer` is the root component of the Availability tree.
-It fetches inventory data for a given SKU (by code or ID) and exposes the result
-to its children through the Availability context.
+The preferred way to display availability. `<Availability>` fetches inventory data on its own —
+no container wrapper needed.
 
-<span title='Requirements' type='warning'>
+<span title='Requirements' type='info'>
 Must be a child of the `<CommerceLayer>` component.
-Can also be a child of `<Skus>` inside a `<SkusContainer>`, in which case `skuCode` is inherited automatically.
 </span>
 
 <span title='Children' type='info'>
@@ -34,6 +32,7 @@ Can also be a child of `<Skus>` inside a `<SkusContainer>`, in which case `skuCo
 | `skuCode` | `string` | — | The SKU code to fetch availability for |
 | `skuId` | `string` | — | The SKU ID (takes precedence over `skuCode`; improves performance) |
 | `getQuantity` | `(quantity: number) => void` | — | Callback fired whenever the available quantity changes |
+| `loader` | `ReactNode` | — | Content shown while fetching (default: `"Loading..."`) |
 
 <Source
   language="jsx"
@@ -41,15 +40,49 @@ Can also be a child of `<Skus>` inside a `<SkusContainer>`, in which case `skuCo
   code={`
 import {
   CommerceLayer,
-  AvailabilityContainer,
+  Availability,
   AvailabilityTemplate,
 } from '@commercelayer/react-components'
 
 <CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
-  <AvailabilityContainer skuCode="TSHIRTMM000000FFFFFFXLXX">
-    <AvailabilityTemplate />
-  </AvailabilityContainer>
+  <Availability skuCode="TSHIRTMM000000FFFFFFXLXX">
+    <AvailabilityTemplate labels={{ available: 'In stock', outOfStock: 'Out of stock' }} />
+  </Availability>
 </CommerceLayer>
+`}
+/>
+
+---
+
+## AvailabilityContainer
+
+<span title='Deprecated' type='warning'>
+`AvailabilityContainer` is deprecated. Use the standalone `<Availability skuCode="...">` component instead (see above).
+</span>
+
+**Migration guide**
+
+Before (deprecated):
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<AvailabilityContainer skuCode="TSHIRTMM000000FFFFFFXLXX">
+  <AvailabilityTemplate />
+</AvailabilityContainer>
+`}
+/>
+
+After (preferred):
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<Availability skuCode="TSHIRTMM000000FFFFFFXLXX">
+  <AvailabilityTemplate />
+</Availability>
 `}
 />
 
@@ -57,13 +90,13 @@ import {
 
 ## AvailabilityTemplate
 
-`AvailabilityTemplate` reads from the parent `AvailabilityContainer` context and renders
+`AvailabilityTemplate` reads from the parent `Availability` (or `AvailabilityContainer`) context and renders
 a `<span>` with availability text. You can customise the label shown for each state
 (`available`, `outOfStock`, `negativeStock`) and optionally include delivery lead time
 and shipping method details.
 
 <span title='Requirements' type='warning'>
-Must be a descendant of the `<AvailabilityContainer>` component.
+Must be a descendant of the `<Availability>` component.
 </span>
 
 **Props**
@@ -81,7 +114,7 @@ Must be a descendant of the `<AvailabilityContainer>` component.
   language="jsx"
   dark
   code={`
-<AvailabilityContainer skuCode="TSHIRTMM000000FFFFFFXLXX">
+<Availability skuCode="TSHIRTMM000000FFFFFFXLXX">
   <AvailabilityTemplate
     labels={{
       available: 'In stock',
@@ -91,7 +124,7 @@ Must be a descendant of the `<AvailabilityContainer>` component.
     showShippingMethodName
     showShippingMethodPrice
   />
-</AvailabilityContainer>
+</Availability>
 `}
 />
 
@@ -105,7 +138,7 @@ The function receives the full availability context including `quantity`, `text`
   language="jsx"
   dark
   code={`
-<AvailabilityContainer skuCode="TSHIRTMM000000FFFFFFXLXX">
+<Availability skuCode="TSHIRTMM000000FFFFFFXLXX">
   <AvailabilityTemplate>
     {({ quantity, text, min, max }) => (
       <div>
@@ -116,15 +149,15 @@ The function receives the full availability context including `quantity`, `text`
       </div>
     )}
   </AvailabilityTemplate>
-</AvailabilityContainer>
+</Availability>
 `}
 />
 
 ---
 
-## Usage inside SkusContainer
+## Usage inside Skus
 
-When used inside a `<SkusContainer>` → `<Skus>` tree, `AvailabilityContainer`
+When used inside a `<Sku>` or `<SkusContainer>` → `<Skus>` tree, `Availability`
 automatically inherits the `skuCode` from the current SKU context —
 no need to pass `skuCode` explicitly.
 
@@ -134,22 +167,19 @@ no need to pass `skuCode` explicitly.
   code={`
 import {
   CommerceLayer,
-  SkusContainer,
-  Skus,
+  Sku,
   SkuField,
-  AvailabilityContainer,
+  Availability,
   AvailabilityTemplate,
 } from '@commercelayer/react-components'
 
 <CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
-  <SkusContainer skus={['TSHIRTMM000000FFFFFFXLXX', 'PANTSMM000000FFFFFFXXXX']}>
-    <Skus>
-      <SkuField attribute="name" tagElement="h3" />
-      <AvailabilityContainer>
-        <AvailabilityTemplate />
-      </AvailabilityContainer>
-    </Skus>
-  </SkusContainer>
+  <Sku skuCode="TSHIRTMM000000FFFFFFXLXX">
+    <SkuField attribute="name" tagElement="h3" />
+    <Availability>
+      <AvailabilityTemplate />
+    </Availability>
+  </Sku>
 </CommerceLayer>
 `}
 />
