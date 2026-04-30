@@ -8,3 +8,5 @@ export interface RequestConfig {
   options?: ResourcesConfig
   interceptors?: InterceptorManager
 }
+
+export type BaseMetadataObject = Record<string, string | undefined | null>
