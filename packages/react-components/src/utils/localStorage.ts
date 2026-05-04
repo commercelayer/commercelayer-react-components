@@ -1,20 +1,11 @@
-export type GetLocalOrder = (key: string) => string | null
+import { getLocalOrder, setLocalOrder, deleteLocalOrder } from "@commercelayer/core"
 
-export const getLocalOrder: GetLocalOrder = (key) => {
-  return localStorage.getItem(key)
-}
-
-export type SetLocalOrder = (key: string, value: string) => void
-
-export const setLocalOrder: SetLocalOrder = (key, value) => {
-  localStorage.setItem(key, value)
-}
-
-export type DeleteLocalOrder = (key: string) => void
-
-export const deleteLocalOrder: DeleteLocalOrder = (key) => {
-  localStorage.removeItem(key)
-}
+export type {
+  GetLocalOrder,
+  SetLocalOrder,
+  DeleteLocalOrder,
+} from "@commercelayer/core"
+export { getLocalOrder, setLocalOrder, deleteLocalOrder }
 
 export const getSavePaymentSourceToCustomerWallet = (): boolean => {
   return (
