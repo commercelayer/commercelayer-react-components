@@ -82,6 +82,8 @@ export function useOrderState({
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: persistKey intentionally the only dep — mirrors original OrderContainer behavior
   useEffect(() => {
+    const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
+    if (state?.orderId) {
       if (localOrder != null && state.orderId !== localOrder) {
         getOrder(localOrder)
       } else {
