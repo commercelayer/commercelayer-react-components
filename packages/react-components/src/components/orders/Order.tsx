@@ -1,8 +1,12 @@
-import type { Order, OrderCreate } from "@commercelayer/sdk"
-import type { JSX } from "react"
-import { Order as OrderComponent } from "#components/orders/Order"
+import type { Order as OrderSDK, OrderCreate } from "@commercelayer/sdk"
+import { type JSX, useContext } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
+import OrderStorageContext from "#context/OrderStorageContext"
+import { useOrderState } from "#hooks/useOrderState"
 import type { BaseMetadataObject } from "#typings"
 import type { DefaultChildrenType } from "#typings/globals"
+import useCustomContext from "#utils/hooks/useCustomContext"
 
 interface Props {
   children: DefaultChildrenType
@@ -21,12 +25,10 @@ interface Props {
   /**
    * Callback called when the order is updated
    */
-  fetchOrder?: (order: Order) => void
+  fetchOrder?: (order: OrderSDK) => void
 }
 
 /**
- * @deprecated Use `<Order>` instead. `<OrderContainer>` will be removed in the next major version.
- *
  * This component is responsible for fetching the order and store it in its context.
  * It also provides the `fetchOrder` callback that is triggered every time the order is updated (it returns the updated order object as argument).
  * When the order is not placed yet, its possible to pass the `metadata` and `attributes` props to update the order.
@@ -59,13 +61,27 @@ interface Props {
  * Check the `orders` resource from our [Core API documentation](https://docs.commercelayer.io/core/v/api-reference/orders/object).
  * </span>
  */
-export function OrderContainer(props: Props): JSX.Element {
-  if (process.env.NODE_ENV !== "production") {
-    console.warn(
-      "[commercelayer-react-components] <OrderContainer> is deprecated and will be removed in the next major version. Use <Order> instead.",
-    )
-  }
-  return <OrderComponent {...props} />
+export function Order(props: Props): JSX.Element {
+  const { children, orderId, metadata, attributes, fetchOrder } = props
+  const { accessToken, interceptors } = useCustomContext({
+    context: CommerceLayerContext,
+    contextComponentName: "CommerceLayer",
+    currentComponentName: "Order",
+    key: "accessToken",
+  })
+  const storageCtx = useContext(OrderStorageContext)
+  const orderValue = useOrderState({
+    accessToken,
+    interceptors,
+    orderId,
+    metadata,
+    attributes,
+    fetchOrder,
+    ...storageCtx,
+  })
+  return (
+    <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
+  )
 }
 
-export default OrderContainer
+export default Order

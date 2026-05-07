@@ -1,0 +1,137 @@
+import { Meta, Source, Canvas } from '@storybook/addon-docs/blocks';
+import * as Stories from './Order.stories.tsx'
+
+<Meta title="Orders/Overview" />
+
+# Orders
+
+The Order components let you fetch and display order data from the Commerce Layer API.
+All order components must be nested inside the `<CommerceLayer>` context that handles API authentication.
+
+Refer to the [Orders API reference](https://docs.commercelayer.io/core/v/api-reference/orders/object)
+for the full list of available attributes.
+
+---
+
+## Order (standalone)
+
+`<Order>` is the recommended way to fetch an order and make it available to its children via context.
+Pass the `orderId` prop to load an existing order, or omit it to create a new one on demand.
+It can optionally receive the `orderId` from a parent `<OrderStorage>` component.
+
+<span title='Requirements' type='info'>
+Must be a child of the `<CommerceLayer>` component.
+Can be a child of the `<OrderStorage>` component and receive the `orderId` from it.
+</span>
+
+<span title='Children' type='info'>
+`<AddToCartButton>`, `<AdjustmentAmount>`, `<CartLink>`, `<CheckoutLink>`, `<DiscountAmount>`,
+`<GiftCardAmount>`, `<HostedCart>`, `<OrderNumber>`, `<PaymentMethodAmount>`,
+`<PlaceOrderButton>`, `<PlaceOrderContainer>`, `<PrivacyAndTermsCheckbox>`,
+`<ShippingAmount>`, `<SubTotalAmount>`, `<TaxesAmount>`, `<TotalAmount>`
+</span>
+
+**Props**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `orderId` | `string` | — | ID of the order to fetch |
+| `metadata` | `object` | — | Metadata to attach when a new order is created |
+| `attributes` | `OrderCreate` | — | Attributes to set when creating or updating the order |
+| `fetchOrder` | `(order: Order) => void` | — | Callback fired every time the order is updated |
+
+<Source
+  language="jsx"
+  dark
+  code={`
+import {
+  CommerceLayer,
+  Order,
+  OrderNumber,
+  SubTotalAmount,
+  TotalAmount,
+} from '@commercelayer/react-components'
+
+<CommerceLayer accessToken="...">
+  <Order orderId="KaeheROdbp" fetchOrder={(order) => console.log(order)}>
+    <div>Order #<OrderNumber /></div>
+    <div>Subtotal: <SubTotalAmount /></div>
+    <div>Total: <TotalAmount /></div>
+  </Order>
+</CommerceLayer>
+`}
+/>
+
+<Canvas of={Stories.OrderStory} />
+
+---
+
+## Order — with fetchOrder callback
+
+Use the `fetchOrder` callback to react to order updates in your application, for example
+to sync the cart badge count or trigger analytics events.
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<CommerceLayer accessToken="...">
+  <Order
+    orderId="KaeheROdbp"
+    fetchOrder={(order) => {
+      console.log('Order updated:', order)
+    }}
+  >
+    <div>Order #<OrderNumber /></div>
+    <div>Total: <TotalAmount /></div>
+  </Order>
+</CommerceLayer>
+`}
+/>
+
+<Canvas of={Stories.OrderWithCallbackStory} />
+
+---
+
+## OrderContainer (deprecated)
+
+<span title='Deprecated' type='warning'>
+`OrderContainer` is deprecated and will be removed in the next major version.
+Use the `<Order>` component instead — it has the same API and is a drop-in replacement.
+</span>
+
+**Migration guide**
+
+Before (deprecated):
+
+<Source
+  language="jsx"
+  dark
+  code={`
+import { CommerceLayer, OrderContainer, OrderNumber, TotalAmount } from '@commercelayer/react-components'
+
+<CommerceLayer accessToken="...">
+  <OrderContainer orderId="KaeheROdbp">
+    <div>Order #<OrderNumber /></div>
+    <div>Total: <TotalAmount /></div>
+  </OrderContainer>
+</CommerceLayer>
+`}
+/>
+
+After (preferred):
+
+<Source
+  language="jsx"
+  dark
+  code={`
+import { CommerceLayer, Order, OrderNumber, TotalAmount } from '@commercelayer/react-components'
+
+<CommerceLayer accessToken="...">
+  <Order orderId="KaeheROdbp">
+    <div>Order #<OrderNumber /></div>
+    <div>Total: <TotalAmount /></div>
+  </Order>
+</CommerceLayer>
+`}
+/>

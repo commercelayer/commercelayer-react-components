@@ -37,7 +37,7 @@ interface TReturnOrder
 }
 
 /**
- * React Hook that provides access to the order context stored in the `<OrderContainer>` component.
+ * React Hook that provides access to the order context stored in the `<Order>` component (or the deprecated `<OrderContainer>`).
  **/
 export function useOrderContainer(): TReturnOrder {
   const ctx = useContext(OrderContext)
@@ -60,7 +60,7 @@ export function useOrderContainer(): TReturnOrder {
       }
     }
   }
-  throw new Error('Cannot use `useOrderContainer` outside of <OrderContainer/>')
+  throw new Error('Cannot use `useOrderContainer` outside of <Order/> (or the deprecated <OrderContainer/>)')
 }
 
 export default useOrderContainer
