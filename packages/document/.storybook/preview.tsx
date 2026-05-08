@@ -32,7 +32,7 @@ export const parameters: Parameters = {
         "Getting Started",
         "Skus",
         "Orders",
-        ["Overview", "Order", "AddToCartButton", ["Overview"]],
+        ["Overview", "Order", "AddToCartButton"],
       ],
     },
   },
