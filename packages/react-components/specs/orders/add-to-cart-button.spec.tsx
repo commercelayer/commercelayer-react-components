@@ -195,7 +195,7 @@ describe("AddToCartButton", () => {
           <AddToCartButton skuCode="SKU1" />
         </CommerceLayerContext.Provider>,
       ),
-    ).toThrow("Cannot use <AddToCartButton/> outside of <OrderContainer/>")
+    ).toThrow("Cannot use <AddToCartButton/> outside of <Order/>")
     consoleSpy.mockRestore()
   })
 })

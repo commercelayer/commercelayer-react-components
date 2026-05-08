@@ -50,7 +50,7 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     includeLoaded,
   } = useCustomContext({
     context: OrderContext,
-    contextComponentName: "OrderContainer",
+    contextComponentName: "Order",
     currentComponentName: "PaymentMethodsContainer",
     key: "order",
   })

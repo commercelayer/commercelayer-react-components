@@ -147,7 +147,7 @@ export function AddToCartButton(props: Props): JSX.Element {
   })
   const { addToCart, orderId, getOrder, setOrderErrors } = useCustomContext({
     context: OrderContext,
-    contextComponentName: "OrderContainer",
+    contextComponentName: "Order",
     currentComponentName: "AddToCartButton",
     key: "addToCart",
   })

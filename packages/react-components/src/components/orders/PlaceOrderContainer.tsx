@@ -39,7 +39,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
     includeLoaded,
   } = useCustomContext({
     context: OrderContext,
-    contextComponentName: "OrderContainer",
+    contextComponentName: "Order",
     currentComponentName: "PlaceOrderContainer",
     key: "order",
   })
