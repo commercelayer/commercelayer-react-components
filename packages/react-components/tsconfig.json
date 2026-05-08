@@ -41,18 +41,18 @@
     "types": ["vitest/globals"],
     /* Module Resolution Options */
     "moduleResolution": "Node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
-    "baseUrl": "." /* Base directory to resolve non-absolute module names. */,
+    "ignoreDeprecations": "6.0",
     "paths": {
-      "@commercelayer/react-components": ["src/index"],
-      "#components/*": ["src/components/*"],
-      "#components-utils/*": ["src/components/utils/*"],
-      "#reducers/*": ["src/reducers/*"],
-      "#context/*": ["src/context/*"],
-      "#typings/*": ["src/typings/*"],
-      "#typings": ["src/typings/index"],
-      "#utils/*": ["src/utils/*"],
-      "#config/*": ["src/config/*"],
-      "#hooks/*": ["src/hooks/*"]
+      "@commercelayer/react-components": ["./src/index"],
+      "#components/*": ["./src/components/*"],
+      "#components-utils/*": ["./src/components/utils/*"],
+      "#reducers/*": ["./src/reducers/*"],
+      "#context/*": ["./src/context/*"],
+      "#typings/*": ["./src/typings/*"],
+      "#typings": ["./src/typings/index"],
+      "#utils/*": ["./src/utils/*"],
+      "#config/*": ["./src/config/*"],
+      "#hooks/*": ["./src/hooks/*"]
     } /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */,
     // "rootDirs": [],                              /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                             /* List of folders to include type definitions from. */
