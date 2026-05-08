@@ -1,0 +1,154 @@
+import { Meta, Source, Canvas } from '@storybook/addon-docs/blocks';
+import * as Stories from './AddToCartButton.stories.tsx'
+
+<Meta title="Orders/AddToCartButton/Overview" />
+
+# AddToCartButton
+
+`<AddToCartButton>` adds line items to the cart (a draft order).
+It works with SKU codes, bundle codes, or picks up the SKU automatically when nested inside a `<Sku>` component.
+
+Refer to the [Line Items API reference](https://docs.commercelayer.io/core/v/api-reference/line_items/object) for more details.
+
+---
+
+<span title='Requirements' type='warning'>
+Must be a descendant of `<CommerceLayer>` and `<Order>`.
+</span>
+
+**Props**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `skuCode` | `string` | — | SKU code to add to cart (auto-read from `<Sku>` context when omitted) |
+| `bundleCode` | `string` | — | Bundle code to add to cart |
+| `quantity` | `string` | `"1"` | Number of units to add |
+| `label` | `string \| ReactNode` | `"Add to cart"` | Button label |
+| `disabled` | `boolean` | `false` | Disables the button |
+| `buyNowMode` | `boolean` | `false` | Redirects to checkout after adding |
+| `checkoutUrl` | `string` | — | Custom checkout URL (used with `buyNowMode`) |
+| `redirectToHostedCart` | `boolean` | `false` | Redirects to the hosted cart after adding |
+| `hostedCartUrl` | `string` | — | Custom cart URL (used with `redirectToHostedCart`) |
+| `skuListId` | `string` | — | Adds all SKUs in a SKU list to the cart |
+| `lineItem` | `CustomLineItem` | — | Custom line item overrides |
+| `lineItemOption` | `LineItemOption` | — | Line item option to attach |
+| `children` | `ChildrenFunction` | — | Render prop — receives `handleClick`, `disabled`, `label` |
+
+> The button is automatically disabled while the cart operation is in progress to prevent double-clicks.
+
+---
+
+## Basic
+
+<Canvas of={Stories.BasicStory} />
+
+<Source
+  language="jsx"
+  dark
+  code={`
+import { CommerceLayer, Order, AddToCartButton } from '@commercelayer/react-components'
+
+<CommerceLayer accessToken="...">
+  <Order>
+    <AddToCartButton skuCode="TSHIRTWS000000FFFFFFLXXX" />
+  </Order>
+</CommerceLayer>
+`}
+/>
+
+---
+
+## Custom label
+
+<Canvas of={Stories.CustomLabelStory} />
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<AddToCartButton skuCode="TSHIRTWS000000FFFFFFLXXX" label="Buy now" />
+`}
+/>
+
+---
+
+## Custom quantity
+
+<Canvas of={Stories.CustomQuantityStory} />
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<AddToCartButton skuCode="TSHIRTWS000000FFFFFFLXXX" quantity="3" label="Add 3 to cart" />
+`}
+/>
+
+---
+
+## Buy now mode
+
+When `buyNowMode` is enabled the customer is redirected to checkout immediately after adding the item.
+Pass `checkoutUrl` to use a self-hosted checkout, otherwise the Commerce Layer hosted checkout is used.
+
+<Canvas of={Stories.BuyNowStory} />
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<AddToCartButton
+  skuCode="TSHIRTWS000000FFFFFFLXXX"
+  label="Buy now"
+  buyNowMode
+  checkoutUrl="https://checkout.your-domain.com"
+/>
+`}
+/>
+
+---
+
+## SKU code from context
+
+When `<AddToCartButton>` is nested inside a `<Sku>` component it automatically picks up
+the `skuCode` from context — no need to pass it as a prop.
+
+<Canvas of={Stories.SkuContextStory} />
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<CommerceLayer accessToken="...">
+  <Order>
+    <Sku skuCode="TSHIRTWS000000FFFFFFLXXX">
+      <SkuField attribute="name" tagElement="h3" />
+      <AddToCartButton />
+    </Sku>
+  </Order>
+</CommerceLayer>
+`}
+/>
+
+---
+
+## Custom children (render prop)
+
+Pass a function as `children` to get full control over the button UI.
+The function receives `handleClick`, `disabled` (reflects the loading state), and `label`.
+
+<Canvas of={Stories.RenderPropStory} />
+
+<Source
+  language="jsx"
+  dark
+  code={`
+<AddToCartButton skuCode="TSHIRTWS000000FFFFFFLXXX">
+  {({ handleClick, disabled, label }) => (
+    <button onClick={() => void handleClick()} disabled={disabled}>
+      {disabled ? 'Adding…' : label}
+    </button>
+  )}
+</AddToCartButton>
+`}
+/>
