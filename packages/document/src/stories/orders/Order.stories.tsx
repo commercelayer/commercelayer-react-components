@@ -11,7 +11,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import CommerceLayer from "../_internals/CommerceLayer"
 
 const meta = {
-  title: "Orders/Stories",
+  title: "Orders/Order",
   parameters: {
     layout: "centered",
   },
