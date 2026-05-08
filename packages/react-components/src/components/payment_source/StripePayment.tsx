@@ -45,7 +45,7 @@ const defaultOptions: StripePaymentElementOptions = {
   layout: {
     type: "accordion",
     defaultCollapsed: false,
-    radios: true,
+    radios: "always",
     spacedAccordionItems: false,
   },
   fields: { billingDetails: "never" },

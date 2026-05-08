@@ -13,29 +13,29 @@
   },
   "dependencies": {
     "@commercelayer/react-components": "workspace:*",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^5.1.1",
-    "@commercelayer/js-auth": "^7.3.0",
-    "@storybook/addon-docs": "^10.3.5",
-    "@storybook/addon-links": "^10.3.5",
-    "@storybook/addon-mcp": "^0.5.0",
-    "@storybook/addon-onboarding": "^10.3.5",
-    "@storybook/icons": "^2.0.1",
-    "@storybook/react": "^10.3.5",
-    "@storybook/react-vite": "^10.3.5",
+    "@chromatic-com/storybook": "^5.1.2",
+    "@commercelayer/js-auth": "^7.4.1",
+    "@storybook/addon-docs": "^10.3.6",
+    "@storybook/addon-links": "^10.3.6",
+    "@storybook/addon-mcp": "^0.6.0",
+    "@storybook/addon-onboarding": "^10.3.6",
+    "@storybook/icons": "^2.0.2",
+    "@storybook/react": "^10.3.6",
+    "@storybook/react-vite": "^10.3.6",
     "@types/js-cookie": "^3.0.6",
-    "@types/react": "^19.2.8",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.2",
+    "@vitejs/plugin-react": "^6.0.1",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "remark-gfm": "^4.0.1",
-    "storybook": "^10.3.5",
-    "typescript": "~5.9.3",
-    "vite": "^7.3.1",
-    "vite-tsconfig-paths": "^6.0.4"
+    "storybook": "^10.3.6",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.11",
+    "vite-tsconfig-paths": "^6.1.1"
   }
 }

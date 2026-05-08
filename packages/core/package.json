@@ -38,14 +38,14 @@
   "license": "MIT",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
-    "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/coverage-v8": "^4.1.5",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.0"
+    "vitest": "^4.1.5"
   },
   "dependencies": {
-    "@commercelayer/js-auth": "^7.3.0",
-    "@commercelayer/sdk": "7.9.0"
+    "@commercelayer/js-auth": "^7.4.1",
+    "@commercelayer/sdk": "7.11.0"
   }
 }

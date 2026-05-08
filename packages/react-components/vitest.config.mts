@@ -12,6 +12,8 @@ export default defineConfig({
       'swr': path.resolve(__dirname, 'node_modules/swr'),
       '@commercelayer/hooks': path.resolve('../hooks/src/index.ts'),
       '@commercelayer/core': path.resolve('../core/src/index.ts'),
+      'mocks': path.resolve(__dirname, 'mocks'),
+      'specs': path.resolve(__dirname, 'specs'),
       '#components': path.resolve(__dirname, 'src/components'),
       '#components/auth': path.resolve(__dirname, 'src/components/auth'),
       '#components/auth/*': path.resolve(__dirname, 'src/components/auth/*'),
