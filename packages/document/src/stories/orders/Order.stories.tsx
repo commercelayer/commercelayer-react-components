@@ -12,10 +12,11 @@ import CommerceLayer from "../_internals/CommerceLayer"
 
 const meta = {
   title: "Orders/Order",
+  component: Order,
   parameters: {
     layout: "centered",
   },
-} satisfies Meta
+} satisfies Meta<typeof Order>
 
 export default meta
 type Story = StoryObj<typeof meta>

@@ -9,10 +9,11 @@ import CommerceLayer from "../_internals/CommerceLayer"
 
 const meta = {
   title: "Orders/AddToCartButton",
+  component: AddToCartButton,
   parameters: {
     layout: "centered",
   },
-} satisfies Meta
+} satisfies Meta<typeof AddToCartButton>
 
 export default meta
 type Story = StoryObj<typeof meta>
