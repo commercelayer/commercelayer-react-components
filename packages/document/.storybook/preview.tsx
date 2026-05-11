@@ -10,7 +10,7 @@ import type { Parameters, Preview } from "@storybook/react-vite"
 import React from "react"
 
 export const parameters: Parameters = {
-  layout: "centered",
+  layout: "padded",
   controls: {
     matchers: {
       color: /(background|color)$/i,
@@ -27,14 +27,20 @@ export const parameters: Parameters = {
   },
   options: {
     storySort: {
-      method: "alphabetical",
       order: [
-        "Getting Started",
-        "Skus",
-        "Orders",
-        ["Overview", "Order", "AddToCartButton"],
-      ],
-    },
+        'Getting Started',
+        'Orders',
+        ['Order', 'AddToCartButton'],
+        'Prices',
+        ['Price'],
+        'Skus',
+        ['Sku'],
+        'Availability',
+        'Examples',
+        ['Listing Page', 'Shopping Cart', 'Checkout Page', 'My Account'],
+        'Hooks'
+      ]
+    }
   },
   docs: {
     page: () => (
