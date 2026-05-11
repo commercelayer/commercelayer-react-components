@@ -4,7 +4,6 @@ import {
   SkuList,
   SkuListsContainer,
   Skus,
-  SkusContainer,
 } from "@commercelayer/react-components"
 import { ArgTypes, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"
@@ -58,113 +57,6 @@ import { CommerceLayer, Sku, SkuField } from '@commercelayer/react-components'
   <Sku skuCode="TSHIRTWKFFFFFF000000MXXX">
     <SkuField attribute="name" tagElement="h2" />
     <SkuField attribute="description" tagElement="p" />
-  </Sku>
-</CommerceLayer>
-`}
-      />
-      <hr />
-      <h2>SkusContainer (deprecated)</h2>
-      <blockquote>
-        <p>
-          ⚠️ <strong>Deprecated:</strong>{" "}
-          <code>{"<SkusContainer>"}</code> is deprecated. Use the standalone{" "}
-          <code>{'<Sku skuCode="...">'}</code> component instead (see above).
-        </p>
-      </blockquote>
-      <p>
-        <strong>Before (deprecated):</strong>
-      </p>
-      <Source
-        language="jsx"
-        dark
-        code={`
-<SkusContainer skus={["TSHIRTWS000000FFFFFFLXXX", "TSHIRTWKFFFFFF000000MXXX"]}>
-  <Skus>
-    <SkuField attribute="name" tagElement="h2" />
-    <SkuField attribute="description" tagElement="p" />
-  </Skus>
-</SkusContainer>
-`}
-      />
-      <p>
-        <strong>After:</strong>
-      </p>
-      <Source
-        language="jsx"
-        dark
-        code={`
-<Sku skuCode="TSHIRTWS000000FFFFFFLXXX">
-  <SkuField attribute="name" tagElement="h2" />
-  <SkuField attribute="description" tagElement="p" />
-</Sku>
-<Sku skuCode="TSHIRTWKFFFFFF000000MXXX">
-  <SkuField attribute="name" tagElement="h2" />
-  <SkuField attribute="description" tagElement="p" />
-</Sku>
-`}
-      />
-      <hr />
-      <h2>Skus</h2>
-      <p>
-        <code>{"<Skus>"}</code> loops through all SKU records stored in the
-        parent <code>{"<SkusContainer>"}</code> context and renders its children
-        once for each SKU. You do not need to loop manually — the component
-        handles iteration.
-      </p>
-      <blockquote>
-        <p>
-          Must be a child of <code>{"<SkusContainer>"}</code>. Accepts{" "}
-          <code>{"<SkuField>"}</code> and{" "}
-          <code>{"<AvailabilityContainer>"}</code> as children.
-        </p>
-      </blockquote>
-      <Source
-        language="jsx"
-        dark
-        code={`
-<SkusContainer skus={["TSHIRTWS000000FFFFFFLXXX", "TSHIRTWKFFFFFF000000MXXX"]}>
-  <Skus>
-    {/* rendered once per SKU */}
-  </Skus>
-</SkusContainer>
-`}
-      />
-      <hr />
-      <h2>SkuField</h2>
-      <p>
-        <code>{"<SkuField>"}</code> renders any attribute of the current SKU
-        from the parent <code>{"<SkusContainer>"}</code> or{" "}
-        <code>{"<Sku>"}</code> context. Use the <code>attribute</code> prop to
-        select which field to display and <code>tagElement</code> to control the
-        HTML tag (defaults to <code>span</code>). When{" "}
-        <code>{'tagElement="img"'}</code>, additional{" "}
-        <code>{"<img>"}</code> props such as <code>width</code> and{" "}
-        <code>height</code> are accepted.
-      </p>
-      <blockquote>
-        <p>
-          Must be a descendant of <code>{"<SkusContainer>"}</code> or{" "}
-          <code>{"<Sku>"}</code>. See the{" "}
-          <a href="https://docs.commercelayer.io/core/v/api-reference/skus/object">
-            SKUs API object
-          </a>{" "}
-          for all available attributes (e.g. <code>name</code>,{" "}
-          <code>description</code>, <code>image_url</code>,{" "}
-          <code>code</code>).
-        </p>
-      </blockquote>
-      <ArgTypes of={SkuField} />
-      <Source
-        language="jsx"
-        dark
-        code={`
-import { CommerceLayer, Sku, SkuField } from '@commercelayer/react-components'
-
-<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
-  <Sku skuCode="TSHIRTWS000000FFFFFFLXXX">
-    <SkuField attribute="name" tagElement="h2" />
-    <SkuField attribute="description" tagElement="p" />
-    <SkuField attribute="image_url" tagElement="img" width={200} height={200} />
   </Sku>
 </CommerceLayer>
 `}
@@ -273,24 +165,6 @@ export const StandaloneSkuStory: Story = {
   ),
 }
 
-export const SkusContainerStory: Story = {
-  name: "SkusContainer — name and code",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <SkusContainer
-        skus={["TSHIRTWS000000FFFFFFLXXX", "TSHIRTWKFFFFFF000000MXXX"]}
-      >
-        <Skus>
-          <div style={{ marginBottom: 12 }}>
-            <SkuField attribute="name" tagElement="h3" />
-            <SkuField attribute="code" tagElement="p" />
-          </div>
-        </Skus>
-      </SkusContainer>
-    </CommerceLayer>
-  ),
-}
-
 export const StandaloneSkuListStory: Story = {
   name: "SkuList — standalone (no container)",
   render: () => (
@@ -321,25 +195,6 @@ export const SkuListsContainerStory: Story = {
           </Skus>
         </SkuList>
       </SkuListsContainer>
-    </CommerceLayer>
-  ),
-}
-
-export const SkuFieldImageStory: Story = {
-  name: "SkuField — image",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <SkusContainer skus={["TSHIRTWS000000FFFFFFLXXX"]}>
-        <Skus>
-          <SkuField
-            attribute="image_url"
-            tagElement="img"
-            width={200}
-            height={200}
-            style={{ objectFit: "contain" }}
-          />
-        </Skus>
-      </SkusContainer>
     </CommerceLayer>
   ),
 }
