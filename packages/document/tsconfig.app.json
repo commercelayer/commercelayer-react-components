@@ -20,7 +20,12 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "paths": {
+      "@commercelayer/react-components": [
+        "../../react-components/src/index.ts"
+      ]
+    }
   },
   "include": ["src", ".storybook/**/*"]
 }

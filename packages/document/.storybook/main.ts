@@ -73,13 +73,6 @@ const storybookConfig: StorybookConfig = {
     reactDocgen: "react-docgen-typescript",
     reactDocgenTypescriptOptions: {
       tsconfigPath: resolve(import.meta.dirname, "../tsconfig.app.json"),
-      // Point react-docgen-typescript to the TypeScript source (same as the
-      // Vite alias), so it can extract prop types instead of reading dist/*.d.ts
-      compilerOptions: {
-        paths: {
-          "@commercelayer/react-components": [`${rcSrc}/index.ts`],
-        },
-      },
       propFilter: (prop) => {
         if (["children", "className"].includes(prop.name)) {
           return true
