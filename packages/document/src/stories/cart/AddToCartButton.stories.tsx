@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import CommerceLayer from "../_internals/CommerceLayer"
 import {
   AddToCartButton,
@@ -17,9 +18,87 @@ import {
   SkusContainer,
 } from "@commercelayer/react-components"
 
+function AddToCartButtonDocsPage(): JSX.Element {
+  return (
+    <>
+      <h1>AddToCartButton</h1>
+      <p>
+        <code>{"<AddToCartButton>"}</code> adds a SKU, bundle, or SKU list to
+        the cart (draft order). It must be a descendant of{" "}
+        <code>{"<Order>"}</code>. When nested inside{" "}
+        <code>{"<Skus>"}</code> or <code>{"<SkuList>"}</code>, the{" "}
+        <code>skuCode</code> is inherited from context automatically.
+      </p>
+      <blockquote>
+        <p>
+          Must be a child of <code>{"<Order>"}</code> (or{" "}
+          <code>{"<OrderContainer>"}</code>). See the{" "}
+          <a href="https://docs.commercelayer.io/core/v/how-tos/placing-orders/shopping-cart/create-a-shopping-cart">
+            shopping cart how-to
+          </a>{" "}
+          for the full flow.
+        </p>
+      </blockquote>
+      <ArgTypes />
+      <Source
+        language="jsx"
+        dark
+        code={`
+import {
+  CommerceLayer,
+  OrderStorage,
+  Order,
+  AddToCartButton,
+} from '@commercelayer/react-components'
+
+<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+  <OrderStorage persistKey="my-cart">
+    <Order>
+      <AddToCartButton skuCode="TSHIRTWS000000FFFFFFLXXX" label="Add to cart" quantity="1" />
+    </Order>
+  </OrderStorage>
+</CommerceLayer>
+`}
+      />
+      <hr />
+      <h2>Add SKU to cart</h2>
+      <Canvas of={AddSku} />
+      <hr />
+      <h2>Add bundle to cart</h2>
+      <Canvas of={AddBundle} />
+      <hr />
+      <h2>Disabled when out of stock</h2>
+      <p>
+        Combine with <code>{"<AvailabilityTemplate>"}</code> to disable the
+        button when the SKU has no stock.
+      </p>
+      <Canvas of={DisabledWhenOutOfStock} />
+      <hr />
+      <h2>Custom attributes / external price</h2>
+      <p>
+        Pass a <code>lineItem</code> prop to customise the created line item
+        (e.g. custom name, external price).
+      </p>
+      <Canvas of={UseCustomAttributesOrExternalPrice} />
+      <hr />
+      <h2>Children render prop</h2>
+      <p>
+        Pass a function as <code>children</code> to take full control of the
+        button UI. The <code>disabled</code> flag reflects the loading state.
+      </p>
+      <Canvas of={ChildrenProps} />
+    </>
+  )
+}
+
 const meta = {
   title: "Orders/AddToCartButton",
   component: AddToCartButton,
+  parameters: {
+    docs: {
+      page: AddToCartButtonDocsPage,
+    },
+  },
 } satisfies Meta<typeof AddToCartButton>
 
 export default meta
