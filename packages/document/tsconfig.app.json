@@ -23,7 +23,7 @@
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@commercelayer/react-components": [
-        "../../react-components/src/index.ts"
+        "../react-components/src/index.ts"
       ]
     }
   },

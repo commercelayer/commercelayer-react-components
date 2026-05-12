@@ -39,7 +39,7 @@ function PricesDocsPage(): JSX.Element {
           <code>{"<CommerceLayer>"}</code> and batching happens automatically.
         </p>
       </blockquote>
-      <ArgTypes of={Price} />
+      <ArgTypes />
       <Source
         language="jsx"
         dark

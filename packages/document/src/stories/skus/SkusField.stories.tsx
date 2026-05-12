@@ -42,7 +42,7 @@ function SkuFieldDocsPage(): JSX.Element {
           <code>code</code>, <code>metadata</code>).
         </p>
       </blockquote>
-      <ArgTypes of={SkuField} />
+      <ArgTypes />
       <Source
         language="jsx"
         dark

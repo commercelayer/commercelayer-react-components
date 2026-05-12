@@ -26,7 +26,7 @@ function SkusContainerDocsPage(): JSX.Element {
         stores them in a React context for its <code>{"<Skus>"}</code> children.
         Internally it debounces registrations into a single API call.
       </p>
-      <ArgTypes of={SkusContainer} />
+      <ArgTypes />
       <hr />
       <h2>Migration guide</h2>
       <p>

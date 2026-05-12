@@ -42,7 +42,7 @@ function SkusDocsPage(): JSX.Element {
           <code>{"<AvailabilityContainer>"}</code> as children.
         </p>
       </blockquote>
-      <ArgTypes of={Sku} />
+      <ArgTypes />
       <Source
         language="jsx"
         dark
@@ -102,7 +102,11 @@ import { CommerceLayer, SkuListsContainer } from '@commercelayer/react-component
           <code>{"<Skus>"}</code> and <code>{"<SkuField>"}</code> as children.
         </p>
       </blockquote>
-      <ArgTypes of={SkuList} />
+      <p>
+        Key props: <code>id</code> (string, required) — the SKU list ID from
+        Commerce Layer. Accepts <code>{"<Skus>"}</code> and{" "}
+        <code>{"<SkuField>"}</code> as children.
+      </p>
       <Source
         language="jsx"
         dark

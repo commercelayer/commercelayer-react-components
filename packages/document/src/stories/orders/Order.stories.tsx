@@ -45,7 +45,7 @@ function OrderDocsPage(): JSX.Element {
           <code>orderId</code> automatically.
         </p>
       </blockquote>
-      <ArgTypes of={Order} />
+      <ArgTypes />
       <Source
         language="jsx"
         dark
