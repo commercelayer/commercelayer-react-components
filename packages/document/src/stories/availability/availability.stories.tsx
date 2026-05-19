@@ -1,6 +1,5 @@
 import {
   Availability,
-  AvailabilityContainer,
   AvailabilityTemplate,
   Sku,
   SkuField,
@@ -14,19 +13,20 @@ function AvailabilityDocsPage(): JSX.Element {
     <>
       <h1>Availability</h1>
       <p>
-        The Availability components display real-time stock and shipping
-        information for a SKU. Use the standalone{" "}
-        <code>{"<Availability>"}</code> component (recommended) — it fetches
-        availability data automatically. The legacy{" "}
-        <code>{"<AvailabilityContainer>"}</code> is kept for backwards
-        compatibility.
+        The Availability components let you display real-time stock quantity and
+        delivery lead times for any SKU. They are powered by the Commerce Layer
+        inventory model and work by fetching availability data through the{" "}
+        <code>useAvailability</code> hook from <code>@commercelayer/hooks</code>
+        . All Availability components must be nested inside the{" "}
+        <code>{"<CommerceLayer>"}</code> context.
       </p>
       <hr />
-      <h2>Availability</h2>
+      <h2>Availability (standalone)</h2>
       <p>
-        Standalone component that fetches availability without any container.
-        Picks up <code>skuCode</code> from a parent <code>{"<Sku>"}</code> or
-        line-item context when no prop is given.
+        The preferred way to display availability.{" "}
+        <code>{"<Availability>"}</code> fetches inventory data on its own — no
+        container wrapper needed. Picks up <code>skuCode</code> from a parent{" "}
+        <code>{"<Sku>"}</code> or line-item context when no prop is given.
       </p>
       <blockquote>
         <p>
@@ -42,65 +42,60 @@ function AvailabilityDocsPage(): JSX.Element {
 import { CommerceLayer, Availability, AvailabilityTemplate } from '@commercelayer/react-components'
 
 <CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
-  <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
-    <AvailabilityTemplate
-      labels={{ available: "In stock", outOfStock: "Out of stock" }}
-    />
+  <Availability skuCode="TSHIRTMM000000FFFFFFXLXX">
+    <AvailabilityTemplate labels={{ available: 'In stock', outOfStock: 'Out of stock' }} />
   </Availability>
 </CommerceLayer>
 `}
       />
       <Canvas of={StandaloneAvailability} />
       <hr />
-      <h2>AvailabilityTemplate — custom labels</h2>
+      <h2>Usage inside Skus</h2>
       <p>
-        Customise the displayed text for all stock states via the{" "}
-        <code>labels</code> prop.
-      </p>
-      <Canvas of={CustomLabels} />
-      <hr />
-      <h2>Lead time</h2>
-      <p>
-        Set <code>timeFormat</code> to <code>"days"</code> or{" "}
-        <code>"hours"</code> to show the shipping lead time alongside the
-        availability status.
-      </p>
-      <Canvas of={WithDeliveryLeadTimeDays} />
-      <hr />
-      <h2>Children render prop</h2>
-      <p>
-        Pass a function as <code>children</code> to{" "}
-        <code>{"<AvailabilityTemplate>"}</code> to receive the raw data (
-        <code>quantity</code>, <code>text</code>, <code>min</code>,{" "}
-        <code>max</code>) and build a custom UI.
-      </p>
-      <Canvas of={WithChildrenRenderProp} />
-      <hr />
-      <h2>Inside Sku (inherits skuCode)</h2>
-      <p>
-        When <code>{"<Availability>"}</code> is nested inside{" "}
-        <code>{"<Sku>"}</code>, the <code>skuCode</code> prop can be omitted —
-        it is inherited from the context automatically.
+        When used inside a <code>{"<Sku>"}</code> or{" "}
+        <code>{"<SkusContainer>"}</code> → <code>{"<Skus>"}</code> tree,{" "}
+        <code>{"<Availability>"}</code> automatically inherits the{" "}
+        <code>skuCode</code> from the current SKU context — no need to pass{" "}
+        <code>skuCode</code> explicitly.
       </p>
       <Canvas of={InsideSku} />
-      <hr />
-      <h2>AvailabilityContainer (deprecated)</h2>
-      <p>
-        <code>{"<AvailabilityContainer>"}</code> is the legacy wrapper. Prefer{" "}
-        the standalone <code>{"<Availability>"}</code> component for new code.
-      </p>
-      <Canvas of={DeprecatedContainer} />
     </>
   )
 }
 
 const meta = {
-  title: "Availability/Availability",
+  title: "Components/Availability/Availability",
   component: Availability,
   parameters: {
     layout: "centered",
     docs: {
       page: AvailabilityDocsPage,
+    },
+  },
+  argTypes: {
+    skuCode: {
+      control: "text",
+      description:
+        "The SKU code to fetch availability for. Automatically inherited from a parent `<Sku>` or line-item context when omitted.",
+    },
+    skuId: {
+      control: "text",
+      description:
+        "The SKU resource ID. Takes precedence over `skuCode` and improves performance by skipping the code-to-id lookup.",
+    },
+    getQuantity: {
+      control: false,
+      description:
+        "Callback fired whenever the available quantity changes. Receives the quantity as a number.",
+    },
+    loader: {
+      control: "text",
+      description: "Content displayed while availability data is loading.",
+    },
+    children: {
+      control: false,
+      description:
+        "Accepts `<AvailabilityTemplate>` as a child to display stock status and lead time.",
     },
   },
 } satisfies Meta<typeof Availability>
@@ -115,77 +110,6 @@ export const StandaloneAvailability: Story = {
       <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
         <AvailabilityTemplate
           labels={{ available: "In stock", outOfStock: "Out of stock" }}
-        />
-      </Availability>
-    </CommerceLayer>
-  ),
-}
-
-export const CustomLabels: Story = {
-  name: "AvailabilityTemplate — custom labels",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
-        <AvailabilityTemplate
-          labels={{
-            available: "✅ In stock",
-            outOfStock: "❌ Sold out",
-            negativeStock: "⚠️ Not available",
-          }}
-        />
-      </Availability>
-    </CommerceLayer>
-  ),
-}
-
-export const WithDeliveryLeadTimeDays: Story = {
-  name: "AvailabilityTemplate — lead time in days",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
-        <AvailabilityTemplate
-          labels={{ available: "Available" }}
-          timeFormat="days"
-        />
-      </Availability>
-    </CommerceLayer>
-  ),
-}
-
-export const WithDeliveryLeadTimeHours: Story = {
-  name: "AvailabilityTemplate — lead time in hours",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
-        <AvailabilityTemplate
-          labels={{ available: "Available" }}
-          timeFormat="hours"
-        />
-      </Availability>
-    </CommerceLayer>
-  ),
-}
-
-export const WithShippingMethodName: Story = {
-  name: "AvailabilityTemplate — with shipping method name",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
-        <AvailabilityTemplate timeFormat="days" showShippingMethodName />
-      </Availability>
-    </CommerceLayer>
-  ),
-}
-
-export const WithShippingMethodPrice: Story = {
-  name: "AvailabilityTemplate — with shipping method price",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
-        <AvailabilityTemplate
-          timeFormat="days"
-          showShippingMethodName
-          showShippingMethodPrice
         />
       </Availability>
     </CommerceLayer>
@@ -208,28 +132,6 @@ export const WithGetQuantityCallback: Story = {
   ),
 }
 
-export const WithChildrenRenderProp: Story = {
-  name: "AvailabilityTemplate — children render prop",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
-        <AvailabilityTemplate>
-          {({ quantity, text, min, max }) => (
-            <div style={{ fontFamily: "monospace", fontSize: 14 }}>
-              <strong>{text}</strong>
-              {quantity > 0 && min != null && (
-                <p style={{ marginTop: 4, color: "#666" }}>
-                  Ships in {min.days}–{max?.days ?? min.days} day(s)
-                </p>
-              )}
-            </div>
-          )}
-        </AvailabilityTemplate>
-      </Availability>
-    </CommerceLayer>
-  ),
-}
-
 export const InsideSku: Story = {
   name: "Availability — inside Sku (inherits skuCode)",
   render: () => (
@@ -244,17 +146,6 @@ export const InsideSku: Story = {
           <AvailabilityTemplate />
         </Availability>
       </Sku>
-    </CommerceLayer>
-  ),
-}
-
-export const DeprecatedContainer: Story = {
-  name: "AvailabilityContainer — deprecated (legacy)",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <AvailabilityContainer skuCode="POLOMXXX000000FFFFFFLXXX">
-        <AvailabilityTemplate />
-      </AvailabilityContainer>
     </CommerceLayer>
   ),
 }
