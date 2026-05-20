@@ -1,8 +1,4 @@
-import {
-  SkuField,
-  Skus,
-  SkusContainer,
-} from "@commercelayer/react-components"
+import { SkuField, Skus, SkusContainer } from "@commercelayer/react-components"
 import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import CommerceLayer from "../_internals/CommerceLayer"
@@ -11,20 +7,18 @@ function SkusContainerDocsPage(): JSX.Element {
   return (
     <>
       <h1>SkusContainer</h1>
-      <blockquote>
+      <span title="Deprecated" type="warning">
         <p>
-          ⚠️ <strong>Deprecated.</strong> Use the standalone{" "}
-          <code>{'<Sku skuCode="...">'}</code> component instead — it batches
-          requests automatically and requires no container. See{" "}
-          <strong>Skus/Sku</strong> for the recommended pattern.
-          <code>{"<SkusContainer>"}</code> will be removed in the next major
+          Use the standalone <code>{'<Sku skuCode="...">'}</code> component instead — it batches
+          requests automatically and requires no container. See <strong>Skus/Sku</strong> for the
+          recommended pattern. <code>{"<SkusContainer>"}</code> will be removed in the next major
           version.
         </p>
-      </blockquote>
+      </span>
       <p>
-        <code>{"<SkusContainer>"}</code> fetches an array of SKUs by code and
-        stores them in a React context for its <code>{"<Skus>"}</code> children.
-        Internally it debounces registrations into a single API call.
+        <code>{"<SkusContainer>"}</code> fetches an array of SKUs by code and stores them in a React
+        context for its <code>{"<Skus>"}</code> children. Internally it debounces registrations into
+        a single API call.
       </p>
       <ArgTypes />
       <hr />
@@ -70,32 +64,6 @@ import { CommerceLayer, Sku, SkuField } from '@commercelayer/react-components'
 `}
       />
       <hr />
-      <h2>Skus</h2>
-      <p>
-        <code>{"<Skus>"}</code> is a child of <code>{"<SkusContainer>"}</code>.
-        It iterates over every SKU fetched by the container and renders its
-        children once per record — no manual looping required.
-      </p>
-      <blockquote>
-        <p>
-          Must be a direct child of <code>{"<SkusContainer>"}</code>. Accepts{" "}
-          <code>{"<SkuField>"}</code> and{" "}
-          <code>{"<AvailabilityContainer>"}</code> as children.
-        </p>
-      </blockquote>
-      <Source
-        language="jsx"
-        dark
-        code={`
-<SkusContainer skus={["TSHIRTWS000000FFFFFFLXXX", "TSHIRTWKFFFFFF000000MXXX"]}>
-  <Skus>
-    {/* rendered once per SKU */}
-    <SkuField attribute="name" tagElement="h3" />
-  </Skus>
-</SkusContainer>
-`}
-      />
-      <hr />
       <h2>Examples</h2>
       <Canvas of={Default} />
       <Canvas of={WithQueryParams} />
@@ -104,12 +72,27 @@ import { CommerceLayer, Sku, SkuField } from '@commercelayer/react-components'
 }
 
 const meta = {
-  title: "Skus/SkusContainer",
+  title: "Components/Skus/SkusContainer",
   component: SkusContainer,
   parameters: {
     layout: "centered",
     docs: {
       page: SkusContainerDocsPage,
+    },
+  },
+  argTypes: {
+    skus: {
+      control: "object",
+      description: "Array of SKU codes to fetch. All codes are batched into a single API request.",
+    },
+    queryParams: {
+      control: "object",
+      description:
+        "Optional query parameters forwarded to the SKUs API request (pagination, sorting, field selection, filters).",
+    },
+    children: {
+      control: false,
+      description: "Accepts `<Skus>` as a child to iterate over fetched SKUs.",
     },
   },
 } satisfies Meta<typeof SkusContainer>
@@ -123,10 +106,7 @@ export const Default: Story = {
     skus: ["POLOMXXX000000FFFFFFLXXX", "CROPTOPWFFFFFF000000XSXX"],
   },
   render: (args) => (
-    <CommerceLayer
-      accessToken="my-access-token"
-      endpoint="https://demo-store.commercelayer.io"
-    >
+    <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
       <SkusContainer {...args}>
         <Skus>
           <div style={{ marginBottom: 12 }}>
@@ -151,10 +131,7 @@ export const WithQueryParams: Story = {
     },
   },
   render: (args) => (
-    <CommerceLayer
-      accessToken="my-access-token"
-      endpoint="https://demo-store.commercelayer.io"
-    >
+    <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
       <SkusContainer {...args}>
         <Skus>
           <div style={{ marginBottom: 12 }}>

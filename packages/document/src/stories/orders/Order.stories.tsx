@@ -38,13 +38,13 @@ function OrderDocsPage(): JSX.Element {
         <code>orderId</code> from a parent <code>{"<OrderStorage>"}</code>{" "}
         component.
       </p>
-      <blockquote>
+      <span title="Usage" type="info">
         <p>
-          Must be a child of <code>{"<CommerceLayer>"}</code>. Can optionally
-          be a child of <code>{"<OrderStorage>"}</code> to receive the{" "}
+          Must be a child of <code>{"<CommerceLayer>"}</code>. Can optionally be
+          a child of <code>{"<OrderStorage>"}</code> to receive the{" "}
           <code>orderId</code> automatically.
         </p>
-      </blockquote>
+      </span>
       <ArgTypes />
       <Source
         language="jsx"
@@ -93,61 +93,44 @@ import {
 `}
       />
       <Canvas of={OrderWithCallbackStory} />
-      <hr />
-      <h2>OrderContainer (deprecated)</h2>
-      <blockquote>
-        <p>
-          ⚠️ <strong>Deprecated:</strong>{" "}
-          <code>{"<OrderContainer>"}</code> is deprecated and will be removed
-          in the next major version. Use <code>{"<Order>"}</code> instead — it
-          has the same API and is a drop-in replacement.
-        </p>
-      </blockquote>
-      <p>
-        <strong>Before (deprecated):</strong>
-      </p>
-      <Source
-        language="jsx"
-        dark
-        code={`
-import { CommerceLayer, OrderContainer, OrderNumber, TotalAmount } from '@commercelayer/react-components'
-
-<CommerceLayer accessToken="...">
-  <OrderContainer orderId="KaeheROdbp">
-    <div>Order #<OrderNumber /></div>
-    <div>Total: <TotalAmount /></div>
-  </OrderContainer>
-</CommerceLayer>
-`}
-      />
-      <p>
-        <strong>After (preferred):</strong>
-      </p>
-      <Source
-        language="jsx"
-        dark
-        code={`
-import { CommerceLayer, Order, OrderNumber, TotalAmount } from '@commercelayer/react-components'
-
-<CommerceLayer accessToken="...">
-  <Order orderId="KaeheROdbp">
-    <div>Order #<OrderNumber /></div>
-    <div>Total: <TotalAmount /></div>
-  </Order>
-</CommerceLayer>
-`}
-      />
     </>
   )
 }
 
 const meta = {
-  title: "Orders/Order",
+  title: "Components/Orders/Order",
   component: Order,
   parameters: {
     layout: "centered",
     docs: {
       page: OrderDocsPage,
+    },
+  },
+  argTypes: {
+    orderId: {
+      control: "text",
+      description:
+        "ID of the order to fetch. Omit to create a new draft order on demand.",
+    },
+    metadata: {
+      control: "object",
+      description:
+        "Metadata key-value pairs added when a new order is created.",
+    },
+    attributes: {
+      control: "object",
+      description:
+        "Order attributes applied when the order is created or updated (e.g. `language_code`, `coupon_code`).",
+    },
+    fetchOrder: {
+      control: false,
+      description:
+        "Callback fired every time the order is updated. Receives the updated `Order` SDK object — useful for syncing cart badge counts or analytics.",
+    },
+    children: {
+      control: false,
+      description:
+        "Accepts order display components such as `<OrderNumber>`, `<TotalAmount>`, `<AddToCartButton>`, etc.",
     },
   },
 } satisfies Meta<typeof Order>

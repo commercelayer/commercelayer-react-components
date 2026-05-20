@@ -1,4 +1,4 @@
-import { Price, PricesContainer } from "@commercelayer/react-components"
+import { Price } from "@commercelayer/react-components"
 import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import CommerceLayer from "../_internals/CommerceLayer"
@@ -32,13 +32,13 @@ function PricesDocsPage(): JSX.Element {
         collects all sibling registrations into{" "}
         <strong>one SWR-deduplicated API request</strong>.
       </p>
-      <blockquote>
+      <span title="Note" type="info">
         <p>
           No provider or wrapper needed. Drop{" "}
           <code>{'<Price skuCode="…" />'}</code> anywhere inside{" "}
           <code>{"<CommerceLayer>"}</code> and batching happens automatically.
         </p>
-      </blockquote>
+      </span>
       <ArgTypes />
       <Source
         language="jsx"
@@ -86,73 +86,12 @@ import { CommerceLayer, Price } from '@commercelayer/react-components'
 `}
       />
       <Canvas of={RenderPropStory} />
-      <hr />
-      <h2>PricesContainer (deprecated)</h2>
-      <blockquote>
-        <p>
-          ⚠️ <strong>Deprecated:</strong>{" "}
-          <code>{"<PricesContainer>"}</code> is deprecated and will be removed
-          in a future major release. Use <code>{'<Price skuCode="…" />'}</code>{" "}
-          as a standalone component instead — it handles batching automatically.
-        </p>
-      </blockquote>
-      <p>
-        <code>{"<PricesContainer>"}</code> fetches prices for one or more SKU
-        codes and stores them in a React context for its{" "}
-        <code>{"<Price>"}</code> children. Multiple <code>{"<Price>"}</code>{" "}
-        children each register their own <code>skuCode</code> — the container
-        batches all registrations into a single API request using a 50 ms
-        debounce.
-      </p>
-      <Source
-        language="jsx"
-        dark
-        code={`
-// Deprecated — prefer standalone <Price> instead
-import { CommerceLayer, PricesContainer, Price } from '@commercelayer/react-components'
-
-<CommerceLayer accessToken="...">
-  <PricesContainer skuCode="MY-SKU-CODE">
-    <Price />
-  </PricesContainer>
-</CommerceLayer>
-`}
-      />
-      <Canvas of={SingleSkuStory} />
-      <hr />
-      <h2>PricesContainer — batched (deprecated)</h2>
-      <p>
-        Mount multiple <code>{"<Price>"}</code> components inside{" "}
-        <code>{"<PricesContainer>"}</code> — each registers its{" "}
-        <code>skuCode</code> and the container debounces all registrations into{" "}
-        <strong>one API call</strong>.
-      </p>
-      <blockquote>
-        <p>
-          This pattern is still supported but deprecated. The same batching now
-          happens automatically when you use standalone{" "}
-          <code>{"<Price>"}</code> components without any container.
-        </p>
-      </blockquote>
-      <Source
-        language="jsx"
-        dark
-        code={`
-// Deprecated — prefer standalone <Price> components instead
-<PricesContainer>
-  <Price skuCode="SKU-A" />
-  <Price skuCode="SKU-B" />
-  <Price skuCode="SKU-C" />
-</PricesContainer>
-`}
-      />
-      <Canvas of={BatchedPricesStory} />
     </>
   )
 }
 
 const meta = {
-  title: "Prices/Price",
+  title: "Components/Prices/Price",
   component: Price,
   parameters: {
     layout: "centered",
@@ -160,101 +99,67 @@ const meta = {
       page: PricesDocsPage,
     },
   },
+  argTypes: {
+    skuCode: {
+      control: "text",
+      description:
+        "The SKU code whose price to fetch. When used standalone (no `PricesContainer` parent), this triggers an automatic batched API request.",
+    },
+    showCompare: {
+      control: "boolean",
+      description:
+        "When `false`, the `compare_at` (strike-through) price is not displayed.",
+    },
+    compareClassName: {
+      control: "text",
+      description: "CSS class name applied to the compare-at price element.",
+    },
+    loader: {
+      control: "text",
+      description:
+        "Content displayed while the price is loading in standalone mode.",
+    },
+    children: {
+      control: false,
+      description:
+        "Render prop receiving `{ prices, loading, loader }` for a fully custom price UI.",
+    },
+  },
 } satisfies Meta<typeof Price>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const SingleSkuStory: Story = {
-  name: "PricesContainer — single SKU",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <PricesContainer skuCode="POST6191FFFFFF000000XXXX">
-        <Price
-          style={{ fontWeight: "bold", fontSize: "1.25rem" }}
-          compareClassName="line-through ml-2"
-        />
-      </PricesContainer>
-    </CommerceLayer>
-  ),
-}
-
-export const BatchedPricesStory: Story = {
-  name: "PricesContainer — batched (single API request)",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <PricesContainer>
-        <div style={{ display: "grid", gap: 12 }}>
-          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-            <span style={{ width: 220, fontSize: "0.85rem", color: "#666" }}>
-              POST6191FFFFFF000000XXXX
-            </span>
-            <Price
-              skuCode="POST6191FFFFFF000000XXXX"
-              style={{ fontWeight: "bold" }}
-            />
-          </div>
-          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-            <span style={{ width: 220, fontSize: "0.85rem", color: "#666" }}>
-              POLOMXXX000000FFFFFFLXXX
-            </span>
-            <Price
-              skuCode="POLOMXXX000000FFFFFFLXXX"
-              style={{ fontWeight: "bold" }}
-            />
-          </div>
-        </div>
-      </PricesContainer>
-    </CommerceLayer>
-  ),
-}
-
 export const RenderPropStory: Story = {
   name: "Price — children render prop",
   render: () => (
     <CommerceLayer accessToken="my-access-token">
-      <PricesContainer skuCode="POST6191FFFFFF000000XXXX">
-        <Price>
-          {({ prices, loading }) => {
-            if (loading) return <span style={{ color: "#999" }}>Loading…</span>
-            if (prices.length === 0)
-              return <span style={{ color: "red" }}>No price available</span>
-            const [p] = prices
-            return (
-              <div>
-                <strong style={{ fontSize: "1.25rem" }}>
-                  {p.formatted_amount}
-                </strong>
-                {p.formatted_compare_at_amount != null && (
-                  <s style={{ marginLeft: 8, color: "#999" }}>
-                    {p.formatted_compare_at_amount}
-                  </s>
-                )}
-              </div>
-            )
-          }}
-        </Price>
-      </PricesContainer>
-    </CommerceLayer>
-  ),
-}
-
-export const WithFiltersStory: Story = {
-  name: "PricesContainer — with filters",
-  render: () => (
-    <CommerceLayer accessToken="my-access-token">
-      <PricesContainer
-        skuCode="POST6191FFFFFF000000XXXX"
-        filters={{ currency_code_eq: "EUR" }}
-      >
-        <Price style={{ fontWeight: "bold" }} />
-      </PricesContainer>
+      <Price skuCode="POST6191FFFFFF000000XXXX">
+        {({ prices, loading }) => {
+          if (loading) return <span style={{ color: "#999" }}>Loading…</span>
+          if (prices.length === 0)
+            return <span style={{ color: "red" }}>No price available</span>
+          const [p] = prices
+          return (
+            <div>
+              <strong style={{ fontSize: "1.25rem" }}>
+                {p.formatted_amount}
+              </strong>
+              {p.formatted_compare_at_amount != null && (
+                <s style={{ marginLeft: 8, color: "#999" }}>
+                  {p.formatted_compare_at_amount}
+                </s>
+              )}
+            </div>
+          )
+        }}
+      </Price>
     </CommerceLayer>
   ),
 }
 
 export const StandalonePrice: Story = {
-  name: "Price — standalone (no PricesContainer)",
+  name: "Price — standalone",
   render: () => (
     <CommerceLayer accessToken="my-access-token">
       <div style={{ display: "grid", gap: 12 }}>
