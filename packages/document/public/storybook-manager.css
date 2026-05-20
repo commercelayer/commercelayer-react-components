@@ -1,0 +1,127 @@
+:root {
+  --color-primary: #101111;
+  --icon-carret-right: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkNhcmV0UmlnaHQiPgo8cGF0aCBpZD0iVmVjdG9yIiBkPSJNMTIgNkwyMiAxNkwxMiAyNiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9nPgo8L3N2Zz4K');
+}
+
+* {
+  box-sizing: border-box !important;
+}
+
+/* Logo and context menu */
+.sidebar-header img {
+  margin: 16px 0;
+  max-height: 29px;
+}
+.sidebar-container .sidebar-header button[title='Shortcuts'] {
+  display: none;
+}
+.sidebar-container .sidebar-header div:first-of-type {
+  margin: 0;
+  justify-content: center;
+}
+
+/* Other changes */
+.sidebar-container {
+  background: white;
+}
+
+/* hides expand-all/collapse-all action button */
+.sidebar-container .sidebar-subheading .sidebar-subheading-action {
+  display: none;
+}
+
+/* hides type icons (group/folder, document, story) — sb v10 uses svg[type] for these */
+.sidebar-container .sidebar-item svg[type],
+.sidebar-container .sidebar-subheading svg[type] {
+  display: none;
+}
+
+.sidebar-container .sidebar-subheading {
+  margin-top: 32px;
+  margin-bottom: 6px;
+}
+.sidebar-container .sidebar-subheading > button {
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* caret icon for root headings */
+.sidebar-container .sidebar-subheading > button > span {
+  background-image: var(--icon-carret-right);
+  border: none;
+  width: 16px;
+  height: 16px;
+  background-size: 100%;
+  margin: 0 !important;
+}
+.sidebar-container .sidebar-subheading > button:focus {
+  color: var(--color-primary);
+}
+
+/* Branch node (expandable folder) — sb v10.
+   Target only the expand/collapse button, not the context-menu button. */
+.sidebar-container .sidebar-item > button:not([data-testid="context-menu"]) {
+  width: 100%;
+  margin: 0;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  font-size: 14px;
+  line-height: 22px;
+  color: #5c6975;
+  background-color: transparent !important;
+}
+
+/* caret icon for expandable folder items */
+.sidebar-container .sidebar-item > button:not([data-testid="context-menu"]) svg {
+  display: none;
+}
+.sidebar-container .sidebar-item > button:not([data-testid="context-menu"])::before {
+  content: '';
+  background-image: var(--icon-carret-right);
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.sidebar-container .sidebar-item > button[aria-expanded='true']:not([data-testid="context-menu"])::before {
+  transform: rotate(90deg);
+}
+
+div.sidebar-item {
+  padding: 0;
+  margin: 4px 20px 4px 20px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  color: rgba(136, 153, 168, 1);
+  font-size: 14px;
+  line-height: 22px;
+}
+div.sidebar-item > a {
+  padding: 4px 8px;
+  font-size: inherit;
+}
+div.sidebar-item:hover {
+  background-color: #eceff1;
+}
+div.sidebar-item[data-selected='true'],
+div.sidebar-item[data-selected='true']:focus,
+div.sidebar-item[data-selected='true']:hover {
+  color: var(--color-primary);
+  background: #f3f3fc;
+}
+/* hide only type icons (group, document, story), not caret SVGs */
+div.sidebar-item svg[type] {
+  display: none;
+}

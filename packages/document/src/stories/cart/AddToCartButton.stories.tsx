@@ -25,11 +25,11 @@ function AddToCartButtonDocsPage(): JSX.Element {
       <p>
         <code>{"<AddToCartButton>"}</code> adds a SKU, bundle, or SKU list to
         the cart (draft order). It must be a descendant of{" "}
-        <code>{"<Order>"}</code>. When nested inside{" "}
-        <code>{"<Skus>"}</code> or <code>{"<SkuList>"}</code>, the{" "}
-        <code>skuCode</code> is inherited from context automatically.
+        <code>{"<Order>"}</code>. When nested inside <code>{"<Skus>"}</code> or{" "}
+        <code>{"<SkuList>"}</code>, the <code>skuCode</code> is inherited from
+        context automatically.
       </p>
-      <blockquote>
+      <span title="Usage" type="info">
         <p>
           Must be a child of <code>{"<Order>"}</code> (or{" "}
           <code>{"<OrderContainer>"}</code>). See the{" "}
@@ -38,7 +38,7 @@ function AddToCartButtonDocsPage(): JSX.Element {
           </a>{" "}
           for the full flow.
         </p>
-      </blockquote>
+      </span>
       <ArgTypes />
       <Source
         language="jsx"
@@ -92,11 +92,68 @@ import {
 }
 
 const meta = {
-  title: "Orders/AddToCartButton",
+  title: "Components/Cart/AddToCartButton",
   component: AddToCartButton,
   parameters: {
     docs: {
       page: AddToCartButtonDocsPage,
+    },
+  },
+  argTypes: {
+    skuCode: {
+      control: "text",
+      description:
+        "SKU code to add to the cart. Automatically inherited from context when nested inside `<Skus>` or `<SkuList>`.",
+    },
+    bundleCode: {
+      control: "text",
+      description: "Bundle code to add to the cart instead of a single SKU.",
+    },
+    skuListId: {
+      control: "text",
+      description:
+        "SKU list ID — adds all SKUs in the list to the cart at once.",
+    },
+    quantity: {
+      control: "text",
+      description: "Quantity of the item to add. Defaults to `1`.",
+    },
+    label: {
+      control: "text",
+      description: "Button label text or element.",
+    },
+    disabled: {
+      control: "boolean",
+      description: "Disables the button.",
+    },
+    buyNowMode: {
+      control: "boolean",
+      description:
+        "When `true`, redirects to the hosted checkout after adding the item.",
+    },
+    checkoutUrl: {
+      control: "text",
+      description: "Self-hosted checkout URL used when `buyNowMode` is `true`.",
+    },
+    redirectToHostedCart: {
+      control: "boolean",
+      description:
+        "When `true`, redirects to the hosted cart after adding the item.",
+    },
+    hostedCartUrl: {
+      control: "text",
+      description:
+        "Self-hosted cart URL used when `redirectToHostedCart` is `true`.",
+    },
+    lineItem: {
+      control: "object",
+      description:
+        "Custom line item attributes (e.g. `name`, `externalPrice`) applied to the created line item.",
+    },
+    children: {
+      control: false,
+      description:
+        "Render prop receiving `{ handleClick, disabled }` for a fully custom button UI.",
     },
   },
 } satisfies Meta<typeof AddToCartButton>

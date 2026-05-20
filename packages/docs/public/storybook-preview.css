@@ -20,19 +20,19 @@ span[type]::before {
 span[type] > p {
   margin: 0;
 }
-span[type='info'] {
+span[type="info"] {
   border-color: #3b82f6;
   background-color: #dbebfe;
 }
-span[type='warning'] {
+span[type="warning"] {
   border-color: #f97317;
   background-color: #ffedd5;
 }
-span[type='success'] {
+span[type="success"] {
   border-color: #22c55f;
   background-color: #ddfce7;
 }
-span[type='danger'] {
+span[type="danger"] {
   border-color: #ef4544;
   background-color: #fee2e3;
 }

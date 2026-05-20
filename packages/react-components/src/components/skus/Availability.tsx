@@ -47,17 +47,15 @@ export function Availability({
   const { lineItem } = useContext(LineItemChildrenContext)
   const { sku } = useContext(SkuChildrenContext)
   const { accessToken, interceptors } = useContext(CommerceLayerContext)
-  const { availability, fetchAvailability, clearAvailability, isLoading } =
-    useAvailability(accessToken ?? "", interceptors)
+  const { availability, fetchAvailability, clearAvailability, isLoading } = useAvailability(
+    accessToken ?? "",
+    interceptors
+  )
 
   const sCode = skuCode ?? lineItem?.sku_code ?? sku?.code
 
   useEffect(() => {
-    if (
-      accessToken != null &&
-      accessToken !== "" &&
-      (sCode != null || skuId != null)
-    ) {
+    if (accessToken != null && accessToken !== "" && (sCode != null || skuId != null)) {
       fetchAvailability({ skuCode: sCode, skuId })
     }
     return () => {
@@ -71,18 +69,13 @@ export function Availability({
     }
   }, [availability?.quantity, getQuantity])
 
-  const contextValue = useMemo(
-    () => ({ ...availability, parent: true }),
-    [availability],
-  )
+  const contextValue = useMemo(() => ({ ...availability, parent: true }), [availability])
 
   const hasFetchTarget = sCode != null || skuId != null
   if (hasFetchTarget && isLoading) return propLoader
 
   return (
-    <AvailabilityContext.Provider value={contextValue}>
-      {children}
-    </AvailabilityContext.Provider>
+    <AvailabilityContext.Provider value={contextValue}>{children}</AvailabilityContext.Provider>
   )
 }
 
