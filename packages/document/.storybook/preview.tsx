@@ -29,13 +29,10 @@ export const parameters: Parameters = {
     storySort: {
       order: [
         'Getting Started',
-        'Orders',
-        ['Order', 'AddToCartButton'],
-        'Prices',
-        ['Price'],
+        'Components',
+        ['Availability', 'Price', 'Order'],
         'Skus',
         ['Sku'],
-        'Availability',
         'Examples',
         ['Listing Page', 'Shopping Cart', 'Checkout Page', 'My Account'],
         'Hooks'

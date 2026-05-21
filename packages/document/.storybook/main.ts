@@ -42,6 +42,7 @@ const storybookConfig: StorybookConfig = {
     "../src/stories/**/*.stories.@(js|jsx|ts|tsx)",
   ],
   addons: [
+    "@storybook/addon-mcp",
     "@storybook/addon-links",
     {
       name: "@storybook/addon-docs",

@@ -1,66 +1,57 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.9/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
   "vcs": {
-    "enabled": false,
+    "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": false
+    "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false,
-    "includes": ["**"]
+    "ignoreUnknown": true,
+    "includes": ["**", "!dist", "!coverage", "!*.min.js"]
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "space"
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
   },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
-      "correctness": {
-        "useExhaustiveDependencies": "warn",
-        "noUnusedVariables": "warn",
-        "useHookAtTopLevel": "warn",
-        "useParseIntRadix": "warn"
-      },
-      "suspicious": {
-        "noExplicitAny": "warn",
-        "noArrayIndexKey": "warn",
-        "noGlobalIsNan": "warn",
-        "noConfusingVoidType": "warn"
-      },
-      "complexity": {
-        "useLiteralKeys": "warn",
-        "noUselessFragments": "warn",
-        "useOptionalChain": "warn",
-        "noUselessSwitchCase": "warn"
-      },
-      "style": {
-        "noParameterAssign": "warn",
-        "useAsConstAssertion": "error",
-        "useDefaultParameterLast": "warn",
-        "useEnumInitializers": "error",
-        "useSelfClosingElements": "error",
-        "useSingleVarDeclarator": "error",
-        "noUnusedTemplateLiteral": "warn",
-        "useNumberNamespace": "error",
-        "noInferrableTypes": "warn",
-        "noUselessElse": "warn"
-      },
-      "a11y": {
-        "noStaticElementInteractions": "warn",
-        "useKeyWithClickEvents": "warn",
-        "useValidAnchor": "warn",
-        "noSvgWithoutTitle": "warn",
-        "useAltText": "warn"
-      }
+      "recommended": true
     }
   },
   "javascript": {
     "formatter": {
       "quoteStyle": "double",
+      "trailingCommas": "es5",
       "semicolons": "asNeeded"
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true,
+      "trailingCommas": "none"
+    },
+    "linter": {
+      "enabled": true
+    }
+  },
+  "css": {
+    "formatter": {
+      "enabled": true,
+      "quoteStyle": "double"
+    },
+    "linter": {
+      "enabled": true
     }
   }
 }

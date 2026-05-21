@@ -25,12 +25,11 @@ function SkuFieldDocsPage(): JSX.Element {
         <code>{"<SkusContainer>"}</code>) context. Use the{" "}
         <code>attribute</code> prop to select which field to display and{" "}
         <code>tagElement</code> to choose the HTML tag (defaults to{" "}
-        <code>span</code>). When <code>{'tagElement="img"'}</code>, the value
-        is used as the <code>src</code> and standard{" "}
-        <code>{"<img>"}</code> props (<code>width</code>, <code>height</code>,
-        etc.) are forwarded.
+        <code>span</code>). When <code>{'tagElement="img"'}</code>, the value is
+        used as the <code>src</code> and standard <code>{"<img>"}</code> props (
+        <code>width</code>, <code>height</code>, etc.) are forwarded.
       </p>
-      <blockquote>
+      <span title="Usage" type="info">
         <p>
           Must be a descendant of <code>{"<Sku>"}</code> or{" "}
           <code>{"<SkusContainer>"}</code>. See the{" "}
@@ -38,10 +37,10 @@ function SkuFieldDocsPage(): JSX.Element {
             SKUs API object
           </a>{" "}
           for all available attributes (e.g. <code>name</code>,{" "}
-          <code>description</code>, <code>image_url</code>,{" "}
-          <code>code</code>, <code>metadata</code>).
+          <code>description</code>, <code>image_url</code>, <code>code</code>,{" "}
+          <code>metadata</code>).
         </p>
-      </blockquote>
+      </span>
       <ArgTypes />
       <Source
         language="jsx"
@@ -87,10 +86,10 @@ import { CommerceLayer, Sku, SkuField } from '@commercelayer/react-components'
 }
 
 const meta = {
-  title: "Skus/SkuField",
+  title: "Components/Skus/SkuField",
   component: SkuField,
   parameters: {
-    layout: "centered",
+    layout: "padded",
     docs: {
       page: SkuFieldDocsPage,
     },
