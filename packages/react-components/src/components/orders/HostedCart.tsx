@@ -3,6 +3,7 @@ import { iframeResizer } from "iframe-resizer"
 import {
   type CSSProperties,
   type JSX,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -16,6 +17,8 @@ import { getApplicationLink } from "#utils/getApplicationLink"
 import { jwt } from "#utils/jwt"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import { getOrganizationConfig } from "#utils/organization"
+
+const DEFAULT_DOMAIN = "commercelayer.io"
 
 interface IframeData {
   message:
@@ -55,7 +58,6 @@ const defaultContainerStyle = {
   height: "100%",
   width: "23rem",
   transition: "right 0.5s ease-in-out",
-  // zIndex: '0',
   pointerEvents: "none",
   overflow: "auto",
 } satisfies CSSProperties
@@ -68,7 +70,6 @@ const defaultBackgroundStyle = {
   height: "100%",
   width: "100vw",
   transition: "opacity 0.5s ease-in-out",
-  // zIndex: '-10',
   pointerEvents: "none",
   backgroundColor: "black",
 } satisfies CSSProperties
@@ -134,7 +135,7 @@ interface Props
  * Or it can work as mini cart - when `type` prop is set to `mini` - and it will be opened in a modal (popup).
  *
  * <span title="Requirement" type="warning">
- * Must be a child of the `<OrderContainer>` component.
+ * Must be a child of the `<Order>` component.
  * </span>
  *
  * <span title="Mini cart" type="info">
@@ -163,36 +164,37 @@ export function HostedCart({
     currentComponentName: "HostedCart",
     key: "accessToken",
   })
-  const [src, setSrc] = useState<string | undefined>()
-  if (accessToken == null) return null
   const { order, createOrder, getOrder } = useContext(OrderContext)
   const { persistKey } = useContext(OrderStorageContext)
+  const [src, setSrc] = useState<string | undefined>()
+
+  if (accessToken == null) return null
+
+  const slug = jwt(accessToken).organization.slug
+
+  async function resolveCartUrl(orderId: string): Promise<string> {
+    const config = await getOrganizationConfig({
+      accessToken,
+      params: { orderId, accessToken, slug },
+    })
+    return (
+      config?.links?.cart ??
+      getApplicationLink({
+        slug,
+        orderId,
+        accessToken,
+        domain: DEFAULT_DOMAIN,
+        applicationType: "cart",
+        customDomain,
+      })
+    )
+  }
+
   async function setOrder(openCart?: boolean): Promise<void> {
     const orderId = localStorage.getItem(persistKey) ?? (await createOrder({}))
     if (orderId != null && accessToken) {
-      const { organization } = jwt(accessToken)
-      const slug = organization.slug
-      const domain = 'commercelayer.io'
-      const config = await getOrganizationConfig({
-        accessToken,
-        params: {
-          orderId: order?.id ?? orderId,
-          accessToken,
-          slug,
-        },
-      })
       loadedOrderIdRef.current = orderId
-      setSrc(
-        config?.links?.cart ??
-          getApplicationLink({
-            slug,
-            orderId,
-            accessToken,
-            domain,
-            applicationType: "cart",
-            customDomain,
-          }),
-      )
+      setSrc(await resolveCartUrl(order?.id ?? orderId))
       if (openCart) {
         setTimeout(() => {
           if (handleOpen != null) handleOpen()
@@ -201,27 +203,31 @@ export function HostedCart({
       }
     }
   }
-  function onMessage(data: IframeData): void {
-    switch (data.message.type) {
-      case "update":
-        if (data.message.payload != null) {
-          getOrder(data.message.payload.id)
-        }
-        break
-      case "close":
-        if (type === "mini") {
-          if (handleOpen != null) handleOpen()
-          else setOpen(false)
-        }
-        break
 
-      case "blur":
-        if (type === "mini" && isOpen) {
-          ref.current?.focus()
-        }
-        break
-    }
-  }
+  const onMessage = useCallback(
+    (data: IframeData): void => {
+      switch (data.message.type) {
+        case "update":
+          if (data.message.payload != null) {
+            getOrder(data.message.payload.id)
+          }
+          break
+        case "close":
+          if (type === "mini") {
+            if (handleOpen != null) handleOpen()
+            else setOpen(false)
+          }
+          break
+        case "blur":
+          if (type === "mini" && isOpen) {
+            ref.current?.focus()
+          }
+          break
+      }
+    },
+    [type, isOpen, handleOpen, getOrder],
+  )
+
   useEffect(() => {
     const resolvedOrderId = order?.id ?? localStorage.getItem(persistKey)
     let ignore = false
@@ -259,28 +265,11 @@ export function HostedCart({
       accessToken &&
       (src == null || loadedOrderIdRef.current !== resolvedOrderId)
     ) {
-      const { organization } = jwt(accessToken)
-      const slug = organization.slug
-      const domain = 'commercelayer.io'
-      getOrganizationConfig({
-        accessToken,
-        params: {
-          orderId: resolvedOrderId,
-          accessToken,
-          slug,
-        },
-      }).then((config) => {
-        loadedOrderIdRef.current = resolvedOrderId
-        setSrc(
-          config?.links?.cart ??
-            getApplicationLink({
-              slug,
-              orderId: resolvedOrderId,
-              accessToken,
-              domain,
-              applicationType: "cart",
-            }),
-        )
+      resolveCartUrl(resolvedOrderId).then((url) => {
+        if (!ignore) {
+          loadedOrderIdRef.current = resolvedOrderId
+          setSrc(url)
+        }
       })
     }
     if (src != null && ref.current != null) {
@@ -293,6 +282,7 @@ export function HostedCart({
       }
     }
   }, [src, open, order?.id, accessToken, persistKey])
+
   useEffect(() => {
     if (ref.current == null) return
     iframeResizer(
@@ -303,7 +293,7 @@ export function HostedCart({
       },
       ref.current,
     )
-  }, [ref.current != null])
+  }, [onMessage])
   /**
    * Close the cart.
    */
