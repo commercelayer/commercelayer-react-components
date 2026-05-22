@@ -94,6 +94,12 @@ const meta = {
       description:
         "Domain of a forked cart application. Overrides the default `<slug>.commercelayer.app` hostname.",
     },
+    target: {
+      control: "select",
+      options: ["_self", "_blank", "_parent", "_top"],
+      description:
+        "Specifies where to open the linked URL. Defaults to `_self`. Only applies when navigating (not when `type=\"mini\"`).",
+    },
     children: {
       control: false,
       description:
