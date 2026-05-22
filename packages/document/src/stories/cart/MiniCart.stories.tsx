@@ -84,6 +84,13 @@ function App() {
 const meta = {
   title: "Components/Cart/MiniCart",
   component: HostedCart,
+  decorators: [
+    (Story) => (
+      <div style={{ minHeight: "500px" }}>
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
     docs: {
       page: MiniCartDocsPage,
