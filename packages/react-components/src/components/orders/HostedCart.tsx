@@ -170,19 +170,20 @@ export function HostedCart({
 
   if (accessToken == null) return null
 
-  const slug = jwt(accessToken).organization.slug
+  const token: string = accessToken
+  const slug = jwt(token).organization.slug ?? ""
 
   async function resolveCartUrl(orderId: string): Promise<string> {
     const config = await getOrganizationConfig({
-      accessToken,
-      params: { orderId, accessToken, slug },
+      accessToken: token,
+      params: { orderId, accessToken: token, slug },
     })
     return (
       config?.links?.cart ??
       getApplicationLink({
         slug,
         orderId,
-        accessToken,
+        accessToken: token,
         domain: DEFAULT_DOMAIN,
         applicationType: "cart",
         customDomain,
@@ -192,7 +193,7 @@ export function HostedCart({
 
   async function setOrder(openCart?: boolean): Promise<void> {
     const orderId = localStorage.getItem(persistKey) ?? (await createOrder({}))
-    if (orderId != null && accessToken) {
+    if (orderId != null) {
       loadedOrderIdRef.current = orderId
       setSrc(await resolveCartUrl(order?.id ?? orderId))
       if (openCart) {
@@ -255,14 +256,12 @@ export function HostedCart({
     if (
       src == null &&
       resolvedOrderId == null &&
-      accessToken != null &&
       !ignore &&
       isOpen
     ) {
       setOrder()
     } else if (
       resolvedOrderId != null &&
-      accessToken &&
       (src == null || loadedOrderIdRef.current !== resolvedOrderId)
     ) {
       resolveCartUrl(resolvedOrderId).then((url) => {
@@ -288,7 +287,6 @@ export function HostedCart({
     iframeResizer(
       {
         checkOrigin: false,
-        // @ts-expect-error No types available
         onMessage,
       },
       ref.current,
