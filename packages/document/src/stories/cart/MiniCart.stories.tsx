@@ -1,28 +1,30 @@
-import { HostedCart, Order } from "@commercelayer/react-components"
+import {
+  AddToCartButton,
+  CartLink,
+  HostedCart,
+  Order,
+} from "@commercelayer/react-components"
 import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { useState, type JSX } from "react"
 import CommerceLayer from "../_internals/CommerceLayer"
-import {
-  AddSampleItems,
-  OrderStorage as OrderStorageHelper,
-} from "../_internals/OrderStorage"
+import { OrderStorage as OrderStorageHelper } from "../_internals/OrderStorage"
 
 function MiniCartDocsPage(): JSX.Element {
   return (
     <>
       <h1>MiniCart</h1>
       <p>
-        The mini cart is <code>{"<HostedCart type=\"mini\">"}</code> — a fixed
-        slide-in panel that overlays the page from the right side. It loads the
-        same Commerce Layer hosted cart micro-frontend as the inline variant, but
-        in a drawer controlled by the <code>open</code> prop.
+        The mini cart is <code>{'<HostedCart type="mini">'}</code> — a fixed slide-in panel that
+        overlays the page from the right side. It loads the same Commerce Layer hosted cart
+        micro-frontend as the inline variant, but in a drawer controlled by the <code>open</code>{" "}
+        prop.
       </p>
       <span title="Usage" type="info">
         <p>
-          Must be a child of <code>{"<Order>"}</code> (wrapped in{" "}
-          <code>{"<OrderStorage>"}</code>). Pair it with a{" "}
-          <code>{"<CartLink type=\"mini\" />"}</code> or your own trigger button
-          to manage the <code>open</code> state.
+          Must be a child of <code>{"<Order>"}</code> (wrapped in <code>{"<OrderStorage>"}</code>).
+          Pair it with a <code>{'<CartLink type="mini" />'}</code> or your own trigger button to
+          manage the <code>open</code> state.
         </p>
       </span>
       <ArgTypes />
@@ -61,18 +63,18 @@ function App() {
       <hr />
       <h2>Mini cart</h2>
       <p>
-        Toggle the <code>open</code> control in the Controls panel to preview
-        the open and closed states. In a real app bind <code>open</code> and{" "}
-        <code>handleOpen</code> to local state.
+        Click the button to open the slide-in panel. The{" "}
+        <code>handleOpen</code> callback keeps external state in sync when the
+        overlay or close icon is clicked inside the cart.
       </p>
       <Canvas of={Default} />
       <hr />
       <h2>Auto-open on add to cart</h2>
       <p>
         Set <code>openAdd</code> to <code>true</code> so the panel opens
-        automatically whenever an item is added via{" "}
-        <code>{"<AddToCartButton>"}</code>. Click the button below to trigger
-        the flow.
+        automatically after <code>{"<AddToCartButton>"}</code> successfully adds
+        an item to the order. Click <strong>Add to cart</strong> below to
+        trigger the flow.
       </p>
       <Canvas of={OpenOnAdd} />
     </>
@@ -89,13 +91,12 @@ const meta = {
   },
   argTypes: {
     open: {
-      control: "boolean",
+      control: false,
       description: "Controls whether the mini cart panel is open.",
     },
     openAdd: {
       control: "boolean",
-      description:
-        'Automatically opens the panel when an item is added via `<AddToCartButton>`.',
+      description: "Automatically opens the panel when an item is added via `<AddToCartButton>`.",
     },
     handleOpen: {
       control: false,
@@ -129,43 +130,50 @@ function Wrapper({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Set `type="mini"` to render a fixed slide-in panel. Toggle the `open` control
- * to preview the open and closed states. In a real app, bind `open` and
- * `handleOpen` to local state:
- *
- * ```tsx
- * const [isOpen, setIsOpen] = useState(false)
- * <HostedCart type="mini" open={isOpen} handleOpen={() => setIsOpen(o => !o)} />
- * ```
+ * Controlled mini cart: `open` and `handleOpen` are wired to local state so the
+ * panel can be opened with the button and closed by clicking the overlay or the
+ * close icon inside the cart iframe.
  */
 export const Default: Story = {
   name: "Mini cart",
-  args: {
-    type: "mini",
-    open: false,
+  render: () => {
+    const [isOpen, setIsOpen] = useState(false)
+    return (
+      <Wrapper>
+        <CartLink
+          type="mini"
+          label="Open mini cart"
+          className="px-4 py-2 bg-black text-white rounded text-sm"
+        />
+        <HostedCart
+          type="mini"
+          open={isOpen}
+          handleOpen={() => setIsOpen((o) => !o)}
+        />
+      </Wrapper>
+    )
   },
-  render: (args) => (
-    <Wrapper>
-      <HostedCart {...args} />
-    </Wrapper>
-  ),
 }
 
 /**
- * When `openAdd` is `true` the mini cart panel opens automatically after an
- * item is successfully added to the order via `<AddToCartButton>`. Click the
- * button below to trigger the flow.
+ * When `openAdd` is `true` the panel opens automatically after
+ * `<AddToCartButton>` successfully adds an item. The `"open-cart"` event is
+ * published internally by `AddToCartButton` on success.
  */
 export const OpenOnAdd: Story = {
   name: "Auto-open on add to cart",
   args: {
     type: "mini",
     openAdd: true,
-    open: false,
   },
   render: (args) => (
     <Wrapper>
-      <AddSampleItems />
+      <AddToCartButton
+        skuCode="SWEATWCX000000FFFFFFXSXX"
+        label="Add to cart"
+        quantity="1"
+        className="px-4 py-2 bg-black text-white rounded text-sm disabled:opacity-50"
+      />
       <HostedCart {...args} />
     </Wrapper>
   ),
