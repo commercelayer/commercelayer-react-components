@@ -2,10 +2,7 @@ import { HostedCart, Order } from "@commercelayer/react-components"
 import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import CommerceLayer from "../_internals/CommerceLayer"
-import {
-  AddSampleItems,
-  OrderStorage as OrderStorageHelper,
-} from "../_internals/OrderStorage"
+import { OrderStorage as OrderStorageHelper } from "../_internals/OrderStorage"
 
 function HostedCartDocsPage(): JSX.Element {
   return (
@@ -20,8 +17,8 @@ function HostedCartDocsPage(): JSX.Element {
       <p>
         By default it renders as an <strong>inline cart</strong> — the iframe
         fills the available container width while the height adjusts to its
-        content. Set <code>type="mini"</code> to switch to a{" "}
-        <strong>slide-in mini cart</strong> panel.
+        content. For the slide-in panel variant, see{" "}
+        <strong>Components/Cart/MiniCart</strong>.
       </p>
       <span title="Usage" type="info">
         <p>
@@ -42,20 +39,10 @@ import {
   HostedCart,
 } from '@commercelayer/react-components'
 
-// Inline cart
 <CommerceLayer accessToken="...">
   <OrderStorage persistKey="my-cart">
     <Order>
       <HostedCart />
-    </Order>
-  </OrderStorage>
-</CommerceLayer>
-
-// Mini cart (slide-in panel)
-<CommerceLayer accessToken="...">
-  <OrderStorage persistKey="my-cart">
-    <Order>
-      <HostedCart type="mini" open={isOpen} handleOpen={() => setIsOpen(o => !o)} />
     </Order>
   </OrderStorage>
 </CommerceLayer>
@@ -69,23 +56,6 @@ import {
         <code>iframe-resizer</code>.
       </p>
       <Canvas of={Default} />
-      <hr />
-      <h2>Mini cart</h2>
-      <p>
-        Set <code>type="mini"</code> to render a fixed slide-in panel. Use the{" "}
-        <code>open</code> prop to control visibility and{" "}
-        <code>handleOpen</code> to toggle it from outside. Toggle{" "}
-        <code>open</code> in the Controls panel below to preview.
-      </p>
-      <Canvas of={MiniCart} />
-      <hr />
-      <h2>Mini cart — auto-open on add to cart</h2>
-      <p>
-        Set <code>openAdd</code> to <code>true</code> (requires{" "}
-        <code>type="mini"</code>) so the panel opens automatically whenever an
-        item is added via <code>{"<AddToCartButton>"}</code>.
-      </p>
-      <Canvas of={MiniCartOpenAdd} />
       <hr />
       <h2>Custom domain</h2>
       <p>
@@ -106,27 +76,6 @@ const meta = {
     },
   },
   argTypes: {
-    type: {
-      control: "select",
-      options: [undefined, "mini"],
-      description:
-        'Rendering mode. Leave `undefined` for an inline cart iframe, or set to `"mini"` for a fixed slide-in panel.',
-    },
-    open: {
-      control: "boolean",
-      description:
-        "Controls whether the mini cart panel is open. Only applies when `type=\"mini\"`.",
-    },
-    openAdd: {
-      control: "boolean",
-      description:
-        'Automatically opens the mini cart when an item is added via `<AddToCartButton>`. Only applies when `type="mini"`.',
-    },
-    handleOpen: {
-      control: false,
-      description:
-        'Callback fired when the background overlay or close icon is clicked. Use this to sync `open` state from outside. Only applies when `type="mini"`.',
-    },
     customDomain: {
       control: "text",
       description:
@@ -162,49 +111,6 @@ export const Default: Story = {
   args: {},
   render: (args) => (
     <Wrapper>
-      <HostedCart {...args} />
-    </Wrapper>
-  ),
-}
-
-/**
- * Set `type="mini"` to render a fixed slide-in panel. Toggle the `open` control
- * to preview the open and closed states. In a real app, bind `open` and
- * `handleOpen` to local state:
- *
- * ```tsx
- * const [isOpen, setIsOpen] = useState(false)
- * <HostedCart type="mini" open={isOpen} handleOpen={() => setIsOpen(o => !o)} />
- * ```
- */
-export const MiniCart: Story = {
-  name: "Mini cart",
-  args: {
-    type: "mini",
-    open: false,
-  },
-  render: (args) => (
-    <Wrapper>
-      <HostedCart {...args} />
-    </Wrapper>
-  ),
-}
-
-/**
- * When `openAdd` is `true` the mini cart panel opens automatically after an
- * item is successfully added to the order via `<AddToCartButton>`. Click the
- * button below to trigger the flow.
- */
-export const MiniCartOpenAdd: Story = {
-  name: "Mini cart — auto-open on add",
-  args: {
-    type: "mini",
-    openAdd: true,
-    open: false,
-  },
-  render: (args) => (
-    <Wrapper>
-      <AddSampleItems />
       <HostedCart {...args} />
     </Wrapper>
   ),
