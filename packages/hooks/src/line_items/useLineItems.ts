@@ -9,7 +9,7 @@ import { useCallback } from "react"
 import useSWR, { type KeyedMutator } from "swr"
 
 interface UseLineItemsParams {
-  accessToken: string
+  accessToken?: string
   orderId?: string | null
   interceptors?: InterceptorManager
 }
@@ -58,6 +58,7 @@ export function useLineItems({
   const { data, error, isLoading, isValidating, mutate } = useSWR<LineItem[]>(
     swrKey,
     async (): Promise<LineItem[]> => {
+      if (!accessToken) throw new Error("accessToken is required")
       if (!orderId) throw new Error("orderId is required")
       return getLineItems({ accessToken, interceptors, orderId })
     },
@@ -70,6 +71,7 @@ export function useLineItems({
       quantity?: number,
       hasExternalPrice?: boolean
     ): Promise<LineItem> => {
+      if (!accessToken) throw new Error("accessToken is required")
       const updated = await coreUpdateLineItem({
         accessToken,
         interceptors,
@@ -85,6 +87,7 @@ export function useLineItems({
 
   const deleteLineItem = useCallback(
     async (lineItemId: string): Promise<void> => {
+      if (!accessToken) throw new Error("accessToken is required")
       await coreDeleteLineItem({ accessToken, interceptors, lineItemId })
       await mutate()
     },

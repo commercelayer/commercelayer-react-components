@@ -92,7 +92,7 @@ describe("useLineItems", () => {
 
     await waitFor(() => expect(result.current.lineItems).toEqual(MOCK_LINE_ITEMS))
 
-    let updated: Awaited<ReturnType<typeof result.current.updateLineItem>>
+    let updated!: Awaited<ReturnType<typeof result.current.updateLineItem>>
     await act(async () => {
       updated = await result.current.updateLineItem("li_1", 3, false)
     })
@@ -100,7 +100,7 @@ describe("useLineItems", () => {
     expect(mockUpdateLineItem).toHaveBeenCalledWith(
       expect.objectContaining({ accessToken, lineItemId: "li_1", quantity: 3, hasExternalPrice: false })
     )
-    expect(updated!).toEqual(MOCK_UPDATED_LINE_ITEM)
+    expect(updated).toEqual(MOCK_UPDATED_LINE_ITEM)
     // SWR revalidates — getLineItems is called again
     expect(mockGetLineItems).toHaveBeenCalledTimes(2)
   })
