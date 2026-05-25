@@ -1,5 +1,5 @@
 import { render, screen, act } from "@testing-library/react"
-import { useContext } from "react"
+import { type ReactNode, useContext } from "react"
 import { vi, beforeEach, describe, it, expect } from "vitest"
 import { LineItems } from "#components/line_items/LineItems"
 import CommerceLayerContext from "#context/CommerceLayerContext"
@@ -40,6 +40,24 @@ function defaultHookReturn(overrides = {}) {
   }
 }
 
+function Providers({
+  accessToken = "token",
+  orderId = "order-1",
+  children,
+}: {
+  accessToken?: string
+  orderId?: string
+  children: ReactNode
+}) {
+  return (
+    <CommerceLayerContext.Provider value={{ accessToken }}>
+      <OrderContext.Provider value={{ ...defaultOrderContext, orderId }}>
+        {children}
+      </OrderContext.Provider>
+    </CommerceLayerContext.Provider>
+  )
+}
+
 describe("LineItems component", () => {
   beforeEach(() => {
     mockUseLineItems.mockReturnValue(defaultHookReturn())
@@ -50,9 +68,11 @@ describe("LineItems component", () => {
 
   it("renders children when not loading", () => {
     render(
-      <LineItems accessToken="token" orderId="order-1">
-        <span data-testid="child">content</span>
-      </LineItems>
+      <Providers>
+        <LineItems>
+          <span data-testid="child">content</span>
+        </LineItems>
+      </Providers>
     )
 
     expect(screen.getByTestId("child")).toBeDefined()
@@ -60,10 +80,12 @@ describe("LineItems component", () => {
 
   it("renders multiple children", () => {
     render(
-      <LineItems accessToken="token" orderId="order-1">
-        <span data-testid="child-1">one</span>
-        <span data-testid="child-2">two</span>
-      </LineItems>
+      <Providers>
+        <LineItems>
+          <span data-testid="child-1">one</span>
+          <span data-testid="child-2">two</span>
+        </LineItems>
+      </Providers>
     )
 
     expect(screen.getByTestId("child-1")).toBeDefined()
@@ -74,13 +96,11 @@ describe("LineItems component", () => {
     mockUseLineItems.mockReturnValue(defaultHookReturn({ isLoading: true }))
 
     render(
-      <LineItems
-        accessToken="token"
-        orderId="order-1"
-        loader={<span data-testid="loader">Loading…</span>}
-      >
-        <span data-testid="child">content</span>
-      </LineItems>
+      <Providers>
+        <LineItems loader={<span data-testid="loader">Loading…</span>}>
+          <span data-testid="child">content</span>
+        </LineItems>
+      </Providers>
     )
 
     expect(screen.getByTestId("loader")).toBeDefined()
@@ -91,13 +111,11 @@ describe("LineItems component", () => {
     mockUseLineItems.mockReturnValue(defaultHookReturn({ isLoading: false }))
 
     render(
-      <LineItems
-        accessToken="token"
-        orderId="order-1"
-        loader={<span data-testid="loader">Loading…</span>}
-      >
-        <span data-testid="child">content</span>
-      </LineItems>
+      <Providers>
+        <LineItems loader={<span data-testid="loader">Loading…</span>}>
+          <span data-testid="child">content</span>
+        </LineItems>
+      </Providers>
     )
 
     expect(screen.queryByTestId("loader")).toBeNull()
@@ -114,9 +132,11 @@ describe("LineItems component", () => {
     }
 
     render(
-      <LineItems accessToken="token" orderId="order-1">
-        <Consumer />
-      </LineItems>
+      <Providers>
+        <LineItems>
+          <Consumer />
+        </LineItems>
+      </Providers>
     )
 
     expect(capturedLineItems).toEqual(MOCK_LINE_ITEMS)
@@ -132,9 +152,11 @@ describe("LineItems component", () => {
     }
 
     render(
-      <LineItems accessToken="token" orderId="order-1" types={["skus"]}>
-        <Consumer />
-      </LineItems>
+      <Providers>
+        <LineItems types={["skus"]}>
+          <Consumer />
+        </LineItems>
+      </Providers>
     )
 
     expect(capturedLineItems).toEqual([MOCK_LINE_ITEMS[0]])
@@ -150,83 +172,27 @@ describe("LineItems component", () => {
     }
 
     render(
-      <LineItems accessToken="token" orderId="order-1">
-        <Consumer />
-      </LineItems>
+      <Providers>
+        <LineItems>
+          <Consumer />
+        </LineItems>
+      </Providers>
     )
 
     expect(capturedLineItems).toEqual(MOCK_LINE_ITEMS)
   })
 
-  it("passes accessToken and orderId to useLineItems", () => {
+  it("reads accessToken and orderId from context and passes them to useLineItems", () => {
     render(
-      <LineItems accessToken="my-token" orderId="my-order">
-        <span />
-      </LineItems>
-    )
-
-    expect(mockUseLineItems).toHaveBeenCalledWith(
-      expect.objectContaining({ accessToken: "my-token", orderId: "my-order" })
-    )
-  })
-
-  it("reads orderId from OrderContext when prop is not provided", () => {
-    const orderCtxValue = { ...defaultOrderContext, orderId: "ctx-order-id" }
-
-    render(
-      <OrderContext.Provider value={orderCtxValue}>
-        <LineItems accessToken="my-token">
+      <Providers accessToken="ctx-token" orderId="ctx-order">
+        <LineItems>
           <span />
         </LineItems>
-      </OrderContext.Provider>
+      </Providers>
     )
 
     expect(mockUseLineItems).toHaveBeenCalledWith(
-      expect.objectContaining({ accessToken: "my-token", orderId: "ctx-order-id" })
-    )
-  })
-
-  it("prop orderId takes precedence over OrderContext orderId", () => {
-    const orderCtxValue = { ...defaultOrderContext, orderId: "ctx-order-id" }
-
-    render(
-      <OrderContext.Provider value={orderCtxValue}>
-        <LineItems accessToken="my-token" orderId="prop-order-id">
-          <span />
-        </LineItems>
-      </OrderContext.Provider>
-    )
-
-    expect(mockUseLineItems).toHaveBeenCalledWith(
-      expect.objectContaining({ accessToken: "my-token", orderId: "prop-order-id" })
-    )
-  })
-
-  it("reads accessToken from CommerceLayerContext when prop is not provided", () => {
-    render(
-      <CommerceLayerContext.Provider value={{ accessToken: "ctx-token" }}>
-        <LineItems orderId="order-1">
-          <span />
-        </LineItems>
-      </CommerceLayerContext.Provider>
-    )
-
-    expect(mockUseLineItems).toHaveBeenCalledWith(
-      expect.objectContaining({ accessToken: "ctx-token", orderId: "order-1" })
-    )
-  })
-
-  it("prop accessToken takes precedence over CommerceLayerContext accessToken", () => {
-    render(
-      <CommerceLayerContext.Provider value={{ accessToken: "ctx-token" }}>
-        <LineItems accessToken="prop-token" orderId="order-1">
-          <span />
-        </LineItems>
-      </CommerceLayerContext.Provider>
-    )
-
-    expect(mockUseLineItems).toHaveBeenCalledWith(
-      expect.objectContaining({ accessToken: "prop-token", orderId: "order-1" })
+      expect.objectContaining({ accessToken: "ctx-token", orderId: "ctx-order" })
     )
   })
 
@@ -241,9 +207,11 @@ describe("LineItems component", () => {
     }
 
     render(
-      <LineItems accessToken="token" orderId="order-1" onUpdate={onUpdate}>
-        <Consumer />
-      </LineItems>
+      <Providers>
+        <LineItems onUpdate={onUpdate}>
+          <Consumer />
+        </LineItems>
+      </Providers>
     )
 
     await act(async () => {
@@ -265,9 +233,11 @@ describe("LineItems component", () => {
     }
 
     render(
-      <LineItems accessToken="token" orderId="order-1" onDelete={onDelete}>
-        <Consumer />
-      </LineItems>
+      <Providers>
+        <LineItems onDelete={onDelete}>
+          <Consumer />
+        </LineItems>
+      </Providers>
     )
 
     await act(async () => {
@@ -288,9 +258,11 @@ describe("LineItems component", () => {
     }
 
     render(
-      <LineItems accessToken="token" orderId="order-1">
-        <Consumer />
-      </LineItems>
+      <Providers>
+        <LineItems>
+          <Consumer />
+        </LineItems>
+      </Providers>
     )
 
     expect(contextReload).toBeDefined()
@@ -314,9 +286,11 @@ describe("LineItems component", () => {
     }
 
     render(
-      <LineItems accessToken="token" orderId="order-1">
-        <Consumer />
-      </LineItems>
+      <Providers>
+        <LineItems>
+          <Consumer />
+        </LineItems>
+      </Providers>
     )
 
     expect(capturedErrors).toEqual([
@@ -337,9 +311,11 @@ describe("LineItems component", () => {
     }
 
     render(
-      <LineItems accessToken="token" orderId="order-1">
-        <Consumer />
-      </LineItems>
+      <Providers>
+        <LineItems>
+          <Consumer />
+        </LineItems>
+      </Providers>
     )
 
     expect(capturedErrors).toEqual([])

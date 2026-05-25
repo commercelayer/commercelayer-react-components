@@ -10,16 +10,6 @@ import type { TLineItem } from "./LineItem"
 interface Props {
   children: DefaultChildrenType
   /**
-   * Commerce Layer API access token.
-   * When omitted, the component reads it from the nearest `<CommerceLayer>` context.
-   */
-  accessToken?: string
-  /**
-   * ID of the order whose line items to display.
-   * When omitted, the component reads `orderId` from the nearest `<Order>` context.
-   */
-  orderId?: string
-  /**
    * Filter line items by item type. When provided, only matching types
    * are put into context (affects LineItem, LineItemsCount, LineItemsEmpty).
    */
@@ -40,18 +30,13 @@ interface Props {
 
 export function LineItems({
   children,
-  accessToken: accessTokenProp,
-  orderId: orderIdProp,
   types,
   loader = <>Loading...</>,
   onUpdate,
   onDelete,
 }: Props): JSX.Element {
-  const { accessToken: contextAccessToken } = useContext(CommerceLayerContext)
-  const accessToken = accessTokenProp ?? contextAccessToken
-
-  const { orderId: contextOrderId } = useContext(OrderContext)
-  const orderId = orderIdProp ?? contextOrderId
+  const { accessToken } = useContext(CommerceLayerContext)
+  const { orderId } = useContext(OrderContext)
 
   const {
     lineItems: allLineItems,
