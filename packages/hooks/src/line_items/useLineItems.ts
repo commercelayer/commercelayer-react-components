@@ -58,9 +58,7 @@ export function useLineItems({
   const { data, error, isLoading, isValidating, mutate } = useSWR<LineItem[]>(
     swrKey,
     async (): Promise<LineItem[]> => {
-      if (!accessToken) throw new Error("accessToken is required")
-      if (!orderId) throw new Error("orderId is required")
-      return getLineItems({ accessToken, interceptors, orderId })
+      return getLineItems({ accessToken: accessToken as string, interceptors, orderId: orderId as string })
     },
     { revalidateOnFocus: false, revalidateOnReconnect: false }
   )

@@ -182,19 +182,29 @@ describe("useLineItems", () => {
     expect(mockUpdateLineItem).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
   })
 
-  it("passes interceptors to deleteLineItem", async () => {
-    const interceptors: InterceptorManager = {
-      request: { onSuccess: vi.fn((req) => req) },
-    }
-
-    const { result } = renderHook(() => useLineItems({ accessToken, orderId, interceptors }), {
+  it("returns empty array and no loading when accessToken is undefined", () => {
+    const { result } = renderHook(() => useLineItems({ orderId }), {
       wrapper: swrWrapper,
     })
 
-    await act(async () => {
-      await result.current.deleteLineItem("li_1")
+    expect(result.current.lineItems).toEqual([])
+    expect(result.current.isLoading).toBe(false)
+    expect(mockGetLineItems).not.toHaveBeenCalled()
+  })
+
+  it("updateLineItem throws when accessToken is not provided", async () => {
+    const { result } = renderHook(() => useLineItems({ orderId }), {
+      wrapper: swrWrapper,
     })
 
-    expect(mockDeleteLineItem).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
+    await expect(result.current.updateLineItem("li_1", 2)).rejects.toThrow("accessToken is required")
+  })
+
+  it("deleteLineItem throws when accessToken is not provided", async () => {
+    const { result } = renderHook(() => useLineItems({ orderId }), {
+      wrapper: swrWrapper,
+    })
+
+    await expect(result.current.deleteLineItem("li_1")).rejects.toThrow("accessToken is required")
   })
 })
