@@ -175,7 +175,7 @@ export const ChildrenProps: Story = {
   name: "Children props (render prop)",
   render: () => (
     <Wrapper>
-      <CartLink>
+      <CartLink target="_blank">
         {({ href, handleClick, orderId }) => (
           <a
             href={href}
