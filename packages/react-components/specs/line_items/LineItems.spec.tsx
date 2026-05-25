@@ -1,8 +1,10 @@
-import { render, screen, act, waitFor } from "@testing-library/react"
+import { render, screen, act } from "@testing-library/react"
 import { useContext } from "react"
 import { vi, beforeEach, describe, it, expect } from "vitest"
 import { LineItems } from "#components/line_items/LineItems"
+import CommerceLayerContext from "#context/CommerceLayerContext"
 import LineItemContext from "#context/LineItemContext"
+import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 
 const MOCK_LINE_ITEMS = [
   { id: "li_1", item_type: "skus", quantity: 2, name: "Baby Onesie" },
@@ -165,6 +167,66 @@ describe("LineItems component", () => {
 
     expect(mockUseLineItems).toHaveBeenCalledWith(
       expect.objectContaining({ accessToken: "my-token", orderId: "my-order" })
+    )
+  })
+
+  it("reads orderId from OrderContext when prop is not provided", () => {
+    const orderCtxValue = { ...defaultOrderContext, orderId: "ctx-order-id" }
+
+    render(
+      <OrderContext.Provider value={orderCtxValue}>
+        <LineItems accessToken="my-token">
+          <span />
+        </LineItems>
+      </OrderContext.Provider>
+    )
+
+    expect(mockUseLineItems).toHaveBeenCalledWith(
+      expect.objectContaining({ accessToken: "my-token", orderId: "ctx-order-id" })
+    )
+  })
+
+  it("prop orderId takes precedence over OrderContext orderId", () => {
+    const orderCtxValue = { ...defaultOrderContext, orderId: "ctx-order-id" }
+
+    render(
+      <OrderContext.Provider value={orderCtxValue}>
+        <LineItems accessToken="my-token" orderId="prop-order-id">
+          <span />
+        </LineItems>
+      </OrderContext.Provider>
+    )
+
+    expect(mockUseLineItems).toHaveBeenCalledWith(
+      expect.objectContaining({ accessToken: "my-token", orderId: "prop-order-id" })
+    )
+  })
+
+  it("reads accessToken from CommerceLayerContext when prop is not provided", () => {
+    render(
+      <CommerceLayerContext.Provider value={{ accessToken: "ctx-token" }}>
+        <LineItems orderId="order-1">
+          <span />
+        </LineItems>
+      </CommerceLayerContext.Provider>
+    )
+
+    expect(mockUseLineItems).toHaveBeenCalledWith(
+      expect.objectContaining({ accessToken: "ctx-token", orderId: "order-1" })
+    )
+  })
+
+  it("prop accessToken takes precedence over CommerceLayerContext accessToken", () => {
+    render(
+      <CommerceLayerContext.Provider value={{ accessToken: "ctx-token" }}>
+        <LineItems accessToken="prop-token" orderId="order-1">
+          <span />
+        </LineItems>
+      </CommerceLayerContext.Provider>
+    )
+
+    expect(mockUseLineItems).toHaveBeenCalledWith(
+      expect.objectContaining({ accessToken: "prop-token", orderId: "order-1" })
     )
   })
 
