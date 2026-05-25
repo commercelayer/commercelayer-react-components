@@ -4,6 +4,7 @@ import type { LineItem } from "@commercelayer/sdk"
 
 export interface LineItemContextValue extends LineItemState {
   lineItems?: LineItem[] | null
+  reload?: () => Promise<void>
 }
 
 const initial: LineItemContextValue = {}
