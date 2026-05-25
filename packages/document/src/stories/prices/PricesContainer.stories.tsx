@@ -10,8 +10,8 @@ function PricesContainerDocsPage(): JSX.Element {
       <span title="Deprecated" type="warning">
         <p>
           <code>{"<PricesContainer>"}</code> is deprecated and will be removed in a future major
-          release. Use <code>{'<Price skuCode="…" />'}</code> as a standalone component instead —
-          it handles batching automatically. See <strong>Prices/Price</strong> for the recommended
+          release. Use <code>{'<Price skuCode="…" />'}</code> as a standalone component instead — it
+          handles batching automatically. See <strong>Prices/Price</strong> for the recommended
           pattern.
         </p>
       </span>

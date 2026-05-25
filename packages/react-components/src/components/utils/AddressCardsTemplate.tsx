@@ -1,12 +1,11 @@
-import Parent from '#components/utils/Parent'
-import { useContext, type JSX } from 'react';
-import type { Address } from '@commercelayer/sdk'
-import AddressChildrenContext from '#context/AddressChildrenContext'
-import ShippingAddressContext from '#context/ShippingAddressContext'
-import type { ChildrenFunction } from '#typings'
+import Parent from "#components/utils/Parent"
+import { useContext, type JSX } from "react"
+import type { Address } from "@commercelayer/sdk"
+import AddressChildrenContext from "#context/AddressChildrenContext"
+import ShippingAddressContext from "#context/ShippingAddressContext"
+import type { ChildrenFunction } from "#typings"
 
-export interface TAddressCards
-  extends Pick<Props, 'customerAddresses' | 'className'> {
+export interface TAddressCards extends Pick<Props, "customerAddresses" | "className"> {
   AddressProvider: typeof AddressChildrenContext.Provider
 }
 
@@ -46,35 +45,32 @@ export default function AddressCardsTemplate({
   selectedClassName,
   className,
   disabledClassName,
-  handleSelect
+  handleSelect,
 }: Props): JSX.Element {
   const { setShippingAddress } = useContext(ShippingAddressContext)
   const addresses = customerAddresses.map((address, k) => {
     const attributes = address
     const disabled =
-      (setShippingAddress &&
-        countryLock &&
-        countryLock !== address.country_code) ||
-      false
-    const selectedClass = deselect ? '' : selectedClassName
+      (setShippingAddress && countryLock && countryLock !== address.country_code) || false
+    const selectedClass = deselect ? "" : selectedClassName
     const addressSelectedClass =
-      selected === k ? `${className ?? ''} ${selectedClass ?? ''}` : className
+      selected === k ? `${className ?? ""} ${selectedClass ?? ""}` : className
     const finalClassName = disabled
-      ? `${className ?? ''} ${disabledClassName ?? ''}`
+      ? `${className ?? ""} ${disabledClassName ?? ""}`
       : addressSelectedClass
-    const customerAddressId: string = address?.reference || ''
+    const customerAddressId: string = address?.reference || ""
     const onClick = async (): Promise<void> => {
       await handleSelect(k, address.id, customerAddressId, disabled, address)
     }
     return {
       ...attributes,
       className: finalClassName,
-      onClick
+      onClick,
     }
   })
   const value = {
     customerAddresses: addresses,
-    AddressProvider: AddressChildrenContext.Provider
+    AddressProvider: AddressChildrenContext.Provider,
   }
   return <Parent {...value}>{children}</Parent>
 }

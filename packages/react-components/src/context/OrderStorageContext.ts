@@ -1,14 +1,6 @@
-import { createContext } from 'react'
-import type {
-  GetLocalOrder,
-  SetLocalOrder,
-  DeleteLocalOrder,
-} from "@commercelayer/core"
-import {
-  getLocalOrder,
-  setLocalOrder,
-  deleteLocalOrder
-} from '@commercelayer/core'
+import { createContext } from "react"
+import type { GetLocalOrder, SetLocalOrder, DeleteLocalOrder } from "@commercelayer/core"
+import { getLocalOrder, setLocalOrder, deleteLocalOrder } from "@commercelayer/core"
 
 export interface OrderStorageConfig {
   persistKey: string
@@ -19,11 +11,11 @@ export interface OrderStorageConfig {
 }
 
 const initial: OrderStorageConfig = {
-  persistKey: '',
+  persistKey: "",
   clearWhenPlaced: true,
   getLocalOrder,
   setLocalOrder,
-  deleteLocalOrder
+  deleteLocalOrder,
 }
 
 const OrderStorageContext = createContext<OrderStorageConfig>(initial)

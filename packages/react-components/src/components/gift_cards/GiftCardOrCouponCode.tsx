@@ -18,15 +18,10 @@ interface Props extends Omit<JSX.IntrinsicElements["span"], "children"> {
   children?: ChildrenFunction<ChildrenProps>
 }
 
-export function GiftCardOrCouponCode({
-  children,
-  type,
-  ...props
-}: Props): JSX.Element | null {
+export function GiftCardOrCouponCode({ children, type, ...props }: Props): JSX.Element | null {
   const { order, managePaymentProviderGiftCards } = useContext(OrderContext)
   let codeType = type ? (`${type}_code` as const) : undefined
-  if (!type && order && "coupon_code" in order && order.coupon_code !== "")
-    codeType = "coupon_code"
+  if (!type && order && "coupon_code" in order && order.coupon_code !== "") codeType = "coupon_code"
   else if (!type) codeType = "gift_card_code"
   const code = order && codeType ? order[codeType] : ""
   let hide = !(order && code)

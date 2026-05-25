@@ -1,13 +1,5 @@
-import {
-  type JSX,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useReducer,
-} from "react"
-import AddressesContext, {
-  defaultAddressContext,
-} from "#context/AddressContext"
+import { type JSX, type ReactNode, useContext, useEffect, useReducer } from "react"
+import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import addressReducer, {
@@ -62,26 +54,15 @@ interface Props {
  * </span>
  */
 export function AddressesContainer(props: Props): JSX.Element {
-  const {
-    children,
-    shipToDifferentAddress = false,
-    isBusiness,
-    invertAddresses = false,
-  } = props
+  const { children, shipToDifferentAddress = false, isBusiness, invertAddresses = false } = props
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
   const { order, orderId, updateOrder } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     if (order?.status === "draft") {
       // Set the customer order parameters to false when the order is in draft status
-      setCustomerOrderParam(
-        "_save_billing_address_to_customer_address_book",
-        "false",
-      )
-      setCustomerOrderParam(
-        "_save_shipping_address_to_customer_address_book",
-        "false",
-      )
+      setCustomerOrderParam("_save_billing_address_to_customer_address_book", "false")
+      setCustomerOrderParam("_save_shipping_address_to_customer_address_book", "false")
     }
   }, [order?.status])
   useEffect(() => {
@@ -132,11 +113,7 @@ export function AddressesContainer(props: Props): JSX.Element {
       setCloneAddress(id, resource, dispatch)
     },
   }
-  return (
-    <AddressesContext.Provider value={contextValue}>
-      {children}
-    </AddressesContext.Provider>
-  )
+  return <AddressesContext.Provider value={contextValue}>{children}</AddressesContext.Provider>
 }
 
 export default AddressesContainer

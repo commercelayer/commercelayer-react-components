@@ -2,11 +2,7 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "target": "ESNext",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": false,
@@ -19,39 +15,16 @@
     "isolatedModules": true,
     "noEmit": true,
     "paths": {
-      "#components/*": [
-        "../react-components/src/components/*"
-      ],
-      "#components-utils/*": [
-        "../react-components/src/components/utils/*"
-      ],
-      "#reducers/*": [
-        "../react-components/src/reducers/*"
-      ],
-      "#context/*": [
-        "../react-components/src/context/*"
-      ],
-      "#typings/*": [
-        "../react-components/src/typings/*"
-      ],
-      "#typings": [
-        "../react-components/src/typings/index"
-      ],
-      "#utils/*": [
-        "../react-components/src/utils/*"
-      ],
-      "#config/*": [
-        "../react-components/src/config/*"
-      ],
-      "#hooks/*": [
-        "../react-components/src/hooks/*"
-      ]
+      "#components/*": ["../react-components/src/components/*"],
+      "#components-utils/*": ["../react-components/src/components/utils/*"],
+      "#reducers/*": ["../react-components/src/reducers/*"],
+      "#context/*": ["../react-components/src/context/*"],
+      "#typings/*": ["../react-components/src/typings/*"],
+      "#typings": ["../react-components/src/typings/index"],
+      "#utils/*": ["../react-components/src/utils/*"],
+      "#config/*": ["../react-components/src/config/*"],
+      "#hooks/*": ["../react-components/src/hooks/*"]
     }
   },
-  "include": [
-    ".storybook/**/*",
-    "stories",
-    "mocks",
-    ".eslintrc.cjs"
-  ]
+  "include": [".storybook/**/*", "stories", "mocks", ".eslintrc.cjs"]
 }

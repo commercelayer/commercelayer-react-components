@@ -1,16 +1,10 @@
-type TEvent = 'open-cart'
+type TEvent = "open-cart"
 
-function subscribe(
-  eventName: TEvent,
-  listener: EventListenerOrEventListenerObject
-): void {
+function subscribe(eventName: TEvent, listener: EventListenerOrEventListenerObject): void {
   document.addEventListener(eventName, listener)
 }
 
-function unsubscribe(
-  eventName: TEvent,
-  listener: EventListenerOrEventListenerObject
-): void {
+function unsubscribe(eventName: TEvent, listener: EventListenerOrEventListenerObject): void {
   document.removeEventListener(eventName, listener)
 }
 

@@ -19,17 +19,15 @@ export function useSkuList(
   id: string,
   accessToken: string,
   interceptors?: InterceptorManager,
-  params?: QueryParamsRetrieve<SkuList>,
+  params?: QueryParamsRetrieve<SkuList>
 ): UseSkuListReturn {
   const { data, isLoading } = useSWR<SkuList>(
-    id && accessToken
-      ? ["sku_list", "retrieve", id, accessToken, params]
-      : null,
+    id && accessToken ? ["sku_list", "retrieve", id, accessToken, params] : null,
     async () => coreRetrieveSkuList({ accessToken, id, params, interceptors }),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    },
+    }
   )
 
   return { skuList: data, isLoading }

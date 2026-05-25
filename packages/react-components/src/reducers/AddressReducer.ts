@@ -5,13 +5,10 @@ import type { AddressValuesKeys } from "#context/BillingAddressFormContext"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { BaseError, CodeErrorType } from "#typings/errors"
 import type { AddressInputName } from "#typings/index"
-import {
-  invertedAddressesHandler,
-  sanitizeMetadataFields,
-} from "#utils/addressesManager"
+import { invertedAddressesHandler, sanitizeMetadataFields } from "#utils/addressesManager"
 import baseReducer from "#utils/baseReducer"
 import { formCleaner } from "#utils/formCleaner"
-import { getSdk } from '@commercelayer/core'
+import { getSdk } from "@commercelayer/core"
 import type { TCustomerAddress } from "./CustomerReducer"
 import type { updateOrder } from "./OrderReducer"
 
@@ -67,15 +64,9 @@ export const addressFields: AddressField[] = [
   "zip_code",
 ]
 
-export type AddressResource = Extract<
-  TResourceError,
-  "billing_address" | "shipping_address"
->
+export type AddressResource = Extract<TResourceError, "billing_address" | "shipping_address">
 
-export type AddressSchema = Omit<
-  Address,
-  "created_at" | "updated_at" | "id" | "type"
->
+export type AddressSchema = Omit<Address, "created_at" | "updated_at" | "id" | "type">
 
 export interface AddressActionPayload {
   errors: BaseError[]
@@ -156,7 +147,7 @@ export function setAddress<V extends TCustomerAddress>({
 type SetCloneAddress = (
   id: string,
   resource: AddressResource,
-  dispatch: Dispatch<AddressAction>,
+  dispatch: Dispatch<AddressAction>
 ) => void
 
 export const setCloneAddress: SetCloneAddress = (id, resource, dispatch) => {
@@ -212,13 +203,9 @@ export async function saveAddresses({
     if (order) {
       let orderAttributes: OrderUpdate | null = null
       const billingAddressCloneId =
-        customerAddress?.resource === "billing_address"
-          ? customerAddress?.id
-          : billingAddressId
+        customerAddress?.resource === "billing_address" ? customerAddress?.id : billingAddressId
       const shippingAddressCloneId =
-        customerAddress?.resource === "shipping_address"
-          ? customerAddress?.id
-          : shippingAddressId
+        customerAddress?.resource === "shipping_address" ? customerAddress?.id : shippingAddressId
       if (invertAddresses) {
         orderAttributes = await invertedAddressesHandler({
           billingAddress,
@@ -233,7 +220,7 @@ export async function saveAddresses({
       } else {
         const doNotShipItems = order?.line_items?.every(
           // @ts-expect-error no type for do_not_ship on SDK
-          (lineItem) => lineItem?.item?.do_not_ship === true,
+          (lineItem) => lineItem?.item?.do_not_ship === true
         )
         const currentBillingAddressRef = order?.billing_address?.reference
         orderAttributes = {
@@ -244,8 +231,7 @@ export async function saveAddresses({
         }
         if (currentBillingAddressRef === billingAddressCloneId) {
           orderAttributes._billing_address_clone_id = order?.billing_address?.id
-          orderAttributes._shipping_address_clone_id =
-            order?.shipping_address?.id
+          orderAttributes._shipping_address_clone_id = order?.shipping_address?.id
         }
         if (
           billingAddress != null &&
@@ -259,10 +245,7 @@ export async function saveAddresses({
           }
           const billingAddressWithMeta = sanitizeMetadataFields(billingAddress)
           let address: Address | undefined
-          if (
-            order?.billing_address?.id &&
-            order?.billing_address?.reference == null
-          ) {
+          if (order?.billing_address?.id && order?.billing_address?.reference == null) {
             address = await sdk.addresses.update({
               id: order.billing_address.id,
               ...billingAddressWithMeta,
@@ -270,9 +253,7 @@ export async function saveAddresses({
             orderAttributes._refresh = true
           } else {
             address = await sdk.addresses.create(billingAddressWithMeta)
-            orderAttributes.billing_address = sdk.addresses.relationship(
-              address.id,
-            )
+            orderAttributes.billing_address = sdk.addresses.relationship(address.id)
           }
         }
         if (!shipToDifferentAddress && billingAddressCloneId) {
@@ -287,18 +268,11 @@ export async function saveAddresses({
           delete orderAttributes._shipping_address_same_as_billing
           if (shippingAddressCloneId)
             orderAttributes._shipping_address_clone_id = shippingAddressCloneId
-          if (
-            shippingAddress != null &&
-            Object.keys(shippingAddress).length > 0
-          ) {
+          if (shippingAddress != null && Object.keys(shippingAddress).length > 0) {
             delete orderAttributes._shipping_address_clone_id
-            const shippingAddressWithMeta =
-              sanitizeMetadataFields(shippingAddress)
+            const shippingAddressWithMeta = sanitizeMetadataFields(shippingAddress)
             let address: Address | undefined
-            if (
-              order?.shipping_address?.id &&
-              order?.shipping_address?.reference == null
-            ) {
+            if (order?.shipping_address?.id && order?.shipping_address?.reference == null) {
               address = await sdk.addresses.update({
                 id: order.shipping_address.id,
                 ...shippingAddressWithMeta,
@@ -306,9 +280,7 @@ export async function saveAddresses({
               orderAttributes._refresh = true
             } else {
               address = await sdk.addresses.create(shippingAddressWithMeta)
-              orderAttributes.shipping_address = sdk.addresses.relationship(
-                address.id,
-              )
+              orderAttributes.shipping_address = sdk.addresses.relationship(address.id)
             }
           }
         }
@@ -336,14 +308,7 @@ const type: AddressActionType[] = [
   "cleanup",
 ]
 
-const addressReducer = (
-  state: AddressState,
-  reducer: AddressAction,
-): AddressState =>
-  baseReducer<AddressState, AddressAction, AddressActionType[]>(
-    state,
-    reducer,
-    type,
-  )
+const addressReducer = (state: AddressState, reducer: AddressAction): AddressState =>
+  baseReducer<AddressState, AddressAction, AddressActionType[]>(state, reducer, type)
 
 export default addressReducer

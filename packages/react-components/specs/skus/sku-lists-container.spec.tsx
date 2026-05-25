@@ -12,11 +12,7 @@ import type { SkuListsContext as SkuListsCtx } from "../utils/context"
 const swrWrapper = ({ children }: { children: ReactNode }) =>
   createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
 
-function SkuListsInspector({
-  onCapture,
-}: {
-  onCapture: (v: Record<string, unknown>) => void
-}) {
+function SkuListsInspector({ onCapture }: { onCapture: (v: Record<string, unknown>) => void }) {
   const { skuLists } = useContext(SkuListsContext)
   onCapture(skuLists)
   return null
@@ -40,7 +36,7 @@ describe("SkuListsContainer component", () => {
           <div data-testid="child">content</div>
         </SkuListsContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     expect(container.querySelector('[data-testid="child"]')).not.toBeNull()
   })
@@ -55,12 +51,11 @@ describe("SkuListsContainer component", () => {
           </SkuList>
         </SkuListsContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
-    await waitFor(
-      () => expect(screen.getByTestId(`list-${ctx.skuListId}`)).toBeTruthy(),
-      { timeout: 5000 },
-    )
+    await waitFor(() => expect(screen.getByTestId(`list-${ctx.skuListId}`)).toBeTruthy(), {
+      timeout: 5000,
+    })
     expect(screen.getByTestId(`list-${ctx.skuListId}`).textContent).toBe("item")
   })
 
@@ -80,12 +75,9 @@ describe("SkuListsContainer component", () => {
           />
         </SkuListsContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
-    await waitFor(
-      () => expect(Object.keys(captured)).toContain(ctx.skuListId),
-      { timeout: 10000 },
-    )
+    await waitFor(() => expect(Object.keys(captured)).toContain(ctx.skuListId), { timeout: 10000 })
     expect(Array.isArray(captured[ctx.skuListId])).toBe(true)
   })
 })

@@ -16,10 +16,9 @@ function OrderDocsPage(): JSX.Element {
     <>
       <h1>Orders</h1>
       <p>
-        The Order components let you fetch and display order data from the
-        Commerce Layer API. All order components must be nested inside the{" "}
-        <code>{"<CommerceLayer>"}</code> context that handles API
-        authentication.
+        The Order components let you fetch and display order data from the Commerce Layer API. All
+        order components must be nested inside the <code>{"<CommerceLayer>"}</code> context that
+        handles API authentication.
       </p>
       <p>
         Refer to the{" "}
@@ -31,18 +30,15 @@ function OrderDocsPage(): JSX.Element {
       <hr />
       <h2>Order (standalone)</h2>
       <p>
-        <code>{"<Order>"}</code> is the recommended way to fetch an order and
-        make it available to its children via context. Pass the{" "}
-        <code>orderId</code> prop to load an existing order, or omit it to
-        create a new one on demand. It can optionally receive the{" "}
-        <code>orderId</code> from a parent <code>{"<OrderStorage>"}</code>{" "}
-        component.
+        <code>{"<Order>"}</code> is the recommended way to fetch an order and make it available to
+        its children via context. Pass the <code>orderId</code> prop to load an existing order, or
+        omit it to create a new one on demand. It can optionally receive the <code>orderId</code>{" "}
+        from a parent <code>{"<OrderStorage>"}</code> component.
       </p>
       <span title="Usage" type="info">
         <p>
-          Must be a child of <code>{"<CommerceLayer>"}</code>. Can optionally be
-          a child of <code>{"<OrderStorage>"}</code> to receive the{" "}
-          <code>orderId</code> automatically.
+          Must be a child of <code>{"<CommerceLayer>"}</code>. Can optionally be a child of{" "}
+          <code>{"<OrderStorage>"}</code> to receive the <code>orderId</code> automatically.
         </p>
       </span>
       <ArgTypes />
@@ -71,9 +67,8 @@ import {
       <hr />
       <h2>Order — with fetchOrder callback</h2>
       <p>
-        Use the <code>fetchOrder</code> callback to react to order updates in
-        your application — for example to sync the cart badge count or trigger
-        analytics events.
+        Use the <code>fetchOrder</code> callback to react to order updates in your application — for
+        example to sync the cart badge count or trigger analytics events.
       </p>
       <Source
         language="jsx"
@@ -109,13 +104,11 @@ const meta = {
   argTypes: {
     orderId: {
       control: "text",
-      description:
-        "ID of the order to fetch. Omit to create a new draft order on demand.",
+      description: "ID of the order to fetch. Omit to create a new draft order on demand.",
     },
     metadata: {
       control: "object",
-      description:
-        "Metadata key-value pairs added when a new order is created.",
+      description: "Metadata key-value pairs added when a new order is created.",
     },
     attributes: {
       control: "object",

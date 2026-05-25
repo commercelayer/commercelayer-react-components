@@ -1,32 +1,32 @@
-import React, { useState, useEffect, Fragment } from 'react'
+import React, { useState, useEffect, Fragment } from "react"
 import {
   getIntegrationToken,
   // getSalesChannelToken,
-} from '@commercelayer/js-auth'
-import CommerceLayer from '../#components/auth/CommerceLayer'
-import { Nav } from '.'
-import OrderContainer from '../#components/OrderContainer'
-import LineItemsContainer from '../#components/LineItemsContainer'
-import LineItem from '../#components/line_items/LineItem'
-import LineItemImage from '../#components/LineItemImage'
-import LineItemName from '../#components/LineItemName'
-import LineItemQuantity from '../#components/LineItemQuantity'
-import LineItemAmount from '../#components/LineItemAmount'
-import LineItemRemoveLink from '../#components/LineItemRemoveLink'
-import CheckoutLink from '../#components/orders/CheckoutLink'
-import SubTotalAmount from '../#components/SubTotalAmount'
-import LineItemsCount from '../#components/LineItemsCount'
-import TotalAmount from '../#components/orders/TotalAmount'
-import DiscountAmount from '../#components/orders/DiscountAmount'
-import ShippingAmount from '../#components/orders/ShippingAmount'
-import TaxesAmount from '../#components/TaxesAmount'
-import GiftCardAmount from '../#components/orders/GiftCardAmount'
-import ItemContainer from '../#components/orders/ItemContainer'
-import SkuListsContainer from '../#components/SkuListsContainer'
-import SkuList from '../#components/SkuList'
-import AddToCartButton from '../#components/orders/AddToCartButton'
-import QuantitySelector from '../#components/skus/QuantitySelector'
-import ExternalFunction from '#components/ExternalFunction'
+} from "@commercelayer/js-auth"
+import CommerceLayer from "../#components/auth/CommerceLayer"
+import { Nav } from "."
+import OrderContainer from "../#components/OrderContainer"
+import LineItemsContainer from "../#components/LineItemsContainer"
+import LineItem from "../#components/line_items/LineItem"
+import LineItemImage from "../#components/LineItemImage"
+import LineItemName from "../#components/LineItemName"
+import LineItemQuantity from "../#components/LineItemQuantity"
+import LineItemAmount from "../#components/LineItemAmount"
+import LineItemRemoveLink from "../#components/LineItemRemoveLink"
+import CheckoutLink from "../#components/orders/CheckoutLink"
+import SubTotalAmount from "../#components/SubTotalAmount"
+import LineItemsCount from "../#components/LineItemsCount"
+import TotalAmount from "../#components/orders/TotalAmount"
+import DiscountAmount from "../#components/orders/DiscountAmount"
+import ShippingAmount from "../#components/orders/ShippingAmount"
+import TaxesAmount from "../#components/TaxesAmount"
+import GiftCardAmount from "../#components/orders/GiftCardAmount"
+import ItemContainer from "../#components/orders/ItemContainer"
+import SkuListsContainer from "../#components/SkuListsContainer"
+import SkuList from "../#components/SkuList"
+import AddToCartButton from "../#components/orders/AddToCartButton"
+import QuantitySelector from "../#components/skus/QuantitySelector"
+import ExternalFunction from "#components/ExternalFunction"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
 const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
@@ -38,21 +38,17 @@ const AddToCartCustom = (props: any) => {
   const customHandleClick = async (e: any) => {
     // e.preventDefault()
     const res = await handleClick(e)
-    console.log('res', res)
+    console.log("res", res)
   }
   return (
-    <button
-      disabled={disabled}
-      className={className}
-      onClick={customHandleClick}
-    >
+    <button disabled={disabled} className={className} onClick={customHandleClick}>
       {label}
     </button>
   )
 }
 
 export default function Order() {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("")
   useEffect(() => {
     const getToken = async () => {
       const auth = await getIntegrationToken({
@@ -67,7 +63,7 @@ export default function Order() {
   }, [])
   return (
     <Fragment>
-      <Nav links={['/']} />
+      <Nav links={["/"]} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer>
@@ -108,18 +104,14 @@ export default function Order() {
             <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
             <LineItemsContainer>
               <p className="text-sm m-2">
-                Your shopping bag contains{' '}
-                <LineItemsCount id="items-count" className="font-bold" /> items
+                Your shopping bag contains <LineItemsCount id="items-count" className="font-bold" />{" "}
+                items
               </p>
               <LineItem type="skus">
                 <div className="flex justify-around items-center border-b">
                   <LineItemImage className="p-2" width={80} />
                   <LineItemName id="line-item-name" className="p-2" />
-                  <LineItemQuantity
-                    id="line-item-quantity"
-                    max={10}
-                    className="p-2"
-                  />
+                  <LineItemQuantity id="line-item-quantity" max={10} className="p-2" />
                   <LineItemAmount id="line-item-total" className="p-2" />
                   <LineItemRemoveLink
                     id="line-item-remove"

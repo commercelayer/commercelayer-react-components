@@ -5,9 +5,7 @@ import PlaceOrderContext from "#context/PlaceOrderContext"
 import { useOrganizationConfig } from "#utils/organization"
 import BaseInput, { type BaseInputProps } from "../utils/BaseInput"
 
-export function PrivacyAndTermsCheckbox(
-  props: Partial<BaseInputProps>,
-): JSX.Element {
+export function PrivacyAndTermsCheckbox(props: Partial<BaseInputProps>): JSX.Element {
   const { accessToken } = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
   const { placeOrderPermitted } = useContext(PlaceOrderContext)
@@ -19,9 +17,7 @@ export function PrivacyAndTermsCheckbox(
   const privacyUrl = order?.privacy_url ?? organizationConfig?.urls?.privacy
   const termsUrl = order?.terms_url ?? organizationConfig?.urls?.terms
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ): void => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const v = (e.target as HTMLInputElement)?.checked
     setChecked(v)
     localStorage.setItem(fieldName, v.toString())

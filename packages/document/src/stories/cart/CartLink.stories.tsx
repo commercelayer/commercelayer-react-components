@@ -12,14 +12,13 @@ function CartLinkDocsPage(): JSX.Element {
       <p>
         <code>{"<CartLink>"}</code> generates a link to the Commerce Layer hosted cart
         micro-frontend. Clicking it navigates the customer to their cart, or — when{" "}
-        <code>type="mini"</code> is set — opens the{" "}
-        <code>{"<HostedCart type=\"mini\">"}</code> slide-in panel instead.
+        <code>type="mini"</code> is set — opens the <code>{'<HostedCart type="mini">'}</code>{" "}
+        slide-in panel instead.
       </p>
       <span title="Usage" type="info">
         <p>
-          Must be a child of <code>{"<Order>"}</code> (wrapped in{" "}
-          <code>{"<OrderStorage>"}</code>). Requires a parent{" "}
-          <code>{"<CommerceLayer>"}</code> context for the access token.
+          Must be a child of <code>{"<Order>"}</code> (wrapped in <code>{"<OrderStorage>"}</code>).
+          Requires a parent <code>{"<CommerceLayer>"}</code> context for the access token.
         </p>
       </span>
       <ArgTypes />
@@ -53,9 +52,9 @@ import {
       <hr />
       <h2>Mini cart trigger</h2>
       <p>
-        Set <code>type="mini"</code> to publish the <code>"open-cart"</code> event on click
-        instead of navigating. Place a <code>{'<HostedCart type="mini">'}</code> on the same page
-        to receive the event and open the slide-in panel.
+        Set <code>type="mini"</code> to publish the <code>"open-cart"</code> event on click instead
+        of navigating. Place a <code>{'<HostedCart type="mini">'}</code> on the same page to receive
+        the event and open the slide-in panel.
       </p>
       <Canvas of={MiniCartTrigger} />
       <hr />
@@ -98,7 +97,7 @@ const meta = {
       control: "select",
       options: ["_self", "_blank", "_parent", "_top"],
       description:
-        "Specifies where to open the linked URL. Defaults to `_self`. Only applies when navigating (not when `type=\"mini\"`).",
+        'Specifies where to open the linked URL. Defaults to `_self`. Only applies when navigating (not when `type="mini"`).',
     },
     children: {
       control: false,
@@ -161,11 +160,7 @@ export const MiniCartTrigger: Story = {
           label="Open mini cart"
           className="px-4 py-2 bg-black text-white rounded text-sm"
         />
-        <HostedCart
-          type="mini"
-          open={isOpen}
-          handleOpen={() => setIsOpen((o) => !o)}
-        />
+        <HostedCart type="mini" open={isOpen} handleOpen={() => setIsOpen((o) => !o)} />
       </Wrapper>
     )
   },

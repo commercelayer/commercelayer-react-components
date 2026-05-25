@@ -67,7 +67,7 @@ interface CheckoutWebComponent {
       status: string
       id: string
       type: string
-    },
+    }
   ) => Promise<void>
   onChange?: (component: Component) => void
   onError?: (component: Component, error: unknown) => void
@@ -122,23 +122,14 @@ type Props = Partial<PaymentMethodConfig["checkoutComPayment"]> &
     templateCustomerSaveToWallet?: PaymentSourceProps["templateCustomerSaveToWallet"]
   }
 
-export function CheckoutComPayment({
-  publicKey,
-  options,
-  ...p
-}: Props): JSX.Element | null {
+export function CheckoutComPayment({ publicKey, options, ...p }: Props): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
   const loaded = useExternalScript(scriptUrl)
   const { setPaymentRef, setPaymentSource } = useContext(PaymentMethodContext)
   const { accessToken } = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
   const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
-  const {
-    containerClassName,
-    templateCustomerSaveToWallet,
-    show,
-    ...divProps
-  } = p
+  const { containerClassName, templateCustomerSaveToWallet, show, ...divProps } = p
   useEffect(() => {
     const ps = order?.payment_source
     if (loaded && window && ps && accessToken) {
@@ -177,7 +168,7 @@ export function CheckoutComPayment({
                     if (savePaymentSourceToCustomerWallet)
                       setCustomerOrderParam(
                         "_save_payment_source_to_customer_wallet",
-                        savePaymentSourceToCustomerWallet,
+                        savePaymentSourceToCustomerWallet
                       )
                     const { data } = await component.tokenize()
                     const token = data?.token

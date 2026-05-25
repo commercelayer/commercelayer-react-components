@@ -1,6 +1,6 @@
-import React, { useState, useEffect, Fragment } from 'react'
-import { getCustomerToken } from '@commercelayer/js-auth'
-import Head from 'next/head'
+import React, { useState, useEffect, Fragment } from "react"
+import { getCustomerToken } from "@commercelayer/js-auth"
+import Head from "next/head"
 import {
   CommerceLayer,
   OrderContainer,
@@ -16,9 +16,9 @@ import {
   Address,
   AddressField,
   ShippingAddressContainer,
-} from 'packages/react-components/src'
-import { useRouter } from 'next/router'
-import getSdk from '#utils/getSdk'
+} from "packages/react-components/src"
+import { useRouter } from "next/router"
+import getSdk from "#utils/getSdk"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -26,7 +26,7 @@ const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
 const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 
-const orderId = 'JwXQehvvyP'
+const orderId = "JwXQehvvyP"
 
 const NestedInput = ({ value }: any) => {
   return (
@@ -42,11 +42,11 @@ const NestedInput = ({ value }: any) => {
 }
 
 export default function Main() {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("")
   const [shipToDifferentAddress, setShipToDifferentAddress] = useState(false)
   const [showBillingAddressForm, setShowBillingAddressForm] = useState(false)
   const [showShippingAddressForm, setShowShippingAddressForm] = useState(false)
-  const [billingFirstName, setBillingFirstName] = useState('')
+  const [billingFirstName, setBillingFirstName] = useState("")
   const [billingAddress, setBillingAddress] = useState({})
   const [shippingAddress, setShippingAddress] = useState({})
   const { query, pathname, push } = useRouter()
@@ -71,15 +71,15 @@ export default function Main() {
       const sdk = getSdk(config)
       try {
         const order = await sdk.orders.retrieve(orderId, {
-          include: ['billing_address', 'shipping_address'],
+          include: ["billing_address", "shipping_address"],
         })
         const billingAddress = order.billing_address
         const shippingAddress = order.shipping_address
         if (billingAddress) {
-          await sdk.addresses.update({ id: billingAddress.id, reference: '' })
+          await sdk.addresses.update({ id: billingAddress.id, reference: "" })
         }
         if (shippingAddress) {
-          await sdk.addresses.update({ id: shippingAddress.id, reference: '' })
+          await sdk.addresses.update({ id: shippingAddress.id, reference: "" })
         }
         push(pathname)
       } catch (error) {
@@ -98,15 +98,15 @@ export default function Main() {
   }, [token])
   const messages: any = [
     {
-      code: 'EMPTY_ERROR',
-      resource: 'billingAddress',
-      field: 'firstName',
+      code: "EMPTY_ERROR",
+      resource: "billingAddress",
+      field: "firstName",
       message: `Can't be blank`,
     },
     {
-      code: 'VALIDATION_ERROR',
-      resource: 'billingAddress',
-      field: 'email',
+      code: "VALIDATION_ERROR",
+      resource: "billingAddress",
+      field: "email",
       message: `Must be valid email`,
     },
   ]
@@ -116,7 +116,7 @@ export default function Main() {
       const sdk = getSdk(config)
       try {
         const order = await sdk.orders.retrieve(orderId, {
-          include: ['billing_address', 'shipping_address'],
+          include: ["billing_address", "shipping_address"],
         })
         const billing = order.billing_address
         const shipping = order.shipping_address
@@ -151,10 +151,9 @@ export default function Main() {
   }
   const handleShowBillingForm = () => {
     setShowBillingAddressForm(!showBillingAddressForm)
-    setBillingFirstName('')
+    setBillingFirstName("")
   }
-  const handleShowShippingForm = () =>
-    setShowShippingAddressForm(!showShippingAddressForm)
+  const handleShowShippingForm = () => setShowShippingAddressForm(!showShippingAddressForm)
   return (
     <Fragment>
       <Head>
@@ -164,9 +163,7 @@ export default function Main() {
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId={orderId}>
             <CustomerContainer>
-              <AddressesContainer
-                shipToDifferentAddress={shipToDifferentAddress}
-              >
+              <AddressesContainer shipToDifferentAddress={shipToDifferentAddress}>
                 <h2 className="p-2 font-semibold text-2xl">Billing Address</h2>
                 <div className="flex">
                   <BillingAddressContainer>
@@ -175,10 +172,7 @@ export default function Main() {
                       selectedClassName="border-blue-500"
                       data-cy="customer-billing-address"
                       deselect={showBillingAddressForm}
-                      onSelect={() =>
-                        showBillingAddressForm &&
-                        setShowBillingAddressForm(false)
-                      }
+                      onSelect={() => showBillingAddressForm && setShowBillingAddressForm(false)}
                     >
                       <div className="flex font-bold">
                         <AddressField name="first_name" />
@@ -210,7 +204,7 @@ export default function Main() {
                     </svg>
                   </button>
                 </div>
-                <div className={`${showBillingAddressForm ? '' : 'hidden'}`}>
+                <div className={`${showBillingAddressForm ? "" : "hidden"}`}>
                   <BillingAddressForm
                     autoComplete="on"
                     className="p-2"
@@ -331,8 +325,8 @@ export default function Main() {
                           name="billing_address_country_code"
                           className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                           placeholder={{
-                            value: '',
-                            label: 'Country',
+                            value: "",
+                            label: "Country",
                             disabled: true,
                           }}
                         />
@@ -447,39 +441,32 @@ export default function Main() {
                     type="button"
                     aria-pressed="false"
                     className={`${
-                      shipToDifferentAddress ? 'bg-blue-500' : 'bg-gray-200'
+                      shipToDifferentAddress ? "bg-blue-500" : "bg-gray-200"
                     } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                    onClick={() =>
-                      setShipToDifferentAddress(!shipToDifferentAddress)
-                    }
+                    onClick={() => setShipToDifferentAddress(!shipToDifferentAddress)}
                   >
                     <span className="sr-only">Use setting</span>
                     <span
                       aria-hidden="true"
                       className={`${
-                        shipToDifferentAddress
-                          ? 'translate-x-5'
-                          : 'translate-x-0'
+                        shipToDifferentAddress ? "translate-x-5" : "translate-x-0"
                       } inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
                     ></span>
                   </button>
                   <p className="ml-5">Ship to different address</p>
                 </div>
-                <div className={`${!shipToDifferentAddress ? 'hidden' : ''}`}>
-                  <h2 className="p-2 font-semibold text-2xl">
-                    Shipping Address
-                  </h2>
+                <div className={`${!shipToDifferentAddress ? "hidden" : ""}`}>
+                  <h2 className="p-2 font-semibold text-2xl">Shipping Address</h2>
                   <div className="flex">
                     <ShippingAddressContainer>
                       <Address
                         data-test="customer-shipping-address"
                         className="w-1/2 p-2 border cursor-pointer rounded hover:border-blue-500 m-2 shadow-sm"
-                        selectedClassName={'border-blue-500'}
-                        disabledClassName={'opacity-50 cursor-not-allowed'}
+                        selectedClassName={"border-blue-500"}
+                        disabledClassName={"opacity-50 cursor-not-allowed"}
                         deselect={showShippingAddressForm}
                         onSelect={() =>
-                          showShippingAddressForm &&
-                          setShowShippingAddressForm(false)
+                          showShippingAddressForm && setShowShippingAddressForm(false)
                         }
                       >
                         <div className="flex font-bold">
@@ -512,14 +499,10 @@ export default function Main() {
                       </svg>
                     </button>
                   </div>
-                  <div
-                    className={`${!showShippingAddressForm ? 'hidden' : ''}`}
-                  >
+                  <div className={`${!showShippingAddressForm ? "hidden" : ""}`}>
                     <ShippingAddressForm
                       autoComplete="on"
-                      className={
-                        shipToDifferentAddress ? `block p-2` : `hidden`
-                      }
+                      className={shipToDifferentAddress ? `block p-2` : `hidden`}
                       reset={!showShippingAddressForm}
                     >
                       <div>
@@ -635,8 +618,8 @@ export default function Main() {
                             name="shipping_address_country_code"
                             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                             placeholder={{
-                              value: '',
-                              label: 'Country',
+                              value: "",
+                              label: "Country",
                               disabled: true,
                             }}
                           />
@@ -767,9 +750,7 @@ export default function Main() {
               )}`}</pre>
             </div>
             <div className="mt-5">
-              <h2 className="font-semibold text-2xl">
-                Current Billing Address
-              </h2>
+              <h2 className="font-semibold text-2xl">Current Billing Address</h2>
               <Address addresses={[billingAddress as any]}>
                 <div className="flex font-bold">
                   <AddressField name="first_name" />
@@ -784,9 +765,7 @@ export default function Main() {
               </Address>
             </div>
             <div className="mt-5">
-              <h2 className="font-semibold text-2xl">
-                Current Shipping Address
-              </h2>
+              <h2 className="font-semibold text-2xl">Current Shipping Address</h2>
               <Address addresses={[shippingAddress as any]}>
                 <div className="flex font-bold">
                   <AddressField name="first_name" />

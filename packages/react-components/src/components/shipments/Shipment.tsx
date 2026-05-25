@@ -1,12 +1,12 @@
-import { useContext, type ReactNode, useState, useEffect, type JSX } from 'react';
-import ShipmentContext from '#context/ShipmentContext'
+import { useContext, type ReactNode, useState, useEffect, type JSX } from "react"
+import ShipmentContext from "#context/ShipmentContext"
 import ShipmentChildrenContext, {
-  type InitialShipmentContext
-} from '#context/ShipmentChildrenContext'
-import getLoaderComponent from '#utils/getLoaderComponent'
-import type { LoaderType } from '#typings'
-import type { Order } from '@commercelayer/sdk'
-import OrderContext from '#context/OrderContext'
+  type InitialShipmentContext,
+} from "#context/ShipmentChildrenContext"
+import getLoaderComponent from "#utils/getLoaderComponent"
+import type { LoaderType } from "#typings"
+import type { Order } from "@commercelayer/sdk"
+import OrderContext from "#context/OrderContext"
 
 interface ShipmentProps {
   children: ReactNode
@@ -16,12 +16,11 @@ interface ShipmentProps {
 
 export function Shipment({
   children,
-  loader = 'Loading...',
-  autoSelectSingleShippingMethod = false
+  loader = "Loading...",
+  autoSelectSingleShippingMethod = false,
 }: ShipmentProps): JSX.Element {
   const [loading, setLoading] = useState(true)
-  const { shipments, deliveryLeadTimes, setShippingMethod } =
-    useContext(ShipmentContext)
+  const { shipments, deliveryLeadTimes, setShippingMethod } = useContext(ShipmentContext)
   const { order } = useContext(OrderContext)
   useEffect(() => {
     if (shipments != null) {
@@ -30,17 +29,10 @@ export function Shipment({
           for (const shipment of shipments) {
             const isSingle = shipment?.available_shipping_methods?.length === 1
             if (!shipment?.shipping_method && isSingle) {
-              const [shippingMethod] =
-                shipment?.available_shipping_methods || []
+              const [shippingMethod] = shipment?.available_shipping_methods || []
               if (shippingMethod && setShippingMethod != null) {
-                const { success, order } = await setShippingMethod(
-                  shipment.id,
-                  shippingMethod.id
-                )
-                if (
-                  typeof autoSelectSingleShippingMethod === 'function' &&
-                  success
-                ) {
+                const { success, order } = await setShippingMethod(shipment.id, shippingMethod.id)
+                if (typeof autoSelectSingleShippingMethod === "function" && success) {
                   autoSelectSingleShippingMethod(order)
                 }
               }
@@ -70,9 +62,7 @@ export function Shipment({
     })
     const shippingMethods = shipment.available_shipping_methods
     const currentShippingMethodId =
-      autoSelectSingleShippingMethod &&
-      shippingMethods &&
-      shippingMethods.length === 1
+      autoSelectSingleShippingMethod && shippingMethods && shippingMethods.length === 1
         ? shippingMethods[0]?.id
         : shipment.shipping_method?.id
     const stockTransfers = shipment.stock_transfers
@@ -88,7 +78,7 @@ export function Shipment({
       stockTransfers,
       deliveryLeadTimes: times,
       shipment,
-      keyNumber: shipment?.id
+      keyNumber: shipment?.id,
     }
     return (
       <ShipmentChildrenContext.Provider key={k} value={shipmentProps}>

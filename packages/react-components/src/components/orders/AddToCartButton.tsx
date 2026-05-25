@@ -3,11 +3,7 @@ import { useContext, useState, type PropsWithoutRef, type JSX } from "react"
 import Parent from "../utils/Parent"
 import OrderContext from "#context/OrderContext"
 import type { ChildrenFunction } from "#typings/index"
-import type {
-  AddToCartReturn,
-  CustomLineItem,
-  LineItemOption,
-} from "#reducers/OrderReducer"
+import type { AddToCartReturn, CustomLineItem, LineItemOption } from "#reducers/OrderReducer"
 import SkuListsContext from "#context/SkuListsContext"
 import ExternalFunctionContext from "#context/ExternalFunctionContext"
 import SkuChildrenContext from "#context/SkuChildrenContext"
@@ -59,9 +55,7 @@ type THostedCart =
       protocol?: never
     }
 
-type TButton = PropsWithoutRef<
-  Omit<JSX.IntrinsicElements["button"], "children">
->
+type TButton = PropsWithoutRef<Omit<JSX.IntrinsicElements["button"], "children">>
 
 type Props = {
   /**
@@ -213,7 +207,7 @@ export function AddToCartButton(props: Props): JSX.Element {
         if (redirectToHostedCart && accessToken != null) {
           const { organization } = jwt(accessToken)
           const slug = organization.slug
-          const domain = 'commercelayer.io'
+          const domain = "commercelayer.io"
           const orderId = res?.orderId
           if (hostedCartUrl && orderId) {
             location.href = `${protocol}://${hostedCartUrl}/${orderId}?accessToken=${accessToken}`

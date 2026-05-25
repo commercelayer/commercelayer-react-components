@@ -89,7 +89,7 @@ const meta = {
     params: {
       control: "object",
       description:
-        "Optional query parameters forwarded to each SKU list retrieval call. `include: [\"skus\"]` is always enforced. Use `fields.skus` to request additional SKU attributes.",
+        'Optional query parameters forwarded to each SKU list retrieval call. `include: ["skus"]` is always enforced. Use `fields.skus` to request additional SKU attributes.',
     },
     children: {
       control: false,

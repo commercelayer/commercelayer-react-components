@@ -60,7 +60,7 @@ export function useOrderState({
 
   const config: CommerceLayerConfig = useMemo(
     () => ({ accessToken, interceptors }),
-    [accessToken, interceptors],
+    [accessToken, interceptors]
   )
 
   const getOrder = useCallback(
@@ -77,7 +77,7 @@ export function useOrderState({
           state,
         }))
     },
-    [persistKey, clearWhenPlaced, config, deleteLocalOrder, state],
+    [persistKey, clearWhenPlaced, config, deleteLocalOrder, state]
   )
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: persistKey intentionally the only dep — mirrors original OrderContainer behavior
@@ -131,7 +131,7 @@ export function useOrderState({
   useEffect(() => {
     const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
     const startRequest = Object.keys(state?.includeLoaded || {}).filter(
-      (key) => state?.includeLoaded?.[key as ResourceIncluded] === true,
+      (key) => state?.includeLoaded?.[key as ResourceIncluded] === true
     )
     if (config.accessToken && state.loading === false && state?.order == null) {
       if (
@@ -142,11 +142,7 @@ export function useOrderState({
         !lockOrder
       ) {
         getOrder(localOrder)
-      } else if (
-        state.withoutIncludes &&
-        !state.include?.length &&
-        startRequest.length === 0
-      ) {
+      } else if (state.withoutIncludes && !state.include?.length && startRequest.length === 0) {
         getOrder(localOrder)
       }
     } else if (
@@ -154,7 +150,12 @@ export function useOrderState({
     ) {
       dispatch({ type: "setLoading", payload: { loading: false } })
     } else if (
-      [config.accessToken, state.order == null, state.loading, state.withoutIncludes === false].every(Boolean)
+      [
+        config.accessToken,
+        state.order == null,
+        state.loading,
+        state.withoutIncludes === false,
+      ].every(Boolean)
     ) {
       dispatch({ type: "setLoading", payload: { loading: false } })
     }
@@ -189,7 +190,7 @@ export function useOrderState({
         // @ts-expect-error no type
         state.order?.payment_source?.payment_request_data?.payment_method?.type === "giftcard",
       paymentSourceRequest: async (
-        params: Parameters<typeof paymentSourceRequest>[number],
+        params: Parameters<typeof paymentSourceRequest>[number]
       ): ReturnType<typeof paymentSourceRequest> =>
         await paymentSourceRequest({ ...params, dispatch, state, config }),
       setOrder: (order: Order) => setOrder(order, dispatch),
@@ -207,7 +208,7 @@ export function useOrderState({
           setLocalOrder,
         }),
       addToCart: async (
-        params: Parameters<typeof addToCart>[number],
+        params: Parameters<typeof addToCart>[number]
       ): ReturnType<typeof addToCart> =>
         await addToCart({
           ...params,
@@ -220,15 +221,16 @@ export function useOrderState({
           orderAttributes: attributes,
           setLocalOrder,
         }),
-      saveAddressToCustomerAddressBook: (
-        args: Parameters<SaveAddressToCustomerAddressBook>[0],
-      ) => {
+      saveAddressToCustomerAddressBook: (args: Parameters<SaveAddressToCustomerAddressBook>[0]) => {
         defaultOrderContext.saveAddressToCustomerAddressBook({ ...args, dispatch })
       },
       setGiftCardOrCouponCode: async ({
         code,
         codeType,
-      }: { code: string; codeType: OrderCodeType }) =>
+      }: {
+        code: string
+        codeType: OrderCodeType
+      }) =>
         await defaultOrderContext.setGiftCardOrCouponCode({
           code,
           codeType,

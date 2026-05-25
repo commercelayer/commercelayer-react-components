@@ -18,15 +18,12 @@ export interface CustomerSaveToWalletProps {
   name: "save_payment_source_to_customer_wallet"
 }
 
-export interface PaymentSourceProps
-  extends Omit<JSX.IntrinsicElements["div"], "children"> {
+export interface PaymentSourceProps extends Omit<JSX.IntrinsicElements["div"], "children"> {
   children?: JSX.Element | JSX.Element[]
   readonly?: boolean
   templateCustomerCards?: CustomerCardsTemplateChildren
   onClickCustomerCards?: () => void
-  templateCustomerSaveToWallet?: (
-    props: CustomerSaveToWalletProps,
-  ) => JSX.Element
+  templateCustomerSaveToWallet?: (props: CustomerSaveToWalletProps) => JSX.Element
   loader?: LoaderType
 }
 
@@ -48,8 +45,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
 
   useEffect(() => {
     const isCustomerPaymentSource =
-      currentCustomerPaymentSourceId != null &&
-      currentCustomerPaymentSourceId === paymentSource?.id
+      currentCustomerPaymentSourceId != null && currentCustomerPaymentSourceId === paymentSource?.id
     const checkPaymentSourceStatus =
       // @ts-expect-error no type
       paymentSource?.payment_response?.status?.toLowerCase?.()
@@ -69,15 +65,9 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
       if (isCustomerPaymentSource && card.brand === "") {
         // Force creadit card icon for customer payment source imported by API
         card.brand =
-          card.issuer_type != null && card.issuer_type !== ""
-            ? card.issuer_type
-            : "credit-card"
+          card.issuer_type != null && card.issuer_type !== "" ? card.issuer_type : "credit-card"
       }
-      if (
-        card.brand &&
-        errors?.length === 0 &&
-        checkPaymentSourceStatus !== "declined"
-      ) {
+      if (card.brand && errors?.length === 0 && checkPaymentSourceStatus !== "declined") {
         if (card.brand !== "giftcard") {
           setShowCard(true)
         }
@@ -89,10 +79,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
         setShowCard(false)
       }
       setShow(true)
-    } else if (
-      expressPayments &&
-      currentPaymentMethodType === "stripe_payments"
-    ) {
+    } else if (expressPayments && currentPaymentMethodType === "stripe_payments") {
       setShow(true)
     }
     return () => {

@@ -9,22 +9,19 @@ function HostedCartDocsPage(): JSX.Element {
     <>
       <h1>HostedCart</h1>
       <p>
-        <code>{"<HostedCart>"}</code> embeds the Commerce Layer hosted cart
-        micro-frontend as an <code>{"<iframe>"}</code> inside your page. It
-        automatically resolves the cart URL from the access token and the current
-        order.
+        <code>{"<HostedCart>"}</code> embeds the Commerce Layer hosted cart micro-frontend as an{" "}
+        <code>{"<iframe>"}</code> inside your page. It automatically resolves the cart URL from the
+        access token and the current order.
       </p>
       <p>
-        By default it renders as an <strong>inline cart</strong> — the iframe
-        fills the available container width while the height adjusts to its
-        content. For the slide-in panel variant, see{" "}
+        By default it renders as an <strong>inline cart</strong> — the iframe fills the available
+        container width while the height adjusts to its content. For the slide-in panel variant, see{" "}
         <strong>Components/Cart/MiniCart</strong>.
       </p>
       <span title="Usage" type="info">
         <p>
-          Must be a child of <code>{"<Order>"}</code> (wrapped in{" "}
-          <code>{"<OrderStorage>"}</code>). Requires a parent{" "}
-          <code>{"<CommerceLayer>"}</code> context for the access token.
+          Must be a child of <code>{"<Order>"}</code> (wrapped in <code>{"<OrderStorage>"}</code>).
+          Requires a parent <code>{"<CommerceLayer>"}</code> context for the access token.
         </p>
       </span>
       <ArgTypes />
@@ -51,16 +48,15 @@ import {
       <hr />
       <h2>Default — inline cart</h2>
       <p>
-        Renders as an inline <code>{"<iframe>"}</code> that fills the container
-        width. The height adjusts automatically to the cart content via{" "}
-        <code>iframe-resizer</code>.
+        Renders as an inline <code>{"<iframe>"}</code> that fills the container width. The height
+        adjusts automatically to the cart content via <code>iframe-resizer</code>.
       </p>
       <Canvas of={Default} />
       <hr />
       <h2>Custom domain</h2>
       <p>
-        Use <code>customDomain</code> to point to a forked cart application
-        instead of the default Commerce Layer hosted micro-frontend.
+        Use <code>customDomain</code> to point to a forked cart application instead of the default
+        Commerce Layer hosted micro-frontend.
       </p>
       <Canvas of={CustomDomain} />
     </>

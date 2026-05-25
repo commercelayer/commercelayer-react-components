@@ -1,10 +1,6 @@
-import type { ReactNode, JSX } from 'react';
-import OrderStorageContext from '#context/OrderStorageContext'
-import {
-  getLocalOrder,
-  setLocalOrder,
-  deleteLocalOrder
-} from '#utils/localStorage'
+import type { ReactNode, JSX } from "react"
+import OrderStorageContext from "#context/OrderStorageContext"
+import { getLocalOrder, setLocalOrder, deleteLocalOrder } from "#utils/localStorage"
 
 interface Props {
   children: ReactNode
@@ -44,7 +40,7 @@ export function OrderStorage(props: Props): JSX.Element {
         setLocalOrder,
         getLocalOrder,
         deleteLocalOrder,
-        clearWhenPlaced
+        clearWhenPlaced,
       }}
     >
       {children}

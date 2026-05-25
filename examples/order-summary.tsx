@@ -1,34 +1,34 @@
-import React, { useState, useEffect, Fragment } from 'react'
-import { getSalesChannelToken } from '@commercelayer/js-auth'
-import CommerceLayer from '../#components/auth/CommerceLayer'
-import { Nav } from '.'
-import OrderContainer from '../#components/OrderContainer'
-import LineItemsContainer from '../#components/LineItemsContainer'
-import LineItem from '../#components/line_items/LineItem'
-import LineItemImage from '../#components/LineItemImage'
-import LineItemName from '../#components/LineItemName'
-import LineItemQuantity from '../#components/LineItemQuantity'
-import LineItemAmount from '../#components/LineItemAmount'
-import SubTotalAmount from '../#components/SubTotalAmount'
-import LineItemsCount from '../#components/LineItemsCount'
-import TotalAmount from '../#components/orders/TotalAmount'
-import DiscountAmount from '../#components/orders/DiscountAmount'
-import ShippingAmount from '../#components/orders/ShippingAmount'
-import TaxesAmount from '../#components/TaxesAmount'
-import GiftCardAmount from '../#components/orders/GiftCardAmount'
-import Head from 'next/head'
-import { OrderNumber } from 'packages/react-components/src'
-import { useRouter } from 'next/router'
-import { OrderStorage } from 'packages/react-components/src'
+import React, { useState, useEffect, Fragment } from "react"
+import { getSalesChannelToken } from "@commercelayer/js-auth"
+import CommerceLayer from "../#components/auth/CommerceLayer"
+import { Nav } from "."
+import OrderContainer from "../#components/OrderContainer"
+import LineItemsContainer from "../#components/LineItemsContainer"
+import LineItem from "../#components/line_items/LineItem"
+import LineItemImage from "../#components/LineItemImage"
+import LineItemName from "../#components/LineItemName"
+import LineItemQuantity from "../#components/LineItemQuantity"
+import LineItemAmount from "../#components/LineItemAmount"
+import SubTotalAmount from "../#components/SubTotalAmount"
+import LineItemsCount from "../#components/LineItemsCount"
+import TotalAmount from "../#components/orders/TotalAmount"
+import DiscountAmount from "../#components/orders/DiscountAmount"
+import ShippingAmount from "../#components/orders/ShippingAmount"
+import TaxesAmount from "../#components/TaxesAmount"
+import GiftCardAmount from "../#components/orders/GiftCardAmount"
+import Head from "next/head"
+import { OrderNumber } from "packages/react-components/src"
+import { useRouter } from "next/router"
+import { OrderStorage } from "packages/react-components/src"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
-let orderId = 'qaMAhJzGnx'
+let orderId = "qaMAhJzGnx"
 
 export default function Order() {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("")
   const { query } = useRouter()
   if (query.orderId) {
     orderId = query.orderId as string
@@ -50,7 +50,7 @@ export default function Order() {
       <Head>
         <script src="http://localhost:8097"></script>
       </Head>
-      <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
+      <Nav links={["/multiOrder", "/multiApp", "/giftCard"]} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           {/* <OrderStorage persistKey="orderUS"> */}
@@ -60,20 +60,15 @@ export default function Order() {
             </h1>
             <LineItemsContainer>
               <p className="text-sm m-2">
-                Your shopping bag contains{' '}
-                <LineItemsCount id="items-count" className="font-bold" /> items
+                Your shopping bag contains <LineItemsCount id="items-count" className="font-bold" />{" "}
+                items
               </p>
               <div className="flex flex-col p-2">
                 <LineItem>
                   <div className="flex justify-around items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      id="line-item-quantity"
-                      max={100}
-                      className="p-2"
-                      readonly
-                    />
+                    <LineItemQuantity id="line-item-quantity" max={100} className="p-2" readonly />
                     <LineItemAmount id="line-item-total" className="p-2" />
                   </div>
                 </LineItem>
@@ -81,12 +76,7 @@ export default function Order() {
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={40} />
                     <LineItemName id="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      id="line-item-quantity"
-                      max={10}
-                      className="p-2"
-                      readonly
-                    />
+                    <LineItemQuantity id="line-item-quantity" max={10} className="p-2" readonly />
                     <LineItemAmount id="line-item-total" className="p-2" />
                   </div>
                 </LineItem>

@@ -1,16 +1,16 @@
-import { getSalesChannelToken } from '@commercelayer/js-auth'
-import { Fragment, useEffect, useState } from 'react'
-import CommerceLayer from '../#components/auth/CommerceLayer'
-import GiftCardContainer from '../#components/GiftCardContainer'
-import SubmitButton from '../#components/SubmitButton'
-import GiftCard from '../#components/gift_cards/GiftCard'
-import GiftCardInput from '../#components/GiftCardInput'
-import GiftCardCurrencySelector from '../#components/GiftCardCurrencySelector'
-import MetadataInput from '../#components/MetadataInput'
-import Errors from '../#components/Errors'
-import { Nav } from '.'
-import OrderContainer from '../#components/OrderContainer'
-import { BaseError } from '../#typings/errors'
+import { getSalesChannelToken } from "@commercelayer/js-auth"
+import { Fragment, useEffect, useState } from "react"
+import CommerceLayer from "../#components/auth/CommerceLayer"
+import GiftCardContainer from "../#components/GiftCardContainer"
+import SubmitButton from "../#components/SubmitButton"
+import GiftCard from "../#components/gift_cards/GiftCard"
+import GiftCardInput from "../#components/GiftCardInput"
+import GiftCardCurrencySelector from "../#components/GiftCardCurrencySelector"
+import MetadataInput from "../#components/MetadataInput"
+import Errors from "../#components/Errors"
+import { Nav } from "."
+import OrderContainer from "../#components/OrderContainer"
+import { BaseError } from "../#typings/errors"
 import {
   LineItemsContainer,
   LineItemsCount,
@@ -28,7 +28,7 @@ import {
   TotalAmount,
   CheckoutLink,
   OrderStorage,
-} from '../packages/react-components/src'
+} from "../packages/react-components/src"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -38,17 +38,15 @@ const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
 const messages = [
   {
-    code: 'VALIDATION_ERROR',
-    message: 'La email non ha un formato valido',
-    field: 'email',
+    code: "VALIDATION_ERROR",
+    message: "La email non ha un formato valido",
+    field: "email",
   },
-  { code: 'VALIDATION_ERROR', message: 'Errore di validazione' },
+  { code: "VALIDATION_ERROR", message: "Errore di validazione" },
 ]
 
 export const Title = ({ title }) => (
-  <div className="font-bold text-2xl mb-2 bg-red-500 text-gray-800 p-3">
-    {title}
-  </div>
+  <div className="font-bold text-2xl mb-2 bg-red-500 text-gray-800 p-3">{title}</div>
 )
 
 export const Type = ({ text }) => (
@@ -58,7 +56,7 @@ export const Type = ({ text }) => (
 )
 
 const Home = () => {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("")
   useEffect(() => {
     const getToken = async () => {
       const token = await getSalesChannelToken({
@@ -72,7 +70,7 @@ const Home = () => {
   }, [])
   return (
     <Fragment>
-      <Nav links={['/order', '/multiOrder', '/multiApp']} />
+      <Nav links={["/order", "/multiOrder", "/multiApp"]} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <OrderStorage persistKey="orderUS">
           <OrderContainer>
@@ -99,11 +97,7 @@ const Home = () => {
                       name="email"
                       placeholder="Email*"
                     />
-                    <Errors
-                      resource="gift_cards"
-                      field="email"
-                      messages={messages}
-                    />
+                    <Errors resource="gift_cards" field="email" messages={messages} />
                   </div>
                   <div className="p-2">
                     <GiftCardInput
@@ -158,24 +152,16 @@ const Home = () => {
             <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
             <LineItemsContainer>
               <p className="text-sm m-2">
-                Your shopping bag contains{' '}
-                <LineItemsCount id="items-count" className="font-bold" /> items
+                Your shopping bag contains <LineItemsCount id="items-count" className="font-bold" />{" "}
+                items
               </p>
               <div className="flex flex-col p-2">
                 <LineItem>
                   <div className="flex justify-around items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      id="line-item-quantity"
-                      max={100}
-                      className="p-2"
-                    />
-                    <Errors
-                      className="text-red-700 p-2"
-                      resource="line_items"
-                      field="quantity"
-                    />
+                    <LineItemQuantity id="line-item-quantity" max={100} className="p-2" />
+                    <Errors className="text-red-700 p-2" resource="line_items" field="quantity" />
                     <LineItemAmount id="line-item-total" className="p-2" />
                     <LineItemRemoveLink
                       id="line-item-remove"
@@ -187,12 +173,7 @@ const Home = () => {
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={40} />
                     <LineItemName id="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      id="line-item-quantity"
-                      max={10}
-                      className="p-2"
-                      disabled
-                    />
+                    <LineItemQuantity id="line-item-quantity" max={10} className="p-2" disabled />
                     <LineItemAmount id="line-item-total" className="p-2" />
                     <LineItemRemoveLink
                       id="line-item-remove"
@@ -255,10 +236,7 @@ const Home = () => {
               </div>
             </div>
             <div className="flex justify-center p-2">
-              <CheckoutLink
-                className="mt-2 primary font-bold py-2 px-4 rounded"
-                label="Checkout"
-              />
+              <CheckoutLink className="mt-2 primary font-bold py-2 px-4 rounded" label="Checkout" />
             </div>
           </OrderContainer>
         </OrderStorage>

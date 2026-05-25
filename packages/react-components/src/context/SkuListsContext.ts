@@ -18,7 +18,6 @@ const defaultContext: SkuListsContextType = {
   registerListId: () => {},
 }
 
-export const SkuListsContext =
-  createContext<SkuListsContextType>(defaultContext)
+export const SkuListsContext = createContext<SkuListsContextType>(defaultContext)
 
 export default SkuListsContext

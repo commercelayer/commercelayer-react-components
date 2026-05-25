@@ -9,8 +9,7 @@ export function TotalAmount(props: BaseAmountComponent): JSX.Element | null {
   const { managePaymentProviderGiftCards, order } = useContext(OrderContext)
   if (managePaymentProviderGiftCards) {
     const giftCardData = manageGiftCard({ order })
-    if (!giftCardData)
-      return <BaseOrderPrice base="total_amount" type="with_taxes" {...props} />
+    if (!giftCardData) return <BaseOrderPrice base="total_amount" type="with_taxes" {...props} />
     const parentProps = {
       price: `${giftCardData?.formattedOrderTotal}`,
       ...props,

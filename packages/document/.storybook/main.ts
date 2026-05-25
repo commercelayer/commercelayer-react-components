@@ -37,10 +37,7 @@ const storybookConfig: StorybookConfig = {
   async viteFinal(config) {
     return mergeConfig(config, viteOverrides)
   },
-  stories: [
-    "../src/stories/**/*.mdx",
-    "../src/stories/**/*.stories.@(js|jsx|ts|tsx)",
-  ],
+  stories: ["../src/stories/**/*.mdx", "../src/stories/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: [
     "@storybook/addon-mcp",
     "@storybook/addon-links",
@@ -56,9 +53,7 @@ const storybookConfig: StorybookConfig = {
     },
   ],
   // @ts-expect-error This 'managerEntries' exists.
-  managerEntries: [
-    resolve(import.meta.dirname, "./addon-gh-repository/manager.tsx"),
-  ],
+  managerEntries: [resolve(import.meta.dirname, "./addon-gh-repository/manager.tsx")],
   framework: {
     name: "@storybook/react-vite",
     options: {},

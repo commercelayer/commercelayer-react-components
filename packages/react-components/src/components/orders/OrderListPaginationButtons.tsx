@@ -1,15 +1,14 @@
-import Parent from '#components/utils/Parent'
+import Parent from "#components/utils/Parent"
 import OrderListPaginationContext, {
-  type OrderListPaginationContext as TOrderListPaginationContext
-} from '#context/OrderListPaginationContext'
-import type { ChildrenFunction } from '#typings/index'
-import useCustomContext from '#utils/hooks/useCustomContext'
-import omit from '#utils/omit'
+  type OrderListPaginationContext as TOrderListPaginationContext,
+} from "#context/OrderListPaginationContext"
+import type { ChildrenFunction } from "#typings/index"
+import useCustomContext from "#utils/hooks/useCustomContext"
+import omit from "#utils/omit"
 
-import type { JSX } from "react";
+import type { JSX } from "react"
 
-interface PaginationButton
-  extends Omit<JSX.IntrinsicElements['button'], 'children' | 'disabled'> {
+interface PaginationButton extends Omit<JSX.IntrinsicElements["button"], "children" | "disabled"> {
   /**
    * Show or hide the pagination button. Default is true.
    */
@@ -24,8 +23,7 @@ interface PaginationButton
   hideWhenDisabled?: boolean
 }
 
-interface NavigationButtons
-  extends Omit<JSX.IntrinsicElements['button'], 'children'> {
+interface NavigationButtons extends Omit<JSX.IntrinsicElements["button"], "children"> {
   /**
    * Show or hide the navigation buttons. Default is true.
    */
@@ -36,9 +34,9 @@ interface NavigationButtons
   activeClassName?: string
 }
 
-type ChildrenProps = Omit<Props, 'children'> & TOrderListPaginationContext
+type ChildrenProps = Omit<Props, "children"> & TOrderListPaginationContext
 
-interface Props extends Omit<JSX.IntrinsicElements['div'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements["div"], "children"> {
   children?: ChildrenFunction<ChildrenProps>
   /**
    * Previous button props
@@ -66,33 +64,31 @@ export function OrderListPaginationButtons({
   const { ...navButton } = { show: true, ...navigationButtons }
   const ctx = useCustomContext({
     context: OrderListPaginationContext,
-    contextComponentName: 'OrderList',
-    currentComponentName: 'OrderListPaginationButtons',
-    key: 'totalRows'
+    contextComponentName: "OrderList",
+    currentComponentName: "OrderListPaginationButtons",
+    key: "totalRows",
   })
   const PrevButton = prevButton.show ? (
-    prevButton.hideWhenDisabled === true &&
-    ctx?.canPreviousPage === false ? null : (
+    prevButton.hideWhenDisabled === true && ctx?.canPreviousPage === false ? null : (
       <button
-        data-testid='prev-button'
-        {...omit(prevButton, ['show', 'hideWhenDisabled'])}
+        data-testid="prev-button"
+        {...omit(prevButton, ["show", "hideWhenDisabled"])}
         disabled={ctx?.canPreviousPage === false}
         onClick={() => ctx?.previousPage()}
       >
-        {previousPageButton?.label ?? '<'}
+        {previousPageButton?.label ?? "<"}
       </button>
     )
   ) : null
   const NextButton = nextButton.show ? (
-    nextButton.hideWhenDisabled === true &&
-    ctx?.canNextPage === false ? null : (
+    nextButton.hideWhenDisabled === true && ctx?.canNextPage === false ? null : (
       <button
-        data-testid='next-button'
-        {...omit(nextButton, ['show', 'hideWhenDisabled'])}
+        data-testid="next-button"
+        {...omit(nextButton, ["show", "hideWhenDisabled"])}
         disabled={ctx?.canNextPage === false}
         onClick={() => ctx?.nextPage()}
       >
-        {nextButton?.label ?? '>'}
+        {nextButton?.label ?? ">"}
       </button>
     )
   ) : null
@@ -103,23 +99,19 @@ export function OrderListPaginationButtons({
         ? ctx?.pageOptions
             .slice(ctx?.pageOptions.length - 3, ctx?.pageOptions.length)
             .map((v) => v + 1)
-        : ctx?.pageOptions
-            .slice(ctx?.pageIndex - 1, ctx?.pageIndex + 2)
-            .map((v) => v + 1)
+        : ctx?.pageOptions.slice(ctx?.pageIndex - 1, ctx?.pageIndex + 2).map((v) => v + 1)
   const NavButtons = navButton.show
     ? pagesToShow?.map((v) => {
         const currentPage = ctx?.pageIndex != null ? ctx?.pageIndex + 1 : 1
         const className =
           currentPage === v
-            ? `${navButton?.className ?? ''} ${
-                navButton?.activeClassName ?? ''
-              }`
+            ? `${navButton?.className ?? ""} ${navButton?.activeClassName ?? ""}`
             : navButton?.className
         return (
           <button
             data-testid={`page-${v}`}
             key={`page-${v}`}
-            {...omit(navButton, ['show', 'activeClassName', 'className'])}
+            {...omit(navButton, ["show", "activeClassName", "className"])}
             className={className}
             onClick={() => ctx?.gotoPage(v - 1)}
           >
@@ -133,7 +125,7 @@ export function OrderListPaginationButtons({
     prevButton,
     nextButton,
     ...ctx,
-    ...props
+    ...props,
   }
   return children == null ? (
     ctx?.totalRows === 0 ? null : (
@@ -148,6 +140,6 @@ export function OrderListPaginationButtons({
   )
 }
 
-OrderListPaginationButtons.displayName = 'OrderListPaginationButtons'
+OrderListPaginationButtons.displayName = "OrderListPaginationButtons"
 
 export default OrderListPaginationButtons

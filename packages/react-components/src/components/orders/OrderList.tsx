@@ -1,11 +1,11 @@
-import { useContext, useMemo, useState, useEffect, type ReactNode, type JSX } from 'react';
-import CustomerContext from '#context/CustomerContext'
+import { useContext, useMemo, useState, useEffect, type ReactNode, type JSX } from "react"
+import CustomerContext from "#context/CustomerContext"
 import OrderListChildrenContext, {
   type TOrderList,
   type InitialOrderListContext,
-  type OrderListContent
-} from '#context/OrderListChildrenContext'
-import OrderListPagination from '#context/OrderListPaginationContext'
+  type OrderListContent,
+} from "#context/OrderListChildrenContext"
+import OrderListPagination from "#context/OrderListPaginationContext"
 import {
   useReactTable,
   getCoreRowModel,
@@ -14,64 +14,59 @@ import {
   type ColumnDef,
   type SortingState,
   flexRender,
-  type PaginationState
-} from '@tanstack/react-table'
-import { sortDescIcon, sortAscIcon } from '#utils/icons'
-import filterChildren from '#utils/filterChildren'
-import type { DefaultChildrenType, TRange } from '#typings/globals'
-import type { Order, QueryPageSize, QuerySort } from '@commercelayer/sdk'
+  type PaginationState,
+} from "@tanstack/react-table"
+import { sortDescIcon, sortAscIcon } from "#utils/icons"
+import filterChildren from "#utils/filterChildren"
+import type { DefaultChildrenType, TRange } from "#typings/globals"
+import type { Order, QueryPageSize, QuerySort } from "@commercelayer/sdk"
 
-type RowComponent = 'OrderListRow' | 'OrderListEmpty'
-type PaginationComponent =
-  | 'OrderListPaginationInfo'
-  | 'OrderListPaginationButtons'
-const rowComponents: RowComponent[] = ['OrderListRow', 'OrderListEmpty']
+type RowComponent = "OrderListRow" | "OrderListEmpty"
+type PaginationComponent = "OrderListPaginationInfo" | "OrderListPaginationButtons"
+const rowComponents: RowComponent[] = ["OrderListRow", "OrderListEmpty"]
 const paginationComponents: PaginationComponent[] = [
-  'OrderListPaginationInfo',
-  'OrderListPaginationButtons'
+  "OrderListPaginationInfo",
+  "OrderListPaginationButtons",
 ]
 
-type OrderListColumn<T extends TOrderList = 'orders'> = ColumnDef<
-  OrderListContent<T>
-> & {
+type OrderListColumn<T extends TOrderList = "orders"> = ColumnDef<OrderListContent<T>> & {
   className?: string
   titleClassName?: string
 }
 
-export type TOrderListColumn<T extends TOrderList = 'orders'> =
-  OrderListColumn<T>
+export type TOrderListColumn<T extends TOrderList = "orders"> = OrderListColumn<T>
 
 type PaginationProps =
   | {
-    /**
-     * Show table pagination. Default is false.
-     */
-    showPagination: true
-    /**
-     * Number of rows per page. Default is 10. Max is 25.
-     */
-    pageSize?: TRange<1, 26>
-  }
+      /**
+       * Show table pagination. Default is false.
+       */
+      showPagination: true
+      /**
+       * Number of rows per page. Default is 10. Max is 25.
+       */
+      pageSize?: TRange<1, 26>
+    }
   | {
-    /**
-     * Show table pagination. Default is false.
-     */
-    showPagination?: false
-    pageSize?: never
-  }
+      /**
+       * Show table pagination. Default is false.
+       */
+      showPagination?: false
+      pageSize?: never
+    }
 
 type SubscriptionFields =
   | {
-    /**
-     * Subscriptions id - Use to fetch subscriptions and shows its orders
-     */
-    id?: string
-    type?: 'subscriptions'
-  }
+      /**
+       * Subscriptions id - Use to fetch subscriptions and shows its orders
+       */
+      id?: string
+      type?: "subscriptions"
+    }
   | {
-    id?: never
-    type?: 'orders'
-  }
+      id?: never
+      type?: "orders"
+    }
 
 type Props = {
   /**
@@ -93,7 +88,7 @@ type Props = {
   /**
    * Function to assign as custom row renderer
    */
-  actionsComponent?: InitialOrderListContext['actionsComponent']
+  actionsComponent?: InitialOrderListContext["actionsComponent"]
   /**
    * Class name to assign to the custom row container
    */
@@ -120,19 +115,19 @@ type Props = {
    * Class name to assign to the table row.
    */
   rowTrClassName?: string
-} & Omit<JSX.IntrinsicElements['table'], 'children'> &
+} & Omit<JSX.IntrinsicElements["table"], "children"> &
   PaginationProps &
   SubscriptionFields
 
 export function OrderList({
   id,
-  type = 'orders',
+  type = "orders",
   children,
   columns,
   loadingElement,
   showActions = false,
   showPagination = false,
-  sortBy = [{ id: 'number', desc: true }],
+  sortBy = [{ id: "number", desc: true }],
   pageSize = 10,
   paginationContainerClassName,
   actionsComponent,
@@ -143,38 +138,43 @@ export function OrderList({
 }: Props): JSX.Element {
   const [loading, setLoading] = useState(true)
   const [sorting, setSorting] = useState<SortingState>(sortBy)
-  const [{ pageIndex, pageSize: currentPageSize }, setPagination] =
-    useState<PaginationState>({
-      pageIndex: 0,
-      pageSize
-    })
+  const [{ pageIndex, pageSize: currentPageSize }, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize,
+  })
   const { orders, subscriptions, getCustomerOrders, getCustomerSubscriptions } =
     useContext(CustomerContext)
 
   // Calculate default server side sorting value compatible with Commerce Layer SDK if defined in component props
-  const defaultSdkSorting = sortBy.length && sortBy[0] != null ? { [sortBy[0].id]: sortBy[0].desc ? 'desc' : 'asc' } : undefined
+  const defaultSdkSorting =
+    sortBy.length && sortBy[0] != null
+      ? { [sortBy[0].id]: sortBy[0].desc ? "desc" : "asc" }
+      : undefined
 
   useEffect(() => {
     // Calculate server side sorting value compatible with Commerce Layer SDK following current sorting state
-    const sdkSorting = sorting.length && sorting[0] != null ? { [sorting[0].id]: sorting[0].desc ? 'desc' : 'asc' } : defaultSdkSorting
-    if (type === 'orders' && getCustomerOrders != null) {
+    const sdkSorting =
+      sorting.length && sorting[0] != null
+        ? { [sorting[0].id]: sorting[0].desc ? "desc" : "asc" }
+        : defaultSdkSorting
+    if (type === "orders" && getCustomerOrders != null) {
       getCustomerOrders({
         pageNumber: pageIndex + 1,
         pageSize: currentPageSize as QueryPageSize,
-        sortBy: sdkSorting as QuerySort<Order>
+        sortBy: sdkSorting as QuerySort<Order>,
       })
     }
-    if (type === 'subscriptions' && getCustomerSubscriptions != null) {
+    if (type === "subscriptions" && getCustomerSubscriptions != null) {
       getCustomerSubscriptions({
         pageNumber: pageIndex + 1,
         pageSize: currentPageSize as QueryPageSize,
         sortBy: sdkSorting as QuerySort<Order>,
-        id
+        id,
       })
     }
   }, [pageIndex, currentPageSize, sorting, id != null])
   const data = useMemo(() => {
-    if (type === 'orders') {
+    if (type === "orders") {
       return orders ?? []
     }
 
@@ -182,20 +182,17 @@ export function OrderList({
       return subscriptions ?? []
     }
 
-    if (subscriptions?.[0]?.type === 'orders') {
+    if (subscriptions?.[0]?.type === "orders") {
       return subscriptions
     }
 
     return []
   }, [orders, subscriptions])
-  const cols = useMemo<ColumnDef<OrderListContent<TOrderList>>[]>(
-    () => columns,
-    [columns]
-  )
+  const cols = useMemo<ColumnDef<OrderListContent<TOrderList>>[]>(() => columns, [columns])
   const pagination = useMemo(
     () => ({
       pageIndex,
-      pageSize: currentPageSize
+      pageSize: currentPageSize,
     }),
     [pageIndex, currentPageSize]
   )
@@ -213,22 +210,22 @@ export function OrderList({
     pageCount,
     state: {
       sorting,
-      pagination
+      pagination,
     },
     onSortingChange: setSorting,
-    onPaginationChange: setPagination
+    onPaginationChange: setPagination,
   })
-  const TableHtmlElement = 'table'
-  const TheadHtmlElement = 'thead'
-  const TbodyHtmlElement = 'tbody'
-  const ThHtmlElement = 'th'
-  const TrHtmlElement = 'tr'
+  const TableHtmlElement = "table"
+  const TheadHtmlElement = "thead"
+  const TbodyHtmlElement = "tbody"
+  const ThHtmlElement = "th"
+  const TrHtmlElement = "tr"
 
   useEffect(() => {
-    if (type === 'orders' && orders != null) {
+    if (type === "orders" && orders != null) {
       setLoading(false)
     }
-    if (type === 'subscriptions' && subscriptions != null) {
+    if (type === "subscriptions" && subscriptions != null) {
       setLoading(false)
     }
     return () => {
@@ -238,54 +235,47 @@ export function OrderList({
   const LoadingComponent = loadingElement || <div>Loading...</div>
   const headerComponent = table.getHeaderGroups().map((headerGroup) => {
     const columnsComponents = headerGroup.headers.map((header, k) => {
-      const sortLabel =
-        header.column.getIsSorted() !== false ? header.column.getIsSorted() : ''
+      const sortLabel = header.column.getIsSorted() !== false ? header.column.getIsSorted() : ""
       return (
         <ThHtmlElement
           data-testid={`thead-${k}`}
-          data-sort={`${sortLabel || ''}`}
+          data-sort={`${sortLabel || ""}`}
           key={header.id}
           className={columns[k]?.className}
         >
           <span
             {...{
-              className: `${columns[k]?.titleClassName ?? ''} ${header.column.getCanSort() ? 'cursor-pointer select-none' : ''
-                }`,
-              onClick: header.column.getToggleSortingHandler()
+              className: `${columns[k]?.titleClassName ?? ""} ${
+                header.column.getCanSort() ? "cursor-pointer select-none" : ""
+              }`,
+              onClick: header.column.getToggleSortingHandler(),
             }}
           >
-            {
-              flexRender(
-                header.column.columnDef.header,
-                header.getContext()
-              ) as ReactNode
-            }
+            {flexRender(header.column.columnDef.header, header.getContext()) as ReactNode}
             {{
               asc: sortAscIcon,
-              desc: sortDescIcon
+              desc: sortDescIcon,
             }[header.column.getIsSorted() as string] ?? null}
           </span>
         </ThHtmlElement>
       )
     })
-    return (
-      <TrHtmlElement key={headerGroup.id}>{columnsComponents}</TrHtmlElement>
-    )
+    return <TrHtmlElement key={headerGroup.id}>{columnsComponents}</TrHtmlElement>
   })
   const rowsComponents = filterChildren({
     children,
     filterBy: rowComponents,
-    componentName: 'OrderList'
+    componentName: "OrderList",
   })
   const components = table.getRowModel().rows.map((row) => {
     const childProps = {
       type,
-      orders: type === 'orders' ? orders : subscriptions,
+      orders: type === "orders" ? orders : subscriptions,
       order: row.original,
       row,
       showActions,
       actionsComponent,
-      actionsContainerClassName
+      actionsContainerClassName,
     }
     return (
       <TrHtmlElement className={rowTrClassName} key={row.id}>
@@ -298,12 +288,10 @@ export function OrderList({
   const pagComponents = filterChildren({
     children,
     filterBy: paginationComponents,
-    componentName: 'OrderList'
+    componentName: "OrderList",
   })
   const totalRows =
-    type === 'orders'
-      ? orders?.meta.recordCount ?? 0
-      : subscriptions?.meta.recordCount ?? 0
+    type === "orders" ? (orders?.meta.recordCount ?? 0) : (subscriptions?.meta.recordCount ?? 0)
 
   const Pagination = (): JSX.Element | null =>
     !showPagination ? null : (
@@ -319,7 +307,7 @@ export function OrderList({
           pageSize: table.getState().pagination.pageSize,
           previousPage: table.previousPage,
           setPageSize: table.setPageSize,
-          totalRows
+          totalRows,
         }}
       >
         {pagComponents}
@@ -328,9 +316,9 @@ export function OrderList({
   if (loading && (orders == null || subscriptions == null)) {
     return <>{LoadingComponent}</>
   }
-  return (type === 'orders' ? orders : subscriptions)?.length === 0 ? (
+  return (type === "orders" ? orders : subscriptions)?.length === 0 ? (
     <OrderListChildrenContext.Provider
-      value={{ orders: type === 'orders' ? orders : subscriptions }}
+      value={{ orders: type === "orders" ? orders : subscriptions }}
     >
       {rowsComponents}
       <Pagination />
@@ -338,9 +326,7 @@ export function OrderList({
   ) : (
     <>
       <TableHtmlElement {...p}>
-        <TheadHtmlElement className={theadClassName}>
-          {headerComponent}
-        </TheadHtmlElement>
+        <TheadHtmlElement className={theadClassName}>{headerComponent}</TheadHtmlElement>
         <TbodyHtmlElement>{components}</TbodyHtmlElement>
       </TableHtmlElement>
       {totalRows <= pageSize ? null : (

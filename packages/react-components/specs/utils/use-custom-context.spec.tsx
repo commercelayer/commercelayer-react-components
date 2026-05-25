@@ -18,7 +18,7 @@ describe("useCustomContext hook", () => {
     render(
       <AvailabilityContext.Provider value={{ parent: true, quantity: 5 }}>
         <ContextChecker keyProp="parent" />
-      </AvailabilityContext.Provider>,
+      </AvailabilityContext.Provider>
     )
   })
 
@@ -26,14 +26,14 @@ describe("useCustomContext hook", () => {
     render(
       <AvailabilityContext.Provider value={{ quantity: 5 }}>
         <ContextChecker keyProp={null} />
-      </AvailabilityContext.Provider>,
+      </AvailabilityContext.Provider>
     )
   })
 
   it("throws when key is not found in context (used outside provider)", () => {
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {})
     expect(() => render(<ContextChecker keyProp="parent" />)).toThrow(
-      "Cannot use <TestComponent/> outside of <AvailabilityContainer/>",
+      "Cannot use <TestComponent/> outside of <AvailabilityContainer/>"
     )
     consoleError.mockRestore()
   })
@@ -43,7 +43,7 @@ describe("useCustomContext hook", () => {
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {})
     render(<ContextChecker keyProp="parent" />)
     expect(consoleError).toHaveBeenCalledWith(
-      expect.stringContaining("Cannot use <TestComponent/>"),
+      expect.stringContaining("Cannot use <TestComponent/>")
     )
     consoleError.mockRestore()
     vi.unstubAllEnvs()

@@ -115,7 +115,7 @@ describe("usePrices", () => {
         expect(result.current.prices.length).toBeGreaterThan(0)
         expect(result.current.error).toBeNull()
       })
-    },
+    }
   )
 
   coreTest("should handle errors gracefully", async () => {
@@ -131,7 +131,7 @@ describe("usePrices", () => {
         expect(result.current.error).toBeDefined()
         expect(result.current.prices).toEqual([])
       },
-      { timeout: 5000 },
+      { timeout: 5000 }
     )
   })
 
@@ -171,7 +171,7 @@ describe("usePrices", () => {
       () => {
         expect(result.current.error).toBeDefined()
       },
-      { timeout: 5000 },
+      { timeout: 5000 }
     )
 
     // Clear the error
@@ -214,7 +214,7 @@ describe("usePrices", () => {
       () => {
         expect(result.current.error).toBeDefined()
       },
-      { timeout: 5000 },
+      { timeout: 5000 }
     )
 
     const errorMessage = result.current.error
@@ -288,80 +288,66 @@ describe("usePrices", () => {
     })
   })
 
-  coreTest(
-    "should throw error when retrieving price with empty ID",
-    async ({ accessToken }) => {
-      const token = accessToken?.accessToken
-      const { result } = renderHook(() => usePrices(token), {
-        wrapper: swrWrapper,
+  coreTest("should throw error when retrieving price with empty ID", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token), {
+      wrapper: swrWrapper,
+    })
+
+    await expect(
+      act(async () => {
+        await result.current.retrievePrice("")
       })
+    ).rejects.toThrow("Price ID is required for retrieve")
+  })
 
-      await expect(
-        act(async () => {
-          await result.current.retrievePrice("")
-        }),
-      ).rejects.toThrow("Price ID is required for retrieve")
-    },
-  )
+  coreTest("should throw error when updating price without an ID", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token), {
+      wrapper: swrWrapper,
+    })
 
-  coreTest(
-    "should throw error when updating price without an ID",
-    async ({ accessToken }) => {
-      const token = accessToken?.accessToken
-      const { result } = renderHook(() => usePrices(token), {
-        wrapper: swrWrapper,
+    await expect(
+      act(async () => {
+        await result.current.updatePrice({} as Parameters<typeof result.current.updatePrice>[0])
       })
+    ).rejects.toThrow("Price resource ID is required for update")
+  })
 
-      await expect(
-        act(async () => {
-          await result.current.updatePrice(
-            {} as Parameters<typeof result.current.updatePrice>[0],
-          )
-        }),
-      ).rejects.toThrow("Price resource ID is required for update")
-    },
-  )
+  coreTest("should batch-fetch prices via registerSku", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
 
-  coreTest(
-    "should batch-fetch prices via registerSku",
-    async ({ accessToken }) => {
-      const token = accessToken?.accessToken
-      const { result } = renderHook(() => usePrices(token))
+    act(() => {
+      result.current.registerSku("DIGITALPRODUCT")
+    })
 
-      act(() => {
-        result.current.registerSku("DIGITALPRODUCT")
-      })
+    await waitFor(
+      () => {
+        expect(result.current.prices.length).toBeGreaterThan(0)
+        expect(result.current.action).toBe("get")
+      },
+      { timeout: 10000 }
+    )
+  })
 
-      await waitFor(
-        () => {
-          expect(result.current.prices.length).toBeGreaterThan(0)
-          expect(result.current.action).toBe("get")
-        },
-        { timeout: 10000 },
-      )
-    },
-  )
+  coreTest("should ignore duplicate registerSku calls (idempotent)", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
 
-  coreTest(
-    "should ignore duplicate registerSku calls (idempotent)",
-    async ({ accessToken }) => {
-      const token = accessToken?.accessToken
-      const { result } = renderHook(() => usePrices(token))
+    act(() => {
+      result.current.registerSku("DIGITALPRODUCT")
+      result.current.registerSku("DIGITALPRODUCT") // duplicate — no-op
+    })
 
-      act(() => {
-        result.current.registerSku("DIGITALPRODUCT")
-        result.current.registerSku("DIGITALPRODUCT") // duplicate — no-op
-      })
-
-      await waitFor(
-        () => {
-          expect(result.current.prices).toBeDefined()
-          expect(result.current.error).toBeNull()
-        },
-        { timeout: 10000 },
-      )
-    },
-  )
+    await waitFor(
+      () => {
+        expect(result.current.prices).toBeDefined()
+        expect(result.current.error).toBeNull()
+      },
+      { timeout: 10000 }
+    )
+  })
 
   coreTest(
     "should cancel pending debounce when a second registerSku fires",
@@ -382,39 +368,36 @@ describe("usePrices", () => {
           expect(result.current.prices).toBeDefined()
           expect(result.current.error).toBeNull()
         },
-        { timeout: 10000 },
+        { timeout: 10000 }
       )
-    },
+    }
   )
 
-  coreTest(
-    "should unregisterSku remove a registered code",
-    async ({ accessToken }) => {
-      const token = accessToken?.accessToken
-      const { result } = renderHook(() => usePrices(token))
+  coreTest("should unregisterSku remove a registered code", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
 
-      act(() => {
-        result.current.registerSku("DIGITALPRODUCT")
-      })
+    act(() => {
+      result.current.registerSku("DIGITALPRODUCT")
+    })
 
-      await waitFor(
-        () => {
-          expect(result.current.prices.length).toBeGreaterThan(0)
-        },
-        { timeout: 10000 },
-      )
+    await waitFor(
+      () => {
+        expect(result.current.prices.length).toBeGreaterThan(0)
+      },
+      { timeout: 10000 }
+    )
 
-      // unregister existing code
-      act(() => {
-        result.current.unregisterSku("DIGITALPRODUCT")
-      })
+    // unregister existing code
+    act(() => {
+      result.current.unregisterSku("DIGITALPRODUCT")
+    })
 
-      // unregister non-existent code — no-op branch
-      act(() => {
-        result.current.unregisterSku("NON-EXISTENT-SKU")
-      })
-    },
-  )
+    // unregister non-existent code — no-op branch
+    act(() => {
+      result.current.unregisterSku("NON-EXISTENT-SKU")
+    })
+  })
 
   coreTest("should not fetch when accessToken is empty", async () => {
     const { result } = renderHook(() => usePrices(""))
@@ -429,7 +412,7 @@ describe("usePrices", () => {
         expect(result.current.prices).toEqual([])
         expect(result.current.action).toBeNull()
       },
-      { timeout: 500 },
+      { timeout: 500 }
     )
   })
 
@@ -468,6 +451,6 @@ describe("usePrices", () => {
 
       expect(updatedPrice).toBeDefined()
       expect(updatedPrice?.id).toBe(priceId)
-    },
+    }
   )
 })

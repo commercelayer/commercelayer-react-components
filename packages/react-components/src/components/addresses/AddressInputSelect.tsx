@@ -1,18 +1,18 @@
-import { useContext, useEffect, useMemo, type JSX } from 'react';
-import BaseSelect from '../utils/BaseSelect'
-import type { BaseSelectComponentProps } from '#typings'
+import { useContext, useEffect, useMemo, type JSX } from "react"
+import BaseSelect from "../utils/BaseSelect"
+import type { BaseSelectComponentProps } from "#typings"
 import BillingAddressFormContext, {
-  type AddressValuesKeys
-} from '#context/BillingAddressFormContext'
-import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
+  type AddressValuesKeys,
+} from "#context/BillingAddressFormContext"
+import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 
 type SelectFieldName =
   | `billing_address_${`metadata_${string}`}`
   | `shipping_address_${`metadata_${string}`}`
 
 interface Props
-  extends Omit<BaseSelectComponentProps, 'name'>,
-    Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'> {
+  extends Omit<BaseSelectComponentProps, "name">,
+    Pick<JSX.IntrinsicElements["select"], "className" | "id" | "style"> {
   name: Extract<AddressValuesKeys, SelectFieldName>
   required?: boolean
   disabled?: boolean
@@ -58,11 +58,8 @@ export function AddressInputSelect(props: Props): JSX.Element {
     }
     return false
   }, [billingAddress?.errors, shippingAddress?.errors, name])
-  const errorClassName =
-    billingAddress?.errorClassName || shippingAddress?.errorClassName
-  const classNameComputed = `${className ?? ''} ${
-    hasError && errorClassName ? errorClassName : ''
-  }`
+  const errorClassName = billingAddress?.errorClassName || shippingAddress?.errorClassName
+  const classNameComputed = `${className ?? ""} ${hasError && errorClassName ? errorClassName : ""}`
   return (
     <BaseSelect
       className={classNameComputed}

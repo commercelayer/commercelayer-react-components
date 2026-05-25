@@ -1,21 +1,21 @@
-import { useContext, useEffect, useMemo, type JSX } from 'react';
-import BaseSelect from '../utils/BaseSelect'
-import type { BaseSelectComponentProps } from '#typings'
+import { useContext, useEffect, useMemo, type JSX } from "react"
+import BaseSelect from "../utils/BaseSelect"
+import type { BaseSelectComponentProps } from "#typings"
 import BillingAddressFormContext, {
-  type AddressValuesKeys
-} from '#context/BillingAddressFormContext'
-import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
-import { getCountries, type Country } from '#utils/countryStateCity'
-import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
+  type AddressValuesKeys,
+} from "#context/BillingAddressFormContext"
+import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
+import { getCountries, type Country } from "#utils/countryStateCity"
+import CustomerAddressFormContext from "#context/CustomerAddressFormContext"
 
 type TCountryFieldName =
-  | 'billing_address_country_code'
-  | 'shipping_address_country_code'
-  | 'customer_address_country_code'
+  | "billing_address_country_code"
+  | "shipping_address_country_code"
+  | "customer_address_country_code"
 
 interface Props
-  extends Omit<BaseSelectComponentProps, 'options' | 'name'>,
-    Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'> {
+  extends Omit<BaseSelectComponentProps, "options" | "name">,
+    Pick<JSX.IntrinsicElements["select"], "className" | "id" | "style"> {
   name: Extract<AddressValuesKeys, TCountryFieldName>
   required?: boolean
   disabled?: boolean
@@ -71,18 +71,12 @@ export function AddressCountrySelector(props: Props): JSX.Element {
       return true
     }
     return false
-  }, [
-    billingAddress?.errors, 
-    shippingAddress?.errors, 
-    customerAddress?.errors, name
-  ])
+  }, [billingAddress?.errors, shippingAddress?.errors, customerAddress?.errors, name])
   const errorClassName =
     billingAddress?.errorClassName ||
     shippingAddress?.errorClassName ||
     customerAddress?.errorClassName
-  const classNameComputed = `${className ?? ''} ${
-    hasError && errorClassName ? errorClassName : ''
-  }`
+  const classNameComputed = `${className ?? ""} ${hasError && errorClassName ? errorClassName : ""}`
   return (
     <BaseSelect
       className={classNameComputed}

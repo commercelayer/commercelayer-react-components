@@ -21,7 +21,7 @@ describe("getAccessToken", () => {
       expect(result).toEqual(mockToken)
       expect(result).toHaveProperty("accessToken")
       expect(result.accessToken).toBe(mockToken.accessToken)
-    },
+    }
   )
 
   coreTest("should throw an error if authenticate fails", async () => {
@@ -33,8 +33,6 @@ describe("getAccessToken", () => {
     const mockError = new Error("Authentication failed")
     // @ts-expect-error No types for this function
     authenticate.mockRejectedValue(mockError)
-    await expect(getAccessToken({ grantType, config })).rejects.toThrow(
-      "Authentication failed",
-    )
+    await expect(getAccessToken({ grantType, config })).rejects.toThrow("Authentication failed")
   })
 })

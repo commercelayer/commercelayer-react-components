@@ -33,35 +33,29 @@ describe("useSkuLists — interceptors", () => {
   })
 
   it("passes interceptors to getSkuLists", async () => {
-    const { result } = renderHook(
-      () => useSkuLists(accessToken, interceptors),
-      { wrapper: ({ children }) => swrWrapper({ children }) },
-    )
+    const { result } = renderHook(() => useSkuLists(accessToken, interceptors), {
+      wrapper: ({ children }) => swrWrapper({ children }),
+    })
 
     act(() => {
       result.current.fetchSkuLists()
     })
 
     await waitFor(() => {
-      expect(mockGetSkuLists).toHaveBeenCalledWith(
-        expect.objectContaining({ interceptors }),
-      )
+      expect(mockGetSkuLists).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
     })
   })
 
   it("passes interceptors to retrieveSkuList", async () => {
-    const { result } = renderHook(
-      () => useSkuLists(accessToken, interceptors),
-      { wrapper: ({ children }) => swrWrapper({ children }) },
-    )
+    const { result } = renderHook(() => useSkuLists(accessToken, interceptors), {
+      wrapper: ({ children }) => swrWrapper({ children }),
+    })
 
     await act(async () => {
       await result.current.retrieveSkuList("list_1")
     })
 
-    expect(mockRetrieveSkuList).toHaveBeenCalledWith(
-      expect.objectContaining({ interceptors }),
-    )
+    expect(mockRetrieveSkuList).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
   })
 
   it("works without interceptors", async () => {
@@ -74,17 +68,14 @@ describe("useSkuLists — interceptors", () => {
     })
 
     await waitFor(() => {
-      expect(mockGetSkuLists).toHaveBeenCalledWith(
-        expect.objectContaining({ accessToken }),
-      )
+      expect(mockGetSkuLists).toHaveBeenCalledWith(expect.objectContaining({ accessToken }))
     })
   })
 
   it("clearSkuLists resets fetch state and clears cached data", async () => {
-    const { result } = renderHook(
-      () => useSkuLists(accessToken, interceptors),
-      { wrapper: ({ children }) => swrWrapper({ children }) },
-    )
+    const { result } = renderHook(() => useSkuLists(accessToken, interceptors), {
+      wrapper: ({ children }) => swrWrapper({ children }),
+    })
 
     act(() => {
       result.current.fetchSkuLists()
@@ -104,15 +95,14 @@ describe("useSkuLists — interceptors", () => {
   })
 
   it("throws when retrieveSkuList is called with an empty id", async () => {
-    const { result } = renderHook(
-      () => useSkuLists(accessToken, interceptors),
-      { wrapper: ({ children }) => swrWrapper({ children }) },
-    )
+    const { result } = renderHook(() => useSkuLists(accessToken, interceptors), {
+      wrapper: ({ children }) => swrWrapper({ children }),
+    })
 
     await expect(
       act(async () => {
         await result.current.retrieveSkuList("")
-      }),
+      })
     ).rejects.toThrow("SKU list ID is required for retrieve")
   })
 })

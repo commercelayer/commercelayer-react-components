@@ -1,6 +1,6 @@
-import React, { useState, useEffect, Fragment } from 'react'
-import { getCustomerToken } from '@commercelayer/js-auth'
-import Head from 'next/head'
+import React, { useState, useEffect, Fragment } from "react"
+import { getCustomerToken } from "@commercelayer/js-auth"
+import Head from "next/head"
 import {
   CommerceLayer,
   CustomerContainer,
@@ -20,10 +20,10 @@ import {
   PlaceOrderButton,
   PlaceOrderContainer,
   CustomerCardsType,
-} from 'packages/react-components/src'
-import { useRouter } from 'next/router'
-import '@adyen/adyen-web/dist/adyen.css'
-import getSdk from '#utils/getSdk'
+} from "packages/react-components/src"
+import { useRouter } from "next/router"
+import "@adyen/adyen-web/dist/adyen.css"
+import getSdk from "#utils/getSdk"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -31,16 +31,13 @@ const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
 const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 
-let orderId = 'PDerhJplRp'
+let orderId = "PDerhJplRp"
 
-let paypalPayerId = ''
-let paypalReturnUrl = ''
-let checkoutComSession = ''
+let paypalPayerId = ""
+let paypalReturnUrl = ""
+let checkoutComSession = ""
 
-const TemplateCustomerCards = ({
-  customerPayments,
-  PaymentSourceProvider,
-}: CustomerCardsType) => {
+const TemplateCustomerCards = ({ customerPayments, PaymentSourceProvider }: CustomerCardsType) => {
   const components = customerPayments.map((p, k) => {
     return (
       <div
@@ -88,7 +85,7 @@ const TemplateSaveToWalletCheckbox = ({ name }: any) => (
 )
 
 export default function Main() {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("")
   const [paymentSource, setPaymentSource] = useState<any>(null)
   const { query } = useRouter()
   if (query.orderId) {
@@ -97,18 +94,18 @@ export default function Main() {
   if (query.PayerID) {
     paypalPayerId = query.PayerID as string
   }
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     paypalReturnUrl = window.location.href
   }
-  if (query['cko-session-id']) {
-    checkoutComSession = query['cko-session-id'] as string
+  if (query["cko-session-id"]) {
+    checkoutComSession = query["cko-session-id"] as string
   }
   // const [shippingMethodId, setShippingMethodId] = useState<string>('')
   const getOrder = async () => {
     const config = { accessToken: token, endpoint }
     const sdk = getSdk(config)
     const order = await sdk.orders.retrieve(orderId, {
-      include: ['payment_source'],
+      include: ["payment_source"],
     })
     // @ts-ignore
     if (order.payment_source) setPaymentSource(order.payment_source?.options)
@@ -156,7 +153,7 @@ export default function Main() {
               <PaymentMethodsContainer
                 config={{
                   stripePayment: {
-                    containerClassName: 'p-5 my-2',
+                    containerClassName: "p-5 my-2",
                   },
                   paypalPayment: {
                     cancel_url: paypalReturnUrl,
@@ -175,7 +172,7 @@ export default function Main() {
                       className="p-2 my-1 flex flex-wrap w-1/2 items-center justify-items-center bg-gray-300"
                       activeClass="bg-opacity-25"
                       onClick={() => {
-                        console.log('custom click payment method')
+                        console.log("custom click payment method")
                       }}
                       clickableContainer
                     >
@@ -184,23 +181,18 @@ export default function Main() {
                       <PaymentMethodPrice className="pl-3 text-xs text-gray-500" />
                       <PaymentSource
                         className="py-2 my-2 flex flex-row"
-                        templateCustomerCards={(props) => (
-                          <TemplateCustomerCards {...props} />
-                        )}
+                        templateCustomerCards={(props) => <TemplateCustomerCards {...props} />}
                         templateCustomerSaveToWallet={(props) => (
                           <TemplateSaveToWalletCheckbox {...props} />
                         )}
-                        onClickCustomerCards={() => console.log('clicked')}
+                        onClickCustomerCards={() => console.log("clicked")}
                       >
                         <div className="flex flex-row items-center justify-start bg-gray-100 p-3 text-sm border">
                           <div className="flex flex-row items-center">
                             <PaymentSourceBrandIcon className="mr-2" />
                             <PaymentSourceBrandName className="mr-1" />
                             ending in
-                            <PaymentSourceDetail
-                              className="ml-1"
-                              type="last4"
-                            />
+                            <PaymentSourceDetail className="ml-1" type="last4" />
                           </div>
                           <div className="text-gray-500 ml-3">
                             <PaymentSourceDetail type="exp_month" />
@@ -212,17 +204,14 @@ export default function Main() {
                           </div>
                         </div>
                       </PaymentSource>
-                      <Errors
-                        className="text-red-600"
-                        resource="payment_methods"
-                      />
+                      <Errors className="text-red-600" resource="payment_methods" />
                     </PaymentMethod>
                   </div>
 
                   <div>
                     <PlaceOrderButton
                       onClick={(res: any) => {
-                        console.log('res', res)
+                        console.log("res", res)
                         debugger
                       }}
                       className="mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"

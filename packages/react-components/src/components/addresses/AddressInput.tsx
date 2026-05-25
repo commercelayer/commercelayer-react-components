@@ -68,22 +68,14 @@ export function AddressInput(props: Props): JSX.Element | null {
       return true
     }
     return false
-  }, [
-    value,
-    billingAddress?.errors,
-    shippingAddress?.errors,
-    customerAddress?.errors,
-  ])
+  }, [value, billingAddress?.errors, shippingAddress?.errors, customerAddress?.errors])
 
   const mandatoryField = billingAddress?.isBusiness
     ? businessMandatoryField(p.name, billingAddress.isBusiness)
     : businessMandatoryField(p.name, shippingAddress.isBusiness)
   const reqField = required !== undefined ? required : mandatoryField
-  const errorClassName =
-    billingAddress?.errorClassName || shippingAddress?.errorClassName
-  const classNameComputed = `${className || ""} ${
-    hasError && errorClassName ? errorClassName : ""
-  }`
+  const errorClassName = billingAddress?.errorClassName || shippingAddress?.errorClassName
+  const classNameComputed = `${className || ""} ${hasError && errorClassName ? errorClassName : ""}`
   if (
     p.name === "billing_address_billing_info" &&
     billingAddress.requiresBillingInfo === false &&

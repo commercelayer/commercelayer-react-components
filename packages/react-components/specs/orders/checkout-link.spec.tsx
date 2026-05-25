@@ -30,9 +30,7 @@ function Wrapper({
 }) {
   return (
     <CommerceLayerContext.Provider value={{ accessToken: FAKE_TOKEN }}>
-      <OrderContext.Provider value={orderCtx}>
-        {children}
-      </OrderContext.Provider>
+      <OrderContext.Provider value={orderCtx}>{children}</OrderContext.Provider>
     </CommerceLayerContext.Provider>
   )
 }
@@ -49,17 +47,13 @@ describe("CheckoutLink", () => {
 
   describe("rendering", () => {
     it("renders an anchor with the given label", () => {
-      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(
-        HOSTED_CHECKOUT_URL,
-      )
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
       render(
         <Wrapper>
           <CheckoutLink label="Go to checkout" />
-        </Wrapper>,
+        </Wrapper>
       )
-      expect(
-        screen.getByRole("link", { name: /go to checkout/i }),
-      ).toBeDefined()
+      expect(screen.getByRole("link", { name: /go to checkout/i })).toBeDefined()
     })
 
     it("builds href via getApplicationLink when hostedCheckout=true (default)", () => {
@@ -70,71 +64,61 @@ describe("CheckoutLink", () => {
       render(
         <Wrapper>
           <CheckoutLink label="Checkout" />
-        </Wrapper>,
+        </Wrapper>
       )
 
       expect(spy).toHaveBeenCalledWith(
         expect.objectContaining({
           orderId: "order-id-1",
           applicationType: "checkout",
-        }),
+        })
       )
-      expect(
-        screen.getByRole("link").getAttribute("href"),
-      ).toBe(HOSTED_CHECKOUT_URL)
+      expect(screen.getByRole("link").getAttribute("href")).toBe(HOSTED_CHECKOUT_URL)
     })
 
     it("uses order.checkout_url when hostedCheckout=false", () => {
       render(
         <Wrapper>
           <CheckoutLink label="Checkout" hostedCheckout={false} />
-        </Wrapper>,
+        </Wrapper>
       )
-      expect(screen.getByRole("link").getAttribute("href")).toBe(
-        mockOrder.checkout_url,
-      )
+      expect(screen.getByRole("link").getAttribute("href")).toBe(mockOrder.checkout_url)
     })
 
     it("falls back to empty string when hostedCheckout=false and checkout_url is absent", () => {
       render(
         <Wrapper orderCtx={makeOrderCtx({ id: "order-id-1", checkout_url: undefined } as any)}>
           <CheckoutLink label="Checkout" hostedCheckout={false} />
-        </Wrapper>,
+        </Wrapper>
       )
       expect(screen.getByText("Checkout").getAttribute("href")).toBe("")
     })
 
     it("forwards className to the anchor element", () => {
-      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(
-        HOSTED_CHECKOUT_URL,
-      )
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
       render(
         <Wrapper>
           <CheckoutLink label="Checkout" className="my-class" />
-        </Wrapper>,
+        </Wrapper>
       )
       expect(screen.getByRole("link").getAttribute("class")).toBe("my-class")
     })
 
     it("forwards target to the anchor element", () => {
-      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(
-        HOSTED_CHECKOUT_URL,
-      )
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
       render(
         <Wrapper>
           <CheckoutLink label="Checkout" target="_blank" />
-        </Wrapper>,
+        </Wrapper>
       )
       expect(screen.getByRole("link").getAttribute("target")).toBe("_blank")
     })
 
     it("throws when rendered outside <CommerceLayer>", () => {
-      const consoleSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => undefined)
-      expect(() =>
-        render(<CheckoutLink label="Checkout" />),
-      ).toThrow("Cannot use `CheckoutLink` outside of `CommerceLayer`")
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => undefined)
+      expect(() => render(<CheckoutLink label="Checkout" />)).toThrow(
+        "Cannot use `CheckoutLink` outside of `CommerceLayer`"
+      )
       consoleSpy.mockRestore()
     })
   })
@@ -145,9 +129,7 @@ describe("CheckoutLink", () => {
 
   describe("handleClick", () => {
     it("navigates to config.links.checkout when org config provides it", async () => {
-      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(
-        HOSTED_CHECKOUT_URL,
-      )
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
       vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue({
         links: { checkout: "https://org-checkout.example.com/order-id-1" },
       } as any)
@@ -156,31 +138,27 @@ describe("CheckoutLink", () => {
       render(
         <Wrapper>
           <CheckoutLink label="Checkout" />
-        </Wrapper>,
+        </Wrapper>
       )
       fireEvent.click(screen.getByRole("link"))
 
       await waitFor(() => {
         expect(windowOpenSpy).toHaveBeenCalledWith(
           "https://org-checkout.example.com/order-id-1",
-          "_self",
+          "_self"
         )
       })
     })
 
     it("falls back to the resolved href when config.links.checkout is absent", async () => {
-      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(
-        HOSTED_CHECKOUT_URL,
-      )
-      vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue(
-        null,
-      )
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
+      vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue(null)
       const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(vi.fn())
 
       render(
         <Wrapper>
           <CheckoutLink label="Checkout" />
-        </Wrapper>,
+        </Wrapper>
       )
       fireEvent.click(screen.getByRole("link"))
 
@@ -190,16 +168,13 @@ describe("CheckoutLink", () => {
     })
 
     it("skips getOrganizationConfig and opens href directly when order.id is absent", async () => {
-      const getOrgConfigSpy = vi.spyOn(
-        organizationUtils,
-        "getOrganizationConfig",
-      )
+      const getOrgConfigSpy = vi.spyOn(organizationUtils, "getOrganizationConfig")
       const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(vi.fn())
 
       render(
         <Wrapper orderCtx={makeOrderCtx(null)}>
           <CheckoutLink label="Checkout" hostedCheckout={false} />
-        </Wrapper>,
+        </Wrapper>
       )
       fireEvent.click(screen.getByText("Checkout"))
 
@@ -210,18 +185,14 @@ describe("CheckoutLink", () => {
     })
 
     it("opens in a new tab when target=_blank", async () => {
-      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(
-        HOSTED_CHECKOUT_URL,
-      )
-      vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue(
-        null,
-      )
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
+      vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue(null)
       const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(vi.fn())
 
       render(
         <Wrapper>
           <CheckoutLink label="Checkout" target="_blank" />
-        </Wrapper>,
+        </Wrapper>
       )
       fireEvent.click(screen.getByRole("link"))
 
@@ -231,18 +202,14 @@ describe("CheckoutLink", () => {
     })
 
     it("opens in _top when target=_top", async () => {
-      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(
-        HOSTED_CHECKOUT_URL,
-      )
-      vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue(
-        null,
-      )
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
+      vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue(null)
       const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(vi.fn())
 
       render(
         <Wrapper>
           <CheckoutLink label="Checkout" target="_top" />
-        </Wrapper>,
+        </Wrapper>
       )
       fireEvent.click(screen.getByRole("link"))
 
@@ -252,18 +219,14 @@ describe("CheckoutLink", () => {
     })
 
     it("defaults to _self when no target is provided", async () => {
-      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(
-        HOSTED_CHECKOUT_URL,
-      )
-      vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue(
-        null,
-      )
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
+      vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue(null)
       const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(vi.fn())
 
       render(
         <Wrapper>
           <CheckoutLink label="Checkout" />
-        </Wrapper>,
+        </Wrapper>
       )
       fireEvent.click(screen.getByRole("link"))
 
@@ -279,9 +242,7 @@ describe("CheckoutLink", () => {
 
   describe("children render prop", () => {
     it("passes href and handleClick to the children function", () => {
-      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(
-        HOSTED_CHECKOUT_URL,
-      )
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
       let capturedHref: string | undefined
       let capturedHandleClick: unknown
 
@@ -298,7 +259,7 @@ describe("CheckoutLink", () => {
               )
             }}
           </CheckoutLink>
-        </Wrapper>,
+        </Wrapper>
       )
 
       expect(capturedHref).toBe(HOSTED_CHECKOUT_URL)
@@ -307,9 +268,7 @@ describe("CheckoutLink", () => {
     })
 
     it("exposes orderId and accessToken in the children props", () => {
-      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(
-        HOSTED_CHECKOUT_URL,
-      )
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
       let capturedOrderId: string | undefined
       let capturedAccessToken: string | undefined
 
@@ -322,7 +281,7 @@ describe("CheckoutLink", () => {
               return null
             }}
           </CheckoutLink>
-        </Wrapper>,
+        </Wrapper>
       )
 
       expect(capturedOrderId).toBe("order-id-1")
@@ -330,9 +289,7 @@ describe("CheckoutLink", () => {
     })
 
     it("exposes checkoutUrl from the order in the children props", () => {
-      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(
-        HOSTED_CHECKOUT_URL,
-      )
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
       let capturedCheckoutUrl: string | undefined
 
       render(
@@ -343,7 +300,7 @@ describe("CheckoutLink", () => {
               return null
             }}
           </CheckoutLink>
-        </Wrapper>,
+        </Wrapper>
       )
 
       expect(capturedCheckoutUrl).toBe(mockOrder.checkout_url)

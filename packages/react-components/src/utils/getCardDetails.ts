@@ -1,8 +1,5 @@
 import type { IconBrand } from "#context/PaymentSourceContext"
-import type {
-  PaymentResource,
-  PaymentSourceObject,
-} from "#reducers/PaymentMethodReducer"
+import type { PaymentResource, PaymentSourceObject } from "#reducers/PaymentMethodReducer"
 import type { CustomerPaymentSource } from "@commercelayer/sdk"
 
 interface CardDetails {
@@ -18,14 +15,10 @@ interface Args {
   customerPayment: Partial<CustomerPaymentSource>
 }
 
-export default function getCardDetails({
-  paymentType,
-  customerPayment,
-}: Args): CardDetails {
+export default function getCardDetails({ paymentType, customerPayment }: Args): CardDetails {
   switch (paymentType) {
     case "checkout_com_payments": {
-      const ps =
-        customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
+      const ps = customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
       const source = ps?.payment_response?.source
       if (source) {
         return {
@@ -38,12 +31,9 @@ export default function getCardDetails({
       break
     }
     case "stripe_payments": {
-      const ps =
-        customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
+      const ps = customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
       const source =
-        (ps?.options?.card ??
-        ps?.payment_method?.card ??
-        ps?.payment_instrument)
+        (ps?.options?.card ?? ps?.payment_method?.card ?? ps?.payment_instrument)
           ? {
               brand: ps?.payment_instrument?.["card_type"],
               exp_month: ps?.payment_instrument?.["card_expiry_month"],
@@ -60,8 +50,7 @@ export default function getCardDetails({
       break
     }
     case "klarna_payments": {
-      const ps =
-        customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
+      const ps = customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
       const source =
         ps?.auth_token != null && ps?.payment_instrument != null
           ? {
@@ -80,8 +69,7 @@ export default function getCardDetails({
       break
     }
     case "braintree_payments": {
-      const ps =
-        customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
+      const ps = customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
       const source = ps?.options?.card
       if (source) {
         return {
@@ -91,8 +79,7 @@ export default function getCardDetails({
       break
     }
     case "adyen_payments": {
-      const ps =
-        customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
+      const ps = customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
       const source = ps?.payment_request_data?.payment_method
       const authorized = ps?.payment_response?.resultCode === "Authorised"
       const last4 =
@@ -113,8 +100,7 @@ export default function getCardDetails({
       break
     }
     default: {
-      const ps =
-        customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
+      const ps = customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
       if (ps?.type !== paymentType) break
       const source = ps?.metadata?.["card"] ?? {
         brand: ps?.payment_instrument?.["issuer_type"]?.replace("_", "-") ?? "",

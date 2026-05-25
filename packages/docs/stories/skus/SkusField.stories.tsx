@@ -1,36 +1,33 @@
-import { type Meta, type StoryFn, type StoryObj } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
-import { Skus } from '#components/skus/Skus'
-import { SkusContainer } from '#components/skus/SkusContainer'
-import { SkuField } from '#components/skus/SkuField'
+import { type Meta, type StoryFn, type StoryObj } from "@storybook/react"
+import CommerceLayer from "../_internals/CommerceLayer"
+import { Skus } from "#components/skus/Skus"
+import { SkusContainer } from "#components/skus/SkusContainer"
+import { SkuField } from "#components/skus/SkuField"
 
 const setup: Meta<typeof SkuField> = {
-  title: 'Components/Skus/SkuField',
+  title: "Components/Skus/SkuField",
   component: SkuField,
   argTypes: {
     attribute: {
-      control: 'select',
-      options: ['name', 'code', 'description', 'image_url', 'weight'],
-      description: 'Resource attribute to display'
+      control: "select",
+      options: ["name", "code", "description", "image_url", "weight"],
+      description: "Resource attribute to display",
     },
     tagElement: {
-      control: 'select',
-      options: ['div', 'p', 'span', 'img', 'section'],
+      control: "select",
+      options: ["div", "p", "span", "img", "section"],
       description:
-        'Resource attribute to displayHtml tag to render. When tag is `img` the value will be used to fill the `src` attribute.'
-    }
-  }
+        "Resource attribute to displayHtml tag to render. When tag is `img` the value will be used to fill the `src` attribute.",
+    },
+  },
 }
 
 export default setup
 
 const Template: StoryFn<typeof SkuField> = (args) => {
   return (
-    <CommerceLayer
-      accessToken='my-access-token'
-      endpoint='https://demo-store.commercelayer.io'
-    >
-      <SkusContainer skus={['POLOMXXX000000FFFFFFLXXX']}>
+    <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
+      <SkusContainer skus={["POLOMXXX000000FFFFFFLXXX"]}>
         <Skus>
           <SkuField {...args} />
         </Skus>
@@ -41,8 +38,8 @@ const Template: StoryFn<typeof SkuField> = (args) => {
 
 export const Default = Template.bind({})
 Default.args = {
-  attribute: 'name',
-  tagElement: 'div'
+  attribute: "name",
+  tagElement: "div",
 }
 
 /**
@@ -51,9 +48,9 @@ Default.args = {
  */
 export const SkuImageAsImgTag = Template.bind({})
 SkuImageAsImgTag.args = {
-  attribute: 'image_url',
-  tagElement: 'img',
-  width: 100
+  attribute: "image_url",
+  tagElement: "img",
+  width: 100,
 }
 
 /**
@@ -66,7 +63,7 @@ SkuImageAsImgTag.args = {
  */
 export const ChildrenProps: StoryObj = () => {
   return (
-    <SkuField attribute='metadata' tagElement='div'>
+    <SkuField attribute="metadata" tagElement="div">
       {(childrenProps: any) => {
         return <pre>{JSON.stringify(childrenProps, null, 2)}</pre>
       }}
@@ -76,23 +73,20 @@ export const ChildrenProps: StoryObj = () => {
 ChildrenProps.decorators = [
   (Story) => {
     return (
-      <CommerceLayer
-        accessToken='my-access-token'
-        endpoint='https://demo-store.commercelayer.io'
-      >
-        <SkusContainer skus={['5PANECAP9D9CA1FFFFFFXXXX']}>
+      <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
+        <SkusContainer skus={["5PANECAP9D9CA1FFFFFFXXXX"]}>
           <Skus>
             <Story />
           </Skus>
         </SkusContainer>
       </CommerceLayer>
     )
-  }
+  },
 ]
 ChildrenProps.parameters = {
   docs: {
     source: {
-      type: 'code'
-    }
-  }
+      type: "code",
+    },
+  },
 }

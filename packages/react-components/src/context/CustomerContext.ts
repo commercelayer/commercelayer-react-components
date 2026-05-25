@@ -9,9 +9,9 @@ import type {
   getCustomerOrders,
   getCustomerSubscriptions,
   setResourceTrigger,
-  deleteCustomerPayment
-} from '#reducers/CustomerReducer'
-import { createContext } from 'react'
+  deleteCustomerPayment,
+} from "#reducers/CustomerReducer"
+import { createContext } from "react"
 
 export type InitialCustomerContext = Partial<
   {
@@ -24,9 +24,7 @@ export type InitialCustomerContext = Partial<
     getCustomerAddresses: typeof getCustomerAddresses
     createCustomerAddress: (address: TCustomerAddress) => Promise<void>
     setResourceTrigger: typeof setResourceTrigger
-    getCustomerOrders: (
-      props: Partial<Parameters<typeof getCustomerOrders>[0]>
-    ) => Promise<void>
+    getCustomerOrders: (props: Partial<Parameters<typeof getCustomerOrders>[0]>) => Promise<void>
     getCustomerSubscriptions: (
       props: Partial<Parameters<typeof getCustomerSubscriptions>[0]>
     ) => Promise<void>
@@ -36,8 +34,6 @@ export type InitialCustomerContext = Partial<
 
 export const defaultCustomerContext = {}
 
-const CustomerContext = createContext<InitialCustomerContext>(
-  defaultCustomerContext
-)
+const CustomerContext = createContext<InitialCustomerContext>(defaultCustomerContext)
 
 export default CustomerContext

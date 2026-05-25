@@ -95,8 +95,7 @@ const defaultStyle = {
   iconContainer: defaultIconContainer,
 } satisfies Styles
 
-interface Props
-  extends Omit<JSX.IntrinsicElements["div"], "children" | "style"> {
+interface Props extends Omit<JSX.IntrinsicElements["div"], "children" | "style"> {
   /**
    * The style of the cart.
    */
@@ -226,7 +225,7 @@ export function HostedCart({
           break
       }
     },
-    [type, isOpen, handleOpen, getOrder],
+    [type, isOpen, handleOpen, getOrder]
   )
 
   useEffect(() => {
@@ -253,12 +252,7 @@ export function HostedCart({
     if (openAdd && type === "mini") {
       subscribe("open-cart", openCartHandler)
     }
-    if (
-      src == null &&
-      resolvedOrderId == null &&
-      !ignore &&
-      isOpen
-    ) {
+    if (src == null && resolvedOrderId == null && !ignore && isOpen) {
       setOrder()
     } else if (
       resolvedOrderId != null &&
@@ -289,7 +283,7 @@ export function HostedCart({
         checkOrigin: false,
         onMessage,
       },
-      ref.current,
+      ref.current
     )
   }, [onMessage])
   /**
@@ -308,9 +302,7 @@ export function HostedCart({
           ...defaultStyle.background,
           ...style?.background,
           opacity: isOpen ? "0.5" : defaultStyle.background?.opacity,
-          pointerEvents: isOpen
-            ? "initial"
-            : defaultStyle.background?.pointerEvents,
+          pointerEvents: isOpen ? "initial" : defaultStyle.background?.pointerEvents,
         }}
         onClick={onCloseCart}
       />
@@ -319,9 +311,7 @@ export function HostedCart({
           ...defaultStyle.container,
           ...style?.container,
           right: isOpen ? "0" : defaultStyle.container?.right,
-          pointerEvents: isOpen
-            ? "initial"
-            : defaultStyle.container?.pointerEvents,
+          pointerEvents: isOpen ? "initial" : defaultStyle.container?.pointerEvents,
         }}
         {...props}
       >
@@ -341,11 +331,7 @@ export function HostedCart({
             }}
             aria-label="Close cart"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
         <iframe

@@ -4,11 +4,7 @@ import type { Dispatch, RefObject } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { BaseError } from "#typings/errors"
 import baseReducer from "#utils/baseReducer"
-import {
-  saveBillingAddress,
-  saveShippingAddress,
-  saveToWallet,
-} from "#utils/customerOrderOptions"
+import { saveBillingAddress, saveShippingAddress, saveToWallet } from "#utils/customerOrderOptions"
 import getErrors from "#utils/getErrors"
 import { getSdk } from "@commercelayer/core"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
@@ -59,7 +55,7 @@ export interface PlaceOrderActionPayload {
 
 export function setButtonRef(
   ref: RefObject<HTMLButtonElement | null>,
-  dispatch: Dispatch<PlaceOrderAction>,
+  dispatch: Dispatch<PlaceOrderAction>
 ): void {
   if (ref?.current != null) {
     dispatch({
@@ -86,7 +82,7 @@ export const placeOrderInitialState: PlaceOrderState = {
 
 export function setPlaceOrderErrors<V extends BaseError[]>(
   errors: V,
-  dispatch: Dispatch<PlaceOrderAction>,
+  dispatch: Dispatch<PlaceOrderAction>
 ): void {
   if (dispatch) {
     dispatch({
@@ -130,8 +126,7 @@ export function placeOrderPermitted({
     const shipment = shipments && shipmentsFilled(shipments)
     const paymentMethod = order.payment_method
     const paymentSource = order.payment_source
-    if (order.total_amount_with_taxes_cents !== 0 && isEmpty(paymentMethod?.id))
-      isPermitted = false
+    if (order.total_amount_with_taxes_cents !== 0 && isEmpty(paymentMethod?.id)) isPermitted = false
     if (isEmpty(billingAddress)) isPermitted = false
     if (isEmpty(shippingAddress) && !doNotShip) isPermitted = false
     if (!isEmpty(shipments) && !shipment) isPermitted = false
@@ -200,10 +195,7 @@ export async function setPlaceOrder({
           order: lastOrderStatus,
         }
       }
-      if (
-        paymentType === "paypal_payments" &&
-        paymentSource?.type === "paypal_payments"
-      ) {
+      if (paymentType === "paypal_payments" && paymentSource?.type === "paypal_payments") {
         if (!options?.paypalPayerId && paymentSource?.approval_url) {
           window.location.href = paymentSource?.approval_url
           return response
@@ -267,11 +259,7 @@ export async function setPlaceOrder({
           })
           if (setOrder) setOrder(orderUpdated)
           if (setOrderErrors) setOrderErrors([])
-          updateOrderSubscriptionCustomerPaymentSource(
-            orderUpdated,
-            paymentType,
-            sdk,
-          )
+          updateOrderSubscriptionCustomerPaymentSource(orderUpdated, paymentType, sdk)
           return {
             placed: true,
             order: orderUpdated,
@@ -301,11 +289,7 @@ export async function setPlaceOrder({
                   if (setOrderErrors) setOrderErrors(errors)
                 }),
           ]).then(() => {
-            updateOrderSubscriptionCustomerPaymentSource(
-              orderUpdated,
-              paymentType,
-              sdk,
-            )
+            updateOrderSubscriptionCustomerPaymentSource(orderUpdated, paymentType, sdk)
           })
           return {
             placed: true,
@@ -354,14 +338,7 @@ const type: PlaceOrderActionType[] = [
   "setStatus",
 ]
 
-const placeOrderReducer = (
-  state: PlaceOrderState,
-  reducer: PlaceOrderAction,
-): PlaceOrderState =>
-  baseReducer<PlaceOrderState, PlaceOrderAction, PlaceOrderActionType[]>(
-    state,
-    reducer,
-    type,
-  )
+const placeOrderReducer = (state: PlaceOrderState, reducer: PlaceOrderAction): PlaceOrderState =>
+  baseReducer<PlaceOrderState, PlaceOrderAction, PlaceOrderActionType[]>(state, reducer, type)
 
 export default placeOrderReducer

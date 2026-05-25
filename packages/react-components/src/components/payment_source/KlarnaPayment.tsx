@@ -23,9 +23,7 @@ type KlarnaPaymentProps = PaymentMethodConfig["klarnaPayment"] &
     locale?: string | null
   }
 
-function typeOfLine(
-  lineItemType: string | null | undefined,
-): OrderLine["type"] {
+function typeOfLine(lineItemType: string | null | undefined): OrderLine["type"] {
   switch (lineItemType) {
     case "percentage_discount_promotions":
       return "discount"
@@ -70,12 +68,8 @@ export default function KlarnaPayment({
   ...p
 }: KlarnaPaymentProps): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
-  const {
-    paymentSource,
-    currentPaymentMethodType,
-    setPaymentRef,
-    setPaymentSource,
-  } = useContext(PaymentMethodContext)
+  const { paymentSource, currentPaymentMethodType, setPaymentRef, setPaymentSource } =
+    useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const loaded = useExternalScript("https://x.klarnacdn.net/kp/lib/v1/api.js")
   const [klarna, setKlarna] = useState<any>()
@@ -86,13 +80,7 @@ export default function KlarnaPayment({
     }
   }, [loaded, window.Klarna])
   useEffect(() => {
-    if (
-      ref.current &&
-      paymentSource &&
-      currentPaymentMethodType &&
-      loaded &&
-      klarna
-    ) {
+    if (ref.current && paymentSource && currentPaymentMethodType && loaded && klarna) {
       ref.current.onsubmit = async (props: any) => {
         handleClick(klarna, props)
       }
@@ -164,7 +152,7 @@ export default function KlarnaPayment({
             }
           }
         }
-      },
+      }
     )
   }
   if (klarna && clientToken) {

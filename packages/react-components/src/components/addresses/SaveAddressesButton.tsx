@@ -6,10 +6,7 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import type { TCustomerAddress } from "#reducers/CustomerReducer"
 import type { ChildrenFunction } from "#typings/index"
-import {
-  addressesController,
-  countryLockController,
-} from "#utils/addressesManager"
+import { addressesController, countryLockController } from "#utils/addressesManager"
 import { formCleaner } from "#utils/formCleaner"
 import { validateValue } from "#utils/validateFormFields"
 
@@ -20,8 +17,7 @@ interface TOnClick {
 
 interface ChildrenProps extends Omit<Props, "children"> {}
 
-interface Props
-  extends Omit<JSX.IntrinsicElements["button"], "children" | "onClick"> {
+interface Props extends Omit<JSX.IntrinsicElements["button"], "children" | "onClick"> {
   children?: ChildrenFunction<ChildrenProps>
   label?: string | ReactNode | (() => ReactNode)
   onClick?: (params: TOnClick) => void
@@ -59,26 +55,17 @@ export function SaveAddressesButton(props: Props): JSX.Element {
   } = useContext(CustomerContext)
   const [forceDisable, setForceDisable] = useState(disabled)
   let customerEmail = !!(
-    !!(isGuest === true || typeof isGuest === "undefined") &&
-    !order?.customer_email
+    !!(isGuest === true || typeof isGuest === "undefined") && !order?.customer_email
   )
   if (email != null && email !== "") {
-    const isValidEmail = validateValue(
-      email,
-      "customer_email",
-      "email",
-      "orders",
-    )
+    const isValidEmail = validateValue(email, "customer_email", "email", "orders")
     customerEmail = Object.keys(isValidEmail).length > 0
   }
-  const shippingAddressCleaned: any = Object.keys(shippingAddress ?? {}).reduce(
-    (acc, key) => {
-      // @ts-expect-error type mismatch
-      acc[key.replace("shipping_address_", "")] = shippingAddress[key].value
-      return acc
-    },
-    {},
-  )
+  const shippingAddressCleaned: any = Object.keys(shippingAddress ?? {}).reduce((acc, key) => {
+    // @ts-expect-error type mismatch
+    acc[key.replace("shipping_address_", "")] = shippingAddress[key].value
+    return acc
+  }, {})
   const { billingDisable, shippingDisable } = addressesController({
     invertAddresses,
     requiresBillingInfo: order?.requires_billing_info,
@@ -101,14 +88,9 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     lineItems: order?.line_items,
   })
   // NOTE: This is a temporary fix to avoid the button to be disabled when the user is editing an address
-  const invertAddressesDisable =
-    invertAddresses && shippingAddressId ? false : shippingDisable
+  const invertAddressesDisable = invertAddresses && shippingAddressId ? false : shippingDisable
   const disable =
-    disabled ||
-    customerEmail ||
-    billingDisable ||
-    invertAddressesDisable ||
-    countryLockDisable
+    disabled || customerEmail || billingDisable || invertAddressesDisable || countryLockDisable
 
   const handleClick = async (): Promise<void> => {
     if (errors && Object.keys(errors).length === 0 && !disable) {
@@ -129,9 +111,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
           response = await saveAddresses({
             customerEmail: email,
             customerAddress: {
-              resource: invertAddresses
-                ? "shipping_address"
-                : "billing_address",
+              resource: invertAddresses ? "shipping_address" : "billing_address",
               id: addressId,
             },
           })
@@ -178,7 +158,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
       }}
       {...p}
     >
-      {typeof label === 'function' ? label() : label}
+      {typeof label === "function" ? label() : label}
     </button>
   )
 }

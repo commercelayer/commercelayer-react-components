@@ -58,12 +58,8 @@ type UseAction = "get" | "retrieve" | "update" | null
  * });
  * ```
  */
-export function useSkus(
-  accessToken: string,
-  interceptors?: InterceptorManager,
-): UseSkusReturn {
-  const [params, setParams] =
-    useState<Parameters<typeof getSkus>[0]["params"]>()
+export function useSkus(accessToken: string, interceptors?: InterceptorManager): UseSkusReturn {
+  const [params, setParams] = useState<Parameters<typeof getSkus>[0]["params"]>()
   const [shouldFetch, setShouldFetch] = useState(false)
   const [action, setAction] = useState<UseAction>(null)
 
@@ -71,17 +67,14 @@ export function useSkus(
   // All useSkus instances with the same token share the same store entry.
   const stableSubscribe = useCallback(
     (listener: () => void) => subscribe(accessToken, listener),
-    [accessToken],
+    [accessToken]
   )
-  const stableSnapshot = useCallback(
-    () => getSnapshot(accessToken),
-    [accessToken],
-  )
+  const stableSnapshot = useCallback(() => getSnapshot(accessToken), [accessToken])
   const skuCodesList = useSyncExternalStore(
     stableSubscribe,
     stableSnapshot,
     // c8 ignore next — server snapshot only used during SSR hydration
-    () => EMPTY,
+    () => EMPTY
   )
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<Sku[]>(
@@ -92,17 +85,14 @@ export function useSkus(
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    },
+    }
   )
 
-  const fetchSkus = useCallback(
-    (newParams?: Parameters<typeof getSkus>[0]["params"]) => {
-      setParams(newParams)
-      setShouldFetch(true)
-      setAction("get")
-    },
-    [],
-  )
+  const fetchSkus = useCallback((newParams?: Parameters<typeof getSkus>[0]["params"]) => {
+    setParams(newParams)
+    setShouldFetch(true)
+    setAction("get")
+  }, [])
 
   // Auto-fetch whenever the batch store snapshot changes (new SKU codes registered).
   // All instances with the same token call fetchSkus with the same params —
@@ -115,12 +105,12 @@ export function useSkus(
 
   const registerSku = useCallback(
     (code: string) => storeRegisterSku(accessToken, code),
-    [accessToken],
+    [accessToken]
   )
 
   const unregisterSku = useCallback(
     (code: string) => storeUnregisterSku(accessToken, code),
-    [accessToken],
+    [accessToken]
   )
 
   const handleRetrieveSku = useCallback(
@@ -130,25 +120,21 @@ export function useSkus(
       const result = await retrieveSku({ accessToken, id, interceptors })
       return result
     },
-    [accessToken, interceptors],
+    [accessToken, interceptors]
   )
 
   const handleUpdateSku = useCallback(
     async (resource: SkuUpdate): Promise<Sku | undefined> => {
-      if (!resource?.id)
-        throw new Error("SKU resource ID is required for update")
+      if (!resource?.id) throw new Error("SKU resource ID is required for update")
       setAction("update")
       const result = await updateSku({ accessToken, resource, interceptors })
       await mutate(
-        (current) =>
-          current?.map((s: Sku) => (s.id === result.id ? result : s)) ?? [
-            result,
-          ],
-        { revalidate: false },
+        (current) => current?.map((s: Sku) => (s.id === result.id ? result : s)) ?? [result],
+        { revalidate: false }
       )
       return result
     },
-    [accessToken, mutate, interceptors],
+    [accessToken, mutate, interceptors]
   )
 
   const clearSkus = useCallback(() => {

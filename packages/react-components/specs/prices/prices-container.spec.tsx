@@ -12,11 +12,7 @@ import type { PricesContext as PricesCtx } from "../utils/context"
 const swrWrapper = ({ children }: { children: ReactNode }) =>
   createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
 
-function PricesInspector({
-  onCapture,
-}: {
-  onCapture: (prices: Record<string, unknown>) => void
-}) {
+function PricesInspector({ onCapture }: { onCapture: (prices: Record<string, unknown>) => void }) {
   const { prices } = useContext(PricesContext)
   onCapture(prices)
   return null
@@ -39,7 +35,7 @@ describe("PricesContainer component", () => {
           <span data-testid="child">price</span>
         </PricesContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     expect(container.querySelector('[data-testid="child"]')).not.toBeNull()
   })
@@ -56,12 +52,9 @@ describe("PricesContainer component", () => {
           />
         </PricesContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
-    await waitFor(
-      () => expect(Object.keys(captured).length).toBeGreaterThan(0),
-      { timeout: 10000 },
-    )
+    await waitFor(() => expect(Object.keys(captured).length).toBeGreaterThan(0), { timeout: 10000 })
     expect(Object.keys(captured)).toContain(ctx.skuCode)
   })
 
@@ -72,7 +65,7 @@ describe("PricesContainer component", () => {
           <Price skuCode={ctx.skuCode} data-testid={`price-${ctx.skuCode}`} />
         </PricesContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     await waitFor(
       () => {
@@ -80,7 +73,7 @@ describe("PricesContainer component", () => {
         expect(els.length).toBeGreaterThan(0)
         expect(els[0].textContent).not.toBe("")
       },
-      { timeout: 10000 },
+      { timeout: 10000 }
     )
   })
 
@@ -91,7 +84,7 @@ describe("PricesContainer component", () => {
           <span data-testid="child">price</span>
         </PricesContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     expect(container.querySelector('[data-testid="child"]')).not.toBeNull()
   })
@@ -111,12 +104,9 @@ describe("PricesContainer component", () => {
           </PricesContainer>
         </CommerceLayer>
       </SkuContext.Provider>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
-    await waitFor(
-      () => expect(Object.keys(captured).length).toBeGreaterThan(0),
-      { timeout: 10000 },
-    )
+    await waitFor(() => expect(Object.keys(captured).length).toBeGreaterThan(0), { timeout: 10000 })
     expect(Object.keys(captured)).toContain(ctx.skuCode)
   })
 
@@ -128,14 +118,14 @@ describe("PricesContainer component", () => {
           <Price skuCode={ctx.skuCode} data-testid={`dyn-${ctx.skuCode}`} />
         </PricesContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     await waitFor(
       () => {
         const els = screen.getAllByTestId(`dyn-${ctx.skuCode}`)
         expect(els[0].textContent).not.toBe("")
       },
-      { timeout: 10000 },
+      { timeout: 10000 }
     )
   })
 
@@ -147,7 +137,7 @@ describe("PricesContainer component", () => {
           <span>test</span>
         </PricesContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     unmount()
   })
@@ -160,7 +150,7 @@ describe("PricesContainer component", () => {
           <span data-testid="empty">no codes</span>
         </PricesContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     expect(container.querySelector('[data-testid="empty"]')).not.toBeNull()
   })
@@ -185,7 +175,7 @@ describe("PricesContainer component", () => {
           <Price skuCode={sku3} />
         </PricesContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     // All three codes must end up in the context (even if the API returns no
     // prices for those SKUs the fetch must have been attempted with all three)
@@ -194,7 +184,7 @@ describe("PricesContainer component", () => {
         const keys = Object.keys(captured)
         expect(keys.length).toBeGreaterThanOrEqual(1)
       },
-      { timeout: 10000 },
+      { timeout: 10000 }
     )
   })
 
@@ -204,21 +194,19 @@ describe("PricesContainer component", () => {
         <PricesContainer skuCode={ctx.skuCode}>
           <Price skuCode={ctx.skuCode}>
             {({ prices, loading }) => (
-              <span data-testid="price-child">
-                {loading ? "loading" : `${prices.length}`}
-              </span>
+              <span data-testid="price-child">{loading ? "loading" : `${prices.length}`}</span>
             )}
           </Price>
         </PricesContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     await waitFor(
       () => {
         const el = screen.getByTestId("price-child")
         expect(el.textContent).not.toBe("loading")
       },
-      { timeout: 10000 },
+      { timeout: 10000 }
     )
   })
 })

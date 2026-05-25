@@ -1,7 +1,4 @@
-import {
-  type DefaultMfeConfig,
-  getMfeConfig,
-} from "@commercelayer/organization-config"
+import { type DefaultMfeConfig, getMfeConfig } from "@commercelayer/organization-config"
 import { useEffect, useState } from "react"
 import { getSdk } from "@commercelayer/core"
 import { jwt } from "./jwt"
@@ -16,7 +13,7 @@ export interface OrganizationConfig {
  *
  */
 export async function getOrganizationConfig(
-  config: OrganizationConfig,
+  config: OrganizationConfig
 ): Promise<DefaultMfeConfig | null> {
   const { market } = jwt(config.accessToken)
   const sdk = getSdk({ accessToken: config.accessToken })
@@ -36,8 +33,7 @@ export function useOrganizationConfig({
   accessToken,
   params,
 }: Partial<OrganizationConfig>): DefaultMfeConfig | null {
-  const [organizationConfig, setOrganizationConfig] =
-    useState<DefaultMfeConfig | null>(null)
+  const [organizationConfig, setOrganizationConfig] = useState<DefaultMfeConfig | null>(null)
   useEffect(() => {
     if (accessToken == null) return
     getOrganizationConfig({

@@ -1,11 +1,11 @@
-import { useContext, type CSSProperties, type JSX } from 'react';
-import LineItemOptionChildrenContext from '#context/LineItemOptionChildrenContext'
-import Parent from '#components/utils/Parent'
-import type { LineItemOption as LineItemOptionType } from '@commercelayer/sdk'
-import type { ChildrenFunction } from '#typings/index'
-import isJSON from '#utils/isJSON'
+import { useContext, type CSSProperties, type JSX } from "react"
+import LineItemOptionChildrenContext from "#context/LineItemOptionChildrenContext"
+import Parent from "#components/utils/Parent"
+import type { LineItemOption as LineItemOptionType } from "@commercelayer/sdk"
+import type { ChildrenFunction } from "#typings/index"
+import isJSON from "#utils/isJSON"
 
-export interface TLineItemOption extends Omit<Props, 'children'> {
+export interface TLineItemOption extends Omit<Props, "children"> {
   lineItemOption: LineItemOptionType
 }
 
@@ -27,18 +27,18 @@ export function LineItemOption(props: Props): JSX.Element {
     children,
     valueClassName,
     key,
-    tagElement = 'li',
-    tagContainer = 'ul',
+    tagElement = "li",
+    tagContainer = "ul",
     ...p
   } = props
   const { lineItemOption, showAll } = useContext(LineItemOptionChildrenContext)
   const parentProps = {
     ...props,
-    lineItemOption
+    lineItemOption,
   }
   const TagElement = tagElement as any
   const TagContainer = tagContainer
-  const label = name != null ? lineItemOption?.options?.[name] : ''
+  const label = name != null ? lineItemOption?.options?.[name] : ""
   const components =
     showAll && isJSON(JSON.stringify(lineItemOption?.options)) ? (
       Object.entries(lineItemOption?.options ?? {}).map(([key, value]) => {
@@ -49,13 +49,11 @@ export function LineItemOption(props: Props): JSX.Element {
           </TagElement>
         )
       })
-    ) : name != null &&
-      lineItemOption?.options != null &&
-      name in lineItemOption.options ? (
+    ) : name != null && lineItemOption?.options != null && name in lineItemOption.options ? (
       <TagElement key={key} {...p}>
         {`${name}:`}
         <span className={valueClassName} {...p}>
-          {label ?? ''}
+          {label ?? ""}
         </span>
       </TagElement>
     ) : null

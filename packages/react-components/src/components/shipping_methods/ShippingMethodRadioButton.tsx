@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState, type JSX } from 'react';
-import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
-import Parent from '#components/utils/Parent'
-import ShipmentContext from '#context/ShipmentContext'
-import type { Order, ShippingMethod } from '@commercelayer/sdk'
+import { useContext, useEffect, useState, type JSX } from "react"
+import ShippingMethodChildrenContext from "#context/ShippingMethodChildrenContext"
+import Parent from "#components/utils/Parent"
+import ShipmentContext from "#context/ShipmentContext"
+import type { Order, ShippingMethod } from "@commercelayer/sdk"
 
-interface ShippingMethodRadioButtonType extends Omit<Props, 'children'> {
+interface ShippingMethodRadioButtonType extends Omit<Props, "children"> {
   shippingMethod: ShippingMethod
   shipmentId: string
 }
@@ -18,7 +18,7 @@ interface TOnChange {
 type Props = {
   children?: (props: ShippingMethodRadioButtonType) => JSX.Element
   onChange?: (params: TOnChange) => void
-} & Omit<JSX.IntrinsicElements['input'], 'onChange' | 'ref' | 'children'>
+} & Omit<JSX.IntrinsicElements["input"], "onChange" | "ref" | "children">
 
 export function ShippingMethodRadioButton(props: Props): JSX.Element {
   const { onChange, children, ...p } = props
@@ -29,8 +29,8 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
   )
   const { setShippingMethod } = useContext(ShipmentContext)
   const shippingMethodId = shippingMethod?.id
-  const name = `shipment-${shipmentId ?? ''}`
-  const id = `${name}-${shippingMethodId ?? ''}`
+  const name = `shipment-${shipmentId ?? ""}`
+  const id = `${name}-${shippingMethodId ?? ""}`
   useEffect(() => {
     if (shippingMethodId === currentShippingMethodId) {
       setChecked(true)
@@ -49,7 +49,7 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
           onChange({
             shippingMethod,
             shipmentId,
-            order
+            order,
           })
       }
     }
@@ -62,14 +62,14 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
     name,
     id,
     disabled,
-    ...props
+    ...props,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <input
       disabled={disabled}
-      type='radio'
+      type="radio"
       name={name}
       id={id}
       onChange={(e) => {

@@ -1,4 +1,4 @@
-import { createContext } from 'react'
+import { createContext } from "react"
 import {
   type UpdatePaymentSource,
   updatePaymentSource,
@@ -11,8 +11,8 @@ import {
   type DestroyPaymentSource,
   type SetPaymentRef,
   setPaymentRef,
-  setLoading
-} from '#reducers/PaymentMethodReducer'
+  setLoading,
+} from "#reducers/PaymentMethodReducer"
 
 type DefaultContext = {
   setPaymentMethodErrors: SetPaymentMethodErrors
@@ -31,11 +31,9 @@ export const defaultPaymentMethodContext: DefaultContext = {
   setPaymentRef,
   destroyPaymentSource,
   updatePaymentSource,
-  setLoading
+  setLoading,
 }
 
-const PaymentMethodContext = createContext<DefaultContext>(
-  defaultPaymentMethodContext
-)
+const PaymentMethodContext = createContext<DefaultContext>(defaultPaymentMethodContext)
 
 export default PaymentMethodContext

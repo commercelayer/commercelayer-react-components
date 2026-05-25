@@ -1,6 +1,6 @@
-import { useState, useEffect, Fragment } from 'react'
-import { getCustomerToken } from '@commercelayer/js-auth'
-import Head from 'next/head'
+import { useState, useEffect, Fragment } from "react"
+import { getCustomerToken } from "@commercelayer/js-auth"
+import Head from "next/head"
 import {
   CommerceLayer,
   LineItem,
@@ -21,22 +21,22 @@ import {
   ShipmentField,
   ShippingMethodRadioButtonType,
   Errors,
-} from 'packages/react-components/src'
-import { isEmpty } from 'packages/react-components/src/utils/isEmpty'
-import { useRouter } from 'next/router'
-import getSdk from '#utils/getSdk'
+} from "packages/react-components/src"
+import { isEmpty } from "packages/react-components/src/utils/isEmpty"
+import { useRouter } from "next/router"
+import getSdk from "#utils/getSdk"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 const username = process.env.NEXT_PUBLIC_USERNAME as string
 const password = process.env.NEXT_PUBLIC_PASSWORD as string
-let orderId = 'PDerhJplRp'
+let orderId = "PDerhJplRp"
 
 export default function Main() {
-  const [token, setToken] = useState('')
-  const [shippingMethodName, setShippingMethodName] = useState('')
-  const [shippingMethodId, setShippingMethodId] = useState<string>('')
+  const [token, setToken] = useState("")
+  const [shippingMethodName, setShippingMethodName] = useState("")
+  const [shippingMethodId, setShippingMethodId] = useState<string>("")
   const { query } = useRouter()
   if (query.orderId) {
     orderId = query.orderId as string
@@ -45,7 +45,7 @@ export default function Main() {
     const config = { accessToken: token, endpoint }
     const sdk = getSdk(config)
     const order = await sdk.orders.retrieve(orderId, {
-      include: ['shipments.shipping_method'],
+      include: ["shipments.shipping_method"],
     })
     const shipments = order.shipments
     if (!isEmpty(shipments) && shipments) {
@@ -75,10 +75,7 @@ export default function Main() {
     if (!token) getToken()
     if (token) getOrder()
   }, [token])
-  const handleChange = ({
-    shippingMethod,
-    shipmentId,
-  }: ShippingMethodRadioButtonType) => {
+  const handleChange = ({ shippingMethod, shipmentId }: ShippingMethodRadioButtonType) => {
     console.log(`shippingMethod`, shippingMethod, shipmentId)
     if (shippingMethod?.name) {
       setShippingMethodName(shippingMethod.name)
@@ -118,7 +115,7 @@ export default function Main() {
                             className="px-1"
                             attribute="image_url"
                             tagElement="img"
-                          />{' '}
+                          />{" "}
                           of <LineItemQuantity readonly className="px-1" />
                           items will undergo a transfer
                         </div>
@@ -135,11 +132,7 @@ export default function Main() {
                     <ShippingMethodName data-cy="shipping-method-name" />
                     <ShippingMethodPrice data-cy="shipping-method-price" />
                     <div className="flex">
-                      <DeliveryLeadTime
-                        type="min_days"
-                        data-cy="delivery-lead-time-min-days"
-                      />{' '}
-                      -{' '}
+                      <DeliveryLeadTime type="min_days" data-cy="delivery-lead-time-min-days" /> -{" "}
                       <DeliveryLeadTime
                         type="max_days"
                         data-cy="delivery-lead-time-max-days"
@@ -163,7 +156,7 @@ export default function Main() {
                         <ShippingMethodName data-cy="shipping-method-name-recap" />
                         <ShippingMethodPrice />
                         <div className="flex">
-                          <DeliveryLeadTime type="min_days" /> -{' '}
+                          <DeliveryLeadTime type="min_days" /> -{" "}
                           <DeliveryLeadTime type="max_days" className="mr-1" />
                           days
                         </div>

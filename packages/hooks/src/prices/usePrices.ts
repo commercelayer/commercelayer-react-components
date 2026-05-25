@@ -51,12 +51,8 @@ type UseAction = "get" | "retrieve" | "update" | null
  * @param interceptors - Optional SDK interceptors for request/response customization
  * @returns Object containing prices data, loading states, and action methods
  */
-export function usePrices(
-  accessToken: string,
-  interceptors?: InterceptorManager,
-): UsePricesReturn {
-  const [fetchParams, setFetchParams] =
-    useState<Parameters<typeof getPrices>[0]["params"]>()
+export function usePrices(accessToken: string, interceptors?: InterceptorManager): UsePricesReturn {
+  const [fetchParams, setFetchParams] = useState<Parameters<typeof getPrices>[0]["params"]>()
   const [shouldFetch, setShouldFetch] = useState(false)
   const [action, setAction] = useState<UseAction>(null)
 
@@ -64,36 +60,27 @@ export function usePrices(
   // All usePrices instances with the same token share the same store entry.
   const stableSubscribe = useCallback(
     (listener: () => void) => subscribe(accessToken, listener),
-    [accessToken],
+    [accessToken]
   )
-  const stableSnapshot = useCallback(
-    () => getSnapshot(accessToken),
-    [accessToken],
-  )
+  const stableSnapshot = useCallback(() => getSnapshot(accessToken), [accessToken])
   const skuCodesList = useSyncExternalStore(
     stableSubscribe,
     stableSnapshot,
     // c8 ignore next — server snapshot only used during SSR hydration
-    () => EMPTY,
+    () => EMPTY
   )
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<Price[]>(
-    shouldFetch && accessToken
-      ? ["prices", "get", accessToken, fetchParams]
-      : null,
-    async (): Promise<Price[]> =>
-      getPrices({ accessToken, params: fetchParams, interceptors }),
-    { revalidateOnFocus: false, revalidateOnReconnect: false },
+    shouldFetch && accessToken ? ["prices", "get", accessToken, fetchParams] : null,
+    async (): Promise<Price[]> => getPrices({ accessToken, params: fetchParams, interceptors }),
+    { revalidateOnFocus: false, revalidateOnReconnect: false }
   )
 
-  const fetchPrices = useCallback(
-    (newParams?: Parameters<typeof getPrices>[0]["params"]) => {
-      setFetchParams(newParams)
-      setShouldFetch(true)
-      setAction("get")
-    },
-    [],
-  )
+  const fetchPrices = useCallback((newParams?: Parameters<typeof getPrices>[0]["params"]) => {
+    setFetchParams(newParams)
+    setShouldFetch(true)
+    setAction("get")
+  }, [])
 
   // Auto-fetch whenever the batch store snapshot changes (new SKU codes registered).
   // All instances with the same token call fetchPrices with the same params —
@@ -106,12 +93,12 @@ export function usePrices(
 
   const registerSku = useCallback(
     (code: string) => storeRegisterSku(accessToken, code),
-    [accessToken],
+    [accessToken]
   )
 
   const unregisterSku = useCallback(
     (code: string) => storeUnregisterSku(accessToken, code),
-    [accessToken],
+    [accessToken]
   )
 
   const handleRetrievePrice = useCallback(
@@ -120,25 +107,21 @@ export function usePrices(
       setAction("retrieve")
       return retrievePrice({ accessToken, id, interceptors })
     },
-    [accessToken, interceptors],
+    [accessToken, interceptors]
   )
 
   const handleUpdatePrice = useCallback(
     async (resource: PriceUpdate): Promise<Price | undefined> => {
-      if (!resource?.id)
-        throw new Error("Price resource ID is required for update")
+      if (!resource?.id) throw new Error("Price resource ID is required for update")
       setAction("update")
       const result = await updatePrice({ accessToken, resource, interceptors })
       await mutate(
-        (current) =>
-          current?.map((p: Price) => (p.id === result.id ? result : p)) ?? [
-            result,
-          ],
-        { revalidate: false },
+        (current) => current?.map((p: Price) => (p.id === result.id ? result : p)) ?? [result],
+        { revalidate: false }
       )
       return result
     },
-    [accessToken, mutate, interceptors],
+    [accessToken, mutate, interceptors]
   )
 
   const clearPrices = useCallback(() => {

@@ -59,15 +59,9 @@ export function BillingAddressForm(props: Props): JSX.Element {
     setValue: setValueForm,
     setError: setErrorForm,
   } = (useRapidForm as any)({ fieldEvent })
-  const { setAddressErrors, setAddress, isBusiness } =
-    useContext(AddressesContext)
-  const {
-    saveAddressToCustomerAddressBook,
-    order,
-    include,
-    addResourceToInclude,
-    includeLoaded,
-  } = useContext(OrderContext)
+  const { setAddressErrors, setAddress, isBusiness } = useContext(AddressesContext)
+  const { saveAddressToCustomerAddressBook, order, include, addResourceToInclude, includeLoaded } =
+    useContext(OrderContext)
   const ref = useRef<HTMLFormElement | null>(null)
   useEffect(() => {
     if (!include?.includes("billing_address")) {
@@ -86,11 +80,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
           const fieldName = field.name
           const value = field.value
           const inError = errors[fieldName] != null
-          if (
-            customFieldMessageError != null &&
-            fieldName != null &&
-            value != null
-          ) {
+          if (customFieldMessageError != null && fieldName != null && value != null) {
             values[fieldName.replace("shipping_address_", "")] = value
             const customMessage = customFieldMessageError({
               field: fieldName,
@@ -160,10 +150,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
       setAddressErrors([], "billing_address")
       for (const name in values) {
         const field = values[name]
-        if (
-          field?.value ||
-          (field?.required === false && field?.type !== "checkbox")
-        ) {
+        if (field?.value || (field?.required === false && field?.type !== "checkbox")) {
           values[name.replace("billing_address_", "")] = field.value
 
           delete values[name]
@@ -186,7 +173,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     }
     const checkboxChecked =
       ref.current?.querySelector(
-        '[name="billing_address_save_to_customer_book"]',
+        '[name="billing_address_save_to_customer_book"]'
         // @ts-expect-error no type no types
       )?.checked || getSaveBillingAddressToAddressBook()
     if (checkboxChecked) {
@@ -218,10 +205,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
       }
     }
   }, [errors, values, reset, include, includeLoaded, isBusiness])
-  const setValue = (
-    name: AddressValuesKeys,
-    value: string | number | readonly string[],
-  ): void => {
+  const setValue = (name: AddressValuesKeys, value: string | number | readonly string[]): void => {
     setValueForm(name, value as string)
     const field: any = {
       [name.replace("billing_address_", "")]: value,

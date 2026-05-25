@@ -1,8 +1,4 @@
-import {
-  type Price,
-  prices,
-  type QueryParamsRetrieve,
-} from "@commercelayer/sdk"
+import { type Price, prices, type QueryParamsRetrieve } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 

@@ -1,10 +1,10 @@
-import { createContext } from 'react'
+import { createContext } from "react"
 import {
   type ShipmentState,
   type SetShipmentErrors,
   setShipmentErrors,
-  type setShippingMethod
-} from '#reducers/ShipmentReducer'
+  type setShippingMethod,
+} from "#reducers/ShipmentReducer"
 
 type DefaultContext = {
   setShipmentErrors: SetShipmentErrors
@@ -15,7 +15,7 @@ type DefaultContext = {
 } & ShipmentState
 
 export const defaultShipmentContext = {
-  setShipmentErrors
+  setShipmentErrors,
 }
 
 const ShipmentContext = createContext<DefaultContext>(defaultShipmentContext)

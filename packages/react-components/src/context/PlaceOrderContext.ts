@@ -1,10 +1,10 @@
-import { createContext, type RefObject } from 'react'
+import { createContext, type RefObject } from "react"
 import {
   type PlaceOrderState,
   type setPlaceOrder,
   setPlaceOrderErrors,
-  setPlaceOrderStatus
-} from '#reducers/PlaceOrderReducer'
+  setPlaceOrderStatus,
+} from "#reducers/PlaceOrderReducer"
 
 type DefaultContext = {
   setPlaceOrderErrors?: typeof setPlaceOrderErrors
@@ -17,11 +17,9 @@ type DefaultContext = {
 export const defaultPlaceOrderContext: DefaultContext = {
   setPlaceOrderStatus,
   setPlaceOrderErrors,
-  status: 'standby'
+  status: "standby",
 }
 
-const PlaceOrderContext = createContext<DefaultContext>(
-  defaultPlaceOrderContext
-)
+const PlaceOrderContext = createContext<DefaultContext>(defaultPlaceOrderContext)
 
 export default PlaceOrderContext

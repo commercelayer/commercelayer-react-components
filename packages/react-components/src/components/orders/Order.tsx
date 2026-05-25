@@ -79,9 +79,7 @@ export function Order(props: Props): JSX.Element {
     fetchOrder,
     ...storageCtx,
   })
-  return (
-    <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
-  )
+  return <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>
 }
 
 export default Order

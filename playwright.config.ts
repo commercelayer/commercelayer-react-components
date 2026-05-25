@@ -1,14 +1,14 @@
 // https://github.com/playwright-community/jest-playwright/#configuration
-import { PlaywrightTestConfig } from '@playwright/test'
+import { PlaywrightTestConfig } from "@playwright/test"
 
 const config: PlaywrightTestConfig = {
   // timeout: 3000,
   webServer: {
-    command: 'pnpm start',
+    command: "pnpm start",
     port: 3000,
     reuseExistingServer: true,
   },
-  testDir: 'specs/e2e',
+  testDir: "specs/e2e",
   use: {
     // Browser options
     headless: false,
@@ -17,18 +17,18 @@ const config: PlaywrightTestConfig = {
     viewport: { width: 1280, height: 720 },
     ignoreHTTPSErrors: true,
     // Artifacts
-    screenshot: 'only-on-failure',
-    video: 'retry-with-video',
+    screenshot: "only-on-failure",
+    video: "retry-with-video",
   },
   projects: [
     {
-      name: 'Chromium',
+      name: "Chromium",
       use: {
         // Configure the browser to use.
-        browserName: 'chromium',
+        browserName: "chromium",
         // Any Chromium-specific options.
         viewport: { width: 1200, height: 800 },
-        baseURL: 'http://localhost:3000',
+        baseURL: "http://localhost:3000",
         launchOptions: {
           devtools: true,
         },

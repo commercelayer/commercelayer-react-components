@@ -16,9 +16,7 @@ const mockPrices = [{ id: "price_1", amount_cents: 1000 }]
 
 const mockGetPrices = vi.fn().mockResolvedValue(mockPrices)
 const mockRetrievePrice = vi.fn().mockResolvedValue(mockPrices[0])
-const mockUpdatePrice = vi
-  .fn()
-  .mockResolvedValue({ ...mockPrices[0], amount_cents: 2000 })
+const mockUpdatePrice = vi.fn().mockResolvedValue({ ...mockPrices[0], amount_cents: 2000 })
 
 vi.mock("@commercelayer/core", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@commercelayer/core")>()
@@ -52,9 +50,7 @@ describe("usePrices — interceptors", () => {
     })
 
     await waitFor(() => {
-      expect(mockGetPrices).toHaveBeenCalledWith(
-        expect.objectContaining({ interceptors }),
-      )
+      expect(mockGetPrices).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
     })
   })
 
@@ -67,9 +63,7 @@ describe("usePrices — interceptors", () => {
       await result.current.retrievePrice("price_1")
     })
 
-    expect(mockRetrievePrice).toHaveBeenCalledWith(
-      expect.objectContaining({ interceptors }),
-    )
+    expect(mockRetrievePrice).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
   })
 
   it("passes interceptors to updatePrice", async () => {
@@ -81,9 +75,7 @@ describe("usePrices — interceptors", () => {
       await result.current.updatePrice({ id: "price_1", amount_cents: 2000 })
     })
 
-    expect(mockUpdatePrice).toHaveBeenCalledWith(
-      expect.objectContaining({ interceptors }),
-    )
+    expect(mockUpdatePrice).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
   })
 
   it("works without interceptors", async () => {
@@ -96,9 +88,7 @@ describe("usePrices — interceptors", () => {
     })
 
     await waitFor(() => {
-      expect(mockGetPrices).toHaveBeenCalledWith(
-        expect.objectContaining({ accessToken }),
-      )
+      expect(mockGetPrices).toHaveBeenCalledWith(expect.objectContaining({ accessToken }))
     })
   })
 })

@@ -18,11 +18,7 @@ interface Params<R extends PaymentResource, C extends PaymentMethodConfig> {
 }
 
 export type ResourceKeys<K extends PaymentResource> = SnakeToCamelCase<
-  StringReplace<
-    StringReplace<K, "payments", "payment">,
-    "transfers",
-    "transfer"
-  >
+  StringReplace<StringReplace<K, "payments", "payment">, "transfers", "transfer">
 >
 
 export function getPaymentAttributes<
@@ -32,15 +28,11 @@ export function getPaymentAttributes<
   const { resource, config, keys } = params
   const attributes = getPaymentConfig(resource, config)
   const keysCamelCase: ResourceKeys<R>[] = keys.map((key) => {
-    const k = replace(
-      replace(key, "payments", "payment"),
-      "transfers",
-      "transfer",
-    )
+    const k = replace(replace(key, "payments", "payment"), "transfers", "transfer")
     return snakeToCamelCase(k)
   })
   const currentResource = snakeToCamelCase(
-    replace(replace(resource, "payments", "payment"), "transfers", "transfer"),
+    replace(replace(resource, "payments", "payment"), "transfers", "transfer")
   )
   return attributes != null && currentResource in attributes
     ? pick(attributes, keysCamelCase)
@@ -49,7 +41,7 @@ export function getPaymentAttributes<
 
 export function getPaypalAttributes(
   paymentResource: PaymentResource,
-  config: PaymentMethodConfig,
+  config: PaymentMethodConfig
 ): Pick<PaypalConfig, "return_url" | "cancel_url"> | undefined {
   const attributes = getPaymentAttributes({
     resource: paymentResource,
@@ -63,7 +55,7 @@ export function getPaypalAttributes(
 
 export function getExternalPaymentAttributes(
   paymentResource: PaymentResource,
-  config: PaymentMethodConfig,
+  config: PaymentMethodConfig
 ): Pick<ExternalPayment, "payment_source_token"> | undefined {
   const attributes = getPaymentAttributes({
     resource: paymentResource,
@@ -77,7 +69,7 @@ export function getExternalPaymentAttributes(
 
 export function getStripeAttributes(
   paymentResource: PaymentResource,
-  config: PaymentMethodConfig,
+  config: PaymentMethodConfig
 ): Pick<StripeConfig, "return_url"> | undefined {
   const attributes = getPaymentAttributes({
     resource: paymentResource,
@@ -91,15 +83,14 @@ export function getStripeAttributes(
 
 export function getCkoAttributes(
   paymentResource: PaymentResource,
-  config: PaymentMethodConfig,
+  config: PaymentMethodConfig
 ): Pick<CheckoutComConfig, "success_url" | "failure_url"> | undefined {
   const attributes = getPaymentAttributes({
     resource: paymentResource,
     config,
     keys: ["checkout_com_payments"],
   })
-  return attributes?.checkoutComPayment != null &&
-    "checkoutComPayment" in attributes
+  return attributes?.checkoutComPayment != null && "checkoutComPayment" in attributes
     ? pick(attributes?.checkoutComPayment, ["success_url", "failure_url"])
     : undefined
 }

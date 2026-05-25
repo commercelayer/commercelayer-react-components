@@ -1,16 +1,7 @@
-import {
-  type JSX,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-} from "react"
+import { type JSX, type ReactNode, useContext, useEffect, useMemo, useReducer } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
-import PaymentMethodContext, {
-  defaultPaymentMethodContext,
-} from "#context/PaymentMethodContext"
+import PaymentMethodContext, { defaultPaymentMethodContext } from "#context/PaymentMethodContext"
 import paymentMethodReducer, {
   getPaymentMethods,
   type PaymentMethodConfig,
@@ -36,10 +27,7 @@ interface Props {
 }
 export function PaymentMethodsContainer(props: Props): JSX.Element {
   const { children, config } = props
-  const [state, dispatch] = useReducer(
-    paymentMethodReducer,
-    paymentMethodInitialState,
-  )
+  const [state, dispatch] = useReducer(paymentMethodReducer, paymentMethodInitialState)
   const {
     order,
     getOrder,
@@ -80,8 +68,7 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
         },
       })
     }
-    if (config && isEmpty(state.config))
-      setPaymentMethodConfig(config, dispatch)
+    if (config && isEmpty(state.config)) setPaymentMethodConfig(config, dispatch)
     if (credentials && order && !state.paymentMethods) {
       getPayMethods()
     }
@@ -103,12 +90,7 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     ) {
       getOrder(order.id)
     }
-  }, [
-    order,
-    credentials,
-    include?.length,
-    Object.keys(includeLoaded ?? []).length,
-  ])
+  }, [order, credentials, include?.length, Object.keys(includeLoaded ?? []).length])
   const contextValue = useMemo(() => {
     return {
       ...state,
@@ -159,9 +141,7 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     }
   }, [state])
   return (
-    <PaymentMethodContext.Provider value={contextValue}>
-      {children}
-    </PaymentMethodContext.Provider>
+    <PaymentMethodContext.Provider value={contextValue}>{children}</PaymentMethodContext.Provider>
   )
 }
 

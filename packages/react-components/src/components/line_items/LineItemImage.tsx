@@ -1,12 +1,12 @@
-import { useContext, type JSX } from 'react';
-import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import type { LineItem } from '@commercelayer/sdk'
-import type { ChildrenFunction } from '#typings'
-import { defaultGiftCardImgUrl, defaultImgUrl } from '#utils/placeholderImages'
-import Parent from '#components/utils/Parent'
-import type { TLineItem } from './LineItem'
+import { useContext, type JSX } from "react"
+import LineItemChildrenContext from "#context/LineItemChildrenContext"
+import type { LineItem } from "@commercelayer/sdk"
+import type { ChildrenFunction } from "#typings"
+import { defaultGiftCardImgUrl, defaultImgUrl } from "#utils/placeholderImages"
+import Parent from "#components/utils/Parent"
+import type { TLineItem } from "./LineItem"
 
-export interface TLineItemImage extends Omit<Props, 'children'> {
+export interface TLineItemImage extends Omit<Props, "children"> {
   src: string
   lineItem: LineItem
 }
@@ -17,7 +17,7 @@ type Props = {
   placeholder?: {
     [K in TLineItem]?: string
   }
-} & Omit<JSX.IntrinsicElements['img'], 'src' | 'srcSet' | 'placeholder'>
+} & Omit<JSX.IntrinsicElements["img"], "src" | "srcSet" | "placeholder">
 
 export function LineItemImage(props: Props): JSX.Element | null {
   const { placeholder, children, ...p } = props
@@ -28,21 +28,21 @@ export function LineItemImage(props: Props): JSX.Element | null {
     if (placeholder?.[itemType]) {
       src = placeholder?.[itemType]
     } else {
-      src = itemType === 'gift_cards' ? defaultGiftCardImgUrl : defaultImgUrl
+      src = itemType === "gift_cards" ? defaultGiftCardImgUrl : defaultImgUrl
     }
   }
   const parenProps = {
     lineItem,
     src,
     placeholder,
-    ...p
+    ...p,
   }
   return children ? (
     <Parent {...parenProps}>{children}</Parent>
   ) : !src ? null : (
     <img
-      data-testid={`line-item-image-${lineItem?.sku_code ?? ''}`}
-      alt={lineItem?.name ?? ''}
+      data-testid={`line-item-image-${lineItem?.sku_code ?? ""}`}
+      alt={lineItem?.name ?? ""}
       src={src}
       {...p}
     />

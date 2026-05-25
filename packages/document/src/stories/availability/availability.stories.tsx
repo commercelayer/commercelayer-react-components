@@ -1,9 +1,4 @@
-import {
-  Availability,
-  AvailabilityTemplate,
-  Sku,
-  SkuField,
-} from "@commercelayer/react-components"
+import { Availability, AvailabilityTemplate, Sku, SkuField } from "@commercelayer/react-components"
 import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import CommerceLayer from "../_internals/CommerceLayer"
@@ -13,19 +8,17 @@ function AvailabilityDocsPage(): JSX.Element {
     <>
       <h1>Availability</h1>
       <p>
-        The Availability components let you display real-time stock quantity and
-        delivery lead times for any SKU. They are powered by the Commerce Layer
-        inventory model and work by fetching availability data through the{" "}
-        <code>useAvailability</code> hook from <code>@commercelayer/hooks</code>
-        . All Availability components must be nested inside the{" "}
+        The Availability components let you display real-time stock quantity and delivery lead times
+        for any SKU. They are powered by the Commerce Layer inventory model and work by fetching
+        availability data through the <code>useAvailability</code> hook from{" "}
+        <code>@commercelayer/hooks</code>. All Availability components must be nested inside the{" "}
         <code>{"<CommerceLayer>"}</code> context.
       </p>
       <hr />
       <h2>Availability (standalone)</h2>
       <p>
-        The preferred way to display availability.{" "}
-        <code>{"<Availability>"}</code> fetches inventory data on its own — no
-        container wrapper needed. Picks up <code>skuCode</code> from a parent{" "}
+        The preferred way to display availability. <code>{"<Availability>"}</code> fetches inventory
+        data on its own — no container wrapper needed. Picks up <code>skuCode</code> from a parent{" "}
         <code>{"<Sku>"}</code> or line-item context when no prop is given.
       </p>
       <blockquote>
@@ -52,11 +45,10 @@ import { CommerceLayer, Availability, AvailabilityTemplate } from '@commercelaye
       <hr />
       <h2>Usage inside Skus</h2>
       <p>
-        When used inside a <code>{"<Sku>"}</code> or{" "}
-        <code>{"<SkusContainer>"}</code> → <code>{"<Skus>"}</code> tree,{" "}
-        <code>{"<Availability>"}</code> automatically inherits the{" "}
-        <code>skuCode</code> from the current SKU context — no need to pass{" "}
-        <code>skuCode</code> explicitly.
+        When used inside a <code>{"<Sku>"}</code> or <code>{"<SkusContainer>"}</code> →{" "}
+        <code>{"<Skus>"}</code> tree, <code>{"<Availability>"}</code> automatically inherits the{" "}
+        <code>skuCode</code> from the current SKU context — no need to pass <code>skuCode</code>{" "}
+        explicitly.
       </p>
       <Canvas of={InsideSku} />
     </>
@@ -108,9 +100,7 @@ export const StandaloneAvailability: Story = {
   render: () => (
     <CommerceLayer accessToken="my-access-token">
       <Availability skuCode="POLOMXXX000000FFFFFFLXXX">
-        <AvailabilityTemplate
-          labels={{ available: "In stock", outOfStock: "Out of stock" }}
-        />
+        <AvailabilityTemplate labels={{ available: "In stock", outOfStock: "Out of stock" }} />
       </Availability>
     </CommerceLayer>
   ),
@@ -137,11 +127,7 @@ export const InsideSku: Story = {
   render: () => (
     <CommerceLayer accessToken="my-access-token">
       <Sku skuCode="POLOMXXX000000FFFFFFLXXX">
-        <SkuField
-          attribute="name"
-          tagElement="h3"
-          style={{ marginBottom: 4 }}
-        />
+        <SkuField attribute="name" tagElement="h3" style={{ marginBottom: 4 }} />
         <Availability>
           <AvailabilityTemplate />
         </Availability>

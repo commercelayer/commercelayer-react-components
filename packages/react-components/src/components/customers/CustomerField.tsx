@@ -1,20 +1,16 @@
-import type { ConditionalElement } from '#typings'
+import type { ConditionalElement } from "#typings"
 import GenericFieldComponent, {
   type TGenericChildrenProps,
   type TResourceKey,
-  type TResources
-} from '#components/utils/GenericFieldComponent'
-import CustomerContext from '#context/CustomerContext'
+  type TResources,
+} from "#components/utils/GenericFieldComponent"
+import CustomerContext from "#context/CustomerContext"
 
-import type { JSX } from "react";
+import type { JSX } from "react"
 
-type StockTransferFieldChildrenProps = TGenericChildrenProps<
-  TResources['Customer']
->
+type StockTransferFieldChildrenProps = TGenericChildrenProps<TResources["Customer"]>
 
-type TCondition = ConditionalElement<
-  Exclude<TResources['Customer'], 'resource'>
->
+type TCondition = ConditionalElement<Exclude<TResources["Customer"], "resource">>
 
 type Props = {
   children?: (props: StockTransferFieldChildrenProps) => JSX.Element
@@ -36,10 +32,10 @@ type Props = {
  * </span>
  */
 export function CustomerField<P extends Props>(props: P): JSX.Element {
-  const { attribute, tagElement = 'span', children, ...p } = props
+  const { attribute, tagElement = "span", children, ...p } = props
   return (
-    <GenericFieldComponent<TResourceKey['Customer']>
-      resource='customers'
+    <GenericFieldComponent<TResourceKey["Customer"]>
+      resource="customers"
       attribute={attribute}
       tagElement={tagElement}
       context={CustomerContext}

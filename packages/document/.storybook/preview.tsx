@@ -28,16 +28,16 @@ export const parameters: Parameters = {
   options: {
     storySort: {
       order: [
-        'Getting Started',
-        'Components',
-        ['Availability', 'Price', 'Order'],
-        'Skus',
-        ['Sku'],
-        'Examples',
-        ['Listing Page', 'Shopping Cart', 'Checkout Page', 'My Account'],
-        'Hooks'
-      ]
-    }
+        "Getting Started",
+        "Components",
+        ["Availability", "Price", "Order"],
+        "Skus",
+        ["Sku"],
+        "Examples",
+        ["Listing Page", "Shopping Cart", "Checkout Page", "My Account"],
+        "Hooks",
+      ],
+    },
   },
   docs: {
     page: () => (
@@ -92,12 +92,8 @@ const argTypesEnhancers: Preview["argTypesEnhancers"] = [
   (context) => {
     // when the className prop comes from `JSX.IntrinsicElements['div' | 'span']`
     // and is not documented, we add a default description
-    if (
-      "className" in context.argTypes &&
-      context.argTypes.className.description === ""
-    ) {
-      context.argTypes.className.description =
-        "CSS class name for the base component"
+    if ("className" in context.argTypes && context.argTypes.className.description === "") {
+      context.argTypes.className.description = "CSS class name for the base component"
     }
 
     return context.argTypes

@@ -1,4 +1,4 @@
-import { server } from './server'
+import { server } from "./server"
 
 beforeAll(async () => {
   server.listen()

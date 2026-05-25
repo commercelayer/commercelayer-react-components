@@ -14,18 +14,8 @@ import {
   type UIElement,
   type UIElementProps,
 } from "@adyen/adyen-web/auto"
-import type {
-  AdyenPayment as AdyenPaymentType,
-  Order,
-} from "@commercelayer/sdk"
-import {
-  type FormEvent,
-  type JSX,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react"
+import type { AdyenPayment as AdyenPaymentType, Order } from "@commercelayer/sdk"
+import { type FormEvent, type JSX, useContext, useEffect, useRef, useState } from "react"
 import Parent from "#components/utils/Parent"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
@@ -43,13 +33,7 @@ interface PaymentMethodsStyle {
   paypal?: PayPalConfiguration["style"]
 }
 
-type PaymentMethodType =
-  | "scheme"
-  | "giftcard"
-  | "paypal"
-  | "applepay"
-  | "googlepay"
-  | (string & {})
+type PaymentMethodType = "scheme" | "giftcard" | "paypal" | "applepay" | "googlepay" | (string & {})
 
 /**
  * Configuration options for the Adyen payment component.
@@ -143,9 +127,7 @@ export function AdyenPayment({
     ...config,
   }
   const [loadAdyen, setLoadAdyen] = useState(false)
-  const [checkout, setCheckout] = useState<
-    UIElement<UIElementProps> | undefined
-  >()
+  const [checkout, setCheckout] = useState<UIElement<UIElementProps> | undefined>()
   const [giftcardError, setGiftcardError] = useState<string | null>(null)
   const {
     setPaymentSource,
@@ -157,21 +139,18 @@ export function AdyenPayment({
   } = useContext(PaymentMethodContext)
   const { order, updateOrder, getOrderByFields } = useContext(OrderContext)
   const authConfig = useContext(CommerceLayerContext)
-  const { placeOrderButtonRef, setPlaceOrder, status } =
-    useContext(PlaceOrderContext)
+  const { placeOrderButtonRef, setPlaceOrder, status } = useContext(PlaceOrderContext)
   const { customers } = useContext(CustomerContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const dropinRef = useRef<Dropin | null>(null)
-  const handleSubmit = async (
-    e: FormEvent<HTMLFormElement>,
-  ): Promise<boolean> => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<boolean> => {
     const savePaymentSourceToCustomerWallet: string =
       // @ts-expect-error no type
       e?.elements?.save_payment_source_to_customer_wallet?.checked
     if (savePaymentSourceToCustomerWallet)
       setCustomerOrderParam(
         "_save_payment_source_to_customer_wallet",
-        savePaymentSourceToCustomerWallet,
+        savePaymentSourceToCustomerWallet
       )
     if (dropinRef.current) {
       dropinRef.current.submit()
@@ -182,9 +161,7 @@ export function AdyenPayment({
     if (state.isValid) {
       if (ref.current) {
         ref.current.onsubmit = async () => {
-          return await handleSubmit(
-            ref.current as unknown as FormEvent<HTMLFormElement>,
-          )
+          return await handleSubmit(ref.current as unknown as FormEvent<HTMLFormElement>)
         }
         setPaymentMethodErrors([])
         setPaymentRef({ ref })
@@ -196,7 +173,7 @@ export function AdyenPayment({
   }
   const handleOnAdditionalDetails = async (
     state: AdditionalDetailsData,
-    component?: UIElement<UIElementProps>,
+    component?: UIElement<UIElementProps>
   ): Promise<CheckoutAdvancedFlowResponse> => {
     const attributes = {
       payment_request_details: state.data,
@@ -250,7 +227,7 @@ export function AdyenPayment({
   }
   const onSubmit = async (
     state: SubmitData,
-    component: UIElement<UIElementProps>,
+    component: UIElement<UIElementProps>
   ): Promise<
     CheckoutAdvancedFlowResponse & {
       paymentMethodType?: string
@@ -328,8 +305,7 @@ export function AdyenPayment({
         const currentBalance = giftCardBalanceCheck?.balance ?? 0
         const totalAmount = order?.total_amount_with_taxes_cents ?? 0
         if (currentBalance === 0) {
-          const message =
-            "The gift card has no balance. Please use a different one."
+          const message = "The gift card has no balance. Please use a different one."
           setPaymentMethodErrors([
             {
               code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
@@ -370,8 +346,7 @@ export function AdyenPayment({
           orderUpdated?.payment_source?.payment_response?.action
         const paymentStatus = orderUpdated?.payment_status
         if (
-          (["Cancelled", "Refused"].includes(resultCode) &&
-            refusalReasonCode !== "12") ||
+          (["Cancelled", "Refused"].includes(resultCode) && refusalReasonCode !== "12") ||
           errorCode
         ) {
           const message =
@@ -413,10 +388,7 @@ export function AdyenPayment({
       // @ts-expect-error no type
       const issuerType = res?.payment_instrument?.issuer_type
       if (["Authorised", "Pending", "Received"].includes(resultCode)) {
-        if (
-          ["apple pay", "google pay"].includes(issuerType) &&
-          setPlaceOrder != null
-        ) {
+        if (["apple pay", "google pay"].includes(issuerType) && setPlaceOrder != null) {
           await setPlaceOrder({
             paymentSource: res,
             currentCustomerPaymentSourceId,
@@ -505,9 +477,7 @@ export function AdyenPayment({
         : [],
     }
     if (paymentMethodsResponse.paymentMethods.length === 0) {
-      console.error(
-        "Payment methods are not available. Please, check your Adyen configuration.",
-      )
+      console.error("Payment methods are not available. Please, check your Adyen configuration.")
     }
     let showStoredPaymentMethods =
       // @ts-expect-error no type
@@ -527,11 +497,9 @@ export function AdyenPayment({
        * because they are not supported in subscriptions
        */
       paymentMethodsResponse.paymentMethods =
-        subscriptionPaymentMethods != null &&
-        subscriptionPaymentMethods.length > 0
-          ? paymentMethodsResponse.paymentMethods.filter(
-              (pm: { type: PaymentMethodType }) =>
-                subscriptionPaymentMethods.includes(pm.type),
+        subscriptionPaymentMethods != null && subscriptionPaymentMethods.length > 0
+          ? paymentMethodsResponse.paymentMethods.filter((pm: { type: PaymentMethodType }) =>
+              subscriptionPaymentMethods.includes(pm.type)
             )
           : paymentMethodsResponse.paymentMethods
     }
@@ -564,10 +532,7 @@ export function AdyenPayment({
       },
       onSubmit: (state, element, actions) => {
         const handleSubmit = async (): Promise<void> => {
-          const { resultCode, action, message, paymentStatus } = await onSubmit(
-            state,
-            element,
-          )
+          const { resultCode, action, message, paymentStatus } = await onSubmit(state, element)
           if (["Cancelled", "Refused"].includes(resultCode)) {
             actions.reject()
             if (message) {
@@ -588,8 +553,7 @@ export function AdyenPayment({
         handleSubmit()
       },
     } satisfies CoreConfiguration
-    if (!ref && clientKey)
-      setCustomerOrderParam("_save_payment_source_to_customer_wallet", "false")
+    if (!ref && clientKey) setCustomerOrderParam("_save_payment_source_to_customer_wallet", "false")
     if (clientKey && !loadAdyen && window && !checkout) {
       const initializeAdyen = async (): Promise<void> => {
         const checkout = await AdyenCheckout(options)
@@ -649,14 +613,9 @@ export function AdyenPayment({
                  * For payment methods different from card, we remove the onsubmit handler
                  * to manage the submission via Adyen Drop-in and the place order button remains disabled
                  */
-                if (
-                  id.search("paypal") === -1 &&
-                  id.search("giftcard") === -1
-                ) {
+                if (id.search("paypal") === -1 && id.search("giftcard") === -1) {
                   ref.current.onsubmit = async () => {
-                    return await handleSubmit(
-                      ref.current as unknown as FormEvent<HTMLFormElement>,
-                    )
+                    return await handleSubmit(ref.current as unknown as FormEvent<HTMLFormElement>)
                   }
                 } else {
                   ref.current.onsubmit = null
@@ -667,9 +626,7 @@ export function AdyenPayment({
             if (isValid) {
               if (ref.current) {
                 ref.current.onsubmit = async () => {
-                  return await handleSubmit(
-                    ref.current as unknown as FormEvent<HTMLFormElement>,
-                  )
+                  return await handleSubmit(ref.current as unknown as FormEvent<HTMLFormElement>)
                 }
                 setPaymentMethodErrors([])
                 setPaymentRef({ ref })

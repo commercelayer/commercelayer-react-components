@@ -1,6 +1,6 @@
-import type { DefaultChildrenType } from '#typings/globals'
+import type { DefaultChildrenType } from "#typings/globals"
 
-import type { JSX } from "react";
+import type { JSX } from "react"
 
 interface Props<T> {
   children: DefaultChildrenType
@@ -14,15 +14,13 @@ interface Props<T> {
 export default function filterChildren<T = string>({
   children,
   filterBy,
-  componentName
+  componentName,
 }: Props<T>): JSX.Element | JSX.Element[] | null {
   const wrongComponents = Array.isArray(children)
-    ? children.filter((child) => typeof child.type === 'string').length > 0
-    : typeof children?.type === 'string'
+    ? children.filter((child) => typeof child.type === "string").length > 0
+    : typeof children?.type === "string"
   if (wrongComponents) {
-    throw new Error(
-      `Only library components are allowed into <${componentName}/>`
-    )
+    throw new Error(`Only library components are allowed into <${componentName}/>`)
   }
   if (Array.isArray(children)) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

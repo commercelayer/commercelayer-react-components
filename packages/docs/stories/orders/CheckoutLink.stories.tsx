@@ -1,11 +1,11 @@
-import type { Meta, StoryFn, StoryObj } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
-import Order from '#components/orders/Order'
-import CheckoutLink from '#components/orders/CheckoutLink'
-import { OrderStorage } from '../_internals/OrderStorage'
+import type { Meta, StoryFn, StoryObj } from "@storybook/react"
+import CommerceLayer from "../_internals/CommerceLayer"
+import Order from "#components/orders/Order"
+import CheckoutLink from "#components/orders/CheckoutLink"
+import { OrderStorage } from "../_internals/OrderStorage"
 
 const setup: Meta<typeof CheckoutLink> = {
-  title: 'Components/Orders/CheckoutLink',
+  title: "Components/Orders/CheckoutLink",
   component: CheckoutLink,
 }
 
@@ -13,8 +13,8 @@ export default setup
 
 const Template: StoryFn<typeof CheckoutLink> = (args) => {
   return (
-    <CommerceLayer accessToken='my-access-token'>
-      <OrderStorage persistKey='cl-examples-checkoutLink'>
+    <CommerceLayer accessToken="my-access-token">
+      <OrderStorage persistKey="cl-examples-checkoutLink">
         <Order>
           <CheckoutLink {...args} />
         </Order>
@@ -29,13 +29,13 @@ const Template: StoryFn<typeof CheckoutLink> = (args) => {
  */
 export const Default = Template.bind({})
 Default.args = {
-  label: 'Go to checkout',
-  className: 'text-blue-600 underline hover:text-blue-800',
+  label: "Go to checkout",
+  className: "text-blue-600 underline hover:text-blue-800",
 }
 Default.parameters = {
   docs: {
     canvas: {
-      sourceState: 'shown',
+      sourceState: "shown",
     },
   },
 }
@@ -47,9 +47,9 @@ Default.parameters = {
  */
 export const WithOrderCheckoutUrl = Template.bind({})
 WithOrderCheckoutUrl.args = {
-  label: 'Checkout via order URL',
+  label: "Checkout via order URL",
   hostedCheckout: false,
-  className: 'text-blue-600 underline hover:text-blue-800',
+  className: "text-blue-600 underline hover:text-blue-800",
 }
 
 /**
@@ -63,7 +63,7 @@ export const ChildrenProps: StoryObj = () => {
         <a
           href={href}
           onClick={handleClick}
-          className='inline-flex items-center gap-2 rounded bg-black px-4 py-2 text-sm text-white hover:bg-gray-800'
+          className="inline-flex items-center gap-2 rounded bg-black px-4 py-2 text-sm text-white hover:bg-gray-800"
         >
           Proceed to checkout →
         </a>
@@ -73,8 +73,8 @@ export const ChildrenProps: StoryObj = () => {
 }
 ChildrenProps.decorators = [
   (Story) => (
-    <CommerceLayer accessToken='my-access-token'>
-      <OrderStorage persistKey='cl-examples-checkoutLink'>
+    <CommerceLayer accessToken="my-access-token">
+      <OrderStorage persistKey="cl-examples-checkoutLink">
         <Order>
           <Story />
         </Order>

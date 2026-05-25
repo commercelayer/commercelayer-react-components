@@ -38,7 +38,7 @@ describe("AvailabilityContainer component", () => {
           <span data-testid="child">availability</span>
         </AvailabilityContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     expect(container.querySelector('[data-testid="child"]')).not.toBeNull()
   })
@@ -55,7 +55,7 @@ describe("AvailabilityContainer component", () => {
           />
         </AvailabilityContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     await waitFor(() => expect(capturedQty).toBeDefined(), { timeout: 10000 })
     expect(typeof capturedQty).toBe("number")
@@ -65,19 +65,17 @@ describe("AvailabilityContainer component", () => {
     render(
       <CommerceLayer accessToken={ctx.accessToken}>
         <AvailabilityContainer skuCode={ctx.skuCode}>
-          <AvailabilityTemplate
-            labels={{ available: "Available", outOfStock: "Out of stock" }}
-          />
+          <AvailabilityTemplate labels={{ available: "Available", outOfStock: "Out of stock" }} />
         </AvailabilityContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     await waitFor(
       () => {
         const span = screen.getByTestId(`availability-${ctx.skuCode}`)
         expect(span.textContent).toMatch(/Available|Out of stock/)
       },
-      { timeout: 10000 },
+      { timeout: 10000 }
     )
   })
 
@@ -89,12 +87,11 @@ describe("AvailabilityContainer component", () => {
           <span />
         </AvailabilityContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
-    await waitFor(
-      () => expect(onQuantity).toHaveBeenCalledWith(expect.any(Number)),
-      { timeout: 10000 },
-    )
+    await waitFor(() => expect(onQuantity).toHaveBeenCalledWith(expect.any(Number)), {
+      timeout: 10000,
+    })
   })
 
   it<AvailabilityCtx>("renders nothing meaningful when skuCode is empty", (ctx) => {
@@ -104,7 +101,7 @@ describe("AvailabilityContainer component", () => {
           <AvailabilityTemplate />
         </AvailabilityContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     const spans = container.querySelectorAll("span")
     spans.forEach((span) => {

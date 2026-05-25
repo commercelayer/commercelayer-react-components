@@ -1,13 +1,10 @@
-import { useContext, type JSX } from 'react';
-import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
+import { useContext, type JSX } from "react"
+import ShipmentChildrenContext from "#context/ShipmentChildrenContext"
 import StockTransferChildrenContext, {
-  type InitialStockTransferContext
-} from '#context/StockTransferChildrenContext'
-import type {
-  LineItem,
-  StockTransfer as TStockTransfer
-} from '@commercelayer/sdk'
-import type { DefaultChildrenType } from '#typings/globals'
+  type InitialStockTransferContext,
+} from "#context/StockTransferChildrenContext"
+import type { LineItem, StockTransfer as TStockTransfer } from "@commercelayer/sdk"
+import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
   children: DefaultChildrenType
@@ -21,15 +18,10 @@ export function StockTransfer(props: Props): JSX.Element {
     .map((stockTransfer: TStockTransfer | LineItem, k) => {
       const stockTransferProps: InitialStockTransferContext = {
         stockTransfer:
-          stockTransfer.type === 'line_items'
-            ? stockTransfer
-            : stockTransfer?.line_item
+          stockTransfer.type === "line_items" ? stockTransfer : stockTransfer?.line_item,
       }
       return (
-        <StockTransferChildrenContext.Provider
-          key={k}
-          value={stockTransferProps}
-        >
+        <StockTransferChildrenContext.Provider key={k} value={stockTransferProps}>
           {children}
         </StockTransferChildrenContext.Provider>
       )

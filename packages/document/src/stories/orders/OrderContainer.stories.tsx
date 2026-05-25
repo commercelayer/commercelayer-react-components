@@ -1,9 +1,4 @@
-import {
-  Order,
-  OrderContainer,
-  OrderNumber,
-  TotalAmount,
-} from "@commercelayer/react-components"
+import { Order, OrderContainer, OrderNumber, TotalAmount } from "@commercelayer/react-components"
 import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import CommerceLayer from "../_internals/CommerceLayer"

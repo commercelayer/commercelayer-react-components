@@ -8,10 +8,9 @@ function PricesDocsPage(): JSX.Element {
     <>
       <h1>Prices</h1>
       <p>
-        The Prices components let you fetch and display product prices from the
-        Commerce Layer API. All price components must be nested inside the{" "}
-        <code>{"<CommerceLayer>"}</code> context that handles API
-        authentication.
+        The Prices components let you fetch and display product prices from the Commerce Layer API.
+        All price components must be nested inside the <code>{"<CommerceLayer>"}</code> context that
+        handles API authentication.
       </p>
       <p>
         Refer to the{" "}
@@ -27,15 +26,13 @@ function PricesDocsPage(): JSX.Element {
         <strong>
           directly under <code>{"<CommerceLayer>"}</code>
         </strong>{" "}
-        without any container. It automatically registers its{" "}
-        <code>skuCode</code> in a module-level batch store and a 50 ms debounce
-        collects all sibling registrations into{" "}
+        without any container. It automatically registers its <code>skuCode</code> in a module-level
+        batch store and a 50 ms debounce collects all sibling registrations into{" "}
         <strong>one SWR-deduplicated API request</strong>.
       </p>
       <span title="Note" type="info">
         <p>
-          No provider or wrapper needed. Drop{" "}
-          <code>{'<Price skuCode="…" />'}</code> anywhere inside{" "}
+          No provider or wrapper needed. Drop <code>{'<Price skuCode="…" />'}</code> anywhere inside{" "}
           <code>{"<CommerceLayer>"}</code> and batching happens automatically.
         </p>
       </span>
@@ -58,9 +55,9 @@ import { CommerceLayer, Price } from '@commercelayer/react-components'
       <hr />
       <h2>Render prop</h2>
       <p>
-        Use the <code>children</code> render prop to access the raw{" "}
-        <code>prices</code> array and <code>loading</code> state for a fully
-        custom price UI. Works in both standalone and container modes.
+        Use the <code>children</code> render prop to access the raw <code>prices</code> array and{" "}
+        <code>loading</code> state for a fully custom price UI. Works in both standalone and
+        container modes.
       </p>
       <Source
         language="jsx"
@@ -107,8 +104,7 @@ const meta = {
     },
     showCompare: {
       control: "boolean",
-      description:
-        "When `false`, the `compare_at` (strike-through) price is not displayed.",
+      description: "When `false`, the `compare_at` (strike-through) price is not displayed.",
     },
     compareClassName: {
       control: "text",
@@ -116,8 +112,7 @@ const meta = {
     },
     loader: {
       control: "text",
-      description:
-        "Content displayed while the price is loading in standalone mode.",
+      description: "Content displayed while the price is loading in standalone mode.",
     },
     children: {
       control: false,
@@ -137,18 +132,13 @@ export const RenderPropStory: Story = {
       <Price skuCode="POST6191FFFFFF000000XXXX">
         {({ prices, loading }) => {
           if (loading) return <span style={{ color: "#999" }}>Loading…</span>
-          if (prices.length === 0)
-            return <span style={{ color: "red" }}>No price available</span>
+          if (prices.length === 0) return <span style={{ color: "red" }}>No price available</span>
           const [p] = prices
           return (
             <div>
-              <strong style={{ fontSize: "1.25rem" }}>
-                {p.formatted_amount}
-              </strong>
+              <strong style={{ fontSize: "1.25rem" }}>{p.formatted_amount}</strong>
               {p.formatted_compare_at_amount != null && (
-                <s style={{ marginLeft: 8, color: "#999" }}>
-                  {p.formatted_compare_at_amount}
-                </s>
+                <s style={{ marginLeft: 8, color: "#999" }}>{p.formatted_compare_at_amount}</s>
               )}
             </div>
           )
@@ -170,9 +160,7 @@ export const StandalonePrice: Story = {
           <Price
             skuCode="POST6191FFFFFF000000XXXX"
             style={{ fontWeight: "bold" }}
-            loader={
-              <span style={{ color: "#bbb", fontSize: "0.8rem" }}>…</span>
-            }
+            loader={<span style={{ color: "#bbb", fontSize: "0.8rem" }}>…</span>}
           />
         </div>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
@@ -182,9 +170,7 @@ export const StandalonePrice: Story = {
           <Price
             skuCode="POLOMXXX000000FFFFFFLXXX"
             style={{ fontWeight: "bold" }}
-            loader={
-              <span style={{ color: "#bbb", fontSize: "0.8rem" }}>…</span>
-            }
+            loader={<span style={{ color: "#bbb", fontSize: "0.8rem" }}>…</span>}
           />
         </div>
       </div>

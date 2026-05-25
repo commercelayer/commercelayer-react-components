@@ -1,26 +1,25 @@
-import PaymentSourceContext from '#context/PaymentSourceContext'
-import { type ReactNode, useContext, type JSX } from 'react';
-import Parent from '#components/utils/Parent'
-import type { ChildrenFunction } from '#typings'
+import PaymentSourceContext from "#context/PaymentSourceContext"
+import { type ReactNode, useContext, type JSX } from "react"
+import Parent from "#components/utils/Parent"
+import type { ChildrenFunction } from "#typings"
 
-interface CustomComponent extends Omit<Props, 'children'> {}
+interface CustomComponent extends Omit<Props, "children"> {}
 
 type Props = {
   children?: ChildrenFunction<CustomComponent>
   label?: string | ReactNode
-} & Omit<JSX.IntrinsicElements['button'], 'onClick'>
+} & Omit<JSX.IntrinsicElements["button"], "onClick">
 export function PaymentSourceEditButton({
   children,
-  label = 'Edit',
+  label = "Edit",
   ...props
 }: Props): JSX.Element | null {
-  const { showCard, handleEditClick, readonly } =
-    useContext(PaymentSourceContext)
+  const { showCard, handleEditClick, readonly } = useContext(PaymentSourceContext)
   const parentProps = {
     showCard,
     label,
     handleEditClick,
-    ...props
+    ...props,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>

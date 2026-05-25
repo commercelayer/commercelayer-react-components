@@ -44,21 +44,13 @@ export function billingAddressController({
     if (requiredMetadataFields != null && requiredMetadataFields.length > 0)
       formFields = [...formFields, ...requiredMetadataFields]
     if (invertAddresses) {
-      billingDisable = !!(
-        billing_address && fieldsExist(billing_address, formFields)
-      )
+      billingDisable = !!(billing_address && fieldsExist(billing_address, formFields))
     } else {
       // if (requiresBillingInfo) formFields = [...formFields, "billing_info"]
-      billingDisable = !!(
-        billing_address && fieldsExist(billing_address, formFields)
-      )
+      billingDisable = !!(billing_address && fieldsExist(billing_address, formFields))
     }
   }
-  if (
-    billingDisable &&
-    !isEmpty(billingAddressId) &&
-    isEmpty(billing_address)
-  ) {
+  if (billingDisable && !isEmpty(billingAddressId) && isEmpty(billing_address)) {
     billingDisable = false
   }
   return billingDisable
@@ -95,21 +87,13 @@ export function shippingAddressController({
       formField = [...formField, ...requiredMetadataFields]
     if (invertAddresses) {
       // if (requiresBillingInfo) formField = [...formField, "billing_info"]
-      shippingDisable = !!(
-        shipping_address && fieldsExist(shipping_address, formField)
-      )
+      shippingDisable = !!(shipping_address && fieldsExist(shipping_address, formField))
     } else if (shipToDifferentAddress) {
       delete shipping_address?.billing_info
-      shippingDisable = !!(
-        shipping_address && fieldsExist(shipping_address, formField)
-      )
+      shippingDisable = !!(shipping_address && fieldsExist(shipping_address, formField))
     }
   }
-  if (
-    shippingDisable &&
-    !isEmpty(shippingAddressId) &&
-    isEmpty(shipping_address)
-  ) {
+  if (shippingDisable && !isEmpty(shippingAddressId) && isEmpty(shipping_address)) {
     shippingDisable = false
   }
   return shippingDisable
@@ -139,25 +123,19 @@ export function countryLockController({
   const doNotShipItems = lineItems
     ?.filter(
       (lineItem) =>
-        lineItem?.item?.type != null &&
-        ["skus", "bundles"].includes(lineItem?.item?.type),
+        lineItem?.item?.type != null && ["skus", "bundles"].includes(lineItem?.item?.type)
     )
     ?.every(
       (lineItem) =>
         // @ts-expect-error no type for do_not_ship on SDK
-        lineItem?.item?.do_not_ship === true,
+        lineItem?.item?.do_not_ship === true
     )
   if (doNotShipItems) return false
-  if (
-    countryCodeLock &&
-    !isEmpty(addresses) &&
-    billingAddressId &&
-    !shipToDifferentAddress
-  ) {
+  if (countryCodeLock && !isEmpty(addresses) && billingAddressId && !shipToDifferentAddress) {
     const addressLocked = addresses?.find(
       (a) =>
         (a?.id === billingAddressId || a?.reference === billingAddressId) &&
-        a?.country_code !== countryCodeLock,
+        a?.country_code !== countryCodeLock
     )
     if (!isEmpty(addressLocked)) return true
   }
@@ -167,16 +145,11 @@ export function countryLockController({
   if (countryCodeLock && !isEmpty(shipping_address) && shipToDifferentAddress) {
     return shipping_address?.country_code !== countryCodeLock
   }
-  if (
-    countryCodeLock &&
-    !isEmpty(addresses) &&
-    shippingAddressId &&
-    shipToDifferentAddress
-  ) {
+  if (countryCodeLock && !isEmpty(addresses) && shippingAddressId && shipToDifferentAddress) {
     const addressLocked = addresses?.find(
       (a) =>
         (a?.id === shippingAddressId || a?.reference === shippingAddressId) &&
-        a?.country_code !== countryCodeLock,
+        a?.country_code !== countryCodeLock
     )
     if (!isEmpty(addressLocked)) return true
   }
@@ -215,11 +188,7 @@ export async function invertedAddressesHandler({
     orderAttributes._billing_address_clone_id = order?.billing_address?.id
     orderAttributes._shipping_address_clone_id = order?.shipping_address?.id
   }
-  if (
-    shippingAddress != null &&
-    Object.keys(shippingAddress).length > 0 &&
-    !shippingAddressId
-  ) {
+  if (shippingAddress != null && Object.keys(shippingAddress).length > 0 && !shippingAddressId) {
     delete orderAttributes._billing_address_clone_id
     delete orderAttributes._shipping_address_clone_id
     orderAttributes._billing_address_same_as_shipping = true
@@ -254,8 +223,7 @@ export async function invertedAddressesHandler({
   }
   if (shipToDifferentAddress) {
     delete orderAttributes._billing_address_same_as_shipping
-    if (billingAddressId)
-      orderAttributes._billing_address_clone_id = billingAddressId
+    if (billingAddressId) orderAttributes._billing_address_clone_id = billingAddressId
     if (billingAddress != null && Object.keys(billingAddress).length > 0) {
       delete orderAttributes._billing_address_clone_id
       const hasMetadata = Object.keys(billingAddress).filter((key) => {

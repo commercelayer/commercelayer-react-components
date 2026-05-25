@@ -24,10 +24,7 @@ interface UseOrderReturn {
     metadata?: BaseMetadataObject
     attributes?: Omit<OrderCreate, "id">
   }) => Promise<Order | undefined>
-  updateOrder: (
-    id: string,
-    attributes: Omit<OrderUpdate, "id">,
-  ) => Promise<Order | undefined>
+  updateOrder: (id: string, attributes: Omit<OrderUpdate, "id">) => Promise<Order | undefined>
   reloadOrder: () => Promise<Order | undefined>
   mutate: KeyedMutator<Order>
 }
@@ -50,15 +47,10 @@ interface UseOrderReturn {
  * })
  * ```
  */
-export function useOrder({
-  accessToken,
-  orderId,
-  interceptors,
-}: UseOrderParams): UseOrderReturn {
+export function useOrder({ accessToken, orderId, interceptors }: UseOrderParams): UseOrderReturn {
   const [isCreating, setIsCreating] = useState(false)
 
-  const swrKey =
-    accessToken && orderId ? ["order", "retrieve", accessToken, orderId] : null
+  const swrKey = accessToken && orderId ? ["order", "retrieve", accessToken, orderId] : null
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<Order>(
     swrKey,
@@ -66,7 +58,7 @@ export function useOrder({
       if (!orderId) throw new Error("orderId is required")
       return retrieveOrder({ accessToken, interceptors, id: orderId })
     },
-    { revalidateOnFocus: false, revalidateOnReconnect: false },
+    { revalidateOnFocus: false, revalidateOnReconnect: false }
   )
 
   const createOrder = useCallback(
@@ -86,14 +78,11 @@ export function useOrder({
         setIsCreating(false)
       }
     },
-    [accessToken, interceptors],
+    [accessToken, interceptors]
   )
 
   const updateOrder = useCallback(
-    async (
-      id: string,
-      attributes: Omit<OrderUpdate, "id">,
-    ): Promise<Order | undefined> => {
+    async (id: string, attributes: Omit<OrderUpdate, "id">): Promise<Order | undefined> => {
       const updated = await coreUpdateOrder({
         accessToken,
         interceptors,
@@ -103,7 +92,7 @@ export function useOrder({
       await mutate(updated, { revalidate: false })
       return updated
     },
-    [accessToken, interceptors, mutate],
+    [accessToken, interceptors, mutate]
   )
 
   const reloadOrder = useCallback(async (): Promise<Order | undefined> => {

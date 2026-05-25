@@ -1,5 +1,5 @@
-import type { LineItem, Shipment } from '@commercelayer/sdk'
-import { isEmpty } from '#utils/isEmpty'
+import type { LineItem, Shipment } from "@commercelayer/sdk"
+import { isEmpty } from "#utils/isEmpty"
 
 export function shipmentsFilled(shipments: Shipment[]): boolean {
   const filled = shipments.filter((shipment) => !isEmpty(shipment.shipping_method))
@@ -11,7 +11,7 @@ export function isDoNotShip(lineItems?: LineItem[] | null): boolean {
   const items = lineItems
     ? lineItems
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        .filter(({ item_type }) => item_type === 'skus')
+        .filter(({ item_type }) => item_type === "skus")
         .map((lineItem) => {
           // @ts-expect-error missing type
           if (lineItem.item?.do_not_ship) {

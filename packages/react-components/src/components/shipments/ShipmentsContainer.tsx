@@ -1,17 +1,15 @@
-import ShipmentContext, {
-  defaultShipmentContext
-} from '#context/ShipmentContext'
-import { type ReactNode, useContext, useEffect, useMemo, useReducer, type JSX } from 'react';
+import ShipmentContext, { defaultShipmentContext } from "#context/ShipmentContext"
+import { type ReactNode, useContext, useEffect, useMemo, useReducer, type JSX } from "react"
 import shipmentReducer, {
   shipmentInitialState,
   setShipmentErrors,
   getShipments,
-  setShippingMethod
-} from '#reducers/ShipmentReducer'
-import OrderContext from '#context/OrderContext'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import type { BaseError } from '#typings/errors'
-import { isEmpty } from '#utils/isEmpty'
+  setShippingMethod,
+} from "#reducers/ShipmentReducer"
+import OrderContext from "#context/OrderContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import type { BaseError } from "#typings/errors"
+import { isEmpty } from "#utils/isEmpty"
 
 interface Props {
   children: ReactNode
@@ -19,31 +17,30 @@ interface Props {
 export function ShipmentsContainer(props: Props): JSX.Element {
   const { children } = props
   const [state, dispatch] = useReducer(shipmentReducer, shipmentInitialState)
-  const { order, getOrder, include, addResourceToInclude, includeLoaded } =
-    useContext(OrderContext)
+  const { order, getOrder, include, addResourceToInclude, includeLoaded } = useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
-    if (!include?.includes('shipments.available_shipping_methods')) {
+    if (!include?.includes("shipments.available_shipping_methods")) {
       addResourceToInclude({
         newResource: [
-          'shipments.available_shipping_methods',
-          'shipments.stock_line_items.line_item',
-          'shipments.shipping_method',
-          'shipments.stock_transfers.line_item',
-          'shipments.stock_location',
-          'shipments.parcels.parcel_line_items'
-        ]
+          "shipments.available_shipping_methods",
+          "shipments.stock_line_items.line_item",
+          "shipments.shipping_method",
+          "shipments.stock_transfers.line_item",
+          "shipments.stock_location",
+          "shipments.parcels.parcel_line_items",
+        ],
       })
-    } else if (!includeLoaded?.['shipments.available_shipping_methods']) {
+    } else if (!includeLoaded?.["shipments.available_shipping_methods"]) {
       addResourceToInclude({
         newResourceLoaded: {
-          'shipments.available_shipping_methods': true,
-          'shipments.stock_line_items.line_item': true,
-          'shipments.shipping_method': true,
-          'shipments.stock_transfers.line_item': true,
-          'shipments.stock_location': true,
-          'shipments.parcels.parcel_line_items': true
-        }
+          "shipments.available_shipping_methods": true,
+          "shipments.stock_line_items.line_item": true,
+          "shipments.shipping_method": true,
+          "shipments.stock_transfers.line_item": true,
+          "shipments.stock_location": true,
+          "shipments.parcels.parcel_line_items": true,
+        },
       })
     }
   }, [include?.length, includeLoaded != null])
@@ -57,8 +54,7 @@ export function ShipmentsContainer(props: Props): JSX.Element {
       if (order.shipments && order.shipments.length > 0) {
         const hasShippingMethods = order.shipments.map((shipment) => {
           return (
-            shipment.available_shipping_methods &&
-            shipment.available_shipping_methods.length > 0
+            shipment.available_shipping_methods && shipment.available_shipping_methods.length > 0
           )
         })
         if (hasShippingMethods.includes(false)) {
@@ -66,10 +62,10 @@ export function ShipmentsContainer(props: Props): JSX.Element {
             [
               ...(state.errors || []),
               {
-                code: 'NO_SHIPPING_METHODS',
-                message: 'No shipping methods',
-                resource: 'shipments'
-              }
+                code: "NO_SHIPPING_METHODS",
+                message: "No shipping methods",
+                resource: "shipments",
+              },
             ],
             dispatch
           )
@@ -77,7 +73,7 @@ export function ShipmentsContainer(props: Props): JSX.Element {
       }
       if (order.line_items && order.line_items.length > 0) {
         const hasStocks = order.line_items
-          .filter(({ item_type: itemType }) => itemType === 'skus')
+          .filter(({ item_type: itemType }) => itemType === "skus")
           .map((lineItem) => {
             const conditions =
               // @ts-expect-error no type
@@ -93,10 +89,10 @@ export function ShipmentsContainer(props: Props): JSX.Element {
             [
               ...(state.errors || []),
               {
-                code: 'OUT_OF_STOCK',
-                message: 'No stock available',
-                resource: 'line_items'
-              }
+                code: "OUT_OF_STOCK",
+                message: "No stock available",
+                resource: "line_items",
+              },
             ],
             dispatch
           )
@@ -119,15 +115,11 @@ export function ShipmentsContainer(props: Props): JSX.Element {
           shipmentId,
           config,
           getOrder,
-          order
-        })
+          order,
+        }),
     }
   }, [state])
-  return (
-    <ShipmentContext.Provider value={contextValue}>
-      {children}
-    </ShipmentContext.Provider>
-  )
+  return <ShipmentContext.Provider value={contextValue}>{children}</ShipmentContext.Provider>
 }
 
 export default ShipmentsContainer

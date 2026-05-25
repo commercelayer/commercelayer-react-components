@@ -16,7 +16,7 @@ interface UseSkuListsReturn {
   fetchSkuLists: (params?: QueryParamsList<SkuList>) => void
   retrieveSkuList: (
     id: string,
-    params?: QueryParamsRetrieve<SkuList>,
+    params?: QueryParamsRetrieve<SkuList>
   ) => Promise<SkuList | undefined>
   clearSkuLists: () => void
   mutate: KeyedMutator<SkuList[]>
@@ -31,15 +31,13 @@ interface UseSkuListsReturn {
  */
 export function useSkuLists(
   accessToken: string,
-  interceptors?: InterceptorManager,
+  interceptors?: InterceptorManager
 ): UseSkuListsReturn {
   const [params, setParams] = useState<QueryParamsList<SkuList>>()
   const [shouldFetch, setShouldFetch] = useState(false)
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<SkuList[]>(
-    shouldFetch && accessToken
-      ? ["sku_lists", "get", accessToken, params]
-      : null,
+    shouldFetch && accessToken ? ["sku_lists", "get", accessToken, params] : null,
     async (): Promise<SkuList[]> => {
       const result = await getSkuLists({ accessToken, params, interceptors })
       return result
@@ -47,7 +45,7 @@ export function useSkuLists(
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    },
+    }
   )
 
   const fetchSkuLists = useCallback((newParams?: QueryParamsList<SkuList>) => {
@@ -56,14 +54,11 @@ export function useSkuLists(
   }, [])
 
   const handleRetrieveSkuList = useCallback(
-    async (
-      id: string,
-      params?: QueryParamsRetrieve<SkuList>,
-    ): Promise<SkuList | undefined> => {
+    async (id: string, params?: QueryParamsRetrieve<SkuList>): Promise<SkuList | undefined> => {
       if (!id) throw new Error("SKU list ID is required for retrieve")
       return await retrieveSkuList({ accessToken, id, params, interceptors })
     },
-    [accessToken, interceptors],
+    [accessToken, interceptors]
   )
 
   const clearSkuLists = useCallback(() => {

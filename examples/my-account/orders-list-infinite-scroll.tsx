@@ -3,32 +3,32 @@ import {
   CustomerContainer,
   OrderList,
   OrderListRow,
-} from 'packages/react-components/src'
-import useGetToken from '../../hooks/useGetToken'
-const colClassName = 'uppercase text-left p-1 text-gray-400 text-sm'
-const titleClassName = 'flex flex-row items-center'
+} from "packages/react-components/src"
+import useGetToken from "../../hooks/useGetToken"
+const colClassName = "uppercase text-left p-1 text-gray-400 text-sm"
+const titleClassName = "flex flex-row items-center"
 const columns = [
   {
-    Header: 'Order',
-    accessor: 'number',
+    Header: "Order",
+    accessor: "number",
     className: colClassName,
     titleClassName,
   },
   {
-    Header: 'Status',
-    accessor: 'status',
+    Header: "Status",
+    accessor: "status",
     className: colClassName,
     titleClassName,
   },
   {
-    Header: 'Date',
-    accessor: 'updated_at',
+    Header: "Date",
+    accessor: "updated_at",
     className: colClassName,
     titleClassName,
   },
   {
-    Header: 'Date',
-    accessor: 'formatted_total_amount_with_taxes',
+    Header: "Date",
+    accessor: "formatted_total_amount_with_taxes",
     className: colClassName,
     titleClassName,
   },
@@ -76,24 +76,19 @@ const OrdersListInfiniteScroll = () => {
         >
           <OrderListRow field="number">
             {({ cell, order, infiniteScroll, ...p }) => {
-              const As = infiniteScroll ? 'div' : 'td'
+              const As = infiniteScroll ? "div" : "td"
               return cell.map((cell) => {
                 return (
                   <As {...p} className="py-5 border-b">
-                    <p className="font-bold">Order # {cell.render('Cell')}</p>
-                    <p className="text-xs text-gray-500">
-                      contains {order.skus_count} items
-                    </p>
+                    <p className="font-bold">Order # {cell.render("Cell")}</p>
+                    <p className="text-xs text-gray-500">contains {order.skus_count} items</p>
                   </As>
                 )
               })
             }}
           </OrderListRow>
           <OrderListRow field="status" className="align-top py-5 border-b" />
-          <OrderListRow
-            field="updated_at"
-            className="align-top py-5 border-b"
-          />
+          <OrderListRow field="updated_at" className="align-top py-5 border-b" />
           <OrderListRow
             field="formatted_total_amount_with_taxes"
             className="align-top py-5 border-b font-bold"

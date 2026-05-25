@@ -1,26 +1,15 @@
 import { useContext, useEffect, useMemo, useState, type JSX } from "react"
 import BaseSelect from "#components/utils/BaseSelect"
-import type {
-  AddressStateSelectName,
-  BaseSelectComponentProps,
-  Option,
-} from "#typings"
+import type { AddressStateSelectName, BaseSelectComponentProps, Option } from "#typings"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 import { isEmpty } from "#utils/isEmpty"
-import {
-  getStateOfCountry,
-  isValidState,
-  type States,
-} from "#utils/countryStateCity"
+import { getStateOfCountry, isValidState, type States } from "#utils/countryStateCity"
 import AddressesContext from "#context/AddressContext"
 import BaseInput from "#components/utils/BaseInput"
 import CustomerAddressFormContext from "#context/CustomerAddressFormContext"
 
-type Props = Omit<
-  BaseSelectComponentProps,
-  "options" | "name" | "placeholder"
-> & {
+type Props = Omit<BaseSelectComponentProps, "options" | "name" | "placeholder"> & {
   name: AddressStateSelectName
   required?: boolean
   disabled?: boolean
@@ -97,18 +86,14 @@ export function AddressStateSelector(props: Props): JSX.Element {
     })
   }, [states, countryCode])
 
-  const isEmptyStates = useMemo(
-    () => () => isEmpty(stateOptions),
-    [stateOptions],
-  )
+  const isEmptyStates = useMemo(() => () => isEmpty(stateOptions), [stateOptions])
 
   useEffect(() => {
     const billingCountryCode =
       typeof billingAddress?.values?.billing_address_country_code === "string"
         ? billingAddress?.values?.billing_address_country_code
         : billingAddress?.values?.billing_address_country_code?.value
-    if (billingCountryCode && billingCountryCode !== countryCode)
-      setCountryCode(billingCountryCode)
+    if (billingCountryCode && billingCountryCode !== countryCode) setCountryCode(billingCountryCode)
     const shippingCountryCode =
       typeof shippingAddress?.values?.shipping_address_country_code === "string"
         ? shippingAddress?.values?.shipping_address_country_code
@@ -120,12 +105,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
       billingCountryCode,
       countryCode !== billingCountryCode,
     ].every(Boolean)
-    if (
-      !changeBillingCountry &&
-      value != null &&
-      value !== "" &&
-      value !== val
-    ) {
+    if (!changeBillingCountry && value != null && value !== "" && value !== val) {
       if (billingAddress.setValue != null) {
         billingAddress?.setValue(name, value)
       }
@@ -149,12 +129,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
       shippingCountryCode,
       countryCode !== shippingCountryCode,
     ].every(Boolean)
-    if (
-      !changeShippingCountry &&
-      value != null &&
-      value !== "" &&
-      value !== val
-    ) {
+    if (!changeShippingCountry && value != null && value !== "" && value !== val) {
       if (shippingAddress.setValue != null) {
         shippingAddress?.setValue(name, value)
       }

@@ -1,29 +1,29 @@
-import React, { useState, useEffect, Fragment } from 'react'
-import { getSalesChannelToken } from '@commercelayer/js-auth'
-import CommerceLayer from '../#components/auth/CommerceLayer'
-import OrderContainer from '../#components/OrderContainer'
-import PriceContainer from '../#components/prices/PricesContainer'
-import Price from '../#components/Price'
-import AddToCart from '../#components/orders/AddToCartButton'
-import LineItemsContainer from '../#components/LineItemsContainer'
-import LineItem from '../#components/line_items/LineItem'
-import LineItemImage from '../#components/LineItemImage'
-import LineItemName from '../#components/LineItemName'
-import LineItemQuantity from '../#components/LineItemQuantity'
-import LineItemAmount from '../#components/LineItemAmount'
-import LineItemRemoveLink from '../#components/LineItemRemoveLink'
-import CheckoutLink from '../#components/orders/CheckoutLink'
-import SubTotalAmount from '../#components/SubTotalAmount'
-import QuantitySelector from '../#components/skus/QuantitySelector'
-import LineItemsCount from '../#components/LineItemsCount'
-import TotalAmount from '../#components/orders/TotalAmount'
-import DiscountAmount from '../#components/orders/DiscountAmount'
-import ShippingAmount from '../#components/orders/ShippingAmount'
-import TaxesAmount from '../#components/TaxesAmount'
-import GiftCardAmount from '../#components/orders/GiftCardAmount'
-import AvailabilityContainer from '../#components/AvailabilityContainer'
-import AvailabilityTemplate from '../#components/skus/AvailabilityTemplate'
-import ItemContainer from '../#components/orders/ItemContainer'
+import React, { useState, useEffect, Fragment } from "react"
+import { getSalesChannelToken } from "@commercelayer/js-auth"
+import CommerceLayer from "../#components/auth/CommerceLayer"
+import OrderContainer from "../#components/OrderContainer"
+import PriceContainer from "../#components/prices/PricesContainer"
+import Price from "../#components/Price"
+import AddToCart from "../#components/orders/AddToCartButton"
+import LineItemsContainer from "../#components/LineItemsContainer"
+import LineItem from "../#components/line_items/LineItem"
+import LineItemImage from "../#components/LineItemImage"
+import LineItemName from "../#components/LineItemName"
+import LineItemQuantity from "../#components/LineItemQuantity"
+import LineItemAmount from "../#components/LineItemAmount"
+import LineItemRemoveLink from "../#components/LineItemRemoveLink"
+import CheckoutLink from "../#components/orders/CheckoutLink"
+import SubTotalAmount from "../#components/SubTotalAmount"
+import QuantitySelector from "../#components/skus/QuantitySelector"
+import LineItemsCount from "../#components/LineItemsCount"
+import TotalAmount from "../#components/orders/TotalAmount"
+import DiscountAmount from "../#components/orders/DiscountAmount"
+import ShippingAmount from "../#components/orders/ShippingAmount"
+import TaxesAmount from "../#components/TaxesAmount"
+import GiftCardAmount from "../#components/orders/GiftCardAmount"
+import AvailabilityContainer from "../#components/AvailabilityContainer"
+import AvailabilityTemplate from "../#components/skus/AvailabilityTemplate"
+import ItemContainer from "../#components/orders/ItemContainer"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -32,7 +32,7 @@ const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 // const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 
 export default function Order() {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("")
   useEffect(() => {
     const getToken = async () => {
       const auth = await getSalesChannelToken({
@@ -69,10 +69,7 @@ export default function Order() {
                         BABYONBU000000E63E746MXX
                       </p>
                     </div>
-                    <div
-                      data-cy="price-BABYONBU000000E63E746MXX"
-                      className="pt-2 text-center"
-                    >
+                    <div data-cy="price-BABYONBU000000E63E746MXX" className="pt-2 text-center">
                       <Price
                         skuCode="BABYONBU000000E63E746MXX"
                         className="text-green-600 text-xl m-1"
@@ -137,9 +134,9 @@ export default function Order() {
                         skuCode="LSLEEVMMFFFFFF000000LXXX"
                         className="w-2/3 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                         lineItem={{
-                          name: 'Darth Vader Sleeve',
+                          name: "Darth Vader Sleeve",
                           imageUrl:
-                            'https://i.pinimg.com/736x/a5/32/de/a532de337eff9b1c1c4bfb8df73acea4--darth-vader-stencil-darth-vader-head.jpg?b=t',
+                            "https://i.pinimg.com/736x/a5/32/de/a532de337eff9b1c1c4bfb8df73acea4--darth-vader-stencil-darth-vader-head.jpg?b=t",
                         }}
                       />
                     </div>
@@ -197,18 +194,14 @@ export default function Order() {
             <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
             <LineItemsContainer>
               <p className="text-sm m-2">
-                Your shopping bag contains{' '}
-                <LineItemsCount id="items-count" className="font-bold" /> items
+                Your shopping bag contains <LineItemsCount id="items-count" className="font-bold" />{" "}
+                items
               </p>
               <LineItem type="skus">
                 <div className="flex justify-around items-center border-b">
                   <LineItemImage className="p-2" width={80} />
                   <LineItemName id="line-item-name" className="p-2" />
-                  <LineItemQuantity
-                    id="line-item-quantity"
-                    max={10}
-                    className="p-2"
-                  />
+                  <LineItemQuantity id="line-item-quantity" max={10} className="p-2" />
                   <LineItemAmount id="line-item-total" className="p-2" />
                   <LineItemRemoveLink
                     id="line-item-remove"

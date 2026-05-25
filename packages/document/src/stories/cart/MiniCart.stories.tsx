@@ -1,9 +1,4 @@
-import {
-  AddToCartButton,
-  CartLink,
-  HostedCart,
-  Order,
-} from "@commercelayer/react-components"
+import { AddToCartButton, CartLink, HostedCart, Order } from "@commercelayer/react-components"
 import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { useState, type JSX } from "react"
@@ -63,18 +58,16 @@ function App() {
       <hr />
       <h2>Mini cart</h2>
       <p>
-        Click the button to open the slide-in panel. The{" "}
-        <code>handleOpen</code> callback keeps external state in sync when the
-        overlay or close icon is clicked inside the cart.
+        Click the button to open the slide-in panel. The <code>handleOpen</code> callback keeps
+        external state in sync when the overlay or close icon is clicked inside the cart.
       </p>
       <Canvas of={Default} />
       <hr />
       <h2>Auto-open on add to cart</h2>
       <p>
-        Set <code>openAdd</code> to <code>true</code> so the panel opens
-        automatically after <code>{"<AddToCartButton>"}</code> successfully adds
-        an item to the order. Click <strong>Add to cart</strong> below to
-        trigger the flow.
+        Set <code>openAdd</code> to <code>true</code> so the panel opens automatically after{" "}
+        <code>{"<AddToCartButton>"}</code> successfully adds an item to the order. Click{" "}
+        <strong>Add to cart</strong> below to trigger the flow.
       </p>
       <Canvas of={OpenOnAdd} />
     </>
@@ -152,11 +145,7 @@ export const Default: Story = {
           label="Open mini cart"
           className="px-4 py-2 bg-black text-white rounded text-sm"
         />
-        <HostedCart
-          type="mini"
-          open={isOpen}
-          handleOpen={() => setIsOpen((o) => !o)}
-        />
+        <HostedCart type="mini" open={isOpen} handleOpen={() => setIsOpen((o) => !o)} />
       </Wrapper>
     )
   },

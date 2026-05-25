@@ -1,32 +1,32 @@
-import type { Meta, StoryFn, StoryObj } from '@storybook/react'
-import CommerceLayer from '../_internals/CommerceLayer'
-import { AvailabilityTemplate } from '#components/skus/AvailabilityTemplate'
-import { AvailabilityContainer } from '#components/skus/AvailabilityContainer'
-import PricesContainer from '#components/prices/PricesContainer'
+import type { Meta, StoryFn, StoryObj } from "@storybook/react"
+import CommerceLayer from "../_internals/CommerceLayer"
+import { AvailabilityTemplate } from "#components/skus/AvailabilityTemplate"
+import { AvailabilityContainer } from "#components/skus/AvailabilityContainer"
+import PricesContainer from "#components/prices/PricesContainer"
 
 const setup: Meta<typeof AvailabilityTemplate> = {
-  title: 'Components/Availability/AvailabilityTemplate',
+  title: "Components/Availability/AvailabilityTemplate",
   component: AvailabilityTemplate,
   argTypes: {
     showShippingMethodName: {
-      control: 'boolean'
+      control: "boolean",
     },
     showShippingMethodPrice: {
-      control: 'boolean'
+      control: "boolean",
     },
     timeFormat: {
-      control: 'radio',
-      options: ['days', 'hours', undefined]
-    }
-  }
+      control: "radio",
+      options: ["days", "hours", undefined],
+    },
+  },
 }
 
 export default setup
 
 const Template: StoryFn<typeof AvailabilityTemplate> = (args) => {
   return (
-    <CommerceLayer accessToken='my-access-token'>
-      <AvailabilityContainer skuCode='POLOMXXX000000FFFFFFLXXX'>
+    <CommerceLayer accessToken="my-access-token">
+      <AvailabilityContainer skuCode="POLOMXXX000000FFFFFFLXXX">
         <AvailabilityTemplate {...args} />
       </AvailabilityContainer>
     </CommerceLayer>
@@ -35,9 +35,9 @@ const Template: StoryFn<typeof AvailabilityTemplate> = (args) => {
 
 export const AvailableWithDeliveryTime = Template.bind({})
 AvailableWithDeliveryTime.args = {
-  timeFormat: 'days',
+  timeFormat: "days",
   showShippingMethodName: true,
-  showShippingMethodPrice: true
+  showShippingMethodPrice: true,
 }
 
 /**
@@ -46,8 +46,8 @@ AvailableWithDeliveryTime.args = {
 export const WithCustomLabel = Template.bind({})
 WithCustomLabel.args = {
   labels: {
-    available: 'Item is available'
-  }
+    available: "Item is available",
+  },
 }
 
 /**
@@ -55,16 +55,9 @@ WithCustomLabel.args = {
  */
 export const NotAvailable: StoryFn<typeof AvailabilityTemplate> = (args) => {
   return (
-    <CommerceLayer
-      accessToken='my-access-token'
-      endpoint='https://demo-store.commercelayer.io'
-    >
-      <AvailabilityContainer skuCode='TSHIRTWV000000FFFFFFSXXX'>
-        <AvailabilityTemplate
-          timeFormat='days'
-          showShippingMethodName
-          showShippingMethodPrice
-        />
+    <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
+      <AvailabilityContainer skuCode="TSHIRTWV000000FFFFFFSXXX">
+        <AvailabilityTemplate timeFormat="days" showShippingMethodName showShippingMethodPrice />
       </AvailabilityContainer>
     </CommerceLayer>
   )
@@ -79,21 +72,18 @@ export const NotAvailable: StoryFn<typeof AvailabilityTemplate> = (args) => {
  */
 export const ChildrenProps: StoryObj = () => {
   return (
-    <CommerceLayer
-      accessToken='my-access-token'
-      endpoint='https://demo-store.commercelayer.io'
-    >
-      <AvailabilityContainer skuCode='POLOMXXX000000FFFFFFLXXX'>
+    <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
+      <AvailabilityContainer skuCode="POLOMXXX000000FFFFFFLXXX">
         <AvailabilityTemplate>
           {(childrenProps) => {
             return (
               <div>
-                <p className='font-bold'>Custom logic:</p>
-                <p className='mb-8'>
-                  {childrenProps.quantity} items available delivered in{' '}
-                  {childrenProps.min?.hours} hours
+                <p className="font-bold">Custom logic:</p>
+                <p className="mb-8">
+                  {childrenProps.quantity} items available delivered in {childrenProps.min?.hours}{" "}
+                  hours
                 </p>
-                <p className='font-bold'>The delivery_lead_times object</p>
+                <p className="font-bold">The delivery_lead_times object</p>
                 <pre>{JSON.stringify(childrenProps, null, 2)}</pre>
               </div>
             )
@@ -106,21 +96,18 @@ export const ChildrenProps: StoryObj = () => {
 ChildrenProps.decorators = [
   (Story) => {
     return (
-      <CommerceLayer
-        accessToken='my-access-token'
-        endpoint='https://demo-store.commercelayer.io'
-      >
+      <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
         <PricesContainer>
           <Story />
         </PricesContainer>
       </CommerceLayer>
     )
-  }
+  },
 ]
 ChildrenProps.parameters = {
   docs: {
     source: {
-      type: 'code'
-    }
-  }
+      type: "code",
+    },
+  },
 }

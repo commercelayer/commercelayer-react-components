@@ -1,15 +1,9 @@
 import { render, screen } from "@testing-library/react"
 import { useContext } from "react"
 import CommerceLayer from "#components/auth/CommerceLayer"
-import CommerceLayerContext, {
-  type CommerceLayerConfig,
-} from "#context/CommerceLayerContext"
+import CommerceLayerContext, { type CommerceLayerConfig } from "#context/CommerceLayerContext"
 
-function ContextInspector({
-  onContext,
-}: {
-  onContext: (ctx: CommerceLayerConfig) => void
-}) {
+function ContextInspector({ onContext }: { onContext: (ctx: CommerceLayerConfig) => void }) {
   const ctx = useContext(CommerceLayerContext)
   onContext(ctx)
   return null
@@ -30,7 +24,7 @@ describe("CommerceLayer component", () => {
     render(
       <CommerceLayer accessToken={token}>
         <span data-testid="child">hello</span>
-      </CommerceLayer>,
+      </CommerceLayer>
     )
     expect(screen.getByTestId("child").textContent).toBe("hello")
   })
@@ -45,7 +39,7 @@ describe("CommerceLayer component", () => {
             captured = ctx
           }}
         />
-      </CommerceLayer>,
+      </CommerceLayer>
     )
     expect(captured.accessToken).toBe(token)
   })
@@ -60,7 +54,7 @@ describe("CommerceLayer component", () => {
             captured = ctx
           }}
         />
-      </CommerceLayer>,
+      </CommerceLayer>
     )
     expect("endpoint" in captured).toBe(false)
   })
@@ -68,9 +62,7 @@ describe("CommerceLayer component", () => {
   it("re-renders with same props (cache-hit path)", () => {
     const token = makeFakeToken("my-org")
     const child = <span data-testid="stable-child">stable</span>
-    const { rerender } = render(
-      <CommerceLayer accessToken={token}>{child}</CommerceLayer>,
-    )
+    const { rerender } = render(<CommerceLayer accessToken={token}>{child}</CommerceLayer>)
     rerender(<CommerceLayer accessToken={token}>{child}</CommerceLayer>)
     expect(screen.getByTestId("stable-child").textContent).toBe("stable")
   })

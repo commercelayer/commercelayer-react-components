@@ -1,12 +1,5 @@
 import PlaceOrderContext from "#context/PlaceOrderContext"
-import {
-  type ReactNode,
-  type RefObject,
-  useContext,
-  useEffect,
-  useReducer,
-  type JSX,
-} from "react"
+import { type ReactNode, type RefObject, useContext, useEffect, useReducer, type JSX } from "react"
 import placeOrderReducer, {
   placeOrderInitialState,
   type PlaceOrderOptions,
@@ -26,23 +19,14 @@ interface Props {
 }
 export function PlaceOrderContainer(props: Props): JSX.Element {
   const { children, options } = props
-  const [state, dispatch] = useReducer(
-    placeOrderReducer,
-    placeOrderInitialState,
-  )
-  const {
-    order,
-    setOrder,
-    setOrderErrors,
-    include,
-    addResourceToInclude,
-    includeLoaded,
-  } = useCustomContext({
-    context: OrderContext,
-    contextComponentName: "Order",
-    currentComponentName: "PlaceOrderContainer",
-    key: "order",
-  })
+  const [state, dispatch] = useReducer(placeOrderReducer, placeOrderInitialState)
+  const { order, setOrder, setOrderErrors, include, addResourceToInclude, includeLoaded } =
+    useCustomContext({
+      context: OrderContext,
+      contextComponentName: "Order",
+      currentComponentName: "PlaceOrderContainer",
+      key: "order",
+    })
   const config = useContext(CommerceLayerContext)
   const organizationConfig = useOrganizationConfig({
     accessToken: config.accessToken,
@@ -123,9 +107,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
         setOrder,
         currentCustomerPaymentSourceId,
       }),
-    setPlaceOrderStatus: ({
-      status,
-    }: Parameters<typeof setPlaceOrderStatus>[0]) => {
+    setPlaceOrderStatus: ({ status }: Parameters<typeof setPlaceOrderStatus>[0]) => {
       setPlaceOrderStatus({ status, dispatch })
     },
     placeOrderPermitted: () => {
@@ -144,11 +126,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
       setButtonRef(ref, dispatch)
     },
   }
-  return (
-    <PlaceOrderContext.Provider value={contextValue}>
-      {children}
-    </PlaceOrderContext.Provider>
-  )
+  return <PlaceOrderContext.Provider value={contextValue}>{children}</PlaceOrderContext.Provider>
 }
 
 export default PlaceOrderContainer

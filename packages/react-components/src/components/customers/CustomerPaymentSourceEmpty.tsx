@@ -1,15 +1,15 @@
-import Parent from '#components/utils/Parent'
-import CustomerContext from '#context/CustomerContext'
-import type { ChildrenFunction } from '#typings/index'
-import useCustomContext from '#utils/hooks/useCustomContext'
+import Parent from "#components/utils/Parent"
+import CustomerContext from "#context/CustomerContext"
+import type { ChildrenFunction } from "#typings/index"
+import useCustomContext from "#utils/hooks/useCustomContext"
 
-import type { JSX } from "react";
+import type { JSX } from "react"
 
-interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements["span"], "children"> {
   /**
    * Function allow you to customize the component
    */
-  children?: ChildrenFunction<Omit<Props, 'children'>>
+  children?: ChildrenFunction<Omit<Props, "children">>
   /**
    * Label to show. Default: 'No payments available.'
    */
@@ -18,14 +18,14 @@ interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
 
 export function CustomerPaymentSourceEmpty({
   children,
-  emptyText = 'No payments available',
+  emptyText = "No payments available",
   ...p
 }: Props): JSX.Element | null {
   const { payments } = useCustomContext({
     context: CustomerContext,
-    contextComponentName: 'CustomerContainer',
-    currentComponentName: 'CustomerPaymentSourceEmpty',
-    key: 'payments'
+    contextComponentName: "CustomerContainer",
+    currentComponentName: "CustomerPaymentSourceEmpty",
+    key: "payments",
   })
   const parentProps = { emptyText, ...p }
   if (payments != null && payments.length > 0) {

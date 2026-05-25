@@ -1,14 +1,14 @@
-import CommerceLayerContext from '#context/CommerceLayerContext'
+import CommerceLayerContext from "#context/CommerceLayerContext"
 import InStockSubscriptionContext, {
-  type InitialInStockSubscriptionContext
-} from '#context/InStockSubscriptionContext'
+  type InitialInStockSubscriptionContext,
+} from "#context/InStockSubscriptionContext"
 import inStockSubscriptionReducer, {
   inStockSubscriptionInitialState,
-  setInStockSubscription
-} from '#reducers/InStockSubscriptionReducer'
-import type { DefaultChildrenType } from '#typings/globals'
-import useCustomContext from '#utils/hooks/useCustomContext'
-import { useReducer, type JSX } from 'react';
+  setInStockSubscription,
+} from "#reducers/InStockSubscriptionReducer"
+import type { DefaultChildrenType } from "#typings/globals"
+import useCustomContext from "#utils/hooks/useCustomContext"
+import { useReducer, type JSX } from "react"
 
 interface Props {
   /**
@@ -17,19 +17,14 @@ interface Props {
   children: DefaultChildrenType
 }
 
-export function InStockSubscriptionsContainer({
-  children
-}: Props): JSX.Element | null {
+export function InStockSubscriptionsContainer({ children }: Props): JSX.Element | null {
   const config = useCustomContext({
     context: CommerceLayerContext,
-    contextComponentName: 'CommerceLayer',
-    currentComponentName: 'InStockSubscriptionsContainer',
-    key: 'accessToken'
+    contextComponentName: "CommerceLayer",
+    currentComponentName: "InStockSubscriptionsContainer",
+    key: "accessToken",
   })
-  const [state, dispatch] = useReducer(
-    inStockSubscriptionReducer,
-    inStockSubscriptionInitialState
-  )
+  const [state, dispatch] = useReducer(inStockSubscriptionReducer, inStockSubscriptionInitialState)
   const value: InitialInStockSubscriptionContext = {
     ...state,
     setInStockSubscription: async ({ customerEmail, skuCode }) =>
@@ -37,8 +32,8 @@ export function InStockSubscriptionsContainer({
         customerEmail,
         skuCode,
         config,
-        dispatch
-      })
+        dispatch,
+      }),
   }
   return (
     <InStockSubscriptionContext.Provider value={value}>

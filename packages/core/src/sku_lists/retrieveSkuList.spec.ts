@@ -22,6 +22,6 @@ describe("retrieveSkuList", () => {
       })
       expect(result).toBeDefined()
       expect(result.id).toBe(first.id)
-    },
+    }
   )
 })

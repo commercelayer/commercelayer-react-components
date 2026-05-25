@@ -1,14 +1,5 @@
-import type {
-  Order,
-  PaymentMethod as PaymentMethodType,
-} from "@commercelayer/sdk"
-import {
-  type JSX,
-  type MouseEvent,
-  useContext,
-  useEffect,
-  useState,
-} from "react"
+import type { Order, PaymentMethod as PaymentMethodType } from "@commercelayer/sdk"
+import { type JSX, type MouseEvent, useContext, useEffect, useState } from "react"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
@@ -122,8 +113,7 @@ export function PaymentMethod({
           setLoadingPlaceOrder({ loading: true })
           setPaymentSelected(paymentMethod.id)
           const paymentMethodId = paymentMethod?.id
-          const paymentResource =
-            paymentMethod?.payment_source_type as PaymentResource
+          const paymentResource = paymentMethod?.payment_source_type as PaymentResource
           await setPaymentMethod({ paymentResource, paymentMethodId })
           const ps = await setPaymentSource({
             paymentResource,
@@ -166,23 +156,16 @@ export function PaymentMethod({
               setLoadingPlaceOrder({ loading: true })
               setPaymentSelected(paymentMethod.id)
               const paymentMethodId = paymentMethod?.id
-              const paymentResource =
-                paymentMethod?.payment_source_type as PaymentResource
+              const paymentResource = paymentMethod?.payment_source_type as PaymentResource
               await setPaymentMethod({ paymentResource, paymentMethodId })
               let attributes: Record<string, unknown> | undefined = {}
               if (config != null && paymentResource === "paypal_payments") {
                 attributes = getPaypalAttributes(paymentResource, config)
               }
               if (config != null && paymentResource === "external_payments") {
-                attributes = getExternalPaymentAttributes(
-                  paymentResource,
-                  config,
-                )
+                attributes = getExternalPaymentAttributes(paymentResource, config)
               }
-              if (
-                config != null &&
-                paymentResource === "checkout_com_payments"
-              ) {
+              if (config != null && paymentResource === "checkout_com_payments") {
                 attributes = getCkoAttributes(paymentResource, config)
               }
               const ps = await setPaymentSource({
@@ -211,11 +194,7 @@ export function PaymentMethod({
             }
           } else {
             setTimeout(() => {
-              if (
-                showLoader &&
-                errors?.length === 0 &&
-                paymentSourceStatus !== "declined"
-              ) {
+              if (showLoader && errors?.length === 0 && paymentSourceStatus !== "declined") {
                 setLoading(showLoader)
               } else {
                 setLoading(false)
@@ -237,11 +216,7 @@ export function PaymentMethod({
       if (isSingle && autoSelectSinglePaymentMethod) {
         if (paymentSource) {
           setTimeout(() => {
-            if (
-              showLoader &&
-              errors?.length === 0 &&
-              paymentSourceStatus !== "declined"
-            ) {
+            if (showLoader && errors?.length === 0 && paymentSourceStatus !== "declined") {
               setLoading(showLoader)
             } else {
               setLoading(false)
@@ -249,11 +224,7 @@ export function PaymentMethod({
           }, 200)
         }
       } else {
-        if (
-          showLoader &&
-          errors?.length === 0 &&
-          paymentSourceStatus !== "declined"
-        ) {
+        if (showLoader && errors?.length === 0 && paymentSourceStatus !== "declined") {
           setLoading(showLoader)
         } else {
           setLoading(false)
@@ -329,9 +300,7 @@ export function PaymentMethod({
         <div
           data-testid={paymentResource}
           key={paymentResource}
-          className={`${className ?? ""} ${
-            isActive && activeClass != null ? activeClass : ""
-          }`}
+          className={`${className ?? ""} ${isActive && activeClass != null ? activeClass : ""}`}
           onClick={(e) => {
             if (onClickable != null) {
               onClickable(e)

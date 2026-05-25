@@ -1,7 +1,7 @@
-import { addons, types } from '@storybook/addons'
-import React from 'react'
-import { Tool } from './Tool'
-import { ADDON_ID, ADDON_NAME } from './constants'
+import { addons, types } from "@storybook/addons"
+import React from "react"
+import { Tool } from "./Tool"
+import { ADDON_ID, ADDON_NAME } from "./constants"
 
 addons.register(ADDON_ID, () => {
   addons.add(ADDON_ID, {

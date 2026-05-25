@@ -79,12 +79,10 @@ export function SkusContainer<P extends Props>(props: P): JSX.Element {
       skuCodes: skus,
       setSkuCodes: () => {},
     }),
-    [skuList, isLoading, skus],
+    [skuList, isLoading, skus]
   )
 
-  return (
-    <SkuContext.Provider value={contextValue}>{children}</SkuContext.Provider>
-  )
+  return <SkuContext.Provider value={contextValue}>{children}</SkuContext.Provider>
 }
 
 export default SkusContainer

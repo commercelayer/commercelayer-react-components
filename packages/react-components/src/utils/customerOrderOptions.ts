@@ -1,8 +1,8 @@
 import {
   getSaveBillingAddressToAddressBook,
   getSavePaymentSourceToCustomerWallet,
-  getSaveShippingAddressToAddressBook
-} from './localStorage'
+  getSaveShippingAddressToAddressBook,
+} from "./localStorage"
 
 export function saveToWallet(): boolean {
   return getSavePaymentSourceToCustomerWallet()

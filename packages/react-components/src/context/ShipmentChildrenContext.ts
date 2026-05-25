@@ -1,12 +1,12 @@
-import { createContext } from 'react'
+import { createContext } from "react"
 import type {
   DeliveryLeadTime,
   LineItem,
   Parcel,
   Shipment,
   ShippingMethod,
-  StockTransfer
-} from '@commercelayer/sdk'
+  StockTransfer,
+} from "@commercelayer/sdk"
 
 export interface InitialShipmentContext {
   currentShippingMethodId?: string
@@ -23,7 +23,7 @@ const initial: InitialShipmentContext = {
   keyNumber: 0,
   lineItems: [],
   shippingMethods: [],
-  stockTransfers: []
+  stockTransfers: [],
 }
 
 const ShipmentChildrenContext = createContext<InitialShipmentContext>(initial)
