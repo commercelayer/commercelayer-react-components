@@ -1,5 +1,5 @@
-import { useState, useEffect, Fragment } from 'react'
-import { getSalesChannelToken } from '@commercelayer/js-auth'
+import { useState, useEffect, Fragment } from "react"
+import { getSalesChannelToken } from "@commercelayer/js-auth"
 import {
   CommerceLayer,
   OrderContainer,
@@ -31,20 +31,16 @@ import {
   SkusContainer,
   SkuField,
   Skus,
-} from 'packages/react-components/src'
+} from "packages/react-components/src"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
-const skus = [
-  'BABYONBU000000E63E7412MX',
-  'CANVASAU000000FFFFFF1824',
-  'BABYONBU000000E63E746MXX',
-]
+const skus = ["BABYONBU000000E63E7412MX", "CANVASAU000000FFFFFF1824", "BABYONBU000000E63E746MXX"]
 
 export default function Cart() {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("")
   useEffect(() => {
     const getToken = async () => {
       const token = await getSalesChannelToken({
@@ -61,17 +57,13 @@ export default function Cart() {
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderStorage persistKey="orderUS">
-            <OrderContainer attributes={{ return_url: 'https://test.co' }}>
+            <OrderContainer attributes={{ return_url: "https://test.co" }}>
               <SkusContainer skus={skus}>
                 <ItemContainer>
                   <PricesContainer>
                     <AvailabilityContainer>
                       <Skus>
-                        <SkuField
-                          attribute="image_url"
-                          tagElement="img"
-                          width={100}
-                        />
+                        <SkuField attribute="image_url" tagElement="img" width={100} />
                         <SkuField attribute="code" tagElement="p" />
                         <div className="text-center p-3">
                           <div className="flex flex-row flex-wrap justify-center">
@@ -106,36 +98,18 @@ export default function Cart() {
               <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
               <LineItemsContainer>
                 <p className="text-sm m-2">
-                  Your shopping bag contains{' '}
-                  <LineItemsCount
-                    data-test="items-count"
-                    className="font-bold"
-                  />{' '}
-                  items
+                  Your shopping bag contains{" "}
+                  <LineItemsCount data-test="items-count" className="font-bold" /> items
                 </p>
                 <div className="flex flex-col p-2">
                   <LineItemsEmpty data-test="line-items-empty" />
                   <LineItem>
                     <div className="flex justify-around items-center border-b p-5">
                       <LineItemImage className="p-2" width={80} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
-                      <LineItemQuantity
-                        data-test="line-item-quantity"
-                        max={100}
-                        className="p-2"
-                      />
-                      <Errors
-                        className="text-red-700 p-2"
-                        resource="line_items"
-                        field="quantity"
-                      />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
+                      <LineItemName data-test="line-item-name" className="p-2" />
+                      <LineItemQuantity data-test="line-item-quantity" max={100} className="p-2" />
+                      <Errors className="text-red-700 p-2" resource="line_items" field="quantity" />
+                      <LineItemAmount data-test="line-item-total" className="p-2" />
                       <LineItemRemoveLink
                         data-test="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -145,20 +119,14 @@ export default function Cart() {
                   <LineItem type="gift_cards">
                     <div className="flex justify-between items-center border-b p-5">
                       <LineItemImage className="p-2" width={40} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
+                      <LineItemName data-test="line-item-name" className="p-2" />
                       <LineItemQuantity
                         data-test="line-item-quantity"
                         max={10}
                         className="p-2"
                         disabled
                       />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
+                      <LineItemAmount data-test="line-item-total" className="p-2" />
                       <LineItemRemoveLink
                         data-test="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -168,19 +136,9 @@ export default function Cart() {
                   <LineItem type="bundles">
                     <div className="flex justify-between items-center border-b p-5">
                       <LineItemImage className="p-2" width={40} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
-                      <LineItemQuantity
-                        data-test="line-item-quantity"
-                        max={10}
-                        className="p-2"
-                      />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
+                      <LineItemName data-test="line-item-name" className="p-2" />
+                      <LineItemQuantity data-test="line-item-quantity" max={10} className="p-2" />
+                      <LineItemAmount data-test="line-item-total" className="p-2" />
                       <LineItemRemoveLink
                         data-test="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -190,19 +148,9 @@ export default function Cart() {
                   <LineItem type="adjustments">
                     <div className="flex justify-between items-center border-b p-5">
                       <LineItemImage className="p-2" width={40} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
-                      <LineItemQuantity
-                        data-test="line-item-quantity"
-                        max={10}
-                        className="p-2"
-                      />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
+                      <LineItemName data-test="line-item-name" className="p-2" />
+                      <LineItemQuantity data-test="line-item-quantity" max={10} className="p-2" />
+                      <LineItemAmount data-test="line-item-total" className="p-2" />
                       <LineItemRemoveLink
                         data-test="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"

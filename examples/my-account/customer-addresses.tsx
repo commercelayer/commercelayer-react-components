@@ -10,22 +10,22 @@ import {
   AddressStateSelector,
   AddressCountrySelector,
   AddressesEmpty,
-} from 'packages/react-components/src'
-import { useState } from 'react'
-import useGetToken from '../../hooks/useGetToken'
-import SaveAddressesButton from '../../#components/addresses/SaveAddressesButton'
+} from "packages/react-components/src"
+import { useState } from "react"
+import useGetToken from "../../hooks/useGetToken"
+import SaveAddressesButton from "../../#components/addresses/SaveAddressesButton"
 
 const messages: any = [
   {
-    code: 'EMPTY_ERROR',
-    resource: 'addresses',
-    field: 'firstName',
+    code: "EMPTY_ERROR",
+    resource: "addresses",
+    field: "firstName",
     message: `Can't be blank`,
   },
   {
-    code: 'VALIDATION_ERROR',
-    resource: 'addresses',
-    field: 'email',
+    code: "VALIDATION_ERROR",
+    resource: "addresses",
+    field: "email",
     message: `Must be valid email`,
   },
 ]
@@ -39,7 +39,7 @@ const addresseses = () => {
     <CommerceLayer {...config}>
       <CustomerContainer>
         <AddressesContainer>
-        <AddressesEmpty />
+          <AddressesEmpty />
           <div className="w-full p-5">
             <div className="flex flex-wrap mx-auto w-full">
               <Address className="w-1/3 p-2 border hover:border-blue-500 rounded m-2 shadow-sm">
@@ -58,7 +58,7 @@ const addresseses = () => {
                         type="edit"
                         label="Edit"
                         onClick={(address) => {
-                          console.log('address', address)
+                          console.log("address", address)
                           setAddress(address)
                           setShowForm(true)
                         }}
@@ -78,7 +78,7 @@ const addresseses = () => {
             </div>
             <div className="mt-3 ml-2">
               <button
-                title='button'
+                title="button"
                 type="button"
                 className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 onClick={() => {
@@ -125,7 +125,7 @@ const addresseses = () => {
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="First name"
-                        value={address?.first_name || ''}
+                        value={address?.first_name || ""}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -151,7 +151,7 @@ const addresseses = () => {
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Last name"
-                        value={address?.last_name || ''}
+                        value={address?.last_name || ""}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -177,7 +177,7 @@ const addresseses = () => {
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Address"
-                        value={address?.line_1 || ''}
+                        value={address?.line_1 || ""}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -203,7 +203,7 @@ const addresseses = () => {
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="City"
-                        value={address?.city || ''}
+                        value={address?.city || ""}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -228,11 +228,11 @@ const addresseses = () => {
                         name="billing_address_country_code"
                         className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                         placeholder={{
-                          value: '',
-                          label: 'Country',
+                          value: "",
+                          label: "Country",
                           disabled: true,
                         }}
-                        value={address?.country_code || ''}
+                        value={address?.country_code || ""}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -258,11 +258,11 @@ const addresseses = () => {
                         className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                         inputClassName="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                         placeholder={{
-                          value: '',
-                          label: 'Select a state',
+                          value: "",
+                          label: "Select a state",
                           disabled: true,
                         }}
-                        value={address?.state_code || ''}
+                        value={address?.state_code || ""}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -288,7 +288,7 @@ const addresseses = () => {
                         type="text"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Zip code"
-                        value={address?.zip_code || ''}
+                        value={address?.zip_code || ""}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -314,7 +314,7 @@ const addresseses = () => {
                         type="tel"
                         className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                         placeholder="Phone"
-                        value={address?.phone || ''}
+                        value={address?.phone || ""}
                       />
                     </div>
                     <p className="mt-2 text-sm text-red-600" id="email-error">

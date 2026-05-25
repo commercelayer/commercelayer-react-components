@@ -17,7 +17,7 @@ import baseReducer from "#utils/baseReducer"
 import { publish } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
 import { jwt } from "#utils/jwt"
-import { getSdk } from '@commercelayer/core'
+import { getSdk } from "@commercelayer/core"
 import {
   type CustomerOrderParams,
   type DeleteLocalOrder,
@@ -53,10 +53,7 @@ type CreateOrderParams = Pick<
 >
 
 export interface AddToCartImportParams
-  extends Omit<
-    AddToCartParams,
-    "skuCode" | "skuId" | "quantity" | "option" | "lineItem"
-  > {
+  extends Omit<AddToCartParams, "skuCode" | "skuId" | "quantity" | "option" | "lineItem"> {
   lineItems: CustomLineItem[]
 }
 
@@ -150,7 +147,10 @@ export async function createOrder(params: CreateOrderParams): Promise<string> {
       setLocalOrder,
     } = params
     if (state?.orderId) return state.orderId
-    const sdk = config != null ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors }) : undefined
+    const sdk =
+      config != null
+        ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+        : undefined
     try {
       if (sdk == null) return ""
       const o = await sdk?.orders.create({ metadata, ...orderAttributes })
@@ -182,9 +182,7 @@ export async function createOrder(params: CreateOrderParams): Promise<string> {
   return ""
 }
 
-export const getApiOrder: GetOrder = async (
-  params,
-): Promise<Order | undefined> => {
+export const getApiOrder: GetOrder = async (params): Promise<Order | undefined> => {
   const {
     id,
     dispatch,
@@ -195,7 +193,10 @@ export const getApiOrder: GetOrder = async (
     state,
     options = {},
   } = params
-  const sdk = config != null ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors }) : undefined
+  const sdk =
+    config != null
+      ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+      : undefined
   try {
     if (sdk == null) return undefined
     if (state?.include && state.include.length > 0) {
@@ -256,7 +257,10 @@ export async function getOrderByFields(params: {
   config: CommerceLayerConfig
 }): Promise<Order> {
   const { orderId, fields, config } = params
-  const sdk = config != null ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors }) : undefined
+  const sdk =
+    config != null
+      ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+      : undefined
   if (sdk == null) throw new Error("SDK not initialized")
   const order = await sdk.orders.retrieve(orderId, { fields })
   return order
@@ -274,13 +278,15 @@ export async function updateOrder({
   error?: { errors: BaseError[] }
   order?: Order
 }> {
-  const sdk = config != null ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors }) : undefined
+  const sdk =
+    config != null
+      ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+      : undefined
   try {
     if (sdk == null) return { success: false }
     const resource = { ...attributes, id }
     // Take note of current total amount with taxes cents (used in some cases like Adyen and the payment source is expired and needs to be updated)
-    const currentTotalAmountWithTaxesCents =
-      state?.order?.total_amount_with_taxes_cents
+    const currentTotalAmountWithTaxesCents = state?.order?.total_amount_with_taxes_cents
     // const order = await sdk.orders.update(resource, { include })
     await sdk.orders.update(resource, { include })
     // NOTE: Retrieve doesn't response with attributes updated
@@ -336,7 +342,10 @@ export async function paymentSourceRequest({
   order,
   state,
 }: TResourceRequest): Promise<{ success: boolean; order?: Order }> {
-  const sdk = config != null ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors }) : undefined
+  const sdk =
+    config != null
+      ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+      : undefined
   try {
     if (sdk == null) return { success: false }
     const sdkResource = sdk[resource]
@@ -359,10 +368,7 @@ export async function paymentSourceRequest({
   }
 }
 
-export const setOrder = (
-  order: Order,
-  dispatch?: Dispatch<OrderActions>,
-): void => {
+export const setOrder = (order: Order, dispatch?: Dispatch<OrderActions>): void => {
   if (dispatch) {
     dispatch({
       type: "setOrder",
@@ -402,8 +408,7 @@ export function addResourceToInclude({
     includeLoaded: undefined,
   }
   if (newResource) {
-    const resources =
-      typeof newResource === "string" ? [newResource] : newResource
+    const resources = typeof newResource === "string" ? [newResource] : newResource
     payload.include = [...new Set([...resourcesIncluded, ...resources])]
     resources.forEach((resource) => {
       const includeLoaded = {
@@ -483,7 +488,7 @@ export type AddToCartParams = Partial<{
 }>
 
 export async function addToCart(
-  params: AddToCartParams,
+  params: AddToCartParams
 ): Promise<{ success: boolean; orderId?: string }> {
   const {
     skuCode,
@@ -520,14 +525,14 @@ export async function addToCart(
               await Promise.all(
                 lineItems.map(async (lineItem) => {
                   await sdk.line_items.delete(lineItem.id)
-                }),
+                })
               )
             }
           } else {
             await Promise.all(
               state?.order?.line_items.map(async (lineItem) => {
                 await sdk.line_items.delete(lineItem.id)
-              }),
+              })
             )
           }
         }
@@ -569,15 +574,11 @@ export async function addToCart(
             },
           })
         }
-        if (
-          buyNowMode &&
-          id &&
-          config?.accessToken != null
-        ) {
+        if (buyNowMode && id && config?.accessToken != null) {
           const params = `${id}?accessToken=${config.accessToken ?? ""}`
           const { organization } = jwt(config.accessToken)
           const slug = organization.slug
-          const domain = 'commercelayer.io'
+          const domain = "commercelayer.io"
           const href = getApplicationLink({
             slug,
             orderId: id,
@@ -658,19 +659,22 @@ export type SaveAddressToCustomerAddressBook = (params: {
   type: AddressResource
   value: boolean
 }) => void
-export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook =
-  ({ type, value, dispatch }) => {
-    const k: CustomerOrderParams = `_save_${type}_to_customer_address_book`
-    const v = `${value.toString()}`
-    setCustomerOrderParam(k, v)
-    if (dispatch)
-      dispatch({
-        type: "setSaveAddressToCustomerAddressBook",
-        payload: {
-          [k]: v,
-        },
-      })
-  }
+export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook = ({
+  type,
+  value,
+  dispatch,
+}) => {
+  const k: CustomerOrderParams = `_save_${type}_to_customer_address_book`
+  const v = `${value.toString()}`
+  setCustomerOrderParam(k, v)
+  if (dispatch)
+    dispatch({
+      type: "setSaveAddressToCustomerAddressBook",
+      payload: {
+        [k]: v,
+      },
+    })
+}
 
 interface TSetGiftCardOrCouponCodeParams {
   code: string
@@ -795,10 +799,6 @@ export const orderInitialState: Partial<OrderState> = {
 }
 
 const orderReducer = (state: OrderState, reducer: OrderActions): OrderState =>
-  baseReducer<OrderState, OrderActions, OrderActionType[]>(
-    state,
-    reducer,
-    actionType,
-  )
+  baseReducer<OrderState, OrderActions, OrderActionType[]>(state, reducer, actionType)
 
 export default orderReducer

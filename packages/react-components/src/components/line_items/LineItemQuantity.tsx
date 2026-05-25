@@ -1,11 +1,11 @@
-import { useContext, type ReactNode, type JSX } from 'react';
-import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import LineItemContext from '#context/LineItemContext'
-import Parent from '#components/utils/Parent'
-import type { ChildrenFunction } from '#typings'
-import type { LineItem } from '@commercelayer/sdk'
+import { useContext, type ReactNode, type JSX } from "react"
+import LineItemChildrenContext from "#context/LineItemChildrenContext"
+import LineItemContext from "#context/LineItemContext"
+import Parent from "#components/utils/Parent"
+import type { ChildrenFunction } from "#typings"
+import type { LineItem } from "@commercelayer/sdk"
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+interface ChildrenProps extends Omit<Props, "children"> {
   quantity: number
   handleChange: (event: React.MouseEvent<HTMLSelectElement>) => void
   lineItem?: LineItem
@@ -21,8 +21,8 @@ type Props = {
    * @link https://docs.commercelayer.io/core/external-resources/external-prices
    */
   hasExternalPrice?: boolean
-} & (Omit<JSX.IntrinsicElements['select'], 'children'> &
-  Omit<JSX.IntrinsicElements['span'], 'children'>)
+} & (Omit<JSX.IntrinsicElements["select"], "children"> &
+  Omit<JSX.IntrinsicElements["span"], "children">)
 
 export function LineItemQuantity(props: Props): JSX.Element {
   const { max = 50, readonly = false, hasExternalPrice, ...p } = props
@@ -47,7 +47,7 @@ export function LineItemQuantity(props: Props): JSX.Element {
     handleChange,
     quantity,
     lineItem,
-    ...props
+    ...props,
   }
   return props.children ? (
     <Parent {...parentProps}>{props.children}</Parent>
@@ -56,7 +56,7 @@ export function LineItemQuantity(props: Props): JSX.Element {
   ) : (
     <select
       data-testid={lineItem?.sku_code}
-      title={lineItem?.name ?? ''}
+      title={lineItem?.name ?? ""}
       value={quantity}
       onChange={handleChange}
       {...p}

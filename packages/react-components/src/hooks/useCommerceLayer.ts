@@ -1,6 +1,6 @@
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import { getSdk } from '@commercelayer/core'
-import { useContext } from 'react'
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import { getSdk } from "@commercelayer/core"
+import { useContext } from "react"
 
 interface ReturnProps {
   /** This is the access token used to initialize the sdk client. It need to be set as prop in the main `<CommerceLayer>` component */
@@ -14,20 +14,20 @@ interface ReturnProps {
  **/
 export function useCommerceLayer(): ReturnProps {
   const ctx = useContext(CommerceLayerContext)
-  if ('accessToken' in ctx) {
+  if ("accessToken" in ctx) {
     return {
       accessToken: ctx.accessToken,
       sdkClient: () => {
         if (ctx?.accessToken != null)
           return getSdk({
             accessToken: ctx.accessToken,
-            interceptors: ctx.interceptors
+            interceptors: ctx.interceptors,
           })
         return undefined
-      }
+      },
     }
   }
-  throw new Error('Cannot use `useCommerceLayer` outside of <CommerceLayer/>')
+  throw new Error("Cannot use `useCommerceLayer` outside of <CommerceLayer/>")
 }
 
 export default useCommerceLayer

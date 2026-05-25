@@ -1,9 +1,9 @@
-import { jwtDecode } from 'jwt-decode'
+import { jwtDecode } from "jwt-decode"
 
 interface JWT {
   application: {
     id: string
-    kind: 'sales_channel' | 'integration'
+    kind: "sales_channel" | "integration"
     public: boolean
   }
   exp: number
@@ -18,7 +18,7 @@ interface JWT {
     id: string
     slug: string
   }
-  owner: { id: string; type: 'Customer' }
+  owner: { id: string; type: "Customer" }
   rand: number
   test: boolean
 }

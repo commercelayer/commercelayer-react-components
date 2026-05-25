@@ -1,30 +1,30 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { useContext, useEffect, useState, type JSX } from 'react';
-import BaseInput from '#components-utils/BaseInput'
-import type { BaseInputComponentProps } from '#typings'
-import { useRapidForm } from 'rapid-form'
-import CustomerContext from '#context/CustomerContext'
-import type { BaseError, CodeErrorType } from '#typings/errors'
-import { validateValue } from '#utils/validateFormFields'
-import OrderContext from '#context/OrderContext'
+import { useContext, useEffect, useState, type JSX } from "react"
+import BaseInput from "#components-utils/BaseInput"
+import type { BaseInputComponentProps } from "#typings"
+import { useRapidForm } from "rapid-form"
+import CustomerContext from "#context/CustomerContext"
+import type { BaseError, CodeErrorType } from "#typings/errors"
+import { validateValue } from "#utils/validateFormFields"
+import OrderContext from "#context/OrderContext"
 
 type Props = {
-  name?: 'customer_email' | string
-  type?: 'email' | string
+  name?: "customer_email" | string
+  type?: "email" | string
   saveOnBlur?: boolean
   onBlur?: (email: string) => void
   errorClassName?: string
-} & Omit<BaseInputComponentProps, 'name' | 'type' | 'onBlur'> &
-  Omit<JSX.IntrinsicElements['input'], 'children'> &
-  Omit<JSX.IntrinsicElements['textarea'], 'children'>
+} & Omit<BaseInputComponentProps, "name" | "type" | "onBlur"> &
+  Omit<JSX.IntrinsicElements["input"], "children"> &
+  Omit<JSX.IntrinsicElements["textarea"], "children">
 
 export function CustomerInput(props: Props): JSX.Element {
   const {
-    name = 'customer_email',
-    placeholder = '',
+    name = "customer_email",
+    placeholder = "",
     required = true,
     saveOnBlur = false,
-    type = 'email',
+    type = "email",
     value,
     onBlur,
     className,
@@ -32,19 +32,16 @@ export function CustomerInput(props: Props): JSX.Element {
     ...p
   } = props
   const { validation, values, errors, setError } = (useRapidForm as any)({
-    fieldEvent: 'blur'
+    fieldEvent: "blur",
   })
-  const { saveCustomerUser, setCustomerErrors, setCustomerEmail } =
-    useContext(CustomerContext)
+  const { saveCustomerUser, setCustomerErrors, setCustomerEmail } = useContext(CustomerContext)
   const { setOrderErrors } = useContext(OrderContext)
   const [hasError, setHasError] = useState(false)
   const handleOnBlur = async (
-    e:
-      | React.FocusEvent<HTMLInputElement, Element>
-      | React.FocusEvent<HTMLTextAreaElement, Element>
+    e: React.FocusEvent<HTMLInputElement, Element> | React.FocusEvent<HTMLTextAreaElement, Element>
   ): Promise<void> => {
     const v = e?.target?.value
-    const checkValue = validateValue(v, name, type, 'orders')
+    const checkValue = validateValue(v, name, type, "orders")
     const isValid = Object.keys(checkValue).length === 0
     if (saveOnBlur && Object.keys(values).length > 0) {
       if (saveCustomerUser != null) {
@@ -55,7 +52,7 @@ export function CustomerInput(props: Props): JSX.Element {
     if (!isValid) {
       const currentError = {
         ...checkValue,
-        name: checkValue?.field
+        name: checkValue?.field,
       }
       setError(currentError)
     }
@@ -68,9 +65,9 @@ export function CustomerInput(props: Props): JSX.Element {
         const message = errors[fieldName]?.message
         formErrors.push({
           code: code as CodeErrorType,
-          message: message || '',
-          resource: 'orders',
-          field: fieldName
+          message: message || "",
+          resource: "orders",
+          field: fieldName,
         })
       }
       if (formErrors.length > 0) {
@@ -89,9 +86,7 @@ export function CustomerInput(props: Props): JSX.Element {
       setHasError(false)
     }
   }, [errors])
-  const classNameComputed = `${className ?? ''} ${
-    hasError && errorClassName ? errorClassName : ''
-  }`
+  const classNameComputed = `${className ?? ""} ${hasError && errorClassName ? errorClassName : ""}`
   return (
     <BaseInput
       name={name}

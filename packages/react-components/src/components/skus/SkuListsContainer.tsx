@@ -10,9 +10,7 @@ import {
   useState,
 } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
-import SkuListsContext, {
-  type SkuListsContextType,
-} from "#context/SkuListsContext"
+import SkuListsContext, { type SkuListsContextType } from "#context/SkuListsContext"
 
 interface Props {
   children: ReactNode
@@ -32,10 +30,7 @@ interface Props {
 export function SkuListsContainer(props: Props): JSX.Element {
   const { children, params } = props
   const config = useContext(CommerceLayerContext)
-  const { retrieveSkuList } = useSkuLists(
-    config.accessToken ?? "",
-    config.interceptors,
-  )
+  const { retrieveSkuList } = useSkuLists(config.accessToken ?? "", config.interceptors)
   const [registeredIds, setRegisteredIds] = useState<string[]>([])
   const [skuLists, setSkuLists] = useState<Record<string, Sku[]>>({})
 
@@ -59,8 +54,8 @@ export function SkuListsContainer(props: Props): JSX.Element {
           retrieveSkuList(id, mergedParams).then((skuList) => ({
             id,
             skus: (skuList?.skus ?? []) as Sku[],
-          })),
-        ),
+          }))
+        )
       ).then((results) => {
         const updated: Record<string, Sku[]> = {}
         for (const { id, skus } of results) {
@@ -78,14 +73,10 @@ export function SkuListsContainer(props: Props): JSX.Element {
       registerListId,
       setListIds: setRegisteredIds,
     }),
-    [registeredIds, skuLists, registerListId],
+    [registeredIds, skuLists, registerListId]
   )
 
-  return (
-    <SkuListsContext.Provider value={contextValue}>
-      {children}
-    </SkuListsContext.Provider>
-  )
+  return <SkuListsContext.Provider value={contextValue}>{children}</SkuListsContext.Provider>
 }
 
 export default SkuListsContainer

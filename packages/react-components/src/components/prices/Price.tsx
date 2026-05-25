@@ -14,8 +14,7 @@ interface PriceChildrenProps extends Omit<PriceProps, "children"> {
   prices: PriceType[]
 }
 
-export interface PriceProps
-  extends Omit<JSX.IntrinsicElements["span"], "children" | "ref"> {
+export interface PriceProps extends Omit<JSX.IntrinsicElements["span"], "children" | "ref"> {
   children?: ChildrenFunction<PriceChildrenProps>
   /**
    * CSS class name to be added for the compare price
@@ -78,10 +77,7 @@ export function Price(props: PriceProps): ReactNode {
     isLoading: batchLoading,
     registerSku,
     unregisterSku,
-  } = usePrices(
-    isStandalone ? (accessToken ?? "") : "",
-    isStandalone ? interceptors : undefined,
-  )
+  } = usePrices(isStandalone ? (accessToken ?? "") : "", isStandalone ? interceptors : undefined)
 
   // Standalone: register/unregister this SKU
   useEffect(() => {

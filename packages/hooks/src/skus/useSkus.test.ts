@@ -13,59 +13,53 @@ const swrWrapper = ({ children }: { children: ReactNode }) =>
   createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
 
 describe("useSkus", () => {
-  coreIntegrationTest(
-    "should return a list of SKUs",
-    async ({ accessToken }) => {
-      const token = accessToken?.accessToken
-      const { result } = renderHook(() => useSkus(token))
+  coreIntegrationTest("should return a list of SKUs", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => useSkus(token))
 
-      expect(result.current.skus).toEqual([])
-      expect(result.current.isLoading).toBe(false)
-      expect(result.current.action).toBeNull()
+    expect(result.current.skus).toEqual([])
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.action).toBeNull()
 
-      act(() => {
-        result.current.fetchSkus()
-      })
+    act(() => {
+      result.current.fetchSkus()
+    })
 
-      await waitFor(() => {
-        expect(result.current.skus.length).toBeGreaterThan(0)
-        expect(result.current.error).toBeNull()
-        expect(result.current.action).toBe("get")
-      })
-    },
-  )
+    await waitFor(() => {
+      expect(result.current.skus.length).toBeGreaterThan(0)
+      expect(result.current.error).toBeNull()
+      expect(result.current.action).toBe("get")
+    })
+  })
 
-  coreIntegrationTest(
-    "should retrieve a single SKU",
-    async ({ accessToken }) => {
-      const token = accessToken?.accessToken
-      const { result } = renderHook(() => useSkus(token))
+  coreIntegrationTest("should retrieve a single SKU", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => useSkus(token))
 
-      act(() => {
-        result.current.fetchSkus()
-      })
+    act(() => {
+      result.current.fetchSkus()
+    })
 
-      await waitFor(() => {
-        expect(result.current.skus.length).toBeGreaterThan(0)
-      })
+    await waitFor(() => {
+      expect(result.current.skus.length).toBeGreaterThan(0)
+    })
 
-      const testSkuId = result.current.skus[0]?.id
-      if (!testSkuId) {
-        throw new Error("No SKU available to retrieve")
-      }
+    const testSkuId = result.current.skus[0]?.id
+    if (!testSkuId) {
+      throw new Error("No SKU available to retrieve")
+    }
 
-      let retrievedSku: Awaited<ReturnType<typeof result.current.retrieveSku>>
-      await act(async () => {
-        retrievedSku = await result.current.retrieveSku(testSkuId)
-      })
+    let retrievedSku: Awaited<ReturnType<typeof result.current.retrieveSku>>
+    await act(async () => {
+      retrievedSku = await result.current.retrieveSku(testSkuId)
+    })
 
-      await waitFor(() => {
-        expect(result.current.action).toBe("retrieve")
-        expect(retrievedSku).toBeDefined()
-        expect(retrievedSku?.id).toBe(testSkuId)
-      })
-    },
-  )
+    await waitFor(() => {
+      expect(result.current.action).toBe("retrieve")
+      expect(retrievedSku).toBeDefined()
+      expect(retrievedSku?.id).toBe(testSkuId)
+    })
+  })
 
   coreIntegrationTest("should update a SKU", async ({ accessToken }) => {
     const token = accessToken?.accessToken
@@ -115,7 +109,7 @@ describe("useSkus", () => {
         expect(result.current.skus.length).toBeGreaterThan(0)
         expect(result.current.error).toBeNull()
       })
-    },
+    }
   )
 
   coreTest("should handle errors gracefully", async () => {
@@ -131,7 +125,7 @@ describe("useSkus", () => {
         expect(result.current.error).toBeDefined()
         expect(result.current.skus).toEqual([])
       },
-      { timeout: 5000 },
+      { timeout: 5000 }
     )
   })
 
@@ -168,7 +162,7 @@ describe("useSkus", () => {
       () => {
         expect(result.current.error).toBeDefined()
       },
-      { timeout: 5000 },
+      { timeout: 5000 }
     )
 
     act(() => {
@@ -249,9 +243,9 @@ describe("useSkus", () => {
       await expect(
         act(async () => {
           await result.current.retrieveSku("")
-        }),
+        })
       ).rejects.toThrow("SKU ID is required for retrieve")
-    },
+    }
   )
 
   coreIntegrationTest(
@@ -264,12 +258,10 @@ describe("useSkus", () => {
 
       await expect(
         act(async () => {
-          await result.current.updateSku(
-            {} as Parameters<typeof result.current.updateSku>[0],
-          )
-        }),
+          await result.current.updateSku({} as Parameters<typeof result.current.updateSku>[0])
+        })
       ).rejects.toThrow("SKU resource ID is required for update")
-    },
+    }
   )
 
   coreIntegrationTest(
@@ -288,7 +280,7 @@ describe("useSkus", () => {
           () => {
             expect(sharedResult.current.skus.length).toBeGreaterThan(0)
           },
-          { timeout: 10000 },
+          { timeout: 10000 }
         )
       } catch {
         return // graceful skip if API is rate-limited or unavailable
@@ -309,6 +301,6 @@ describe("useSkus", () => {
       expect(updatedSku).toBeDefined()
       expect(updatedSku?.id).toBe(skuId)
     },
-    15000,
+    15000
   )
 })

@@ -81,10 +81,7 @@ describe("getSdk", () => {
     }
     getSdk({ accessToken: "fake-token", interceptors })
     expect(mockAddResponseInterceptor).toHaveBeenCalledOnce()
-    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(
-      onSuccess,
-      onFailure,
-    )
+    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(onSuccess, onFailure)
     expect(mockAddRequestInterceptor).not.toHaveBeenCalled()
     expect(mockAddRawResponseReader).not.toHaveBeenCalled()
   })
@@ -126,9 +123,6 @@ describe("getSdk", () => {
       response: { onFailure },
     }
     getSdk({ accessToken: "fake-token", interceptors })
-    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(
-      undefined,
-      onFailure,
-    )
+    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(undefined, onFailure)
   })
 })

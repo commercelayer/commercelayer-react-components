@@ -1,4 +1,4 @@
-import { useContext, useEffect, useReducer, useMemo, type JSX } from 'react';
+import { useContext, useEffect, useReducer, useMemo, type JSX } from "react"
 import customerReducer, {
   customerInitialState,
   getCustomerAddresses,
@@ -15,15 +15,15 @@ import customerReducer, {
   getCustomerSubscriptions,
   getCustomerInfo,
   type SetResourceTriggerParams,
-  setResourceTrigger
-} from '#reducers/CustomerReducer'
-import OrderContext from '#context/OrderContext'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import CustomerContext from '#context/CustomerContext'
-import type { BaseError } from '#typings/errors'
-import type { DefaultChildrenType } from '#typings/globals'
-import { isGuestToken } from '#utils/isGuestToken'
-import type { Order, QueryPageSize, QuerySort } from '@commercelayer/sdk'
+  setResourceTrigger,
+} from "#reducers/CustomerReducer"
+import OrderContext from "#context/OrderContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import CustomerContext from "#context/CustomerContext"
+import type { BaseError } from "#typings/errors"
+import type { DefaultChildrenType } from "#typings/globals"
+import { isGuestToken } from "#utils/isGuestToken"
+import type { Order, QueryPageSize, QuerySort } from "@commercelayer/sdk"
 
 interface Props {
   children: DefaultChildrenType
@@ -62,52 +62,36 @@ interface Props {
 export function CustomerContainer(props: Props): JSX.Element {
   const { children, isGuest, addressesPageSize: pageSize } = props
   const [state, dispatch] = useReducer(customerReducer, customerInitialState)
-  const {
-    order,
-    addResourceToInclude,
-    include,
-    updateOrder,
-    includeLoaded,
-    withoutIncludes
-  } = useContext(OrderContext)
+  const { order, addResourceToInclude, include, updateOrder, includeLoaded, withoutIncludes } =
+    useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   useEffect(() => {
     if (config.accessToken) {
-      const guestToken =
-        isGuest == null ? isGuestToken(config.accessToken) : isGuest
+      const guestToken = isGuest == null ? isGuestToken(config.accessToken) : isGuest
       if (guestToken) {
         return
       }
-      if (
-        !include?.includes('available_customer_payment_sources.payment_source')
-      ) {
+      if (!include?.includes("available_customer_payment_sources.payment_source")) {
         addResourceToInclude({
           newResource: [
-            'available_customer_payment_sources.payment_source',
-            'available_customer_payment_sources.payment_method'
-          ]
+            "available_customer_payment_sources.payment_source",
+            "available_customer_payment_sources.payment_method",
+          ],
         })
-      } else if (
-        !includeLoaded?.['available_customer_payment_sources.payment_source']
-      ) {
+      } else if (!includeLoaded?.["available_customer_payment_sources.payment_source"]) {
         addResourceToInclude({
           newResourceLoaded: {
-            'available_customer_payment_sources.payment_source': true,
-            'available_customer_payment_sources.payment_method': true
-          }
+            "available_customer_payment_sources.payment_source": true,
+            "available_customer_payment_sources.payment_method": true,
+          },
         })
       }
     }
-  }, [
-    config.accessToken,
-    include?.length,
-    Object.keys(includeLoaded ?? {}).length
-  ])
+  }, [config.accessToken, include?.length, Object.keys(includeLoaded ?? {}).length])
 
   useEffect(() => {
     if (config.accessToken) {
-      const guestToken =
-        isGuest == null ? isGuestToken(config.accessToken) : isGuest
+      const guestToken = isGuest == null ? isGuestToken(config.accessToken) : isGuest
       if (guestToken) {
         return
       }
@@ -119,7 +103,7 @@ export function CustomerContainer(props: Props): JSX.Element {
           config,
           dispatch,
           isOrderAvailable: withoutIncludes != null,
-          pageSize
+          pageSize,
         })
       }
       if (order?.available_customer_payment_sources) {
@@ -145,7 +129,7 @@ export function CustomerContainer(props: Props): JSX.Element {
           customerEmail,
           dispatch,
           updateOrder,
-          order
+          order,
         })
       },
       setCustomerErrors: (errors: BaseError[]) => {
@@ -158,36 +142,32 @@ export function CustomerContainer(props: Props): JSX.Element {
         getCustomerPaymentSources({ dispatch, order })
       },
       deleteCustomerPayment: async ({
-        customerPaymentSourceId
+        customerPaymentSourceId,
       }: {
         customerPaymentSourceId: string
       }) => {
         await deleteCustomerPayment({
           customerPaymentSourceId,
           dispatch,
-          config
+          config,
         })
       },
-      deleteCustomerAddress: async ({
-        customerAddressId
-      }: {
-        customerAddressId: string
-      }) => {
+      deleteCustomerAddress: async ({ customerAddressId }: { customerAddressId: string }) => {
         await deleteCustomerAddress({
           customerAddressId,
           dispatch,
           config,
-          addresses: state.addresses
+          addresses: state.addresses,
         })
       },
       setResourceTrigger: async (
-        props: Omit<SetResourceTriggerParams, 'dispatch' | 'config'>
+        props: Omit<SetResourceTriggerParams, "dispatch" | "config">
       ): Promise<boolean> => {
         // @ts-expect-error strange type error
         return await setResourceTrigger({
           ...props,
           dispatch,
-          config
+          config,
         })
       },
       createCustomerAddress: async (address: TCustomerAddress) => {
@@ -196,7 +176,7 @@ export function CustomerContainer(props: Props): JSX.Element {
       getCustomerOrders: async ({
         pageNumber,
         pageSize,
-        sortBy
+        sortBy,
       }: {
         pageNumber?: number
         pageSize?: QueryPageSize
@@ -207,14 +187,14 @@ export function CustomerContainer(props: Props): JSX.Element {
           dispatch,
           pageNumber,
           pageSize,
-          sortBy
+          sortBy,
         })
       },
       getCustomerSubscriptions: async ({
         pageNumber,
         pageSize,
         sortBy,
-        id
+        id,
       }: {
         pageNumber?: number
         pageSize?: QueryPageSize
@@ -227,7 +207,7 @@ export function CustomerContainer(props: Props): JSX.Element {
           pageNumber,
           pageSize,
           sortBy,
-          id
+          id,
         })
       },
       reloadCustomerAddresses: async () => {
@@ -235,16 +215,12 @@ export function CustomerContainer(props: Props): JSX.Element {
           config,
           dispatch,
           isOrderAvailable: withoutIncludes != null,
-          pageSize
+          pageSize,
         })
-      }
+      },
     }
   }, [state, isGuest])
-  return (
-    <CustomerContext.Provider value={contextValue}>
-      {children}
-    </CustomerContext.Provider>
-  )
+  return <CustomerContext.Provider value={contextValue}>{children}</CustomerContext.Provider>
 }
 
 export default CustomerContainer

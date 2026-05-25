@@ -1,21 +1,21 @@
-import { useContext, useState, useEffect, type JSX } from 'react';
-import Parent from '#components/utils/Parent'
-import getLineItemsCount from '#utils/getLineItemsCount'
-import LineItemContext from '#context/LineItemContext'
-import type { ChildrenFunction } from '#typings/index'
+import { useContext, useState, useEffect, type JSX } from "react"
+import Parent from "#components/utils/Parent"
+import getLineItemsCount from "#utils/getLineItemsCount"
+import LineItemContext from "#context/LineItemContext"
+import type { ChildrenFunction } from "#typings/index"
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+interface ChildrenProps extends Omit<Props, "children"> {
   quantity: number
   text: string
 }
 
-interface Props extends Omit<JSX.IntrinsicElements['span'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements["span"], "children"> {
   children?: ChildrenFunction<ChildrenProps>
   text?: string
 }
 
 export function LineItemsEmpty(props: Props): JSX.Element | null {
-  const { children, text = 'Your shopping bag is empty', ...p } = props
+  const { children, text = "Your shopping bag is empty", ...p } = props
   const { lineItems } = useContext(LineItemContext)
   const [quantity, setQuantity] = useState<undefined | number>()
   const emptyText = quantity === 0 ? <span {...p}>{text}</span> : null
@@ -35,7 +35,7 @@ export function LineItemsEmpty(props: Props): JSX.Element | null {
   const parentProps = {
     quantity,
     text,
-    ...p
+    ...p,
   }
   return children ? <Parent {...parentProps}>{children}</Parent> : emptyText
 }

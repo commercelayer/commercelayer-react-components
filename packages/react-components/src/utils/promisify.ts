@@ -7,7 +7,7 @@ export default async function promisify(cb: any, params?: any): Promise<any> {
         if (err) reject(err)
         resolve(res)
       })
-    else if (typeof cb?.tokenize === 'function') {
+    else if (typeof cb?.tokenize === "function") {
       cb?.tokenize((err: any, payload: any) => {
         if (err) reject(err)
         resolve(payload)

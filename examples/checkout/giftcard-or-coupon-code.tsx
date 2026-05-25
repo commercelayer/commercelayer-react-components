@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
-import { getCustomerToken } from '@commercelayer/js-auth'
-import Head from 'next/head'
+import { useState, useEffect } from "react"
+import { getCustomerToken } from "@commercelayer/js-auth"
+import Head from "next/head"
 import {
   CommerceLayer,
   GiftCardOrCouponForm,
@@ -11,8 +11,8 @@ import {
   OrderContainer,
   GiftCardOrCouponCode,
   GiftCardOrCouponRemoveButton,
-} from 'packages/react-components/src'
-import { useRouter } from 'next/router'
+} from "packages/react-components/src"
+import { useRouter } from "next/router"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -20,42 +20,26 @@ const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
 const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 
-let orderId = 'PDerhJplRp'
+let orderId = "PDerhJplRp"
 
 export default function Main() {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("")
   const [codeError, setCodeError] = useState(false)
   const { query } = useRouter()
   if (query.orderId) {
     orderId = query.orderId as string
   }
   const classError = codeError
-    ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500'
-    : ''
-  const handleSubmit = ({
-    success,
-    value,
-  }: {
-    success: boolean
-    value: string
-  }) => {
-    console.log('success, value', success, value)
+    ? "border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500"
+    : ""
+  const handleSubmit = ({ success, value }: { success: boolean; value: string }) => {
+    console.log("success, value", success, value)
     if (!success && value) return setCodeError(true)
     return setCodeError(false)
   }
   const removeIcon = (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M6 18L18 6M6 6l12 12"
-      />
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
     </svg>
   )
   useEffect(() => {
@@ -104,10 +88,7 @@ export default function Main() {
           <OrderContainer orderId={orderId}>
             <GiftCardOrCouponForm onSubmit={handleSubmit}>
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Coupon or Gift Card code
                 </label>
                 <div className={`mt-1 flex rounded-md shadow-sm`}>
@@ -134,26 +115,20 @@ export default function Main() {
                       className={`${classError} focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md pl-10 sm:text-sm border-gray-300`}
                       placeholderTranslation={(codeType) => {
                         switch (codeType) {
-                          case 'gift_card_or_coupon_code':
+                          case "gift_card_or_coupon_code":
                           default:
-                            return 'Insert a gift card o coupon code'
-                          case 'coupon_code':
-                            return 'Insert a coupon code'
-                          case 'gift_card_code':
-                            return 'Insert a gift card'
+                            return "Insert a gift card o coupon code"
+                          case "coupon_code":
+                            return "Insert a coupon code"
+                          case "gift_card_code":
+                            return "Insert a gift card"
                         }
                       }}
                     >
                       {(props) => {
                         // Custom input
                         const { parentRef, placeholder, ...p } = props
-                        return (
-                          <input
-                            ref={parentRef}
-                            placeholder={placeholder}
-                            {...p}
-                          />
-                        )
+                        return <input ref={parentRef} placeholder={placeholder} {...p} />
                       }}
                     </GiftCardOrCouponInput>
                   </div>
@@ -172,10 +147,10 @@ export default function Main() {
               field="gift_card_or_coupon_code"
               messages={[
                 {
-                  code: 'VALIDATION_ERROR',
-                  resource: 'orders',
-                  field: 'gift_card_or_coupon_code',
-                  message: 'Invalid coupon code',
+                  code: "VALIDATION_ERROR",
+                  resource: "orders",
+                  field: "gift_card_or_coupon_code",
+                  message: "Invalid coupon code",
                 },
               ]}
             />

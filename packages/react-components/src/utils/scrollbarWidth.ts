@@ -1,9 +1,9 @@
 export default function scrollbarWidth(): number {
-  if (typeof document === 'undefined') return 0
-  const scrollDiv = document.createElement('div')
+  if (typeof document === "undefined") return 0
+  const scrollDiv = document.createElement("div")
   scrollDiv.setAttribute(
-    'style',
-    'width: 100px; height: 100px; overflow: scroll; position:absolute; top:-9999px;'
+    "style",
+    "width: 100px; height: 100px; overflow: scroll; position:absolute; top:-9999px;"
   )
   document.body.appendChild(scrollDiv)
   const scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth

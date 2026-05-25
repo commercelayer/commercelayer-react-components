@@ -14,8 +14,7 @@ import OrderContext from "#context/OrderContext"
 import ShippingAddressContext from "#context/ShippingAddressContext"
 import type { DefaultChildrenType } from "#typings/globals"
 
-interface Props
-  extends Omit<JSX.IntrinsicElements["div"], "children" | "onSelect"> {
+interface Props extends Omit<JSX.IntrinsicElements["div"], "children" | "onSelect"> {
   children: DefaultChildrenType | AddressCardsTemplateChildren
   selectedClassName?: string
   disabledClassName?: string
@@ -53,19 +52,12 @@ export function Address(props: Props): JSX.Element {
     ...p
   } = props
   const { addresses: addressesContext } = useContext(CustomerContext)
-  const { setBillingAddress, billingCustomerAddressId } = useContext(
-    BillingAddressContext,
-  )
-  const { setShippingAddress, shippingCustomerAddressId } = useContext(
-    ShippingAddressContext,
-  )
-  const { shipToDifferentAddress, billingAddressId, shippingAddressId } =
-    useContext(AddressContext)
+  const { setBillingAddress, billingCustomerAddressId } = useContext(BillingAddressContext)
+  const { setShippingAddress, shippingCustomerAddressId } = useContext(ShippingAddressContext)
+  const { shipToDifferentAddress, billingAddressId, shippingAddressId } = useContext(AddressContext)
   const { order } = useContext(OrderContext)
   const [selected, setSelected] = useState<null | number | undefined>(null)
-  const items = !isEmpty(addresses)
-    ? addresses
-    : (addressesContext && addressesContext) || []
+  const items = !isEmpty(addresses) ? addresses : (addressesContext && addressesContext) || []
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentional effect with stable context refs
   useEffect(() => {
     if (items && !deselect) {
@@ -76,12 +68,7 @@ export function Address(props: Props): JSX.Element {
             setSelected(k)
           }
         }
-        if (
-          !billingAddressId &&
-          k === selected &&
-          setBillingAddress &&
-          address.reference != null
-        ) {
+        if (!billingAddressId && k === selected && setBillingAddress && address.reference != null) {
           setBillingAddress(address.id, {
             customerAddressId: address.reference,
           })
@@ -116,19 +103,10 @@ export function Address(props: Props): JSX.Element {
     addressesContext,
     shipToDifferentAddress,
   ])
-  const handleSelect: HandleSelect = async (
-    k,
-    addressId,
-    customerAddressId,
-    disabled,
-    address,
-  ) => {
+  const handleSelect: HandleSelect = async (k, addressId, customerAddressId, disabled, address) => {
     !disabled && setSelected(k)
-    setBillingAddress &&
-      (await setBillingAddress(addressId, { customerAddressId }))
-    !disabled &&
-      setShippingAddress &&
-      (await setShippingAddress(addressId, { customerAddressId }))
+    setBillingAddress && (await setBillingAddress(addressId, { customerAddressId }))
+    !disabled && setShippingAddress && (await setShippingAddress(addressId, { customerAddressId }))
     if (onSelect) onSelect(address)
   }
   const countryLock = order?.shipping_country_code_lock
@@ -137,11 +115,7 @@ export function Address(props: Props): JSX.Element {
       ? []
       : items
           .filter((address) => {
-            if (
-              setShippingAddress &&
-              countryLock &&
-              countryLock !== address.country_code
-            ) {
+            if (setShippingAddress && countryLock && countryLock !== address.country_code) {
               return false
             }
             return true
@@ -151,10 +125,7 @@ export function Address(props: Props): JSX.Element {
               address,
             }
             const disabled =
-              (setShippingAddress &&
-                countryLock &&
-                countryLock !== address.country_code) ||
-              false
+              (setShippingAddress && countryLock && countryLock !== address.country_code) || false
             const selectedClass = deselect ? "" : selectedClassName
             const addressSelectedClass =
               selected === k ? `${className || ""} ${selectedClass}` : className
@@ -170,13 +141,7 @@ export function Address(props: Props): JSX.Element {
                 <div
                   className={finalClassName}
                   onClick={() => {
-                    handleSelect(
-                      k,
-                      address.id,
-                      customerAddressId,
-                      disabled,
-                      address,
-                    )
+                    handleSelect(k, address.id, customerAddressId, disabled, address)
                   }}
                   data-disabled={disabled}
                   {...p}

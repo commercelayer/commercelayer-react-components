@@ -1,13 +1,13 @@
-import Parent from '#components/utils/Parent'
-import OrderListPaginationContext from '#context/OrderListPaginationContext'
-import type { ChildrenFunction } from '#typings/index'
-import useCustomContext from '#utils/hooks/useCustomContext'
+import Parent from "#components/utils/Parent"
+import OrderListPaginationContext from "#context/OrderListPaginationContext"
+import type { ChildrenFunction } from "#typings/index"
+import useCustomContext from "#utils/hooks/useCustomContext"
 
-import type { JSX } from "react";
+import type { JSX } from "react"
 
-type TAsComponent = keyof Pick<JSX.IntrinsicElements, 'p' | 'span' | 'div'>
+type TAsComponent = keyof Pick<JSX.IntrinsicElements, "p" | "span" | "div">
 
-type ChildrenProps<A extends TAsComponent> = Omit<Props<A>, 'children'> & {
+type ChildrenProps<A extends TAsComponent> = Omit<Props<A>, "children"> & {
   /**
    * Current number of the first page row to display
    */
@@ -28,18 +28,18 @@ type Props<A extends TAsComponent> = {
    * HTML Tag to display
    */
   as?: TAsComponent
-} & Omit<JSX.IntrinsicElements[A], 'children' | 'ref'>
+} & Omit<JSX.IntrinsicElements[A], "children" | "ref">
 
-export function OrderListPaginationInfo<A extends TAsComponent = 'span'>({
-  as = 'span',
+export function OrderListPaginationInfo<A extends TAsComponent = "span">({
+  as = "span",
   children,
   ...props
 }: Props<A>): JSX.Element | null {
   const ctx = useCustomContext({
     context: OrderListPaginationContext,
-    contextComponentName: 'OrderList',
-    currentComponentName: 'OrderListPaginationInfo',
-    key: 'totalRows'
+    contextComponentName: "OrderList",
+    currentComponentName: "OrderListPaginationInfo",
+    key: "totalRows",
   })
   const TagElement = as
   const totRows = ctx?.totalRows ?? 0
@@ -57,15 +57,13 @@ export function OrderListPaginationInfo<A extends TAsComponent = 'span'>({
   const parentProps = { ...props, as, firstRow, lastRow, totRows }
   return children == null ? (
     totRows === 0 ? null : (
-      <TagElement {...props}>
-        {`${firstRow} - ${lastRow} of ${totRows}`}
-      </TagElement>
+      <TagElement {...props}>{`${firstRow} - ${lastRow} of ${totRows}`}</TagElement>
     )
   ) : (
     <Parent {...parentProps}>{children}</Parent>
   )
 }
 
-OrderListPaginationInfo.displayName = 'OrderListPaginationInfo'
+OrderListPaginationInfo.displayName = "OrderListPaginationInfo"
 
 export default OrderListPaginationInfo

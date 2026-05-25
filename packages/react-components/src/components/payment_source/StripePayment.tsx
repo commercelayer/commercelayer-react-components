@@ -67,12 +67,8 @@ function StripePaymentForm({
   stripe,
 }: StripePaymentFormProps): JSX.Element {
   const ref = useRef<null | HTMLFormElement>(null)
-  const {
-    errors,
-    currentPaymentMethodType,
-    setPaymentMethodErrors,
-    setPaymentRef,
-  } = useContext(PaymentMethodContext)
+  const { errors, currentPaymentMethodType, setPaymentMethodErrors, setPaymentRef } =
+    useContext(PaymentMethodContext)
   const { order, setOrderErrors } = useContext(OrderContext)
   const { sdkClient } = useCommerceLayer()
   const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
@@ -92,11 +88,7 @@ function StripePaymentForm({
       setPaymentRef({ ref: { current: null } })
     }
   }, [ref, stripe, elements])
-  const onSubmit = async ({
-    event,
-    stripe,
-    elements,
-  }: OnSubmitArgs): Promise<boolean> => {
+  const onSubmit = async ({ event, stripe, elements }: OnSubmitArgs): Promise<boolean> => {
     if (!stripe) return false
     const sdk = sdkClient()
     if (sdk == null) return false
@@ -132,7 +124,7 @@ function StripePaymentForm({
     if (savePaymentSourceToCustomerWallet)
       setCustomerOrderParam(
         "_save_payment_source_to_customer_wallet",
-        savePaymentSourceToCustomerWallet,
+        savePaymentSourceToCustomerWallet
       )
     if (elements != null) {
       const billingInfo = order?.billing_address

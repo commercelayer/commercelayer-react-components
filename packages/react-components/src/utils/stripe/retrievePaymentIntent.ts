@@ -5,9 +5,7 @@ interface StripePaymentIntentParams {
   paymentIntentClientSecret: string
 }
 
-type PaymentIntentResultPromise = Promise<
-  PaymentIntentResult | undefined | null
->
+type PaymentIntentResultPromise = Promise<PaymentIntentResult | undefined | null>
 
 async function retrievePaymentIntent({
   publicApiKey,
@@ -15,9 +13,7 @@ async function retrievePaymentIntent({
 }: StripePaymentIntentParams): PaymentIntentResultPromise {
   const stripe = await loadStripe(publicApiKey)
   try {
-    const paymentIntent = await stripe?.retrievePaymentIntent(
-      paymentIntentClientSecret,
-    )
+    const paymentIntent = await stripe?.retrievePaymentIntent(paymentIntentClientSecret)
     return paymentIntent
   } catch (error) {
     console.error("Error retrieving payment intent:", error)
@@ -74,7 +70,6 @@ export async function checkPaymentIntent({
   const status = paymentIntentValidation({ paymentIntent })
   return {
     status,
-    message:
-      status === "invalid" && error?.message != null ? error.message : "",
+    message: status === "invalid" && error?.message != null ? error.message : "",
   }
 }

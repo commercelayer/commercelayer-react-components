@@ -61,9 +61,7 @@ describe("useAvailability", () => {
     expect(result.current.availability?.quantity).toBe(5)
     expect(result.current.availability?.skuCode).toBe(SKU_CODE)
     expect(result.current.error).toBeNull()
-    expect(mock).toHaveBeenCalledWith(
-      expect.objectContaining({ skuCode: SKU_CODE }),
-    )
+    expect(mock).toHaveBeenCalledWith(expect.objectContaining({ skuCode: SKU_CODE }))
   })
 
   it("should clear availability after fetch", async () => {
@@ -126,7 +124,7 @@ describe("useAvailability", () => {
     mock.mockReturnValueOnce(
       new Promise<typeof mockAvailability>((res) => {
         resolve = res
-      }),
+      })
     )
 
     const { result } = renderHook(() => useAvailability("test-token"), {

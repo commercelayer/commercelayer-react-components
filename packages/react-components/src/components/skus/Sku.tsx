@@ -29,11 +29,7 @@ export interface SkuProps {
  * </CommerceLayer>
  * ```
  */
-export function Sku({
-  children,
-  skuCode = "",
-  loader: propLoader,
-}: SkuProps): ReactNode {
+export function Sku({ children, skuCode = "", loader: propLoader }: SkuProps): ReactNode {
   const { setSkuCodes } = useContext(SkuContext)
   const { accessToken, interceptors } = useContext(CommerceLayerContext)
   const [currentSku, setCurrentSku] = useState<SkuType | undefined>(undefined)
@@ -48,10 +44,7 @@ export function Sku({
     isLoading: batchLoading,
     registerSku,
     unregisterSku,
-  } = useSkus(
-    isStandalone ? (accessToken ?? "") : "",
-    isStandalone ? interceptors : undefined,
-  )
+  } = useSkus(isStandalone ? (accessToken ?? "") : "", isStandalone ? interceptors : undefined)
 
   // Register/unregister this SKU code with the batch store
   useEffect(() => {

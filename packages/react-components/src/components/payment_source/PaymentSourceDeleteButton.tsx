@@ -3,7 +3,7 @@ import Parent from "#components/utils/Parent"
 import CustomerPaymentSourceContext from "#context/CustomerPaymentSourceContext"
 import type { ChildrenFunction } from "#typings"
 
-interface CustomComponent extends Omit<Props, "children"> { }
+interface CustomComponent extends Omit<Props, "children"> {}
 
 type Props = {
   children?: ChildrenFunction<CustomComponent>

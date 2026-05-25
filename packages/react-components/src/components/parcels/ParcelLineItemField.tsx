@@ -1,20 +1,16 @@
-import type { ConditionalElement } from '#typings'
+import type { ConditionalElement } from "#typings"
 import GenericFieldComponent, {
   type TGenericChildrenProps,
   type TResourceKey,
-  type TResources
-} from '#components/utils/GenericFieldComponent'
-import ParcelLineItemChildrenContext from '#context/ParcelLineItemChildrenContext'
+  type TResources,
+} from "#components/utils/GenericFieldComponent"
+import ParcelLineItemChildrenContext from "#context/ParcelLineItemChildrenContext"
 
-import type { JSX } from "react";
+import type { JSX } from "react"
 
-type ParcelLineItemFieldChildrenProps = TGenericChildrenProps<
-  TResources['ParcelLineItem']
->
+type ParcelLineItemFieldChildrenProps = TGenericChildrenProps<TResources["ParcelLineItem"]>
 
-type TCondition = ConditionalElement<
-  Exclude<TResources['ParcelLineItem'], 'resource'>
->
+type TCondition = ConditionalElement<Exclude<TResources["ParcelLineItem"], "resource">>
 
 type Props = {
   children?: (props: ParcelLineItemFieldChildrenProps) => JSX.Element
@@ -24,10 +20,10 @@ type Props = {
  * @returns
  */
 export function ParcelLineItemField<P extends Props>(props: P): JSX.Element {
-  const { attribute, tagElement = 'span', children, ...p } = props
+  const { attribute, tagElement = "span", children, ...p } = props
   return (
-    <GenericFieldComponent<TResourceKey['ParcelLineItem']>
-      resource='parcelLineItem'
+    <GenericFieldComponent<TResourceKey["ParcelLineItem"]>
+      resource="parcelLineItem"
       attribute={attribute}
       tagElement={tagElement}
       context={ParcelLineItemChildrenContext}

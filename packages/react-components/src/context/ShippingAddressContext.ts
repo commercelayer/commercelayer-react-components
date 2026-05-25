@@ -1,5 +1,5 @@
-import { createContext } from 'react'
-import type { ShippingAddressState } from '#reducers/ShippingAddressReducer'
+import { createContext } from "react"
+import type { ShippingAddressState } from "#reducers/ShippingAddressReducer"
 
 type DefaultContext = {
   setShippingAddress?: (
@@ -12,8 +12,6 @@ type DefaultContext = {
 
 export const defaultShippingAddressContext = {}
 
-const ShippingAddressContext = createContext<DefaultContext>(
-  defaultShippingAddressContext
-)
+const ShippingAddressContext = createContext<DefaultContext>(defaultShippingAddressContext)
 
 export default ShippingAddressContext

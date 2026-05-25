@@ -26,8 +26,7 @@ interface ChildrenProps extends Omit<Props, "children"> {
   handleClick: () => Promise<void>
 }
 
-interface Props
-  extends Omit<JSX.IntrinsicElements["button"], "children" | "onClick"> {
+interface Props extends Omit<JSX.IntrinsicElements["button"], "children" | "onClick"> {
   children?: ChildrenFunction<ChildrenProps>
   /**
    * The label of the button
@@ -44,11 +43,7 @@ interface Props
   /**
    * Callback function that is fired when the button is clicked
    */
-  onClick?: (response: {
-    placed: boolean
-    order?: Order
-    errors?: BaseError[]
-  }) => void
+  onClick?: (response: { placed: boolean; order?: Order; errors?: BaseError[] }) => void
 }
 
 export function PlaceOrderButton(props: Props): JSX.Element {
@@ -112,17 +107,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           card.brand = "credit-card"
         }
         if (
-          ((isFree && isPermitted) ||
-            currentPaymentMethodRef?.current?.onsubmit ||
-            card.brand) &&
+          ((isFree && isPermitted) || currentPaymentMethodRef?.current?.onsubmit || card.brand) &&
           isPermitted
         ) {
           setNotPermitted(false)
         }
-        if (
-          !currentPaymentMethodRef?.current?.onsubmit &&
-          paymentSourceStatus === "declined"
-        ) {
+        if (!currentPaymentMethodRef?.current?.onsubmit && paymentSourceStatus === "declined") {
           setNotPermitted(true)
         }
       } else if (isFree && isPermitted) {
@@ -145,14 +135,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     order?.total_amount_with_taxes_cents,
   ])
   useEffect(() => {
-    const giftCardCouponFields = [
-      "gift_card_code",
-      "coupon_code",
-      "gift_card_or_coupon_code",
-    ]
-    const blockingErrors = errors?.filter(
-      (e) => !giftCardCouponFields.includes(e.field ?? ""),
-    )
+    const giftCardCouponFields = ["gift_card_code", "coupon_code", "gift_card_or_coupon_code"]
+    const blockingErrors = errors?.filter((e) => !giftCardCouponFields.includes(e.field ?? ""))
     if (
       (blockingErrors && blockingErrors.length > 0) ||
       (paymentMethodErrors && paymentMethodErrors.length > 0)
@@ -189,8 +173,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     ) {
       // @ts-expect-error no type
       const publicApiKey = order?.payment_source?.publishable_key
-      const paymentIntentClientSecret =
-        options?.stripe?.paymentIntentClientSecret
+      const paymentIntentClientSecret = options?.stripe?.paymentIntentClientSecret
 
       const getPaymentIntent = async (): Promise<void> => {
         const paymentIntentResult = await checkPaymentIntent({
@@ -239,11 +222,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       const paymentMethodType =
         // @ts-expect-error no type
         order?.payment_source?.payment_response?.paymentMethod?.type
-      if (
-        paymentType === "adyen_payments" &&
-        options?.adyen?.redirectResult &&
-        !paymentDetails
-      ) {
+      if (paymentType === "adyen_payments" && options?.adyen?.redirectResult && !paymentDetails) {
         const attributes = {
           payment_request_details: {
             details: {
@@ -263,10 +242,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           const errorCode = res?.payment_response?.errorCode
           // @ts-expect-error no type
           const message = res?.payment_response?.message
-          if (
-            ["Authorised", "Pending", "Received"].includes(resultCode) &&
-            autoPlaceOrder
-          ) {
+          if (["Authorised", "Pending", "Received"].includes(resultCode) && autoPlaceOrder) {
             handleClick()
           } else if (errorCode != null) {
             setPaymentMethodErrors([
@@ -290,9 +266,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         // NOTE: This is a workaround for the case when the user reloads the page after selecting a customer payment source
         if (
           // @ts-expect-error no type
-          order?.payment_source?.payment_response?.merchantReference?.includes(
-            order?.number,
-          )
+          order?.payment_source?.payment_response?.merchantReference?.includes(order?.number)
         ) {
           handleClick()
         }
@@ -308,9 +282,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         // NOTE: This is a workaround for the case when the user reloads the page after selecting a customer payment source
         if (
           // @ts-expect-error no type
-          order?.payment_source?.payment_response?.merchantReference?.includes(
-            order?.number,
-          )
+          order?.payment_source?.payment_response?.merchantReference?.includes(order?.number)
         ) {
           handleClick()
         }
@@ -357,9 +329,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
           })
           // @ts-expect-error no type
           const paymentStatus: string = res?.payment_response?.status
-          const isValidStatus = ["authorized", "captured"].includes(
-            paymentStatus?.toLowerCase(),
-          )
+          const isValidStatus = ["authorized", "captured"].includes(paymentStatus?.toLowerCase())
           if (paymentStatus && isValidStatus) {
             handleClick()
           } else {
@@ -425,9 +395,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         break
     }
   }, [status != null])
-  const handleClick = async (
-    e?: MouseEvent<HTMLButtonElement>,
-  ): Promise<void> => {
+  const handleClick = async (e?: MouseEvent<HTMLButtonElement>): Promise<void> => {
     e?.preventDefault()
     e?.stopPropagation()
     const sdk = sdkClient()
@@ -443,11 +411,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
        * and to prevent placing a draft order
        * @see https://docs.commercelayer.io/core/how-tos/placing-orders/checkout/placing-the-order
        */
-      const { status, payment_status: paymentStatus } =
-        await sdk.orders.retrieve(order?.id, {
-          fields: ["status", "payment_status", "payment_source"],
-          include: ["payment_source"],
-        })
+      const { status, payment_status: paymentStatus } = await sdk.orders.retrieve(order?.id, {
+        fields: ["status", "payment_status", "payment_source"],
+        include: ["payment_source"],
+      })
       const isAlreadyPlaced = status === "placed"
       const isDraftOrder = status === "draft"
       currentPaymentStatus = paymentStatus ?? "unpaid"
@@ -510,11 +477,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       })
     if (
       currentPaymentMethodRef?.current?.onsubmit &&
-      [
-        !options?.paypalPayerId,
-        !options?.adyen?.MD,
-        !options?.checkoutCom?.session_id,
-      ].every(Boolean)
+      [!options?.paypalPayerId, !options?.adyen?.MD, !options?.checkoutCom?.session_id].every(
+        Boolean
+      )
     ) {
       isValid = (await currentPaymentMethodRef.current?.onsubmit({
         // @ts-expect-error no type
@@ -580,11 +545,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     }
   }
   const disabledButton = disabled !== undefined ? disabled : notPermitted
-  const labelButton = isLoading
-    ? loadingLabel
-    : typeof label === 'function'
-      ? label()
-      : label
+  const labelButton = isLoading ? loadingLabel : typeof label === "function" ? label() : label
   const parentProps = {
     ...p,
     label,

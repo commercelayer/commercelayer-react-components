@@ -1,33 +1,33 @@
-import React, { useState, useEffect, Fragment } from 'react'
-import { getIntegrationToken } from '@commercelayer/js-auth'
-import CommerceLayer from '../#components/auth/CommerceLayer'
-import { Nav } from '.'
-import OrderContainer from '../#components/OrderContainer'
-import VariantsContainer from '../#components/VariantsContainer'
-import VariantSelector from '../#components/skus/VariantSelector'
-import PricesContainer from '../#components/prices/PricesContainer'
-import Price from '../#components/Price'
-import AddToCartButton from '../#components/orders/AddToCartButton'
-import LineItemsContainer from '../#components/LineItemsContainer'
-import LineItem from '../#components/line_items/LineItem'
-import LineItemImage from '../#components/LineItemImage'
-import LineItemName from '../#components/LineItemName'
-import LineItemQuantity from '../#components/LineItemQuantity'
-import LineItemAmount from '../#components/LineItemAmount'
-import LineItemRemoveLink from '../#components/LineItemRemoveLink'
-import CheckoutLink from '../#components/orders/CheckoutLink'
-import SubTotalAmount from '../#components/SubTotalAmount'
-import QuantitySelector from '../#components/skus/QuantitySelector'
-import LineItemsCount from '../#components/LineItemsCount'
-import TotalAmount from '../#components/orders/TotalAmount'
-import DiscountAmount from '../#components/orders/DiscountAmount'
-import ShippingAmount from '../#components/orders/ShippingAmount'
-import TaxesAmount from '../#components/TaxesAmount'
-import GiftCardAmount from '../#components/orders/GiftCardAmount'
-import AvailabilityContainer from '../#components/AvailabilityContainer'
-import AvailabilityTemplate from '../#components/skus/AvailabilityTemplate'
-import ItemContainer from '../#components/orders/ItemContainer'
-import Errors from '../#components/Errors'
+import React, { useState, useEffect, Fragment } from "react"
+import { getIntegrationToken } from "@commercelayer/js-auth"
+import CommerceLayer from "../#components/auth/CommerceLayer"
+import { Nav } from "."
+import OrderContainer from "../#components/OrderContainer"
+import VariantsContainer from "../#components/VariantsContainer"
+import VariantSelector from "../#components/skus/VariantSelector"
+import PricesContainer from "../#components/prices/PricesContainer"
+import Price from "../#components/Price"
+import AddToCartButton from "../#components/orders/AddToCartButton"
+import LineItemsContainer from "../#components/LineItemsContainer"
+import LineItem from "../#components/line_items/LineItem"
+import LineItemImage from "../#components/LineItemImage"
+import LineItemName from "../#components/LineItemName"
+import LineItemQuantity from "../#components/LineItemQuantity"
+import LineItemAmount from "../#components/LineItemAmount"
+import LineItemRemoveLink from "../#components/LineItemRemoveLink"
+import CheckoutLink from "../#components/orders/CheckoutLink"
+import SubTotalAmount from "../#components/SubTotalAmount"
+import QuantitySelector from "../#components/skus/QuantitySelector"
+import LineItemsCount from "../#components/LineItemsCount"
+import TotalAmount from "../#components/orders/TotalAmount"
+import DiscountAmount from "../#components/orders/DiscountAmount"
+import ShippingAmount from "../#components/orders/ShippingAmount"
+import TaxesAmount from "../#components/TaxesAmount"
+import GiftCardAmount from "../#components/orders/GiftCardAmount"
+import AvailabilityContainer from "../#components/AvailabilityContainer"
+import AvailabilityTemplate from "../#components/skus/AvailabilityTemplate"
+import ItemContainer from "../#components/orders/ItemContainer"
+import Errors from "../#components/Errors"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID_INTEGRATION as string
 const clientSecret = process.env.NEXT_PUBLIC_CLIENT_SECRET as string
@@ -35,7 +35,7 @@ const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
 const CustomAddToCart = (props) => {
-  const classes = props.disabled ? 'opacity-50 cursor-not-allowed' : ''
+  const classes = props.disabled ? "opacity-50 cursor-not-allowed" : ""
   const myClick = () => {
     props.handleClick()
   }
@@ -52,7 +52,7 @@ const CustomAddToCart = (props) => {
 }
 
 export default function Order() {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("")
   useEffect(() => {
     const getToken = async () => {
       const token = await getIntegrationToken({
@@ -67,7 +67,7 @@ export default function Order() {
   }, [])
   return (
     <Fragment>
-      <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
+      <Nav links={["/multiOrder", "/multiApp", "/giftCard"]} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer>
@@ -98,16 +98,16 @@ export default function Order() {
                         name="variant1"
                         options={[
                           {
-                            label: '6 months',
-                            code: 'BABYONBU000000E63E746MXX',
+                            label: "6 months",
+                            code: "BABYONBU000000E63E746MXX",
                           },
                           {
-                            label: '12 months',
-                            code: 'BABYONBU000000E63E7412MX',
+                            label: "12 months",
+                            code: "BABYONBU000000E63E7412MX",
                           },
                           {
-                            label: '24 months',
-                            code: 'BABYONBU000000E63E746MXXFAKE',
+                            label: "24 months",
+                            code: "BABYONBU000000E63E746MXXFAKE",
                           },
                         ]}
                       />
@@ -136,24 +136,16 @@ export default function Order() {
             <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
             <LineItemsContainer>
               <p className="text-sm m-2">
-                Your shopping bag contains{' '}
-                <LineItemsCount id="items-count" className="font-bold" /> items
+                Your shopping bag contains <LineItemsCount id="items-count" className="font-bold" />{" "}
+                items
               </p>
               <div className="flex flex-col p-2">
                 <LineItem>
                   <div className="flex justify-around items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName id="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      id="line-item-quantity"
-                      max={100}
-                      className="p-2"
-                    />
-                    <Errors
-                      className="text-red-700 p-2"
-                      resource="lineItem"
-                      field="quantity"
-                    />
+                    <LineItemQuantity id="line-item-quantity" max={100} className="p-2" />
+                    <Errors className="text-red-700 p-2" resource="lineItem" field="quantity" />
                     <LineItemAmount id="line-item-total" className="p-2" />
                     <LineItemRemoveLink
                       id="line-item-remove"
@@ -165,12 +157,7 @@ export default function Order() {
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={40} />
                     <LineItemName id="line-item-name" className="p-2" />
-                    <LineItemQuantity
-                      id="line-item-quantity"
-                      max={10}
-                      className="p-2"
-                      disabled
-                    />
+                    <LineItemQuantity id="line-item-quantity" max={10} className="p-2" disabled />
                     <LineItemAmount id="line-item-total" className="p-2" />
                     <LineItemRemoveLink
                       id="line-item-remove"

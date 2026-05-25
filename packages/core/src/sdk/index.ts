@@ -8,12 +8,8 @@ import type { ErrorObj, RequestObj, ResponseObj } from "@commercelayer/sdk"
 import type { CommerceLayerBundle } from "@commercelayer/sdk/bundle"
 import { CommerceLayer as Sdk } from "@commercelayer/sdk/bundle"
 
-type RequestInterceptor = (
-  request: RequestObj,
-) => RequestObj | Promise<RequestObj>
-type ResponseInterceptor = (
-  response: ResponseObj,
-) => ResponseObj | Promise<ResponseObj>
+type RequestInterceptor = (request: RequestObj) => RequestObj | Promise<RequestObj>
+type ResponseInterceptor = (response: ResponseObj) => ResponseObj | Promise<ResponseObj>
 type ErrorInterceptor = (error: ErrorObj) => ErrorObj | Promise<ErrorObj>
 
 export type InterceptorManager = {
@@ -39,22 +35,13 @@ export function getSdk({
   interceptors?: InterceptorManager
 }): CommerceLayerBundle {
   const { payload } = jwtDecode(accessToken)
-  const { organization } = payload as
-    | JWTIntegration
-    | JWTWebApp
-    | JWTSalesChannel
+  const { organization } = payload as JWTIntegration | JWTWebApp | JWTSalesChannel
   const sdk = Sdk({ accessToken, organization: organization.slug })
   if (interceptors?.request != null) {
-    sdk.addRequestInterceptor(
-      interceptors.request.onSuccess,
-      interceptors.request.onFailure,
-    )
+    sdk.addRequestInterceptor(interceptors.request.onSuccess, interceptors.request.onFailure)
   }
   if (interceptors?.response != null) {
-    sdk.addResponseInterceptor(
-      interceptors.response.onSuccess,
-      interceptors.response.onFailure,
-    )
+    sdk.addResponseInterceptor(interceptors.response.onSuccess, interceptors.response.onFailure)
   }
   if (interceptors?.rawReader != null) {
     sdk.addRawResponseReader()

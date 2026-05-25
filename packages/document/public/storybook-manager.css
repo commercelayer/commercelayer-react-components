@@ -1,6 +1,6 @@
 :root {
   --color-primary: #101111;
-  --icon-carret-right: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkNhcmV0UmlnaHQiPgo8cGF0aCBpZD0iVmVjdG9yIiBkPSJNMTIgNkwyMiAxNkwxMiAyNiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9nPgo8L3N2Zz4K');
+  --icon-carret-right: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgaWQ9IkNhcmV0UmlnaHQiPgo8cGF0aCBpZD0iVmVjdG9yIiBkPSJNMTIgNkwyMiAxNkwxMiAyNiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9nPgo8L3N2Zz4K");
 }
 
 * {
@@ -12,7 +12,7 @@
   margin: 16px 0;
   max-height: 29px;
 }
-.sidebar-container .sidebar-header button[title='Shortcuts'] {
+.sidebar-container .sidebar-header button[title="Shortcuts"] {
   display: none;
 }
 .sidebar-container .sidebar-header div:first-of-type {
@@ -83,7 +83,7 @@
   display: none;
 }
 .sidebar-container .sidebar-item > button:not([data-testid="context-menu"])::before {
-  content: '';
+  content: "";
   background-image: var(--icon-carret-right);
   background-size: 100%;
   background-repeat: no-repeat;
@@ -95,7 +95,9 @@
   flex-shrink: 0;
   transition: transform 0.2s ease;
 }
-.sidebar-container .sidebar-item > button[aria-expanded='true']:not([data-testid="context-menu"])::before {
+.sidebar-container
+  .sidebar-item
+  > button[aria-expanded="true"]:not([data-testid="context-menu"])::before {
   transform: rotate(90deg);
 }
 
@@ -115,9 +117,9 @@ div.sidebar-item > a {
 div.sidebar-item:hover {
   background-color: #eceff1;
 }
-div.sidebar-item[data-selected='true'],
-div.sidebar-item[data-selected='true']:focus,
-div.sidebar-item[data-selected='true']:hover {
+div.sidebar-item[data-selected="true"],
+div.sidebar-item[data-selected="true"]:focus,
+div.sidebar-item[data-selected="true"]:hover {
   color: var(--color-primary);
   background: #f3f3fc;
 }

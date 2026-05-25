@@ -30,19 +30,16 @@ describe("useAvailability — interceptors", () => {
   })
 
   it("passes interceptors to getSkuAvailability via fetchAvailability", async () => {
-    const { result } = renderHook(
-      () => useAvailability(accessToken, interceptors),
-      { wrapper: ({ children }) => swrWrapper({ children }) },
-    )
+    const { result } = renderHook(() => useAvailability(accessToken, interceptors), {
+      wrapper: ({ children }) => swrWrapper({ children }),
+    })
 
     act(() => {
       result.current.fetchAvailability({ skuCode: "MY-SKU" })
     })
 
     await waitFor(() => {
-      expect(mockGetSkuAvailability).toHaveBeenCalledWith(
-        expect.objectContaining({ interceptors }),
-      )
+      expect(mockGetSkuAvailability).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
     })
   })
 
@@ -56,9 +53,7 @@ describe("useAvailability — interceptors", () => {
     })
 
     await waitFor(() => {
-      expect(mockGetSkuAvailability).toHaveBeenCalledWith(
-        expect.objectContaining({ accessToken }),
-      )
+      expect(mockGetSkuAvailability).toHaveBeenCalledWith(expect.objectContaining({ accessToken }))
     })
   })
 })

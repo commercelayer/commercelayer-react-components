@@ -56,16 +56,14 @@ export function AvailabilityContainer({
     currentComponentName: "AvailabilityContainer",
     key: "accessToken",
   })
-  const { availability, fetchAvailability, clearAvailability } =
-    useAvailability(accessToken ?? "", interceptors)
+  const { availability, fetchAvailability, clearAvailability } = useAvailability(
+    accessToken ?? "",
+    interceptors
+  )
   const sCode = skuCode ?? lineItem?.sku_code ?? sku?.code
 
   useEffect(() => {
-    if (
-      accessToken != null &&
-      accessToken !== "" &&
-      (sCode != null || skuId != null)
-    ) {
+    if (accessToken != null && accessToken !== "" && (sCode != null || skuId != null)) {
       fetchAvailability({ skuCode: sCode, skuId })
     }
     return () => {
@@ -79,15 +77,10 @@ export function AvailabilityContainer({
     }
   }, [availability?.quantity, getQuantity])
 
-  const contextValue = useMemo(
-    () => ({ ...availability, parent: true }),
-    [availability],
-  )
+  const contextValue = useMemo(() => ({ ...availability, parent: true }), [availability])
 
   return (
-    <AvailabilityContext.Provider value={contextValue}>
-      {children}
-    </AvailabilityContext.Provider>
+    <AvailabilityContext.Provider value={contextValue}>{children}</AvailabilityContext.Provider>
   )
 }
 

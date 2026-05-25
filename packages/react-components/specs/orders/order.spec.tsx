@@ -53,7 +53,7 @@ describe("Order component", () => {
         <Order orderId="test-order-id">
           <span data-testid="child">hello</span>
         </Order>
-      </Wrapper>,
+      </Wrapper>
     )
     expect(screen.getByTestId("child")).toBeDefined()
   })
@@ -71,23 +71,21 @@ describe("Order component", () => {
         <Order orderId="test-order-id">
           <Consumer />
         </Order>
-      </Wrapper>,
+      </Wrapper>
     )
 
     expect(capturedCtx).not.toBeNull()
   })
 
   it("throws when rendered outside <CommerceLayer>", () => {
-    const consoleSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => undefined)
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => undefined)
 
     expect(() =>
       render(
         <Order orderId="test-order-id">
           <span />
-        </Order>,
-      ),
+        </Order>
+      )
     ).toThrow("Cannot use <Order/> outside of <CommerceLayer/>")
 
     consoleSpy.mockRestore()
@@ -100,7 +98,7 @@ describe("Order component", () => {
           <span data-testid="child-1">one</span>
           <span data-testid="child-2">two</span>
         </Order>
-      </Wrapper>,
+      </Wrapper>
     )
     expect(screen.getByTestId("child-1")).toBeDefined()
     expect(screen.getByTestId("child-2")).toBeDefined()
@@ -118,7 +116,7 @@ describe("OrderContainer component (deprecated)", () => {
         <OrderContainer orderId="test-order-id">
           <span data-testid="oc-child">content</span>
         </OrderContainer>
-      </Wrapper>,
+      </Wrapper>
     )
     expect(screen.getByTestId("oc-child")).toBeDefined()
   })
@@ -131,12 +129,10 @@ describe("OrderContainer component (deprecated)", () => {
         <OrderContainer orderId="test-order-id">
           <span />
         </OrderContainer>
-      </Wrapper>,
+      </Wrapper>
     )
 
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("<OrderContainer> is deprecated"),
-    )
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("<OrderContainer> is deprecated"))
     warnSpy.mockRestore()
   })
 
@@ -149,7 +145,7 @@ describe("OrderContainer component (deprecated)", () => {
         <OrderContainer orderId="test-order-id">
           <span />
         </OrderContainer>
-      </Wrapper>,
+      </Wrapper>
     )
 
     expect(warnSpy).not.toHaveBeenCalled()
@@ -170,7 +166,7 @@ describe("OrderContainer component (deprecated)", () => {
         <OrderContainer orderId="test-order-id">
           <Consumer />
         </OrderContainer>
-      </Wrapper>,
+      </Wrapper>
     )
 
     expect(capturedCtx).not.toBeNull()
@@ -183,9 +179,7 @@ describe("OrderContainer component (deprecated)", () => {
 
 describe("useOrderContainer hook", () => {
   it("throws when used outside <Order>", () => {
-    const consoleSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => undefined)
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => undefined)
 
     function BadConsumer() {
       useOrderContainer()
@@ -193,7 +187,7 @@ describe("useOrderContainer hook", () => {
     }
 
     expect(() => render(<BadConsumer />)).toThrow(
-      "Cannot use `useOrderContainer` outside of <Order/>",
+      "Cannot use `useOrderContainer` outside of <Order/>"
     )
 
     consoleSpy.mockRestore()
@@ -223,7 +217,7 @@ describe("useOrderContainer hook", () => {
     render(
       <OrderContext.Provider value={mockCtx}>
         <Consumer />
-      </OrderContext.Provider>,
+      </OrderContext.Provider>
     )
 
     expect(result).not.toBeNull()

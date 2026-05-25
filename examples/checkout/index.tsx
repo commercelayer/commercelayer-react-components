@@ -1,7 +1,7 @@
-import { useState, useEffect, Fragment } from 'react'
-import { getSalesChannelToken } from '@commercelayer/js-auth'
-import { Nav } from '..'
-import Head from 'next/head'
+import { useState, useEffect, Fragment } from "react"
+import { getSalesChannelToken } from "@commercelayer/js-auth"
+import { Nav } from ".."
+import Head from "next/head"
 import {
   CommerceLayer,
   OrderContainer,
@@ -53,20 +53,20 @@ import {
   PlaceOrderContainer,
   PrivacyAndTermsCheckbox,
   PaymentMethodAmount,
-} from 'packages/react-components/src'
-import { useRouter } from 'next/router'
+} from "packages/react-components/src"
+import { useRouter } from "next/router"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
 const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 
-let orderId = ''
-let paypalPayerId = ''
-let paypalReturnUrl = ''
+let orderId = ""
+let paypalPayerId = ""
+let paypalReturnUrl = ""
 
 export default function Main() {
-  const [token, setToken] = useState('')
-  const [customerEmail, setCustomerEmail] = useState('')
+  const [token, setToken] = useState("")
+  const [customerEmail, setCustomerEmail] = useState("")
   const [shipToDifferentAddress, setShipToDifferentAddress] = useState(false)
   const [saveOnBlur, setSaveOnBlur] = useState(false)
   const [billingAddress, setBillingAddress] = useState({})
@@ -91,15 +91,15 @@ export default function Main() {
   }, [token])
   const messages: any = [
     {
-      code: 'EMPTY_ERROR',
-      resource: 'billingAddress',
-      field: 'firstName',
+      code: "EMPTY_ERROR",
+      resource: "billingAddress",
+      field: "firstName",
       message: `Can't be blank`,
     },
     {
-      code: 'VALIDATION_ERROR',
-      resource: 'billingAddress',
-      field: 'email',
+      code: "VALIDATION_ERROR",
+      resource: "billingAddress",
+      field: "email",
       message: `Must be valid email`,
     },
   ]
@@ -160,7 +160,7 @@ export default function Main() {
       <Head>
         <script src="http://localhost:8097"></script>
       </Head>
-      <Nav links={['/multiOrder', '/multiApp', '/giftCard']} />
+      <Nav links={["/multiOrder", "/multiApp", "/giftCard"]} />
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId={orderId}>
@@ -171,7 +171,7 @@ export default function Main() {
                 type="button"
                 aria-pressed="false"
                 className={`${
-                  saveOnBlur ? 'bg-blue-500' : 'bg-gray-200'
+                  saveOnBlur ? "bg-blue-500" : "bg-gray-200"
                 } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                 onClick={() => setSaveOnBlur(!saveOnBlur)}
               >
@@ -179,7 +179,7 @@ export default function Main() {
                 <span
                   aria-hidden="true"
                   className={`${
-                    saveOnBlur ? 'translate-x-5' : 'translate-x-0'
+                    saveOnBlur ? "translate-x-5" : "translate-x-0"
                   } inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
                 ></span>
               </button>
@@ -187,10 +187,7 @@ export default function Main() {
             </div>
             <CustomerContainer isGuest>
               <div>
-                <label
-                  htmlFor="customer_email"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="customer_email" className="block text-sm font-medium text-gray-700">
                   Customer email
                 </label>
                 <div className="mt-1">
@@ -212,7 +209,7 @@ export default function Main() {
                   />
                 </p>
               </div>
-              <div className={saveOnBlur ? 'hidden' : ''}>
+              <div className={saveOnBlur ? "hidden" : ""}>
                 <div className="mt-1">
                   <SaveCustomerButton
                     data-cy="save-customer-button"
@@ -353,8 +350,8 @@ export default function Main() {
                       name="billing_address_country_code"
                       className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                       placeholder={{
-                        value: '',
-                        label: 'Country',
+                        value: "",
+                        label: "Country",
                         disabled: true,
                       }}
                       value="IT"
@@ -383,11 +380,11 @@ export default function Main() {
                       className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                       inputClassName="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                       placeholder={{
-                        value: '',
-                        label: 'Select a state',
+                        value: "",
+                        label: "Select a state",
                         disabled: true,
                       }}
-                      value={'GE'}
+                      value={"GE"}
                     />
                   </div>
                   <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -499,17 +496,15 @@ export default function Main() {
                   type="button"
                   aria-pressed="false"
                   className={`${
-                    shipToDifferentAddress ? 'bg-blue-500' : 'bg-gray-200'
+                    shipToDifferentAddress ? "bg-blue-500" : "bg-gray-200"
                   } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                  onClick={() =>
-                    setShipToDifferentAddress(!shipToDifferentAddress)
-                  }
+                  onClick={() => setShipToDifferentAddress(!shipToDifferentAddress)}
                 >
                   <span className="sr-only">Use setting</span>
                   <span
                     aria-hidden="true"
                     className={`${
-                      shipToDifferentAddress ? 'translate-x-5' : 'translate-x-0'
+                      shipToDifferentAddress ? "translate-x-5" : "translate-x-0"
                     } inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
                   ></span>
                 </button>
@@ -633,8 +628,8 @@ export default function Main() {
                       name="shipping_address_country_code"
                       className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                       placeholder={{
-                        value: '',
-                        label: 'Country',
+                        value: "",
+                        label: "Country",
                         disabled: true,
                       }}
                     />
@@ -661,8 +656,8 @@ export default function Main() {
                       name="shipping_address_state_code"
                       className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
                       placeholder={{
-                        value: '',
-                        label: 'Select a state',
+                        value: "",
+                        label: "Select a state",
                         disabled: true,
                       }}
                     />
@@ -773,11 +768,8 @@ export default function Main() {
                     <div>
                       <StockTransfer>
                         <div className="flex flex-row" data-cy="stock-transfer">
-                          <StockTransferField
-                            className="px-1"
-                            type="quantity"
-                          />{' '}
-                          of <LineItemQuantity readonly className="px-1" />
+                          <StockTransferField className="px-1" type="quantity" /> of{" "}
+                          <LineItemQuantity readonly className="px-1" />
                           items will undergo a transfer
                         </div>
                       </StockTransfer>
@@ -797,11 +789,8 @@ export default function Main() {
                     <div>
                       <StockTransfer>
                         <div className="flex flex-row" data-cy="stock-transfer">
-                          <StockTransferField
-                            className="px-1"
-                            type="quantity"
-                          />{' '}
-                          of <LineItemQuantity readonly className="px-1" />
+                          <StockTransferField className="px-1" type="quantity" /> of{" "}
+                          <LineItemQuantity readonly className="px-1" />
                           items will undergo a transfer
                         </div>
                       </StockTransfer>
@@ -817,11 +806,7 @@ export default function Main() {
                     <ShippingMethodName data-cy="shipping-method-name" />
                     <ShippingMethodPrice data-cy="shipping-method-price" />
                     <div className="flex">
-                      <DeliveryLeadTime
-                        type="min_days"
-                        data-cy="delivery-lead-time-min-days"
-                      />{' '}
-                      -{' '}
+                      <DeliveryLeadTime type="min_days" data-cy="delivery-lead-time-min-days" /> -{" "}
                       <DeliveryLeadTime
                         type="max_days"
                         data-cy="delivery-lead-time-max-days"
@@ -863,7 +848,7 @@ export default function Main() {
                     hideIcon: false,
                     hidePostalCode: true,
                   },
-                  containerClassName: 'w-1/2 px-3',
+                  containerClassName: "w-1/2 px-3",
                 },
                 paypalPayment: {
                   cancel_url: paypalReturnUrl,
@@ -883,7 +868,7 @@ export default function Main() {
                   <PaymentSource
                     data-cy="payment-source"
                     className="p-5 my-2"
-                    loader={'Caricamento...'}
+                    loader={"Caricamento..."}
                   >
                     <div className="flex flex-row items-center justify-start bg-gray-100 p-5 my-10">
                       <div className="flex flex-row items-center">
@@ -900,14 +885,8 @@ export default function Main() {
                         />
                       </div>
                       <div className="text-gray-500 ml-5">
-                        <PaymentSourceDetail
-                          data-cy="payment-exp-month"
-                          type="exp_month"
-                        />
-                        <PaymentSourceDetail
-                          data-cy="payment-exp-year"
-                          type="exp_year"
-                        />
+                        <PaymentSourceDetail data-cy="payment-exp-month" type="exp_month" />
+                        <PaymentSourceDetail data-cy="payment-exp-year" type="exp_year" />
                       </div>
                       <div className="ml-5">
                         <PaymentSourceEditButton
@@ -917,10 +896,7 @@ export default function Main() {
                       </div>
                     </div>
                   </PaymentSource>
-                  <Errors
-                    className="text-red-600 block"
-                    resource="payment_methods"
-                  />
+                  <Errors className="text-red-600 block" resource="payment_methods" />
                 </PaymentMethod>
 
                 <div className="flex flex-row-reverse justify-end">
@@ -940,7 +916,7 @@ export default function Main() {
                 <div>
                   <PlaceOrderButton
                     onClick={(res: any) => {
-                      console.log('res', res)
+                      console.log("res", res)
                     }}
                     className="mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                   />
@@ -949,44 +925,30 @@ export default function Main() {
             </PaymentMethodsContainer>
             <LineItemsContainer>
               <p className="text-sm m-2">
-                Your shopping bag contains{' '}
-                <LineItemsCount data-test="items-count" className="font-bold" />{' '}
-                items
+                Your shopping bag contains{" "}
+                <LineItemsCount data-test="items-count" className="font-bold" /> items
               </p>
               <div className="flex flex-col p-2">
                 <LineItem>
                   <div className="flex justify-around items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <Errors
-                      className="text-red-700 p-2"
-                      resource="line_items"
-                      field="quantity"
-                    />
-                    <LineItemAmount
-                      data-test="line-item-total"
-                      className="p-2"
-                    />
+                    <Errors className="text-red-700 p-2" resource="line_items" field="quantity" />
+                    <LineItemAmount data-test="line-item-total" className="p-2" />
                   </div>
                 </LineItem>
                 <LineItem type="gift_cards">
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={40} />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <LineItemAmount
-                      data-test="line-item-total"
-                      className="p-2"
-                    />
+                    <LineItemAmount data-test="line-item-total" className="p-2" />
                   </div>
                 </LineItem>
                 <LineItem type="bundles">
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={40} />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <LineItemAmount
-                      data-test="line-item-total"
-                      className="p-2"
-                    />
+                    <LineItemAmount data-test="line-item-total" className="p-2" />
                   </div>
                 </LineItem>
                 <LineItem type="adjustments">
@@ -995,14 +957,11 @@ export default function Main() {
                       className="p-2"
                       width={40}
                       placeholder={{
-                        adjustments: '',
+                        adjustments: "",
                       }}
                     />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <LineItemAmount
-                      data-test="line-item-total"
-                      className="p-2"
-                    />
+                    <LineItemAmount data-test="line-item-total" className="p-2" />
                   </div>
                 </LineItem>
               </div>

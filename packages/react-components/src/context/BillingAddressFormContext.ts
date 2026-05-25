@@ -13,10 +13,7 @@ export type AddressValuesKeys =
 export interface DefaultContextAddress {
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   validation?: void
-  setValue?: (
-    name: AddressValuesKeys,
-    value: string | number | readonly string[],
-  ) => void
+  setValue?: (name: AddressValuesKeys, value: string | number | readonly string[]) => void
   errors?: Record<
     string,
     {

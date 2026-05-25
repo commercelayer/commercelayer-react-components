@@ -8,10 +8,7 @@ import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PaymentSourceContext from "#context/PaymentSourceContext"
-import {
-  getPaymentConfig,
-  type PaymentResource,
-} from "#reducers/PaymentMethodReducer"
+import { getPaymentConfig, type PaymentResource } from "#reducers/PaymentMethodReducer"
 import getCardDetails from "#utils/getCardDetails"
 import PaymentCardsTemplate from "../utils/PaymentCardsTemplate"
 
@@ -31,8 +28,7 @@ export function StripeGateway(props: Props): JSX.Element | null {
   const { order } = useContext(OrderContext)
   const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { payments, isGuest } = useContext(CustomerContext)
-  const { currentPaymentMethodId, config, paymentSource } =
-    useContext(PaymentMethodContext)
+  const { currentPaymentMethodId, config, paymentSource } = useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = "stripe_payments"
   const locale = order?.language_code as StripeElementLocale
 
@@ -72,9 +68,7 @@ export function StripeGateway(props: Props): JSX.Element | null {
       paymentSource,
     }
     return card?.brand == null ? null : (
-      <PaymentSourceContext.Provider value={value}>
-        {children}
-      </PaymentSourceContext.Provider>
+      <PaymentSourceContext.Provider value={value}>{children}</PaymentSourceContext.Provider>
     )
   }
   if (!isGuest && templateCustomerCards) {

@@ -9,15 +9,15 @@ interface TReturn {
 }
 
 export default function getBrowserInfo(): TReturn {
-  const screenWidth = window?.screen ? window.screen.width : ''
-  const screenHeight = window?.screen ? window.screen.height : ''
-  const colorDepth = window?.screen ? window.screen.colorDepth : ''
-  const userAgent = window?.navigator ? window.navigator.userAgent : ''
+  const screenWidth = window?.screen ? window.screen.width : ""
+  const screenHeight = window?.screen ? window.screen.height : ""
+  const colorDepth = window?.screen ? window.screen.colorDepth : ""
+  const userAgent = window?.navigator ? window.navigator.userAgent : ""
   const javaEnabled = window?.navigator ? navigator.javaEnabled() : false
   const acceptHeader =
-    'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
 
-  let language = ''
+  let language = ""
   if (window?.navigator) language = window.navigator.language
 
   const d = new Date()
@@ -31,13 +31,13 @@ export default function getBrowserInfo(): TReturn {
     timeZoneOffset,
     language,
     javaEnabled,
-    acceptHeader
+    acceptHeader,
   }
 
   return browserInfo
 }
 
-export function cleanUrlBy(symbol: string = '&'): string {
+export function cleanUrlBy(symbol: string = "&"): string {
   const currentLocation = window?.location.href
   const [splitLocation] = currentLocation.split(symbol)
   return splitLocation ?? currentLocation

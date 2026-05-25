@@ -22,11 +22,7 @@ interface Props {
 /**
  * CommerceLayer component
  */
-export function CommerceLayer({
-  children,
-  accessToken,
-  interceptors,
-}: Props): JSX.Element {
+export function CommerceLayer({ children, accessToken, interceptors }: Props): JSX.Element {
   return (
     <ErrorBoundary>
       <CommerceLayerContext.Provider value={{ accessToken, interceptors }}>

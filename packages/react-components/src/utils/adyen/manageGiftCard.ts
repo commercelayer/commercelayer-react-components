@@ -21,9 +21,7 @@ export function manageGiftCard({ order }: Props): ReturnTypes | null {
   if (!order) return null
   if (!order?.payment_source) return null
   const getPaymentSource =
-    order.payment_source?.type === "adyen_payments"
-      ? order.payment_source
-      : null
+    order.payment_source?.type === "adyen_payments" ? order.payment_source : null
   if (!getPaymentSource) return null
   const errorCode =
     // @ts-expect-error No type for payment_response errorCode
@@ -40,25 +38,20 @@ export function manageGiftCard({ order }: Props): ReturnTypes | null {
     getPaymentSource?.payment_response?.amount?.value ?? (0 as number)
   const giftCardData: GiftCardData = {
     cardSummary: additionalData?.cardSummary ?? "",
-    currentBalanceValue:
-      amount ?? Number.parseInt(additionalData?.currentBalanceValue) ?? 0,
+    currentBalanceValue: amount ?? Number.parseInt(additionalData?.currentBalanceValue) ?? 0,
     currentBalanceCurrency: additionalData?.currentBalanceCurrency ?? "",
-    cardBrand:
-      additionalData?.originalSelectedBrand ??
-      additionalData?.paymentMethod ??
-      "",
+    cardBrand: additionalData?.originalSelectedBrand ?? additionalData?.paymentMethod ?? "",
     formattedBalanceValue: additionalData?.currentBalanceValue ?? "",
   }
   const orderTotal =
     order?.total_amount_with_taxes_cents != null
       ? order?.total_amount_with_taxes_cents - giftCardData.currentBalanceValue
       : 0
-  const currencyCode =
-    (order?.currency_code as CurrencyCode) ?? ("USD" as CurrencyCode)
+  const currencyCode = (order?.currency_code as CurrencyCode) ?? ("USD" as CurrencyCode)
   const formattedOrderTotal = formatCentsToCurrency(orderTotal, currencyCode)
   const formattedCurrentBalance = formatCentsToCurrency(
     giftCardData.currentBalanceValue,
-    currencyCode,
+    currencyCode
   )
   giftCardData.formattedBalanceValue = formattedCurrentBalance
   if (giftCardData.cardSummary === "") return null

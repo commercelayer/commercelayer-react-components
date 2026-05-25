@@ -2,13 +2,7 @@
  * @vitest-environment jsdom
  */
 import { afterEach, describe, expect, it, vi } from "vitest"
-import {
-  EMPTY,
-  getSnapshot,
-  registerSku,
-  subscribe,
-  unregisterSku,
-} from "./pricesBatchStore"
+import { EMPTY, getSnapshot, registerSku, subscribe, unregisterSku } from "./pricesBatchStore"
 
 describe("pricesBatchStore", () => {
   afterEach(() => {

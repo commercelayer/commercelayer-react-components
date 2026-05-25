@@ -1,14 +1,11 @@
-import { CommerceLayer as CommerceLayerComponent } from '@commercelayer/react-components'
-import { useGetToken } from './useGetToken'
+import { CommerceLayer as CommerceLayerComponent } from "@commercelayer/react-components"
+import { useGetToken } from "./useGetToken"
 
 type DefaultChildrenType = JSX.Element[] | JSX.Element | null
 
 interface Props {
   children: DefaultChildrenType
-  accessToken:
-    | 'customer-access-token'
-    | 'customer-orders-access-token'
-    | 'my-access-token' // guest token
+  accessToken: "customer-access-token" | "customer-orders-access-token" | "my-access-token" // guest token
   endpoint?: string
 }
 
@@ -19,11 +16,11 @@ interface Props {
 function CommerceLayer({ children, ...props }: Props): JSX.Element {
   const { accessToken, endpoint } = useGetToken({
     mode:
-      props.accessToken === 'customer-access-token'
-        ? 'customer'
-        : props.accessToken === 'customer-orders-access-token'
-        ? 'customer-orders'
-        : 'guest'
+      props.accessToken === "customer-access-token"
+        ? "customer"
+        : props.accessToken === "customer-orders-access-token"
+          ? "customer-orders"
+          : "guest",
   })
 
   return (

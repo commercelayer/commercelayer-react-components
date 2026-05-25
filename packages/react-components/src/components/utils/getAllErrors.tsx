@@ -15,19 +15,11 @@ export interface AllErrorsParams {
 }
 
 export type GetAllErrors = <P extends AllErrorsParams>(
-  params: P,
+  params: P
 ) => Array<JSX.Element | string | undefined>
 
 const getAllErrors: GetAllErrors = (params) => {
-  const {
-    allErrors,
-    messages,
-    field,
-    props,
-    lineItem,
-    resource,
-    returnHtml = true,
-  } = params
+  const { allErrors, messages, field, props, lineItem, resource, returnHtml = true } = params
   return allErrors
     .map((v, k): JSX.Element | string | undefined => {
       const objMsg = customMessages(messages, v)
@@ -49,10 +41,7 @@ const getAllErrors: GetAllErrors = (params) => {
             )
           }
         }
-        if (
-          (field === v.field || v.detail?.includes(field)) &&
-          resource === v.resource
-        ) {
+        if ((field === v.field || v.detail?.includes(field)) && resource === v.resource) {
           return isEmpty ? undefined : returnHtml ? (
             <span key={k} {...props}>
               {text}

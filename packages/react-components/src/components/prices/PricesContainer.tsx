@@ -1,14 +1,6 @@
 import { usePrices } from "@commercelayer/hooks"
 import type { QueryPageSize } from "@commercelayer/sdk"
-import {
-  type JSX,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import { type JSX, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import PricesContext, { type PricesContextValue } from "#context/PricesContext"
 import SkuContext from "#context/SkuContext"
@@ -65,9 +57,7 @@ export function PricesContainer({
 }: Props): JSX.Element {
   const config = useContext(CommerceLayerContext)
   const { skuCodes: contextSkuCodes } = useContext(SkuContext)
-  const [skuCodes, setSkuCodesState] = useState<string[]>(
-    skuCode ? [skuCode] : [],
-  )
+  const [skuCodes, setSkuCodesState] = useState<string[]>(skuCode ? [skuCode] : [])
   const {
     prices: pricesList,
     isLoading,
@@ -75,8 +65,7 @@ export function PricesContainer({
     clearPrices,
   } = usePrices(config.accessToken ?? "", config.interceptors)
 
-  const sCode =
-    contextSkuCodes != null && contextSkuCodes.length > 0 ? "" : skuCode
+  const sCode = contextSkuCodes != null && contextSkuCodes.length > 0 ? "" : skuCode
 
   // Sync skuCodes from SkuContext (e.g. when used inside <SkusContainer>)
   useEffect(() => {
@@ -92,10 +81,7 @@ export function PricesContainer({
   const filtersKey = JSON.stringify(filters)
   // biome-ignore lint/correctness/useExhaustiveDependencies: fetchPrices/clearPrices are stable; filtersKey stringifies filters for stable comparison
   useEffect(() => {
-    const codes =
-      contextSkuCodes != null && contextSkuCodes.length > 0
-        ? contextSkuCodes
-        : skuCodes
+    const codes = contextSkuCodes != null && contextSkuCodes.length > 0 ? contextSkuCodes : skuCodes
     if (config.accessToken != null && codes.length > 0) {
       if (fetchTimerRef.current != null) clearTimeout(fetchTimerRef.current)
       fetchTimerRef.current = setTimeout(() => {
@@ -111,16 +97,13 @@ export function PricesContainer({
     }
   }, [config.accessToken, skuCodes, contextSkuCodes, filtersKey, perPage])
 
-  const setSkuCodes = useCallback(
-    ({ skuCodes: newCodes }: { skuCodes: string[] }) => {
-      // Functional update so concurrent Price children don't overwrite each other
-      setSkuCodesState((prev) => {
-        const merged = Array.from(new Set([...prev, ...newCodes]))
-        return merged.length === prev.length ? prev : merged
-      })
-    },
-    [],
-  )
+  const setSkuCodes = useCallback(({ skuCodes: newCodes }: { skuCodes: string[] }) => {
+    // Functional update so concurrent Price children don't overwrite each other
+    setSkuCodesState((prev) => {
+      const merged = Array.from(new Set([...prev, ...newCodes]))
+      return merged.length === prev.length ? prev : merged
+    })
+  }, [])
 
   const pricesMap = useMemo(() => getPricesMap(pricesList), [pricesList])
 
@@ -134,14 +117,10 @@ export function PricesContainer({
       loader,
       setSkuCodes,
     }),
-    [isLoading, pricesMap, skuCodes, sCode, loader, setSkuCodes],
+    [isLoading, pricesMap, skuCodes, sCode, loader, setSkuCodes]
   )
 
-  return (
-    <PricesContext.Provider value={contextValue}>
-      {children}
-    </PricesContext.Provider>
-  )
+  return <PricesContext.Provider value={contextValue}>{children}</PricesContext.Provider>
 }
 
 export default PricesContainer

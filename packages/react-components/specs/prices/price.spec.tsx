@@ -51,18 +51,14 @@ describe("Price component", () => {
     const { container } = render(
       <CommerceLayer accessToken={FAKE_TOKEN}>
         <PricesContainer>
-          <SkuChildrenContext.Provider
-            value={{ sku: { code: SKU_CODE } as Partial<Sku> as Sku }}
-          >
+          <SkuChildrenContext.Provider value={{ sku: { code: SKU_CODE } as Partial<Sku> as Sku }}>
             <Price data-testid="sku-ctx-price" />
           </SkuChildrenContext.Provider>
         </PricesContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
-    expect(
-      container.querySelector('[data-testid="sku-ctx-price"]'),
-    ).not.toBeNull()
+    expect(container.querySelector('[data-testid="sku-ctx-price"]')).not.toBeNull()
   })
 
   it("renders when no skuCode available (final empty-string fallback)", () => {
@@ -73,11 +69,9 @@ describe("Price component", () => {
           <Price data-testid="no-code-price" />
         </PricesContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
-    expect(
-      container.querySelector('[data-testid="no-code-price"]'),
-    ).not.toBeNull()
+    expect(container.querySelector('[data-testid="no-code-price"]')).not.toBeNull()
   })
 
   it("renders standalone — filters batch prices by sku_code", () => {
@@ -97,7 +91,7 @@ describe("Price component", () => {
       <CommerceLayer accessToken={FAKE_TOKEN}>
         <Price skuCode={SKU_CODE} data-testid="standalone-price" />
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     expect(container).not.toBeNull()
   })
@@ -108,7 +102,7 @@ describe("Price component", () => {
       <CommerceLayerContext.Provider value={{}}>
         <Price skuCode={SKU_CODE} data-testid="no-token-standalone" />
       </CommerceLayerContext.Provider>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     // usePrices called with "" since accessToken is undefined
     expect(vi.mocked(usePrices)).toHaveBeenLastCalledWith("", undefined)
@@ -122,7 +116,7 @@ describe("Price component", () => {
           <span data-testid="child">test</span>
         </PricesContainer>
       </CommerceLayerContext.Provider>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     expect(container.querySelector('[data-testid="child"]')).not.toBeNull()
   })

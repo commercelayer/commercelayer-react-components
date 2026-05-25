@@ -1,4 +1,4 @@
-import type PropTypes from 'prop-types'
+import type PropTypes from "prop-types"
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 

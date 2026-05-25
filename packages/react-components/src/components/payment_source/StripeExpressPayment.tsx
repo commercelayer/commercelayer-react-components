@@ -20,13 +20,9 @@ interface Props {
   clientSecret: string
 }
 
-export function StripeExpressPayment({
-  clientSecret,
-}: Props): JSX.Element | null {
+export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | null {
   const stripe = useStripe()
-  const [paymentRequest, setPaymentRequest] = useState<null | PaymentRequest>(
-    null,
-  )
+  const [paymentRequest, setPaymentRequest] = useState<null | PaymentRequest>(null)
   const { accessToken } = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
   const { paymentMethods, paymentSource } = useContext(PaymentMethodContext)
@@ -133,8 +129,7 @@ export function StripeExpressPayment({
       if (paymentMethod == null) throw new Error("Payment method is null")
       if (paymentSource == null) throw new Error("Payment source is null")
       const requiresBillingInfo = order?.requires_billing_info ?? false
-      const paymentResource =
-        paymentMethod?.payment_source_type as PaymentResource
+      const paymentResource = paymentMethod?.payment_source_type as PaymentResource
       if (accessToken != null) {
         const [firstName, lastName] = ev.payerName?.split(" ") ?? []
         const [line] = ev.shippingAddress?.addressLine ?? ""
@@ -178,12 +173,11 @@ export function StripeExpressPayment({
         }
         await setExpressPlaceOrder(placeOrderParams)
         // Confirm the PaymentIntent without handling potential next actions (yet).
-        const { paymentIntent, error: confirmError } =
-          await stripe.confirmCardPayment(
-            clientSecret,
-            { payment_method: ev.paymentMethod.id },
-            { handleActions: false },
-          )
+        const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
+          clientSecret,
+          { payment_method: ev.paymentMethod.id },
+          { handleActions: false }
+        )
         if (confirmError) {
           // Report to the browser that the payment failed, prompting it to
           // re-show the payment interface, or show an error message and close
@@ -254,10 +248,7 @@ export function StripeExpressPayment({
     })
     return (
       <>
-        <PaymentRequestButtonElement
-          className=""
-          options={{ paymentRequest }}
-        />
+        <PaymentRequestButtonElement className="" options={{ paymentRequest }} />
       </>
     )
   }

@@ -1,7 +1,7 @@
-import { useContext, type ReactNode, useEffect, useState, type JSX } from 'react';
-import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
-import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
-import { isEmpty } from '#utils/isEmpty'
+import { useContext, type ReactNode, useEffect, useState, type JSX } from "react"
+import ShippingMethodChildrenContext from "#context/ShippingMethodChildrenContext"
+import ShipmentChildrenContext from "#context/ShipmentChildrenContext"
+import { isEmpty } from "#utils/isEmpty"
 
 interface Props {
   children: ReactNode
@@ -9,17 +9,9 @@ interface Props {
   emptyText?: string
 }
 export function ShippingMethod(props: Props): JSX.Element {
-  const {
-    children,
-    readonly,
-    emptyText = `There are not any shipping method available`
-  } = props
-  const {
-    shippingMethods,
-    currentShippingMethodId,
-    deliveryLeadTimes,
-    shipment
-  } = useContext(ShipmentChildrenContext)
+  const { children, readonly, emptyText = `There are not any shipping method available` } = props
+  const { shippingMethods, currentShippingMethodId, deliveryLeadTimes, shipment } =
+    useContext(ShipmentChildrenContext)
   const [items, setItems] = useState<JSX.Element[]>([])
   useEffect(() => {
     const methods = shippingMethods
@@ -37,7 +29,7 @@ export function ShippingMethod(props: Props): JSX.Element {
           shipmentId: shipment?.id,
           shippingMethod,
           currentShippingMethodId,
-          deliveryLeadTimeForShipment
+          deliveryLeadTimeForShipment,
         }
         return (
           <ShippingMethodChildrenContext.Provider key={k} value={shippingProps}>

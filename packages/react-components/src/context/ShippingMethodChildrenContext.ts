@@ -1,5 +1,5 @@
-import { createContext } from 'react'
-import type { DeliveryLeadTime, ShippingMethod } from '@commercelayer/sdk'
+import { createContext } from "react"
+import type { DeliveryLeadTime, ShippingMethod } from "@commercelayer/sdk"
 
 export interface InitialShippingMethodContext {
   shippingMethod?: ShippingMethod
@@ -10,7 +10,6 @@ export interface InitialShippingMethodContext {
 
 const initial: InitialShippingMethodContext = {}
 
-const ShippingMethodChildrenContext =
-  createContext<InitialShippingMethodContext>(initial)
+const ShippingMethodChildrenContext = createContext<InitialShippingMethodContext>(initial)
 
 export default ShippingMethodChildrenContext

@@ -98,8 +98,7 @@ export function PaymentGateway({
           })
         }
         if (
-          ((errors != null && errors?.length > 0) ||
-            order?.payment_source === null) &&
+          ((errors != null && errors?.length > 0) || order?.payment_source === null) &&
           paymentMethods &&
           paymentMethods?.length === 1
         ) {
@@ -111,16 +110,10 @@ export function PaymentGateway({
         }
         if (getCustomerPaymentSources) getCustomerPaymentSources()
       }
-      if (
-        !paymentSource &&
-        order?.payment_method.id &&
-        show &&
-        !expressPayments
-      ) {
+      if (!paymentSource && order?.payment_method.id && show && !expressPayments) {
         setPaymentSources()
       } else if (
-        ((!paymentSource && !expressPayments) ||
-          paymentSource?.type !== paymentResource) &&
+        ((!paymentSource && !expressPayments) || paymentSource?.type !== paymentResource) &&
         show
       ) {
         setPaymentSources()
@@ -182,9 +175,7 @@ export function PaymentGateway({
     case "braintree_payments":
       return <BraintreeGateway {...gatewayConfig}>{children}</BraintreeGateway>
     case "checkout_com_payments":
-      return (
-        <CheckoutComGateway {...gatewayConfig}>{children}</CheckoutComGateway>
-      )
+      return <CheckoutComGateway {...gatewayConfig}>{children}</CheckoutComGateway>
     case "external_payments":
       return <ExternalGateway {...gatewayConfig}>{children}</ExternalGateway>
     case "klarna_payments":
@@ -192,9 +183,7 @@ export function PaymentGateway({
     case "stripe_payments":
       return <StripeGateway {...gatewayConfig}>{children}</StripeGateway>
     case "wire_transfers":
-      return (
-        <WireTransferGateway {...gatewayConfig}>{children}</WireTransferGateway>
-      )
+      return <WireTransferGateway {...gatewayConfig}>{children}</WireTransferGateway>
     case "paypal_payments":
       return <PaypalGateway {...gatewayConfig}>{children}</PaypalGateway>
     default:

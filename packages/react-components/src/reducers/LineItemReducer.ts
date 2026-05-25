@@ -1,12 +1,12 @@
-import baseReducer from '#utils/baseReducer'
-import type { Dispatch } from 'react'
-import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import type { getOrderContext } from './OrderReducer'
-import type { LoaderType } from '#typings'
-import type { BaseError } from '#typings/errors'
-import type { Order, LineItem } from '@commercelayer/sdk'
-import { getSdk } from '@commercelayer/core'
-import getErrors from '#utils/getErrors'
+import baseReducer from "#utils/baseReducer"
+import type { Dispatch } from "react"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
+import type { getOrderContext } from "./OrderReducer"
+import type { LoaderType } from "#typings"
+import type { BaseError } from "#typings/errors"
+import type { Order, LineItem } from "@commercelayer/sdk"
+import { getSdk } from "@commercelayer/core"
+import getErrors from "#utils/getErrors"
 
 export interface UpdateLineItemParams {
   lineItemId: string
@@ -62,80 +62,70 @@ export const getLineItems: GetLineItems = (params) => {
   order &&
     sdk.orders
       .retrieve(order?.id, {
-        include: ['line_items', 'line_items.line_item_options.sku_option'],
+        include: ["line_items", "line_items.line_item_options.sku_option"],
         fields: {
-          orders: ['line_items']
-        }
+          orders: ["line_items"],
+        },
       })
       .then((response) => {
         dispatch({
-          type: 'setLoading',
+          type: "setLoading",
           payload: {
-            loading: false
-          }
+            loading: false,
+          },
         })
         const items = response.line_items || []
         allLineItems = [...allLineItems, ...items]
         dispatch({
-          type: 'setLineItems',
+          type: "setLineItems",
           payload: {
-            lineItems: allLineItems
-          }
+            lineItems: allLineItems,
+          },
         })
       })
       .catch((error) => {
         const errors = getErrors({
           error,
-          resource: 'line_items'
+          resource: "line_items",
         })
         dispatch({
-          type: 'setErrors',
+          type: "setErrors",
           payload: {
-            errors
-          }
+            errors,
+          },
         })
       })
 }
 
-export async function updateLineItem(
-  params: UpdateLineItemParams
-): Promise<void> {
-  const {
-    config,
-    lineItemId,
-    quantity,
-    hasExternalPrice,
-    getOrder,
-    orderId,
-    dispatch
-  } = params
+export async function updateLineItem(params: UpdateLineItemParams): Promise<void> {
+  const { config, lineItemId, quantity, hasExternalPrice, getOrder, orderId, dispatch } = params
   const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   try {
     await sdk.line_items.update({
       id: lineItemId,
       quantity,
-      _external_price: hasExternalPrice
+      _external_price: hasExternalPrice,
     })
     getOrder && (await getOrder(orderId))
     dispatch({
-      type: 'setErrors',
+      type: "setErrors",
       payload: {
-        errors: []
-      }
+        errors: [],
+      },
     })
   } catch (error: any) {
     const errors = getErrors({
       error,
-      resource: 'line_items',
+      resource: "line_items",
       attributes: {
-        id: lineItemId
-      }
+        id: lineItemId,
+      },
     })
     dispatch({
-      type: 'setErrors',
+      type: "setErrors",
       payload: {
-        errors
-      }
+        errors,
+      },
     })
   }
 }
@@ -147,21 +137,21 @@ export const deleteLineItem: DeleteLineItem = async (params) => {
     await sdk.line_items.delete(lineItemId)
     getOrder && (await getOrder(orderId))
     dispatch({
-      type: 'setErrors',
+      type: "setErrors",
       payload: {
-        errors: []
-      }
+        errors: [],
+      },
     })
   } catch (error: any) {
     const errors = getErrors({
       error,
-      resource: 'line_items'
+      resource: "line_items",
     })
     dispatch({
-      type: 'setErrors',
+      type: "setErrors",
       payload: {
-        errors
-      }
+        errors,
+      },
     })
   }
 }
@@ -169,25 +159,14 @@ export const deleteLineItem: DeleteLineItem = async (params) => {
 export const lineItemInitialState: LineItemState = {
   loading: false,
   errors: [],
-  lineItems: []
+  lineItems: [],
 }
 
-export type LineItemActionType = 'setLineItems' | 'setErrors' | 'setLoading'
+export type LineItemActionType = "setLineItems" | "setErrors" | "setLoading"
 
-const actionType: LineItemActionType[] = [
-  'setLineItems',
-  'setErrors',
-  'setLoading'
-]
+const actionType: LineItemActionType[] = ["setLineItems", "setErrors", "setLoading"]
 
-const lineItemReducer = (
-  state: LineItemState,
-  reducer: LineItemAction
-): LineItemState =>
-  baseReducer<LineItemState, LineItemAction, LineItemActionType[]>(
-    state,
-    reducer,
-    actionType
-  )
+const lineItemReducer = (state: LineItemState, reducer: LineItemAction): LineItemState =>
+  baseReducer<LineItemState, LineItemAction, LineItemActionType[]>(state, reducer, actionType)
 
 export default lineItemReducer

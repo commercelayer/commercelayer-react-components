@@ -32,8 +32,7 @@ export function AdyenGateway(props: Props): JSX.Element | null {
   const { accessToken } = useContext(CommerceLayerContext)
   const { payment } = useContext(PaymentMethodChildrenContext)
   const { payments, isGuest } = useContext(CustomerContext)
-  const { currentPaymentMethodId, config, paymentSource } =
-    useContext(PaymentMethodContext)
+  const { currentPaymentMethodId, config, paymentSource } = useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = "adyen_payments"
   const locale = order?.language_code as StripeElementLocale
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
@@ -64,9 +63,7 @@ export function AdyenGateway(props: Props): JSX.Element | null {
     })
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (
-      <PaymentSourceContext.Provider value={value}>
-        {children}
-      </PaymentSourceContext.Provider>
+      <PaymentSourceContext.Provider value={value}>{children}</PaymentSourceContext.Provider>
     )
   }
   let hasStoredPaymentMethods =

@@ -1,7 +1,4 @@
-import {
-  Availability,
-  AvailabilityTemplate,
-} from "@commercelayer/react-components"
+import { Availability, AvailabilityTemplate } from "@commercelayer/react-components"
 import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import CommerceLayer from "../_internals/CommerceLayer"
@@ -166,14 +163,12 @@ const meta = {
   argTypes: {
     labels: {
       control: "object",
-      description:
-        "Text labels for each stock state: `available`, `outOfStock`, `negativeStock`.",
+      description: "Text labels for each stock state: `available`, `outOfStock`, `negativeStock`.",
     },
     timeFormat: {
       control: "select",
       options: ["days", "hours"],
-      description:
-        "When set, delivery lead time is appended to the availability label.",
+      description: "When set, delivery lead time is appended to the availability label.",
     },
     showShippingMethodName: {
       control: "boolean",

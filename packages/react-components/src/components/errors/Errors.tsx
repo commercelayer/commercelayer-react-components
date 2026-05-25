@@ -33,8 +33,7 @@ type ErrorChildrenComponentProps = ChildrenFunction<
   Omit<TErrorComponent, "children"> & { errors: string[] }
 >
 
-export interface TErrorComponent
-  extends Omit<JSX.IntrinsicElements["span"], "children"> {
+export interface TErrorComponent extends Omit<JSX.IntrinsicElements["span"], "children"> {
   /**
    * Resource which get the error
    */
@@ -67,9 +66,7 @@ export function Errors(props: Props): JSX.Element {
   const { errors: addressErrors } = useContext(AddressContext)
   const { errors: customerErrors } = useContext(CustomerContext)
   const { errors: shipmentErrors } = useContext(ShipmentContext)
-  const { errors: inStockSubscriptionErrors } = useContext(
-    InStockSubscriptionContext,
-  )
+  const { errors: inStockSubscriptionErrors } = useContext(InStockSubscriptionContext)
   const {
     errors: paymentMethodErrors,
     currentPaymentMethodType,
@@ -85,9 +82,7 @@ export function Errors(props: Props): JSX.Element {
       ...(shipmentErrors || []),
       ...(inStockSubscriptionErrors || []),
       ...(paymentMethodErrors?.filter(
-        (v) =>
-          v.field === currentPaymentMethodType &&
-          payment?.id === currentPaymentMethodId,
+        (v) => v.field === currentPaymentMethodType && payment?.id === currentPaymentMethodId
       ) || []),
     ],
     [
@@ -98,12 +93,9 @@ export function Errors(props: Props): JSX.Element {
       shipmentErrors,
       inStockSubscriptionErrors,
       paymentMethodErrors,
-    ],
+    ]
   ).filter((v, k, a) => v?.code !== a[k - 1]?.code)
-  const addressesErrors = useMemo(
-    () => [...(addressErrors || [])],
-    [addressErrors],
-  )
+  const addressesErrors = useMemo(() => [...(addressErrors || [])], [addressErrors])
   const msgErrors = getAllErrors({
     allErrors: [...allErrors, ...addressesErrors],
     field,
@@ -114,11 +106,7 @@ export function Errors(props: Props): JSX.Element {
     returnHtml: !children,
   })
   const parentProps = { messages, resource, field, errors: msgErrors, ...p }
-  return children ? (
-    <Parent {...parentProps}>{children}</Parent>
-  ) : (
-    <>{msgErrors}</>
-  )
+  return children ? <Parent {...parentProps}>{children}</Parent> : <>{msgErrors}</>
 }
 
 export default Errors

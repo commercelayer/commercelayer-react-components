@@ -6,10 +6,7 @@ import CommerceLayer from "../_internals/CommerceLayer"
 
 function Wrapper({ children }: { children: ReactNode }): JSX.Element {
   return (
-    <CommerceLayer
-      accessToken="my-access-token"
-      endpoint="https://demo-store.commercelayer.io"
-    >
+    <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
       <Sku skuCode="POLOMXXX000000FFFFFFLXXX">{children}</Sku>
     </CommerceLayer>
   )
@@ -20,25 +17,22 @@ function SkuFieldDocsPage(): JSX.Element {
     <>
       <h1>SkuField</h1>
       <p>
-        <code>{"<SkuField>"}</code> renders any attribute of the current SKU
-        provided by a parent <code>{"<Sku>"}</code> (or the deprecated{" "}
-        <code>{"<SkusContainer>"}</code>) context. Use the{" "}
-        <code>attribute</code> prop to select which field to display and{" "}
-        <code>tagElement</code> to choose the HTML tag (defaults to{" "}
-        <code>span</code>). When <code>{'tagElement="img"'}</code>, the value is
-        used as the <code>src</code> and standard <code>{"<img>"}</code> props (
+        <code>{"<SkuField>"}</code> renders any attribute of the current SKU provided by a parent{" "}
+        <code>{"<Sku>"}</code> (or the deprecated <code>{"<SkusContainer>"}</code>) context. Use the{" "}
+        <code>attribute</code> prop to select which field to display and <code>tagElement</code> to
+        choose the HTML tag (defaults to <code>span</code>). When <code>{'tagElement="img"'}</code>,
+        the value is used as the <code>src</code> and standard <code>{"<img>"}</code> props (
         <code>width</code>, <code>height</code>, etc.) are forwarded.
       </p>
       <span title="Usage" type="info">
         <p>
-          Must be a descendant of <code>{"<Sku>"}</code> or{" "}
-          <code>{"<SkusContainer>"}</code>. See the{" "}
+          Must be a descendant of <code>{"<Sku>"}</code> or <code>{"<SkusContainer>"}</code>. See
+          the{" "}
           <a href="https://docs.commercelayer.io/core/v/api-reference/skus/object">
             SKUs API object
           </a>{" "}
-          for all available attributes (e.g. <code>name</code>,{" "}
-          <code>description</code>, <code>image_url</code>, <code>code</code>,{" "}
-          <code>metadata</code>).
+          for all available attributes (e.g. <code>name</code>, <code>description</code>,{" "}
+          <code>image_url</code>, <code>code</code>, <code>metadata</code>).
         </p>
       </span>
       <ArgTypes />
@@ -60,25 +54,24 @@ import { CommerceLayer, Sku, SkuField } from '@commercelayer/react-components'
       <hr />
       <h2>Text attribute</h2>
       <p>
-        Any string attribute (e.g. <code>name</code>, <code>code</code>,{" "}
-        <code>description</code>) is rendered as the text content of the chosen
-        tag.
+        Any string attribute (e.g. <code>name</code>, <code>code</code>, <code>description</code>)
+        is rendered as the text content of the chosen tag.
       </p>
       <Canvas of={Default} />
       <hr />
       <h2>Image attribute</h2>
       <p>
-        Set <code>{'tagElement="img"'}</code> to render <code>image_url</code>{" "}
-        as an <code>{"<img>"}</code> element. Pass standard image props like{" "}
-        <code>width</code> and <code>height</code> directly.
+        Set <code>{'tagElement="img"'}</code> to render <code>image_url</code> as an{" "}
+        <code>{"<img>"}</code> element. Pass standard image props like <code>width</code> and{" "}
+        <code>height</code> directly.
       </p>
       <Canvas of={SkuImageAsImgTag} />
       <hr />
       <h2>Children render prop</h2>
       <p>
-        Pass a function as <code>children</code> to receive the raw attribute
-        value and apply your own rendering logic — useful for complex types like{" "}
-        <code>metadata</code> (JSON objects or arrays).
+        Pass a function as <code>children</code> to receive the raw attribute value and apply your
+        own rendering logic — useful for complex types like <code>metadata</code> (JSON objects or
+        arrays).
       </p>
       <Canvas of={ChildrenProps} />
     </>
@@ -103,8 +96,7 @@ const meta = {
     tagElement: {
       control: "select",
       options: ["div", "p", "span", "img", "section"],
-      description:
-        "HTML tag to render. When set to `img`, the value fills the `src` attribute.",
+      description: "HTML tag to render. When set to `img`, the value fills the `src` attribute.",
     },
   },
 } satisfies Meta<typeof SkuField>
@@ -146,16 +138,11 @@ export const SkuImageAsImgTag: Story = {
 export const ChildrenProps: Story = {
   name: "SkuField — children render prop",
   render: () => (
-    <CommerceLayer
-      accessToken="my-access-token"
-      endpoint="https://demo-store.commercelayer.io"
-    >
+    <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
       <Sku skuCode="5PANECAP9D9CA1FFFFFFXXXX">
         <SkuField attribute="metadata" tagElement="div">
           {(childrenProps: any) => (
-            <pre style={{ fontSize: "0.75rem" }}>
-              {JSON.stringify(childrenProps, null, 2)}
-            </pre>
+            <pre style={{ fontSize: "0.75rem" }}>{JSON.stringify(childrenProps, null, 2)}</pre>
           )}
         </SkuField>
       </Sku>

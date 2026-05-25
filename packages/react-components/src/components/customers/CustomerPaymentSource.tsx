@@ -14,10 +14,7 @@ interface Props {
   loader?: string | JSX.Element
 }
 
-export function CustomerPaymentSource({
-  children,
-  loader = "Loading...",
-}: Props): JSX.Element {
+export function CustomerPaymentSource({ children, loader = "Loading..." }: Props): JSX.Element {
   const [loading, setLoading] = useState(true)
   const { payments, deleteCustomerPayment } = useCustomContext({
     context: CustomerContext,
@@ -45,7 +42,7 @@ export function CustomerPaymentSource({
           e?.stopPropagation()
           if (deleteCustomerPayment != null) {
             deleteCustomerPayment({
-              customerPaymentSourceId: p.id
+              customerPaymentSourceId: p.id,
             })
           }
         },

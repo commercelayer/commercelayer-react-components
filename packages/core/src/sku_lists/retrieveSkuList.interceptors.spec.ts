@@ -27,9 +27,7 @@ vi.mock("@commercelayer/sdk/bundle", () => ({
   CommerceLayer: vi.fn().mockReturnValue(mockSdkInstance),
 }))
 vi.mock("@commercelayer/js-auth", () => ({
-  jwtDecode: vi
-    .fn()
-    .mockReturnValue({ payload: { organization: { slug: "my-org" } } }),
+  jwtDecode: vi.fn().mockReturnValue({ payload: { organization: { slug: "my-org" } } }),
 }))
 vi.mock("@commercelayer/sdk", () => ({
   sku_lists: { retrieve: vi.fn().mockResolvedValue({ id: "list-1" }) },
@@ -58,10 +56,7 @@ describe("retrieveSkuList interceptors", () => {
       id: "list-1",
       interceptors,
     })
-    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(
-      onSuccess,
-      undefined,
-    )
+    expect(mockAddResponseInterceptor).toHaveBeenCalledWith(onSuccess, undefined)
     expect(mockAddRequestInterceptor).not.toHaveBeenCalled()
   })
 

@@ -1,14 +1,14 @@
-import baseReducer from '#utils/baseReducer'
-import type { Dispatch } from 'react'
-import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import type { AddressUpdate, Order } from '@commercelayer/sdk'
-import { getSdk } from '@commercelayer/core'
-import type { AddressResource } from './AddressReducer'
+import baseReducer from "#utils/baseReducer"
+import type { Dispatch } from "react"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
+import type { AddressUpdate, Order } from "@commercelayer/sdk"
+import { getSdk } from "@commercelayer/core"
+import type { AddressResource } from "./AddressReducer"
 
 export type BillingAddressActionType =
-  | 'setBillingAddress'
-  | 'setBillingCustomerAddressId'
-  | 'cleanup'
+  | "setBillingAddress"
+  | "setBillingCustomerAddressId"
+  | "cleanup"
 
 export interface BillingAddressActionPayload {
   _billing_address_clone_id: string
@@ -23,7 +23,7 @@ export interface BillingAddressAction {
 }
 
 export const billingAddressInitialState: BillingAddressState = {
-  _billing_address_clone_id: ''
+  _billing_address_clone_id: "",
 }
 
 export type SetBillingAddress = (
@@ -41,22 +41,25 @@ export const setBillingAddress: SetBillingAddress = async (id, options) => {
   try {
     if (options?.order) {
       if (options.customerAddressId) {
-        const sdk = getSdk({ accessToken: options.config.accessToken!, interceptors: options.config.interceptors })
+        const sdk = getSdk({
+          accessToken: options.config.accessToken!,
+          interceptors: options.config.interceptors,
+        })
         const attributes: AddressUpdate = {
           id,
-          reference: options.customerAddressId
+          reference: options.customerAddressId,
         }
         await sdk.addresses.update(attributes)
       }
       options.dispatch({
-        type: 'setBillingAddress',
+        type: "setBillingAddress",
         payload: {
-          _billing_address_clone_id: id
-        }
+          _billing_address_clone_id: id,
+        },
       })
     }
   } catch (error) {
-    console.error('Set billing address', error)
+    console.error("Set billing address", error)
   }
 }
 
@@ -69,36 +72,36 @@ interface SetBillingCustomerAddressIdParams {
 export function setBillingCustomerAddressId({
   dispatch,
   order,
-  setCloneAddress
+  setCloneAddress,
 }: SetBillingCustomerAddressIdParams): void {
   const customerAddressId = order?.billing_address?.reference
   try {
     if (customerAddressId) {
       dispatch({
-        type: 'setBillingCustomerAddressId',
-        payload: { billingCustomerAddressId: customerAddressId }
+        type: "setBillingCustomerAddressId",
+        payload: { billingCustomerAddressId: customerAddressId },
       })
-      setCloneAddress(customerAddressId, 'billing_address')
+      setCloneAddress(customerAddressId, "billing_address")
     }
   } catch (error) {
-    console.error('error', error)
+    console.error("error", error)
   }
 }
 
 const type: BillingAddressActionType[] = [
-  'setBillingAddress',
-  'setBillingCustomerAddressId',
-  'cleanup'
+  "setBillingAddress",
+  "setBillingCustomerAddressId",
+  "cleanup",
 ]
 
 const billingAddressReducer = (
   state: BillingAddressState,
   reducer: BillingAddressAction
 ): BillingAddressState =>
-  baseReducer<
-    BillingAddressState,
-    BillingAddressAction,
-    BillingAddressActionType[]
-  >(state, reducer, type)
+  baseReducer<BillingAddressState, BillingAddressAction, BillingAddressActionType[]>(
+    state,
+    reducer,
+    type
+  )
 
 export default billingAddressReducer

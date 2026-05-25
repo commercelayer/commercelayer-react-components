@@ -1,30 +1,27 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import baseReducer from '#utils/baseReducer'
+import baseReducer from "#utils/baseReducer"
 import type {
   Customer,
   Market,
   GiftCardRecipient,
   GiftCardRecipientCreate,
   Order,
-  GiftCardRecipientUpdate
-} from '@commercelayer/sdk'
-import type { BaseMetadata } from '#typings'
-import type { Dispatch } from 'react'
-import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { isEmpty } from '#utils/isEmpty'
-import type { BaseError } from '#typings/errors'
-import getErrors from '#utils/getErrors'
-import { getSdk } from '@commercelayer/core'
-import type {
-  createOrder as makeOrder,
-  getOrderContext
-} from '#reducers/OrderReducer'
+  GiftCardRecipientUpdate,
+} from "@commercelayer/sdk"
+import type { BaseMetadata } from "#typings"
+import type { Dispatch } from "react"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
+import { isEmpty } from "#utils/isEmpty"
+import type { BaseError } from "#typings/errors"
+import getErrors from "#utils/getErrors"
+import { getSdk } from "@commercelayer/core"
+import type { createOrder as makeOrder, getOrderContext } from "#reducers/OrderReducer"
 
 export type GiftCardActionType =
-  | 'setAvailability'
-  | 'setGiftCardRecipient'
-  | 'setGiftCardErrors'
-  | 'setGiftCardLoading'
+  | "setAvailability"
+  | "setGiftCardRecipient"
+  | "setGiftCardErrors"
+  | "setGiftCardLoading"
 
 export interface GiftCardRecipientI {
   email: string
@@ -64,9 +61,7 @@ export interface GiftCardActionPayload extends GiftCardI {
 export interface GiftCardState extends GiftCardActionPayload {
   currencyCode: string
   balanceCent: number
-  addGiftCardRecipient?: (
-    values: GiftCardRecipientI & Record<string, any>
-  ) => void
+  addGiftCardRecipient?: (values: GiftCardRecipientI & Record<string, any>) => void
   addGiftCard?: (values: GiftCardI & Record<string, any>) => void
   addGiftCardError?: (errors: BaseError[]) => void
   addGiftCardLoading?: (loading: boolean) => void
@@ -78,13 +73,13 @@ export interface GiftCardAction {
 }
 
 export const giftCardInitialState: GiftCardState = {
-  currencyCode: '',
+  currencyCode: "",
   balanceCent: 0,
   singleUse: false,
   rechargeable: true,
   loading: false,
   expiresAt: null,
-  errors: []
+  errors: [],
 }
 
 export type AddGiftCardError = <V extends BaseError[]>(
@@ -106,10 +101,10 @@ export async function addGiftCardRecipient<V extends GiftCardRecipientCreate>(
     const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const recipient = await sdk.gift_card_recipients.create(values)
     dispatch({
-      type: 'setGiftCardRecipient',
+      type: "setGiftCardRecipient",
       payload: {
-        giftCardRecipient: recipient
-      }
+        giftCardRecipient: recipient,
+      },
     })
   } catch (error) {
     console.error(error)
@@ -118,10 +113,10 @@ export async function addGiftCardRecipient<V extends GiftCardRecipientCreate>(
 
 export const addGiftCardLoading: AddGiftCardLoading = (loading, dispatch) => {
   dispatch({
-    type: 'setGiftCardLoading',
+    type: "setGiftCardLoading",
     payload: {
-      loading
-    }
+      loading,
+    },
   })
 }
 
@@ -132,7 +127,7 @@ export async function addGiftCard<V extends GiftCardI>(
     dispatch,
     getOrder,
     createOrder,
-    order
+    order,
   }: {
     getOrder?: getOrderContext
     createOrder?: typeof makeOrder
@@ -148,13 +143,13 @@ export async function addGiftCard<V extends GiftCardI>(
     // TODO: Change any type
     const giftCardValue: any = {
       recipient_email: email,
-      ...val
+      ...val,
     }
     const giftCard = await sdk.gift_cards.create(giftCardValue, {
-      include: ['gift_card_recipient']
+      include: ["gift_card_recipient"],
     })
     const recipientValues: GiftCardRecipientUpdate = {
-      id: giftCard.gift_card_recipient?.id ?? ''
+      id: giftCard.gift_card_recipient?.id ?? "",
     }
     if (firstName) recipientValues.first_name = firstName
     if (lastName) recipientValues.last_name = lastName
@@ -169,25 +164,25 @@ export async function addGiftCard<V extends GiftCardI>(
         await sdk.line_items.create({
           quantity: 1,
           order,
-          item
+          item,
         })
         await getOrder(id)
       }
     }
     dispatch({
-      type: 'setGiftCardRecipient',
+      type: "setGiftCardRecipient",
       payload: {
-        ...giftCardValue
-      }
+        ...giftCardValue,
+      },
     })
     addGiftCardLoading(false, dispatch)
   } catch (error: any) {
-    const errors = getErrors({ error, resource: 'gift_cards' })
+    const errors = getErrors({ error, resource: "gift_cards" })
     dispatch({
-      type: 'setGiftCardErrors',
+      type: "setGiftCardErrors",
       payload: {
-        errors
-      }
+        errors,
+      },
     })
     addGiftCardLoading(false, dispatch)
   }
@@ -195,28 +190,21 @@ export async function addGiftCard<V extends GiftCardI>(
 
 export const addGiftCardError: AddGiftCardError = (errors, dispatch) => {
   dispatch({
-    type: 'setGiftCardErrors',
+    type: "setGiftCardErrors",
     payload: {
-      errors
-    }
+      errors,
+    },
   })
 }
 
 const type: GiftCardActionType[] = [
-  'setAvailability',
-  'setGiftCardRecipient',
-  'setGiftCardErrors',
-  'setGiftCardLoading'
+  "setAvailability",
+  "setGiftCardRecipient",
+  "setGiftCardErrors",
+  "setGiftCardLoading",
 ]
 
-const giftCardReducer = (
-  state: GiftCardState,
-  reducer: GiftCardAction
-): GiftCardState =>
-  baseReducer<GiftCardState, GiftCardAction, GiftCardActionType[]>(
-    state,
-    reducer,
-    type
-  )
+const giftCardReducer = (state: GiftCardState, reducer: GiftCardAction): GiftCardState =>
+  baseReducer<GiftCardState, GiftCardAction, GiftCardActionType[]>(state, reducer, type)
 
 export default giftCardReducer

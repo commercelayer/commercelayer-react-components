@@ -1,29 +1,27 @@
-import { authenticate } from '@commercelayer/js-auth'
-import { useEffect, useMemo, useState } from 'react'
-import Cookie from 'js-cookie'
-import { jwtDecode } from 'jwt-decode'
+import { authenticate } from "@commercelayer/js-auth"
+import { useEffect, useMemo, useState } from "react"
+import Cookie from "js-cookie"
+import { jwtDecode } from "jwt-decode"
 
 const salesChannel = {
-  clientId: 'Z5ypiDlsqgV8twWRz0GabrJvTKXad4U-PMoVAU-XvV0',
-  slug: 'react-components-store',
-  scope: 'market:15283',
-  domain: 'commercelayer.io'
+  clientId: "Z5ypiDlsqgV8twWRz0GabrJvTKXad4U-PMoVAU-XvV0",
+  slug: "react-components-store",
+  scope: "market:15283",
+  domain: "commercelayer.io",
 }
 const savedCustomerWithOrders = {
-  username: 'bruce@wayne.com',
-  password: '123456'
+  username: "bruce@wayne.com",
+  password: "123456",
 }
 
-type UserMode = 'customer' | 'customer-orders' | 'guest'
+type UserMode = "customer" | "customer-orders" | "guest"
 interface UseGetTokenOptions {
   mode?: UserMode
 }
 
-const getAccessTokenCookieName = (mode: UserMode): string =>
-  `clToken.${salesChannel.slug}.${mode}`
+const getAccessTokenCookieName = (mode: UserMode): string => `clToken.${salesChannel.slug}.${mode}`
 
-const getCustomerLoginCookieName = (mode: UserMode): string =>
-  `clToken.customerLogin.${mode}`
+const getCustomerLoginCookieName = (mode: UserMode): string => `clToken.customerLogin.${mode}`
 
 export function useGetToken<T extends UseGetTokenOptions>(
   options?: T
@@ -31,10 +29,8 @@ export function useGetToken<T extends UseGetTokenOptions>(
   accessToken: string
   endpoint: string
 } {
-  const mode = options?.mode ?? 'guest'
-  const [accessToken, setAccessToken] = useState(
-    Cookie.get(getAccessTokenCookieName(mode)) ?? ''
-  )
+  const mode = options?.mode ?? "guest"
+  const [accessToken, setAccessToken] = useState(Cookie.get(getAccessTokenCookieName(mode)) ?? "")
   const clientId = salesChannel.clientId
   const slug = salesChannel.slug
   const scope = salesChannel.scope
@@ -43,15 +39,15 @@ export function useGetToken<T extends UseGetTokenOptions>(
   const initToken = useMemo(() => {
     return async () => {
       const user =
-        mode === 'customer'
+        mode === "customer"
           ? await retrieveCustomerData({
               clientId,
               slug,
               scope,
               domain,
-              mode
+              mode,
             })
-          : mode === 'customer-orders'
+          : mode === "customer-orders"
             ? savedCustomerWithOrders
             : undefined
 
@@ -61,7 +57,7 @@ export function useGetToken<T extends UseGetTokenOptions>(
         scope,
         domain,
         user,
-        mode
+        mode,
       }).then(({ accessToken, expires }) => {
         setAccessToken(accessToken)
         Cookie.set(getAccessTokenCookieName(mode), accessToken, { expires })
@@ -72,7 +68,7 @@ export function useGetToken<T extends UseGetTokenOptions>(
   useEffect(() => {
     if (
       accessToken == null ||
-      accessToken === '' ||
+      accessToken === "" ||
       isTokenExpired({ accessToken, compareTo: new Date() })
     ) {
       initToken()
@@ -81,7 +77,7 @@ export function useGetToken<T extends UseGetTokenOptions>(
 
   return {
     accessToken,
-    endpoint: `https://${slug}.${domain}`
+    endpoint: `https://${slug}.${domain}`,
   }
 }
 
@@ -90,7 +86,7 @@ async function retrieveCustomerData({
   slug,
   scope,
   domain,
-  mode
+  mode,
 }: {
   clientId: string
   slug: string
@@ -102,19 +98,17 @@ async function retrieveCustomerData({
   password: string
 }> {
   const existingUser = Cookie.get(getCustomerLoginCookieName(mode))
-  const savedEmail = parseEmailAddress(existingUser?.split(':')[0])
-  const savedPassword = parsePassword(existingUser?.split(':')[1])
+  const savedEmail = parseEmailAddress(existingUser?.split(":")[0])
+  const savedPassword = parsePassword(existingUser?.split(":")[1])
 
   if (savedEmail != null && savedPassword != null) {
     return {
       username: savedEmail,
-      password: savedPassword
+      password: savedPassword,
     }
   }
 
-  const newEmail = `user-${generateRandomString(5)}-${generateRandomString(
-    5
-  )}@domain.com`
+  const newEmail = `user-${generateRandomString(5)}-${generateRandomString(5)}@domain.com`
   const newPassword = generateRandomString(10)
 
   const guestToken = await generateNewToken({
@@ -122,7 +116,7 @@ async function retrieveCustomerData({
     slug,
     scope,
     domain,
-    mode
+    mode,
   })
 
   await createNewCustomer({
@@ -130,14 +124,14 @@ async function retrieveCustomerData({
     password: newPassword,
     salesChannelToken: guestToken.accessToken,
     slug,
-    domain
+    domain,
   })
 
   Cookie.set(getCustomerLoginCookieName(mode), `${newEmail}:${newPassword}`)
 
   return {
     username: newEmail,
-    password: newPassword
+    password: newPassword,
   }
 }
 
@@ -148,7 +142,7 @@ async function generateNewToken({
   scope,
   domain,
   user,
-  mode
+  mode,
 }: {
   clientId: string
   slug: string
@@ -158,20 +152,20 @@ async function generateNewToken({
   mode: UserMode
 }) {
   return user == null
-    ? await authenticate('client_credentials', {
-        clientId,
-        scope,
-        domain
-      })
-    : await authenticate('password', {
+    ? await authenticate("client_credentials", {
         clientId,
         scope,
         domain,
-        ...user
+      })
+    : await authenticate("password", {
+        clientId,
+        scope,
+        domain,
+        ...user,
       }).then((res) => {
-        if (res != null && 'error' in res) {
-          Cookie.remove(getCustomerLoginCookieName('customer'))
-          Cookie.remove(getCustomerLoginCookieName('customer-orders'))
+        if (res != null && "error" in res) {
+          Cookie.remove(getCustomerLoginCookieName("customer"))
+          Cookie.remove(getCustomerLoginCookieName("customer-orders"))
           Cookie.remove(getAccessTokenCookieName(mode))
         }
         return res
@@ -180,12 +174,12 @@ async function generateNewToken({
 
 function isTokenExpired({
   accessToken,
-  compareTo
+  compareTo,
 }: {
   accessToken?: string
   compareTo: Date
 }): boolean {
-  if (accessToken == null || accessToken === '') {
+  if (accessToken == null || accessToken === "") {
     return true
   }
 
@@ -204,8 +198,8 @@ function isTokenExpired({
 }
 
 function generateRandomString(length = 10): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let result = ''
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  let result = ""
   for (let i = 0; i < length; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length))
   }
@@ -229,7 +223,7 @@ async function createNewCustomer({
   password,
   salesChannelToken,
   slug,
-  domain
+  domain,
 }: {
   email: string
   password: string
@@ -238,24 +232,24 @@ async function createNewCustomer({
   domain: string
 }): Promise<void> {
   const newCustomer = await fetch(`https://${slug}.${domain}/api/customers`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      Accept: 'application/vnd.api+json',
-      'Content-Type': 'application/vnd.api+json',
-      Authorization: `Bearer ${salesChannelToken}`
+      Accept: "application/vnd.api+json",
+      "Content-Type": "application/vnd.api+json",
+      Authorization: `Bearer ${salesChannelToken}`,
     },
     body: JSON.stringify({
       data: {
-        type: 'customers',
+        type: "customers",
         attributes: {
           email,
-          password
-        }
-      }
-    })
+          password,
+        },
+      },
+    }),
   })
 
   if (newCustomer.status !== 201) {
-    throw new Error('Error creating customer')
+    throw new Error("Error creating customer")
   }
 }

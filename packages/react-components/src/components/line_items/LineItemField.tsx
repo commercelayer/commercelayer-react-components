@@ -1,18 +1,16 @@
-import LineItemChildrenContext from '#context/LineItemChildrenContext'
-import type { ConditionalElement } from '#typings'
+import LineItemChildrenContext from "#context/LineItemChildrenContext"
+import type { ConditionalElement } from "#typings"
 import GenericFieldComponent, {
   type TGenericChildrenProps,
   type TResourceKey,
-  type TResources
-} from '#components/utils/GenericFieldComponent'
+  type TResources,
+} from "#components/utils/GenericFieldComponent"
 
-import type { JSX } from "react";
+import type { JSX } from "react"
 
-type LineItemFieldChildrenProps = TGenericChildrenProps<TResources['LineItem']>
+type LineItemFieldChildrenProps = TGenericChildrenProps<TResources["LineItem"]>
 
-type TCondition = ConditionalElement<
-  Exclude<TResources['LineItem'], 'resource'>
->
+type TCondition = ConditionalElement<Exclude<TResources["LineItem"], "resource">>
 
 type Props = {
   children?: (props: LineItemFieldChildrenProps) => JSX.Element
@@ -22,10 +20,10 @@ type Props = {
  * @returns
  */
 export function LineItemField<P extends Props>(props: P): JSX.Element {
-  const { attribute, tagElement = 'span', children, ...p } = props
+  const { attribute, tagElement = "span", children, ...p } = props
   return (
-    <GenericFieldComponent<TResourceKey['LineItem']>
-      resource='lineItem'
+    <GenericFieldComponent<TResourceKey["LineItem"]>
+      resource="lineItem"
       attribute={attribute}
       tagElement={tagElement}
       context={LineItemChildrenContext}

@@ -1,13 +1,10 @@
-export type SnakeToCamelCase<S extends string> =
-  S extends `${infer T}_${infer U}`
-    ? `${Lowercase<T>}${Capitalize<SnakeToCamelCase<U>>}`
-    : S
+export type SnakeToCamelCase<S extends string> = S extends `${infer T}_${infer U}`
+  ? `${Lowercase<T>}${Capitalize<SnakeToCamelCase<U>>}`
+  : S
 
 export type SnakeToCamelCaseNested<T> = T extends object
   ? {
-      [K in keyof T as SnakeToCamelCase<K & string>]: SnakeToCamelCaseNested<
-        T[K]
-      >
+      [K in keyof T as SnakeToCamelCase<K & string>]: SnakeToCamelCaseNested<T[K]>
     }
   : T
 
@@ -20,9 +17,7 @@ export type SnakeToCamelCaseNested<T> = T extends object
  * @returns string
  * @description Converts a string from snake_case to camelCase
  */
-export function snakeToCamelCase<S extends string>(
-  value: S,
-): SnakeToCamelCase<S> {
+export function snakeToCamelCase<S extends string>(value: S): SnakeToCamelCase<S> {
   const words = value.toLowerCase().split("_")
   const first = words[0] ?? ""
   const secondLetter = words[1]?.[0]?.toUpperCase() ?? ""

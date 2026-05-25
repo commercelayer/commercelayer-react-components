@@ -25,9 +25,7 @@ describe("HostedCart component", () => {
 
     const getApplicationLinkSpy = vi
       .spyOn(applicationLinkUtils, "getApplicationLink")
-      .mockImplementation(
-        ({ orderId }) => `https://test-cart.local/cart/${orderId}`,
-      )
+      .mockImplementation(({ orderId }) => `https://test-cart.local/cart/${orderId}`)
 
     const orderContextValue = {
       ...defaultOrderContext,
@@ -44,7 +42,8 @@ describe("HostedCart component", () => {
     const { rerender } = render(
       <CommerceLayerContext.Provider
         value={{
-          accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdhbml6YXRpb24iOnsiaWQiOiJvcmctaWQiLCJzbHVnIjoidGVzdC1vcmcifSwibWFya2V0Ijp7ImlkIjpbIjEiXSwicHJpY2VfbGlzdF9pZCI6InBsMSIsInN0b2NrX2xvY2F0aW9uX2lkcyI6W10sImdlb2NvZGVyX2lkIjpudWxsLCJhbGxvd3NfZXh0ZXJuYWxfcHJpY2VzIjpmYWxzZX0sImFwcGxpY2F0aW9uIjp7ImlkIjoiYXBwLWlkIiwia2luZCI6InNhbGVzX2NoYW5uZWwiLCJwdWJsaWMiOnRydWV9LCJleHAiOjk5OTk5OTk5OTksIm93bmVyIjp7ImlkIjoiY3VzLWlkIiwidHlwZSI6IkN1c3RvbWVyIn0sInJhbmQiOjEsInRlc3QiOnRydWV9.fake-sig",
+          accessToken:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdhbml6YXRpb24iOnsiaWQiOiJvcmctaWQiLCJzbHVnIjoidGVzdC1vcmcifSwibWFya2V0Ijp7ImlkIjpbIjEiXSwicHJpY2VfbGlzdF9pZCI6InBsMSIsInN0b2NrX2xvY2F0aW9uX2lkcyI6W10sImdlb2NvZGVyX2lkIjpudWxsLCJhbGxvd3NfZXh0ZXJuYWxfcHJpY2VzIjpmYWxzZX0sImFwcGxpY2F0aW9uIjp7ImlkIjoiYXBwLWlkIiwia2luZCI6InNhbGVzX2NoYW5uZWwiLCJwdWJsaWMiOnRydWV9LCJleHAiOjk5OTk5OTk5OTksIm93bmVyIjp7ImlkIjoiY3VzLWlkIiwidHlwZSI6IkN1c3RvbWVyIn0sInJhbmQiOjEsInRlc3QiOnRydWV9.fake-sig",
         }}
       >
         <OrderContext.Provider value={orderContextValue}>
@@ -57,19 +56,20 @@ describe("HostedCart component", () => {
             <HostedCart />
           </OrderStorageContext.Provider>
         </OrderContext.Provider>
-      </CommerceLayerContext.Provider>,
+      </CommerceLayerContext.Provider>
     )
 
     await waitFor(() => {
       expect(getApplicationLinkSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ orderId: "order-id-1" }),
+        expect.objectContaining({ orderId: "order-id-1" })
       )
     })
 
     rerender(
       <CommerceLayerContext.Provider
         value={{
-          accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdhbml6YXRpb24iOnsiaWQiOiJvcmctaWQiLCJzbHVnIjoidGVzdC1vcmcifSwibWFya2V0Ijp7ImlkIjpbIjEiXSwicHJpY2VfbGlzdF9pZCI6InBsMSIsInN0b2NrX2xvY2F0aW9uX2lkcyI6W10sImdlb2NvZGVyX2lkIjpudWxsLCJhbGxvd3NfZXh0ZXJuYWxfcHJpY2VzIjpmYWxzZX0sImFwcGxpY2F0aW9uIjp7ImlkIjoiYXBwLWlkIiwia2luZCI6InNhbGVzX2NoYW5uZWwiLCJwdWJsaWMiOnRydWV9LCJleHAiOjk5OTk5OTk5OTksIm93bmVyIjp7ImlkIjoiY3VzLWlkIiwidHlwZSI6IkN1c3RvbWVyIn0sInJhbmQiOjEsInRlc3QiOnRydWV9.fake-sig",
+          accessToken:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdhbml6YXRpb24iOnsiaWQiOiJvcmctaWQiLCJzbHVnIjoidGVzdC1vcmcifSwibWFya2V0Ijp7ImlkIjpbIjEiXSwicHJpY2VfbGlzdF9pZCI6InBsMSIsInN0b2NrX2xvY2F0aW9uX2lkcyI6W10sImdlb2NvZGVyX2lkIjpudWxsLCJhbGxvd3NfZXh0ZXJuYWxfcHJpY2VzIjpmYWxzZX0sImFwcGxpY2F0aW9uIjp7ImlkIjoiYXBwLWlkIiwia2luZCI6InNhbGVzX2NoYW5uZWwiLCJwdWJsaWMiOnRydWV9LCJleHAiOjk5OTk5OTk5OTksIm93bmVyIjp7ImlkIjoiY3VzLWlkIiwidHlwZSI6IkN1c3RvbWVyIn0sInJhbmQiOjEsInRlc3QiOnRydWV9.fake-sig",
         }}
       >
         <OrderContext.Provider value={orderContextValue}>
@@ -82,12 +82,12 @@ describe("HostedCart component", () => {
             <HostedCart />
           </OrderStorageContext.Provider>
         </OrderContext.Provider>
-      </CommerceLayerContext.Provider>,
+      </CommerceLayerContext.Provider>
     )
 
     await waitFor(() => {
       expect(getApplicationLinkSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ orderId: "order-id-2" }),
+        expect.objectContaining({ orderId: "order-id-2" })
       )
     })
   })

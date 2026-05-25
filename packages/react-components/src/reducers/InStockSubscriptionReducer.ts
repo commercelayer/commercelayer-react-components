@@ -1,25 +1,22 @@
-import baseReducer from '#utils/baseReducer'
-import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import { getSdk } from '@commercelayer/core'
-import type { BaseAction } from '#typings'
-import type { Dispatch } from 'react'
-import type { BaseError } from '#typings/errors'
-import type { InStockSubscriptionCreate } from '@commercelayer/sdk'
-import getErrors from '#utils/getErrors'
+import baseReducer from "#utils/baseReducer"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
+import { getSdk } from "@commercelayer/core"
+import type { BaseAction } from "#typings"
+import type { Dispatch } from "react"
+import type { BaseError } from "#typings/errors"
+import type { InStockSubscriptionCreate } from "@commercelayer/sdk"
+import getErrors from "#utils/getErrors"
 
-type InStockSubscriptionActionType = 'setErrors'
-type InStockSubscriptionAction = BaseAction<
-  InStockSubscriptionActionType,
-  InStockSubscriptionState
->
+type InStockSubscriptionActionType = "setErrors"
+type InStockSubscriptionAction = BaseAction<InStockSubscriptionActionType, InStockSubscriptionState>
 export interface InStockSubscriptionState {
   errors?: BaseError[]
 }
 
-const actionType: InStockSubscriptionActionType[] = ['setErrors']
+const actionType: InStockSubscriptionActionType[] = ["setErrors"]
 
 export const inStockSubscriptionInitialState: InStockSubscriptionState = {
-  errors: []
+  errors: [],
 }
 
 interface TSetInStockSubscriptionParams {
@@ -41,20 +38,18 @@ interface TSetInStockSubscriptionParams {
   dispatch?: Dispatch<InStockSubscriptionAction>
 }
 
-export async function setInStockSubscription<
-  T extends TSetInStockSubscriptionParams
->({
+export async function setInStockSubscription<T extends TSetInStockSubscriptionParams>({
   config,
   customerEmail,
   skuCode,
-  dispatch
+  dispatch,
 }: T): Promise<{ success: boolean }> {
   try {
-    if (config == null) throw new Error('Access token is required')
+    if (config == null) throw new Error("Access token is required")
     const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     // @ts-expect-error OpenAPI schema is not updated
     const attributes: InStockSubscriptionCreate = {
-      sku_code: skuCode
+      sku_code: skuCode,
     }
     if (customerEmail != null) {
       attributes.customer_email = customerEmail
@@ -64,14 +59,14 @@ export async function setInStockSubscription<
   } catch (error: any) {
     const errors = getErrors({
       error,
-      resource: 'in_stock_subscriptions'
+      resource: "in_stock_subscriptions",
     })
     if (dispatch != null) {
       dispatch({
-        type: 'setErrors',
+        type: "setErrors",
         payload: {
-          errors
-        }
+          errors,
+        },
       })
     }
     return { success: false }

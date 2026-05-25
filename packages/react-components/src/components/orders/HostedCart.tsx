@@ -14,8 +14,8 @@ import OrderContext from "#context/OrderContext"
 import OrderStorageContext from "#context/OrderStorageContext"
 import { subscribe, unsubscribe } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
-import { jwt } from "#utils/jwt"
 import useCustomContext from "#utils/hooks/useCustomContext"
+import { jwt } from "#utils/jwt"
 import { getOrganizationConfig } from "#utils/organization"
 
 const DEFAULT_DOMAIN = "commercelayer.io"
@@ -95,8 +95,7 @@ const defaultStyle = {
   iconContainer: defaultIconContainer,
 } satisfies Styles
 
-interface Props
-  extends Omit<JSX.IntrinsicElements["div"], "children" | "style"> {
+interface Props extends Omit<JSX.IntrinsicElements["div"], "children" | "style"> {
   /**
    * The style of the cart.
    */
@@ -170,19 +169,20 @@ export function HostedCart({
 
   if (accessToken == null) return null
 
-  const slug = jwt(accessToken).organization.slug
+  const token: string = accessToken
+  const slug = jwt(token).organization.slug ?? ""
 
   async function resolveCartUrl(orderId: string): Promise<string> {
     const config = await getOrganizationConfig({
-      accessToken,
-      params: { orderId, accessToken, slug },
+      accessToken: token,
+      params: { orderId, accessToken: token, slug },
     })
     return (
       config?.links?.cart ??
       getApplicationLink({
         slug,
         orderId,
-        accessToken,
+        accessToken: token,
         domain: DEFAULT_DOMAIN,
         applicationType: "cart",
         customDomain,
@@ -192,7 +192,7 @@ export function HostedCart({
 
   async function setOrder(openCart?: boolean): Promise<void> {
     const orderId = localStorage.getItem(persistKey) ?? (await createOrder({}))
-    if (orderId != null && accessToken) {
+    if (orderId != null) {
       loadedOrderIdRef.current = orderId
       setSrc(await resolveCartUrl(order?.id ?? orderId))
       if (openCart) {
@@ -225,7 +225,7 @@ export function HostedCart({
           break
       }
     },
-    [type, isOpen, handleOpen, getOrder],
+    [type, isOpen, handleOpen, getOrder]
   )
 
   useEffect(() => {
@@ -252,17 +252,10 @@ export function HostedCart({
     if (openAdd && type === "mini") {
       subscribe("open-cart", openCartHandler)
     }
-    if (
-      src == null &&
-      resolvedOrderId == null &&
-      accessToken != null &&
-      !ignore &&
-      isOpen
-    ) {
+    if (src == null && resolvedOrderId == null && !ignore && isOpen) {
       setOrder()
     } else if (
       resolvedOrderId != null &&
-      accessToken &&
       (src == null || loadedOrderIdRef.current !== resolvedOrderId)
     ) {
       resolveCartUrl(resolvedOrderId).then((url) => {
@@ -288,10 +281,9 @@ export function HostedCart({
     iframeResizer(
       {
         checkOrigin: false,
-        // @ts-expect-error No types available
         onMessage,
       },
-      ref.current,
+      ref.current
     )
   }, [onMessage])
   /**
@@ -310,9 +302,7 @@ export function HostedCart({
           ...defaultStyle.background,
           ...style?.background,
           opacity: isOpen ? "0.5" : defaultStyle.background?.opacity,
-          pointerEvents: isOpen
-            ? "initial"
-            : defaultStyle.background?.pointerEvents,
+          pointerEvents: isOpen ? "initial" : defaultStyle.background?.pointerEvents,
         }}
         onClick={onCloseCart}
       />
@@ -321,9 +311,7 @@ export function HostedCart({
           ...defaultStyle.container,
           ...style?.container,
           right: isOpen ? "0" : defaultStyle.container?.right,
-          pointerEvents: isOpen
-            ? "initial"
-            : defaultStyle.container?.pointerEvents,
+          pointerEvents: isOpen ? "initial" : defaultStyle.container?.pointerEvents,
         }}
         {...props}
       >
@@ -343,11 +331,7 @@ export function HostedCart({
             }}
             aria-label="Close cart"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
         <iframe

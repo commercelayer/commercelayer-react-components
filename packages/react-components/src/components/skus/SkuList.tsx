@@ -1,9 +1,5 @@
 import { useSkuList } from "@commercelayer/hooks"
-import type {
-  QueryParamsRetrieve,
-  Sku,
-  SkuList as SkuListType,
-} from "@commercelayer/sdk"
+import type { QueryParamsRetrieve, Sku, SkuList as SkuListType } from "@commercelayer/sdk"
 import { type JSX, type ReactNode, useContext, useEffect, useMemo } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import SkuContext from "#context/SkuContext"
@@ -59,14 +55,14 @@ export function SkuList(props: Props): JSX.Element {
         ...params?.fields,
       },
     }),
-    [params],
+    [params]
   )
 
   const { skuList, isLoading } = useSkuList(
     isStandalone ? id : "",
     isStandalone ? (accessToken ?? "") : "",
     isStandalone ? interceptors : undefined,
-    isStandalone ? mergedParams : undefined,
+    isStandalone ? mergedParams : undefined
   )
 
   // In container mode: register this list ID with the parent container.
@@ -86,17 +82,12 @@ export function SkuList(props: Props): JSX.Element {
       loading: skusForList === undefined,
       skuCodes: (skusForList ?? []).map((s) => s.code ?? ""),
     }),
-    [skusForList],
+    [skusForList]
   )
 
-  if (isStandalone && (isLoading || skusForList == null))
-    return loader as JSX.Element
+  if (isStandalone && (isLoading || skusForList == null)) return loader as JSX.Element
 
-  return (
-    <SkuContext.Provider value={skuContextValue}>
-      {children}
-    </SkuContext.Provider>
-  )
+  return <SkuContext.Provider value={skuContextValue}>{children}</SkuContext.Provider>
 }
 
 export default SkuList

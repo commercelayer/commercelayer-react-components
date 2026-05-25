@@ -1,14 +1,14 @@
-import { type ReactNode, useContext, type JSX } from 'react';
-import Parent from '#components/utils/Parent'
+import { type ReactNode, useContext, type JSX } from "react"
+import Parent from "#components/utils/Parent"
 import OrderListChildrenContext, {
   type TOrderList,
   type OrderListContent,
-  type TableAccessor
-} from '#context/OrderListChildrenContext'
-import isDate from '#utils/isDate'
-import { flexRender, type Row } from '@tanstack/react-table'
+  type TableAccessor,
+} from "#context/OrderListChildrenContext"
+import isDate from "#utils/isDate"
+import { flexRender, type Row } from "@tanstack/react-table"
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+interface ChildrenProps extends Omit<Props, "children"> {
   /**
    * The order resource
    */
@@ -20,12 +20,10 @@ interface ChildrenProps extends Omit<Props, 'children'> {
   /**
    * The current cell
    */
-  cell: Array<
-    ReturnType<Row<OrderListContent<TOrderList>>['getVisibleCells']>[number]
-  >
+  cell: Array<ReturnType<Row<OrderListContent<TOrderList>>["getVisibleCells"]>[number]>
 }
 
-interface Props extends Omit<JSX.IntrinsicElements['td'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements["td"], "children"> {
   children?: (props: ChildrenProps) => JSX.Element
   /**
    * The order field to show
@@ -34,24 +32,15 @@ interface Props extends Omit<JSX.IntrinsicElements['td'], 'children'> {
 }
 
 export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
-  const {
-    order,
-    row,
-    showActions,
-    actionsComponent,
-    actionsContainerClassName
-  } = useContext(OrderListChildrenContext)
+  const { order, row, showActions, actionsComponent, actionsContainerClassName } =
+    useContext(OrderListChildrenContext)
   const cell = row?.getVisibleCells().filter((cell) => cell.column.id === field)
   const isLastRow = row?.getVisibleCells().at(-1)?.column.id === field
-  const As = 'td'
+  const As = "td"
   const ActionRow = (): JSX.Element | null => {
     return (
       (showActions && isLastRow && actionsComponent && (
-        <As
-          data-testid='action-cell'
-          {...p}
-          className={actionsContainerClassName}
-        >
+        <As data-testid="action-cell" {...p} className={actionsContainerClassName}>
           <Parent {...parentProps}>{actionsComponent}</Parent>
         </As>
       )) ||
@@ -63,7 +52,7 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
     field,
     order,
     row,
-    cell
+    cell,
   }
   return children ? (
     <>
@@ -78,10 +67,7 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
         const cellValue = cell.getValue<string>()
         const value = isDate(cellValue)
           ? new Date(Date.parse(cellValue)).toLocaleString()
-          : (flexRender(
-              cell.column.columnDef.cell,
-              cell.getContext()
-            ) as ReactNode)
+          : (flexRender(cell.column.columnDef.cell, cell.getContext()) as ReactNode)
         return (
           <As data-testid={`cell-${k}`} {...p} key={cell.id}>
             {value}
@@ -93,6 +79,6 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
   )
 }
 
-OrderListRow.displayName = 'OrderListRow'
+OrderListRow.displayName = "OrderListRow"
 
 export default OrderListRow

@@ -62,7 +62,7 @@ interface Props {
 export function OrderContainer(props: Props): JSX.Element {
   if (process.env.NODE_ENV !== "production") {
     console.warn(
-      "[commercelayer-react-components] <OrderContainer> is deprecated and will be removed in the next major version. Use <Order> instead.",
+      "[commercelayer-react-components] <OrderContainer> is deprecated and will be removed in the next major version. Use <Order> instead."
     )
   }
   return <OrderComponent {...props} />

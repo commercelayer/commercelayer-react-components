@@ -5,9 +5,7 @@ import AvailabilityContext from "#context/AvailabilityContext"
 import type { ChildrenFunction, TimeFormat } from "#typings/index"
 import useCustomContext from "#utils/hooks/useCustomContext"
 
-interface AvailabilityTemplateChildrenProps
-  extends Omit<Props, "children">,
-    DeliveryLeadTime {
+interface AvailabilityTemplateChildrenProps extends Omit<Props, "children">, DeliveryLeadTime {
   text: string
   quantity: number
 }
@@ -62,14 +60,8 @@ type Props = {
  * </span>
  */
 export function AvailabilityTemplate(props: Props): JSX.Element {
-  const {
-    timeFormat,
-    showShippingMethodName,
-    showShippingMethodPrice,
-    children,
-    labels,
-    ...p
-  } = props
+  const { timeFormat, showShippingMethodName, showShippingMethodPrice, children, labels, ...p } =
+    props
   const {
     min,
     max,
@@ -89,17 +81,12 @@ export function AvailabilityTemplate(props: Props): JSX.Element {
     showShippingMethodPrice && shippingMethod?.formatted_price_amount
       ? `(${shippingMethod?.formatted_price_amount})`
       : ""
-  const name =
-    showShippingMethodName && shippingMethod
-      ? `with ${shippingMethod.name}`
-      : ""
+  const name = showShippingMethodName && shippingMethod ? `with ${shippingMethod.name}` : ""
   if (quantity != null) {
     if (quantity > 0) {
       text.push(labels?.available ?? "Available")
       if (mn && mx && timeFormat) {
-        text.push(
-          `in ${mn} - ${mx} ${timeFormat} ${name} ${shippingMethodPrice}`,
-        )
+        text.push(`in ${mn} - ${mx} ${timeFormat} ${name} ${shippingMethodPrice}`)
       }
     } else if (quantity === 0) {
       text.push(labels?.outOfStock ?? "Out of stock")

@@ -1,9 +1,4 @@
-import {
-  type QueryParamsRetrieve,
-  type Sku,
-  type SkuUpdate,
-  skus,
-} from "@commercelayer/sdk"
+import { type QueryParamsRetrieve, type Sku, type SkuUpdate, skus } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 

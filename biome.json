@@ -7,7 +7,13 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!dist", "!coverage", "!*.min.js"]
+    "includes": [
+      "**",
+      "!dist",
+      "!coverage",
+      "!*.min.js",
+      "!**/mocks/resources/orders/customer-orders-full.ts"
+    ]
   },
   "formatter": {
     "enabled": true,

@@ -1,5 +1,5 @@
-import { createContext } from 'react'
-import type { LineItemOption } from '@commercelayer/sdk'
+import { createContext } from "react"
+import type { LineItemOption } from "@commercelayer/sdk"
 
 export interface TLineItemOptions extends LineItemOption {}
 
@@ -9,10 +9,9 @@ export interface InitialLineItemContext {
 }
 
 const initial: InitialLineItemContext = {
-  lineItemOption: {}
+  lineItemOption: {},
 }
 
-const LineItemOptionChildrenContext =
-  createContext<InitialLineItemContext>(initial)
+const LineItemOptionChildrenContext = createContext<InitialLineItemContext>(initial)
 
 export default LineItemOptionChildrenContext

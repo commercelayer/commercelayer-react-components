@@ -1,15 +1,15 @@
-import { createContext } from 'react'
+import { createContext } from "react"
 
 export type IconBrand =
-  | 'visa'
-  | 'credit-card'
-  | 'amex'
-  | 'mastercard'
-  | 'jcb'
-  | 'wire-transfer'
-  | 'maestro'
-  | 'cirrus'
-  | 'paypal'
+  | "visa"
+  | "credit-card"
+  | "amex"
+  | "mastercard"
+  | "jcb"
+  | "wire-transfer"
+  | "maestro"
+  | "cirrus"
+  | "paypal"
 
 interface DefaultContext {
   brand?: IconBrand | string
@@ -24,8 +24,6 @@ interface DefaultContext {
 
 export const defaultPaymentSourceContext = {}
 
-const PaymentSourceContext = createContext<DefaultContext>(
-  defaultPaymentSourceContext
-)
+const PaymentSourceContext = createContext<DefaultContext>(defaultPaymentSourceContext)
 
 export default PaymentSourceContext

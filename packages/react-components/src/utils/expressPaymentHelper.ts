@@ -10,14 +10,12 @@ import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import { getApplicationLink } from "./getApplicationLink"
 import { jwt } from "./jwt"
-import { getSdk } from '@commercelayer/core'
+import { getSdk } from "@commercelayer/core"
 import { getOrganizationConfig } from "./organization"
 
 const availablePaymentMethods = ["stripe_payments"]
 
-export function getAvailableExpressPayments(
-  paymentMethods: PaymentMethod[],
-): PaymentMethod[] {
+export function getAvailableExpressPayments(paymentMethods: PaymentMethod[]): PaymentMethod[] {
   return paymentMethods.filter((payment) => {
     if (!payment.payment_source_type) return false
     return availablePaymentMethods.includes(payment.payment_source_type)
@@ -64,13 +62,9 @@ export async function setExpressFakeAddress({
   return await sdk.orders.retrieve(orderId, params)
 }
 
-export function getExpressShippingMethods(
-  order: Order,
-): PaymentRequestShippingOption[] | null {
+export function getExpressShippingMethods(order: Order): PaymentRequestShippingOption[] | null {
   const isSingleShipment = order?.shipments?.length === 1
-  const shippingMethods = order?.shipments?.map(
-    (shipment) => shipment.available_shipping_methods,
-  )
+  const shippingMethods = order?.shipments?.map((shipment) => shipment.available_shipping_methods)
   if (isSingleShipment) {
     if (shippingMethods == null) return null
     return shippingMethods.flat().map((method) => {
@@ -89,9 +83,7 @@ export function getExpressShippingMethods(
     if (methods != null) {
       const [firstMethod] = methods
       if (firstMethod != null) {
-        shippingOptionsAmount.push(
-          firstMethod.price_amount_for_shipment_cents ?? 0,
-        )
+        shippingOptionsAmount.push(firstMethod.price_amount_for_shipment_cents ?? 0)
       }
     }
   })
@@ -158,18 +150,14 @@ export async function setExpressShippingMethod({
       if (firstShippingMethodId != null) {
         await sdk.shipments.update({
           id: shipmentId,
-          shipping_method: sdk.shipping_methods.relationship(
-            firstShippingMethodId,
-          ),
+          shipping_method: sdk.shipping_methods.relationship(firstShippingMethodId),
         })
       }
     } else {
       if (selectedShippingMethodId != null) {
         await sdk.shipments.update({
           id: shipmentId,
-          shipping_method: sdk.shipping_methods.relationship(
-            selectedShippingMethodId,
-          ),
+          shipping_method: sdk.shipping_methods.relationship(selectedShippingMethodId),
         })
       }
     }
@@ -180,9 +168,7 @@ export async function setExpressShippingMethod({
       if (firstShippingMethodId != null) {
         await sdk.shipments.update({
           id: shipment.id,
-          shipping_method: sdk.shipping_methods.relationship(
-            firstShippingMethodId,
-          ),
+          shipping_method: sdk.shipping_methods.relationship(firstShippingMethodId),
         })
       }
     }
@@ -230,11 +216,7 @@ export async function setExpressPlaceOrder({
 }: TSetExpressPlaceOrderParams): Promise<Order> {
   const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   if (!placeTheOrder && paymentResource != null && paymentSourceId != null) {
-    const include = [
-      "shipments.shipping_method",
-      "payment_source",
-      "payment_method",
-    ]
+    const include = ["shipments.shipping_method", "payment_source", "payment_method"]
     await sdk.orders.retrieve(orderId, {
       include,
     })
@@ -278,7 +260,7 @@ export async function expressRedirectUrl({
   if (accessToken == null) throw new Error("No access token found")
   const { organization } = jwt(accessToken)
   const slug = organization.slug
-  const domain = 'commercelayer.io'
+  const domain = "commercelayer.io"
   if (slug == null) throw new Error("No slug found")
   const config = await getOrganizationConfig({
     accessToken,

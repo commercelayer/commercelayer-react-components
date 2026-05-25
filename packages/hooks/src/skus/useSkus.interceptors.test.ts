@@ -18,9 +18,7 @@ const mockSkus = [{ id: "sku_1", code: "TEST-SKU" }]
 
 const mockGetSkus = vi.fn().mockResolvedValue(mockSkus)
 const mockRetrieveSku = vi.fn().mockResolvedValue(mockSkus[0])
-const mockUpdateSku = vi
-  .fn()
-  .mockResolvedValue({ ...mockSkus[0], reference: "updated" })
+const mockUpdateSku = vi.fn().mockResolvedValue({ ...mockSkus[0], reference: "updated" })
 
 vi.mock("@commercelayer/core", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@commercelayer/core")>()
@@ -54,9 +52,7 @@ describe("useSkus — interceptors", () => {
     })
 
     await waitFor(() => {
-      expect(mockGetSkus).toHaveBeenCalledWith(
-        expect.objectContaining({ interceptors }),
-      )
+      expect(mockGetSkus).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
     })
   })
 
@@ -69,9 +65,7 @@ describe("useSkus — interceptors", () => {
       await result.current.retrieveSku("sku_1")
     })
 
-    expect(mockRetrieveSku).toHaveBeenCalledWith(
-      expect.objectContaining({ interceptors }),
-    )
+    expect(mockRetrieveSku).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
   })
 
   it("passes interceptors to updateSku", async () => {
@@ -83,9 +77,7 @@ describe("useSkus — interceptors", () => {
       await result.current.updateSku({ id: "sku_1", reference: "new-ref" })
     })
 
-    expect(mockUpdateSku).toHaveBeenCalledWith(
-      expect.objectContaining({ interceptors }),
-    )
+    expect(mockUpdateSku).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
   })
 
   it("works without interceptors", async () => {
@@ -98,9 +90,7 @@ describe("useSkus — interceptors", () => {
     })
 
     await waitFor(() => {
-      expect(mockGetSkus).toHaveBeenCalledWith(
-        expect.objectContaining({ accessToken }),
-      )
+      expect(mockGetSkus).toHaveBeenCalledWith(expect.objectContaining({ accessToken }))
     })
   })
 
@@ -119,10 +109,7 @@ describe("useSkus — interceptors", () => {
 
     // Pre-populate cache with two SKUs via the bound mutate (same key)
     await act(async () => {
-      await result.current.mutate(
-        [...mockSkus, sku2] as unknown as Sku[],
-        false,
-      )
+      await result.current.mutate([...mockSkus, sku2] as unknown as Sku[], false)
     })
 
     await act(async () => {

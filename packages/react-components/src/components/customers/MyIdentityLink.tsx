@@ -77,22 +77,23 @@ export function MyIdentityLink(props: Props): JSX.Element {
   } = props
   const { accessToken } = useContext(CommerceLayerContext)
   const [href, setHref] = useState<string | undefined>(undefined)
-  if (accessToken == null)
-    throw new Error("Cannot use `MyIdentityLink` outside of `CommerceLayer`")
+  if (accessToken == null) throw new Error("Cannot use `MyIdentityLink` outside of `CommerceLayer`")
   useEffect(() => {
     if (accessToken) {
       const { organization } = jwt(accessToken)
       const slug = organization.slug
-      const domain = 'commercelayer.io'
+      const domain = "commercelayer.io"
       getOrganizationConfig({
         accessToken,
         params: {
           accessToken,
-          slug,          identityType: type,
+          slug,
+          identityType: type,
           clientId,
           scope,
           returnUrl: returnUrl ?? window.location.href,
-          resetPasswordUrl,        },
+          resetPasswordUrl,
+        },
       }).then((config) => {
         if (config?.links?.identity) {
           setHref(config.links.identity)

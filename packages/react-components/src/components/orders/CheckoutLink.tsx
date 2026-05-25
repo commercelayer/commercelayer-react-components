@@ -1,13 +1,13 @@
-import { useContext, type JSX, type ReactNode, type MouseEvent } from 'react'
-import OrderContext from '#context/OrderContext'
-import Parent from '../utils/Parent'
-import type { ChildrenFunction } from '#typings/index'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import { getApplicationLink } from '#utils/getApplicationLink'
-import { jwt } from '#utils/jwt'
-import { getOrganizationConfig } from '#utils/organization'
+import { useContext, type JSX, type ReactNode, type MouseEvent } from "react"
+import OrderContext from "#context/OrderContext"
+import Parent from "../utils/Parent"
+import type { ChildrenFunction } from "#typings/index"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import { getApplicationLink } from "#utils/getApplicationLink"
+import { jwt } from "#utils/jwt"
+import { getOrganizationConfig } from "#utils/organization"
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+interface ChildrenProps extends Omit<Props, "children"> {
   /**
    * The `checkout_url` attribute of the order, if set
    */
@@ -30,7 +30,7 @@ interface ChildrenProps extends Omit<Props, 'children'> {
   accessToken?: string
 }
 
-interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements["a"], "children"> {
   children?: ChildrenFunction<ChildrenProps>
   /**
    * Label for the checkout link
@@ -63,22 +63,21 @@ export function CheckoutLink(props: Props): JSX.Element | null {
   const { label, hostedCheckout = true, children, customDomain, target, ...p } = props
   const { order } = useContext(OrderContext)
   const { accessToken } = useContext(CommerceLayerContext)
-  if (accessToken == null)
-    throw new Error('Cannot use `CheckoutLink` outside of `CommerceLayer`')
+  if (accessToken == null) throw new Error("Cannot use `CheckoutLink` outside of `CommerceLayer`")
   const { organization } = jwt(accessToken)
   const slug = organization.slug
-  const domain = 'commercelayer.io'
+  const domain = "commercelayer.io"
   const href =
     hostedCheckout && order?.id
       ? getApplicationLink({
           slug,
           orderId: order.id,
           accessToken,
-          applicationType: 'checkout',
+          applicationType: "checkout",
           domain,
           customDomain,
         })
-      : (order?.checkout_url ?? '')
+      : (order?.checkout_url ?? "")
 
   const handleClick = async (e: MouseEvent<HTMLAnchorElement>): Promise<void> => {
     e.preventDefault()
@@ -93,9 +92,9 @@ export function CheckoutLink(props: Props): JSX.Element | null {
           orderId: order.id,
         },
       })
-      window.open(config?.links?.checkout ?? currentHref, target ?? '_self')
+      window.open(config?.links?.checkout ?? currentHref, target ?? "_self")
     } else {
-      window.open(currentHref, target ?? '_self')
+      window.open(currentHref, target ?? "_self")
     }
   }
 

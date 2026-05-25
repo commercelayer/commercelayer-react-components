@@ -1,5 +1,5 @@
-import { useState, useEffect, Fragment } from 'react'
-import { getSalesChannelToken } from '@commercelayer/js-auth'
+import { useState, useEffect, Fragment } from "react"
+import { getSalesChannelToken } from "@commercelayer/js-auth"
 import {
   CommerceLayer,
   OrderContainer,
@@ -29,14 +29,14 @@ import {
   ItemContainer,
   Errors,
   OrderStorage,
-} from 'packages/react-components/src'
+} from "packages/react-components/src"
 
-const clientId = process.env['NEXT_PUBLIC_CLIENT_ID'] as string
-const endpoint = process.env['NEXT_PUBLIC_ENDPOINT'] as string
-const scope = process.env['NEXT_PUBLIC_MARKET_ID'] as string
+const clientId = process.env["NEXT_PUBLIC_CLIENT_ID"] as string
+const endpoint = process.env["NEXT_PUBLIC_ENDPOINT"] as string
+const scope = process.env["NEXT_PUBLIC_MARKET_ID"] as string
 
 export default function Order() {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("")
   useEffect(() => {
     const getToken = async () => {
       const token = await getSalesChannelToken({
@@ -53,7 +53,7 @@ export default function Order() {
       <CommerceLayer accessToken={token} endpoint={endpoint}>
         <div className="container mx-auto mt-5 px-5">
           <OrderStorage persistKey="orderUS">
-            <OrderContainer attributes={{ return_url: 'https://test.co' }}>
+            <OrderContainer attributes={{ return_url: "https://test.co" }}>
               <ItemContainer>
                 <div className="md:flex">
                   <div className="md:flex-shrink-0">
@@ -82,21 +82,21 @@ export default function Order() {
                           name="variant1"
                           options={[
                             {
-                              label: '12 months',
-                              code: 'BABYONBU000000E63E7412MX',
+                              label: "12 months",
+                              code: "BABYONBU000000E63E7412MX",
                               lineItem: {
-                                name: 'Darth Vader (12 Months)',
+                                name: "Darth Vader (12 Months)",
                                 imageUrl:
-                                  'https://i.pinimg.com/736x/a5/32/de/a532de337eff9b1c1c4bfb8df73acea4--darth-vader-stencil-darth-vader-head.jpg?b=t',
+                                  "https://i.pinimg.com/736x/a5/32/de/a532de337eff9b1c1c4bfb8df73acea4--darth-vader-stencil-darth-vader-head.jpg?b=t",
                               },
                             },
                             {
-                              label: '6 months',
-                              code: 'BABYONBU000000E63E746MXX',
+                              label: "6 months",
+                              code: "BABYONBU000000E63E746MXX",
                             },
                             {
-                              label: '24 months',
-                              code: 'BABYONBU000000E63E746MXXFAKE',
+                              label: "24 months",
+                              code: "BABYONBU000000E63E746MXXFAKE",
                             },
                           ]}
                           handleCallback={(variant) => {
@@ -135,36 +135,18 @@ export default function Order() {
               <h1 className="text-4xl border-b-2 my-5">Shopping Bag</h1>
               <LineItemsContainer>
                 <p className="text-sm m-2">
-                  Your shopping bag contains{' '}
-                  <LineItemsCount
-                    data-test="items-count"
-                    className="font-bold"
-                  />{' '}
-                  items
+                  Your shopping bag contains{" "}
+                  <LineItemsCount data-test="items-count" className="font-bold" /> items
                 </p>
                 <div className="flex flex-col p-2">
                   <LineItemsEmpty data-test="line-items-empty" />
                   <LineItem>
                     <div className="flex justify-around items-center border-b p-5">
                       <LineItemImage className="p-2" width={80} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
-                      <LineItemQuantity
-                        data-test="line-item-quantity"
-                        max={100}
-                        className="p-2"
-                      />
-                      <Errors
-                        className="text-red-700 p-2"
-                        resource="line_items"
-                        field="quantity"
-                      />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
+                      <LineItemName data-test="line-item-name" className="p-2" />
+                      <LineItemQuantity data-test="line-item-quantity" max={100} className="p-2" />
+                      <Errors className="text-red-700 p-2" resource="line_items" field="quantity" />
+                      <LineItemAmount data-test="line-item-total" className="p-2" />
                       <LineItemRemoveLink
                         data-test="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -174,20 +156,14 @@ export default function Order() {
                   <LineItem type="gift_cards">
                     <div className="flex justify-between items-center border-b p-5">
                       <LineItemImage className="p-2" width={40} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
+                      <LineItemName data-test="line-item-name" className="p-2" />
                       <LineItemQuantity
                         data-test="line-item-quantity"
                         max={10}
                         className="p-2"
                         disabled
                       />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
+                      <LineItemAmount data-test="line-item-total" className="p-2" />
                       <LineItemRemoveLink
                         data-test="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -197,19 +173,9 @@ export default function Order() {
                   <LineItem type="bundles">
                     <div className="flex justify-between items-center border-b p-5">
                       <LineItemImage className="p-2" width={40} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
-                      <LineItemQuantity
-                        data-test="line-item-quantity"
-                        max={10}
-                        className="p-2"
-                      />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
+                      <LineItemName data-test="line-item-name" className="p-2" />
+                      <LineItemQuantity data-test="line-item-quantity" max={10} className="p-2" />
+                      <LineItemAmount data-test="line-item-total" className="p-2" />
                       <LineItemRemoveLink
                         data-test="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -219,19 +185,9 @@ export default function Order() {
                   <LineItem type="adjustments">
                     <div className="flex justify-between items-center border-b p-5">
                       <LineItemImage className="p-2" width={40} />
-                      <LineItemName
-                        data-test="line-item-name"
-                        className="p-2"
-                      />
-                      <LineItemQuantity
-                        data-test="line-item-quantity"
-                        max={10}
-                        className="p-2"
-                      />
-                      <LineItemAmount
-                        data-test="line-item-total"
-                        className="p-2"
-                      />
+                      <LineItemName data-test="line-item-name" className="p-2" />
+                      <LineItemQuantity data-test="line-item-quantity" max={10} className="p-2" />
+                      <LineItemAmount data-test="line-item-total" className="p-2" />
                       <LineItemRemoveLink
                         data-test="line-item-remove"
                         className="p-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"

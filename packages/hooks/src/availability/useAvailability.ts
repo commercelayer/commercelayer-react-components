@@ -25,38 +25,34 @@ interface UseAvailabilityReturn {
  */
 export function useAvailability(
   accessToken: string,
-  interceptors?: InterceptorManager,
+  interceptors?: InterceptorManager
 ): UseAvailabilityReturn {
   const [fetchParams, setFetchParams] = useState<{
     skuCode?: string
     skuId?: string
   } | null>(null)
 
-  const { data, error, isLoading, isValidating, mutate } =
-    useSWR<SkuAvailability | null>(
-      fetchParams && accessToken
-        ? ["availability", accessToken, fetchParams.skuCode, fetchParams.skuId]
-        : null,
-      async (): Promise<SkuAvailability | null> => {
-        return await getSkuAvailability({
-          accessToken,
-          skuCode: fetchParams?.skuCode,
-          skuId: fetchParams?.skuId,
-          interceptors,
-        })
-      },
-      {
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
-      },
-    )
-
-  const fetchAvailability = useCallback(
-    (params: { skuCode?: string; skuId?: string }) => {
-      setFetchParams(params)
+  const { data, error, isLoading, isValidating, mutate } = useSWR<SkuAvailability | null>(
+    fetchParams && accessToken
+      ? ["availability", accessToken, fetchParams.skuCode, fetchParams.skuId]
+      : null,
+    async (): Promise<SkuAvailability | null> => {
+      return await getSkuAvailability({
+        accessToken,
+        skuCode: fetchParams?.skuCode,
+        skuId: fetchParams?.skuId,
+        interceptors,
+      })
     },
-    [],
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
   )
+
+  const fetchAvailability = useCallback((params: { skuCode?: string; skuId?: string }) => {
+    setFetchParams(params)
+  }, [])
 
   const clearAvailability = useCallback(() => {
     setFetchParams(null)

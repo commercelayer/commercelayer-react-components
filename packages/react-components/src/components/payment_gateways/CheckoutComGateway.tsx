@@ -9,10 +9,7 @@ import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PaymentSourceContext from "#context/PaymentSourceContext"
-import {
-  getPaymentConfig,
-  type PaymentResource,
-} from "#reducers/PaymentMethodReducer"
+import { getPaymentConfig, type PaymentResource } from "#reducers/PaymentMethodReducer"
 import getCardDetails from "#utils/getCardDetails"
 
 type Props = GatewayBaseType
@@ -31,8 +28,7 @@ export function CheckoutComGateway(props: Props): JSX.Element | null {
   const { order } = React.useContext(OrderContext)
   const { payment } = React.useContext(PaymentMethodChildrenContext)
   const { payments, isGuest } = React.useContext(CustomerContext)
-  const { currentPaymentMethodId, config, paymentSource } =
-    React.useContext(PaymentMethodContext)
+  const { currentPaymentMethodId, config, paymentSource } = React.useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = "checkout_com_payments"
   const locale = order?.language_code as StripeElementLocale
 
@@ -57,9 +53,7 @@ export function CheckoutComGateway(props: Props): JSX.Element | null {
     })
     const value = { ...card, showCard, handleEditClick, readonly }
     return !card.brand ? null : (
-      <PaymentSourceContext.Provider value={value}>
-        {children}
-      </PaymentSourceContext.Provider>
+      <PaymentSourceContext.Provider value={value}>{children}</PaymentSourceContext.Provider>
     )
   }
   if (!isGuest && templateCustomerCards) {
@@ -83,14 +77,7 @@ export function CheckoutComGateway(props: Props): JSX.Element | null {
     )
   }
 
-  return (
-    <CheckoutComPayment
-      show={show}
-      publicKey={publicKey}
-      locale={locale}
-      {...paymentConfig}
-    />
-  )
+  return <CheckoutComPayment show={show} publicKey={publicKey} locale={locale} {...paymentConfig} />
 }
 
 export default CheckoutComGateway

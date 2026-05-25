@@ -13,8 +13,8 @@ function SkusDocsPage(): JSX.Element {
       </p>
       <span title="Usage" type="info">
         <p>
-          Must be a direct child of <code>{"<SkuList>"}</code>. Accepts{" "}
-          <code>{"<SkuField>"}</code> as children.
+          Must be a direct child of <code>{"<SkuList>"}</code>. Accepts <code>{"<SkuField>"}</code>{" "}
+          as children.
         </p>
       </span>
       <ArgTypes />

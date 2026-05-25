@@ -31,7 +31,7 @@ describe("SkusContainer component", () => {
           </Skus>
         </SkusContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     for await (const sku of ctx.skus) {
       await waitFor(() => screen.getByTestId(sku), { timeout: 10000 })
@@ -48,13 +48,11 @@ describe("SkusContainer component", () => {
           </Skus>
         </SkusContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
-    await waitFor(
-      () =>
-        expect(screen.getAllByTestId(/^BABY/)).toHaveLength(ctx.skus.length),
-      { timeout: 10000 },
-    )
+    await waitFor(() => expect(screen.getAllByTestId(/^BABY/)).toHaveLength(ctx.skus.length), {
+      timeout: 10000,
+    })
   })
 
   it<SkusContext>("renders SKU name field", async (ctx) => {
@@ -62,15 +60,11 @@ describe("SkusContainer component", () => {
       <CommerceLayer accessToken={ctx.accessToken}>
         <SkusContainer skus={[ctx.sku]}>
           <Skus>
-            <SkuField
-              attribute="name"
-              tagElement="span"
-              data-testid="sku-name"
-            />
+            <SkuField attribute="name" tagElement="span" data-testid="sku-name" />
           </Skus>
         </SkusContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     await waitFor(() => screen.getByTestId("sku-name"), { timeout: 10000 })
     expect(screen.getByTestId("sku-name").textContent).not.toBe("")
@@ -85,7 +79,7 @@ describe("SkusContainer component", () => {
           </Skus>
         </SkusContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     await waitFor(
       () => {
@@ -93,7 +87,7 @@ describe("SkusContainer component", () => {
         expect(img).not.toBeNull()
         expect(img?.getAttribute("src")).toBeTruthy()
       },
-      { timeout: 10000 },
+      { timeout: 10000 }
     )
   })
 
@@ -106,7 +100,7 @@ describe("SkusContainer component", () => {
           </Skus>
         </SkusContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
     expect(container.querySelectorAll("p")).toHaveLength(0)
   })
@@ -120,12 +114,10 @@ describe("SkusContainer component", () => {
           </Skus>
         </SkusContainer>
       </CommerceLayer>,
-      { wrapper: swrWrapper },
+      { wrapper: swrWrapper }
     )
-    await waitFor(
-      () =>
-        expect(screen.getAllByTestId(/^BABY/).length).toBeGreaterThanOrEqual(1),
-      { timeout: 10000 },
-    )
+    await waitFor(() => expect(screen.getAllByTestId(/^BABY/).length).toBeGreaterThanOrEqual(1), {
+      timeout: 10000,
+    })
   })
 })

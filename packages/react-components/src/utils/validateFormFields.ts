@@ -15,7 +15,7 @@ type FormField = HTMLInputElement | HTMLSelectElement
 export type ValidateFormFields = <R extends string[]>(
   fields: HTMLFormControlsCollection,
   required: R,
-  resourceType: TResourceError,
+  resourceType: TResourceError
 ) => {
   errors: BaseError[]
   values: BaseState
@@ -30,8 +30,8 @@ export type ValidateValue = <
   val: V,
   name: N,
   type: T,
-  resource: B,
-// biome-ignore lint/suspicious/noExplicitAny: generic return type for validation errors
+  resource: B
+  // biome-ignore lint/suspicious/noExplicitAny: generic return type for validation errors
 ) => BaseError | Record<string, any>
 
 export const validateValue: ValidateValue = (val, name, type, resource) => {
@@ -43,7 +43,7 @@ export const validateValue: ValidateValue = (val, name, type, resource) => {
       resource,
     }
   }
-  if (type === "email" && typeof val === 'string' && !val.match(EMAIL_PATTERN)) {
+  if (type === "email" && typeof val === "string" && !val.match(EMAIL_PATTERN)) {
     return {
       field: name,
       code: "VALIDATION_ERROR",
@@ -54,11 +54,7 @@ export const validateValue: ValidateValue = (val, name, type, resource) => {
   return {}
 }
 
-const validateFormFields: ValidateFormFields = (
-  fields,
-  required,
-  resourceType,
-) => {
+const validateFormFields: ValidateFormFields = (fields, required, resourceType) => {
   const errors: BaseError[] = []
   let values = { metadata: {} }
   Array.from(fields).forEach((v: FormField) => {
@@ -87,18 +83,15 @@ const validateFormFields: ValidateFormFields = (
 
 export function fieldsExist(
   address: AddressCreate,
-  schema: Array<AddressField | string> = addressFields,
+  schema: Array<AddressField | string> = addressFields
 ): boolean {
   if (!address.business) {
-    const required = schema.filter(
-      (v) => !["line_2", "company", "state_code"].includes(v),
-    )
+    const required = schema.filter((v) => !["line_2", "company", "state_code"].includes(v))
     const validAddress = Object.keys(address).filter((k) => required.includes(k))
     return required.length > validAddress.length
   }
   const required = schema.filter(
-    (v) =>
-      !["first_name", "last_name", "line_2", "state_code"].includes(v),
+    (v) => !["first_name", "last_name", "line_2", "state_code"].includes(v)
   )
   const validAddress = Object.keys(address).filter((k) => required.includes(k))
   return required.length > validAddress.length
@@ -141,20 +134,11 @@ const customerOptionalFields: CustomerOptionalField[] = [
   "company",
 ]
 
-export function businessMandatoryField(
-  fieldName: AddressInputName,
-  isBusiness?: boolean,
-): boolean {
-  if (
-    isBusiness &&
-    businessOptionalFields.includes(fieldName as BusinessOptionalField)
-  ) {
+export function businessMandatoryField(fieldName: AddressInputName, isBusiness?: boolean): boolean {
+  if (isBusiness && businessOptionalFields.includes(fieldName as BusinessOptionalField)) {
     return false
   }
-  if (
-    !isBusiness &&
-    customerOptionalFields.includes(fieldName as CustomerOptionalField)
-  ) {
+  if (!isBusiness && customerOptionalFields.includes(fieldName as CustomerOptionalField)) {
     return false
   }
   return true

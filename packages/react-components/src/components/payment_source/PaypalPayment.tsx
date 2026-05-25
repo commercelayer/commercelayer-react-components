@@ -1,5 +1,5 @@
-import PaymentMethodContext from '#context/PaymentMethodContext'
-import { type ReactNode, useContext, useEffect, useRef, type JSX } from 'react';
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import { type ReactNode, useContext, useEffect, useRef, type JSX } from "react"
 
 export interface PaypalConfig {
   return_url: string
@@ -11,21 +11,13 @@ export interface PaypalConfig {
 }
 
 const defaultMessage =
-  'by placing the order, you will be redirected to the PayPal website to sign in and authorize the payment'
+  "by placing the order, you will be redirected to the PayPal website to sign in and authorize the payment"
 
-type Props = Omit<PaypalConfig, 'return_url' | 'cancel_url'> &
-  JSX.IntrinsicElements['div']
-export function PaypalPayment({
-  infoMessage,
-  ...p
-}: Props): JSX.Element | null {
+type Props = Omit<PaypalConfig, "return_url" | "cancel_url"> & JSX.IntrinsicElements["div"]
+export function PaypalPayment({ infoMessage, ...p }: Props): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
-  const {
-    setPaymentSource,
-    paymentSource,
-    currentPaymentMethodType,
-    setPaymentRef
-  } = useContext(PaymentMethodContext)
+  const { setPaymentSource, paymentSource, currentPaymentMethodType, setPaymentRef } =
+    useContext(PaymentMethodContext)
   useEffect(() => {
     if (
       ref.current &&
@@ -53,11 +45,11 @@ export function PaypalPayment({
             metadata: {
               card: {
                 id: paymentSource.id,
-                brand: 'paypal',
-                last4: ''
-              }
-            }
-          }
+                brand: "paypal",
+                last4: "",
+              },
+            },
+          },
         })
         return true
       } catch (e) {
@@ -70,7 +62,7 @@ export function PaypalPayment({
     <form ref={ref}>
       <div {...p}>
         <span className={infoMessage?.className}>
-          {typeof infoMessage?.text === 'function'
+          {typeof infoMessage?.text === "function"
             ? infoMessage?.text()
             : infoMessage?.text || defaultMessage}
         </span>

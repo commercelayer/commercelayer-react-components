@@ -1,21 +1,13 @@
-import baseReducer from '#utils/baseReducer'
-import type { Dispatch } from 'react'
-import type { BaseError } from '#typings/errors'
-import type {
-  DeliveryLeadTime,
-  LineItem,
-  Order,
-  Shipment
-} from '@commercelayer/sdk'
-import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import type { getOrderContext } from './OrderReducer'
-import { getSdk } from '@commercelayer/core'
-import { canPlaceOrder } from '#utils/canPlaceOrder'
+import baseReducer from "#utils/baseReducer"
+import type { Dispatch } from "react"
+import type { BaseError } from "#typings/errors"
+import type { DeliveryLeadTime, LineItem, Order, Shipment } from "@commercelayer/sdk"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
+import type { getOrderContext } from "./OrderReducer"
+import { getSdk } from "@commercelayer/core"
+import { canPlaceOrder } from "#utils/canPlaceOrder"
 
-export type ShipmentActionType =
-  | 'setErrors'
-  | 'setShipments'
-  | 'setShippingMethod'
+export type ShipmentActionType = "setErrors" | "setShipments" | "setShippingMethod"
 
 export type ShipmentLineItem = LineItem & { line_item: LineItem }
 
@@ -33,7 +25,7 @@ export interface ShipmentAction {
 }
 
 export const shipmentInitialState: ShipmentState = {
-  errors: []
+  errors: [],
 }
 
 export type SetShipmentErrors = <V extends BaseError[]>(
@@ -44,10 +36,10 @@ export type SetShipmentErrors = <V extends BaseError[]>(
 export const setShipmentErrors: SetShipmentErrors = (errors, dispatch) => {
   if (dispatch) {
     dispatch({
-      type: 'setErrors',
+      type: "setErrors",
       payload: {
-        errors
-      }
+        errors,
+      },
     })
   }
 }
@@ -58,11 +50,7 @@ type GetShipments = (args: {
   config: CommerceLayerConfig
 }) => Promise<void>
 
-export const getShipments: GetShipments = async ({
-  order,
-  dispatch,
-  config
-}) => {
+export const getShipments: GetShipments = async ({ order, dispatch, config }) => {
   try {
     const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const shipments = order.shipments
@@ -71,19 +59,19 @@ export const getShipments: GetShipments = async ({
     let totalPages = 1
     do {
       const response = await sdk.delivery_lead_times.list({
-        include: ['shipping_method', 'stock_location'],
-        pageNumber: currentPage
+        include: ["shipping_method", "stock_location"],
+        pageNumber: currentPage,
       })
       allDeliveryLeadTimes = allDeliveryLeadTimes.concat(response)
       totalPages = response.meta.pageCount
       currentPage++
     } while (currentPage <= totalPages)
     dispatch({
-      type: 'setShipments',
+      type: "setShipments",
       payload: {
         shipments,
-        deliveryLeadTimes: allDeliveryLeadTimes
-      }
+        deliveryLeadTimes: allDeliveryLeadTimes,
+      },
     })
   } catch (error) {
     console.error(error)
@@ -103,7 +91,7 @@ export async function setShippingMethod({
   shipmentId,
   shippingMethodId,
   getOrder,
-  order
+  order,
 }: TSetShippingMethodParams): Promise<{ success: boolean; order?: Order }> {
   try {
     if (order != null && !canPlaceOrder(order)) {
@@ -113,7 +101,7 @@ export async function setShippingMethod({
       const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       await sdk.shipments.update({
         id: shipmentId,
-        shipping_method: sdk.shipping_methods.relationship(shippingMethodId)
+        shipping_method: sdk.shipping_methods.relationship(shippingMethodId),
       })
       if (getOrder != null && order != null) {
         const currentOrder = await getOrder(order.id)
@@ -127,20 +115,9 @@ export async function setShippingMethod({
   }
 }
 
-const type: ShipmentActionType[] = [
-  'setErrors',
-  'setShipments',
-  'setShippingMethod'
-]
+const type: ShipmentActionType[] = ["setErrors", "setShipments", "setShippingMethod"]
 
-const shipmentReducer = (
-  state: ShipmentState,
-  reducer: ShipmentAction
-): ShipmentState =>
-  baseReducer<ShipmentState, ShipmentAction, ShipmentActionType[]>(
-    state,
-    reducer,
-    type
-  )
+const shipmentReducer = (state: ShipmentState, reducer: ShipmentAction): ShipmentState =>
+  baseReducer<ShipmentState, ShipmentAction, ShipmentActionType[]>(state, reducer, type)
 
 export default shipmentReducer

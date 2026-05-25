@@ -54,19 +54,10 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     setValue: setValueForm,
     setError: setErrorForm,
   } = (useRapidForm as any)({ fieldEvent })
-  const {
-    setAddressErrors,
-    setAddress,
-    shipToDifferentAddress,
-    isBusiness,
-    invertAddresses,
-  } = useContext(AddressesContext)
-  const {
-    saveAddressToCustomerAddressBook,
-    include,
-    addResourceToInclude,
-    includeLoaded,
-  } = useContext(OrderContext)
+  const { setAddressErrors, setAddress, shipToDifferentAddress, isBusiness, invertAddresses } =
+    useContext(AddressesContext)
+  const { saveAddressToCustomerAddressBook, include, addResourceToInclude, includeLoaded } =
+    useContext(OrderContext)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
     if (!include?.includes("shipping_address")) {
@@ -85,11 +76,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
           const fieldName = field.name
           const value = field.value
           const inError = errors[fieldName] != null
-          if (
-            customFieldMessageError != null &&
-            fieldName != null &&
-            value != null
-          ) {
+          if (customFieldMessageError != null && fieldName != null && value != null) {
             values[fieldName.replace("shipping_address_", "")] = value
             const customMessage = customFieldMessageError({
               field: fieldName,
@@ -165,10 +152,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
       setAddressErrors([], "shipping_address")
       for (const name in values) {
         const field = values[name]
-        if (
-          field?.value ||
-          (field?.required === false && field?.type !== "checkbox")
-        ) {
+        if (field?.value || (field?.required === false && field?.type !== "checkbox")) {
           values[name.replace("shipping_address_", "")] = field.value
           delete values[name]
         }
@@ -190,7 +174,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     }
     const checkboxChecked =
       ref.current?.querySelector(
-        '[name="shipping_address_save_to_customer_book"]',
+        '[name="shipping_address_save_to_customer_book"]'
         // @ts-expect-error no type
       )?.checked || getSaveShippingAddressToAddressBook()
     if (checkboxChecked) {
@@ -217,19 +201,8 @@ export function ShippingAddressForm(props: Props): JSX.Element {
         setAddress({ values: {} as any, resource: "shipping_address" })
       }
     }
-  }, [
-    values,
-    errors,
-    shipToDifferentAddress,
-    reset,
-    include,
-    includeLoaded,
-    isBusiness,
-  ])
-  const setValue = (
-    name: AddressValuesKeys,
-    value: string | number | readonly string[],
-  ): void => {
+  }, [values, errors, shipToDifferentAddress, reset, include, includeLoaded, isBusiness])
+  const setValue = (name: AddressValuesKeys, value: string | number | readonly string[]): void => {
     setValueForm(name, value as string)
     const field: any = {
       [name.replace("shipping_address_", "")]: value,

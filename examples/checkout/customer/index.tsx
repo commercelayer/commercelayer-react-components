@@ -1,6 +1,6 @@
-import React, { useState, useEffect, Fragment } from 'react'
-import { getCustomerToken } from '@commercelayer/js-auth'
-import Head from 'next/head'
+import React, { useState, useEffect, Fragment } from "react"
+import { getCustomerToken } from "@commercelayer/js-auth"
+import Head from "next/head"
 import {
   CommerceLayer,
   OrderContainer,
@@ -53,9 +53,9 @@ import {
   PrivacyAndTermsCheckbox,
   PaymentMethodAmount,
   CustomerCardsType,
-} from 'packages/react-components/src'
-import { useRouter } from 'next/router'
-import { Address, AddressField } from 'packages/react-components/src'
+} from "packages/react-components/src"
+import { useRouter } from "next/router"
+import { Address, AddressField } from "packages/react-components/src"
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID as string
 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT as string
@@ -63,11 +63,11 @@ const scope = process.env.NEXT_PUBLIC_MARKET_ID as string
 const username = process.env.NEXT_PUBLIC_CUSTOMER_USERNAME as string
 const password = process.env.NEXT_PUBLIC_CUSTOMER_PASSWORD as string
 
-let orderId = ''
-let paypalPayerId = ''
-let paypalReturnUrl = ''
+let orderId = ""
+let paypalPayerId = ""
+let paypalReturnUrl = ""
 
-const adyen = { MD: '', PaRes: '' }
+const adyen = { MD: "", PaRes: "" }
 
 const NestedInput = ({ value }: any) => {
   return (
@@ -82,10 +82,7 @@ const NestedInput = ({ value }: any) => {
   )
 }
 
-const TemplateCustomerCards = ({
-  customerPayments,
-  PaymentSourceProvider,
-}: CustomerCardsType) => {
+const TemplateCustomerCards = ({ customerPayments, PaymentSourceProvider }: CustomerCardsType) => {
   const components = customerPayments.map((p, k) => {
     return (
       <div
@@ -133,11 +130,11 @@ const TemplateSaveToWalletCheckbox = ({ name }: any) => (
 )
 
 export default function Main() {
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("")
   const [shipToDifferentAddress, setShipToDifferentAddress] = useState(false)
   const [showBillingAddressForm, setShowBillingAddressForm] = useState(false)
   const [showShippingAddressForm, setShowShippingAddressForm] = useState(false)
-  const [billingFirstName, setBillingFirstName] = useState('')
+  const [billingFirstName, setBillingFirstName] = useState("")
   const [saveOnBlur, setSaveOnBlur] = useState(false)
   const { query } = useRouter()
   if (query.orderId) {
@@ -152,7 +149,7 @@ export default function Main() {
   if (query.PaRes) {
     adyen.PaRes = query.PaRes as string
   }
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     paypalReturnUrl = window.location.href
   }
   useEffect(() => {
@@ -176,24 +173,23 @@ export default function Main() {
   }, [token])
   const messages: any = [
     {
-      code: 'EMPTY_ERROR',
-      resource: 'billingAddress',
-      field: 'firstName',
+      code: "EMPTY_ERROR",
+      resource: "billingAddress",
+      field: "firstName",
       message: `Can't be blank`,
     },
     {
-      code: 'VALIDATION_ERROR',
-      resource: 'billingAddress',
-      field: 'email',
+      code: "VALIDATION_ERROR",
+      resource: "billingAddress",
+      field: "email",
       message: `Must be valid email`,
     },
   ]
   const handleShowBillingForm = () => {
     setShowBillingAddressForm(!showBillingAddressForm)
-    setBillingFirstName('')
+    setBillingFirstName("")
   }
-  const handleShowShippingForm = () =>
-    setShowShippingAddressForm(!showShippingAddressForm)
+  const handleShowShippingForm = () => setShowShippingAddressForm(!showShippingAddressForm)
   const handleOnSave = async () => {
     // if (token) {
     //   const config = { accessToken: token, endpoint }
@@ -255,9 +251,7 @@ export default function Main() {
         <div className="container mx-auto mt-5 px-5">
           <OrderContainer orderId={orderId}>
             <CustomerContainer>
-              <AddressesContainer
-                shipToDifferentAddress={shipToDifferentAddress}
-              >
+              <AddressesContainer shipToDifferentAddress={shipToDifferentAddress}>
                 <h2 className="p-2 font-semibold text-2xl">Billing Address</h2>
                 <div>
                   <BillingAddressContainer>
@@ -266,10 +260,7 @@ export default function Main() {
                       selectedClassName="border-blue-500"
                       data-cy="customer-billing-address"
                       deselect={showBillingAddressForm}
-                      onSelect={() =>
-                        showBillingAddressForm &&
-                        setShowBillingAddressForm(false)
-                      }
+                      onSelect={() => showBillingAddressForm && setShowBillingAddressForm(false)}
                     >
                       {/* {(props) => <CustomAddressCards {...props} />} */}
                       <AddressField name="first_name" />
@@ -302,7 +293,7 @@ export default function Main() {
                     </svg>
                   </button>
                 </div>
-                <div className={`${showBillingAddressForm ? '' : 'hidden'}`}>
+                <div className={`${showBillingAddressForm ? "" : "hidden"}`}>
                   <BillingAddressForm
                     autoComplete="off"
                     className="p-2"
@@ -423,8 +414,8 @@ export default function Main() {
                           name="billing_address_country_code"
                           className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                           placeholder={{
-                            value: '',
-                            label: 'Country',
+                            value: "",
+                            label: "Country",
                             disabled: true,
                           }}
                         />
@@ -564,39 +555,32 @@ export default function Main() {
                     type="button"
                     aria-pressed="false"
                     className={`${
-                      shipToDifferentAddress ? 'bg-blue-500' : 'bg-gray-200'
+                      shipToDifferentAddress ? "bg-blue-500" : "bg-gray-200"
                     } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                    onClick={() =>
-                      setShipToDifferentAddress(!shipToDifferentAddress)
-                    }
+                    onClick={() => setShipToDifferentAddress(!shipToDifferentAddress)}
                   >
                     <span className="sr-only">Use setting</span>
                     <span
                       aria-hidden="true"
                       className={`${
-                        shipToDifferentAddress
-                          ? 'translate-x-5'
-                          : 'translate-x-0'
+                        shipToDifferentAddress ? "translate-x-5" : "translate-x-0"
                       } inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
                     ></span>
                   </button>
                   <p className="ml-5">Ship to different address</p>
                 </div>
-                <div className={`${!shipToDifferentAddress ? 'hidden' : ''}`}>
-                  <h2 className="p-2 font-semibold text-2xl">
-                    Shipping Address
-                  </h2>
+                <div className={`${!shipToDifferentAddress ? "hidden" : ""}`}>
+                  <h2 className="p-2 font-semibold text-2xl">Shipping Address</h2>
                   <div className="flex">
                     <ShippingAddressContainer>
                       <Address
                         data-cy="customer-shipping-address"
                         className="w-1/2 p-2 border cursor-pointer rounded hover:border-blue-500 m-2 shadow-sm"
-                        selectedClassName={'border-blue-500'}
-                        disabledClassName={'opacity-50 cursor-not-allowed'}
+                        selectedClassName={"border-blue-500"}
+                        disabledClassName={"opacity-50 cursor-not-allowed"}
                         deselect={showShippingAddressForm}
                         onSelect={() =>
-                          showShippingAddressForm &&
-                          setShowShippingAddressForm(false)
+                          showShippingAddressForm && setShowShippingAddressForm(false)
                         }
                       >
                         <div className="flex font-bold">
@@ -629,14 +613,10 @@ export default function Main() {
                       </svg>
                     </button>
                   </div>
-                  <div
-                    className={`${!showShippingAddressForm ? 'hidden' : ''}`}
-                  >
+                  <div className={`${!showShippingAddressForm ? "hidden" : ""}`}>
                     <ShippingAddressForm
                       autoComplete="off"
-                      className={
-                        shipToDifferentAddress ? `block p-2` : `hidden`
-                      }
+                      className={shipToDifferentAddress ? `block p-2` : `hidden`}
                       reset={!showShippingAddressForm}
                     >
                       <div>
@@ -655,10 +635,7 @@ export default function Main() {
                             placeholder="First name"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600" id="email-error">
                           <Errors
                             data-cy="shipping_address_first_name_error"
                             resource="shipping_address"
@@ -683,10 +660,7 @@ export default function Main() {
                             placeholder="Last name"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600" id="email-error">
                           <Errors
                             data-cy="shipping_address_last_name_error"
                             resource="shipping_address"
@@ -711,10 +685,7 @@ export default function Main() {
                             placeholder="Address"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600" id="email-error">
                           <Errors
                             data-cy="shipping_address_line_1_error"
                             resource="shipping_address"
@@ -739,10 +710,7 @@ export default function Main() {
                             placeholder="City"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600" id="email-error">
                           <Errors
                             data-cy="shipping_address_city_error"
                             resource="shipping_address"
@@ -764,16 +732,13 @@ export default function Main() {
                             name="shipping_address_country_code"
                             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                             placeholder={{
-                              value: '',
-                              label: 'Country',
+                              value: "",
+                              label: "Country",
                               disabled: true,
                             }}
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600" id="email-error">
                           <Errors
                             data-cy="shipping_address_country_code_error"
                             resource="shipping_address"
@@ -798,10 +763,7 @@ export default function Main() {
                             placeholder="State"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600" id="email-error">
                           <Errors
                             data-cy="shipping_address_state_code_error"
                             resource="shipping_address"
@@ -826,10 +788,7 @@ export default function Main() {
                             placeholder="Zip code"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600" id="email-error">
                           <Errors
                             data-cy="shipping_address_zip_code_error"
                             resource="shipping_address"
@@ -854,10 +813,7 @@ export default function Main() {
                             placeholder="Phone"
                           />
                         </div>
-                        <p
-                          className="mt-2 text-sm text-red-600"
-                          id="email-error"
-                        >
+                        <p className="mt-2 text-sm text-red-600" id="email-error">
                           <Errors
                             data-cy="shipping_address_phone_error"
                             resource="shipping_address"
@@ -899,19 +855,13 @@ export default function Main() {
                 <Shipment loader={<>Caricamento...</>}>
                   <div className="flex">
                     Shipments N:
-                    <ShipmentField
-                      className="font-bold pl-1"
-                      name="key_number"
-                    />
+                    <ShipmentField className="font-bold pl-1" name="key_number" />
                   </div>
                   <LineItemsContainer>
                     <LineItem>
                       <div className="flex justify-between items-center border-b p-5">
                         <LineItemImage className="p-2" width={80} />
-                        <LineItemName
-                          data-cy="line-item-name"
-                          className="p-2"
-                        />
+                        <LineItemName data-cy="line-item-name" className="p-2" />
                         <LineItemQuantity
                           readonly
                           data-cy="line-item-quantity"
@@ -921,15 +871,9 @@ export default function Main() {
                       </div>
                       <div>
                         <StockTransfer>
-                          <div
-                            className="flex flex-row"
-                            data-cy="stock-transfer"
-                          >
-                            <StockTransferField
-                              className="px-1"
-                              type="quantity"
-                            />{' '}
-                            of <LineItemQuantity readonly className="px-1" />
+                          <div className="flex flex-row" data-cy="stock-transfer">
+                            <StockTransferField className="px-1" type="quantity" /> of{" "}
+                            <LineItemQuantity readonly className="px-1" />
                             items will undergo a transfer
                           </div>
                         </StockTransfer>
@@ -938,10 +882,7 @@ export default function Main() {
                     <LineItem type="bundles">
                       <div className="flex justify-between items-center border-b p-5">
                         <LineItemImage className="p-2" width={80} />
-                        <LineItemName
-                          data-cy="line-item-name"
-                          className="p-2"
-                        />
+                        <LineItemName data-cy="line-item-name" className="p-2" />
                         <LineItemQuantity
                           readonly
                           data-cy="line-item-quantity"
@@ -951,15 +892,9 @@ export default function Main() {
                       </div>
                       <div>
                         <StockTransfer>
-                          <div
-                            className="flex flex-row"
-                            data-cy="stock-transfer"
-                          >
-                            <StockTransferField
-                              className="px-1"
-                              type="quantity"
-                            />{' '}
-                            of <LineItemQuantity readonly className="px-1" />
+                          <div className="flex flex-row" data-cy="stock-transfer">
+                            <StockTransferField className="px-1" type="quantity" /> of{" "}
+                            <LineItemQuantity readonly className="px-1" />
                             items will undergo a transfer
                           </div>
                         </StockTransfer>
@@ -975,11 +910,7 @@ export default function Main() {
                       <ShippingMethodName data-cy="shipping-method-name" />
                       <ShippingMethodPrice data-cy="shipping-method-price" />
                       <div className="flex">
-                        <DeliveryLeadTime
-                          type="min_days"
-                          data-cy="delivery-lead-time-min-days"
-                        />{' '}
-                        -{' '}
+                        <DeliveryLeadTime type="min_days" data-cy="delivery-lead-time-min-days" /> -{" "}
                         <DeliveryLeadTime
                           type="max_days"
                           data-cy="delivery-lead-time-max-days"
@@ -995,7 +926,7 @@ export default function Main() {
               <PaymentMethodsContainer
                 config={{
                   stripePayment: {
-                    containerClassName: 'p-5 my-2',
+                    containerClassName: "p-5 my-2",
                   },
                   paypalPayment: {
                     cancel_url: paypalReturnUrl,
@@ -1009,7 +940,7 @@ export default function Main() {
                       className="p-2 my-1 flex flex-wrap w-1/2 items-center justify-items-center bg-gray-300"
                       activeClass="bg-opacity-25"
                       onClick={() => {
-                        console.log('custom click payment method')
+                        console.log("custom click payment method")
                       }}
                       clickableContainer
                     >
@@ -1018,23 +949,18 @@ export default function Main() {
                       <PaymentMethodPrice className="pl-3 text-xs text-gray-500" />
                       <PaymentSource
                         className="py-2 my-2 flex flex-row"
-                        templateCustomerCards={(props) => (
-                          <TemplateCustomerCards {...props} />
-                        )}
+                        templateCustomerCards={(props) => <TemplateCustomerCards {...props} />}
                         templateCustomerSaveToWallet={(props) => (
                           <TemplateSaveToWalletCheckbox {...props} />
                         )}
-                        onClickCustomerCards={() => console.log('clicked')}
+                        onClickCustomerCards={() => console.log("clicked")}
                       >
                         <div className="flex flex-row items-center justify-start bg-gray-100 p-3 text-sm border">
                           <div className="flex flex-row items-center">
                             <PaymentSourceBrandIcon className="mr-2" />
                             <PaymentSourceBrandName className="mr-1" />
                             ending in
-                            <PaymentSourceDetail
-                              className="ml-1"
-                              type="last4"
-                            />
+                            <PaymentSourceDetail className="ml-1" type="last4" />
                           </div>
                           <div className="text-gray-500 ml-3">
                             <PaymentSourceDetail type="exp_month" />
@@ -1046,17 +972,14 @@ export default function Main() {
                           </div>
                         </div>
                       </PaymentSource>
-                      <Errors
-                        className="text-red-600"
-                        resource="payment_methods"
-                      />
+                      <Errors className="text-red-600" resource="payment_methods" />
                     </PaymentMethod>
                   </div>
 
                   <div>
                     <PlaceOrderButton
                       onClick={(res: any) => {
-                        console.log('res', res)
+                        console.log("res", res)
                         debugger
                       }}
                       className="mt-5 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
@@ -1067,54 +990,37 @@ export default function Main() {
             </CustomerContainer>
             <LineItemsContainer>
               <p className="text-sm m-2">
-                Your shopping bag contains{' '}
-                <LineItemsCount data-test="items-count" className="font-bold" />{' '}
-                items
+                Your shopping bag contains{" "}
+                <LineItemsCount data-test="items-count" className="font-bold" /> items
               </p>
               <div className="flex flex-col p-2">
                 <LineItem>
                   <div className="flex justify-around items-center border-b p-5">
                     <LineItemImage className="p-2" width={80} />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <Errors
-                      className="text-red-700 p-2"
-                      resource="line_items"
-                      field="quantity"
-                    />
-                    <LineItemAmount
-                      data-test="line-item-total"
-                      className="p-2"
-                    />
+                    <Errors className="text-red-700 p-2" resource="line_items" field="quantity" />
+                    <LineItemAmount data-test="line-item-total" className="p-2" />
                   </div>
                 </LineItem>
                 <LineItem type="gift_cards">
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={40} />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <LineItemAmount
-                      data-test="line-item-total"
-                      className="p-2"
-                    />
+                    <LineItemAmount data-test="line-item-total" className="p-2" />
                   </div>
                 </LineItem>
                 <LineItem type="bundles">
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={40} />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <LineItemAmount
-                      data-test="line-item-total"
-                      className="p-2"
-                    />
+                    <LineItemAmount data-test="line-item-total" className="p-2" />
                   </div>
                 </LineItem>
                 <LineItem type="adjustments">
                   <div className="flex justify-between items-center border-b p-5">
                     <LineItemImage className="p-2" width={40} />
                     <LineItemName data-test="line-item-name" className="p-2" />
-                    <LineItemAmount
-                      data-test="line-item-total"
-                      className="p-2"
-                    />
+                    <LineItemAmount data-test="line-item-total" className="p-2" />
                   </div>
                 </LineItem>
               </div>

@@ -1,6 +1,3 @@
 module.exports = {
-  reject: [
-    'pnpm',
-    'iframe-resizer'
-  ]
+  reject: ["pnpm", "iframe-resizer"],
 }

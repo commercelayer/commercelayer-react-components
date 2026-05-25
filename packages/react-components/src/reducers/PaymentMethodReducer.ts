@@ -147,13 +147,10 @@ export const paymentMethodInitialState: PaymentMethodState = {
 
 export type SetPaymentMethodErrors = <V extends BaseError[]>(
   errors: V,
-  dispatch?: Dispatch<PaymentMethodAction>,
+  dispatch?: Dispatch<PaymentMethodAction>
 ) => void
 
-export const setPaymentMethodErrors: SetPaymentMethodErrors = (
-  errors,
-  dispatch,
-) => {
+export const setPaymentMethodErrors: SetPaymentMethodErrors = (errors, dispatch) => {
   if (dispatch)
     dispatch({
       type: "setErrors",
@@ -168,10 +165,7 @@ type GetPaymentMethods = (args: {
   dispatch: Dispatch<PaymentMethodAction>
 }) => Promise<void>
 
-export const getPaymentMethods: GetPaymentMethods = async ({
-  order,
-  dispatch,
-}) => {
+export const getPaymentMethods: GetPaymentMethods = async ({ order, dispatch }) => {
   const paymentMethods = order.available_payment_methods
   const paymentMethod = order.payment_method
   const paymentSource = order.payment_source
@@ -180,8 +174,7 @@ export const getPaymentMethods: GetPaymentMethods = async ({
     payload: {
       paymentMethods,
       currentPaymentMethodId: paymentMethod?.id,
-      currentPaymentMethodType:
-        paymentMethod?.payment_source_type as PaymentResource,
+      currentPaymentMethodType: paymentMethod?.payment_source_type as PaymentResource,
       paymentSource,
     },
   })
@@ -276,17 +269,14 @@ export async function setPaymentMethod({
   }
 }
 
-type PaymentSourceTypes =
-  | (StripePayment & WireTransfer)
-  | (StripePayment | WireTransfer)
+type PaymentSourceTypes = (StripePayment & WireTransfer) | (StripePayment | WireTransfer)
 
 export type SetPaymentSourceResponse = {
   order: Order
   paymentSource: PaymentSourceTypes
 } | null
 
-export interface SetPaymentSourceParams
-  extends Omit<PaymentMethodState, "config"> {
+export interface SetPaymentSourceParams extends Omit<PaymentMethodState, "config"> {
   config?: CommerceLayerConfig
   dispatch?: Dispatch<PaymentMethodAction>
   getOrder?: getOrderContext
@@ -384,10 +374,7 @@ export async function setPaymentSource({
       const [error] = errors
       if (error?.status === "401" && getOrder != null && order != null) {
         const currentOrder = await getOrder(order?.id)
-        if (
-          currentOrder?.status != null &&
-          !["placed", "approved"].includes(currentOrder.status)
-        ) {
+        if (currentOrder?.status != null && !["placed", "approved"].includes(currentOrder.status)) {
           console.error("Set payment source:", errors)
           setErrors({
             currentErrors,
@@ -482,13 +469,10 @@ export interface PaymentMethodConfig {
 
 type SetPaymentMethodConfig = (
   config: PaymentMethodConfig,
-  dispatch: Dispatch<PaymentMethodAction>,
+  dispatch: Dispatch<PaymentMethodAction>
 ) => void
 
-export const setPaymentMethodConfig: SetPaymentMethodConfig = (
-  config,
-  dispatch,
-) => {
+export const setPaymentMethodConfig: SetPaymentMethodConfig = (config, dispatch) => {
   dispatch({
     type: "setPaymentMethodConfig",
     payload: { config },
@@ -502,7 +486,7 @@ export function getPaymentConfig<
   const resourceKeys = replace(
     replace(paymentResource, "payments", "payment"),
     "transfers",
-    "transfer",
+    "transfer"
   )
   const resource = snakeToCamelCase(resourceKeys)
   return pick(config, [resource])
@@ -519,12 +503,12 @@ const type: PaymentMethodActionType[] = [
 
 const paymentMethodReducer = (
   state: PaymentMethodState,
-  reducer: PaymentMethodAction,
+  reducer: PaymentMethodAction
 ): PaymentMethodState =>
-  baseReducer<
-    PaymentMethodState,
-    PaymentMethodAction,
-    PaymentMethodActionType[]
-  >(state, reducer, type)
+  baseReducer<PaymentMethodState, PaymentMethodAction, PaymentMethodActionType[]>(
+    state,
+    reducer,
+    type
+  )
 
 export default paymentMethodReducer

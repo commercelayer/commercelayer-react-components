@@ -22,9 +22,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@commercelayer/react-components": [
-        "../react-components/src/index.ts"
-      ]
+      "@commercelayer/react-components": ["../react-components/src/index.ts"]
     }
   },
   "include": ["src", ".storybook/**/*"]

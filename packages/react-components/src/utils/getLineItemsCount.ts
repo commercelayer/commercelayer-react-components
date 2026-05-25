@@ -1,10 +1,7 @@
-import type { TLineItem } from '#components/line_items/LineItem'
-import type { LineItem } from '@commercelayer/sdk'
+import type { TLineItem } from "#components/line_items/LineItem"
+import type { LineItem } from "@commercelayer/sdk"
 
-export type TypeAccepted = Extract<
-  TLineItem,
-  'skus' | 'gift_cards' | 'bundles' | 'adjustments'
->
+export type TypeAccepted = Extract<TLineItem, "skus" | "gift_cards" | "bundles" | "adjustments">
 
 interface Args {
   lineItems: LineItem[]
@@ -15,7 +12,7 @@ interface Args {
 export default function getLineItemsCount({
   lineItems,
   quantity = 0,
-  typeAccepted = ['skus', 'gift_cards', 'bundles', 'adjustments']
+  typeAccepted = ["skus", "gift_cards", "bundles", "adjustments"],
 }: Args): number {
   lineItems
     .filter(
