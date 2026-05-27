@@ -1,6 +1,6 @@
-import { LineItemAmount } from "#components/line_items/LineItemAmount"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
+import { LineItemAmount } from "#components/line_items/LineItemAmount"
 import { LineItemProvider } from "./helpers"
 
 describe("LineItemAmount component", () => {
@@ -27,7 +27,9 @@ describe("LineItemAmount component", () => {
   it("renders children render-prop with price prop", () => {
     render(
       <LineItemProvider>
-        <LineItemAmount>{({ price }) => <span data-testid="custom-amount">{price}</span>}</LineItemAmount>
+        <LineItemAmount>
+          {({ price }) => <span data-testid="custom-amount">{price}</span>}
+        </LineItemAmount>
       </LineItemProvider>
     )
 

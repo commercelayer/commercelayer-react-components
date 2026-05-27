@@ -1,9 +1,9 @@
-import { useContext, type JSX } from "react"
-import LineItemChildrenContext from "#context/LineItemChildrenContext"
 import type { LineItem } from "@commercelayer/sdk"
+import { type JSX, useContext } from "react"
+import Parent from "#components/utils/Parent"
+import LineItemChildrenContext from "#context/LineItemChildrenContext"
 import type { ChildrenFunction } from "#typings"
 import { defaultGiftCardImgUrl, defaultImgUrl } from "#utils/placeholderImages"
-import Parent from "#components/utils/Parent"
 import type { TLineItem } from "./LineItem"
 
 export interface TLineItemImage extends Omit<Props, "children"> {

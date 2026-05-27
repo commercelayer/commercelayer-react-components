@@ -1,6 +1,6 @@
-import { LineItemsCount } from "#components/line_items/LineItemsCount"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
+import { LineItemsCount } from "#components/line_items/LineItemsCount"
 import { buildLineItem, LineItemsProvider } from "./helpers"
 
 describe("LineItemsCount component", () => {
@@ -45,7 +45,9 @@ describe("LineItemsCount component", () => {
   it("renders children render-prop", () => {
     render(
       <LineItemsProvider lineItems={lineItems}>
-        <LineItemsCount>{({ quantity }) => <span data-testid="custom-count">{quantity}</span>}</LineItemsCount>
+        <LineItemsCount>
+          {({ quantity }) => <span data-testid="custom-count">{quantity}</span>}
+        </LineItemsCount>
       </LineItemsProvider>
     )
 

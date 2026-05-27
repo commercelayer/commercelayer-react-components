@@ -1,7 +1,9 @@
-import { LineItemImage } from "#components/line_items/LineItemImage"
-import { defaultGiftCardImgUrl, defaultImgUrl } from "#utils/placeholderImages"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
+import type { TLineItemImage } from "#components/line_items/LineItemImage"
+import { LineItemImage } from "#components/line_items/LineItemImage"
+import type { ChildrenFunction } from "#typings"
+import { defaultGiftCardImgUrl, defaultImgUrl } from "#utils/placeholderImages"
 import { buildLineItem, LineItemProvider } from "./helpers"
 
 describe("LineItemImage component", () => {
@@ -18,7 +20,7 @@ describe("LineItemImage component", () => {
 
   it("uses default placeholder when no image_url is available", () => {
     render(
-      <LineItemProvider lineItem={buildLineItem({ image_url: undefined as any })}>
+      <LineItemProvider lineItem={buildLineItem({ image_url: undefined })}>
         <LineItemImage />
       </LineItemProvider>
     )
@@ -30,13 +32,11 @@ describe("LineItemImage component", () => {
   it('uses the gift card placeholder when item_type is "gift_cards"', () => {
     render(
       <LineItemProvider
-        lineItem={
-          buildLineItem({
-            item_type: "gift_cards",
-            image_url: undefined as any,
-            sku_code: "GIFTCARD001",
-          })
-        }
+        lineItem={buildLineItem({
+          item_type: "gift_cards",
+          image_url: undefined,
+          sku_code: "GIFTCARD001",
+        })}
       >
         <LineItemImage />
       </LineItemProvider>
@@ -48,7 +48,7 @@ describe("LineItemImage component", () => {
 
   it("uses a custom placeholder when provided for the item type", () => {
     render(
-      <LineItemProvider lineItem={buildLineItem({ image_url: undefined as any })}>
+      <LineItemProvider lineItem={buildLineItem({ image_url: undefined })}>
         <LineItemImage placeholder={{ skus: "https://example.com/custom-placeholder.jpg" }} />
       </LineItemProvider>
     )
@@ -61,7 +61,11 @@ describe("LineItemImage component", () => {
     render(
       <LineItemProvider>
         <LineItemImage>
-          {(({ src }: { src: string }) => <span data-testid="custom-image">{src}</span>) as any}
+          {
+            (({ src }: TLineItemImage) => (
+              <span data-testid="custom-image">{src}</span>
+            )) as ChildrenFunction<TLineItemImage>
+          }
         </LineItemImage>
       </LineItemProvider>
     )

@@ -1,7 +1,7 @@
-import { type CSSProperties, type ElementType, type JSX, useContext } from "react"
-import LineItemOptionChildrenContext from "#context/LineItemOptionChildrenContext"
-import Parent from "#components/utils/Parent"
 import type { LineItemOption as LineItemOptionType } from "@commercelayer/sdk"
+import { type CSSProperties, type ElementType, type JSX, useContext } from "react"
+import Parent from "#components/utils/Parent"
+import LineItemOptionChildrenContext from "#context/LineItemOptionChildrenContext"
 import type { ChildrenFunction } from "#typings/index"
 
 export interface TLineItemOption extends Omit<Props, "children"> {

@@ -1,6 +1,6 @@
-import { LineItemRemoveLink } from "#components/line_items/LineItemRemoveLink"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
+import { LineItemRemoveLink } from "#components/line_items/LineItemRemoveLink"
 import { LineItemProvider, LineItemsProvider } from "./helpers"
 
 describe("LineItemRemoveLink component", () => {

@@ -40,7 +40,7 @@ export function LineItemOptions(props: Props): JSX.Element {
   const options = lineItemOptions
     .filter((o) => {
       if (showAll) return true
-      return (o as any).skuOption?.()?.id === skuOptionId
+      return o.sku_option?.id === skuOptionId
     })
     .map((o, k) => {
       const showTitle = showName ? (
@@ -51,7 +51,7 @@ export function LineItemOptions(props: Props): JSX.Element {
         showAll,
       }
       return (
-        <div className={className} key={k} {...p}>
+        <div className={className} key={o.id ?? k} {...p}>
           {showTitle}
           <LineItemOptionChildrenContext.Provider value={valueProps}>
             {children}

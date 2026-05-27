@@ -1,6 +1,6 @@
-import { LineItemQuantity } from "#components/line_items/LineItemQuantity"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
+import { LineItemQuantity } from "#components/line_items/LineItemQuantity"
 import { LineItemProvider, LineItemsProvider } from "./helpers"
 
 describe("LineItemQuantity component", () => {

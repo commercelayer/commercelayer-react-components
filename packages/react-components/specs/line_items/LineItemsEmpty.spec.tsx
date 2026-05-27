@@ -1,6 +1,6 @@
-import { LineItemsEmpty } from "#components/line_items/LineItemsEmpty"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
+import { LineItemsEmpty } from "#components/line_items/LineItemsEmpty"
 import { LineItemsProvider, MOCK_LINE_ITEM } from "./helpers"
 
 describe("LineItemsEmpty component", () => {

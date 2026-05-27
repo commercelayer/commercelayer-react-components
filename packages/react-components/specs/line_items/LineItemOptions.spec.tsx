@@ -1,7 +1,7 @@
-import { LineItemOption } from "#components/line_items/LineItemOption"
-import { LineItemOptions } from "#components/line_items/LineItemOptions"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
+import { LineItemOption } from "#components/line_items/LineItemOption"
+import { LineItemOptions } from "#components/line_items/LineItemOptions"
 import { buildLineItem, buildLineItemOption, LineItemProvider } from "./helpers"
 
 describe("LineItemOptions component", () => {
@@ -10,7 +10,7 @@ describe("LineItemOptions component", () => {
     buildLineItemOption({
       name: "Engraving",
       options: { Text: "Hello" },
-      skuOption: () => ({ id: "sku-opt-2" }),
+      sku_option: { id: "sku-opt-2" },
     }),
   ]
 

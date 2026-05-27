@@ -1,8 +1,8 @@
-import { useContext, useMemo, type JSX } from "react"
+import { type JSX, useContext, useMemo } from "react"
 import Parent from "#components/utils/Parent"
-import getLineItemsCount from "#utils/getLineItemsCount"
 import LineItemContext from "#context/LineItemContext"
 import type { ChildrenFunction } from "#typings/index"
+import getLineItemsCount from "#utils/getLineItemsCount"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   quantity: number

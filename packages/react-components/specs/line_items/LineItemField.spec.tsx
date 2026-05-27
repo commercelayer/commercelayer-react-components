@@ -1,6 +1,6 @@
-import { LineItemField } from "#components/line_items/LineItemField"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
+import { LineItemField } from "#components/line_items/LineItemField"
 import { LineItemProvider } from "./helpers"
 
 describe("LineItemField component", () => {

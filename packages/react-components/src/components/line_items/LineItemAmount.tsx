@@ -1,8 +1,8 @@
-import { useContext, useMemo, type JSX } from "react"
-import getAmount from "#utils/getAmount"
-import LineItemChildrenContext from "#context/LineItemChildrenContext"
+import { type JSX, useContext, useMemo } from "react"
 import Parent from "#components/utils/Parent"
+import LineItemChildrenContext from "#context/LineItemChildrenContext"
 import type { BaseAmountComponent, BasePriceType } from "#typings/index"
+import getAmount from "#utils/getAmount"
 
 type Props = BaseAmountComponent & {
   type?: BasePriceType

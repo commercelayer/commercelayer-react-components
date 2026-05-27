@@ -1,6 +1,6 @@
-import { LineItemCode } from "#components/line_items/LineItemCode"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
+import { LineItemCode } from "#components/line_items/LineItemCode"
 import { buildLineItem, LineItemProvider } from "./helpers"
 
 describe("LineItemCode component", () => {

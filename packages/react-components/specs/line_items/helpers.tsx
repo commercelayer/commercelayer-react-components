@@ -1,16 +1,17 @@
-import LineItemContext from "#context/LineItemContext"
+import type { LineItem, LineItemOption } from "@commercelayer/sdk"
+import type { ReactNode } from "react"
 import LineItemChildrenContext from "#context/LineItemChildrenContext"
+import LineItemContext from "#context/LineItemContext"
 import LineItemOptionChildrenContext from "#context/LineItemOptionChildrenContext"
 import ShipmentChildrenContext from "#context/ShipmentChildrenContext"
-import type { ReactNode } from "react"
 
-export const MOCK_LINE_ITEM: any = {
+export const MOCK_LINE_ITEM: Partial<LineItem> = {
   id: "li_1",
   item_type: "skus",
   quantity: 2,
   name: "Baby Onesie",
   sku_code: "BABYONBU000000E63E7412MX",
-  bundle_code: null,
+  bundle_code: undefined,
   image_url: "https://example.com/img.jpg",
   formatted_total_amount: "€24.00",
   total_amount_float: 24.0,
@@ -21,7 +22,7 @@ export const MOCK_LINE_ITEM: any = {
   line_item_options: [],
 }
 
-export function buildLineItem(overrides: Record<string, any> = {}) {
+export function buildLineItem(overrides: Partial<LineItem> = {}): Partial<LineItem> {
   return {
     ...MOCK_LINE_ITEM,
     ...overrides,
@@ -35,15 +36,16 @@ export function buildLineItemOption(overrides: Record<string, unknown> = {}) {
       Size: "M",
       Color: "Blue",
     },
-    skuOption: () => ({ id: "sku-opt-1" }),
+    sku_option: { id: "sku-opt-1" },
     ...overrides,
   }
 }
 
-export function LineItemProvider(props: { children: ReactNode; lineItem?: any }) {
-  const lineItem = Object.prototype.hasOwnProperty.call(props, "lineItem")
-    ? props.lineItem
-    : MOCK_LINE_ITEM
+export function LineItemProvider(props: {
+  children: ReactNode
+  lineItem?: Partial<LineItem> | null
+}) {
+  const lineItem = "lineItem" in props ? props.lineItem : MOCK_LINE_ITEM
 
   return (
     <LineItemChildrenContext.Provider value={{ lineItem }}>
@@ -54,18 +56,20 @@ export function LineItemProvider(props: { children: ReactNode; lineItem?: any })
 
 export function LineItemsProvider(props: {
   children: ReactNode
-  lineItems?: any
-  updateLineItem?: any
-  deleteLineItem?: any
+  lineItems?: Array<Partial<LineItem>>
+  updateLineItem?: (
+    lineItemId: string,
+    quantity?: number,
+    hasExternalPrice?: boolean
+  ) => Promise<void>
+  deleteLineItem?: (lineItemId: string) => Promise<void>
 }) {
-  const lineItems = Object.prototype.hasOwnProperty.call(props, "lineItems")
-    ? props.lineItems
-    : [MOCK_LINE_ITEM]
+  const lineItems = "lineItems" in props ? props.lineItems : [MOCK_LINE_ITEM]
 
   return (
     <LineItemContext.Provider
       value={{
-        lineItems,
+        lineItems: lineItems as LineItem[],
         updateLineItem: props.updateLineItem,
         deleteLineItem: props.deleteLineItem,
       }}
@@ -77,11 +81,11 @@ export function LineItemsProvider(props: {
 
 export function LineItemOptionProvider({
   children,
-  lineItemOption = buildLineItemOption(),
+  lineItemOption = buildLineItemOption() as unknown as Partial<LineItemOption>,
   showAll,
 }: {
   children: ReactNode
-  lineItemOption?: any
+  lineItemOption?: Partial<LineItemOption>
   showAll?: boolean
 }) {
   return (
@@ -96,7 +100,7 @@ export function ShipmentProvider({
   lineItems = [],
 }: {
   children: ReactNode
-  lineItems?: any[]
+  lineItems?: Array<LineItem | null | undefined>
 }) {
   return (
     <ShipmentChildrenContext.Provider value={{ keyNumber: 0, lineItems }}>

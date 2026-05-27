@@ -1,6 +1,6 @@
-import { LineItemName } from "#components/line_items/LineItemName"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
+import { LineItemName } from "#components/line_items/LineItemName"
 import { LineItemProvider } from "./helpers"
 
 describe("LineItemName component", () => {

@@ -1,8 +1,8 @@
-import { useMemo, type JSX } from "react"
+import { type JSX, useMemo } from "react"
 import Parent from "#components/utils/Parent"
-import getLineItemsCount, { type TypeAccepted } from "#utils/getLineItemsCount"
 import LineItemContext from "#context/LineItemContext"
 import type { ChildrenFunction } from "#typings/index"
+import getLineItemsCount, { type TypeAccepted } from "#utils/getLineItemsCount"
 import useCustomContext from "#utils/hooks/useCustomContext"
 
 interface ChildrenProps extends Omit<Props, "children"> {

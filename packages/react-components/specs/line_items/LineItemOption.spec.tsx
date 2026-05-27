@@ -1,6 +1,6 @@
-import { LineItemOption } from "#components/line_items/LineItemOption"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
+import { LineItemOption } from "#components/line_items/LineItemOption"
 import { buildLineItemOption, LineItemOptionProvider } from "./helpers"
 
 describe("LineItemOption component", () => {
@@ -72,7 +72,9 @@ describe("LineItemOption component", () => {
 
   it("falls back to an empty string when the option value is undefined", () => {
     render(
-      <LineItemOptionProvider lineItemOption={buildLineItemOption({ options: { Size: undefined } })}>
+      <LineItemOptionProvider
+        lineItemOption={buildLineItemOption({ options: { Size: undefined } })}
+      >
         <LineItemOption name="Size" />
       </LineItemOptionProvider>
     )

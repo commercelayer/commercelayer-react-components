@@ -1,10 +1,11 @@
-import { LineItem } from "#components/line_items/LineItem"
-import LineItemContext from "#context/LineItemContext"
-import LineItemChildrenContext from "#context/LineItemChildrenContext"
-import ShipmentChildrenContext from "#context/ShipmentChildrenContext"
+import type { LineItem as LineItemResource } from "@commercelayer/sdk"
 import { render, screen } from "@testing-library/react"
 import { useContext } from "react"
 import { describe, expect, it } from "vitest"
+import { LineItem } from "#components/line_items/LineItem"
+import LineItemChildrenContext from "#context/LineItemChildrenContext"
+import LineItemContext from "#context/LineItemContext"
+import ShipmentChildrenContext from "#context/ShipmentChildrenContext"
 import { buildLineItem, MOCK_LINE_ITEM } from "./helpers"
 
 function Child() {
@@ -18,8 +19,8 @@ function renderComponent({
   shipmentLineItems = [],
 }: {
   type?: "skus" | "gift_cards" | "bundles"
-  lineItems?: any[]
-  shipmentLineItems?: any[]
+  lineItems?: Array<Partial<LineItemResource>>
+  shipmentLineItems?: Array<Partial<LineItemResource>>
 } = {}) {
   return render(
     <LineItemContext.Provider value={{ lineItems }}>
