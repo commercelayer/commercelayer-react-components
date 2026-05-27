@@ -1,4 +1,4 @@
-import { useState, useEffect, type JSX } from "react"
+import { useMemo, type JSX } from "react"
 import Parent from "#components/utils/Parent"
 import getLineItemsCount, { type TypeAccepted } from "#utils/getLineItemsCount"
 import LineItemContext from "#context/LineItemContext"
@@ -22,19 +22,10 @@ export function LineItemsCount(props: Props): JSX.Element {
     currentComponentName: "LineItemsCount",
     key: "lineItems",
   })
-  const [quantity, setQuantity] = useState(0)
-  useEffect(() => {
-    if (lineItems && lineItems.length > 0) {
-      const qty = getLineItemsCount({
-        lineItems: lineItems || [],
-        typeAccepted,
-      })
-      setQuantity(qty)
-    }
-    return (): void => {
-      setQuantity(0)
-    }
-  }, [lineItems, typeAccepted])
+  const quantity = useMemo(
+    () => (lineItems && lineItems.length > 0 ? getLineItemsCount({ lineItems, typeAccepted }) : 0),
+    [lineItems, typeAccepted]
+  )
   const parentProps = {
     quantity,
     typeAccepted,

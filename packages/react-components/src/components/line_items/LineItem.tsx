@@ -26,7 +26,7 @@ export function LineItem(props: Props): JSX.Element {
   const items = shipmentLineItems && shipmentLineItems?.length > 0 ? shipmentLineItems : lineItems
   const components = items
     ?.filter((l) => l?.item_type === type)
-    .map((lineItem, k, check) => {
+    .map((lineItem, k, check): JSX.Element | null => {
       if (
         lineItem?.item_type === "bundles" &&
         k > 0 &&
@@ -35,7 +35,7 @@ export function LineItem(props: Props): JSX.Element {
         return null
       if (
         lineItem?.item_type === "gift_cards" &&
-        lineItem?.total_amount_cents &&
+        lineItem?.total_amount_cents != null &&
         lineItem?.total_amount_cents <= 0
       )
         return null

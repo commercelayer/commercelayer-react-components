@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, type JSX } from "react"
+import { useContext, useMemo, type JSX } from "react"
 import getAmount from "#utils/getAmount"
 import LineItemChildrenContext from "#context/LineItemChildrenContext"
 import Parent from "#components/utils/Parent"
@@ -11,21 +11,10 @@ type Props = BaseAmountComponent & {
 export function LineItemAmount(props: Props): JSX.Element {
   const { format = "formatted", type = "total", ...p } = props
   const { lineItem } = useContext(LineItemChildrenContext)
-  const [price, setPrice] = useState("")
-  useEffect(() => {
-    if (lineItem) {
-      const p = getAmount({
-        base: "amount",
-        type,
-        format,
-        obj: lineItem,
-      })
-      setPrice(p)
-    }
-    return (): void => {
-      setPrice("")
-    }
-  }, [lineItem])
+  const price = useMemo(
+    () => (lineItem ? getAmount({ base: "amount", type, format, obj: lineItem }) : ""),
+    [lineItem, type, format]
+  )
   const parentProps = {
     price,
     ...p,
