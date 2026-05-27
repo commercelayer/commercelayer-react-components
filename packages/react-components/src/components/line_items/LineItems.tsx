@@ -48,7 +48,9 @@ export function LineItems({
   } = useLineItems({ accessToken, orderId })
 
   const lineItems =
-    types != null ? allLineItems.filter((li) => types.includes(li.item_type as TLineItem)) : allLineItems
+    types != null
+      ? allLineItems.filter((li) => types.includes(li.item_type as TLineItem))
+      : allLineItems
 
   const errors: BaseError[] = error
     ? [{ code: "INTERNAL_SERVER_ERROR", message: error, resource: "line_items" }]

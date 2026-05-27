@@ -1,17 +1,17 @@
-import { useEffect, useReducer, useContext, type JSX } from "react"
+import { type JSX, useContext, useEffect, useReducer } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import LineItemContext, { type LineItemContextValue } from "#context/LineItemContext"
+import OrderContext from "#context/OrderContext"
 import lineItemReducer, {
+  deleteLineItem,
   lineItemInitialState,
   updateLineItem,
-  deleteLineItem,
 } from "#reducers/LineItemReducer"
-import OrderContext from "#context/OrderContext"
-import LineItemContext, { type LineItemContextValue } from "#context/LineItemContext"
-import CommerceLayerContext from "#context/CommerceLayerContext"
 import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
   children: DefaultChildrenType
-  filters?: Record<string, any>
+  filters?: Record<string, unknown>
   loader?: JSX.Element
 }
 
@@ -48,7 +48,7 @@ export function LineItemsContainer(props: Props): JSX.Element {
         },
       })
     }
-  }, [include, includeLoaded])
+  }, [include, includeLoaded, addResourceToInclude])
   useEffect(() => {
     if (order?.line_items) {
       dispatch({
