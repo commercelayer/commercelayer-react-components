@@ -18,7 +18,7 @@ export function LineItemsCount(props: Props): JSX.Element {
   const { children, typeAccepted, ...p } = props
   const { lineItems } = useCustomContext({
     context: LineItemContext,
-    contextComponentName: "LineItemsContainer",
+    contextComponentName: "LineItems",
     currentComponentName: "LineItemsCount",
     key: "lineItems",
   })

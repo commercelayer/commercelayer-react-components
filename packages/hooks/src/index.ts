@@ -1,5 +1,6 @@
 export type { InterceptorManager } from "@commercelayer/core"
 export { useAvailability } from "./availability/useAvailability"
+export { useLineItems } from "./line_items/useLineItems"
 export { useOrder } from "./orders/useOrder"
 export { usePrices } from "./prices/usePrices"
 export { useSkuList } from "./sku_lists/useSkuList"

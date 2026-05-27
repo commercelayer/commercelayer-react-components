@@ -15,6 +15,10 @@ interface Props {
   loader?: JSX.Element
 }
 
+/**
+ * @deprecated Use `<LineItems accessToken="..." orderId="...">` instead.
+ * `LineItemsContainer` requires an `OrderContext` parent and will be removed in a future major version.
+ */
 export function LineItemsContainer(props: Props): JSX.Element {
   const { children, loader = "Loading..." } = props
   const { order, addResourceToInclude, include, orderId, getOrder, includeLoaded } =
