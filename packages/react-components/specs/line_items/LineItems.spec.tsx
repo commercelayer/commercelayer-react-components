@@ -1,6 +1,6 @@
-import { render, screen, act } from "@testing-library/react"
+import { act, render, screen } from "@testing-library/react"
 import { type ReactNode, useContext } from "react"
-import { vi, beforeEach, describe, it, expect } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import { LineItems } from "#components/line_items/LineItems"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import LineItemContext from "#context/LineItemContext"

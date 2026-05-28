@@ -1,9 +1,9 @@
-import { useContext, type ReactNode, type JSX } from "react"
+import type { LineItem } from "@commercelayer/sdk"
+import { type JSX, type ReactNode, useContext } from "react"
+import Parent from "#components/utils/Parent"
 import LineItemChildrenContext from "#context/LineItemChildrenContext"
 import LineItemContext from "#context/LineItemContext"
-import Parent from "#components/utils/Parent"
 import type { ChildrenFunction } from "#typings"
-import type { LineItem } from "@commercelayer/sdk"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   quantity: number

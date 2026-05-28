@@ -1,8 +1,8 @@
-import { useContext, useState, useEffect, type JSX } from "react"
+import { type JSX, useContext, useMemo } from "react"
 import Parent from "#components/utils/Parent"
-import getLineItemsCount from "#utils/getLineItemsCount"
 import LineItemContext from "#context/LineItemContext"
 import type { ChildrenFunction } from "#typings/index"
+import getLineItemsCount from "#utils/getLineItemsCount"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   quantity: number
@@ -17,21 +17,11 @@ interface Props extends Omit<JSX.IntrinsicElements["span"], "children"> {
 export function LineItemsEmpty(props: Props): JSX.Element | null {
   const { children, text = "Your shopping bag is empty", ...p } = props
   const { lineItems } = useContext(LineItemContext)
-  const [quantity, setQuantity] = useState<undefined | number>()
-  const emptyText = quantity === 0 ? <span {...p}>{text}</span> : null
-  useEffect(() => {
-    if (lineItems) {
-      if (lineItems.length > 0) {
-        const qty = getLineItemsCount({ lineItems: lineItems || [] })
-        setQuantity(qty)
-      } else {
-        setQuantity(0)
-      }
-    }
-    return (): void => {
-      setQuantity(undefined)
-    }
+  const quantity = useMemo(() => {
+    if (lineItems == null) return undefined
+    return getLineItemsCount({ lineItems })
   }, [lineItems])
+  const emptyText = quantity === 0 ? <span {...p}>{text}</span> : null
   const parentProps = {
     quantity,
     text,

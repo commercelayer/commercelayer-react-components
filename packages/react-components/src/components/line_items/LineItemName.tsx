@@ -1,7 +1,7 @@
-import { useContext, type JSX } from "react"
-import LineItemChildrenContext from "#context/LineItemChildrenContext"
-import Parent from "#components/utils/Parent"
 import type { LineItem } from "@commercelayer/sdk"
+import { type JSX, useContext } from "react"
+import Parent from "#components/utils/Parent"
+import LineItemChildrenContext from "#context/LineItemChildrenContext"
 import type { ChildrenFunction } from "#typings/index"
 
 export interface TLineItemName extends Omit<Props, "children"> {

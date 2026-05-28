@@ -1,4 +1,4 @@
-import { useContext, type ReactNode, type JSX } from "react"
+import { type ElementType, type JSX, type ReactNode, useContext } from "react"
 import LineItemChildrenContext from "#context/LineItemChildrenContext"
 import LineItemOptionChildrenContext, {
   type TLineItemOptions,
@@ -36,12 +36,11 @@ export function LineItemOptions(props: Props): JSX.Element {
   } = props
   const { lineItem } = useContext(LineItemChildrenContext)
   const lineItemOptions = lineItem != null ? lineItem?.line_item_options || [] : []
-  const TitleTagElement = titleTagElement as any
+  const TitleTagElement: ElementType = titleTagElement
   const options = lineItemOptions
     .filter((o) => {
       if (showAll) return true
-      // @ts-expect-error no type
-      return o.skuOption().id === skuOptionId
+      return o.sku_option?.id === skuOptionId
     })
     .map((o, k) => {
       const showTitle = showName ? (
@@ -52,7 +51,7 @@ export function LineItemOptions(props: Props): JSX.Element {
         showAll,
       }
       return (
-        <div className={className} key={k} {...p}>
+        <div className={className} key={o.id ?? k} {...p}>
           {showTitle}
           <LineItemOptionChildrenContext.Provider value={valueProps}>
             {children}
