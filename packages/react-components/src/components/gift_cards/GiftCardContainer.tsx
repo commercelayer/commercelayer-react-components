@@ -14,7 +14,6 @@ import GiftCardContext, {
 import OrderContext from "#context/OrderContext"
 import type { BaseError, TAPIError } from "#typings/errors"
 import getErrors from "#utils/getErrors"
-import { isEmpty } from "#utils/isEmpty"
 
 export interface GiftCardContainerProps {
   children: ReactNode
@@ -57,8 +56,8 @@ export function GiftCardContainer(props: GiftCardContainerProps): JSX.Element {
     )
   }
   const { children } = props
-  const [errors, setErrors] = useState<BaseError[]>(giftCardInitialState.errors ?? [])
-  const [loading, setLoading] = useState<boolean>(giftCardInitialState.loading ?? false)
+  const [errors, setErrors] = useState<BaseError[]>(giftCardInitialState.errors!)
+  const [loading, setLoading] = useState<boolean>(giftCardInitialState.loading!)
   const [giftCardRecipient, setGiftCardRecipient] = useState<GiftCardRecipient | undefined>(
     undefined
   )
@@ -102,7 +101,7 @@ export function GiftCardContainer(props: GiftCardContainerProps): JSX.Element {
         }
         if (firstName) recipientValues.first_name = firstName
         if (lastName) recipientValues.last_name = lastName
-        if (!isEmpty(recipientValues)) {
+        if (firstName != null || lastName != null) {
           await sdk.gift_card_recipients.update(recipientValues)
         }
         if (createOrder && getOrder) {

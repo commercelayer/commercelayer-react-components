@@ -24,7 +24,7 @@ export function GiftCardOrCouponInput(props: Props): JSX.Element | null {
   return codeType == null ? null : (
     <BaseInput
       type="text"
-      name={codeType ?? "gift_card_or_coupon_code"}
+      name={codeType}
       required={required !== undefined ? required : true}
       placeholder={placeholderLabel}
       defaultValue={value}

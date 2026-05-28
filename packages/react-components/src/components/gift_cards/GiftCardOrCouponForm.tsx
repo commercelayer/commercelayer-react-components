@@ -49,15 +49,15 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
     async (e: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
       e.preventDefault()
       if (type == null || values[type] == null || setGiftCardOrCouponCode == null) return
+      const form = e.currentTarget
       const code = values[type].value
       const { success, order: updatedOrder } = await setGiftCardOrCouponCode({
         code,
         // "gift_card_or_coupon_code" is accepted by the CL API at runtime
         codeType: type as OrderCodeType,
       })
-      const value = values[type]?.value ?? ""
-      onSubmit?.({ success, value, order: updatedOrder })
-      if (success) e.currentTarget.reset()
+      onSubmit?.({ success, value: code, order: updatedOrder })
+      if (success) form.reset()
     },
     [type, values, setGiftCardOrCouponCode, onSubmit]
   )
