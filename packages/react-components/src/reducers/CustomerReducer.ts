@@ -222,7 +222,7 @@ export async function deleteCustomerAddress({
           addresses: newAddresses,
         },
       })
-    } catch (error) {
+    } catch {
       throw new Error("Couldn't delete address")
     }
   }
@@ -411,7 +411,7 @@ export async function createCustomerAddress({
           }
         }
       }
-    } catch (error) {
+    } catch {
       throw new Error("Couldn't create customer address")
     }
   }
@@ -464,7 +464,7 @@ export async function deleteCustomerPayment({
         config,
         dispatch,
       })
-    } catch (error) {
+    } catch {
       throw new Error("Couldn't delete payment source")
     }
   }
