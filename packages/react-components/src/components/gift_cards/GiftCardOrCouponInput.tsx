@@ -16,7 +16,7 @@ type Props = {
 
 export function GiftCardOrCouponInput(props: Props): JSX.Element | null {
   const { placeholder = "", required, value, placeholderTranslation, name, ...p } = props
-  const { validation, codeType } = useContext(CouponAndGiftCardFormContext)
+  const { codeType } = useContext(CouponAndGiftCardFormContext)
   let placeholderLabel = placeholder
   if (placeholderTranslation && codeType) {
     placeholderLabel = placeholderTranslation(codeType)
@@ -25,8 +25,6 @@ export function GiftCardOrCouponInput(props: Props): JSX.Element | null {
     <BaseInput
       type="text"
       name={codeType ?? "gift_card_or_coupon_code"}
-      // biome-ignore lint/suspicious/noExplicitAny: ref forwarding requires any cast for BaseInput compatibility
-      ref={validation as any}
       required={required !== undefined ? required : true}
       placeholder={placeholderLabel}
       defaultValue={value}
