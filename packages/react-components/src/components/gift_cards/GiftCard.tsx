@@ -1,19 +1,22 @@
-import { useContext, useMemo, useReducer, type RefObject, type JSX } from "react"
+import { useContext, useMemo, useState, type RefObject, type JSX } from "react"
 import validateFormFields from "#utils/validateFormFields"
 import { isEmpty } from "#utils/isEmpty"
-import GiftCardContext, { type GCContext } from "#context/GiftCardContext"
-import CommerceLayerContext from "#context/CommerceLayerContext"
-import OrderContext from "#context/OrderContext"
-import giftCardReducer, {
+import GiftCardContext, {
   giftCardInitialState,
-  addGiftCard,
-  addGiftCardError,
-  addGiftCardLoading,
-  addGiftCardRecipient,
+  type GCContext,
   type GiftCardI,
   type GiftCardRecipientI,
-} from "#reducers/GiftCardReducer"
-import type { BaseError } from "#typings/errors"
+} from "#context/GiftCardContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
+import { createGiftCard, getSdk } from "@commercelayer/core"
+import getErrors from "#utils/getErrors"
+import type {
+  GiftCardRecipient,
+  GiftCardRecipientCreate,
+  GiftCardRecipientUpdate,
+} from "@commercelayer/sdk"
+import type { BaseError, TAPIError } from "#typings/errors"
 import type { BaseState } from "#typings/index"
 import type { DefaultChildrenType } from "#typings/globals"
 
@@ -54,29 +57,80 @@ export function GiftCard(props: GiftCardProps): JSX.Element {
   const isStandalone = containerContext.addGiftCard == null
 
   // Always initialize hooks (rules of hooks) — values only used when standalone.
-  const [state, dispatch] = useReducer(giftCardReducer, giftCardInitialState)
+  const [errors, setErrors] = useState<BaseError[]>(giftCardInitialState.errors ?? [])
+  const [loading, setLoading] = useState<boolean>(giftCardInitialState.loading ?? false)
+  const [giftCardRecipient, setGiftCardRecipient] = useState<GiftCardRecipient | undefined>(
+    undefined
+  )
   const config = useContext(CommerceLayerContext)
   const { getOrder, createOrder, order } = useContext(OrderContext)
 
   // Memoized standalone context value — only provided when not inside GiftCardContainer.
   const standaloneContextValue = useMemo<GCContext>(
     () => ({
-      ...state,
-      addGiftCardRecipient: async (values: GiftCardRecipientI & object) => {
-        await addGiftCardRecipient(values as Parameters<typeof addGiftCardRecipient>[0], config, dispatch)
+      ...giftCardInitialState,
+      errors,
+      loading,
+      giftCardRecipient,
+      addGiftCardRecipient: async (values: GiftCardRecipientI & object): Promise<void> => {
+        try {
+          const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+          const recipient = await sdk.gift_card_recipients.create(
+            values as GiftCardRecipientCreate
+          )
+          setGiftCardRecipient(recipient)
+        } catch (error) {
+          console.error(error)
+        }
       },
-      addGiftCard: async (values: GiftCardI & object) => {
-        await addGiftCard({ ...values }, { config, dispatch, getOrder, createOrder, order })
+      addGiftCard: async (values: GiftCardI & object): Promise<void> => {
+        try {
+          const { firstName, lastName, email, ...val } = values as GiftCardI
+          setLoading(true)
+          setErrors([])
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const giftCard = await createGiftCard({
+            accessToken: config.accessToken!,
+            interceptors: config.interceptors,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            resource: { recipient_email: email, ...val } as any,
+            params: { include: ["gift_card_recipient"] },
+          })
+          const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+          const recipientValues: GiftCardRecipientUpdate = {
+            id: giftCard.gift_card_recipient?.id ?? "",
+          }
+          if (firstName) recipientValues.first_name = firstName
+          if (lastName) recipientValues.last_name = lastName
+          if (!isEmpty(recipientValues)) {
+            await sdk.gift_card_recipients.update(recipientValues)
+          }
+          if (createOrder && getOrder) {
+            const id = order ? order.id : await createOrder({})
+            if (id) {
+              const orderRel = sdk.orders.relationship(id)
+              const item = sdk.gift_cards.relationship(giftCard.id)
+              await sdk.line_items.create({ quantity: 1, order: orderRel, item })
+              await getOrder(id)
+            }
+          }
+          setGiftCardRecipient(giftCard.gift_card_recipient ?? undefined)
+          setLoading(false)
+        } catch (error: unknown) {
+          const errs = getErrors({ error: error as TAPIError, resource: "gift_cards" })
+          setErrors(errs)
+          setLoading(false)
+        }
       },
-      addGiftCardError: (errors: BaseError[]): void => {
-        addGiftCardError(errors, dispatch)
+      addGiftCardError: (errs: BaseError[]): void => {
+        setErrors(errs)
       },
-      addGiftCardLoading: (loading: boolean): void => {
-        addGiftCardLoading(loading, dispatch)
+      addGiftCardLoading: (l: boolean): void => {
+        setLoading(l)
       },
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state, config, getOrder, createOrder, order]
+    [errors, loading, giftCardRecipient, config, getOrder, createOrder, order]
   )
 
   // In standalone mode use the internal context; in container mode re-expose the container's

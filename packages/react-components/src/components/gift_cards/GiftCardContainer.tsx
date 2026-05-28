@@ -1,14 +1,20 @@
-import { useReducer, useContext, type ReactNode, type JSX } from "react"
-import GiftCardContext from "#context/GiftCardContext"
-import CommerceLayerContext from "#context/CommerceLayerContext"
-import giftCardReducer, {
+import { useState, useContext, type ReactNode, type JSX } from "react"
+import GiftCardContext, {
   giftCardInitialState,
-  addGiftCardRecipient,
-  addGiftCard,
-  addGiftCardError,
-  addGiftCardLoading,
-} from "#reducers/GiftCardReducer"
+  type GiftCardI,
+  type GiftCardRecipientI,
+} from "#context/GiftCardContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import { createGiftCard, getSdk } from "@commercelayer/core"
+import getErrors from "#utils/getErrors"
+import { isEmpty } from "#utils/isEmpty"
 import OrderContext from "#context/OrderContext"
+import type {
+  GiftCardRecipient,
+  GiftCardRecipientCreate,
+  GiftCardRecipientUpdate,
+} from "@commercelayer/sdk"
+import type { BaseError, TAPIError } from "#typings/errors"
 
 export interface GiftCardContainerProps {
   children: ReactNode
@@ -51,22 +57,71 @@ export function GiftCardContainer(props: GiftCardContainerProps): JSX.Element {
     )
   }
   const { children } = props
-  const [state, dispatch] = useReducer(giftCardReducer, giftCardInitialState)
+  const [errors, setErrors] = useState<BaseError[]>(giftCardInitialState.errors ?? [])
+  const [loading, setLoading] = useState<boolean>(giftCardInitialState.loading ?? false)
+  const [giftCardRecipient, setGiftCardRecipient] = useState<GiftCardRecipient | undefined>(
+    undefined
+  )
   const config = useContext(CommerceLayerContext)
   const { getOrder, createOrder, order } = useContext(OrderContext)
   const giftCardValue = {
-    ...state,
-    addGiftCardRecipient: async (values: any) => {
-      await addGiftCardRecipient(values, config, dispatch)
+    ...giftCardInitialState,
+    errors,
+    loading,
+    giftCardRecipient,
+    addGiftCardRecipient: async (values: GiftCardRecipientI & object): Promise<void> => {
+      try {
+        const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+        const recipient = await sdk.gift_card_recipients.create(values as GiftCardRecipientCreate)
+        setGiftCardRecipient(recipient)
+      } catch (error) {
+        console.error(error)
+      }
     },
-    addGiftCard: async (values: any) => {
-      await addGiftCard({ ...values }, { config, dispatch, getOrder, createOrder, order })
+    addGiftCard: async (values: GiftCardI & object): Promise<void> => {
+      try {
+        const { firstName, lastName, email, ...val } = values as GiftCardI
+        setLoading(true)
+        setErrors([])
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const giftCard = await createGiftCard({
+          accessToken: config.accessToken!,
+          interceptors: config.interceptors,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          resource: { recipient_email: email, ...val } as any,
+          params: { include: ["gift_card_recipient"] },
+        })
+        const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+        const recipientValues: GiftCardRecipientUpdate = {
+          id: giftCard.gift_card_recipient?.id ?? "",
+        }
+        if (firstName) recipientValues.first_name = firstName
+        if (lastName) recipientValues.last_name = lastName
+        if (!isEmpty(recipientValues)) {
+          await sdk.gift_card_recipients.update(recipientValues)
+        }
+        if (createOrder && getOrder) {
+          const id = order ? order.id : await createOrder({})
+          if (id) {
+            const orderRel = sdk.orders.relationship(id)
+            const item = sdk.gift_cards.relationship(giftCard.id)
+            await sdk.line_items.create({ quantity: 1, order: orderRel, item })
+            await getOrder(id)
+          }
+        }
+        setGiftCardRecipient(giftCard.gift_card_recipient ?? undefined)
+        setLoading(false)
+      } catch (error: unknown) {
+        const errs = getErrors({ error: error as TAPIError, resource: "gift_cards" })
+        setErrors(errs)
+        setLoading(false)
+      }
     },
-    addGiftCardError: (errors: any): void => {
-      addGiftCardError(errors, dispatch)
+    addGiftCardError: (errs: BaseError[]): void => {
+      setErrors(errs)
     },
-    addGiftCardLoading: (loading: boolean): void => {
-      addGiftCardLoading(loading, dispatch)
+    addGiftCardLoading: (l: boolean): void => {
+      setLoading(l)
     },
   }
   return <GiftCardContext.Provider value={giftCardValue}>{children}</GiftCardContext.Provider>
