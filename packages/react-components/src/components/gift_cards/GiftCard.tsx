@@ -140,7 +140,7 @@ export function GiftCard(props: GiftCardProps): JSX.Element {
   // context so all descendants (including <Errors> inside this form) stay in sync.
   const activeContext = isStandalone ? standaloneContextValue : containerContext
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>): void => {
     e.preventDefault()
     const form = e.currentTarget
     const { errors, values } = validateFormFields<RequiredFields[]>(

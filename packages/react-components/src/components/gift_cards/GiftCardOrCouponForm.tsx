@@ -46,7 +46,7 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
   }, [order, codeType])
 
   const handleSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    async (e: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
       e.preventDefault()
       if (type == null || values[type] == null || setGiftCardOrCouponCode == null) return
       const code = values[type].value
