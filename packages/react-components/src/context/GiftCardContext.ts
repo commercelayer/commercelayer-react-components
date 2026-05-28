@@ -1,5 +1,5 @@
-import { createContext } from "react"
 import type { GiftCardRecipient, Market } from "@commercelayer/sdk"
+import { createContext } from "react"
 import type { BaseMetadata } from "#typings"
 import type { BaseError } from "#typings/errors"
 

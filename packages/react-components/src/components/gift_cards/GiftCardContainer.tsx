@@ -1,20 +1,20 @@
-import { useState, useContext, type ReactNode, type JSX } from "react"
-import GiftCardContext, {
-  giftCardInitialState,
-  type GiftCardI,
-  type GiftCardRecipientI,
-} from "#context/GiftCardContext"
-import CommerceLayerContext from "#context/CommerceLayerContext"
 import { createGiftCard, getSdk } from "@commercelayer/core"
-import getErrors from "#utils/getErrors"
-import { isEmpty } from "#utils/isEmpty"
-import OrderContext from "#context/OrderContext"
 import type {
   GiftCardRecipient,
   GiftCardRecipientCreate,
   GiftCardRecipientUpdate,
 } from "@commercelayer/sdk"
+import { type JSX, type ReactNode, useContext, useState } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import GiftCardContext, {
+  type GiftCardI,
+  type GiftCardRecipientI,
+  giftCardInitialState,
+} from "#context/GiftCardContext"
+import OrderContext from "#context/OrderContext"
 import type { BaseError, TAPIError } from "#typings/errors"
+import getErrors from "#utils/getErrors"
+import { isEmpty } from "#utils/isEmpty"
 
 export interface GiftCardContainerProps {
   children: ReactNode
@@ -71,7 +71,10 @@ export function GiftCardContainer(props: GiftCardContainerProps): JSX.Element {
     giftCardRecipient,
     addGiftCardRecipient: async (values: GiftCardRecipientI & object): Promise<void> => {
       try {
-        const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+        const sdk = getSdk({
+          accessToken: config.accessToken ?? "",
+          interceptors: config.interceptors,
+        })
         const recipient = await sdk.gift_card_recipients.create(values as GiftCardRecipientCreate)
         setGiftCardRecipient(recipient)
       } catch (error) {
@@ -83,15 +86,17 @@ export function GiftCardContainer(props: GiftCardContainerProps): JSX.Element {
         const { firstName, lastName, email, ...val } = values as GiftCardI
         setLoading(true)
         setErrors([])
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const giftCard = await createGiftCard({
-          accessToken: config.accessToken!,
+          accessToken: config.accessToken ?? "",
           interceptors: config.interceptors,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // biome-ignore lint/suspicious/noExplicitAny: form values use camelCase field names at runtime
           resource: { recipient_email: email, ...val } as any,
           params: { include: ["gift_card_recipient"] },
         })
-        const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+        const sdk = getSdk({
+          accessToken: config.accessToken ?? "",
+          interceptors: config.interceptors,
+        })
         const recipientValues: GiftCardRecipientUpdate = {
           id: giftCard.gift_card_recipient?.id ?? "",
         }

@@ -1,8 +1,8 @@
-import { useContext, type JSX } from "react"
+import { type JSX, useContext } from "react"
 import BaseInput from "#components/utils/BaseInput"
 import CouponAndGiftCardFormContext from "#context/CouponAndGiftCardFormContext"
-import type { BaseInputComponentProps } from "#typings"
 import type { OrderCodeType } from "#reducers/OrderReducer"
+import type { BaseInputComponentProps } from "#typings"
 
 type FieldName = "gift_card_code" | "coupon_code"
 
@@ -25,6 +25,7 @@ export function GiftCardOrCouponInput(props: Props): JSX.Element | null {
     <BaseInput
       type="text"
       name={codeType ?? "gift_card_or_coupon_code"}
+      // biome-ignore lint/suspicious/noExplicitAny: ref forwarding requires any cast for BaseInput compatibility
       ref={validation as any}
       required={required !== undefined ? required : true}
       placeholder={placeholderLabel}
