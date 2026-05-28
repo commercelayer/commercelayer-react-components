@@ -109,7 +109,12 @@ export function GiftCard(props: GiftCardProps): JSX.Element {
             await sdk.gift_card_recipients.update(recipientValues)
           }
           if (createOrder && getOrder) {
-            const id = order ? order.id : await createOrder({})
+            let id: string | undefined
+            if (order) {
+              id = order.id
+            } else {
+              id = await createOrder({})
+            }
             if (id) {
               const orderRel = sdk.orders.relationship(id)
               const item = sdk.gift_cards.relationship(giftCard.id)

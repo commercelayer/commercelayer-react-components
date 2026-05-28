@@ -362,6 +362,24 @@ describe("GiftCard", () => {
     expect(getOrder).toHaveBeenCalledWith("order-new")
   })
 
+  it("skips line item creation when order exists but has no id", async () => {
+    const createOrder = vi.fn()
+    const getOrder = vi.fn()
+    const { getContext } = renderStandalone({ createOrder, getOrder, order: { id: undefined } })
+    core.createGiftCard.mockResolvedValue({
+      id: "gift-card-noid",
+      gift_card_recipient: { id: "recipient-noid" },
+    })
+
+    await act(async () => {
+      await getContext().addGiftCard({ currencyCode: "USD", email: "gift@example.com" })
+    })
+
+    expect(createOrder).not.toHaveBeenCalled()
+    expect(MOCK_SDK.line_items.create).not.toHaveBeenCalled()
+    expect(getOrder).not.toHaveBeenCalled()
+  })
+
   it("skips line item creation when the created order id is missing", async () => {
     const createOrder = vi.fn().mockResolvedValue(undefined)
     const getOrder = vi.fn().mockResolvedValue(undefined)
