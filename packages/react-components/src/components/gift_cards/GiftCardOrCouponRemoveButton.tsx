@@ -56,25 +56,6 @@ export function GiftCardOrCouponRemoveButton(props: Props): JSX.Element | null {
     const giftCardData = manageGiftCard({ order })
     if (!giftCardData) return null
     hide = false
-    const parentProps = {
-      ...p,
-      label,
-      handleClick,
-      codeType,
-    }
-    return children ? (
-      <Parent {...parentProps}>{children}</Parent>
-    ) : hide ? null : (
-      <button
-        type="button"
-        onClick={() => {
-          handleClick()
-        }}
-        {...p}
-      >
-        {label}
-      </button>
-    )
   }
   const parentProps = {
     ...p,

@@ -1,4 +1,4 @@
-import { useRef, useContext, type RefObject, type JSX } from "react"
+import { useContext, type RefObject, type JSX } from "react"
 import validateFormFields from "#utils/validateFormFields"
 import { isEmpty } from "#utils/isEmpty"
 import GiftCardContext from "#context/GiftCardContext"
@@ -15,23 +15,19 @@ interface Props extends Omit<JSX.IntrinsicElements["form"], "children" | "ref"> 
 }
 
 export function GiftCard(props: Props): JSX.Element {
-  const { children, onSubmit } = props
-  const name = "giftCardForm"
-  const ref: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement>(null)
+  const { children, onSubmit, ref, ...formProps } = props
   const { addGiftCard, addGiftCardError } = useContext(GiftCardContext)
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
-    const currentForm = ref.current
-    const elements = currentForm?.elements
+    const form = e.currentTarget
     const { errors, values } = validateFormFields<RequiredFields[]>(
-      // @ts-expect-error type undefined
-      elements,
+      form.elements,
       ["currencyCode", "balanceCents"],
       "gift_cards"
     )
     if (isEmpty(errors)) {
       addGiftCard(values as GiftCardI)
-      currentForm?.reset()
+      form.reset()
       if (onSubmit) {
         onSubmit(values)
       }
@@ -40,12 +36,10 @@ export function GiftCard(props: Props): JSX.Element {
     }
   }
   return (
-    <>
-      <form key={name} name={name} onSubmit={handleSubmit}>
-        {children}
-      </form>
-    </>
+    <form {...formProps} ref={ref} name="giftCardForm" onSubmit={handleSubmit}>
+      {children}
+    </form>
   )
 }
-
 export default GiftCard
+

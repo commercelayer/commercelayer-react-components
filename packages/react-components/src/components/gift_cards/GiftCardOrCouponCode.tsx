@@ -28,16 +28,16 @@ export function GiftCardOrCouponCode({ children, type, ...props }: Props): JSX.E
   if (managePaymentProviderGiftCards && type === "gift_card") {
     const giftCardData = manageGiftCard({ order })
     if (!giftCardData) return null
-    hide = false
+    const displayCode = `${giftCardData.cardBrand} ${giftCardData.cardSummary}`
     const parentProps: ChildrenProps = {
       ...props,
-      code: `${giftCardData.cardBrand} ${giftCardData.cardSummary}`,
-      hide,
+      code: displayCode,
+      hide: false,
     }
     return children ? (
       <Parent {...parentProps}>{children}</Parent>
-    ) : hide ? null : (
-      <span {...props}>{code}</span>
+    ) : (
+      <span {...props}>{displayCode}</span>
     )
   }
   const parentProps: ChildrenProps = {
