@@ -10,11 +10,46 @@ import giftCardReducer, {
 } from "#reducers/GiftCardReducer"
 import OrderContext from "#context/OrderContext"
 
-export interface Props {
+export interface GiftCardContainerProps {
   children: ReactNode
 }
 
-export function GiftCardContainer(props: Props): JSX.Element {
+/** @deprecated kept for backward compatibility — remove once GiftCardContainer is no longer exported */
+export interface Props extends GiftCardContainerProps {}
+
+let _deprecationWarned = false
+
+/**
+ * @deprecated `GiftCardContainer` will be removed in a future major release.
+ * Use `<GiftCard>` as a standalone component instead — it now manages its own context internally.
+ *
+ * **Before (deprecated):**
+ * ```tsx
+ * <GiftCardContainer>
+ *   <GiftCard onSubmit={handleSubmit}>
+ *     <GiftCardCurrencySelector />
+ *     <GiftCardInput name="balanceCents" type="number" />
+ *   </GiftCard>
+ *   <Errors resource="gift_cards" />
+ * </GiftCardContainer>
+ * ```
+ *
+ * **After:**
+ * ```tsx
+ * <GiftCard onSubmit={handleSubmit}>
+ *   <GiftCardCurrencySelector />
+ *   <GiftCardInput name="balanceCents" type="number" />
+ *   <Errors resource="gift_cards" />
+ * </GiftCard>
+ * ```
+ */
+export function GiftCardContainer(props: GiftCardContainerProps): JSX.Element {
+  if (process.env.NODE_ENV !== "production" && !_deprecationWarned) {
+    _deprecationWarned = true
+    console.warn(
+      "[commercelayer-react-components] <GiftCardContainer> is deprecated and will be removed in a future major version. Use <GiftCard> as a standalone component instead."
+    )
+  }
   const { children } = props
   const [state, dispatch] = useReducer(giftCardReducer, giftCardInitialState)
   const config = useContext(CommerceLayerContext)
