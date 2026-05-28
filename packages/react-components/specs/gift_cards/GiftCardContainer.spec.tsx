@@ -2,10 +2,7 @@ import { act, render, waitFor } from "@testing-library/react"
 import { useContext } from "react"
 import { GiftCardContainer } from "#components/gift_cards/GiftCardContainer"
 import CommerceLayerContext from "#context/CommerceLayerContext"
-import GiftCardContext, {
-  type GCContext,
-  giftCardInitialState,
-} from "#context/GiftCardContext"
+import GiftCardContext, { type GCContext } from "#context/GiftCardContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import type { BaseError } from "#typings/errors"
 
@@ -48,13 +45,17 @@ function renderContainer(
 ) {
   latestContext = undefined
   return render(
+    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
     <CommerceLayerContext.Provider value={commerceLayerValue as any}>
       <OrderContext.Provider
-        value={{
-          ...defaultOrderContext,
-          setOrderErrors: vi.fn(),
-          ...orderContextOverrides,
-        } as any}
+        value={
+          {
+            ...defaultOrderContext,
+            setOrderErrors: vi.fn(),
+            ...orderContextOverrides,
+            // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+          } as any
+        }
       >
         <GiftCardContainer>
           <ContextProbe />
@@ -94,7 +95,9 @@ describe("GiftCardContainer", () => {
     renderContainer()
 
     expect(warnSpy).toHaveBeenCalledTimes(1)
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("<GiftCardContainer> is deprecated"))
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("<GiftCardContainer> is deprecated")
+    )
     warnSpy.mockRestore()
   })
 
@@ -139,9 +142,7 @@ describe("GiftCardContainer", () => {
     })
 
     expect(core.getSdk).toHaveBeenCalledWith({ accessToken: "", interceptors: undefined })
-    expect(core.createGiftCard).toHaveBeenCalledWith(
-      expect.objectContaining({ accessToken: "" })
-    )
+    expect(core.createGiftCard).toHaveBeenCalledWith(expect.objectContaining({ accessToken: "" }))
   })
 
   it("logs recipient creation failures", async () => {

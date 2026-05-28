@@ -1,11 +1,8 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { act, fireEvent, render, waitFor } from "@testing-library/react"
 import { type ReactNode, useContext } from "react"
 import { GiftCard } from "#components/gift_cards/GiftCard"
 import CommerceLayerContext from "#context/CommerceLayerContext"
-import GiftCardContext, {
-  giftCardInitialState,
-  type GCContext,
-} from "#context/GiftCardContext"
+import GiftCardContext, { type GCContext, giftCardInitialState } from "#context/GiftCardContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import type { BaseError } from "#typings/errors"
 
@@ -54,13 +51,17 @@ function renderStandalone(
 ) {
   latestContext = undefined
   render(
+    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
     <CommerceLayerContext.Provider value={commerceLayerValue as any}>
       <OrderContext.Provider
-        value={{
-          ...defaultOrderContext,
-          setOrderErrors: vi.fn(),
-          ...orderContextOverrides,
-        } as any}
+        value={
+          {
+            ...defaultOrderContext,
+            setOrderErrors: vi.fn(),
+            ...orderContextOverrides,
+            // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+          } as any
+        }
       >
         <GiftCard>
           <input name="currencyCode" defaultValue="USD" />
@@ -87,8 +88,10 @@ function renderWithContainerContext({
 }) {
   return render(
     <CommerceLayerContext.Provider value={{ accessToken: "token" }}>
+      {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
       <OrderContext.Provider value={{ ...defaultOrderContext, setOrderErrors: vi.fn() } as any}>
         <GiftCardContext.Provider value={context}>
+          {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
           <GiftCard onSubmit={onSubmit as any}>{children ?? <ContextProbe />}</GiftCard>
         </GiftCardContext.Provider>
       </OrderContext.Provider>
@@ -136,6 +139,7 @@ describe("GiftCard", () => {
       ),
     })
 
+    // biome-ignore lint/style/noNonNullAssertion: form always present in test
     fireEvent.submit(container.querySelector("form")!)
 
     expect(addGiftCard).toHaveBeenCalledWith(
@@ -182,6 +186,7 @@ describe("GiftCard", () => {
       ),
     })
 
+    // biome-ignore lint/style/noNonNullAssertion: form always present in test
     fireEvent.submit(container.querySelector("form")!)
 
     expect(addGiftCard).not.toHaveBeenCalled()
@@ -230,6 +235,7 @@ describe("GiftCard", () => {
       ),
     })
 
+    // biome-ignore lint/style/noNonNullAssertion: form always present in test
     expect(() => fireEvent.submit(container.querySelector("form")!)).not.toThrow()
     expect(addGiftCard).toHaveBeenCalledWith(
       expect.objectContaining({ currencyCode: "USD", balanceCents: "500", metadata: {} })
@@ -250,9 +256,7 @@ describe("GiftCard", () => {
     })
 
     expect(core.getSdk).toHaveBeenCalledWith({ accessToken: "", interceptors: undefined })
-    expect(core.createGiftCard).toHaveBeenCalledWith(
-      expect.objectContaining({ accessToken: "" })
-    )
+    expect(core.createGiftCard).toHaveBeenCalledWith(expect.objectContaining({ accessToken: "" }))
   })
 
   it("creates a gift card recipient in standalone mode", async () => {

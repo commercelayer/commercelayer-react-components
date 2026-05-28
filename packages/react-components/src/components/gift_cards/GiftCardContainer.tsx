@@ -56,8 +56,8 @@ export function GiftCardContainer(props: GiftCardContainerProps): JSX.Element {
     )
   }
   const { children } = props
-  const [errors, setErrors] = useState<BaseError[]>(giftCardInitialState.errors!)
-  const [loading, setLoading] = useState<boolean>(giftCardInitialState.loading!)
+  const [errors, setErrors] = useState<BaseError[]>(giftCardInitialState.errors ?? [])
+  const [loading, setLoading] = useState<boolean>(giftCardInitialState.loading ?? false)
   const [giftCardRecipient, setGiftCardRecipient] = useState<GiftCardRecipient | undefined>(
     undefined
   )

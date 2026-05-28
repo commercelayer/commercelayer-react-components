@@ -42,6 +42,7 @@ function renderComponent({
   }
 
   const result = render(
+    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
     <OrderContext.Provider value={orderContext as any}>
       <GiftCardOrCouponForm codeType={codeType} onSubmit={onSubmit} data-testid="gift-card-form">
         <CodeTypeProbe />
@@ -203,6 +204,7 @@ describe("GiftCardOrCouponForm", () => {
       codeType: "coupon_code",
     })
 
+    // biome-ignore lint/style/noNonNullAssertion: form always present in test
     fireEvent.submit(container.querySelector("form")!)
 
     await waitFor(() => {
@@ -228,6 +230,7 @@ describe("GiftCardOrCouponForm", () => {
       },
     })
 
+    // biome-ignore lint/style/noNonNullAssertion: form always present in test
     fireEvent.submit(container.querySelector("form")!)
 
     await waitFor(() => expect(onSubmit).not.toHaveBeenCalled())
@@ -250,6 +253,7 @@ describe("GiftCardOrCouponForm", () => {
     })
     setGiftCardOrCouponCode.mockResolvedValue({ success: true, order: updatedOrder })
 
+    // biome-ignore lint/style/noNonNullAssertion: form always present in test
     fireEvent.submit(container.querySelector("form")!)
 
     await waitFor(() => {
@@ -287,6 +291,7 @@ describe("GiftCardOrCouponForm", () => {
     })
     setGiftCardOrCouponCode.mockResolvedValue({ success: false, order: undefined })
 
+    // biome-ignore lint/style/noNonNullAssertion: form always present in test
     fireEvent.submit(container.querySelector("form")!)
 
     await waitFor(() => {

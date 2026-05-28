@@ -57,8 +57,8 @@ export function GiftCard(props: GiftCardProps): JSX.Element {
   const isStandalone = containerContext.addGiftCard == null
 
   // Always initialize hooks (rules of hooks) — values only used when standalone.
-  const [errors, setErrors] = useState<BaseError[]>(giftCardInitialState.errors!)
-  const [loading, setLoading] = useState<boolean>(giftCardInitialState.loading!)
+  const [errors, setErrors] = useState<BaseError[]>(giftCardInitialState.errors ?? [])
+  const [loading, setLoading] = useState<boolean>(giftCardInitialState.loading ?? false)
   const [giftCardRecipient, setGiftCardRecipient] = useState<GiftCardRecipient | undefined>(
     undefined
   )
