@@ -46,7 +46,7 @@ export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
           },
         })
         return true
-      } catch (error) {
+      } catch {
         return false
       }
     }

@@ -1,8 +1,7 @@
+import type { JSX } from "react"
 import BaseSelect from "#components/utils/BaseSelect"
 import currencyOptions from "#config/currency"
 import type { BaseSelectComponentProps } from "#typings"
-
-import type { JSX } from "react"
 
 type Props = Omit<BaseSelectComponentProps, "options" | "name"> & {
   required?: boolean

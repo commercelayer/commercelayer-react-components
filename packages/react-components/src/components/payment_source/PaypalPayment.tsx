@@ -52,7 +52,7 @@ export function PaypalPayment({ infoMessage, ...p }: Props): JSX.Element | null 
           },
         })
         return true
-      } catch (e) {
+      } catch {
         return false
       }
     }

@@ -1,6 +1,7 @@
 export * from "./auth"
 export * from "./availability"
 export * from "./createBatchStore"
+export * from "./gift_cards"
 export * from "./line_items"
 export * from "./orders"
 export * from "./prices"

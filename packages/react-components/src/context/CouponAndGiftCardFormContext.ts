@@ -1,9 +1,7 @@
-import type { OrderCodeType } from "#reducers/OrderReducer"
 import { createContext } from "react"
+import type { OrderCodeType } from "#reducers/OrderReducer"
 
 interface DefaultContext {
-  // biome-ignore lint/suspicious/noConfusingVoidType: <explanation>
-  validation?: void
   setValue?: (name: string, value: string) => void
   codeType?: OrderCodeType
 }
