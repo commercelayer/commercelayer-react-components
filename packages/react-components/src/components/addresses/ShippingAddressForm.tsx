@@ -201,7 +201,24 @@ export function ShippingAddressForm(props: Props): JSX.Element {
         setAddress({ values: {} as any, resource: "shipping_address" })
       }
     }
-  }, [values, errors, shipToDifferentAddress, reset, include, includeLoaded, isBusiness])
+  }, [
+    values,
+    errors,
+    shipToDifferentAddress,
+    reset,
+    include,
+    includeLoaded,
+    isBusiness,
+    setValueForm,
+    setAddress,
+    setErrorForm,
+    saveAddressToCustomerAddressBook,
+    customFieldMessageError,
+    setAddressErrors,
+    resetForm,
+    invertAddresses,
+    addResourceToInclude,
+  ])
   const setValue = (name: AddressValuesKeys, value: string | number | readonly string[]): void => {
     setValueForm(name, value as string)
     const field: any = {

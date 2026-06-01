@@ -1,5 +1,4 @@
 import type { Address as AddressType } from "@commercelayer/sdk"
-import { isEmpty } from "#utils/isEmpty"
 import { type JSX, useContext, useEffect, useState } from "react"
 import AddressCardsTemplate, {
   type AddressCardsTemplateChildren,
@@ -13,6 +12,7 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import ShippingAddressContext from "#context/ShippingAddressContext"
 import type { DefaultChildrenType } from "#typings/globals"
+import { isEmpty } from "#utils/isEmpty"
 
 interface Props extends Omit<JSX.IntrinsicElements["div"], "children" | "onSelect"> {
   children: DefaultChildrenType | AddressCardsTemplateChildren
@@ -161,7 +161,7 @@ export function Address(props: Props): JSX.Element {
   return typeof children === "function" ? (
     <AddressCardsTemplate {...parentProps}>{children}</AddressCardsTemplate>
   ) : (
-    <>{components}</>
+    components
   )
 }
 

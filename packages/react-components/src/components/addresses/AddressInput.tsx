@@ -55,7 +55,7 @@ export function AddressInput(props: Props): JSX.Element | null {
     if (value && customerAddress?.setValue) {
       customerAddress.setValue(p.name, value)
     }
-  }, [value])
+  }, [value, customerAddress.setValue, shippingAddress.setValue, p.name, billingAddress?.setValue])
 
   const hasError = useMemo(() => {
     if (billingAddress?.errors?.[p.name]?.error) {
@@ -68,7 +68,7 @@ export function AddressInput(props: Props): JSX.Element | null {
       return true
     }
     return false
-  }, [value, billingAddress?.errors, shippingAddress?.errors, customerAddress?.errors])
+  }, [billingAddress?.errors, shippingAddress?.errors, customerAddress?.errors, p.name])
 
   const mandatoryField = billingAddress?.isBusiness
     ? businessMandatoryField(p.name, billingAddress.isBusiness)

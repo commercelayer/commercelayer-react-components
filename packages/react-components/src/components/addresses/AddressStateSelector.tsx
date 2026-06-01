@@ -1,13 +1,13 @@
-import { useContext, useEffect, useMemo, useState, type JSX } from "react"
-import BaseSelect from "#components/utils/BaseSelect"
-import type { AddressStateSelectName, BaseSelectComponentProps, Option } from "#typings"
-import BillingAddressFormContext from "#context/BillingAddressFormContext"
-import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
-import { isEmpty } from "#utils/isEmpty"
-import { getStateOfCountry, isValidState, type States } from "#utils/countryStateCity"
-import AddressesContext from "#context/AddressContext"
+import { type JSX, useContext, useEffect, useMemo, useState } from "react"
 import BaseInput from "#components/utils/BaseInput"
+import BaseSelect from "#components/utils/BaseSelect"
+import AddressesContext from "#context/AddressContext"
+import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import CustomerAddressFormContext from "#context/CustomerAddressFormContext"
+import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
+import type { AddressStateSelectName, BaseSelectComponentProps, Option } from "#typings"
+import { getStateOfCountry, isValidState, type States } from "#utils/countryStateCity"
+import { isEmpty } from "#utils/isEmpty"
 
 type Props = Omit<BaseSelectComponentProps, "options" | "name" | "placeholder"> & {
   name: AddressStateSelectName
@@ -170,8 +170,19 @@ export function AddressStateSelector(props: Props): JSX.Element {
     value,
     billingAddress?.values?.billing_address_country_code,
     shippingAddress?.values?.shipping_address_country_code,
-    addressErrors,
     customerAddress,
+    val,
+    states,
+    shippingAddress?.setValue,
+    shippingAddress?.resetField,
+    name,
+    isEmptyStates,
+    countryCode,
+    billingAddress?.setValue,
+    billingAddress.resetField,
+    billingAddress,
+    shippingAddress?.errors,
+    shippingAddress,
   ])
   const errorClassName =
     billingAddress?.errorClassName ||
