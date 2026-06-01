@@ -96,4 +96,10 @@ describe("AddressField", () => {
     expect(screen.getByTestId("custom").textContent).toBe("custom")
     expect(child.mock.calls[0][0]).toMatchObject({ address: mockAddress })
   })
+
+  it("renders field with undefined name — falls back to empty string in data-testid", () => {
+    // Cast as any to bypass TypeScript — tests the name ?? "" fallback in the <p> element
+    renderField({ type: "field" } as any)
+    expect(screen.getByTestId("address-field-")).toBeTruthy()
+  })
 })

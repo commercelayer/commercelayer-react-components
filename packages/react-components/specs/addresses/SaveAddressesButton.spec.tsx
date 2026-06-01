@@ -180,22 +180,86 @@ describe("SaveAddressesButton", () => {
     })
   })
 
-  it("calls createCustomerAddress when no order is present but createCustomerAddress exists", async () => {
+  it("calls createCustomerAddress when no order/saveAddresses but createCustomerAddress exists", async () => {
     const createCustomerAddress = vi.fn()
     renderButton(
-      { onClick: mockOnClick },
-      { saveAddresses: undefined },
-      { order: undefined, setOrderErrors: mockSetOrderErrors },
+      {},
+      { saveAddresses: undefined, errors: [] },
+      { order: undefined },
+      { createCustomerAddress, isGuest: false, customerEmail: "" }
+    )
+    fireEvent.click(screen.getByRole("button"))
+    await waitFor(() => {
+      expect(createCustomerAddress).toHaveBeenCalled()
+    })
+  })
+
+  it("uses shipping_address resource when invertAddresses is true and addressId provided", async () => {
+    const createCustomerAddress = vi.fn()
+    renderButton(
+      { addressId: "addr-1" },
+      { invertAddresses: true, shippingAddressId: "ship-1", errors: [] },
+      {},
       { createCustomerAddress }
     )
-    // No order, no saveAddresses, has createCustomerAddress — button might be disabled or enabled
-    // Just verify createCustomerAddress path is accessible without error
-    try {
-      fireEvent.click(screen.getByRole("button"))
-    } catch (_e) {
-      // button may be disabled
-    }
-    // createCustomerAddress path is covered
-    expect(typeof createCustomerAddress).toBe("function")
+    fireEvent.click(screen.getByRole("button"))
+    await waitFor(() => {
+      expect(mockSaveAddresses).toHaveBeenCalledWith(
+        expect.objectContaining({
+          customerAddress: expect.objectContaining({ resource: "shipping_address" }),
+        })
+      )
+    })
+  })
+
+  it("calls createCustomerAddress with invertAddresses true (shippingAddress path) and addressId", async () => {
+    const createCustomerAddress = vi.fn()
+    renderButton(
+      { addressId: "my-addr" },
+      {
+        saveAddresses: undefined,
+        invertAddresses: true,
+        shippingAddressId: "ship-1",
+        shipping_address: {},
+        errors: [],
+      },
+      { order: undefined },
+      { createCustomerAddress, isGuest: false, customerEmail: "" }
+    )
+    fireEvent.click(screen.getByRole("button"))
+    await waitFor(() => {
+      expect(createCustomerAddress).toHaveBeenCalledWith(expect.objectContaining({ id: "my-addr" }))
+    })
+  })
+
+  it("is disabled when isGuest is true and no customer_email on order", () => {
+    renderButton(
+      {},
+      {},
+      { order: { id: "ord-1", requires_billing_info: false, customer_email: null } },
+      { isGuest: true, customerEmail: null }
+    )
+    const btn = screen.getByRole("button")
+    expect(btn.hasAttribute("disabled")).toBe(true)
+  })
+
+  it("handles undefined shippingAddress gracefully (shippingAddress ?? {} fallback)", () => {
+    renderButton({}, { shipping_address: undefined, errors: [] })
+    // Component renders without crashing when shippingAddress is undefined
+    expect(screen.getByRole("button")).toBeTruthy()
+  })
+
+  it("does not call saveAddresses when handleClick is blocked by non-empty errors", async () => {
+    renderButton(
+      {},
+      {
+        errors: [
+          { code: "EMPTY_ERROR", resource: "billing_address", field: "city", message: "required" },
+        ],
+      }
+    )
+    fireEvent.click(screen.getByRole("button"))
+    await new Promise((r) => setTimeout(r, 50))
+    expect(mockSaveAddresses).not.toHaveBeenCalled()
   })
 })

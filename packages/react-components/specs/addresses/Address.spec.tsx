@@ -289,4 +289,11 @@ describe("Address", () => {
       customerAddressId: "cust-addr-1",
     })
   })
+
+  it("renders address card with empty customerAddressId when reference is undefined", () => {
+    const addressWithoutRef: AddressType = { ...mockAddress, reference: undefined }
+    renderAddress({ addresses: [addressWithoutRef] })
+    // address renders (covers address?.reference || "" branch — the "" fallback)
+    expect(screen.queryAllByTestId("address-child").length).toBe(1)
+  })
 })
