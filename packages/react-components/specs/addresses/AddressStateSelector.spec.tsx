@@ -12,10 +12,8 @@ function renderSelector(
   shippingOverrides: Partial<DefaultContextAddress> | null = {}
 ) {
   const setValue = vi.fn()
-  // biome-ignore lint/suspicious/noExplicitAny: test cast
   const billingCtx =
     billingOverrides !== null ? ({ setValue, errors: {}, ...billingOverrides } as any) : ({} as any)
-  // biome-ignore lint/suspicious/noExplicitAny: test cast
   const shippingCtx =
     shippingOverrides !== null
       ? ({ setValue, errors: {}, ...shippingOverrides } as any)
