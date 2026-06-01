@@ -43,7 +43,7 @@ describe("createGiftCard interceptors", () => {
     const interceptors: InterceptorManager = { request: { onSuccess } }
     await createGiftCard({
       accessToken: "fake-token",
-      resource: { currency_code: "USD", initial_balance_cents: 1000 },
+      resource: { currency_code: "USD", balance_cents: 1000 },
       interceptors,
     })
     expect(mockAddRequestInterceptor).toHaveBeenCalledWith(onSuccess, undefined)
@@ -55,7 +55,7 @@ describe("createGiftCard interceptors", () => {
     const interceptors: InterceptorManager = { response: { onSuccess } }
     await createGiftCard({
       accessToken: "fake-token",
-      resource: { currency_code: "USD", initial_balance_cents: 1000 },
+      resource: { currency_code: "USD", balance_cents: 1000 },
       interceptors,
     })
     expect(mockAddResponseInterceptor).toHaveBeenCalledWith(onSuccess, undefined)
@@ -65,7 +65,7 @@ describe("createGiftCard interceptors", () => {
   test("should not call interceptor methods when no interceptors provided", async () => {
     await createGiftCard({
       accessToken: "fake-token",
-      resource: { currency_code: "USD", initial_balance_cents: 1000 },
+      resource: { currency_code: "USD", balance_cents: 1000 },
     })
     expect(mockAddRequestInterceptor).not.toHaveBeenCalled()
     expect(mockAddResponseInterceptor).not.toHaveBeenCalled()

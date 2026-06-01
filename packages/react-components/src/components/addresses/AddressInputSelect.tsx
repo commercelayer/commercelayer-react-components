@@ -1,10 +1,10 @@
-import { useContext, useEffect, useMemo, type JSX } from "react"
-import BaseSelect from "../utils/BaseSelect"
-import type { BaseSelectComponentProps } from "#typings"
+import { type JSX, useContext, useEffect, useMemo } from "react"
 import BillingAddressFormContext, {
   type AddressValuesKeys,
 } from "#context/BillingAddressFormContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
+import type { BaseSelectComponentProps } from "#typings"
+import BaseSelect from "../utils/BaseSelect"
 
 type SelectFieldName =
   | `billing_address_${`metadata_${string}`}`
@@ -63,8 +63,6 @@ export function AddressInputSelect(props: Props): JSX.Element {
   return (
     <BaseSelect
       className={classNameComputed}
-      // biome-ignore lint/suspicious/noExplicitAny: validation ref type mismatch between address form contexts
-      ref={(billingAddress?.validation as any) || shippingAddress?.validation}
       required={required}
       options={options}
       name={name}

@@ -1,226 +1,53 @@
-import { useContext, useEffect, useReducer, useMemo, type JSX } from "react"
-import customerReducer, {
-  customerInitialState,
-  getCustomerAddresses,
-  getCustomerOrders,
-  getCustomerPaymentSources,
-  deleteCustomerPayment,
-  setCustomerEmail,
-  setCustomerErrors,
-  deleteCustomerAddress,
-  createCustomerAddress,
-  type TCustomerAddress,
-  saveCustomerUser,
-  getCustomerPayments,
-  getCustomerSubscriptions,
-  getCustomerInfo,
-  type SetResourceTriggerParams,
-  setResourceTrigger,
-} from "#reducers/CustomerReducer"
-import OrderContext from "#context/OrderContext"
+import type { QueryPageSize } from "@commercelayer/sdk"
+import { type JSX, useContext, useEffect } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
-import type { BaseError } from "#typings/errors"
+import OrderContext from "#context/OrderContext"
 import type { DefaultChildrenType } from "#typings/globals"
-import { isGuestToken } from "#utils/isGuestToken"
-import type { Order, QueryPageSize, QuerySort } from "@commercelayer/sdk"
+import { useCustomerProviderValue } from "./Customer"
 
 interface Props {
   children: DefaultChildrenType
-  /**
-   * Customer type
-   */
   isGuest?: boolean
-  /**
-   * The page size
-   * default: 10
-   */
   addressesPageSize?: QueryPageSize
 }
 
 /**
- * Main container for the Customers components.
- * It stores - in its context - the details of an active customer, if present.
- *
- * It also accept a `isGuest` prop to define if no customer is currently set as active.
- *
- * <span title='Requirements' type='warning'>
- * Must be a child of the `<CommerceLayer>` component.
- * </span>
- * <span title='Children' type='info'>
- * `<CustomerField>`,
- * `<CustomerInput>`,
- * `<SaveCustomerButton>`,
- * `<AddressesContainer>`,
- * `<AddressesEmpty>`,
- * `<CustomerPaymentSource>`,
- * `<CustomerPaymentSourceEmpty>`,
- * `<PaymentMethodsContainer>`,
- * `<OrdersList>`
- * </span>
+ * @deprecated Use `<Customer>` instead.
  */
 export function CustomerContainer(props: Props): JSX.Element {
-  const { children, isGuest, addressesPageSize: pageSize } = props
-  const [state, dispatch] = useReducer(customerReducer, customerInitialState)
-  const { order, addResourceToInclude, include, updateOrder, includeLoaded, withoutIncludes } =
+  const { children, isGuest, addressesPageSize } = props
+  const { accessToken, interceptors } = useContext(CommerceLayerContext)
+  const { order, addResourceToInclude, include, includeLoaded, withoutIncludes } =
     useContext(OrderContext)
-  const config = useContext(CommerceLayerContext)
-  useEffect(() => {
-    if (config.accessToken) {
-      const guestToken = isGuest == null ? isGuestToken(config.accessToken) : isGuest
-      if (guestToken) {
-        return
-      }
-      if (!include?.includes("available_customer_payment_sources.payment_source")) {
-        addResourceToInclude({
-          newResource: [
-            "available_customer_payment_sources.payment_source",
-            "available_customer_payment_sources.payment_method",
-          ],
-        })
-      } else if (!includeLoaded?.["available_customer_payment_sources.payment_source"]) {
-        addResourceToInclude({
-          newResourceLoaded: {
-            "available_customer_payment_sources.payment_source": true,
-            "available_customer_payment_sources.payment_method": true,
-          },
-        })
-      }
-    }
-  }, [config.accessToken, include?.length, Object.keys(includeLoaded ?? {}).length])
 
   useEffect(() => {
-    if (config.accessToken) {
-      const guestToken = isGuest == null ? isGuestToken(config.accessToken) : isGuest
-      if (guestToken) {
-        return
-      }
-      if (state.customers == null) {
-        getCustomerInfo({ config, dispatch })
-      }
-      if (state.addresses == null) {
-        getCustomerAddresses({
-          config,
-          dispatch,
-          isOrderAvailable: withoutIncludes != null,
-          pageSize,
-        })
-      }
-      if (order?.available_customer_payment_sources) {
-        getCustomerPaymentSources({ dispatch, order })
-      }
-      if (
-        order == null &&
-        include == null &&
-        includeLoaded == null &&
-        withoutIncludes === undefined
-      ) {
-        getCustomerPayments({ config, dispatch })
+    const runtime = globalThis as typeof globalThis & {
+      process?: {
+        env?: {
+          NODE_ENV?: string
+        }
       }
     }
-  }, [config.accessToken, order?.payment_source != null, isGuest])
-  const contextValue = useMemo(() => {
-    return {
-      isGuest,
-      ...state,
-      saveCustomerUser: async (customerEmail: string) => {
-        await saveCustomerUser({
-          config,
-          customerEmail,
-          dispatch,
-          updateOrder,
-          order,
-        })
-      },
-      setCustomerErrors: (errors: BaseError[]) => {
-        setCustomerErrors(errors, dispatch)
-      },
-      setCustomerEmail: (customerEmail: string) => {
-        setCustomerEmail(customerEmail, dispatch)
-      },
-      getCustomerPaymentSources: () => {
-        getCustomerPaymentSources({ dispatch, order })
-      },
-      deleteCustomerPayment: async ({
-        customerPaymentSourceId,
-      }: {
-        customerPaymentSourceId: string
-      }) => {
-        await deleteCustomerPayment({
-          customerPaymentSourceId,
-          dispatch,
-          config,
-        })
-      },
-      deleteCustomerAddress: async ({ customerAddressId }: { customerAddressId: string }) => {
-        await deleteCustomerAddress({
-          customerAddressId,
-          dispatch,
-          config,
-          addresses: state.addresses,
-        })
-      },
-      setResourceTrigger: async (
-        props: Omit<SetResourceTriggerParams, "dispatch" | "config">
-      ): Promise<boolean> => {
-        // @ts-expect-error strange type error
-        return await setResourceTrigger({
-          ...props,
-          dispatch,
-          config,
-        })
-      },
-      createCustomerAddress: async (address: TCustomerAddress) => {
-        await createCustomerAddress({ address, config, dispatch, state })
-      },
-      getCustomerOrders: async ({
-        pageNumber,
-        pageSize,
-        sortBy,
-      }: {
-        pageNumber?: number
-        pageSize?: QueryPageSize
-        sortBy?: QuerySort<Order>
-      }) => {
-        await getCustomerOrders({
-          config,
-          dispatch,
-          pageNumber,
-          pageSize,
-          sortBy,
-        })
-      },
-      getCustomerSubscriptions: async ({
-        pageNumber,
-        pageSize,
-        sortBy,
-        id,
-      }: {
-        pageNumber?: number
-        pageSize?: QueryPageSize
-        sortBy?: QuerySort<Order>
-        id?: string
-      }) => {
-        await getCustomerSubscriptions({
-          config,
-          dispatch,
-          pageNumber,
-          pageSize,
-          sortBy,
-          id,
-        })
-      },
-      reloadCustomerAddresses: async () => {
-        await getCustomerAddresses({
-          config,
-          dispatch,
-          isOrderAvailable: withoutIncludes != null,
-          pageSize,
-        })
-      },
+
+    if (runtime.process?.env?.NODE_ENV !== "production") {
+      console.warn("CustomerContainer is deprecated. Use <Customer> component instead.")
     }
-  }, [state, isGuest])
-  return <CustomerContext.Provider value={contextValue}>{children}</CustomerContext.Provider>
+  }, [])
+
+  const customerValue = useCustomerProviderValue({
+    accessToken,
+    interceptors,
+    order,
+    addResourceToInclude,
+    include,
+    includeLoaded,
+    withoutIncludes,
+    isGuest,
+    pageSize: addressesPageSize,
+  })
+
+  return <CustomerContext.Provider value={customerValue}>{children}</CustomerContext.Provider>
 }
 
 export default CustomerContainer

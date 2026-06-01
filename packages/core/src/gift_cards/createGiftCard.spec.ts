@@ -10,12 +10,12 @@ describe("createGiftCard", () => {
       accessToken: token,
       resource: {
         currency_code: "USD",
-        initial_balance_cents: 5000,
+        balance_cents: 5000,
       },
     })
     expect(result).toBeDefined()
     expect(result.id).toBeDefined()
     expect(result.currency_code).toBe("USD")
-    expect(result.initial_balance_cents).toBe(5000)
+    expect(result.balance_cents).toBe(5000)
   })
 })

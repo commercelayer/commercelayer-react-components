@@ -1,9 +1,9 @@
 import CustomerContext, { type InitialCustomerContext } from "#context/CustomerContext"
-import type { setResourceTrigger, CustomerState } from "#reducers/CustomerReducer"
+import type { CustomerState, SetResourceTriggerParams } from "#typings/customers"
 import { useContext } from "react"
 
 type TCustomer = Omit<CustomerState, "errors" | "isGuest"> & {
-  setResourceTrigger?: typeof setResourceTrigger
+  setResourceTrigger?: (params: SetResourceTriggerParams) => Promise<boolean>
 } & Pick<InitialCustomerContext, "reloadCustomerAddresses">
 
 interface TReturnCustomer extends Omit<TCustomer, "errors" | "isGuest"> {}
