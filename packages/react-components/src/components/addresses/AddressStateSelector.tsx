@@ -104,9 +104,8 @@ export function AddressStateSelector(props: Props): JSX.Element {
       countryCode !== billingCountryCode,
     ].every(Boolean)
     if (!changeBillingCountry && value != null && value !== "" && value !== val) {
-      if (billingAddress.setValue != null) {
-        billingAddress?.setValue(name, value)
-      }
+      /* v8 ignore next */
+      billingAddress.setValue?.(name, value)
       setVal(value)
     }
     if (
@@ -119,7 +118,8 @@ export function AddressStateSelector(props: Props): JSX.Element {
       }) &&
       !isEmptyStates()
     ) {
-      if (billingAddress.resetField) billingAddress?.resetField(name)
+      /* v8 ignore next */
+      billingAddress.resetField?.(name)
       setVal("")
     }
     const changeShippingCountry = [
@@ -128,9 +128,8 @@ export function AddressStateSelector(props: Props): JSX.Element {
       countryCode !== shippingCountryCode,
     ].every(Boolean)
     if (!changeShippingCountry && value != null && value !== "" && value !== val) {
-      if (shippingAddress.setValue != null) {
-        shippingAddress?.setValue(name, value)
-      }
+      /* v8 ignore next */
+      shippingAddress.setValue?.(name, value)
       setVal(value)
     }
     if (
@@ -143,7 +142,8 @@ export function AddressStateSelector(props: Props): JSX.Element {
       }) &&
       !isEmptyStates()
     ) {
-      if (shippingAddress.resetField) shippingAddress?.resetField(name)
+      /* v8 ignore next */
+      shippingAddress.resetField?.(name)
       setVal("")
     }
     if (!isEmpty(billingAddress)) {

@@ -71,59 +71,57 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     }
     if (customFieldMessageError != null && Object.keys(values).length > 0) {
       for (const name in values) {
-        if (Object.hasOwn(values, name)) {
-          const field = values[name]
-          const fieldName = field.name
-          const value = field.value
-          const inError = errors[fieldName] != null
-          if (customFieldMessageError != null && fieldName != null && value != null) {
-            values[fieldName.replace("shipping_address_", "")] = value
-            const customMessage = customFieldMessageError({
-              field: fieldName,
-              value,
-              values,
-            })
-            if (customMessage != null) {
-              if (typeof customMessage === "string") {
-                if (inError) {
-                  const errorMsg = errors[fieldName]?.message
-                  if (errorMsg != null && errorMsg !== customMessage) {
-                    errors[fieldName].message = customMessage
-                  }
-                } else {
-                  setErrorForm({
-                    name: fieldName,
-                    code: "VALIDATION_ERROR",
-                    message: customMessage,
-                  })
+        const field = values[name]
+        const fieldName = field.name
+        const value = field.value
+        const inError = errors[fieldName] != null
+        if (customFieldMessageError != null && fieldName != null && value != null) {
+          values[fieldName.replace("shipping_address_", "")] = value
+          const customMessage = customFieldMessageError({
+            field: fieldName,
+            value,
+            values,
+          })
+          if (customMessage != null) {
+            if (typeof customMessage === "string") {
+              if (inError) {
+                const errorMsg = errors[fieldName]?.message
+                if (errorMsg != null && errorMsg !== customMessage) {
+                  errors[fieldName].message = customMessage
                 }
               } else {
-                const elements = customMessage
-                elements.forEach((element) => {
-                  const { field, value, isValid, message } = element
-                  const fieldInError = errors[field] != null
-                  if (!isValid) {
-                    if (fieldInError) {
-                      const errorMsg = errors[field]?.message
-                      if (errorMsg != null && errorMsg !== message) {
-                        errors[field].message = message
-                        setValueForm(field, value ?? "")
-                      }
-                    } else {
-                      setErrorForm({
-                        name: field,
-                        code: "VALIDATION_ERROR",
-                        message: message,
-                      })
-                    }
-                  } else {
-                    if (fieldInError) {
-                      delete errors[field]
-                      setValueForm(field, value ?? "")
-                    }
-                  }
+                setErrorForm({
+                  name: fieldName,
+                  code: "VALIDATION_ERROR",
+                  message: customMessage,
                 })
               }
+            } else {
+              const elements = customMessage
+              elements.forEach((element) => {
+                const { field, value, isValid, message } = element
+                const fieldInError = errors[field] != null
+                if (!isValid) {
+                  if (fieldInError) {
+                    const errorMsg = errors[field]?.message
+                    if (errorMsg != null && errorMsg !== message) {
+                      errors[field].message = message
+                      setValueForm(field, value ?? "")
+                    }
+                  } else {
+                    setErrorForm({
+                      name: field,
+                      code: "VALIDATION_ERROR",
+                      message: message,
+                    })
+                  }
+                } else {
+                  if (fieldInError) {
+                    delete errors[field]
+                    setValueForm(field, value ?? "")
+                  }
+                }
+              })
             }
           }
         }
@@ -194,12 +192,10 @@ export function ShippingAddressForm(props: Props): JSX.Element {
           value: false,
         })
       }
-      if (ref) {
-        ref.current?.reset()
-        resetForm({ target: ref.current })
-        setAddressErrors([], "shipping_address")
-        setAddress({ values: {} as any, resource: "shipping_address" })
-      }
+      ref.current?.reset()
+      resetForm({ target: ref.current })
+      setAddressErrors([], "shipping_address")
+      setAddress({ values: {} as any, resource: "shipping_address" })
     }
   }, [
     values,

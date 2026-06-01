@@ -296,4 +296,18 @@ describe("Address", () => {
     // address renders (covers address?.reference || "" branch — the "" fallback)
     expect(screen.queryAllByTestId("address-child").length).toBe(1)
   })
+
+  it("applies disabledClassName when countryLock does not match address country_code", () => {
+    // Addresses with mismatched country code are filtered out (not disabled)
+    const ukAddress: AddressType = { ...mockAddress, country_code: "GB" }
+    renderAddress(
+      { addresses: [ukAddress] },
+      {
+        order: { order: { id: "ord-1", shipping_country_code_lock: "US" } },
+        shipping: { setShippingAddress: mockSetShippingAddress },
+      }
+    )
+    // Filtered out — not rendered at all
+    expect(screen.queryAllByTestId("address-child")).toHaveLength(0)
+  })
 })

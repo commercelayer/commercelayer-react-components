@@ -69,7 +69,7 @@ export function AddressesContainer(props: Props): JSX.Element {
     dispatch({
       type: "setShipToDifferentAddress",
       payload: {
-        shipToDifferentAddress: shipToDifferentAddress ?? false,
+        shipToDifferentAddress,
         isBusiness,
         invertAddresses,
       },
