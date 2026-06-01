@@ -1,7 +1,6 @@
 import { type JSX, useContext, useEffect, useMemo, useState } from "react"
 import BaseInput from "#components/utils/BaseInput"
 import BaseSelect from "#components/utils/BaseSelect"
-import AddressesContext from "#context/AddressContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import CustomerAddressFormContext from "#context/CustomerAddressFormContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
@@ -71,7 +70,6 @@ export function AddressStateSelector(props: Props): JSX.Element {
   const billingAddress = useContext(BillingAddressFormContext)
   const shippingAddress = useContext(ShippingAddressFormContext)
   const customerAddress = useContext(CustomerAddressFormContext)
-  const { errors: addressErrors } = useContext(AddressesContext)
   const [hasError, setHasError] = useState(false)
   const [countryCode, setCountryCode] = useState("")
   const [val, setVal] = useState(value ?? "")

@@ -25,7 +25,7 @@ interface Props {
 export function BillingAddress({ children }: Props): JSX.Element {
   const config = useContext(CommerceLayerContext)
   const { order, include, addResourceToInclude } = useContext(OrderContext)
-  const { shipToDifferentAddress, setCloneAddress } = useContext(AddressContext)
+  const { setCloneAddress } = useContext(AddressContext)
   const [cloneId, setCloneId] = useState<string>("")
   const [billingCustomerAddressId, setBillingCustomerAddressId] = useState<string | undefined>()
 

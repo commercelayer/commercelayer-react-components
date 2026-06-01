@@ -1,8 +1,9 @@
-import { type JSX, type ReactNode, useEffect } from "react"
+import { type JSX, useEffect } from "react"
 import BillingAddress from "#components/addresses/BillingAddress"
+import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
-  children: ReactNode
+  children: DefaultChildrenType
 }
 
 /**

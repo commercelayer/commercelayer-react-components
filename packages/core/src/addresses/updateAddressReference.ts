@@ -1,7 +1,7 @@
-import type { InterceptorManager } from "@commercelayer/sdk"
-import { getSdk } from "../sdk"
+import { getSdk } from "#sdk"
+import type { RequestConfig } from "#types"
 
-interface Params {
+interface Params extends RequestConfig {
   /**
    * The address ID to update.
    */
@@ -10,8 +10,6 @@ interface Params {
    * The customer address reference (customer_address ID) to link.
    */
   reference: string
-  accessToken: string
-  interceptors?: InterceptorManager
 }
 
 /**
