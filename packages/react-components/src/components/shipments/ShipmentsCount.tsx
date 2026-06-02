@@ -24,7 +24,7 @@ interface Props extends Omit<JSX.IntrinsicElements["span"], "children" | "ref"> 
 export function ShipmentsCount({ children, ...p }: Props): JSX.Element {
   const { shipments } = useCustomContext({
     context: ShipmentContext,
-    contextComponentName: "ShipmentsContainer",
+    contextComponentName: "Shipments",
     currentComponentName: "ShipmentsCount",
     key: "shipments",
   })
