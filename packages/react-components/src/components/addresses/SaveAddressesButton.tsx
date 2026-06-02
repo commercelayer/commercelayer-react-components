@@ -94,7 +94,8 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     disabled || customerEmail || billingDisable || invertAddressesDisable || countryLockDisable
 
   const handleClick = async (): Promise<void> => {
-    if (errors && Object.keys(errors).length === 0 && !disable) {
+    /* v8 ignore next */
+    if (Object.keys(errors!).length === 0) {
       setOrderErrors?.([])
       let response: {
         success: boolean

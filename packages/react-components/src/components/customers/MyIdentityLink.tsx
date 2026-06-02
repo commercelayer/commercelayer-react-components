@@ -129,7 +129,7 @@ export function MyIdentityLink(props: Props): JSX.Element {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a href={href} {...p}>
+    <a href={href} rel="noreferrer" {...p}>
       {label}
     </a>
   )

@@ -95,7 +95,7 @@ export function MyAccountLink(props: Props): JSX.Element {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a aria-disabled={disabled} href={href} {...p}>
+    <a aria-disabled={disabled} href={href} rel="noreferrer" {...p}>
       {label}
     </a>
   )

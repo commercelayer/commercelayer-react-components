@@ -104,6 +104,25 @@ describe("BillingAddressForm", () => {
     expect(screen.getByTestId("form").className).toContain("my-form")
   })
 
+  it("exposes errorClassName through context", async () => {
+    let contextRef: { errorClassName?: string } | undefined
+
+    function ErrorClassProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      contextRef = ctx as typeof contextRef
+      return <div />
+    }
+
+    renderForm({
+      children: <ErrorClassProbe />,
+      props: { errorClassName: "field-error" },
+    })
+
+    await waitFor(() => {
+      expect(contextRef?.errorClassName).toBe("field-error")
+    })
+  })
+
   it("propagates valid form values to setAddress", async () => {
     const { setAddress } = renderForm({
       values: {

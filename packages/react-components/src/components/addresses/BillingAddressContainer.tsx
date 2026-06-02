@@ -1,61 +1,30 @@
-import { type JSX, type ReactNode, useContext, useEffect, useReducer } from "react"
-import AddressContext from "#context/AddressContext"
-import BillingAddressContext from "#context/BillingAddressContext"
-import CommerceLayerContext from "#context/CommerceLayerContext"
-import OrderContext from "#context/OrderContext"
-import billingAddressReducer, {
-  billingAddressInitialState,
-  setBillingAddress,
-  setBillingCustomerAddressId,
-} from "#reducers/BillingAddressReducer"
+import { type JSX, useEffect } from "react"
+import BillingAddress from "#components/addresses/BillingAddress"
+import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
-  children: ReactNode
+  children: DefaultChildrenType
 }
-export function BillingAddressContainer(props: Props): JSX.Element {
-  const { children } = props
-  const [state, dispatch] = useReducer(billingAddressReducer, billingAddressInitialState)
-  const config = useContext(CommerceLayerContext)
-  const { order, include, addResourceToInclude } = useContext(OrderContext)
-  const { shipToDifferentAddress, setCloneAddress } = useContext(AddressContext)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional effect with stable context refs
+
+/**
+ * @deprecated Use `<BillingAddress>` instead. `BillingAddressContainer` will be removed in a future major version.
+ *
+ * @example Migration:
+ * ```tsx
+ * // Before (deprecated)
+ * <BillingAddressContainer>…</BillingAddressContainer>
+ *
+ * // After
+ * <BillingAddress>…</BillingAddress>
+ * ```
+ */
+export function BillingAddressContainer({ children }: Props): JSX.Element {
   useEffect(() => {
-    if (!include?.includes("billing_address")) {
-      addResourceToInclude({
-        newResource: "billing_address",
-        resourcesIncluded: include,
-      })
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[BillingAddressContainer] is deprecated. Use <BillingAddress> instead.")
     }
-    if (order && config) {
-      setBillingCustomerAddressId({
-        dispatch,
-        order,
-        setCloneAddress,
-      })
-    }
-    return () => {
-      dispatch({
-        type: "cleanup",
-        payload: {},
-      })
-    }
-  }, [order, include])
-  const contextValue = {
-    ...state,
-    setBillingAddress: async (id: string, options?: { customerAddressId: string }) => {
-      await setBillingAddress(id, {
-        config,
-        dispatch,
-        order,
-        shipToDifferentAddress,
-        customerAddressId: options?.customerAddressId,
-      })
-      setCloneAddress(id, "billing_address")
-    },
-  }
-  return (
-    <BillingAddressContext.Provider value={contextValue}>{children}</BillingAddressContext.Provider>
-  )
+  }, [])
+  return <BillingAddress>{children}</BillingAddress>
 }
 
 export default BillingAddressContainer

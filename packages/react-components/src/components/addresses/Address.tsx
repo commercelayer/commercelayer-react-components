@@ -45,7 +45,6 @@ export function Address(props: Props): JSX.Element {
     children,
     className,
     selectedClassName = "",
-    disabledClassName = "",
     onSelect,
     addresses = [],
     deselect = false,
@@ -124,15 +123,10 @@ export function Address(props: Props): JSX.Element {
             const addressProps = {
               address,
             }
-            const disabled =
-              (setShippingAddress && countryLock && countryLock !== address.country_code) || false
             const selectedClass = deselect ? "" : selectedClassName
-            const addressSelectedClass =
+            const finalClassName =
               selected === k ? `${className || ""} ${selectedClass}` : className
             const customerAddressId: string = address?.reference || ""
-            const finalClassName = disabled
-              ? `${className || ""} ${disabledClassName}`
-              : addressSelectedClass
             return (
               // biome-ignore lint/suspicious/noArrayIndexKey: address list has no stable unique key other than index
               <AddressChildrenContext.Provider key={k} value={addressProps}>
@@ -141,9 +135,8 @@ export function Address(props: Props): JSX.Element {
                 <div
                   className={finalClassName}
                   onClick={() => {
-                    handleSelect(k, address.id, customerAddressId, disabled, address)
+                    handleSelect(k, address.id, customerAddressId, false, address)
                   }}
-                  data-disabled={disabled}
                   {...p}
                 >
                   {children}

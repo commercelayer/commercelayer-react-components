@@ -114,6 +114,16 @@ describe("CheckoutLink", () => {
       expect(screen.getByRole("link").getAttribute("target")).toBe("_blank")
     })
 
+    it("has rel=noreferrer by default to prevent Referer header leakage", () => {
+      vi.spyOn(applicationLinkUtils, "getApplicationLink").mockReturnValue(HOSTED_CHECKOUT_URL)
+      render(
+        <Wrapper>
+          <CheckoutLink label="Checkout" />
+        </Wrapper>
+      )
+      expect(screen.getByRole("link").getAttribute("rel")).toBe("noreferrer")
+    })
+
     it("throws when rendered outside <CommerceLayer>", () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => undefined)
       expect(() => render(<CheckoutLink label="Checkout" />)).toThrow(

@@ -1,11 +1,11 @@
-import { useContext, type JSX, type ReactNode, type MouseEvent } from "react"
-import OrderContext from "#context/OrderContext"
-import Parent from "../utils/Parent"
-import type { ChildrenFunction } from "#typings/index"
+import { type JSX, type MouseEvent, type ReactNode, useContext } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
+import type { ChildrenFunction } from "#typings/index"
 import { getApplicationLink } from "#utils/getApplicationLink"
 import { jwt } from "#utils/jwt"
 import { getOrganizationConfig } from "#utils/organization"
+import Parent from "../utils/Parent"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   /**
@@ -116,7 +116,7 @@ export function CheckoutLink(props: Props): JSX.Element | null {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a href={href} onClick={handleClick} target={target} {...p}>
+    <a href={href} onClick={handleClick} target={target} rel="noreferrer" {...p}>
       {label}
     </a>
   )
