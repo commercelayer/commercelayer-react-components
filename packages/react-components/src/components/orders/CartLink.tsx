@@ -1,12 +1,12 @@
-import { type MouseEvent, type ReactNode, useContext, type JSX } from "react"
-import OrderContext from "#context/OrderContext"
-import Parent from "../utils/Parent"
-import type { ChildrenFunction } from "#typings/index"
+import { type JSX, type MouseEvent, type ReactNode, useContext } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
+import type { ChildrenFunction } from "#typings/index"
+import { publish } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
 import { jwt } from "#utils/jwt"
-import { publish } from "#utils/events"
 import { getOrganizationConfig } from "#utils/organization"
+import Parent from "../utils/Parent"
 
 const DEFAULT_DOMAIN = "commercelayer.io"
 
@@ -119,7 +119,7 @@ export function CartLink(props: Props): JSX.Element | null {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a href={href} onClick={handleClick} target={target} {...p}>
+    <a href={href} onClick={handleClick} target={target} rel="noreferrer" {...p}>
       {label}
     </a>
   )

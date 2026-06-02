@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState, type JSX } from "react"
-import Parent from "../utils/Parent"
-import type { ChildrenFunction } from "#typings/index"
+import { type JSX, useContext, useEffect, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
+import type { ChildrenFunction } from "#typings/index"
 import { getApplicationLink } from "#utils/getApplicationLink"
 import { jwt } from "#utils/jwt"
 import { getOrganizationConfig } from "#utils/organization"
+import Parent from "../utils/Parent"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   /**
@@ -95,7 +95,7 @@ export function MyAccountLink(props: Props): JSX.Element {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a aria-disabled={disabled} href={href} {...p}>
+    <a aria-disabled={disabled} href={href} rel="noreferrer" {...p}>
       {label}
     </a>
   )
