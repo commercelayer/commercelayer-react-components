@@ -3,8 +3,8 @@ import { type ReactNode, useContext } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { Shipments } from "#components/shipments/Shipments"
 import CommerceLayerContext from "#context/CommerceLayerContext"
-import ShipmentContext from "#context/ShipmentContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import ShipmentContext from "#context/ShipmentContext"
 
 const MOCK_SHIPMENTS = [
   {
@@ -225,9 +225,7 @@ describe("Shipments component", () => {
     })
 
     expect(capturedErrors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ code: "NO_SHIPPING_METHODS" }),
-      ])
+      expect.arrayContaining([expect.objectContaining({ code: "NO_SHIPPING_METHODS" })])
     )
   })
 
@@ -265,10 +263,50 @@ describe("Shipments component", () => {
     })
 
     expect(capturedErrors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ code: "OUT_OF_STOCK" }),
-      ])
+      expect.arrayContaining([expect.objectContaining({ code: "OUT_OF_STOCK" })])
     )
+  })
+
+  it("does not set OUT_OF_STOCK error when all stock line items have sufficient inventory", async () => {
+    const shipmentsWithStock = [
+      {
+        ...MOCK_SHIPMENTS[0],
+        stock_line_items: [
+          {
+            id: "sli_1",
+            quantity: 2,
+            // @ts-expect-error test
+            item: { inventory: { quantity: 10 } },
+          },
+        ],
+      },
+    ]
+    const orderWithStock = {
+      ...MOCK_ORDER_PENDING,
+      // @ts-expect-error test
+      line_items: [{ id: "li_1", item_type: "skus", quantity: 2, item: { inventory: { quantity: 10 } } }],
+    }
+    mockUseShipments.mockReturnValue(defaultHookReturn({ shipments: shipmentsWithStock as any }))
+
+    let capturedErrors: unknown = null
+
+    function Consumer() {
+      const { errors } = useContext(ShipmentContext)
+      capturedErrors = errors
+      return null
+    }
+
+    await act(async () => {
+      render(
+        <Providers order={orderWithStock}>
+          <Shipments>
+            <Consumer />
+          </Shipments>
+        </Providers>
+      )
+    })
+
+    expect(capturedErrors).toEqual([])
   })
 
   it("setShippingMethod calls hook and returns success with refreshed order", async () => {
@@ -328,5 +366,92 @@ describe("Shipments component", () => {
 
     expect(mockHookSetShippingMethod).not.toHaveBeenCalled()
     expect(result).toEqual({ success: false, order: placedOrder })
+  })
+
+  it("setShippingMethod returns success: true without order when orderId is not available", async () => {
+    let capturedSetShippingMethod: ((id: string, smId: string) => Promise<unknown>) | undefined
+
+    function Consumer() {
+      const { setShippingMethod } = useContext(ShipmentContext)
+      capturedSetShippingMethod = setShippingMethod
+      return null
+    }
+
+    render(
+      <CommerceLayerContext.Provider value={{ accessToken: "token" }}>
+        {/* biome-ignore lint/suspicious/noExplicitAny: test cast */}
+        <OrderContext.Provider value={{ ...defaultOrderContext, orderId: null as any, order: MOCK_ORDER_PENDING }}>
+          <Shipments>
+            <Consumer />
+          </Shipments>
+        </OrderContext.Provider>
+      </CommerceLayerContext.Provider>
+    )
+
+    let result: unknown
+    await act(async () => {
+      result = await capturedSetShippingMethod?.("ship_1", "sm_1")
+    })
+
+    expect(mockHookSetShippingMethod).toHaveBeenCalledWith("ship_1", "sm_1")
+    expect(result).toEqual({ success: true })
+  })
+
+  it("setShippingMethod returns success: false when the hook throws", async () => {
+    mockHookSetShippingMethod.mockRejectedValueOnce(new Error("Network error"))
+
+    let capturedSetShippingMethod: ((id: string, smId: string) => Promise<unknown>) | undefined
+
+    function Consumer() {
+      const { setShippingMethod } = useContext(ShipmentContext)
+      capturedSetShippingMethod = setShippingMethod
+      return null
+    }
+
+    render(
+      <Providers>
+        <Shipments>
+          <Consumer />
+        </Shipments>
+      </Providers>
+    )
+
+    let result: unknown
+    await act(async () => {
+      result = await capturedSetShippingMethod?.("ship_1", "sm_1")
+    })
+
+    expect(result).toEqual({ success: false })
+  })
+
+  it("setShipmentErrors updates the errors in context", async () => {
+    let capturedCtx: { errors: unknown; setShipmentErrors: ((...args: unknown[]) => void) | undefined } = {
+      errors: null,
+      setShipmentErrors: undefined,
+    }
+
+    function Consumer() {
+      const { errors, setShipmentErrors } = useContext(ShipmentContext)
+      capturedCtx = { errors, setShipmentErrors }
+      return null
+    }
+
+    render(
+      <Providers>
+        <Shipments>
+          <Consumer />
+        </Shipments>
+      </Providers>
+    )
+
+    await act(async () => {
+      capturedCtx.setShipmentErrors?.([
+        { code: "CUSTOM_ERROR", message: "custom", resource: "shipments" },
+      ])
+    })
+
+    expect(capturedCtx.errors).toEqual([
+      expect.objectContaining({ code: "CUSTOM_ERROR" }),
+    ])
   })
 })
