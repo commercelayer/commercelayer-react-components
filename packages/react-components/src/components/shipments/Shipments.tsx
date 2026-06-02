@@ -1,15 +1,15 @@
 import { useShipments } from "@commercelayer/hooks"
+import type { Order } from "@commercelayer/sdk"
 import { type JSX, useContext, useEffect, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
 import ShipmentContext from "#context/ShipmentContext"
 import type { SetShipmentErrors } from "#reducers/ShipmentReducer"
-import OrderContext from "#context/OrderContext"
+import type { LoaderType } from "#typings"
 import type { BaseError } from "#typings/errors"
 import type { DefaultChildrenType } from "#typings/globals"
-import type { LoaderType } from "#typings"
-import getLoaderComponent from "#utils/getLoaderComponent"
 import { canPlaceOrder } from "#utils/canPlaceOrder"
-import type { Order } from "@commercelayer/sdk"
+import getLoaderComponent from "#utils/getLoaderComponent"
 
 interface Props {
   children: DefaultChildrenType
@@ -77,7 +77,7 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
     return () => {
       setErrors([])
     }
-  }, [shipments.length, order?.shipments])
+  }, [shipments, order])
 
   const setShippingMethod = async (
     shipmentId: string,
@@ -110,9 +110,7 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
     return getLoaderComponent(loader)
   }
 
-  return (
-    <ShipmentContext.Provider value={contextValue}>{children}</ShipmentContext.Provider>
-  )
+  return <ShipmentContext.Provider value={contextValue}>{children}</ShipmentContext.Provider>
 }
 
 export default Shipments

@@ -17,9 +17,7 @@ const MOCK_SHIPMENTS = [
   { id: "ship_2", status: "picking" },
 ]
 
-const MOCK_DELIVERY_LEAD_TIMES = [
-  { id: "dlt_1", shipping_method: { id: "sm_1" } },
-]
+const MOCK_DELIVERY_LEAD_TIMES = [{ id: "dlt_1", shipping_method: { id: "sm_1" } }]
 
 const MOCK_RESULT = { shipments: MOCK_SHIPMENTS, deliveryLeadTimes: MOCK_DELIVERY_LEAD_TIMES }
 

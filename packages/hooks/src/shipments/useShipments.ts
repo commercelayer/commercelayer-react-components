@@ -1,8 +1,8 @@
 import {
-  getShipments,
   setShippingMethod as coreSetShippingMethod,
-  type InterceptorManager,
   type GetShipmentsResult,
+  getShipments,
+  type InterceptorManager,
 } from "@commercelayer/core"
 import type { DeliveryLeadTime, Shipment } from "@commercelayer/sdk"
 import { useCallback } from "react"
@@ -48,8 +48,7 @@ export function useShipments({
   orderId,
   interceptors,
 }: UseShipmentsParams): UseShipmentsReturn {
-  const swrKey =
-    accessToken && orderId ? ["shipments", "get", accessToken, orderId] : null
+  const swrKey = accessToken && orderId ? ["shipments", "get", accessToken, orderId] : null
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<GetShipmentsResult>(
     swrKey,

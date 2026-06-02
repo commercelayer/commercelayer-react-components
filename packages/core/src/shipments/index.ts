@@ -1,2 +1,2 @@
-export { getShipments, type GetShipmentsResult } from "./getShipments"
+export { type GetShipmentsResult, getShipments } from "./getShipments"
 export { setShippingMethod } from "./setShippingMethod"
