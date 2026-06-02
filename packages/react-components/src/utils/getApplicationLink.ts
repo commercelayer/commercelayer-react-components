@@ -54,15 +54,22 @@ export function getApplicationLink({
 }: Props): string {
   const env = domain === "commercelayer.io" ? "" : "stg."
   const t = applicationType === "identity" ? (modeType === "login" ? "" : "signup") : ""
-  const c = clientId ? `&clientId=${clientId}` : ""
-  const s = scope ? `&scope=${scope}` : ""
-  const r = returnUrl ? `&returnUrl=${returnUrl}` : ""
-  const p = resetPasswordUrl ? `&resetPasswordUrl=${resetPasswordUrl}` : ""
-  const params =
-    applicationType === "identity" ? `${c}${s}${r}${p}` : applicationType === "my-account" ? r : ""
   const domainName = customDomain ?? `${slug}.${env}commercelayer.app`
   const application = customDomain ? "" : `/${applicationType.toString()}`
-  return `https://${domainName}${application}/${
-    orderId ?? t ?? ""
-  }?accessToken=${accessToken}${params}`
+  const path = orderId ?? t ?? ""
+
+  // Use URLSearchParams to ensure all values are properly encoded,
+  // preventing query-string injection via special characters in user-supplied inputs.
+  const params = new URLSearchParams({ accessToken })
+
+  if (applicationType === "identity") {
+    if (clientId) params.set("clientId", clientId)
+    if (scope) params.set("scope", scope)
+    if (returnUrl) params.set("returnUrl", returnUrl)
+    if (resetPasswordUrl) params.set("resetPasswordUrl", resetPasswordUrl)
+  } else if (applicationType === "my-account") {
+    if (returnUrl) params.set("returnUrl", returnUrl)
+  }
+
+  return `https://${domainName}${application}/${path}?${params.toString()}`
 }
