@@ -9,7 +9,7 @@ describe("updateGiftCard", () => {
     if (token == null) return
     const created = await createGiftCard({
       accessToken: token,
-      resource: { currency_code: "USD", initial_balance_cents: 5000 },
+      resource: { currency_code: "USD", balance_cents: 5000 },
     })
     const result = await updateGiftCard({
       accessToken: token,

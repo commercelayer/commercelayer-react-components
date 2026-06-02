@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
-import type { TCustomerAddress } from "#reducers/CustomerReducer"
+import type { TCustomerAddress } from "#typings/customers"
 
 type CombinedAddressType = TCustomerAddress | undefined
 

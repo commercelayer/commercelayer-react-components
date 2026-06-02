@@ -1,13 +1,13 @@
-import ShippingAddressContext from "#context/ShippingAddressContext"
-import { useContext, useEffect, useReducer, type JSX } from "react"
-import shippingAddressReducer, {
-  setShippingAddress,
-  shippingAddressInitialState,
-  setShippingCustomerAddressId,
-} from "#reducers/ShippingAddressReducer"
+import { type JSX, useContext, useEffect, useReducer } from "react"
+import AddressContext from "#context/AddressContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
-import AddressContext from "#context/AddressContext"
+import ShippingAddressContext from "#context/ShippingAddressContext"
+import shippingAddressReducer, {
+  setShippingAddress,
+  setShippingCustomerAddressId,
+  shippingAddressInitialState,
+} from "#reducers/ShippingAddressReducer"
 import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {

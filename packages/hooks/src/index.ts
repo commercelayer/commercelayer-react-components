@@ -1,5 +1,6 @@
 export type { InterceptorManager } from "@commercelayer/core"
 export { useAvailability } from "./availability/useAvailability"
+export { useCustomer } from "./customers/useCustomer"
 export { useGiftCards } from "./gift_cards/useGiftCards"
 export { useLineItems } from "./line_items/useLineItems"
 export { useOrder } from "./orders/useOrder"

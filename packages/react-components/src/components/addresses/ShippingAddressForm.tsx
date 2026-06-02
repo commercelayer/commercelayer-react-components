@@ -1,10 +1,19 @@
-import { useRapidForm } from "rapid-form"
-import { type JSX, type ReactNode, useContext, useEffect, useRef } from "react"
+import { useRapidForm, type Value } from "rapid-form"
+import {
+  type JSX,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import AddressesContext from "#context/AddressContext"
-import type { AddressValuesKeys } from "#context/BillingAddressFormContext"
+import type { AddressValuesKeys, DefaultContextAddress } from "#context/BillingAddressFormContext"
 import OrderContext from "#context/OrderContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 import type { CustomFieldMessageError } from "#reducers/AddressReducer"
+import type { TCustomerAddress } from "#typings/customers"
 import type { BaseError, CodeErrorType } from "#typings/errors"
 import { getSaveShippingAddressToAddressBook } from "#utils/localStorage"
 
@@ -13,222 +22,281 @@ interface Props extends Omit<JSX.IntrinsicElements["form"], "onSubmit"> {
   reset?: boolean
   errorClassName?: string
   fieldEvent?: "blur" | "change"
-  /**
-   * Callback to customize the error message for a specific field. Called for each error in the form.
-   */
   customFieldMessageError?: CustomFieldMessageError
 }
 
-/**
- * Form container for creating or editing an order related shipping address.
- *
- * It accept:
- * - a `reset` prop to define if current form needs to be reset over a defined boolean condition.
- * - a `errorClassName` prop to define children input and select classnames assigned in case of validation error.
- *
- * <span title='Requirements' type='warning'>
- * Must be a child of the `<AddressesContainer>` component.
- * </span>
- * <span title='Children' type='info'>
- * `<AddressInput>`,
- * `<AddressCountrySelector>`,
- * `<AddressStateSelector>`,
- * `<SaveAddressesButton>`
- * </span>
- */
+type FormErrors = Record<
+  string,
+  {
+    code: string
+    message: string
+    error: boolean
+  }
+>
+
+type FormElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+type FormValue = Value & {
+  checked?: boolean
+  name?: string
+  required?: boolean
+  type?: string
+  value?: string | number | readonly string[]
+}
+
+function getFormElement(form: HTMLFormElement | null, name: string): FormElement | null {
+  const element = form?.elements.namedItem(name)
+  if (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLSelectElement ||
+    element instanceof HTMLTextAreaElement
+  ) {
+    return element
+  }
+  return null
+}
+
 export function ShippingAddressForm(props: Props): JSX.Element {
   const {
     children,
     errorClassName,
     autoComplete = "on",
-    fieldEvent = "change",
+    fieldEvent: _fieldEvent = "change",
     reset = false,
     customFieldMessageError,
     ...p
   } = props
-  const {
-    validation,
-    values,
-    errors,
-    reset: resetForm,
-    setValue: setValueForm,
-    setError: setErrorForm,
-  } = (useRapidForm as any)({ fieldEvent })
+  const { refValidation, values } = useRapidForm()
+  const formValues = values as Record<string, FormValue>
+  const [errors, setErrors] = useState<FormErrors>({})
   const { setAddressErrors, setAddress, shipToDifferentAddress, isBusiness, invertAddresses } =
     useContext(AddressesContext)
   const { saveAddressToCustomerAddressBook, include, addResourceToInclude, includeLoaded } =
     useContext(OrderContext)
-  const ref = useRef<HTMLFormElement>(null)
+  const formRef = useRef<HTMLFormElement | null>(null)
+  const shouldSyncShippingAddress = shipToDifferentAddress || invertAddresses
+  const setFormRef = useCallback(
+    (node: HTMLFormElement | null) => {
+      formRef.current = node
+      refValidation(node)
+    },
+    [refValidation]
+  )
+
+  const clearFieldError = useCallback((name: string) => {
+    const input = getFormElement(formRef.current, name)
+    input?.setCustomValidity("")
+    setErrors((previousErrors) => {
+      const nextErrors = { ...previousErrors }
+      delete nextErrors[name]
+      return nextErrors
+    })
+  }, [])
+
   useEffect(() => {
     if (!include?.includes("shipping_address")) {
-      addResourceToInclude({
-        newResource: "shipping_address",
-      })
+      addResourceToInclude({ newResource: "shipping_address" })
     } else if (!includeLoaded?.shipping_address) {
-      addResourceToInclude({
-        newResourceLoaded: { shipping_address: true },
-      })
+      addResourceToInclude({ newResourceLoaded: { shipping_address: true } })
     }
-    if (customFieldMessageError != null && Object.keys(values).length > 0) {
-      for (const name in values) {
-        if (Object.hasOwn(values, name)) {
-          const field = values[name]
-          const fieldName = field.name
-          const value = field.value
-          const inError = errors[fieldName] != null
-          if (customFieldMessageError != null && fieldName != null && value != null) {
-            values[fieldName.replace("shipping_address_", "")] = value
-            const customMessage = customFieldMessageError({
-              field: fieldName,
-              value,
-              values,
-            })
-            if (customMessage != null) {
-              if (typeof customMessage === "string") {
-                if (inError) {
-                  const errorMsg = errors[fieldName]?.message
-                  if (errorMsg != null && errorMsg !== customMessage) {
-                    errors[fieldName].message = customMessage
-                  }
-                } else {
-                  setErrorForm({
-                    name: fieldName,
-                    code: "VALIDATION_ERROR",
-                    message: customMessage,
-                  })
-                }
-              } else {
-                const elements = customMessage
-                elements.forEach((element) => {
-                  const { field, value, isValid, message } = element
-                  const fieldInError = errors[field] != null
-                  if (!isValid) {
-                    if (fieldInError) {
-                      const errorMsg = errors[field]?.message
-                      if (errorMsg != null && errorMsg !== message) {
-                        errors[field].message = message
-                        setValueForm(field, value ?? "")
-                      }
-                    } else {
-                      setErrorForm({
-                        name: field,
-                        code: "VALIDATION_ERROR",
-                        message: message,
-                      })
-                    }
-                  } else {
-                    if (fieldInError) {
-                      delete errors[field]
-                      setValueForm(field, value ?? "")
-                    }
-                  }
-                })
+  }, [include, includeLoaded, addResourceToInclude])
+
+  useEffect(() => {
+    if (Object.keys(formValues).length === 0) {
+      return
+    }
+
+    const nativeErrors: FormErrors = {}
+    for (const fieldName of Object.keys(formValues)) {
+      const input = getFormElement(formRef.current, fieldName)
+      if (input != null && !input.validity.valid) {
+        nativeErrors[fieldName] = {
+          code: "VALIDATION_ERROR",
+          message: input.validationMessage,
+          error: true,
+        }
+      }
+    }
+
+    let finalErrors: FormErrors = { ...nativeErrors }
+
+    if (customFieldMessageError != null) {
+      const updatedErrors: FormErrors = { ...nativeErrors }
+
+      for (const [, field] of Object.entries(formValues)) {
+        if (field == null || field.name == null || field.value == null) {
+          continue
+        }
+
+        const flatValues: Record<string, unknown> = {}
+        for (const [key, entry] of Object.entries(formValues)) {
+          flatValues[key.replace("shipping_address_", "")] = entry?.value
+          flatValues[key] = entry?.value
+        }
+
+        const customMessage = customFieldMessageError({
+          field: field.name,
+          value: String(field.value),
+          values: flatValues,
+        })
+
+        if (customMessage == null) {
+          continue
+        }
+
+        if (typeof customMessage === "string") {
+          updatedErrors[field.name] = {
+            ...(updatedErrors[field.name] ?? {
+              code: "VALIDATION_ERROR",
+              message: customMessage,
+              error: true,
+            }),
+            message: customMessage,
+          }
+        } else {
+          for (const element of customMessage) {
+            if (!element.isValid) {
+              updatedErrors[element.field] = {
+                code: "VALIDATION_ERROR",
+                message: element.message ?? "",
+                error: true,
               }
+            } else {
+              delete updatedErrors[element.field]
             }
           }
         }
       }
+
+      finalErrors = updatedErrors
     }
-    if (errors != null && Object.keys(errors).length > 0) {
-      const formErrors: BaseError[] = []
-      for (const fieldName in errors) {
-        const code = errors[fieldName]?.code
-        const message = errors[fieldName]?.message
-        formErrors.push({
-          code: code as CodeErrorType,
-          message: message ?? "",
-          resource: "shipping_address",
-          field: fieldName,
-        })
-      }
-      if (shipToDifferentAddress || invertAddresses) {
-        setAddressErrors(formErrors, "shipping_address")
-      }
-    } else if (
-      values &&
-      Object.keys(values).length > 0 &&
-      (shipToDifferentAddress || invertAddresses)
-    ) {
-      setAddressErrors([], "shipping_address")
-      for (const name in values) {
-        const field = values[name]
-        if (field?.value || (field?.required === false && field?.type !== "checkbox")) {
-          values[name.replace("shipping_address_", "")] = field.value
-          delete values[name]
-        }
-        if (field?.type === "checkbox") {
-          delete values[name]
-          saveAddressToCustomerAddressBook({
-            type: "shipping_address",
-            value: field.checked,
-          })
-        }
-      }
-      setAddress({
-        values: {
-          ...values,
-          ...(isBusiness && { business: isBusiness }),
-        },
+
+    setErrors(finalErrors)
+
+    if (!shouldSyncShippingAddress) {
+      return
+    }
+
+    if (Object.keys(finalErrors).length > 0) {
+      const formErrors: BaseError[] = Object.entries(finalErrors).map(([fieldName, error]) => ({
+        code: error.code as CodeErrorType,
+        message: error.message,
         resource: "shipping_address",
-      })
+        field: fieldName,
+      }))
+      setAddressErrors(formErrors, "shipping_address")
+      return
     }
-    const checkboxChecked =
-      ref.current?.querySelector(
-        '[name="shipping_address_save_to_customer_book"]'
-        // @ts-expect-error no type
-      )?.checked || getSaveShippingAddressToAddressBook()
-    if (checkboxChecked) {
-      ref.current
-        ?.querySelector('[name="shipping_address_save_to_customer_book"]')
-        ?.setAttribute("checked", "true")
-    }
-    if (
-      reset &&
-      ((values != null && Object.keys(values).length > 0) ||
-        (errors != null && Object.keys(errors).length > 0) ||
-        checkboxChecked)
-    ) {
-      if (saveAddressToCustomerAddressBook) {
-        saveAddressToCustomerAddressBook({
+
+    setAddressErrors([], "shipping_address")
+    const addressValues: Record<string, unknown> = {}
+
+    for (const [name, field] of Object.entries(formValues)) {
+      if (field == null) {
+        continue
+      }
+
+      if (
+        field.value != null &&
+        (field.value || field.required === false) &&
+        field.type !== "checkbox"
+      ) {
+        addressValues[name.replace("shipping_address_", "")] = field.value
+      }
+
+      if (field.type === "checkbox") {
+        saveAddressToCustomerAddressBook?.({
           type: "shipping_address",
-          value: false,
+          value: field.checked ?? false,
         })
       }
-      if (ref) {
-        ref.current?.reset()
-        resetForm({ target: ref.current })
-        setAddressErrors([], "shipping_address")
-        setAddress({ values: {} as any, resource: "shipping_address" })
-      }
     }
-  }, [values, errors, shipToDifferentAddress, reset, include, includeLoaded, isBusiness])
-  const setValue = (name: AddressValuesKeys, value: string | number | readonly string[]): void => {
-    setValueForm(name, value as string)
-    const field: any = {
-      [name.replace("shipping_address_", "")]: value,
-    }
+
     setAddress({
       values: {
-        ...values,
-        ...field,
+        ...addressValues,
         ...(isBusiness && { business: isBusiness }),
-      },
+      } as TCustomerAddress,
       resource: "shipping_address",
     })
-  }
-  const providerValues = {
-    values,
-    validation,
+  }, [
+    formValues,
+    shouldSyncShippingAddress,
+    isBusiness,
+    customFieldMessageError,
+    saveAddressToCustomerAddressBook,
+    setAddress,
+    setAddressErrors,
+  ])
+
+  useEffect(() => {
+    const checkbox = formRef.current?.querySelector<HTMLInputElement>(
+      '[name="shipping_address_save_to_customer_book"]'
+    )
+    const checkboxChecked = checkbox?.checked || getSaveShippingAddressToAddressBook()
+
+    if (checkboxChecked) {
+      checkbox?.setAttribute("checked", "true")
+      saveAddressToCustomerAddressBook?.({ type: "shipping_address", value: true })
+    }
+  }, [saveAddressToCustomerAddressBook])
+
+  useEffect(() => {
+    const checkbox = formRef.current?.querySelector<HTMLInputElement>(
+      '[name="shipping_address_save_to_customer_book"]'
+    )
+    const checkboxChecked = checkbox?.checked || getSaveShippingAddressToAddressBook()
+
+    if (
+      reset &&
+      (Object.keys(formValues).length > 0 || Object.keys(errors).length > 0 || checkboxChecked)
+    ) {
+      saveAddressToCustomerAddressBook?.({ type: "shipping_address", value: false })
+      formRef.current?.reset()
+      setErrors((prev) => (Object.keys(prev).length > 0 ? {} : prev))
+      setAddressErrors([], "shipping_address")
+      setAddress({ values: {} as TCustomerAddress, resource: "shipping_address" })
+    }
+  }, [reset, formValues, errors, saveAddressToCustomerAddressBook, setAddress, setAddressErrors])
+
+  const setValue = useCallback(
+    (name: AddressValuesKeys, value: string | number | readonly string[]): void => {
+      const input = getFormElement(formRef.current, name)
+      if (input != null) {
+        input.setCustomValidity("")
+        input.value = String(value)
+        input.dispatchEvent(new Event("change", { bubbles: true }))
+      }
+
+      clearFieldError(name)
+      setAddress({
+        values: {
+          [name.replace("shipping_address_", "")]: value,
+        } as TCustomerAddress,
+        resource: "shipping_address",
+      })
+    },
+    [clearFieldError, setAddress]
+  )
+
+  const providerValues: DefaultContextAddress = {
+    values: formValues,
     setValue,
     errorClassName,
-    errors: errors as any,
+    errors,
     resetField: (name: string) => {
-      resetForm({ currentTarget: ref.current }, name)
+      const input = getFormElement(formRef.current, name)
+      if (input != null) {
+        input.setCustomValidity("")
+        input.value = ""
+        input.dispatchEvent(new Event("change", { bubbles: true }))
+      }
+      clearFieldError(name)
     },
-  } as any
+  }
+
   return (
     <ShippingAddressFormContext.Provider value={providerValues}>
-      <form ref={ref} autoComplete={autoComplete} {...p}>
+      <form ref={setFormRef} autoComplete={autoComplete} {...p}>
         {children}
       </form>
     </ShippingAddressFormContext.Provider>

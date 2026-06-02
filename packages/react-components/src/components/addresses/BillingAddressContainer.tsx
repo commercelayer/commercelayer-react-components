@@ -1,13 +1,13 @@
+import { type JSX, type ReactNode, useContext, useEffect, useReducer } from "react"
+import AddressContext from "#context/AddressContext"
 import BillingAddressContext from "#context/BillingAddressContext"
-import { type ReactNode, useContext, useEffect, useReducer, type JSX } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
 import billingAddressReducer, {
   billingAddressInitialState,
   setBillingAddress,
   setBillingCustomerAddressId,
 } from "#reducers/BillingAddressReducer"
-import CommerceLayerContext from "#context/CommerceLayerContext"
-import OrderContext from "#context/OrderContext"
-import AddressContext from "#context/AddressContext"
 
 interface Props {
   children: ReactNode

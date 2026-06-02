@@ -1,8 +1,8 @@
-import { type ReactNode, useContext, type JSX } from "react"
+import { type JSX, type ReactNode, useContext } from "react"
 import Parent from "#components/utils/Parent"
+import CustomerContext from "#context/CustomerContext"
 import type { ChildrenFunction } from "#typings/index"
 import { isEmpty } from "#utils/isEmpty"
-import CustomerContext from "#context/CustomerContext"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   handleClick: () => void
