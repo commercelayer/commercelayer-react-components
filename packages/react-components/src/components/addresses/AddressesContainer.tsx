@@ -11,7 +11,7 @@ import addressReducer, {
   setAddressErrors,
   setCloneAddress,
 } from "#reducers/AddressReducer"
-import type { TCustomerAddress } from "#reducers/CustomerReducer"
+import type { TCustomerAddress } from "#typings/customers"
 import type { BaseError } from "#typings/errors"
 import { setCustomerOrderParam } from "#utils/localStorage"
 

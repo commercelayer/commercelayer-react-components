@@ -5,7 +5,7 @@ import { act, renderHook, waitFor } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { createElement } from "react"
 import { SWRConfig } from "swr"
-import { describe, expect, vi } from "vitest"
+import { describe, expect } from "vitest"
 import { coreIntegrationTest } from "#extender"
 import { useGiftCards } from "./useGiftCards"
 
@@ -45,7 +45,7 @@ describe("useGiftCards", () => {
     await act(async () => {
       created = await result.current.createGiftCard({
         currency_code: "USD",
-        initial_balance_cents: 1000,
+        balance_cents: 1000,
       })
     })
 
@@ -67,13 +67,13 @@ describe("useGiftCards", () => {
     await act(async () => {
       created = await result.current.createGiftCard({
         currency_code: "USD",
-        initial_balance_cents: 500,
+        balance_cents: 500,
       })
     })
 
     let retrieved: Awaited<ReturnType<typeof result.current.retrieveGiftCard>>
     await act(async () => {
-      retrieved = await result.current.retrieveGiftCard(created!.id)
+      retrieved = await result.current.retrieveGiftCard(created?.id ?? "")
     })
 
     await waitFor(() => {
@@ -92,14 +92,14 @@ describe("useGiftCards", () => {
     await act(async () => {
       created = await result.current.createGiftCard({
         currency_code: "USD",
-        initial_balance_cents: 2000,
+        balance_cents: 2000,
       })
     })
 
     let updated: Awaited<ReturnType<typeof result.current.updateGiftCard>>
     await act(async () => {
       updated = await result.current.updateGiftCard({
-        id: created!.id,
+        id: created?.id ?? "",
         reference: "hook-test-ref",
       })
     })
@@ -131,12 +131,12 @@ describe("useGiftCards", () => {
     await act(async () => {
       created = await result.current.createGiftCard({
         currency_code: "USD",
-        initial_balance_cents: 1500,
+        balance_cents: 1500,
       })
     })
 
     await act(async () => {
-      await result.current.updateGiftCard({ id: created!.id, reference: "list-update-test" })
+      await result.current.updateGiftCard({ id: created?.id ?? "", reference: "list-update-test" })
     })
 
     await waitFor(() => {
@@ -217,21 +217,18 @@ describe("useGiftCards", () => {
     ).rejects.toThrow("Gift card ID is required for retrieve")
   })
 
-  coreIntegrationTest(
-    "should throw when updating without an ID",
-    async ({ accessToken }) => {
-      const token = accessToken?.accessToken
-      const { result } = renderHook(() => useGiftCards(token), { wrapper: swrWrapper })
+  coreIntegrationTest("should throw when updating without an ID", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => useGiftCards(token), { wrapper: swrWrapper })
 
-      await expect(
-        act(async () => {
-          await result.current.updateGiftCard(
-            {} as Parameters<typeof result.current.updateGiftCard>[0]
-          )
-        })
-      ).rejects.toThrow("Gift card resource ID is required for update")
-    }
-  )
+    await expect(
+      act(async () => {
+        await result.current.updateGiftCard(
+          {} as Parameters<typeof result.current.updateGiftCard>[0]
+        )
+      })
+    ).rejects.toThrow("Gift card resource ID is required for update")
+  })
 
   coreIntegrationTest(
     "should update without prior fetch (no cached list)",
@@ -244,7 +241,7 @@ describe("useGiftCards", () => {
       await act(async () => {
         created = await result.current.createGiftCard({
           currency_code: "USD",
-          initial_balance_cents: 3000,
+          balance_cents: 3000,
         })
       })
 
@@ -255,7 +252,7 @@ describe("useGiftCards", () => {
       let updated: Awaited<ReturnType<typeof result.current.updateGiftCard>>
       await act(async () => {
         updated = await result.current.updateGiftCard({
-          id: created!.id,
+          id: created?.id ?? "",
           reference: "no-cache-update",
         })
       })
@@ -265,20 +262,17 @@ describe("useGiftCards", () => {
     }
   )
 
-  coreIntegrationTest(
-    "should filter gift cards by params",
-    async ({ accessToken }) => {
-      const token = accessToken?.accessToken
-      const { result } = renderHook(() => useGiftCards(token))
+  coreIntegrationTest("should filter gift cards by params", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => useGiftCards(token))
 
-      act(() => {
-        result.current.fetchGiftCards({ filters: { status_eq: "inactive" } })
-      })
+    act(() => {
+      result.current.fetchGiftCards({ filters: { status_eq: "inactive" } })
+    })
 
-      await waitFor(() => {
-        expect(result.current.action).toBe("get")
-        expect(result.current.error).toBeNull()
-      })
-    }
-  )
+    await waitFor(() => {
+      expect(result.current.action).toBe("get")
+      expect(result.current.error).toBeNull()
+    })
+  })
 })

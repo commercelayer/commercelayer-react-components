@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { useContext, useEffect, useState, type JSX } from "react"
+import { type JSX, useContext, useState } from "react"
 import BaseInput from "#components-utils/BaseInput"
-import type { BaseInputComponentProps } from "#typings"
-import { useRapidForm } from "rapid-form"
 import CustomerContext from "#context/CustomerContext"
-import type { BaseError, CodeErrorType } from "#typings/errors"
-import { validateValue } from "#utils/validateFormFields"
 import OrderContext from "#context/OrderContext"
+import type { BaseInputComponentProps } from "#typings"
+import type { BaseError } from "#typings/errors"
+import { validateValue } from "#utils/validateFormFields"
 
 type Props = {
   name?: "customer_email" | string
@@ -31,72 +29,54 @@ export function CustomerInput(props: Props): JSX.Element {
     errorClassName,
     ...p
   } = props
-  const { validation, values, errors, setError } = (useRapidForm as any)({
-    fieldEvent: "blur",
-  })
   const { saveCustomerUser, setCustomerErrors, setCustomerEmail } = useContext(CustomerContext)
   const { setOrderErrors } = useContext(OrderContext)
-  const [hasError, setHasError] = useState(false)
+  const [fieldError, setFieldError] = useState<BaseError | null>(null)
+
   const handleOnBlur = async (
-    e: React.FocusEvent<HTMLInputElement, Element> | React.FocusEvent<HTMLTextAreaElement, Element>
+    event: React.FocusEvent<HTMLInputElement> | React.FocusEvent<HTMLTextAreaElement>
   ): Promise<void> => {
-    const v = e?.target?.value
-    const checkValue = validateValue(v, name, type, "orders")
-    const isValid = Object.keys(checkValue).length === 0
-    if (saveOnBlur && Object.keys(values).length > 0) {
-      if (saveCustomerUser != null) {
-        await saveCustomerUser(values[name].value)
-        if (onBlur) onBlur(values[name].value)
+    const customerEmail = event.target.value
+    const validationError = validateValue(customerEmail, name, type, "orders")
+
+    setCustomerEmail?.(customerEmail)
+
+    if (Object.keys(validationError).length > 0) {
+      const nextError: BaseError = {
+        code: "VALIDATION_ERROR",
+        message: validationError.message ?? "",
+        resource: "orders",
+        field: validationError.field ?? name,
       }
+
+      setFieldError(nextError)
+      setCustomerErrors?.([nextError])
+      setOrderErrors?.([nextError])
+      return
     }
-    if (!isValid) {
-      const currentError = {
-        ...checkValue,
-        name: checkValue?.field,
-      }
-      setError(currentError)
+
+    setFieldError(null)
+    setCustomerErrors?.([])
+    setOrderErrors?.([])
+
+    if (saveOnBlur && saveCustomerUser != null) {
+      await saveCustomerUser(customerEmail)
+      onBlur?.(customerEmail)
     }
   }
-  useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      const formErrors: BaseError[] = []
-      for (const fieldName in errors) {
-        const code = errors[fieldName]?.code
-        const message = errors[fieldName]?.message
-        formErrors.push({
-          code: code as CodeErrorType,
-          message: message || "",
-          resource: "orders",
-          field: fieldName,
-        })
-      }
-      if (formErrors.length > 0) {
-        setHasError(true)
-        if (setCustomerErrors) setCustomerErrors(formErrors)
-      }
-    } else {
-      if (setCustomerErrors) setCustomerErrors([])
-      if (setOrderErrors) setOrderErrors([])
-      setHasError(false)
-    }
-    if (Object.keys(values).length > 0) {
-      if (setCustomerEmail) setCustomerEmail(values[name].value)
-    }
-    return () => {
-      setHasError(false)
-    }
-  }, [errors])
-  const classNameComputed = `${className ?? ""} ${hasError && errorClassName ? errorClassName : ""}`
+
+  const classNameComputed =
+    `${className ?? ""} ${fieldError != null && errorClassName ? errorClassName : ""}`.trim()
+
   return (
     <BaseInput
       name={name}
       type={type}
-      ref={validation as any}
       required={required}
       placeholder={placeholder}
       defaultValue={value}
-      onBlur={(e) => {
-        handleOnBlur(e)
+      onBlur={(event) => {
+        void handleOnBlur(event)
       }}
       className={classNameComputed}
       {...p}

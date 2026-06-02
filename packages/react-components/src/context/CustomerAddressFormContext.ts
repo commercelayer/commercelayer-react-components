@@ -1,11 +1,13 @@
+import type { Value } from "rapid-form"
 import { createContext } from "react"
-import type { AddressCountrySelectName, AddressInputName } from "#typings"
 import type { AddressField } from "#reducers/AddressReducer"
+import type { AddressCountrySelectName, AddressInputName } from "#typings"
 
 export interface DefaultContextAddress {
-  // biome-ignore lint/suspicious/noConfusingVoidType: <explanation>
-  validation?: void
-  setValue?: (name: AddressField | AddressInputName | AddressCountrySelectName, value: any) => void
+  setValue?: (
+    name: AddressField | AddressInputName | AddressCountrySelectName,
+    value: string | number | readonly string[]
+  ) => void
   errors?: Record<
     string,
     {
@@ -17,7 +19,7 @@ export interface DefaultContextAddress {
   errorClassName?: string
   requiresBillingInfo?: boolean
   resetField?: (name: string) => void
-  values?: Record<string, any>
+  values?: Record<string, Value>
 }
 
 const CustomerAddressFormContext = createContext<DefaultContextAddress>({})

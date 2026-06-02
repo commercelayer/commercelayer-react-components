@@ -4,7 +4,7 @@ import Parent from "#components/utils/Parent"
 import AddressContext from "#context/AddressContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
-import type { TCustomerAddress } from "#reducers/CustomerReducer"
+import type { TCustomerAddress } from "#typings/customers"
 import type { ChildrenFunction } from "#typings/index"
 import { addressesController, countryLockController } from "#utils/addressesManager"
 import { formCleaner } from "#utils/formCleaner"
@@ -61,6 +61,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     const isValidEmail = validateValue(email, "customer_email", "email", "orders")
     customerEmail = Object.keys(isValidEmail).length > 0
   }
+  // biome-ignore lint/suspicious/noExplicitAny: reduce over unknown keys with dynamic shape
   const shippingAddressCleaned: any = Object.keys(shippingAddress ?? {}).reduce((acc, key) => {
     // @ts-expect-error type mismatch
     acc[key.replace("shipping_address_", "")] = shippingAddress[key].value

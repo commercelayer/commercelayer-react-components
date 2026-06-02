@@ -1,46 +1,61 @@
-import { useRapidForm } from "rapid-form"
-import { type JSX, type ReactNode, useContext, useEffect, useRef } from "react"
+import { useRapidForm, type Value } from "rapid-form"
+import {
+  type JSX,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import AddressesContext from "#context/AddressContext"
 import BillingAddressFormContext, {
   type AddressValuesKeys,
-  type DefaultContextAddress,
 } from "#context/BillingAddressFormContext"
 import OrderContext from "#context/OrderContext"
 import type { CustomFieldMessageError } from "#reducers/AddressReducer"
+import type { TCustomerAddress } from "#typings/customers"
 import type { BaseError, CodeErrorType } from "#typings/errors"
 import { getSaveBillingAddressToAddressBook } from "#utils/localStorage"
 
 type Props = {
   children: ReactNode
-  /**
-   * Define if current form needs to be reset over a defined boolean condition
-   */
   reset?: boolean
-  /**
-   * Define children input and select classnames assigned in case of validation error.
-   */
   errorClassName?: string
   fieldEvent?: "blur" | "change"
-  /**
-   * Callback to customize the error message for a specific field. Called for each error in the form.
-   */
   customFieldMessageError?: CustomFieldMessageError
 } & Omit<JSX.IntrinsicElements["form"], "onSubmit">
 
-/**
- * Form container for creating or editing an order related billing address or a customer address, depending on the context in use.
- *
- * <span title='Requirements' type='warning'>
- * Must be a child of the `<AddressesContainer>` component.
- * Can optionally be a child of the `<OrderContainer>` component, when it needs to be used in the checkout process and store the billing address in the order object.
- * </span>
- * <span title='Children' type='info'>
- * `<AddressInput>`,
- * `<AddressCountrySelector>`,
- * `<AddressStateSelector>`,
- * `<SaveAddressesButton>`
- * </span>
- */
+type FormErrors = Record<
+  string,
+  {
+    code: string
+    message: string
+    error: boolean
+  }
+>
+
+type FormElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+type FormValue = Value & {
+  checked?: boolean
+  name?: string
+  required?: boolean
+  type?: string
+  value?: string | number | readonly string[]
+}
+
+function getFormElement(form: HTMLFormElement | null, name: string): FormElement | null {
+  const element = form?.elements.namedItem(name)
+  if (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLSelectElement ||
+    element instanceof HTMLTextAreaElement
+  ) {
+    return element
+  }
+  return null
+}
+
 export function BillingAddressForm(props: Props): JSX.Element {
   const {
     children,
@@ -48,203 +63,237 @@ export function BillingAddressForm(props: Props): JSX.Element {
     autoComplete = "on",
     reset = false,
     customFieldMessageError,
-    fieldEvent = "change",
+    fieldEvent: _fieldEvent = "change",
     ...p
   } = props
-  const {
-    validation,
-    values,
-    errors,
-    reset: resetForm,
-    setValue: setValueForm,
-    setError: setErrorForm,
-  } = (useRapidForm as any)({ fieldEvent })
+  const { refValidation, values } = useRapidForm()
+  const formValues = values as Record<string, FormValue>
+  const [errors, setErrors] = useState<FormErrors>({})
   const { setAddressErrors, setAddress, isBusiness } = useContext(AddressesContext)
   const { saveAddressToCustomerAddressBook, order, include, addResourceToInclude, includeLoaded } =
     useContext(OrderContext)
-  const ref = useRef<HTMLFormElement | null>(null)
+  const formRef = useRef<HTMLFormElement | null>(null)
+  const setFormRef = useCallback(
+    (node: HTMLFormElement | null) => {
+      formRef.current = node
+      refValidation(node)
+    },
+    [refValidation]
+  )
+
+  const resetFieldError = useCallback((name: string) => {
+    const input = getFormElement(formRef.current, name)
+    input?.setCustomValidity("")
+    setErrors((previousErrors) => {
+      const nextErrors = { ...previousErrors }
+      delete nextErrors[name]
+      return nextErrors
+    })
+  }, [])
+
   useEffect(() => {
     if (!include?.includes("billing_address")) {
-      addResourceToInclude({
-        newResource: "billing_address",
-      })
+      addResourceToInclude({ newResource: "billing_address" })
     } else if (!includeLoaded?.billing_address) {
-      addResourceToInclude({
-        newResourceLoaded: { billing_address: true },
-      })
+      addResourceToInclude({ newResourceLoaded: { billing_address: true } })
     }
-    if (customFieldMessageError != null && Object.keys(values).length > 0) {
-      for (const name in values) {
-        const field = values[name]
-        const fieldName = field.name
-        const value = field.value
-        const inError = errors[fieldName] != null
-        if (customFieldMessageError != null && fieldName != null && value != null) {
-          values[fieldName.replace("shipping_address_", "")] = value
-          const customMessage = customFieldMessageError({
-            field: fieldName,
-            value,
-            values,
-          })
-          if (customMessage != null) {
-            if (typeof customMessage === "string") {
-              if (inError) {
-                const errorMsg = errors[fieldName]?.message
-                if (errorMsg != null && errorMsg !== customMessage) {
-                  errors[fieldName].message = customMessage
-                }
-              } else {
-                setErrorForm({
-                  name: fieldName,
-                  code: "VALIDATION_ERROR",
-                  message: customMessage,
-                })
+  }, [include, includeLoaded, addResourceToInclude])
+
+  useEffect(() => {
+    if (Object.keys(formValues).length === 0) {
+      return
+    }
+
+    const nativeErrors: FormErrors = {}
+    for (const fieldName of Object.keys(formValues)) {
+      const input = getFormElement(formRef.current, fieldName)
+      if (input != null && !input.validity.valid) {
+        nativeErrors[fieldName] = {
+          code: "VALIDATION_ERROR",
+          message: input.validationMessage,
+          error: true,
+        }
+      }
+    }
+
+    let finalErrors: FormErrors = { ...nativeErrors }
+
+    if (customFieldMessageError != null) {
+      const updatedErrors: FormErrors = { ...nativeErrors }
+
+      for (const [, field] of Object.entries(formValues)) {
+        if (field == null || field.name == null || field.value == null) {
+          continue
+        }
+
+        const flatValues: Record<string, unknown> = {}
+        for (const [key, entry] of Object.entries(formValues)) {
+          flatValues[key.replace("billing_address_", "")] = entry?.value
+          flatValues[key] = entry?.value
+        }
+
+        const customMessage = customFieldMessageError({
+          field: field.name,
+          value: String(field.value),
+          values: flatValues,
+        })
+
+        if (customMessage == null) {
+          continue
+        }
+
+        if (typeof customMessage === "string") {
+          updatedErrors[field.name] = {
+            ...(updatedErrors[field.name] ?? {
+              code: "VALIDATION_ERROR",
+              message: customMessage,
+              error: true,
+            }),
+            message: customMessage,
+          }
+        } else {
+          for (const element of customMessage) {
+            if (!element.isValid) {
+              updatedErrors[element.field] = {
+                code: "VALIDATION_ERROR",
+                message: element.message ?? "",
+                error: true,
               }
             } else {
-              const elements = customMessage
-              elements.forEach((element) => {
-                const { field, value, isValid, message } = element
-                const fieldInError = errors[field] != null
-                if (!isValid) {
-                  if (fieldInError) {
-                    const errorMsg = errors[field]?.message
-                    if (errorMsg != null && errorMsg !== message) {
-                      errors[field].message = message
-                      setValueForm(field, value ?? "")
-                    }
-                  } else {
-                    setErrorForm({
-                      name: field,
-                      code: "VALIDATION_ERROR",
-                      message,
-                    })
-                  }
-                } else {
-                  if (fieldInError) {
-                    delete errors[field]
-                    setValueForm(field, value ?? "")
-                  }
-                }
-              })
+              delete updatedErrors[element.field]
             }
           }
         }
       }
-    }
-    if (errors != null && Object.keys(errors).length > 0) {
-      const formErrors: BaseError[] = []
-      for (const fieldName in errors) {
-        const code = errors[fieldName]?.code
-        const message = errors[fieldName]?.message
-        formErrors.push({
-          code: code as CodeErrorType,
-          message: message ?? "",
-          resource: "billing_address",
-          field: fieldName,
-        })
-      }
-      setAddressErrors(formErrors, "billing_address")
-    } else if (values && Object.keys(values).length > 0) {
-      setAddressErrors([], "billing_address")
-      for (const name in values) {
-        const field = values[name]
-        if (field?.value || (field?.required === false && field?.type !== "checkbox")) {
-          values[name.replace("billing_address_", "")] = field.value
 
-          delete values[name]
-        }
-        if (field?.type === "checkbox") {
-          delete values[name]
-          saveAddressToCustomerAddressBook({
-            type: "billing_address",
-            value: field.checked,
-          })
-        }
-      }
-      setAddress({
-        values: {
-          ...values,
-          ...(isBusiness && { business: isBusiness }),
-        },
+      finalErrors = updatedErrors
+    }
+
+    setErrors(finalErrors)
+
+    if (Object.keys(finalErrors).length > 0) {
+      const formErrors: BaseError[] = Object.entries(finalErrors).map(([fieldName, error]) => ({
+        code: error.code as CodeErrorType,
+        message: error.message,
         resource: "billing_address",
-      })
+        field: fieldName,
+      }))
+      setAddressErrors(formErrors, "billing_address")
+      return
     }
-    const checkboxChecked =
-      ref.current?.querySelector(
-        '[name="billing_address_save_to_customer_book"]'
-        // @ts-expect-error no type no types
-      )?.checked || getSaveBillingAddressToAddressBook()
-    if (checkboxChecked) {
-      ref.current
-        ?.querySelector('[name="billing_address_save_to_customer_book"]')
-        ?.setAttribute("checked", "true")
-      saveAddressToCustomerAddressBook({
-        type: "billing_address",
-        value: true,
-      })
-    }
-    if (
-      reset &&
-      ((values != null && Object.keys(values).length > 0) ||
-        (errors != null && Object.keys(errors).length > 0) ||
-        checkboxChecked)
-    ) {
-      if (saveAddressToCustomerAddressBook) {
-        saveAddressToCustomerAddressBook({
+
+    setAddressErrors([], "billing_address")
+    const addressValues: Record<string, unknown> = {}
+
+    for (const [name, field] of Object.entries(formValues)) {
+      if (field == null) {
+        continue
+      }
+
+      if (
+        field.value != null &&
+        (field.value || field.required === false) &&
+        field.type !== "checkbox"
+      ) {
+        addressValues[name.replace("billing_address_", "")] = field.value
+      }
+
+      if (field.type === "checkbox") {
+        saveAddressToCustomerAddressBook?.({
           type: "billing_address",
-          value: false,
+          value: field.checked ?? false,
         })
       }
-      ref.current?.reset()
-      resetForm({ target: ref.current })
-      setAddressErrors([], "billing_address")
-      setAddress({ values: {} as any, resource: "billing_address" })
     }
-  }, [
-    errors,
-    values,
-    reset,
-    include,
-    includeLoaded,
-    isBusiness,
-    setAddressErrors,
-    setValueForm,
-    setAddress,
-    customFieldMessageError,
-    setErrorForm,
-    saveAddressToCustomerAddressBook,
-    resetForm,
-    addResourceToInclude,
-  ])
-  const setValue = (name: AddressValuesKeys, value: string | number | readonly string[]): void => {
-    setValueForm(name, value as string)
-    const field: any = {
-      [name.replace("billing_address_", "")]: value,
-    }
+
     setAddress({
       values: {
-        ...values,
-        ...field,
+        ...addressValues,
         ...(isBusiness && { business: isBusiness }),
-      },
+      } as TCustomerAddress,
       resource: "billing_address",
     })
-  }
+  }, [
+    formValues,
+    isBusiness,
+    customFieldMessageError,
+    saveAddressToCustomerAddressBook,
+    setAddress,
+    setAddressErrors,
+  ])
+
+  useEffect(() => {
+    const checkbox = formRef.current?.querySelector<HTMLInputElement>(
+      '[name="billing_address_save_to_customer_book"]'
+    )
+    const checkboxChecked = checkbox?.checked || getSaveBillingAddressToAddressBook()
+
+    if (checkboxChecked) {
+      checkbox?.setAttribute("checked", "true")
+      saveAddressToCustomerAddressBook?.({ type: "billing_address", value: true })
+    }
+  }, [saveAddressToCustomerAddressBook])
+
+  useEffect(() => {
+    const checkbox = formRef.current?.querySelector<HTMLInputElement>(
+      '[name="billing_address_save_to_customer_book"]'
+    )
+    const checkboxChecked = checkbox?.checked || getSaveBillingAddressToAddressBook()
+
+    if (
+      reset &&
+      (Object.keys(formValues).length > 0 || Object.keys(errors).length > 0 || checkboxChecked)
+    ) {
+      saveAddressToCustomerAddressBook?.({ type: "billing_address", value: false })
+      formRef.current?.reset()
+      setErrors((prev) => (Object.keys(prev).length > 0 ? {} : prev))
+      setAddressErrors([], "billing_address")
+      setAddress({ values: {} as TCustomerAddress, resource: "billing_address" })
+    }
+  }, [reset, formValues, errors, saveAddressToCustomerAddressBook, setAddress, setAddressErrors])
+
+  const setValue = useCallback(
+    (name: AddressValuesKeys, value: string | number | readonly string[]): void => {
+      const input = getFormElement(formRef.current, name)
+      if (input != null) {
+        input.setCustomValidity("")
+        input.value = String(value)
+        input.dispatchEvent(new Event("change", { bubbles: true }))
+      }
+
+      resetFieldError(name)
+      setAddress({
+        values: {
+          [name.replace("billing_address_", "")]: value,
+          ...(isBusiness && { business: isBusiness }),
+        } as TCustomerAddress,
+        resource: "billing_address",
+      })
+    },
+    [isBusiness, resetFieldError, setAddress]
+  )
+
   const providerValues = {
     isBusiness,
-    values: values as DefaultContextAddress["values"],
-    validation,
+    values: formValues,
     setValue,
     errorClassName,
-    requiresBillingInfo: order?.requires_billing_info || false,
-    errors: errors as any,
+    requiresBillingInfo: order?.requires_billing_info ?? false,
+    errors,
     resetField: (name: string) => {
-      resetForm({ currentTarget: ref.current }, name)
+      const input = getFormElement(formRef.current, name)
+      if (input != null) {
+        input.setCustomValidity("")
+        input.value = ""
+        input.dispatchEvent(new Event("change", { bubbles: true }))
+      }
+      resetFieldError(name)
     },
   }
+
   return (
     <BillingAddressFormContext.Provider value={providerValues}>
-      <form ref={ref} autoComplete={autoComplete} {...p}>
+      <form ref={setFormRef} autoComplete={autoComplete} {...p}>
         {children}
       </form>
     </BillingAddressFormContext.Provider>

@@ -63,8 +63,6 @@ export function AddressInputSelect(props: Props): JSX.Element {
   return (
     <BaseSelect
       className={classNameComputed}
-      // biome-ignore lint/suspicious/noExplicitAny: validation ref type mismatch between address form contexts
-      ref={(billingAddress?.validation as any) || shippingAddress?.validation}
       required={required}
       options={options}
       name={name}

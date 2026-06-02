@@ -14,7 +14,7 @@ describe("retrieveGiftCard", () => {
       // No gift cards yet — create one to retrieve
       const created = await createGiftCard({
         accessToken: token,
-        resource: { currency_code: "USD", initial_balance_cents: 1000 },
+        resource: { currency_code: "USD", balance_cents: 1000 },
       })
       const result = await retrieveGiftCard({ accessToken: token, id: created.id })
       expect(result).toBeDefined()

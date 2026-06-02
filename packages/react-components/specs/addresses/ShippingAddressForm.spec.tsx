@@ -13,502 +13,216 @@ vi.mock("rapid-form", () => ({
   useRapidForm: rapidForm.useRapidForm,
 }))
 
-const mockGetSaveShippingAddress = vi.hoisted(() => vi.fn().mockReturnValue(false))
-vi.mock("#utils/localStorage", () => ({
-  getSaveShippingAddressToAddressBook: mockGetSaveShippingAddress,
+const localStorageMock = vi.hoisted(() => ({
+  getSaveShippingAddressToAddressBook: vi.fn(),
 }))
 
-const mockSetAddress = vi.fn()
-const mockSetAddressErrors = vi.fn()
-const mockAddResourceToInclude = vi.fn()
-const mockSaveAddressToCustomerAddressBook = vi.fn()
+vi.mock("#utils/localStorage", () => ({
+  getSaveBillingAddressToAddressBook: vi.fn(),
+  getSaveShippingAddressToAddressBook: localStorageMock.getSaveShippingAddressToAddressBook,
+  setCustomerOrderParam: vi.fn(),
+  getLocalOrder: vi.fn(),
+  setLocalOrder: vi.fn(),
+  deleteLocalOrder: vi.fn(),
+}))
 
 function ContextProbe(): JSX.Element {
   const ctx = useContext(ShippingAddressFormContext)
   return (
-    <div
-      data-testid="probe"
-      data-error-class={ctx.errorClassName ?? ""}
-      // biome-ignore lint/suspicious/noExplicitAny: test probe
-      {...({
-        onClick: () => (ctx as any).setValue?.("shipping_address_first_name", "Jane"),
-      } as any)}
-    />
-  )
-}
-
-function ResetFieldProbe(): JSX.Element {
-  const ctx = useContext(ShippingAddressFormContext)
-  return (
-    <button
-      type="button"
-      data-testid="reset-probe"
-      // biome-ignore lint/suspicious/noExplicitAny: test probe
-      onClick={() => (ctx as any).resetField?.("shipping_address_first_name")}
-    />
+    <div>
+      <div data-testid="errors">{JSON.stringify(ctx.errors ?? {})}</div>
+      <div data-testid="values">{JSON.stringify(ctx.values ?? {})}</div>
+    </div>
   )
 }
 
 function renderForm(
-  formProps: Partial<Parameters<typeof ShippingAddressForm>[0]> = {},
-  orderOverrides: Record<string, unknown> = {},
-  addressOverrides: Record<string, unknown> = {}
+  overrides: {
+    addressOverrides?: Record<string, unknown>
+    orderOverrides?: Record<string, unknown>
+    props?: Partial<React.ComponentProps<typeof ShippingAddressForm>>
+    children?: React.ReactNode
+    values?: Record<string, unknown>
+  } = {}
 ) {
-  // biome-ignore lint/suspicious/noExplicitAny: test cast
-  const orderCtx = {
-    ...defaultOrderContext,
-    addResourceToInclude: mockAddResourceToInclude,
-    saveAddressToCustomerAddressBook: mockSaveAddressToCustomerAddressBook,
-    include: [],
-    includeLoaded: {},
-    order: { id: "ord-1" },
-    ...orderOverrides,
-  } as any
-  // biome-ignore lint/suspicious/noExplicitAny: test cast
-  const addressCtx = {
+  const setAddressErrors = vi.fn()
+  const setAddress = vi.fn()
+  const addResourceToInclude = vi.fn()
+  const addressContext = {
     ...defaultAddressContext,
-    setAddress: mockSetAddress,
-    setAddressErrors: mockSetAddressErrors,
+    setAddressErrors,
+    setAddress,
     shipToDifferentAddress: true,
-    isBusiness: false,
-    ...addressOverrides,
-  } as any
-  return render(
-    <OrderContext.Provider value={orderCtx}>
-      <AddressesContext.Provider value={addressCtx}>
-        <ShippingAddressForm data-testid="shipping-form" {...formProps}>
-          <ContextProbe />
-          <ResetFieldProbe />
-        </ShippingAddressForm>
-      </AddressesContext.Provider>
-    </OrderContext.Provider>
-  )
-}
+    ...overrides.addressOverrides,
+  }
+  const orderContext = {
+    ...defaultOrderContext,
+    include: ["shipping_address"],
+    includeLoaded: { shipping_address: true },
+    addResourceToInclude,
+    ...overrides.orderOverrides,
+  }
 
-const defaultRapidFormReturn = {
-  validation: undefined,
-  values: {},
-  errors: {},
-  reset: vi.fn(),
-  setValue: vi.fn(),
-  setError: vi.fn(),
+  rapidForm.useRapidForm.mockReturnValue({
+    refValidation: vi.fn(),
+    values: overrides.values ?? {},
+  })
+
+  const result = render(
+    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+    <AddressesContext.Provider value={addressContext as any}>
+      {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
+      <OrderContext.Provider value={orderContext as any}>
+        <ShippingAddressForm data-testid="form" {...overrides.props}>
+          {overrides.children ?? <ContextProbe />}
+        </ShippingAddressForm>
+      </OrderContext.Provider>
+    </AddressesContext.Provider>
+  )
+
+  return { ...result, setAddressErrors, setAddress, addResourceToInclude }
 }
 
 beforeEach(() => {
   vi.clearAllMocks()
-  mockGetSaveShippingAddress.mockReturnValue(false)
-  rapidForm.useRapidForm.mockReturnValue({ ...defaultRapidFormReturn })
+  localStorageMock.getSaveShippingAddressToAddressBook.mockReturnValue(false)
 })
 
 describe("ShippingAddressForm", () => {
-  it("renders a form element with children", () => {
+  it("renders a form with children", () => {
     renderForm()
-    expect(screen.getByTestId("shipping-form")).toBeTruthy()
-    expect(screen.getByTestId("probe")).toBeTruthy()
+    expect(screen.getByTestId("form")).toBeDefined()
   })
 
-  it("calls addResourceToInclude for shipping_address on mount", async () => {
+  it("defaults to autocomplete=on", () => {
     renderForm()
+    expect(screen.getByTestId("form").getAttribute("autocomplete")).toBe("on")
+  })
+
+  it("passes extra props to the form element", () => {
+    renderForm({ props: { className: "my-form" } })
+    expect(screen.getByTestId("form").className).toContain("my-form")
+  })
+
+  it("exposes errorClassName through context", async () => {
+    let contextRef: { errorClassName?: string } | undefined
+
+    function ErrorClassProbe(): JSX.Element {
+      const ctx = useContext(ShippingAddressFormContext)
+      contextRef = ctx as typeof contextRef
+      return <div />
+    }
+
+    renderForm({
+      children: <ErrorClassProbe />,
+      props: { errorClassName: "field-error" },
+    })
+
     await waitFor(() => {
-      expect(mockAddResourceToInclude).toHaveBeenCalledWith({
-        newResource: "shipping_address",
-      })
+      expect(contextRef?.errorClassName).toBe("field-error")
     })
   })
 
-  it("calls addResourceToInclude with newResourceLoaded when already included", async () => {
-    renderForm({}, { include: ["shipping_address"], includeLoaded: {} })
-    await waitFor(() => {
-      expect(mockAddResourceToInclude).toHaveBeenCalledWith({
-        newResourceLoaded: { shipping_address: true },
-      })
-    })
-  })
-
-  it("exposes errorClassName through context", () => {
-    renderForm({ errorClassName: "field-error" })
-    expect(screen.getByTestId("probe").getAttribute("data-error-class")).toBe("field-error")
-  })
-
-  it("calls setAddressErrors when form has errors and shipToDifferentAddress is true", async () => {
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      errors: {
-        shipping_address_first_name: { code: "VALIDATION_ERROR", message: "required" },
+  it("propagates valid form values to setAddress when shipToDifferentAddress=true", async () => {
+    const { setAddress } = renderForm({
+      values: {
+        shipping_address_first_name: { value: "Jane", required: true },
+        shipping_address_last_name: { value: "Doe", required: true },
       },
+      addressOverrides: { shipToDifferentAddress: true },
     })
-    renderForm({}, {}, { shipToDifferentAddress: true })
+
     await waitFor(() => {
-      expect(mockSetAddressErrors).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            resource: "shipping_address",
-            field: "shipping_address_first_name",
+      expect(setAddress).toHaveBeenCalledWith(
+        expect.objectContaining({
+          resource: "shipping_address",
+          values: expect.objectContaining({
+            first_name: "Jane",
+            last_name: "Doe",
           }),
-        ]),
-        "shipping_address"
+        })
       )
     })
   })
 
-  it("calls setAddress when values are valid and shipToDifferentAddress is true", async () => {
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      errors: {},
+  it("propagates valid form values to setAddress when invertAddresses=true", async () => {
+    const { setAddress } = renderForm({
       values: {
-        shipping_address_first_name: { value: "Jane", required: true, type: "text" },
+        shipping_address_first_name: { value: "Jane", required: true },
       },
+      addressOverrides: { shipToDifferentAddress: false, invertAddresses: true },
     })
-    renderForm({}, {}, { shipToDifferentAddress: true })
+
     await waitFor(() => {
-      expect(mockSetAddressErrors).toHaveBeenCalledWith([], "shipping_address")
-      expect(mockSetAddress).toHaveBeenCalledWith(
+      expect(setAddress).toHaveBeenCalledWith(
         expect.objectContaining({ resource: "shipping_address" })
       )
     })
   })
 
-  it("does not call setAddress when shipToDifferentAddress is false", async () => {
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      errors: {},
+  it("does NOT call setAddress when shouldSyncShippingAddress=false", async () => {
+    const { setAddress } = renderForm({
       values: {
-        shipping_address_first_name: { value: "Jane", required: true, type: "text" },
+        shipping_address_first_name: { value: "Jane", required: true },
       },
+      addressOverrides: { shipToDifferentAddress: false, invertAddresses: false },
     })
-    renderForm({}, {}, { shipToDifferentAddress: false })
+
     await act(async () => {})
-    expect(mockSetAddress).not.toHaveBeenCalled()
+    expect(setAddress).not.toHaveBeenCalled()
   })
 
-  it("accepts autoComplete and forwarded props", () => {
-    renderForm({ autoComplete: "off" })
-    const form = screen.getByTestId("shipping-form")
-    expect(form.getAttribute("autocomplete")).toBe("off")
+  it("does not call setAddress when values are empty", async () => {
+    const { setAddress } = renderForm({ values: {} })
+    await act(async () => {})
+    expect(setAddress).not.toHaveBeenCalled()
   })
 
-  it("context setValue calls setValueForm and setAddress when shipToDifferentAddress is true", async () => {
-    const setValueForm = vi.fn()
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setValue: setValueForm,
-      values: {},
-      errors: {},
-    })
-    renderForm({}, {}, { shipToDifferentAddress: true })
-    const probe = screen.getByTestId("probe")
-    await act(async () => {
-      probe.click()
-    })
-    expect(setValueForm).toHaveBeenCalledWith("shipping_address_first_name", "Jane")
-    expect(mockSetAddress).toHaveBeenCalledWith(
-      expect.objectContaining({ resource: "shipping_address" })
-    )
-  })
-
-  it("resets form when reset=true and errors are non-empty", async () => {
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      values: {},
-      errors: {
-        shipping_address_first_name: { code: "VALIDATION_ERROR", message: "required" },
-      },
-    })
-    renderForm({ reset: true }, {}, { shipToDifferentAddress: true })
-    await waitFor(() => {
-      expect(mockSetAddressErrors).toHaveBeenCalledWith([], "shipping_address")
-    })
-  })
-
-  it("handles checkbox field type (save to customer address book)", async () => {
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      errors: {},
+  it("skips fields with no value when required", async () => {
+    const { setAddress } = renderForm({
       values: {
-        shipping_address_save_to_customer_book: { type: "checkbox", checked: true },
+        shipping_address_first_name: { value: "", required: true },
       },
     })
-    renderForm({}, {}, { shipToDifferentAddress: true })
-    await waitFor(() => {
-      expect(mockSaveAddressToCustomerAddressBook).toHaveBeenCalledWith({
-        type: "shipping_address",
-        value: true,
+
+    await act(async () => {})
+    expect(setAddress).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        values: expect.objectContaining({ first_name: "" }),
       })
-    })
-  })
-
-  it("marks checkbox as checked when checkboxChecked from localStorage", async () => {
-    mockGetSaveShippingAddress.mockReturnValue(true)
-    rapidForm.useRapidForm.mockReturnValue({ ...defaultRapidFormReturn, values: {}, errors: {} })
-    renderForm({}, {}, { shipToDifferentAddress: true })
-    // checkboxChecked from localStorage triggers the setAttribute block (line 181)
-    await act(async () => {})
-    expect(mockGetSaveShippingAddress).toHaveBeenCalled()
-  })
-
-  it("resetField calls resetForm with field name", async () => {
-    const resetForm = vi.fn()
-    rapidForm.useRapidForm.mockReturnValue({ ...defaultRapidFormReturn, reset: resetForm })
-    renderForm()
-    await act(async () => {
-      screen.getByTestId("reset-probe").click()
-    })
-    expect(resetForm).toHaveBeenCalledWith(
-      expect.objectContaining({ currentTarget: expect.anything() }),
-      "shipping_address_first_name"
     )
   })
 
-  it("customFieldMessageError: returns string for field not in error — calls setErrorForm", async () => {
-    const setError = vi.fn()
-    const customFieldMessageError = vi.fn().mockReturnValue("Custom error message")
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setError,
-      errors: {},
+  it("includes optional fields with required=false even when empty", async () => {
+    const { setAddress } = renderForm({
       values: {
-        shipping_address_first_name: {
-          name: "shipping_address_first_name",
-          value: "Jane",
-          required: true,
-          type: "text",
-        },
+        shipping_address_company: { value: "", required: false },
+        shipping_address_first_name: { value: "Jane", required: true },
       },
     })
-    renderForm({ customFieldMessageError }, {}, { shipToDifferentAddress: true })
+
     await waitFor(() => {
-      expect(setError).toHaveBeenCalledWith(
-        expect.objectContaining({ name: "shipping_address_first_name", code: "VALIDATION_ERROR" })
+      expect(setAddress).toHaveBeenCalledWith(
+        expect.objectContaining({
+          values: expect.objectContaining({
+            company: "",
+            first_name: "Jane",
+          }),
+        })
       )
     })
   })
 
-  it("customFieldMessageError: returns string for field already in error — updates message", async () => {
-    const customFieldMessageError = vi.fn().mockReturnValue("Updated error")
-    const errorsObj = {
-      shipping_address_first_name: { code: "VALIDATION_ERROR", message: "original error" },
-    }
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      errors: errorsObj,
+  it("includes isBusiness flag in address values", async () => {
+    const { setAddress } = renderForm({
       values: {
-        shipping_address_first_name: {
-          name: "shipping_address_first_name",
-          value: "Jane",
-          required: true,
-          type: "text",
-        },
+        shipping_address_first_name: { value: "Jane", required: true },
       },
+      addressOverrides: { isBusiness: true, shipToDifferentAddress: true },
     })
-    renderForm({ customFieldMessageError }, {}, { shipToDifferentAddress: true })
+
     await waitFor(() => {
-      expect(customFieldMessageError).toHaveBeenCalled()
-      expect(errorsObj.shipping_address_first_name.message).toBe("Updated error")
-    })
-  })
-
-  it("customFieldMessageError: returns array with isValid=false — calls setErrorForm", async () => {
-    const setError = vi.fn()
-    const customFieldMessageError = vi.fn().mockReturnValue([
-      {
-        field: "shipping_address_first_name",
-        value: "Jane",
-        isValid: false,
-        message: "Bad value",
-      },
-    ])
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setError,
-      errors: {},
-      values: {
-        shipping_address_first_name: {
-          name: "shipping_address_first_name",
-          value: "Jane",
-          required: true,
-          type: "text",
-        },
-      },
-    })
-    renderForm({ customFieldMessageError }, {}, { shipToDifferentAddress: true })
-    await waitFor(() => {
-      expect(setError).toHaveBeenCalledWith(
-        expect.objectContaining({ name: "shipping_address_first_name", code: "VALIDATION_ERROR" })
-      )
-    })
-  })
-
-  it("customFieldMessageError: returns array with isValid=true, in error — deletes error and setValue", async () => {
-    const setValueForm = vi.fn()
-    const customFieldMessageError = vi
-      .fn()
-      .mockReturnValue([
-        { field: "shipping_address_first_name", value: "Fixed", isValid: true, message: "" },
-      ])
-    const errorsObj = {
-      shipping_address_first_name: { code: "VALIDATION_ERROR", message: "bad" },
-    }
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setValue: setValueForm,
-      errors: errorsObj,
-      values: {
-        shipping_address_first_name: {
-          name: "shipping_address_first_name",
-          value: "Fixed",
-          required: true,
-          type: "text",
-        },
-      },
-    })
-    renderForm({ customFieldMessageError }, {}, { shipToDifferentAddress: true })
-    await waitFor(() => {
-      expect(customFieldMessageError).toHaveBeenCalled()
-      expect(errorsObj.shipping_address_first_name).toBeUndefined()
-      expect(setValueForm).toHaveBeenCalledWith("shipping_address_first_name", "Fixed")
-    })
-  })
-
-  it("customFieldMessageError: returns array with isValid=false, field in error, message changed — updates message", async () => {
-    const setValueForm = vi.fn()
-    const customFieldMessageError = vi.fn().mockReturnValue([
-      {
-        field: "shipping_address_first_name",
-        value: "Jane",
-        isValid: false,
-        message: "New error",
-      },
-    ])
-    const errorsObj = {
-      shipping_address_first_name: { code: "VALIDATION_ERROR", message: "Old error" },
-    }
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setValue: setValueForm,
-      errors: errorsObj,
-      values: {
-        shipping_address_first_name: {
-          name: "shipping_address_first_name",
-          value: "Jane",
-          required: true,
-          type: "text",
-        },
-      },
-    })
-    renderForm({ customFieldMessageError }, {}, { shipToDifferentAddress: true })
-    await waitFor(() => {
-      expect(customFieldMessageError).toHaveBeenCalled()
-      expect(errorsObj.shipping_address_first_name.message).toBe("New error")
-      expect(setValueForm).toHaveBeenCalledWith("shipping_address_first_name", "Jane")
-    })
-  })
-
-  it("customFieldMessageError: returns null — skips error processing", async () => {
-    const setError = vi.fn()
-    const customFieldMessageError = vi.fn().mockReturnValue(null)
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setError,
-      errors: {},
-      values: {
-        shipping_address_first_name: {
-          name: "shipping_address_first_name",
-          value: "Jane",
-          required: true,
-          type: "text",
-        },
-      },
-    })
-    renderForm({ customFieldMessageError })
-    await act(async () => {})
-    expect(setError).not.toHaveBeenCalled()
-  })
-
-  it("customFieldMessageError: returns string, field in error, same message — no update", async () => {
-    const setError = vi.fn()
-    const msg = "Same error"
-    const customFieldMessageError = vi.fn().mockReturnValue(msg)
-    const errorsObj = {
-      shipping_address_first_name: { code: "VALIDATION_ERROR", message: msg },
-    }
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setError,
-      errors: errorsObj,
-      values: {
-        shipping_address_first_name: {
-          name: "shipping_address_first_name",
-          value: "Jane",
-          required: true,
-          type: "text",
-        },
-      },
-    })
-    renderForm({ customFieldMessageError })
-    await act(async () => {})
-    expect(errorsObj.shipping_address_first_name.message).toBe(msg)
-  })
-
-  it("customFieldMessageError: returns array with isValid=true, field NOT in error — no action", async () => {
-    const setValueForm = vi.fn()
-    const customFieldMessageError = vi
-      .fn()
-      .mockReturnValue([
-        { field: "shipping_address_first_name", value: "Jane", isValid: true, message: "" },
-      ])
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setValue: setValueForm,
-      errors: {},
-      values: {
-        shipping_address_first_name: {
-          name: "shipping_address_first_name",
-          value: "Jane",
-          required: true,
-          type: "text",
-        },
-      },
-    })
-    renderForm({ customFieldMessageError })
-    await act(async () => {})
-    expect(setValueForm).not.toHaveBeenCalled()
-  })
-
-  it("skips field value copy when field.value is empty and field is required", async () => {
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      errors: {},
-      values: {
-        shipping_address_first_name: {
-          value: "",
-          required: true,
-          type: "text",
-        },
-      },
-    })
-    renderForm()
-    await waitFor(() => {
-      expect(mockSetAddress).toHaveBeenCalledWith(
-        expect.objectContaining({ resource: "shipping_address" })
-      )
-    })
-  })
-
-  it("includes business flag in address when isBusiness is true", async () => {
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      errors: {},
-      values: {
-        shipping_address_first_name: {
-          value: "Jane",
-          required: true,
-          type: "text",
-        },
-      },
-    })
-    renderForm({}, {}, { isBusiness: true })
-    await waitFor(() => {
-      expect(mockSetAddress).toHaveBeenCalledWith(
+      expect(setAddress).toHaveBeenCalledWith(
         expect.objectContaining({
           values: expect.objectContaining({ business: true }),
         })
@@ -516,252 +230,320 @@ describe("ShippingAddressForm", () => {
     })
   })
 
-  it("handles include already loaded state", async () => {
-    rapidForm.useRapidForm.mockReturnValue({ ...defaultRapidFormReturn, values: {}, errors: {} })
-    renderForm({}, { include: ["shipping_address"], includeLoaded: { shipping_address: true } })
-    await act(async () => {})
-    expect(mockAddResourceToInclude).not.toHaveBeenCalled()
-  })
-
-  it("customFieldMessageError: skips field without name property", async () => {
-    const setError = vi.fn()
-    const customFieldMessageError = vi.fn().mockReturnValue("Custom error")
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setError,
-      errors: {},
+  it("calls saveAddressToCustomerAddressBook for checkbox fields", async () => {
+    const saveAddressToCustomerAddressBook = vi.fn()
+    renderForm({
       values: {
-        shipping_address_first_name: {
-          // no 'name' property
-          value: "Jane",
-          required: true,
-          type: "text",
+        shipping_address_first_name: { value: "Jane", required: true },
+        shipping_address_save_to_customer_book: {
+          value: "on",
+          type: "checkbox",
+          checked: true,
         },
       },
+      orderOverrides: { saveAddressToCustomerAddressBook },
     })
-    renderForm({ customFieldMessageError })
-    await act(async () => {})
-    expect(customFieldMessageError).not.toHaveBeenCalled()
-    expect(setError).not.toHaveBeenCalled()
-  })
 
-  it("customFieldMessageError: array, isValid=false, in error, same message — no update", async () => {
-    const setValueForm = vi.fn()
-    const msg = "Same error"
-    const customFieldMessageError = vi
-      .fn()
-      .mockReturnValue([
-        { field: "shipping_address_first_name", value: "Jane", isValid: false, message: msg },
-      ])
-    const errorsObj = {
-      shipping_address_first_name: { code: "VALIDATION_ERROR", message: msg },
-    }
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setValue: setValueForm,
-      errors: errorsObj,
-      values: {
-        shipping_address_first_name: {
-          name: "shipping_address_first_name",
-          value: "Jane",
-          required: true,
-          type: "text",
-        },
-      },
-    })
-    renderForm({ customFieldMessageError })
-    await act(async () => {})
-    expect(setValueForm).not.toHaveBeenCalled()
-  })
-
-  it("customFieldMessageError: array, isValid=true, in error, value=null — setValueForm called with empty string", async () => {
-    const setValueForm = vi.fn()
-    const customFieldMessageError = vi
-      .fn()
-      .mockReturnValue([
-        { field: "shipping_address_first_name", value: null, isValid: true, message: "" },
-      ])
-    const errorsObj = {
-      shipping_address_first_name: { code: "VALIDATION_ERROR", message: "bad" },
-    }
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setValue: setValueForm,
-      errors: errorsObj,
-      values: {
-        shipping_address_first_name: {
-          name: "shipping_address_first_name",
-          value: "Jane",
-          required: true,
-          type: "text",
-        },
-      },
-    })
-    renderForm({ customFieldMessageError })
     await waitFor(() => {
-      expect(setValueForm).toHaveBeenCalledWith("shipping_address_first_name", "")
+      expect(saveAddressToCustomerAddressBook).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "shipping_address", value: true })
+      )
     })
   })
 
-  it("sets address errors when invertAddresses=true covers right side of || operator", async () => {
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      errors: {
-        shipping_address_first_name: { code: "VALIDATION_ERROR", message: "required" },
+  it("sets address errors when input validation fails (with shouldSyncShippingAddress)", async () => {
+    const { setAddressErrors, container } = renderForm({
+      children: (
+        <>
+          <input name="shipping_address_first_name" required />
+          <ContextProbe />
+        </>
+      ),
+      values: {
+        shipping_address_first_name: { value: "" },
       },
-      values: {},
+      addressOverrides: { shipToDifferentAddress: true },
     })
-    renderForm({}, {}, { shipToDifferentAddress: false, invertAddresses: true })
+
+    const input = container.querySelector<HTMLInputElement>(
+      "input[name='shipping_address_first_name']"
+    )
+    if (input != null) {
+      input.required = true
+      input.setCustomValidity("Required")
+    }
+
     await waitFor(() => {
-      expect(mockSetAddressErrors).toHaveBeenCalledWith(
-        expect.arrayContaining([expect.objectContaining({ resource: "shipping_address" })]),
+      expect(setAddressErrors).toHaveBeenCalled()
+    })
+  })
+
+  it("does not set address errors when shouldSyncShippingAddress=false", async () => {
+    const { setAddressErrors } = renderForm({
+      values: {
+        shipping_address_first_name: { value: "Jane", required: true },
+      },
+      addressOverrides: { shipToDifferentAddress: false, invertAddresses: false },
+    })
+
+    await act(async () => {})
+    expect(setAddressErrors).not.toHaveBeenCalledWith(expect.anything(), "shipping_address")
+  })
+
+  it("applies customFieldMessageError (string response)", async () => {
+    const { setAddressErrors } = renderForm({
+      values: {
+        shipping_address_first_name: {
+          value: "X",
+          name: "shipping_address_first_name",
+          required: true,
+        },
+      },
+      props: {
+        customFieldMessageError: ({ field }) =>
+          field === "shipping_address_first_name" ? "Too short" : null,
+      },
+    })
+
+    await waitFor(() => {
+      expect(setAddressErrors).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ message: "Too short" })]),
         "shipping_address"
       )
     })
   })
 
-  it("calls setValue with isBusiness flag in address update", async () => {
-    rapidForm.useRapidForm.mockReturnValue({ ...defaultRapidFormReturn, values: {}, errors: {} })
-    renderForm({}, {}, { isBusiness: true })
-    await act(async () => {
-      screen.getByTestId("probe").click()
-    })
-    expect(mockSetAddress).toHaveBeenCalledWith(
-      expect.objectContaining({
-        values: expect.objectContaining({ business: true }),
-      })
-    )
-  })
-
-  it("handles reset with non-empty errors", async () => {
-    const resetForm = vi.fn()
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      reset: resetForm,
-      values: {},
-      errors: {
-        shipping_address_first_name: { code: "VALIDATION_ERROR", message: "required" },
-      },
-    })
-    renderForm({ reset: true }, {}, { shipToDifferentAddress: true })
-    await waitFor(() => {
-      expect(mockSaveAddressToCustomerAddressBook).toHaveBeenCalledWith({
-        type: "shipping_address",
-        value: false,
-      })
-    })
-  })
-
-  it("handles reset without saveAddressToCustomerAddressBook (null path)", async () => {
-    const resetForm = vi.fn()
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      reset: resetForm,
+  it("applies customFieldMessageError (array response with isValid=false)", async () => {
+    const { setAddressErrors } = renderForm({
       values: {
-        shipping_address_first_name: { value: "Jane", required: true, type: "text" },
+        shipping_address_first_name: {
+          value: "X",
+          name: "shipping_address_first_name",
+          required: true,
+        },
       },
-      errors: {},
-    })
-    renderForm(
-      { reset: true },
-      { saveAddressToCustomerAddressBook: undefined },
-      { shipToDifferentAddress: true }
-    )
-    await waitFor(() => {
-      expect(mockSetAddressErrors).toHaveBeenCalledWith([], "shipping_address")
-    })
-  })
-
-  it("handles reset triggered by checkboxChecked (values/errors empty, checkbox=true)", async () => {
-    mockGetSaveShippingAddress.mockReturnValue(true)
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      reset: vi.fn(),
-      values: {},
-      errors: {},
-    })
-    renderForm({ reset: true }, {}, { shipToDifferentAddress: true })
-    await waitFor(() => {
-      expect(mockSaveAddressToCustomerAddressBook).toHaveBeenCalledWith({
-        type: "shipping_address",
-        value: false,
-      })
-    })
-    mockGetSaveShippingAddress.mockReturnValue(false)
-  })
-
-  it("uses empty string fallback when error message is undefined", async () => {
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      errors: {
-        shipping_address_first_name: { code: "VALIDATION_ERROR" }, // no message
+      props: {
+        customFieldMessageError: () => [
+          { field: "shipping_address_first_name", isValid: false, message: "Bad" },
+        ],
       },
-      values: {},
     })
-    renderForm({}, {}, { shipToDifferentAddress: true })
+
     await waitFor(() => {
-      expect(mockSetAddressErrors).toHaveBeenCalledWith(
-        expect.arrayContaining([expect.objectContaining({ message: "" })]),
+      expect(setAddressErrors).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ message: "Bad" })]),
         "shipping_address"
       )
     })
   })
 
-  it("skips setAddressErrors when shipToDifferentAddress and invertAddresses are both false", async () => {
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      errors: {
-        shipping_address_first_name: { code: "VALIDATION_ERROR", message: "required" },
+  it("clears errors for field when customFieldMessageError returns isValid=true", async () => {
+    const { setAddressErrors } = renderForm({
+      values: {
+        shipping_address_first_name: {
+          value: "Jane",
+          name: "shipping_address_first_name",
+          required: true,
+        },
       },
-      values: {},
+      props: {
+        customFieldMessageError: () => [{ field: "shipping_address_first_name", isValid: true }],
+      },
     })
-    renderForm({}, {}, { shipToDifferentAddress: false, invertAddresses: false })
-    await act(async () => {})
-    expect(mockSetAddressErrors).not.toHaveBeenCalled()
+
+    await waitFor(() => {
+      expect(setAddressErrors).toHaveBeenCalledWith([], "shipping_address")
+    })
   })
 
-  it("sets address when field has required=false and no value", async () => {
+  it("resets form when reset prop is true", async () => {
+    const setAddress = vi.fn()
+    const setAddressErrors = vi.fn()
+    const addResourceToInclude = vi.fn()
+
     rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      errors: {},
-      values: {
-        shipping_address_company: { value: "", required: false, type: "text" },
+      refValidation: vi.fn(),
+      values: { shipping_address_first_name: { value: "Jane", required: true } },
+    })
+
+    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+    const addrCtx = {
+      ...defaultAddressContext,
+      setAddress,
+      setAddressErrors,
+      shipToDifferentAddress: true,
+    } as any
+    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+    const orderCtx = {
+      ...defaultOrderContext,
+      include: ["shipping_address"],
+      includeLoaded: { shipping_address: true },
+      addResourceToInclude,
+    } as any
+
+    const { rerender } = render(
+      <AddressesContext.Provider value={addrCtx}>
+        <OrderContext.Provider value={orderCtx}>
+          <ShippingAddressForm data-testid="form" reset={false}>
+            <ContextProbe />
+          </ShippingAddressForm>
+        </OrderContext.Provider>
+      </AddressesContext.Provider>
+    )
+
+    await waitFor(() => expect(setAddress).toHaveBeenCalled())
+    setAddressErrors.mockClear()
+
+    rerender(
+      <AddressesContext.Provider value={addrCtx}>
+        <OrderContext.Provider value={orderCtx}>
+          <ShippingAddressForm data-testid="form" reset={true}>
+            <ContextProbe />
+          </ShippingAddressForm>
+        </OrderContext.Provider>
+      </AddressesContext.Provider>
+    )
+
+    await waitFor(() => {
+      expect(setAddressErrors).toHaveBeenCalledWith([], "shipping_address")
+    })
+  })
+
+  it("calls addResourceToInclude when shipping_address not in include", async () => {
+    const addResourceToInclude = vi.fn()
+    renderForm({
+      orderOverrides: {
+        include: [],
+        includeLoaded: {},
+        addResourceToInclude,
       },
     })
-    renderForm({}, {}, { shipToDifferentAddress: true })
+
     await waitFor(() => {
-      expect(mockSetAddress).toHaveBeenCalledWith(
+      expect(addResourceToInclude).toHaveBeenCalledWith(
+        expect.objectContaining({ newResource: "shipping_address" })
+      )
+    })
+  })
+
+  it("calls addResourceToInclude to mark shipping_address as loaded", async () => {
+    const addResourceToInclude = vi.fn()
+    renderForm({
+      orderOverrides: {
+        include: ["shipping_address"],
+        includeLoaded: { shipping_address: false },
+        addResourceToInclude,
+      },
+    })
+
+    await waitFor(() => {
+      expect(addResourceToInclude).toHaveBeenCalledWith(
+        expect.objectContaining({ newResourceLoaded: { shipping_address: true } })
+      )
+    })
+  })
+
+  it("provides setValue via context", async () => {
+    let contextRef: { setValue?: (name: string, value: string) => void } | undefined
+
+    function ValueSetter(): JSX.Element {
+      const ctx = useContext(ShippingAddressFormContext)
+      contextRef = ctx as typeof contextRef
+      return <input name="shipping_address_first_name" data-testid="input" />
+    }
+
+    renderForm({ children: <ValueSetter /> })
+    await waitFor(() => expect(contextRef).toBeDefined())
+
+    act(() => {
+      contextRef?.setValue?.("shipping_address_first_name", "Updated")
+    })
+
+    const input = screen.getByTestId("input") as HTMLInputElement
+    expect(input.value).toBe("Updated")
+  })
+
+  it("provides resetField via context", async () => {
+    let contextRef: { resetField?: (name: string) => void } | undefined
+
+    function FieldResetter(): JSX.Element {
+      const ctx = useContext(ShippingAddressFormContext)
+      contextRef = ctx as typeof contextRef
+      return <input name="shipping_address_first_name" data-testid="input" defaultValue="Jane" />
+    }
+
+    renderForm({ children: <FieldResetter /> })
+    await waitFor(() => expect(contextRef).toBeDefined())
+
+    act(() => {
+      contextRef?.resetField?.("shipping_address_first_name")
+    })
+
+    const input = screen.getByTestId("input") as HTMLInputElement
+    expect(input.value).toBe("")
+  })
+
+  it("saves address to book when localStorage flag is set", async () => {
+    const saveAddressToCustomerAddressBook = vi.fn()
+    localStorageMock.getSaveShippingAddressToAddressBook.mockReturnValue(true)
+
+    renderForm({
+      orderOverrides: { saveAddressToCustomerAddressBook },
+    })
+
+    await waitFor(() => {
+      expect(saveAddressToCustomerAddressBook).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "shipping_address", value: true })
+      )
+    })
+  })
+
+  it("skips null fields in formValues during error collection", async () => {
+    const { setAddressErrors } = renderForm({
+      values: {
+        shipping_address_first_name: { value: "Jane", required: true },
+        // biome-ignore lint/suspicious/noExplicitAny: test null field
+        shipping_address_null_field: null as any,
+      },
+    })
+
+    await waitFor(() => {
+      expect(setAddressErrors).toHaveBeenCalledWith([], "shipping_address")
+    })
+  })
+
+  it("skips fields with null name in customFieldMessageError processing", async () => {
+    const customFieldMessageError = vi.fn().mockReturnValue(null)
+    const { setAddress } = renderForm({
+      values: {
+        shipping_address_first_name: { value: "Jane", name: null, required: true },
+      },
+      props: { customFieldMessageError },
+    })
+
+    await waitFor(() => {
+      expect(setAddress).toHaveBeenCalled()
+    })
+  })
+
+  it("customFieldMessageError returning null skips the field", async () => {
+    const { setAddress } = renderForm({
+      values: {
+        shipping_address_first_name: {
+          value: "Jane",
+          name: "shipping_address_first_name",
+          required: true,
+        },
+      },
+      props: {
+        customFieldMessageError: () => null,
+      },
+    })
+
+    await waitFor(() => {
+      expect(setAddress).toHaveBeenCalledWith(
         expect.objectContaining({ resource: "shipping_address" })
       )
-    })
-  })
-
-  it("customFieldMessageError: array, isValid=false, in error, different message, value=null — setValueForm called with empty string", async () => {
-    const setValueForm = vi.fn()
-    const customFieldMessageError = vi
-      .fn()
-      .mockReturnValue([
-        { field: "shipping_address_first_name", value: null, isValid: false, message: "New error" },
-      ])
-    const errorsObj = {
-      shipping_address_first_name: { code: "VALIDATION_ERROR", message: "Old error" },
-    }
-    rapidForm.useRapidForm.mockReturnValue({
-      ...defaultRapidFormReturn,
-      setValue: setValueForm,
-      errors: errorsObj,
-      values: {
-        shipping_address_first_name: {
-          name: "shipping_address_first_name",
-          value: "Jane",
-          required: true,
-          type: "text",
-        },
-      },
-    })
-    renderForm({ customFieldMessageError })
-    await waitFor(() => {
-      expect(setValueForm).toHaveBeenCalledWith("shipping_address_first_name", "")
     })
   })
 })

@@ -9,7 +9,7 @@ import { invertedAddressesHandler, sanitizeMetadataFields } from "#utils/address
 import baseReducer from "#utils/baseReducer"
 import { formCleaner } from "#utils/formCleaner"
 import { getSdk } from "@commercelayer/core"
-import type { TCustomerAddress } from "./CustomerReducer"
+import type { TCustomerAddress } from "#typings/customers"
 import type { updateOrder } from "./OrderReducer"
 
 // TODO: Move in the future

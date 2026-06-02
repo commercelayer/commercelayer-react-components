@@ -8,6 +8,9 @@ import type { AddressStateSelectName, BaseSelectComponentProps, Option } from "#
 import { getStateOfCountry, isValidState, type States } from "#utils/countryStateCity"
 import { isEmpty } from "#utils/isEmpty"
 
+const BILLING_COUNTRY_KEY = "billing_address_country_code" as const
+const SHIPPING_COUNTRY_KEY = "shipping_address_country_code" as const
+
 type Props = Omit<BaseSelectComponentProps, "options" | "name" | "placeholder"> & {
   name: AddressStateSelectName
   required?: boolean
@@ -86,16 +89,15 @@ export function AddressStateSelector(props: Props): JSX.Element {
 
   const isEmptyStates = useMemo(() => () => isEmpty(stateOptions), [stateOptions])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally tracking specific nested values for country change detection
   useEffect(() => {
+    const billingCountryValue = billingAddress?.values?.[BILLING_COUNTRY_KEY]
     const billingCountryCode =
-      typeof billingAddress?.values?.billing_address_country_code === "string"
-        ? billingAddress?.values?.billing_address_country_code
-        : billingAddress?.values?.billing_address_country_code?.value
+      typeof billingCountryValue === "string" ? billingCountryValue : billingCountryValue?.value
     if (billingCountryCode && billingCountryCode !== countryCode) setCountryCode(billingCountryCode)
+    const shippingCountryValue = shippingAddress?.values?.[SHIPPING_COUNTRY_KEY]
     const shippingCountryCode =
-      typeof shippingAddress?.values?.shipping_address_country_code === "string"
-        ? shippingAddress?.values?.shipping_address_country_code
-        : shippingAddress?.values?.shipping_address_country_code?.value
+      typeof shippingCountryValue === "string" ? shippingCountryValue : shippingCountryValue?.value
     if (shippingCountryCode && shippingCountryCode !== countryCode)
       setCountryCode(shippingCountryCode)
     const changeBillingCountry = [
@@ -104,8 +106,9 @@ export function AddressStateSelector(props: Props): JSX.Element {
       countryCode !== billingCountryCode,
     ].every(Boolean)
     if (!changeBillingCountry && value != null && value !== "" && value !== val) {
-      /* v8 ignore next */
-      billingAddress.setValue?.(name, value)
+      if (billingAddress.setValue != null) {
+        billingAddress?.setValue(name, value)
+      }
       setVal(value)
     }
     if (
@@ -118,8 +121,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
       }) &&
       !isEmptyStates()
     ) {
-      /* v8 ignore next */
-      billingAddress.resetField?.(name)
+      if (billingAddress.resetField) billingAddress?.resetField(name)
       setVal("")
     }
     const changeShippingCountry = [
@@ -128,8 +130,9 @@ export function AddressStateSelector(props: Props): JSX.Element {
       countryCode !== shippingCountryCode,
     ].every(Boolean)
     if (!changeShippingCountry && value != null && value !== "" && value !== val) {
-      /* v8 ignore next */
-      shippingAddress.setValue?.(name, value)
+      if (shippingAddress.setValue != null) {
+        shippingAddress?.setValue(name, value)
+      }
       setVal(value)
     }
     if (
@@ -142,8 +145,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
       }) &&
       !isEmptyStates()
     ) {
-      /* v8 ignore next */
-      shippingAddress.resetField?.(name)
+      if (shippingAddress.resetField) shippingAddress?.resetField(name)
       setVal("")
     }
     if (!isEmpty(billingAddress)) {
@@ -166,21 +168,9 @@ export function AddressStateSelector(props: Props): JSX.Element {
     }
   }, [
     value,
-    billingAddress?.values?.billing_address_country_code,
-    shippingAddress?.values?.shipping_address_country_code,
+    billingAddress?.values?.[BILLING_COUNTRY_KEY],
+    shippingAddress?.values?.[SHIPPING_COUNTRY_KEY],
     customerAddress,
-    val,
-    states,
-    shippingAddress?.setValue,
-    shippingAddress?.resetField,
-    name,
-    isEmptyStates,
-    countryCode,
-    billingAddress?.setValue,
-    billingAddress.resetField,
-    billingAddress,
-    shippingAddress?.errors,
-    shippingAddress,
   ])
   const errorClassName =
     billingAddress?.errorClassName ||
@@ -195,11 +185,6 @@ export function AddressStateSelector(props: Props): JSX.Element {
       {...p}
       placeholder={selectPlaceholder}
       className={classNameComputed}
-      ref={
-        (billingAddress?.validation as any) ||
-        shippingAddress?.validation ||
-        customerAddress?.validation
-      }
       required={required}
       options={stateOptions}
       name={name}
@@ -207,13 +192,9 @@ export function AddressStateSelector(props: Props): JSX.Element {
     />
   ) : (
     <BaseInput
-      {...(p as any)}
+      id={p.id}
+      style={p.style}
       name={name}
-      ref={
-        (billingAddress?.validation as any) ||
-        shippingAddress?.validation ||
-        customerAddress?.validation
-      }
       className={classNameComputed}
       required={required}
       placeholder={inputPlaceholder ?? ""}

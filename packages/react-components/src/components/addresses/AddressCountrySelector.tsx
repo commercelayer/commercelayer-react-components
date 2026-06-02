@@ -80,12 +80,6 @@ export function AddressCountrySelector(props: Props): JSX.Element {
   return (
     <BaseSelect
       className={classNameComputed}
-      ref={
-        // biome-ignore lint/suspicious/noExplicitAny: validation ref type mismatch between address form contexts
-        (billingAddress?.validation as any) ||
-        shippingAddress?.validation ||
-        customerAddress?.validation
-      }
       required={required}
       options={getCountries(countries)}
       name={name}

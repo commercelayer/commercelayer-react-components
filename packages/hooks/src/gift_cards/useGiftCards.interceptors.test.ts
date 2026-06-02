@@ -12,7 +12,7 @@ import { useGiftCards } from "./useGiftCards"
 const swrWrapper = ({ children }: { children: ReactNode }) =>
   createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
 
-const mockGiftCard = { id: "gc_1", currency_code: "USD", initial_balance_cents: 1000 }
+const mockGiftCard = { id: "gc_1", currency_code: "USD", balance_cents: 1000 }
 
 const mockGetGiftCards = vi.fn().mockResolvedValue([mockGiftCard])
 const mockRetrieveGiftCard = vi.fn().mockResolvedValue(mockGiftCard)
@@ -79,7 +79,7 @@ describe("useGiftCards — interceptors", () => {
     })
 
     await act(async () => {
-      await result.current.createGiftCard({ currency_code: "USD", initial_balance_cents: 1000 })
+      await result.current.createGiftCard({ currency_code: "USD", balance_cents: 1000 })
     })
 
     expect(mockCreateGiftCard).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
@@ -126,7 +126,7 @@ describe("useGiftCards — interceptors", () => {
 
     // Create a second card
     await act(async () => {
-      await result.current.createGiftCard({ currency_code: "EUR", initial_balance_cents: 2000 })
+      await result.current.createGiftCard({ currency_code: "EUR", balance_cents: 2000 })
     })
 
     await waitFor(() => {
@@ -152,7 +152,7 @@ describe("useGiftCards — interceptors", () => {
     // Create immediately while fetch is still in-flight — hits the `current == null ? [result]` branch
     let created: Awaited<ReturnType<typeof result.current.createGiftCard>>
     await act(async () => {
-      created = await result.current.createGiftCard({ currency_code: "EUR", initial_balance_cents: 500 })
+      created = await result.current.createGiftCard({ currency_code: "EUR", balance_cents: 500 })
     })
 
     expect(created?.id).toBe("gc_new")
@@ -164,7 +164,7 @@ describe("useGiftCards — interceptors", () => {
   })
 
   it("updates existing item in cached list (covers map callback branches)", async () => {
-    const anotherCard = { id: "gc_2", currency_code: "EUR", initial_balance_cents: 2000 }
+    const anotherCard = { id: "gc_2", currency_code: "EUR", balance_cents: 2000 }
     // Return 2 cards so both `match` and `no-match` branches of the inner map are exercised
     mockGetGiftCards.mockResolvedValueOnce([mockGiftCard, anotherCard])
     mockUpdateGiftCard.mockResolvedValueOnce({ ...mockGiftCard, reference: "map-updated" })
