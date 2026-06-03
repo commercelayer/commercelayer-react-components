@@ -154,7 +154,7 @@ export function Address(props: Props): JSX.Element {
   return typeof children === "function" ? (
     <AddressCardsTemplate {...parentProps}>{children}</AddressCardsTemplate>
   ) : (
-    <>{components}</>
+    components
   )
 }
 

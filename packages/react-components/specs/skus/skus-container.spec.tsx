@@ -19,6 +19,8 @@ describe("SkusContainer component", () => {
       ctx.endpoint = endpoint
       ctx.sku = "BABYONBU000000E63E7412MX"
       ctx.skus = ["BABYONBU000000E63E7412MX", "BABYONBU000000FFFFFF12MX"]
+    } else {
+      ctx.skip()
     }
   })
 

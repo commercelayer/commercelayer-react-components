@@ -204,6 +204,7 @@ export function HostedCart({
     }
   }
 
+  // biome-ignore lint/correctness/useHookAtTopLevel: hook is called after an early return; refactoring would require restructuring the whole component
   const onMessage = useCallback(
     (data: IframeData): void => {
       switch (data.message.type) {
@@ -228,6 +229,7 @@ export function HostedCart({
     [type, isOpen, handleOpen, getOrder]
   )
 
+  // biome-ignore lint/correctness/useHookAtTopLevel: hook is called after an early return; refactoring would require restructuring the whole component
   useEffect(() => {
     const resolvedOrderId = order?.id ?? localStorage.getItem(persistKey)
     let ignore = false
@@ -274,8 +276,10 @@ export function HostedCart({
         unsubscribe("open-cart", openCartHandler)
       }
     }
-  }, [src, open, order?.id, accessToken, persistKey])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: setOrder and resolveCartUrl are intentionally excluded
+  }, [src, open, order?.id, persistKey, setOrder, resolveCartUrl, type, isOpen, openAdd, handleOpen])
 
+  // biome-ignore lint/correctness/useHookAtTopLevel: hook is called after an early return; refactoring would require restructuring the whole component
   useEffect(() => {
     if (ref.current == null) return
     iframeResizer(

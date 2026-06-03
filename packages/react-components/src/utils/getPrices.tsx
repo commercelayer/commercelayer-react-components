@@ -22,8 +22,9 @@ export function getPricesComponent(
       props.showCompare
     return (
       <PriceTemplate
-        {...props}
+        // biome-ignore lint/suspicious/noArrayIndexKey: prices don't have stable ids in this context
         key={k}
+        {...props}
         showCompare={showCompare}
         formattedAmount={p.formatted_amount}
         formattedCompare={p.formatted_compare_at_amount}

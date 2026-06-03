@@ -42,6 +42,6 @@ export function useOrganizationConfig({
     }).then((config) => {
       setOrganizationConfig(config)
     })
-  }, [accessToken])
+  }, [accessToken, params])
   return organizationConfig
 }

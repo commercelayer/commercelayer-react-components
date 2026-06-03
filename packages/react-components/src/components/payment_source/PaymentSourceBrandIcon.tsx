@@ -42,6 +42,7 @@ export function PaymentSourceBrandIcon({ src, width = 32, children, ...p }: Prop
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
+    // biome-ignore lint/a11y/useAltText: alt provided by parent via spread props
     <img ref={ref} src={url} onError={handleError} width={width} {...p} />
   )
 }

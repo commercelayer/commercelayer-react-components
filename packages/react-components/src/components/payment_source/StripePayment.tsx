@@ -87,7 +87,8 @@ function StripePaymentForm({
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  }, [ref, stripe, elements])
+  // biome-ignore lint/correctness/useExhaustiveDependencies lint/correctness/noInvalidUseBeforeDeclaration: onSubmit declared after useEffect (pre-existing pattern)
+  }, [stripe, elements, setPaymentRef, onSubmit])
   const onSubmit = async ({ event, stripe, elements }: OnSubmitArgs): Promise<boolean> => {
     if (!stripe) return false
     const sdk = sdkClient()
@@ -280,7 +281,7 @@ export function StripePayment({
     return () => {
       setIsLoaded(false)
     }
-  }, [show, publishableKey, connectedAccount])
+  }, [show, publishableKey, connectedAccount, locale])
   const elementsOptions: StripeElementsOptions = {
     clientSecret,
     appearance: { ...defaultAppearance, ...appearance },

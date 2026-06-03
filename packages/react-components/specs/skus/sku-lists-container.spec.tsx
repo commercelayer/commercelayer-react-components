@@ -26,6 +26,8 @@ describe("SkuListsContainer component", () => {
       ctx.endpoint = endpoint
       const lists = await getSkuLists({ accessToken, params: { pageSize: 1 } })
       ctx.skuListId = lists.first()?.id ?? ""
+    } else {
+      ctx.skip()
     }
   })
 

@@ -41,6 +41,7 @@ export async function triggerAttributeHelper({
   attribute,
   resource,
 }: TriggerAttributeHelper): TriggerAttributeHelperResponse {
+  // biome-ignore lint/style/noNonNullAssertion: accessToken is guaranteed by caller context
   const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   return await sdk[resource].update({
     id,

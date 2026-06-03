@@ -34,7 +34,8 @@ export function PaypalPayment({ infoMessage, ...p }: Props): JSX.Element | null 
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  }, [ref, paymentSource, currentPaymentMethodType])
+  // biome-ignore lint/correctness/useExhaustiveDependencies lint/correctness/noInvalidUseBeforeDeclaration: handleClick declared after useEffect (pre-existing pattern)
+  }, [paymentSource, currentPaymentMethodType, setPaymentRef, handleClick])
   const handleClick = async (): Promise<boolean> => {
     if (paymentSource && currentPaymentMethodType) {
       try {

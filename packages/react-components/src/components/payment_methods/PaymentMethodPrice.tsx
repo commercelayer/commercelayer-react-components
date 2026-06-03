@@ -36,7 +36,7 @@ export function PaymentMethodPrice(props: Props): JSX.Element {
       setPrice("")
       setPriceCents(0)
     }
-  }, [payment])
+  }, [payment, type, format])
   const parentProps = {
     labelFree,
     price,

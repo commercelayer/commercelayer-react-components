@@ -154,12 +154,13 @@ export function AddToCartButton(props: Props): JSX.Element {
         success: boolean
         orderId?: string
       }
+    // biome-ignore lint/suspicious/noExplicitAny: return type must accommodate arbitrary SDK payloads
     | Record<string, any>
     | undefined
   > => {
     setIsLoading(true)
     try {
-      const qty: number = quantity != null ? Number.parseInt(quantity) : 1
+      const qty: number = quantity != null ? Number.parseInt(quantity, 10) : 1
       if (skuLists != null && skuListId && url) {
         if (skuListId in skuLists) {
           const lineItems = skuLists?.[skuListId]?.map((sku) => {

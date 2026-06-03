@@ -53,7 +53,7 @@ export function CustomerPaymentSource({ children, loader = "Loading..." }: Props
         </CustomerPaymentSourceContext.Provider>
       )
     })
-  return loading ? <>{loader}</> : <>{provider}</>
+  return loading ? loader : provider
 }
 
 export default CustomerPaymentSource

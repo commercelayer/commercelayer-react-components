@@ -1,5 +1,5 @@
 import { AvailabilityTemplate } from "#components/skus/AvailabilityTemplate"
-import { DeliveryLeadTime } from "#components/skus/DeliveryLeadTime"
+import { DeliveryLeadTime } from "#components/shipping_methods/DeliveryLeadTime"
 import { SkuField } from "#components/skus/SkuField"
 import { SkuList } from "#components/skus/SkuList"
 import { SkuListsContainer } from "#components/skus/SkuListsContainer"

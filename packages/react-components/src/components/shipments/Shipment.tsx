@@ -6,7 +6,6 @@ import ShipmentChildrenContext, {
 import getLoaderComponent from "#utils/getLoaderComponent"
 import type { LoaderType } from "#typings"
 import type { Order } from "@commercelayer/sdk"
-import OrderContext from "#context/OrderContext"
 
 interface ShipmentProps {
   children: ReactNode
@@ -21,7 +20,6 @@ export function Shipment({
 }: ShipmentProps): JSX.Element {
   const [loading, setLoading] = useState(true)
   const { shipments, deliveryLeadTimes, setShippingMethod } = useContext(ShipmentContext)
-  const { order } = useContext(OrderContext)
   useEffect(() => {
     if (shipments != null) {
       if (autoSelectSingleShippingMethod) {
@@ -52,7 +50,7 @@ export function Shipment({
       setLoading(true)
     }
     // @ts-expect-error deprecate `gift_card_or_coupon_code`
-  }, [shipments != null, shipments?.length, order?.gift_card_or_coupon_code])
+  }, [shipments?.length, setShippingMethod, shipments, autoSelectSingleShippingMethod])
   const components = shipments?.map((shipment, k) => {
     const shipmentLineItems = shipment.stock_line_items
     const lineItems = shipmentLineItems?.map((shipmentLineItem) => {
@@ -81,12 +79,13 @@ export function Shipment({
       keyNumber: shipment?.id,
     }
     return (
+      // biome-ignore lint/suspicious/noArrayIndexKey: shipments don't have stable keys in this context
       <ShipmentChildrenContext.Provider key={k} value={shipmentProps}>
         {children}
       </ShipmentChildrenContext.Provider>
     )
   })
-  return !loading ? <>{components}</> : getLoaderComponent(loader)
+  return !loading ? components : getLoaderComponent(loader)
 }
 
 export default Shipment

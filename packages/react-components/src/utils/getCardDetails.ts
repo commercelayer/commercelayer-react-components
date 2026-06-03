@@ -35,11 +35,11 @@ export default function getCardDetails({ paymentType, customerPayment }: Args): 
       const source =
         (ps?.options?.card ?? ps?.payment_method?.card ?? ps?.payment_instrument)
           ? {
-              brand: ps?.payment_instrument?.["card_type"],
-              exp_month: ps?.payment_instrument?.["card_expiry_month"],
-              exp_year: ps?.payment_instrument?.["card_expiry_year"],
-              last4: ps?.payment_instrument?.["card_last_digits"],
-              issuer_type: ps?.payment_instrument?.["issuer_type"],
+              brand: ps?.payment_instrument?.card_type,
+              exp_month: ps?.payment_instrument?.card_expiry_month,
+              exp_year: ps?.payment_instrument?.card_expiry_year,
+              last4: ps?.payment_instrument?.card_last_digits,
+              issuer_type: ps?.payment_instrument?.issuer_type,
             }
           : undefined
       if (source?.brand != null) {
@@ -58,7 +58,7 @@ export default function getCardDetails({ paymentType, customerPayment }: Args): 
               exp_month: "",
               exp_year: "",
               last4: "",
-              issuer_type: ps?.payment_instrument?.["issuer_type"],
+              issuer_type: ps?.payment_instrument?.issuer_type,
             }
           : undefined
       if (source) {
@@ -83,8 +83,8 @@ export default function getCardDetails({ paymentType, customerPayment }: Args): 
       const source = ps?.payment_request_data?.payment_method
       const authorized = ps?.payment_response?.resultCode === "Authorised"
       const last4 =
-        ps?.payment_response?.["additionalData"]?.cardSummary ??
-        ps?.payment_instrument?.["card_last_digits"] ??
+        ps?.payment_response?.additionalData?.cardSummary ??
+        ps?.payment_instrument?.card_last_digits ??
         "****"
       if (source && authorized) {
         const brand =
@@ -102,11 +102,11 @@ export default function getCardDetails({ paymentType, customerPayment }: Args): 
     default: {
       const ps = customerPayment.payment_source as PaymentSourceObject[typeof paymentType]
       if (ps?.type !== paymentType) break
-      const source = ps?.metadata?.["card"] ?? {
-        brand: ps?.payment_instrument?.["issuer_type"]?.replace("_", "-") ?? "",
-        last4: ps?.metadata?.["last4"] ?? "",
-        exp_month: ps?.metadata?.["exp_month"] ?? "",
-        exp_year: ps?.metadata?.["exp_year"] ?? "",
+      const source = ps?.metadata?.card ?? {
+        brand: ps?.payment_instrument?.issuer_type?.replace("_", "-") ?? "",
+        last4: ps?.metadata?.last4 ?? "",
+        exp_month: ps?.metadata?.exp_month ?? "",
+        exp_year: ps?.metadata?.exp_year ?? "",
       }
       if (source) {
         return {

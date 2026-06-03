@@ -172,7 +172,7 @@ export function OrderList({
         id,
       })
     }
-  }, [pageIndex, currentPageSize, sorting, id != null])
+  }, [pageIndex, currentPageSize, sorting, getCustomerOrders, type, id, getCustomerSubscriptions, defaultSdkSorting])
   const data = useMemo(() => {
     if (type === "orders") {
       return orders ?? []
@@ -187,7 +187,7 @@ export function OrderList({
     }
 
     return []
-  }, [orders, subscriptions])
+  }, [orders, subscriptions, type, id])
   const cols = useMemo<ColumnDef<OrderListContent<TOrderList>>[]>(() => columns, [columns])
   const pagination = useMemo(
     () => ({
@@ -231,7 +231,7 @@ export function OrderList({
     return () => {
       setLoading(true)
     }
-  }, [orders, subscriptions])
+  }, [orders, subscriptions, type])
   const LoadingComponent = loadingElement || <div>Loading...</div>
   const headerComponent = table.getHeaderGroups().map((headerGroup) => {
     const columnsComponents = headerGroup.headers.map((header, k) => {

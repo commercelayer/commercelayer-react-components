@@ -1,5 +1,6 @@
 /* eslint-disable n/no-callback-literal */
 
+// biome-ignore lint/suspicious/noExplicitAny: legacy utility, caller types are unknown
 export default async function promisify(cb: any, params?: any): Promise<any> {
   return await new Promise<any>((resolve, reject) => {
     if (params)

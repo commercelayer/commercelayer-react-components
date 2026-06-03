@@ -33,6 +33,7 @@ const getAllErrors: GetAllErrors = (params) => {
         if (v.resource === "line_items") {
           if (lineItem && v.id === lineItem.id) {
             return isEmpty ? undefined : returnHtml ? (
+              // biome-ignore lint/suspicious/noArrayIndexKey: error messages don't have stable ids
               <span key={k} {...props}>
                 {text}
               </span>
@@ -43,6 +44,7 @@ const getAllErrors: GetAllErrors = (params) => {
         }
         if ((field === v.field || v.detail?.includes(field)) && resource === v.resource) {
           return isEmpty ? undefined : returnHtml ? (
+            // biome-ignore lint/suspicious/noArrayIndexKey: error messages don't have stable ids
             <span key={k} {...props}>
               {text}
             </span>
@@ -53,6 +55,7 @@ const getAllErrors: GetAllErrors = (params) => {
       }
       if (resource === v.resource && !field) {
         return isEmpty ? undefined : returnHtml ? (
+          // biome-ignore lint/suspicious/noArrayIndexKey: error messages don't have stable ids
           <span key={k} {...props}>
             {text}
           </span>

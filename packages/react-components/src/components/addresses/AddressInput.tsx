@@ -68,7 +68,7 @@ export function AddressInput(props: Props): JSX.Element | null {
       return true
     }
     return false
-  }, [value, billingAddress?.errors, shippingAddress?.errors, customerAddress?.errors, p.name])
+  }, [billingAddress?.errors, shippingAddress?.errors, customerAddress?.errors, p.name])
 
   const mandatoryField = billingAddress?.isBusiness
     ? businessMandatoryField(p.name, billingAddress.isBusiness)
