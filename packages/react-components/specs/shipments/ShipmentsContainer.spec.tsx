@@ -3,8 +3,8 @@ import { type ReactNode, useContext } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import ShipmentsContainer from "#components/shipments/ShipmentsContainer"
 import CommerceLayerContext from "#context/CommerceLayerContext"
-import ShipmentContext from "#context/ShipmentContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import ShipmentContext from "#context/ShipmentContext"
 
 const mockUseShipments = vi.fn()
 

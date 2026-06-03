@@ -1,7 +1,7 @@
 import { type JSX, useEffect } from "react"
 import Shipments from "#components/shipments/Shipments"
-import type { DefaultChildrenType } from "#typings/globals"
 import type { LoaderType } from "#typings"
+import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
   children: DefaultChildrenType
@@ -33,4 +33,3 @@ export function ShipmentsContainer({ children, loader }: Props): JSX.Element {
 }
 
 export default ShipmentsContainer
-

@@ -16,7 +16,7 @@ interface Props {
 }
 
 /**
- * @deprecated Use `<LineItems accessToken="..." orderId="...">` instead.
+ * @deprecated Use `<LineItems>` instead.
  * `LineItemsContainer` requires an `OrderContext` parent and will be removed in a future major version.
  */
 export function LineItemsContainer(props: Props): JSX.Element {
