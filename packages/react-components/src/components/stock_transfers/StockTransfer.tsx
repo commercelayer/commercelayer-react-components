@@ -1,9 +1,9 @@
-import { useContext, type JSX } from "react"
+import type { LineItem, StockTransfer as TStockTransfer } from "@commercelayer/sdk"
+import { type JSX, useContext } from "react"
 import ShipmentChildrenContext from "#context/ShipmentChildrenContext"
 import StockTransferChildrenContext, {
   type InitialStockTransferContext,
 } from "#context/StockTransferChildrenContext"
-import type { LineItem, StockTransfer as TStockTransfer } from "@commercelayer/sdk"
 import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
@@ -21,6 +21,7 @@ export function StockTransfer(props: Props): JSX.Element {
           stockTransfer.type === "line_items" ? stockTransfer : stockTransfer?.line_item,
       }
       return (
+        // biome-ignore lint/suspicious/noArrayIndexKey: stable list — no unique key available on stock transfers
         <StockTransferChildrenContext.Provider key={k} value={stockTransferProps}>
           {children}
         </StockTransferChildrenContext.Provider>
