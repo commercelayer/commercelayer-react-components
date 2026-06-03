@@ -1,12 +1,11 @@
-import StockTransferChildrenContext from "#context/StockTransferChildrenContext"
-import type { ConditionalElement } from "#typings"
+import type { JSX } from "react"
 import GenericFieldComponent, {
   type TGenericChildrenProps,
   type TResourceKey,
   type TResources,
 } from "#components/utils/GenericFieldComponent"
-
-import type { JSX } from "react"
+import StockTransferChildrenContext from "#context/StockTransferChildrenContext"
+import type { ConditionalElement } from "#typings"
 
 type StockTransferFieldChildrenProps = TGenericChildrenProps<TResources["StockTransfer"]>
 
