@@ -1,7 +1,7 @@
-import { useContext, type JSX } from "react"
-import ShippingMethodChildrenContext from "#context/ShippingMethodChildrenContext"
-import Parent from "#components/utils/Parent"
 import type { ShippingMethod } from "@commercelayer/sdk"
+import { type JSX, useContext } from "react"
+import Parent from "#components/utils/Parent"
+import ShippingMethodChildrenContext from "#context/ShippingMethodChildrenContext"
 
 type ChildrenProps = Omit<Props, "children"> & {
   label: string
@@ -16,7 +16,7 @@ export function ShippingMethodName(props: Props): JSX.Element {
   const { shippingMethod, deliveryLeadTimeForShipment, shipmentId } = useContext(
     ShippingMethodChildrenContext
   )
-  const htmlFor = `shipment-${shipmentId ?? ""}-${shippingMethod?.id ?? ""}` || ""
+  const htmlFor = `shipment-${shipmentId ?? ""}-${shippingMethod?.id ?? ""}`
   const labelName = shippingMethod?.name
   const parentProps = {
     shippingMethod,

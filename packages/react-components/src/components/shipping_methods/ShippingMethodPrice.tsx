@@ -1,8 +1,8 @@
-import { useState, useEffect, useContext, type JSX } from "react"
-import getAmount from "#utils/getAmount"
-import ShippingMethodChildrenContext from "#context/ShippingMethodChildrenContext"
+import { type JSX, useContext, useEffect, useState } from "react"
 import Parent from "#components/utils/Parent"
+import ShippingMethodChildrenContext from "#context/ShippingMethodChildrenContext"
 import type { BaseAmountComponent } from "#typings/index"
+import getAmount from "#utils/getAmount"
 
 type Props = BaseAmountComponent & {
   /**
@@ -37,6 +37,7 @@ export function ShippingMethodPrice(props: Props): JSX.Element {
   const [price, setPrice] = useState("")
   const [priceCents, setPriceCents] = useState(0)
   const scheme = shippingMethod?.scheme
+  // biome-ignore lint/correctness/useExhaustiveDependencies: base, type, format are static defaults; only shippingMethod triggers re-computation
   useEffect(() => {
     if (shippingMethod) {
       const p = getAmount({
