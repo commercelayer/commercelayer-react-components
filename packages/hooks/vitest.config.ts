@@ -1,3 +1,4 @@
+import path from "node:path"
 import tsconfigPaths from "vite-tsconfig-paths"
 import { defineConfig } from "vitest/config"
 
@@ -5,6 +6,7 @@ export default defineConfig({
   test: {
     name: "hooks",
     environment: "jsdom",
+    envDir: path.resolve(__dirname, "../.."),
     testTimeout: 30000,
     fileParallelism: false,
     setupFiles: ["./src/vitest.setup.ts"],
