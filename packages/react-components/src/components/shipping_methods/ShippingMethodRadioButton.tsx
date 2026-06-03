@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState, type JSX } from "react"
-import ShippingMethodChildrenContext from "#context/ShippingMethodChildrenContext"
+import type { Order, ShippingMethod } from "@commercelayer/sdk"
+import { type JSX, useContext, useEffect, useState } from "react"
 import Parent from "#components/utils/Parent"
 import ShipmentContext from "#context/ShipmentContext"
-import type { Order, ShippingMethod } from "@commercelayer/sdk"
+import ShippingMethodChildrenContext from "#context/ShippingMethodChildrenContext"
 
 interface ShippingMethodRadioButtonType extends Omit<Props, "children"> {
   shippingMethod: ShippingMethod
