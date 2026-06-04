@@ -11,6 +11,7 @@ export function ParcelLineItem({ children }: Props): JSX.Element {
   const { parcel } = useContext(ParcelChildrenContext)
   const components = parcel?.parcel_line_items?.map((parcelLineItem, key) => {
     return (
+      // biome-ignore lint/suspicious/noArrayIndexKey: parcel line items don't have stable keys
       <ParcelLineItemChildrenContext.Provider key={key} value={{ parcelLineItem }}>
         {children}
       </ParcelLineItemChildrenContext.Provider>

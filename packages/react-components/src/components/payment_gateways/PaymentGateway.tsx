@@ -82,8 +82,8 @@ export function PaymentGateway({
       }
       if (config != null && paymentResource === "stripe_payments") {
         attributes = getStripeAttributes(paymentResource, config)
-        if (attributes != null && attributes["return_url"] == null) {
-          attributes["return_url"] = window.location.href
+        if (attributes != null && attributes.return_url == null) {
+          attributes.return_url = window.location.href
         }
       }
       if (config != null && paymentResource === "checkout_com_payments") {
@@ -141,7 +141,7 @@ export function PaymentGateway({
     return () => {
       setLoading(true)
     }
-  }, [order?.payment_method?.id, show, paymentSource?.id])
+  }, [order?.payment_method?.id, show, paymentSource?.id, order?.status, paymentSource?.mismatched_amounts, paymentSource?.type, paymentSource, paymentResource, payment?.id, setPaymentSource, order?.payment_source?.id, order?.payment_source, order?.payment_method?.payment_source_type, order, getCustomerPaymentSources, paymentMethods?.length, paymentMethods, currentPaymentMethodId, expressPayments, errors?.length, errors, config])
 
   useEffect(() => {
     if (status === "placing") setLoading(true)
@@ -152,7 +152,7 @@ export function PaymentGateway({
     return () => {
       setLoading(true)
     }
-  }, [status, order?.status])
+  }, [status, order?.status, order, loading])
 
   const gatewayConfig = {
     readonly,

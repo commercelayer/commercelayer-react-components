@@ -52,7 +52,7 @@ export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | nul
       .catch((err) => {
         console.error("Can make payment:", err)
       })
-  }, [isEmpty(stripe), isEmpty(order)])
+  }, [stripe, order?.total_amount_with_taxes_cents, order])
 
   if (paymentRequest != null && stripe != null) {
     paymentRequest.on("shippingaddresschange", async (ev) => {
@@ -247,9 +247,7 @@ export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | nul
       }
     })
     return (
-      <>
-        <PaymentRequestButtonElement className="" options={{ paymentRequest }} />
-      </>
+      <PaymentRequestButtonElement className="" options={{ paymentRequest }} />
     )
   }
 

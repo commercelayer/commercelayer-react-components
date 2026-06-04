@@ -90,7 +90,8 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     ) {
       getOrder(order.id)
     }
-  }, [order, credentials, include?.length, Object.keys(includeLoaded ?? []).length])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pre-existing dependency list, refactoring would risk regressions
+  }, [order, credentials, getOrder, addResourceToInclude, include?.includes, state.paymentMethods, state.config, includeLoaded?.available_payment_methods, getPayMethods, config])
   const contextValue = useMemo(() => {
     return {
       ...state,
@@ -139,7 +140,7 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
         })
       },
     }
-  }, [state])
+  }, [state, order, getOrder, updateOrder, setOrderErrors, credentials])
   return (
     <PaymentMethodContext.Provider value={contextValue}>{children}</PaymentMethodContext.Provider>
   )

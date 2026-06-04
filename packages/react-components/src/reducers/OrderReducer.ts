@@ -162,7 +162,7 @@ export async function createOrder(params: CreateOrderParams): Promise<string> {
           },
         })
       }
-      persistKey && setLocalOrder && setLocalOrder(persistKey, o.id)
+      persistKey && setLocalOrder?.(persistKey, o.id)
       return o.id
       // biome-ignore lint/suspicious/noExplicitAny: No types information about the error
     } catch (error: any) {
@@ -204,7 +204,7 @@ export const getApiOrder: GetOrder = async (params): Promise<Order | undefined> 
     }
     const order = await sdk.orders.retrieve(id ?? "", options)
     if (clearWhenPlaced && order.editable === false) {
-      persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
+      persistKey && deleteLocalOrder?.(persistKey)
       if (dispatch) {
         dispatch({
           type: "setOrder",

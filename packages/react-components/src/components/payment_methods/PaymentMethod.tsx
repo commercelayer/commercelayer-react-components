@@ -134,7 +134,7 @@ export function PaymentMethod({
         selectExpressPayment()
       }
     }
-  }, [!isEmpty(paymentMethods), expressPayments, errors?.length])
+  }, [expressPayments, errors?.length, setPaymentMethod, setPaymentSource, paymentMethods, setLoadingPlaceOrder, order, onClick, paymentSource, showLoader])
   useEffect(() => {
     if (
       paymentMethods != null &&
@@ -205,7 +205,7 @@ export function PaymentMethod({
         autoSelect()
       }
     }
-  }, [!isEmpty(paymentMethods), errors?.length])
+  }, [errors?.length, setLoadingPlaceOrder, (paymentSource as any)?.payment_response?.status?.toLowerCase, paymentMethods, order, config, setPaymentSource, setPaymentMethod, paymentSourceCreated, onClick, getCustomerPaymentSources, expressPayments, paymentSource, showLoader, autoSelectSinglePaymentMethod])
   useEffect(() => {
     if (paymentMethods) {
       const isSingle = paymentMethods.length === 1
@@ -236,7 +236,7 @@ export function PaymentMethod({
       setLoading(true)
       setPaymentSelected("")
     }
-  }, [paymentMethods, currentPaymentMethodId, errors?.length])
+  }, [paymentMethods, currentPaymentMethodId, errors?.length, showLoader, (paymentSource as any)?.payment_response?.status?.toLowerCase, paymentSource, autoSelectSinglePaymentMethod])
   useEffect(() => {
     const status =
       // @ts-expect-error no type
@@ -297,6 +297,7 @@ export function PaymentMethod({
             setLoadingPlaceOrder({ loading: false })
           }
       return (
+        // biome-ignore lint/a11y/useKeyWithClickEvents lint/a11y/noStaticElementInteractions: pre-existing pattern, keyboard interaction handled by payment provider
         <div
           data-testid={paymentResource}
           key={paymentResource}

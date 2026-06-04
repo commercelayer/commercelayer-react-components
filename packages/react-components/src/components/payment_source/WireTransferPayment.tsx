@@ -18,17 +18,6 @@ export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
   const ref = useRef<null | HTMLFormElement>(null)
   const { setPaymentSource, paymentSource, currentPaymentMethodType, setPaymentRef } =
     useContext(PaymentMethodContext)
-  useEffect(() => {
-    if (ref.current && paymentSource && currentPaymentMethodType) {
-      ref.current.onsubmit = async () => {
-        return await handleClick()
-      }
-      setPaymentRef({ ref })
-    }
-    return () => {
-      setPaymentRef({ ref: { current: null } })
-    }
-  }, [ref, paymentSource, currentPaymentMethodType])
   const handleClick = async (): Promise<boolean> => {
     if (paymentSource && currentPaymentMethodType) {
       try {
@@ -52,6 +41,18 @@ export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
     }
     return false
   }
+  useEffect(() => {
+    if (ref.current && paymentSource && currentPaymentMethodType) {
+      ref.current.onsubmit = async () => {
+        return await handleClick()
+      }
+      setPaymentRef({ ref })
+    }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is stable within render
+  }, [paymentSource, currentPaymentMethodType, setPaymentRef, handleClick])
   return (
     <form ref={ref}>
       <div className={className} data-testid={dataTestId}>

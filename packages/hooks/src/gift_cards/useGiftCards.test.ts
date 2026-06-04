@@ -5,14 +5,19 @@ import { act, renderHook, waitFor } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { createElement } from "react"
 import { SWRConfig } from "swr"
-import { describe, expect } from "vitest"
+import { beforeEach, describe, expect } from "vitest"
 import { coreIntegrationTest } from "#extender"
 import { useGiftCards } from "./useGiftCards"
 
 const swrWrapper = ({ children }: { children: ReactNode }) =>
   createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
 
+const domain = import.meta.env.VITE_DOMAIN
+
 describe("useGiftCards", () => {
+  beforeEach(({ skip }) => {
+    if (domain == null) skip()
+  })
   coreIntegrationTest("should start with empty state", async ({ accessToken }) => {
     const token = accessToken?.accessToken
     const { result } = renderHook(() => useGiftCards(token))

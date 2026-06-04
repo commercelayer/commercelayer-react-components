@@ -95,6 +95,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
 
   const handleClick = async (): Promise<void> => {
     /* v8 ignore next */
+    // biome-ignore lint/style/noNonNullAssertion: errors is always defined when handleClick is reachable
     if (Object.keys(errors!).length === 0) {
       setOrderErrors?.([])
       let response: {

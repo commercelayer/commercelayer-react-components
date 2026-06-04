@@ -34,7 +34,7 @@ export function BaseOrderPrice(props: BaseOrderPriceProps): JSX.Element {
         setPrice("")
       }
     }
-  }, [order])
+  }, [order, type, format, base])
   const parentProps = {
     priceCents: cents,
     price,

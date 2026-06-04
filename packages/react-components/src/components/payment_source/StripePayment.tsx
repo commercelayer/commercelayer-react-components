@@ -73,21 +73,6 @@ function StripePaymentForm({
   const { sdkClient } = useCommerceLayer()
   const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
   const elements = useElements()
-  useEffect(() => {
-    if (ref.current && stripe && elements) {
-      ref.current.onsubmit = async () => {
-        return await onSubmit({
-          event: ref.current,
-          stripe,
-          elements,
-        })
-      }
-      setPaymentRef({ ref })
-    }
-    return () => {
-      setPaymentRef({ ref: { current: null } })
-    }
-  }, [ref, stripe, elements])
   const onSubmit = async ({ event, stripe, elements }: OnSubmitArgs): Promise<boolean> => {
     if (!stripe) return false
     const sdk = sdkClient()
@@ -170,6 +155,22 @@ function StripePaymentForm({
     }
     return false
   }
+  useEffect(() => {
+    if (ref.current && stripe && elements) {
+      ref.current.onsubmit = async () => {
+        return await onSubmit({
+          event: ref.current,
+          stripe,
+          elements,
+        })
+      }
+      setPaymentRef({ ref })
+    }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: onSubmit intentionally included in deps
+  }, [stripe, elements, setPaymentRef, onSubmit])
 
   async function handleChange(event: StripePaymentElementChangeEvent) {
     selectedPaymentMethodType = event.value.type
@@ -280,7 +281,7 @@ export function StripePayment({
     return () => {
       setIsLoaded(false)
     }
-  }, [show, publishableKey, connectedAccount])
+  }, [show, publishableKey, connectedAccount, locale])
   const elementsOptions: StripeElementsOptions = {
     clientSecret,
     appearance: { ...defaultAppearance, ...appearance },

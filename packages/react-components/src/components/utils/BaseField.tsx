@@ -17,7 +17,7 @@ const BaseField: FunctionComponent<BaseFieldProps> = ({ children, attribute, ...
     return () => {
       setField("")
     }
-  }, [order])
+  }, [order, attribute])
   const parentProps = { attribute: field, ...p }
   return children ? <Parent {...parentProps}>{children}</Parent> : <span {...p}>{field}</span>
 }

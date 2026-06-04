@@ -4,11 +4,16 @@ export type TokenType = "sales_channel" | "customer" | "customer_empty" | "custo
 
 export default async function getToken(
   type: TokenType = "sales_channel"
-): Promise<{ accessToken: string | undefined; endpoint: string }> {
-  const clientId = process.env["VITE_TEST_CLIENT_ID"] ?? ""
-  const slug = process.env["VITE_TEST_SLUG"] ?? ""
-  const scope = process.env["VITE_TEST_MARKET_ID"] ?? ""
-  const domain = process.env["VITE_TEST_DOMAIN"] ?? ""
+): Promise<{ accessToken: string | undefined; endpoint: string | undefined }> {
+  const clientId = process.env["VITE_TEST_CLIENT_ID"]
+  const slug = process.env["VITE_TEST_SLUG"]
+  const scope = process.env["VITE_TEST_MARKET_ID"]
+  const domain = process.env["VITE_TEST_DOMAIN"]
+
+  if (!clientId || !slug || !domain) {
+    return { accessToken: undefined, endpoint: undefined }
+  }
+
   const user =
     type === "customer"
       ? {
@@ -31,12 +36,12 @@ export default async function getToken(
       ? await authenticate("client_credentials", {
           clientId,
           domain,
-          scope,
+          scope: scope ?? "",
         })
       : await authenticate("password", {
           clientId,
           domain,
-          scope,
+          scope: scope ?? "",
           ...user,
         })
   return {

@@ -1,4 +1,5 @@
 export const sortDescIcon = (
+  // biome-ignore lint/a11y/noSvgWithoutTitle: decorative icon without semantic meaning
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={20}
@@ -16,6 +17,7 @@ export const sortDescIcon = (
 )
 
 export const sortAscIcon = (
+  // biome-ignore lint/a11y/noSvgWithoutTitle: decorative icon without semantic meaning
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={20}

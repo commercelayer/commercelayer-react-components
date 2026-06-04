@@ -21,6 +21,7 @@ const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (props, ref) 
   const Options = options.map((o, k) => {
     const { label, ...option } = o
     return (
+      // biome-ignore lint/suspicious/noArrayIndexKey: options don't have stable ids
       <option key={k} {...option}>
         {label}
       </option>

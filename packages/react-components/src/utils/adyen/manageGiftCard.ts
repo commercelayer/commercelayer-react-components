@@ -38,7 +38,7 @@ export function manageGiftCard({ order }: Props): ReturnTypes | null {
     getPaymentSource?.payment_response?.amount?.value ?? (0 as number)
   const giftCardData: GiftCardData = {
     cardSummary: additionalData?.cardSummary ?? "",
-    currentBalanceValue: amount ?? Number.parseInt(additionalData?.currentBalanceValue) ?? 0,
+    currentBalanceValue: amount ?? Number.parseInt(additionalData?.currentBalanceValue, 10) ?? 0,
     currentBalanceCurrency: additionalData?.currentBalanceCurrency ?? "",
     cardBrand: additionalData?.originalSelectedBrand ?? additionalData?.paymentMethod ?? "",
     formattedBalanceValue: additionalData?.currentBalanceValue ?? "",

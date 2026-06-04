@@ -31,7 +31,6 @@ function typeOfLine(lineItemType: string | null | undefined): OrderLine["type"] 
       return "shipping_fee"
     case "skus":
       return "physical"
-    case "payment_methods":
     default:
       return null
   }
@@ -78,18 +77,7 @@ export default function KlarnaPayment({
     if (loaded && window?.Klarna !== undefined) {
       setKlarna(window.Klarna)
     }
-  }, [loaded, window.Klarna])
-  useEffect(() => {
-    if (ref.current && paymentSource && currentPaymentMethodType && loaded && klarna) {
-      ref.current.onsubmit = async (props: any) => {
-        handleClick(klarna, props)
-      }
-      setPaymentRef({ ref })
-    }
-    return () => {
-      setPaymentRef({ ref: { current: null } })
-    }
-  }, [ref, paymentSource, currentPaymentMethodType, loaded, klarna])
+  }, [loaded])
   const handleClick = (kl: any, props: any): void => {
     // @ts-expect-error no type
     const [first] = paymentSource?.payment_methods || undefined
@@ -155,6 +143,18 @@ export default function KlarnaPayment({
       }
     )
   }
+  useEffect(() => {
+    if (ref.current && paymentSource && currentPaymentMethodType && loaded && klarna) {
+      ref.current.onsubmit = async (props: any) => {
+        handleClick(klarna, props)
+      }
+      setPaymentRef({ ref })
+    }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick intentionally included in deps
+  }, [paymentSource, currentPaymentMethodType, loaded, klarna, setPaymentRef, handleClick])
   if (klarna && clientToken) {
     // @ts-expect-error no type
     const [first] = paymentSource?.payment_methods || undefined

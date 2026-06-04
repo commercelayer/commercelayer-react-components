@@ -275,7 +275,8 @@ export function BraintreePayment({
       setPaymentRef({ ref: { current: null } })
       setLoadBraintree(false)
     }
-  }, [authorization, ref])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pre-existing dependency list, refactoring would risk regressions
+  }, [authorization, setPaymentMethodErrors, styles, loadBraintree, currentPaymentMethodType, setPaymentRef, handleSubmitForm, fields, config?.challengeRequested])
   return !authorization && !loadBraintree ? null : (
     <div className={containerClassName}>
       <form

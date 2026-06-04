@@ -1,14 +1,6 @@
-import CommerceLayerContext from "#context/CommerceLayerContext"
-import InStockSubscriptionContext, {
-  type InitialInStockSubscriptionContext,
-} from "#context/InStockSubscriptionContext"
-import inStockSubscriptionReducer, {
-  inStockSubscriptionInitialState,
-  setInStockSubscription,
-} from "#reducers/InStockSubscriptionReducer"
+import { type JSX, useEffect } from "react"
+import InStockSubscriptions from "#components/in_stock_subscriptions/InStockSubscriptions"
 import type { DefaultChildrenType } from "#typings/globals"
-import useCustomContext from "#utils/hooks/useCustomContext"
-import { useReducer, type JSX } from "react"
 
 interface Props {
   /**
@@ -17,29 +9,27 @@ interface Props {
   children: DefaultChildrenType
 }
 
-export function InStockSubscriptionsContainer({ children }: Props): JSX.Element | null {
-  const config = useCustomContext({
-    context: CommerceLayerContext,
-    contextComponentName: "CommerceLayer",
-    currentComponentName: "InStockSubscriptionsContainer",
-    key: "accessToken",
-  })
-  const [state, dispatch] = useReducer(inStockSubscriptionReducer, inStockSubscriptionInitialState)
-  const value: InitialInStockSubscriptionContext = {
-    ...state,
-    setInStockSubscription: async ({ customerEmail, skuCode }) =>
-      await setInStockSubscription({
-        customerEmail,
-        skuCode,
-        config,
-        dispatch,
-      }),
-  }
-  return (
-    <InStockSubscriptionContext.Provider value={value}>
-      {children}
-    </InStockSubscriptionContext.Provider>
-  )
+/**
+ * @deprecated Use `<InStockSubscriptions>` instead. `InStockSubscriptionsContainer` will be removed in a future major version.
+ *
+ * @example Migration:
+ * ```tsx
+ * // Before (deprecated)
+ * <InStockSubscriptionsContainer>…</InStockSubscriptionsContainer>
+ *
+ * // After
+ * <InStockSubscriptions>…</InStockSubscriptions>
+ * ```
+ */
+export function InStockSubscriptionsContainer({ children }: Props): JSX.Element {
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        "[InStockSubscriptionsContainer] is deprecated. Use <InStockSubscriptions> instead."
+      )
+    }
+  }, [])
+  return <InStockSubscriptions>{children}</InStockSubscriptions>
 }
 
 export default InStockSubscriptionsContainer

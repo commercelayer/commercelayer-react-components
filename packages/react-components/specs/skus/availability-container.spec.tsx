@@ -28,6 +28,8 @@ describe("AvailabilityContainer component", () => {
       ctx.accessToken = accessToken
       ctx.endpoint = endpoint
       ctx.skuCode = "BABYONBU000000E63E7412MX"
+    } else {
+      ctx.skip()
     }
   })
 

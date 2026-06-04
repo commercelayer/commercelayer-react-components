@@ -267,5 +267,5 @@ export function useOrderState({
         }),
       getOrderByFields,
     }
-  }, [state, config.accessToken, persistKey])
+  }, [state, config.accessToken, persistKey, config, setLocalOrder, metadata, fetchOrder, attributes])
 }
