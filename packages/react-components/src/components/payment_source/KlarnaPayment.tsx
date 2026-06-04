@@ -78,18 +78,6 @@ export default function KlarnaPayment({
       setKlarna(window.Klarna)
     }
   }, [loaded])
-  useEffect(() => {
-    if (ref.current && paymentSource && currentPaymentMethodType && loaded && klarna) {
-      ref.current.onsubmit = async (props: any) => {
-        handleClick(klarna, props)
-      }
-      setPaymentRef({ ref })
-    }
-    return () => {
-      setPaymentRef({ ref: { current: null } })
-    }
-  // biome-ignore lint/correctness/useExhaustiveDependencies lint/correctness/noInvalidUseBeforeDeclaration: handleClick declared after useEffect (pre-existing pattern)
-  }, [paymentSource, currentPaymentMethodType, loaded, klarna, setPaymentRef, handleClick])
   const handleClick = (kl: any, props: any): void => {
     // @ts-expect-error no type
     const [first] = paymentSource?.payment_methods || undefined
@@ -155,6 +143,18 @@ export default function KlarnaPayment({
       }
     )
   }
+  useEffect(() => {
+    if (ref.current && paymentSource && currentPaymentMethodType && loaded && klarna) {
+      ref.current.onsubmit = async (props: any) => {
+        handleClick(klarna, props)
+      }
+      setPaymentRef({ ref })
+    }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick intentionally included in deps
+  }, [paymentSource, currentPaymentMethodType, loaded, klarna, setPaymentRef, handleClick])
   if (klarna && clientToken) {
     // @ts-expect-error no type
     const [first] = paymentSource?.payment_methods || undefined

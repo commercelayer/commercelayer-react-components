@@ -205,7 +205,7 @@ export function PaymentMethod({
         autoSelect()
       }
     }
-  }, [errors?.length, setLoadingPlaceOrder, paymentSource.payment_response?.status?.toLowerCase, paymentMethods, order, config, setPaymentSource, setPaymentMethod, paymentSourceCreated, onClick, getCustomerPaymentSources, expressPayments, paymentSource, showLoader, autoSelectSinglePaymentMethod])
+  }, [errors?.length, setLoadingPlaceOrder, (paymentSource as any)?.payment_response?.status?.toLowerCase, paymentMethods, order, config, setPaymentSource, setPaymentMethod, paymentSourceCreated, onClick, getCustomerPaymentSources, expressPayments, paymentSource, showLoader, autoSelectSinglePaymentMethod])
   useEffect(() => {
     if (paymentMethods) {
       const isSingle = paymentMethods.length === 1
@@ -236,7 +236,7 @@ export function PaymentMethod({
       setLoading(true)
       setPaymentSelected("")
     }
-  }, [paymentMethods, currentPaymentMethodId, errors?.length, showLoader, paymentSource.payment_response?.status?.toLowerCase, paymentSource, autoSelectSinglePaymentMethod])
+  }, [paymentMethods, currentPaymentMethodId, errors?.length, showLoader, (paymentSource as any)?.payment_response?.status?.toLowerCase, paymentSource, autoSelectSinglePaymentMethod])
   useEffect(() => {
     const status =
       // @ts-expect-error no type
@@ -315,7 +315,7 @@ export function PaymentMethod({
         </div>
       )
     })
-  return !loading ? components : getLoaderComponent(loader)
+  return !loading ? <>{components}</> : getLoaderComponent(loader)
 }
 
 export default PaymentMethod

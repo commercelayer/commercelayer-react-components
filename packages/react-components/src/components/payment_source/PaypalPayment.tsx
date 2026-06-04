@@ -18,24 +18,6 @@ export function PaypalPayment({ infoMessage, ...p }: Props): JSX.Element | null 
   const ref = useRef<null | HTMLFormElement>(null)
   const { setPaymentSource, paymentSource, currentPaymentMethodType, setPaymentRef } =
     useContext(PaymentMethodContext)
-  useEffect(() => {
-    if (
-      ref.current &&
-      paymentSource &&
-      currentPaymentMethodType &&
-      // @ts-expect-error no type
-      paymentSource?.approval_url
-    ) {
-      ref.current.onsubmit = async () => {
-        return await handleClick()
-      }
-      setPaymentRef({ ref })
-    }
-    return () => {
-      setPaymentRef({ ref: { current: null } })
-    }
-  // biome-ignore lint/correctness/useExhaustiveDependencies lint/correctness/noInvalidUseBeforeDeclaration: handleClick declared after useEffect (pre-existing pattern)
-  }, [paymentSource, currentPaymentMethodType, setPaymentRef, handleClick])
   const handleClick = async (): Promise<boolean> => {
     if (paymentSource && currentPaymentMethodType) {
       try {
@@ -59,6 +41,24 @@ export function PaypalPayment({ infoMessage, ...p }: Props): JSX.Element | null 
     }
     return false
   }
+  useEffect(() => {
+    if (
+      ref.current &&
+      paymentSource &&
+      currentPaymentMethodType &&
+      // @ts-expect-error no type
+      paymentSource?.approval_url
+    ) {
+      ref.current.onsubmit = async () => {
+        return await handleClick()
+      }
+      setPaymentRef({ ref })
+    }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick intentionally included in deps
+  }, [paymentSource, currentPaymentMethodType, setPaymentRef, handleClick])
   return (
     <form ref={ref}>
       <div {...p}>

@@ -106,7 +106,7 @@ export function Errors(props: Props): JSX.Element {
     returnHtml: !children,
   })
   const parentProps = { messages, resource, field, errors: msgErrors, ...p }
-  return children ? <Parent {...parentProps}>{children}</Parent> : msgErrors
+  return children ? <Parent {...parentProps}>{children}</Parent> : <>{msgErrors}</>
 }
 
 export default Errors

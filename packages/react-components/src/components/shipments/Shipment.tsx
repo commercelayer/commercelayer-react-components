@@ -49,7 +49,7 @@ export function Shipment({
     return () => {
       setLoading(true)
     }
-    // @ts-expect-error deprecate `gift_card_or_coupon_code`
+    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   }, [shipments?.length, setShippingMethod, shipments, autoSelectSingleShippingMethod])
   const components = shipments?.map((shipment, k) => {
     const shipmentLineItems = shipment.stock_line_items
@@ -85,7 +85,7 @@ export function Shipment({
       </ShipmentChildrenContext.Provider>
     )
   })
-  return !loading ? components : getLoaderComponent(loader)
+  return !loading ? <>{components}</> : getLoaderComponent(loader)
 }
 
 export default Shipment

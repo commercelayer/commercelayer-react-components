@@ -73,22 +73,6 @@ function StripePaymentForm({
   const { sdkClient } = useCommerceLayer()
   const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
   const elements = useElements()
-  useEffect(() => {
-    if (ref.current && stripe && elements) {
-      ref.current.onsubmit = async () => {
-        return await onSubmit({
-          event: ref.current,
-          stripe,
-          elements,
-        })
-      }
-      setPaymentRef({ ref })
-    }
-    return () => {
-      setPaymentRef({ ref: { current: null } })
-    }
-  // biome-ignore lint/correctness/useExhaustiveDependencies lint/correctness/noInvalidUseBeforeDeclaration: onSubmit declared after useEffect (pre-existing pattern)
-  }, [stripe, elements, setPaymentRef, onSubmit])
   const onSubmit = async ({ event, stripe, elements }: OnSubmitArgs): Promise<boolean> => {
     if (!stripe) return false
     const sdk = sdkClient()
@@ -171,6 +155,22 @@ function StripePaymentForm({
     }
     return false
   }
+  useEffect(() => {
+    if (ref.current && stripe && elements) {
+      ref.current.onsubmit = async () => {
+        return await onSubmit({
+          event: ref.current,
+          stripe,
+          elements,
+        })
+      }
+      setPaymentRef({ ref })
+    }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: onSubmit intentionally included in deps
+  }, [stripe, elements, setPaymentRef, onSubmit])
 
   async function handleChange(event: StripePaymentElementChangeEvent) {
     selectedPaymentMethodType = event.value.type
