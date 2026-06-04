@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react"
 import path from "node:path"
 
 export default defineConfig({
+  envDir: path.resolve(__dirname, "../.."),
   resolve: {
     dedupe: ["react", "react-dom", "swr"],
     alias: {
@@ -71,7 +72,6 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
-    envDir: path.resolve(__dirname, "../.."),
     testTimeout: 30000,
     coverage: {
       provider: "v8",
