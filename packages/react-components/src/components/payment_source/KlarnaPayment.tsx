@@ -153,8 +153,8 @@ export default function KlarnaPayment({
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick intentionally included in deps
-  }, [paymentSource, currentPaymentMethodType, loaded, klarna, setPaymentRef, handleClick])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is recreated each render; its deps are already tracked
+  }, [paymentSource, currentPaymentMethodType, loaded, klarna, setPaymentRef])
   if (klarna && clientToken) {
     // @ts-expect-error no type
     const [first] = paymentSource?.payment_methods || undefined

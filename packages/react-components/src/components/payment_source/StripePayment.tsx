@@ -169,8 +169,8 @@ function StripePaymentForm({
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: onSubmit intentionally included in deps
-  }, [stripe, elements, setPaymentRef, onSubmit])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: onSubmit is recreated each render; its deps are already tracked
+  }, [stripe, elements, setPaymentRef])
 
   async function handleChange(event: StripePaymentElementChangeEvent) {
     selectedPaymentMethodType = event.value.type

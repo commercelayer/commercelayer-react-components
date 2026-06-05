@@ -57,8 +57,8 @@ export function PaypalPayment({ infoMessage, ...p }: Props): JSX.Element | null 
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick intentionally included in deps
-  }, [paymentSource, currentPaymentMethodType, setPaymentRef, handleClick])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is recreated each render; its deps are already tracked
+  }, [paymentSource, currentPaymentMethodType, setPaymentRef])
   return (
     <form ref={ref}>
       <div {...p}>

@@ -51,8 +51,8 @@ export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is stable within render
-  }, [paymentSource, currentPaymentMethodType, setPaymentRef, handleClick])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is recreated each render; its deps are already tracked
+  }, [paymentSource, currentPaymentMethodType, setPaymentRef])
   return (
     <form ref={ref}>
       <div className={className} data-testid={dataTestId}>
