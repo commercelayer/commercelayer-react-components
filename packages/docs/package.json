@@ -33,7 +33,6 @@
     "@vitejs/plugin-react": "^6.0.1",
     "babel-loader": "^10.1.1",
     "js-cookie": "^3.0.5",
-    "jwt-decode": "^4.0.0",
     "msw": "^2.14.5",
     "prop-types": "^15.8.1",
     "react": "^19.2.6",

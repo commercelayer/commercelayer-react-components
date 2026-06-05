@@ -5,9 +5,13 @@ import { InStockSubscriptionButton } from "#components/in_stock_subscriptions/In
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import InStockSubscriptionContext from "#context/InStockSubscriptionContext"
 
-vi.mock("jwt-decode", () => ({
-  jwtDecode: vi.fn().mockReturnValue({ owner: { id: "cust_1", type: "Customer" } }),
-}))
+vi.mock("@commercelayer/js-auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@commercelayer/js-auth")>()
+  return {
+    ...actual,
+    jwtDecode: vi.fn().mockReturnValue({ payload: { owner: { id: "cust_1", type: "Customer" } } }),
+  }
+})
 
 const mockSetInStockSubscription = vi.fn().mockResolvedValue({ success: true })
 
@@ -179,9 +183,9 @@ describe("InStockSubscriptionButton", () => {
   })
 
   it("logs an error and does not call setInStockSubscription when no customerEmail and JWT has no owner", async () => {
-    const { jwtDecode } = await import("jwt-decode")
+    const { jwtDecode } = await import("@commercelayer/js-auth")
     // biome-ignore lint/suspicious/noExplicitAny: test cast
-    vi.mocked(jwtDecode as any).mockReturnValueOnce({ owner: null })
+    vi.mocked(jwtDecode as any).mockReturnValueOnce({ payload: { owner: null } })
 
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined)
 
@@ -201,9 +205,9 @@ describe("InStockSubscriptionButton", () => {
   })
 
   it("skips the JWT owner check when customerEmail is provided", async () => {
-    const { jwtDecode } = await import("jwt-decode")
+    const { jwtDecode } = await import("@commercelayer/js-auth")
     // biome-ignore lint/suspicious/noExplicitAny: test cast
-    vi.mocked(jwtDecode as any).mockReturnValueOnce({ owner: null })
+    vi.mocked(jwtDecode as any).mockReturnValueOnce({ payload: { owner: null } })
 
     render(
       <Providers accessToken="some-token">

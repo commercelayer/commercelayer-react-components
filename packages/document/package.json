@@ -31,7 +31,6 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "js-cookie": "^3.0.5",
-    "jwt-decode": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "storybook": "^10.3.6",
     "typescript": "~6.0.3",

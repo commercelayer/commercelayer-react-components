@@ -158,9 +158,6 @@ importers:
       js-cookie:
         specifier: ^3.0.5
         version: 3.0.5
-      jwt-decode:
-        specifier: ^4.0.0
-        version: 4.0.0
       msw:
         specifier: ^2.14.5
         version: 2.14.5(@types/node@25.6.2)(typescript@6.0.3)
@@ -243,9 +240,6 @@ importers:
       js-cookie:
         specifier: ^3.0.5
         version: 3.0.5
-      jwt-decode:
-        specifier: ^4.0.0
-        version: 4.0.0
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
@@ -352,9 +346,6 @@ importers:
       iframe-resizer:
         specifier: ^4.3.6
         version: 4.4.5
-      jwt-decode:
-        specifier: ^4.0.0
-        version: 4.0.0
       rapid-form:
         specifier: 4.0.1
         version: 4.0.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -4283,10 +4274,6 @@ packages:
 
   just-diff@6.0.2:
     resolution: {integrity: sha512-S59eriX5u3/QhMNq3v/gm8Kd0w8OS6Tz2FS1NG4blv+z0MuQcBRJyFWjdovM0Rad4/P4aUPFtnkNjMjyMlMSYA==}
-
-  jwt-decode@4.0.0:
-    resolution: {integrity: sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==}
-    engines: {node: '>=18'}
 
   kind-of@6.0.3:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
@@ -8402,7 +8389,7 @@ snapshots:
 
   '@testing-library/dom@10.4.1':
     dependencies:
-      '@babel/code-frame': 7.27.1
+      '@babel/code-frame': 7.29.0
       '@babel/runtime': 7.26.10
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
@@ -10166,8 +10153,6 @@ snapshots:
   just-diff-apply@5.5.0: {}
 
   just-diff@6.0.2: {}
-
-  jwt-decode@4.0.0: {}
 
   kind-of@6.0.3: {}
 

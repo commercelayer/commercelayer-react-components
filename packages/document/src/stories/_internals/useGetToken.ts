@@ -1,7 +1,7 @@
 import { authenticate } from "@commercelayer/js-auth"
 import { useEffect, useMemo, useState } from "react"
 import Cookie from "js-cookie"
-import { jwtDecode } from "jwt-decode"
+import { jwtDecode } from "@commercelayer/js-auth"
 
 const salesChannel = {
   clientId: "Z5ypiDlsqgV8twWRz0GabrJvTKXad4U-PMoVAU-XvV0",
@@ -184,7 +184,7 @@ function isTokenExpired({
   }
 
   try {
-    const { exp } = jwtDecode<{ exp: number }>(accessToken)
+    const { payload: { exp } } = jwtDecode(accessToken)
 
     if (exp == null) {
       return true

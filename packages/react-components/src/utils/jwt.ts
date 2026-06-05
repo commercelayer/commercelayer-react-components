@@ -1,4 +1,4 @@
-import { jwtDecode } from "jwt-decode"
+import { jwtDecode } from "@commercelayer/js-auth"
 
 interface JWT {
   application: {
@@ -24,5 +24,5 @@ interface JWT {
 }
 
 export function jwt(accessToken: string): JWT {
-  return jwtDecode<JWT>(accessToken)
+  return jwtDecode(accessToken).payload as JWT
 }
