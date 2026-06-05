@@ -30,6 +30,7 @@
     "test:e2e:coverage": "nyc pnpm test:e2e && pnpm coverage:report",
     "coverage:report": "nyc report --reporter=html",
     "build": "tsup",
+    "build:watch": "tsup --watch",
     "dev": "NODE_OPTIONS='--inspect' next dev"
   },
   "repository": {
