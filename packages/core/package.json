@@ -26,6 +26,7 @@
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "build": "tsup",
+    "build:watch": "tsup --watch",
     "ci": "pnpm  build && pnpm check-exports && pnpm lint"
   },
   "publishConfig": {

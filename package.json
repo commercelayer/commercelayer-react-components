@@ -7,7 +7,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "pnpm -r build",
+    "build:watch": "pnpm --filter @commercelayer/core --filter @commercelayer/hooks --filter @commercelayer/react-components --parallel build:watch",
     "prepare": "husky",
     "test": "pnpm -r --workspace-concurrency=1 --no-bail test",
     "docs:dev": "pnpm --filter docs storybook",
