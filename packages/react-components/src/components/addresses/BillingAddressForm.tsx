@@ -1,8 +1,6 @@
 import { type JSX, type ReactNode, useContext } from "react"
 import AddressesContext from "#context/AddressContext"
-import BillingAddressFormContext, {
-  type AddressValuesKeys,
-} from "#context/BillingAddressFormContext"
+import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import type { CustomFieldMessageError } from "#reducers/AddressReducer"
@@ -83,8 +81,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
   const providerValues = {
     isBusiness,
     values: formValues,
-    setValue: (name: AddressValuesKeys, value: string | number | readonly string[]) =>
-      setValue(name, value),
+    setValue,
     errorClassName,
     requiresBillingInfo: order?.requires_billing_info ?? false,
     errors,

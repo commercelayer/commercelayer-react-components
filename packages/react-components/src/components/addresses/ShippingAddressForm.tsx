@@ -1,6 +1,6 @@
 import { type JSX, type ReactNode, useContext } from "react"
 import AddressesContext from "#context/AddressContext"
-import type { AddressValuesKeys, DefaultContextAddress } from "#context/BillingAddressFormContext"
+import type { DefaultContextAddress } from "#context/BillingAddressFormContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
@@ -86,8 +86,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
 
   const providerValues: DefaultContextAddress = {
     values: formValues,
-    setValue: (name: AddressValuesKeys, value: string | number | readonly string[]) =>
-      setValue(name, value),
+    setValue,
     errorClassName,
     errors,
     resetField,

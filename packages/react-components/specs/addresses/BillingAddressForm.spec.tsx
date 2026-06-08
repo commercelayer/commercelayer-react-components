@@ -528,6 +528,35 @@ describe("BillingAddressForm", () => {
       )
     })
   })
+
+  it("provides a stable setValue reference across renders (no infinite loop)", async () => {
+    let renderCount = 0
+    let capturedSetValue: ((...args: unknown[]) => void) | undefined
+    const seenSetValues = new Set<unknown>()
+
+    function StabilityProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      renderCount++
+      if (ctx.setValue != null) {
+        seenSetValues.add(ctx.setValue)
+        capturedSetValue = ctx.setValue as typeof capturedSetValue
+      }
+      return <div />
+    }
+
+    renderForm({ children: <StabilityProbe /> })
+
+    await waitFor(() => expect(capturedSetValue).toBeDefined())
+
+    const countAfterMount = renderCount
+    // Allow a few more frames to detect any runaway re-renders
+    await new Promise((r) => setTimeout(r, 100))
+
+    // setValue must be the same reference across renders (no new arrow fn each cycle)
+    expect(seenSetValues.size).toBe(1)
+    // render count should not grow unboundedly
+    expect(renderCount).toBeLessThanOrEqual(countAfterMount + 2)
+  })
 })
 
 // Standalone mode: BillingAddressForm without an AddressesContainer ancestor
