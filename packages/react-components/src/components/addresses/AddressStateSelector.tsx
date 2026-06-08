@@ -100,6 +100,10 @@ export function AddressStateSelector(props: Props): JSX.Element {
       typeof shippingCountryValue === "string" ? shippingCountryValue : shippingCountryValue?.value
     if (shippingCountryCode && shippingCountryCode !== countryCode)
       setCountryCode(shippingCountryCode)
+    // True when this is the first time a country is detected (was empty before).
+    // Used to distinguish initial pre-fill from a user-initiated country change.
+    const isFirstCountryDetection = !countryCode
+
     const changeBillingCountry = [
       Object.keys(billingAddress).length > 0,
       billingCountryCode,
@@ -111,8 +115,16 @@ export function AddressStateSelector(props: Props): JSX.Element {
       }
       setVal(value)
     }
+    // On initial country detection, pre-fill the state from the value prop.
+    if (changeBillingCountry && isFirstCountryDetection && value != null && value !== "") {
+      if (billingAddress.setValue != null) billingAddress.setValue(name, String(value))
+      setVal(String(value))
+    }
+    // On user-initiated country change, reset the state only if the current value
+    // is invalid for the newly selected country (and the country has states).
     if (
       changeBillingCountry &&
+      !isFirstCountryDetection &&
       billingCountryCode &&
       !isValidState({
         stateCode: val ?? "",
@@ -135,8 +147,13 @@ export function AddressStateSelector(props: Props): JSX.Element {
       }
       setVal(value)
     }
+    if (changeShippingCountry && isFirstCountryDetection && value != null && value !== "") {
+      if (shippingAddress.setValue != null) shippingAddress.setValue(name, String(value))
+      setVal(String(value))
+    }
     if (
       changeShippingCountry &&
+      !isFirstCountryDetection &&
       shippingCountryCode &&
       !isValidState({
         stateCode: val ?? "",

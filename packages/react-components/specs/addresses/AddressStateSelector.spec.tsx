@@ -92,6 +92,27 @@ describe("AddressStateSelector", () => {
     expect(setValue).toHaveBeenCalledWith("billing_address_state_code", "CA")
   })
 
+  it("pre-fills state via setValue when country is set for the first time (edit existing address)", async () => {
+    // When editing an existing address, country is pre-filled via setValue which
+    // triggers changeBillingCountry=true (from "" to "US"). The state pre-fill
+    // must also happen in this case (not only when changeBillingCountry=false).
+    const setValue = vi.fn()
+    renderSelector(
+      { value: "CA" }, // existing state_code from API
+      {
+        setValue,
+        errors: {},
+        values: {
+          billing_address_country_code: "US", // pre-filled country
+        } as any,
+      },
+      null
+    )
+    await waitFor(() => {
+      expect(setValue).toHaveBeenCalledWith("billing_address_state_code", "CA")
+    })
+  })
+
   it("applies errorClassName when billing field has error", async () => {
     renderSelector(
       {},
