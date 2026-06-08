@@ -254,7 +254,10 @@ export function useAddressFormFields({
       if (input != null) {
         input.setCustomValidity("")
         input.value = String(value)
-        input.dispatchEvent(new Event("change", { bubbles: true }))
+        // Dispatch 'input' (not 'change') so rapid-form captures the update.
+        // This is required for AddressStateSelector to detect the country code
+        // from billingAddress.values when a value is set programmatically.
+        input.dispatchEvent(new Event("input", { bubbles: true }))
       }
       clearFieldError(name)
       // Build the complete address from ALL current form inputs so that multiple
@@ -290,7 +293,7 @@ export function useAddressFormFields({
       if (input != null) {
         input.setCustomValidity("")
         input.value = ""
-        input.dispatchEvent(new Event("change", { bubbles: true }))
+        input.dispatchEvent(new Event("input", { bubbles: true }))
       }
       clearFieldError(name)
     },

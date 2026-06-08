@@ -143,4 +143,57 @@ describe("BillingAddressForm (real rapid-form)", () => {
       })
     })
   })
+
+  it("updates ctx.values for required fields when setValue is called (needed by AddressStateSelector)", async () => {
+    // AddressStateSelector watches billingAddress.values[country_key] to detect
+    // the country and load the correct state options. setValue must dispatch
+    // an 'input' event (not 'change') so rapid-form captures the update.
+    const setAddress = vi.fn()
+    let capturedCtx: ReturnType<typeof useContext<typeof BillingAddressFormContext>> | undefined
+
+    function CountryProbe(): JSX.Element {
+      capturedCtx = useContext(BillingAddressFormContext)
+      return <div data-testid="country-value">{JSON.stringify(capturedCtx?.values ?? {})}</div>
+    }
+
+    const addressContext = {
+      ...defaultAddressContext,
+      setAddressErrors: vi.fn(),
+      setAddress,
+      saveAddresses: vi.fn(),
+    }
+    const orderContext = {
+      ...defaultOrderContext,
+      order: { id: "ord-country" },
+      include: ["billing_address"],
+      includeLoaded: { billing_address: true },
+      addResourceToInclude: vi.fn(),
+    }
+
+    render(
+      // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+      <AddressesContext.Provider value={addressContext as any}>
+        {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
+        <OrderContext.Provider value={orderContext as any}>
+          <BillingAddressForm data-testid="form">
+            {/* Country select is required by default */}
+            <AddressInput
+              name="billing_address_country_code"
+              data-testid="country"
+              required
+              value="US"
+            />
+            <CountryProbe />
+          </BillingAddressForm>
+        </OrderContext.Provider>
+      </AddressesContext.Provider>
+    )
+
+    // After setValue fires (triggered by AddressInput.useEffect with value="US"),
+    // ctx.values should contain the country code so AddressStateSelector can detect it.
+    await waitFor(() => {
+      const countryValues = JSON.parse(screen.getByTestId("country-value").textContent ?? "{}")
+      expect(countryValues["billing_address_country_code"]?.value).toBe("US")
+    })
+  })
 })
