@@ -72,6 +72,26 @@ describe("AddressStateSelector", () => {
     expect(setValue).toHaveBeenCalledWith("billing_address_state_code", "CA")
   })
 
+  it("calls setValue on select dropdown change", async () => {
+    const setValue = vi.fn()
+    renderSelector(
+      {},
+      {
+        setValue,
+        errors: {},
+        values: {
+          billing_address_country_code: "US",
+        } as any,
+      },
+      null
+    )
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toBeTruthy()
+    })
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "CA" } })
+    expect(setValue).toHaveBeenCalledWith("billing_address_state_code", "CA")
+  })
+
   it("applies errorClassName when billing field has error", async () => {
     renderSelector(
       {},

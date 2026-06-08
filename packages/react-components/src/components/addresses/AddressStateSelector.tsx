@@ -189,6 +189,16 @@ export function AddressStateSelector(props: Props): JSX.Element {
       options={stateOptions}
       name={name}
       value={val}
+      onChange={(e) => {
+        const selected = e.target.value
+        setVal(selected)
+        if (billingAddress.setValue != null) {
+          billingAddress.setValue(name, selected)
+        }
+        if (shippingAddress.setValue != null) {
+          shippingAddress.setValue(name, selected)
+        }
+      }}
     />
   ) : (
     <BaseInput
