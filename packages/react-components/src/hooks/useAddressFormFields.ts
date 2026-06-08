@@ -2,8 +2,15 @@ import { useRapidForm } from "rapid-form"
 import { useCallback, useEffect, useRef, useState } from "react"
 import type { AddressResource } from "#reducers/AddressReducer"
 import type { CustomFieldMessageError } from "#reducers/AddressReducer"
-import { setAddress as setAddressAction, setAddressErrors as setAddressErrorsAction } from "#reducers/AddressReducer"
-import type { AddResourceToInclude, ResourceIncluded, SaveAddressToCustomerAddressBook } from "#reducers/OrderReducer"
+import {
+  setAddress as setAddressAction,
+  setAddressErrors as setAddressErrorsAction,
+} from "#reducers/AddressReducer"
+import type {
+  AddResourceToInclude,
+  ResourceIncluded,
+  SaveAddressToCustomerAddressBook,
+} from "#reducers/OrderReducer"
 import type { TCustomerAddress } from "#typings/customers"
 import type { BaseError, CodeErrorType } from "#typings/errors"
 import { type FormErrors, type FormValue, getFormElement } from "#utils/addressFormUtils"
@@ -17,7 +24,10 @@ interface UseAddressFormFieldsParams {
   saveAddressToCustomerAddressBook?: SaveAddressToCustomerAddressBook
   getSaveToAddressBook: () => boolean
   setAddress: (params: Parameters<typeof setAddressAction>[0]) => void
-  setAddressErrors: (errors: BaseError[], resource: Parameters<typeof setAddressErrorsAction>[0]["resource"]) => void
+  setAddressErrors: (
+    errors: BaseError[],
+    resource: Parameters<typeof setAddressErrorsAction>[0]["resource"]
+  ) => void
   include?: ResourceIncluded[]
   addResourceToInclude: (params: AddResourceToInclude) => void
   includeLoaded?: Partial<Record<ResourceIncluded, boolean>>
@@ -66,7 +76,9 @@ export function useAddressFormFields({
     if (!include?.includes(resource)) {
       addResourceToInclude({ newResource: resource })
     } else if (!includeLoaded?.[resource]) {
-      addResourceToInclude({ newResourceLoaded: { [resource]: true } as Partial<Record<ResourceIncluded, boolean>> })
+      addResourceToInclude({
+        newResourceLoaded: { [resource]: true } as Partial<Record<ResourceIncluded, boolean>>,
+      })
     }
   }, [include, includeLoaded, addResourceToInclude, resource])
 
@@ -184,7 +196,9 @@ export function useAddressFormFields({
   ])
 
   useEffect(() => {
-    const checkbox = formRef.current?.querySelector<HTMLInputElement>(`[name="${checkboxFieldName}"]`)
+    const checkbox = formRef.current?.querySelector<HTMLInputElement>(
+      `[name="${checkboxFieldName}"]`
+    )
     const checked = checkbox?.checked || getSaveToAddressBook()
     if (checked) {
       checkbox?.setAttribute("checked", "true")
@@ -193,16 +207,31 @@ export function useAddressFormFields({
   }, [saveAddressToCustomerAddressBook, checkboxFieldName, getSaveToAddressBook, resource])
 
   useEffect(() => {
-    const checkbox = formRef.current?.querySelector<HTMLInputElement>(`[name="${checkboxFieldName}"]`)
+    const checkbox = formRef.current?.querySelector<HTMLInputElement>(
+      `[name="${checkboxFieldName}"]`
+    )
     const checked = checkbox?.checked || getSaveToAddressBook()
-    if (reset && (Object.keys(formValues).length > 0 || Object.keys(errors).length > 0 || checked)) {
+    if (
+      reset &&
+      (Object.keys(formValues).length > 0 || Object.keys(errors).length > 0 || checked)
+    ) {
       saveAddressToCustomerAddressBook?.({ type: resource, value: false })
       formRef.current?.reset()
       setErrors((prev) => (Object.keys(prev).length > 0 ? {} : prev))
       setAddressErrors([], resource)
       setAddress({ values: {} as TCustomerAddress, resource })
     }
-  }, [reset, formValues, errors, saveAddressToCustomerAddressBook, setAddress, setAddressErrors, resource, checkboxFieldName, getSaveToAddressBook])
+  }, [
+    reset,
+    formValues,
+    errors,
+    saveAddressToCustomerAddressBook,
+    setAddress,
+    setAddressErrors,
+    resource,
+    checkboxFieldName,
+    getSaveToAddressBook,
+  ])
 
   const setValue = useCallback(
     (name: string, value: string | number | readonly string[]): void => {

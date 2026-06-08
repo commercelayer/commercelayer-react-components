@@ -47,8 +47,15 @@ export function BillingAddressForm(props: Props): JSX.Element {
     : (parentAddressContext.shipToDifferentAddress ?? shipToDifferentAddress_prop)
 
   const config = useContext(CommerceLayerContext)
-  const { saveAddressToCustomerAddressBook, order, orderId, include, addResourceToInclude, includeLoaded, updateOrder } =
-    useContext(OrderContext)
+  const {
+    saveAddressToCustomerAddressBook,
+    order,
+    orderId,
+    include,
+    addResourceToInclude,
+    includeLoaded,
+    updateOrder,
+  } = useContext(OrderContext)
 
   const standalone = useStandaloneAddress({
     isStandalone,
@@ -60,8 +67,12 @@ export function BillingAddressForm(props: Props): JSX.Element {
     shipToDifferentAddress,
   })
 
-  const setAddress = isStandalone ? standalone.standaloneSetAddress : parentAddressContext.setAddress
-  const setAddressErrors = isStandalone ? standalone.standaloneSetAddressErrors : parentAddressContext.setAddressErrors
+  const setAddress = isStandalone
+    ? standalone.standaloneSetAddress
+    : parentAddressContext.setAddress
+  const setAddressErrors = isStandalone
+    ? standalone.standaloneSetAddressErrors
+    : parentAddressContext.setAddressErrors
 
   const { formValues, errors, setFormRef, setValue, resetField } = useAddressFormFields({
     resource: "billing_address",
