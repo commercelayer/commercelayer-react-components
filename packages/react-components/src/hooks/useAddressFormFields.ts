@@ -176,6 +176,21 @@ export function useAddressFormFields({
       }
     }
 
+    // Supplement with non-required fields from the DOM that rapid-form doesn't track.
+    // This preserves pre-filled optional fields (phone, line_2, state_code, etc.)
+    // when the user edits a required field and the main effect fires.
+    if (formRef.current) {
+      for (const el of Array.from(formRef.current.elements)) {
+        const inputEl = el as HTMLInputElement
+        if (!inputEl.name?.startsWith(prefix) || inputEl.type === "checkbox") continue
+        const fieldKey = inputEl.name.replace(prefix, "")
+        if (fieldKey in addressValues) continue // rapid-form value takes precedence
+        if (inputEl.value) {
+          addressValues[fieldKey] = inputEl.value
+        }
+      }
+    }
+
     setAddress({
       values: {
         ...addressValues,
@@ -242,9 +257,25 @@ export function useAddressFormFields({
         input.dispatchEvent(new Event("change", { bubbles: true }))
       }
       clearFieldError(name)
+      // Build the complete address from ALL current form inputs so that multiple
+      // setValue calls (e.g., pre-filling from an existing address) accumulate
+      // values rather than each call replacing the entire address object.
+      const allValues: Record<string, unknown> = {}
+      if (formRef.current) {
+        for (const el of Array.from(formRef.current.elements)) {
+          const inputEl = el as HTMLInputElement
+          if (!inputEl.name?.startsWith(prefix) || inputEl.type === "checkbox") continue
+          if (inputEl.value) {
+            allValues[inputEl.name.replace(prefix, "")] = inputEl.value
+          }
+        }
+      }
+      // Ensure the value just set is included (covers edge cases where the input
+      // might not be found in form.elements, e.g., not yet mounted).
+      allValues[name.replace(prefix, "")] = value
       setAddress({
         values: {
-          [name.replace(prefix, "")]: value,
+          ...allValues,
           ...(isBusiness && { business: isBusiness }),
         } as TCustomerAddress,
         resource,

@@ -1,13 +1,14 @@
 /**
  * Integration tests using the REAL rapid-form (no mock).
  * Verifies that user typing updates formValues and triggers setAddress.
+ * Also verifies pre-fill behavior (editing an existing address).
  */
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { useContext } from "react"
 import { BillingAddressForm } from "#components/addresses/BillingAddressForm"
 import AddressInput from "#components/addresses/AddressInput"
-import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
+import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 
 // Do NOT mock rapid-form so real event listeners are used
@@ -23,14 +24,16 @@ vi.mock("#utils/localStorage", () => ({
 
 function ContextProbe(): JSX.Element {
   const ctx = useContext(BillingAddressFormContext)
-  return (
-    <div>
-      <div data-testid="ctx-values">{JSON.stringify(ctx.values ?? {})}</div>
-    </div>
-  )
+  return <div data-testid="ctx-values">{JSON.stringify(ctx.values ?? {})}</div>
 }
 
-function renderRealForm(setAddress: ReturnType<typeof vi.fn>) {
+interface RenderOptions {
+  firstName?: string
+  lastName?: string
+  phone?: string
+}
+
+function renderRealForm(setAddress: ReturnType<typeof vi.fn>, prefill: RenderOptions = {}) {
   const addressContext = {
     ...defaultAddressContext,
     setAddressErrors: vi.fn(),
@@ -55,6 +58,19 @@ function renderRealForm(setAddress: ReturnType<typeof vi.fn>) {
             name="billing_address_first_name"
             data-testid="first-name"
             required
+            {...(prefill.firstName != null ? { value: prefill.firstName } : {})}
+          />
+          <AddressInput
+            name="billing_address_last_name"
+            data-testid="last-name"
+            required
+            {...(prefill.lastName != null ? { value: prefill.lastName } : {})}
+          />
+          {/* phone is intentionally not required — tests non-required field preservation */}
+          <AddressInput
+            name="billing_address_phone"
+            data-testid="phone"
+            {...(prefill.phone != null ? { value: prefill.phone } : {})}
           />
           <ContextProbe />
         </BillingAddressForm>
@@ -70,36 +86,61 @@ describe("BillingAddressForm (real rapid-form)", () => {
 
     const input = screen.getByTestId("first-name") as HTMLInputElement
 
-    // Simulate user typing — rapid-form listens to 'input' events
+    // rapid-form listens to 'input' events
     await act(async () => {
       fireEvent.input(input, { target: { value: "Alice" } })
     })
 
-    // ctx.values should now contain the typed value
     await waitFor(() => {
       const ctxValues = JSON.parse(screen.getByTestId("ctx-values").textContent ?? "{}")
-      expect(ctxValues).toHaveProperty("billing_address_first_name")
-      expect(ctxValues.billing_address_first_name.value).toBe("Alice")
+      expect(ctxValues.billing_address_first_name?.value).toBe("Alice")
     })
   })
 
-  it("calls setAddress with address values after typing", async () => {
+  it("includes non-required DOM fields when user types a required field", async () => {
     const setAddress = vi.fn()
     renderRealForm(setAddress)
 
-    const input = screen.getByTestId("first-name") as HTMLInputElement
+    const firstNameInput = screen.getByTestId("first-name") as HTMLInputElement
+    const phoneInput = screen.getByTestId("phone") as HTMLInputElement
 
+    // Simulate a pre-filled non-required field (no rapid-form tracking)
     await act(async () => {
-      fireEvent.input(input, { target: { value: "Alice" } })
+      phoneInput.value = "555-1234"
+    })
+
+    // User types in a required field → triggers the main effect
+    await act(async () => {
+      fireEvent.input(firstNameInput, { target: { value: "Alice" } })
     })
 
     await waitFor(() => {
-      expect(setAddress).toHaveBeenCalledWith(
-        expect.objectContaining({
-          resource: "billing_address",
-          values: expect.objectContaining({ first_name: "Alice" }),
-        })
-      )
+      const lastCall = setAddress.mock.calls[setAddress.mock.calls.length - 1][0]
+      expect(lastCall.values).toMatchObject({
+        first_name: "Alice",
+        phone: "555-1234", // non-required field preserved from DOM
+      })
+    })
+  })
+
+  it("accumulates all field values when setValue is called for multiple fields (edit scenario)", async () => {
+    const setAddress = vi.fn()
+    // Render with pre-filled values simulating editing an existing address
+    renderRealForm(setAddress, {
+      firstName: "Jane",
+      lastName: "Doe",
+      phone: "555-9999",
+    })
+
+    // After pre-fill effects fire, the last setAddress call should have ALL fields
+    await waitFor(() => {
+      expect(setAddress).toHaveBeenCalled()
+      const lastCall = setAddress.mock.calls[setAddress.mock.calls.length - 1][0]
+      expect(lastCall.values).toMatchObject({
+        first_name: "Jane",
+        last_name: "Doe",
+        phone: "555-9999",
+      })
     })
   })
 })
