@@ -1,4 +1,4 @@
-import { type JSX, type ReactNode, useContext, useEffect, useReducer } from "react"
+import { type JSX, type ReactNode, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from "react"
 import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
@@ -32,26 +32,22 @@ interface Props {
 }
 
 /**
- * Main container for the Addresses components.
- * It provides demanded functionalities to show/manage an address or a series of addresses depending on the context in use.
- * In addition it provides order oriented functionalities to manage billing and shipping addresses.
+ * @deprecated
+ * `AddressesContainer` is deprecated. Use standalone `<BillingAddressForm>` and
+ * `<ShippingAddressForm>` instead — they no longer require a container wrapper.
  *
- * It accept:
- * - a `shipToDifferentAddress` prop to define if the order related shipping address will be different from the billing one.
- * - a `isBusiness` prop to define if the current address needs to be threated as a `business` address during creation/update.
+ * @example Migration:
+ * ```tsx
+ * // Before (deprecated)
+ * <AddressesContainer isBusiness={isBusiness} shipToDifferentAddress={ship}>
+ *   <BillingAddressForm>…</BillingAddressForm>
+ *   <ShippingAddressForm>…</ShippingAddressForm>
+ * </AddressesContainer>
  *
- * <span title='Requirements' type='warning'>
- * Must be a child of the `<CommerceLayer>` component.
- * </span>
- * <span title='Children' type='info'>
- * `<BillingAddressContainer>`,
- * `<BillingAddressForm>`,
- * `<ShippingAddressContainer>`,
- * `<ShippingAddressForm>`,
- * `<CustomerAddressForm>`,
- * `<AddressesEmpty>`,
- * `<Addresses>`
- * </span>
+ * // After
+ * <BillingAddressForm isBusiness={isBusiness} shipToDifferentAddress={ship}>…</BillingAddressForm>
+ * <ShippingAddressForm shipToDifferentAddress={ship}>…</ShippingAddressForm>
+ * ```
  */
 export function AddressesContainer(props: Props): JSX.Element {
   const { children, shipToDifferentAddress = false, isBusiness, invertAddresses = false } = props
@@ -83,36 +79,48 @@ export function AddressesContainer(props: Props): JSX.Element {
       })
     }
   }, [shipToDifferentAddress, isBusiness, invertAddresses])
-  const contextValue = {
+  const errorsRef = useRef(state.errors)
+  errorsRef.current = state.errors
+
+  const setAddressFn = useCallback((params: SetAddressParams<TCustomerAddress>) => {
+    defaultAddressContext.setAddress({ ...params, dispatch })
+  }, [])
+
+  const setAddressErrorsFn = useCallback((errors: BaseError[], resource: AddressResource) => {
+    setAddressErrors({
+      errors,
+      resource,
+      dispatch,
+      currentErrors: errorsRef.current,
+    })
+  }, [])
+
+  const saveAddressesFn = useCallback(async (params: {
+    customerEmail?: string
+    customerAddress?: ICustomerAddress
+  }): ReturnType<typeof saveAddresses> =>
+    await saveAddresses({
+      config,
+      dispatch,
+      updateOrder,
+      order,
+      orderId,
+      state,
+      ...params,
+    }),
+  [config, updateOrder, order, orderId, state])
+
+  const setCloneAddressFn = useCallback((id: string, resource: AddressResource): void => {
+    setCloneAddress(id, resource, dispatch)
+  }, [])
+
+  const contextValue = useMemo(() => ({
     ...state,
-    setAddressErrors: (errors: BaseError[], resource: AddressResource) => {
-      setAddressErrors({
-        errors,
-        resource,
-        dispatch,
-        currentErrors: state.errors,
-      })
-    },
-    setAddress: (params: SetAddressParams<TCustomerAddress>) => {
-      defaultAddressContext.setAddress({ ...params, dispatch })
-    },
-    saveAddresses: async (params: {
-      customerEmail?: string
-      customerAddress?: ICustomerAddress
-    }): ReturnType<typeof saveAddresses> =>
-      await saveAddresses({
-        config,
-        dispatch,
-        updateOrder,
-        order,
-        orderId,
-        state,
-        ...params,
-      }),
-    setCloneAddress: (id: string, resource: AddressResource): void => {
-      setCloneAddress(id, resource, dispatch)
-    },
-  }
+    setAddressErrors: setAddressErrorsFn,
+    setAddress: setAddressFn,
+    saveAddresses: saveAddressesFn,
+    setCloneAddress: setCloneAddressFn,
+  }), [state, setAddressErrorsFn, setAddressFn, saveAddressesFn, setCloneAddressFn])
   return <AddressesContext.Provider value={contextValue}>{children}</AddressesContext.Provider>
 }
 

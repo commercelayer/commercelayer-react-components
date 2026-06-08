@@ -3,6 +3,7 @@ import { useContext } from "react"
 import { BillingAddressForm } from "#components/addresses/BillingAddressForm"
 import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 
 const rapidForm = vi.hoisted(() => ({
@@ -47,11 +48,13 @@ function renderForm(
 ) {
   const setAddressErrors = vi.fn()
   const setAddress = vi.fn()
+  const saveAddresses = vi.fn()
   const addResourceToInclude = vi.fn()
   const addressContext = {
     ...defaultAddressContext,
     setAddressErrors,
     setAddress,
+    saveAddresses,
     ...overrides.addressOverrides,
   }
   const orderContext = {
@@ -80,7 +83,7 @@ function renderForm(
     </AddressesContext.Provider>
   )
 
-  return { ...result, setAddressErrors, setAddress, addResourceToInclude }
+  return { ...result, setAddressErrors, setAddress, saveAddresses, addResourceToInclude }
 }
 
 beforeEach(() => {
@@ -329,7 +332,7 @@ describe("BillingAddressForm", () => {
     })
 
     // biome-ignore lint/suspicious/noExplicitAny: test provider cast
-    const addrCtx = { ...defaultAddressContext, setAddress, setAddressErrors } as any
+    const addrCtx = { ...defaultAddressContext, setAddress, setAddressErrors, saveAddresses: vi.fn() } as any
     // biome-ignore lint/suspicious/noExplicitAny: test provider cast
     const orderCtx = {
       ...defaultOrderContext,
@@ -523,6 +526,224 @@ describe("BillingAddressForm", () => {
       expect(setAddress).toHaveBeenCalledWith(
         expect.objectContaining({ resource: "billing_address" })
       )
+    })
+  })
+})
+
+// Standalone mode: BillingAddressForm without an AddressesContainer ancestor
+
+const saveAddressesMock = vi.hoisted(() => vi.fn())
+vi.mock("#reducers/AddressReducer", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("#reducers/AddressReducer")>()
+  return { ...actual, saveAddresses: saveAddressesMock }
+})
+
+function renderStandalone(
+  overrides: {
+    props?: Partial<React.ComponentProps<typeof BillingAddressForm>>
+    orderOverrides?: Record<string, unknown>
+    values?: Record<string, unknown>
+    children?: React.ReactNode
+    commerceLayerConfig?: Record<string, unknown>
+  } = {}
+) {
+  const addResourceToInclude = vi.fn()
+  const orderContext = {
+    ...defaultOrderContext,
+    order: { id: "ord-1" },
+    include: ["billing_address"],
+    includeLoaded: { billing_address: true },
+    addResourceToInclude,
+    ...overrides.orderOverrides,
+  }
+  const clConfig = { accessToken: "tok", ...overrides.commerceLayerConfig }
+
+  rapidForm.useRapidForm.mockReturnValue({
+    refValidation: vi.fn(),
+    values: overrides.values ?? {},
+  })
+
+  // No AddressesContext.Provider → isStandalone = true
+  const result = render(
+    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+    <CommerceLayerContext.Provider value={clConfig as any}>
+      {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
+      <OrderContext.Provider value={orderContext as any}>
+        <BillingAddressForm data-testid="form" {...overrides.props}>
+          {overrides.children ?? <div data-testid="child" />}
+        </BillingAddressForm>
+      </OrderContext.Provider>
+    </CommerceLayerContext.Provider>
+  )
+
+  return { ...result, addResourceToInclude }
+}
+
+describe("BillingAddressForm (standalone mode)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    localStorageMock.getSaveBillingAddressToAddressBook.mockReturnValue(false)
+    saveAddressesMock.mockResolvedValue(undefined)
+  })
+
+  it("renders without an AddressesContext provider (standalone detection)", () => {
+    renderStandalone()
+    expect(screen.getByTestId("form")).toBeDefined()
+  })
+
+  it("wraps children in its own AddressesContext.Provider with saveAddresses", async () => {
+    let ctxRef: { saveAddresses?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => {
+      expect(typeof ctxRef?.saveAddresses).toBe("function")
+    })
+  })
+
+  it("exposes isBusiness prop via AddressesContext in standalone mode", async () => {
+    let ctxRef: { isBusiness?: boolean } | undefined
+
+    function IsBizProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ props: { isBusiness: true }, children: <IsBizProbe /> })
+
+    await waitFor(() => {
+      expect(ctxRef?.isBusiness).toBe(true)
+    })
+  })
+
+  it("exposes shipToDifferentAddress prop via AddressesContext in standalone mode", async () => {
+    let ctxRef: { shipToDifferentAddress?: boolean } | undefined
+
+    function ShipProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ props: { shipToDifferentAddress: true }, children: <ShipProbe /> })
+
+    await waitFor(() => {
+      expect(ctxRef?.shipToDifferentAddress).toBe(true)
+    })
+  })
+
+  it("standaloneSetAddress dispatches to own reducer", async () => {
+    let ctxRef: { setAddress?: unknown; billing_address?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => expect(ctxRef?.setAddress).toBeDefined())
+
+    act(() => {
+      ;(ctxRef as any)?.setAddress?.({
+        resource: "billing_address",
+        values: { first_name: "Alice" },
+      })
+    })
+
+    await waitFor(() => {
+      expect((ctxRef as any)?.billing_address?.first_name).toBe("Alice")
+    })
+  })
+
+  it("standaloneSetAddressErrors dispatches to own reducer", async () => {
+    let ctxRef: { setAddressErrors?: unknown; errors?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => expect(ctxRef?.setAddressErrors).toBeDefined())
+
+    act(() => {
+      ;(ctxRef as any)?.setAddressErrors?.(
+        [{ code: "REQUIRED", message: "Required", resource: "billing_address", field: "first_name" }],
+        "billing_address"
+      )
+    })
+
+    await waitFor(() => {
+      const errors = (ctxRef as any)?.errors
+      expect(errors).toBeDefined()
+    })
+  })
+
+  it("propagates form values to own standalone state via setAddress", async () => {
+    let ctxRef: { billing_address?: Record<string, unknown> } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({
+      values: {
+        billing_address_first_name: { value: "Bob", required: true },
+      },
+      children: <AddressCtxProbe />,
+    })
+
+    await waitFor(() => {
+      expect(ctxRef?.billing_address?.first_name).toBe("Bob")
+    })
+  })
+
+  it("calls saveAddresses (AddressReducer) when standaloneSaveAddresses is invoked", async () => {
+    let ctxRef: { saveAddresses?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => expect(ctxRef?.saveAddresses).toBeDefined())
+
+    await act(async () => {
+      await (ctxRef as any)?.saveAddresses?.()
+    })
+
+    expect(saveAddressesMock).toHaveBeenCalled()
+  })
+
+  it("also provides BillingAddressFormContext in standalone mode", async () => {
+    let formCtxRef: { errorClassName?: string } | undefined
+
+    function FormCtxProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      formCtxRef = ctx as typeof formCtxRef
+      return <div />
+    }
+
+    renderStandalone({ props: { errorClassName: "err" }, children: <FormCtxProbe /> })
+
+    await waitFor(() => {
+      expect(formCtxRef?.errorClassName).toBe("err")
     })
   })
 })
