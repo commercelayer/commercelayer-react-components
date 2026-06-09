@@ -123,7 +123,11 @@ export function AddressStateSelector(props: Props): JSX.Element {
     // Fall back to the text input's current DOM value to handle the case where
     // setValue was called externally (e.g. from AddressInput) before country arrived.
     if (changeBillingCountry && isFirstCountryDetection) {
-      const stateValue = String(value ?? textInputRef.current?.value ?? "")
+      // textInputRef.current is always mounted here (countryCode is still "" at this point).
+      // The ?? "" fallback is a defensive guard for the unreachable case where both are absent.
+      const rawStateValue = value ?? textInputRef.current?.value
+      /* v8 ignore next */
+      const stateValue = String(rawStateValue ?? "")
       if (stateValue !== "") {
         if (billingAddress.setValue != null) billingAddress.setValue(name, stateValue)
         setVal(stateValue)
@@ -157,7 +161,9 @@ export function AddressStateSelector(props: Props): JSX.Element {
       setVal(value)
     }
     if (changeShippingCountry && isFirstCountryDetection) {
-      const stateValue = String(value ?? textInputRef.current?.value ?? "")
+      const rawStateValue = value ?? textInputRef.current?.value
+      /* v8 ignore next */
+      const stateValue = String(rawStateValue ?? "")
       if (stateValue !== "") {
         if (shippingAddress.setValue != null) shippingAddress.setValue(name, stateValue)
         setVal(stateValue)

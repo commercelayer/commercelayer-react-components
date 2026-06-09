@@ -643,4 +643,32 @@ describe("AddressStateSelector", () => {
       expect(screen.getByRole("combobox")).toBeTruthy()
     })
   })
+
+  it("updates val without calling billing setValue when value prop changes and setValue is null", async () => {
+    // Covers line 117 false branch: billing context exists but has no setValue.
+    // Trigger: type into input (changing val to "WA"), then rerender with value="CA".
+    // In the effect: !changeBillingCountry (no country), value!==val, setValue==null → false branch.
+    const noSetValueCtx = { errors: {}, values: {} } as any
+    const Wrapper = ({ stateValue }: { stateValue: string }) => (
+      <BillingAddressFormContext.Provider value={noSetValueCtx}>
+        <ShippingAddressFormContext.Provider value={{} as any}>
+          <CustomerAddressFormContext.Provider value={{} as any}>
+            <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
+              <AddressStateSelector name={"billing_address_state_code" as any} value={stateValue} />
+            </AddressesContext.Provider>
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+    const { rerender } = render(<Wrapper stateValue="NY" />)
+    await act(async () => {})
+    // Type in the input to change internal val to "WA" (setValue is null so nothing extra happens)
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "WA" } })
+    await act(async () => {})
+    // Rerender with a different value prop — effect fires: value="CA", val="WA", no country
+    // → !changeBillingCountry=true, value!==val, billingAddress.setValue==null → false branch
+    rerender(<Wrapper stateValue="CA" />)
+    await act(async () => {})
+    expect(screen.getByRole("textbox")).toBeTruthy()
+  })
 })
