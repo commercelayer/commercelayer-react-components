@@ -1,6 +1,8 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { SaveAddressesButton } from "#components/addresses/SaveAddressesButton"
 import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
+import BillingAddressFormContext from "#context/BillingAddressFormContext"
+import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 import CustomerContext, { defaultCustomerContext } from "#context/CustomerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 
@@ -261,5 +263,126 @@ describe("SaveAddressesButton", () => {
     fireEvent.click(screen.getByRole("button"))
     await new Promise((r) => setTimeout(r, 50))
     expect(mockSaveAddresses).not.toHaveBeenCalled()
+  })
+})
+
+describe("SaveAddressesButton (errorMode='submit')", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockSaveAddresses.mockResolvedValue({ success: true, order: { id: "ord-1" } })
+  })
+
+  function renderButtonWithFormCtx(
+    billingCtxOverrides: Record<string, unknown> = {},
+    shippingCtxOverrides: Record<string, unknown> = {}
+  ) {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const addressCtx = {
+      ...defaultAddressContext,
+      errors: [],
+      billing_address: {
+        first_name: { value: "John" },
+        last_name: { value: "Doe" },
+        line_1: { value: "123 Main St" },
+        city: { value: "NYC" },
+        country_code: { value: "US" },
+        zip_code: { value: "10001" },
+        state_code: { value: "NY" },
+        phone: { value: "+1234567890" },
+      },
+      shipping_address: {},
+      shipToDifferentAddress: false,
+      billingAddressId: "addr-1",
+      shippingAddressId: undefined,
+      invertAddresses: false,
+      saveAddresses: mockSaveAddresses,
+    } as any
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const orderCtx = {
+      ...defaultOrderContext,
+      setOrderErrors: mockSetOrderErrors,
+      order: { id: "ord-1", customer_email: "test@example.com", requires_billing_info: false },
+    } as any
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const customerCtx = {
+      ...defaultCustomerContext,
+      isGuest: false,
+      customerEmail: "test@example.com",
+      addresses: [],
+    } as any
+
+    return render(
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      <BillingAddressFormContext.Provider value={{ errorMode: "submit", validate: vi.fn().mockReturnValue({}), ...billingCtxOverrides } as any}>
+        {/* biome-ignore lint/suspicious/noExplicitAny: test cast */}
+        <ShippingAddressFormContext.Provider value={{ errorMode: "inline", ...shippingCtxOverrides } as any}>
+          <OrderContext.Provider value={orderCtx}>
+            <AddressesContext.Provider value={addressCtx}>
+              <CustomerContext.Provider value={customerCtx}>
+                <SaveAddressesButton />
+              </CustomerContext.Provider>
+            </AddressesContext.Provider>
+          </OrderContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+  }
+
+  it("calls billing validate() when errorMode='submit' and proceeds when valid", async () => {
+    const mockValidate = vi.fn().mockReturnValue({})
+    renderButtonWithFormCtx({ errorMode: "submit", validate: mockValidate })
+
+    fireEvent.click(screen.getByRole("button"))
+
+    await waitFor(() => {
+      expect(mockValidate).toHaveBeenCalled()
+      expect(mockSaveAddresses).toHaveBeenCalled()
+    })
+  })
+
+  it("blocks save when billing validate() returns errors", async () => {
+    const mockValidate = vi.fn().mockReturnValue({
+      billing_address_first_name: { code: "VALIDATION_ERROR", message: "Required", error: true },
+    })
+    renderButtonWithFormCtx({ errorMode: "submit", validate: mockValidate })
+
+    fireEvent.click(screen.getByRole("button"))
+    await act(async () => {})
+
+    expect(mockValidate).toHaveBeenCalled()
+    expect(mockSaveAddresses).not.toHaveBeenCalled()
+  })
+
+  it("calls shipping validate() when shipping errorMode='submit' and blocks if errors", async () => {
+    const mockBillingValidate = vi.fn().mockReturnValue({})
+    const mockShippingValidate = vi.fn().mockReturnValue({
+      shipping_address_first_name: { code: "VALIDATION_ERROR", message: "Required", error: true },
+    })
+    renderButtonWithFormCtx(
+      { errorMode: "inline" },
+      { errorMode: "submit", validate: mockShippingValidate }
+    )
+
+    fireEvent.click(screen.getByRole("button"))
+    await act(async () => {})
+
+    expect(mockShippingValidate).toHaveBeenCalled()
+    expect(mockBillingValidate).not.toHaveBeenCalled()
+    expect(mockSaveAddresses).not.toHaveBeenCalled()
+  })
+
+  it("skips validate() when both forms use errorMode='inline'", async () => {
+    const mockValidate = vi.fn().mockReturnValue({})
+    renderButtonWithFormCtx(
+      { errorMode: "inline", validate: mockValidate },
+      { errorMode: "inline", validate: mockValidate }
+    )
+
+    fireEvent.click(screen.getByRole("button"))
+
+    await waitFor(() => {
+      expect(mockSaveAddresses).toHaveBeenCalled()
+    })
+    expect(mockValidate).not.toHaveBeenCalled()
   })
 })

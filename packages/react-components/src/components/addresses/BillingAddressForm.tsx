@@ -1,6 +1,7 @@
 import { type JSX, type ReactNode, useContext } from "react"
 import AddressesContext from "#context/AddressContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
+import type { ErrorMode } from "#context/BillingAddressFormContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import type { CustomFieldMessageError } from "#reducers/AddressReducer"
@@ -24,6 +25,13 @@ type Props = {
    * Used in standalone mode (without `<AddressesContainer>`).
    */
   shipToDifferentAddress?: boolean
+  /**
+   * Controls when validation errors are displayed.
+   * - `"inline"` (default): errors appear as the user types each field.
+   * - `"submit"`: errors appear only after the user clicks Save (via `SaveAddressesButton`).
+   *   After the first Save attempt, errors update live as the user corrects them.
+   */
+  errorMode?: ErrorMode
 } & Omit<JSX.IntrinsicElements["form"], "onSubmit">
 
 export function BillingAddressForm(props: Props): JSX.Element {
@@ -33,6 +41,7 @@ export function BillingAddressForm(props: Props): JSX.Element {
     autoComplete = "on",
     reset = false,
     customFieldMessageError,
+    errorMode = "inline",
     isBusiness: isBusiness_prop = false,
     shipToDifferentAddress: shipToDifferentAddress_prop = false,
     ...p
@@ -74,12 +83,13 @@ export function BillingAddressForm(props: Props): JSX.Element {
     ? standalone.standaloneSetAddressErrors
     : parentAddressContext.setAddressErrors
 
-  const { formValues, errors, setFormRef, setValue, resetField } = useAddressFormFields({
+  const { formValues, errors, setFormRef, setValue, resetField, validate } = useAddressFormFields({
     resource: "billing_address",
     isBusiness,
     shouldSync: true,
     customFieldMessageError,
     reset,
+    errorMode,
     saveAddressToCustomerAddressBook,
     getSaveToAddressBook: getSaveBillingAddressToAddressBook,
     setAddress,
@@ -113,6 +123,8 @@ export function BillingAddressForm(props: Props): JSX.Element {
     requiresBillingInfo: order?.requires_billing_info ?? false,
     errors,
     resetField,
+    errorMode,
+    validate,
   }
 
   const formContent = (

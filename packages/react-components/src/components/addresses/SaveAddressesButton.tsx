@@ -2,6 +2,8 @@ import type { Order } from "@commercelayer/sdk"
 import { type JSX, type ReactNode, useContext, useState } from "react"
 import Parent from "#components/utils/Parent"
 import AddressContext from "#context/AddressContext"
+import BillingAddressFormContext from "#context/BillingAddressFormContext"
+import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import type { TCustomerAddress } from "#typings/customers"
@@ -53,6 +55,8 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     isGuest,
     createCustomerAddress,
   } = useContext(CustomerContext)
+  const billingFormCtx = useContext(BillingAddressFormContext)
+  const shippingFormCtx = useContext(ShippingAddressFormContext)
   const [forceDisable, setForceDisable] = useState(disabled)
   let customerEmail = !!(
     !!(isGuest === true || typeof isGuest === "undefined") && !order?.customer_email
@@ -94,6 +98,15 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     disabled || customerEmail || billingDisable || invertAddressesDisable || countryLockDisable
 
   const handleClick = async (): Promise<void> => {
+    // When errorMode="submit", trigger validation on both forms before proceeding.
+    // validate() sets errors in context and returns them synchronously.
+    if (billingFormCtx.errorMode === "submit" || shippingFormCtx.errorMode === "submit") {
+      const billingErrors =
+        billingFormCtx.errorMode === "submit" ? (billingFormCtx.validate?.() ?? {}) : {}
+      const shippingErrors =
+        shippingFormCtx.errorMode === "submit" ? (shippingFormCtx.validate?.() ?? {}) : {}
+      if (Object.keys(billingErrors).length > 0 || Object.keys(shippingErrors).length > 0) return
+    }
     /* v8 ignore next */
     // biome-ignore lint/style/noNonNullAssertion: errors is always defined when handleClick is reachable
     if (Object.keys(errors!).length === 0) {

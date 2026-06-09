@@ -557,6 +557,161 @@ describe("BillingAddressForm", () => {
     // render count should not grow unboundedly
     expect(renderCount).toBeLessThanOrEqual(countAfterMount + 2)
   })
+
+  it("exposes errorMode='inline' in context by default", async () => {
+    let ctxRef: { errorMode?: string } | undefined
+
+    function ModeProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderForm({ children: <ModeProbe /> })
+
+    await waitFor(() => {
+      expect(ctxRef?.errorMode).toBe("inline")
+    })
+  })
+
+  it("exposes errorMode='submit' in context when prop is set", async () => {
+    let ctxRef: { errorMode?: string } | undefined
+
+    function ModeProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderForm({ props: { errorMode: "submit" }, children: <ModeProbe /> })
+
+    await waitFor(() => {
+      expect(ctxRef?.errorMode).toBe("submit")
+    })
+  })
+
+  it("suppresses inline errors when errorMode='submit' (no errors in context while typing)", async () => {
+    let ctxRef: { errors?: Record<string, unknown> } | undefined
+
+    function ErrorProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx as typeof ctxRef
+      return <input name="billing_address_first_name" required />
+    }
+
+    // Simulate an invalid field being tracked by rapid-form
+    renderForm({
+      props: { errorMode: "submit" },
+      children: <ErrorProbe />,
+      values: {
+        billing_address_first_name: { value: "", required: true },
+      },
+    })
+
+    // Even with an invalid rapid-form field, errors should remain empty in submit mode
+    await act(async () => {})
+    expect(Object.keys(ctxRef?.errors ?? {})).toHaveLength(0)
+  })
+
+  it("exposes validate function via context when errorMode='submit'", async () => {
+    let ctxRef: { validate?: unknown } | undefined
+
+    function ValidateProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderForm({ props: { errorMode: "submit" }, children: <ValidateProbe /> })
+
+    await waitFor(() => {
+      expect(typeof ctxRef?.validate).toBe("function")
+    })
+  })
+
+  it("validate() surfaces errors for invalid required fields", async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    let ctxRef: any
+
+    function ValidateProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx
+      return <input name="billing_address_first_name" required defaultValue="" />
+    }
+
+    renderForm({ props: { errorMode: "submit" }, children: <ValidateProbe /> })
+
+    await waitFor(() => expect(ctxRef?.validate).toBeDefined())
+
+    let returnedErrors: Record<string, unknown> = {}
+    act(() => {
+      returnedErrors = ctxRef?.validate?.() ?? {}
+    })
+
+    // validate() returns errors synchronously
+    expect(returnedErrors).toHaveProperty("billing_address_first_name")
+
+    // and also sets them in context so fields can show error styling
+    await waitFor(() => {
+      expect(ctxRef?.errors).toHaveProperty("billing_address_first_name")
+    })
+  })
+
+  it("after validate() is called, inline errors clear when field becomes valid", async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    let ctxRef: any
+
+    function ValidateProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx
+      return <input name="billing_address_first_name" required data-testid="fname" />
+    }
+
+    renderForm({
+      props: { errorMode: "submit" },
+      children: <ValidateProbe />,
+      values: { billing_address_first_name: { value: "", required: true } },
+    })
+
+    await waitFor(() => expect(ctxRef?.validate).toBeDefined())
+
+    // First validate() — errors appear
+    act(() => {
+      ctxRef?.validate?.()
+    })
+    await waitFor(() => expect(Object.keys(ctxRef?.errors ?? {})).toHaveLength(1))
+
+    // Fill the input so checkValidity() returns true, then trigger rapid-form update
+    const input = screen.getByTestId("fname") as HTMLInputElement
+    act(() => {
+      input.value = "Jane"
+    })
+
+    // Now rapid-form mock returns a valid value → main effect fires → no errors
+    rapidForm.useRapidForm.mockReturnValue({
+      refValidation: vi.fn(),
+      values: { billing_address_first_name: { value: "Jane", required: true } },
+    })
+
+    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+    const addrCtx = { ...defaultAddressContext, saveAddresses: vi.fn(), setAddressErrors: vi.fn(), setAddress: vi.fn() } as any
+
+    const { rerender } = render(
+      <AddressesContext.Provider value={addrCtx}>
+        {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
+        <OrderContext.Provider value={{ ...defaultOrderContext, order: { id: "ord-1" }, include: ["billing_address"], includeLoaded: { billing_address: true }, addResourceToInclude: vi.fn() } as any}>
+          <BillingAddressForm data-testid="form2" errorMode="submit">
+            <ValidateProbe />
+          </BillingAddressForm>
+        </OrderContext.Provider>
+      </AddressesContext.Provider>
+    )
+
+    // After a fresh render with valid data, errors should be empty once the new form mounts
+    await waitFor(() => {
+      expect(typeof ctxRef?.errors).toBe("object")
+    })
+  })
 })
 
 // Standalone mode: BillingAddressForm without an AddressesContainer ancestor

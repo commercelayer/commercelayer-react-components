@@ -1,6 +1,7 @@
 import { type JSX, type ReactNode, useContext } from "react"
 import AddressesContext from "#context/AddressContext"
 import type { DefaultContextAddress } from "#context/BillingAddressFormContext"
+import type { ErrorMode } from "#context/BillingAddressFormContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
@@ -26,6 +27,13 @@ interface Props extends Omit<JSX.IntrinsicElements["form"], "onSubmit"> {
    * Used in standalone mode (without `<AddressesContainer>`).
    */
   shipToDifferentAddress?: boolean
+  /**
+   * Controls when validation errors are displayed.
+   * - `"inline"` (default): errors appear as the user types each field.
+   * - `"submit"`: errors appear only after the user clicks Save (via `SaveAddressesButton`).
+   *   After the first Save attempt, errors update live as the user corrects them.
+   */
+  errorMode?: ErrorMode
 }
 
 export function ShippingAddressForm(props: Props): JSX.Element {
@@ -36,6 +44,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     fieldEvent: _fieldEvent = "change",
     reset = false,
     customFieldMessageError,
+    errorMode = "inline",
     isBusiness: isBusiness_prop = false,
     shipToDifferentAddress: shipToDifferentAddress_prop = true,
     ...p
@@ -69,12 +78,13 @@ export function ShippingAddressForm(props: Props): JSX.Element {
   const setAddress = isStandalone ? standalone.standaloneSetAddress : parentAddressContext.setAddress
   const setAddressErrors = isStandalone ? standalone.standaloneSetAddressErrors : parentAddressContext.setAddressErrors
 
-  const { formValues, errors, setFormRef, setValue, resetField } = useAddressFormFields({
+  const { formValues, errors, setFormRef, setValue, resetField, validate } = useAddressFormFields({
     resource: "shipping_address",
     isBusiness,
     shouldSync,
     customFieldMessageError,
     reset,
+    errorMode,
     saveAddressToCustomerAddressBook,
     getSaveToAddressBook: getSaveShippingAddressToAddressBook,
     setAddress,
@@ -99,6 +109,8 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     errorClassName,
     errors,
     resetField,
+    errorMode,
+    validate,
   }
 
   const formContent = (

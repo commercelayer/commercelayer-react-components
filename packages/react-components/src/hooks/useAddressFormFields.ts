@@ -13,6 +13,7 @@ import type {
 } from "#reducers/OrderReducer"
 import type { TCustomerAddress } from "#typings/customers"
 import type { BaseError, CodeErrorType } from "#typings/errors"
+import type { ErrorMode } from "#context/BillingAddressFormContext"
 import { type FormErrors, type FormValue, getFormElement } from "#utils/addressFormUtils"
 
 interface UseAddressFormFieldsParams {
@@ -31,6 +32,7 @@ interface UseAddressFormFieldsParams {
   include?: ResourceIncluded[]
   addResourceToInclude: (params: AddResourceToInclude) => void
   includeLoaded?: Partial<Record<ResourceIncluded, boolean>>
+  errorMode?: ErrorMode
 }
 
 export function useAddressFormFields({
@@ -46,10 +48,12 @@ export function useAddressFormFields({
   include,
   addResourceToInclude,
   includeLoaded,
+  errorMode = "inline",
 }: UseAddressFormFieldsParams) {
   const { refValidation, values } = useRapidForm()
   const formValues = values as Record<string, FormValue>
   const [errors, setErrors] = useState<FormErrors>({})
+  const [hasValidated, setHasValidated] = useState(false)
   const formRef = useRef<HTMLFormElement | null>(null)
   const prefix = `${resource}_`
   const checkboxFieldName = `${resource}_save_to_customer_book`
@@ -142,7 +146,13 @@ export function useAddressFormFields({
       finalErrors = updatedErrors
     }
 
-    setErrors(finalErrors)
+    // In submit mode, suppress inline error display until the user has
+    // explicitly triggered validation (e.g., by clicking Save).
+    // After the first validate() call (hasValidated=true), errors update
+    // live so the user can see corrections in real time.
+    if (errorMode === "inline" || hasValidated) {
+      setErrors(finalErrors)
+    }
 
     if (!shouldSync) return
 
@@ -208,6 +218,8 @@ export function useAddressFormFields({
     setAddressErrors,
     resource,
     prefix,
+    errorMode,
+    hasValidated,
   ])
 
   useEffect(() => {
@@ -300,5 +312,30 @@ export function useAddressFormFields({
     [clearFieldError]
   )
 
-  return { formValues, errors, formRef, setFormRef, setValue, resetField }
+  // Validates all form fields and returns any errors found.
+  // In submit mode, this must be called before saving to surface errors.
+  // After the first call, hasValidated becomes true and errors update inline.
+  const validate = useCallback((): FormErrors => {
+    const form = formRef.current
+    if (!form) return {}
+
+    const newErrors: FormErrors = {}
+    for (const el of Array.from(form.elements)) {
+      const input = el as HTMLInputElement
+      if (!input.name?.startsWith(prefix) || input.type === "checkbox") continue
+      if (!input.checkValidity()) {
+        newErrors[input.name] = {
+          code: "VALIDATION_ERROR",
+          message: input.validationMessage,
+          error: true,
+        }
+      }
+    }
+
+    setHasValidated(true)
+    setErrors(newErrors)
+    return newErrors
+  }, [prefix])
+
+  return { formValues, errors, formRef, setFormRef, setValue, resetField, validate }
 }
