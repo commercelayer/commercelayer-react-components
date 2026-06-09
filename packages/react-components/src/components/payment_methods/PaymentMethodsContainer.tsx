@@ -43,9 +43,6 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     key: "order",
   })
   const credentials = useContext(CommerceLayerContext)
-  async function getPayMethods(): Promise<void> {
-    order && (await getPaymentMethods({ order, dispatch }))
-  }
   useEffect(() => {
     if (!include?.includes("available_payment_methods")) {
       addResourceToInclude({
@@ -70,7 +67,7 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     }
     if (config && isEmpty(state.config)) setPaymentMethodConfig(config, dispatch)
     if (credentials && order && !state.paymentMethods) {
-      getPayMethods()
+      getPaymentMethods({ order, dispatch })
     }
     if (order?.payment_source === null) {
       // Reset save customer payment source to wallet param if the payment source is null
@@ -91,7 +88,7 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
       getOrder(order.id)
     }
   // biome-ignore lint/correctness/useExhaustiveDependencies: pre-existing dependency list, refactoring would risk regressions
-  }, [order, credentials, getOrder, addResourceToInclude, include?.includes, state.paymentMethods, state.config, includeLoaded?.available_payment_methods, getPayMethods, config])
+  }, [order, credentials, getOrder, addResourceToInclude, include?.includes, state.paymentMethods, state.config, includeLoaded?.available_payment_methods, config])
   const contextValue = useMemo(() => {
     return {
       ...state,
