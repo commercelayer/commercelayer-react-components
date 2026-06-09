@@ -15,6 +15,8 @@ import {
 } from "#reducers/PaymentMethodReducer"
 
 type DefaultContext = {
+  /** Set by `<PaymentMethodsContainer>` (or the standalone hook) to signal the context is provided. */
+  _isProvided?: true
   setPaymentMethodErrors: SetPaymentMethodErrors
   setPaymentMethod: typeof setPaymentMethod
   setPaymentSource: typeof setPaymentSource

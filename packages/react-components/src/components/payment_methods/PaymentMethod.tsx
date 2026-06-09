@@ -5,7 +5,8 @@ import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
-import type { PaymentResource } from "#reducers/PaymentMethodReducer"
+import type { PaymentMethodConfig, PaymentResource } from "#reducers/PaymentMethodReducer"
+import { usePaymentMethod } from "#hooks/usePaymentMethod"
 import type { LoaderType } from "#typings"
 import type { DefaultChildrenType } from "#typings/globals"
 import { getAvailableExpressPayments } from "#utils/expressPaymentHelper"
@@ -15,7 +16,6 @@ import {
   getExternalPaymentAttributes,
   getPaypalAttributes,
 } from "#utils/getPaymentAttributes"
-import useCustomContext from "#utils/hooks/useCustomContext"
 import { isEmpty } from "#utils/isEmpty"
 import { sortPaymentMethods } from "#utils/payment-methods/sortPaymentMethods"
 
@@ -56,6 +56,11 @@ type Props = {
    * Sort payment methods by an array of strings
    */
   sortBy?: Array<PaymentMethodType["payment_source_type"]>
+  /**
+   * Payment method configuration (gateway keys, options, etc.).
+   * Required in standalone mode (when used without `<PaymentMethodsContainer>`).
+   */
+  config?: PaymentMethodConfig
 } & Omit<JSX.IntrinsicElements["div"], "onClick" | "children"> &
   (
     | {
@@ -82,11 +87,21 @@ export function PaymentMethod({
   hide,
   onClick,
   sortBy,
+  config: configProp,
   ...p
 }: Props): JSX.Element {
   const [loading, setLoading] = useState(true)
   const [paymentSelected, setPaymentSelected] = useState("")
   const [paymentSourceCreated, setPaymentSourceCreated] = useState(false)
+
+  // Detect standalone mode: no <PaymentMethodsContainer> parent has set _isProvided.
+  const parentCtx = useContext(PaymentMethodContext)
+  const isStandalone = parentCtx._isProvided !== true
+
+  // Always call the hook (Rules of Hooks). When not standalone, effects are
+  // guarded internally and the returned value is not used.
+  const standaloneCtx = usePaymentMethod({ isStandalone, config: configProp })
+
   const {
     paymentMethods,
     currentPaymentMethodId,
@@ -96,12 +111,7 @@ export function PaymentMethod({
     setPaymentSource,
     config,
     errors,
-  } = useCustomContext({
-    context: PaymentMethodContext,
-    contextComponentName: "PaymentMethodsContainer",
-    currentComponentName: "PaymentMethod",
-    key: "paymentMethods",
-  })
+  } = isStandalone ? standaloneCtx : parentCtx
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
   const { status } = useContext(PlaceOrderContext)
@@ -315,7 +325,19 @@ export function PaymentMethod({
         </div>
       )
     })
-  return !loading ? <>{components}</> : getLoaderComponent(loader)
+  const content = !loading ? <>{components}</> : getLoaderComponent(loader)
+
+  // In standalone mode provide the context so that child components
+  // (PaymentSource, PaymentGateway, etc.) can read payment state without
+  // a surrounding <PaymentMethodsContainer>.
+  if (isStandalone) {
+    return (
+      <PaymentMethodContext.Provider value={standaloneCtx}>
+        {content}
+      </PaymentMethodContext.Provider>
+    )
+  }
+  return content
 }
 
 export default PaymentMethod
