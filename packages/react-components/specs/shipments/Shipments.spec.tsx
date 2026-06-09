@@ -489,4 +489,41 @@ describe("Shipments component", () => {
       expect.objectContaining({ code: "CUSTOM_ERROR" }),
     ])
   })
+
+  it("provides a stable setShippingMethod reference across renders (does not change on re-render)", async () => {
+    // Regression test: setShippingMethod was recreated on every Shipments render.
+    // Shipment.tsx has setShippingMethod in its useEffect deps, so an unstable
+    // reference caused the effect to re-run on every render → infinite loop.
+    const references = new Set<unknown>()
+    // Use a stable getOrder mock — a new vi.fn() on every render would incorrectly
+    // invalidate the useCallback that wraps setShippingMethod.
+    const stableGetOrder = vi.fn().mockResolvedValue(MOCK_ORDER_PENDING)
+
+    function Consumer() {
+      const { setShippingMethod } = useContext(ShipmentContext)
+      references.add(setShippingMethod)
+      return null
+    }
+
+    const { rerender } = render(
+      <Providers getOrder={stableGetOrder}>
+        <Shipments>
+          <Consumer />
+        </Shipments>
+      </Providers>
+    )
+
+    await act(async () => {
+      rerender(
+        <Providers getOrder={stableGetOrder}>
+          <Shipments>
+            <Consumer />
+          </Shipments>
+        </Providers>
+      )
+    })
+
+    // setShippingMethod should be the same reference across renders
+    expect(references.size).toBe(1)
+  })
 })

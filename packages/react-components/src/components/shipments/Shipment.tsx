@@ -46,11 +46,10 @@ export function Shipment({
         setLoading(false)
       }
     }
-    return () => {
-      setLoading(true)
-    }
+    // No cleanup: resetting setLoading(true) on every dep change caused an
+    // unnecessary extra re-render that contributed to infinite update loops.
     // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
-  }, [shipments?.length, setShippingMethod, shipments, autoSelectSingleShippingMethod])
+  }, [shipments, setShippingMethod, autoSelectSingleShippingMethod])
   const components = shipments?.map((shipment, k) => {
     const shipmentLineItems = shipment.stock_line_items
     const lineItems = shipmentLineItems?.map((shipmentLineItem) => {
