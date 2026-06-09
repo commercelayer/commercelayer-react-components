@@ -424,6 +424,41 @@ describe("Shipments component", () => {
     expect(result).toEqual({ success: false })
   })
 
+  it("does not cause infinite re-renders when useShipments returns a new array reference on every call", async () => {
+    // Regression test for "Maximum update depth exceeded".
+    // When useShipments returns a new shipments array reference on every render (unstable identity),
+    // the old cleanup setErrors([]) + setErrors(nextErrors) on every effect run caused an infinite loop.
+    // The fix: remove the cleanup and use a functional updater that bails out when errors are unchanged.
+    let callCount = 0
+    mockUseShipments.mockImplementation(() => {
+      callCount++
+      return {
+        ...defaultHookReturn(),
+        // New array reference on every call — simulates unstable hook return
+        shipments: [...MOCK_SHIPMENTS],
+      }
+    })
+
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {})
+
+    await act(async () => {
+      render(
+        <Providers>
+          <Shipments>
+            <span data-testid="child">content</span>
+          </Shipments>
+        </Providers>
+      )
+    })
+
+    const errorCalls = consoleError.mock.calls.map((c) => String(c[0]))
+    expect(errorCalls.some((msg) => msg.includes("Maximum update depth exceeded"))).toBe(false)
+    // Component should stabilise after 1-3 renders — well under the 50-render React limit
+    expect(callCount).toBeLessThan(10)
+    expect(screen.getByTestId("child")).toBeDefined()
+    consoleError.mockRestore()
+  })
+
   it("setShipmentErrors updates the errors in context", async () => {
     let capturedCtx: { errors: unknown; setShipmentErrors: ((...args: unknown[]) => void) | undefined } = {
       errors: null,

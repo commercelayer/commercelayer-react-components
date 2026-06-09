@@ -72,11 +72,19 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
       }
     }
 
-    setErrors(nextErrors)
-
-    return () => {
-      setErrors([])
-    }
+    // Use functional updater to bail out when errors haven't changed,
+    // preventing re-render loops when shipments/order return new references.
+    setErrors((prev) => {
+      if (
+        prev.length === nextErrors.length &&
+        prev.every((e, i) => e.code === nextErrors[i]?.code)
+      ) {
+        return prev
+      }
+      return nextErrors
+    })
+    // No cleanup: errors are always recomputed from current deps.
+    // The old cleanup setErrors([]) caused an unnecessary extra re-render.
   }, [shipments, order])
 
   const setShippingMethod = async (
