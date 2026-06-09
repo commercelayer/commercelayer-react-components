@@ -1,5 +1,5 @@
 import type { Order, PaymentMethod as PaymentMethodType } from "@commercelayer/sdk"
-import { type JSX, type MouseEvent, useContext, useEffect, useState } from "react"
+import { type JSX, type MouseEvent, useContext, useEffect, useRef, useState } from "react"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
@@ -73,8 +73,6 @@ type Props = {
       }
   )
 
-let loadingResource = false
-
 export function PaymentMethod({
   children,
   className,
@@ -93,6 +91,7 @@ export function PaymentMethod({
   const [loading, setLoading] = useState(true)
   const [paymentSelected, setPaymentSelected] = useState("")
   const [paymentSourceCreated, setPaymentSourceCreated] = useState(false)
+  const loadingResourceRef = useRef(false)
 
   // Detect standalone mode: no <PaymentMethodsContainer> parent has set _isProvided.
   const parentCtx = useContext(PaymentMethodContext)
@@ -149,10 +148,10 @@ export function PaymentMethod({
     if (
       paymentMethods != null &&
       !paymentSourceCreated &&
-      !loadingResource &&
+      !loadingResourceRef.current &&
       !isEmpty(paymentMethods)
     ) {
-      loadingResource = true
+      loadingResourceRef.current = true
       if (autoSelectSinglePaymentMethod != null && !expressPayments) {
         const autoSelect = async (): Promise<void> => {
           const isSingle = paymentMethods.length === 1
