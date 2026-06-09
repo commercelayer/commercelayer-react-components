@@ -443,4 +443,204 @@ describe("AddressStateSelector", () => {
       expect(el.className).toContain("billing-select-error")
     })
   })
+
+  it("pre-fills shipping state via setValue when shipping country is first detected", async () => {
+    // Mirrors the billing pre-fill test but for shipping context (lines 162-163).
+    // When editing an existing shipping address, shipping country arrives from "" → "US"
+    // and the existing state_code must be pre-filled.
+    const shippingSetValue = vi.fn()
+    renderSelector(
+      { name: "shipping_address_state_code" as any, value: "TX" },
+      null, // no billing context
+      {
+        setValue: shippingSetValue,
+        errors: {},
+        values: { shipping_address_country_code: "US" } as any,
+      }
+    )
+    await waitFor(() => {
+      expect(shippingSetValue).toHaveBeenCalledWith("shipping_address_state_code", "TX")
+    })
+  })
+
+  it("calls shipping setValue on select dropdown change", async () => {
+    // Covers line 228 — the shippingAddress.setValue call inside BaseSelect onChange.
+    const shippingSetValue = vi.fn()
+    renderSelector(
+      { name: "shipping_address_state_code" as any },
+      null, // no billing context
+      {
+        setValue: shippingSetValue,
+        errors: {},
+        values: { shipping_address_country_code: "US" } as any,
+      }
+    )
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toBeTruthy()
+    })
+    fireEvent.change(screen.getByRole("combobox"), { target: { value: "TX" } })
+    expect(shippingSetValue).toHaveBeenCalledWith("shipping_address_state_code", "TX")
+  })
+
+  it("skips setValue when shipping country first detected but no state value available (stateValue='')", async () => {
+    // Covers line 161 false branch: changeShippingCountry && isFirstCountryDetection but stateValue=""
+    const shippingSetValue = vi.fn()
+    renderSelector(
+      { name: "shipping_address_state_code" as any }, // no value prop
+      null,
+      {
+        setValue: shippingSetValue,
+        errors: {},
+        values: { shipping_address_country_code: "US" } as any,
+      }
+    )
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toBeTruthy()
+    })
+    // setValue should NOT have been called since stateValue=""
+    expect(shippingSetValue).not.toHaveBeenCalled()
+  })
+
+  it("does not throw when shipping context has no resetField on country change with invalid state", async () => {
+    // Covers line 177 false branch: shippingAddress.resetField is undefined
+    const Wrapper = ({ country }: { country: string }) => {
+      const shippingCtx = {
+        setValue: vi.fn(),
+        // no resetField in context
+        errors: {},
+        values: { shipping_address_country_code: country },
+      } as any
+      return (
+        <BillingAddressFormContext.Provider value={{} as any}>
+          <ShippingAddressFormContext.Provider value={shippingCtx}>
+            <CustomerAddressFormContext.Provider value={{} as any}>
+              <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
+                <AddressStateSelector name={"billing_address_state_code" as any} />
+              </AddressesContext.Provider>
+            </CustomerAddressFormContext.Provider>
+          </ShippingAddressFormContext.Provider>
+        </BillingAddressFormContext.Provider>
+      )
+    }
+    const { rerender } = render(<Wrapper country="US" />)
+    await act(async () => {})
+    // Switch country — changeShippingCountry=true, !isFirstCountryDetection, invalid state
+    // resetField is undefined → the `if (shippingAddress.resetField)` guard must not throw
+    expect(() => {
+      rerender(<Wrapper country="CA" />)
+    }).not.toThrow()
+  })
+
+  it("does not throw when billing context has no resetField on country change with invalid state", async () => {
+    // Covers line 145 false branch: billingAddress.resetField is undefined
+    const Wrapper = ({ country }: { country: string }) => {
+      const billingCtx = {
+        setValue: vi.fn(),
+        // no resetField in context
+        errors: {},
+        values: { billing_address_country_code: country },
+      } as any
+      return (
+        <BillingAddressFormContext.Provider value={billingCtx}>
+          <ShippingAddressFormContext.Provider value={{} as any}>
+            <CustomerAddressFormContext.Provider value={{} as any}>
+              <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
+                <AddressStateSelector name={"billing_address_state_code" as any} />
+              </AddressesContext.Provider>
+            </CustomerAddressFormContext.Provider>
+          </ShippingAddressFormContext.Provider>
+        </BillingAddressFormContext.Provider>
+      )
+    }
+    const { rerender } = render(<Wrapper country="US" />)
+    await act(async () => {})
+    // Switch country — changeBillingCountry=true, !isFirstCountryDetection, invalid state
+    // resetField is undefined → the `if (billingAddress.resetField)` guard must not throw
+    expect(() => {
+      rerender(<Wrapper country="CA" />)
+    }).not.toThrow()
+  })
+
+  it("skips setValue when billing country first detected but no state value available (stateValue='')", async () => {
+    // Covers line 126 ?? '' final fallback: no value prop, no textInputRef value
+    const billingSetValue = vi.fn()
+    renderSelector(
+      { name: "billing_address_state_code" as any }, // no value prop
+      {
+        setValue: billingSetValue,
+        errors: {},
+        values: { billing_address_country_code: "US" } as any,
+      },
+      null
+    )
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toBeTruthy()
+    })
+    // No state pre-fill because stateValue=""
+    expect(billingSetValue).not.toHaveBeenCalled()
+  })
+
+  it("sets val without calling setValue when billing context has no setValue on first country detection", async () => {
+    // Covers line 128 false branch: billingAddress.setValue == null (no setValue in context)
+    const Wrapper = ({ country }: { country: string }) => {
+      // context has values (with country) but NO setValue function
+      const billingCtx = {
+        errors: {},
+        values: { billing_address_country_code: country },
+      } as any
+      return (
+        <BillingAddressFormContext.Provider value={billingCtx}>
+          <ShippingAddressFormContext.Provider value={{} as any}>
+            <CustomerAddressFormContext.Provider value={{} as any}>
+              <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
+                <AddressStateSelector
+                  name={"billing_address_state_code" as any}
+                  value="NY"
+                />
+              </AddressesContext.Provider>
+            </CustomerAddressFormContext.Provider>
+          </ShippingAddressFormContext.Provider>
+        </BillingAddressFormContext.Provider>
+      )
+    }
+    // Render with no country first so isFirstCountryDetection triggers
+    const { rerender } = render(<Wrapper country="" />)
+    await act(async () => {})
+    // Country arrives — no setValue available, but setVal still runs
+    rerender(<Wrapper country="US" />)
+    await waitFor(() => {
+      // Select shows (country arrived) — no error thrown
+      expect(screen.getByRole("combobox")).toBeTruthy()
+    })
+  })
+
+  it("sets val without calling shipping setValue when shipping context has no setValue on first country detection", async () => {
+    // Covers line 162 false branch: shippingAddress.setValue == null (no setValue in context)
+    const Wrapper = ({ country }: { country: string }) => {
+      const shippingCtx = {
+        errors: {},
+        values: { shipping_address_country_code: country },
+      } as any
+      return (
+        <BillingAddressFormContext.Provider value={{} as any}>
+          <ShippingAddressFormContext.Provider value={shippingCtx}>
+            <CustomerAddressFormContext.Provider value={{} as any}>
+              <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
+                <AddressStateSelector
+                  name={"shipping_address_state_code" as any}
+                  value="TX"
+                />
+              </AddressesContext.Provider>
+            </CustomerAddressFormContext.Provider>
+          </ShippingAddressFormContext.Provider>
+        </BillingAddressFormContext.Provider>
+      )
+    }
+    const { rerender } = render(<Wrapper country="" />)
+    await act(async () => {})
+    rerender(<Wrapper country="US" />)
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toBeTruthy()
+    })
+  })
 })

@@ -550,6 +550,24 @@ describe("ShippingAddressForm", () => {
       )
     })
   })
+
+  it("uses shipToDifferentAddress_prop as fallback when parentAddressContext.shipToDifferentAddress is undefined", async () => {
+    // Covers line 59: parentAddressContext.shipToDifferentAddress ?? shipToDifferentAddress_prop
+    // When the context value is undefined, the prop default (true) should be used.
+    const { setAddress } = renderForm({
+      addressOverrides: { shipToDifferentAddress: undefined },
+      values: {
+        shipping_address_first_name: { value: "Jane", required: true },
+      },
+    })
+
+    // shipToDifferentAddress_prop defaults to true → shouldSync=true → setAddress called
+    await waitFor(() => {
+      expect(setAddress).toHaveBeenCalledWith(
+        expect.objectContaining({ resource: "shipping_address" })
+      )
+    })
+  })
 })
 
 // Standalone mode: ShippingAddressForm without an AddressesContainer ancestor

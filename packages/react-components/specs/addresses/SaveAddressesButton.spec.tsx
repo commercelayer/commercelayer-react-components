@@ -385,4 +385,101 @@ describe("SaveAddressesButton (errorMode='submit')", () => {
     })
     expect(mockValidate).not.toHaveBeenCalled()
   })
+
+  it("proceeds when billing errorMode='submit' but validate is undefined (covers ?? {} branch)", async () => {
+    // Covers lines 105-107: billingFormCtx.validate?.() ?? {} — the undefined path
+    renderButtonWithFormCtx({ errorMode: "submit", validate: undefined })
+
+    fireEvent.click(screen.getByRole("button"))
+
+    // validate is undefined → ?? {} → no errors → save proceeds
+    await waitFor(() => {
+      expect(mockSaveAddresses).toHaveBeenCalled()
+    })
+  })
+
+  it("proceeds when shipping errorMode='submit' but validate is undefined (covers shipping ?? {} branch)", async () => {
+    // Covers line 107: shippingFormCtx.validate?.() ?? {} — the undefined path
+    renderButtonWithFormCtx(
+      { errorMode: "inline" },
+      { errorMode: "submit", validate: undefined }
+    )
+
+    fireEvent.click(screen.getByRole("button"))
+
+    // shipping validate is undefined → ?? {} → no errors → save proceeds
+    await waitFor(() => {
+      expect(mockSaveAddresses).toHaveBeenCalled()
+    })
+  })
+
+  it("blocks save when AddressContext has API errors even after submit validation passes", async () => {
+    // Covers line 112: if (Object.keys(errors!).length === 0) — the false branch.
+    // Use children function to bypass disabled-button check and call handleClick directly.
+    const mockValidate = vi.fn().mockReturnValue({})
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const addressCtx = {
+      errors: [{ code: "API_ERROR", resource: "billing_address", field: "line_1", message: "Invalid" }],
+      billing_address: {
+        first_name: { value: "John" },
+        last_name: { value: "Doe" },
+        line_1: { value: "123 Main St" },
+        city: { value: "NYC" },
+        country_code: { value: "US" },
+        zip_code: { value: "10001" },
+        state_code: { value: "NY" },
+        phone: { value: "+1234567890" },
+      },
+      shipping_address: {},
+      shipToDifferentAddress: false,
+      billingAddressId: "addr-1",
+      shippingAddressId: undefined,
+      invertAddresses: false,
+      saveAddresses: mockSaveAddresses,
+    } as any
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const orderCtx = {
+      ...defaultOrderContext,
+      setOrderErrors: mockSetOrderErrors,
+      order: { id: "ord-1", customer_email: "test@example.com", requires_billing_info: false },
+    } as any
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const customerCtx = {
+      ...defaultCustomerContext,
+      isGuest: false,
+      customerEmail: "test@example.com",
+      addresses: [],
+    } as any
+
+    render(
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      <BillingAddressFormContext.Provider value={{ errorMode: "submit", validate: mockValidate } as any}>
+        {/* biome-ignore lint/suspicious/noExplicitAny: test cast */}
+        <ShippingAddressFormContext.Provider value={{ errorMode: "inline" } as any}>
+          <OrderContext.Provider value={orderCtx}>
+            <AddressesContext.Provider value={addressCtx}>
+              <CustomerContext.Provider value={customerCtx}>
+                {/* Use children function to bypass disabled state and call handleClick directly */}
+                <SaveAddressesButton>
+                  {/* biome-ignore lint/suspicious/noExplicitAny: ChildrenFunction type */}
+                  {({ handleClick }: any) => (
+                    <button type="button" data-testid="inner-btn" onClick={() => handleClick()}>
+                      Save
+                    </button>
+                  )}
+                </SaveAddressesButton>
+              </CustomerContext.Provider>
+            </AddressesContext.Provider>
+          </OrderContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+
+    fireEvent.click(screen.getByTestId("inner-btn"))
+    await act(async () => {})
+
+    // validate() called (submit mode), passed (no form errors), but API errors block save
+    expect(mockValidate).toHaveBeenCalled()
+    expect(mockSaveAddresses).not.toHaveBeenCalled()
+  })
 })
