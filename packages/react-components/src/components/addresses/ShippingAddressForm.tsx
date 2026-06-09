@@ -85,8 +85,8 @@ export function ShippingAddressForm(props: Props): JSX.Element {
   })
 
   const reducerAddressValues = isStandalone
-    ? standalone.standaloneState.shipping_address?.values
-    : parentAddressContext.shipping_address?.values
+    ? (standalone.standaloneState["shipping_address"] as Record<string, unknown> | undefined)
+    : (parentAddressContext["shipping_address"] as Record<string, unknown> | undefined)
   const prefixedReducerValues = Object.fromEntries(
     Object.entries(reducerAddressValues ?? {})
       .filter(([, v]) => v != null && v !== "")

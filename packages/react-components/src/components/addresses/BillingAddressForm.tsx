@@ -95,8 +95,8 @@ export function BillingAddressForm(props: Props): JSX.Element {
   // billingAddress.values["billing_address_country_code"] to detect the country.
   // rapid-form only tracks required fields; the reducer captures everything.
   const reducerAddressValues = isStandalone
-    ? standalone.standaloneState.billing_address?.values
-    : parentAddressContext.billing_address?.values
+    ? (standalone.standaloneState["billing_address"] as Record<string, unknown> | undefined)
+    : (parentAddressContext["billing_address"] as Record<string, unknown> | undefined)
   const prefixedReducerValues = Object.fromEntries(
     Object.entries(reducerAddressValues ?? {})
       .filter(([, v]) => v != null && v !== "")
