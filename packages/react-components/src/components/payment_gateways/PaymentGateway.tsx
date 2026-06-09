@@ -138,21 +138,16 @@ export function PaymentGateway({
     ) {
       setLoading(false)
     }
-    return () => {
-      setLoading(true)
-    }
+    // No cleanup: setLoading(true) in cleanup caused unnecessary extra re-renders.
   }, [order?.payment_method?.id, show, paymentSource?.id, order?.status, paymentSource?.mismatched_amounts, paymentSource?.type, paymentSource, paymentResource, payment?.id, setPaymentSource, order?.payment_source?.id, order?.payment_source, order?.payment_method?.payment_source_type, order, getCustomerPaymentSources, paymentMethods?.length, paymentMethods, currentPaymentMethodId, expressPayments, errors?.length, errors, config])
 
   useEffect(() => {
     if (status === "placing") setLoading(true)
-    if (status === "standby" && loading) setLoading(false)
-    if (order && order.status === "placed" && loading) {
-      setLoading(false)
-    }
-    return () => {
-      setLoading(true)
-    }
-  }, [status, order?.status, order, loading])
+    if (status === "standby") setLoading(false)
+    if (order?.status === "placed") setLoading(false)
+    // No cleanup: setLoading(true) in cleanup + loading in deps caused an infinite
+    // toggle loop (setLoading(false) → dep change → cleanup setLoading(true) → repeat).
+  }, [status, order?.status])
 
   const gatewayConfig = {
     readonly,
