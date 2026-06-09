@@ -1,4 +1,4 @@
-import { type JSX, useContext, useEffect, useMemo, useState } from "react"
+import { type JSX, useContext, useEffect, useMemo, useRef, useState } from "react"
 import BaseInput from "#components/utils/BaseInput"
 import BaseSelect from "#components/utils/BaseSelect"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
@@ -76,6 +76,10 @@ export function AddressStateSelector(props: Props): JSX.Element {
   const [hasError, setHasError] = useState(false)
   const [countryCode, setCountryCode] = useState("")
   const [val, setVal] = useState(value ?? "")
+  // Tracks the current DOM value of the text input so that externally pre-filled
+  // values (via billingAddress.setValue called by AddressInput or similar) can be
+  // picked up when transitioning from text input to state select.
+  const textInputRef = useRef<HTMLInputElement | null>(null)
 
   const stateOptions = useMemo(() => {
     if (isEmpty(countryCode)) {
@@ -116,9 +120,14 @@ export function AddressStateSelector(props: Props): JSX.Element {
       setVal(value)
     }
     // On initial country detection, pre-fill the state from the value prop.
-    if (changeBillingCountry && isFirstCountryDetection && value != null && value !== "") {
-      if (billingAddress.setValue != null) billingAddress.setValue(name, String(value))
-      setVal(String(value))
+    // Fall back to the text input's current DOM value to handle the case where
+    // setValue was called externally (e.g. from AddressInput) before country arrived.
+    if (changeBillingCountry && isFirstCountryDetection) {
+      const stateValue = String(value ?? textInputRef.current?.value ?? "")
+      if (stateValue !== "") {
+        if (billingAddress.setValue != null) billingAddress.setValue(name, stateValue)
+        setVal(stateValue)
+      }
     }
     // On user-initiated country change, reset the state only if the current value
     // is invalid for the newly selected country (and the country has states).
@@ -147,9 +156,12 @@ export function AddressStateSelector(props: Props): JSX.Element {
       }
       setVal(value)
     }
-    if (changeShippingCountry && isFirstCountryDetection && value != null && value !== "") {
-      if (shippingAddress.setValue != null) shippingAddress.setValue(name, String(value))
-      setVal(String(value))
+    if (changeShippingCountry && isFirstCountryDetection) {
+      const stateValue = String(value ?? textInputRef.current?.value ?? "")
+      if (stateValue !== "") {
+        if (shippingAddress.setValue != null) shippingAddress.setValue(name, stateValue)
+        setVal(stateValue)
+      }
     }
     if (
       changeShippingCountry &&
@@ -219,6 +231,7 @@ export function AddressStateSelector(props: Props): JSX.Element {
     />
   ) : (
     <BaseInput
+      ref={textInputRef}
       id={p.id}
       style={p.style}
       name={name}

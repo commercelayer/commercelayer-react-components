@@ -113,6 +113,118 @@ describe("AddressStateSelector", () => {
     })
   })
 
+  it("shows state dropdown with pre-filled value when country arrives after first render", async () => {
+    // Real-world scenario: country arrives asynchronously (after AddressCountrySelector.useEffect).
+    // Step 1: render with no country. Step 2: country arrives in context. Step 3: state select must show.
+    const setValue = vi.fn()
+    const { rerender } = render(
+      <BillingAddressFormContext.Provider
+        value={{ setValue, errors: {}, values: {} } as any}
+      >
+        <ShippingAddressFormContext.Provider value={{} as any}>
+          <CustomerAddressFormContext.Provider value={{} as any}>
+            <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
+              <AddressStateSelector
+                name={"billing_address_state_code" as any}
+                value="MI" // existing state_code from API
+              />
+            </AddressesContext.Provider>
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+
+    // Initially shows text input (no country)
+    expect(screen.getByRole("textbox")).toBeTruthy()
+
+    // Country arrives (simulates AddressCountrySelector.useEffect firing)
+    rerender(
+      <BillingAddressFormContext.Provider
+        value={{
+          setValue,
+          errors: {},
+          values: { billing_address_country_code: { value: "IT" } } as any,
+        }}
+      >
+        <ShippingAddressFormContext.Provider value={{} as any}>
+          <CustomerAddressFormContext.Provider value={{} as any}>
+            <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
+              <AddressStateSelector
+                name={"billing_address_state_code" as any}
+                value="MI"
+              />
+            </AddressesContext.Provider>
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+
+    // Italian provinces select should now appear
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toBeTruthy()
+    })
+
+    // The pre-filled state code MI (Milano) should be selected
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("MI")
+
+    // setValue must have been called to sync into form context
+    await waitFor(() => {
+      expect(setValue).toHaveBeenCalledWith("billing_address_state_code", "MI")
+    })
+  })
+
+  it("shows pre-filled state when value came from external setValue (no value prop)", async () => {
+    // When AddressInput pre-fills state_code via billingAddress.setValue (setting the DOM value
+    // directly), AddressStateSelector has no value prop but must still pick up the DOM value
+    // when transitioning from text input to state select.
+    const setValue = vi.fn()
+    const { rerender } = render(
+      <BillingAddressFormContext.Provider
+        value={{ setValue, errors: {}, values: {} } as any}
+      >
+        <ShippingAddressFormContext.Provider value={{} as any}>
+          <CustomerAddressFormContext.Provider value={{} as any}>
+            <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
+              {/* No value prop — relies on DOM being pre-filled externally */}
+              <AddressStateSelector name={"billing_address_state_code" as any} />
+            </AddressesContext.Provider>
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+
+    // Simulate an external setValue setting the DOM value (as AddressInput would do)
+    const textInput = screen.getByRole("textbox") as HTMLInputElement
+    textInput.value = "MI"
+
+    // Country arrives
+    rerender(
+      <BillingAddressFormContext.Provider
+        value={{
+          setValue,
+          errors: {},
+          values: { billing_address_country_code: { value: "IT" } } as any,
+        }}
+      >
+        <ShippingAddressFormContext.Provider value={{} as any}>
+          <CustomerAddressFormContext.Provider value={{} as any}>
+            <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
+              <AddressStateSelector name={"billing_address_state_code" as any} />
+            </AddressesContext.Provider>
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole("combobox")).toBeTruthy()
+    })
+
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("MI")
+  })
+
   it("applies errorClassName when billing field has error", async () => {
     renderSelector(
       {},
