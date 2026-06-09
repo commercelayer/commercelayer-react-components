@@ -84,8 +84,17 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     includeLoaded,
   })
 
+  const reducerAddressValues = isStandalone
+    ? standalone.standaloneState.shipping_address?.values
+    : parentAddressContext.shipping_address?.values
+  const prefixedReducerValues = Object.fromEntries(
+    Object.entries(reducerAddressValues ?? {})
+      .filter(([, v]) => v != null && v !== "")
+      .map(([k, v]) => [`shipping_address_${k}`, String(v)])
+  )
+
   const providerValues: DefaultContextAddress = {
-    values: formValues,
+    values: { ...prefixedReducerValues, ...formValues } as typeof formValues,
     setValue,
     errorClassName,
     errors,

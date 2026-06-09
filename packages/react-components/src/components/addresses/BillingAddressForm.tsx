@@ -89,9 +89,25 @@ export function BillingAddressForm(props: Props): JSX.Element {
     includeLoaded,
   })
 
+  // Read the address reducer values so that fields set via setValue (which always
+  // calls setAddress regardless of the 'required' attribute) are exposed in the
+  // form context. This is required by AddressStateSelector, which watches
+  // billingAddress.values["billing_address_country_code"] to detect the country.
+  // rapid-form only tracks required fields; the reducer captures everything.
+  const reducerAddressValues = isStandalone
+    ? standalone.standaloneState.billing_address?.values
+    : parentAddressContext.billing_address?.values
+  const prefixedReducerValues = Object.fromEntries(
+    Object.entries(reducerAddressValues ?? {})
+      .filter(([, v]) => v != null && v !== "")
+      .map(([k, v]) => [`billing_address_${k}`, String(v)])
+  )
+
   const providerValues = {
     isBusiness,
-    values: formValues,
+    // Merge: rapid-form values (objects) take precedence over reducer values (strings).
+    // AddressStateSelector handles both via: typeof v === "string" ? v : v?.value
+    values: { ...prefixedReducerValues, ...formValues } as typeof formValues,
     setValue,
     errorClassName,
     requiresBillingInfo: order?.requires_billing_info ?? false,
