@@ -180,10 +180,16 @@ export function useOrderState({
     lockOrder,
   ])
 
-  return useMemo(() => {
+  // Call fetchOrder in an effect so it runs after render, not during.
+  // Calling it inside useMemo (render phase) triggered React's
+  // "Cannot update a component while rendering a different component" warning.
+  useEffect(() => {
     if (fetchOrder != null && state?.order != null) {
       fetchOrder(state.order)
     }
+  }, [fetchOrder, state.order])
+
+  return useMemo(() => {
     return {
       ...state,
       managePaymentProviderGiftCards:
@@ -267,5 +273,5 @@ export function useOrderState({
         }),
       getOrderByFields,
     }
-  }, [state, config.accessToken, persistKey, config, setLocalOrder, metadata, fetchOrder, attributes])
+  }, [state, config.accessToken, persistKey, config, setLocalOrder, metadata, attributes])
 }
