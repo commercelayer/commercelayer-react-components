@@ -75,6 +75,14 @@ describe("AddressCountrySelector", () => {
     expect(screen.getByRole("option", { name: "Select an option" }).selected).toBe(true)
   })
 
+  it("shows the placeholder when value prop is explicitly null (SDK may return null for unset country)", () => {
+    // biome-ignore lint/suspicious/noExplicitAny: testing null prop
+    renderSelector({ value: null as any })
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("")
+    expect(screen.getByRole("option", { name: "Select an option" }).selected).toBe(true)
+  })
+
   it("resets to placeholder when value changes from a country to empty", async () => {
     // biome-ignore lint/suspicious/noExplicitAny: test cast
     const billingCtx = { ...mockBillingCtx } as any

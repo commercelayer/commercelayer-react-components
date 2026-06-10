@@ -14,11 +14,13 @@ const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (props, ref) 
     ...p
   } = props
 
-  const [localValue, setLocalValue] = useState(value)
+  const [localValue, setLocalValue] = useState(value ?? "")
 
   // Keep the select in sync when the controlled value prop changes externally.
+  // Normalise null → "" so the placeholder option is always selected when no
+  // country/state has been chosen (null and undefined both mean "no selection").
   useEffect(() => {
-    setLocalValue(value)
+    setLocalValue(value ?? "")
   }, [value])
 
   if (placeholder != null) {
