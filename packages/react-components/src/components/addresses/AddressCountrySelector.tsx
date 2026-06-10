@@ -49,14 +49,14 @@ export function AddressCountrySelector(props: Props): JSX.Element {
   const shippingAddress = useContext(ShippingAddressFormContext)
   const customerAddress = useContext(CustomerAddressFormContext)
   useEffect(() => {
-    if (value && billingAddress?.setValue) {
-      billingAddress.setValue(name, value)
+    if (billingAddress?.setValue) {
+      billingAddress.setValue(name, value ?? "")
     }
-    if (value && shippingAddress?.setValue) {
-      shippingAddress.setValue(name, value)
+    if (shippingAddress?.setValue) {
+      shippingAddress.setValue(name, value ?? "")
     }
-    if (value && customerAddress?.setValue) {
-      customerAddress.setValue(name, value)
+    if (customerAddress?.setValue) {
+      customerAddress.setValue(name, value ?? "")
     }
   }, [value, billingAddress.setValue, customerAddress.setValue, name, shippingAddress.setValue])
 

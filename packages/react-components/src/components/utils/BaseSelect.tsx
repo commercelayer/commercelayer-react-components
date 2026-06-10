@@ -1,4 +1,4 @@
-import React, { type ForwardRefRenderFunction } from "react"
+import React, { type ForwardRefRenderFunction, useEffect, useState } from "react"
 import Parent from "./Parent"
 import type { BaseSelectComponentProps } from "#typings"
 
@@ -10,8 +10,17 @@ const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (props, ref) 
     children,
     placeholder = { label: "Select an option", value: "" },
     value = "",
+    onChange,
     ...p
   } = props
+
+  const [localValue, setLocalValue] = useState(value)
+
+  // Keep the select in sync when the controlled value prop changes externally.
+  useEffect(() => {
+    setLocalValue(value)
+  }, [value])
+
   if (placeholder != null) {
     const isPlaceholderInOptions = options.some((option) => option.value === placeholder.value)
     if (!isPlaceholderInOptions) {
@@ -32,10 +41,16 @@ const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (props, ref) 
     ref,
     ...p,
   }
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLocalValue(e.target.value)
+    onChange?.(e)
+  }
+
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <select ref={ref} defaultValue={value} {...p}>
+    <select ref={ref} value={localValue} onChange={handleChange} {...p}>
       {Options}
     </select>
   )

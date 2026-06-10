@@ -61,6 +61,49 @@ describe("AddressCountrySelector", () => {
     expect(screen.getByRole("combobox")).toBeTruthy()
   })
 
+  it("shows the placeholder as selected when no value prop is provided", () => {
+    renderSelector()
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("")
+    expect(screen.getByRole("option", { name: "Select an option" }).selected).toBe(true)
+  })
+
+  it("shows the placeholder when value prop is explicitly empty string", () => {
+    renderSelector({ value: "" })
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("")
+    expect(screen.getByRole("option", { name: "Select an option" }).selected).toBe(true)
+  })
+
+  it("resets to placeholder when value changes from a country to empty", async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const billingCtx = { ...mockBillingCtx } as any
+    const { rerender } = render(
+      <BillingAddressFormContext.Provider value={billingCtx}>
+        <ShippingAddressFormContext.Provider value={{ ...mockShippingCtx } as any}>
+          <CustomerAddressFormContext.Provider value={{ ...mockCustomerCtx } as any}>
+            <AddressCountrySelector name="billing_address_country_code" value="US" />
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("US")
+    await act(async () => {
+      rerender(
+        <BillingAddressFormContext.Provider value={billingCtx}>
+          <ShippingAddressFormContext.Provider value={{ ...mockShippingCtx } as any}>
+            <CustomerAddressFormContext.Provider value={{ ...mockCustomerCtx } as any}>
+              <AddressCountrySelector name="billing_address_country_code" value="" />
+            </CustomerAddressFormContext.Provider>
+          </ShippingAddressFormContext.Provider>
+        </BillingAddressFormContext.Provider>
+      )
+    })
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("")
+    expect(screen.getByRole("option", { name: "Select an option" }).selected).toBe(true)
+  })
+
   it("calls billing setValue when value prop changes", async () => {
     // biome-ignore lint/suspicious/noExplicitAny: test cast
     const billingCtx = { ...mockBillingCtx } as any
