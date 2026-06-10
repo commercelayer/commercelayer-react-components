@@ -86,6 +86,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
   const [isLoading, setIsLoading] = useState(false)
+  const [hasBlockingErrors, setHasBlockingErrors] = useState(false)
   const { sdkClient } = useCommerceLayer()
   const {
     currentPaymentMethodRef,
@@ -100,6 +101,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const { order, setOrderErrors, errors } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
   useEffect(() => {
+    if (hasBlockingErrors) {
+      setNotPermitted(true)
+      return () => {
+        setNotPermitted(true)
+      }
+    }
     if (isFree && !isPermitted) {
       setNotPermitted(false)
     }
@@ -150,22 +157,21 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     order?.id,
     paymentSource?.id,
     order?.total_amount_with_taxes_cents,
+    hasBlockingErrors,
   ])
   useEffect(() => {
     const giftCardCouponFields = ["gift_card_code", "coupon_code", "gift_card_or_coupon_code"]
     const blockingErrors = errors?.filter((e) => !giftCardCouponFields.includes(e.field ?? ""))
-    if (
-      (blockingErrors && blockingErrors.length > 0) ||
-      (paymentMethodErrors && paymentMethodErrors.length > 0)
-    ) {
+    const hasErrors =
+      (blockingErrors != null && blockingErrors.length > 0) ||
+      (paymentMethodErrors != null && paymentMethodErrors.length > 0)
+    setHasBlockingErrors(hasErrors)
+    if (hasErrors) {
       setNotPermitted(true)
       setIsLoading(false)
       setForceDisable(false)
-    } else if (isPermitted) {
-      // Only re-enable when errors clear AND the order is permitted (privacy/terms accepted, etc.)
-      setNotPermitted(false)
     }
-  }, [errors?.length, paymentMethodErrors?.length, isPermitted])
+  }, [errors?.length, paymentMethodErrors?.length])
   useEffect(() => {
     // PayPal redirect flow
     if (

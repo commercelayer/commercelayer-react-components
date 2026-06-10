@@ -391,6 +391,36 @@ describe("PlaceOrderButton (standalone)", () => {
     })
   })
 
+  it("stays disabled when no payment method is selected even if errors clear", async () => {
+    localStorage.clear()
+    const orderNoPayment = {
+      ...MOCK_ORDER,
+      payment_method: null,
+      payment_source: null,
+    }
+    const mockError = [{ code: "PAYMENT_METHOD_ERROR", resource: "payment_methods", field: "card", message: "Invalid" }]
+
+    const { rerender } = render(
+      <Providers order={orderNoPayment} paymentMethodErrors={mockError}>
+        <PlaceOrderButton />
+      </Providers>
+    )
+    await waitFor(() => {
+      expect(screen.getByRole("button").hasAttribute("disabled")).toBe(true)
+    })
+
+    rerender(
+      <Providers order={orderNoPayment} paymentMethodErrors={[]}>
+        <PlaceOrderButton />
+      </Providers>
+    )
+
+    // Still disabled — no payment method selected
+    await waitFor(() => {
+      expect(screen.getByRole("button").hasAttribute("disabled")).toBe(true)
+    })
+  })
+
   it("renders children render prop", () => {
     render(
       <Providers>
