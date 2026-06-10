@@ -414,11 +414,11 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       case "placing":
         setNotPermitted(true)
         break
-      default:
-        setNotPermitted(false)
-        break
+      // No default — the payment check effect above is the sole authority for enabling
+      // the button. Enabling unconditionally here (old default case) caused the button
+      // to be enabled on mount regardless of whether a payment method was selected.
     }
-  }, [status != null])
+  }, [status])
   const handleClick = async (e?: MouseEvent<HTMLButtonElement>): Promise<void> => {
     e?.preventDefault()
     e?.stopPropagation()

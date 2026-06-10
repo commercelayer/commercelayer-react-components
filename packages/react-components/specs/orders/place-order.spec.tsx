@@ -63,6 +63,7 @@ function Providers({
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   includeLoaded = {} as any,
   paymentMethodErrors = [],
+  currentPaymentMethodType = "stripe_payments",
 }: {
   children: ReactNode
   // biome-ignore lint/suspicious/noExplicitAny: test cast
@@ -73,6 +74,7 @@ function Providers({
   includeLoaded?: any
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   paymentMethodErrors?: any[]
+  currentPaymentMethodType?: string
 }) {
   return (
     <CommerceLayerContext.Provider value={{ accessToken: "test-token" }}>
@@ -96,7 +98,7 @@ function Providers({
               ...defaultPaymentMethodContext,
               _isProvided: true as const,
               loading: false,
-              currentPaymentMethodType: "stripe_payments",
+              currentPaymentMethodType,
               paymentSource: MOCK_ORDER.payment_source,
               setPaymentSource: vi.fn().mockResolvedValue(MOCK_ORDER.payment_source),
               setPaymentMethodErrors: vi.fn(),
@@ -314,6 +316,22 @@ describe("PlaceOrderButton (standalone)", () => {
     )
     const btn = screen.getByRole("button")
     expect(btn.getAttribute("disabled")).toBeDefined()
+  })
+
+  it("stays disabled when no payment method is selected at all (status effect must not override payment check)", async () => {
+    // order has no payment_method — isPermitted will stay false, and the
+    // status effect's default case must NOT enable the button by overriding
+    // the payment check effect.
+    const orderWithoutPayment = { ...MOCK_ORDER, payment_method: null }
+    render(
+      <Providers order={orderWithoutPayment}>
+        <PlaceOrderButton />
+      </Providers>
+    )
+    // After all effects settle the button must still be disabled
+    await waitFor(() => {
+      expect(screen.getByRole("button").hasAttribute("disabled")).toBe(true)
+    })
   })
 
   it("detects standalone mode (_isProvided not set on parent ctx)", () => {
@@ -811,6 +829,10 @@ describe("usePlaceOrder RECHECK_EVENT integration", () => {
 describe("PlaceOrderButton handleClick", () => {
   beforeEach(async () => {
     vi.clearAllMocks()
+    // Mock getCardDetails to return a brand — button enabling now correctly requires
+    // card.brand or onsubmit; the old buggy status-effect default case no longer does it.
+    const getCardDetailsModule = await import("#utils/getCardDetails")
+    vi.mocked(getCardDetailsModule.default).mockReturnValue({ brand: "visa" } as any)
     // Always restore getSdk to return a functional mock so sdk-null test
     // doesn't corrupt subsequent tests
     const { getSdk } = await import("@commercelayer/core")
@@ -869,6 +891,7 @@ describe("PlaceOrderButton handleClick", () => {
             _isProvided: true as const,
             isPermitted: true,
             status: "standby",
+            paymentType: "stripe_payments",
             setPlaceOrder,
           }}
         >
@@ -897,7 +920,7 @@ describe("PlaceOrderButton handleClick", () => {
     const setPlaceOrderStatus = vi.fn()
 
     render(
-      <Providers>
+      <Providers currentPaymentMethodType="wire_transfers">
         <PlaceOrderContext.Provider
           value={{
             ...defaultPlaceOrderContext,
