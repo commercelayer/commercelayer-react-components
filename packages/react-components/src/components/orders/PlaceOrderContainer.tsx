@@ -17,6 +17,12 @@ interface Props {
   children: ReactNode
   options?: PlaceOrderOptions
 }
+
+/**
+ * @deprecated Use `<PlaceOrderButton>` and `<PrivacyAndTermsCheckbox>` directly —
+ * they are now standalone and no longer require a container wrapper.
+ * `PlaceOrderContainer` will be removed in the next major version.
+ */
 export function PlaceOrderContainer(props: Props): JSX.Element {
   const { children, options } = props
   const [state, dispatch] = useReducer(placeOrderReducer, placeOrderInitialState)
@@ -88,6 +94,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
   }, [order, include, includeLoaded, organizationConfig])
   const contextValue = {
     ...state,
+    _isProvided: true as const,
     setPlaceOrder: async ({
       paymentSource,
       currentCustomerPaymentSourceId,

@@ -13,6 +13,8 @@ import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
 import useCommerceLayer from "#hooks/useCommerceLayer"
+import { usePlaceOrder } from "#hooks/usePlaceOrder"
+import type { PlaceOrderOptions } from "#reducers/PlaceOrderReducer"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
 import getCardDetails from "#utils/getCardDetails"
@@ -44,6 +46,11 @@ interface Props extends Omit<JSX.IntrinsicElements["button"], "children" | "onCl
    * Callback function that is fired when the button is clicked
    */
   onClick?: (response: { placed: boolean; order?: Order; errors?: BaseError[] }) => void
+  /**
+   * Place order options (PayPal, Adyen, Stripe, Checkout.com redirect flows).
+   * Required in standalone mode when used without `<PlaceOrderContainer>`.
+   */
+  options?: PlaceOrderOptions
 }
 
 export function PlaceOrderButton(props: Props): JSX.Element {
@@ -55,8 +62,18 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     autoPlaceOrder = true,
     disabled,
     onClick,
+    options: optionsProp,
     ...p
   } = props
+
+  // Detect standalone mode: no <PlaceOrderContainer> parent has set _isProvided.
+  const parentCtx = useContext(PlaceOrderContext)
+  const isStandalone = parentCtx._isProvided !== true
+
+  // Always call the hook (Rules of Hooks). When not standalone, effects are
+  // guarded internally and the returned value is not used.
+  const standaloneCtx = usePlaceOrder({ isStandalone, options: optionsProp })
+
   const {
     isPermitted,
     setPlaceOrder,
@@ -65,7 +82,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     setButtonRef,
     setPlaceOrderStatus,
     status,
-  } = useContext(PlaceOrderContext)
+  } = isStandalone ? standaloneCtx : parentCtx
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
   const [isLoading, setIsLoading] = useState(false)

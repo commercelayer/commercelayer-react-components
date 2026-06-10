@@ -7,6 +7,8 @@ import {
 } from "#reducers/PlaceOrderReducer"
 
 type DefaultContext = {
+  /** Sentinel set to `true` by `usePlaceOrder` / `<PlaceOrderContainer>` to signal that a provider is already present. */
+  _isProvided?: true
   setPlaceOrderErrors?: typeof setPlaceOrderErrors
   setPlaceOrder?: typeof setPlaceOrder
   placeOrderPermitted?: () => void
