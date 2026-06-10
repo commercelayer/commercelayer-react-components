@@ -161,10 +161,11 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       setNotPermitted(true)
       setIsLoading(false)
       setForceDisable(false)
-    } else {
+    } else if (isPermitted) {
+      // Only re-enable when errors clear AND the order is permitted (privacy/terms accepted, etc.)
       setNotPermitted(false)
     }
-  }, [errors?.length, paymentMethodErrors?.length])
+  }, [errors?.length, paymentMethodErrors?.length, isPermitted])
   useEffect(() => {
     // PayPal redirect flow
     if (

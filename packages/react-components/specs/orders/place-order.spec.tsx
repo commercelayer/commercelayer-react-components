@@ -62,6 +62,7 @@ function Providers({
   include = [],
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   includeLoaded = {} as any,
+  paymentMethodErrors = [],
 }: {
   children: ReactNode
   // biome-ignore lint/suspicious/noExplicitAny: test cast
@@ -70,6 +71,8 @@ function Providers({
   include?: string[]
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   includeLoaded?: any
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  paymentMethodErrors?: any[]
 }) {
   return (
     <CommerceLayerContext.Provider value={{ accessToken: "test-token" }}>
@@ -97,6 +100,7 @@ function Providers({
               paymentSource: MOCK_ORDER.payment_source,
               setPaymentSource: vi.fn().mockResolvedValue(MOCK_ORDER.payment_source),
               setPaymentMethodErrors: vi.fn(),
+              errors: paymentMethodErrors,
             }}
           >
             {children}
@@ -351,6 +355,40 @@ describe("PlaceOrderButton (standalone)", () => {
       </Providers>
     )
     expect(screen.getByRole("button")).toBeDefined()
+  })
+
+  it("stays disabled when paymentMethodErrors clear but privacy/terms checkbox is not checked", async () => {
+    localStorage.clear()
+    // Order with privacy/terms URLs — checkbox NOT checked (nothing in localStorage)
+    const order = {
+      ...MOCK_ORDER,
+      privacy_url: "https://example.com/privacy",
+      terms_url: "https://example.com/terms",
+    }
+    const mockError = [{ code: "PAYMENT_METHOD_ERROR", resource: "payment_methods", field: "card", message: "Invalid" }]
+
+    // Start with payment method errors present
+    const { rerender } = render(
+      <Providers order={order} paymentMethodErrors={mockError}>
+        <PlaceOrderButton />
+      </Providers>
+    )
+    // Button disabled (due to errors AND unchecked privacy)
+    await waitFor(() => {
+      expect(screen.getByRole("button").hasAttribute("disabled")).toBe(true)
+    })
+
+    // Clear payment errors (simulates user successfully filling in payment data)
+    rerender(
+      <Providers order={order} paymentMethodErrors={[]}>
+        <PlaceOrderButton />
+      </Providers>
+    )
+
+    // Button must STILL be disabled because privacy/terms checkbox is not checked
+    await waitFor(() => {
+      expect(screen.getByRole("button").hasAttribute("disabled")).toBe(true)
+    })
   })
 
   it("renders children render prop", () => {
