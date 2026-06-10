@@ -1,4 +1,4 @@
-import React, { type ForwardRefRenderFunction, useEffect, useState } from "react"
+import React, { type ForwardRefRenderFunction, useState } from "react"
 import Parent from "./Parent"
 import type { BaseSelectComponentProps } from "#typings"
 
@@ -14,14 +14,24 @@ const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (props, ref) 
     ...p
   } = props
 
-  const [localValue, setLocalValue] = useState(value ?? "")
+  // Normalise null/undefined → "" so the placeholder is always selected when
+  // no external value has been set (the SDK returns null for unset fields).
+  const safeValue = value ?? ""
 
-  // Keep the select in sync when the controlled value prop changes externally.
-  // Normalise null → "" so the placeholder option is always selected when no
-  // country/state has been chosen (null and undefined both mean "no selection").
-  useEffect(() => {
-    setLocalValue(value ?? "")
-  }, [value])
+  // Track the last external value we synced from so we can detect when the
+  // parent intentionally changes it (e.g. pre-fill from loaded order, or reset).
+  // Using derived-state pattern (during render) avoids the one-frame lag and
+  // the stale-value issues that come with useEffect for controlled inputs.
+  const [localValue, setLocalValue] = useState(safeValue)
+  const [prevSafeValue, setPrevSafeValue] = useState(safeValue)
+
+  if (safeValue !== prevSafeValue) {
+    // Parent changed the value prop — sync immediately so this render already
+    // shows the correct option. This does NOT fire when null/undefined oscillate
+    // (both normalise to "") which preserves the user's own selection.
+    setPrevSafeValue(safeValue)
+    setLocalValue(safeValue)
+  }
 
   if (placeholder != null) {
     const isPlaceholderInOptions = options.some((option) => option.value === placeholder.value)

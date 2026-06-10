@@ -83,6 +83,51 @@ describe("AddressCountrySelector", () => {
     expect(screen.getByRole("option", { name: "Select an option" }).selected).toBe(true)
   })
 
+  it("pre-fills the country when value changes from null to a country code (order loading)", async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const billingCtx = { ...mockBillingCtx } as any
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const ctx = (v: any) => (
+      <BillingAddressFormContext.Provider value={billingCtx}>
+        <ShippingAddressFormContext.Provider value={{ ...mockShippingCtx } as any}>
+          <CustomerAddressFormContext.Provider value={{ ...mockCustomerCtx } as any}>
+            <AddressCountrySelector name="billing_address_country_code" value={v} />
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+    // biome-ignore lint/suspicious/noExplicitAny: testing null prop
+    const { rerender } = render(ctx(null as any))
+    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("")
+    await act(async () => { rerender(ctx("IT")) })
+    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("IT")
+  })
+
+  it("preserves user selection when parent re-renders with same null value", async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const billingCtx = { ...mockBillingCtx } as any
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const ctx = (v: any) => (
+      <BillingAddressFormContext.Provider value={billingCtx}>
+        <ShippingAddressFormContext.Provider value={{ ...mockShippingCtx } as any}>
+          <CustomerAddressFormContext.Provider value={{ ...mockCustomerCtx } as any}>
+            <AddressCountrySelector name="billing_address_country_code" value={v} />
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+    // biome-ignore lint/suspicious/noExplicitAny: testing null prop
+    const { rerender } = render(ctx(null as any))
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    // Simulate user picking Italy via fireEvent
+    const { fireEvent } = await import("@testing-library/react")
+    fireEvent.change(select, { target: { value: "IT" } })
+    expect(select.value).toBe("IT")
+    // Parent re-renders with same null value — should NOT reset user's selection
+    await act(async () => { rerender(ctx(null as any)) })
+    expect(select.value).toBe("IT")
+  })
+
   it("resets to placeholder when value changes from a country to empty", async () => {
     // biome-ignore lint/suspicious/noExplicitAny: test cast
     const billingCtx = { ...mockBillingCtx } as any
