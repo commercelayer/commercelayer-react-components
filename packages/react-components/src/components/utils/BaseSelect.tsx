@@ -1,4 +1,9 @@
-import React, { type ForwardRefRenderFunction, useState } from "react"
+import React, {
+  type ForwardRefRenderFunction,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+} from "react"
 import Parent from "./Parent"
 import type { BaseSelectComponentProps } from "#typings"
 
@@ -18,20 +23,38 @@ const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (props, ref) 
   // no external value has been set (the SDK returns null for unset fields).
   const safeValue = value ?? ""
 
-  // Track the last external value we synced from so we can detect when the
-  // parent intentionally changes it (e.g. pre-fill from loaded order, or reset).
-  // Using derived-state pattern (during render) avoids the one-frame lag and
-  // the stale-value issues that come with useEffect for controlled inputs.
-  const [localValue, setLocalValue] = useState(safeValue)
-  const [prevSafeValue, setPrevSafeValue] = useState(safeValue)
+  // Keep an internal ref to the DOM select so we can imperatively sync it
+  // when the external value changes (e.g., order loads with a pre-filled address).
+  const internalRef = useRef<HTMLSelectElement>(null)
 
-  if (safeValue !== prevSafeValue) {
-    // Parent changed the value prop — sync immediately so this render already
-    // shows the correct option. This does NOT fire when null/undefined oscillate
-    // (both normalise to "") which preserves the user's own selection.
-    setPrevSafeValue(safeValue)
-    setLocalValue(safeValue)
-  }
+  // Track the last external value we pushed to the DOM.
+  const prevSafeValueRef = useRef(safeValue)
+
+  // Combine the forwarded ref with our internal ref so callers can still hold
+  // a ref to the underlying <select> element while we also manage it.
+  const combinedRef = useCallback(
+    (node: HTMLSelectElement | null) => {
+      internalRef.current = node
+      if (ref == null) return
+      if (typeof ref === "function") {
+        ref(node)
+      } else {
+        ref.current = node
+      }
+    },
+    [ref]
+  )
+
+  // When the parent changes the value prop (e.g. order pre-fill arrives),
+  // update the uncontrolled DOM select directly before the browser paints.
+  // We intentionally leave the DOM alone when safeValue stays the same so
+  // user-driven changes (picking a different country) are never overridden.
+  useLayoutEffect(() => {
+    if (safeValue !== prevSafeValueRef.current && internalRef.current != null) {
+      prevSafeValueRef.current = safeValue
+      internalRef.current.value = safeValue
+    }
+  }, [safeValue])
 
   if (placeholder != null) {
     const isPlaceholderInOptions = options.some((option) => option.value === placeholder.value)
@@ -55,14 +78,15 @@ const BaseSelect: ForwardRefRenderFunction<any, BaseSelectProps> = (props, ref) 
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLocalValue(e.target.value)
     onChange?.(e)
   }
 
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <select ref={ref} value={localValue} onChange={handleChange} {...p}>
+    // Uncontrolled: defaultValue sets the initial selection; user changes and
+    // programmatic updates via useLayoutEffect above drive the DOM value.
+    <select ref={combinedRef} defaultValue={safeValue} onChange={handleChange} {...p}>
       {Options}
     </select>
   )

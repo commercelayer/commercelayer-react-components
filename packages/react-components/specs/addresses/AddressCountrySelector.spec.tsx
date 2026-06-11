@@ -128,6 +128,32 @@ describe("AddressCountrySelector", () => {
     expect(select.value).toBe("IT")
   })
 
+  it("preserves user selection when pre-filled value is set and user changes the option", async () => {
+    // Regression: value="IT" pre-fills Italy. User picks Germany. Select should show Germany,
+    // not revert to Italy on subsequent re-renders with the same value="IT".
+    const billingCtx = { ...mockBillingCtx } as any
+    const mkTree = (v: string) => (
+      <BillingAddressFormContext.Provider value={billingCtx}>
+        <ShippingAddressFormContext.Provider value={{ ...mockShippingCtx } as any}>
+          <CustomerAddressFormContext.Provider value={{ ...mockCustomerCtx } as any}>
+            <AddressCountrySelector name="billing_address_country_code" value={v} />
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+    const { rerender } = render(mkTree("IT"))
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("IT")
+    // Simulate user changing to Germany
+    const { fireEvent } = await import("@testing-library/react")
+    fireEvent.change(select, { target: { value: "DE" } })
+    expect(select.value).toBe("DE")
+    // Parent re-renders with the same value="IT" (e.g., order state unchanged)
+    await act(async () => { rerender(mkTree("IT")) })
+    // User's selection should be preserved, not reverted to Italy
+    expect(select.value).toBe("DE")
+  })
+
   it("resets to placeholder when value changes from a country to empty", async () => {
     // biome-ignore lint/suspicious/noExplicitAny: test cast
     const billingCtx = { ...mockBillingCtx } as any
