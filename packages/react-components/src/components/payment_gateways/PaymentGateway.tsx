@@ -1,4 +1,4 @@
-import { type JSX, useContext, useEffect, useState } from "react"
+import { type JSX, useContext, useEffect, useRef, useState } from "react"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
@@ -50,6 +50,9 @@ export function PaymentGateway({
 }: Props): JSX.Element | null {
   const loaderComponent = getLoaderComponent(loader)
   const [loading, setLoading] = useState(true)
+  // Guards against the effect re-entering and firing a second `setPaymentSource`
+  // before the first (fire-and-forget) request resolves and settles state. See ADR 0001.
+  const settingPaymentSourceRef = useRef(false)
   const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
@@ -82,31 +85,39 @@ export function PaymentGateway({
       }
       if (config != null && paymentResource === "stripe_payments") {
         attributes = getStripeAttributes(paymentResource, config)
-        if (attributes != null && attributes.return_url == null) {
-          attributes.return_url = window.location.href
+        if (attributes != null && attributes["return_url"] == null) {
+          attributes["return_url"] = window.location.href
         }
       }
       if (config != null && paymentResource === "checkout_com_payments") {
         attributes = getCkoAttributes(paymentResource, config)
       }
       const setPaymentSources = async (): Promise<void> => {
-        if (order != null && paymentMethods && paymentMethods?.length > 1) {
-          await setPaymentSource({
-            paymentResource,
-            order,
-            attributes,
-          })
-        }
-        if (
-          ((errors != null && errors?.length > 0) || order?.payment_source === null) &&
-          paymentMethods &&
-          paymentMethods?.length === 1
-        ) {
-          await setPaymentSource({
-            paymentResource,
-            order,
-            attributes,
-          })
+        // Skip the whole pass if a previous one is still in flight — a concurrent
+        // effect run must not fire a second create/update before state settles.
+        if (settingPaymentSourceRef.current) return
+        settingPaymentSourceRef.current = true
+        try {
+          if (order != null && paymentMethods && paymentMethods?.length > 1) {
+            await setPaymentSource({
+              paymentResource,
+              order,
+              attributes,
+            })
+          }
+          if (
+            ((errors != null && errors?.length > 0) || order?.payment_source === null) &&
+            paymentMethods &&
+            paymentMethods?.length === 1
+          ) {
+            await setPaymentSource({
+              paymentResource,
+              order,
+              attributes,
+            })
+          }
+        } finally {
+          settingPaymentSourceRef.current = false
         }
         if (getCustomerPaymentSources) getCustomerPaymentSources()
       }
@@ -139,7 +150,31 @@ export function PaymentGateway({
       setLoading(false)
     }
     // No cleanup: setLoading(true) in cleanup caused unnecessary extra re-renders.
-  }, [order?.payment_method?.id, show, paymentSource?.id, order?.status, paymentSource?.mismatched_amounts, paymentSource?.type, paymentSource, paymentResource, payment?.id, setPaymentSource, order?.payment_source?.id, order?.payment_source, order?.payment_method?.payment_source_type, order, getCustomerPaymentSources, paymentMethods?.length, paymentMethods, currentPaymentMethodId, expressPayments, errors?.length, errors, config])
+  }, [
+    order?.payment_method?.id,
+    show,
+    paymentSource?.id,
+    order?.status,
+    // @ts-expect-error no type
+    paymentSource?.mismatched_amounts,
+    paymentSource?.type,
+    paymentSource,
+    paymentResource,
+    payment?.id,
+    setPaymentSource,
+    order?.payment_source?.id,
+    order?.payment_source,
+    order?.payment_method?.payment_source_type,
+    order,
+    getCustomerPaymentSources,
+    paymentMethods?.length,
+    paymentMethods,
+    currentPaymentMethodId,
+    expressPayments,
+    errors?.length,
+    errors,
+    config,
+  ])
 
   useEffect(() => {
     if (status === "placing") setLoading(true)
