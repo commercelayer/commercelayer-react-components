@@ -1,11 +1,11 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_SALES_CHANNEL_CLIENT_ID: string
-  readonly VITE_SALES_CHANNEL_SCOPE: string
-  readonly VITE_INTEGRATION_CLIENT_ID: string
-  readonly VITE_INTEGRATION_CLIENT_SECRET: string
-  readonly VITE_DOMAIN: string
+  readonly VITE_TEST_CLIENT_ID: string
+  readonly VITE_TEST_MARKET_ID: string
+  readonly VITE_TEST_CLIENT_ID_INTEGRATION: string
+  readonly VITE_TEST_CLIENT_SECRET: string
+  readonly VITE_TEST_DOMAIN: string
 }
 
 interface ImportMeta {

@@ -16,7 +16,7 @@ describe("getPrices", () => {
     if (token == null) return
     const params = {
       filters: {
-        sku_code_eq: "DIGITALPRODUCT",
+        sku_code_eq: "TSHIRTMM000000E63E74MXXX",
       },
     } satisfies QueryParamsList<Price>
     // Call the getPrices function
