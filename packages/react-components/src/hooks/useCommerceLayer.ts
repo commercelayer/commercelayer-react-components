@@ -1,6 +1,6 @@
-import CommerceLayerContext from "#context/CommerceLayerContext"
 import { getSdk } from "@commercelayer/core"
 import { useContext } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
 
 interface ReturnProps {
   /** This is the access token used to initialize the sdk client. It need to be set as prop in the main `<CommerceLayer>` component */

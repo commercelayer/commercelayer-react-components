@@ -158,7 +158,10 @@ describe("saveOrderAddresses", () => {
       expect(result.success).toBe(true)
       expect(mockCreate).toHaveBeenCalledTimes(2)
       expect(result.orderAttributes?._shipping_address_same_as_billing).toBeUndefined()
-      expect(result.orderAttributes?.shipping_address).toEqual({ id: "shipping_new", type: "addresses" })
+      expect(result.orderAttributes?.shipping_address).toEqual({
+        id: "shipping_new",
+        type: "addresses",
+      })
     })
 
     test("updates an existing shipping address when shipToDifferentAddress=true", async () => {
@@ -173,7 +176,10 @@ describe("saveOrderAddresses", () => {
       })
 
       expect(result.success).toBe(true)
-      expect(mockUpdate).toHaveBeenCalledWith({ id: "ship_existing", first_name: "Updated Shipper" })
+      expect(mockUpdate).toHaveBeenCalledWith({
+        id: "ship_existing",
+        first_name: "Updated Shipper",
+      })
       expect(result.orderAttributes?._refresh).toBe(true)
     })
 

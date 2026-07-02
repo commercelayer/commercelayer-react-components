@@ -1,11 +1,6 @@
-import React, {
-  type ForwardRefRenderFunction,
-  useCallback,
-  useLayoutEffect,
-  useRef,
-} from "react"
-import Parent from "./Parent"
+import React, { type ForwardRefRenderFunction, useCallback, useLayoutEffect, useRef } from "react"
 import type { BaseSelectComponentProps } from "#typings"
+import Parent from "./Parent"
 
 export type BaseSelectProps = BaseSelectComponentProps
 

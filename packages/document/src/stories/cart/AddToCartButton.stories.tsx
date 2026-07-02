@@ -1,6 +1,3 @@
-import type { Meta, StoryObj } from "@storybook/react-vite"
-import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
-import CommerceLayer from "../_internals/CommerceLayer"
 import {
   AddToCartButton,
   AvailabilityContainer,
@@ -17,6 +14,9 @@ import {
   Skus,
   SkusContainer,
 } from "@commercelayer/react-components"
+import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
+import type { Meta, StoryObj } from "@storybook/react-vite"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 function AddToCartButtonDocsPage(): JSX.Element {
   return (
@@ -288,8 +288,8 @@ export const ChildrenProps: Story = {
     <Wrapper>
       <AddToCartButton skuCode="SWEATWCX000000FFFFFFXSXX" quantity="1">
         {({ handleClick, disabled }) => (
-          <div
-            role="button"
+          <button
+            type="button"
             className="border-dotted border-2 border-blue-500 text-blue-500 p-4 w-auto inline"
             onClick={() => {
               void handleClick().then(({ orderId, success }) => {
@@ -300,7 +300,7 @@ export const ChildrenProps: Story = {
             }}
           >
             {disabled ? "Adding…" : "Add to cart"}
-          </div>
+          </button>
         )}
       </AddToCartButton>
     </Wrapper>

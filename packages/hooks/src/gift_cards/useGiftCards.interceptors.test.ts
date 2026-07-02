@@ -16,12 +16,8 @@ const mockGiftCard = { id: "gc_1", currency_code: "USD", balance_cents: 1000 }
 
 const mockGetGiftCards = vi.fn().mockResolvedValue([mockGiftCard])
 const mockRetrieveGiftCard = vi.fn().mockResolvedValue(mockGiftCard)
-const mockCreateGiftCard = vi
-  .fn()
-  .mockResolvedValue({ ...mockGiftCard, id: "gc_new" })
-const mockUpdateGiftCard = vi
-  .fn()
-  .mockResolvedValue({ ...mockGiftCard, reference: "updated-ref" })
+const mockCreateGiftCard = vi.fn().mockResolvedValue({ ...mockGiftCard, id: "gc_new" })
+const mockUpdateGiftCard = vi.fn().mockResolvedValue({ ...mockGiftCard, reference: "updated-ref" })
 
 vi.mock("@commercelayer/core", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@commercelayer/core")>()

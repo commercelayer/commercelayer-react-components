@@ -24,7 +24,6 @@ const getCustomerPaymentSources = vi.fn()
 function Tree({
   order,
   setPaymentSource,
-  // biome-ignore lint/suspicious/noExplicitAny: test cast
 }: {
   order: any
   setPaymentSource: (...args: any[]) => Promise<unknown>
@@ -37,7 +36,6 @@ function Tree({
         {/* biome-ignore lint/suspicious/noExplicitAny: test cast */}
         <PlaceOrderContext.Provider value={{ status: "" } as any}>
           <PaymentMethodChildrenContext.Provider
-            // biome-ignore lint/suspicious/noExplicitAny: test cast
             value={
               {
                 payment: { id: "pm-1", payment_source_type: "stripe_payments" },
@@ -47,7 +45,6 @@ function Tree({
             }
           >
             <PaymentMethodContext.Provider
-              // biome-ignore lint/suspicious/noExplicitAny: test cast
               value={
                 {
                   currentPaymentMethodId: "pm-1",

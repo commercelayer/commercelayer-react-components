@@ -1,3 +1,5 @@
+import type { StripeElementLocale } from "@stripe/stripe-js"
+import React, { type JSX } from "react"
 import type { GatewayBaseType } from "#components/payment_gateways/PaymentGateway"
 import ExternalPayment from "#components/payment_source/ExternalPayment"
 import CustomerContext from "#context/CustomerContext"
@@ -7,9 +9,7 @@ import PaymentMethodContext from "#context/PaymentMethodContext"
 import PaymentSourceContext from "#context/PaymentSourceContext"
 import { getPaymentConfig, type PaymentResource } from "#reducers/PaymentMethodReducer"
 import getCardDetails from "#utils/getCardDetails"
-import type { StripeElementLocale } from "@stripe/stripe-js"
 import { isEmpty } from "#utils/isEmpty"
-import React, { type JSX } from "react"
 import PaymentCardsTemplate from "../utils/PaymentCardsTemplate"
 
 type Props = GatewayBaseType

@@ -1,7 +1,6 @@
-import { authenticate } from "@commercelayer/js-auth"
-import { useEffect, useMemo, useState } from "react"
+import { authenticate, jwtDecode } from "@commercelayer/js-auth"
 import Cookie from "js-cookie"
-import { jwtDecode } from "@commercelayer/js-auth"
+import { useEffect, useMemo, useState } from "react"
 
 const salesChannel = {
   clientId: "Z5ypiDlsqgV8twWRz0GabrJvTKXad4U-PMoVAU-XvV0",
@@ -63,7 +62,7 @@ export function useGetToken<T extends UseGetTokenOptions>(
         Cookie.set(getAccessTokenCookieName(mode), accessToken, { expires })
       })
     }
-  }, [])
+  }, [mode])
 
   useEffect(() => {
     if (
@@ -73,7 +72,7 @@ export function useGetToken<T extends UseGetTokenOptions>(
     ) {
       initToken()
     }
-  }, [accessToken])
+  }, [accessToken, initToken])
 
   return {
     accessToken,
@@ -184,7 +183,9 @@ function isTokenExpired({
   }
 
   try {
-    const { payload: { exp } } = jwtDecode(accessToken)
+    const {
+      payload: { exp },
+    } = jwtDecode(accessToken)
 
     if (exp == null) {
       return true

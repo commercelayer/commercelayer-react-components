@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
+
+import type { CommerceLayerClient } from "@commercelayer/sdk"
+import { useEffect, useState } from "react"
 import OrderStorageComponent from "#components/orders/OrderStorage"
 import useCommerceLayer from "#hooks/useCommerceLayer"
-import { useState, useEffect } from "react"
 import useOrderContainer from "#hooks/useOrderContainer"
-import type { CommerceLayerClient } from "@commercelayer/sdk"
 
 export const OrderStorage = ({
   persistKey,
@@ -24,7 +25,7 @@ export const OrderStorage = ({
         localStorage.setItem(persistKey, orderId)
       })
     }
-  }, [cl, persistKey])
+  }, [cl, orderId, persistKey])
 
   if (cl == null || orderId == null) {
     return <div />
@@ -48,6 +49,7 @@ export const AddSampleItems = (): JSX.Element => {
     >
       <p className="mb-4">Cart is empty</p>
       <button
+        type="button"
         onClick={async () => {
           await addToCart({
             skuCode: "5PANECAP9D9CA1FFFFFFXXXX",

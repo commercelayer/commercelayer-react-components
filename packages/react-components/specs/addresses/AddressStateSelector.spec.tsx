@@ -118,9 +118,7 @@ describe("AddressStateSelector", () => {
     // Step 1: render with no country. Step 2: country arrives in context. Step 3: state select must show.
     const setValue = vi.fn()
     const { rerender } = render(
-      <BillingAddressFormContext.Provider
-        value={{ setValue, errors: {}, values: {} } as any}
-      >
+      <BillingAddressFormContext.Provider value={{ setValue, errors: {}, values: {} } as any}>
         <ShippingAddressFormContext.Provider value={{} as any}>
           <CustomerAddressFormContext.Provider value={{} as any}>
             <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
@@ -149,10 +147,7 @@ describe("AddressStateSelector", () => {
         <ShippingAddressFormContext.Provider value={{} as any}>
           <CustomerAddressFormContext.Provider value={{} as any}>
             <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
-              <AddressStateSelector
-                name={"billing_address_state_code" as any}
-                value="MI"
-              />
+              <AddressStateSelector name={"billing_address_state_code" as any} value="MI" />
             </AddressesContext.Provider>
           </CustomerAddressFormContext.Provider>
         </ShippingAddressFormContext.Provider>
@@ -180,9 +175,7 @@ describe("AddressStateSelector", () => {
     // when transitioning from text input to state select.
     const setValue = vi.fn()
     const { rerender } = render(
-      <BillingAddressFormContext.Provider
-        value={{ setValue, errors: {}, values: {} } as any}
-      >
+      <BillingAddressFormContext.Provider value={{ setValue, errors: {}, values: {} } as any}>
         <ShippingAddressFormContext.Provider value={{} as any}>
           <CustomerAddressFormContext.Provider value={{} as any}>
             <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
@@ -593,10 +586,7 @@ describe("AddressStateSelector", () => {
           <ShippingAddressFormContext.Provider value={{} as any}>
             <CustomerAddressFormContext.Provider value={{} as any}>
               <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
-                <AddressStateSelector
-                  name={"billing_address_state_code" as any}
-                  value="NY"
-                />
+                <AddressStateSelector name={"billing_address_state_code" as any} value="NY" />
               </AddressesContext.Provider>
             </CustomerAddressFormContext.Provider>
           </ShippingAddressFormContext.Provider>
@@ -626,10 +616,7 @@ describe("AddressStateSelector", () => {
           <ShippingAddressFormContext.Provider value={shippingCtx}>
             <CustomerAddressFormContext.Provider value={{} as any}>
               <AddressesContext.Provider value={{ ...defaultAddressContext, errors: [] } as any}>
-                <AddressStateSelector
-                  name={"shipping_address_state_code" as any}
-                  value="TX"
-                />
+                <AddressStateSelector name={"shipping_address_state_code" as any} value="TX" />
               </AddressesContext.Provider>
             </CustomerAddressFormContext.Provider>
           </ShippingAddressFormContext.Provider>

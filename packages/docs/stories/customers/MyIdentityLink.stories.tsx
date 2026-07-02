@@ -1,8 +1,8 @@
+import { Controls, Description, Primary, Subtitle, Title } from "@storybook/addon-docs"
 import type { Meta, StoryFn } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
-import MyIdentityLink from "#components/customers/MyIdentityLink"
 import { Code } from "stories/_internals/Code"
-import { Description, Subtitle, Title, Controls, Primary } from "@storybook/addon-docs"
+import MyIdentityLink from "#components/customers/MyIdentityLink"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof MyIdentityLink> = {
   title: "Components/Customers/MyIdentityLink",

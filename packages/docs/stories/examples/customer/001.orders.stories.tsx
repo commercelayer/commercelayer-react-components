@@ -1,11 +1,11 @@
 import type { Meta, StoryFn } from "@storybook/react"
-import CommerceLayer from "../../_internals/CommerceLayer"
 import CustomerContainer from "#components/customers/CustomerContainer"
 import OrderList from "#components/orders/OrderList"
 import OrderListEmpty from "#components/orders/OrderListEmpty"
-import OrderListRow from "#components/orders/OrderListRow"
 import OrderListPaginationButtons from "#components/orders/OrderListPaginationButtons"
 import OrderListPaginationInfo from "#components/orders/OrderListPaginationInfo"
+import OrderListRow from "#components/orders/OrderListRow"
+import CommerceLayer from "../../_internals/CommerceLayer"
 
 const setup: Meta = {
   title: "Examples/Customer Account/Order list",

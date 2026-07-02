@@ -17,8 +17,12 @@ vi.mock("@commercelayer/core", async (importOriginal) => {
     ...actual,
     getSdk: vi.fn().mockReturnValue({
       orders: {
-        retrieve: vi.fn().mockResolvedValue({ id: "order-1", status: "pending", payment_status: "unpaid" }),
-        update: vi.fn().mockResolvedValue({ id: "order-1", status: "placed", payment_status: "authorized" }),
+        retrieve: vi
+          .fn()
+          .mockResolvedValue({ id: "order-1", status: "pending", payment_status: "unpaid" }),
+        update: vi
+          .fn()
+          .mockResolvedValue({ id: "order-1", status: "placed", payment_status: "authorized" }),
       },
     }),
   }
@@ -192,7 +196,9 @@ describe("PlaceOrderContainer", () => {
     )
     await waitFor(() => {
       const calls = addResourceToInclude.mock.calls.map((c) => c[0])
-      const newResources = calls.flatMap((c) => (Array.isArray(c.newResource) ? c.newResource : [c.newResource]))
+      const newResources = calls.flatMap((c) =>
+        Array.isArray(c.newResource) ? c.newResource : [c.newResource]
+      )
       expect(newResources).toContain("shipments.available_shipping_methods")
       expect(newResources).toContain("billing_address")
       expect(newResources).toContain("shipping_address")
@@ -360,7 +366,11 @@ describe("PlaceOrderButton (standalone)", () => {
     )
     await waitFor(() => {
       const resources = addResourceToInclude.mock.calls.flatMap((c) =>
-        Array.isArray(c[0].newResource) ? c[0].newResource : c[0].newResource ? [c[0].newResource] : []
+        Array.isArray(c[0].newResource)
+          ? c[0].newResource
+          : c[0].newResource
+            ? [c[0].newResource]
+            : []
       )
       expect(resources).toContain("shipments.available_shipping_methods")
     })
@@ -383,7 +393,14 @@ describe("PlaceOrderButton (standalone)", () => {
       privacy_url: "https://example.com/privacy",
       terms_url: "https://example.com/terms",
     }
-    const mockError = [{ code: "PAYMENT_METHOD_ERROR", resource: "payment_methods", field: "card", message: "Invalid" }]
+    const mockError = [
+      {
+        code: "PAYMENT_METHOD_ERROR",
+        resource: "payment_methods",
+        field: "card",
+        message: "Invalid",
+      },
+    ]
 
     // Start with payment method errors present
     const { rerender } = render(
@@ -416,7 +433,14 @@ describe("PlaceOrderButton (standalone)", () => {
       payment_method: null,
       payment_source: null,
     }
-    const mockError = [{ code: "PAYMENT_METHOD_ERROR", resource: "payment_methods", field: "card", message: "Invalid" }]
+    const mockError = [
+      {
+        code: "PAYMENT_METHOD_ERROR",
+        resource: "payment_methods",
+        field: "card",
+        message: "Invalid",
+      },
+    ]
 
     const { rerender } = render(
       <Providers order={orderNoPayment} paymentMethodErrors={mockError}>
@@ -838,8 +862,12 @@ describe("PlaceOrderButton handleClick", () => {
     const { getSdk } = await import("@commercelayer/core")
     vi.mocked(getSdk).mockReturnValue({
       orders: {
-        retrieve: vi.fn().mockResolvedValue({ id: "order-1", status: "pending", payment_status: "unpaid" }),
-        update: vi.fn().mockResolvedValue({ id: "order-1", status: "placed", payment_status: "authorized" }),
+        retrieve: vi
+          .fn()
+          .mockResolvedValue({ id: "order-1", status: "pending", payment_status: "unpaid" }),
+        update: vi
+          .fn()
+          .mockResolvedValue({ id: "order-1", status: "placed", payment_status: "authorized" }),
       },
     } as any)
   })
@@ -1252,8 +1280,12 @@ describe("usePlaceOrder hook direct", () => {
     const { getSdk } = await import("@commercelayer/core")
     vi.mocked(getSdk).mockReturnValue({
       orders: {
-        retrieve: vi.fn().mockResolvedValue({ id: "order-1", status: "pending", payment_status: "unpaid" }),
-        update: vi.fn().mockResolvedValue({ id: "order-1", status: "placed", payment_status: "authorized" }),
+        retrieve: vi
+          .fn()
+          .mockResolvedValue({ id: "order-1", status: "pending", payment_status: "unpaid" }),
+        update: vi
+          .fn()
+          .mockResolvedValue({ id: "order-1", status: "placed", payment_status: "authorized" }),
       },
     } as any)
   })
@@ -1323,7 +1355,11 @@ describe("usePlaceOrder hook direct", () => {
               ...defaultOrderContext,
               orderId: "order-1",
               order: MOCK_ORDER,
-              include: ["shipments.available_shipping_methods", "billing_address", "shipping_address"],
+              include: [
+                "shipments.available_shipping_methods",
+                "billing_address",
+                "shipping_address",
+              ],
               includeLoaded: {} as any,
               addResourceToInclude,
               setOrder: vi.fn(),
@@ -1372,7 +1408,9 @@ describe("usePlaceOrder hook direct", () => {
         </CommerceLayerContext.Provider>
       )
     }
-    renderHook(() => usePlaceOrder({ isStandalone: true }), { wrapper: wrapperWithShippingIncluded })
+    renderHook(() => usePlaceOrder({ isStandalone: true }), {
+      wrapper: wrapperWithShippingIncluded,
+    })
     await waitFor(() => {
       const calls = addResourceToInclude.mock.calls.map((c) => c[0])
       const shippingLoaded = calls.find((c) => c.newResourceLoaded?.shipping_address === true)
@@ -1390,7 +1428,11 @@ describe("usePlaceOrder hook direct", () => {
               ...defaultOrderContext,
               orderId: "order-1",
               order: MOCK_ORDER,
-              include: ["shipments.available_shipping_methods", "billing_address", "shipping_address"],
+              include: [
+                "shipments.available_shipping_methods",
+                "billing_address",
+                "shipping_address",
+              ],
               includeLoaded: {
                 "shipments.available_shipping_methods": true,
                 billing_address: true,
@@ -1487,26 +1529,35 @@ describe("usePlaceOrder hook direct", () => {
 // ---------------------------------------------------------------------------
 
 describe("PrivacyAndTermsCheckbox !checked branch", () => {
-  beforeEach(() => { localStorage.clear(); vi.clearAllMocks() })
+  beforeEach(() => {
+    localStorage.clear()
+    vi.clearAllMocks()
+  })
   afterEach(() => localStorage.clear())
 
   it("effect skips localStorage write when checked=true (line 36 false branch)", async () => {
     const { rerender } = render(
-      <Providers order={{ ...MOCK_ORDER, privacy_url: "https://p1.com", terms_url: "https://t1.com" }}>
+      <Providers
+        order={{ ...MOCK_ORDER, privacy_url: "https://p1.com", terms_url: "https://t1.com" }}
+      >
         <PrivacyAndTermsCheckbox />
       </Providers>
     )
     await waitFor(() => {
       expect(screen.getByRole("checkbox").getAttribute("disabled")).toBeNull()
     })
-    await act(async () => { fireEvent.click(screen.getByRole("checkbox")) })
+    await act(async () => {
+      fireEvent.click(screen.getByRole("checkbox"))
+    })
     expect(localStorage.getItem("privacy-terms")).toBe("true")
 
     // Change URLs so effect re-runs with checked=true → !checked = false → localStorage write skipped
     // (cleanup from prior effect removes the item; since checked=true the false branch means no re-write to "false")
     await act(async () => {
       rerender(
-        <Providers order={{ ...MOCK_ORDER, privacy_url: "https://p2.com", terms_url: "https://t2.com" }}>
+        <Providers
+          order={{ ...MOCK_ORDER, privacy_url: "https://p2.com", terms_url: "https://t2.com" }}
+        >
           <PrivacyAndTermsCheckbox />
         </Providers>
       )

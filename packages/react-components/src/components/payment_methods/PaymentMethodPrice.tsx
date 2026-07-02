@@ -1,8 +1,8 @@
-import { useState, useEffect, type JSX } from "react"
-import getAmount from "#utils/getAmount"
-import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
+import { type JSX, useEffect, useState } from "react"
 import Parent from "#components/utils/Parent"
+import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import type { BaseAmountComponent } from "#typings/index"
+import getAmount from "#utils/getAmount"
 import useCustomContext from "#utils/hooks/useCustomContext"
 
 interface Props extends BaseAmountComponent {

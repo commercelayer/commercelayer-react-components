@@ -1,4 +1,4 @@
-import { type StorybookConfig } from "@storybook/react-vite"
+import type { StorybookConfig } from "@storybook/react-vite"
 import { resolve } from "path"
 import { mergeConfig, type UserConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"

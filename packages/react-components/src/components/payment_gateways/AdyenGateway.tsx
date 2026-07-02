@@ -1,5 +1,4 @@
 import type { StripeElementLocale } from "@stripe/stripe-js"
-import { isEmpty } from "#utils/isEmpty"
 import { type JSX, useContext } from "react"
 import type { GatewayBaseType } from "#components/payment_gateways/PaymentGateway"
 import AdyenPayment from "#components/payment_source/AdyenPayment"
@@ -13,6 +12,7 @@ import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import getCardDetails from "#utils/getCardDetails"
 import { getPaymentAttributes } from "#utils/getPaymentAttributes"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
+import { isEmpty } from "#utils/isEmpty"
 import { jwt } from "#utils/jwt"
 import PaymentCardsTemplate from "../utils/PaymentCardsTemplate"
 

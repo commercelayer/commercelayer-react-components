@@ -1,3 +1,3 @@
+export { deleteLineItem } from "./deleteLineItem"
 export { getLineItems } from "./getLineItems"
 export { updateLineItem } from "./updateLineItem"
-export { deleteLineItem } from "./deleteLineItem"

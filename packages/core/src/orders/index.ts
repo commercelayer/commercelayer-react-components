@@ -1,6 +1,6 @@
-export type { GetLocalOrder, SetLocalOrder, DeleteLocalOrder } from "./orderStorage"
-export { getLocalOrder, setLocalOrder, deleteLocalOrder } from "./orderStorage"
 export type { BaseMetadataObject } from "#types"
 export { createOrder } from "./createOrder"
+export type { DeleteLocalOrder, GetLocalOrder, SetLocalOrder } from "./orderStorage"
+export { deleteLocalOrder, getLocalOrder, setLocalOrder } from "./orderStorage"
 export { retrieveOrder } from "./retrieveOrder"
 export { updateOrder } from "./updateOrder"

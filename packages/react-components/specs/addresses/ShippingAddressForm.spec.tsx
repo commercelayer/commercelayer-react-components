@@ -369,7 +369,6 @@ describe("ShippingAddressForm", () => {
       values: { shipping_address_first_name: { value: "Jane", required: true } },
     })
 
-    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
     const addrCtx = {
       ...defaultAddressContext,
       setAddress,
@@ -377,7 +376,6 @@ describe("ShippingAddressForm", () => {
       saveAddresses: vi.fn(),
       shipToDifferentAddress: true,
     } as any
-    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
     const orderCtx = {
       ...defaultOrderContext,
       include: ["shipping_address"],
@@ -735,7 +733,14 @@ describe("ShippingAddressForm (standalone mode)", () => {
 
     act(() => {
       ;(ctxRef as any)?.setAddressErrors?.(
-        [{ code: "REQUIRED", message: "Required", resource: "shipping_address", field: "first_name" }],
+        [
+          {
+            code: "REQUIRED",
+            message: "Required",
+            resource: "shipping_address",
+            field: "first_name",
+          },
+        ],
         "shipping_address"
       )
     })

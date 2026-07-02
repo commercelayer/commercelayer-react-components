@@ -1,4 +1,12 @@
-import { type JSX, type ReactNode, useCallback, useContext, useEffect, useMemo, useReducer } from "react"
+import {
+  type JSX,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodContext, { defaultPaymentMethodContext } from "#context/PaymentMethodContext"
@@ -92,8 +100,17 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
     ) {
       getOrder(order.id)
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: pre-existing dependency list, refactoring would risk regressions
-  }, [order, credentials, getOrder, addResourceToInclude, include?.includes, state.paymentMethods, state.config, includeLoaded?.available_payment_methods, config])
+  }, [
+    order,
+    credentials,
+    getOrder,
+    addResourceToInclude,
+    include?.includes,
+    state.paymentMethods,
+    state.config,
+    includeLoaded?.available_payment_methods,
+    config,
+  ])
   // Stable callbacks — dispatch from useReducer is guaranteed stable, so empty deps are correct.
   // Without useCallback these would be new function references on every useMemo recompute, causing
   // payment forms (e.g. StripePaymentForm) that include setPaymentRef in their effect deps to
@@ -150,7 +167,17 @@ export function PaymentMethodsContainer(props: Props): JSX.Element {
         })
       },
     }
-  }, [state, order, getOrder, updateOrder, setOrderErrors, credentials, setLoadingCallback, setPaymentRefCallback, setPaymentMethodErrorsCallback])
+  }, [
+    state,
+    order,
+    getOrder,
+    updateOrder,
+    setOrderErrors,
+    credentials,
+    setLoadingCallback,
+    setPaymentRefCallback,
+    setPaymentMethodErrorsCallback,
+  ])
   return (
     <PaymentMethodContext.Provider value={contextValue}>{children}</PaymentMethodContext.Provider>
   )

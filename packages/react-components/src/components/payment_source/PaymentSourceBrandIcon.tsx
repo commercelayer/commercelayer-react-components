@@ -1,8 +1,8 @@
-import PaymentSourceContext, { type IconBrand } from "#context/PaymentSourceContext"
-import { useContext, useRef, type JSX } from "react"
+import { type JSX, useContext, useRef } from "react"
 import Parent from "#components/utils/Parent"
-import type { ChildrenFunction } from "#typings"
 import CustomerPaymentSourceContext from "#context/CustomerPaymentSourceContext"
+import PaymentSourceContext, { type IconBrand } from "#context/PaymentSourceContext"
+import type { ChildrenFunction } from "#typings"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   brand: IconBrand

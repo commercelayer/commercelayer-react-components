@@ -63,7 +63,7 @@ function renderAddress(
               setBillingAddress: mockSetBillingAddress,
               billingCustomerAddressId: undefined,
               ...contextOverrides.billing,
-            } as any /* biome-ignore lint/suspicious/noExplicitAny: test cast */
+            } as any
           }
         >
           <ShippingAddressContext.Provider
@@ -72,14 +72,14 @@ function renderAddress(
                 setShippingAddress: mockSetShippingAddress,
                 shippingCustomerAddressId: undefined,
                 ...contextOverrides.shipping,
-              } as any /* biome-ignore lint/suspicious/noExplicitAny: test cast */
+              } as any
             }
           >
             <CustomerContext.Provider
               value={
                 {
                   addresses: contextOverrides.customerAddresses as AddressType[] | undefined,
-                } as any /* biome-ignore lint/suspicious/noExplicitAny: test cast */
+                } as any
               }
             >
               <Address selectedClassName="selected" disabledClassName="disabled" {...props}>
@@ -243,7 +243,6 @@ describe("Address", () => {
   })
 
   it("calls setBillingAddress via effect re-run when dep changes after address is selected", async () => {
-    // biome-ignore lint/suspicious/noExplicitAny: test cast
     const Wrapper = ({ extra }: { extra: boolean }) => (
       <OrderContext.Provider value={{ ...defaultOrderContext } as any}>
         <AddressContext.Provider

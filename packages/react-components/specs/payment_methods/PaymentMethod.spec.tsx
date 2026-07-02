@@ -6,9 +6,7 @@ import { PaymentMethodsContainer } from "#components/payment_methods/PaymentMeth
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
-import PaymentMethodContext, {
-  defaultPaymentMethodContext,
-} from "#context/PaymentMethodContext"
+import PaymentMethodContext, { defaultPaymentMethodContext } from "#context/PaymentMethodContext"
 import PlaceOrderContext, { defaultPlaceOrderContext } from "#context/PlaceOrderContext"
 
 vi.mock("@commercelayer/core", async (importOriginal) => {
@@ -18,7 +16,9 @@ vi.mock("@commercelayer/core", async (importOriginal) => {
     getSdk: vi.fn().mockReturnValue({
       payment_methods: { relationship: vi.fn().mockReturnValue({}) },
       orders: { update: vi.fn().mockResolvedValue({ id: "order-1" }) },
-      stripe_payments: { create: vi.fn().mockResolvedValue({ id: "sp-1", type: "stripe_payments" }) },
+      stripe_payments: {
+        create: vi.fn().mockResolvedValue({ id: "sp-1", type: "stripe_payments" }),
+      },
       wire_transfers: { create: vi.fn().mockResolvedValue({ id: "wt-1" }) },
     }),
     getErrors: vi.fn().mockReturnValue([]),
@@ -133,9 +133,7 @@ function MockPaymentMethodProvider({
     destroyPaymentSource: vi.fn().mockResolvedValue(undefined),
     errors: [],
   }
-  return (
-    <PaymentMethodContext.Provider value={mockCtx}>{children}</PaymentMethodContext.Provider>
-  )
+  return <PaymentMethodContext.Provider value={mockCtx}>{children}</PaymentMethodContext.Provider>
 }
 
 /** Reads and captures the current PaymentMethodContext value. */
@@ -164,7 +162,11 @@ describe("PaymentMethod", () => {
         render(
           <Providers>
             <PaymentMethod>
-              <ContextCapture onCapture={(c) => { capturedCtx = c }} />
+              <ContextCapture
+                onCapture={(c) => {
+                  capturedCtx = c
+                }}
+              />
             </PaymentMethod>
           </Providers>
         )
@@ -181,7 +183,11 @@ describe("PaymentMethod", () => {
         render(
           <Providers>
             <PaymentMethod>
-              <ContextCapture onCapture={(c) => { capturedCtx = c }} />
+              <ContextCapture
+                onCapture={(c) => {
+                  capturedCtx = c
+                }}
+              />
             </PaymentMethod>
           </Providers>
         )
@@ -253,7 +259,11 @@ describe("PaymentMethod", () => {
         render(
           <Providers>
             <PaymentMethod>
-              <ContextCapture onCapture={(c) => { capturedCtx = c }} />
+              <ContextCapture
+                onCapture={(c) => {
+                  capturedCtx = c
+                }}
+              />
             </PaymentMethod>
           </Providers>
         )
@@ -319,7 +329,11 @@ describe("PaymentMethod", () => {
           <Providers>
             <PaymentMethodsContainer>
               <PaymentMethod>
-                <ContextCapture onCapture={(c) => { capturedCtx = c }} />
+                <ContextCapture
+                  onCapture={(c) => {
+                    capturedCtx = c
+                  }}
+                />
               </PaymentMethod>
             </PaymentMethodsContainer>
           </Providers>
@@ -370,9 +384,17 @@ describe("PaymentMethod", () => {
         render(
           <Providers>
             <PaymentMethodsContainer>
-              <ContextCapture onCapture={(c) => { ctxInsideContainer = c }} />
+              <ContextCapture
+                onCapture={(c) => {
+                  ctxInsideContainer = c
+                }}
+              />
               <PaymentMethod>
-                <ContextCapture onCapture={(c) => { ctxInsideMethod = c }} />
+                <ContextCapture
+                  onCapture={(c) => {
+                    ctxInsideMethod = c
+                  }}
+                />
               </PaymentMethod>
             </PaymentMethodsContainer>
           </Providers>
@@ -440,7 +462,11 @@ describe("PaymentMethod", () => {
         render(
           <Providers>
             <PaymentMethod>
-              <ContextCapture onCapture={(c) => { capturedCtx = c }} />
+              <ContextCapture
+                onCapture={(c) => {
+                  capturedCtx = c
+                }}
+              />
             </PaymentMethod>
           </Providers>
         )
@@ -450,10 +476,16 @@ describe("PaymentMethod", () => {
         capturedCtx.setLoading({ loading: true })
         capturedCtx.setPaymentRef({ ref: {} })
         capturedCtx.setPaymentMethodErrors([])
-        await capturedCtx.setPaymentMethod({ paymentResource: "stripe_payments", paymentMethodId: "pm_stripe" }).catch(() => {})
+        await capturedCtx
+          .setPaymentMethod({ paymentResource: "stripe_payments", paymentMethodId: "pm_stripe" })
+          .catch(() => {})
         await capturedCtx.setPaymentSource({ paymentResource: "stripe_payments" }).catch(() => {})
-        await capturedCtx.updatePaymentSource({ paymentResource: "stripe_payments" }).catch(() => {})
-        await capturedCtx.destroyPaymentSource({ paymentSourceId: "ps-1", paymentResource: "stripe_payments" }).catch(() => {})
+        await capturedCtx
+          .updatePaymentSource({ paymentResource: "stripe_payments" })
+          .catch(() => {})
+        await capturedCtx
+          .destroyPaymentSource({ paymentSourceId: "ps-1", paymentResource: "stripe_payments" })
+          .catch(() => {})
       })
 
       expect(typeof capturedCtx.setLoading).toBe("function")
@@ -511,9 +543,11 @@ describe("PaymentMethod", () => {
         )
       })
 
-      const divs = screen.getAllByRole("generic").filter((el) =>
-        ["stripe_payments", "wire_transfers"].includes(el.getAttribute("data-testid") ?? "")
-      )
+      const divs = screen
+        .getAllByRole("generic")
+        .filter((el) =>
+          ["stripe_payments", "wire_transfers"].includes(el.getAttribute("data-testid") ?? "")
+        )
       expect(divs[0].getAttribute("data-testid")).toBe("wire_transfers")
       expect(divs[1].getAttribute("data-testid")).toBe("stripe_payments")
     })
@@ -571,7 +605,9 @@ describe("PaymentMethod", () => {
   describe("PaymentMethod effects — expressPayments", () => {
     it("auto-selects express payment when expressPayments is true and no paymentSource", async () => {
       const mockSetPaymentMethod = vi.fn().mockResolvedValue({ success: true, order: MOCK_ORDER })
-      const mockSetPaymentSource = vi.fn().mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
+      const mockSetPaymentSource = vi
+        .fn()
+        .mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
       const mockSetLoading = vi.fn()
 
       await act(async () => {
@@ -598,8 +634,12 @@ describe("PaymentMethod", () => {
 
   describe("PaymentMethod effects — autoSelectSinglePaymentMethod", () => {
     it("auto-selects when single payment method and no paymentSource", async () => {
-      const mockSetPaymentMethod = vi.fn().mockResolvedValue({ success: true, order: MOCK_ORDER_SINGLE })
-      const mockSetPaymentSource = vi.fn().mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
+      const mockSetPaymentMethod = vi
+        .fn()
+        .mockResolvedValue({ success: true, order: MOCK_ORDER_SINGLE })
+      const mockSetPaymentSource = vi
+        .fn()
+        .mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
       const mockSetLoading = vi.fn()
 
       await act(async () => {
@@ -626,7 +666,9 @@ describe("PaymentMethod", () => {
 
     it("calls autoSelectSinglePaymentMethod callback when provided as function", async () => {
       const callbackFn = vi.fn()
-      const mockSetPaymentMethod = vi.fn().mockResolvedValue({ success: true, order: MOCK_ORDER_SINGLE })
+      const mockSetPaymentMethod = vi
+        .fn()
+        .mockResolvedValue({ success: true, order: MOCK_ORDER_SINGLE })
       const mockSetPaymentSource = vi.fn().mockResolvedValue({ id: "ps-1" })
 
       await act(async () => {
@@ -699,7 +741,9 @@ describe("PaymentMethod", () => {
     it("calls onClick and runs setTimeout callback after express payment selection", async () => {
       vi.useFakeTimers()
       const onClickFn = vi.fn()
-      const mockSetPaymentSource = vi.fn().mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
+      const mockSetPaymentSource = vi
+        .fn()
+        .mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
 
       await act(async () => {
         render(
@@ -725,13 +769,21 @@ describe("PaymentMethod", () => {
     it("runs setTimeout with showLoader=true in expressPayments onClick branch", async () => {
       vi.useFakeTimers()
       const onClickFn = vi.fn()
-      const mockSetPaymentSource = vi.fn().mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
+      const mockSetPaymentSource = vi
+        .fn()
+        .mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
 
       await act(async () => {
         render(
           <Providers>
             <MockPaymentMethodProvider setPaymentSource={mockSetPaymentSource}>
-              <PaymentMethod expressPayments onClick={onClickFn} clickableContainer showLoader loader={<span data-testid="loader2" />}>
+              <PaymentMethod
+                expressPayments
+                onClick={onClickFn}
+                clickableContainer
+                showLoader
+                loader={<span data-testid="loader2" />}
+              >
                 <span>method</span>
               </PaymentMethod>
             </MockPaymentMethodProvider>
@@ -776,7 +828,9 @@ describe("PaymentMethod", () => {
     it("covers autoSelect onClick branch and setTimeout callback", async () => {
       vi.useFakeTimers()
       const onClickFn = vi.fn()
-      const mockSetPaymentSource = vi.fn().mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
+      const mockSetPaymentSource = vi
+        .fn()
+        .mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
 
       await act(async () => {
         render(
@@ -869,8 +923,17 @@ describe("PaymentMethod", () => {
     it("autoSelect with paypal config sets paypal attributes", async () => {
       const mockSetPaymentSource = vi.fn().mockResolvedValue(null)
       // biome-ignore lint/suspicious/noExplicitAny: test cast
-      const paypalMethod: any = { id: "pm_paypal", payment_source_type: "paypal_payments", name: "PayPal" }
-      const paypalConfig = { paypalPay: { returnUrl: "https://example.com/return", cancelUrl: "https://example.com/cancel" } }
+      const paypalMethod: any = {
+        id: "pm_paypal",
+        payment_source_type: "paypal_payments",
+        name: "PayPal",
+      }
+      const paypalConfig = {
+        paypalPay: {
+          returnUrl: "https://example.com/return",
+          cancelUrl: "https://example.com/cancel",
+        },
+      }
 
       await act(async () => {
         render(
@@ -894,7 +957,11 @@ describe("PaymentMethod", () => {
     it("autoSelect with external_payments config sets external attributes", async () => {
       const mockSetPaymentSource = vi.fn().mockResolvedValue(null)
       // biome-ignore lint/suspicious/noExplicitAny: test cast
-      const externalMethod: any = { id: "pm_ext", payment_source_type: "external_payments", name: "External" }
+      const externalMethod: any = {
+        id: "pm_ext",
+        payment_source_type: "external_payments",
+        name: "External",
+      }
       const externalConfig = { externalPayment: { paymentSourceToken: "tok_test" } }
 
       await act(async () => {
@@ -919,7 +986,11 @@ describe("PaymentMethod", () => {
     it("autoSelect with checkout_com_payments config sets cko attributes", async () => {
       const mockSetPaymentSource = vi.fn().mockResolvedValue(null)
       // biome-ignore lint/suspicious/noExplicitAny: test cast
-      const ckoMethod: any = { id: "pm_cko", payment_source_type: "checkout_com_payments", name: "CKO" }
+      const ckoMethod: any = {
+        id: "pm_cko",
+        payment_source_type: "checkout_com_payments",
+        name: "CKO",
+      }
       const ckoConfig = { checkoutComPayment: { publicKey: "pk_test_123" } }
 
       await act(async () => {
@@ -984,7 +1055,11 @@ describe("PaymentMethod", () => {
               paymentMethods={MOCK_ORDER_SINGLE.available_payment_methods}
               paymentSource={existingPaymentSource}
             >
-              <PaymentMethod autoSelectSinglePaymentMethod showLoader loader={<span data-testid="sl-loader" />}>
+              <PaymentMethod
+                autoSelectSinglePaymentMethod
+                showLoader
+                loader={<span data-testid="sl-loader" />}
+              >
                 <span>method</span>
               </PaymentMethod>
             </MockPaymentMethodProvider>
@@ -1075,7 +1150,11 @@ describe("PaymentMethod", () => {
         render(
           <Providers>
             <PaymentMethod config={config}>
-              <ContextCapture onCapture={(c) => { capturedCtx = c }} />
+              <ContextCapture
+                onCapture={(c) => {
+                  capturedCtx = c
+                }}
+              />
             </PaymentMethod>
           </Providers>
         )
@@ -1171,7 +1250,9 @@ describe("PaymentMethod", () => {
     it("sets loading from showLoader in autoSelect onClick setTimeout", async () => {
       vi.useFakeTimers()
       const onClickFn = vi.fn()
-      const mockSetPaymentSource = vi.fn().mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
+      const mockSetPaymentSource = vi
+        .fn()
+        .mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
 
       await act(async () => {
         render(
@@ -1180,7 +1261,12 @@ describe("PaymentMethod", () => {
               paymentMethods={MOCK_ORDER_SINGLE.available_payment_methods}
               setPaymentSource={mockSetPaymentSource}
             >
-              <PaymentMethod autoSelectSinglePaymentMethod onClick={onClickFn} clickableContainer showLoader>
+              <PaymentMethod
+                autoSelectSinglePaymentMethod
+                onClick={onClickFn}
+                clickableContainer
+                showLoader
+              >
                 <span>method</span>
               </PaymentMethod>
             </MockPaymentMethodProvider>
@@ -1205,7 +1291,11 @@ describe("PaymentMethod", () => {
           <Providers>
             <MockPaymentMethodProvider>
               {/* 2 payment methods → else branch → setTimeout with showLoader */}
-              <PaymentMethod autoSelectSinglePaymentMethod showLoader loader={<span data-testid="sl2" />}>
+              <PaymentMethod
+                autoSelectSinglePaymentMethod
+                showLoader
+                loader={<span data-testid="sl2" />}
+              >
                 <span>method</span>
               </PaymentMethod>
             </MockPaymentMethodProvider>

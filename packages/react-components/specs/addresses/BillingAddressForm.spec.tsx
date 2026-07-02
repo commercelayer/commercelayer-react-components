@@ -331,9 +331,12 @@ describe("BillingAddressForm", () => {
       values: { billing_address_first_name: { value: "Jane", required: true } },
     })
 
-    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
-    const addrCtx = { ...defaultAddressContext, setAddress, setAddressErrors, saveAddresses: vi.fn() } as any
-    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+    const addrCtx = {
+      ...defaultAddressContext,
+      setAddress,
+      setAddressErrors,
+      saveAddresses: vi.fn(),
+    } as any
     const orderCtx = {
       ...defaultOrderContext,
       order: { id: "ord-1" },
@@ -693,13 +696,26 @@ describe("BillingAddressForm", () => {
       values: { billing_address_first_name: { value: "Jane", required: true } },
     })
 
-    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
-    const addrCtx = { ...defaultAddressContext, saveAddresses: vi.fn(), setAddressErrors: vi.fn(), setAddress: vi.fn() } as any
+    const addrCtx = {
+      ...defaultAddressContext,
+      saveAddresses: vi.fn(),
+      setAddressErrors: vi.fn(),
+      setAddress: vi.fn(),
+    } as any
 
     const { rerender } = render(
       <AddressesContext.Provider value={addrCtx}>
-        {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
-        <OrderContext.Provider value={{ ...defaultOrderContext, order: { id: "ord-1" }, include: ["billing_address"], includeLoaded: { billing_address: true }, addResourceToInclude: vi.fn() } as any}>
+        <OrderContext.Provider
+          value={
+            {
+              ...defaultOrderContext,
+              order: { id: "ord-1" },
+              include: ["billing_address"],
+              includeLoaded: { billing_address: true },
+              addResourceToInclude: vi.fn(),
+            } as any
+          }
+        >
           <BillingAddressForm data-testid="form2" errorMode="submit">
             <ValidateProbe />
           </BillingAddressForm>
@@ -863,7 +879,14 @@ describe("BillingAddressForm (standalone mode)", () => {
 
     act(() => {
       ;(ctxRef as any)?.setAddressErrors?.(
-        [{ code: "REQUIRED", message: "Required", resource: "billing_address", field: "first_name" }],
+        [
+          {
+            code: "REQUIRED",
+            message: "Required",
+            resource: "billing_address",
+            field: "first_name",
+          },
+        ],
         "billing_address"
       )
     })

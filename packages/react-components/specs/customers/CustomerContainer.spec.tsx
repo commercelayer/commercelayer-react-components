@@ -71,11 +71,9 @@ describe("CustomerContainer", () => {
 
   it("delegates to CustomerContext.Provider", () => {
     render(
-      // biome-ignore lint/suspicious/noExplicitAny: test provider cast
       <CommerceLayerContext.Provider
         value={{ accessToken: "token", interceptors: undefined } as any}
       >
-        {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
         <OrderContext.Provider
           value={{ ...defaultOrderContext, addResourceToInclude: vi.fn() } as any}
         >

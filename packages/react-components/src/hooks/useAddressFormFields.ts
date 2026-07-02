@@ -1,8 +1,9 @@
 import { useRapidForm } from "rapid-form"
 import { useCallback, useEffect, useRef, useState } from "react"
-import type { AddressResource } from "#reducers/AddressReducer"
-import type { CustomFieldMessageError } from "#reducers/AddressReducer"
-import {
+import type { ErrorMode } from "#context/BillingAddressFormContext"
+import type {
+  AddressResource,
+  CustomFieldMessageError,
   setAddress as setAddressAction,
   setAddressErrors as setAddressErrorsAction,
 } from "#reducers/AddressReducer"
@@ -13,7 +14,6 @@ import type {
 } from "#reducers/OrderReducer"
 import type { TCustomerAddress } from "#typings/customers"
 import type { BaseError, CodeErrorType } from "#typings/errors"
-import type { ErrorMode } from "#context/BillingAddressFormContext"
 import { type FormErrors, type FormValue, getFormElement } from "#utils/addressFormUtils"
 
 interface UseAddressFormFieldsParams {

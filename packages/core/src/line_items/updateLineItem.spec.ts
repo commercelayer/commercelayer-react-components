@@ -56,9 +56,7 @@ describe("updateLineItem", () => {
   test("calls line_items.update with correct id and quantity", async () => {
     await updateLineItem({ accessToken: "fake-token", lineItemId: "li_1", quantity: 2 })
 
-    expect(mockUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "li_1", quantity: 2 })
-    )
+    expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ id: "li_1", quantity: 2 }))
   })
 
   test("passes hasExternalPrice as _external_price", async () => {

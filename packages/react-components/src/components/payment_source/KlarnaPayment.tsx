@@ -1,10 +1,11 @@
-import { useContext, useEffect, useRef, useState, type JSX } from "react"
+import type { LineItem } from "@commercelayer/sdk"
+import { type JSX, useContext, useEffect, useRef, useState } from "react"
+import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
-import type { PaymentSourceProps } from "./PaymentSource"
-import OrderContext from "#context/OrderContext"
 import useExternalScript from "#utils/hooks/useExternalScript"
-import type { LineItem } from "@commercelayer/sdk"
+import type { PaymentSourceProps } from "./PaymentSource"
+
 // import PlaceOrderContext from '#context/PlaceOrderContext'
 // import { tr } from '@faker-js/faker'
 
@@ -143,6 +144,7 @@ export default function KlarnaPayment({
       }
     )
   }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is recreated each render; its deps are already tracked
   useEffect(() => {
     if (ref.current && paymentSource && currentPaymentMethodType && loaded && klarna) {
       ref.current.onsubmit = async (props: any) => {
@@ -153,7 +155,6 @@ export default function KlarnaPayment({
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is recreated each render; its deps are already tracked
   }, [paymentSource, currentPaymentMethodType, loaded, klarna, setPaymentRef])
   if (klarna && clientToken) {
     // @ts-expect-error no type

@@ -1,20 +1,20 @@
+import { PaymentRequestButtonElement, useStripe } from "@stripe/react-stripe-js"
+import type { PaymentRequest } from "@stripe/stripe-js"
+import { type JSX, useContext, useEffect, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import {
-  type TSetExpressPlaceOrderParams,
+  expressRedirectUrl,
   getAvailableExpressPayments,
   getExpressShippingMethods,
   setExpressFakeAddress,
   setExpressPlaceOrder,
   setExpressShippingMethod,
-  expressRedirectUrl,
+  type TSetExpressPlaceOrderParams,
 } from "#utils/expressPaymentHelper"
 import { isEmpty } from "#utils/isEmpty"
-import { PaymentRequestButtonElement, useStripe } from "@stripe/react-stripe-js"
-import type { PaymentRequest } from "@stripe/stripe-js"
-import { useContext, useEffect, useState, type JSX } from "react"
 
 interface Props {
   clientSecret: string
@@ -246,9 +246,7 @@ export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | nul
         }
       }
     })
-    return (
-      <PaymentRequestButtonElement className="" options={{ paymentRequest }} />
-    )
+    return <PaymentRequestButtonElement className="" options={{ paymentRequest }} />
   }
 
   return null

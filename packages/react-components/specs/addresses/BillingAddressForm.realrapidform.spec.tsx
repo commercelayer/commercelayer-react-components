@@ -5,10 +5,10 @@
  */
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { useContext } from "react"
-import { BillingAddressForm } from "#components/addresses/BillingAddressForm"
 import AddressInput from "#components/addresses/AddressInput"
-import BillingAddressFormContext from "#context/BillingAddressFormContext"
+import { BillingAddressForm } from "#components/addresses/BillingAddressForm"
 import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
+import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 
 // Do NOT mock rapid-form so real event listeners are used

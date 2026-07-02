@@ -1,6 +1,6 @@
-import { getSdk } from "#sdk"
-import type { InterceptorManager } from "#sdk"
 import type { Address, AddressCreate, Order, OrderUpdate } from "@commercelayer/sdk"
+import type { InterceptorManager } from "#sdk"
+import { getSdk } from "#sdk"
 
 export interface SaveOrderAddressesParams {
   accessToken: string
@@ -98,8 +98,7 @@ export async function saveOrderAddresses({
       orderAttributes._shipping_address_clone_id = order.shipping_address?.id
     }
 
-    const hasBillingAddress =
-      billingAddress != null && Object.keys(billingAddress).length > 0
+    const hasBillingAddress = billingAddress != null && Object.keys(billingAddress).length > 0
 
     if (hasBillingAddress && !billingAddressCloneId) {
       delete orderAttributes._billing_address_clone_id
@@ -130,8 +129,7 @@ export async function saveOrderAddresses({
         orderAttributes._shipping_address_clone_id = shippingAddressCloneId
       }
 
-      const hasShippingAddress =
-        shippingAddress != null && Object.keys(shippingAddress).length > 0
+      const hasShippingAddress = shippingAddress != null && Object.keys(shippingAddress).length > 0
 
       if (hasShippingAddress) {
         delete orderAttributes._shipping_address_clone_id

@@ -1,5 +1,5 @@
+import { type JSX, type ReactNode, useContext, useEffect, useRef } from "react"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import { type ReactNode, useContext, useEffect, useRef, type JSX } from "react"
 
 export interface PaypalConfig {
   return_url: string
@@ -41,6 +41,7 @@ export function PaypalPayment({ infoMessage, ...p }: Props): JSX.Element | null 
     }
     return false
   }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is recreated each render; its deps are already tracked
   useEffect(() => {
     if (
       ref.current &&
@@ -57,7 +58,6 @@ export function PaypalPayment({ infoMessage, ...p }: Props): JSX.Element | null 
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is recreated each render; its deps are already tracked
   }, [paymentSource, currentPaymentMethodType, setPaymentRef])
   return (
     <form ref={ref}>

@@ -109,10 +109,7 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
     [order, hookSetShippingMethod, getOrder, orderId]
   )
 
-  const setShipmentErrors = useCallback(
-    (errs: BaseError[]) => setErrors(errs),
-    []
-  )
+  const setShipmentErrors = useCallback((errs: BaseError[]) => setErrors(errs), [])
 
   const contextValue = useMemo(
     () => ({

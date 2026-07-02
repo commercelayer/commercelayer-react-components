@@ -1,5 +1,5 @@
-import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { CommerceLayerClient, Order } from "@commercelayer/sdk"
+import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 
 /**
  * Check if a given `order` has a linked `order_subscription` to replace its `customer_payment_source` with the `order`'s `payment_source`.

@@ -1,7 +1,7 @@
 import { Sku, SkuField } from "@commercelayer/react-components"
 import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { type ReactNode } from "react"
+import type { ReactNode } from "react"
 import CommerceLayer from "../_internals/CommerceLayer"
 
 function Wrapper({ children }: { children: ReactNode }): JSX.Element {

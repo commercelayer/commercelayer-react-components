@@ -1,12 +1,12 @@
-import baseReducer from "#utils/baseReducer"
+import { getSdk } from "@commercelayer/core"
+import type { LineItem, Order } from "@commercelayer/sdk"
 import type { Dispatch } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
-import type { getOrderContext } from "./OrderReducer"
 import type { LoaderType } from "#typings"
 import type { BaseError } from "#typings/errors"
-import type { Order, LineItem } from "@commercelayer/sdk"
-import { getSdk } from "@commercelayer/core"
+import baseReducer from "#utils/baseReducer"
 import getErrors from "#utils/getErrors"
+import type { getOrderContext } from "./OrderReducer"
 
 export interface UpdateLineItemParams {
   lineItemId: string

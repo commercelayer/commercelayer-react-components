@@ -1,8 +1,8 @@
 import {
   deleteLineItem as coreDeleteLineItem,
+  updateLineItem as coreUpdateLineItem,
   getLineItems,
   type InterceptorManager,
-  updateLineItem as coreUpdateLineItem,
 } from "@commercelayer/core"
 import type { LineItem } from "@commercelayer/sdk"
 import { useCallback } from "react"
@@ -52,13 +52,16 @@ export function useLineItems({
   orderId,
   interceptors,
 }: UseLineItemsParams): UseLineItemsReturn {
-  const swrKey =
-    accessToken && orderId ? ["line_items", "get", accessToken, orderId] : null
+  const swrKey = accessToken && orderId ? ["line_items", "get", accessToken, orderId] : null
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<LineItem[]>(
     swrKey,
     async (): Promise<LineItem[]> => {
-      return getLineItems({ accessToken: accessToken as string, interceptors, orderId: orderId as string })
+      return getLineItems({
+        accessToken: accessToken as string,
+        interceptors,
+        orderId: orderId as string,
+      })
     },
     { revalidateOnFocus: false, revalidateOnReconnect: false }
   )

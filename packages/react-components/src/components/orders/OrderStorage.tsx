@@ -1,6 +1,6 @@
-import type { ReactNode, JSX } from "react"
+import type { JSX, ReactNode } from "react"
 import OrderStorageContext from "#context/OrderStorageContext"
-import { getLocalOrder, setLocalOrder, deleteLocalOrder } from "#utils/localStorage"
+import { deleteLocalOrder, getLocalOrder, setLocalOrder } from "#utils/localStorage"
 
 interface Props {
   children: ReactNode

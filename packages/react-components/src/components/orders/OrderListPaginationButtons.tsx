@@ -1,3 +1,4 @@
+import type { JSX } from "react"
 import Parent from "#components/utils/Parent"
 import OrderListPaginationContext, {
   type OrderListPaginationContext as TOrderListPaginationContext,
@@ -5,8 +6,6 @@ import OrderListPaginationContext, {
 import type { ChildrenFunction } from "#typings/index"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import omit from "#utils/omit"
-
-import type { JSX } from "react"
 
 interface PaginationButton extends Omit<JSX.IntrinsicElements["button"], "children" | "disabled"> {
   /**

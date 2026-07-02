@@ -1,9 +1,9 @@
 import {
   createGiftCard,
-  getGiftCards,
   type GiftCard,
   type GiftCardCreate,
   type GiftCardUpdate,
+  getGiftCards,
   type InterceptorManager,
   retrieveGiftCard,
   updateGiftCard,
@@ -44,8 +44,7 @@ export function useGiftCards(
   accessToken: string,
   interceptors?: InterceptorManager
 ): UseGiftCardsReturn {
-  const [fetchParams, setFetchParams] =
-    useState<Parameters<typeof getGiftCards>[0]["params"]>()
+  const [fetchParams, setFetchParams] = useState<Parameters<typeof getGiftCards>[0]["params"]>()
   const [shouldFetch, setShouldFetch] = useState(false)
   const [action, setAction] = useState<UseAction>(null)
 
@@ -56,14 +55,11 @@ export function useGiftCards(
     { revalidateOnFocus: false, revalidateOnReconnect: false }
   )
 
-  const fetchGiftCards = useCallback(
-    (newParams?: Parameters<typeof getGiftCards>[0]["params"]) => {
-      setFetchParams(newParams)
-      setShouldFetch(true)
-      setAction("get")
-    },
-    []
-  )
+  const fetchGiftCards = useCallback((newParams?: Parameters<typeof getGiftCards>[0]["params"]) => {
+    setFetchParams(newParams)
+    setShouldFetch(true)
+    setAction("get")
+  }, [])
 
   const handleRetrieveGiftCard = useCallback(
     async (id: string): Promise<GiftCard | undefined> => {
@@ -78,10 +74,9 @@ export function useGiftCards(
     async (resource: GiftCardCreate): Promise<GiftCard | undefined> => {
       setAction("create")
       const result = await createGiftCard({ accessToken, resource, interceptors })
-      await mutate(
-        (current) => (current != null ? [...current, result] : [result]),
-        { revalidate: false }
-      )
+      await mutate((current) => (current != null ? [...current, result] : [result]), {
+        revalidate: false,
+      })
       return result
     },
     [accessToken, interceptors, mutate]

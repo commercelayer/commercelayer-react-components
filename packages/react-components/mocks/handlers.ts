@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/return-await */
-import { HttpResponse, bypass, http } from "msw"
+import { bypass, HttpResponse, http } from "msw"
 // import { customerAddresses } from './resources/orders/customer-addresses'
 // import { customerOrdersFull } from './resources/orders/customer-orders-full'
 

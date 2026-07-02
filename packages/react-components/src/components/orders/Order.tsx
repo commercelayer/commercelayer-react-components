@@ -1,4 +1,4 @@
-import type { Order as OrderSDK, OrderCreate } from "@commercelayer/sdk"
+import type { OrderCreate, Order as OrderSDK } from "@commercelayer/sdk"
 import { type JSX, useContext } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"

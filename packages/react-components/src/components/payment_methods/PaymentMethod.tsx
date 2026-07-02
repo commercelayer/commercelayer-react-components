@@ -5,8 +5,8 @@ import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
-import type { PaymentMethodConfig, PaymentResource } from "#reducers/PaymentMethodReducer"
 import { usePaymentMethod } from "#hooks/usePaymentMethod"
+import type { PaymentMethodConfig, PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { LoaderType } from "#typings"
 import type { DefaultChildrenType } from "#typings/globals"
 import { getAvailableExpressPayments } from "#utils/expressPaymentHelper"
@@ -143,7 +143,18 @@ export function PaymentMethod({
         selectExpressPayment()
       }
     }
-  }, [expressPayments, errors?.length, setPaymentMethod, setPaymentSource, paymentMethods, setLoadingPlaceOrder, order, onClick, paymentSource, showLoader])
+  }, [
+    expressPayments,
+    errors?.length,
+    setPaymentMethod,
+    setPaymentSource,
+    paymentMethods,
+    setLoadingPlaceOrder,
+    order,
+    onClick,
+    paymentSource,
+    showLoader,
+  ])
   useEffect(() => {
     if (
       paymentMethods != null &&
@@ -214,7 +225,23 @@ export function PaymentMethod({
         autoSelect()
       }
     }
-  }, [errors?.length, setLoadingPlaceOrder, (paymentSource as any)?.payment_response?.status?.toLowerCase, paymentMethods, order, config, setPaymentSource, setPaymentMethod, paymentSourceCreated, onClick, getCustomerPaymentSources, expressPayments, paymentSource, showLoader, autoSelectSinglePaymentMethod])
+  }, [
+    errors?.length,
+    setLoadingPlaceOrder,
+    (paymentSource as any)?.payment_response?.status?.toLowerCase,
+    paymentMethods,
+    order,
+    config,
+    setPaymentSource,
+    setPaymentMethod,
+    paymentSourceCreated,
+    onClick,
+    getCustomerPaymentSources,
+    expressPayments,
+    paymentSource,
+    showLoader,
+    autoSelectSinglePaymentMethod,
+  ])
   useEffect(() => {
     if (paymentMethods) {
       const isSingle = paymentMethods.length === 1
@@ -245,7 +272,15 @@ export function PaymentMethod({
       setLoading(true)
       setPaymentSelected("")
     }
-  }, [paymentMethods, currentPaymentMethodId, errors?.length, showLoader, (paymentSource as any)?.payment_response?.status?.toLowerCase, paymentSource, autoSelectSinglePaymentMethod])
+  }, [
+    paymentMethods,
+    currentPaymentMethodId,
+    errors?.length,
+    showLoader,
+    (paymentSource as any)?.payment_response?.status?.toLowerCase,
+    paymentSource,
+    autoSelectSinglePaymentMethod,
+  ])
   useEffect(() => {
     const status =
       // @ts-expect-error no type
@@ -331,9 +366,7 @@ export function PaymentMethod({
   // a surrounding <PaymentMethodsContainer>.
   if (isStandalone) {
     return (
-      <PaymentMethodContext.Provider value={standaloneCtx}>
-        {content}
-      </PaymentMethodContext.Provider>
+      <PaymentMethodContext.Provider value={standaloneCtx}>{content}</PaymentMethodContext.Provider>
     )
   }
   return content

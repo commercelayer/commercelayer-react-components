@@ -1,5 +1,5 @@
-import { createContext } from "react"
 import type { Address } from "@commercelayer/sdk"
+import { createContext } from "react"
 
 export interface InitialAddressContext {
   address: Address | undefined

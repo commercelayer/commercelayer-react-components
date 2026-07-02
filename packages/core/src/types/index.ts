@@ -1,1 +1,1 @@
-export type { RequestConfig, BaseMetadataObject } from "./base"
+export type { BaseMetadataObject, RequestConfig } from "./base"

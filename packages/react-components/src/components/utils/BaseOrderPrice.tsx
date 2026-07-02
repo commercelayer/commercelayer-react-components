@@ -1,10 +1,10 @@
+import { type JSX, useContext, useEffect, useState } from "react"
 import OrderContext from "#context/OrderContext"
-import getAmount from "#utils/getAmount"
-import Parent from "./Parent"
-import { useState, useEffect, useContext, type JSX } from "react"
-import type { PropsType } from "#utils/PropsType"
 import type { baseOrderPricePropTypes } from "#typings"
+import getAmount from "#utils/getAmount"
 import { isEmpty } from "#utils/isEmpty"
+import type { PropsType } from "#utils/PropsType"
+import Parent from "./Parent"
 
 export type BaseOrderPriceProps = PropsType<typeof baseOrderPricePropTypes, unknown> &
   Omit<JSX.IntrinsicElements["span"], "children" | "ref">

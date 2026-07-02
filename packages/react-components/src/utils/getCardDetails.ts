@@ -1,6 +1,6 @@
+import type { CustomerPaymentSource } from "@commercelayer/sdk"
 import type { IconBrand } from "#context/PaymentSourceContext"
 import type { PaymentResource, PaymentSourceObject } from "#reducers/PaymentMethodReducer"
-import type { CustomerPaymentSource } from "@commercelayer/sdk"
 
 interface CardDetails {
   brand: IconBrand | string

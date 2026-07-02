@@ -1,3 +1,4 @@
+import { getSdk } from "@commercelayer/core"
 import type {
   AdyenPaymentUpdate,
   LineItemCreate,
@@ -7,7 +8,6 @@ import type {
   QueryParamsRetrieve,
   ResourceUpdate,
 } from "@commercelayer/sdk"
-import { isEmpty } from "#utils/isEmpty"
 import type { Dispatch } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { BaseError } from "#typings/errors"
@@ -16,8 +16,8 @@ import type { BaseMetadataObject } from "#typings/index"
 import baseReducer from "#utils/baseReducer"
 import { publish } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
+import { isEmpty } from "#utils/isEmpty"
 import { jwt } from "#utils/jwt"
-import { getSdk } from "@commercelayer/core"
 import {
   type CustomerOrderParams,
   type DeleteLocalOrder,

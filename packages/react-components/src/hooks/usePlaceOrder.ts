@@ -1,7 +1,7 @@
+import type { RefObject } from "react"
 import { useCallback, useContext, useEffect, useMemo, useReducer } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
-import { useOrganizationConfig } from "#utils/organization"
 import placeOrderReducer, {
   type PlaceOrderOptions,
   placeOrderInitialState,
@@ -10,7 +10,7 @@ import placeOrderReducer, {
   setPlaceOrder,
   setPlaceOrderStatus,
 } from "#reducers/PlaceOrderReducer"
-import type { RefObject } from "react"
+import { useOrganizationConfig } from "#utils/organization"
 
 /**
  * Custom DOM event dispatched by `<PrivacyAndTermsCheckbox>` in standalone mode

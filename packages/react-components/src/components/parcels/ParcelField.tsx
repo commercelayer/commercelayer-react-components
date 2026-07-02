@@ -1,12 +1,11 @@
-import type { ConditionalElement } from "#typings"
+import type { JSX } from "react"
 import GenericFieldComponent, {
   type TGenericChildrenProps,
   type TResourceKey,
   type TResources,
 } from "#components/utils/GenericFieldComponent"
 import ParcelChildrenContext from "#context/ParcelChildrenContext"
-
-import type { JSX } from "react"
+import type { ConditionalElement } from "#typings"
 
 type ParcelFieldChildrenProps = TGenericChildrenProps<TResources["Parcel"]>
 

@@ -99,7 +99,9 @@ describe("AddressCountrySelector", () => {
     // biome-ignore lint/suspicious/noExplicitAny: testing null prop
     const { rerender } = render(ctx(null as any))
     expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("")
-    await act(async () => { rerender(ctx("IT")) })
+    await act(async () => {
+      rerender(ctx("IT"))
+    })
     expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("IT")
   })
 
@@ -124,7 +126,9 @@ describe("AddressCountrySelector", () => {
     fireEvent.change(select, { target: { value: "IT" } })
     expect(select.value).toBe("IT")
     // Parent re-renders with same null value — should NOT reset user's selection
-    await act(async () => { rerender(ctx(null as any)) })
+    await act(async () => {
+      rerender(ctx(null as any))
+    })
     expect(select.value).toBe("IT")
   })
 
@@ -149,7 +153,9 @@ describe("AddressCountrySelector", () => {
     fireEvent.change(select, { target: { value: "DE" } })
     expect(select.value).toBe("DE")
     // Parent re-renders with the same value="IT" (e.g., order state unchanged)
-    await act(async () => { rerender(mkTree("IT")) })
+    await act(async () => {
+      rerender(mkTree("IT"))
+    })
     // User's selection should be preserved, not reverted to Italy
     expect(select.value).toBe("DE")
   })

@@ -1,12 +1,12 @@
 import { type JSX, type ReactNode, useContext } from "react"
 import AddressesContext from "#context/AddressContext"
-import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import type { ErrorMode } from "#context/BillingAddressFormContext"
+import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
-import type { CustomFieldMessageError } from "#reducers/AddressReducer"
 import { useAddressFormFields } from "#hooks/useAddressFormFields"
 import { useStandaloneAddress } from "#hooks/useStandaloneAddress"
+import type { CustomFieldMessageError } from "#reducers/AddressReducer"
 import { getSaveBillingAddressToAddressBook } from "#utils/localStorage"
 
 type Props = {
@@ -105,8 +105,8 @@ export function BillingAddressForm(props: Props): JSX.Element {
   // billingAddress.values["billing_address_country_code"] to detect the country.
   // rapid-form only tracks required fields; the reducer captures everything.
   const reducerAddressValues = isStandalone
-    ? (standalone.standaloneState["billing_address"] as Record<string, unknown> | undefined)
-    : (parentAddressContext["billing_address"] as Record<string, unknown> | undefined)
+    ? (standalone.standaloneState.billing_address as Record<string, unknown> | undefined)
+    : (parentAddressContext.billing_address as Record<string, unknown> | undefined)
   const prefixedReducerValues = Object.fromEntries(
     Object.entries(reducerAddressValues ?? {})
       .filter(([, v]) => v != null && v !== "")

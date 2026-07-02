@@ -1,4 +1,13 @@
-import { type JSX, type ReactNode, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from "react"
+import {
+  type JSX,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+} from "react"
 import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
@@ -95,32 +104,37 @@ export function AddressesContainer(props: Props): JSX.Element {
     })
   }, [])
 
-  const saveAddressesFn = useCallback(async (params: {
-    customerEmail?: string
-    customerAddress?: ICustomerAddress
-  }): ReturnType<typeof saveAddresses> =>
-    await saveAddresses({
-      config,
-      dispatch,
-      updateOrder,
-      order,
-      orderId,
-      state,
-      ...params,
-    }),
-  [config, updateOrder, order, orderId, state])
+  const saveAddressesFn = useCallback(
+    async (params: {
+      customerEmail?: string
+      customerAddress?: ICustomerAddress
+    }): ReturnType<typeof saveAddresses> =>
+      await saveAddresses({
+        config,
+        dispatch,
+        updateOrder,
+        order,
+        orderId,
+        state,
+        ...params,
+      }),
+    [config, updateOrder, order, orderId, state]
+  )
 
   const setCloneAddressFn = useCallback((id: string, resource: AddressResource): void => {
     setCloneAddress(id, resource, dispatch)
   }, [])
 
-  const contextValue = useMemo(() => ({
-    ...state,
-    setAddressErrors: setAddressErrorsFn,
-    setAddress: setAddressFn,
-    saveAddresses: saveAddressesFn,
-    setCloneAddress: setCloneAddressFn,
-  }), [state, setAddressErrorsFn, setAddressFn, saveAddressesFn, setCloneAddressFn])
+  const contextValue = useMemo(
+    () => ({
+      ...state,
+      setAddressErrors: setAddressErrorsFn,
+      setAddress: setAddressFn,
+      saveAddresses: saveAddressesFn,
+      setCloneAddress: setCloneAddressFn,
+    }),
+    [state, setAddressErrorsFn, setAddressFn, saveAddressesFn, setCloneAddressFn]
+  )
   return <AddressesContext.Provider value={contextValue}>{children}</AddressesContext.Provider>
 }
 

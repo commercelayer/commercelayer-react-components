@@ -3,10 +3,10 @@ import { type ReactNode, useContext } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { PaymentMethodsContainer } from "#components/payment_methods/PaymentMethodsContainer"
 import CommerceLayerContext from "#context/CommerceLayerContext"
-import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import CustomerContext from "#context/CustomerContext"
-import PlaceOrderContext, { defaultPlaceOrderContext } from "#context/PlaceOrderContext"
+import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
+import PlaceOrderContext, { defaultPlaceOrderContext } from "#context/PlaceOrderContext"
 
 vi.mock("@commercelayer/core", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@commercelayer/core")>()
@@ -280,10 +280,14 @@ describe("PaymentMethodsContainer", () => {
       capturedCtx.setLoading({ loading: true })
       capturedCtx.setPaymentRef({ ref: {} })
       capturedCtx.setPaymentMethodErrors([])
-      await capturedCtx.setPaymentMethod({ paymentResource: "stripe_payments", paymentMethodId: "pm_stripe" }).catch(() => {})
+      await capturedCtx
+        .setPaymentMethod({ paymentResource: "stripe_payments", paymentMethodId: "pm_stripe" })
+        .catch(() => {})
       await capturedCtx.setPaymentSource({ paymentResource: "stripe_payments" }).catch(() => {})
       await capturedCtx.updatePaymentSource({ paymentResource: "stripe_payments" }).catch(() => {})
-      await capturedCtx.destroyPaymentSource({ paymentSourceId: "ps-1", paymentResource: "stripe_payments" }).catch(() => {})
+      await capturedCtx
+        .destroyPaymentSource({ paymentSourceId: "ps-1", paymentResource: "stripe_payments" })
+        .catch(() => {})
     })
 
     // If we reach here without exceptions being re-thrown, all action bodies executed

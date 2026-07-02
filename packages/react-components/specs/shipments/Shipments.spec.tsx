@@ -284,7 +284,9 @@ describe("Shipments component", () => {
     const orderWithStock = {
       ...MOCK_ORDER_PENDING,
       // @ts-expect-error test
-      line_items: [{ id: "li_1", item_type: "skus", quantity: 2, item: { inventory: { quantity: 10 } } }],
+      line_items: [
+        { id: "li_1", item_type: "skus", quantity: 2, item: { inventory: { quantity: 10 } } },
+      ],
     }
     mockUseShipments.mockReturnValue(defaultHookReturn({ shipments: shipmentsWithStock as any }))
 
@@ -379,8 +381,9 @@ describe("Shipments component", () => {
 
     render(
       <CommerceLayerContext.Provider value={{ accessToken: "token" }}>
-        {/* biome-ignore lint/suspicious/noExplicitAny: test cast */}
-        <OrderContext.Provider value={{ ...defaultOrderContext, orderId: null as any, order: MOCK_ORDER_PENDING }}>
+        <OrderContext.Provider
+          value={{ ...defaultOrderContext, orderId: null as any, order: MOCK_ORDER_PENDING }}
+        >
           <Shipments>
             <Consumer />
           </Shipments>
@@ -460,7 +463,10 @@ describe("Shipments component", () => {
   })
 
   it("setShipmentErrors updates the errors in context", async () => {
-    let capturedCtx: { errors: unknown; setShipmentErrors: ((...args: unknown[]) => void) | undefined } = {
+    let capturedCtx: {
+      errors: unknown
+      setShipmentErrors: ((...args: unknown[]) => void) | undefined
+    } = {
       errors: null,
       setShipmentErrors: undefined,
     }
@@ -485,9 +491,7 @@ describe("Shipments component", () => {
       ])
     })
 
-    expect(capturedCtx.errors).toEqual([
-      expect.objectContaining({ code: "CUSTOM_ERROR" }),
-    ])
+    expect(capturedCtx.errors).toEqual([expect.objectContaining({ code: "CUSTOM_ERROR" })])
   })
 
   it("provides a stable setShippingMethod reference across renders (does not change on re-render)", async () => {

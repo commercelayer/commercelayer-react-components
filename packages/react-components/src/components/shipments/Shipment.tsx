@@ -1,19 +1,11 @@
-import {
-  useContext,
-  type ReactNode,
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-  type JSX,
-} from "react"
-import ShipmentContext from "#context/ShipmentContext"
+import type { DeliveryLeadTime, Order, Shipment as SdkShipment } from "@commercelayer/sdk"
+import { type JSX, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react"
 import ShipmentChildrenContext, {
   type InitialShipmentContext,
 } from "#context/ShipmentChildrenContext"
-import getLoaderComponent from "#utils/getLoaderComponent"
+import ShipmentContext from "#context/ShipmentContext"
 import type { LoaderType } from "#typings"
-import type { DeliveryLeadTime, Order, Shipment as SdkShipment } from "@commercelayer/sdk"
+import getLoaderComponent from "#utils/getLoaderComponent"
 
 interface ShipmentProps {
   children: ReactNode
@@ -120,12 +112,11 @@ export function Shipment({
     // No cleanup: resetting setLoading(true) on every dep change caused an
     // unnecessary extra re-render that contributed to infinite update loops.
     // setShippingMethod is accessed via setShippingMethodRef (see above).
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional
   }, [shipments, autoSelectSingleShippingMethod])
 
   const components = shipments?.map((shipment, k) => (
-    // biome-ignore lint/suspicious/noArrayIndexKey: shipments don't have stable keys in this context
     <ShipmentItem
+      // biome-ignore lint/suspicious/noArrayIndexKey: shipments don't have stable keys in this context
       key={k}
       autoSelectSingleShippingMethod={autoSelectSingleShippingMethod}
       deliveryLeadTimes={deliveryLeadTimes}

@@ -1,8 +1,8 @@
-import { type Meta, type StoryFn, type StoryObj } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
+import type { Meta, StoryFn, StoryObj } from "@storybook/react"
+import { SkuField } from "#components/skus/SkuField"
 import { Skus } from "#components/skus/Skus"
 import { SkusContainer } from "#components/skus/SkusContainer"
-import { SkuField } from "#components/skus/SkuField"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof SkuField> = {
   title: "Components/Skus/SkuField",

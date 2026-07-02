@@ -1,7 +1,7 @@
 import type { Meta, StoryFn } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
 import CustomerContainer from "#components/customers/CustomerContainer"
 import { CustomerField } from "#components/customers/CustomerField"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof CustomerContainer> = {
   title: "Components/Customers/CustomerContainer",

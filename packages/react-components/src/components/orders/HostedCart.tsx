@@ -276,8 +276,20 @@ export function HostedCart({
         unsubscribe("open-cart", openCartHandler)
       }
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: setOrder and resolveCartUrl are intentionally excluded
-  }, [src, open, order?.id, persistKey, setOrder, resolveCartUrl, type, isOpen, openAdd, handleOpen])
+  }, [
+    src,
+    open,
+    order?.id,
+    persistKey,
+    // biome-ignore lint/correctness/useExhaustiveDependencies: setOrder is stable enough for this effect
+    setOrder,
+    // biome-ignore lint/correctness/useExhaustiveDependencies: resolveCartUrl is stable enough for this effect
+    resolveCartUrl,
+    type,
+    isOpen,
+    openAdd,
+    handleOpen,
+  ])
 
   // biome-ignore lint/correctness/useHookAtTopLevel: hook is called after an early return; refactoring would require restructuring the whole component
   useEffect(() => {

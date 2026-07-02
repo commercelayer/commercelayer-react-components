@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
+import { getSdk } from "@commercelayer/core"
 import type {
   AdyenPayment,
   BraintreePayment,
@@ -26,7 +27,6 @@ import type { BaseError } from "#typings/errors"
 import baseReducer from "#utils/baseReducer"
 import getErrors, { setErrors } from "#utils/getErrors"
 import type { ResourceKeys } from "#utils/getPaymentAttributes"
-import { getSdk } from "@commercelayer/core"
 import { pick } from "#utils/pick"
 import { replace } from "#utils/replace"
 import { snakeToCamelCase } from "#utils/snakeToCamelCase"

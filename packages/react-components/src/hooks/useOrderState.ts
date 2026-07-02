@@ -1,14 +1,14 @@
 import type { Order, OrderCreate } from "@commercelayer/sdk"
-import { useCallback, useMemo, useReducer, useState } from "react"
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import { defaultOrderContext } from "#context/OrderContext"
 import type { OrderStorageConfig } from "#context/OrderStorageContext"
 import orderReducer, {
+  type AddResourceToInclude,
   addToCart,
   createOrder,
   getApiOrder,
   getOrderByFields,
-  type AddResourceToInclude,
   type OrderCodeType,
   orderInitialState,
   paymentSourceRequest,
@@ -22,7 +22,6 @@ import orderReducer, {
 import type { BaseMetadataObject } from "#typings"
 import type { BaseError } from "#typings/errors"
 import compareObjAttribute from "#utils/compareObjAttribute"
-import { useEffect } from "react"
 
 interface UseOrderStateConfig
   extends Pick<CommerceLayerConfig, "accessToken" | "interceptors">,

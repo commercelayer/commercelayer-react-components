@@ -1,17 +1,17 @@
+import { type JSX, type ReactNode, type RefObject, useContext, useEffect, useReducer } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
-import { type ReactNode, type RefObject, useContext, useEffect, useReducer, type JSX } from "react"
 import placeOrderReducer, {
-  placeOrderInitialState,
   type PlaceOrderOptions,
+  placeOrderInitialState,
   placeOrderPermitted,
   setButtonRef,
   setPlaceOrderStatus,
 } from "#reducers/PlaceOrderReducer"
-import OrderContext from "#context/OrderContext"
-import CommerceLayerContext from "#context/CommerceLayerContext"
-import { setPlaceOrder } from "../../reducers/PlaceOrderReducer"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import { useOrganizationConfig } from "#utils/organization"
+import { setPlaceOrder } from "../../reducers/PlaceOrderReducer"
 
 interface Props {
   children: ReactNode

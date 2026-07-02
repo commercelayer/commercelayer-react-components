@@ -2,9 +2,9 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { SaveAddressesButton } from "#components/addresses/SaveAddressesButton"
 import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
-import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 import CustomerContext, { defaultCustomerContext } from "#context/CustomerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 
 const mockSaveAddresses = vi.fn()
 const mockSetOrderErrors = vi.fn()
@@ -16,7 +16,6 @@ function renderButton(
   orderOverrides: Record<string, unknown> = {},
   customerOverrides: Record<string, unknown> = {}
 ) {
-  // biome-ignore lint/suspicious/noExplicitAny: test cast
   const addressCtx = {
     ...defaultAddressContext,
     errors: [],
@@ -38,7 +37,6 @@ function renderButton(
     saveAddresses: mockSaveAddresses,
     ...addressOverrides,
   } as any
-  // biome-ignore lint/suspicious/noExplicitAny: test cast
   const orderCtx = {
     ...defaultOrderContext,
     setOrderErrors: mockSetOrderErrors,
@@ -49,7 +47,6 @@ function renderButton(
     },
     ...orderOverrides,
   } as any
-  // biome-ignore lint/suspicious/noExplicitAny: test cast
   const customerCtx = {
     ...defaultCustomerContext,
     isGuest: false,
@@ -276,7 +273,6 @@ describe("SaveAddressesButton (errorMode='submit')", () => {
     billingCtxOverrides: Record<string, unknown> = {},
     shippingCtxOverrides: Record<string, unknown> = {}
   ) {
-    // biome-ignore lint/suspicious/noExplicitAny: test cast
     const addressCtx = {
       ...defaultAddressContext,
       errors: [],
@@ -297,13 +293,11 @@ describe("SaveAddressesButton (errorMode='submit')", () => {
       invertAddresses: false,
       saveAddresses: mockSaveAddresses,
     } as any
-    // biome-ignore lint/suspicious/noExplicitAny: test cast
     const orderCtx = {
       ...defaultOrderContext,
       setOrderErrors: mockSetOrderErrors,
       order: { id: "ord-1", customer_email: "test@example.com", requires_billing_info: false },
     } as any
-    // biome-ignore lint/suspicious/noExplicitAny: test cast
     const customerCtx = {
       ...defaultCustomerContext,
       isGuest: false,
@@ -312,10 +306,18 @@ describe("SaveAddressesButton (errorMode='submit')", () => {
     } as any
 
     return render(
-      // biome-ignore lint/suspicious/noExplicitAny: test cast
-      <BillingAddressFormContext.Provider value={{ errorMode: "submit", validate: vi.fn().mockReturnValue({}), ...billingCtxOverrides } as any}>
-        {/* biome-ignore lint/suspicious/noExplicitAny: test cast */}
-        <ShippingAddressFormContext.Provider value={{ errorMode: "inline", ...shippingCtxOverrides } as any}>
+      <BillingAddressFormContext.Provider
+        value={
+          {
+            errorMode: "submit",
+            validate: vi.fn().mockReturnValue({}),
+            ...billingCtxOverrides,
+          } as any
+        }
+      >
+        <ShippingAddressFormContext.Provider
+          value={{ errorMode: "inline", ...shippingCtxOverrides } as any}
+        >
           <OrderContext.Provider value={orderCtx}>
             <AddressesContext.Provider value={addressCtx}>
               <CustomerContext.Provider value={customerCtx}>
@@ -400,10 +402,7 @@ describe("SaveAddressesButton (errorMode='submit')", () => {
 
   it("proceeds when shipping errorMode='submit' but validate is undefined (covers shipping ?? {} branch)", async () => {
     // Covers line 107: shippingFormCtx.validate?.() ?? {} — the undefined path
-    renderButtonWithFormCtx(
-      { errorMode: "inline" },
-      { errorMode: "submit", validate: undefined }
-    )
+    renderButtonWithFormCtx({ errorMode: "inline" }, { errorMode: "submit", validate: undefined })
 
     fireEvent.click(screen.getByRole("button"))
 
@@ -417,9 +416,10 @@ describe("SaveAddressesButton (errorMode='submit')", () => {
     // Covers line 112: if (Object.keys(errors!).length === 0) — the false branch.
     // Use children function to bypass disabled-button check and call handleClick directly.
     const mockValidate = vi.fn().mockReturnValue({})
-    // biome-ignore lint/suspicious/noExplicitAny: test cast
     const addressCtx = {
-      errors: [{ code: "API_ERROR", resource: "billing_address", field: "line_1", message: "Invalid" }],
+      errors: [
+        { code: "API_ERROR", resource: "billing_address", field: "line_1", message: "Invalid" },
+      ],
       billing_address: {
         first_name: { value: "John" },
         last_name: { value: "Doe" },
@@ -437,13 +437,11 @@ describe("SaveAddressesButton (errorMode='submit')", () => {
       invertAddresses: false,
       saveAddresses: mockSaveAddresses,
     } as any
-    // biome-ignore lint/suspicious/noExplicitAny: test cast
     const orderCtx = {
       ...defaultOrderContext,
       setOrderErrors: mockSetOrderErrors,
       order: { id: "ord-1", customer_email: "test@example.com", requires_billing_info: false },
     } as any
-    // biome-ignore lint/suspicious/noExplicitAny: test cast
     const customerCtx = {
       ...defaultCustomerContext,
       isGuest: false,
@@ -452,8 +450,9 @@ describe("SaveAddressesButton (errorMode='submit')", () => {
     } as any
 
     render(
-      // biome-ignore lint/suspicious/noExplicitAny: test cast
-      <BillingAddressFormContext.Provider value={{ errorMode: "submit", validate: mockValidate } as any}>
+      <BillingAddressFormContext.Provider
+        value={{ errorMode: "submit", validate: mockValidate } as any}
+      >
         {/* biome-ignore lint/suspicious/noExplicitAny: test cast */}
         <ShippingAddressFormContext.Provider value={{ errorMode: "inline" } as any}>
           <OrderContext.Provider value={orderCtx}>

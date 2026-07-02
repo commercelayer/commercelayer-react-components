@@ -86,13 +86,16 @@ export function Errors(props: Props): JSX.Element {
       ) || []),
     ],
     [
-      giftCardErrors, 
-      orderErrors, 
-      lineItemErrors, 
-      customerErrors, 
-      shipmentErrors, 
-      inStockSubscriptionErrors, 
-      paymentMethodErrors, payment?.id, currentPaymentMethodType, currentPaymentMethodId
+      giftCardErrors,
+      orderErrors,
+      lineItemErrors,
+      customerErrors,
+      shipmentErrors,
+      inStockSubscriptionErrors,
+      paymentMethodErrors,
+      payment?.id,
+      currentPaymentMethodType,
+      currentPaymentMethodId,
     ]
   ).filter((v, k, a) => v?.code !== a[k - 1]?.code)
   const addressesErrors = useMemo(() => [...(addressErrors || [])], [addressErrors])

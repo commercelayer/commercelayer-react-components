@@ -1,13 +1,13 @@
+import type { InterceptorManager } from "@commercelayer/core"
 import {
-  saveOrderAddresses,
-  type SaveOrderAddressesParams,
   updateOrder as coreUpdateOrder,
+  retrieveOrder,
+  type SaveOrderAddressesParams,
+  saveOrderAddresses,
 } from "@commercelayer/core"
 import type { Order } from "@commercelayer/sdk"
 import { useCallback, useState } from "react"
 import useSWR from "swr"
-import { retrieveOrder } from "@commercelayer/core"
-import type { InterceptorManager } from "@commercelayer/core"
 
 interface UseAddressFormParams {
   accessToken: string
@@ -62,9 +62,13 @@ export function useAddressForm({
   orderId,
   interceptors,
 }: UseAddressFormParams): UseAddressFormReturn {
-  const { data: order, isLoading, error: swrError, mutate } = useSWR(
-    orderId != null ? `order-${orderId}` : null,
-    () => retrieveOrder({ accessToken, interceptors, id: orderId as string }),
+  const {
+    data: order,
+    isLoading,
+    error: swrError,
+    mutate,
+  } = useSWR(orderId != null ? `order-${orderId}` : null, () =>
+    retrieveOrder({ accessToken, interceptors, id: orderId as string })
   )
 
   const [billingAddress, setBillingAddress] = useState<Record<string, unknown>>({})

@@ -1,19 +1,19 @@
 import type { Meta, StoryFn, StoryObj } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
-import OrderContainerComponent from "#components/orders/OrderContainer"
-import { AddToCartButton } from "#components/orders/AddToCartButton"
-import OrderStorage from "#components/orders/OrderStorage"
-import LineItemsContainer from "#components/line_items/LineItemsContainer"
 import Errors from "#components/errors/Errors"
-import LineItemName from "#components/line_items/LineItemName"
 import LineItem from "#components/line_items/LineItem"
+import LineItemName from "#components/line_items/LineItemName"
 import LineItemQuantity from "#components/line_items/LineItemQuantity"
 import LineItemRemoveLink from "#components/line_items/LineItemRemoveLink"
+import LineItemsContainer from "#components/line_items/LineItemsContainer"
 import LineItemsEmpty from "#components/line_items/LineItemsEmpty"
+import { AddToCartButton } from "#components/orders/AddToCartButton"
+import OrderContainerComponent from "#components/orders/OrderContainer"
+import OrderStorage from "#components/orders/OrderStorage"
 import AvailabilityContainer from "#components/skus/AvailabilityContainer"
 import AvailabilityTemplate from "#components/skus/AvailabilityTemplate"
-import { SkusContainer } from "#components/skus/SkusContainer"
 import Skus from "#components/skus/Skus"
+import { SkusContainer } from "#components/skus/SkusContainer"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof AddToCartButton> = {
   title: "Components/Cart/AddToCartButton",
@@ -129,8 +129,8 @@ export const ChildrenProps: StoryObj = () => {
     <AddToCartButton skuCode="SWEATWCX000000FFFFFFXSXX" quantity="1">
       {(childrenProps) => {
         return (
-          <div
-            role="button"
+          <button
+            type="button"
             className="border-dotted border-2 border-blue-500 text-blue-500 p-4 w-auto inline"
             onClick={() => {
               childrenProps.handleClick().then(({ orderId, success }) => {
@@ -141,7 +141,7 @@ export const ChildrenProps: StoryObj = () => {
             }}
           >
             Add to cart
-          </div>
+          </button>
         )
       }}
     </AddToCartButton>

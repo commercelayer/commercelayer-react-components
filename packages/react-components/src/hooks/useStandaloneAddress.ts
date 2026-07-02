@@ -1,16 +1,16 @@
+import type { Order } from "@commercelayer/sdk"
 import { useCallback, useMemo, useReducer, useRef } from "react"
 import { defaultAddressContext } from "#context/AddressContext"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
-import type { Order } from "@commercelayer/sdk"
 import addressReducer, {
-  type ICustomerAddress,
   addressInitialState,
+  type ICustomerAddress,
   saveAddresses,
   setAddress as setAddressAction,
   setAddressErrors as setAddressErrorsAction,
 } from "#reducers/AddressReducer"
-import type { BaseError } from "#typings/errors"
 import type { updateOrder } from "#reducers/OrderReducer"
+import type { BaseError } from "#typings/errors"
 
 interface UseStandaloneAddressParams {
   isStandalone: boolean
@@ -37,12 +37,9 @@ export function useStandaloneAddress({
   const errorsRef = useRef(standaloneState.errors)
   errorsRef.current = standaloneState.errors
 
-  const standaloneSetAddress = useCallback(
-    (params: Parameters<typeof setAddressAction>[0]) => {
-      setAddressAction({ ...params, dispatch: standaloneDispatch })
-    },
-    []
-  )
+  const standaloneSetAddress = useCallback((params: Parameters<typeof setAddressAction>[0]) => {
+    setAddressAction({ ...params, dispatch: standaloneDispatch })
+  }, [])
 
   const standaloneSetAddressErrors = useCallback(
     (errors: BaseError[], resource: Parameters<typeof setAddressErrorsAction>[0]["resource"]) => {

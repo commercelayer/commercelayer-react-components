@@ -22,12 +22,9 @@ vi.mock("swr", async () => {
     const [isLoading, setIsLoading] = useState(key != null)
     const [error, setError] = useState<unknown>(undefined)
 
-    const mutate = useCallback(
-      async (updated: unknown) => {
-        setData(updated)
-      },
-      []
-    )
+    const mutate = useCallback(async (updated: unknown) => {
+      setData(updated)
+    }, [])
 
     // Trigger fetch on mount (simulate SWR)
     const [fetched, setFetched] = useState(false)
@@ -64,9 +61,7 @@ beforeEach(() => {
 
 describe("useAddressForm", () => {
   test("returns initial state", () => {
-    const { result } = renderHook(() =>
-      useAddressForm({ accessToken: "token", orderId: null })
-    )
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
 
     expect(result.current.billingAddress).toEqual({})
     expect(result.current.shippingAddress).toEqual({})
@@ -76,9 +71,7 @@ describe("useAddressForm", () => {
   })
 
   test("fetches the order when orderId is provided", async () => {
-    const { result } = renderHook(() =>
-      useAddressForm({ accessToken: "token", orderId: "ord_1" })
-    )
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
 
     await waitFor(() => expect(result.current.order).toEqual(fakeOrder))
     expect(mocks.retrieveOrder).toHaveBeenCalledWith(
@@ -94,17 +87,13 @@ describe("useAddressForm", () => {
   test("exposes error as string when SWR fetch fails", async () => {
     mocks.retrieveOrder.mockRejectedValueOnce(new Error("Fetch failed"))
 
-    const { result } = renderHook(() =>
-      useAddressForm({ accessToken: "token", orderId: "ord_1" })
-    )
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
 
     await waitFor(() => expect(result.current.error).toContain("Fetch failed"))
   })
 
   test("setBillingAddress updates billingAddress state", () => {
-    const { result } = renderHook(() =>
-      useAddressForm({ accessToken: "token", orderId: null })
-    )
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
 
     act(() => {
       result.current.setBillingAddress({ first_name: "John" })
@@ -114,9 +103,7 @@ describe("useAddressForm", () => {
   })
 
   test("setShippingAddress updates shippingAddress state", () => {
-    const { result } = renderHook(() =>
-      useAddressForm({ accessToken: "token", orderId: null })
-    )
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
 
     act(() => {
       result.current.setShippingAddress({ first_name: "Jane" })
@@ -126,9 +113,7 @@ describe("useAddressForm", () => {
   })
 
   test("saveAddresses returns success=false when no order is loaded", async () => {
-    const { result } = renderHook(() =>
-      useAddressForm({ accessToken: "token", orderId: null })
-    )
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
 
     const outcome = await result.current.saveAddresses()
     expect(outcome).toEqual({ success: false })
@@ -136,9 +121,7 @@ describe("useAddressForm", () => {
   })
 
   test("saveAddresses calls saveOrderAddresses and updateOrder on success", async () => {
-    const { result } = renderHook(() =>
-      useAddressForm({ accessToken: "token", orderId: "ord_1" })
-    )
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
 
     await waitFor(() => expect(result.current.order).toBeDefined())
 
@@ -146,13 +129,13 @@ describe("useAddressForm", () => {
       result.current.setBillingAddress({ first_name: "John" })
     })
 
-    let outcome: Awaited<ReturnType<typeof result.current.saveAddresses>>
+    let outcome!: Awaited<ReturnType<typeof result.current.saveAddresses>>
     await act(async () => {
       outcome = await result.current.saveAddresses({ customerEmail: "john@example.com" })
     })
 
     // biome-ignore lint/suspicious/noExplicitAny: test assertion
-    expect((outcome! as any).success).toBe(true)
+    expect((outcome as any).success).toBe(true)
     expect(mocks.saveOrderAddresses).toHaveBeenCalledWith(
       expect.objectContaining({
         accessToken: "token",
@@ -175,21 +158,19 @@ describe("useAddressForm", () => {
       error: new Error("SDK error"),
     })
 
-    const { result } = renderHook(() =>
-      useAddressForm({ accessToken: "token", orderId: "ord_1" })
-    )
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
 
     await waitFor(() => expect(result.current.order).toBeDefined())
 
-    let outcome: Awaited<ReturnType<typeof result.current.saveAddresses>>
+    let outcome!: Awaited<ReturnType<typeof result.current.saveAddresses>>
     await act(async () => {
       outcome = await result.current.saveAddresses()
     })
 
     // biome-ignore lint/suspicious/noExplicitAny: test assertion
-    expect((outcome! as any).success).toBe(false)
+    expect((outcome as any).success).toBe(false)
     // biome-ignore lint/suspicious/noExplicitAny: test assertion
-    expect((outcome! as any).error).toBeInstanceOf(Error)
+    expect((outcome as any).error).toBeInstanceOf(Error)
   })
 
   test("saveAddresses returns success=false when orderAttributes is null", async () => {
@@ -198,39 +179,35 @@ describe("useAddressForm", () => {
       orderAttributes: null,
     })
 
-    const { result } = renderHook(() =>
-      useAddressForm({ accessToken: "token", orderId: "ord_1" })
-    )
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
 
     await waitFor(() => expect(result.current.order).toBeDefined())
 
-    let outcome: Awaited<ReturnType<typeof result.current.saveAddresses>>
+    let outcome!: Awaited<ReturnType<typeof result.current.saveAddresses>>
     await act(async () => {
       outcome = await result.current.saveAddresses()
     })
 
     // biome-ignore lint/suspicious/noExplicitAny: test assertion
-    expect((outcome! as any).success).toBe(false)
+    expect((outcome as any).success).toBe(false)
   })
 
   test("saveAddresses returns success=false when updateOrder throws", async () => {
     mocks.updateOrder.mockRejectedValueOnce(new Error("Update failed"))
 
-    const { result } = renderHook(() =>
-      useAddressForm({ accessToken: "token", orderId: "ord_1" })
-    )
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
 
     await waitFor(() => expect(result.current.order).toBeDefined())
 
-    let outcome: Awaited<ReturnType<typeof result.current.saveAddresses>>
+    let outcome!: Awaited<ReturnType<typeof result.current.saveAddresses>>
     await act(async () => {
       outcome = await result.current.saveAddresses()
     })
 
     // biome-ignore lint/suspicious/noExplicitAny: test assertion
-    expect((outcome! as any).success).toBe(false)
+    expect((outcome as any).success).toBe(false)
     // biome-ignore lint/suspicious/noExplicitAny: test assertion
-    expect((outcome! as any).error).toBeInstanceOf(Error)
+    expect((outcome as any).error).toBeInstanceOf(Error)
   })
 
   test("isSaving is true during saveAddresses and false after", async () => {
@@ -246,9 +223,7 @@ describe("useAddressForm", () => {
         })
     )
 
-    const { result } = renderHook(() =>
-      useAddressForm({ accessToken: "token", orderId: "ord_1" })
-    )
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
 
     await waitFor(() => expect(result.current.order).toBeDefined())
 

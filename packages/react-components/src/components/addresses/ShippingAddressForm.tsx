@@ -1,13 +1,12 @@
 import { type JSX, type ReactNode, useContext } from "react"
 import AddressesContext from "#context/AddressContext"
-import type { DefaultContextAddress } from "#context/BillingAddressFormContext"
-import type { ErrorMode } from "#context/BillingAddressFormContext"
+import type { DefaultContextAddress, ErrorMode } from "#context/BillingAddressFormContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
-import type { CustomFieldMessageError } from "#reducers/AddressReducer"
 import { useAddressFormFields } from "#hooks/useAddressFormFields"
 import { useStandaloneAddress } from "#hooks/useStandaloneAddress"
+import type { CustomFieldMessageError } from "#reducers/AddressReducer"
 import { getSaveShippingAddressToAddressBook } from "#utils/localStorage"
 
 interface Props extends Omit<JSX.IntrinsicElements["form"], "onSubmit"> {
@@ -61,8 +60,15 @@ export function ShippingAddressForm(props: Props): JSX.Element {
   const shouldSync = shipToDifferentAddress || invertAddresses
 
   const config = useContext(CommerceLayerContext)
-  const { saveAddressToCustomerAddressBook, include, addResourceToInclude, includeLoaded, order, orderId, updateOrder } =
-    useContext(OrderContext)
+  const {
+    saveAddressToCustomerAddressBook,
+    include,
+    addResourceToInclude,
+    includeLoaded,
+    order,
+    orderId,
+    updateOrder,
+  } = useContext(OrderContext)
 
   const standalone = useStandaloneAddress({
     isStandalone,
@@ -75,8 +81,12 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     invertAddresses,
   })
 
-  const setAddress = isStandalone ? standalone.standaloneSetAddress : parentAddressContext.setAddress
-  const setAddressErrors = isStandalone ? standalone.standaloneSetAddressErrors : parentAddressContext.setAddressErrors
+  const setAddress = isStandalone
+    ? standalone.standaloneSetAddress
+    : parentAddressContext.setAddress
+  const setAddressErrors = isStandalone
+    ? standalone.standaloneSetAddressErrors
+    : parentAddressContext.setAddressErrors
 
   const { formValues, errors, setFormRef, setValue, resetField, validate } = useAddressFormFields({
     resource: "shipping_address",
@@ -95,8 +105,8 @@ export function ShippingAddressForm(props: Props): JSX.Element {
   })
 
   const reducerAddressValues = isStandalone
-    ? (standalone.standaloneState["shipping_address"] as Record<string, unknown> | undefined)
-    : (parentAddressContext["shipping_address"] as Record<string, unknown> | undefined)
+    ? (standalone.standaloneState.shipping_address as Record<string, unknown> | undefined)
+    : (parentAddressContext.shipping_address as Record<string, unknown> | undefined)
   const prefixedReducerValues = Object.fromEntries(
     Object.entries(reducerAddressValues ?? {})
       .filter(([, v]) => v != null && v !== "")

@@ -1,7 +1,7 @@
 import type { Meta, StoryFn } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
-import MyAccountLink from "#components/customers/MyAccountLink"
 import CustomerContainer from "#components/customers/CustomerContainer"
+import MyAccountLink from "#components/customers/MyAccountLink"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof MyAccountLink> = {
   title: "Components/Customers/MyAccountLink",

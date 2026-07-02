@@ -1,7 +1,7 @@
 import { AddToCartButton, CartLink, HostedCart, Order } from "@commercelayer/react-components"
 import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { useState, type JSX } from "react"
+import { type JSX, useState } from "react"
 import CommerceLayer from "../_internals/CommerceLayer"
 import { OrderStorage as OrderStorageHelper } from "../_internals/OrderStorage"
 

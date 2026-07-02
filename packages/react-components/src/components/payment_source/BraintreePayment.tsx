@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { type FormEvent, useContext, useEffect, useRef, useState, type JSX } from "react"
-import PaymentMethodContext from "#context/PaymentMethodContext"
-import { isEmpty } from "#utils/isEmpty"
-import OrderContext from "#context/OrderContext"
-import Parent from "#components/utils/Parent"
-import type { PaymentSourceProps } from "./PaymentSource"
-import { setCustomerOrderParam } from "#utils/localStorage"
-import promisify from "#utils/promisify"
-import type { HostedFieldFieldOptions, ThreeDSecure } from "braintree-web"
+
 import type { BraintreePayment as BraintreePaymentType } from "@commercelayer/sdk"
+import type { HostedFieldFieldOptions, ThreeDSecure } from "braintree-web"
 import type { HostedFieldsHostedFieldsFieldName } from "braintree-web/hosted-fields"
 import type { ThreeDSecureVerifyOptions } from "braintree-web/three-d-secure"
+import { type FormEvent, type JSX, useContext, useEffect, useRef, useState } from "react"
+import Parent from "#components/utils/Parent"
+import OrderContext from "#context/OrderContext"
+import PaymentMethodContext from "#context/PaymentMethodContext"
+import { isEmpty } from "#utils/isEmpty"
+import { setCustomerOrderParam } from "#utils/localStorage"
+import promisify from "#utils/promisify"
+import type { PaymentSourceProps } from "./PaymentSource"
+
 type BraintreeHostedFields<Type> = {
   [Property in keyof Type]: {
     label?: string
@@ -275,8 +277,18 @@ export function BraintreePayment({
       setPaymentRef({ ref: { current: null } })
       setLoadBraintree(false)
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: pre-existing dependency list, refactoring would risk regressions
-  }, [authorization, setPaymentMethodErrors, styles, loadBraintree, currentPaymentMethodType, setPaymentRef, handleSubmitForm, fields, config?.challengeRequested])
+  }, [
+    authorization,
+    setPaymentMethodErrors,
+    styles,
+    loadBraintree,
+    currentPaymentMethodType,
+    setPaymentRef,
+    // biome-ignore lint/correctness/useExhaustiveDependencies: handleSubmitForm is recreated each render; its deps are already tracked
+    handleSubmitForm,
+    fields,
+    config?.challengeRequested,
+  ])
   return !authorization && !loadBraintree ? null : (
     <div className={containerClassName}>
       <form

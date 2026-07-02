@@ -1,3 +1,4 @@
+import { type JSX, useContext } from "react"
 import type { GatewayBaseType } from "#components/payment_gateways/PaymentGateway"
 import WireTransferPayment from "#components/payment_source/WireTransferPayment"
 import OrderContext from "#context/OrderContext"
@@ -7,7 +8,6 @@ import PaymentSourceContext from "#context/PaymentSourceContext"
 import { getPaymentConfig, type PaymentResource } from "#reducers/PaymentMethodReducer"
 import getCardDetails from "#utils/getCardDetails"
 import { isEmpty } from "#utils/isEmpty"
-import { useContext, type JSX } from "react"
 
 type Props = GatewayBaseType
 

@@ -3,9 +3,9 @@ import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import { defaultPaymentMethodContext } from "#context/PaymentMethodContext"
 import paymentMethodReducer, {
+  getPaymentMethods,
   type PaymentMethodConfig,
   type PaymentRef,
-  getPaymentMethods,
   paymentMethodInitialState,
   setPaymentMethodConfig,
   setPaymentRef,
@@ -46,7 +46,6 @@ export function usePaymentMethod({
   } = useContext(OrderContext)
   const credentials = useContext(CommerceLayerContext)
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: mirrors PaymentMethodsContainer behavior
   useEffect(() => {
     if (!isStandalone) return
     if (!include?.includes("available_payment_methods")) {
