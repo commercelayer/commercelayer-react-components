@@ -24,6 +24,7 @@
   "scripts": {
     "lint": "biome lint ./src",
     "lint:fix": "pnpm biome lint --write ./src",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "test": "pnpm audit --prod --audit-level high && (pnpm audit || exit 0) && pnpm lint && vitest run --silent",
     "coverage": "vitest run --coverage",
     "test:e2e": "NODE_ENV=test playwright test",
