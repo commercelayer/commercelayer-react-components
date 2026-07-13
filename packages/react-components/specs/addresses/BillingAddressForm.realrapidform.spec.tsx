@@ -4,7 +4,8 @@
  * Also verifies pre-fill behavior (editing an existing address).
  */
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
+import AddressCountrySelector from "#components/addresses/AddressCountrySelector"
 import AddressInput from "#components/addresses/AddressInput"
 import { BillingAddressForm } from "#components/addresses/BillingAddressForm"
 import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
@@ -141,6 +142,82 @@ describe("BillingAddressForm (real rapid-form)", () => {
         last_name: "Doe",
         phone: "555-9999",
       })
+    })
+  })
+
+  it("captures changes on fields mounted after the form wiring (child-only commit)", async () => {
+    // Regression test for the intermittent mfe-checkout race: the checkout mounts
+    // the address fields only after an async settings fetch resolves, in a render
+    // that does NOT re-render BillingAddressForm (the state change happens in a
+    // descendant). rapid-form wires listeners only to the elements present when
+    // refValidation runs, so a field mounted in such a child-only commit was left
+    // without an 'input' listener: selecting a country updated the DOM but the
+    // change was silently ignored (never reached formValues/context), forever.
+    //
+    // The failure mode under test is "change ignored", NOT "change is slow":
+    // the assertion below must eventually see the value propagate after a single
+    // user change on the late-mounted field.
+    function LateMountedCountry(): JSX.Element | null {
+      const [mounted, setMounted] = useState(false)
+      useEffect(() => {
+        // Simulates the async settings fetch: mounts the field in a commit
+        // triggered by this component's own state, so the parent
+        // BillingAddressForm does not re-render (and does not re-wire).
+        const timer = setTimeout(() => {
+          setMounted(true)
+        }, 10)
+        return () => {
+          clearTimeout(timer)
+        }
+      }, [])
+      if (!mounted) return null
+      return (
+        <AddressCountrySelector name="billing_address_country_code" data-testid="late-country" />
+      )
+    }
+
+    const setAddress = vi.fn()
+    const addressContext = {
+      ...defaultAddressContext,
+      setAddressErrors: vi.fn(),
+      setAddress,
+      saveAddresses: vi.fn(),
+    }
+    const orderContext = {
+      ...defaultOrderContext,
+      order: { id: "ord-late-mount" },
+      include: ["billing_address"],
+      includeLoaded: { billing_address: true },
+      addResourceToInclude: vi.fn(),
+    }
+
+    render(
+      // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+      <AddressesContext.Provider value={addressContext as any}>
+        {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
+        <OrderContext.Provider value={orderContext as any}>
+          <BillingAddressForm data-testid="form">
+            <LateMountedCountry />
+            <ContextProbe />
+          </BillingAddressForm>
+        </OrderContext.Provider>
+      </AddressesContext.Provider>
+    )
+
+    // The field is not in the DOM yet: the form was wired without it.
+    expect(screen.queryByTestId("late-country")).toBeNull()
+    const select = await screen.findByTestId("late-country")
+
+    // Single user-driven country change (rapid-form listens to 'input' events).
+    await act(async () => {
+      fireEvent.input(select, { target: { value: "IT" } })
+    })
+
+    await waitFor(() => {
+      const ctxValues = JSON.parse(screen.getByTestId("ctx-values").textContent ?? "{}")
+      const country = ctxValues.billing_address_country_code
+      // Read it the same way AddressStateSelector does (string or {value}).
+      expect(typeof country === "string" ? country : country?.value).toBe("IT")
     })
   })
 

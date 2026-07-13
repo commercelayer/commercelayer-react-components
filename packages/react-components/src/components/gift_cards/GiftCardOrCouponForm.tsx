@@ -3,6 +3,7 @@ import { useRapidForm } from "rapid-form"
 import { type JSX, useCallback, useContext, useEffect, useState } from "react"
 import CouponAndGiftCardFormContext from "#context/CouponAndGiftCardFormContext"
 import OrderContext from "#context/OrderContext"
+import { useFormWiring } from "#hooks/useFormWiring"
 import type { OrderCodeType } from "#reducers/OrderReducer"
 import type { DefaultChildrenType } from "#typings/globals"
 
@@ -19,6 +20,7 @@ interface Props extends Omit<JSX.IntrinsicElements["form"], "onSubmit"> {
 export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
   const { children, codeType, autoComplete = "on", onSubmit, ...p } = props
   const { refValidation, values } = useRapidForm()
+  const wireForm = useFormWiring(refValidation)
   const { setGiftCardOrCouponCode, order, errors, setOrderErrors } = useContext(OrderContext)
   const [type, setType] = useState<FormCodeType | undefined>(codeType)
 
@@ -67,7 +69,7 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
   }
   return (order?.gift_card_code && order?.coupon_code) || order == null ? null : (
     <CouponAndGiftCardFormContext.Provider value={{ codeType: type as OrderCodeType }}>
-      <form ref={refValidation} autoComplete={autoComplete} onSubmit={handleSubmit} {...p}>
+      <form ref={wireForm} autoComplete={autoComplete} onSubmit={handleSubmit} {...p}>
         {children}
       </form>
     </CouponAndGiftCardFormContext.Provider>
