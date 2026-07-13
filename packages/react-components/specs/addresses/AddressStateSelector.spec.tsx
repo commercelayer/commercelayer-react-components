@@ -37,6 +37,29 @@ describe("AddressStateSelector", () => {
     expect(screen.getByRole("textbox")).toBeTruthy()
   })
 
+  it("passes through extra props (data-testid, disabled) on BOTH the select and input branches", async () => {
+    // Regression: the input branch used to drop passthrough props, so consumers
+    // (e.g. mfe-checkout e2e fixtures) lost data-testid whenever the field
+    // rendered as a text input (country without states).
+    const { unmount } = renderSelector({
+      "data-testid": "input_billing_address_state_code",
+      disabled: true,
+    } as any)
+    const input = screen.getByTestId("input_billing_address_state_code")
+    expect(input.tagName).toBe("INPUT")
+    expect((input as HTMLInputElement).disabled).toBe(true)
+    unmount()
+
+    renderSelector({ "data-testid": "input_billing_address_state_code" } as any, {
+      values: {
+        billing_address_country_code: "IT",
+      } as any,
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId("input_billing_address_state_code").tagName).toBe("SELECT")
+    })
+  })
+
   it("renders a select when country code with states is provided via billing context", async () => {
     renderSelector(
       {},

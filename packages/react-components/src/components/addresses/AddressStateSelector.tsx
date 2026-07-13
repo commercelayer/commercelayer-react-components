@@ -1,4 +1,12 @@
-import { type JSX, useContext, useEffect, useMemo, useRef, useState } from "react"
+import {
+  type ComponentProps,
+  type JSX,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import BaseInput from "#components/utils/BaseInput"
 import BaseSelect from "#components/utils/BaseSelect"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
@@ -237,9 +245,10 @@ export function AddressStateSelector(props: Props): JSX.Element {
     />
   ) : (
     <BaseInput
+      // Spread passthrough props (data-testid, aria-*, disabled, ...) on the
+      // input branch too — they must survive the select/input swap.
+      {...(p as unknown as Omit<ComponentProps<typeof BaseInput>, "children" | "ref">)}
       ref={textInputRef}
-      id={p.id}
-      style={p.style}
       name={name}
       className={classNameComputed}
       required={required}
