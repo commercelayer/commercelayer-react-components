@@ -69,7 +69,7 @@
     "braintree-web": "^3.141.0",
     "frames-react": "^1.2.4",
     "iframe-resizer": "^4.3.6",
-    "rapid-form": "4.0.1"
+    "rapid-form": "^4.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",

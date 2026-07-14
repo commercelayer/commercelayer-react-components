@@ -1,7 +1,6 @@
 import { useRapidForm } from "rapid-form"
 import { useCallback, useEffect, useRef, useState } from "react"
 import type { ErrorMode } from "#context/BillingAddressFormContext"
-import { useFormWiring } from "#hooks/useFormWiring"
 import type {
   AddressResource,
   CustomFieldMessageError,
@@ -59,13 +58,12 @@ export function useAddressFormFields({
   const prefix = `${resource}_`
   const checkboxFieldName = `${resource}_save_to_customer_book`
 
-  const wireForm = useFormWiring(refValidation)
   const setFormRef = useCallback(
     (node: HTMLFormElement | null) => {
       formRef.current = node
-      wireForm(node)
+      refValidation(node)
     },
-    [wireForm]
+    [refValidation]
   )
 
   const clearFieldError = useCallback((name: string) => {

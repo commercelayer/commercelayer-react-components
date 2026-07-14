@@ -11,7 +11,6 @@ import {
 import AddressesContext from "#context/AddressContext"
 import CustomerAddressFormContext from "#context/CustomerAddressFormContext"
 import OrderContext from "#context/OrderContext"
-import { useFormWiring } from "#hooks/useFormWiring"
 import type { AddressField } from "#reducers/AddressReducer"
 import type { AddressCountrySelectName, AddressInputName } from "#typings"
 import type { TCustomerAddress } from "#typings/customers"
@@ -70,13 +69,12 @@ export function CustomerAddressForm(props: Props): JSX.Element {
   const { setAddressErrors, setAddress } = useContext(AddressesContext)
   const { order } = useContext(OrderContext)
   const formRef = useRef<HTMLFormElement | null>(null)
-  const wireForm = useFormWiring(refValidation)
   const setFormRef = useCallback(
     (node: HTMLFormElement | null) => {
       formRef.current = node
-      wireForm(node)
+      refValidation(node)
     },
-    [wireForm]
+    [refValidation]
   )
 
   const clearFieldError = useCallback((name: string) => {

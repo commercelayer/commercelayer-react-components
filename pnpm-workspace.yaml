@@ -8,6 +8,9 @@ allowBuilds:
   msw: true
   nx: true
 
+minimumReleaseAgeExclude:
+  - rapid-form@4.0.3
+
 onlyBuiltDependencies:
   - esbuild
   - iframe-resizer
