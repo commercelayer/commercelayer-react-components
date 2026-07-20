@@ -47,18 +47,18 @@ function buildBillingAddressTree({
   addResourceToInclude?: ReturnType<typeof vi.fn>
   setCloneAddress?: ReturnType<typeof vi.fn>
 }) {
-  const commerceLayerValue = commerceLayer as any // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+  const commerceLayerValue = commerceLayer as any
   const orderContextValue = {
     ...defaultOrderContext,
     addResourceToInclude,
     include,
     ...orderOverrides,
-  } as any // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+  } as any
   const addressContextValue = {
     ...defaultAddressContext,
     setCloneAddress,
     ...addressOverrides,
-  } as any // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+  } as any
 
   return (
     <CommerceLayerContext.Provider value={commerceLayerValue}>

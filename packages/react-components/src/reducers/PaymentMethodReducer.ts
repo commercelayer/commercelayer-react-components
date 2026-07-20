@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
+import { getSdk } from "@commercelayer/core"
 import type {
   AdyenPayment,
   BraintreePayment,
@@ -26,7 +27,6 @@ import type { BaseError } from "#typings/errors"
 import baseReducer from "#utils/baseReducer"
 import getErrors, { setErrors } from "#utils/getErrors"
 import type { ResourceKeys } from "#utils/getPaymentAttributes"
-import { getSdk } from "@commercelayer/core"
 import { pick } from "#utils/pick"
 import { replace } from "#utils/replace"
 import { snakeToCamelCase } from "#utils/snakeToCamelCase"
@@ -288,7 +288,38 @@ export interface SetPaymentSourceParams extends Omit<PaymentMethodState, "config
   updateOrder?: typeof updateOrder
 }
 
-export async function setPaymentSource({
+// Coalesces genuinely-concurrent duplicate calls (e.g. a re-entrant PaymentGateway
+// effect firing `create` twice before the first request settles). Keyed per order,
+// resource and operation path so different operations never merge; entries are removed
+// once settled, so a later legitimate re-create still runs. See ADR 0001.
+const inFlightPaymentSourceRequests = new Map<
+  string,
+  Promise<PaymentSourceType | undefined | null>
+>()
+
+export async function setPaymentSource(
+  params: SetPaymentSourceParams
+): Promise<PaymentSourceType | undefined | null> {
+  const { order, paymentResource, customerPaymentSourceId, paymentSourceId } = params
+  // Without a stable order id there is no real request to coalesce.
+  if (order?.id == null) {
+    return runSetPaymentSource(params)
+  }
+  const key = `${order.id}:${paymentResource}:${
+    customerPaymentSourceId ?? paymentSourceId ?? "create"
+  }`
+  const existing = inFlightPaymentSourceRequests.get(key)
+  if (existing != null) {
+    return existing
+  }
+  const request = runSetPaymentSource(params).finally(() => {
+    inFlightPaymentSourceRequests.delete(key)
+  })
+  inFlightPaymentSourceRequests.set(key, request)
+  return request
+}
+
+async function runSetPaymentSource({
   config,
   dispatch,
   getOrder,

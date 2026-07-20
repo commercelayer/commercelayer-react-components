@@ -1,11 +1,11 @@
 import {
+  DiscountAmount,
   Order,
   OrderNumber,
-  TotalAmount,
-  SubTotalAmount,
-  DiscountAmount,
   ShippingAmount,
+  SubTotalAmount,
   TaxesAmount,
+  TotalAmount,
 } from "@commercelayer/react-components"
 import { ArgTypes, Canvas, Source } from "@storybook/addon-docs/blocks"
 import type { Meta, StoryObj } from "@storybook/react-vite"

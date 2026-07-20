@@ -1,6 +1,6 @@
 import type { Meta, StoryFn } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
 import { AvailabilityContainer } from "#components/skus/AvailabilityContainer"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof AvailabilityContainer> = {
   title: "Components/Availability/AvailabilityContainer",

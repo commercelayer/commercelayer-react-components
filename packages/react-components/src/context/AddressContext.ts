@@ -1,10 +1,10 @@
 import { createContext } from "react"
 import {
-  type AddressState,
-  setAddress,
   type AddressResource,
-  type saveAddresses,
+  type AddressState,
   type ICustomerAddress,
+  type saveAddresses,
+  setAddress,
 } from "#reducers/AddressReducer"
 import type { BaseError } from "#typings/errors"
 

@@ -1,8 +1,8 @@
 import type { Meta, StoryFn, StoryObj } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
-import { AvailabilityTemplate } from "#components/skus/AvailabilityTemplate"
-import { AvailabilityContainer } from "#components/skus/AvailabilityContainer"
 import PricesContainer from "#components/prices/PricesContainer"
+import { AvailabilityContainer } from "#components/skus/AvailabilityContainer"
+import { AvailabilityTemplate } from "#components/skus/AvailabilityTemplate"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof AvailabilityTemplate> = {
   title: "Components/Availability/AvailabilityTemplate",

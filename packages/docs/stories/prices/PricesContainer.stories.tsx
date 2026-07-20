@@ -1,7 +1,7 @@
 import type { Meta, StoryFn } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
-import PricesContainer from "#components/prices/PricesContainer"
 import Price from "#components/prices/Price"
+import PricesContainer from "#components/prices/PricesContainer"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof PricesContainer> = {
   title: "Components/Prices/PricesContainer",

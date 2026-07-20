@@ -1,15 +1,15 @@
+import type { ExternalPayment } from "@commercelayer/sdk"
+import type { CheckoutComConfig } from "#components/payment_source/CheckoutComPayment"
 import type { PaypalConfig } from "#components/payment_source/PaypalPayment"
+import type { StripeConfig } from "#components/payment_source/StripePayment"
 import {
   getPaymentConfig,
   type PaymentMethodConfig,
   type PaymentResource,
 } from "#reducers/PaymentMethodReducer"
-import type { ExternalPayment } from "@commercelayer/sdk"
 import { pick } from "./pick"
 import { replace, type StringReplace } from "./replace"
 import { type SnakeToCamelCase, snakeToCamelCase } from "./snakeToCamelCase"
-import type { StripeConfig } from "#components/payment_source/StripePayment"
-import type { CheckoutComConfig } from "#components/payment_source/CheckoutComPayment"
 
 interface Params<R extends PaymentResource, C extends PaymentMethodConfig> {
   resource: R

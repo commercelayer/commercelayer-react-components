@@ -1,25 +1,25 @@
-import { useContext, useMemo, useState, useEffect, type ReactNode, type JSX } from "react"
-import CustomerContext from "#context/CustomerContext"
-import OrderListChildrenContext, {
-  type TOrderList,
-  type InitialOrderListContext,
-  type OrderListContent,
-} from "#context/OrderListChildrenContext"
-import OrderListPagination from "#context/OrderListPaginationContext"
+import type { Order, QueryPageSize, QuerySort } from "@commercelayer/sdk"
 import {
-  useReactTable,
+  type ColumnDef,
+  flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  type ColumnDef,
-  type SortingState,
-  flexRender,
   type PaginationState,
+  type SortingState,
+  useReactTable,
 } from "@tanstack/react-table"
-import { sortDescIcon, sortAscIcon } from "#utils/icons"
-import filterChildren from "#utils/filterChildren"
+import { type JSX, type ReactNode, useContext, useEffect, useMemo, useState } from "react"
+import CustomerContext from "#context/CustomerContext"
+import OrderListChildrenContext, {
+  type InitialOrderListContext,
+  type OrderListContent,
+  type TOrderList,
+} from "#context/OrderListChildrenContext"
+import OrderListPagination from "#context/OrderListPaginationContext"
 import type { DefaultChildrenType, TRange } from "#typings/globals"
-import type { Order, QueryPageSize, QuerySort } from "@commercelayer/sdk"
+import filterChildren from "#utils/filterChildren"
+import { sortAscIcon, sortDescIcon } from "#utils/icons"
 
 type RowComponent = "OrderListRow" | "OrderListEmpty"
 type PaginationComponent = "OrderListPaginationInfo" | "OrderListPaginationButtons"
@@ -172,7 +172,16 @@ export function OrderList({
         id,
       })
     }
-  }, [pageIndex, currentPageSize, sorting, getCustomerOrders, type, id, getCustomerSubscriptions, defaultSdkSorting])
+  }, [
+    pageIndex,
+    currentPageSize,
+    sorting,
+    getCustomerOrders,
+    type,
+    id,
+    getCustomerSubscriptions,
+    defaultSdkSorting,
+  ])
   const data = useMemo(() => {
     if (type === "orders") {
       return orders ?? []

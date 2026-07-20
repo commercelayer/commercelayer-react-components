@@ -1,10 +1,9 @@
+import type { Parcel } from "@commercelayer/sdk"
+import type { JSX } from "react"
 import Parent from "#components/utils/Parent"
 import ShipmentChildrenContext from "#context/ShipmentChildrenContext"
 import type { ChildrenFunction } from "#typings/index"
 import useCustomContext from "#utils/hooks/useCustomContext"
-import type { Parcel } from "@commercelayer/sdk"
-
-import type { JSX } from "react"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   /**

@@ -1,6 +1,6 @@
+import { getSdk } from "@commercelayer/core"
 import { type DefaultMfeConfig, getMfeConfig } from "@commercelayer/organization-config"
 import { useEffect, useState } from "react"
-import { getSdk } from "@commercelayer/core"
 import { jwt } from "./jwt"
 
 export interface OrganizationConfig {

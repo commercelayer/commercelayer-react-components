@@ -94,6 +94,7 @@ export function AddressField(props: Props): JSX.Element {
   ) : (
     // biome-ignore lint/a11y/noStaticElementInteractions: anchor used as action trigger per existing API
     // biome-ignore lint/a11y/useValidAnchor: href intentionally omitted for action-only anchor
+    // biome-ignore lint/a11y/useKeyWithClickEvents: action-only anchor, keyboard handling out of scope for this component's public API
     <a data-testid={`address-field-${name ?? ""}`} {...p} onClick={handleClick}>
       {label}
     </a>

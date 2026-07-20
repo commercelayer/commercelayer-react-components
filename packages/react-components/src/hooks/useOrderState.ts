@@ -1,14 +1,14 @@
 import type { Order, OrderCreate } from "@commercelayer/sdk"
-import { useCallback, useMemo, useReducer, useState } from "react"
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import { defaultOrderContext } from "#context/OrderContext"
 import type { OrderStorageConfig } from "#context/OrderStorageContext"
 import orderReducer, {
+  type AddResourceToInclude,
   addToCart,
   createOrder,
   getApiOrder,
   getOrderByFields,
-  type AddResourceToInclude,
   type OrderCodeType,
   orderInitialState,
   paymentSourceRequest,
@@ -22,7 +22,6 @@ import orderReducer, {
 import type { BaseMetadataObject } from "#typings"
 import type { BaseError } from "#typings/errors"
 import compareObjAttribute from "#utils/compareObjAttribute"
-import { useEffect } from "react"
 
 interface UseOrderStateConfig
   extends Pick<CommerceLayerConfig, "accessToken" | "interceptors">,
@@ -180,10 +179,16 @@ export function useOrderState({
     lockOrder,
   ])
 
-  return useMemo(() => {
+  // Call fetchOrder in an effect so it runs after render, not during.
+  // Calling it inside useMemo (render phase) triggered React's
+  // "Cannot update a component while rendering a different component" warning.
+  useEffect(() => {
     if (fetchOrder != null && state?.order != null) {
       fetchOrder(state.order)
     }
+  }, [fetchOrder, state.order])
+
+  return useMemo(() => {
     return {
       ...state,
       managePaymentProviderGiftCards:
@@ -267,5 +272,5 @@ export function useOrderState({
         }),
       getOrderByFields,
     }
-  }, [state, config.accessToken, persistKey, config, setLocalOrder, metadata, fetchOrder, attributes])
+  }, [state, config.accessToken, persistKey, config, setLocalOrder, metadata, attributes])
 }

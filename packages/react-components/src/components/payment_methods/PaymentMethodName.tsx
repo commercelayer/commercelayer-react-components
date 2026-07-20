@@ -1,9 +1,8 @@
-import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
-import Parent from "#components/utils/Parent"
-import useCustomContext from "#utils/hooks/useCustomContext"
-import type { ChildrenFunction } from "#typings/index"
-
 import type { JSX } from "react"
+import Parent from "#components/utils/Parent"
+import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
+import type { ChildrenFunction } from "#typings/index"
+import useCustomContext from "#utils/hooks/useCustomContext"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   labelName: string

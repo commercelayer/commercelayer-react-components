@@ -98,7 +98,12 @@ describe("useLineItems", () => {
     })
 
     expect(mockUpdateLineItem).toHaveBeenCalledWith(
-      expect.objectContaining({ accessToken, lineItemId: "li_1", quantity: 3, hasExternalPrice: false })
+      expect.objectContaining({
+        accessToken,
+        lineItemId: "li_1",
+        quantity: 3,
+        hasExternalPrice: false,
+      })
     )
     expect(updated).toEqual(MOCK_UPDATED_LINE_ITEM)
     // SWR revalidates — getLineItems is called again
@@ -197,7 +202,9 @@ describe("useLineItems", () => {
       wrapper: swrWrapper,
     })
 
-    await expect(result.current.updateLineItem("li_1", 2)).rejects.toThrow("accessToken is required")
+    await expect(result.current.updateLineItem("li_1", 2)).rejects.toThrow(
+      "accessToken is required"
+    )
   })
 
   it("deleteLineItem throws when accessToken is not provided", async () => {

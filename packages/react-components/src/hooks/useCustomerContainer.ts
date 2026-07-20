@@ -1,6 +1,6 @@
+import { useContext } from "react"
 import CustomerContext, { type InitialCustomerContext } from "#context/CustomerContext"
 import type { CustomerState, SetResourceTriggerParams } from "#typings/customers"
-import { useContext } from "react"
 
 type TCustomer = Omit<CustomerState, "errors" | "isGuest"> & {
   setResourceTrigger?: (params: SetResourceTriggerParams) => Promise<boolean>

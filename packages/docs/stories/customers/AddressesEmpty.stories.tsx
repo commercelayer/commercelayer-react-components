@@ -1,8 +1,8 @@
 import type { Meta, StoryFn } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
-import CustomerContainer from "#components/customers/CustomerContainer"
 import AddressesContainer from "#components/addresses/AddressesContainer"
 import { AddressesEmpty } from "#components/addresses/AddressesEmpty"
+import CustomerContainer from "#components/customers/CustomerContainer"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof AddressesEmpty> = {
   title: "Components/Customers/AddressesEmpty",

@@ -1,6 +1,5 @@
-import type { DefaultChildrenType } from "#typings/globals"
-
 import type { JSX } from "react"
+import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props<T> {
   children: DefaultChildrenType

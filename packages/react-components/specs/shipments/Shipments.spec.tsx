@@ -284,7 +284,9 @@ describe("Shipments component", () => {
     const orderWithStock = {
       ...MOCK_ORDER_PENDING,
       // @ts-expect-error test
-      line_items: [{ id: "li_1", item_type: "skus", quantity: 2, item: { inventory: { quantity: 10 } } }],
+      line_items: [
+        { id: "li_1", item_type: "skus", quantity: 2, item: { inventory: { quantity: 10 } } },
+      ],
     }
     mockUseShipments.mockReturnValue(defaultHookReturn({ shipments: shipmentsWithStock as any }))
 
@@ -379,8 +381,9 @@ describe("Shipments component", () => {
 
     render(
       <CommerceLayerContext.Provider value={{ accessToken: "token" }}>
-        {/* biome-ignore lint/suspicious/noExplicitAny: test cast */}
-        <OrderContext.Provider value={{ ...defaultOrderContext, orderId: null as any, order: MOCK_ORDER_PENDING }}>
+        <OrderContext.Provider
+          value={{ ...defaultOrderContext, orderId: null as any, order: MOCK_ORDER_PENDING }}
+        >
           <Shipments>
             <Consumer />
           </Shipments>
@@ -424,8 +427,46 @@ describe("Shipments component", () => {
     expect(result).toEqual({ success: false })
   })
 
+  it("does not cause infinite re-renders when useShipments returns a new array reference on every call", async () => {
+    // Regression test for "Maximum update depth exceeded".
+    // When useShipments returns a new shipments array reference on every render (unstable identity),
+    // the old cleanup setErrors([]) + setErrors(nextErrors) on every effect run caused an infinite loop.
+    // The fix: remove the cleanup and use a functional updater that bails out when errors are unchanged.
+    let callCount = 0
+    mockUseShipments.mockImplementation(() => {
+      callCount++
+      return {
+        ...defaultHookReturn(),
+        // New array reference on every call — simulates unstable hook return
+        shipments: [...MOCK_SHIPMENTS],
+      }
+    })
+
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {})
+
+    await act(async () => {
+      render(
+        <Providers>
+          <Shipments>
+            <span data-testid="child">content</span>
+          </Shipments>
+        </Providers>
+      )
+    })
+
+    const errorCalls = consoleError.mock.calls.map((c) => String(c[0]))
+    expect(errorCalls.some((msg) => msg.includes("Maximum update depth exceeded"))).toBe(false)
+    // Component should stabilise after 1-3 renders — well under the 50-render React limit
+    expect(callCount).toBeLessThan(10)
+    expect(screen.getByTestId("child")).toBeDefined()
+    consoleError.mockRestore()
+  })
+
   it("setShipmentErrors updates the errors in context", async () => {
-    let capturedCtx: { errors: unknown; setShipmentErrors: ((...args: unknown[]) => void) | undefined } = {
+    let capturedCtx: {
+      errors: unknown
+      setShipmentErrors: ((...args: unknown[]) => void) | undefined
+    } = {
       errors: null,
       setShipmentErrors: undefined,
     }
@@ -450,8 +491,43 @@ describe("Shipments component", () => {
       ])
     })
 
-    expect(capturedCtx.errors).toEqual([
-      expect.objectContaining({ code: "CUSTOM_ERROR" }),
-    ])
+    expect(capturedCtx.errors).toEqual([expect.objectContaining({ code: "CUSTOM_ERROR" })])
+  })
+
+  it("provides a stable setShippingMethod reference across renders (does not change on re-render)", async () => {
+    // Regression test: setShippingMethod was recreated on every Shipments render.
+    // Shipment.tsx has setShippingMethod in its useEffect deps, so an unstable
+    // reference caused the effect to re-run on every render → infinite loop.
+    const references = new Set<unknown>()
+    // Use a stable getOrder mock — a new vi.fn() on every render would incorrectly
+    // invalidate the useCallback that wraps setShippingMethod.
+    const stableGetOrder = vi.fn().mockResolvedValue(MOCK_ORDER_PENDING)
+
+    function Consumer() {
+      const { setShippingMethod } = useContext(ShipmentContext)
+      references.add(setShippingMethod)
+      return null
+    }
+
+    const { rerender } = render(
+      <Providers getOrder={stableGetOrder}>
+        <Shipments>
+          <Consumer />
+        </Shipments>
+      </Providers>
+    )
+
+    await act(async () => {
+      rerender(
+        <Providers getOrder={stableGetOrder}>
+          <Shipments>
+            <Consumer />
+          </Shipments>
+        </Providers>
+      )
+    })
+
+    // setShippingMethod should be the same reference across renders
+    expect(references.size).toBe(1)
   })
 })

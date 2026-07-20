@@ -1,11 +1,11 @@
-import type { Meta, StoryFn, Decorator } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
-import OrderContainer from "#components/orders/OrderContainer"
-import CartLink from "#components/orders/CartLink"
-import { HostedCart } from "#components/orders/HostedCart"
-import { OrderStorage } from "../_internals/OrderStorage"
+import type { Decorator, Meta, StoryFn } from "@storybook/react"
 import LineItemsContainer from "#components/line_items/LineItemsContainer"
 import LineItemsCount from "#components/line_items/LineItemsCount"
+import CartLink from "#components/orders/CartLink"
+import { HostedCart } from "#components/orders/HostedCart"
+import OrderContainer from "#components/orders/OrderContainer"
+import CommerceLayer from "../_internals/CommerceLayer"
+import { OrderStorage } from "../_internals/OrderStorage"
 
 const setup: Meta = {
   title: "Components/Cart/Mini Cart",
@@ -54,6 +54,7 @@ export const CartIcon: StoryFn = (args) => {
     <div className="relative inline-block cursor-pointer  text-xs font-bold">
       <LineItemsContainer>
         <svg
+          aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="36"
           height="36"
@@ -84,6 +85,7 @@ const MyCartIcon = (): JSX.Element => (
   <div className="relative inline-block cursor-pointer  text-xs font-bold">
     <LineItemsContainer>
       <svg
+        aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
         width="36"
         height="36"

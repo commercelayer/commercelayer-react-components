@@ -1,6 +1,5 @@
-import BaseField, { type BaseFieldProps } from "../utils/BaseField"
-
 import type { JSX } from "react"
+import BaseField, { type BaseFieldProps } from "../utils/BaseField"
 
 type Props = Omit<BaseFieldProps, "attribute">
 

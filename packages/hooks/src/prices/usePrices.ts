@@ -12,8 +12,8 @@ import {
   EMPTY,
   getSnapshot,
   registerSku as storeRegisterSku,
-  subscribe,
   unregisterSku as storeUnregisterSku,
+  subscribe,
 } from "./pricesBatchStore"
 
 /** Stable empty array returned when SWR has no data yet — prevents new reference on every render. */

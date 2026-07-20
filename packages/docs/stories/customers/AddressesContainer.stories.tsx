@@ -1,10 +1,10 @@
 import type { Meta, StoryFn } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
-import CustomerContainer from "#components/customers/CustomerContainer"
+import { Address as AddressComponent } from "#components/addresses/Address"
 import AddressesContainer from "#components/addresses/AddressesContainer"
 import { AddressesEmpty } from "#components/addresses/AddressesEmpty"
-import { Address as AddressComponent } from "#components/addresses/Address"
 import { AddressField } from "#components/addresses/AddressField"
+import CustomerContainer from "#components/customers/CustomerContainer"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof AddressesContainer> = {
   title: "Components/Customers/AddressesContainer",

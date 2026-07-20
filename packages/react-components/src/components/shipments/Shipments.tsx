@@ -1,6 +1,6 @@
 import { useShipments } from "@commercelayer/hooks"
 import type { Order } from "@commercelayer/sdk"
-import { type JSX, useContext, useEffect, useState } from "react"
+import { type JSX, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import ShipmentContext from "#context/ShipmentContext"
@@ -72,39 +72,55 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
       }
     }
 
-    setErrors(nextErrors)
-
-    return () => {
-      setErrors([])
-    }
+    // Use functional updater to bail out when errors haven't changed,
+    // preventing re-render loops when shipments/order return new references.
+    setErrors((prev) => {
+      if (
+        prev.length === nextErrors.length &&
+        prev.every((e, i) => e.code === nextErrors[i]?.code)
+      ) {
+        return prev
+      }
+      return nextErrors
+    })
+    // No cleanup: errors are always recomputed from current deps.
+    // The old cleanup setErrors([]) caused an unnecessary extra re-render.
   }, [shipments, order])
 
-  const setShippingMethod = async (
-    shipmentId: string,
-    shippingMethodId: string
-  ): Promise<{ success: boolean; order?: Order }> => {
-    try {
-      if (order != null && !canPlaceOrder(order)) {
-        return { success: false, order }
+  const setShippingMethod = useCallback(
+    async (
+      shipmentId: string,
+      shippingMethodId: string
+    ): Promise<{ success: boolean; order?: Order }> => {
+      try {
+        if (order != null && !canPlaceOrder(order)) {
+          return { success: false, order }
+        }
+        await hookSetShippingMethod(shipmentId, shippingMethodId)
+        if (getOrder != null && orderId != null) {
+          const currentOrder = await getOrder(orderId)
+          return { success: true, order: currentOrder }
+        }
+        return { success: true }
+      } catch {
+        return { success: false }
       }
-      await hookSetShippingMethod(shipmentId, shippingMethodId)
-      if (getOrder != null && orderId != null) {
-        const currentOrder = await getOrder(orderId)
-        return { success: true, order: currentOrder }
-      }
-      return { success: true }
-    } catch {
-      return { success: false }
-    }
-  }
+    },
+    [order, hookSetShippingMethod, getOrder, orderId]
+  )
 
-  const contextValue = {
-    shipments: shipments.length > 0 ? shipments : null,
-    deliveryLeadTimes,
-    errors,
-    setShipmentErrors: ((errs: BaseError[]) => setErrors(errs)) as SetShipmentErrors,
-    setShippingMethod,
-  }
+  const setShipmentErrors = useCallback((errs: BaseError[]) => setErrors(errs), [])
+
+  const contextValue = useMemo(
+    () => ({
+      shipments: shipments.length > 0 ? shipments : null,
+      deliveryLeadTimes,
+      errors,
+      setShipmentErrors: setShipmentErrors as SetShipmentErrors,
+      setShippingMethod,
+    }),
+    [shipments, deliveryLeadTimes, errors, setShipmentErrors, setShippingMethod]
+  )
 
   if (isLoading) {
     return getLoaderComponent(loader)

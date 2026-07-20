@@ -1,4 +1,4 @@
-import renderer from "react-test-renderer"
+import type renderer from "react-test-renderer"
 
 export default function toJson(
   component: renderer.ReactTestRenderer

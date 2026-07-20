@@ -9,10 +9,10 @@ import type {
   Order,
   OrderUpdate,
 } from "@commercelayer/sdk"
-import { isEmpty } from "#utils/isEmpty"
 import { type AddressField, addressFields } from "#reducers/AddressReducer"
 import type { TCustomerAddress } from "#typings/customers"
 import type { BaseError } from "#typings/errors"
+import { isEmpty } from "#utils/isEmpty"
 import { fieldsExist } from "#utils/validateFormFields"
 
 interface BillingAddressControllerProps {

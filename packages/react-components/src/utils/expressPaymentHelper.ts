@@ -1,3 +1,4 @@
+import { getSdk } from "@commercelayer/core"
 import type {
   AddressCreate,
   Order,
@@ -10,7 +11,6 @@ import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import { getApplicationLink } from "./getApplicationLink"
 import { jwt } from "./jwt"
-import { getSdk } from "@commercelayer/core"
 import { getOrganizationConfig } from "./organization"
 
 const availablePaymentMethods = ["stripe_payments"]

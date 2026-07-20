@@ -1,5 +1,5 @@
+import { type JSX, useContext, useEffect, useRef } from "react"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import { useContext, useEffect, useRef, type JSX } from "react"
 
 export interface WireTransferConfig {
   infoMessage?: {
@@ -41,6 +41,7 @@ export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
     }
     return false
   }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is recreated each render; its deps are already tracked
   useEffect(() => {
     if (ref.current && paymentSource && currentPaymentMethodType) {
       ref.current.onsubmit = async () => {
@@ -51,7 +52,6 @@ export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is recreated each render; its deps are already tracked
   }, [paymentSource, currentPaymentMethodType, setPaymentRef])
   return (
     <form ref={ref}>

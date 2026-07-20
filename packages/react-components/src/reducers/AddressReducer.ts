@@ -1,15 +1,15 @@
+import { getSdk } from "@commercelayer/core"
 import type { Address, Order, OrderUpdate } from "@commercelayer/sdk"
 import type { Dispatch } from "react"
 import type { TResourceError } from "#components/errors/Errors"
 import type { AddressValuesKeys } from "#context/BillingAddressFormContext"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
+import type { TCustomerAddress } from "#typings/customers"
 import type { BaseError, CodeErrorType } from "#typings/errors"
 import type { AddressInputName } from "#typings/index"
 import { invertedAddressesHandler, sanitizeMetadataFields } from "#utils/addressesManager"
 import baseReducer from "#utils/baseReducer"
 import { formCleaner } from "#utils/formCleaner"
-import { getSdk } from "@commercelayer/core"
-import type { TCustomerAddress } from "#typings/customers"
 import type { updateOrder } from "./OrderReducer"
 
 // TODO: Move in the future

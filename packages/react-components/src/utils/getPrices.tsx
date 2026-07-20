@@ -1,7 +1,6 @@
 import type { Price } from "@commercelayer/sdk"
-import PriceTemplate, { type PTemplateProps } from "#components/utils/PriceTemplate"
-
 import type { JSX } from "react"
+import PriceTemplate, { type PTemplateProps } from "#components/utils/PriceTemplate"
 
 export function getPriceByCode(skuPrices: Price[], code: string = ""): Price | undefined {
   return code ? skuPrices.filter((p) => p.currency_code === code)[0] : skuPrices[0]

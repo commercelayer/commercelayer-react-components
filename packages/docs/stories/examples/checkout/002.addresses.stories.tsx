@@ -1,22 +1,23 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-base-to-string */
+
+import type { Order } from "@commercelayer/sdk"
 import type { Meta, StoryFn } from "@storybook/react"
-import CommerceLayer from "../../_internals/CommerceLayer"
-import OrderContainer from "#components/orders/OrderContainer"
-import { OrderStorage } from "../../_internals/OrderStorage"
+import { useMemo, useState } from "react"
+import { AddressCountrySelector } from "#components/addresses/AddressCountrySelector"
+import { AddressesContainer } from "#components/addresses/AddressesContainer"
+import { AddressInput } from "#components/addresses/AddressInput"
+import { AddressStateSelector } from "#components/addresses/AddressStateSelector"
+import { BillingAddressForm } from "#components/addresses/BillingAddressForm"
+import { SaveAddressesButton } from "#components/addresses/SaveAddressesButton"
+import { ShippingAddressForm } from "#components/addresses/ShippingAddressForm"
 import { CustomerContainer } from "#components/customers/CustomerContainer"
 import { CustomerInput } from "#components/customers/CustomerInput"
 import Errors from "#components/errors/Errors"
-import { BillingAddressForm } from "#components/addresses/BillingAddressForm"
-import { ShippingAddressForm } from "#components/addresses/ShippingAddressForm"
-import { AddressesContainer } from "#components/addresses/AddressesContainer"
-import { AddressInput } from "#components/addresses/AddressInput"
-import { AddressCountrySelector } from "#components/addresses/AddressCountrySelector"
-import { AddressStateSelector } from "#components/addresses/AddressStateSelector"
-import { SaveAddressesButton } from "#components/addresses/SaveAddressesButton"
+import OrderContainer from "#components/orders/OrderContainer"
+import CommerceLayer from "../../_internals/CommerceLayer"
+import { OrderStorage } from "../../_internals/OrderStorage"
 import { makeAddressWithRequired, persistKey } from "./utils"
-import { useMemo, useState } from "react"
-import { type Order } from "@commercelayer/sdk"
 
 const setup: Meta = {
   title: "Examples/Checkout Page/Addresses",

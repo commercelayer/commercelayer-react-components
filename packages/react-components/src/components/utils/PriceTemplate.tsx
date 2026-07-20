@@ -1,6 +1,5 @@
-import type { PriceProps } from "#components/prices/Price"
-
 import type { JSX } from "react"
+import type { PriceProps } from "#components/prices/Price"
 
 export type PTemplateProps = {
   formattedAmount?: string | null

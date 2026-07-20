@@ -155,6 +155,7 @@ function StripePaymentForm({
     }
     return false
   }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: onSubmit is recreated each render; its deps are already tracked
   useEffect(() => {
     if (ref.current && stripe && elements) {
       ref.current.onsubmit = async () => {
@@ -169,7 +170,6 @@ function StripePaymentForm({
     return () => {
       setPaymentRef({ ref: { current: null } })
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: onSubmit is recreated each render; its deps are already tracked
   }, [stripe, elements, setPaymentRef])
 
   async function handleChange(event: StripePaymentElementChangeEvent) {

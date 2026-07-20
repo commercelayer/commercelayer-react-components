@@ -1,20 +1,22 @@
 import { createContext } from "react"
 import {
-  type UpdatePaymentSource,
-  updatePaymentSource,
+  type DestroyPaymentSource,
+  destroyPaymentSource,
   type PaymentMethodState,
   type SetPaymentMethodErrors,
-  setPaymentMethodErrors,
-  setPaymentSource,
-  setPaymentMethod,
-  destroyPaymentSource,
-  type DestroyPaymentSource,
   type SetPaymentRef,
-  setPaymentRef,
   setLoading,
+  setPaymentMethod,
+  setPaymentMethodErrors,
+  setPaymentRef,
+  setPaymentSource,
+  type UpdatePaymentSource,
+  updatePaymentSource,
 } from "#reducers/PaymentMethodReducer"
 
 type DefaultContext = {
+  /** Set by `<PaymentMethodsContainer>` (or the standalone hook) to signal the context is provided. */
+  _isProvided?: true
   setPaymentMethodErrors: SetPaymentMethodErrors
   setPaymentMethod: typeof setPaymentMethod
   setPaymentSource: typeof setPaymentSource

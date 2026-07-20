@@ -1,10 +1,10 @@
 import type { AddressCreate } from "@commercelayer/sdk"
-import { isEmpty } from "#utils/isEmpty"
 import type { TResourceError } from "#components/errors/Errors"
 import { type AddressField, addressFields } from "#reducers/AddressReducer"
 import type { AddressInputName } from "#typings"
 import type { BaseError } from "#typings/errors"
 import type { BaseState } from "#typings/index"
+import { isEmpty } from "#utils/isEmpty"
 
 const EMAIL_PATTERN =
   // eslint-disable-next-line no-useless-escape

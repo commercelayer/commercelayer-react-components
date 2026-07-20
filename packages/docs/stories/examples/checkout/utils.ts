@@ -1,6 +1,6 @@
-import { type Address } from "@commercelayer/sdk"
+import type { Address } from "@commercelayer/sdk"
+import type { SetNonNullable } from "type-fest"
 import useOrderContainer from "#hooks/useOrderContainer"
-import { type SetNonNullable } from "type-fest"
 
 type AddressWithRequired = SetNonNullable<
   Address,

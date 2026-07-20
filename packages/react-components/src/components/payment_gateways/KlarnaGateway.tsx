@@ -1,15 +1,15 @@
 import React, { type JSX } from "react"
-import KlarnaPayment from "#components/payment_source/KlarnaPayment"
 import type { GatewayBaseType } from "#components/payment_gateways/PaymentGateway"
+import KlarnaPayment from "#components/payment_source/KlarnaPayment"
+import PaymentCardsTemplate from "#components/utils/PaymentCardsTemplate"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PaymentSourceContext from "#context/PaymentSourceContext"
 import { getPaymentConfig, type PaymentResource } from "#reducers/PaymentMethodReducer"
-import { isEmpty } from "#utils/isEmpty"
-import PaymentCardsTemplate from "#components/utils/PaymentCardsTemplate"
 import getCardDetails from "#utils/getCardDetails"
+import { isEmpty } from "#utils/isEmpty"
 
 type Props = GatewayBaseType
 

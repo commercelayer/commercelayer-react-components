@@ -1,3 +1,4 @@
+import { type JSX, useContext } from "react"
 import type { GatewayBaseType } from "#components/payment_gateways/PaymentGateway"
 import PaypalPayment from "#components/payment_source/PaypalPayment"
 import OrderContext from "#context/OrderContext"
@@ -8,7 +9,6 @@ import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import getCardDetails from "#utils/getCardDetails"
 import { getPaymentAttributes } from "#utils/getPaymentAttributes"
 import { isEmpty } from "#utils/isEmpty"
-import { useContext, type JSX } from "react"
 
 type Props = Partial<GatewayBaseType>
 

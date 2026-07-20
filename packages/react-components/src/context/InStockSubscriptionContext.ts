@@ -1,8 +1,8 @@
-import type {
-  setInStockSubscription,
-  InStockSubscriptionState,
-} from "#reducers/InStockSubscriptionReducer"
 import { createContext } from "react"
+import type {
+  InStockSubscriptionState,
+  setInStockSubscription,
+} from "#reducers/InStockSubscriptionReducer"
 
 export interface InitialInStockSubscriptionContext extends InStockSubscriptionState {
   setInStockSubscription?: typeof setInStockSubscription

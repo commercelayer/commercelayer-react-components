@@ -16,11 +16,11 @@ describe("getSkus", () => {
     if (token == null) return
     const params = {
       filters: {
-        code_eq: "DIGITALPRODUCT",
+        code_eq: "TSHIRTMM000000E63E74MXXX",
       },
     } satisfies QueryParamsList<Sku>
     const result = await getSkus({ accessToken: token, params })
     expect(result).toBeDefined()
-    expect(result.getRecordCount()).toBeGreaterThanOrEqual(0)
+    expect(result.getRecordCount()).toBe(1)
   })
 })

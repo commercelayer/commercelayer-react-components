@@ -1,32 +1,5 @@
-import type { Dispatch, ForwardedRef, Ref, JSX } from "react"
-import PropTypes, { type InferProps } from "prop-types"
+import type { Dispatch, ForwardedRef, JSX, Ref } from "react"
 import type { BaseError } from "./errors"
-
-export const BC = {
-  id: PropTypes.string,
-  className: PropTypes.string,
-  style: PropTypes.object,
-  name: PropTypes.string,
-}
-
-export const PTLoader = PropTypes.oneOfType([PropTypes.element, PropTypes.string])
-
-export const BaseSelectComponentPropTypes = {
-  children: PropTypes.func,
-  options: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      selected: PropTypes.bool,
-    }).isRequired
-  ).isRequired,
-  placeholder: PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  }),
-  value: PropTypes.string,
-  name: PropTypes.string.isRequired,
-}
 
 export type SelectPlaceholder = Option
 
@@ -111,12 +84,9 @@ export type AddressStateSelectName = "billing_address_state_code" | "shipping_ad
 
 export type LoaderType = string | JSX.Element
 
-export const BMObject = PropTypes.objectOf(PropTypes.string)
 export type BaseMetadataObject = Record<string, string | undefined | null>
 
 export type TimeFormat = "days" | "hours"
-
-export type BaseComponent = InferProps<typeof BC>
 
 export interface BaseAction<A = string, P = Record<string, any>> {
   type: A
@@ -144,18 +114,12 @@ export type BaseMetadata = Record<string, string | undefined | null>
 
 export type BaseFormatPrice = "formatted" | "cents" | "float"
 
-export const baseOrderPricePropTypes = {
-  base: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-  children: PropTypes.func,
-  format: PropTypes.oneOf<BaseFormatPrice>(["formatted", "cents", "float"]),
-  ...BC,
-}
-
-export const baseOrderComponentPricePropTypes = {
-  children: baseOrderPricePropTypes.children,
-  format: baseOrderPricePropTypes.format,
-  ...BC,
+export interface BaseOrderPriceOwnProps {
+  base: string
+  type: string
+  children?: ((...args: any[]) => any) | null
+  format?: BaseFormatPrice | null
+  name?: string | null
 }
 
 export type BasePriceType = "total" | "option" | "unit"

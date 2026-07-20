@@ -1,7 +1,7 @@
 import type { Meta, StoryFn } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
 import { SkusContainer } from "#components/skus/SkusContainer"
 import { Code } from "../_internals/Code"
+import CommerceLayer from "../_internals/CommerceLayer"
 
 const setup: Meta<typeof SkusContainer> = {
   title: "Components/Skus/SkusContainer",

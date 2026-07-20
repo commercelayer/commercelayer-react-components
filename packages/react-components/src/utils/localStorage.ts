@@ -1,11 +1,11 @@
-import { getLocalOrder, setLocalOrder, deleteLocalOrder } from "@commercelayer/core"
+import { deleteLocalOrder, getLocalOrder, setLocalOrder } from "@commercelayer/core"
 
 export type {
+  DeleteLocalOrder,
   GetLocalOrder,
   SetLocalOrder,
-  DeleteLocalOrder,
 } from "@commercelayer/core"
-export { getLocalOrder, setLocalOrder, deleteLocalOrder }
+export { deleteLocalOrder, getLocalOrder, setLocalOrder }
 
 export const getSavePaymentSourceToCustomerWallet = (): boolean => {
   return localStorage.getItem("_save_payment_source_to_customer_wallet") === "true"

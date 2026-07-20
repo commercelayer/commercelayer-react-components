@@ -1,10 +1,10 @@
-import baseReducer from "#utils/baseReducer"
+import { getSdk } from "@commercelayer/core"
+import type { AddressUpdate, Order } from "@commercelayer/sdk"
 import type { Dispatch } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
-import type { Order, AddressUpdate } from "@commercelayer/sdk"
 import type { getOrderContext } from "#reducers/OrderReducer"
+import baseReducer from "#utils/baseReducer"
 import type { AddressResource } from "./AddressReducer"
-import { getSdk } from "@commercelayer/core"
 
 export type ShippingAddressActionType =
   | "setShippingAddress"

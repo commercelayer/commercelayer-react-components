@@ -1,18 +1,18 @@
+import type { Address as TAddress } from "@commercelayer/sdk"
 import type { Meta, StoryFn } from "@storybook/react"
-import CommerceLayer from "../../_internals/CommerceLayer"
-import CustomerContainer from "#components/customers/CustomerContainer"
+import { useState } from "react"
+import { Address } from "#components/addresses/Address"
+import AddressCountrySelector from "#components/addresses/AddressCountrySelector"
 import AddressesContainer from "#components/addresses/AddressesContainer"
 import { AddressesEmpty } from "#components/addresses/AddressesEmpty"
-import { Address } from "#components/addresses/Address"
-import { BillingAddressForm } from "#components/addresses/BillingAddressForm"
 import { AddressField } from "#components/addresses/AddressField"
-import { useState } from "react"
 import AddressInput from "#components/addresses/AddressInput"
-import Errors from "#components/errors/Errors"
-import AddressCountrySelector from "#components/addresses/AddressCountrySelector"
 import AddressStateSelector from "#components/addresses/AddressStateSelector"
+import { BillingAddressForm } from "#components/addresses/BillingAddressForm"
 import SaveAddressesButton from "#components/addresses/SaveAddressesButton"
-import { type Address as TAddress } from "@commercelayer/sdk"
+import CustomerContainer from "#components/customers/CustomerContainer"
+import Errors from "#components/errors/Errors"
+import CommerceLayer from "../../_internals/CommerceLayer"
 
 type PartialAddress = Partial<TAddress>
 
@@ -64,6 +64,7 @@ export const Default: StoryFn = () => {
 
           {/* Add new address */}
           <button
+            type="button"
             className="my-3 px-3 py-2 rounded bg-green-600 text-white"
             onClick={() => {
               setAddress({})

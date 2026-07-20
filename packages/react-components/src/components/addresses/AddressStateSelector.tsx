@@ -1,4 +1,12 @@
-import { type JSX, useContext, useEffect, useMemo, useState } from "react"
+import {
+  type ComponentProps,
+  type JSX,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import BaseInput from "#components/utils/BaseInput"
 import BaseSelect from "#components/utils/BaseSelect"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
@@ -76,6 +84,10 @@ export function AddressStateSelector(props: Props): JSX.Element {
   const [hasError, setHasError] = useState(false)
   const [countryCode, setCountryCode] = useState("")
   const [val, setVal] = useState(value ?? "")
+  // Tracks the current DOM value of the text input so that externally pre-filled
+  // values (via billingAddress.setValue called by AddressInput or similar) can be
+  // picked up when transitioning from text input to state select.
+  const textInputRef = useRef<HTMLInputElement | null>(null)
 
   const stateOptions = useMemo(() => {
     if (isEmpty(countryCode)) {
@@ -100,6 +112,10 @@ export function AddressStateSelector(props: Props): JSX.Element {
       typeof shippingCountryValue === "string" ? shippingCountryValue : shippingCountryValue?.value
     if (shippingCountryCode && shippingCountryCode !== countryCode)
       setCountryCode(shippingCountryCode)
+    // True when this is the first time a country is detected (was empty before).
+    // Used to distinguish initial pre-fill from a user-initiated country change.
+    const isFirstCountryDetection = !countryCode
+
     const changeBillingCountry = [
       Object.keys(billingAddress).length > 0,
       billingCountryCode,
@@ -111,8 +127,25 @@ export function AddressStateSelector(props: Props): JSX.Element {
       }
       setVal(value)
     }
+    // On initial country detection, pre-fill the state from the value prop.
+    // Fall back to the text input's current DOM value to handle the case where
+    // setValue was called externally (e.g. from AddressInput) before country arrived.
+    if (changeBillingCountry && isFirstCountryDetection) {
+      // textInputRef.current is always mounted here (countryCode is still "" at this point).
+      // The ?? "" fallback is a defensive guard for the unreachable case where both are absent.
+      const rawStateValue = value ?? textInputRef.current?.value
+      /* v8 ignore next */
+      const stateValue = String(rawStateValue ?? "")
+      if (stateValue !== "") {
+        if (billingAddress.setValue != null) billingAddress.setValue(name, stateValue)
+        setVal(stateValue)
+      }
+    }
+    // On user-initiated country change, reset the state only if the current value
+    // is invalid for the newly selected country (and the country has states).
     if (
       changeBillingCountry &&
+      !isFirstCountryDetection &&
       billingCountryCode &&
       !isValidState({
         stateCode: val ?? "",
@@ -135,8 +168,18 @@ export function AddressStateSelector(props: Props): JSX.Element {
       }
       setVal(value)
     }
+    if (changeShippingCountry && isFirstCountryDetection) {
+      const rawStateValue = value ?? textInputRef.current?.value
+      /* v8 ignore next */
+      const stateValue = String(rawStateValue ?? "")
+      if (stateValue !== "") {
+        if (shippingAddress.setValue != null) shippingAddress.setValue(name, stateValue)
+        setVal(stateValue)
+      }
+    }
     if (
       changeShippingCountry &&
+      !isFirstCountryDetection &&
       shippingCountryCode &&
       !isValidState({
         stateCode: val ?? "",
@@ -189,11 +232,23 @@ export function AddressStateSelector(props: Props): JSX.Element {
       options={stateOptions}
       name={name}
       value={val}
+      onChange={(e) => {
+        const selected = e.target.value
+        setVal(selected)
+        if (billingAddress.setValue != null) {
+          billingAddress.setValue(name, selected)
+        }
+        if (shippingAddress.setValue != null) {
+          shippingAddress.setValue(name, selected)
+        }
+      }}
     />
   ) : (
     <BaseInput
-      id={p.id}
-      style={p.style}
+      // Spread passthrough props (data-testid, aria-*, disabled, ...) on the
+      // input branch too — they must survive the select/input swap.
+      {...(p as unknown as Omit<ComponentProps<typeof BaseInput>, "children" | "ref">)}
+      ref={textInputRef}
       name={name}
       className={classNameComputed}
       required={required}

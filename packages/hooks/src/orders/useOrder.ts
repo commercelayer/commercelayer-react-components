@@ -1,9 +1,9 @@
 import {
-  createOrder as coreCreateOrder,
-  retrieveOrder,
-  updateOrder as coreUpdateOrder,
   type BaseMetadataObject,
+  createOrder as coreCreateOrder,
+  updateOrder as coreUpdateOrder,
   type InterceptorManager,
+  retrieveOrder,
 } from "@commercelayer/core"
 import type { Order, OrderCreate, OrderUpdate } from "@commercelayer/sdk"
 import { useCallback, useState } from "react"

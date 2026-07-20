@@ -1,5 +1,7 @@
-import BraintreePayment from "#components/payment_source/BraintreePayment"
+import type { StripeElementLocale } from "@stripe/stripe-js"
+import { type JSX, useContext } from "react"
 import type { GatewayBaseType } from "#components/payment_gateways/PaymentGateway"
+import BraintreePayment from "#components/payment_source/BraintreePayment"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
@@ -7,11 +9,9 @@ import PaymentMethodContext from "#context/PaymentMethodContext"
 import PaymentSourceContext from "#context/PaymentSourceContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import getCardDetails from "#utils/getCardDetails"
-import type { StripeElementLocale } from "@stripe/stripe-js"
-import { isEmpty } from "#utils/isEmpty"
-import { useContext, type JSX } from "react"
-import PaymentCardsTemplate from "../utils/PaymentCardsTemplate"
 import { getPaymentAttributes } from "#utils/getPaymentAttributes"
+import { isEmpty } from "#utils/isEmpty"
+import PaymentCardsTemplate from "../utils/PaymentCardsTemplate"
 
 type Props = GatewayBaseType
 

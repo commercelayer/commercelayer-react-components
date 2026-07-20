@@ -1,5 +1,5 @@
-import { createContext } from "react"
 import type { LineItemOption } from "@commercelayer/sdk"
+import { createContext } from "react"
 
 export interface TLineItemOptions extends LineItemOption {}
 

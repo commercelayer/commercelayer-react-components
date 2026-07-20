@@ -138,6 +138,7 @@ describe("AddToCartButton", () => {
         <AddToCartButton skuCode="SKU1">
           {({ handleClick }) => (
             <button
+              type="button"
               onClick={() => {
                 void handleClick()
               }}

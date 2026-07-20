@@ -1,5 +1,5 @@
-import { type DefaultChildrenType } from "#typings/globals"
 import CommerceLayerComponent from "#components/auth/CommerceLayer"
+import type { DefaultChildrenType } from "#typings/globals"
 import { useGetToken } from "./useGetToken"
 
 interface Props {

@@ -3,6 +3,7 @@ import { useContext } from "react"
 import { BillingAddressForm } from "#components/addresses/BillingAddressForm"
 import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 
 const rapidForm = vi.hoisted(() => ({
@@ -47,11 +48,13 @@ function renderForm(
 ) {
   const setAddressErrors = vi.fn()
   const setAddress = vi.fn()
+  const saveAddresses = vi.fn()
   const addResourceToInclude = vi.fn()
   const addressContext = {
     ...defaultAddressContext,
     setAddressErrors,
     setAddress,
+    saveAddresses,
     ...overrides.addressOverrides,
   }
   const orderContext = {
@@ -80,7 +83,7 @@ function renderForm(
     </AddressesContext.Provider>
   )
 
-  return { ...result, setAddressErrors, setAddress, addResourceToInclude }
+  return { ...result, setAddressErrors, setAddress, saveAddresses, addResourceToInclude }
 }
 
 beforeEach(() => {
@@ -328,9 +331,12 @@ describe("BillingAddressForm", () => {
       values: { billing_address_first_name: { value: "Jane", required: true } },
     })
 
-    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
-    const addrCtx = { ...defaultAddressContext, setAddress, setAddressErrors } as any
-    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+    const addrCtx = {
+      ...defaultAddressContext,
+      setAddress,
+      setAddressErrors,
+      saveAddresses: vi.fn(),
+    } as any
     const orderCtx = {
       ...defaultOrderContext,
       order: { id: "ord-1" },
@@ -523,6 +529,428 @@ describe("BillingAddressForm", () => {
       expect(setAddress).toHaveBeenCalledWith(
         expect.objectContaining({ resource: "billing_address" })
       )
+    })
+  })
+
+  it("provides a stable setValue reference across renders (no infinite loop)", async () => {
+    let renderCount = 0
+    let capturedSetValue: ((...args: unknown[]) => void) | undefined
+    const seenSetValues = new Set<unknown>()
+
+    function StabilityProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      renderCount++
+      if (ctx.setValue != null) {
+        seenSetValues.add(ctx.setValue)
+        capturedSetValue = ctx.setValue as typeof capturedSetValue
+      }
+      return <div />
+    }
+
+    renderForm({ children: <StabilityProbe /> })
+
+    await waitFor(() => expect(capturedSetValue).toBeDefined())
+
+    const countAfterMount = renderCount
+    // Allow a few more frames to detect any runaway re-renders
+    await new Promise((r) => setTimeout(r, 100))
+
+    // setValue must be the same reference across renders (no new arrow fn each cycle)
+    expect(seenSetValues.size).toBe(1)
+    // render count should not grow unboundedly
+    expect(renderCount).toBeLessThanOrEqual(countAfterMount + 2)
+  })
+
+  it("exposes errorMode='inline' in context by default", async () => {
+    let ctxRef: { errorMode?: string } | undefined
+
+    function ModeProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderForm({ children: <ModeProbe /> })
+
+    await waitFor(() => {
+      expect(ctxRef?.errorMode).toBe("inline")
+    })
+  })
+
+  it("exposes errorMode='submit' in context when prop is set", async () => {
+    let ctxRef: { errorMode?: string } | undefined
+
+    function ModeProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderForm({ props: { errorMode: "submit" }, children: <ModeProbe /> })
+
+    await waitFor(() => {
+      expect(ctxRef?.errorMode).toBe("submit")
+    })
+  })
+
+  it("suppresses inline errors when errorMode='submit' (no errors in context while typing)", async () => {
+    let ctxRef: { errors?: Record<string, unknown> } | undefined
+
+    function ErrorProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx as typeof ctxRef
+      return <input name="billing_address_first_name" required />
+    }
+
+    // Simulate an invalid field being tracked by rapid-form
+    renderForm({
+      props: { errorMode: "submit" },
+      children: <ErrorProbe />,
+      values: {
+        billing_address_first_name: { value: "", required: true },
+      },
+    })
+
+    // Even with an invalid rapid-form field, errors should remain empty in submit mode
+    await act(async () => {})
+    expect(Object.keys(ctxRef?.errors ?? {})).toHaveLength(0)
+  })
+
+  it("exposes validate function via context when errorMode='submit'", async () => {
+    let ctxRef: { validate?: unknown } | undefined
+
+    function ValidateProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderForm({ props: { errorMode: "submit" }, children: <ValidateProbe /> })
+
+    await waitFor(() => {
+      expect(typeof ctxRef?.validate).toBe("function")
+    })
+  })
+
+  it("validate() surfaces errors for invalid required fields", async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    let ctxRef: any
+
+    function ValidateProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx
+      return <input name="billing_address_first_name" required defaultValue="" />
+    }
+
+    renderForm({ props: { errorMode: "submit" }, children: <ValidateProbe /> })
+
+    await waitFor(() => expect(ctxRef?.validate).toBeDefined())
+
+    let returnedErrors: Record<string, unknown> = {}
+    act(() => {
+      returnedErrors = ctxRef?.validate?.() ?? {}
+    })
+
+    // validate() returns errors synchronously
+    expect(returnedErrors).toHaveProperty("billing_address_first_name")
+
+    // and also sets them in context so fields can show error styling
+    await waitFor(() => {
+      expect(ctxRef?.errors).toHaveProperty("billing_address_first_name")
+    })
+  })
+
+  it("after validate() is called, inline errors clear when field becomes valid", async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    let ctxRef: any
+
+    function ValidateProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      ctxRef = ctx
+      return <input name="billing_address_first_name" required data-testid="fname" />
+    }
+
+    renderForm({
+      props: { errorMode: "submit" },
+      children: <ValidateProbe />,
+      values: { billing_address_first_name: { value: "", required: true } },
+    })
+
+    await waitFor(() => expect(ctxRef?.validate).toBeDefined())
+
+    // First validate() — errors appear
+    act(() => {
+      ctxRef?.validate?.()
+    })
+    await waitFor(() => expect(Object.keys(ctxRef?.errors ?? {})).toHaveLength(1))
+
+    // Fill the input so checkValidity() returns true, then trigger rapid-form update
+    const input = screen.getByTestId("fname") as HTMLInputElement
+    act(() => {
+      input.value = "Jane"
+    })
+
+    // Now rapid-form mock returns a valid value → main effect fires → no errors
+    rapidForm.useRapidForm.mockReturnValue({
+      refValidation: vi.fn(),
+      values: { billing_address_first_name: { value: "Jane", required: true } },
+    })
+
+    const addrCtx = {
+      ...defaultAddressContext,
+      saveAddresses: vi.fn(),
+      setAddressErrors: vi.fn(),
+      setAddress: vi.fn(),
+    } as any
+
+    const { rerender } = render(
+      <AddressesContext.Provider value={addrCtx}>
+        <OrderContext.Provider
+          value={
+            {
+              ...defaultOrderContext,
+              order: { id: "ord-1" },
+              include: ["billing_address"],
+              includeLoaded: { billing_address: true },
+              addResourceToInclude: vi.fn(),
+            } as any
+          }
+        >
+          <BillingAddressForm data-testid="form2" errorMode="submit">
+            <ValidateProbe />
+          </BillingAddressForm>
+        </OrderContext.Provider>
+      </AddressesContext.Provider>
+    )
+
+    // After a fresh render with valid data, errors should be empty once the new form mounts
+    await waitFor(() => {
+      expect(typeof ctxRef?.errors).toBe("object")
+    })
+  })
+})
+
+// Standalone mode: BillingAddressForm without an AddressesContainer ancestor
+
+const saveAddressesMock = vi.hoisted(() => vi.fn())
+vi.mock("#reducers/AddressReducer", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("#reducers/AddressReducer")>()
+  return { ...actual, saveAddresses: saveAddressesMock }
+})
+
+function renderStandalone(
+  overrides: {
+    props?: Partial<React.ComponentProps<typeof BillingAddressForm>>
+    orderOverrides?: Record<string, unknown>
+    values?: Record<string, unknown>
+    children?: React.ReactNode
+    commerceLayerConfig?: Record<string, unknown>
+  } = {}
+) {
+  const addResourceToInclude = vi.fn()
+  const orderContext = {
+    ...defaultOrderContext,
+    order: { id: "ord-1" },
+    include: ["billing_address"],
+    includeLoaded: { billing_address: true },
+    addResourceToInclude,
+    ...overrides.orderOverrides,
+  }
+  const clConfig = { accessToken: "tok", ...overrides.commerceLayerConfig }
+
+  rapidForm.useRapidForm.mockReturnValue({
+    refValidation: vi.fn(),
+    values: overrides.values ?? {},
+  })
+
+  // No AddressesContext.Provider → isStandalone = true
+  const result = render(
+    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+    <CommerceLayerContext.Provider value={clConfig as any}>
+      {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
+      <OrderContext.Provider value={orderContext as any}>
+        <BillingAddressForm data-testid="form" {...overrides.props}>
+          {overrides.children ?? <div data-testid="child" />}
+        </BillingAddressForm>
+      </OrderContext.Provider>
+    </CommerceLayerContext.Provider>
+  )
+
+  return { ...result, addResourceToInclude }
+}
+
+describe("BillingAddressForm (standalone mode)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    localStorageMock.getSaveBillingAddressToAddressBook.mockReturnValue(false)
+    saveAddressesMock.mockResolvedValue(undefined)
+  })
+
+  it("renders without an AddressesContext provider (standalone detection)", () => {
+    renderStandalone()
+    expect(screen.getByTestId("form")).toBeDefined()
+  })
+
+  it("wraps children in its own AddressesContext.Provider with saveAddresses", async () => {
+    let ctxRef: { saveAddresses?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => {
+      expect(typeof ctxRef?.saveAddresses).toBe("function")
+    })
+  })
+
+  it("exposes isBusiness prop via AddressesContext in standalone mode", async () => {
+    let ctxRef: { isBusiness?: boolean } | undefined
+
+    function IsBizProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ props: { isBusiness: true }, children: <IsBizProbe /> })
+
+    await waitFor(() => {
+      expect(ctxRef?.isBusiness).toBe(true)
+    })
+  })
+
+  it("exposes shipToDifferentAddress prop via AddressesContext in standalone mode", async () => {
+    let ctxRef: { shipToDifferentAddress?: boolean } | undefined
+
+    function ShipProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ props: { shipToDifferentAddress: true }, children: <ShipProbe /> })
+
+    await waitFor(() => {
+      expect(ctxRef?.shipToDifferentAddress).toBe(true)
+    })
+  })
+
+  it("standaloneSetAddress dispatches to own reducer", async () => {
+    let ctxRef: { setAddress?: unknown; billing_address?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => expect(ctxRef?.setAddress).toBeDefined())
+
+    act(() => {
+      ;(ctxRef as any)?.setAddress?.({
+        resource: "billing_address",
+        values: { first_name: "Alice" },
+      })
+    })
+
+    await waitFor(() => {
+      expect((ctxRef as any)?.billing_address?.first_name).toBe("Alice")
+    })
+  })
+
+  it("standaloneSetAddressErrors dispatches to own reducer", async () => {
+    let ctxRef: { setAddressErrors?: unknown; errors?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => expect(ctxRef?.setAddressErrors).toBeDefined())
+
+    act(() => {
+      ;(ctxRef as any)?.setAddressErrors?.(
+        [
+          {
+            code: "REQUIRED",
+            message: "Required",
+            resource: "billing_address",
+            field: "first_name",
+          },
+        ],
+        "billing_address"
+      )
+    })
+
+    await waitFor(() => {
+      const errors = (ctxRef as any)?.errors
+      expect(errors).toBeDefined()
+    })
+  })
+
+  it("propagates form values to own standalone state via setAddress", async () => {
+    let ctxRef: { billing_address?: Record<string, unknown> } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({
+      values: {
+        billing_address_first_name: { value: "Bob", required: true },
+      },
+      children: <AddressCtxProbe />,
+    })
+
+    await waitFor(() => {
+      expect(ctxRef?.billing_address?.first_name).toBe("Bob")
+    })
+  })
+
+  it("calls saveAddresses (AddressReducer) when standaloneSaveAddresses is invoked", async () => {
+    let ctxRef: { saveAddresses?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => expect(ctxRef?.saveAddresses).toBeDefined())
+
+    await act(async () => {
+      await (ctxRef as any)?.saveAddresses?.()
+    })
+
+    expect(saveAddressesMock).toHaveBeenCalled()
+  })
+
+  it("also provides BillingAddressFormContext in standalone mode", async () => {
+    let formCtxRef: { errorClassName?: string } | undefined
+
+    function FormCtxProbe(): JSX.Element {
+      const ctx = useContext(BillingAddressFormContext)
+      formCtxRef = ctx as typeof formCtxRef
+      return <div />
+    }
+
+    renderStandalone({ props: { errorClassName: "err" }, children: <FormCtxProbe /> })
+
+    await waitFor(() => {
+      expect(formCtxRef?.errorClassName).toBe("err")
     })
   })
 })

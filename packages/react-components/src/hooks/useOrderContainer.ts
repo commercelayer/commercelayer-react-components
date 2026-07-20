@@ -1,6 +1,6 @@
-import OrderContext from "#context/OrderContext"
-import type { createOrder, OrderState, addToCart } from "#reducers/OrderReducer"
 import { useContext } from "react"
+import OrderContext from "#context/OrderContext"
+import type { addToCart, createOrder, OrderState } from "#reducers/OrderReducer"
 
 type TAddToCartParams = Omit<
   Parameters<typeof addToCart>[number],

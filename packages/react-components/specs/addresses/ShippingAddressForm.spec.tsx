@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from "@testing-library/react"
 import { useContext } from "react"
 import { ShippingAddressForm } from "#components/addresses/ShippingAddressForm"
 import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 
@@ -47,11 +48,13 @@ function renderForm(
 ) {
   const setAddressErrors = vi.fn()
   const setAddress = vi.fn()
+  const saveAddresses = vi.fn()
   const addResourceToInclude = vi.fn()
   const addressContext = {
     ...defaultAddressContext,
     setAddressErrors,
     setAddress,
+    saveAddresses,
     shipToDifferentAddress: true,
     ...overrides.addressOverrides,
   }
@@ -80,7 +83,7 @@ function renderForm(
     </AddressesContext.Provider>
   )
 
-  return { ...result, setAddressErrors, setAddress, addResourceToInclude }
+  return { ...result, setAddressErrors, setAddress, saveAddresses, addResourceToInclude }
 }
 
 beforeEach(() => {
@@ -366,14 +369,13 @@ describe("ShippingAddressForm", () => {
       values: { shipping_address_first_name: { value: "Jane", required: true } },
     })
 
-    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
     const addrCtx = {
       ...defaultAddressContext,
       setAddress,
       setAddressErrors,
+      saveAddresses: vi.fn(),
       shipToDifferentAddress: true,
     } as any
-    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
     const orderCtx = {
       ...defaultOrderContext,
       include: ["shipping_address"],
@@ -544,6 +546,265 @@ describe("ShippingAddressForm", () => {
       expect(setAddress).toHaveBeenCalledWith(
         expect.objectContaining({ resource: "shipping_address" })
       )
+    })
+  })
+
+  it("uses shipToDifferentAddress_prop as fallback when parentAddressContext.shipToDifferentAddress is undefined", async () => {
+    // Covers line 59: parentAddressContext.shipToDifferentAddress ?? shipToDifferentAddress_prop
+    // When the context value is undefined, the prop default (true) should be used.
+    const { setAddress } = renderForm({
+      addressOverrides: { shipToDifferentAddress: undefined },
+      values: {
+        shipping_address_first_name: { value: "Jane", required: true },
+      },
+    })
+
+    // shipToDifferentAddress_prop defaults to true → shouldSync=true → setAddress called
+    await waitFor(() => {
+      expect(setAddress).toHaveBeenCalledWith(
+        expect.objectContaining({ resource: "shipping_address" })
+      )
+    })
+  })
+})
+
+// Standalone mode: ShippingAddressForm without an AddressesContainer ancestor
+
+const saveAddressesMock = vi.hoisted(() => vi.fn())
+vi.mock("#reducers/AddressReducer", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("#reducers/AddressReducer")>()
+  return { ...actual, saveAddresses: saveAddressesMock }
+})
+
+function renderStandaloneShipping(
+  overrides: {
+    props?: Partial<React.ComponentProps<typeof ShippingAddressForm>>
+    orderOverrides?: Record<string, unknown>
+    values?: Record<string, unknown>
+    children?: React.ReactNode
+    commerceLayerConfig?: Record<string, unknown>
+  } = {}
+) {
+  const addResourceToInclude = vi.fn()
+  const orderContext = {
+    ...defaultOrderContext,
+    order: { id: "ord-1" },
+    include: ["shipping_address"],
+    includeLoaded: { shipping_address: true },
+    addResourceToInclude,
+    ...overrides.orderOverrides,
+  }
+  const clConfig = { accessToken: "tok", ...overrides.commerceLayerConfig }
+
+  rapidForm.useRapidForm.mockReturnValue({
+    refValidation: vi.fn(),
+    values: overrides.values ?? {},
+  })
+
+  // No AddressesContext.Provider → isStandalone = true
+  const result = render(
+    // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+    <CommerceLayerContext.Provider value={clConfig as any}>
+      {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
+      <OrderContext.Provider value={orderContext as any}>
+        <ShippingAddressForm data-testid="form" {...overrides.props}>
+          {overrides.children ?? <div data-testid="child" />}
+        </ShippingAddressForm>
+      </OrderContext.Provider>
+    </CommerceLayerContext.Provider>
+  )
+
+  return { ...result, addResourceToInclude }
+}
+
+describe("ShippingAddressForm (standalone mode)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    localStorageMock.getSaveShippingAddressToAddressBook.mockReturnValue(false)
+    saveAddressesMock.mockResolvedValue(undefined)
+  })
+
+  it("renders without an AddressesContext provider (standalone detection)", () => {
+    renderStandaloneShipping()
+    expect(screen.getByTestId("form")).toBeDefined()
+  })
+
+  it("wraps children in its own AddressesContext.Provider with saveAddresses", async () => {
+    let ctxRef: { saveAddresses?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => {
+      expect(typeof ctxRef?.saveAddresses).toBe("function")
+    })
+  })
+
+  it("exposes isBusiness prop via AddressesContext in standalone mode", async () => {
+    let ctxRef: { isBusiness?: boolean } | undefined
+
+    function IsBizProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({ props: { isBusiness: true }, children: <IsBizProbe /> })
+
+    await waitFor(() => {
+      expect(ctxRef?.isBusiness).toBe(true)
+    })
+  })
+
+  it("exposes shipToDifferentAddress=true by default via AddressesContext in standalone mode", async () => {
+    let ctxRef: { shipToDifferentAddress?: boolean } | undefined
+
+    function ShipProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({ children: <ShipProbe /> })
+
+    await waitFor(() => {
+      expect(ctxRef?.shipToDifferentAddress).toBe(true)
+    })
+  })
+
+  it("exposes shipToDifferentAddress=false when prop is false", async () => {
+    let ctxRef: { shipToDifferentAddress?: boolean } | undefined
+
+    function ShipProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({ props: { shipToDifferentAddress: false }, children: <ShipProbe /> })
+
+    await waitFor(() => {
+      expect(ctxRef?.shipToDifferentAddress).toBe(false)
+    })
+  })
+
+  it("standaloneSetAddress dispatches to own reducer", async () => {
+    let ctxRef: { setAddress?: unknown; shipping_address?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => expect(ctxRef?.setAddress).toBeDefined())
+
+    act(() => {
+      ;(ctxRef as any)?.setAddress?.({
+        resource: "shipping_address",
+        values: { first_name: "Alice" },
+      })
+    })
+
+    await waitFor(() => {
+      expect((ctxRef as any)?.shipping_address?.first_name).toBe("Alice")
+    })
+  })
+
+  it("standaloneSetAddressErrors dispatches to own reducer", async () => {
+    let ctxRef: { setAddressErrors?: unknown; errors?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => expect(ctxRef?.setAddressErrors).toBeDefined())
+
+    act(() => {
+      ;(ctxRef as any)?.setAddressErrors?.(
+        [
+          {
+            code: "REQUIRED",
+            message: "Required",
+            resource: "shipping_address",
+            field: "first_name",
+          },
+        ],
+        "shipping_address"
+      )
+    })
+
+    await waitFor(() => {
+      const errors = (ctxRef as any)?.errors
+      expect(errors).toBeDefined()
+    })
+  })
+
+  it("propagates form values to own standalone state via setAddress", async () => {
+    let ctxRef: { shipping_address?: Record<string, unknown> } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({
+      values: {
+        shipping_address_first_name: { value: "Bob", required: true },
+      },
+      children: <AddressCtxProbe />,
+    })
+
+    await waitFor(() => {
+      expect(ctxRef?.shipping_address?.first_name).toBe("Bob")
+    })
+  })
+
+  it("calls saveAddresses (AddressReducer) when standaloneSaveAddresses is invoked", async () => {
+    let ctxRef: { saveAddresses?: unknown } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({ children: <AddressCtxProbe /> })
+
+    await waitFor(() => expect(ctxRef?.saveAddresses).toBeDefined())
+
+    await act(async () => {
+      await (ctxRef as any)?.saveAddresses?.()
+    })
+
+    expect(saveAddressesMock).toHaveBeenCalled()
+  })
+
+  it("also provides ShippingAddressFormContext in standalone mode", async () => {
+    let formCtxRef: { errorClassName?: string } | undefined
+
+    function FormCtxProbe(): JSX.Element {
+      const ctx = useContext(ShippingAddressFormContext)
+      formCtxRef = ctx as typeof formCtxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({ props: { errorClassName: "err" }, children: <FormCtxProbe /> })
+
+    await waitFor(() => {
+      expect(formCtxRef?.errorClassName).toBe("err")
     })
   })
 })

@@ -162,7 +162,6 @@ describe("Customer (standalone)", () => {
     render(
       // biome-ignore lint/suspicious/noExplicitAny: test provider cast
       <CommerceLayerContext.Provider value={{ accessToken: VALID_TOKEN } as any}>
-        {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
         <OrderContext.Provider
           value={
             {
@@ -201,7 +200,6 @@ describe("Customer (standalone)", () => {
     render(
       // biome-ignore lint/suspicious/noExplicitAny: test provider cast
       <CommerceLayerContext.Provider value={{ accessToken: VALID_TOKEN } as any}>
-        {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
         <OrderContext.Provider
           value={
             {

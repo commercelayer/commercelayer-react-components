@@ -61,6 +61,134 @@ describe("AddressCountrySelector", () => {
     expect(screen.getByRole("combobox")).toBeTruthy()
   })
 
+  it("shows the placeholder as selected when no value prop is provided", () => {
+    renderSelector()
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("")
+    expect(screen.getByRole("option", { name: "Select an option" }).selected).toBe(true)
+  })
+
+  it("shows the placeholder when value prop is explicitly empty string", () => {
+    renderSelector({ value: "" })
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("")
+    expect(screen.getByRole("option", { name: "Select an option" }).selected).toBe(true)
+  })
+
+  it("shows the placeholder when value prop is explicitly null (SDK may return null for unset country)", () => {
+    // biome-ignore lint/suspicious/noExplicitAny: testing null prop
+    renderSelector({ value: null as any })
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("")
+    expect(screen.getByRole("option", { name: "Select an option" }).selected).toBe(true)
+  })
+
+  it("pre-fills the country when value changes from null to a country code (order loading)", async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const billingCtx = { ...mockBillingCtx } as any
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const ctx = (v: any) => (
+      <BillingAddressFormContext.Provider value={billingCtx}>
+        <ShippingAddressFormContext.Provider value={{ ...mockShippingCtx } as any}>
+          <CustomerAddressFormContext.Provider value={{ ...mockCustomerCtx } as any}>
+            <AddressCountrySelector name="billing_address_country_code" value={v} />
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+    // biome-ignore lint/suspicious/noExplicitAny: testing null prop
+    const { rerender } = render(ctx(null as any))
+    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("")
+    await act(async () => {
+      rerender(ctx("IT"))
+    })
+    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("IT")
+  })
+
+  it("preserves user selection when parent re-renders with same null value", async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const billingCtx = { ...mockBillingCtx } as any
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const ctx = (v: any) => (
+      <BillingAddressFormContext.Provider value={billingCtx}>
+        <ShippingAddressFormContext.Provider value={{ ...mockShippingCtx } as any}>
+          <CustomerAddressFormContext.Provider value={{ ...mockCustomerCtx } as any}>
+            <AddressCountrySelector name="billing_address_country_code" value={v} />
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+    // biome-ignore lint/suspicious/noExplicitAny: testing null prop
+    const { rerender } = render(ctx(null as any))
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    // Simulate user picking Italy via fireEvent
+    const { fireEvent } = await import("@testing-library/react")
+    fireEvent.change(select, { target: { value: "IT" } })
+    expect(select.value).toBe("IT")
+    // Parent re-renders with same null value — should NOT reset user's selection
+    await act(async () => {
+      rerender(ctx(null as any))
+    })
+    expect(select.value).toBe("IT")
+  })
+
+  it("preserves user selection when pre-filled value is set and user changes the option", async () => {
+    // Regression: value="IT" pre-fills Italy. User picks Germany. Select should show Germany,
+    // not revert to Italy on subsequent re-renders with the same value="IT".
+    const billingCtx = { ...mockBillingCtx } as any
+    const mkTree = (v: string) => (
+      <BillingAddressFormContext.Provider value={billingCtx}>
+        <ShippingAddressFormContext.Provider value={{ ...mockShippingCtx } as any}>
+          <CustomerAddressFormContext.Provider value={{ ...mockCustomerCtx } as any}>
+            <AddressCountrySelector name="billing_address_country_code" value={v} />
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+    const { rerender } = render(mkTree("IT"))
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("IT")
+    // Simulate user changing to Germany
+    const { fireEvent } = await import("@testing-library/react")
+    fireEvent.change(select, { target: { value: "DE" } })
+    expect(select.value).toBe("DE")
+    // Parent re-renders with the same value="IT" (e.g., order state unchanged)
+    await act(async () => {
+      rerender(mkTree("IT"))
+    })
+    // User's selection should be preserved, not reverted to Italy
+    expect(select.value).toBe("DE")
+  })
+
+  it("resets to placeholder when value changes from a country to empty", async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const billingCtx = { ...mockBillingCtx } as any
+    const { rerender } = render(
+      <BillingAddressFormContext.Provider value={billingCtx}>
+        <ShippingAddressFormContext.Provider value={{ ...mockShippingCtx } as any}>
+          <CustomerAddressFormContext.Provider value={{ ...mockCustomerCtx } as any}>
+            <AddressCountrySelector name="billing_address_country_code" value="US" />
+          </CustomerAddressFormContext.Provider>
+        </ShippingAddressFormContext.Provider>
+      </BillingAddressFormContext.Provider>
+    )
+    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("US")
+    await act(async () => {
+      rerender(
+        <BillingAddressFormContext.Provider value={billingCtx}>
+          <ShippingAddressFormContext.Provider value={{ ...mockShippingCtx } as any}>
+            <CustomerAddressFormContext.Provider value={{ ...mockCustomerCtx } as any}>
+              <AddressCountrySelector name="billing_address_country_code" value="" />
+            </CustomerAddressFormContext.Provider>
+          </ShippingAddressFormContext.Provider>
+        </BillingAddressFormContext.Provider>
+      )
+    })
+    const select = screen.getByRole("combobox") as HTMLSelectElement
+    expect(select.value).toBe("")
+    expect(screen.getByRole("option", { name: "Select an option" }).selected).toBe(true)
+  })
+
   it("calls billing setValue when value prop changes", async () => {
     // biome-ignore lint/suspicious/noExplicitAny: test cast
     const billingCtx = { ...mockBillingCtx } as any

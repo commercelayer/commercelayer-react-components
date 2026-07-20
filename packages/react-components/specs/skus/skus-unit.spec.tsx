@@ -1,5 +1,8 @@
-import { AvailabilityTemplate } from "#components/skus/AvailabilityTemplate"
+import { render, screen, waitFor } from "@testing-library/react"
+import { createElement, type ReactNode } from "react"
+import { SWRConfig } from "swr"
 import { DeliveryLeadTime } from "#components/shipping_methods/DeliveryLeadTime"
+import { AvailabilityTemplate } from "#components/skus/AvailabilityTemplate"
 import { SkuField } from "#components/skus/SkuField"
 import { SkuList } from "#components/skus/SkuList"
 import { SkuListsContainer } from "#components/skus/SkuListsContainer"
@@ -9,9 +12,6 @@ import CommerceLayerContext from "#context/CommerceLayerContext"
 import ShippingMethodChildrenContext from "#context/ShippingMethodChildrenContext"
 import SkuChildrenContext from "#context/SkuChildrenContext"
 import SkuListsContext from "#context/SkuListsContext"
-import { render, screen, waitFor } from "@testing-library/react"
-import { createElement, type ReactNode } from "react"
-import { SWRConfig } from "swr"
 
 const swrWrapper = ({ children }: { children: ReactNode }) =>
   createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
@@ -188,14 +188,11 @@ describe("AvailabilityTemplate component", () => {
 
   it("renders via children render prop", () => {
     render(
-      createElement(
-        AvailabilityContext.Provider,
-        { value: { quantity: 5, skuCode: "TESTSKU3", parent: true } },
-        createElement(AvailabilityTemplate, {
-          children: ({ quantity }) =>
-            createElement("span", { "data-testid": "custom-avail" }, String(quantity)),
-        })
-      )
+      <AvailabilityContext.Provider value={{ quantity: 5, skuCode: "TESTSKU3", parent: true }}>
+        <AvailabilityTemplate>
+          {({ quantity }) => <span data-testid="custom-avail">{String(quantity)}</span>}
+        </AvailabilityTemplate>
+      </AvailabilityContext.Provider>
     )
     expect(screen.getByTestId("custom-avail").textContent).toBe("5")
   })

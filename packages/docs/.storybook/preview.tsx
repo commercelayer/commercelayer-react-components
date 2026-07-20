@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference types="vite/client" />
 
+import { Controls, Description, Primary, Stories, Subtitle, Title } from "@storybook/addon-docs"
 import type { Parameters, Preview } from "@storybook/react"
 import { worker } from "../mocks/browser"
-import { Controls, Description, Primary, Stories, Subtitle, Title } from "@storybook/addon-docs"
 
 const parameters: Parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },

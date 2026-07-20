@@ -1,22 +1,28 @@
+import { type JSX, type ReactNode, type RefObject, useContext, useEffect, useReducer } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
-import { type ReactNode, type RefObject, useContext, useEffect, useReducer, type JSX } from "react"
 import placeOrderReducer, {
-  placeOrderInitialState,
   type PlaceOrderOptions,
+  placeOrderInitialState,
   placeOrderPermitted,
   setButtonRef,
   setPlaceOrderStatus,
 } from "#reducers/PlaceOrderReducer"
-import OrderContext from "#context/OrderContext"
-import CommerceLayerContext from "#context/CommerceLayerContext"
-import { setPlaceOrder } from "../../reducers/PlaceOrderReducer"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import { useOrganizationConfig } from "#utils/organization"
+import { setPlaceOrder } from "../../reducers/PlaceOrderReducer"
 
 interface Props {
   children: ReactNode
   options?: PlaceOrderOptions
 }
+
+/**
+ * @deprecated Use `<PlaceOrderButton>` and `<PrivacyAndTermsCheckbox>` directly —
+ * they are now standalone and no longer require a container wrapper.
+ * `PlaceOrderContainer` will be removed in the next major version.
+ */
 export function PlaceOrderContainer(props: Props): JSX.Element {
   const { children, options } = props
   const [state, dispatch] = useReducer(placeOrderReducer, placeOrderInitialState)
@@ -88,6 +94,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
   }, [order, include, includeLoaded, organizationConfig])
   const contextValue = {
     ...state,
+    _isProvided: true as const,
     setPlaceOrder: async ({
       paymentSource,
       currentCustomerPaymentSourceId,

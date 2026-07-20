@@ -1,11 +1,11 @@
-import { SkuListsContainer } from "#components/skus/SkuListsContainer"
-import { SkuList } from "#components/skus/SkuList"
-import CommerceLayerContext from "#context/CommerceLayerContext"
-import SkuListsContext from "#context/SkuListsContext"
 import { render, waitFor } from "@testing-library/react"
-import { createElement, useContext, type ReactNode } from "react"
+import { createElement, type ReactNode, useContext } from "react"
 import { SWRConfig } from "swr"
 import { vi } from "vitest"
+import { SkuList } from "#components/skus/SkuList"
+import { SkuListsContainer } from "#components/skus/SkuListsContainer"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import SkuListsContext from "#context/SkuListsContext"
 
 vi.mock("@commercelayer/hooks", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@commercelayer/hooks")>()

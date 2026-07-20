@@ -1,7 +1,7 @@
 import type { Meta, StoryFn, StoryObj } from "@storybook/react"
-import CommerceLayer from "../_internals/CommerceLayer"
-import Order from "#components/orders/Order"
 import CheckoutLink from "#components/orders/CheckoutLink"
+import Order from "#components/orders/Order"
+import CommerceLayer from "../_internals/CommerceLayer"
 import { OrderStorage } from "../_internals/OrderStorage"
 
 const setup: Meta<typeof CheckoutLink> = {

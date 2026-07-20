@@ -1,11 +1,11 @@
+import { render, waitFor } from "@testing-library/react"
+import { vi } from "vitest"
+import { HostedCart } from "#components/orders/HostedCart"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import OrderStorageContext from "#context/OrderStorageContext"
-import { HostedCart } from "#components/orders/HostedCart"
-import * as organizationUtils from "#utils/organization"
 import * as applicationLinkUtils from "#utils/getApplicationLink"
-import { render, waitFor } from "@testing-library/react"
-import { vi } from "vitest"
+import * as organizationUtils from "#utils/organization"
 
 vi.mock("iframe-resizer", () => ({
   iframeResizer: vi.fn(),

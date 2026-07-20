@@ -224,7 +224,17 @@ export function CheckoutComPayment({ publicKey, options, ...p }: Props): JSX.Ele
         loadFlow()
       }
     }
-  }, [loaded, order?.payment_source?.id, accessToken, setPaymentRef, options?.appearance, setPaymentSource, setPlaceOrderStatus, order?.payment_source, order?.language_code])
+  }, [
+    loaded,
+    order?.payment_source?.id,
+    accessToken,
+    setPaymentRef,
+    options?.appearance,
+    setPaymentSource,
+    setPlaceOrderStatus,
+    order?.payment_source,
+    order?.language_code,
+  ])
   return loaded && show ? (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>
