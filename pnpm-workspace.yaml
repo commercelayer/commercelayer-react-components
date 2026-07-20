@@ -2,10 +2,10 @@ packages:
   - packages/*
 
 allowBuilds:
-  esbuild: set this to true or false
-  iframe-resizer: set this to true or false
-  msw: set this to true or false
-  nx: set this to true or false
+  esbuild: true
+  iframe-resizer: true
+  msw: true
+  nx: true
 
 onlyBuiltDependencies:
   - esbuild
@@ -37,3 +37,7 @@ overrides:
   'uuid': '>=11.1.1'
   'vitest': '>=4.1.0'
   'tmp': '>=0.2.6'
+  # security fixes — issue #798
+  'ws@>=8.0.0 <8.21.0': '>=8.21.0'
+  'esbuild@>=0.27.3 <0.28.1': '>=0.28.1'
+  '@babel/core@<=7.29.0': '>=7.29.6'
