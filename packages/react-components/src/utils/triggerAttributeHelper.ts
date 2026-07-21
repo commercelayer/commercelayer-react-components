@@ -1,4 +1,4 @@
-import { getSdk } from "@commercelayer/core"
+import { getSdk } from "@commercelayer/core-components"
 import type { Order, OrderSubscription } from "@commercelayer/sdk"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 

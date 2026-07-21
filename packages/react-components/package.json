@@ -61,8 +61,8 @@
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
     "@adyen/adyen-web": "^6.41.0",
-    "@commercelayer/core": "workspace:*",
-    "@commercelayer/hooks": "workspace:*",
+    "@commercelayer/core-components": "workspace:*",
+    "@commercelayer/react-hooks-components": "workspace:*",
     "@commercelayer/organization-config": "^2.8.4",
     "@commercelayer/sdk": "7.12.1",
     "@stripe/react-stripe-js": "^6.8.0",

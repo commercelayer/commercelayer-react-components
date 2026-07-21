@@ -3,7 +3,7 @@ import AddressField from "#components/addresses/AddressField"
 import AddressChildrenContext from "#context/AddressChildrenContext"
 import CustomerContext from "#context/CustomerContext"
 
-vi.mock("@commercelayer/core", () => ({}))
+vi.mock("@commercelayer/core-components", () => ({}))
 
 const mockAddress = {
   id: "addr-1",

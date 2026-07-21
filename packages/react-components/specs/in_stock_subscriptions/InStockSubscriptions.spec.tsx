@@ -8,8 +8,8 @@ import InStockSubscriptionContext from "#context/InStockSubscriptionContext"
 const mockHookSetInStockSubscription = vi.fn().mockResolvedValue(undefined)
 const mockUseInStockSubscriptions = vi.fn()
 
-vi.mock("@commercelayer/hooks", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@commercelayer/hooks")>()
+vi.mock("@commercelayer/react-hooks-components", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@commercelayer/react-hooks-components")>()
   return {
     ...actual,
     useInStockSubscriptions: (...args: unknown[]) => mockUseInStockSubscriptions(...args),

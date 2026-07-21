@@ -1,4 +1,4 @@
-import type { InterceptorManager } from "@commercelayer/core"
+import type { InterceptorManager } from "@commercelayer/core-components"
 import { createContext } from "react"
 
 export interface CommerceLayerConfig {

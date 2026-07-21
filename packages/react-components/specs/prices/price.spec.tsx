@@ -1,4 +1,4 @@
-import { usePrices } from "@commercelayer/hooks"
+import { usePrices } from "@commercelayer/react-hooks-components"
 import type { Price as PriceType, Sku } from "@commercelayer/sdk"
 import { render } from "@testing-library/react"
 import { createElement, type ReactNode } from "react"
@@ -14,7 +14,7 @@ import SkuChildrenContext from "#context/SkuChildrenContext"
  * useSyncExternalStore + SWR interactions in test environments.
  * These tests only verify DOM rendering — no real price data is needed.
  */
-vi.mock("@commercelayer/hooks", () => ({
+vi.mock("@commercelayer/react-hooks-components", () => ({
   usePrices: vi.fn(),
 }))
 

@@ -1,4 +1,4 @@
-import { updateAddressReference } from "@commercelayer/core"
+import { updateAddressReference } from "@commercelayer/core-components"
 import { type JSX, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import AddressContext from "#context/AddressContext"
 import BillingAddressContext from "#context/BillingAddressContext"

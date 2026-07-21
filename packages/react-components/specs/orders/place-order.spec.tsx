@@ -11,8 +11,8 @@ import PaymentMethodContext, { defaultPaymentMethodContext } from "#context/Paym
 import PlaceOrderContext, { defaultPlaceOrderContext } from "#context/PlaceOrderContext"
 import { PLACE_ORDER_RECHECK_EVENT, usePlaceOrder } from "#hooks/usePlaceOrder"
 
-vi.mock("@commercelayer/core", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@commercelayer/core")>()
+vi.mock("@commercelayer/core-components", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@commercelayer/core-components")>()
   return {
     ...actual,
     getSdk: vi.fn().mockReturnValue({
@@ -859,7 +859,7 @@ describe("PlaceOrderButton handleClick", () => {
     vi.mocked(getCardDetailsModule.default).mockReturnValue({ brand: "visa" } as any)
     // Always restore getSdk to return a functional mock so sdk-null test
     // doesn't corrupt subsequent tests
-    const { getSdk } = await import("@commercelayer/core")
+    const { getSdk } = await import("@commercelayer/core-components")
     vi.mocked(getSdk).mockReturnValue({
       orders: {
         retrieve: vi
@@ -908,7 +908,7 @@ describe("PlaceOrderButton handleClick", () => {
 
   it("returns early if sdk is null", async () => {
     const setPlaceOrder = vi.fn()
-    const { getSdk } = await import("@commercelayer/core")
+    const { getSdk } = await import("@commercelayer/core-components")
     vi.mocked(getSdk).mockReturnValueOnce(null as any)
 
     render(
@@ -937,7 +937,7 @@ describe("PlaceOrderButton handleClick", () => {
 
   it("sets isValid=false when payment_status is partially_authorized (covers line 535)", async () => {
     // Must use non-stripe payment type so sdk.orders.retrieve is called
-    const { getSdk } = await import("@commercelayer/core")
+    const { getSdk } = await import("@commercelayer/core-components")
     const sdk = vi.mocked(getSdk)() as any
     vi.mocked(sdk.orders.retrieve).mockResolvedValueOnce({
       id: "order-1",
@@ -1277,7 +1277,7 @@ describe("usePlaceOrder hook direct", () => {
   beforeEach(async () => {
     localStorage.clear()
     vi.clearAllMocks()
-    const { getSdk } = await import("@commercelayer/core")
+    const { getSdk } = await import("@commercelayer/core-components")
     vi.mocked(getSdk).mockReturnValue({
       orders: {
         retrieve: vi

@@ -5,7 +5,7 @@ import AddressContext from "#context/AddressContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 
-vi.mock("@commercelayer/core", () => ({}))
+vi.mock("@commercelayer/core-components", () => ({}))
 vi.mock("#utils/localStorage", () => ({
   setCustomerOrderParam: vi.fn(),
   getLocalOrder: vi.fn(),

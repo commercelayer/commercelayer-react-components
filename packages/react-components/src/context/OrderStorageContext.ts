@@ -1,5 +1,5 @@
-import type { DeleteLocalOrder, GetLocalOrder, SetLocalOrder } from "@commercelayer/core"
-import { deleteLocalOrder, getLocalOrder, setLocalOrder } from "@commercelayer/core"
+import type { DeleteLocalOrder, GetLocalOrder, SetLocalOrder } from "@commercelayer/core-components"
+import { deleteLocalOrder, getLocalOrder, setLocalOrder } from "@commercelayer/core-components"
 import { createContext } from "react"
 
 export interface OrderStorageConfig {

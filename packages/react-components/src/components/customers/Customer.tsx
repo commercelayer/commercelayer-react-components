@@ -13,7 +13,7 @@ import {
   type InterceptorManager,
   type Order,
   type QueryPageSize,
-} from "@commercelayer/core"
+} from "@commercelayer/core-components"
 import { type JSX, useContext, useEffect, useMemo, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"

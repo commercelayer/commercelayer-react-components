@@ -8,8 +8,8 @@ import ShipmentContext from "#context/ShipmentContext"
 
 const mockUseShipments = vi.fn()
 
-vi.mock("@commercelayer/hooks", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@commercelayer/hooks")>()
+vi.mock("@commercelayer/react-hooks-components", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@commercelayer/react-hooks-components")>()
   return {
     ...actual,
     useShipments: (...args: unknown[]) => mockUseShipments(...args),

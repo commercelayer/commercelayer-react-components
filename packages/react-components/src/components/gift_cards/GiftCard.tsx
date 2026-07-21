@@ -1,4 +1,4 @@
-import { createGiftCard, getSdk } from "@commercelayer/core"
+import { createGiftCard, getSdk } from "@commercelayer/core-components"
 import type {
   GiftCardRecipient,
   GiftCardRecipientCreate,

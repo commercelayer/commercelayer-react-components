@@ -1,4 +1,4 @@
-import type { InterceptorManager } from "@commercelayer/core"
+import type { InterceptorManager } from "@commercelayer/core-components"
 import type { JSX } from "react"
 import ErrorBoundary from "#components/utils/ErrorBoundary"
 import CommerceLayerContext from "#context/CommerceLayerContext"

@@ -11,7 +11,7 @@ const core = vi.hoisted(() => ({
   getSdk: vi.fn(),
 }))
 
-vi.mock("@commercelayer/core", () => ({
+vi.mock("@commercelayer/core-components", () => ({
   createGiftCard: core.createGiftCard,
   getSdk: core.getSdk,
 }))

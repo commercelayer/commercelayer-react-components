@@ -4,9 +4,9 @@ import { Meta, Source } from '@storybook/addon-docs/blocks';
 
 # Core package
 
-The `@commercelayer/core` package is a collection of **low-level async functions** that wrap the [Commerce Layer SDK](https://github.com/commercelayer/commercelayer-sdk).
+The `@commercelayer/core-components` package is a collection of **low-level async functions** that wrap the [Commerce Layer SDK](https://github.com/commercelayer/commercelayer-sdk).
 
-It is the foundation layer used internally by the `@commercelayer/hooks` package and by the React components. You can use it directly if you need to fetch or mutate Commerce Layer resources outside of a React component.
+It is the foundation layer used internally by the `@commercelayer/react-hooks-components` package and by the React components. You can use it directly if you need to fetch or mutate Commerce Layer resources outside of a React component.
 
 <span type="info">
 This package has no React dependency — it can be used in any JavaScript/TypeScript environment (Node.js, edge functions, plain scripts, etc.).
@@ -20,9 +20,9 @@ The package is published to npm as part of this monorepo and listed as a workspa
   language="bash"
   dark
   code={`
-npm install @commercelayer/core
+npm install @commercelayer/core-components
 # or
-pnpm add @commercelayer/core
+pnpm add @commercelayer/core-components
 `}
 />
 
@@ -49,7 +49,7 @@ Every function follows the same pattern:
   language="typescript"
   dark
   code={`
-import { getSkus } from '@commercelayer/core'
+import { getSkus } from '@commercelayer/core-components'
 
 const skus = await getSkus({
   accessToken: 'your-access-token',
@@ -77,7 +77,7 @@ The first argument is always an object with:
   language="typescript"
   dark
   code={`
-import { getAccessToken } from '@commercelayer/core'
+import { getAccessToken } from '@commercelayer/core-components'
 
 const token = await getAccessToken({
   grantType: 'client_credentials',
@@ -98,7 +98,7 @@ console.log(token.accessToken)
   language="typescript"
   dark
   code={`
-import { getSkus } from '@commercelayer/core'
+import { getSkus } from '@commercelayer/core-components'
 
 const result = await getSkus({
   accessToken,
@@ -120,7 +120,7 @@ for (const sku of result) {
   language="typescript"
   dark
   code={`
-import { retrieveSkuList } from '@commercelayer/core'
+import { retrieveSkuList } from '@commercelayer/core-components'
 
 const skuList = await retrieveSkuList({
   accessToken,

@@ -7,8 +7,8 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "pnpm --filter @commercelayer/core --filter @commercelayer/hooks --filter @commercelayer/react-components build",
-    "build:watch": "pnpm --filter @commercelayer/core --filter @commercelayer/hooks --filter @commercelayer/react-components --parallel build:watch",
+    "build": "pnpm --filter @commercelayer/core-components --filter @commercelayer/react-hooks-components --filter @commercelayer/react-components build",
+    "build:watch": "pnpm --filter @commercelayer/core-components --filter @commercelayer/react-hooks-components --filter @commercelayer/react-components --parallel build:watch",
     "prepare": "husky",
     "test": "pnpm -r --workspace-concurrency=1 --no-bail test",
     "docs:dev": "pnpm --filter docs storybook",

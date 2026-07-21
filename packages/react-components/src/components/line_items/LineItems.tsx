@@ -1,4 +1,4 @@
-import { useLineItems } from "@commercelayer/hooks"
+import { useLineItems } from "@commercelayer/react-hooks-components"
 import { type JSX, useContext } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import LineItemContext, { type LineItemContextValue } from "#context/LineItemContext"

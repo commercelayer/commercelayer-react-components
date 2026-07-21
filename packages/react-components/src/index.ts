@@ -1,4 +1,4 @@
-export type { SkuAvailability } from "@commercelayer/core"
+export type { SkuAvailability } from "@commercelayer/core-components"
 export * from "#components/addresses/Address"
 export * from "#components/addresses/AddressCountrySelector"
 export * from "#components/addresses/AddressesContainer"

@@ -1,4 +1,4 @@
-import { getSdk } from "@commercelayer/core"
+import { getSdk } from "@commercelayer/core-components"
 import type { Order, OrderUpdate, StripePayment } from "@commercelayer/sdk"
 import type { Dispatch, RefObject } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"

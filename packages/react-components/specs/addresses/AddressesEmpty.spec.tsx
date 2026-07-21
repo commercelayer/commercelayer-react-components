@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react"
 import AddressesEmpty from "#components/addresses/AddressesEmpty"
 import CustomerContext from "#context/CustomerContext"
 
-vi.mock("@commercelayer/core", () => ({}))
+vi.mock("@commercelayer/core-components", () => ({}))
 
 function renderEmpty(
   addresses: Address[] | null | undefined,

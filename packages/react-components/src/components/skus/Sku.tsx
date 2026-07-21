@@ -1,4 +1,4 @@
-import { useSkus } from "@commercelayer/hooks"
+import { useSkus } from "@commercelayer/react-hooks-components"
 import type { Sku as SkuType } from "@commercelayer/sdk"
 import { type ReactNode, useContext, useEffect, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"

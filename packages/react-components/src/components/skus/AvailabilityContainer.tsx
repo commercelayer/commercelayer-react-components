@@ -1,4 +1,4 @@
-import { useAvailability } from "@commercelayer/hooks"
+import { useAvailability } from "@commercelayer/react-hooks-components"
 import { type JSX, type ReactNode, useContext, useEffect, useMemo } from "react"
 import AvailabilityContext from "#context/AvailabilityContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
