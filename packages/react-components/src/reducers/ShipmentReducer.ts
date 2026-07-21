@@ -1,4 +1,4 @@
-import { getSdk } from "@commercelayer/core"
+import { getSdk } from "@commercelayer/core-components"
 import type { DeliveryLeadTime, LineItem, Order, Shipment } from "@commercelayer/sdk"
 import type { Dispatch } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"

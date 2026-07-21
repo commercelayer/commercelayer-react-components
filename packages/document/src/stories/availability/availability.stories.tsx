@@ -11,7 +11,7 @@ function AvailabilityDocsPage(): JSX.Element {
         The Availability components let you display real-time stock quantity and delivery lead times
         for any SKU. They are powered by the Commerce Layer inventory model and work by fetching
         availability data through the <code>useAvailability</code> hook from{" "}
-        <code>@commercelayer/hooks</code>. All Availability components must be nested inside the{" "}
+        <code>@commercelayer/react-hooks-components</code>. All Availability components must be nested inside the{" "}
         <code>{"<CommerceLayer>"}</code> context.
       </p>
       <hr />

@@ -1,4 +1,4 @@
-import { getSdk } from "@commercelayer/core"
+import { getSdk } from "@commercelayer/core-components"
 import type { Address, Order, OrderUpdate } from "@commercelayer/sdk"
 import type { Dispatch } from "react"
 import type { TResourceError } from "#components/errors/Errors"

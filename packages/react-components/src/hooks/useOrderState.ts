@@ -38,7 +38,7 @@ interface UseOrderStateConfig
 /**
  * Internal hook that encapsulates the full order state machine used by
  * `<OrderContainer>`. Not intended for direct consumer use — use
- * `useOrderContainer()` or `useOrder()` from `@commercelayer/hooks` instead.
+ * `useOrderContainer()` or `useOrder()` from `@commercelayer/react-hooks-components` instead.
  */
 export function useOrderState({
   accessToken,

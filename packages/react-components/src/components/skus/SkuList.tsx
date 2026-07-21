@@ -1,4 +1,4 @@
-import { useSkuList } from "@commercelayer/hooks"
+import { useSkuList } from "@commercelayer/react-hooks-components"
 import type { QueryParamsRetrieve, Sku, SkuList as SkuListType } from "@commercelayer/sdk"
 import { type JSX, type ReactNode, useContext, useEffect, useMemo } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"

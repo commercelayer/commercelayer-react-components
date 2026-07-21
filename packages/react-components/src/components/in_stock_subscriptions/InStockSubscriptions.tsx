@@ -1,4 +1,4 @@
-import { useInStockSubscriptions } from "@commercelayer/hooks"
+import { useInStockSubscriptions } from "@commercelayer/react-hooks-components"
 import { type JSX, useCallback, useContext, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import InStockSubscriptionContext, {

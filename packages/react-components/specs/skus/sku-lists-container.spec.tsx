@@ -1,4 +1,4 @@
-import { getSkuLists } from "@commercelayer/core"
+import { getSkuLists } from "@commercelayer/core-components"
 import { render, screen, waitFor } from "@testing-library/react"
 import { getAccessToken } from "mocks/getAccessToken"
 import { createElement, type ReactNode, useContext } from "react"

@@ -17,7 +17,7 @@ const core = vi.hoisted(() => ({
   setResourceTrigger: vi.fn(),
 }))
 
-vi.mock("@commercelayer/core", () => ({
+vi.mock("@commercelayer/core-components", () => ({
   getCustomerInfo: core.getCustomerInfo,
   getCustomerAddresses: core.getCustomerAddresses,
   getCustomerPayments: core.getCustomerPayments,

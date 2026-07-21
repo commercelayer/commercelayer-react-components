@@ -37,8 +37,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build elements 🛠
-        run: pnpm --filter @commercelayer/core --filter @commercelayer/hooks --filter @commercelayer/react-components build
+        run: pnpm --filter @commercelayer/core-components --filter @commercelayer/react-hooks-components --filter @commercelayer/react-components build
 
       - name: Publish 🚀 pkg.pr.new
         run: |
-          npx pkg-pr-new publish './packages/react-components' './packages/core' './packages/hooks' --no-template
+          npx pkg-pr-new publish './packages/react-components' './packages/core-components' './packages/react-hooks-components' --no-template

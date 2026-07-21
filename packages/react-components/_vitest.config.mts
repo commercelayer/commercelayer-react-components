@@ -6,8 +6,8 @@ import { defineConfig } from "vitest/config"
 export default defineConfig({
   resolve: {
     alias: {
-      "@commercelayer/hooks": path.resolve("../hooks/src/index.ts"),
-      "@commercelayer/core": path.resolve("../core/src/index.ts"),
+      "@commercelayer/react-hooks-components": path.resolve("../react-hooks-components/src/index.ts"),
+      "@commercelayer/core-components": path.resolve("../core-components/src/index.ts"),
       "#components": path.resolve(__dirname, "src/components"),
       "#components/auth": path.resolve(__dirname, "src/components/auth"),
       "#components/auth/*": path.resolve(__dirname, "src/components/auth/*"),

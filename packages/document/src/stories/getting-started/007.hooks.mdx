@@ -4,7 +4,7 @@ import { Meta, Source } from '@storybook/addon-docs/blocks';
 
 # Hooks package
 
-The `@commercelayer/hooks` package provides **SWR-based React hooks** built on top of the `@commercelayer/core` package.
+The `@commercelayer/react-hooks-components` package provides **SWR-based React hooks** built on top of the `@commercelayer/core-components` package.
 
 These hooks handle caching, deduplication, loading states, and error handling automatically. They are used internally by the React components in this library and are available for direct use if you want to build custom UI on top of Commerce Layer data.
 
@@ -18,9 +18,9 @@ This package requires React 18+ and depends on `swr` for data fetching and cachi
   language="bash"
   dark
   code={`
-npm install @commercelayer/hooks
+npm install @commercelayer/react-hooks-components
 # or
-pnpm add @commercelayer/hooks
+pnpm add @commercelayer/react-hooks-components
 `}
 />
 
@@ -65,7 +65,7 @@ All hooks use [SWR](https://swr.vercel.app/) with `revalidateOnFocus: false` and
   language="tsx"
   dark
   code={`
-import { useSkus } from '@commercelayer/hooks'
+import { useSkus } from '@commercelayer/react-hooks-components'
 
 function SkuList({ accessToken }: { accessToken: string }) {
   const { skus, isLoading, fetchSkus } = useSkus(accessToken)
@@ -96,7 +96,7 @@ function SkuList({ accessToken }: { accessToken: string }) {
   language="tsx"
   dark
   code={`
-import { useSkuLists } from '@commercelayer/hooks'
+import { useSkuLists } from '@commercelayer/react-hooks-components'
 
 function SkuListItems({ accessToken }: { accessToken: string }) {
   const { retrieveSkuList } = useSkuLists(accessToken)
@@ -126,7 +126,7 @@ function SkuListItems({ accessToken }: { accessToken: string }) {
   language="tsx"
   dark
   code={`
-import { usePrices } from '@commercelayer/hooks'
+import { usePrices } from '@commercelayer/react-hooks-components'
 
 function PriceList({ accessToken }: { accessToken: string }) {
   const { prices, isLoading, fetchPrices } = usePrices(accessToken)
@@ -154,7 +154,7 @@ function PriceList({ accessToken }: { accessToken: string }) {
   language="tsx"
   dark
   code={`
-import { useAvailability } from '@commercelayer/hooks'
+import { useAvailability } from '@commercelayer/react-hooks-components'
 
 function StockBadge({ accessToken, skuCode }: { accessToken: string; skuCode: string }) {
   const { quantity, isLoading, fetchAvailability } = useAvailability(accessToken)

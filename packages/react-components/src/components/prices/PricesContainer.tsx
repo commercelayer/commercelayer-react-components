@@ -1,4 +1,4 @@
-import { usePrices } from "@commercelayer/hooks"
+import { usePrices } from "@commercelayer/react-hooks-components"
 import type { QueryPageSize } from "@commercelayer/sdk"
 import { type JSX, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"

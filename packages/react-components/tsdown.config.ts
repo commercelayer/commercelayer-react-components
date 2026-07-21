@@ -24,8 +24,8 @@ export default defineConfig({
     neverBundle: [
       "react",
       "react-dom",
-      "@commercelayer/hooks",
-      "@commercelayer/core",
+      "@commercelayer/react-hooks-components",
+      "@commercelayer/core-components",
       "@commercelayer/sdk",
       "@commercelayer/sdk/bundle",
     ],

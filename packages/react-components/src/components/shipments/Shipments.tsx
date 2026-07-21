@@ -1,4 +1,4 @@
-import { useShipments } from "@commercelayer/hooks"
+import { useShipments } from "@commercelayer/react-hooks-components"
 import type { Order } from "@commercelayer/sdk"
 import { type JSX, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"

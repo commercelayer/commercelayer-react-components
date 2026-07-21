@@ -1,10 +1,10 @@
-import { deleteLocalOrder, getLocalOrder, setLocalOrder } from "@commercelayer/core"
+import { deleteLocalOrder, getLocalOrder, setLocalOrder } from "@commercelayer/core-components"
 
 export type {
   DeleteLocalOrder,
   GetLocalOrder,
   SetLocalOrder,
-} from "@commercelayer/core"
+} from "@commercelayer/core-components"
 export { deleteLocalOrder, getLocalOrder, setLocalOrder }
 
 export const getSavePaymentSourceToCustomerWallet = (): boolean => {

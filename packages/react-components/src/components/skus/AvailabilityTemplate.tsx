@@ -1,4 +1,4 @@
-import type { DeliveryLeadTime } from "@commercelayer/core"
+import type { DeliveryLeadTime } from "@commercelayer/core-components"
 import type { JSX } from "react"
 import Parent from "#components/utils/Parent"
 import AvailabilityContext from "#context/AvailabilityContext"

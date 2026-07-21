@@ -4,8 +4,8 @@ import { setPaymentSource } from "#reducers/PaymentMethodReducer"
 const stripeCreate = vi.fn()
 const wireCreate = vi.fn()
 
-vi.mock("@commercelayer/core", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@commercelayer/core")>()
+vi.mock("@commercelayer/core-components", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@commercelayer/core-components")>()
   return {
     ...actual,
     getSdk: vi.fn(() => ({

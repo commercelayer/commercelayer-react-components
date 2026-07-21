@@ -8,8 +8,8 @@ import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PlaceOrderContext, { defaultPlaceOrderContext } from "#context/PlaceOrderContext"
 
-vi.mock("@commercelayer/core", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@commercelayer/core")>()
+vi.mock("@commercelayer/core-components", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@commercelayer/core-components")>()
   return {
     ...actual,
     getSdk: vi.fn().mockReturnValue({

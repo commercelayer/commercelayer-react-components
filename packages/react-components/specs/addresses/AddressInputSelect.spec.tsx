@@ -4,7 +4,7 @@ import type { DefaultContextAddress } from "#context/BillingAddressFormContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 
-vi.mock("@commercelayer/core", () => ({}))
+vi.mock("@commercelayer/core-components", () => ({}))
 
 const OPTIONS = [
   { label: "Option A", value: "a" },

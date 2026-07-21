@@ -1,4 +1,4 @@
-import { getSdk } from "@commercelayer/core"
+import { getSdk } from "@commercelayer/core-components"
 import { useContext } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 

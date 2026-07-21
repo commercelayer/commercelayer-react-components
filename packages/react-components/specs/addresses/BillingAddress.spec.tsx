@@ -10,7 +10,7 @@ const core = vi.hoisted(() => ({
   updateAddressReference: vi.fn(),
 }))
 
-vi.mock("@commercelayer/core", () => ({
+vi.mock("@commercelayer/core-components", () => ({
   updateAddressReference: core.updateAddressReference,
 }))
 

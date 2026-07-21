@@ -7,7 +7,7 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import ShippingAddressContext from "#context/ShippingAddressContext"
 
-vi.mock("@commercelayer/core", () => ({}))
+vi.mock("@commercelayer/core-components", () => ({}))
 
 const mockAddress: AddressType = {
   id: "addr-1",

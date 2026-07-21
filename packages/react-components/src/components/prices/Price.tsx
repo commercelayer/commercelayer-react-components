@@ -1,4 +1,4 @@
-import { usePrices } from "@commercelayer/hooks"
+import { usePrices } from "@commercelayer/react-hooks-components"
 import type { Price as PriceType } from "@commercelayer/sdk"
 import { type JSX, type ReactNode, useContext, useEffect, useState } from "react"
 import Parent from "#components/utils/Parent"
