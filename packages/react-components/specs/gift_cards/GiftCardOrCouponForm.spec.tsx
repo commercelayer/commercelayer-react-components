@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
-import { useContext } from "react"
+import { type ReactNode, useContext } from "react"
 import { GiftCardOrCouponForm } from "#components/gift_cards/GiftCardOrCouponForm"
 import CouponAndGiftCardFormContext from "#context/CouponAndGiftCardFormContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
@@ -21,10 +21,12 @@ function renderComponent({
   codeType,
   onSubmit = vi.fn(),
   orderContextOverrides = {},
+  children = <CodeTypeProbe />,
 }: {
   codeType?: "coupon_code" | "gift_card_code"
   onSubmit?: ReturnType<typeof vi.fn>
   orderContextOverrides?: Record<string, unknown>
+  children?: ReactNode
 }) {
   const setGiftCardOrCouponCode = vi.fn()
   const setOrderErrors = vi.fn()
@@ -45,7 +47,7 @@ function renderComponent({
     // biome-ignore lint/suspicious/noExplicitAny: test provider cast
     <OrderContext.Provider value={orderContext as any}>
       <GiftCardOrCouponForm codeType={codeType} onSubmit={onSubmit} data-testid="gift-card-form">
-        <CodeTypeProbe />
+        {children}
       </GiftCardOrCouponForm>
     </OrderContext.Provider>
   )
@@ -179,7 +181,7 @@ describe("GiftCardOrCouponForm", () => {
     })
   })
 
-  it("clears order errors to an empty list when none are present", async () => {
+  it("does not dispatch when the active field is empty and there is nothing to clear", async () => {
     const setOrderErrors = vi.fn()
     rapidForm.useRapidForm.mockReturnValue({
       refValidation: vi.fn(),
@@ -196,7 +198,33 @@ describe("GiftCardOrCouponForm", () => {
       },
     })
 
-    await waitFor(() => expect(setOrderErrors).toHaveBeenCalledWith([]))
+    // No errors to strip → dispatching a fresh [] would only churn `errors`' identity
+    // and re-fire the effect forever (React 19 "Maximum update depth exceeded").
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(setOrderErrors).not.toHaveBeenCalled()
+  })
+
+  it("does not dispatch when every existing error already belongs to the active field", async () => {
+    const setOrderErrors = vi.fn()
+    rapidForm.useRapidForm.mockReturnValue({
+      refValidation: vi.fn(),
+      values: {
+        coupon_code: { value: "" },
+      },
+    })
+
+    renderComponent({
+      codeType: "coupon_code",
+      orderContextOverrides: {
+        // Filtering keeps all of these → same contents → no-op. This is the settled
+        // state the loop must converge to; a fresh-array dispatch here would spin.
+        errors: [{ code: "VALIDATION_ERROR", message: "coupon", field: "coupon_code" }],
+        setOrderErrors,
+      },
+    })
+
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(setOrderErrors).not.toHaveBeenCalled()
   })
 
   it("returns early on submit when the current field value is missing", async () => {
@@ -250,6 +278,8 @@ describe("GiftCardOrCouponForm", () => {
     const { container, setGiftCardOrCouponCode } = renderComponent({
       codeType: "coupon_code",
       onSubmit,
+      // handleSubmit reads the code from the form DOM, not rapid-form's values.
+      children: <input name="coupon_code" defaultValue="SAVE10" />,
     })
     setGiftCardOrCouponCode.mockResolvedValue({ success: true, order: updatedOrder })
 
@@ -288,6 +318,8 @@ describe("GiftCardOrCouponForm", () => {
       orderContextOverrides: {
         order: { id: "order-1", gift_card_code: "", coupon_code: "" },
       },
+      // handleSubmit reads the code from the form DOM, not rapid-form's values.
+      children: <input name="gift_card_code" defaultValue="GC-123" />,
     })
     setGiftCardOrCouponCode.mockResolvedValue({ success: false, order: undefined })
 
