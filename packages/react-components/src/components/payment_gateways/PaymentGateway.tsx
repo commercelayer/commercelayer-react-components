@@ -1,4 +1,4 @@
-import { type JSX, useContext, useEffect, useRef, useState } from "react"
+import { type JSX, useContext, useEffect, useEffectEvent, useRef, useState } from "react"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
@@ -51,7 +51,8 @@ export function PaymentGateway({
   const loaderComponent = getLoaderComponent(loader)
   const [loading, setLoading] = useState(true)
   // Guards against the effect re-entering and firing a second `setPaymentSource`
-  // before the first (fire-and-forget) request resolves and settles state. See ADR 0001.
+  // before the first (fire-and-forget) request resolves and settles state.
+  // See docs/adr/0001-payment-source-effect-invariants.md.
   const settingPaymentSourceRef = useRef(false)
   const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
@@ -69,7 +70,15 @@ export function PaymentGateway({
   const paymentResource = readonly
     ? currentPaymentMethodType
     : (payment?.payment_source_type as PaymentResource)
-  useEffect(() => {
+
+  // Non-reactive reconcile pass. It reads the *latest* `order`, `config`, `paymentSource`,
+  // etc. on every invocation, so those objects are deliberately absent from the driving
+  // effect's dependency array below — only stable id/scalar selectors are. This is what
+  // ends the mismatched-amounts loop: a customer-sources refetch that only mints new
+  // `order`/`paymentSource` object identities no longer re-fires the effect, while a real
+  // field change (a flipped `mismatched_amounts`, a new source id, a status transition)
+  // still does. See docs/adr/0001-payment-source-effect-invariants.md.
+  const onPaymentSync = useEffectEvent((): void => {
     if (
       payment?.id === currentPaymentMethodId &&
       paymentResource &&
@@ -97,6 +106,10 @@ export function PaymentGateway({
         // effect run must not fire a second create/update before state settles.
         if (settingPaymentSourceRef.current) return
         settingPaymentSourceRef.current = true
+        // Only refetch customer sources when a source was actually (re)created; the
+        // unconditional refetch on a no-op pass was what re-armed the effect and drove
+        // the single-method mismatched-amounts loop.
+        let recreated = false
         try {
           if (order != null && paymentMethods && paymentMethods?.length > 1) {
             await setPaymentSource({
@@ -104,9 +117,13 @@ export function PaymentGateway({
               order,
               attributes,
             })
+            recreated = true
           }
           if (
-            ((errors != null && errors?.length > 0) || order?.payment_source === null) &&
+            ((errors != null && errors?.length > 0) ||
+              order?.payment_source == null ||
+              // @ts-expect-error no type
+              order?.payment_source?.mismatched_amounts) &&
             paymentMethods &&
             paymentMethods?.length === 1
           ) {
@@ -115,11 +132,12 @@ export function PaymentGateway({
               order,
               attributes,
             })
+            recreated = true
           }
         } finally {
           settingPaymentSourceRef.current = false
         }
-        if (getCustomerPaymentSources) getCustomerPaymentSources()
+        if (recreated && getCustomerPaymentSources) getCustomerPaymentSources()
       }
       if (!paymentSource && order?.payment_method.id && show && !expressPayments) {
         setPaymentSources()
@@ -149,31 +167,35 @@ export function PaymentGateway({
     ) {
       setLoading(false)
     }
-    // No cleanup: setLoading(true) in cleanup caused unnecessary extra re-renders.
+  })
+
+  // The array below is a deliberate trigger set, not the effect body's reads —
+  // `onPaymentSync` (a useEffectEvent) reads the latest values, so the linter sees these
+  // deps as "more than necessary". See docs/adr/0001-payment-source-effect-invariants.md.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: deliberate trigger set, see ADR 0001
+  useEffect(() => {
+    onPaymentSync()
+    // Reactive triggers only: stable ids/scalars, never whole objects. `order` and `config`
+    // are read latest inside `onPaymentSync`, so listing their identities here would re-fire
+    // the effect on meaningless refetch churn. See docs/adr/0001-payment-source-effect-invariants.md.
   }, [
     order?.payment_method?.id,
-    show,
-    paymentSource?.id,
+    order?.payment_method?.payment_source_type,
     order?.status,
+    order?.payment_source?.id,
+    // @ts-expect-error no type
+    order?.payment_source?.mismatched_amounts,
+    paymentSource?.id,
+    paymentSource?.type,
     // @ts-expect-error no type
     paymentSource?.mismatched_amounts,
-    paymentSource?.type,
-    paymentSource,
     paymentResource,
     payment?.id,
-    setPaymentSource,
-    order?.payment_source?.id,
-    order?.payment_source,
-    order?.payment_method?.payment_source_type,
-    order,
-    getCustomerPaymentSources,
-    paymentMethods?.length,
-    paymentMethods,
     currentPaymentMethodId,
     expressPayments,
+    show,
     errors?.length,
-    errors,
-    config,
+    paymentMethods?.length,
   ])
 
   useEffect(() => {
