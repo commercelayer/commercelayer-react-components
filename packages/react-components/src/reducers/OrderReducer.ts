@@ -798,7 +798,34 @@ export const orderInitialState: Partial<OrderState> = {
   withoutIncludes: true,
 }
 
-const orderReducer = (state: OrderState, reducer: OrderActions): OrderState =>
-  baseReducer<OrderState, OrderActions, OrderActionType[]>(state, reducer, actionType)
+const orderReducer = (state: OrderState, reducer: OrderActions): OrderState => {
+  if (reducer.type === "setIncludesResource") {
+    const { payload } = reducer
+    // `include` is a union of what every mounted component needs, so it must accumulate
+    // rather than be replaced. `addResourceToInclude` is a free function with no access
+    // to the store, so it can only union against the `resourcesIncluded` it is handed —
+    // and most call sites don't pass it. Several components dispatch more than once from
+    // a single effect pass, all reading the same stale `include` snapshot, so a plain
+    // spread would let the last dispatch drop the others' resources. Missing an include
+    // is indistinguishable from an unset relationship in the API response, which turns
+    // a dropped resource into wrong application state rather than a failed request.
+    //
+    // An explicitly empty list is the one exception: it means "reset" (see the effect
+    // teardown in `useOrderState`), so it is passed through as-is.
+    if (payload.include != null && payload.include.length === 0) {
+      return { ...state, ...payload }
+    }
+    const merged = [...new Set([...(state.include ?? []), ...(payload.include ?? [])])]
+    return {
+      ...state,
+      ...payload,
+      // Keep `include` untouched when there is nothing to merge — callers that only
+      // report `includeLoaded` omit it, and turning `undefined` into `[]` would flip
+      // the `include?.length === 0` checks in `useOrderState`.
+      include: merged.length > 0 ? merged : state.include,
+    }
+  }
+  return baseReducer<OrderState, OrderActions, OrderActionType[]>(state, reducer, actionType)
+}
 
 export default orderReducer
