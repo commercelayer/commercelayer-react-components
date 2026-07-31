@@ -70,6 +70,16 @@ export function PaymentGateway({
   const paymentResource = readonly
     ? currentPaymentMethodType
     : (payment?.payment_source_type as PaymentResource)
+  // Returning the loader instead of the gateway (see the render below) swaps the gateway out
+  // rather than overlaying the loader, so every flip of `loading` unmounts it — and with it a
+  // mounted Adyen Drop-in, which loses the shopper's selection and re-initializes on the way
+  // back.
+  //
+  // While the order is partially authorized the shopper is mid-payment in that very gateway,
+  // so it must stay mounted. `mismatched_amounts` is also expected in that window (we
+  // authorized only the gift-card balance against the full total), and "healing" it by
+  // recreating the payment source would throw the authorization away.
+  const isPartiallyAuthorized = order?.payment_status === "partially_authorized"
 
   // Non-reactive reconcile pass. It reads the *latest* `order`, `config`, `paymentSource`,
   // etc. on every invocation, so those objects are deliberately absent from the driving
@@ -148,13 +158,13 @@ export function PaymentGateway({
         setPaymentSources()
       }
       // @ts-expect-error no type
-      if (paymentSource?.mismatched_amounts && show) {
+      if (paymentSource?.mismatched_amounts && show && !isPartiallyAuthorized) {
         setPaymentSources()
       }
       if (order?.payment_source?.id != null) {
         setLoading(false)
       }
-      if (!paymentSource) {
+      if (!paymentSource && !isPartiallyAuthorized) {
         setLoading(true)
       }
     }
@@ -182,6 +192,9 @@ export function PaymentGateway({
     order?.payment_method?.id,
     order?.payment_method?.payment_source_type,
     order?.status,
+    // Read by the recreate guard and the loader branch, so it has to re-fire the effect —
+    // otherwise the pass keeps deciding from a stale partial-authorization state.
+    order?.payment_status,
     order?.payment_source?.id,
     // @ts-expect-error no type
     order?.payment_source?.mismatched_amounts,
@@ -199,12 +212,15 @@ export function PaymentGateway({
   ])
 
   useEffect(() => {
-    if (status === "placing") setLoading(true)
+    // Not while partially authorized: a place-order attempt on such an order is refused
+    // anyway (see <PlaceOrderButton>), so raising the loader here only unmounts the gateway
+    // the shopper still needs in order to pay the remainder.
+    if (status === "placing" && !isPartiallyAuthorized) setLoading(true)
     if (status === "standby") setLoading(false)
     if (order?.status === "placed") setLoading(false)
     // No cleanup: setLoading(true) in cleanup + loading in deps caused an infinite
     // toggle loop (setLoading(false) → dep change → cleanup setLoading(true) → repeat).
-  }, [status, order?.status])
+  }, [status, order?.status, isPartiallyAuthorized])
 
   const gatewayConfig = {
     readonly,
@@ -220,7 +236,25 @@ export function PaymentGateway({
     ...p,
   }
   if (currentPaymentMethodType !== paymentResource) return null
-  if (loading) return loaderComponent
+  // Swapping the gateway out for the loader unmounts it. For a stateless gateway that costs
+  // nothing; the Adyen Drop-in, though, owns imperative state — the shopper's selected method
+  // and typed-in details — and unmounting it destroys that and forces a full re-initialization
+  // (fresh AdyenCheckout(), new Dropin().mount(), translations and analytics again).
+  //
+  // Guarding individual `loading` flips is not enough: `payment_response.status` and
+  // `payment_status` are populated by two different API calls, so there is a window where a
+  // flip looks legitimate. Keeping the Drop-in mounted removes the whole class of problem —
+  // and it manages its own loading UI anyway.
+  // The Adyen Drop-in owns imperative state — the shopper's selected method and typed-in
+  // details — so unmounting it destroys that and forces a full re-initialization (fresh
+  // AdyenCheckout(), new Dropin().mount(), translations and analytics again). For a stateless
+  // gateway the swap costs nothing, so it is kept.
+  //
+  // Guarding individual `loading` flips is not enough here: `payment_response.status` and
+  // `payment_status` are populated by two different API calls, so there is a window where a
+  // flip looks legitimate. Keeping the Drop-in mounted removes the whole class of problem, and
+  // it manages its own loading UI anyway.
+  if (loading && paymentResource !== "adyen_payments") return loaderComponent
   switch (paymentResource) {
     case "adyen_payments":
       return <AdyenGateway {...gatewayConfig}>{children}</AdyenGateway>

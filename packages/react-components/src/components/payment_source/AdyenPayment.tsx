@@ -8,6 +8,7 @@ import {
   type CoreConfiguration,
   Dropin,
   type DropinConfiguration,
+  type ICore,
   type OnChangeData,
   type PayPalConfiguration,
   type SubmitData,
@@ -143,6 +144,31 @@ export function AdyenPayment({
   const { customers } = useContext(CustomerContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const dropinRef = useRef<Dropin | null>(null)
+  // The Core instance, kept alongside the Drop-in: refreshing the amount after a partial
+  // authorization goes through Core, not the Drop-in. See the `onSubmit` handler below.
+  const checkoutRef = useRef<ICore | null>(null)
+  // Latches the partial-authorization refresh: refreshing the Drop-in once, when the order
+  // becomes partially authorized, is intended — doing it again for the same authorization is
+  // the glitch. Keyed by payment source id so a genuinely new source can refresh again.
+  const refreshedForSourceRef = useRef<string | null>(null)
+
+  // Tear the Adyen instance down on real unmount only, and clear the refs so a remounted
+  // component can initialize a fresh one (the init guard below is `!dropinRef.current`, so a
+  // leftover reference would leave the component wired to a destroyed Drop-in forever).
+  //
+  // Deliberately its own mount-scoped effect: the main effect below re-runs whenever the
+  // place-order `status` changes, and destroying the Drop-in on those passes would throw the
+  // shopper's selection away mid-checkout.
+  useEffect(() => {
+    return () => {
+      // `remove()` rather than `unmount()`: Adyen documents it as the "destroy" cleanup — it
+      // unmounts the element *and* drops it from `core.components`, so Core stops holding a
+      // reference to a dead element (which `triggerAmountUpdate()` would otherwise iterate).
+      dropinRef.current?.remove()
+      dropinRef.current = null
+      checkoutRef.current = null
+    }
+  }, [])
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<boolean> => {
     const savePaymentSourceToCustomerWallet: string =
       // @ts-expect-error no type
@@ -153,7 +179,25 @@ export function AdyenPayment({
         savePaymentSourceToCustomerWallet
       )
     if (dropinRef.current) {
-      dropinRef.current.submit()
+      // `Dropin.submit()` throws synchronously when it has no `activePaymentMethod` — e.g.
+      // the shopper has not picked a method, or the Drop-in was re-rendered and lost the
+      // selection while `ref.current.onsubmit` stayed patched from an earlier `onChange`.
+      // Because this function is async the throw became a rejected promise that
+      // <PlaceOrderButton> awaited without a catch, surfacing as an unhandledRejection that
+      // takes the page (and the e2e run) down instead of telling the shopper anything.
+      try {
+        dropinRef.current.submit()
+      } catch (error) {
+        setPaymentMethodErrors([
+          {
+            code: "VALIDATION_ERROR",
+            resource: "payment_methods",
+            field: currentPaymentMethodType,
+            message: error instanceof Error ? error.message : String(error),
+          },
+        ])
+        return false
+      }
     }
     return false
   }
@@ -233,6 +277,8 @@ export function AdyenPayment({
       paymentMethodType?: string
       message?: string
       paymentStatus?: Order["payment_status"]
+      /** Still to be covered by another payment method, in Adyen's `{ currency, value }` shape. */
+      remainingAmount?: { currency: string; value: number }
     }
   > => {
     const url = cleanUrlBy()
@@ -360,11 +406,36 @@ export function AdyenPayment({
             message,
           }
         }
+        // What the shopper still has to cover with another method, in Adyen's
+        // `{ currency, value }` shape.
+        //
+        // Do NOT derive this from `gift_card_amount_cents`: that field is the sum of the
+        // Commerce Layer `gift_card` resources applied to the order, and an Adyen gift card
+        // authorized through `_authorization_amount_cents` never creates one — it stays 0,
+        // so the subtraction would hand the Drop-in back the full total.
+        //
+        // Adyen's own `remainingAmount` is authoritative when the account uses the
+        // partial-payments order flow (it already nets off every card authorized so far);
+        // otherwise fall back to what we just authorized ourselves: `currentBalance`, the
+        // amount sent as `_authorization_amount_cents` above.
+        const adyenRemainingAmount =
+          // @ts-expect-error no type
+          orderUpdated?.payment_source?.payment_response?.order?.remainingAmount
+        const currency = orderUpdated?.currency_code ?? order?.currency_code
+        const remainingValue =
+          typeof adyenRemainingAmount?.value === "number"
+            ? adyenRemainingAmount.value
+            : Math.max(totalAmount - currentBalance, 0)
         return {
           resultCode: "Authorised",
           paymentMethodType: currentPaymentMethodType,
           action,
           paymentStatus,
+          // Adyen validates the amount and silently cancels the update on an empty
+          // currency, so only report one when the currency is actually known.
+          ...(currency != null && remainingValue > 0
+            ? { remainingAmount: { currency, value: remainingValue } }
+            : {}),
         }
       }
       const res = await setPaymentSource({
@@ -532,7 +603,10 @@ export function AdyenPayment({
       },
       onSubmit: (state, element, actions) => {
         const handleSubmit = async (): Promise<void> => {
-          const { resultCode, action, message, paymentStatus } = await onSubmit(state, element)
+          const { resultCode, action, message, paymentStatus, remainingAmount } = await onSubmit(
+            state,
+            element
+          )
           if (["Cancelled", "Refused"].includes(resultCode)) {
             actions.reject()
             if (message) {
@@ -544,8 +618,37 @@ export function AdyenPayment({
             actions.resolve({
               resultCode,
             })
-            if (paymentStatus === "partially_authorized") {
-              dropinRef.current?.mount("#adyen-dropin")
+            const refreshKey = paymentSource?.id ?? "unknown"
+            if (
+              paymentStatus === "partially_authorized" &&
+              remainingAmount != null &&
+              refreshedForSourceRef.current !== refreshKey
+            ) {
+              refreshedForSourceRef.current = refreshKey
+              // Refresh the Drop-in for the reduced amount. `shouldReinitializeCheckout: true`
+              // makes Core `setOptions(amount)`, re-`initialize()`, then `update()` every
+              // mounted component — and `BaseElement.update()` is `state = {}` plus
+              // `unmount().mount(this._node)`, i.e. a real refresh in place, with the payment
+              // method list consistent with what is left to pay.
+              //
+              // This replaces `dropinRef.current?.mount("#adyen-dropin")`, which re-rendered
+              // the Drop-in with the *old* amount: same lost selection, none of the benefit.
+              //
+              // Latched above, so it happens once per authorization and not on every pass.
+              checkoutRef.current?.update(
+                { amount: remainingAmount },
+                { shouldReinitializeCheckout: true }
+              )
+              // The refresh resets `activePaymentMethod`, so the form is genuinely not
+              // submittable until the shopper picks a method again — at which point
+              // `handleChange` re-patches `ref.current.onsubmit` and re-arms the ref. Dropping
+              // it here keeps <PlaceOrderButton> honest; leaving it patched is what let it
+              // call `Dropin.submit()` on an empty Drop-in and throw "No active payment
+              // method.".
+              if (ref.current != null) {
+                ref.current.onsubmit = null
+              }
+              setPaymentRef({ ref: { current: null } })
             }
             setGiftcardError(null)
           }
@@ -557,6 +660,7 @@ export function AdyenPayment({
     if (clientKey && !loadAdyen && window && !checkout) {
       const initializeAdyen = async (): Promise<void> => {
         const checkout = await AdyenCheckout(options)
+        checkoutRef.current = checkout
         const dropin = new Dropin(checkout, {
           disableFinalAnimation: true,
           showRemovePaymentMethodButton: showStoredPaymentMethods,
