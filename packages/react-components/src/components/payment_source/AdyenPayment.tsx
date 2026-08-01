@@ -32,6 +32,7 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
+import { getAdyenShopperLocale } from "#utils/adyenShopperLocale"
 import browserInfo, { cleanUrlBy } from "#utils/browserInfo"
 import { getPublicIP } from "#utils/getPublicIp"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
@@ -111,6 +112,20 @@ export interface AdyenPaymentConfig {
    */
   onSelect?: (component: UIElement<UIElementProps>) => void
   giftcardErrorComponent?: (message: string) => JSX.Element
+  /**
+   * The locale Adyen should use for anything **it** renders — in particular the hosted page a
+   * redirect payment method sends the shopper to (Klarna, iDEAL, …). Sent as `shopperLocale`
+   * in the payment request.
+   *
+   * This is not the same as the Drop-in's `locale`, which only selects the client-side
+   * translation bundle. Without a `shopperLocale` Adyen falls back to the merchant account
+   * default or the country code, so a Drop-in in English can hand over to a Klarna page in
+   * Italian.
+   *
+   * @default derived from `order.language_code` (see `getAdyenShopperLocale`)
+   * @example "en-US"
+   */
+  shopperLocale?: string
 }
 
 interface Props {
@@ -138,6 +153,7 @@ export function AdyenPayment({
     onReady,
     onSelect,
     subscriptionPaymentMethods,
+    shopperLocale: shopperLocaleConfig,
   } = {
     ...defaultConfig,
     ...config,
@@ -162,6 +178,13 @@ export function AdyenPayment({
   const { customers } = useContext(CustomerContext)
   const ref = useRef<null | HTMLFormElement>(null)
   const dropinRef = useRef<Dropin | null>(null)
+  // Two distinct locales, deliberately derived from the same source (see the Core `options`
+  // below, which uses the first one): `dropInLocale` only selects the Drop-in's client-side
+  // translations, while `shopperLocale` travels with the payment request and is what Adyen
+  // uses for the hosted pages it renders itself.
+  const dropInLocale = order?.language_code ?? locale
+  const shopperLocale =
+    shopperLocaleConfig ?? getAdyenShopperLocale(dropInLocale)
   const handleSubmit = async (
     e: FormEvent<HTMLFormElement>,
   ): Promise<boolean> => {
@@ -297,6 +320,11 @@ export function AdyenPayment({
         redirect_from_issuer_method: "GET",
         shopper_ip: shopperIp,
         shopperInteraction: "Ecommerce",
+        // The language Adyen renders its own hosted pages in (the Klarna screen a redirect
+        // method hands over to). The Drop-in's `locale` is client-side only and never reaches
+        // Adyen, so without this the hosted page falls back to the account default or the
+        // country code.
+        ...(shopperLocale != null ? { shopperLocale } : {}),
         browser_info: {
           ...browserInfo(),
         },
@@ -536,7 +564,7 @@ export function AdyenPayment({
           : paymentMethodsResponse.paymentMethods
     }
     const options = {
-      locale: order?.language_code ?? locale,
+      locale: dropInLocale,
       environment,
       clientKey,
       amount: {

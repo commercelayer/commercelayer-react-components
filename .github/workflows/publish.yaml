@@ -14,19 +14,21 @@ jobs:
 
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: pnpm 🧰
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Node 🧰
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v7
         with:
-          node-version: 20.x
+          node-version: 22.x
           registry-url: https://registry.npmjs.org
           cache: 'pnpm'
 
       - name: Update npm
+        # Keep this in step with node-version above: npm 12 requires Node >=22.22.2, so on the
+        # previous 20.x runner `npm@latest` failed with EBADENGINE.
         run: npm install -g npm@latest
 
       - name: Install 📦
