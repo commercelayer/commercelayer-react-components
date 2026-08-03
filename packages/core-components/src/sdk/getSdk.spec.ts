@@ -49,6 +49,7 @@ describe("getSdk", () => {
     expect(CommerceLayer).toHaveBeenCalledWith({
       accessToken: "fake-token",
       organization: "my-org",
+      apiVersion: "2026-05",
     })
     expect(result).toBe(mockSdkInstance)
   })
