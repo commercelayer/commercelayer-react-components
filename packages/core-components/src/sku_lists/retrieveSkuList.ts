@@ -1,4 +1,4 @@
-import { type QueryParamsRetrieve, type SkuList, sku_lists } from "@commercelayer/sdk"
+import type { QueryParamsRetrieve, SkuList } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 
@@ -21,6 +21,6 @@ export async function retrieveSkuList({
   params,
   interceptors,
 }: RetrieveSkuList): Promise<SkuList> {
-  getSdk({ accessToken, interceptors })
-  return await sku_lists.retrieve(id, params)
+  const sdk = getSdk({ accessToken, interceptors })
+  return await sdk.sku_lists.retrieve(id, params)
 }
