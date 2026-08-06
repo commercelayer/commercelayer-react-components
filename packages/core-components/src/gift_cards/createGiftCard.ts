@@ -1,9 +1,4 @@
-import {
-  type GiftCard,
-  type GiftCardCreate,
-  gift_cards,
-  type QueryParamsRetrieve,
-} from "@commercelayer/sdk"
+import type { GiftCard, GiftCardCreate, QueryParamsRetrieve } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 
@@ -26,6 +21,6 @@ export async function createGiftCard({
   params,
   interceptors,
 }: CreateGiftCardParams): Promise<GiftCard> {
-  getSdk({ accessToken, interceptors })
-  return await gift_cards.create(resource, params)
+  const sdk = getSdk({ accessToken, interceptors })
+  return await sdk.gift_cards.create(resource, params)
 }

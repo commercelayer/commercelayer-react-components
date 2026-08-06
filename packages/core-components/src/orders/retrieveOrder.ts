@@ -1,5 +1,4 @@
 import type { Order, QueryParamsRetrieve } from "@commercelayer/sdk"
-import { orders } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 
@@ -22,6 +21,6 @@ export async function retrieveOrder({
   id,
   params,
 }: RetrieveOrderParams): Promise<Order> {
-  getSdk({ accessToken, interceptors })
-  return await orders.retrieve(id, params)
+  const sdk = getSdk({ accessToken, interceptors })
+  return await sdk.orders.retrieve(id, params)
 }

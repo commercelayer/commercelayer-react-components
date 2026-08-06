@@ -1,4 +1,4 @@
-import { type QueryParamsRetrieve, type Sku, skus } from "@commercelayer/sdk"
+import type { QueryParamsRetrieve, Sku } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 
@@ -25,6 +25,6 @@ export async function retrieveSku({
   options,
   interceptors,
 }: RetrieveSkuParams): Promise<Sku> {
-  getSdk({ accessToken, interceptors })
-  return await skus.retrieve(id, params, options)
+  const sdk = getSdk({ accessToken, interceptors })
+  return await sdk.skus.retrieve(id, params, options)
 }

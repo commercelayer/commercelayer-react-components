@@ -12,8 +12,8 @@ export default defineConfig({
   dts: {
     // tsconfig.json limits "types" to ["vitest/globals"] for tests;
     // reset to ["node"] so all @types/* are auto-included for DTS generation.
-    // "bundler" moduleResolution enables package.json exports subpath imports
-    // (e.g. @commercelayer/sdk/bundle) which "node" resolution doesn't support.
+    // "bundler" moduleResolution resolves dependencies through their package.json
+    // "exports" map, which "node" resolution doesn't support.
     compilerOptions: { types: ["node"], moduleResolution: "bundler" },
   },
   fixedExtension: false,
@@ -27,7 +27,6 @@ export default defineConfig({
       "@commercelayer/react-hooks-components",
       "@commercelayer/core-components",
       "@commercelayer/sdk",
-      "@commercelayer/sdk/bundle",
     ],
   },
   banner: {

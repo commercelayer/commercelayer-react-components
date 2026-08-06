@@ -1,4 +1,4 @@
-import { type Price, prices, type QueryParamsRetrieve } from "@commercelayer/sdk"
+import type { Price, QueryParamsRetrieve } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 
@@ -25,6 +25,6 @@ export async function retrievePrice({
   options,
   interceptors,
 }: RetrievePriceParams): Promise<Price> {
-  getSdk({ accessToken, interceptors })
-  return await prices.retrieve(id, params, options)
+  const sdk = getSdk({ accessToken, interceptors })
+  return await sdk.prices.retrieve(id, params, options)
 }

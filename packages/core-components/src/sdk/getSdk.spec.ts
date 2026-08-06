@@ -24,7 +24,7 @@ const {
   }
 })
 
-vi.mock("@commercelayer/sdk/bundle", () => ({
+vi.mock("@commercelayer/sdk", () => ({
   CommerceLayer: vi.fn().mockReturnValue(mockSdkInstance),
 }))
 
@@ -44,7 +44,7 @@ describe("getSdk", () => {
   })
 
   test("should return an SDK instance initialized with the org slug from JWT", async () => {
-    const { CommerceLayer } = await import("@commercelayer/sdk/bundle")
+    const { CommerceLayer } = await import("@commercelayer/sdk")
     const result = getSdk({ accessToken: "fake-token" })
     expect(CommerceLayer).toHaveBeenCalledWith({
       accessToken: "fake-token",

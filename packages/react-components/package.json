@@ -62,9 +62,9 @@
   "dependencies": {
     "@adyen/adyen-web": "^6.41.0",
     "@commercelayer/core-components": "workspace:*",
-    "@commercelayer/react-hooks-components": "workspace:*",
     "@commercelayer/organization-config": "^2.8.4",
-    "@commercelayer/sdk": "7.12.1",
+    "@commercelayer/react-hooks-components": "workspace:*",
+    "@commercelayer/sdk": "8.0.0-beta.11",
     "@stripe/react-stripe-js": "^6.8.0",
     "@stripe/stripe-js": "^9.10.0",
     "@tanstack/react-table": "^8.21.3",

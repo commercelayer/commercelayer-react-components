@@ -1,5 +1,4 @@
 import type { Order, OrderCreate } from "@commercelayer/sdk"
-import { orders } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { BaseMetadataObject, RequestConfig } from "#types"
 
@@ -22,6 +21,6 @@ export async function createOrder({
   metadata,
   attributes = {},
 }: CreateOrderParams): Promise<Order> {
-  getSdk({ accessToken, interceptors })
-  return await orders.create({ metadata, ...attributes })
+  const sdk = getSdk({ accessToken, interceptors })
+  return await sdk.orders.create({ metadata, ...attributes })
 }

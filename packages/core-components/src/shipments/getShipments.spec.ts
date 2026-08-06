@@ -23,7 +23,7 @@ const {
   }
 })
 
-vi.mock("@commercelayer/sdk/bundle", () => ({
+vi.mock("@commercelayer/sdk", () => ({
   CommerceLayer: vi.fn().mockReturnValue({
     addRequestInterceptor: mockAddRequestInterceptor,
     addResponseInterceptor: mockAddResponseInterceptor,

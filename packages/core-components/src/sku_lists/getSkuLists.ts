@@ -1,9 +1,4 @@
-import {
-  type ListResponse,
-  type QueryParamsList,
-  type SkuList,
-  sku_lists,
-} from "@commercelayer/sdk"
+import type { ListResponse, QueryParamsList, SkuList } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 
@@ -23,6 +18,6 @@ export async function getSkuLists({
   params,
   interceptors,
 }: GetSkuLists): Promise<ListResponse<SkuList>> {
-  getSdk({ accessToken, interceptors })
-  return await sku_lists.list(params)
+  const sdk = getSdk({ accessToken, interceptors })
+  return await sdk.sku_lists.list(params)
 }

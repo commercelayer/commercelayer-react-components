@@ -1,10 +1,4 @@
-import {
-  type ListResponse,
-  type Price,
-  prices,
-  type QueryParamsList,
-  type ResourcesConfig,
-} from "@commercelayer/sdk"
+import type { ListResponse, Price, QueryParamsList, ResourcesConfig } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 
@@ -16,7 +10,7 @@ interface GetPrices extends RequestConfig {
 type GetPricesParams = GetPrices
 
 /**
- * Get a list of prices
+ * Get a list of
  *
  * @param {string} accessToken - The access token to use for authentication.
  * @param {QueryParamsList<Price>} params - Optional query parameters for the request.
@@ -29,6 +23,6 @@ export async function getPrices({
   options,
   interceptors,
 }: GetPricesParams): Promise<ListResponse<Price>> {
-  getSdk({ accessToken, interceptors })
-  return await prices.list(params, options)
+  const sdk = getSdk({ accessToken, interceptors })
+  return await sdk.prices.list(params, options)
 }

@@ -4,9 +4,8 @@ import {
   type JWTWebApp,
   jwtDecode,
 } from "@commercelayer/js-auth"
-import type { ErrorObj, RequestObj, ResponseObj } from "@commercelayer/sdk"
-import type { CommerceLayerBundle } from "@commercelayer/sdk/bundle"
-import { CommerceLayer as Sdk } from "@commercelayer/sdk/bundle"
+import type { CommerceLayerClient, ErrorObj, RequestObj, ResponseObj } from "@commercelayer/sdk"
+import { CommerceLayer as Sdk } from "@commercelayer/sdk"
 
 type RequestInterceptor = (request: RequestObj) => RequestObj | Promise<RequestObj>
 type ResponseInterceptor = (response: ResponseObj) => ResponseObj | Promise<ResponseObj>
@@ -33,7 +32,7 @@ export function getSdk({
 }: {
   accessToken: string
   interceptors?: InterceptorManager
-}): CommerceLayerBundle {
+}): CommerceLayerClient {
   const { payload } = jwtDecode(accessToken)
   const { organization } = payload as JWTIntegration | JWTWebApp | JWTSalesChannel
   const sdk = Sdk({ accessToken, organization: organization.slug })

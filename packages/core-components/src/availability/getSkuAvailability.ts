@@ -1,4 +1,4 @@
-import { type Sku, skus } from "@commercelayer/sdk"
+import type { Sku } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 
@@ -48,18 +48,18 @@ export async function getSkuAvailability({
   skuId,
   interceptors,
 }: GetSkuAvailability): Promise<SkuAvailability | null> {
-  getSdk({ accessToken, interceptors })
+  const sdk = getSdk({ accessToken, interceptors })
   const [sku] =
     skuId != null
       ? [{ id: skuId } as Sku]
       : skuCode != null
-        ? await skus.list({
+        ? await sdk.skus.list({
             fields: { skus: ["id"] },
             filters: { code_in: skuCode },
           })
         : []
   if (sku == null) return null
-  const skuInventory = await skus.retrieve(sku.id, {
+  const skuInventory = await sdk.skus.retrieve(sku.id, {
     fields: { skus: ["inventory", "code"] },
   })
   const inventory = (

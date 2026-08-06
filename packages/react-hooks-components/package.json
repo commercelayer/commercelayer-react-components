@@ -41,7 +41,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@babel/core": "^7.29.7",
-    "@commercelayer/sdk": "^7.12.1",
+    "@commercelayer/sdk": "8.0.0-beta.11",
     "@rolldown/plugin-babel": "^0.2.3",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.17",

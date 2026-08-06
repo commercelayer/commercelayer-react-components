@@ -23,14 +23,14 @@ const {
   }
 })
 
-vi.mock("@commercelayer/sdk/bundle", () => ({
-  CommerceLayer: vi.fn().mockReturnValue(mockSdkInstance),
+vi.mock("@commercelayer/sdk", () => ({
+  CommerceLayer: vi.fn().mockReturnValue({
+    ...mockSdkInstance,
+    gift_cards: { retrieve: vi.fn().mockResolvedValue({ id: "gift-card-1" }) },
+  }),
 }))
 vi.mock("@commercelayer/js-auth", () => ({
   jwtDecode: vi.fn().mockReturnValue({ payload: { organization: { slug: "my-org" } } }),
-}))
-vi.mock("@commercelayer/sdk", () => ({
-  gift_cards: { retrieve: vi.fn().mockResolvedValue({ id: "gift-card-1" }) },
 }))
 
 describe("retrieveGiftCard interceptors", () => {
