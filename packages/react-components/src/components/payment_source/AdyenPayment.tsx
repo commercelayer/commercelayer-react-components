@@ -702,6 +702,24 @@ export function AdyenPayment({
       setLoadAdyen(false)
     }
   }, [clientKey, ref != null, status, setPaymentMethodErrors != null])
+
+  /**
+   * Destroys the Adyen Drop-in only on true unmount (empty deps), independent
+   * of the effect above: that effect's cleanup also runs on every `status`
+   * flip (e.g. standby -> placing -> standby on a declined retry) while the
+   * component stays mounted, and calling remove() there would tear down and
+   * rebuild the Drop-in mid-flow.
+   */
+  useEffect(() => {
+    return () => {
+      try {
+        dropinRef.current?.remove()
+      } catch (error) {
+        console.error("Adyen drop-in teardown error:", error)
+      }
+      dropinRef.current = null
+    }
+  }, [])
   return !clientKey && !loadAdyen && !checkout ? null : (
     <form
       ref={ref}
