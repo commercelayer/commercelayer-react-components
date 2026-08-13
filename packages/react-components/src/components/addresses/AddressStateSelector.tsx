@@ -13,6 +13,7 @@ import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import CustomerAddressFormContext from "#context/CustomerAddressFormContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 import type { AddressStateSelectName, BaseSelectComponentProps, Option } from "#typings"
+import { singleFormValue } from "#utils/addressFormUtils"
 import { getStateOfCountry, isValidState, type States } from "#utils/countryStateCity"
 import { isEmpty } from "#utils/isEmpty"
 
@@ -105,11 +106,15 @@ export function AddressStateSelector(props: Props): JSX.Element {
   useEffect(() => {
     const billingCountryValue = billingAddress?.values?.[BILLING_COUNTRY_KEY]
     const billingCountryCode =
-      typeof billingCountryValue === "string" ? billingCountryValue : billingCountryValue?.value
+      typeof billingCountryValue === "string"
+        ? billingCountryValue
+        : singleFormValue(billingCountryValue?.value)
     if (billingCountryCode && billingCountryCode !== countryCode) setCountryCode(billingCountryCode)
     const shippingCountryValue = shippingAddress?.values?.[SHIPPING_COUNTRY_KEY]
     const shippingCountryCode =
-      typeof shippingCountryValue === "string" ? shippingCountryValue : shippingCountryValue?.value
+      typeof shippingCountryValue === "string"
+        ? shippingCountryValue
+        : singleFormValue(shippingCountryValue?.value)
     if (shippingCountryCode && shippingCountryCode !== countryCode)
       setCountryCode(shippingCountryCode)
     // True when this is the first time a country is detected (was empty before).

@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.2.1",
-    "@commercelayer/js-auth": "^7.4.2",
+    "@commercelayer/js-auth": "^8.0.0",
     "@storybook/addon-docs": "^10.5.3",
     "@storybook/addon-links": "^10.5.3",
     "@storybook/addon-mcp": "^0.7.0",
