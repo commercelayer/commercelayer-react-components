@@ -233,25 +233,54 @@ describe("ShippingAddressForm", () => {
     })
   })
 
-  it("calls saveAddressToCustomerAddressBook for checkbox fields", async () => {
-    const saveAddressToCustomerAddressBook = vi.fn()
-    renderForm({
+  it.each([
+    ["ticked", "true", true],
+    ["unticked", "false", false],
+  ])(
+    "reports a %s save-to-address-book checkbox from rapid-form's string value",
+    async (_label, reported, expected) => {
+      // rapid-form v5 reports a checkbox as the string "true"/"false" and carries no
+      // `type`/`checked`. Tracking it at all requires trackUnvalidatedFields, since the
+      // checkbox is not a required field.
+      const saveAddressToCustomerAddressBook = vi.fn()
+      renderForm({
+        values: {
+          shipping_address_first_name: { value: "Jane", required: true },
+          shipping_address_save_to_customer_book: {
+            name: "shipping_address_save_to_customer_book",
+            value: reported,
+          },
+        },
+        orderOverrides: { saveAddressToCustomerAddressBook },
+      })
+
+      await waitFor(() => {
+        expect(saveAddressToCustomerAddressBook).toHaveBeenCalledWith(
+          expect.objectContaining({ type: "shipping_address", value: expected })
+        )
+      })
+    }
+  )
+
+  it("keeps the checkbox out of the address attributes", async () => {
+    // "false" is a truthy string, so a checkbox leaking into the values would be
+    // PATCHed onto the address as a bogus `save_to_customer_book` attribute.
+    const { setAddress } = renderForm({
       values: {
         shipping_address_first_name: { value: "Jane", required: true },
         shipping_address_save_to_customer_book: {
-          value: "on",
-          type: "checkbox",
-          checked: true,
+          name: "shipping_address_save_to_customer_book",
+          value: "false",
         },
       },
-      orderOverrides: { saveAddressToCustomerAddressBook },
     })
 
     await waitFor(() => {
-      expect(saveAddressToCustomerAddressBook).toHaveBeenCalledWith(
-        expect.objectContaining({ type: "shipping_address", value: true })
-      )
+      expect(setAddress).toHaveBeenCalled()
     })
+    for (const call of setAddress.mock.calls) {
+      expect(call[0].values).not.toHaveProperty("save_to_customer_book")
+    }
   })
 
   it("sets address errors when input validation fails (with shouldSyncShippingAddress)", async () => {

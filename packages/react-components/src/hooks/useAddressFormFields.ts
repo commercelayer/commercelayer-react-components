@@ -14,7 +14,12 @@ import type {
 } from "#reducers/OrderReducer"
 import type { TCustomerAddress } from "#typings/customers"
 import type { BaseError, CodeErrorType } from "#typings/errors"
-import { type FormErrors, type FormValue, getFormElement } from "#utils/addressFormUtils"
+import {
+  type FormErrors,
+  type FormValue,
+  getFormElement,
+  singleFormValue,
+} from "#utils/addressFormUtils"
 
 interface UseAddressFormFieldsParams {
   resource: AddressResource
@@ -61,7 +66,10 @@ export function useAddressFormFields({
   const setFormRef = useCallback(
     (node: HTMLFormElement | null) => {
       formRef.current = node
-      refValidation(node)
+      // Track fields that carry no `required` attribute as well. The "save this address
+      // in your account" checkbox is optional, so without this rapid-form never reports
+      // it, the effect below never sees it, and ticking it was silently discarded.
+      refValidation(node, { trackUnvalidatedFields: true })
     },
     [refValidation]
   )
@@ -174,15 +182,30 @@ export function useAddressFormFields({
     const addressValues: Record<string, unknown> = {}
     for (const [name, field] of Object.entries(formValues)) {
       if (field == null) continue
-      if (
-        field.value != null &&
-        (field.value || field.required === false) &&
-        field.type !== "checkbox"
-      ) {
-        addressValues[name.replace(prefix, "")] = field.value
+
+      // rapid-form v5 reports every tracked field as `{ name, value }` only — no `type`
+      // or `checked` — and encodes a checkbox as the string "true"/"false". A v5 checkbox
+      // is therefore indistinguishable from a text field by shape alone, so recognise
+      // the save-to-address-book field by its known name and fall back to the DOM for any
+      // other checkbox. Either way a checkbox must never reach `addressValues`: "false"
+      // is a truthy string and would be PATCHed onto the address as a bogus attribute.
+      const isSaveToAddressBookField = name === checkboxFieldName
+      const element = getFormElement(formRef.current, name)
+      if (isSaveToAddressBookField || element?.type === "checkbox" || field.type === "checkbox") {
+        if (isSaveToAddressBookField) {
+          // The live element is authoritative; fall back to the reported field for
+          // environments without a real input, then to v5's "true"/"false" string.
+          const checked =
+            (element as HTMLInputElement | null)?.checked ??
+            field.checked ??
+            singleFormValue(field.value as string | string[] | undefined) === "true"
+          saveAddressToCustomerAddressBook?.({ type: resource, value: checked })
+        }
+        continue
       }
-      if (field.type === "checkbox") {
-        saveAddressToCustomerAddressBook?.({ type: resource, value: field.checked ?? false })
+
+      if (field.value != null && (field.value || field.required === false)) {
+        addressValues[name.replace(prefix, "")] = field.value
       }
     }
 
@@ -220,6 +243,7 @@ export function useAddressFormFields({
     prefix,
     errorMode,
     hasValidated,
+    checkboxFieldName,
   ])
 
   useEffect(() => {
@@ -228,7 +252,9 @@ export function useAddressFormFields({
     )
     const checked = checkbox?.checked || getSaveToAddressBook()
     if (checked) {
-      checkbox?.setAttribute("checked", "true")
+      // Assign the property, not the attribute: the attribute only seeds `defaultChecked`,
+      // so on a re-opened step it left the box visually unticked.
+      if (checkbox != null && !checkbox.checked) checkbox.checked = true
       saveAddressToCustomerAddressBook?.({ type: resource, value: true })
     }
   }, [saveAddressToCustomerAddressBook, checkboxFieldName, getSaveToAddressBook, resource])
