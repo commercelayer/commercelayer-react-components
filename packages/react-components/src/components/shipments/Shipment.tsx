@@ -85,9 +85,12 @@ export function Shipment({
       if (autoSelectSingleShippingMethod) {
         const autoSelect = async (): Promise<void> => {
           for (const shipment of shipments) {
-            const isSingle = shipment?.available_shipping_methods?.length === 1
+            // Normalise once: `isSingle` below already proves the array is present, so
+            // a second fallback at the destructuring site would be unreachable.
+            const availableShippingMethods = shipment?.available_shipping_methods ?? []
+            const isSingle = availableShippingMethods.length === 1
             if (!shipment?.shipping_method && isSingle) {
-              const [shippingMethod] = shipment?.available_shipping_methods || []
+              const [shippingMethod] = availableShippingMethods
               if (shippingMethod && setShippingMethodRef.current != null) {
                 const { success, order } = await setShippingMethodRef.current(
                   shipment.id,

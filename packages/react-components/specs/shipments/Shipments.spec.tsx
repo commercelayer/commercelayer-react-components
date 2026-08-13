@@ -470,6 +470,45 @@ describe("Shipments component", () => {
     consoleError.mockRestore()
   })
 
+  it("keeps the same errors array when a recompute yields identical error codes", async () => {
+    // The errors effect bails out via a functional updater when the recomputed codes
+    // match, so repeated order updates don't hand children a new array each time and
+    // spin the render loop. Needs a non-empty error to actually run the comparison.
+    mockUseShipments.mockReturnValue(
+      defaultHookReturn({
+        shipments: [{ id: "ship_1", available_shipping_methods: [] }],
+      })
+    )
+
+    const seen: unknown[] = []
+    function Consumer() {
+      const { errors } = useContext(ShipmentContext)
+      seen.push(errors)
+      return null
+    }
+
+    const tree = (order: unknown) => (
+      <Providers order={order}>
+        <Shipments>
+          <Consumer />
+        </Shipments>
+      </Providers>
+    )
+
+    const { rerender } = render(tree(MOCK_ORDER_PENDING))
+
+    await act(async () => {
+      rerender(tree({ ...MOCK_ORDER_PENDING, updated_at: "2026-08-12T10:05:00.000Z" }))
+    })
+
+    const withErrors = seen.filter(
+      (e): e is Array<{ code: string }> => Array.isArray(e) && e.length > 0
+    )
+    expect(withErrors[0]?.[0]?.code).toBe("NO_SHIPPING_METHODS")
+    // Same identity across the recompute — the updater returned `prev`.
+    expect(new Set(withErrors).size).toBe(1)
+  })
+
   describe("revalidating shipments when the order changes", () => {
     // Regression tests for "shipping method stays selected after applying a coupon".
     // The API clears `shipment.shipping_method` server-side whenever the order totals
