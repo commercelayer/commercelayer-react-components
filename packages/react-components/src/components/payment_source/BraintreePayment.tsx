@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 import type { BraintreePayment as BraintreePaymentType } from "@commercelayer/sdk"
 import type { HostedFieldFieldOptions, ThreeDSecure } from "braintree-web"
 import type { HostedFieldsHostedFieldsFieldName } from "braintree-web/hosted-fields"
@@ -12,6 +10,16 @@ import { isEmpty } from "#utils/isEmpty"
 import { setCustomerOrderParam } from "#utils/localStorage"
 import promisify from "#utils/promisify"
 import type { PaymentSourceProps } from "./PaymentSource"
+
+/**
+ * braintree-web ships CommonJS, so a dynamic `import()` of one of its subpaths
+ * resolves to a namespace whose `default` holds `module.exports` under some
+ * bundlers and whose members are hoisted under others. Normalise both shapes.
+ */
+// biome-ignore lint/suspicious/noExplicitAny: braintree-web subpaths are untyped CJS namespaces
+function interopDefault(mod: any): any {
+  return mod?.default ?? mod
+}
 
 type BraintreeHostedFields<Type> = {
   [Property in keyof Type]: {
@@ -208,72 +216,97 @@ export function BraintreePayment({
     }
     return false
   }
+  // `handleSubmitForm` is rebuilt on every render, so keeping it in the effect's
+  // dependencies re-ran the effect every render — and the cleanup's setState calls
+  // triggered the next render, looping forever. Hold the latest closure in a ref and
+  // read it at submit time instead.
+  const handleSubmitFormRef = useRef(handleSubmitForm)
+  handleSubmitFormRef.current = handleSubmitForm
+  // Guard initialisation with a ref rather than the `loadBraintree` state: that state
+  // is reset by this effect's own cleanup, so depending on it made the effect tear
+  // down and re-create the Braintree client in a cycle.
+  const initializedRef = useRef(false)
   useEffect(() => {
     if (!ref && authorization)
       setCustomerOrderParam("_save_payment_source_to_customer_wallet", "false")
-    if (authorization && !loadBraintree && !isEmpty(window)) {
-      const braintreeClient = require("braintree-web/client")
-      const hostedFields = require("braintree-web/hosted-fields")
-      const threeDSecure = require("braintree-web/three-d-secure")
-      braintreeClient.create(
-        {
-          authorization,
-          challengeRequested: config?.challengeRequested ?? true,
-        },
-        (clientErr: any, clientInstance: any) => {
-          if (clientErr) {
-            console.error(clientErr)
-            return
-          }
-          hostedFields.create(
-            {
-              client: clientInstance,
-              fields: fields as HostedFieldFieldOptions,
-              styles,
-            },
-            (hostedFieldsErr: any, hostedFieldsInstance: HostedFieldsHostedFieldsFieldName) => {
-              if (hostedFieldsErr) {
-                console.error(hostedFieldsErr)
-                return
-              }
-              setLoadBraintree(true)
-              threeDSecure.create(
-                {
-                  authorization,
-                  version: 2,
-                },
-                (threeDSecureErr: any, threeDSInstance: ThreeDSecure) => {
-                  if (threeDSecureErr) {
-                    // Handle error in 3D Secure component creation
-                    console.error("3DSecure error", threeDSecureErr)
-                    setPaymentMethodErrors([
-                      {
-                        code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
-                        resource: "payment_methods",
-                        field: currentPaymentMethodType,
-                        message: threeDSecureErr.message as string,
-                      },
-                    ])
-                  }
-                  if (ref.current) {
-                    ref.current.onsubmit = async (paymentSource: any) => {
-                      return await handleSubmitForm({
-                        event: ref.current as any,
-                        hostedFieldsInstance,
-                        threeDSInstance,
-                        paymentSource,
-                      })
-                    }
-                    setPaymentRef({ ref })
-                  }
-                }
-              )
+    let cancelled = false
+    if (authorization && !initializedRef.current && !isEmpty(window)) {
+      initializedRef.current = true
+      void (async () => {
+        // Load the SDK through dynamic import rather than `require`: braintree-web is
+        // CommonJS, and a bare require() survived into the browser bundle, where it
+        // resolved to a shim that throws as soon as <BraintreePayment> mounts. Dynamic
+        // import is bundler-safe and keeps the SDK out of the main chunk.
+        const [braintreeClient, hostedFields, threeDSecure] = (
+          await Promise.all([
+            import("braintree-web/client"),
+            import("braintree-web/hosted-fields"),
+            import("braintree-web/three-d-secure"),
+          ])
+        ).map(interopDefault)
+        if (cancelled) return
+        braintreeClient.create(
+          {
+            authorization,
+            challengeRequested: config?.challengeRequested ?? true,
+          },
+          (clientErr: any, clientInstance: any) => {
+            if (clientErr) {
+              console.error(clientErr)
+              return
             }
-          )
-        }
-      )
+            hostedFields.create(
+              {
+                client: clientInstance,
+                fields: fields as HostedFieldFieldOptions,
+                styles,
+              },
+              (hostedFieldsErr: any, hostedFieldsInstance: HostedFieldsHostedFieldsFieldName) => {
+                if (hostedFieldsErr) {
+                  console.error(hostedFieldsErr)
+                  return
+                }
+                setLoadBraintree(true)
+                threeDSecure.create(
+                  {
+                    authorization,
+                    version: 2,
+                  },
+                  (threeDSecureErr: any, threeDSInstance: ThreeDSecure) => {
+                    if (threeDSecureErr) {
+                      // Handle error in 3D Secure component creation
+                      console.error("3DSecure error", threeDSecureErr)
+                      setPaymentMethodErrors([
+                        {
+                          code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
+                          resource: "payment_methods",
+                          field: currentPaymentMethodType,
+                          message: threeDSecureErr.message as string,
+                        },
+                      ])
+                    }
+                    if (ref.current) {
+                      ref.current.onsubmit = async (paymentSource: any) => {
+                        return await handleSubmitFormRef.current({
+                          event: ref.current as any,
+                          hostedFieldsInstance,
+                          threeDSInstance,
+                          paymentSource,
+                        })
+                      }
+                      setPaymentRef({ ref })
+                    }
+                  }
+                )
+              }
+            )
+          }
+        )
+      })()
     }
     return () => {
+      cancelled = true
+      initializedRef.current = false
       setPaymentRef({ ref: { current: null } })
       setLoadBraintree(false)
     }
@@ -281,11 +314,8 @@ export function BraintreePayment({
     authorization,
     setPaymentMethodErrors,
     styles,
-    loadBraintree,
     currentPaymentMethodType,
     setPaymentRef,
-    // biome-ignore lint/correctness/useExhaustiveDependencies: handleSubmitForm is recreated each render; its deps are already tracked
-    handleSubmitForm,
     fields,
     config?.challengeRequested,
   ])
