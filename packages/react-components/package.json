@@ -67,11 +67,10 @@
     "@commercelayer/sdk": "8.0.0-beta.11",
     "@stripe/react-stripe-js": "^6.8.1",
     "@stripe/stripe-js": "^9.10.0",
+    "@iframe-resizer/parent": "^5.5.9",
     "@tanstack/react-table": "^8.21.3",
-    "@types/iframe-resizer": "^4.0.0",
     "braintree-web": "^3.143.0",
     "frames-react": "^1.2.4",
-    "iframe-resizer": "^5.5.9",
     "rapid-form": "^5.0.0"
   },
   "devDependencies": {
