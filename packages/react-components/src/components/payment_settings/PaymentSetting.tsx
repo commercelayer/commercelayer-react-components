@@ -3,7 +3,11 @@ import {
   findCurrentPaymentSession,
   findReusablePaymentSession,
 } from "@commercelayer/core-components"
-import type { PaymentSetting as PaymentSettingResource } from "@commercelayer/sdk"
+import type {
+  Order,
+  PaymentSession,
+  PaymentSetting as PaymentSettingResource,
+} from "@commercelayer/sdk"
 import { type JSX, type ReactNode, useContext, useEffect, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
@@ -23,8 +27,24 @@ import type { BaseError } from "#typings/errors"
  */
 const IMPLEMENTED_SETTING_TYPES = ["payment_setting_manuals"] as const
 
+export interface PaymentSettingOnSelectParams {
+  setting: PaymentSettingResource
+  /** The order as refetched after the selection was stored. */
+  order?: Order
+  /** The Payment Session backing the selection. */
+  paymentSession?: PaymentSession
+}
+
 interface Props {
   children?: ReactNode
+  /**
+   * Fired once the selection has been stored and the order refetched — not on
+   * click. The counterpart of `<PaymentMethod>`'s `onClick`.
+   *
+   * Keep the identity stable (`useCallback`): it is read during the selection
+   * handler, and an unstable one is the usual route to a render loop here.
+   */
+  onSelect?: (params: PaymentSettingOnSelectParams) => void
 }
 
 /**
@@ -35,7 +55,7 @@ interface Props {
  * can be mounted alongside `<PaymentMethod>` without a coordinator above: each
  * tree silently steps aside when the order is not its own.
  */
-export function PaymentSetting({ children }: Props): JSX.Element | null {
+export function PaymentSetting({ children, onSelect }: Props): JSX.Element | null {
   const paymentsModel = usePaymentsModel()
   const { order, include, includeLoaded, addResourceToInclude, getOrder } = useContext(OrderContext)
   const { accessToken, interceptors } = useContext(CommerceLayerContext)
@@ -101,7 +121,15 @@ export function PaymentSetting({ children }: Props): JSX.Element | null {
           paymentSettingId: setting.id,
         })
       }
-      await getOrder(order.id)
+      const refreshed = await getOrder(order.id)
+      onSelect?.({
+        setting,
+        order: refreshed,
+        paymentSession: findCurrentPaymentSession({
+          paymentSessions: refreshed?.payment_sessions ?? order.payment_sessions,
+          paymentSettingId: setting.id,
+        }),
+      })
     } catch (error) {
       setErrors([
         {

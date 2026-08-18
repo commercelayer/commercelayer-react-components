@@ -2,6 +2,7 @@ import type { Order } from "@commercelayer/sdk"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { PaymentMethod } from "#components/payment_methods/PaymentMethod"
 import { PaymentSetting } from "#components/payment_settings/PaymentSetting"
 import { PaymentSettingManualPayment } from "#components/payment_settings/PaymentSettingManualPayment"
 import { PaymentSettingName } from "#components/payment_settings/PaymentSettingName"
@@ -240,6 +241,38 @@ describe("PaymentSetting", () => {
         fireEvent.click(screen.getByTestId("radio"))
       })
       expect(createPaymentSessionMock).not.toHaveBeenCalled()
+    })
+  })
+
+  // Both trees can be mounted together with no coordinator above them. 2026-05
+  // is additive, so an order on the newer model still carries
+  // available_payment_methods — without this the shopper would see two sets of
+  // payment options, one of them dead.
+  describe("precedence over the payment_source tree", () => {
+    it("silences <PaymentMethod> on the payment_sessions model", () => {
+      render(
+        <Wrapper
+          currentOrder={
+            {
+              id: "order-1",
+              available_payment_settings: [MANUAL],
+              available_payment_methods: [
+                { id: "pm-1", payment_source_type: "stripe_payments", name: "Stripe" },
+              ],
+              payment_sessions: [],
+            } as never
+          }
+        >
+          <PaymentMethod>
+            <span data-testid="old-tree">old</span>
+          </PaymentMethod>
+          <PaymentSetting>
+            <PaymentSettingName data-testid="name" />
+          </PaymentSetting>
+        </Wrapper>
+      )
+      expect(screen.queryByTestId("old-tree")).toBeNull()
+      expect(screen.getByTestId("name").textContent).toBe("Bank transfer")
     })
   })
 })
