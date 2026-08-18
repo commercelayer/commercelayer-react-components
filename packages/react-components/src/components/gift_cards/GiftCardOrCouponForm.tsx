@@ -3,6 +3,7 @@ import { useRapidForm } from "rapid-form"
 import { type JSX, useCallback, useContext, useEffect, useState } from "react"
 import CouponAndGiftCardFormContext from "#context/CouponAndGiftCardFormContext"
 import OrderContext from "#context/OrderContext"
+import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import type { OrderCodeType } from "#reducers/OrderReducer"
 import type { DefaultChildrenType } from "#typings/globals"
 
@@ -19,6 +20,7 @@ interface Props extends Omit<JSX.IntrinsicElements["form"], "onSubmit"> {
 export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
   const { children, codeType, autoComplete = "on", onSubmit, ...p } = props
   const { refValidation, values } = useRapidForm()
+  const paymentsModel = usePaymentsModel()
   const { setGiftCardOrCouponCode, order, errors, setOrderErrors } = useContext(OrderContext)
   const [type, setType] = useState<FormCodeType | undefined>(codeType)
 
@@ -39,6 +41,16 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
 
   // Derive the active code type from the current order state
   useEffect(() => {
+    // On the `payment_sessions` model a gift card is not an order-level code:
+    // it is spent by creating a Payment Session against a gift-card Payment
+    // Setting, so it appears among the payment methods instead. Writing
+    // `gift_card_code` on the order there is meaningless, and letting it
+    // through would silently apply a gift card that no session reflects — so
+    // this overrides an explicit `codeType` too, rather than trusting it.
+    if (paymentsModel === "payment_sessions") {
+      setType("coupon_code")
+      return
+    }
     if (codeType != null) {
       setType(codeType)
       return
@@ -50,7 +62,7 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
     } else if (!order?.gift_card_code && !order?.coupon_code) {
       setType("gift_card_or_coupon_code")
     }
-  }, [order, codeType])
+  }, [order, codeType, paymentsModel])
 
   const handleSubmit = useCallback(
     async (e: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
@@ -76,7 +88,16 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
     [type, setGiftCardOrCouponCode, onSubmit]
   )
 
-  if (codeType != null && order?.[codeType] != null && order?.[codeType] !== "") {
+  // Skip the "this slot is already filled" check when the model overrode the
+  // requested type: the consumer's `codeType` is no longer what is rendered,
+  // so testing the order against it would hide the coupon form for an order
+  // that merely has a leftover gift card code from the older model.
+  if (
+    paymentsModel !== "payment_sessions" &&
+    codeType != null &&
+    order?.[codeType] != null &&
+    order?.[codeType] !== ""
+  ) {
     return null
   }
   return (order?.gift_card_code && order?.coupon_code) || order == null ? null : (

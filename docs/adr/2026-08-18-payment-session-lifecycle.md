@@ -105,6 +105,19 @@ The session is always **searched for**, never read positionally. `payment_sessio
 wrong today for orders carrying a gift-card session and will be wrong for everyone once
 split payment is supported.
 
+**The selection is single per order, and it is the most recent live session.** This
+followed from the decision not to delete: switching setting leaves the previous session on
+the order, so a per-setting reading of "is this selected?" would light up every setting the
+shopper has ever tried at once — a radio group with several selections. Taking the newest
+keeps the group coherent without deleting anything a token may be refused.
+
+Consequence for the reuse rule above: with only one setting implemented, the *adopt* branch
+is currently unreachable through the UI, because a reusable session already reads as
+selected and the radio ignores a click on the current selection. What is reachable, and
+covered by tests, is the retry path — a burnt session does not count as the selection, so
+clicking again creates a fresh one. The adopt branch is kept because it becomes live as
+soon as a second setting exists.
+
 ### Failed sessions are abandoned, not deleted
 
 A session whose authorization failed stays `unpaid`, so it is outside

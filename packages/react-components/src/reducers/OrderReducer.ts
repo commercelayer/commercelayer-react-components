@@ -84,6 +84,14 @@ export type ResourceIncluded =
   | "payment_source"
   | "available_payment_methods"
   | "payment_method"
+  // `payment_sessions` model. `available_payment_settings` is registered by
+  // `<Order>` for every consumer: without it, an absent array cannot be told
+  // apart from one that was never asked for, and the Payments Model cannot be
+  // derived. The two nested ones are registered by `<PaymentSetting>` only —
+  // they are the expensive part and nothing outside the payment UI needs them.
+  | "available_payment_settings"
+  | "payment_sessions.payment_setting"
+  | "payment_sessions.payment_authorization"
 
 type ResourceIncludedLoaded = Partial<Record<ResourceIncluded, boolean>>
 
