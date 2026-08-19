@@ -238,3 +238,31 @@ describe("PlaceOrderButtonPaymentSessions", () => {
     })
   })
 })
+
+// The checkbox lives outside the button and talks to it through a DOM event.
+// In container mode it used to notify only PlaceOrderContext, which the newer
+// branch does not use — leaving the button disabled forever.
+describe("privacy checkbox reaches the payment_sessions button", () => {
+  it("enables the button when the recheck event fires", async () => {
+    render(
+      <Wrapper
+        currentOrder={orderOnSessions({
+          privacy_url: "https://example.com/privacy",
+          terms_url: "https://example.com/terms",
+        } as never)}
+      >
+        <PlaceOrderButtonPaymentSessions />
+      </Wrapper>
+    )
+    expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(true)
+
+    await act(async () => {
+      localStorage.setItem("privacy-terms", "true")
+      window.dispatchEvent(new CustomEvent("cl:placeorder:recheck"))
+    })
+
+    await waitFor(() => {
+      expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(false)
+    })
+  })
+})

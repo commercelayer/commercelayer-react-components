@@ -9,7 +9,7 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import PaymentMethodContext, { defaultPaymentMethodContext } from "#context/PaymentMethodContext"
 import PlaceOrderContext, { defaultPlaceOrderContext } from "#context/PlaceOrderContext"
-import { usePlaceOrder } from "#hooks/usePlaceOrder"
+import { PLACE_ORDER_RECHECK_EVENT, usePlaceOrder } from "#hooks/usePlaceOrder"
 import {
   getAcceptedSnapshot,
   getCheckboxCount,
@@ -799,6 +799,45 @@ describe("PrivacyAndTermsCheckbox (container mode)", () => {
     vi.mocked(getCardDetails).mockReturnValue({ brand: "" } as never)
   })
 
+  // The event is dispatched in both modes. It is the only channel that reaches
+  // a `payment_sessions` place-order button, which does not subscribe to the
+  // acceptance store — and a consumer may still mount the deprecated
+  // <PlaceOrderContainer> above it, as mfe-checkout does.
+  it("dispatches PLACE_ORDER_RECHECK_EVENT in container mode too", async () => {
+    const handler = vi.fn()
+    window.addEventListener(PLACE_ORDER_RECHECK_EVENT, handler)
+
+    render(
+      <Providers
+        order={{
+          ...MOCK_ORDER,
+          privacy_url: "https://example.com/privacy",
+          terms_url: "https://example.com/terms",
+        }}
+      >
+        <PlaceOrderContext.Provider
+          value={{
+            ...defaultPlaceOrderContext,
+            _isProvided: true as const,
+            placeOrderPermitted: vi.fn(),
+          }}
+        >
+          <PrivacyAndTermsCheckbox />
+        </PlaceOrderContext.Provider>
+      </Providers>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole("checkbox").getAttribute("disabled")).toBeNull()
+    })
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("checkbox"))
+    })
+
+    expect(handler).toHaveBeenCalled()
+    window.removeEventListener(PLACE_ORDER_RECHECK_EVENT, handler)
+  })
 })
 
 // ---------------------------------------------------------------------------
