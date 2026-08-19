@@ -134,22 +134,21 @@ export function useOrderState({
   // The cost — one relationship on carts that will never show a payment method
   // — is accepted deliberately, because the alternative is making every
   // consumer opt in to a correctness requirement they cannot see.
+  //
+  // Note `withoutIncludes` is *not* a consumer opt-out to respect here: it
+  // starts `true` and means "nothing has asked for an include yet".
+  // Registering one is what flips it, which `addResourceToInclude` does — along
+  // with marking the resource loaded, so the two-phase idiom the containers use
+  // is belt-and-braces and one call is enough.
   useEffect(() => {
-    if (state.withoutIncludes === true) return
-    const register = (args: AddResourceToInclude): void => {
-      defaultOrderContext.addResourceToInclude({
-        ...args,
-        dispatch,
-        resourcesIncluded: state.include,
-        resourceIncludedLoaded: state.includeLoaded,
-      })
-    }
-    if (!state.include?.includes("available_payment_settings")) {
-      register({ newResource: ["available_payment_settings"] })
-    } else if (state.includeLoaded?.available_payment_settings !== true) {
-      register({ newResourceLoaded: { available_payment_settings: true } })
-    }
-  }, [state.include, state.includeLoaded, state.withoutIncludes])
+    if (state.include?.includes("available_payment_settings")) return
+    defaultOrderContext.addResourceToInclude({
+      newResource: ["available_payment_settings"],
+      dispatch,
+      resourcesIncluded: state.include,
+      resourceIncludedLoaded: state.includeLoaded,
+    })
+  }, [state.include, state.includeLoaded])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: complex dep array mirrors original OrderContainer — adding all deps causes fetch loops
   useEffect(() => {
