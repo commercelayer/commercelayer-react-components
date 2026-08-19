@@ -171,3 +171,22 @@ failed job never retries and the authorization stays `pending` **forever**. Exha
 attempts is therefore a reachable steady state, not just a slow path. It is reported as a
 recoverable condition inviting another attempt — never as a payment failure, and never by
 deleting anything, since the payment may in fact have succeeded.
+
+### Open: what a timeout should actually show the shopper
+
+Reporting the last refusal is a placeholder, not a considered answer. It tells someone whose
+payment is still settling that something went wrong.
+
+The direction to explore, in a grilling session of its own: always land on a thank-you page
+carrying a payment-status summary and a refresh control, and — when a payment did fail —
+re-offer the payment components there so the shopper can settle the remainder and the order
+finally reads as paid. That reframes the timeout as "we are still checking" rather than an
+error, which is what it actually is.
+
+Not designed here because it reaches past this component into checkout navigation and into
+what happens after placement, and deserves its own set of questions.
+
+Until then: on timeout, nothing is rolled back. A gift card authorized during a timed-out
+attempt stays authorized and bound to the order, and its remove control disappears —
+the money has been taken and only a refund could return it, which this iteration does not
+implement.
