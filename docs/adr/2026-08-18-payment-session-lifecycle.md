@@ -205,6 +205,27 @@ Not fixed yet because the clean fix is a `<PaymentSettingErrors>` component, and
 component invented for a problem no one can observe is harder to remove than to add.
 Whoever implements the second setting should fix this first.
 
+**Auto-selecting a single setting is deliberately absent.** `<PaymentMethod>` offers
+`autoSelectSinglePaymentMethod` and the symmetric prop belongs here, but the obvious
+condition is a trap: `<PaymentSetting>` renders only the *implemented* settings, so "one
+entry rendered" is not "one option offered". An organization with five settings configured
+and one implemented would have its shoppers silently committed to bank transfer while the
+card options it pays for stay invisible — and that is the situation for every organization
+until the table below is complete.
+
+The condition has to be `available_payment_settings.length === 1` on the raw array, plus
+the setting being implemented and no live session already on the order. Deferred rather
+than written blind: under the correct condition it cannot fire on any organization that
+still has unimplemented settings, so it would ship untested against the real API. Pick it
+up with the second setting, when the rendered list and the real one start to converge.
+
+Note that selecting is not a neutral gesture on either model. Creating a Payment Session
+makes `new_payments_engaged?` true and the API then stops serving
+`available_payment_methods` — observed: an order went from one available method to zero the
+moment its first session existed. The mirror of what writing `payment_method` does to
+`available_payment_settings`. Whichever tree acts first commits the order for good, which
+is precisely why neither may act without the shopper.
+
 ### Payment Setting implementation status
 
 | Setting | Type literal | Status |
