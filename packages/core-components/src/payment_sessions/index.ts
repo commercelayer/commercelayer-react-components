@@ -1,6 +1,8 @@
 export { createPaymentSession } from "./createPaymentSession"
 export { findCurrentPaymentSession } from "./findCurrentPaymentSession"
 export { findReusablePaymentSession } from "./findReusablePaymentSession"
+export type { PaymentsModel } from "./getPaymentsModel"
+export { getPaymentsModel } from "./getPaymentsModel"
 export { mapPlaceabilityErrors } from "./mapPlaceabilityErrors"
 export type { PlaceOrderWithPaymentSessionsResult } from "./placeOrderWithPaymentSessions"
 export {
