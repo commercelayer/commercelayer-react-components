@@ -188,6 +188,23 @@ checkout with **no payment options and no explanation**. A development-only `con
 fires whenever `<PaymentSetting>` skips a setting; it is not public API and should be
 removed once the table below is complete.
 
+`<PaymentSetting>` must stay mounted even when the order turns out to be on the older
+model. It registers the payment-session includes, and that has to happen *before* the order
+is fetched: adding an include afterwards does not trigger a refetch, so a component mounted
+only once the model is known would never receive its data. Consumers that mount it
+conditionally will see an order whose `payment_sessions` never expand.
+
+### Known debt, due with the second setting
+
+`<PaymentSetting>` holds **one** `errors` state for the whole list, not one per setting,
+while `isPending` is correctly per-setting. With only the manual setting implemented this
+is invisible; the moment a second one exists, an error raised while selecting Stripe will
+render under the manual entry too.
+
+Not fixed yet because the clean fix is a `<PaymentSettingErrors>` component, and a public
+component invented for a problem no one can observe is harder to remove than to add.
+Whoever implements the second setting should fix this first.
+
 ### Payment Setting implementation status
 
 | Setting | Type literal | Status |
