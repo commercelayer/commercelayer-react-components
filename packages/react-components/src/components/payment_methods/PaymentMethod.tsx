@@ -125,6 +125,13 @@ export function PaymentMethod({
    */
   const isPartiallyAuthorized = order?.payment_status === "partially_authorized"
   useEffect(() => {
+    // Silencing this component in render is not enough: React runs a mounted
+    // component's effects whatever it returns, so without this the newer
+    // model's orders get a payment_method written behind the tree that is
+    // supposed to be inactive — and the API then drops
+    // available_payment_settings, flipping the order onto the older model for
+    // good.
+    if (paymentsModel === "payment_sessions") return
     if (paymentMethods != null && !isEmpty(paymentMethods) && expressPayments) {
       const [paymentMethod] = getAvailableExpressPayments(paymentMethods)
       if (!paymentSource && paymentMethod != null) {
@@ -166,6 +173,13 @@ export function PaymentMethod({
     showLoader,
   ])
   useEffect(() => {
+    // Silencing this component in render is not enough: React runs a mounted
+    // component's effects whatever it returns, so without this the newer
+    // model's orders get a payment_method written behind the tree that is
+    // supposed to be inactive — and the API then drops
+    // available_payment_settings, flipping the order onto the older model for
+    // good.
+    if (paymentsModel === "payment_sessions") return
     if (
       paymentMethods != null &&
       !paymentSourceCreated &&
