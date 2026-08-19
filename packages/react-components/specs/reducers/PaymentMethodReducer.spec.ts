@@ -80,3 +80,38 @@ describe("setPaymentSource request coalescing", () => {
     expect(stripeCreate).not.toHaveBeenCalled()
   })
 })
+
+describe("setPaymentSource when the payment session expired", () => {
+  it("returns undefined and clears the payment source instead of reporting a balance", async () => {
+    const expired = Object.assign(new Error("expired"), {
+      errors: [
+        {
+          code: "VALIDATION_ERROR",
+          status: "422",
+          title: "is expired",
+          detail: "order_data - is expired",
+          meta: { error: "expired" },
+        },
+      ],
+    })
+    stripeCreate.mockRejectedValueOnce(expired)
+    const dispatch = vi.fn()
+
+    const result = await setPaymentSource(
+      createParams({
+        dispatch,
+        // biome-ignore lint/suspicious/noExplicitAny: test cast
+        order: { id: "order-1", status: "pending", payment_source: { id: "sp-1" } } as any,
+      }),
+    )
+
+    // The caller must be able to tell "the call failed" from "the card is empty":
+    // AdyenPayment used to read `undefined?.balance ?? 0` as a zero balance and told
+    // the shopper to find another gift card.
+    expect(result).toBeUndefined()
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "setPaymentSource",
+      payload: { paymentSource: undefined },
+    })
+  })
+})

@@ -732,3 +732,119 @@ describe("the real payment chain keeps the Adyen Drop-in mounted", () => {
     expect(adyen.dropinRemove).not.toHaveBeenCalled()
   })
 })
+
+// Adyen's session — the `order_data` that expires after a minute — is baked into the Drop-in
+// at creation. When the API rejects a call because it expired, the reducer destroys the
+// payment source and a fresh one takes its place, and the instance on screen is left talking
+// to a session the API now refuses. It has to be rebuilt, or the shopper's retry can never
+// succeed. This is the one case that may rebuild: the test above pins down that an ordinary
+// order update must NOT.
+describe("AdyenPayment expired Adyen session", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    adyen.captured.options = null
+  })
+
+  it("rebuilds the Drop-in against the replacement payment source", async () => {
+    // What setPaymentSource returns once the API answers 422 "order_data - is expired":
+    // the reducer swallows the error and hands back undefined.
+    const setPaymentSource = vi.fn(async () => undefined)
+    const setPaymentMethodErrors = vi.fn()
+    const tree = (
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      paymentSource: any
+    ) => (
+      <Providers
+        setPaymentSource={setPaymentSource}
+        setPaymentMethodErrors={setPaymentMethodErrors}
+        updateOrder={vi.fn()}
+        paymentSource={paymentSource}
+      >
+        <AdyenPayment clientKey="test_CLIENTKEY" />
+      </Providers>
+    )
+
+    const { rerender } = render(tree(PAYMENT_SOURCE))
+    await flush()
+    expect(adyen.dropinMount).toHaveBeenCalledTimes(1)
+
+    const actions = { resolve: vi.fn(), reject: vi.fn() }
+    await act(async () => {
+      adyen.captured.options.onSubmit(
+        { data: { paymentMethod: { type: "giftcard" } }, isValid: true },
+        { mount: vi.fn() },
+        actions
+      )
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    // The shopper is told the session expired, not that their gift card is empty — the
+    // balance check came back undefined because the request failed, not because it is zero.
+    const [[errors]] = setPaymentMethodErrors.mock.calls
+    expect(errors[0].message).toMatch(/session expired/i)
+
+    // <PaymentGateway> creates the replacement: new id, and the payment methods payload
+    // arrives with it.
+    await act(async () => {
+      rerender(tree({ ...PAYMENT_SOURCE, id: "ps-expired-replacement" }))
+    })
+    await flush()
+
+    expect(adyen.dropinRemove).toHaveBeenCalled()
+    expect(adyen.dropinMount).toHaveBeenCalledTimes(2)
+  })
+})
+
+// <PaymentGateway> recreates the adyen_payment whenever the order carries more than one
+// payment method, and it can land after the Drop-in was built. The Drop-in installs its
+// `onSubmit` once, so without a latest-value ref the submit authorizes against the source
+// the order has already replaced: Adyen redeems the gift card against an orphan, the order
+// comes back with `gift_card_amount_cents: 0`, and no amount is ever shown.
+describe("AdyenPayment when the payment source is recreated mid-flight", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    adyen.captured.options = null
+  })
+
+  it("submits against the current payment source, not the one it was built with", async () => {
+    const setPaymentSource = vi.fn(async () => ({ ...PAYMENT_SOURCE, balance: 5000 }))
+    const tree = (
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      paymentSource: any
+    ) => (
+      <Providers
+        setPaymentSource={setPaymentSource}
+        updateOrder={vi.fn().mockResolvedValue({ order: ORDER })}
+        paymentSource={paymentSource}
+      >
+        <AdyenPayment clientKey="test_CLIENTKEY" />
+      </Providers>
+    )
+
+    const { rerender } = render(tree(PAYMENT_SOURCE))
+    await flush()
+    expect(adyen.dropinMount).toHaveBeenCalledTimes(1)
+
+    // The replacement arrives after the Drop-in is already mounted. It must not rebuild it
+    // — that is the reload loop guarded elsewhere — but the next submit has to follow it.
+    await act(async () => {
+      rerender(tree({ ...PAYMENT_SOURCE, id: "ps-recreated" }))
+    })
+    await flush()
+    expect(adyen.dropinRemove).not.toHaveBeenCalled()
+
+    setPaymentSource.mockClear()
+    await act(async () => {
+      adyen.captured.options.onSubmit(
+        { data: { paymentMethod: { type: "giftcard" } }, isValid: true },
+        { mount: vi.fn() },
+        { resolve: vi.fn(), reject: vi.fn() }
+      )
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    const ids = setPaymentSource.mock.calls.map(([args]) => args.paymentSourceId)
+    expect(ids.length).toBeGreaterThan(0)
+    expect(new Set(ids)).toEqual(new Set(["ps-recreated"]))
+  })
+})
