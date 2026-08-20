@@ -49,10 +49,21 @@ describe("derivePaymentSessionsState", () => {
     expect(state.currentPaymentSession).toBeUndefined()
   })
 
-  it("handles a missing order", () => {
+  // A total we do not have must never read as "nothing left to pay": an order
+  // fetched without `total_amount_with_taxes_cents` would otherwise hide the
+  // entire payment step.
+  it("does not report coverage for a missing order", () => {
     const state = derivePaymentSessionsState(undefined)
     expect(state.remainingAmountCents).toBe(0)
-    expect(state.isCovered).toBe(true)
+    expect(state.isCovered).toBe(false)
+  })
+
+  it("does not report coverage when the total is absent from the fetch", () => {
+    const state = derivePaymentSessionsState({
+      id: "order-1",
+      payment_sessions: [],
+    } as never)
+    expect(state.isCovered).toBe(false)
   })
 
   // The point of this derivation: the server's own remainder does not move

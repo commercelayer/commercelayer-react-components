@@ -22,14 +22,18 @@ type Props = {
  * API stored. The cost is that the radio does not light up on click — it lights
  * up once the session exists. `disabled` covers that round trip.
  */
-export function PaymentSettingRadioButton(props: Props): JSX.Element {
+export function PaymentSettingRadioButton(props: Props): JSX.Element | null {
   const { children, ...p } = props
-  const { setting, isSelected, isPending, selectSetting } = useCustomContext({
+  const { setting, isSelected, isPending, selectSetting, readonly } = useCustomContext({
     context: PaymentSettingChildrenContext,
     contextComponentName: "PaymentSetting",
     currentComponentName: "PaymentSettingRadioButton",
     key: "setting",
   })
+
+  // A recap has nothing to pick, and a disabled checked radio reads as a broken
+  // control rather than a statement. The setting's name is the recap.
+  if (readonly === true) return null
 
   const checked = isSelected === true
   const id = setting?.id

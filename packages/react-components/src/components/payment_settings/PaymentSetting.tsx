@@ -12,6 +12,7 @@ import { type JSX, type ReactNode, useContext, useEffect, useState } from "react
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
+import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
 import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import type { BaseError } from "#typings/errors"
 
@@ -38,6 +39,12 @@ export interface PaymentSettingOnSelectParams {
 interface Props {
   children?: ReactNode
   /**
+   * Show what was chosen without letting it change — a placed order, for
+   * instance. Renders only the selected setting, and keeps rendering it even
+   * once nothing is left to pay.
+   */
+  readonly?: boolean
+  /**
    * Fired once the selection has been stored and the order refetched — not on
    * click. The counterpart of `<PaymentMethod>`'s `onClick`.
    *
@@ -55,8 +62,9 @@ interface Props {
  * can be mounted alongside `<PaymentMethod>` without a coordinator above: each
  * tree silently steps aside when the order is not its own.
  */
-export function PaymentSetting({ children, onSelect }: Props): JSX.Element | null {
+export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Element | null {
   const paymentsModel = usePaymentsModel()
+  const { isCovered } = usePaymentSessionsState()
   const { order, include, includeLoaded, addResourceToInclude, getOrder } = useContext(OrderContext)
   const { accessToken, interceptors } = useContext(CommerceLayerContext)
   const [pendingSettingId, setPendingSettingId] = useState<string | null>(null)
@@ -84,6 +92,15 @@ export function PaymentSetting({ children, onSelect }: Props): JSX.Element | nul
   }, [include, includeLoaded, addResourceToInclude])
 
   if (paymentsModel !== "payment_sessions" || order == null) return null
+
+  // Nothing left to pay means nothing to choose. Gift cards can cover an order
+  // outright, and offering a payment method then is not merely redundant:
+  // creating that session fails with a 422 about `amount_cents` having to be
+  // greater than zero, which is not something a shopper can act on.
+  //
+  // Readonly is exempt — a placed order is covered by definition, and hiding
+  // what was used is the opposite of the point.
+  if (readonly !== true && isCovered) return null
 
   const settings = (order.available_payment_settings ?? []).filter((setting) => {
     const implemented = IMPLEMENTED_SETTING_TYPES.includes(
@@ -152,27 +169,32 @@ export function PaymentSetting({ children, onSelect }: Props): JSX.Element | nul
 
   return (
     <>
-      {settings.map((setting) => {
-        const isSelected = selectedSession?.payment_setting?.id === setting.id
-        const currentPaymentSession = isSelected ? selectedSession : undefined
-        return (
-          <PaymentSettingChildrenContext.Provider
-            key={setting.id}
-            value={{
-              setting,
-              currentPaymentSession,
-              isSelected,
-              isPending: pendingSettingId === setting.id,
-              errors,
-              selectSetting: async () => {
-                await selectSetting(setting)
-              },
-            }}
-          >
-            {children}
-          </PaymentSettingChildrenContext.Provider>
+      {settings
+        .filter(
+          (setting) => readonly !== true || selectedSession?.payment_setting?.id === setting.id
         )
-      })}
+        .map((setting) => {
+          const isSelected = selectedSession?.payment_setting?.id === setting.id
+          const currentPaymentSession = isSelected ? selectedSession : undefined
+          return (
+            <PaymentSettingChildrenContext.Provider
+              key={setting.id}
+              value={{
+                setting,
+                currentPaymentSession,
+                isSelected,
+                isPending: pendingSettingId === setting.id,
+                errors,
+                readonly,
+                selectSetting: async () => {
+                  await selectSetting(setting)
+                },
+              }}
+            >
+              {children}
+            </PaymentSettingChildrenContext.Provider>
+          )
+        })}
     </>
   )
 }

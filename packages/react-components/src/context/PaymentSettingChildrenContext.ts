@@ -22,6 +22,8 @@ export interface InitialPaymentSettingChildrenContext {
   errors?: BaseError[]
   /** Select this setting, creating or adopting its Payment Session. */
   selectSetting?: () => Promise<void>
+  /** Nothing may change — the subtree is a recap, not a form. */
+  readonly?: boolean
 }
 
 const initial: InitialPaymentSettingChildrenContext = {}

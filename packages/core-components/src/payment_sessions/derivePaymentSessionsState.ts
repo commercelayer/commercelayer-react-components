@@ -23,7 +23,12 @@ export interface PaymentSessionsState {
    * reimplementation of its rules.
    */
   remainingAmountCents: number
-  /** True when nothing is left to pay, so no other payment method is needed. */
+  /**
+   * True when the order had something to pay and it is now all covered.
+   *
+   * False when the total is unknown or zero: an order fetched without
+   * `total_amount_with_taxes_cents` must not read as paid for.
+   */
   isCovered: boolean
   /**
    * Whether another gift card may be applied.
@@ -67,11 +72,18 @@ export function derivePaymentSessionsState(order?: Order | null): PaymentSession
 
   const remainingAmountCents = Math.max(0, total - giftCardAmountCents - takenMethodAmountCents)
 
+  // `total > 0` guards against reading "nothing left to pay" out of a total we
+  // do not have. An order fetched without `total_amount_with_taxes_cents` in
+  // its `fields` looks free, and a bare `remainingAmountCents === 0` would then
+  // hide the whole payment step. A genuinely free order needs no payment either,
+  // but that is decided from the total itself, not from coverage.
+  const isCovered = total > 0 && remainingAmountCents === 0
+
   return {
     giftCardSessions,
     giftCardAmountCents,
     remainingAmountCents,
-    isCovered: remainingAmountCents === 0,
+    isCovered,
     canAddGiftCard: remainingAmountCents > 0 && !sessions.some(hasLiveAuthorization),
     currentPaymentSession: findCurrentPaymentSession({ paymentSessions: sessions }),
     giftCardSettingId: (order?.available_payment_settings ?? []).find(
