@@ -1,7 +1,6 @@
 import {
   DEFAULT_PLACEABLE_ATTEMPTS,
   DEFAULT_PLACEABLE_INTERVAL_MS,
-  findCurrentPaymentSession,
   placeOrderWithPaymentSessions,
 } from "@commercelayer/core-components"
 import type { Order } from "@commercelayer/sdk"
@@ -98,18 +97,13 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
     setIsLoading(true)
     setOrderErrors([])
     try {
-      // The Current Payment Session is searched for, never read positionally:
-      // abandoned attempts leave inert sessions behind, and switching setting
-      // leaves the previous one in the same array.
-      const paymentSession = findCurrentPaymentSession({
-        paymentSessions: order.payment_sessions,
-      })
-
+      // The whole order goes in: which sessions get authorized, and in which
+      // order — gift cards first, then the one paying the difference — is
+      // domain knowledge that belongs with the sequence, not here.
       const result = await placeOrderWithPaymentSessions({
         accessToken,
         interceptors,
-        orderId: order.id,
-        paymentSession,
+        order,
         attempts: placeableAttempts,
         intervalMs: placeableIntervalMs,
       })

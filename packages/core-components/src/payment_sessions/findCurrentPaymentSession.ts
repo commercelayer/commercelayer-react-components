@@ -1,5 +1,5 @@
 import type { PaymentSession } from "@commercelayer/sdk"
-import { TERMINAL_FAILURE_TRANSACTION_STATUSES } from "./types"
+import { isGiftCardSession, TERMINAL_FAILURE_TRANSACTION_STATUSES } from "./types"
 
 interface FindCurrentPaymentSessionParams {
   paymentSessions?: PaymentSession[] | null
@@ -25,6 +25,12 @@ interface FindCurrentPaymentSessionParams {
  * shopper has to try again, and showing it as the current selection would tell
  * them a payment is in place when none is.
  *
+ * **Gift card sessions are excluded entirely.** A gift card is not one of the
+ * alternatives the shopper picks between — it is additive, applied on top, and
+ * an order may carry several at once. Including them here would put more than
+ * one session in a group that has room for exactly one. They are read through
+ * `derivePaymentSessionsState` instead.
+ *
  * **The selection is single, and it is the most recent session.** Switching
  * setting leaves the previous session on the order — it is never deleted, both
  * because an inert `unpaid` session costs nothing and because a sales-channel
@@ -37,6 +43,7 @@ export function findCurrentPaymentSession({
   paymentSettingId,
 }: FindCurrentPaymentSessionParams): PaymentSession | undefined {
   const live = (paymentSessions ?? []).filter((session) => {
+    if (isGiftCardSession(session)) return false
     if (paymentSettingId != null && session.payment_setting?.id !== paymentSettingId) return false
     const authorizationStatus = session.payment_authorization?.status
     if (authorizationStatus == null) return true

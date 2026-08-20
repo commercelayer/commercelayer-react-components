@@ -134,7 +134,9 @@ describe("PlaceOrderButtonPaymentSessions", () => {
     expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(false)
   })
 
-  it("places the order with the current session", async () => {
+  // The whole order is handed over: which sessions get authorized, and in which
+  // order, is decided by the sequence rather than here.
+  it("hands the order to the place-order sequence", async () => {
     const onClick = vi.fn()
     renderButton(orderOnSessions(), { onClick })
 
@@ -144,10 +146,7 @@ describe("PlaceOrderButtonPaymentSessions", () => {
 
     await waitFor(() => {
       expect(placeOrderMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          orderId: "order-1",
-          paymentSession: expect.objectContaining({ id: "session-1" }),
-        })
+        expect.objectContaining({ order: expect.objectContaining({ id: "order-1" }) })
       )
     })
     expect(onClick).toHaveBeenCalledWith(expect.objectContaining({ placed: true }))

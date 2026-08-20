@@ -1,3 +1,5 @@
+import type { PaymentSession } from "@commercelayer/sdk"
+
 /**
  * Status values for the `payment_sessions` payment model.
  *
@@ -88,4 +90,34 @@ export interface PlaceabilityError {
   field?: string
   /** Symbolic reason from `meta.error`, when the API sends one. */
   meta?: { error: string }
+}
+
+/**
+ * The Payment Setting type a gift card is spent through.
+ *
+ * Gift cards are the one setting that is *additive* rather than an alternative:
+ * an order carries zero or more of them plus at most one other session for the
+ * difference. Everything that separates the two families keys off this literal.
+ */
+export const GIFT_CARD_SETTING_TYPE = "payment_setting_gift_cards"
+
+/** True when this session spends a gift card rather than paying the difference. */
+export function isGiftCardSession(session: PaymentSession): boolean {
+  return session.payment_setting?.type === GIFT_CARD_SETTING_TYPE
+}
+
+/**
+ * True when the session is carrying a Payment Authorization that has not failed
+ * — i.e. money is either taken or in flight.
+ *
+ * Note this is *not* "paid": an authorization can still be `pending` while its
+ * background job runs. What it rules out is a session the shopper may still
+ * change freely.
+ */
+export function hasLiveAuthorization(session: PaymentSession): boolean {
+  const status = session.payment_authorization?.status
+  if (status == null) return false
+  return !TERMINAL_FAILURE_TRANSACTION_STATUSES.includes(
+    status as (typeof TERMINAL_FAILURE_TRANSACTION_STATUSES)[number]
+  )
 }
