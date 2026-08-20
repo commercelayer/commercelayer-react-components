@@ -1,6 +1,6 @@
 import { useShipments } from "@commercelayer/react-hooks-components"
 import type { Order } from "@commercelayer/sdk"
-import { type JSX, useCallback, useContext, useEffect, useMemo, useState } from "react"
+import { type JSX, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import ShipmentContext from "#context/ShipmentContext"
@@ -27,10 +27,34 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
     shipments,
     deliveryLeadTimes,
     isLoading,
+    reload,
     setShippingMethod: hookSetShippingMethod,
   } = useShipments({ accessToken, orderId })
 
   const [errors, setErrors] = useState<BaseError[]>([])
+
+  // The shipments cache is keyed on (accessToken, orderId) alone, so it never
+  // revalidates on its own. The API, though, re-evaluates shipments whenever the
+  // order changes: applying a coupon clears `shipment.shipping_method` server-side,
+  // because shipping method availability depends on the order totals. Left stale,
+  // the cached shipment keeps a shipping method the order no longer has, so
+  // `<ShippingMethodRadioButton>` stays checked on it — and re-clicking a checked
+  // radio fires no change event, leaving the user unable to re-select. Refetch
+  // whenever the order moves on.
+  const syncedOrderUpdatedAt = useRef<string | undefined>(undefined)
+
+  useEffect(() => {
+    const updatedAt = order?.updated_at
+    if (updatedAt == null) return
+    // First order we see: the initial shipments fetch is already in step with it.
+    if (syncedOrderUpdatedAt.current == null) {
+      syncedOrderUpdatedAt.current = updatedAt
+      return
+    }
+    if (syncedOrderUpdatedAt.current === updatedAt) return
+    syncedOrderUpdatedAt.current = updatedAt
+    void reload()
+  }, [order?.updated_at, reload])
 
   useEffect(() => {
     const nextErrors: BaseError[] = []
@@ -99,6 +123,12 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
         await hookSetShippingMethod(shipmentId, shippingMethodId)
         if (getOrder != null && orderId != null) {
           const currentOrder = await getOrder(orderId)
+          // `hookSetShippingMethod` has already revalidated the shipments cache,
+          // so this order revision is in step — stamp it so the effect above
+          // doesn't refetch shipments a second time for our own update.
+          if (currentOrder?.updated_at != null) {
+            syncedOrderUpdatedAt.current = currentOrder.updated_at
+          }
           return { success: true, order: currentOrder }
         }
         return { success: true }

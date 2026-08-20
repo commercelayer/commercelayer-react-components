@@ -397,7 +397,9 @@ async function runSetPaymentSource({
       const expiredErrors = errors.filter((v) => v?.meta?.error === "expired")
       if (expiredErrors.length > 0 && order && config) {
         console.error("Set payment source - expired:", expiredErrors)
-        destroyPaymentSource({
+        // Awaited for ordering: today this only dispatches, but the caller's result
+        // depends on the source being gone, so it should not be left in flight.
+        await destroyPaymentSource({
           paymentSourceId: order.payment_source?.id || "",
           paymentResource,
           dispatch,

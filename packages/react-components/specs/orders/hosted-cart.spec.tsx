@@ -7,8 +7,8 @@ import OrderStorageContext from "#context/OrderStorageContext"
 import * as applicationLinkUtils from "#utils/getApplicationLink"
 import * as organizationUtils from "#utils/organization"
 
-vi.mock("iframe-resizer", () => ({
-  iframeResizer: vi.fn(),
+vi.mock("@iframe-resizer/parent", () => ({
+  default: vi.fn(),
 }))
 
 describe("HostedCart component", () => {

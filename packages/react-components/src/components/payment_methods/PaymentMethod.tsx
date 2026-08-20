@@ -92,6 +92,8 @@ export function PaymentMethod({
   const [paymentSelected, setPaymentSelected] = useState("")
   const [paymentSourceCreated, setPaymentSourceCreated] = useState(false)
   const loadingResourceRef = useRef(false)
+  /** Latches once the methods have rendered, so the loader can never unmount them again. */
+  const hasRenderedMethodsRef = useRef(false)
 
   // Detect standalone mode: no <PaymentMethodsContainer> parent has set _isProvided.
   const parentCtx = useContext(PaymentMethodContext)
@@ -114,6 +116,12 @@ export function PaymentMethod({
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
   const { status } = useContext(PlaceOrderContext)
+  /**
+   * A partially-authorized order is mid-payment: part of the total is covered (an Adyen gift
+   * card, say) and the shopper still has to pay the remainder with another method, in the
+   * gateway that is already on screen. Raising the loader in that window unmounts it.
+   */
+  const isPartiallyAuthorized = order?.payment_status === "partially_authorized"
   useEffect(() => {
     if (paymentMethods != null && !isEmpty(paymentMethods) && expressPayments) {
       const [paymentMethod] = getAvailableExpressPayments(paymentMethods)
@@ -286,7 +294,16 @@ export function PaymentMethod({
       // @ts-expect-error no type
       order?.payment_source?.payment_response?.status
     // If showLoader is undefined, we don't change the loading
-    if (showLoader && status) {
+    //
+    // `content` swaps the whole subtree for the loader rather than overlaying it, so raising
+    // `loading` here unmounts <PaymentGateway> and with it any mounted Adyen Drop-in. A gift
+    // card authorization is exactly what populates `payment_response.status`, so without the
+    // partial-authorization guard this fires on the very update the shopper is mid-way
+    // through and reloads the Drop-in — repeatedly, as the order settles.
+    //
+    // A partially-authorized order is still mid-payment: the shopper has to cover the
+    // remainder in that same Drop-in, so the subtree has to stay mounted.
+    if (showLoader && status && !isPartiallyAuthorized) {
       if (status.toLowerCase() === "declined") {
         setLoading(false)
       } else {
@@ -296,7 +313,7 @@ export function PaymentMethod({
       setLoading(false)
     }
     // @ts-expect-error no type
-  }, [showLoader, order?.payment_source?.payment_response?.status])
+  }, [showLoader, order?.payment_source?.payment_response?.status, isPartiallyAuthorized])
   const sortedPaymentMethods =
     paymentMethods != null && sortBy != null
       ? sortPaymentMethods(paymentMethods, sortBy)
@@ -359,7 +376,21 @@ export function PaymentMethod({
         </div>
       )
     })
-  const content = !loading ? <>{components}</> : getLoaderComponent(loader)
+  // Once the payment methods have rendered, never swap them back out for the loader.
+  //
+  // `content` replaces the whole subtree rather than overlaying the loader, so any later flip
+  // of `loading` unmounts every gateway below — including a mounted Adyen Drop-in, which owns
+  // the shopper's selected method and typed-in details and has to fully re-initialize on the
+  // way back. Guarding the individual flips cannot close this: `payment_response.status` and
+  // `payment_status` are populated by two different API calls, so there is a window where a
+  // flip looks legitimate.
+  //
+  // This makes `showLoader` mean "while first fetching the payment methods", which is what it
+  // documents ("Show loader while fetching payment methods"). Re-entering the loading state
+  // after that is the glitch, not a feature.
+  if (!loading) hasRenderedMethodsRef.current = true
+  const content =
+    !loading || hasRenderedMethodsRef.current ? <>{components}</> : getLoaderComponent(loader)
 
   // In standalone mode provide the context so that child components
   // (PaymentSource, PaymentGateway, etc.) can read payment state without
