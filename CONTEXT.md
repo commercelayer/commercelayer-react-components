@@ -30,8 +30,8 @@ The record proving a Payment Session's money was actually taken. A session is on
 _Avoid_: authorized session, payment (as a synonym for the session)
 
 **Current Payment Session**:
-The Payment Session the shopper's selection points at — the one whose Payment Setting is the selected one and whose `amount_cents` still equals the order total. It is the shopper's choice made durable: the order has no `payment_setting` relationship, so the selection is read back as `order.payment_sessions[].payment_setting`. Browser state is a rendering cache of it, never the authority.
-_Avoid_: pending session, selected payment method
+The Payment Session the shopper's selection points at — the one paying whatever the Applied Gift Cards do not. It is the shopper's choice made durable: the order has no `payment_setting` relationship, so the selection is read back as `order.payment_sessions[].payment_setting`. Browser state is a rendering cache of it, never the authority. There is at most one, it is the most recent live non-gift-card session, and **gift card sessions are never it** — those are additive, and several are live at once. Its `amount_cents` covers the Remaining Amount at the moment it was created, not the order total.
+_Avoid_: pending session, selected payment method, "the payment session" (an order has several)
 
 **Placeable**:
 Whether the API would accept placing the order. Two distinct things share the word: `order.placeable` and the `_placeable` trigger — but they are **not** two ways to ask the same question, and only one of them is usable. `order.placeable` is transient and served **only in an update response**, never on a `GET`, so it can never gate a button on render. The `_placeable` trigger is a `PATCH` that *validates* the order: 200 with the whole order on success, 422 with a JSON:API `errors` array on failure. Because a failed validation persists nothing, repeating it is cheap. Payment coverage is checked by a default payment rule whose threshold an organization can change — so placeability is a server judgement, never a client calculation.
@@ -40,6 +40,18 @@ _Avoid_: "can be placed" (ambiguous between the attribute and the check), valida
 **Reusable Session**:
 A Payment Session the library may adopt instead of creating a new one: same Payment Setting, `status` still `unpaid`, not past `expires_at`, and with no Payment Authorization in a terminal failure state. Anything failing that predicate is abandoned in place, not deleted — an `unpaid` session counts toward nothing, and a sales-channel token may be refused the delete anyway.
 _Avoid_: pending session, stale session, orphan session (the last one is what an abandoned session *becomes*)
+
+**Applied Gift Card**:
+A gift card the shopper has spent on an order — a Payment Session against a `payment_setting_gift_cards` setting. Additive rather than an alternative: an order carries zero or more of them *plus* at most one other session for the difference. Its `amount_cents` is what it covers **of this order**, capped by the server to whatever was still owed — never the card's balance, which a session does not carry at all. Removable for free until it is authorized; after that only a refund could return the money, and the balance is debited the instant the authorization succeeds.
+_Avoid_: gift card discount (it is a payment, not a discount), gift card balance (a different number)
+
+**Remaining Amount**:
+What the shopper still has to pay: the order total, less the Applied Gift Cards at face value, less any other session that has already taken money. Derived on the client, because `order.session_amount_cents` — despite its name meaning the same thing — does not move until a session is authorized, and gift cards are authorized at place time. The figures summed are the ones the server computed per session.
+_Avoid_: session amount (the API's name for the same idea, but only after authorization), balance, outstanding total
+
+**Coverage**:
+Whether the Remaining Amount has reached zero, so no other payment method is needed. Requires the order total to be known: an order fetched without `total_amount_with_taxes_cents` looks free, and treating that as covered hides the whole payment step.
+_Avoid_: paid (coverage is intent; only a succeeded Payment Authorization means paid), fully funded
 
 **Undetermined**:
 The window in which the order has not yet been loaded with the relationship needed to tell the Payments Model apart, so neither payment tree may be mounted. It is an observable state that every consumer must render something for — not a transient detail that can be ignored.
@@ -62,6 +74,9 @@ _Avoid_: using "gateway" to mean the Payment Method
 - A **Payment Session** has at most one **Payment Authorization**; a session without one has taken no money, and one whose authorization failed stays `unpaid` and is abandoned rather than deleted
 - A **Payment Session** only counts toward the order's paid amount once its **Payment Authorization** has succeeded — and for a manual Payment Setting that happens in a background job, so it is never immediate
 - An **Order** on the `payment_sessions` model can still carry `available_payment_methods`: API version `2026-05` is additive, and the new model simply takes precedence
+- On the `payment_sessions` model a gift card is a **Payment Session**, so it never changes `order.total_amount_with_taxes_cents` — unlike the older model, where it was a negative line item and the total already came back net
+- An **Order** carries zero or more **Applied Gift Cards** and at most one other **Payment Session**; that is the only split payment supported
+- Changing the Applied Gift Cards invalidates the other **Payment Session**: its `amount_cents` is fixed at creation, so once the **Remaining Amount** moves that session is not stale but wrong
 - A **Customer Payment Source** belongs to a **Customer**; selecting one sets the **Order**'s Payment Source
 
 ## Example dialogue
@@ -83,9 +98,20 @@ _Avoid_: using "gateway" to mean the Payment Method
 
 ## Flagged ambiguities
 
-- ~~Gift cards on the `payment_sessions` model are undecided and out of scope.~~ **Resolved.** A gift card is spent by creating a Payment Session against a `payment_setting_gift_cards` setting — it is a payment method, not an order-level code. On the `payment_sessions` model `GiftCardOrCouponForm` therefore works on the coupon only, overriding an explicit `codeType="gift_card_code"`. Note the trigger named in the original entry never existed: there is no `_gift_card_or_coupon_code`, only the plain order attribute `gift_card_or_coupon_code`, and the components write `gift_card_code` / `coupon_code` directly. See `docs/adr/2026-08-18-payment-session-lifecycle.md`.
+- ~~Gift cards on the `payment_sessions` model are undecided and out of scope.~~ **Resolved.** A gift card is spent by creating a Payment Session against a `payment_setting_gift_cards` setting — it is a payment method, not an order-level code. On the `payment_sessions` model `GiftCardOrCouponForm` therefore works on the coupon only, overriding an explicit `codeType="gift_card_code"`. Note the trigger named in the original entry never existed: there is no `_gift_card_or_coupon_code`, only the plain order attribute `gift_card_or_coupon_code`, and the components write `gift_card_code` / `coupon_code` directly. See `docs/adr/2026-08-20-gift-cards-as-payment-sessions.md` for the full lifecycle.
 - **Three official sources are wrong about this domain**, so verify against `core-api` rather than the SDK types or the docs: `available_payment_methods` is annotated `@deprecated Last available in API version 2017-08` but is still served on `2026-05`; `payment_type` is documented as `"manual_payment"` but the real values are uppercase (`MANUAL`, `GIFT_CARD`, …); and both `status` fields are typed as bare `string` with a single `@example`, hiding state machines of seven and eight values.
 - "the session's type" was used to mean the gateway (e.g. "manual") — but `payment_session.type` is always the literal `"payment_sessions"` (the resource type). The gateway is `payment_session.payment_setting.type` (e.g. `payment_setting_manuals`). When someone says "the session type", ask which one they mean.
 - "the payment is done" was used for both a created **Payment Session** and a taken payment — resolved: only a `succeeded` **Payment Authorization** means paid; a session on its own means nothing was taken.
 - "placeable" was used for both the readable order attribute and the `_placeable` validation trigger — resolved in the glossary above; when someone says "check if it's placeable", ask whether they mean reading the attribute or asking the API.
 - "set payment source" was used to mean both the async operation that creates/attaches a Payment Source *and* the reducer action that stores it in state — resolved: the operation is `setPaymentSource(...)`, the reducer action is `dispatch({ type: "setPaymentSource" })`.
+
+## Example dialogue — gift cards
+
+> **Dev:** "The shopper applied a $50 gift card on a $71 order. Why is the API still saying $71 is left?"
+> **Domain expert:** "Because nothing has been authorized yet. `session_amount_cents` only drops once a session has taken money, and gift cards are authorized at place time so they can still be removed. The **Remaining Amount** you show is derived on the client."
+
+> **Dev:** "So for the second gift card I just leave `amount_cents` out again?"
+> **Domain expert:** "No — that is the one exception. The server would size it against a remainder that has not moved, so it would ask for the whole order. Send the real remainder; the server clamps it down if it disagrees, never up."
+
+> **Dev:** "The shopper wants to take a gift card off, but the order was already placed. Do I delete the session?"
+> **Domain expert:** "You cannot. Authorizing a gift card debits the balance straight away, and the API refuses to delete a session with transactions on it — it comes back as a 500. Only a refund would return that money, and we do not implement one, so the remove control is not rendered at all."

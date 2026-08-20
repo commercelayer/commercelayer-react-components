@@ -87,6 +87,12 @@ session — that is what makes it survive a reload.
 Create with **`payment_setting` and `order` only**. Never send `amount_cents`; let the
 server size the session against the remaining amount.
 
+> **Superseded in one place.** Gift cards after the first *do* send an explicit
+> `amount_cents`, because the server's remainder does not move until a session is
+> authorized and gift cards are authorized at place time — so it would size every card for
+> the whole order. See `2026-08-20-gift-cards-as-payment-sessions.md`. The rule above still
+> holds for the session paying the difference, where the server must work out what is left.
+
 Before creating, **reuse** an existing session when all of these hold:
 
 - its `payment_setting.id` matches the selected setting, **and**
@@ -117,6 +123,14 @@ selected and the radio ignores a click on the current selection. What is reachab
 covered by tests, is the retry path — a burnt session does not count as the selection, so
 clicking again creates a fresh one. The adopt branch is kept because it becomes live as
 soon as a second setting exists.
+
+### Sessions that took no money are deleted; everything else is abandoned
+
+> **Reformulated** by `2026-08-20-gift-cards-as-payment-sessions.md`. The constraint behind
+> the original "never delete" was that a burnt session might not be deletable — not that
+> deletion is always wrong. Removing a gift card, and invalidating a session whose amount is
+> no longer correct, both require deleting; both only ever touch sessions that have taken
+> nothing.
 
 ### Failed sessions are abandoned, not deleted
 
@@ -196,14 +210,10 @@ conditionally will see an order whose `payment_sessions` never expand.
 
 ### Known debt, due with the second setting
 
-`<PaymentSetting>` holds **one** `errors` state for the whole list, not one per setting,
-while `isPending` is correctly per-setting. With only the manual setting implemented this
-is invisible; the moment a second one exists, an error raised while selecting Stripe will
-render under the manual entry too.
-
-Not fixed yet because the clean fix is a `<PaymentSettingErrors>` component, and a public
-component invented for a problem no one can observe is harder to remove than to add.
-Whoever implements the second setting should fix this first.
+~~`<PaymentSetting>` holds one `errors` state for the whole list.~~ **Closed** by
+`2026-08-20-gift-cards-as-payment-sessions.md`: gift card errors live on their own context,
+because gift cards and the method turned out to be two disjoint sets with two separate UIs
+rather than two entries in one list. No `<PaymentSettingErrors>` was needed.
 
 **Auto-selecting a single setting is deliberately absent.** `<PaymentMethod>` offers
 `autoSelectSinglePaymentMethod` and the symmetric prop belongs here, but the obvious
@@ -235,20 +245,26 @@ is precisely why neither may act without the shopper.
 | Adyen | `payment_setting_adyens` | ⬜ not implemented |
 | Braintree | `payment_setting_braintrees` | ⬜ not implemented |
 | External | `payment_setting_externals` | ⬜ not implemented |
-| Gift card | `payment_setting_gift_cards` | ⬜ not implemented |
+| Gift card | `payment_setting_gift_cards` | ✅ implemented — see `2026-08-20-gift-cards-as-payment-sessions.md` |
 
 ### Gift cards
 
 On this model a gift card is spent by creating a Payment Session against a
-`payment_setting_gift_cards` setting, carrying `gift_card_code` and no `amount_cents`.
-It is therefore a payment method, not an order-level code.
+`payment_setting_gift_cards` setting. It is therefore a payment, not an order-level code —
+the full lifecycle is in `2026-08-20-gift-cards-as-payment-sessions.md`.
 
-Until that setting is implemented, `GiftCardOrCouponForm` pins its code type to
+`GiftCardOrCouponForm` pins its code type to
 `coupon_code` whenever the model is `payment_sessions` — **overriding an explicit
 `codeType="gift_card_code"` prop**. Writing `gift_card_code` on the order is meaningless
 here, and allowing it through would silently apply a gift card that no session reflects.
 `GiftCardOrCouponCode` and `GiftCardOrCouponRemoveButton` follow the same rule; their
 `managePaymentProviderGiftCards` branch is Adyen-specific and unreachable on this model.
+
+The coupon and the gift card end up in different places on this model, and deliberately:
+the coupon is a discount and belongs with the order summary, while the gift card is a
+payment and belongs in the payment step. Putting a control that creates a payment session
+next to the discounts would have the total drop as if it were a coupon, while the card is
+in fact charged at place time.
 
 This supersedes the "gift cards are undecided and out of scope" ambiguity previously
 flagged in `CONTEXT.md`.
