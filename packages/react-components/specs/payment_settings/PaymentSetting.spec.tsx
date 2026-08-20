@@ -275,4 +275,21 @@ describe("PaymentSetting", () => {
       expect(screen.getByTestId("name").textContent).toBe("Bank transfer")
     })
   })
+
+  // Gift cards live in <PaymentSettingGiftCard>: additive, not one of the
+  // alternatives this group picks between. Skipped without a warning, unlike a
+  // setting that genuinely has no implementation.
+  it("leaves gift card settings to their own component, silently", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined)
+    renderSettings(
+      order({
+        available_payment_settings: [
+          MANUAL,
+          { id: "ps-gift", type: "payment_setting_gift_cards", name: "Gift card" },
+        ],
+      } as never)
+    )
+    expect(screen.getAllByTestId("name")).toHaveLength(1)
+    expect(warn).not.toHaveBeenCalled()
+  })
 })

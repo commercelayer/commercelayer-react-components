@@ -2,6 +2,7 @@ import {
   createPaymentSession,
   findCurrentPaymentSession,
   findReusablePaymentSession,
+  GIFT_CARD_SETTING_TYPE,
 } from "@commercelayer/core-components"
 import type {
   Order,
@@ -103,6 +104,11 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
   if (readonly !== true && isCovered) return null
 
   const settings = (order.available_payment_settings ?? []).filter((setting) => {
+    // Gift cards are handled by <PaymentSettingGiftCard>, not here: they are
+    // additive rather than one of the alternatives this group picks between.
+    // Skipped silently — they are implemented, just elsewhere.
+    if (setting.type === GIFT_CARD_SETTING_TYPE) return false
+
     const implemented = IMPLEMENTED_SETTING_TYPES.includes(
       setting.type as (typeof IMPLEMENTED_SETTING_TYPES)[number]
     )
