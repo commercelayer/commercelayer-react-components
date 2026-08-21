@@ -2,13 +2,13 @@ name: Deploy to Pages
 
 on:
   # Runs on pushes targeting the default branch
-  # push:
-  # branches: ["main"]
+  push:
+    branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-    # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
@@ -25,24 +25,25 @@ jobs:
 
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: pnpm 🧰
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8
+        uses: pnpm/action-setup@v6
 
       - name: Node 🧰
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: "latest"
+          node-version: 24.x
           cache: "pnpm"
 
       - name: Install 📦
         run: pnpm install
 
       - name: Build 🛠
-        run: pnpm docs:build
+        # The libraries have to be built first: the storybook resolves
+        # @commercelayer/core-components to its dist, which does not exist on a
+        # clean checkout.
+        run: pnpm build && pnpm docs:build
 
       - name: Setup Pages 🧰
         uses: actions/configure-pages@v4
@@ -50,7 +51,7 @@ jobs:
       - name: Upload artifact 🚀
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./packages/docs/dist/
+          path: ./packages/docs/storybook-static/
 
   deploy:
     environment:

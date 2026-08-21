@@ -1,107 +1,108 @@
-import { useRapidForm } from 'rapid-form'
-import { useContext, useEffect, useRef, useState, type JSX } from 'react';
-import CouponAndGiftCardFormContext from '#context/CouponAndGiftCardFormContext'
-import OrderContext from '#context/OrderContext'
-import type { OrderCodeType } from '#reducers/OrderReducer'
-import type { Order } from '@commercelayer/sdk'
-import type { DefaultChildrenType } from '#typings/globals'
+import type { Order } from "@commercelayer/sdk"
+import { useRapidForm } from "rapid-form"
+import { type JSX, useCallback, useContext, useEffect, useState } from "react"
+import CouponAndGiftCardFormContext from "#context/CouponAndGiftCardFormContext"
+import OrderContext from "#context/OrderContext"
+import type { OrderCodeType } from "#reducers/OrderReducer"
+import type { DefaultChildrenType } from "#typings/globals"
 
-interface Props extends Omit<JSX.IntrinsicElements['form'], 'onSubmit'> {
+// "gift_card_or_coupon_code" is accepted by the CL API as a universal code field
+// but is not part of the OrderCodeType union — kept as a local widened type
+type FormCodeType = OrderCodeType | "gift_card_or_coupon_code"
+
+interface Props extends Omit<JSX.IntrinsicElements["form"], "onSubmit"> {
   codeType?: OrderCodeType
   children: DefaultChildrenType
-  onSubmit?: (response: {
-    success: boolean
-    value: string
-    order?: Order
-  }) => void
+  onSubmit?: (response: { success: boolean; value: string; order?: Order }) => void
 }
 
 export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
-  const { children, codeType, autoComplete = 'on', onSubmit, ...p } = props
-  const { validation, values, reset } = useRapidForm()
-  const { setGiftCardOrCouponCode, order, errors, setOrderErrors } =
-    useContext(OrderContext)
-  const ref = useRef<HTMLFormElement>(null)
-  const [type, setType] = useState(codeType)
-  useEffect(() => {
-    if (
-      type != null &&
-      values[type]?.value === '' &&
-      errors != null &&
-      errors.length > 0
-    ) {
-      const err = errors.filter((e) => e.field === type)
-      setOrderErrors(err)
-      if (onSubmit) {
-        onSubmit({ value: values[type]?.value, success: false })
-      }
-    }
-    if (type != null && values[type]?.value === '') {
-      setOrderErrors([])
-      if (onSubmit) {
-        onSubmit({ value: values[type]?.value, success: false })
-      }
-    }
-  }, [values])
+  const { children, codeType, autoComplete = "on", onSubmit, ...p } = props
+  const { refValidation, values } = useRapidForm()
+  const { setGiftCardOrCouponCode, order, errors, setOrderErrors } = useContext(OrderContext)
+  const [type, setType] = useState<FormCodeType | undefined>(codeType)
 
+  // When the active field is emptied, drop the *other* fields' errors from the order.
   useEffect(() => {
-    if (codeType == null) {
-      if (order?.gift_card_code && !order?.coupon_code) {
-        setType('coupon_code')
-      }
-      if (!order?.gift_card_code && order?.coupon_code) {
-        setType('gift_card_code')
-      }
-      if (!order?.gift_card_code && !order?.coupon_code) {
-        // TODO: Remove the `as` assertion
-        setType('gift_card_or_coupon_code' as OrderCodeType)
-      }
-    } else {
+    if (type == null || values[type]?.value !== "") return
+    const current = errors ?? []
+    const fieldErrors = current.filter((e) => e.field === type)
+    // Bail when filtering removes nothing. `fieldErrors` is an order-preserving subset,
+    // so equal lengths mean identical contents — dispatching it would only mint a fresh
+    // `errors` array reference, which this effect depends on, re-firing it forever
+    // (React 19 hard-crashes with "Maximum update depth exceeded"). Same identity-churn
+    // failure class as docs/adr/0001-payment-source-effect-invariants.md.
+    if (fieldErrors.length === current.length) return
+    setOrderErrors(fieldErrors)
+    onSubmit?.({ value: "", success: false })
+  }, [values, errors, type, setOrderErrors, onSubmit])
+
+  // Derive the active code type from the current order state
+  useEffect(() => {
+    if (codeType != null) {
       setType(codeType)
+      return
     }
-  }, [order])
+    if (order?.gift_card_code && !order?.coupon_code) {
+      setType("coupon_code")
+    } else if (!order?.gift_card_code && order?.coupon_code) {
+      setType("gift_card_code")
+    } else if (!order?.gift_card_code && !order?.coupon_code) {
+      setType("gift_card_or_coupon_code")
+    }
+  }, [order, codeType])
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ): Promise<void> => {
-    e.preventDefault()
-    const code =
-      type != null && values[type] != null ? values[type].value : undefined
-    if (code != null && setGiftCardOrCouponCode != null && type != null) {
-      const { success, order } = await setGiftCardOrCouponCode({
+  const handleSubmit = useCallback(
+    async (e: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
+      e.preventDefault()
+      if (type == null || setGiftCardOrCouponCode == null) return
+      const form = e.currentTarget
+      // Read the typed code straight from the form DOM rather than rapid-form's tracked
+      // `values`. rapid-form v4 only tracks a field that is `required` or has a validation
+      // config, so a `required={false}` field (e.g. mfe-checkout) may never be tracked and
+      // `values[type]` stays undefined — which silently made submit a no-op. The form
+      // element is authoritative and available here regardless of any wiring/timing.
+      const field = form.elements.namedItem(type) as HTMLInputElement | null
+      const code = field?.value?.trim() ?? ""
+      if (code === "") return
+      const { success, order: updatedOrder } = await setGiftCardOrCouponCode({
         code,
-        // TODO: Remove the `as` assertion
-        codeType: type as OrderCodeType
+        // "gift_card_or_coupon_code" is accepted by the CL API at runtime
+        codeType: type as OrderCodeType,
       })
-      const value = values[type]?.value
-      if (onSubmit) {
-        onSubmit({
-          success,
-          value,
-          order
-        })
-      }
-      if (success) reset(e)
-    }
-  }
-  if (
-    codeType != null &&
-    order?.[codeType] != null &&
-    order?.[codeType] !== ''
-  ) {
+      onSubmit?.({ success, value: code, order: updatedOrder })
+      if (success) form.reset()
+    },
+    [type, setGiftCardOrCouponCode, onSubmit]
+  )
+
+  if (codeType != null && order?.[codeType] != null && order?.[codeType] !== "") {
     return null
   }
-  return (order?.gift_card_code && order?.coupon_code) ||
-    order == null ? null : (
-    <CouponAndGiftCardFormContext.Provider
-      value={{ validation, codeType: type }}
-    >
+  return (order?.gift_card_code && order?.coupon_code) || order == null ? null : (
+    <CouponAndGiftCardFormContext.Provider value={{ codeType: type as OrderCodeType }}>
       <form
-        ref={ref}
-        autoComplete={autoComplete}
-        onSubmit={(e) => {
-          handleSubmit(e)
+        // Two rapid-form v4 behaviours are neutralised here so submission is robust:
+        // 1. `resetOnSubmit: false` — by default rapid-form attaches its own native
+        //    `submit` listener that resets the form; native listeners fire before React's
+        //    delegated `onSubmit`, so it would wipe the input before `handleSubmit` reads
+        //    the DOM. Disabling it means rapid-form attaches no submit listener at all, so
+        //    the typed value survives (and the field is now preserved on failure, cleared
+        //    only by our own `form.reset()` on success).
+        // 2. Pass-through `validations` for the active field — rapid-form only tracks a
+        //    field that is `required` or validated, so a `required={false}` field (e.g.
+        //    mfe-checkout) would otherwise stay untracked. This keeps `values[type]`
+        //    populated for the error-clearing effect without imposing any real constraint.
+        ref={(node) => {
+          refValidation(
+            node,
+            type != null
+              ? { resetOnSubmit: false, validations: { [type]: { validation: () => true } } }
+              : { resetOnSubmit: false }
+          )
         }}
+        autoComplete={autoComplete}
+        onSubmit={handleSubmit}
         {...p}
       >
         {children}

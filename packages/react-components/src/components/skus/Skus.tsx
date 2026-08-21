@@ -1,6 +1,6 @@
-import SkuChildrenContext from '#context/SkuChildrenContext'
-import SkuContext from '#context/SkuContext'
-import { type ReactNode, useContext, type JSX } from 'react';
+import { type JSX, type ReactNode, useContext } from "react"
+import SkuChildrenContext from "#context/SkuChildrenContext"
+import SkuContext from "#context/SkuContext"
 
 interface Props {
   children: ReactNode
@@ -20,10 +20,10 @@ interface Props {
  */
 export function Skus<P extends Props>({ children }: P): JSX.Element {
   const { skus } = useContext(SkuContext)
-  const components = skus?.map((sku, key) => {
+  const components = skus?.map((sku) => {
     const value = { sku }
     return (
-      <SkuChildrenContext.Provider key={key} value={value}>
+      <SkuChildrenContext.Provider key={sku.id} value={value}>
         {children}
       </SkuChildrenContext.Provider>
     )

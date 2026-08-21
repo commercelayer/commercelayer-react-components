@@ -1,35 +1,31 @@
-import OrderContext from '#context/OrderContext'
-import type {
-  createOrder,
-  OrderState,
-  addToCart
-} from '#reducers/OrderReducer'
-import { useContext } from 'react'
+import { useContext } from "react"
+import OrderContext from "#context/OrderContext"
+import type { addToCart, createOrder, OrderState } from "#reducers/OrderReducer"
 
 type TAddToCartParams = Omit<
   Parameters<typeof addToCart>[number],
-  | 'buyNowMode'
-  | 'state'
-  | 'dispatch'
-  | 'setLocalOrder'
-  | 'errors'
-  | 'checkoutUrl'
-  | 'persistKey'
-  | 'config'
+  | "buyNowMode"
+  | "state"
+  | "dispatch"
+  | "setLocalOrder"
+  | "errors"
+  | "checkoutUrl"
+  | "persistKey"
+  | "config"
 >
 
 type TCreateCartParams = Pick<
   Parameters<typeof createOrder>[number],
-  'orderAttributes' | 'orderMetadata'
+  "orderAttributes" | "orderMetadata"
 >
 
 interface TReturnOrder
   extends Omit<
     OrderState,
-    'loading' | 'include' | 'includeLoaded' | 'withoutIncludes' | 'orderId'
+    "loading" | "include" | "includeLoaded" | "withoutIncludes" | "orderId"
   > {
   /** Refetch the current order and update the context */
-  reloadOrder: () => Promise<OrderState['order']>
+  reloadOrder: () => Promise<OrderState["order"]>
   /** Allow to add a SKU or a Bundle to the order stored in the context */
   addToCart: (params: TAddToCartParams) => ReturnType<typeof addToCart>
   /** Allow to create a new order and store it in the OrderContainer context */
@@ -37,11 +33,11 @@ interface TReturnOrder
 }
 
 /**
- * React Hook that provides access to the order context stored in the `<OrderContainer>` component.
+ * React Hook that provides access to the order context stored in the `<Order>` component (or the deprecated `<OrderContainer>`).
  **/
 export function useOrderContainer(): TReturnOrder {
   const ctx = useContext(OrderContext)
-  if ('order' in ctx) {
+  if ("order" in ctx) {
     return {
       order: ctx.order,
       reloadOrder: async () => {
@@ -51,16 +47,18 @@ export function useOrderContainer(): TReturnOrder {
       addToCart: async (params) => {
         if (ctx?.addToCart) return await ctx?.addToCart(params)
         return {
-          success: false
+          success: false,
         }
       },
       createOrder: async (params) => {
         if (ctx?.createOrder) return await ctx?.createOrder(params)
         return undefined
-      }
+      },
     }
   }
-  throw new Error('Cannot use `useOrderContainer` outside of <OrderContainer/>')
+  throw new Error(
+    "Cannot use `useOrderContainer` outside of <Order/> (or the deprecated <OrderContainer/>)"
+  )
 }
 
 export default useOrderContainer

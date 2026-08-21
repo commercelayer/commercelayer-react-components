@@ -1,4 +1,5 @@
 import type { Address } from "@commercelayer/sdk"
+import type { Value } from "rapid-form"
 import { createContext } from "react"
 
 export type AddressValuesKeys =
@@ -10,13 +11,10 @@ export type AddressValuesKeys =
   | `billing_address_save_to_customer_book`
   | `shipping_address_save_to_customer_book`
 
+export type ErrorMode = "inline" | "submit"
+
 export interface DefaultContextAddress {
-  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  validation?: void
-  setValue?: (
-    name: AddressValuesKeys,
-    value: string | number | readonly string[],
-  ) => void
+  setValue?: (name: AddressValuesKeys, value: string | number | readonly string[]) => void
   errors?: Record<
     string,
     {
@@ -28,10 +26,15 @@ export interface DefaultContextAddress {
   errorClassName?: string
   requiresBillingInfo?: boolean
   resetField?: (name: string) => void
-  values?: {
-    [T in AddressValuesKeys]: string | { value: string }
-  }
+  values?: Record<string, Value>
   isBusiness?: boolean
+  errorMode?: ErrorMode
+  /**
+   * Triggers form validation and returns any errors found.
+   * When `errorMode="submit"`, call this before saving to show errors.
+   * After the first call, errors update inline as the user corrects fields.
+   */
+  validate?: () => Record<string, { code: string; message: string; error: boolean }>
 }
 
 const BillingAddressFormContext = createContext<DefaultContextAddress>({})

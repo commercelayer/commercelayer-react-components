@@ -1,24 +1,24 @@
-import { type MouseEvent, type ReactNode, useContext, type JSX } from 'react';
-import OrderContext from '#context/OrderContext'
-import Parent from '../utils/Parent'
-import type { ChildrenFunction } from '#typings/index'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import { getApplicationLink } from '#utils/getApplicationLink'
-import { getDomain } from '#utils/getDomain'
-import { publish } from '#utils/events'
-import { getOrganizationConfig } from '#utils/organization'
+import { type JSX, type MouseEvent, type ReactNode, useContext } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
+import type { ChildrenFunction } from "#typings/index"
+import { publish } from "#utils/events"
+import { getApplicationLink } from "#utils/getApplicationLink"
+import { jwt } from "#utils/jwt"
+import { getOrganizationConfig } from "#utils/organization"
+import Parent from "../utils/Parent"
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+const DEFAULT_DOMAIN = "commercelayer.io"
+
+interface ChildrenProps extends Omit<Props, "children"> {
   /**
-   * The url of the cart
+   * The resolved href for the cart link
    */
-  href: string
+  href: string | undefined
   /**
    * Callback to dispatch the click event
-   * @param e: MouseEvent<HTMLAnchorElement>
-   * @returns Promise<void>
    */
-  handleClick?: (e: MouseEvent<HTMLAnchorElement>) => Promise<void>
+  handleClick: (e: MouseEvent<HTMLAnchorElement>) => Promise<void>
   /**
    * The order id
    */
@@ -29,7 +29,7 @@ interface ChildrenProps extends Omit<Props, 'children'> {
   accessToken?: string
 }
 
-interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements["a"], "children"> {
   children?: ChildrenFunction<ChildrenProps>
   /**
    * Label to display
@@ -38,7 +38,7 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
   /**
    * The type of the cart. Defaults to undefined. If set to 'mini', the cart will open in a modal.
    */
-  type?: 'mini'
+  type?: "mini"
   /**
    * The domain of your forked application
    */
@@ -50,92 +50,76 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
  * In this way you can connect your shop application with our hosted micro-frontend.
  *
  * <span title="Requirement" type="warning">
- * Must be a child of the `<OrderContainer>` component. <br />
+ * Must be a child of the `<Order>` component. <br />
  * </span>
  */
 export function CartLink(props: Props): JSX.Element | null {
-  const { label, children, type, customDomain, ...p } = props
+  const { label, children, type, customDomain, target, ...p } = props
   const { order, createOrder } = useContext(OrderContext)
-  const { accessToken, endpoint } = useContext(CommerceLayerContext)
-  if (accessToken == null)
-    throw new Error('Cannot use `CartLink` outside of `CommerceLayer`')
-  if (endpoint == null)
-    throw new Error('Cannot use `CartLink` outside of `CommerceLayer`')
-  const { domain, slug } = getDomain(endpoint)
+  const { accessToken } = useContext(CommerceLayerContext)
+  if (accessToken == null) throw new Error("Cannot use `CartLink` outside of `CommerceLayer`")
+  const token: string = accessToken
+  const { organization } = jwt(token)
+  const slug = organization.slug
   const href =
     slug && order?.id
       ? getApplicationLink({
           slug,
-          orderId: order?.id,
-          accessToken,
-          domain,
-          applicationType: 'cart',
-          customDomain
+          orderId: order.id,
+          accessToken: token,
+          domain: DEFAULT_DOMAIN,
+          applicationType: "cart",
+          customDomain,
         })
       : undefined
-  const handleClick = async (
-    event: MouseEvent<HTMLAnchorElement>
-  ): Promise<void> => {
+
+  async function resolveCartUrl(orderId: string): Promise<string> {
+    const config = await getOrganizationConfig({
+      accessToken: token,
+      params: { orderId, accessToken: token, slug },
+    })
+    return (
+      config?.links?.cart ??
+      getApplicationLink({
+        slug,
+        orderId,
+        accessToken: token,
+        domain: DEFAULT_DOMAIN,
+        applicationType: "cart",
+        customDomain,
+      })
+    )
+  }
+
+  const handleClick = async (event: MouseEvent<HTMLAnchorElement>): Promise<void> => {
     event.preventDefault()
-    if (type !== 'mini') {
-      if (order?.id) {
-        const config = await getOrganizationConfig({
-          accessToken,
-          endpoint,
-          params: {
-            orderId: order?.id,
-            accessToken,
-            slug
-          }
-        })
-        location.href = config?.links?.cart ?? href ?? ''
-      } else {
-        const orderId = await createOrder({})
-        const config = await getOrganizationConfig({
-          accessToken,
-          endpoint,
-          params: {
-            orderId: order?.id,
-            accessToken,
-            slug
-          }
-        })
-        if (slug) {
-          location.href =
-            config?.links?.cart ??
-            getApplicationLink({
-              slug,
-              orderId,
-              accessToken,
-              domain,
-              applicationType: 'cart',
-              customDomain
-            })
-        }
-      }
-    } else {
-      publish('open-cart')
+    event.stopPropagation()
+    if (type === "mini") {
+      publish("open-cart")
+      return
+    }
+    const orderId = order?.id ?? (await createOrder({}))
+    if (orderId) {
+      window.open(await resolveCartUrl(orderId), target ?? "_self")
     }
   }
+
   const parentProps = {
     handleClick,
     label,
     href,
     orderId: order?.id,
-    accessToken,
-    ...p
+    accessToken: token,
+    type,
+    customDomain,
+    target,
+    ...p,
   }
-  if (!accessToken) return null
+
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a
-      href={href}
-      onClick={(e) => {
-        handleClick(e)
-      }}
-      {...p}
-    >
+    <a href={href} onClick={handleClick} target={target} rel="noreferrer" {...p}>
       {label}
     </a>
   )

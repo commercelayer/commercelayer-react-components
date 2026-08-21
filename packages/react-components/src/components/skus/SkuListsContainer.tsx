@@ -1,29 +1,82 @@
-import { useReducer, useContext, type ReactNode, useEffect, type JSX } from 'react';
-import SkuListsContext from '#context/SkuListsContext'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import skuListsReducer, {
-  skuListsInitialState,
-  getSkuList
-} from '#reducers/SkuListsReducer'
+import { useSkuLists } from "@commercelayer/react-hooks-components"
+import type { QueryParamsRetrieve, Sku, SkuList } from "@commercelayer/sdk"
+import {
+  type JSX,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import SkuListsContext, { type SkuListsContextType } from "#context/SkuListsContext"
 
 interface Props {
   children: ReactNode
+  /**
+   * Optional query parameters forwarded to each SKU list retrieval call.
+   * `include: ["skus"]` is always enforced; any `include` entries here are merged.
+   * Use `fields.skus` to request additional SKU attributes (default is `["code"]`).
+   */
+  params?: QueryParamsRetrieve<SkuList>
 }
 
+/**
+ * @deprecated Use `<SkuList>` as a standalone component instead.
+ * `SkuList` now fetches its own data without requiring a container parent.
+ * `SkuListsContainer` remains functional for backwards compatibility.
+ */
 export function SkuListsContainer(props: Props): JSX.Element {
-  const { children } = props
-  const [state, dispatch] = useReducer(skuListsReducer, skuListsInitialState)
+  const { children, params } = props
   const config = useContext(CommerceLayerContext)
+  const { retrieveSkuList } = useSkuLists(config.accessToken ?? "", config.interceptors)
+  const [registeredIds, setRegisteredIds] = useState<string[]>([])
+  const [skuLists, setSkuLists] = useState<Record<string, Sku[]>>({})
+
+  const registerListId = useCallback((id: string) => {
+    setRegisteredIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+  }, [])
+
   useEffect(() => {
-    if (state.listIds && state.listIds.length > 0 && config.accessToken) {
-      getSkuList({ listIds: state.listIds, dispatch, config, state })
+    if (config.accessToken != null && registeredIds.length > 0) {
+      const mergedParams: QueryParamsRetrieve<SkuList> = {
+        ...params,
+        // Always include skus relationship; merge with any caller-supplied includes.
+        include: [...new Set([...(params?.include ?? []), "skus"])],
+        fields: {
+          skus: ["code"],
+          ...params?.fields,
+        },
+      }
+      void Promise.all(
+        registeredIds.map((id) =>
+          retrieveSkuList(id, mergedParams).then((skuList) => ({
+            id,
+            skus: (skuList?.skus ?? []) as Sku[],
+          }))
+        )
+      ).then((results) => {
+        const updated: Record<string, Sku[]> = {}
+        for (const { id, skus } of results) {
+          updated[id] = skus
+        }
+        setSkuLists(updated)
+      })
     }
-  }, [config.accessToken])
-  return (
-    <SkuListsContext.Provider value={state}>
-      {children}
-    </SkuListsContext.Provider>
+  }, [config.accessToken, registeredIds, retrieveSkuList, params])
+
+  const contextValue = useMemo<SkuListsContextType>(
+    () => ({
+      listIds: registeredIds,
+      skuLists,
+      registerListId,
+      setListIds: setRegisteredIds,
+    }),
+    [registeredIds, skuLists, registerListId]
   )
+
+  return <SkuListsContext.Provider value={contextValue}>{children}</SkuListsContext.Provider>
 }
 
 export default SkuListsContainer

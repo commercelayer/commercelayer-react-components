@@ -1,18 +1,18 @@
-import { useContext, useEffect, useMemo, type JSX } from 'react';
-import BaseSelect from '../utils/BaseSelect'
-import type { BaseSelectComponentProps } from '#typings'
+import { type JSX, useContext, useEffect, useMemo } from "react"
 import BillingAddressFormContext, {
-  type AddressValuesKeys
-} from '#context/BillingAddressFormContext'
-import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
+  type AddressValuesKeys,
+} from "#context/BillingAddressFormContext"
+import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
+import type { BaseSelectComponentProps } from "#typings"
+import BaseSelect from "../utils/BaseSelect"
 
 type SelectFieldName =
   | `billing_address_${`metadata_${string}`}`
   | `shipping_address_${`metadata_${string}`}`
 
 interface Props
-  extends Omit<BaseSelectComponentProps, 'name'>,
-    Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'> {
+  extends Omit<BaseSelectComponentProps, "name">,
+    Pick<JSX.IntrinsicElements["select"], "className" | "id" | "style"> {
   name: Extract<AddressValuesKeys, SelectFieldName>
   required?: boolean
   disabled?: boolean
@@ -47,7 +47,7 @@ export function AddressInputSelect(props: Props): JSX.Element {
     if (value && shippingAddress?.setValue) {
       shippingAddress.setValue(name, value)
     }
-  }, [value])
+  }, [value, billingAddress.setValue, name, shippingAddress.setValue])
 
   const hasError = useMemo(() => {
     if (billingAddress?.errors?.[name]?.error) {
@@ -57,16 +57,12 @@ export function AddressInputSelect(props: Props): JSX.Element {
       return true
     }
     return false
-  }, [value, billingAddress?.errors, shippingAddress?.errors])
-  const errorClassName =
-    billingAddress?.errorClassName || shippingAddress?.errorClassName
-  const classNameComputed = `${className ?? ''} ${
-    hasError && errorClassName ? errorClassName : ''
-  }`
+  }, [billingAddress?.errors, shippingAddress?.errors, name])
+  const errorClassName = billingAddress?.errorClassName || shippingAddress?.errorClassName
+  const classNameComputed = `${className ?? ""} ${hasError && errorClassName ? errorClassName : ""}`
   return (
     <BaseSelect
       className={classNameComputed}
-      ref={(billingAddress?.validation as any) || shippingAddress?.validation}
       required={required}
       options={options}
       name={name}

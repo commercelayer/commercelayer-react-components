@@ -1,8 +1,8 @@
-import type { CommerceLayerConfig } from '#context/CommerceLayerContext'
-import type { Order, OrderSubscription } from '@commercelayer/sdk'
-import getSdk from './getSdk'
+import { getSdk } from "@commercelayer/core-components"
+import type { Order, OrderSubscription } from "@commercelayer/sdk"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 
-export type HelperRequestResource = 'orders' | 'order_subscriptions'
+export type HelperRequestResource = "orders" | "order_subscriptions"
 
 export type TriggerAttributeHelper = {
   /**
@@ -18,15 +18,15 @@ export type TriggerAttributeHelper = {
       /**
        * The resource name
        */
-      resource: 'orders'
+      resource: "orders"
       /**
        * The attribute to trigger
        */
-      attribute: '_place' | '_refresh' | '_create_subscriptions'
+      attribute: "_place" | "_refresh" | "_create_subscriptions"
     }
   | {
-      resource: 'order_subscriptions'
-      attribute: '_active' | '_deactivate' | '_cancel'
+      resource: "order_subscriptions"
+      attribute: "_active" | "_deactivate" | "_cancel"
     }
 )
 
@@ -39,11 +39,12 @@ export async function triggerAttributeHelper({
   config,
   id,
   attribute,
-  resource
+  resource,
 }: TriggerAttributeHelper): TriggerAttributeHelperResponse {
-  const sdk = getSdk(config)
+  // biome-ignore lint/style/noNonNullAssertion: accessToken is guaranteed by caller context
+  const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   return await sdk[resource].update({
     id,
-    [attribute]: true
+    [attribute]: true,
   })
 }

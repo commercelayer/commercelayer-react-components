@@ -1,7 +1,12 @@
-import type { SkuState } from '#reducers/SkuReducer'
-import { createContext } from 'react'
+import type { Sku } from "@commercelayer/sdk"
+import { createContext } from "react"
 
-export type SkuContextValue = SkuState
+export type SkuContextValue = Partial<{
+  skus: Sku[]
+  loading: boolean
+  skuCodes: string[]
+  setSkuCodes: (params: { skuCodes: string[] }) => void
+}>
 
 const SkuContext = createContext<SkuContextValue>({})
 

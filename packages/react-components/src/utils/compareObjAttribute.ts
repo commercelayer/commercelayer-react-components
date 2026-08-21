@@ -16,20 +16,20 @@ function sortObj<T extends Item>(obj: T): Item {
 
 export default function compareObjAttribute<A extends Item, B extends Item>({
   attributes,
-  object
+  object,
 }: TArgs<A, B>): Item {
   const returnObj: Item = {}
   Object.keys(object).forEach((v) => {
     const element = attributes[v]
     const compare = object[v]
-    if (typeof element === 'object' && element) {
+    if (typeof element === "object" && element) {
       const elementSorted = sortObj(element)
       const compareSorted = sortObj(compare)
       if (JSON.stringify(elementSorted) !== JSON.stringify(compareSorted)) {
         returnObj[v] = element
       }
     }
-    if (typeof element !== 'object' && element && element !== compare) {
+    if (typeof element !== "object" && element && element !== compare) {
       returnObj[v] = element
     }
   })

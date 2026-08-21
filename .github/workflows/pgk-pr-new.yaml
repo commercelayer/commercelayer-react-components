@@ -19,24 +19,24 @@ jobs:
 
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
       - name: pnpm 🧰
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Node 🧰
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 22.x
+          node-version: 24.x
 
       - name: Install 📦
         run: pnpm install --frozen-lockfile
 
       - name: Build elements 🛠
-        run: pnpm build
+        run: pnpm --filter @commercelayer/core-components --filter @commercelayer/react-hooks-components --filter @commercelayer/react-components build
 
       - name: Publish 🚀 pkg.pr.new
         run: |
-          npx pkg-pr-new publish './packages/react-components' --no-template
+          npx pkg-pr-new publish './packages/react-components' './packages/core-components' './packages/react-hooks-components' --no-template

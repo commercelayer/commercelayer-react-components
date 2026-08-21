@@ -1,4 +1,4 @@
-import { createContext } from 'react'
+import { createContext } from "react"
 
 interface Context {
   url: string | null
@@ -10,20 +10,17 @@ type CallExternalFunction = (params: {
   data: Record<string, any>
 }) => Promise<Record<string, any>>
 
-export const callExternalFunction: CallExternalFunction = async ({
-  url,
-  data
-}) => {
+export const callExternalFunction: CallExternalFunction = async ({ url, data }) => {
   const response = await fetch(url, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(data),
     headers: {
-      'Content-Type': 'application/json'
-    }
+      "Content-Type": "application/json",
+    },
   })
 
   if (!response.ok) {
-    throw new Error('Failed to call external function')
+    throw new Error("Failed to call external function")
   }
 
   return await response.json()
@@ -31,7 +28,7 @@ export const callExternalFunction: CallExternalFunction = async ({
 
 const ExternalFunctionContext = createContext<Context>({
   url: null,
-  callExternalFunction
+  callExternalFunction,
 })
 
 export default ExternalFunctionContext

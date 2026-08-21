@@ -1,4 +1,4 @@
-import { type JSX, useContext, useEffect, useState } from "react"
+import { type JSX, useContext, useEffect, useEffectEvent, useRef, useState } from "react"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
@@ -50,6 +50,10 @@ export function PaymentGateway({
 }: Props): JSX.Element | null {
   const loaderComponent = getLoaderComponent(loader)
   const [loading, setLoading] = useState(true)
+  // Guards against the effect re-entering and firing a second `setPaymentSource`
+  // before the first (fire-and-forget) request resolves and settles state.
+  // See docs/adr/0001-payment-source-effect-invariants.md.
+  const settingPaymentSourceRef = useRef(false)
   const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
@@ -66,7 +70,25 @@ export function PaymentGateway({
   const paymentResource = readonly
     ? currentPaymentMethodType
     : (payment?.payment_source_type as PaymentResource)
-  useEffect(() => {
+  // Returning the loader instead of the gateway (see the render below) swaps the gateway out
+  // rather than overlaying the loader, so every flip of `loading` unmounts it — and with it a
+  // mounted Adyen Drop-in, which loses the shopper's selection and re-initializes on the way
+  // back.
+  //
+  // While the order is partially authorized the shopper is mid-payment in that very gateway,
+  // so it must stay mounted. `mismatched_amounts` is also expected in that window (we
+  // authorized only the gift-card balance against the full total), and "healing" it by
+  // recreating the payment source would throw the authorization away.
+  const isPartiallyAuthorized = order?.payment_status === "partially_authorized"
+
+  // Non-reactive reconcile pass. It reads the *latest* `order`, `config`, `paymentSource`,
+  // etc. on every invocation, so those objects are deliberately absent from the driving
+  // effect's dependency array below — only stable id/scalar selectors are. This is what
+  // ends the mismatched-amounts loop: a customer-sources refetch that only mints new
+  // `order`/`paymentSource` object identities no longer re-fires the effect, while a real
+  // field change (a flipped `mismatched_amounts`, a new source id, a status transition)
+  // still does. See docs/adr/0001-payment-source-effect-invariants.md.
+  const onPaymentSync = useEffectEvent((): void => {
     if (
       payment?.id === currentPaymentMethodId &&
       paymentResource &&
@@ -90,49 +112,59 @@ export function PaymentGateway({
         attributes = getCkoAttributes(paymentResource, config)
       }
       const setPaymentSources = async (): Promise<void> => {
-        if (order != null && paymentMethods && paymentMethods?.length > 1) {
-          await setPaymentSource({
-            paymentResource,
-            order,
-            attributes,
-          })
+        // Skip the whole pass if a previous one is still in flight — a concurrent
+        // effect run must not fire a second create/update before state settles.
+        if (settingPaymentSourceRef.current) return
+        settingPaymentSourceRef.current = true
+        // Only refetch customer sources when a source was actually (re)created; the
+        // unconditional refetch on a no-op pass was what re-armed the effect and drove
+        // the single-method mismatched-amounts loop.
+        let recreated = false
+        try {
+          if (order != null && paymentMethods && paymentMethods?.length > 1) {
+            await setPaymentSource({
+              paymentResource,
+              order,
+              attributes,
+            })
+            recreated = true
+          }
+          if (
+            ((errors != null && errors?.length > 0) ||
+              order?.payment_source == null ||
+              // @ts-expect-error no type
+              order?.payment_source?.mismatched_amounts) &&
+            paymentMethods &&
+            paymentMethods?.length === 1
+          ) {
+            await setPaymentSource({
+              paymentResource,
+              order,
+              attributes,
+            })
+            recreated = true
+          }
+        } finally {
+          settingPaymentSourceRef.current = false
         }
-        if (
-          ((errors != null && errors?.length > 0) ||
-            order?.payment_source === null) &&
-          paymentMethods &&
-          paymentMethods?.length === 1
-        ) {
-          await setPaymentSource({
-            paymentResource,
-            order,
-            attributes,
-          })
-        }
-        if (getCustomerPaymentSources) getCustomerPaymentSources()
+        if (recreated && getCustomerPaymentSources) getCustomerPaymentSources()
       }
-      if (
-        !paymentSource &&
-        order?.payment_method.id &&
-        show &&
-        !expressPayments
-      ) {
+      if (!paymentSource && order?.payment_method.id && show && !expressPayments) {
         setPaymentSources()
       } else if (
-        ((!paymentSource && !expressPayments) ||
-          paymentSource?.type !== paymentResource) &&
+        ((!paymentSource && !expressPayments) || paymentSource?.type !== paymentResource) &&
         show
       ) {
         setPaymentSources()
       }
       // @ts-expect-error no type
-      if (paymentSource?.mismatched_amounts && show) {
+      if (paymentSource?.mismatched_amounts && show && !isPartiallyAuthorized) {
         setPaymentSources()
       }
       if (order?.payment_source?.id != null) {
         setLoading(false)
       }
-      if (!paymentSource) {
+      if (!paymentSource && !isPartiallyAuthorized) {
         setLoading(true)
       }
     }
@@ -145,21 +177,50 @@ export function PaymentGateway({
     ) {
       setLoading(false)
     }
-    return () => {
-      setLoading(true)
-    }
-  }, [order?.payment_method?.id, show, paymentSource?.id])
+  })
+
+  // The array below is a deliberate trigger set, not the effect body's reads —
+  // `onPaymentSync` (a useEffectEvent) reads the latest values, so the linter sees these
+  // deps as "more than necessary". See docs/adr/0001-payment-source-effect-invariants.md.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: deliberate trigger set, see ADR 0001
+  useEffect(() => {
+    onPaymentSync()
+    // Reactive triggers only: stable ids/scalars, never whole objects. `order` and `config`
+    // are read latest inside `onPaymentSync`, so listing their identities here would re-fire
+    // the effect on meaningless refetch churn. See docs/adr/0001-payment-source-effect-invariants.md.
+  }, [
+    order?.payment_method?.id,
+    order?.payment_method?.payment_source_type,
+    order?.status,
+    // Read by the recreate guard and the loader branch, so it has to re-fire the effect —
+    // otherwise the pass keeps deciding from a stale partial-authorization state.
+    order?.payment_status,
+    order?.payment_source?.id,
+    // @ts-expect-error no type
+    order?.payment_source?.mismatched_amounts,
+    paymentSource?.id,
+    paymentSource?.type,
+    // @ts-expect-error no type
+    paymentSource?.mismatched_amounts,
+    paymentResource,
+    payment?.id,
+    currentPaymentMethodId,
+    expressPayments,
+    show,
+    errors?.length,
+    paymentMethods?.length,
+  ])
 
   useEffect(() => {
-    if (status === "placing") setLoading(true)
-    if (status === "standby" && loading) setLoading(false)
-    if (order && order.status === "placed" && loading) {
-      setLoading(false)
-    }
-    return () => {
-      setLoading(true)
-    }
-  }, [status, order?.status])
+    // Not while partially authorized: a place-order attempt on such an order is refused
+    // anyway (see <PlaceOrderButton>), so raising the loader here only unmounts the gateway
+    // the shopper still needs in order to pay the remainder.
+    if (status === "placing" && !isPartiallyAuthorized) setLoading(true)
+    if (status === "standby") setLoading(false)
+    if (order?.status === "placed") setLoading(false)
+    // No cleanup: setLoading(true) in cleanup + loading in deps caused an infinite
+    // toggle loop (setLoading(false) → dep change → cleanup setLoading(true) → repeat).
+  }, [status, order?.status, isPartiallyAuthorized])
 
   const gatewayConfig = {
     readonly,
@@ -175,16 +236,32 @@ export function PaymentGateway({
     ...p,
   }
   if (currentPaymentMethodType !== paymentResource) return null
-  if (loading) return loaderComponent
+  // Swapping the gateway out for the loader unmounts it. For a stateless gateway that costs
+  // nothing; the Adyen Drop-in, though, owns imperative state — the shopper's selected method
+  // and typed-in details — and unmounting it destroys that and forces a full re-initialization
+  // (fresh AdyenCheckout(), new Dropin().mount(), translations and analytics again).
+  //
+  // Guarding individual `loading` flips is not enough: `payment_response.status` and
+  // `payment_status` are populated by two different API calls, so there is a window where a
+  // flip looks legitimate. Keeping the Drop-in mounted removes the whole class of problem —
+  // and it manages its own loading UI anyway.
+  // The Adyen Drop-in owns imperative state — the shopper's selected method and typed-in
+  // details — so unmounting it destroys that and forces a full re-initialization (fresh
+  // AdyenCheckout(), new Dropin().mount(), translations and analytics again). For a stateless
+  // gateway the swap costs nothing, so it is kept.
+  //
+  // Guarding individual `loading` flips is not enough here: `payment_response.status` and
+  // `payment_status` are populated by two different API calls, so there is a window where a
+  // flip looks legitimate. Keeping the Drop-in mounted removes the whole class of problem, and
+  // it manages its own loading UI anyway.
+  if (loading && paymentResource !== "adyen_payments") return loaderComponent
   switch (paymentResource) {
     case "adyen_payments":
       return <AdyenGateway {...gatewayConfig}>{children}</AdyenGateway>
     case "braintree_payments":
       return <BraintreeGateway {...gatewayConfig}>{children}</BraintreeGateway>
     case "checkout_com_payments":
-      return (
-        <CheckoutComGateway {...gatewayConfig}>{children}</CheckoutComGateway>
-      )
+      return <CheckoutComGateway {...gatewayConfig}>{children}</CheckoutComGateway>
     case "external_payments":
       return <ExternalGateway {...gatewayConfig}>{children}</ExternalGateway>
     case "klarna_payments":
@@ -192,9 +269,7 @@ export function PaymentGateway({
     case "stripe_payments":
       return <StripeGateway {...gatewayConfig}>{children}</StripeGateway>
     case "wire_transfers":
-      return (
-        <WireTransferGateway {...gatewayConfig}>{children}</WireTransferGateway>
-      )
+      return <WireTransferGateway {...gatewayConfig}>{children}</WireTransferGateway>
     case "paypal_payments":
       return <PaypalGateway {...gatewayConfig}>{children}</PaypalGateway>
     default:

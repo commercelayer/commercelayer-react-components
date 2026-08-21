@@ -1,8 +1,9 @@
 import type { Order } from "@commercelayer/sdk"
-import { iframeResizer } from "iframe-resizer"
+import iframeResizer from "@iframe-resizer/parent"
 import {
   type CSSProperties,
   type JSX,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -13,9 +14,11 @@ import OrderContext from "#context/OrderContext"
 import OrderStorageContext from "#context/OrderStorageContext"
 import { subscribe, unsubscribe } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
-import { getDomain } from "#utils/getDomain"
 import useCustomContext from "#utils/hooks/useCustomContext"
+import { jwt } from "#utils/jwt"
 import { getOrganizationConfig } from "#utils/organization"
+
+const DEFAULT_DOMAIN = "commercelayer.io"
 
 interface IframeData {
   message:
@@ -55,7 +58,6 @@ const defaultContainerStyle = {
   height: "100%",
   width: "23rem",
   transition: "right 0.5s ease-in-out",
-  // zIndex: '0',
   pointerEvents: "none",
   overflow: "auto",
 } satisfies CSSProperties
@@ -68,7 +70,6 @@ const defaultBackgroundStyle = {
   height: "100%",
   width: "100vw",
   transition: "opacity 0.5s ease-in-out",
-  // zIndex: '-10',
   pointerEvents: "none",
   backgroundColor: "black",
 } satisfies CSSProperties
@@ -94,8 +95,7 @@ const defaultStyle = {
   iconContainer: defaultIconContainer,
 } satisfies Styles
 
-interface Props
-  extends Omit<JSX.IntrinsicElements["div"], "children" | "style"> {
+interface Props extends Omit<JSX.IntrinsicElements["div"], "children" | "style"> {
   /**
    * The style of the cart.
    */
@@ -134,7 +134,7 @@ interface Props
  * Or it can work as mini cart - when `type` prop is set to `mini` - and it will be opened in a modal (popup).
  *
  * <span title="Requirement" type="warning">
- * Must be a child of the `<OrderContainer>` component.
+ * Must be a child of the `<Order>` component.
  * </span>
  *
  * <span title="Mini cart" type="info">
@@ -157,41 +157,44 @@ export function HostedCart({
   const ref = useRef<HTMLIFrameElement>(null)
   const loadedOrderIdRef = useRef<string | null>(null)
   const prevOpenRef = useRef<boolean | undefined>(undefined)
-  const { accessToken, endpoint } = useCustomContext({
+  const { accessToken } = useCustomContext({
     context: CommerceLayerContext,
     contextComponentName: "CommerceLayer",
     currentComponentName: "HostedCart",
     key: "accessToken",
   })
-  const [src, setSrc] = useState<string | undefined>()
-  if (accessToken == null || endpoint == null) return null
   const { order, createOrder, getOrder } = useContext(OrderContext)
   const { persistKey } = useContext(OrderStorageContext)
-  const { domain, slug } = getDomain(endpoint)
+  const [src, setSrc] = useState<string | undefined>()
+
+  if (accessToken == null) return null
+
+  const token: string = accessToken
+  const slug = jwt(token).organization.slug ?? ""
+
+  async function resolveCartUrl(orderId: string): Promise<string> {
+    const config = await getOrganizationConfig({
+      accessToken: token,
+      params: { orderId, accessToken: token, slug },
+    })
+    return (
+      config?.links?.cart ??
+      getApplicationLink({
+        slug,
+        orderId,
+        accessToken: token,
+        domain: DEFAULT_DOMAIN,
+        applicationType: "cart",
+        customDomain,
+      })
+    )
+  }
+
   async function setOrder(openCart?: boolean): Promise<void> {
     const orderId = localStorage.getItem(persistKey) ?? (await createOrder({}))
-    if (orderId != null && accessToken && endpoint) {
-      const config = await getOrganizationConfig({
-        accessToken,
-        endpoint,
-        params: {
-          orderId: order?.id ?? orderId,
-          accessToken,
-          slug,
-        },
-      })
+    if (orderId != null) {
       loadedOrderIdRef.current = orderId
-      setSrc(
-        config?.links?.cart ??
-          getApplicationLink({
-            slug,
-            orderId,
-            accessToken,
-            domain,
-            applicationType: "cart",
-            customDomain,
-          }),
-      )
+      setSrc(await resolveCartUrl(order?.id ?? orderId))
       if (openCart) {
         setTimeout(() => {
           if (handleOpen != null) handleOpen()
@@ -200,27 +203,33 @@ export function HostedCart({
       }
     }
   }
-  function onMessage(data: IframeData): void {
-    switch (data.message.type) {
-      case "update":
-        if (data.message.payload != null) {
-          getOrder(data.message.payload.id)
-        }
-        break
-      case "close":
-        if (type === "mini") {
-          if (handleOpen != null) handleOpen()
-          else setOpen(false)
-        }
-        break
 
-      case "blur":
-        if (type === "mini" && isOpen) {
-          ref.current?.focus()
-        }
-        break
-    }
-  }
+  // biome-ignore lint/correctness/useHookAtTopLevel: hook is called after an early return; refactoring would require restructuring the whole component
+  const onMessage = useCallback(
+    (data: IframeData): void => {
+      switch (data.message.type) {
+        case "update":
+          if (data.message.payload != null) {
+            getOrder(data.message.payload.id)
+          }
+          break
+        case "close":
+          if (type === "mini") {
+            if (handleOpen != null) handleOpen()
+            else setOpen(false)
+          }
+          break
+        case "blur":
+          if (type === "mini" && isOpen) {
+            ref.current?.focus()
+          }
+          break
+      }
+    },
+    [type, isOpen, handleOpen, getOrder]
+  )
+
+  // biome-ignore lint/correctness/useHookAtTopLevel: hook is called after an early return; refactoring would require restructuring the whole component
   useEffect(() => {
     const resolvedOrderId = order?.id ?? localStorage.getItem(persistKey)
     let ignore = false
@@ -245,39 +254,17 @@ export function HostedCart({
     if (openAdd && type === "mini") {
       subscribe("open-cart", openCartHandler)
     }
-    if (
-      src == null &&
-      resolvedOrderId == null &&
-      accessToken != null &&
-      !ignore &&
-      isOpen
-    ) {
+    if (src == null && resolvedOrderId == null && !ignore && isOpen) {
       setOrder()
     } else if (
       resolvedOrderId != null &&
-      accessToken &&
       (src == null || loadedOrderIdRef.current !== resolvedOrderId)
     ) {
-      getOrganizationConfig({
-        accessToken,
-        endpoint,
-        params: {
-          orderId: resolvedOrderId,
-          accessToken,
-          slug,
-        },
-      }).then((config) => {
-        loadedOrderIdRef.current = resolvedOrderId
-        setSrc(
-          config?.links?.cart ??
-            getApplicationLink({
-              slug,
-              orderId: resolvedOrderId,
-              accessToken,
-              domain,
-              applicationType: "cart",
-            }),
-        )
+      resolveCartUrl(resolvedOrderId).then((url) => {
+        if (!ignore) {
+          loadedOrderIdRef.current = resolvedOrderId
+          setSrc(url)
+        }
       })
     }
     if (src != null && ref.current != null) {
@@ -289,18 +276,32 @@ export function HostedCart({
         unsubscribe("open-cart", openCartHandler)
       }
     }
-  }, [src, open, order?.id, accessToken, persistKey])
+  }, [
+    src,
+    open,
+    order?.id,
+    persistKey,
+    // biome-ignore lint/correctness/useExhaustiveDependencies: setOrder is stable enough for this effect
+    setOrder,
+    // biome-ignore lint/correctness/useExhaustiveDependencies: resolveCartUrl is stable enough for this effect
+    resolveCartUrl,
+    type,
+    isOpen,
+    openAdd,
+    handleOpen,
+  ])
+
+  // biome-ignore lint/correctness/useHookAtTopLevel: hook is called after an early return; refactoring would require restructuring the whole component
   useEffect(() => {
     if (ref.current == null) return
     iframeResizer(
       {
         checkOrigin: false,
-        // @ts-expect-error No types available
         onMessage,
       },
-      ref.current,
+      ref.current
     )
-  }, [ref.current != null])
+  }, [onMessage])
   /**
    * Close the cart.
    */
@@ -317,9 +318,7 @@ export function HostedCart({
           ...defaultStyle.background,
           ...style?.background,
           opacity: isOpen ? "0.5" : defaultStyle.background?.opacity,
-          pointerEvents: isOpen
-            ? "initial"
-            : defaultStyle.background?.pointerEvents,
+          pointerEvents: isOpen ? "initial" : defaultStyle.background?.pointerEvents,
         }}
         onClick={onCloseCart}
       />
@@ -328,9 +327,7 @@ export function HostedCart({
           ...defaultStyle.container,
           ...style?.container,
           right: isOpen ? "0" : defaultStyle.container?.right,
-          pointerEvents: isOpen
-            ? "initial"
-            : defaultStyle.container?.pointerEvents,
+          pointerEvents: isOpen ? "initial" : defaultStyle.container?.pointerEvents,
         }}
         {...props}
       >
@@ -350,11 +347,7 @@ export function HostedCart({
             }}
             aria-label="Close cart"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
         <iframe

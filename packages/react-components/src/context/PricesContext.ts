@@ -1,10 +1,27 @@
-import { createContext } from 'react'
-import { priceInitialState, type PriceState } from '#reducers/PriceReducer'
+import type { Price } from "@commercelayer/sdk"
+import { createContext } from "react"
+import type { LoaderType } from "#typings"
+import type { BaseError } from "#typings/errors"
 
-export interface PricesContextValue extends PriceState {
-  skuCode: PriceState['skuCode']
+export type Prices = Record<string, Price[]>
+
+export interface PricesContextValue {
+  loading: boolean
+  prices: Prices
+  skuCodes: string[]
+  errors?: BaseError[]
+  skuCode?: string
+  loader?: LoaderType
+  setSkuCodes?: (params: { skuCodes: string[] }) => void
 }
 
-const PricesContext = createContext(priceInitialState)
+export const pricesInitialState: PricesContextValue = {
+  loading: true,
+  prices: {},
+  skuCodes: [],
+  errors: [],
+}
+
+const PricesContext = createContext<PricesContextValue>(pricesInitialState)
 
 export default PricesContext

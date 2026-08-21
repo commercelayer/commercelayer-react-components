@@ -1,13 +1,12 @@
-import { useContext, useEffect, useState, type JSX } from 'react';
-import Parent from '../utils/Parent'
-import type { ChildrenFunction } from '#typings/index'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import { getApplicationLink } from '#utils/getApplicationLink'
-import { getDomain } from '#utils/getDomain'
-import { jwt } from '#utils/jwt'
-import { getOrganizationConfig } from '#utils/organization'
+import { type JSX, useContext, useEffect, useState } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import type { ChildrenFunction } from "#typings/index"
+import { getApplicationLink } from "#utils/getApplicationLink"
+import { jwt } from "#utils/jwt"
+import { getOrganizationConfig } from "#utils/organization"
+import Parent from "../utils/Parent"
 
-interface ChildrenProps extends Omit<Props, 'children'> {
+interface ChildrenProps extends Omit<Props, "children"> {
   /**
    * The link href
    */
@@ -18,7 +17,7 @@ interface ChildrenProps extends Omit<Props, 'children'> {
   disabled: boolean
 }
 
-interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
+interface Props extends Omit<JSX.IntrinsicElements["a"], "children"> {
   /**
    * A render function to render your own custom component
    */
@@ -49,52 +48,54 @@ interface Props extends Omit<JSX.IntrinsicElements['a'], 'children'> {
  * @link https://github.com/commercelayer/mfe-my-account
  */
 export function MyAccountLink(props: Props): JSX.Element {
-  const { label = 'Go to my account', children, customDomain, returnUrl, ...p } = props
-  const { accessToken, endpoint } = useContext(CommerceLayerContext)
+  const { label = "Go to my account", children, customDomain, returnUrl, ...p } = props
+  const { accessToken } = useContext(CommerceLayerContext)
   const [href, setHref] = useState<string | undefined>(undefined)
-  if (accessToken == null || endpoint == null)
-    throw new Error('Cannot use `MyAccountLink` outside of `CommerceLayer`')
-  const disabled = !('owner' in jwt(accessToken))
+  if (accessToken == null) throw new Error("Cannot use `MyAccountLink` outside of `CommerceLayer`")
+  const disabled = !("owner" in jwt(accessToken))
   useEffect(() => {
-    if (accessToken && endpoint) {
-      const { domain, slug } = getDomain(endpoint)
+    if (accessToken) {
+      const { organization } = jwt(accessToken)
+      const slug = organization.slug
+      const domain = "commercelayer.io"
       getOrganizationConfig({
         accessToken,
-        endpoint,
         params: {
           accessToken,
           slug,
-          returnUrl
-        }
+          returnUrl,
+        },
       }).then((config) => {
         if (config?.links?.my_account) {
           setHref(config.links.my_account)
         } else {
-          setHref(getApplicationLink({
-            slug,
-            accessToken,
-            applicationType: 'my-account',
-            domain,
-            customDomain,
-            returnUrl
-          }))
+          setHref(
+            getApplicationLink({
+              slug,
+              accessToken,
+              applicationType: "my-account",
+              domain,
+              customDomain,
+              returnUrl,
+            })
+          )
         }
       })
     }
     return () => {
       setHref(undefined)
     }
-  }, [accessToken, endpoint, returnUrl, customDomain])
+  }, [accessToken, returnUrl, customDomain])
   const parentProps = {
     disabled,
     label,
     href,
-    ...p
+    ...p,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a aria-disabled={disabled} href={href} {...p}>
+    <a aria-disabled={disabled} href={href} rel="noreferrer" {...p}>
       {label}
     </a>
   )

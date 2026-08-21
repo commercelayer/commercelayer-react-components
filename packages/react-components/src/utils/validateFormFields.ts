@@ -1,16 +1,10 @@
-// TODO: Remove lodash
-
 import type { AddressCreate } from "@commercelayer/sdk"
-import isEmpty from "lodash/isEmpty"
-import isString from "lodash/isString"
-import keys from "lodash/keys"
-import map from "lodash/map"
-import without from "lodash/without"
 import type { TResourceError } from "#components/errors/Errors"
 import { type AddressField, addressFields } from "#reducers/AddressReducer"
 import type { AddressInputName } from "#typings"
 import type { BaseError } from "#typings/errors"
 import type { BaseState } from "#typings/index"
+import { isEmpty } from "#utils/isEmpty"
 
 const EMAIL_PATTERN =
   // eslint-disable-next-line no-useless-escape
@@ -21,7 +15,7 @@ type FormField = HTMLInputElement | HTMLSelectElement
 export type ValidateFormFields = <R extends string[]>(
   fields: HTMLFormControlsCollection,
   required: R,
-  resourceType: TResourceError,
+  resourceType: TResourceError
 ) => {
   errors: BaseError[]
   values: BaseState
@@ -36,7 +30,8 @@ export type ValidateValue = <
   val: V,
   name: N,
   type: T,
-  resource: B,
+  resource: B
+  // biome-ignore lint/suspicious/noExplicitAny: generic return type for validation errors
 ) => BaseError | Record<string, any>
 
 export const validateValue: ValidateValue = (val, name, type, resource) => {
@@ -48,7 +43,7 @@ export const validateValue: ValidateValue = (val, name, type, resource) => {
       resource,
     }
   }
-  if (type === "email" && isString(val) && !val.match(EMAIL_PATTERN)) {
+  if (type === "email" && typeof val === "string" && !val.match(EMAIL_PATTERN)) {
     return {
       field: name,
       code: "VALIDATION_ERROR",
@@ -59,14 +54,10 @@ export const validateValue: ValidateValue = (val, name, type, resource) => {
   return {}
 }
 
-const validateFormFields: ValidateFormFields = (
-  fields,
-  required,
-  resourceType,
-) => {
+const validateFormFields: ValidateFormFields = (fields, required, resourceType) => {
   const errors: BaseError[] = []
   let values = { metadata: {} }
-  map(fields, (v: FormField) => {
+  Array.from(fields).forEach((v: FormField) => {
     const isTick = "checked" in v
     const val = isTick || (v.value === "on" ? false : v.value)
     const attrName = v.getAttribute("name")
@@ -92,21 +83,17 @@ const validateFormFields: ValidateFormFields = (
 
 export function fieldsExist(
   address: AddressCreate,
-  schema: Array<AddressField | string> = addressFields,
+  schema: Array<AddressField | string> = addressFields
 ): boolean {
   if (!address.business) {
-    const required = without(schema, "line_2", "company", "state_code")
-    const validAddress = keys(address).filter((k) => required.includes(k))
+    const required = schema.filter((v) => !["line_2", "company", "state_code"].includes(v))
+    const validAddress = Object.keys(address).filter((k) => required.includes(k))
     return required.length > validAddress.length
   }
-  const required = without(
-    schema,
-    "first_name",
-    "last_name",
-    "line_2",
-    "state_code",
+  const required = schema.filter(
+    (v) => !["first_name", "last_name", "line_2", "state_code"].includes(v)
   )
-  const validAddress = keys(address).filter((k) => required.includes(k))
+  const validAddress = Object.keys(address).filter((k) => required.includes(k))
   return required.length > validAddress.length
 }
 
@@ -147,20 +134,11 @@ const customerOptionalFields: CustomerOptionalField[] = [
   "company",
 ]
 
-export function businessMandatoryField(
-  fieldName: AddressInputName,
-  isBusiness?: boolean,
-): boolean {
-  if (
-    isBusiness &&
-    businessOptionalFields.includes(fieldName as BusinessOptionalField)
-  ) {
+export function businessMandatoryField(fieldName: AddressInputName, isBusiness?: boolean): boolean {
+  if (isBusiness && businessOptionalFields.includes(fieldName as BusinessOptionalField)) {
     return false
   }
-  if (
-    !isBusiness &&
-    customerOptionalFields.includes(fieldName as CustomerOptionalField)
-  ) {
+  if (!isBusiness && customerOptionalFields.includes(fieldName as CustomerOptionalField)) {
     return false
   }
   return true

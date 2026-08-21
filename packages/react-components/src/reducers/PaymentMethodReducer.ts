@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
+import { getSdk } from "@commercelayer/core-components"
 import type {
   AdyenPayment,
   BraintreePayment,
@@ -26,7 +27,6 @@ import type { BaseError } from "#typings/errors"
 import baseReducer from "#utils/baseReducer"
 import getErrors, { setErrors } from "#utils/getErrors"
 import type { ResourceKeys } from "#utils/getPaymentAttributes"
-import getSdk from "#utils/getSdk"
 import { pick } from "#utils/pick"
 import { replace } from "#utils/replace"
 import { snakeToCamelCase } from "#utils/snakeToCamelCase"
@@ -147,13 +147,10 @@ export const paymentMethodInitialState: PaymentMethodState = {
 
 export type SetPaymentMethodErrors = <V extends BaseError[]>(
   errors: V,
-  dispatch?: Dispatch<PaymentMethodAction>,
+  dispatch?: Dispatch<PaymentMethodAction>
 ) => void
 
-export const setPaymentMethodErrors: SetPaymentMethodErrors = (
-  errors,
-  dispatch,
-) => {
+export const setPaymentMethodErrors: SetPaymentMethodErrors = (errors, dispatch) => {
   if (dispatch)
     dispatch({
       type: "setErrors",
@@ -168,10 +165,7 @@ type GetPaymentMethods = (args: {
   dispatch: Dispatch<PaymentMethodAction>
 }) => Promise<void>
 
-export const getPaymentMethods: GetPaymentMethods = async ({
-  order,
-  dispatch,
-}) => {
+export const getPaymentMethods: GetPaymentMethods = async ({ order, dispatch }) => {
   const paymentMethods = order.available_payment_methods
   const paymentMethod = order.payment_method
   const paymentSource = order.payment_source
@@ -180,8 +174,7 @@ export const getPaymentMethods: GetPaymentMethods = async ({
     payload: {
       paymentMethods,
       currentPaymentMethodId: paymentMethod?.id,
-      currentPaymentMethodType:
-        paymentMethod?.payment_source_type as PaymentResource,
+      currentPaymentMethodType: paymentMethod?.payment_source_type as PaymentResource,
       paymentSource,
     },
   })
@@ -236,7 +229,7 @@ export async function setPaymentMethod({
   try {
     if (config && order && dispatch && paymentResource) {
       localStorage.removeItem("_save_payment_source_to_customer_wallet")
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       const attributes = {
         payment_method: sdk.payment_methods.relationship(paymentMethodId),
       }
@@ -276,17 +269,14 @@ export async function setPaymentMethod({
   }
 }
 
-type PaymentSourceTypes =
-  | (StripePayment & WireTransfer)
-  | (StripePayment | WireTransfer)
+type PaymentSourceTypes = (StripePayment & WireTransfer) | (StripePayment | WireTransfer)
 
 export type SetPaymentSourceResponse = {
   order: Order
   paymentSource: PaymentSourceTypes
 } | null
 
-export interface SetPaymentSourceParams
-  extends Omit<PaymentMethodState, "config"> {
+export interface SetPaymentSourceParams extends Omit<PaymentMethodState, "config"> {
   config?: CommerceLayerConfig
   dispatch?: Dispatch<PaymentMethodAction>
   getOrder?: getOrderContext
@@ -298,7 +288,39 @@ export interface SetPaymentSourceParams
   updateOrder?: typeof updateOrder
 }
 
-export async function setPaymentSource({
+// Coalesces genuinely-concurrent duplicate calls (e.g. a re-entrant PaymentGateway
+// effect firing `create` twice before the first request settles). Keyed per order,
+// resource and operation path so different operations never merge; entries are removed
+// once settled, so a later legitimate re-create still runs.
+// See docs/adr/0001-payment-source-effect-invariants.md.
+const inFlightPaymentSourceRequests = new Map<
+  string,
+  Promise<PaymentSourceType | undefined | null>
+>()
+
+export async function setPaymentSource(
+  params: SetPaymentSourceParams
+): Promise<PaymentSourceType | undefined | null> {
+  const { order, paymentResource, customerPaymentSourceId, paymentSourceId } = params
+  // Without a stable order id there is no real request to coalesce.
+  if (order?.id == null) {
+    return runSetPaymentSource(params)
+  }
+  const key = `${order.id}:${paymentResource}:${
+    customerPaymentSourceId ?? paymentSourceId ?? "create"
+  }`
+  const existing = inFlightPaymentSourceRequests.get(key)
+  if (existing != null) {
+    return existing
+  }
+  const request = runSetPaymentSource(params).finally(() => {
+    inFlightPaymentSourceRequests.delete(key)
+  })
+  inFlightPaymentSourceRequests.set(key, request)
+  return request
+}
+
+async function runSetPaymentSource({
   config,
   dispatch,
   getOrder,
@@ -314,7 +336,7 @@ export async function setPaymentSource({
     const isAlreadyPlaced = order?.status === "placed"
     if (config && order && !isAlreadyPlaced) {
       let paymentSource: PaymentSourceType
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       if (!customerPaymentSourceId) {
         if (!paymentSourceId) {
           // biome-ignore lint/suspicious/noExplicitAny: Multiple types
@@ -370,11 +392,14 @@ export async function setPaymentSource({
       resource: "payment_methods",
       field: paymentResource,
     })
+    console.error("Set payment source:", errors)
     if (errors != null && errors?.length > 0) {
       const expiredErrors = errors.filter((v) => v?.meta?.error === "expired")
       if (expiredErrors.length > 0 && order && config) {
         console.error("Set payment source - expired:", expiredErrors)
-        destroyPaymentSource({
+        // Awaited for ordering: today this only dispatches, but the caller's result
+        // depends on the source being gone, so it should not be left in flight.
+        await destroyPaymentSource({
           paymentSourceId: order.payment_source?.id || "",
           paymentResource,
           dispatch,
@@ -383,10 +408,7 @@ export async function setPaymentSource({
       const [error] = errors
       if (error?.status === "401" && getOrder != null && order != null) {
         const currentOrder = await getOrder(order?.id)
-        if (
-          currentOrder?.status != null &&
-          !["placed", "approved"].includes(currentOrder.status)
-        ) {
+        if (currentOrder?.status != null && !["placed", "approved"].includes(currentOrder.status)) {
           console.error("Set payment source:", errors)
           setErrors({
             currentErrors,
@@ -429,7 +451,7 @@ export const updatePaymentSource: UpdatePaymentSource = async ({
 }) => {
   if (config) {
     try {
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       const paymentSource = await sdk[paymentResource].update({
         id,
         ...attributes,
@@ -481,13 +503,10 @@ export interface PaymentMethodConfig {
 
 type SetPaymentMethodConfig = (
   config: PaymentMethodConfig,
-  dispatch: Dispatch<PaymentMethodAction>,
+  dispatch: Dispatch<PaymentMethodAction>
 ) => void
 
-export const setPaymentMethodConfig: SetPaymentMethodConfig = (
-  config,
-  dispatch,
-) => {
+export const setPaymentMethodConfig: SetPaymentMethodConfig = (config, dispatch) => {
   dispatch({
     type: "setPaymentMethodConfig",
     payload: { config },
@@ -501,7 +520,7 @@ export function getPaymentConfig<
   const resourceKeys = replace(
     replace(paymentResource, "payments", "payment"),
     "transfers",
-    "transfer",
+    "transfer"
   )
   const resource = snakeToCamelCase(resourceKeys)
   return pick(config, [resource])
@@ -518,12 +537,12 @@ const type: PaymentMethodActionType[] = [
 
 const paymentMethodReducer = (
   state: PaymentMethodState,
-  reducer: PaymentMethodAction,
+  reducer: PaymentMethodAction
 ): PaymentMethodState =>
-  baseReducer<
-    PaymentMethodState,
-    PaymentMethodAction,
-    PaymentMethodActionType[]
-  >(state, reducer, type)
+  baseReducer<PaymentMethodState, PaymentMethodAction, PaymentMethodActionType[]>(
+    state,
+    reducer,
+    type
+  )
 
 export default paymentMethodReducer

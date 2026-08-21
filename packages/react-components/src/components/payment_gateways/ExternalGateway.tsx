@@ -1,3 +1,5 @@
+import type { StripeElementLocale } from "@stripe/stripe-js"
+import React, { type JSX } from "react"
 import type { GatewayBaseType } from "#components/payment_gateways/PaymentGateway"
 import ExternalPayment from "#components/payment_source/ExternalPayment"
 import CustomerContext from "#context/CustomerContext"
@@ -5,14 +7,9 @@ import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PaymentSourceContext from "#context/PaymentSourceContext"
-import {
-  getPaymentConfig,
-  type PaymentResource,
-} from "#reducers/PaymentMethodReducer"
+import { getPaymentConfig, type PaymentResource } from "#reducers/PaymentMethodReducer"
 import getCardDetails from "#utils/getCardDetails"
-import type { StripeElementLocale } from "@stripe/stripe-js"
-import isEmpty from "lodash/isEmpty"
-import React, { type JSX } from "react"
+import { isEmpty } from "#utils/isEmpty"
 import PaymentCardsTemplate from "../utils/PaymentCardsTemplate"
 
 type Props = GatewayBaseType
@@ -33,17 +30,14 @@ export function ExternalGateway(props: Props): JSX.Element | null {
   const { order } = React.useContext(OrderContext)
   const { payment } = React.useContext(PaymentMethodChildrenContext)
   const { payments, isGuest } = React.useContext(CustomerContext)
-  const { currentPaymentMethodId, config, paymentSource } =
-    React.useContext(PaymentMethodContext)
+  const { currentPaymentMethodId, config, paymentSource } = React.useContext(PaymentMethodContext)
   const paymentResource: PaymentResource = "external_payments"
   const locale = order?.language_code as StripeElementLocale
 
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
   // @ts-expect-error no type
   const paymentSourceToken = paymentSource?.payment_source_token
-  const getConfig = config
-    ? getPaymentConfig<"external_payments">(paymentResource, config)
-    : {}
+  const getConfig = config ? getPaymentConfig<"external_payments">(paymentResource, config) : {}
   const paymentConfig = getConfig?.externalPayment
   const customerPayments =
     !isEmpty(payments) && payments
@@ -61,9 +55,7 @@ export function ExternalGateway(props: Props): JSX.Element | null {
     })
     const value = { ...card, showCard, handleEditClick, readonly }
     return isEmpty(card) ? null : (
-      <PaymentSourceContext.Provider value={value}>
-        {children}
-      </PaymentSourceContext.Provider>
+      <PaymentSourceContext.Provider value={value}>{children}</PaymentSourceContext.Provider>
     )
   }
   if (!isGuest && templateCustomerCards) {

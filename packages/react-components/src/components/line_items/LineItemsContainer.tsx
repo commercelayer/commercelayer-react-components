@@ -1,63 +1,59 @@
-import { useEffect, useReducer, useContext, type JSX } from 'react';
+import { type JSX, useContext, useEffect, useReducer } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import LineItemContext, { type LineItemContextValue } from "#context/LineItemContext"
+import OrderContext from "#context/OrderContext"
 import lineItemReducer, {
+  deleteLineItem,
   lineItemInitialState,
   updateLineItem,
-  deleteLineItem
-} from '#reducers/LineItemReducer'
-import OrderContext from '#context/OrderContext'
-import LineItemContext, {
-  type LineItemContextValue
-} from '#context/LineItemContext'
-import CommerceLayerContext from '#context/CommerceLayerContext'
-import type { DefaultChildrenType } from '#typings/globals'
+} from "#reducers/LineItemReducer"
+import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
   children: DefaultChildrenType
-  filters?: Record<string, any>
+  filters?: Record<string, unknown>
   loader?: JSX.Element
 }
 
+/**
+ * @deprecated Use `<LineItems>` instead.
+ * `LineItemsContainer` requires an `OrderContext` parent and will be removed in a future major version.
+ */
 export function LineItemsContainer(props: Props): JSX.Element {
-  const { children, loader = 'Loading...' } = props
-  const {
-    order,
-    addResourceToInclude,
-    include,
-    orderId,
-    getOrder,
-    includeLoaded
-  } = useContext(OrderContext)
+  const { children, loader = "Loading..." } = props
+  const { order, addResourceToInclude, include, orderId, getOrder, includeLoaded } =
+    useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   const [state, dispatch] = useReducer(lineItemReducer, lineItemInitialState)
   useEffect(() => {
-    if (!include?.includes('line_items.line_item_options.sku_option')) {
+    if (!include?.includes("line_items.line_item_options.sku_option")) {
       addResourceToInclude({
-        newResource: ['line_items.line_item_options.sku_option']
+        newResource: ["line_items.line_item_options.sku_option"],
       })
-    } else if (!includeLoaded?.['line_items.line_item_options.sku_option']) {
-      addResourceToInclude({
-        newResourceLoaded: {
-          'line_items.line_item_options.sku_option': true
-        }
-      })
-    }
-    if (!include?.includes('line_items.item')) {
-      addResourceToInclude({
-        newResource: ['line_items.item']
-      })
-    } else if (!includeLoaded?.['line_items.item']) {
+    } else if (!includeLoaded?.["line_items.line_item_options.sku_option"]) {
       addResourceToInclude({
         newResourceLoaded: {
-          'line_items.item': true
-        }
+          "line_items.line_item_options.sku_option": true,
+        },
       })
     }
-  }, [include, includeLoaded])
+    if (!include?.includes("line_items.item")) {
+      addResourceToInclude({
+        newResource: ["line_items.item"],
+      })
+    } else if (!includeLoaded?.["line_items.item"]) {
+      addResourceToInclude({
+        newResourceLoaded: {
+          "line_items.item": true,
+        },
+      })
+    }
+  }, [include, includeLoaded, addResourceToInclude])
   useEffect(() => {
     if (order?.line_items) {
       dispatch({
-        type: 'setLineItems',
-        payload: { lineItems: order.line_items }
+        type: "setLineItems",
+        payload: { lineItems: order.line_items },
       })
     }
   }, [order?.line_items])
@@ -73,8 +69,8 @@ export function LineItemsContainer(props: Props): JSX.Element {
         dispatch,
         config,
         getOrder,
-        orderId: orderId ?? '',
-        errors: state.errors
+        orderId: orderId ?? "",
+        errors: state.errors,
       })
     },
     deleteLineItem: async (lineItemId) => {
@@ -83,10 +79,10 @@ export function LineItemsContainer(props: Props): JSX.Element {
         dispatch,
         config,
         getOrder,
-        orderId: orderId ?? '',
-        errors: state.errors
+        orderId: orderId ?? "",
+        errors: state.errors,
       })
-    }
+    },
   }
   return (
     <LineItemContext.Provider value={lineItemValue}>

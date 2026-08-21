@@ -1,52 +1,41 @@
+import { type JSX, type ReactNode, type RefObject, useContext, useEffect, useReducer } from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
-import {
-  type ReactNode,
-  type RefObject,
-  useContext,
-  useEffect,
-  useReducer,
-  type JSX,
-} from "react"
 import placeOrderReducer, {
-  placeOrderInitialState,
   type PlaceOrderOptions,
+  placeOrderInitialState,
   placeOrderPermitted,
   setButtonRef,
   setPlaceOrderStatus,
 } from "#reducers/PlaceOrderReducer"
-import OrderContext from "#context/OrderContext"
-import CommerceLayerContext from "#context/CommerceLayerContext"
-import { setPlaceOrder } from "../../reducers/PlaceOrderReducer"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import { useOrganizationConfig } from "#utils/organization"
+import { setPlaceOrder } from "../../reducers/PlaceOrderReducer"
 
 interface Props {
   children: ReactNode
   options?: PlaceOrderOptions
 }
+
+/**
+ * @deprecated Use `<PlaceOrderButton>` and `<PrivacyAndTermsCheckbox>` directly —
+ * they are now standalone and no longer require a container wrapper.
+ * `PlaceOrderContainer` will be removed in the next major version.
+ */
 export function PlaceOrderContainer(props: Props): JSX.Element {
   const { children, options } = props
-  const [state, dispatch] = useReducer(
-    placeOrderReducer,
-    placeOrderInitialState,
-  )
-  const {
-    order,
-    setOrder,
-    setOrderErrors,
-    include,
-    addResourceToInclude,
-    includeLoaded,
-  } = useCustomContext({
-    context: OrderContext,
-    contextComponentName: "OrderContainer",
-    currentComponentName: "PlaceOrderContainer",
-    key: "order",
-  })
+  const [state, dispatch] = useReducer(placeOrderReducer, placeOrderInitialState)
+  const { order, setOrder, setOrderErrors, include, addResourceToInclude, includeLoaded } =
+    useCustomContext({
+      context: OrderContext,
+      contextComponentName: "Order",
+      currentComponentName: "PlaceOrderContainer",
+      key: "order",
+    })
   const config = useContext(CommerceLayerContext)
   const organizationConfig = useOrganizationConfig({
     accessToken: config.accessToken,
-    endpoint: config.endpoint,
   })
   // biome-ignore lint/correctness/useExhaustiveDependencies: Infinite loop
   useEffect(() => {
@@ -105,6 +94,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
   }, [order, include, includeLoaded, organizationConfig])
   const contextValue = {
     ...state,
+    _isProvided: true as const,
     setPlaceOrder: async ({
       paymentSource,
       currentCustomerPaymentSourceId,
@@ -124,9 +114,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
         setOrder,
         currentCustomerPaymentSourceId,
       }),
-    setPlaceOrderStatus: ({
-      status,
-    }: Parameters<typeof setPlaceOrderStatus>[0]) => {
+    setPlaceOrderStatus: ({ status }: Parameters<typeof setPlaceOrderStatus>[0]) => {
       setPlaceOrderStatus({ status, dispatch })
     },
     placeOrderPermitted: () => {
@@ -145,11 +133,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
       setButtonRef(ref, dispatch)
     },
   }
-  return (
-    <PlaceOrderContext.Provider value={contextValue}>
-      {children}
-    </PlaceOrderContext.Provider>
-  )
+  return <PlaceOrderContext.Provider value={contextValue}>{children}</PlaceOrderContext.Provider>
 }
 
 export default PlaceOrderContainer

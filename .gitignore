@@ -137,3 +137,6 @@ dist
 
 # Storybook
 storybook-static
+
+# Blog articles
+episode-*

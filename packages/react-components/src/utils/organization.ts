@@ -1,32 +1,10 @@
-import {
-  type DefaultMfeConfig,
-  getMfeConfig,
-} from "@commercelayer/organization-config"
+import { getSdk } from "@commercelayer/core-components"
+import { type DefaultMfeConfig, getMfeConfig } from "@commercelayer/organization-config"
 import { useEffect, useState } from "react"
-import { getDomain } from "./getDomain"
-import getSdk from "./getSdk"
 import { jwt } from "./jwt"
-
-interface ReturnObj {
-  organization: string
-  domain: string
-}
-
-export function getOrganizationSlug<E extends string>(endpoint: E): ReturnObj {
-  const org = {
-    organization: "",
-    domain: "commercelayer.io",
-  }
-  const { domain, slug } = getDomain(endpoint)
-  return {
-    organization: slug,
-    domain: domain || org.domain,
-  }
-}
 
 export interface OrganizationConfig {
   accessToken: string
-  endpoint: string
   params: Parameters<typeof getMfeConfig>[0]["params"]
 }
 
@@ -35,10 +13,10 @@ export interface OrganizationConfig {
  *
  */
 export async function getOrganizationConfig(
-  config: OrganizationConfig,
+  config: OrganizationConfig
 ): Promise<DefaultMfeConfig | null> {
   const { market } = jwt(config.accessToken)
-  const sdk = getSdk(config)
+  const sdk = getSdk({ accessToken: config.accessToken })
   const organization = await sdk.organization.retrieve({
     fields: {
       organizations: ["id", "config"],
@@ -53,20 +31,17 @@ export async function getOrganizationConfig(
 
 export function useOrganizationConfig({
   accessToken,
-  endpoint,
   params,
 }: Partial<OrganizationConfig>): DefaultMfeConfig | null {
-  const [organizationConfig, setOrganizationConfig] =
-    useState<DefaultMfeConfig | null>(null)
+  const [organizationConfig, setOrganizationConfig] = useState<DefaultMfeConfig | null>(null)
   useEffect(() => {
-    if (accessToken == null || endpoint == null) return
+    if (accessToken == null) return
     getOrganizationConfig({
       accessToken,
-      endpoint,
       params,
     }).then((config) => {
       setOrganizationConfig(config)
     })
-  }, [accessToken, endpoint])
+  }, [accessToken, params])
   return organizationConfig
 }

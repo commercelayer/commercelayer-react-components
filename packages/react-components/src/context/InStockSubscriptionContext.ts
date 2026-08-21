@@ -1,17 +1,15 @@
+import { createContext } from "react"
 import type {
+  InStockSubscriptionState,
   setInStockSubscription,
-  InStockSubscriptionState
-} from '#reducers/InStockSubscriptionReducer'
-import { createContext } from 'react'
+} from "#reducers/InStockSubscriptionReducer"
 
-export interface InitialInStockSubscriptionContext
-  extends InStockSubscriptionState {
+export interface InitialInStockSubscriptionContext extends InStockSubscriptionState {
   setInStockSubscription?: typeof setInStockSubscription
 }
 
 const initial: InitialInStockSubscriptionContext = {}
 
-const InStockSubscriptionContext =
-  createContext<InitialInStockSubscriptionContext>(initial)
+const InStockSubscriptionContext = createContext<InitialInStockSubscriptionContext>(initial)
 
 export default InStockSubscriptionContext

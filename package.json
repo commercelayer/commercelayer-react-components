@@ -1,16 +1,17 @@
 {
   "name": "root",
   "private": true,
-  "packageManager": "pnpm@10.34.5",
+  "packageManager": "pnpm@11.22.0",
   "author": {
     "name": "Alessandro Casazza",
     "email": "alessandro@commercelayer.io"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "pnpm -r build",
+    "build": "pnpm --filter @commercelayer/core-components --filter @commercelayer/react-hooks-components --filter @commercelayer/react-components build",
+    "build:watch": "pnpm --filter @commercelayer/core-components --filter @commercelayer/react-hooks-components --filter @commercelayer/react-components --parallel build:watch",
     "prepare": "husky",
-    "test": "pnpm -r test",
+    "test": "pnpm -r --workspace-concurrency=1 --no-bail test",
     "docs:dev": "pnpm --filter docs storybook",
     "docs:build": "pnpm --filter docs build-storybook",
     "components:build:dev": "pnpm --filter react-components build:dev",
@@ -22,9 +23,10 @@
     "clean": "pnpm dlx rimraf --glob **/node_modules **/pnpm-lock.yaml"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.6",
+    "@biomejs/biome": "^2.5.8",
     "husky": "^9.1.7",
-    "lerna": "^9.0.7",
-    "typescript": "^5.9.3"
-  }
+    "lerna": "^10.0.0",
+    "typescript": "^6.0.3"
+  },
+  "pnpm": {}
 }

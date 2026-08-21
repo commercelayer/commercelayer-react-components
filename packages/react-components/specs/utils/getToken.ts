@@ -1,50 +1,51 @@
-import { authenticate } from '@commercelayer/js-auth'
+import { authenticate } from "@commercelayer/js-auth"
 
-export type TokenType =
-  | 'sales_channel'
-  | 'customer'
-  | 'customer_empty'
-  | 'customer_with_low_data'
+export type TokenType = "sales_channel" | "customer" | "customer_empty" | "customer_with_low_data"
 
 export default async function getToken(
-  type: TokenType = 'sales_channel'
-): Promise<{ accessToken: string | undefined; endpoint: string }> {
-  const clientId = process.env['VITE_TEST_CLIENT_ID'] ?? ''
-  const slug = process.env['VITE_TEST_SLUG'] ?? ''
-  const scope = process.env['VITE_TEST_MARKET_ID'] ?? ''
-  const domain = process.env['VITE_TEST_DOMAIN'] ?? ''
+  type: TokenType = "sales_channel"
+): Promise<{ accessToken: string | undefined; endpoint: string | undefined }> {
+  const clientId = process.env["VITE_TEST_CLIENT_ID"]
+  const slug = process.env["VITE_TEST_SLUG"]
+  const scope = process.env["VITE_TEST_MARKET_ID"]
+  const domain = process.env["VITE_TEST_DOMAIN"]
+
+  if (!clientId || !slug || !domain) {
+    return { accessToken: undefined, endpoint: undefined }
+  }
+
   const user =
-    type === 'customer'
+    type === "customer"
       ? {
-          username: process.env['VITE_TEST_USERNAME'] ?? '',
-          password: process.env['VITE_TEST_PASSWORD'] ?? ''
+          username: process.env["VITE_TEST_USERNAME"] ?? "",
+          password: process.env["VITE_TEST_PASSWORD"] ?? "",
         }
-      : type === 'customer_empty'
+      : type === "customer_empty"
         ? {
-            username: process.env['VITE_TEST_USERNAME_EMPTY'] ?? '',
-            password: process.env['VITE_TEST_PASSWORD_EMPTY'] ?? ''
+            username: process.env["VITE_TEST_USERNAME_EMPTY"] ?? "",
+            password: process.env["VITE_TEST_PASSWORD_EMPTY"] ?? "",
           }
-        : type === 'customer_with_low_data'
+        : type === "customer_with_low_data"
           ? {
-              username: process.env['VITE_TEST_USERNAME_WITH_LOW_DATA'] ?? '',
-              password: process.env['VITE_TEST_PASSWORD_WITH_LOW_DATA'] ?? ''
+              username: process.env["VITE_TEST_USERNAME_WITH_LOW_DATA"] ?? "",
+              password: process.env["VITE_TEST_PASSWORD_WITH_LOW_DATA"] ?? "",
             }
           : undefined
   const { accessToken } =
     user == null
-      ? await authenticate('client_credentials', {
+      ? await authenticate("client_credentials", {
           clientId,
           domain,
-          scope
+          scope: scope ?? "",
         })
-      : await authenticate('password', {
+      : await authenticate("password", {
           clientId,
           domain,
-          scope,
-          ...user
+          scope: scope ?? "",
+          ...user,
         })
   return {
     accessToken,
-    endpoint: `https://${slug}.${domain}`
+    endpoint: `https://${slug}.${domain}`,
   }
 }

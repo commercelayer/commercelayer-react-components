@@ -1,4 +1,4 @@
-import isEmpty from "lodash/isEmpty"
+import { isEmpty } from "#utils/isEmpty"
 
 /**
  * Validate the list of countries the user can optionally pass or returns our default list
@@ -6,10 +6,7 @@ import isEmpty from "lodash/isEmpty"
  * @returns List of countries
  */
 export function getCountries(countries?: Country[]): Country[] {
-  if (
-    !isEmpty(countries) &&
-    countries?.every((c) => "value" in c && "label" in c)
-  ) {
+  if (!isEmpty(countries) && countries?.every((c) => "value" in c && "label" in c)) {
     return countries
   }
   return [...defaultCountries]
@@ -59,9 +56,7 @@ export function isValidState({
     ...states,
   }
   return Boolean(
-    statesToUse[countryCode as CountryCode]?.find(
-      (state) => state.value === stateCode,
-    ),
+    statesToUse[countryCode as CountryCode]?.find((state) => state.value === stateCode)
   )
 }
 
@@ -77,8 +72,7 @@ export function isEmptyStates({
   countriesWithPredefinedStateOptions?: string[]
 }): boolean {
   const countryLock =
-    countriesWithPredefinedStateOptions == null ||
-    isEmpty(countriesWithPredefinedStateOptions)
+    countriesWithPredefinedStateOptions == null || isEmpty(countriesWithPredefinedStateOptions)
       ? Object.keys(defaultStates)
       : countriesWithPredefinedStateOptions
   return !countryLock.includes(countryCode)

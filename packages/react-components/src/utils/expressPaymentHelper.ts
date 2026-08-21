@@ -1,23 +1,21 @@
-import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
+import { getSdk } from "@commercelayer/core-components"
 import type {
-  OrderUpdate,
+  AddressCreate,
   Order,
+  OrderUpdate,
   PaymentMethod,
   QueryParamsRetrieve,
-  AddressCreate,
 } from "@commercelayer/sdk"
-import getSdk from "./getSdk"
 import type { PaymentRequestShippingOption } from "@stripe/stripe-js"
+import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
-import { getDomain } from "./getDomain"
-import { getOrganizationConfig } from "./organization"
 import { getApplicationLink } from "./getApplicationLink"
+import { jwt } from "./jwt"
+import { getOrganizationConfig } from "./organization"
 
 const availablePaymentMethods = ["stripe_payments"]
 
-export function getAvailableExpressPayments(
-  paymentMethods: PaymentMethod[],
-): PaymentMethod[] {
+export function getAvailableExpressPayments(paymentMethods: PaymentMethod[]): PaymentMethod[] {
   return paymentMethods.filter((payment) => {
     if (!payment.payment_source_type) return false
     return availablePaymentMethods.includes(payment.payment_source_type)
@@ -32,7 +30,7 @@ interface TFakeAddressParams {
   /**
    * The Commerce Layer config
    */
-  config: Required<CommerceLayerConfig>
+  config: Required<Pick<CommerceLayerConfig, "accessToken">>
   /**
    * The address resource
    */
@@ -52,7 +50,7 @@ export async function setExpressFakeAddress({
   const params: QueryParamsRetrieve = {
     include: ["shipments.available_shipping_methods"],
   }
-  const sdk = getSdk(config)
+  const sdk = getSdk({ accessToken: config.accessToken! })
   const fakeAddress = await sdk.addresses.create(address)
   const resource: OrderUpdate = {
     id: orderId,
@@ -64,13 +62,9 @@ export async function setExpressFakeAddress({
   return await sdk.orders.retrieve(orderId, params)
 }
 
-export function getExpressShippingMethods(
-  order: Order,
-): PaymentRequestShippingOption[] | null {
+export function getExpressShippingMethods(order: Order): PaymentRequestShippingOption[] | null {
   const isSingleShipment = order?.shipments?.length === 1
-  const shippingMethods = order?.shipments?.map(
-    (shipment) => shipment.available_shipping_methods,
-  )
+  const shippingMethods = order?.shipments?.map((shipment) => shipment.available_shipping_methods)
   if (isSingleShipment) {
     if (shippingMethods == null) return null
     return shippingMethods.flat().map((method) => {
@@ -85,14 +79,11 @@ export function getExpressShippingMethods(
   }
   if (shippingMethods == null) return null
   const shippingOptionsAmount: number[] = []
-  // biome-ignore lint/complexity/noForEach: Need to refactor
   shippingMethods.forEach((methods) => {
     if (methods != null) {
       const [firstMethod] = methods
       if (firstMethod != null) {
-        shippingOptionsAmount.push(
-          firstMethod.price_amount_for_shipment_cents ?? 0,
-        )
+        shippingOptionsAmount.push(firstMethod.price_amount_for_shipment_cents ?? 0)
       }
     }
   })
@@ -144,7 +135,7 @@ export async function setExpressShippingMethod({
   selectedShippingMethodId,
   params,
 }: TSetExpressShippingMethodParams): Promise<Order> {
-  const sdk = getSdk(config)
+  const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   const order = await sdk.orders.retrieve(orderId, params)
   const shippingMethods = getExpressShippingMethods(order)
   if (order?.shipments == null) throw new Error("No shipments found")
@@ -159,18 +150,14 @@ export async function setExpressShippingMethod({
       if (firstShippingMethodId != null) {
         await sdk.shipments.update({
           id: shipmentId,
-          shipping_method: sdk.shipping_methods.relationship(
-            firstShippingMethodId,
-          ),
+          shipping_method: sdk.shipping_methods.relationship(firstShippingMethodId),
         })
       }
     } else {
       if (selectedShippingMethodId != null) {
         await sdk.shipments.update({
           id: shipmentId,
-          shipping_method: sdk.shipping_methods.relationship(
-            selectedShippingMethodId,
-          ),
+          shipping_method: sdk.shipping_methods.relationship(selectedShippingMethodId),
         })
       }
     }
@@ -181,9 +168,7 @@ export async function setExpressShippingMethod({
       if (firstShippingMethodId != null) {
         await sdk.shipments.update({
           id: shipment.id,
-          shipping_method: sdk.shipping_methods.relationship(
-            firstShippingMethodId,
-          ),
+          shipping_method: sdk.shipping_methods.relationship(firstShippingMethodId),
         })
       }
     }
@@ -229,13 +214,9 @@ export async function setExpressPlaceOrder({
   paymentSourceId,
   placeTheOrder = false,
 }: TSetExpressPlaceOrderParams): Promise<Order> {
-  const sdk = getSdk(config)
+  const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
   if (!placeTheOrder && paymentResource != null && paymentSourceId != null) {
-    const include = [
-      "shipments.shipping_method",
-      "payment_source",
-      "payment_method",
-    ]
+    const include = ["shipments.shipping_method", "payment_source", "payment_method"]
     await sdk.orders.retrieve(orderId, {
       include,
     })
@@ -274,15 +255,15 @@ interface TExpressRedirectUrlParams {
 
 export async function expressRedirectUrl({
   order,
-  config: { accessToken, endpoint },
+  config: { accessToken },
 }: TExpressRedirectUrlParams): Promise<void> {
   if (accessToken == null) throw new Error("No access token found")
-  if (endpoint == null) throw new Error("No endpoint found")
-  const { slug, domain } = getDomain(endpoint)
+  const { organization } = jwt(accessToken)
+  const slug = organization.slug
+  const domain = "commercelayer.io"
   if (slug == null) throw new Error("No slug found")
   const config = await getOrganizationConfig({
     accessToken,
-    endpoint,
     params: {
       accessToken,
       slug,

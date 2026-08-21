@@ -1,0 +1,22 @@
+# Netlify reads this file before anything configured in the dashboard, so the
+# whole build lives here on purpose: the dashboard settings are invisible to
+# code review and silently rotted once the package they pointed at was renamed.
+#
+# `base` is pinned explicitly to neutralise any base directory left over in the
+# dashboard — a stale one would abort the build before this file is even read.
+# The pnpm version comes from the root `packageManager` field via Corepack;
+# Netlify has no PNPM_VERSION variable.
+
+[build]
+  base = "/"
+  # The libraries must be built before the storybook. Its Vite config aliases
+  # @commercelayer/react-components straight to source, but that source imports
+  # @commercelayer/core-components, which is a workspace package resolving to
+  # ./dist/index.js — absent on a clean checkout, so rolldown fails to resolve
+  # it. Locally the storybook builds without this only because dist/ is already
+  # lying around from a previous build.
+  command = "pnpm build && pnpm docs:build"
+  publish = "packages/docs/storybook-static"
+
+[build.environment]
+  NODE_VERSION = "24"

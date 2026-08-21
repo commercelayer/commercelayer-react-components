@@ -1,10 +1,11 @@
-import { useContext, useEffect, useRef, useState, type JSX } from "react"
+import type { LineItem } from "@commercelayer/sdk"
+import { type JSX, useContext, useEffect, useRef, useState } from "react"
+import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
-import type { PaymentSourceProps } from "./PaymentSource"
-import OrderContext from "#context/OrderContext"
 import useExternalScript from "#utils/hooks/useExternalScript"
-import type { LineItem } from "@commercelayer/sdk"
+import type { PaymentSourceProps } from "./PaymentSource"
+
 // import PlaceOrderContext from '#context/PlaceOrderContext'
 // import { tr } from '@faker-js/faker'
 
@@ -23,9 +24,7 @@ type KlarnaPaymentProps = PaymentMethodConfig["klarnaPayment"] &
     locale?: string | null
   }
 
-function typeOfLine(
-  lineItemType: string | null | undefined,
-): OrderLine["type"] {
+function typeOfLine(lineItemType: string | null | undefined): OrderLine["type"] {
   switch (lineItemType) {
     case "percentage_discount_promotions":
       return "discount"
@@ -33,7 +32,6 @@ function typeOfLine(
       return "shipping_fee"
     case "skus":
       return "physical"
-    case "payment_methods":
     default:
       return null
   }
@@ -70,12 +68,8 @@ export default function KlarnaPayment({
   ...p
 }: KlarnaPaymentProps): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
-  const {
-    paymentSource,
-    currentPaymentMethodType,
-    setPaymentRef,
-    setPaymentSource,
-  } = useContext(PaymentMethodContext)
+  const { paymentSource, currentPaymentMethodType, setPaymentRef, setPaymentSource } =
+    useContext(PaymentMethodContext)
   const { order } = useContext(OrderContext)
   const loaded = useExternalScript("https://x.klarnacdn.net/kp/lib/v1/api.js")
   const [klarna, setKlarna] = useState<any>()
@@ -84,24 +78,7 @@ export default function KlarnaPayment({
     if (loaded && window?.Klarna !== undefined) {
       setKlarna(window.Klarna)
     }
-  }, [loaded, window.Klarna])
-  useEffect(() => {
-    if (
-      ref.current &&
-      paymentSource &&
-      currentPaymentMethodType &&
-      loaded &&
-      klarna
-    ) {
-      ref.current.onsubmit = async (props: any) => {
-        handleClick(klarna, props)
-      }
-      setPaymentRef({ ref })
-    }
-    return () => {
-      setPaymentRef({ ref: { current: null } })
-    }
-  }, [ref, paymentSource, currentPaymentMethodType, loaded, klarna])
+  }, [loaded])
   const handleClick = (kl: any, props: any): void => {
     // @ts-expect-error no type
     const [first] = paymentSource?.payment_methods || undefined
@@ -164,9 +141,21 @@ export default function KlarnaPayment({
             }
           }
         }
-      },
+      }
     )
   }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is recreated each render; its deps are already tracked
+  useEffect(() => {
+    if (ref.current && paymentSource && currentPaymentMethodType && loaded && klarna) {
+      ref.current.onsubmit = async (props: any) => {
+        handleClick(klarna, props)
+      }
+      setPaymentRef({ ref })
+    }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
+  }, [paymentSource, currentPaymentMethodType, loaded, klarna, setPaymentRef])
   if (klarna && clientToken) {
     // @ts-expect-error no type
     const [first] = paymentSource?.payment_methods || undefined

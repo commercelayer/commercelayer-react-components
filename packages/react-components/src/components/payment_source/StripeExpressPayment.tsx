@@ -1,33 +1,29 @@
+import { PaymentRequestButtonElement, useStripe } from "@stripe/react-stripe-js"
+import type { PaymentRequest } from "@stripe/stripe-js"
+import { type JSX, useContext, useEffect, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import {
-  type TSetExpressPlaceOrderParams,
+  expressRedirectUrl,
   getAvailableExpressPayments,
   getExpressShippingMethods,
   setExpressFakeAddress,
   setExpressPlaceOrder,
   setExpressShippingMethod,
-  expressRedirectUrl,
+  type TSetExpressPlaceOrderParams,
 } from "#utils/expressPaymentHelper"
 import { isEmpty } from "#utils/isEmpty"
-import { PaymentRequestButtonElement, useStripe } from "@stripe/react-stripe-js"
-import type { PaymentRequest } from "@stripe/stripe-js"
-import { useContext, useEffect, useState, type JSX } from "react"
 
 interface Props {
   clientSecret: string
 }
 
-export function StripeExpressPayment({
-  clientSecret,
-}: Props): JSX.Element | null {
+export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | null {
   const stripe = useStripe()
-  const [paymentRequest, setPaymentRequest] = useState<null | PaymentRequest>(
-    null,
-  )
-  const { accessToken, endpoint } = useContext(CommerceLayerContext)
+  const [paymentRequest, setPaymentRequest] = useState<null | PaymentRequest>(null)
+  const { accessToken } = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
   const { paymentMethods, paymentSource } = useContext(PaymentMethodContext)
 
@@ -56,17 +52,16 @@ export function StripeExpressPayment({
       .catch((err) => {
         console.error("Can make payment:", err)
       })
-  }, [isEmpty(stripe), isEmpty(order)])
+  }, [stripe, order?.total_amount_with_taxes_cents, order])
 
   if (paymentRequest != null && stripe != null) {
     paymentRequest.on("shippingaddresschange", async (ev) => {
-      if (order != null && accessToken != null && endpoint != null) {
+      if (order != null && accessToken != null) {
         const requiresBillingInfo = order?.requires_billing_info ?? false
         const orderWithShipments = await setExpressFakeAddress({
           orderId: order.id,
           config: {
             accessToken,
-            endpoint,
           },
           address: {
             first_name: "Fake name",
@@ -102,12 +97,11 @@ export function StripeExpressPayment({
       }
     })
     paymentRequest.on("shippingoptionchange", async (ev) => {
-      if (order != null && accessToken != null && endpoint != null) {
+      if (order != null && accessToken != null) {
         const updatedOrder = await setExpressShippingMethod({
           orderId: order.id,
           config: {
             accessToken,
-            endpoint,
           },
           selectFirst: false,
           selectedShippingMethodId: ev.shippingOption.id,
@@ -135,9 +129,8 @@ export function StripeExpressPayment({
       if (paymentMethod == null) throw new Error("Payment method is null")
       if (paymentSource == null) throw new Error("Payment source is null")
       const requiresBillingInfo = order?.requires_billing_info ?? false
-      const paymentResource =
-        paymentMethod?.payment_source_type as PaymentResource
-      if (accessToken != null && endpoint != null) {
+      const paymentResource = paymentMethod?.payment_source_type as PaymentResource
+      if (accessToken != null) {
         const [firstName, lastName] = ev.payerName?.split(" ") ?? []
         const [line] = ev.shippingAddress?.addressLine ?? ""
         const email = ev.payerEmail ?? ""
@@ -145,7 +138,6 @@ export function StripeExpressPayment({
           orderId: order.id,
           config: {
             accessToken,
-            endpoint,
           },
           address: {
             first_name: firstName ?? "Fake name",
@@ -164,7 +156,6 @@ export function StripeExpressPayment({
           orderId: order.id,
           config: {
             accessToken,
-            endpoint,
           },
           selectFirst: false,
           selectedShippingMethodId: ev?.shippingOption?.id,
@@ -175,7 +166,6 @@ export function StripeExpressPayment({
         const placeOrderParams: TSetExpressPlaceOrderParams = {
           config: {
             accessToken,
-            endpoint,
           },
           orderId: order?.id,
           paymentResource,
@@ -183,12 +173,11 @@ export function StripeExpressPayment({
         }
         await setExpressPlaceOrder(placeOrderParams)
         // Confirm the PaymentIntent without handling potential next actions (yet).
-        const { paymentIntent, error: confirmError } =
-          await stripe.confirmCardPayment(
-            clientSecret,
-            { payment_method: ev.paymentMethod.id },
-            { handleActions: false },
-          )
+        const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
+          clientSecret,
+          { payment_method: ev.paymentMethod.id },
+          { handleActions: false }
+        )
         if (confirmError) {
           // Report to the browser that the payment failed, prompting it to
           // re-show the payment interface, or show an error message and close
@@ -213,7 +202,6 @@ export function StripeExpressPayment({
               const placeOrderParams: TSetExpressPlaceOrderParams = {
                 config: {
                   accessToken,
-                  endpoint,
                 },
                 orderId: order?.id,
                 placeTheOrder: true,
@@ -225,7 +213,6 @@ export function StripeExpressPayment({
                   order,
                   config: {
                     accessToken,
-                    endpoint,
                   },
                 })
               } catch (err) {
@@ -238,7 +225,6 @@ export function StripeExpressPayment({
             const placeOrderParams: TSetExpressPlaceOrderParams = {
               config: {
                 accessToken,
-                endpoint,
               },
               orderId: order?.id,
               placeTheOrder: true,
@@ -250,7 +236,6 @@ export function StripeExpressPayment({
                 order,
                 config: {
                   accessToken,
-                  endpoint,
                 },
               })
             } catch (err) {
@@ -261,14 +246,7 @@ export function StripeExpressPayment({
         }
       }
     })
-    return (
-      <>
-        <PaymentRequestButtonElement
-          className=""
-          options={{ paymentRequest }}
-        />
-      </>
-    )
+    return <PaymentRequestButtonElement className="" options={{ paymentRequest }} />
   }
 
   return null

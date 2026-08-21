@@ -1,5 +1,5 @@
-import PaymentMethodContext from '#context/PaymentMethodContext'
-import { useContext, useEffect, useRef, type JSX } from 'react';
+import { type JSX, useContext, useEffect, useRef } from "react"
+import PaymentMethodContext from "#context/PaymentMethodContext"
 
 export interface WireTransferConfig {
   infoMessage?: {
@@ -9,31 +9,15 @@ export interface WireTransferConfig {
 }
 
 const defaultMessage =
-  'after placing the order, you will need to manually complete the payment with your bank'
+  "after placing the order, you will need to manually complete the payment with your bank"
 
-type Props = WireTransferConfig &
-  JSX.IntrinsicElements['div'] & { 'data-testid'?: string }
+type Props = WireTransferConfig & JSX.IntrinsicElements["div"] & { "data-testid"?: string }
 
 export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
-  const { className, 'data-testid': dataTestId } = p
+  const { className, "data-testid": dataTestId } = p
   const ref = useRef<null | HTMLFormElement>(null)
-  const {
-    setPaymentSource,
-    paymentSource,
-    currentPaymentMethodType,
-    setPaymentRef
-  } = useContext(PaymentMethodContext)
-  useEffect(() => {
-    if (ref.current && paymentSource && currentPaymentMethodType) {
-      ref.current.onsubmit = async () => {
-        return await handleClick()
-      }
-      setPaymentRef({ ref })
-    }
-    return () => {
-      setPaymentRef({ ref: { current: null } })
-    }
-  }, [ref, paymentSource, currentPaymentMethodType])
+  const { setPaymentSource, paymentSource, currentPaymentMethodType, setPaymentRef } =
+    useContext(PaymentMethodContext)
   const handleClick = async (): Promise<boolean> => {
     if (paymentSource && currentPaymentMethodType) {
       try {
@@ -44,25 +28,35 @@ export function WireTransferPayment({ infoMessage, ...p }: Props): JSX.Element {
             metadata: {
               card: {
                 id: paymentSource.id,
-                brand: 'wire-transfer',
-                last4: ''
-              }
-            }
-          }
+                brand: "wire-transfer",
+                last4: "",
+              },
+            },
+          },
         })
         return true
-      } catch (error) {
+      } catch {
         return false
       }
     }
     return false
   }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleClick is recreated each render; its deps are already tracked
+  useEffect(() => {
+    if (ref.current && paymentSource && currentPaymentMethodType) {
+      ref.current.onsubmit = async () => {
+        return await handleClick()
+      }
+      setPaymentRef({ ref })
+    }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
+  }, [paymentSource, currentPaymentMethodType, setPaymentRef])
   return (
     <form ref={ref}>
       <div className={className} data-testid={dataTestId}>
-        <span className={infoMessage?.className}>
-          {infoMessage?.text ?? defaultMessage}
-        </span>
+        <span className={infoMessage?.className}>{infoMessage?.text ?? defaultMessage}</span>
       </div>
     </form>
   )

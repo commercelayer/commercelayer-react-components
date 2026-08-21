@@ -2903,7 +2903,7 @@ export const currencies = {
  *  Returns a currency object for a given currency code
  */
 export function getCurrency(
-  currencyCode: CurrencyCode | Lowercase<CurrencyCode>,
+  currencyCode: CurrencyCode | Lowercase<CurrencyCode>
 ): Currency | undefined {
   return currencies[currencyCode.toLowerCase() as Lowercase<CurrencyCode>]
 }
@@ -2945,10 +2945,7 @@ export function addCurrencySymbol({
  * Example: JPY -> 0
  * Example: CLF -> 0,0000
  */
-export function makePlaceholder(
-  currency: Currency,
-  prefix: string = "",
-): string {
+export function makePlaceholder(currency: Currency, prefix: string = ""): string {
   const decimalLength = getDecimalLength(currency)
   if (decimalLength === 0) {
     return "0"
@@ -2968,7 +2965,7 @@ export function makePlaceholder(
 export function formatCentsToCurrency(
   cents: number,
   currencyCode: CurrencyCode,
-  stripZeroDecimals = false,
+  stripZeroDecimals = false
 ): string {
   const currency = getCurrency(currencyCode)
   if (currency == null) {
@@ -2978,9 +2975,7 @@ export function formatCentsToCurrency(
   const decimalLength = getDecimalLength(currency)
   const unit = cents / currency.subunit_to_unit
   const fixedDecimals =
-    stripZeroDecimals && unit % 1 === 0
-      ? unit.toFixed(0)
-      : unit.toFixed(decimalLength)
+    stripZeroDecimals && unit % 1 === 0 ? unit.toFixed(0) : unit.toFixed(decimalLength)
   const value = `${fixedDecimals}`.replace(".", currency.decimal_mark)
 
   return addCurrencySymbol({ formattedValue: value, currency })

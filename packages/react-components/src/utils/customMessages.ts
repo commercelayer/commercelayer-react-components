@@ -1,11 +1,11 @@
-import type { BaseError } from '#typings/errors'
-import { pick } from './pick'
+import type { BaseError } from "#typings/errors"
+import { pick } from "./pick"
 
 export default function customMessages(
   messages: BaseError[] = [],
   v: BaseError
 ): null | BaseError | undefined {
-  const objFiltered = pick(v, ['field', 'code', 'resource', 'detail'])
+  const objFiltered = pick(v, ["field", "code", "resource", "detail"])
   const [msg] = messages.filter((item) => {
     switch (true) {
       case item.field === objFiltered.field &&

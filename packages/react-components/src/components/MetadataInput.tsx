@@ -1,11 +1,10 @@
-import BaseInput from '#components/utils/BaseInput'
-import type { BaseInputComponentProps } from '#typings'
-
-import type { JSX } from "react";
+import type { JSX } from "react"
+import BaseInput from "#components/utils/BaseInput"
+import type { BaseInputComponentProps } from "#typings"
 
 type Props = BaseInputComponentProps &
-  JSX.IntrinsicElements['input'] &
-  JSX.IntrinsicElements['textarea']
+  JSX.IntrinsicElements["input"] &
+  JSX.IntrinsicElements["textarea"]
 
 export function MetadataInput(props: Props): JSX.Element {
   return <BaseInput data-metadata={true} {...props} />

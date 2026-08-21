@@ -1,7 +1,7 @@
-import { useContext, type ReactNode, useEffect, useState, type JSX } from 'react';
-import ShippingMethodChildrenContext from '#context/ShippingMethodChildrenContext'
-import ShipmentChildrenContext from '#context/ShipmentChildrenContext'
-import isEmpty from 'lodash/isEmpty'
+import { type JSX, type ReactNode, useContext, useEffect, useState } from "react"
+import ShipmentChildrenContext from "#context/ShipmentChildrenContext"
+import ShippingMethodChildrenContext from "#context/ShippingMethodChildrenContext"
+import { isEmpty } from "#utils/isEmpty"
 
 interface Props {
   children: ReactNode
@@ -9,18 +9,11 @@ interface Props {
   emptyText?: string
 }
 export function ShippingMethod(props: Props): JSX.Element {
-  const {
-    children,
-    readonly,
-    emptyText = `There are not any shipping method available`
-  } = props
-  const {
-    shippingMethods,
-    currentShippingMethodId,
-    deliveryLeadTimes,
-    shipment
-  } = useContext(ShipmentChildrenContext)
+  const { children, readonly, emptyText = `There are not any shipping method available` } = props
+  const { shippingMethods, currentShippingMethodId, deliveryLeadTimes, shipment } =
+    useContext(ShipmentChildrenContext)
   const [items, setItems] = useState<JSX.Element[]>([])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional — children and readonly are stable within render cycle
   useEffect(() => {
     const methods = shippingMethods
       ?.filter((s) => {
@@ -37,18 +30,16 @@ export function ShippingMethod(props: Props): JSX.Element {
           shipmentId: shipment?.id,
           shippingMethod,
           currentShippingMethodId,
-          deliveryLeadTimeForShipment
+          deliveryLeadTimeForShipment,
         }
         return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: stable list — no unique key available on shipping methods
           <ShippingMethodChildrenContext.Provider key={k} value={shippingProps}>
             {children}
           </ShippingMethodChildrenContext.Provider>
         )
       })
     if (methods) setItems(methods)
-    return () => {
-      setItems([])
-    }
   }, [currentShippingMethodId, deliveryLeadTimes, shippingMethods])
   const components = (!isEmpty(items) && items) || emptyText
   return <>{components}</>

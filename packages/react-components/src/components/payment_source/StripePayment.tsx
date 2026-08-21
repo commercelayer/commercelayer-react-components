@@ -45,7 +45,7 @@ const defaultOptions: StripePaymentElementOptions = {
   layout: {
     type: "accordion",
     defaultCollapsed: false,
-    radios: true,
+    radios: "always",
     spacedAccordionItems: false,
   },
   fields: { billingDetails: "never" },
@@ -67,36 +67,13 @@ function StripePaymentForm({
   stripe,
 }: StripePaymentFormProps): JSX.Element {
   const ref = useRef<null | HTMLFormElement>(null)
-  const {
-    errors,
-    currentPaymentMethodType,
-    setPaymentMethodErrors,
-    setPaymentRef,
-  } = useContext(PaymentMethodContext)
+  const { errors, currentPaymentMethodType, setPaymentMethodErrors, setPaymentRef } =
+    useContext(PaymentMethodContext)
   const { order, setOrderErrors } = useContext(OrderContext)
   const { sdkClient } = useCommerceLayer()
   const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
   const elements = useElements()
-  useEffect(() => {
-    if (ref.current && stripe && elements) {
-      ref.current.onsubmit = async () => {
-        return await onSubmit({
-          event: ref.current,
-          stripe,
-          elements,
-        })
-      }
-      setPaymentRef({ ref })
-    }
-    return () => {
-      setPaymentRef({ ref: { current: null } })
-    }
-  }, [ref, stripe, elements])
-  const onSubmit = async ({
-    event,
-    stripe,
-    elements,
-  }: OnSubmitArgs): Promise<boolean> => {
+  const onSubmit = async ({ event, stripe, elements }: OnSubmitArgs): Promise<boolean> => {
     if (!stripe) return false
     const sdk = sdkClient()
     if (sdk == null) return false
@@ -132,7 +109,7 @@ function StripePaymentForm({
     if (savePaymentSourceToCustomerWallet)
       setCustomerOrderParam(
         "_save_payment_source_to_customer_wallet",
-        savePaymentSourceToCustomerWallet,
+        savePaymentSourceToCustomerWallet
       )
     if (elements != null) {
       const billingInfo = order?.billing_address
@@ -178,6 +155,22 @@ function StripePaymentForm({
     }
     return false
   }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: onSubmit is recreated each render; its deps are already tracked
+  useEffect(() => {
+    if (ref.current && stripe && elements) {
+      ref.current.onsubmit = async () => {
+        return await onSubmit({
+          event: ref.current,
+          stripe,
+          elements,
+        })
+      }
+      setPaymentRef({ ref })
+    }
+    return () => {
+      setPaymentRef({ ref: { current: null } })
+    }
+  }, [stripe, elements, setPaymentRef])
 
   async function handleChange(event: StripePaymentElementChangeEvent) {
     selectedPaymentMethodType = event.value.type
@@ -288,7 +281,7 @@ export function StripePayment({
     return () => {
       setIsLoaded(false)
     }
-  }, [show, publishableKey, connectedAccount])
+  }, [show, publishableKey, connectedAccount, locale])
   const elementsOptions: StripeElementsOptions = {
     clientSecret,
     appearance: { ...defaultAppearance, ...appearance },

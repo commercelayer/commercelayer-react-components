@@ -1,4 +1,4 @@
-import { Component, type ErrorInfo, type JSX } from 'react';
+import { Component, type ErrorInfo, type JSX } from "react"
 
 interface Props {
   children: JSX.Element
@@ -10,7 +10,7 @@ interface State {
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false
+    hasError: false,
   }
 
   public static getDerivedStateFromError(): State {
@@ -18,8 +18,8 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    if (process.env.NODE_ENV !== 'test') {
-      console.error('Uncaught error:', error, errorInfo)
+    if (process.env.NODE_ENV !== "test") {
+      console.error("Uncaught error:", error, errorInfo)
     } else {
       throw error
     }

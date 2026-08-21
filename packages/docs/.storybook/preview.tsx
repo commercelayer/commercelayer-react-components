@@ -1,113 +1,107 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference types="vite/client" />
-
-import type { Parameters, Preview } from '@storybook/react'
-import { worker } from '../mocks/browser'
 import {
   Controls,
   Description,
   Primary,
   Stories,
   Subtitle,
-  Title
-} from '@storybook/addon-docs'
+  Title,
+} from "@storybook/addon-docs/blocks"
+import type { Parameters, Preview } from "@storybook/react-vite"
+import React from "react"
 
-const parameters: Parameters = {
-  actions: { argTypesRegex: '^on[A-Z].*' },
-  layout: 'padded',
+export const parameters: Parameters = {
+  layout: "padded",
   controls: {
     matchers: {
       color: /(background|color)$/i,
-      date: /Date$/
-    }
+      date: /Date$/,
+    },
+  },
+  backgrounds: {
+    options: {
+      overlay: {
+        name: "overlay",
+        value: "#F8F8F8",
+      },
+    },
   },
   options: {
     storySort: {
       order: [
-        'Getting Started',
-        'Components',
-        [
-          'Skus',
-          ['SkusContainer', 'Skus'],
-          'Prices',
-          ['PricesContainer'],
-          'Availability',
-          ['AvailabilityContainer'],
-          'Orders',
-          ['OrderStorage', 'OrderContainer'],
-          'Cart',
-          ['AddToCartButton', 'HostedCart', 'CartLink', 'MiniCart'],
-          'Customers',
-          [
-            'CustomerContainer',
-            'CustomerField',
-            'AddressesContainer',
-            'AddressesEmpty',
-            'Address',
-            'AddressField',
-            'BillingAddressForm',
-            'MyAccountLink'
-          ]
-        ],
-        'Examples',
-        ['Listing Page', 'Shopping Cart', 'Checkout Page', 'My Account'],
-        'Hooks'
-      ]
-    }
+        "Getting Started",
+        "Components",
+        ["Availability", "Price", "Order"],
+        "Skus",
+        ["Sku"],
+        "Examples",
+        ["Listing Page", "Shopping Cart", "Checkout Page", "My Account"],
+        "Hooks",
+      ],
+    },
   },
   docs: {
     page: () => (
-      <>
+      <React.Fragment>
         <Title />
         <Subtitle />
         <Description />
         <Primary />
         <Controls />
         <Stories includePrimary={false} />
-      </>
-    )
-  }
+      </React.Fragment>
+    ),
+    // source: {
+    //   transform: (input: string) =>
+    //     prettier.format(input, {
+    //       parser: 'babel',
+    //       plugins: [prettierBabel]
+    //     }),
+    // },
+  },
 }
 
-// Storybook executes this module in both bootstrap phase (Node)
-// and a story's runtime (browser). However, we cannot call `setupWorker`
-// in Node environment, so need to check if we're in a browser.
-if (typeof global.process === 'undefined') {
-  // Start the mocking when each story is loaded.
-  // Repetitive calls to the `.start()` method do not register a new worker,
-  // but check whether there's an existing once, reusing it, if so.
-  worker.start({
-    serviceWorker: {
-      url: `${import.meta.env.BASE_URL}mockServiceWorker.js`
-    },
-    quiet: import.meta.env.PROD,
-    onUnhandledRequest: !import.meta.env.PROD
-      ? (req, reqPrint) => {
-          if (req.url.hostname === 'mock.localhost') {
-            reqPrint.warning()
-          }
-        }
-      : () => {}
-  })
-}
+// export const withContainer: Decorator = (Story, context) => {
+//   const { containerEnabled } = context.globals
+//   if (containerEnabled === true) {
+//     return (
+//       <Container minHeight={false}>
+//         <Story />
+//       </Container>
+//     )
+//   }
 
-const argTypesEnhancers: Preview['argTypesEnhancers'] = [
+//   return <Story />
+// }
+
+// export const withLocale: Decorator = (Story, context) => {
+//   const locale = "en-US"
+//   return (
+//     <I18NProvider enforcedLocaleCode={locale}>
+//       <Story />
+//     </I18NProvider>
+//   )
+// }
+
+// export const decorators: Decorator[] = [withLocale, withContainer]
+
+// export const globals = {
+//   [PARAM_KEY]: true,
+// }
+
+const argTypesEnhancers: Preview["argTypesEnhancers"] = [
   (context) => {
     // when the className prop comes from `JSX.IntrinsicElements['div' | 'span']`
     // and is not documented, we add a default description
-    if (
-      'className' in context.argTypes &&
-      context.argTypes.className.description === ''
-    ) {
-      context.argTypes.className.description =
-        'CSS class name for the base component'
+    if ("className" in context.argTypes && context.argTypes.className.description === "") {
+      context.argTypes.className.description = "CSS class name for the base component"
     }
 
     return context.argTypes
-  }
+  },
 ]
 
 export default {
   parameters,
-  argTypesEnhancers
+  argTypesEnhancers,
+  tags: ["autodocs"],
 }

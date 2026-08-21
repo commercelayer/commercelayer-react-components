@@ -1,10 +1,10 @@
+import type { StripeElementLocale } from "@stripe/stripe-js"
+import { type JSX, useContext, useEffect, useRef } from "react"
 import Parent from "#components/utils/Parent"
+import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import type { ChildrenFunction } from "#typings/index"
-import type { StripeElementLocale } from "@stripe/stripe-js"
-import { useContext, useEffect, useRef, type JSX } from "react"
 import type { PaymentSourceProps } from "./PaymentSource"
-import OrderContext from "#context/OrderContext"
 
 export interface ExternalPaymentConfig {
   /**

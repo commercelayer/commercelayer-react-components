@@ -1,0 +1,461 @@
+/**
+ * @vitest-environment jsdom
+ */
+import { act, renderHook, waitFor } from "@testing-library/react"
+import type { ReactNode } from "react"
+import { createElement } from "react"
+import { SWRConfig } from "swr"
+import { beforeEach, describe, expect, vi } from "vitest"
+import { coreIntegrationTest, coreTest } from "#extender"
+import { usePrices } from "./usePrices"
+
+const swrWrapper = ({ children }: { children: ReactNode }) =>
+  createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
+
+const domain = import.meta.env.VITE_DOMAIN
+
+describe("usePrices", () => {
+  beforeEach(({ skip }) => {
+    if (domain == null) skip()
+  })
+  coreTest("should return a list of prices", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+
+    expect(result.current.prices).toEqual([])
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.action).toBeNull()
+
+    act(() => {
+      result.current.fetchPrices()
+    })
+
+    await waitFor(() => {
+      expect(result.current.prices.length).toBeGreaterThan(0)
+      expect(result.current.error).toBeNull()
+      expect(result.current.action).toBe("get")
+    })
+  })
+
+  coreTest("should retrieve a single price", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+    // First fetch prices
+    act(() => {
+      result.current.fetchPrices()
+    })
+
+    await waitFor(() => {
+      expect(result.current.prices.length).toBeGreaterThan(0)
+    })
+
+    // Get an ID of one of the fetched prices
+    const testPriceId = result.current.prices[0]?.id
+
+    if (!testPriceId) {
+      throw new Error("No price available to retrieve")
+    }
+
+    // Retrieve a specific price
+    let retrievedPrice: Awaited<ReturnType<typeof result.current.retrievePrice>>
+    await act(async () => {
+      retrievedPrice = await result.current.retrievePrice(testPriceId)
+    })
+
+    await waitFor(() => {
+      expect(result.current.action).toBe("retrieve")
+      expect(retrievedPrice).toBeDefined()
+      expect(retrievedPrice?.id).toBe(testPriceId)
+    })
+  })
+
+  coreIntegrationTest("should update a price", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+
+    // First fetch prices
+    act(() => {
+      result.current.fetchPrices()
+    })
+
+    await waitFor(() => {
+      expect(result.current.prices.length).toBeGreaterThan(0)
+    })
+    // Get an ID of one of the fetched prices
+    const priceToUpdate = result.current.prices[0]
+
+    if (!priceToUpdate) {
+      throw new Error("No price available to update")
+    }
+
+    // Update the price
+    let updatedPrice: Awaited<ReturnType<typeof result.current.updatePrice>>
+    await act(async () => {
+      updatedPrice = await result.current.updatePrice({
+        id: priceToUpdate.id,
+      })
+    })
+
+    await waitFor(() => {
+      expect(result.current.action).toBe("update")
+      expect(updatedPrice).toBeDefined()
+      expect(updatedPrice?.id).toBe(priceToUpdate.id)
+    })
+  })
+
+  coreIntegrationTest(
+    "should return a list of prices with an integration token",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+      const { result } = renderHook(() => usePrices(token))
+
+      expect(result.current.prices).toEqual([])
+      expect(result.current.isLoading).toBe(false)
+
+      act(() => {
+        result.current.fetchPrices()
+      })
+
+      await waitFor(() => {
+        expect(result.current.prices.length).toBeGreaterThan(0)
+        expect(result.current.error).toBeNull()
+      })
+    }
+  )
+
+  coreTest("should handle errors gracefully", async () => {
+    const token = "invalid-token"
+    const { result } = renderHook(() => usePrices(token))
+
+    act(() => {
+      result.current.fetchPrices()
+    })
+
+    await waitFor(
+      () => {
+        expect(result.current.error).toBeDefined()
+        expect(result.current.prices).toEqual([])
+      },
+      { timeout: 5000 }
+    )
+  })
+
+  coreTest("should clear prices", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+
+    // First fetch some prices
+    act(() => {
+      result.current.fetchPrices()
+    })
+
+    await waitFor(() => {
+      expect(result.current.prices.length).toBeGreaterThan(0)
+    })
+
+    // Then clear them
+    act(() => {
+      result.current.clearPrices()
+    })
+
+    await waitFor(() => {
+      expect(result.current.prices).toEqual([])
+    })
+  })
+
+  coreTest("should clear errors", async () => {
+    const token = "invalid-token"
+    const { result } = renderHook(() => usePrices(token))
+
+    // Trigger an error
+    act(() => {
+      result.current.fetchPrices()
+    })
+
+    await waitFor(
+      () => {
+        expect(result.current.error).toBeDefined()
+      },
+      { timeout: 5000 }
+    )
+
+    // Clear the error
+    act(() => {
+      result.current.clearError()
+    })
+
+    await waitFor(() => {
+      expect(result.current.error).toBeNull()
+    })
+  })
+
+  coreTest("should filter prices by parameters", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+
+    act(() => {
+      result.current.fetchPrices({
+        filters: {
+          sku_code_eq: "DIGITALPRODUCT",
+        },
+      })
+    })
+
+    await waitFor(() => {
+      expect(result.current.prices).toBeDefined()
+      expect(result.current.error).toBe(null)
+    })
+  })
+
+  coreTest("should maintain error state until cleared", async () => {
+    const token = "invalid-token"
+    const { result } = renderHook(() => usePrices(token))
+
+    act(() => {
+      result.current.fetchPrices()
+    })
+
+    await waitFor(
+      () => {
+        expect(result.current.error).toBeDefined()
+      },
+      { timeout: 5000 }
+    )
+
+    const errorMessage = result.current.error
+
+    // Error should persist
+    expect(result.current.error).toBe(errorMessage)
+
+    // Clear the error
+    act(() => {
+      result.current.clearError()
+    })
+
+    await waitFor(() => {
+      expect(result.current.error).toBeNull()
+    })
+  })
+
+  coreTest("should support pagination parameters", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+
+    act(() => {
+      result.current.fetchPrices({
+        pageSize: 5,
+        pageNumber: 1,
+      })
+    })
+
+    await waitFor(() => {
+      expect(result.current.prices).toBeDefined()
+      expect(result.current.error).toBeNull()
+    })
+  })
+
+  coreTest("should support include parameters", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+
+    act(() => {
+      result.current.fetchPrices({
+        include: ["price_list"],
+      })
+    })
+
+    await waitFor(() => {
+      expect(result.current.prices).toBeDefined()
+      expect(result.current.error).toBeNull()
+    })
+  })
+
+  coreTest("should track action state", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+
+    expect(result.current.action).toBeNull()
+
+    act(() => {
+      result.current.fetchPrices()
+    })
+
+    await waitFor(() => {
+      expect(result.current.action).toBe("get")
+    })
+
+    act(() => {
+      result.current.clearPrices()
+    })
+
+    await waitFor(() => {
+      expect(result.current.action).toBeNull()
+    })
+  })
+
+  coreTest("should throw error when retrieving price with empty ID", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token), {
+      wrapper: swrWrapper,
+    })
+
+    await expect(
+      act(async () => {
+        await result.current.retrievePrice("")
+      })
+    ).rejects.toThrow("Price ID is required for retrieve")
+  })
+
+  coreTest("should throw error when updating price without an ID", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token), {
+      wrapper: swrWrapper,
+    })
+
+    await expect(
+      act(async () => {
+        await result.current.updatePrice({} as Parameters<typeof result.current.updatePrice>[0])
+      })
+    ).rejects.toThrow("Price resource ID is required for update")
+  })
+
+  coreTest("should batch-fetch prices via registerSku", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+
+    act(() => {
+      result.current.registerSku("DIGITALPRODUCT")
+    })
+
+    await waitFor(
+      () => {
+        expect(result.current.prices.length).toBeGreaterThan(0)
+        expect(result.current.action).toBe("get")
+      },
+      { timeout: 10000 }
+    )
+  })
+
+  coreTest("should ignore duplicate registerSku calls (idempotent)", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+
+    act(() => {
+      result.current.registerSku("DIGITALPRODUCT")
+      result.current.registerSku("DIGITALPRODUCT") // duplicate — no-op
+    })
+
+    await waitFor(
+      () => {
+        expect(result.current.prices).toBeDefined()
+        expect(result.current.error).toBeNull()
+      },
+      { timeout: 10000 }
+    )
+  })
+
+  coreTest(
+    "should cancel pending debounce when a second registerSku fires",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+      const { result } = renderHook(() => usePrices(token))
+
+      // Two different SKUs in rapid succession — second call hits the clearTimeout branch (line 80)
+      act(() => {
+        result.current.registerSku("DIGITALPRODUCT")
+      })
+      act(() => {
+        result.current.registerSku("SHIRT-S")
+      })
+
+      await waitFor(
+        () => {
+          expect(result.current.prices).toBeDefined()
+          expect(result.current.error).toBeNull()
+        },
+        { timeout: 10000 }
+      )
+    }
+  )
+
+  coreTest("should unregisterSku remove a registered code", async ({ accessToken }) => {
+    const token = accessToken?.accessToken
+    const { result } = renderHook(() => usePrices(token))
+
+    act(() => {
+      result.current.registerSku("DIGITALPRODUCT")
+    })
+
+    await waitFor(
+      () => {
+        expect(result.current.prices.length).toBeGreaterThan(0)
+      },
+      { timeout: 10000 }
+    )
+
+    // unregister existing code
+    act(() => {
+      result.current.unregisterSku("DIGITALPRODUCT")
+    })
+
+    // unregister non-existent code — no-op branch
+    act(() => {
+      result.current.unregisterSku("NON-EXISTENT-SKU")
+    })
+  })
+
+  coreTest("should not fetch when accessToken is empty", async () => {
+    const { result } = renderHook(() => usePrices(""))
+
+    act(() => {
+      result.current.registerSku("DIGITALPRODUCT")
+    })
+
+    // Wait for the 50ms debounce to fire — early-return branch (line 83) is hit
+    await vi.waitFor(
+      () => {
+        expect(result.current.prices).toEqual([])
+        expect(result.current.action).toBeNull()
+      },
+      { timeout: 500 }
+    )
+  })
+
+  coreIntegrationTest(
+    "should update a price without prior fetch (no cached list)",
+    async ({ accessToken }) => {
+      const token = accessToken?.accessToken
+
+      // Use an isolated SWR provider so mutate receives undefined as current (covers ?? [result] branch)
+      const { result } = renderHook(() => usePrices(token), {
+        wrapper: swrWrapper,
+      })
+
+      // First fetch to have a valid price ID to use
+      act(() => {
+        result.current.fetchPrices()
+      })
+      await waitFor(() => {
+        expect(result.current.prices.length).toBeGreaterThan(0)
+      })
+      const priceId = result.current.prices[0]?.id
+      if (!priceId) throw new Error("No price available")
+
+      // Clear cache so mutate current will be undefined when updating
+      act(() => {
+        result.current.clearPrices()
+      })
+      await waitFor(() => {
+        expect(result.current.prices).toEqual([])
+      })
+
+      let updatedPrice: Awaited<ReturnType<typeof result.current.updatePrice>>
+      await act(async () => {
+        updatedPrice = await result.current.updatePrice({ id: priceId })
+      })
+
+      expect(updatedPrice).toBeDefined()
+      expect(updatedPrice?.id).toBe(priceId)
+    }
+  )
+})

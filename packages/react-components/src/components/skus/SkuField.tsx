@@ -1,16 +1,15 @@
-import SkuChildrenContext from '#context/SkuChildrenContext'
-import type { ConditionalElement } from '#typings'
+import type { JSX } from "react"
 import GenericFieldComponent, {
   type TGenericChildrenProps,
   type TResourceKey,
-  type TResources
-} from '#components-utils/GenericFieldComponent'
+  type TResources,
+} from "#components-utils/GenericFieldComponent"
+import SkuChildrenContext from "#context/SkuChildrenContext"
+import type { ConditionalElement } from "#typings"
 
-import type { JSX } from "react";
+type SkuFieldChildrenProps = TGenericChildrenProps<TResources["Sku"]>
 
-type SkuFieldChildrenProps = TGenericChildrenProps<TResources['Sku']>
-
-type TCondition = ConditionalElement<Exclude<TResources['Sku'], 'resource'>>
+type TCondition = ConditionalElement<Exclude<TResources["Sku"], "resource">>
 
 type Props = {
   children?: (props: SkuFieldChildrenProps) => JSX.Element
@@ -32,10 +31,10 @@ type Props = {
  * </span>
  */
 export function SkuField<P extends Props>(props: P): JSX.Element {
-  const { attribute, tagElement = 'span', children, ...p } = props
+  const { attribute, tagElement = "span", children, ...p } = props
   return (
-    <GenericFieldComponent<TResourceKey['Sku']>
-      resource='sku'
+    <GenericFieldComponent<TResourceKey["Sku"]>
+      resource="sku"
       attribute={attribute}
       tagElement={tagElement}
       context={SkuChildrenContext}

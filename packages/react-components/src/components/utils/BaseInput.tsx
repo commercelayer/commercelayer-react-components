@@ -6,17 +6,10 @@ export type BaseInputProps = BaseInputComponentProps &
   Omit<JSX.IntrinsicElements["input"], "children" | "pattern"> &
   Omit<JSX.IntrinsicElements["textarea"], "children" | "pattern">
 
-const BaseInput: ForwardRefRenderFunction<any, BaseInputProps> = (
-  props,
-  ref,
-) => {
+const BaseInput: ForwardRefRenderFunction<any, BaseInputProps> = (props, ref) => {
   const { children, ...p } = props
   const input =
-    props.type === "textarea" ? (
-      <textarea ref={ref} {...p} />
-    ) : (
-      <input ref={ref} {...p} />
-    )
+    props.type === "textarea" ? <textarea ref={ref} {...p} /> : <input ref={ref} {...p} />
   return children ? (
     <Parent parentRef={ref} {...p}>
       {children}

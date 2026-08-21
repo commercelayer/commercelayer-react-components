@@ -2,7 +2,7 @@ import { type JSX, useContext, useEffect, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import type { ChildrenFunction } from "#typings/index"
 import { getApplicationLink } from "#utils/getApplicationLink"
-import { getDomain } from "#utils/getDomain"
+import { jwt } from "#utils/jwt"
 import { getOrganizationConfig } from "#utils/organization"
 import Parent from "../utils/Parent"
 
@@ -75,23 +75,25 @@ export function MyIdentityLink(props: Props): JSX.Element {
     resetPasswordUrl,
     ...p
   } = props
-  const { accessToken, endpoint } = useContext(CommerceLayerContext)
+  const { accessToken } = useContext(CommerceLayerContext)
   const [href, setHref] = useState<string | undefined>(undefined)
-  if (accessToken == null || endpoint == null)
-    throw new Error("Cannot use `MyIdentityLink` outside of `CommerceLayer`")
+  if (accessToken == null) throw new Error("Cannot use `MyIdentityLink` outside of `CommerceLayer`")
   useEffect(() => {
-    if (accessToken && endpoint) {
-      const { domain, slug } = getDomain(endpoint)
+    if (accessToken) {
+      const { organization } = jwt(accessToken)
+      const slug = organization.slug
+      const domain = "commercelayer.io"
       getOrganizationConfig({
         accessToken,
-        endpoint,
         params: {
           accessToken,
-          slug,          identityType: type,
+          slug,
+          identityType: type,
           clientId,
           scope,
           returnUrl: returnUrl ?? window.location.href,
-          resetPasswordUrl,        },
+          resetPasswordUrl,
+        },
       }).then((config) => {
         if (config?.links?.identity) {
           setHref(config.links.identity)
@@ -115,7 +117,7 @@ export function MyIdentityLink(props: Props): JSX.Element {
     return () => {
       setHref(undefined)
     }
-  }, [accessToken, endpoint, type, clientId, scope, returnUrl, resetPasswordUrl, customDomain])
+  }, [accessToken, type, clientId, scope, returnUrl, resetPasswordUrl, customDomain])
 
   const parentProps = {
     label,
@@ -127,7 +129,7 @@ export function MyIdentityLink(props: Props): JSX.Element {
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
-    <a href={href} {...p}>
+    <a href={href} rel="noreferrer" {...p}>
       {label}
     </a>
   )

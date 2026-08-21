@@ -1,6 +1,6 @@
+import { getSdk } from "@commercelayer/core-components"
 import type {
   AdyenPaymentUpdate,
-  CommerceLayerClient,
   LineItemCreate,
   LineItemOptionCreate,
   Order,
@@ -8,7 +8,6 @@ import type {
   QueryParamsRetrieve,
   ResourceUpdate,
 } from "@commercelayer/sdk"
-import isEmpty from "lodash/isEmpty"
 import type { Dispatch } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { BaseError } from "#typings/errors"
@@ -17,8 +16,8 @@ import type { BaseMetadataObject } from "#typings/index"
 import baseReducer from "#utils/baseReducer"
 import { publish } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
-import { getDomain } from "#utils/getDomain"
-import getSdk from "#utils/getSdk"
+import { isEmpty } from "#utils/isEmpty"
+import { jwt } from "#utils/jwt"
 import {
   type CustomerOrderParams,
   type DeleteLocalOrder,
@@ -54,10 +53,7 @@ type CreateOrderParams = Pick<
 >
 
 export interface AddToCartImportParams
-  extends Omit<
-    AddToCartParams,
-    "skuCode" | "skuId" | "quantity" | "option" | "lineItem"
-  > {
+  extends Omit<AddToCartParams, "skuCode" | "skuId" | "quantity" | "option" | "lineItem"> {
   lineItems: CustomLineItem[]
 }
 
@@ -151,7 +147,10 @@ export async function createOrder(params: CreateOrderParams): Promise<string> {
       setLocalOrder,
     } = params
     if (state?.orderId) return state.orderId
-    const sdk = config != null ? getSdk(config) : undefined
+    const sdk =
+      config != null
+        ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+        : undefined
     try {
       if (sdk == null) return ""
       const o = await sdk?.orders.create({ metadata, ...orderAttributes })
@@ -163,7 +162,7 @@ export async function createOrder(params: CreateOrderParams): Promise<string> {
           },
         })
       }
-      persistKey && setLocalOrder && setLocalOrder(persistKey, o.id)
+      persistKey && setLocalOrder?.(persistKey, o.id)
       return o.id
       // biome-ignore lint/suspicious/noExplicitAny: No types information about the error
     } catch (error: any) {
@@ -183,9 +182,7 @@ export async function createOrder(params: CreateOrderParams): Promise<string> {
   return ""
 }
 
-export const getApiOrder: GetOrder = async (
-  params,
-): Promise<Order | undefined> => {
+export const getApiOrder: GetOrder = async (params): Promise<Order | undefined> => {
   const {
     id,
     dispatch,
@@ -196,7 +193,10 @@ export const getApiOrder: GetOrder = async (
     state,
     options = {},
   } = params
-  const sdk = config != null ? getSdk(config) : undefined
+  const sdk =
+    config != null
+      ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+      : undefined
   try {
     if (sdk == null) return undefined
     if (state?.include && state.include.length > 0) {
@@ -204,7 +204,7 @@ export const getApiOrder: GetOrder = async (
     }
     const order = await sdk.orders.retrieve(id ?? "", options)
     if (clearWhenPlaced && order.editable === false) {
-      persistKey && deleteLocalOrder && deleteLocalOrder(persistKey)
+      persistKey && deleteLocalOrder?.(persistKey)
       if (dispatch) {
         dispatch({
           type: "setOrder",
@@ -257,7 +257,10 @@ export async function getOrderByFields(params: {
   config: CommerceLayerConfig
 }): Promise<Order> {
   const { orderId, fields, config } = params
-  const sdk = config != null ? getSdk(config) : undefined
+  const sdk =
+    config != null
+      ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+      : undefined
   if (sdk == null) throw new Error("SDK not initialized")
   const order = await sdk.orders.retrieve(orderId, { fields })
   return order
@@ -275,13 +278,15 @@ export async function updateOrder({
   error?: { errors: BaseError[] }
   order?: Order
 }> {
-  const sdk = config != null ? getSdk(config) : undefined
+  const sdk =
+    config != null
+      ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+      : undefined
   try {
     if (sdk == null) return { success: false }
     const resource = { ...attributes, id }
     // Take note of current total amount with taxes cents (used in some cases like Adyen and the payment source is expired and needs to be updated)
-    const currentTotalAmountWithTaxesCents =
-      state?.order?.total_amount_with_taxes_cents
+    const currentTotalAmountWithTaxesCents = state?.order?.total_amount_with_taxes_cents
     // const order = await sdk.orders.update(resource, { include })
     await sdk.orders.update(resource, { include })
     // NOTE: Retrieve doesn't response with attributes updated
@@ -317,7 +322,7 @@ export async function updateOrder({
 }
 
 interface TResourceRequest {
-  resource: Extract<keyof CommerceLayerClient, "adyen_payments">
+  resource: "adyen_payments"
   requestType: "update"
   attributes: TResourceRequest["resource"] extends "adyen_payments"
     ? AdyenPaymentUpdate
@@ -337,7 +342,10 @@ export async function paymentSourceRequest({
   order,
   state,
 }: TResourceRequest): Promise<{ success: boolean; order?: Order }> {
-  const sdk = config != null ? getSdk(config) : undefined
+  const sdk =
+    config != null
+      ? getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
+      : undefined
   try {
     if (sdk == null) return { success: false }
     const sdkResource = sdk[resource]
@@ -360,10 +368,7 @@ export async function paymentSourceRequest({
   }
 }
 
-export const setOrder = (
-  order: Order,
-  dispatch?: Dispatch<OrderActions>,
-): void => {
+export const setOrder = (order: Order, dispatch?: Dispatch<OrderActions>): void => {
   if (dispatch) {
     dispatch({
       type: "setOrder",
@@ -403,8 +408,7 @@ export function addResourceToInclude({
     includeLoaded: undefined,
   }
   if (newResource) {
-    const resources =
-      typeof newResource === "string" ? [newResource] : newResource
+    const resources = typeof newResource === "string" ? [newResource] : newResource
     payload.include = [...new Set([...resourcesIncluded, ...resources])]
     resources.forEach((resource) => {
       const includeLoaded = {
@@ -484,7 +488,7 @@ export type AddToCartParams = Partial<{
 }>
 
 export async function addToCart(
-  params: AddToCartParams,
+  params: AddToCartParams
 ): Promise<{ success: boolean; orderId?: string }> {
   const {
     skuCode,
@@ -502,7 +506,7 @@ export async function addToCart(
   } = params
   try {
     if (config) {
-      const sdk = getSdk(config)
+      const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
       const id = await createOrder(params)
       if (id) {
         const order = sdk.orders.relationship(id)
@@ -521,14 +525,14 @@ export async function addToCart(
               await Promise.all(
                 lineItems.map(async (lineItem) => {
                   await sdk.line_items.delete(lineItem.id)
-                }),
+                })
               )
             }
           } else {
             await Promise.all(
               state?.order?.line_items.map(async (lineItem) => {
                 await sdk.line_items.delete(lineItem.id)
-              }),
+              })
             )
           }
         }
@@ -570,14 +574,11 @@ export async function addToCart(
             },
           })
         }
-        if (
-          buyNowMode &&
-          id &&
-          config?.accessToken != null &&
-          config?.endpoint != null
-        ) {
+        if (buyNowMode && id && config?.accessToken != null) {
           const params = `${id}?accessToken=${config.accessToken ?? ""}`
-          const { domain, slug } = getDomain(config.endpoint)
+          const { organization } = jwt(config.accessToken)
+          const slug = organization.slug
+          const domain = "commercelayer.io"
           const href = getApplicationLink({
             slug,
             orderId: id,
@@ -587,7 +588,6 @@ export async function addToCart(
           })
           const organizationConfig = await getOrganizationConfig({
             accessToken: config.accessToken,
-            endpoint: config.endpoint,
             params: {
               accessToken: config.accessToken,
               orderId: order?.id,
@@ -659,19 +659,22 @@ export type SaveAddressToCustomerAddressBook = (params: {
   type: AddressResource
   value: boolean
 }) => void
-export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook =
-  ({ type, value, dispatch }) => {
-    const k: CustomerOrderParams = `_save_${type}_to_customer_address_book`
-    const v = `${value.toString()}`
-    setCustomerOrderParam(k, v)
-    if (dispatch)
-      dispatch({
-        type: "setSaveAddressToCustomerAddressBook",
-        payload: {
-          [k]: v,
-        },
-      })
-  }
+export const saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook = ({
+  type,
+  value,
+  dispatch,
+}) => {
+  const k: CustomerOrderParams = `_save_${type}_to_customer_address_book`
+  const v = `${value.toString()}`
+  setCustomerOrderParam(k, v)
+  if (dispatch)
+    dispatch({
+      type: "setSaveAddressToCustomerAddressBook",
+      payload: {
+        [k]: v,
+      },
+    })
+}
 
 interface TSetGiftCardOrCouponCodeParams {
   code: string
@@ -795,11 +798,34 @@ export const orderInitialState: Partial<OrderState> = {
   withoutIncludes: true,
 }
 
-const orderReducer = (state: OrderState, reducer: OrderActions): OrderState =>
-  baseReducer<OrderState, OrderActions, OrderActionType[]>(
-    state,
-    reducer,
-    actionType,
-  )
+const orderReducer = (state: OrderState, reducer: OrderActions): OrderState => {
+  if (reducer.type === "setIncludesResource") {
+    const { payload } = reducer
+    // `include` is a union of what every mounted component needs, so it must accumulate
+    // rather than be replaced. `addResourceToInclude` is a free function with no access
+    // to the store, so it can only union against the `resourcesIncluded` it is handed —
+    // and most call sites don't pass it. Several components dispatch more than once from
+    // a single effect pass, all reading the same stale `include` snapshot, so a plain
+    // spread would let the last dispatch drop the others' resources. Missing an include
+    // is indistinguishable from an unset relationship in the API response, which turns
+    // a dropped resource into wrong application state rather than a failed request.
+    //
+    // An explicitly empty list is the one exception: it means "reset" (see the effect
+    // teardown in `useOrderState`), so it is passed through as-is.
+    if (payload.include != null && payload.include.length === 0) {
+      return { ...state, ...payload }
+    }
+    const merged = [...new Set([...(state.include ?? []), ...(payload.include ?? [])])]
+    return {
+      ...state,
+      ...payload,
+      // Keep `include` untouched when there is nothing to merge — callers that only
+      // report `includeLoaded` omit it, and turning `undefined` into `[]` would flip
+      // the `include?.length === 0` checks in `useOrderState`.
+      include: merged.length > 0 ? merged : state.include,
+    }
+  }
+  return baseReducer<OrderState, OrderActions, OrderActionType[]>(state, reducer, actionType)
+}
 
 export default orderReducer

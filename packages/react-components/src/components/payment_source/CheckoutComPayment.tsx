@@ -67,7 +67,7 @@ interface CheckoutWebComponent {
       status: string
       id: string
       type: string
-    },
+    }
   ) => Promise<void>
   onChange?: (component: Component) => void
   onError?: (component: Component, error: unknown) => void
@@ -90,7 +90,28 @@ export interface CheckoutComConfig {
   options?: {
     appearance: Appearance
   }
-  [key: string]: unknown
+  footnote: {
+    fontFamily: string
+    fontSize: string
+    fontWeight: number
+    letterSpacing: number
+    lineHeight: string
+  }
+  label: {
+    fontFamily: string
+    fontSize: string
+    fontWeight: number
+    letterSpacing: number
+    lineHeight: string
+  }
+  subheading: {
+    fontFamily: string
+    fontSize: string
+    fontWeight: number
+    letterSpacing: number
+    lineHeight: string
+  }
+  borderRadius: [string, string]
 }
 
 type Props = Partial<PaymentMethodConfig["checkoutComPayment"]> &
@@ -101,23 +122,34 @@ type Props = Partial<PaymentMethodConfig["checkoutComPayment"]> &
     templateCustomerSaveToWallet?: PaymentSourceProps["templateCustomerSaveToWallet"]
   }
 
-export function CheckoutComPayment({
-  publicKey,
-  options,
-  ...p
-}: Props): JSX.Element | null {
+export function CheckoutComPayment({ publicKey, options, ...p }: Props): JSX.Element | null {
   const ref = useRef<null | HTMLFormElement>(null)
   const loaded = useExternalScript(scriptUrl)
   const { setPaymentRef, setPaymentSource } = useContext(PaymentMethodContext)
   const { accessToken } = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
   const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
-  const {
-    containerClassName,
-    templateCustomerSaveToWallet,
-    show,
-    ...divProps
-  } = p
+  const { containerClassName, templateCustomerSaveToWallet, show, ...divProps } = p
+  // Everything below is read at mount time only. Keeping any of it in the effect's
+  // dependencies re-ran the effect on unrelated re-renders and re-created the Flow
+  // component, which wiped whatever the shopper had typed into the card field:
+  // `onChange` calls `setPaymentRef` as soon as the card is valid, that context update
+  // re-renders the consumer, the consumer rebuilds its `options` object literal, and the
+  // fresh `options.appearance` identity looked like a real dependency change.
+  const optionsRef = useRef(options)
+  optionsRef.current = options
+  const setPaymentRefRef = useRef(setPaymentRef)
+  setPaymentRefRef.current = setPaymentRef
+  const setPaymentSourceRef = useRef(setPaymentSource)
+  setPaymentSourceRef.current = setPaymentSource
+  const setPlaceOrderStatusRef = useRef(setPlaceOrderStatus)
+  setPlaceOrderStatusRef.current = setPlaceOrderStatus
+  // Guards against mounting the Flow twice for the same payment source.
+  const mountedForRef = useRef<string | null>(null)
+  // Depending on the `order.payment_source` object rather than its id remounts the Flow
+  // on every order refetch and wipes the shopper's card input. The id is the only part
+  // that should re-trigger; everything else is read through the refs above.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional — see above
   useEffect(() => {
     const ps = order?.payment_source
     if (loaded && window && ps && accessToken) {
@@ -133,7 +165,7 @@ export function CheckoutComPayment({
           // @ts-expect-error no type
           const checkout = await window.CheckoutWebComponents({
             appearance: {
-              ...options?.appearance,
+              ...optionsRef.current?.appearance,
             },
             showPayButton: false,
             publicKey,
@@ -156,11 +188,11 @@ export function CheckoutComPayment({
                     if (savePaymentSourceToCustomerWallet)
                       setCustomerOrderParam(
                         "_save_payment_source_to_customer_wallet",
-                        savePaymentSourceToCustomerWallet,
+                        savePaymentSourceToCustomerWallet
                       )
                     const { data } = await component.tokenize()
                     const token = data?.token
-                    const paymentSource = await setPaymentSource({
+                    const paymentSource = await setPaymentSourceRef.current?.({
                       paymentSourceId: ps.id,
                       paymentResource: "checkout_com_payments",
                       attributes: {
@@ -183,7 +215,7 @@ export function CheckoutComPayment({
                     }
                     return false
                   }
-                  setPaymentRef?.({ ref })
+                  setPaymentRefRef.current?.({ ref })
                 }
               }
             },
@@ -192,7 +224,7 @@ export function CheckoutComPayment({
             },
             onPaymentCompleted: async (_component, paymentResponse) => {
               if (paymentResponse.status.toLowerCase() === "approved") {
-                await setPaymentSource({
+                await setPaymentSourceRef.current?.({
                   paymentSourceId: ps.id,
                   paymentResource: "checkout_com_payments",
                   attributes: {
@@ -200,7 +232,7 @@ export function CheckoutComPayment({
                     _authorize: true,
                   },
                 })
-                setPlaceOrderStatus?.({
+                setPlaceOrderStatusRef.current?.({
                   status: "placing",
                 })
               }
@@ -209,10 +241,18 @@ export function CheckoutComPayment({
           const flowComponent = checkout.create("flow")
           flowComponent.mount(document.getElementById("flow-container"))
         }
-        loadFlow()
+        // Belt and braces: even if the effect were re-entered for the same payment
+        // source, don't build and mount a second Flow over the first.
+        if (mountedForRef.current !== ps.id) {
+          mountedForRef.current = ps.id
+          loadFlow()
+        }
       }
     }
-  }, [loaded, order?.payment_source?.id, accessToken])
+    // Only primitives here. Object identities (options.appearance, the payment_source
+    // object, the context setters) change on unrelated re-renders and would remount the
+    // Flow mid-typing; they are read through refs above instead.
+  }, [loaded, order?.payment_source?.id, accessToken, order?.language_code])
   return loaded && show ? (
     <form ref={ref}>
       <div className={containerClassName} {...divProps}>

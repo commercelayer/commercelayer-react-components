@@ -1,0 +1,65 @@
+import { Meta, Source } from '@storybook/addon-docs/blocks'; 
+
+<Meta title="Getting Started/Containers"></Meta>
+
+# Containers
+
+Getting used to the components hierarchy is important to understand how to use this library.
+
+All components need to be wrapped inside the main `<CommerceLayer>` context that handles the authentication with the API layer.
+**It needs to be placed at the top of the application**.
+
+---
+
+## Deprecation notice
+
+<span title="Deprecation" type="warning">
+Container components (e.g. `PricesContainer`) are **deprecated** and will be removed in a future major release.
+Components are being migrated to work **standalone** — drop them directly under `<CommerceLayer>` with no wrapper needed.
+Batching, caching and deduplication are handled automatically at the module level.
+</span>
+
+Previously, components like `<Price>` required a dedicated container to fetch and share data:
+
+<Source
+  language="jsx"
+  dark
+  code={`// ❌ Old pattern — PricesContainer is deprecated
+<CommerceLayer accessToken="...">
+  <PricesContainer skuCode="MY-SKU">
+    <Price />
+  </PricesContainer>
+</CommerceLayer>`}
+/>
+
+Now components work standalone — multiple instances are automatically batched into a single API request via a 50 ms debounce:
+
+<Source
+  language="jsx"
+  dark
+  code={`// ✅ New pattern — no container needed
+<CommerceLayer accessToken="...">
+  <Price skuCode="SKU-A" />
+  <Price skuCode="SKU-B" />
+  <Price skuCode="SKU-C" />
+</CommerceLayer>`}
+/>
+
+---
+
+## Hierarchy
+
+Each component documented in the Components section of this guide highlights a list of **Requirements** and **Children** that are needed to make it work.
+
+Example:
+
+<span title="Requirements" type="warning">
+Must be a child of `<CommerceLayer>` component.
+</span>
+
+
+<span title="Children" type="info">
+`<OrderNumber>`
+`<TotalAmount>`
+`<PlaceOrderButton>`
+</span>

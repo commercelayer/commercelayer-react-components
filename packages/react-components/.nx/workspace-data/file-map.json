@@ -2,36 +2,16 @@
   "version": "6.0",
   "nxVersion": "20.6.0",
   "pathMappings": {
-    "@commercelayer/react-components": [
-      "src/index"
-    ],
-    "#components/*": [
-      "src/components/*"
-    ],
-    "#components-utils/*": [
-      "src/components/utils/*"
-    ],
-    "#reducers/*": [
-      "src/reducers/*"
-    ],
-    "#context/*": [
-      "src/context/*"
-    ],
-    "#typings/*": [
-      "src/typings/*"
-    ],
-    "#typings": [
-      "src/typings/index"
-    ],
-    "#utils/*": [
-      "src/utils/*"
-    ],
-    "#config/*": [
-      "src/config/*"
-    ],
-    "#hooks/*": [
-      "src/hooks/*"
-    ]
+    "@commercelayer/react-components": ["src/index"],
+    "#components/*": ["src/components/*"],
+    "#components-utils/*": ["src/components/utils/*"],
+    "#reducers/*": ["src/reducers/*"],
+    "#context/*": ["src/context/*"],
+    "#typings/*": ["src/typings/*"],
+    "#typings": ["src/typings/index"],
+    "#utils/*": ["src/utils/*"],
+    "#config/*": ["src/config/*"],
+    "#hooks/*": ["src/hooks/*"]
   },
   "nxJsonPlugins": [],
   "fileMap": {

@@ -1,21 +1,21 @@
-import { useContext, useEffect, useMemo, type JSX } from 'react';
-import BaseSelect from '../utils/BaseSelect'
-import type { BaseSelectComponentProps } from '#typings'
+import { type JSX, useContext, useEffect, useMemo } from "react"
 import BillingAddressFormContext, {
-  type AddressValuesKeys
-} from '#context/BillingAddressFormContext'
-import ShippingAddressFormContext from '#context/ShippingAddressFormContext'
-import { getCountries, type Country } from '#utils/countryStateCity'
-import CustomerAddressFormContext from '#context/CustomerAddressFormContext'
+  type AddressValuesKeys,
+} from "#context/BillingAddressFormContext"
+import CustomerAddressFormContext from "#context/CustomerAddressFormContext"
+import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
+import type { BaseSelectComponentProps } from "#typings"
+import { type Country, getCountries } from "#utils/countryStateCity"
+import BaseSelect from "../utils/BaseSelect"
 
 type TCountryFieldName =
-  | 'billing_address_country_code'
-  | 'shipping_address_country_code'
-  | 'customer_address_country_code'
+  | "billing_address_country_code"
+  | "shipping_address_country_code"
+  | "customer_address_country_code"
 
 interface Props
-  extends Omit<BaseSelectComponentProps, 'options' | 'name'>,
-    Pick<JSX.IntrinsicElements['select'], 'className' | 'id' | 'style'> {
+  extends Omit<BaseSelectComponentProps, "options" | "name">,
+    Pick<JSX.IntrinsicElements["select"], "className" | "id" | "style"> {
   name: Extract<AddressValuesKeys, TCountryFieldName>
   required?: boolean
   disabled?: boolean
@@ -58,7 +58,7 @@ export function AddressCountrySelector(props: Props): JSX.Element {
     if (value && customerAddress?.setValue) {
       customerAddress.setValue(name, value)
     }
-  }, [value])
+  }, [value, billingAddress.setValue, customerAddress.setValue, name, shippingAddress.setValue])
 
   const hasError = useMemo(() => {
     if (billingAddress?.errors?.[name]?.error) {
@@ -71,27 +71,15 @@ export function AddressCountrySelector(props: Props): JSX.Element {
       return true
     }
     return false
-  }, [
-    value,
-    billingAddress?.errors,
-    shippingAddress?.errors,
-    customerAddress?.errors
-  ])
+  }, [billingAddress?.errors, shippingAddress?.errors, customerAddress?.errors, name])
   const errorClassName =
     billingAddress?.errorClassName ||
     shippingAddress?.errorClassName ||
     customerAddress?.errorClassName
-  const classNameComputed = `${className ?? ''} ${
-    hasError && errorClassName ? errorClassName : ''
-  }`
+  const classNameComputed = `${className ?? ""} ${hasError && errorClassName ? errorClassName : ""}`
   return (
     <BaseSelect
       className={classNameComputed}
-      ref={
-        (billingAddress?.validation as any) ||
-        shippingAddress?.validation ||
-        customerAddress?.validation
-      }
       required={required}
       options={getCountries(countries)}
       name={name}
