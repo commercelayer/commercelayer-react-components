@@ -9,7 +9,13 @@
 
 [build]
   base = "/"
-  command = "pnpm docs:build"
+  # The libraries must be built before the storybook. Its Vite config aliases
+  # @commercelayer/react-components straight to source, but that source imports
+  # @commercelayer/core-components, which is a workspace package resolving to
+  # ./dist/index.js — absent on a clean checkout, so rolldown fails to resolve
+  # it. Locally the storybook builds without this only because dist/ is already
+  # lying around from a previous build.
+  command = "pnpm build && pnpm docs:build"
   publish = "packages/docs/storybook-static"
 
 [build.environment]
