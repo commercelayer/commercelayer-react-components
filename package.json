@@ -1,6 +1,7 @@
 {
   "name": "root",
   "private": true,
+  "packageManager": "pnpm@11.22.0",
   "author": {
     "name": "Alessandro Casazza",
     "email": "alessandro@commercelayer.io"
