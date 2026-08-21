@@ -40,7 +40,10 @@ jobs:
         run: pnpm install
 
       - name: Build 🛠
-        run: pnpm docs:build
+        # The libraries have to be built first: the storybook resolves
+        # @commercelayer/core-components to its dist, which does not exist on a
+        # clean checkout.
+        run: pnpm build && pnpm docs:build
 
       - name: Setup Pages 🧰
         uses: actions/configure-pages@v4
