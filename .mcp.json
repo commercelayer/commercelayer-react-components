@@ -2,7 +2,7 @@
   "mcpServers": {
     "storybook": {
       "command": "pnpm",
-      "args": ["--filter", "document", "run", "mcp"]
+      "args": ["--filter", "docs", "run", "mcp"]
     }
   }
 }
