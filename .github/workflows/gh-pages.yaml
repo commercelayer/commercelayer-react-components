@@ -38,7 +38,7 @@ jobs:
         run: pnpm install
 
       - name: Build 🛠
-        run: pnpm docs:build
+        run: pnpm document:build
 
       - name: Setup Pages 🧰
         uses: actions/configure-pages@v4
@@ -46,7 +46,7 @@ jobs:
       - name: Upload artifact 🚀
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./packages/docs/dist/
+          path: ./packages/document/storybook-static/
 
   deploy:
     environment:
