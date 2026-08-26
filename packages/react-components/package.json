@@ -1,6 +1,6 @@
 {
   "name": "@commercelayer/react-components",
-  "version": "5.0.0-beta.1",
+  "version": "5.0.0-beta.2",
   "description": "The Official Commerce Layer React Components",
   "type": "module",
   "main": "./dist/index.js",
@@ -65,9 +65,9 @@
     "@commercelayer/organization-config": "^2.8.4",
     "@commercelayer/react-hooks-components": "workspace:*",
     "@commercelayer/sdk": "8.0.0-beta.11",
+    "@iframe-resizer/parent": "^5.5.9",
     "@stripe/react-stripe-js": "^6.8.1",
     "@stripe/stripe-js": "^9.10.0",
-    "@iframe-resizer/parent": "^5.5.9",
     "@tanstack/react-table": "^8.21.3",
     "braintree-web": "^3.143.0",
     "frames-react": "^1.2.4",
