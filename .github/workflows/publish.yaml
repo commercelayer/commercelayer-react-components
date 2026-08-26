@@ -20,10 +20,15 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Node 🧰
-        uses: actions/setup-node@v6
+        # v7 dropped the dummy NODE_AUTH_TOKEN that v6 injects.
+        uses: actions/setup-node@v7
         with:
           node-version: 24.x
-          registry-url: https://registry.npmjs.org
+          # No registry-url on purpose: it makes setup-node write an .npmrc
+          # holding //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN} and set
+          # NODE_AUTH_TOKEN to a placeholder. npm then believes it is
+          # authenticated, never attempts the OIDC exchange, and the publish
+          # 404s. The default registry is registry.npmjs.org anyway.
           cache: 'pnpm'
 
       # npm >= 11.5.1 is required for trusted publishing (OIDC) on npmjs.
