@@ -42,12 +42,34 @@ jobs:
       - name: Publish 🚀 PRERELEASE
         if: 'github.event.release.prerelease'
         run: |
-          pnpm -r publish --tag next --no-git-checks --access public
+          set -euo pipefail
+          # pnpm packs, because only it resolves the workspace: protocol into
+          # concrete versions. npm publishes, because npmjs trusted publishing
+          # expects npm's OIDC implementation -- pnpm's own token exchange 404s
+          # here. Dependency order, so a package never precedes what it needs.
+          for dir in packages/core-components \
+                     packages/react-hooks-components \
+                     packages/react-components; do
+            out=$(mktemp -d)
+            ( cd "$dir" && pnpm pack --pack-destination "$out" )
+            npm publish "$out"/*.tgz --tag next --access public
+          done
 
       - name: Publish 🚀 PRODUCTION
         if: '!github.event.release.prerelease'
         run: |
-          pnpm -r publish --no-git-checks --access public
+          set -euo pipefail
+          # pnpm packs, because only it resolves the workspace: protocol into
+          # concrete versions. npm publishes, because npmjs trusted publishing
+          # expects npm's OIDC implementation -- pnpm's own token exchange 404s
+          # here. Dependency order, so a package never precedes what it needs.
+          for dir in packages/core-components \
+                     packages/react-hooks-components \
+                     packages/react-components; do
+            out=$(mktemp -d)
+            ( cd "$dir" && pnpm pack --pack-destination "$out" )
+            npm publish "$out"/*.tgz --access public
+          done
 
       - name: Post to a Slack channel
         id: slack
