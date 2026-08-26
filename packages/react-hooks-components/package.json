@@ -4,6 +4,11 @@
   "description": "Commerce Layer React Hooks",
   "type": "module",
   "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
   "exports": {
     "./package.json": "./package.json",
     ".": {
