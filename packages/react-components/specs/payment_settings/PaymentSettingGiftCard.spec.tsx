@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { PaymentSetting } from "#components/payment_settings/PaymentSetting"
 import { PaymentSettingGiftCard } from "#components/payment_settings/PaymentSettingGiftCard"
 import { PaymentSettingGiftCardAddButton } from "#components/payment_settings/PaymentSettingGiftCardAddButton"
+import { PaymentSettingGiftCardErrors } from "#components/payment_settings/PaymentSettingGiftCardErrors"
 import { PaymentSettingGiftCardInput } from "#components/payment_settings/PaymentSettingGiftCardInput"
 import { PaymentSettingGiftCardList } from "#components/payment_settings/PaymentSettingGiftCardList"
 import { PaymentSettingGiftCardListItem } from "#components/payment_settings/PaymentSettingGiftCardListItem"
@@ -174,6 +175,97 @@ describe("PaymentSettingGiftCard", () => {
       expect(applyGiftCardMock).toHaveBeenCalled()
     })
     expect(getOrder).not.toHaveBeenCalled()
+  })
+
+  // Without a component of its own the failure is invisible: these errors are
+  // rejected before anything is written to the order, so <Errors resource=
+  // "orders"> never sees them and the shopper gets a control that silently
+  // does nothing.
+  describe("errors", () => {
+    function renderWithErrors() {
+      return render(
+        <Wrapper currentOrder={order()}>
+          <PaymentSettingGiftCard>
+            <PaymentSettingGiftCardInput data-testid="input" />
+            <PaymentSettingGiftCardSubmitButton data-testid="apply" />
+            <PaymentSettingGiftCardErrors data-testid="gift-card-error" />
+          </PaymentSettingGiftCard>
+        </Wrapper>
+      )
+    }
+
+    async function submit(code: string) {
+      await act(async () => {
+        fireEvent.change(screen.getByTestId("input"), { target: { value: code } })
+      })
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("apply"))
+      })
+    }
+
+    it("renders nothing while there is nothing to report", () => {
+      renderWithErrors()
+      expect(screen.queryByTestId("gift-card-error")).toBeNull()
+    })
+
+    // The SDK throws with an empty `message`; the API's wording is only in the
+    // JSON:API errors array, so reading `message` renders an empty box.
+    it("shows the API message when a code is refused", async () => {
+      applyGiftCardMock.mockRejectedValue({
+        errors: [
+          {
+            title: "doesn't match any active gift card",
+            detail: "gift_card_code - doesn't match any active gift card",
+            code: "VALIDATION_ERROR",
+            source: { pointer: "/data/attributes/gift_card_code" },
+            meta: { error: "invalid_gift_card" },
+          },
+          {
+            title: "can't be blank",
+            detail: "token - can't be blank",
+            code: "VALIDATION_ERROR",
+            source: { pointer: "/data/attributes/token" },
+          },
+        ],
+      })
+      renderWithErrors()
+
+      await submit("NOPE")
+
+      await waitFor(() => {
+        expect(screen.getByTestId("gift-card-error").textContent).toBe(
+          "doesn't match any active gift card"
+        )
+      })
+    })
+
+    it("falls back to a message of its own when the failure never reached the API", async () => {
+      applyGiftCardMock.mockRejectedValue(new Error("Network request failed"))
+      renderWithErrors()
+
+      await submit("NOPE")
+
+      await waitFor(() => {
+        expect(screen.getByTestId("gift-card-error").textContent).toBe("Network request failed")
+      })
+    })
+
+    it("clears the message once a later code is accepted", async () => {
+      applyGiftCardMock.mockRejectedValueOnce(new Error("Network request failed"))
+      renderWithErrors()
+
+      await submit("NOPE")
+      await waitFor(() => {
+        expect(screen.queryByTestId("gift-card-error")).not.toBeNull()
+      })
+
+      applyGiftCardMock.mockResolvedValue({ id: "gift-new" })
+      await submit("GOOD")
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("gift-card-error")).toBeNull()
+      })
+    })
   })
 
   describe("the applied list", () => {

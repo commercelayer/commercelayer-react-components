@@ -65,7 +65,7 @@ interface Props {
  */
 export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Element | null {
   const paymentsModel = usePaymentsModel()
-  const { isCovered } = usePaymentSessionsState()
+  const { isCovered, remainingAmountCents } = usePaymentSessionsState()
   const { order, include, includeLoaded, addResourceToInclude, getOrder } = useContext(OrderContext)
   const { accessToken, interceptors } = useContext(CommerceLayerContext)
   const [pendingSettingId, setPendingSettingId] = useState<string | null>(null)
@@ -135,6 +135,7 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
       const reusable = findReusablePaymentSession({
         paymentSessions: order.payment_sessions,
         paymentSettingId: setting.id,
+        amountCents: remainingAmountCents,
       })
       if (reusable == null) {
         await createPaymentSession({
@@ -142,6 +143,9 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
           interceptors,
           orderId: order.id,
           paymentSettingId: setting.id,
+          // The remainder after the gift cards, which the server cannot work
+          // out for itself until they are authorized at place time.
+          amountCents: remainingAmountCents,
         })
       }
       const refreshed = await getOrder(order.id)

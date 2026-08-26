@@ -7,6 +7,7 @@ export { findReusablePaymentSession } from "./findReusablePaymentSession"
 export type { PaymentsModel } from "./getPaymentsModel"
 export { getPaymentsModel } from "./getPaymentsModel"
 export { invalidateCurrentPaymentSession } from "./invalidateCurrentPaymentSession"
+export { mapGiftCardErrors } from "./mapGiftCardErrors"
 export { mapPlaceabilityErrors } from "./mapPlaceabilityErrors"
 export type { PlaceOrderWithPaymentSessionsResult } from "./placeOrderWithPaymentSessions"
 export {

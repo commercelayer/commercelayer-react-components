@@ -142,3 +142,53 @@ describe("findReusablePaymentSession", () => {
     ).toBeUndefined()
   })
 })
+
+// Applying a gift card moves the remainder, and `amount_cents` is immutable —
+// so the session created before it is wrong, not merely stale. The deletion in
+// `invalidateCurrentPaymentSession` is best effort, which is why this check
+// exists here too.
+describe("findReusablePaymentSession amount check", () => {
+  it("ignores a session sized for a different remainder", () => {
+    expect(
+      findReusablePaymentSession({
+        paymentSessions: [session({ amount_cents: 7100 })],
+        paymentSettingId: SETTING_ID,
+        amountCents: 5100,
+        now: NOW,
+      })
+    ).toBeUndefined()
+  })
+
+  it("adopts a session sized for the current remainder", () => {
+    const reusable = session({ amount_cents: 5100 })
+    expect(
+      findReusablePaymentSession({
+        paymentSessions: [reusable],
+        paymentSettingId: SETTING_ID,
+        amountCents: 5100,
+        now: NOW,
+      })
+    ).toBe(reusable)
+  })
+
+  it("still adopts when either amount is unknown", () => {
+    const noSessionAmount = session()
+    expect(
+      findReusablePaymentSession({
+        paymentSessions: [noSessionAmount],
+        paymentSettingId: SETTING_ID,
+        amountCents: 5100,
+        now: NOW,
+      })
+    ).toBe(noSessionAmount)
+
+    const withAmount = session({ amount_cents: 7100 })
+    expect(
+      findReusablePaymentSession({
+        paymentSessions: [withAmount],
+        paymentSettingId: SETTING_ID,
+        now: NOW,
+      })
+    ).toBe(withAmount)
+  })
+})

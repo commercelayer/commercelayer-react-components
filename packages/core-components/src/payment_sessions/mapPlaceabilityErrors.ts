@@ -1,13 +1,5 @@
+import { extractApiErrors, fieldFromPointer } from "./apiErrors"
 import type { PlaceabilityError } from "./types"
-
-/** Shape of a JSON:API error object as the API sends it. */
-interface ApiErrorObject {
-  code?: string
-  title?: string
-  detail?: string
-  source?: { pointer?: string }
-  meta?: { error?: string }
-}
 
 /**
  * Turn a 422 response from the `_placeable` trigger into one error per reason.
@@ -32,7 +24,7 @@ interface ApiErrorObject {
  * They can only be told apart by their message.
  */
 export function mapPlaceabilityErrors(error: unknown): PlaceabilityError[] {
-  const errors = extractErrorArray(error)
+  const errors = extractApiErrors(error)
   if (errors.length === 0) return []
 
   return errors.map((apiError) => ({
@@ -41,26 +33,4 @@ export function mapPlaceabilityErrors(error: unknown): PlaceabilityError[] {
     field: fieldFromPointer(apiError.source?.pointer),
     ...(apiError.meta?.error != null ? { meta: { error: apiError.meta.error } } : {}),
   }))
-}
-
-/**
- * `/data/attributes/payment_action` → `payment_action`.
- * `/data` (a base error, not tied to an attribute) → `base`.
- */
-function fieldFromPointer(pointer?: string): string | undefined {
-  if (pointer == null || pointer === "") return undefined
-  const last = pointer.split("/").pop()
-  if (last == null || last === "") return undefined
-  return last === "data" ? "base" : last
-}
-
-/**
- * The SDK surfaces API errors as a thrown object, but the exact wrapper has
- * moved between versions, so probe the two shapes rather than assuming one.
- */
-function extractErrorArray(error: unknown): ApiErrorObject[] {
-  if (error == null || typeof error !== "object") return []
-  const candidate = error as { errors?: unknown; response?: { data?: { errors?: unknown } } }
-  const errors = candidate.errors ?? candidate.response?.data?.errors
-  return Array.isArray(errors) ? (errors as ApiErrorObject[]) : []
 }

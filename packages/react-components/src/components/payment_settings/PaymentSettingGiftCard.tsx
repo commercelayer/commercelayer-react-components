@@ -1,4 +1,4 @@
-import { applyGiftCard, removeGiftCard } from "@commercelayer/core-components"
+import { applyGiftCard, mapGiftCardErrors, removeGiftCard } from "@commercelayer/core-components"
 import { type JSX, type ReactNode, useCallback, useContext, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
@@ -63,7 +63,7 @@ export function PaymentSettingGiftCard({ children, readonly }: Props): JSX.Eleme
         setInputRequested(false)
         await getOrder(order.id)
       } catch (error) {
-        setErrors([toGiftCardError(error)])
+        setErrors(toGiftCardErrors(error))
       } finally {
         setIsApplying(false)
       }
@@ -79,7 +79,7 @@ export function PaymentSettingGiftCard({ children, readonly }: Props): JSX.Eleme
         await removeGiftCard({ accessToken, interceptors, order, paymentSessionId })
         await getOrder(order.id)
       } catch (error) {
-        setErrors([toGiftCardError(error)])
+        setErrors(toGiftCardErrors(error))
       }
     },
     [accessToken, interceptors, order, getOrder]
@@ -114,17 +114,40 @@ export function PaymentSettingGiftCard({ children, readonly }: Props): JSX.Eleme
 /**
  * Both a code we recognise and the message the API sent.
  *
+ * The wording is dug out of the JSON:API `errors` array rather than read off
+ * `error.message`, which is empty on an SDK error — see `mapGiftCardErrors`,
+ * which also drops the `token - can't be blank` entry that rides along with
+ * every refusal.
+ *
  * The API collapses four different causes — no such code, expired, empty, bound
  * to another market — into one message, so we cannot tell the shopper *why*.
  * A translated consumer keys off `code`; one that wants the detail shows
- * `message`.
+ * `message`. `meta.error` carries the API's symbolic reason when there is one.
+ *
+ * The fallback is for a failure that never reached the API at all — a dropped
+ * connection, say — where there is no `errors` array to read.
  */
-function toGiftCardError(error: unknown): BaseError {
-  const message =
-    error instanceof Error
-      ? error.message
-      : "This gift card code could not be applied to the order."
-  return { code: "INVALID_FIELD_VALUE", resource: "gift_cards", field: "gift_card_code", message }
+function toGiftCardErrors(error: unknown): BaseError[] {
+  const mapped = mapGiftCardErrors(error).map((giftCardError) => ({
+    code: "INVALID_FIELD_VALUE" as const,
+    resource: "gift_cards" as const,
+    field: giftCardError.field,
+    message: giftCardError.message,
+    ...(giftCardError.meta != null ? { meta: giftCardError.meta } : {}),
+  }))
+  if (mapped.length > 0) return mapped
+
+  return [
+    {
+      code: "INVALID_FIELD_VALUE",
+      resource: "gift_cards",
+      field: "gift_card_code",
+      message:
+        error instanceof Error && error.message !== ""
+          ? error.message
+          : "This gift card code could not be applied to the order.",
+    },
+  ]
 }
 
 export default PaymentSettingGiftCard

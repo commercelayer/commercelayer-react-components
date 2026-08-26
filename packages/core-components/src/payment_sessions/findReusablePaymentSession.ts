@@ -6,6 +6,12 @@ interface FindReusablePaymentSessionParams {
   paymentSessions?: PaymentSession[] | null
   /** The Payment Setting the shopper selected. */
   paymentSettingId: string
+  /**
+   * What the session would have to pay, from `derivePaymentSessionsState`. When
+   * given, a session sized for a different remainder is not adopted. Omit it
+   * only where the remainder is unknown.
+   */
+  amountCents?: number
   /** Injectable for tests. Defaults to now. */
   now?: Date
 }
@@ -25,14 +31,26 @@ interface FindReusablePaymentSessionParams {
  * Sessions are always searched for, never read positionally: failed attempts
  * leave inert `unpaid` sessions behind, and a gift card (or, later, a split
  * payment) puts other settings' sessions in the same array.
+ *
+ * A session sized for a different remainder is not reusable either. Applying a
+ * gift card is supposed to delete it (`invalidateCurrentPaymentSession`), but
+ * that deletion is best effort and swallows its failures — so the amount is
+ * checked here as well, where adopting the wrong one would authorize more than
+ * is owed.
  */
 export function findReusablePaymentSession({
   paymentSessions,
   paymentSettingId,
+  amountCents,
   now = new Date(),
 }: FindReusablePaymentSessionParams): PaymentSession | undefined {
   return (paymentSessions ?? []).find((session) => {
     if (session.payment_setting?.id !== paymentSettingId) return false
+
+    // Only when both numbers are known: an order fetched without
+    // `amount_cents` in its `fields` must not lose reuse altogether.
+    if (amountCents != null && session.amount_cents != null && session.amount_cents !== amountCents)
+      return false
 
     // Anything past `unpaid` has taken money (or has been voided/refunded);
     // in both cases creating or adopting it again would be wrong.
