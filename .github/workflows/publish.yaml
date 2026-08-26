@@ -48,32 +48,56 @@ jobs:
         if: 'github.event.release.prerelease'
         run: |
           set -euo pipefail
-          # pnpm packs, because only it resolves the workspace: protocol into
-          # concrete versions. npm publishes, because npmjs trusted publishing
-          # expects npm's OIDC implementation -- pnpm's own token exchange 404s
-          # here. Dependency order, so a package never precedes what it needs.
-          for dir in packages/core-components \
-                     packages/react-hooks-components \
-                     packages/react-components; do
+          # Trusted publishing needs npm >= 11.5.1 and the ACTIONS_ID_TOKEN_*
+          # vars; log both, since their absence is invisible in an ENEEDAUTH.
+          echo "npm $(npm --version)"
+          echo "OIDC request url: ${ACTIONS_ID_TOKEN_REQUEST_URL:-ABSENT}"
+
+          pkgs=(packages/core-components \
+                packages/react-hooks-components \
+                packages/react-components)
+
+          # Pack first, while every workspace manifest is still untouched, so
+          # pnpm resolves the workspace: protocol against the real versions.
+          for dir in "${pkgs[@]}"; do
             out=$(mktemp -d)
             ( cd "$dir" && pnpm pack --pack-destination "$out" )
-            npm publish "$out"/*.tgz --tag next --access public
+            tar -xzOf "$out"/*.tgz package/package.json > "$dir/package.json.resolved"
+          done
+
+          # Then publish from the real directories: provenance and the OIDC
+          # exchange are not supported for an out-of-band tarball.
+          for dir in "${pkgs[@]}"; do
+            mv "$dir/package.json.resolved" "$dir/package.json"
+            ( cd "$dir" && npm publish --tag next --access public )
           done
 
       - name: Publish 🚀 PRODUCTION
         if: '!github.event.release.prerelease'
         run: |
           set -euo pipefail
-          # pnpm packs, because only it resolves the workspace: protocol into
-          # concrete versions. npm publishes, because npmjs trusted publishing
-          # expects npm's OIDC implementation -- pnpm's own token exchange 404s
-          # here. Dependency order, so a package never precedes what it needs.
-          for dir in packages/core-components \
-                     packages/react-hooks-components \
-                     packages/react-components; do
+          # Trusted publishing needs npm >= 11.5.1 and the ACTIONS_ID_TOKEN_*
+          # vars; log both, since their absence is invisible in an ENEEDAUTH.
+          echo "npm $(npm --version)"
+          echo "OIDC request url: ${ACTIONS_ID_TOKEN_REQUEST_URL:-ABSENT}"
+
+          pkgs=(packages/core-components \
+                packages/react-hooks-components \
+                packages/react-components)
+
+          # Pack first, while every workspace manifest is still untouched, so
+          # pnpm resolves the workspace: protocol against the real versions.
+          for dir in "${pkgs[@]}"; do
             out=$(mktemp -d)
             ( cd "$dir" && pnpm pack --pack-destination "$out" )
-            npm publish "$out"/*.tgz --access public
+            tar -xzOf "$out"/*.tgz package/package.json > "$dir/package.json.resolved"
+          done
+
+          # Then publish from the real directories: provenance and the OIDC
+          # exchange are not supported for an out-of-band tarball.
+          for dir in "${pkgs[@]}"; do
+            mv "$dir/package.json.resolved" "$dir/package.json"
+            ( cd "$dir" && npm publish --access public )
           done
 
       - name: Post to a Slack channel
