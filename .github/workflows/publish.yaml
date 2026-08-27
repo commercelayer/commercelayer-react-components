@@ -39,35 +39,15 @@ jobs:
       - name: Uncommitted changes 🔎
         run: git status
 
-      - name: Check the npm token 🔑
-        # OIDC cannot be used for these packages: npm's token exchange answers
-        # "package not found" for @commercelayer/core-components and
-        # @commercelayer/react-hooks-components even though their metadata is
-        # served fine, the condition reported in npm/cli#8678 and closed with
-        # no fix. So publishing goes through a token, and an empty secret must
-        # fail loudly here rather than as an opaque 404 from the registry.
-        run: |
-          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
-            echo "::error::the NPM_TOKEN secret is empty or not visible to this repository"
-            exit 1
-          fi
-          echo "token present, length ${#NODE_AUTH_TOKEN}"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Publish 🚀 PRERELEASE
         if: 'github.event.release.prerelease'
         run: |
           pnpm -r publish --tag next --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish 🚀 PRODUCTION
         if: '!github.event.release.prerelease'
         run: |
           pnpm -r publish --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Post to a Slack channel
         id: slack
