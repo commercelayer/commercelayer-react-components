@@ -122,6 +122,11 @@ interface Props {
   environment?: CoreConfiguration["environment"]
 }
 
+// Adyen's own fallback when a locale does not resolve, spelled the way Adyen documents it:
+// `language-REGION`. It used to read `en_US` here, which their client normalizes but their
+// payment request does not.
+const DEFAULT_LOCALE = "en-US"
+
 const defaultConfig: AdyenPaymentConfig = {}
 
 export function AdyenPayment({
@@ -129,7 +134,7 @@ export function AdyenPayment({
   config,
   templateCustomerSaveToWallet,
   environment = "test",
-  locale = "en_US",
+  locale = DEFAULT_LOCALE,
 }: Props): JSX.Element | null {
   const {
     cardContainerClassName,

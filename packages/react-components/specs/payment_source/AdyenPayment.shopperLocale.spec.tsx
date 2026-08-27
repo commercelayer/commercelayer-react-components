@@ -1,7 +1,8 @@
 // The Drop-in was translated correctly but the Klarna page it redirects to came up in Italian.
 // `locale` in the Core configuration is client-side only — it picks the Drop-in's translation
 // bundle and never reaches Adyen. The language Adyen uses for the hosted pages it renders
-// itself comes from `shopperLocale` in the payment request, which was not being sent.
+// itself comes from the shopper locale in the payment request — `shopper_locale` in Commerce
+// Layer's attributes — which was not being sent.
 import { act, render } from "@testing-library/react"
 import { AdyenPayment } from "#components/payment_source/AdyenPayment"
 import CommerceLayerContext from "#context/CommerceLayerContext"
@@ -147,7 +148,7 @@ describe("AdyenPayment shopperLocale", () => {
     adyen.captured.options = null
   })
 
-  it("sends shopperLocale derived from the order language", async () => {
+  it("sends shopper_locale derived from the order language", async () => {
     const { paymentRequestData, dropInLocale } = await submitAndCapturePaymentRequest({
       languageCode: "en",
     })
@@ -189,7 +190,7 @@ describe("AdyenPayment shopperLocale", () => {
     expect(paymentRequestData.shopper_locale).toBe("it-IT")
   })
 
-  it("omits shopperLocale when the language cannot be expanded", async () => {
+  it("omits shopper_locale when the language cannot be expanded", async () => {
     const { paymentRequestData } = await submitAndCapturePaymentRequest({
       languageCode: "xx",
     })
@@ -204,7 +205,7 @@ describe("AdyenPayment shopperLocale", () => {
     })
 
     // Same source the Drop-in falls back to, so the two stay consistent.
-    expect(dropInLocale).toBe("en_US")
+    expect(dropInLocale).toBe("en-US")
     expect(paymentRequestData.shopper_locale).toBe("en-US")
   })
 })
