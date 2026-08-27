@@ -384,12 +384,12 @@ export function AdyenPayment({
         origin: window.location.origin,
         redirect_from_issuer_method: "GET",
         shopper_ip: shopperIp,
-        shopperInteraction: "Ecommerce",
+        shopper_interaction: "Ecommerce",
         // The language Adyen renders its own hosted pages in (the Klarna screen a redirect
         // method hands over to). The Drop-in's `locale` is client-side only and never reaches
         // Adyen, so without this the hosted page falls back to the account default or the
-        // country code. snake_case because these are Commerce Layer attributes, and it is the
-        // API that maps them onto Adyen's own camelCase names.
+        // country code. snake_case, like every attribute in this payload: it is the API that
+        // maps them onto Adyen's own camelCase names.
         ...(shopperLocale != null ? { shopper_locale: shopperLocale } : {}),
         browser_info: {
           ...browserInfo(),
