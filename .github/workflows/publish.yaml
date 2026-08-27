@@ -32,6 +32,26 @@ jobs:
       - name: Update npm
         run: npm install -g npm@latest
 
+      - name: Clear the npmrc auth line 🔑
+        # setup-node writes //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}.
+        # With no NODE_AUTH_TOKEN the value stays literal, npm still reads the
+        # key as "credentials are configured", skips the OIDC exchange, and the
+        # PUT 404s. Only the token line goes: registry-url must stay, because
+        # without registry= npm answers ENEEDAUTH instead of exchanging.
+        # pnpm 10 got this right by accident -- it failed to expand the value
+        # and invoked npm without a token, so npm fell through to OIDC.
+        run: |
+          set -euo pipefail
+          npmrc="${NPM_CONFIG_USERCONFIG:-}"
+          [ -n "$npmrc" ] || npmrc="${RUNNER_TEMP:-/tmp}/.npmrc"
+          if [ -f "$npmrc" ]; then
+            sed -i '/_authToken/d' "$npmrc"
+            echo "npmrc after cleanup:"
+            cat "$npmrc"
+          else
+            echo "no npmrc at $npmrc"
+          fi
+
       - name: Install 📦
         run: pnpm install --frozen-lockfile
 
@@ -109,6 +129,16 @@ jobs:
               continue
             fi
             ( cd "$dir" && npm publish --access public )
+          done
+
+      - name: npm debug log 🔎
+        if: failure()
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for f in "$HOME"/.npm/_logs/*-debug-0.log; do
+            echo "===== $f ====="
+            cat "$f"
           done
 
       - name: Post to a Slack channel
