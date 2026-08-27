@@ -23,6 +23,7 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
+import { getAdyenShopperLocale } from "#utils/adyenShopperLocale"
 import browserInfo, { cleanUrlBy } from "#utils/browserInfo"
 import { getPublicIP } from "#utils/getPublicIp"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
@@ -96,6 +97,21 @@ export interface AdyenPaymentConfig {
    */
   onSelect?: (component: UIElement<UIElementProps>) => void
   giftcardErrorComponent?: (message: string) => JSX.Element
+  /**
+   * The locale Adyen should use for anything **it** renders — in particular the hosted page a
+   * redirect payment method sends the shopper to (Klarna, iDEAL, …). Sent as `shopper_locale`
+   * in the payment request, and it also selects the Drop-in's own translations.
+   *
+   * Without it the locale is derived from `order.language_code`, and Adyen falls back to the
+   * merchant account default or the country code when that language cannot be expanded — which
+   * is how a Drop-in in English ends up handing over to a Klarna page in Italian.
+   *
+   * Read once when the Drop-in is built: changing it on a mounted Drop-in has no effect.
+   *
+   * @default derived from `order.language_code` (see `getAdyenShopperLocale`)
+   * @example "en-US"
+   */
+  shopperLocale?: string
 }
 
 interface Props {
@@ -123,6 +139,7 @@ export function AdyenPayment({
     onReady,
     onSelect,
     subscriptionPaymentMethods,
+    shopperLocale: shopperLocaleConfig,
   } = {
     ...defaultConfig,
     ...config,
@@ -147,6 +164,19 @@ export function AdyenPayment({
   const authConfig = useContext(CommerceLayerContext)
   const { placeOrderButtonRef, setPlaceOrder, status } = useContext(PlaceOrderContext)
   const { customers } = useContext(CustomerContext)
+  // Two distinct locales that Adyen does not treat as interchangeable, deliberately derived
+  // from one source. `dropInLocale` goes into the Core configuration and is client-side only:
+  // it picks the Drop-in's translation bundle. `shopperLocale` travels with the payment
+  // request and is what Adyen uses for the pages it renders itself, which is why the two must
+  // not be allowed to disagree — a Drop-in in English handing over to a Klarna page in Italian
+  // is the bug this fixes.
+  //
+  // The config value is read here rather than only in the request, so an integration that
+  // sets it moves both. `getAdyenShopperLocale` then normalizes it (`en_US`, `PT_br`) and
+  // expands a bare `language_code` into the `language-REGION` form the payment request needs,
+  // returning undefined — and so omitting the field — rather than guessing.
+  const dropInLocale = shopperLocaleConfig ?? order?.language_code ?? locale
+  const shopperLocale = getAdyenShopperLocale(dropInLocale)
   const ref = useRef<null | HTMLFormElement>(null)
   const dropinRef = useRef<Dropin | null>(null)
   // The Core instance, kept alongside the Drop-in: refreshing the amount after a partial
@@ -350,6 +380,12 @@ export function AdyenPayment({
         redirect_from_issuer_method: "GET",
         shopper_ip: shopperIp,
         shopperInteraction: "Ecommerce",
+        // The language Adyen renders its own hosted pages in (the Klarna screen a redirect
+        // method hands over to). The Drop-in's `locale` is client-side only and never reaches
+        // Adyen, so without this the hosted page falls back to the account default or the
+        // country code. snake_case because these are Commerce Layer attributes, and it is the
+        // API that maps them onto Adyen's own camelCase names.
+        ...(shopperLocale != null ? { shopper_locale: shopperLocale } : {}),
         browser_info: {
           ...browserInfo(),
         },
@@ -627,7 +663,7 @@ export function AdyenPayment({
           : paymentMethodsResponse.paymentMethods
     }
     const options = {
-      locale: order?.language_code ?? locale,
+      locale: dropInLocale,
       environment,
       clientKey,
       amount: {
