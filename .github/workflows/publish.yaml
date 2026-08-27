@@ -44,12 +44,72 @@ jobs:
       - name: Publish 🚀 PRERELEASE
         if: 'github.event.release.prerelease'
         run: |
-          pnpm -r publish --tag next --no-git-checks --access public
+          set -euo pipefail
+          # pnpm 11 runs its own OIDC token exchange, it 404s here, and pnpm
+          # then falls back to publishing unauthenticated. pnpm 10 did no
+          # exchange of its own: it delegated to npm, whose exchange works and
+          # is what published v4.29.8-beta.0 with a signed provenance
+          # statement. So pnpm only packs, to resolve the workspace: protocol,
+          # and npm does the publishing.
+          pkgs=(packages/core-components \
+                packages/react-hooks-components \
+                packages/react-components)
+
+          # Pack every package before any manifest is swapped, so pnpm always
+          # resolves workspace: against untouched versions.
+          for dir in "${pkgs[@]}"; do
+            out=$(mktemp -d)
+            ( cd "$dir" && pnpm pack --pack-destination "$out" )
+            tar -xzOf "$out"/*.tgz package/package.json > "$dir/package.json.resolved"
+          done
+
+          for dir in "${pkgs[@]}"; do
+            mv "$dir/package.json.resolved" "$dir/package.json"
+            name=$(node -p "require('./$dir/package.json').name")
+            version=$(node -p "require('./$dir/package.json').version")
+            # Idempotent: a version already on the registry would abort the
+            # loop, which matters when a package was bootstrapped by hand.
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "$name@$version is already published, skipping"
+              continue
+            fi
+            ( cd "$dir" && npm publish --tag next --access public )
+          done
 
       - name: Publish 🚀 PRODUCTION
         if: '!github.event.release.prerelease'
         run: |
-          pnpm -r publish --no-git-checks --access public
+          set -euo pipefail
+          # pnpm 11 runs its own OIDC token exchange, it 404s here, and pnpm
+          # then falls back to publishing unauthenticated. pnpm 10 did no
+          # exchange of its own: it delegated to npm, whose exchange works and
+          # is what published v4.29.8-beta.0 with a signed provenance
+          # statement. So pnpm only packs, to resolve the workspace: protocol,
+          # and npm does the publishing.
+          pkgs=(packages/core-components \
+                packages/react-hooks-components \
+                packages/react-components)
+
+          # Pack every package before any manifest is swapped, so pnpm always
+          # resolves workspace: against untouched versions.
+          for dir in "${pkgs[@]}"; do
+            out=$(mktemp -d)
+            ( cd "$dir" && pnpm pack --pack-destination "$out" )
+            tar -xzOf "$out"/*.tgz package/package.json > "$dir/package.json.resolved"
+          done
+
+          for dir in "${pkgs[@]}"; do
+            mv "$dir/package.json.resolved" "$dir/package.json"
+            name=$(node -p "require('./$dir/package.json').name")
+            version=$(node -p "require('./$dir/package.json').version")
+            # Idempotent: a version already on the registry would abort the
+            # loop, which matters when a package was bootstrapped by hand.
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "$name@$version is already published, skipping"
+              continue
+            fi
+            ( cd "$dir" && npm publish --access public )
+          done
 
       - name: Post to a Slack channel
         id: slack
