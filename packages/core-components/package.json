@@ -16,6 +16,10 @@
       "default": "./dist/index.cjs"
     }
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/commercelayer/commercelayer-react-components.git"
+  },
   "keywords": [
     "jamstack",
     "headless",
