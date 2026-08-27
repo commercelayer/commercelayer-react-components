@@ -14,43 +14,21 @@ jobs:
 
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v7
+        uses: actions/checkout@v6
 
       - name: pnpm 🧰
-        # No version here: it must come from packageManager alone, or
-        # action-setup aborts with "Multiple versions of pnpm specified".
-        # netlify.toml depends on that field too, via Corepack.
         uses: pnpm/action-setup@v6
 
       - name: Node 🧰
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v6
         with:
           node-version: 24.x
           registry-url: https://registry.npmjs.org
           cache: 'pnpm'
 
+      # npm >= 11.5.1 is required for trusted publishing (OIDC) on npmjs.
       - name: Update npm
         run: npm install -g npm@latest
-
-      - name: Clear the npmrc auth line 🔑
-        # setup-node writes //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}.
-        # With no NODE_AUTH_TOKEN the value stays literal, npm still reads the
-        # key as "credentials are configured", skips the OIDC exchange, and the
-        # PUT 404s. Only the token line goes: registry-url must stay, because
-        # without registry= npm answers ENEEDAUTH instead of exchanging.
-        # pnpm 10 got this right by accident -- it failed to expand the value
-        # and invoked npm without a token, so npm fell through to OIDC.
-        run: |
-          set -euo pipefail
-          npmrc="${NPM_CONFIG_USERCONFIG:-}"
-          [ -n "$npmrc" ] || npmrc="${RUNNER_TEMP:-/tmp}/.npmrc"
-          if [ -f "$npmrc" ]; then
-            sed -i '/_authToken/d' "$npmrc"
-            echo "npmrc after cleanup:"
-            cat "$npmrc"
-          else
-            echo "no npmrc at $npmrc"
-          fi
 
       - name: Install 📦
         run: pnpm install --frozen-lockfile
@@ -64,89 +42,17 @@ jobs:
       - name: Publish 🚀 PRERELEASE
         if: 'github.event.release.prerelease'
         run: |
-          set -euo pipefail
-          # pnpm 11 runs its own OIDC token exchange, it 404s here, and pnpm
-          # then falls back to publishing unauthenticated. pnpm 10 did no
-          # exchange of its own: it delegated to npm, whose exchange works and
-          # is what published v4.29.8-beta.0 with a signed provenance
-          # statement. So pnpm only packs, to resolve the workspace: protocol,
-          # and npm does the publishing.
-          pkgs=(packages/core-components \
-                packages/react-hooks-components \
-                packages/react-components)
-
-          # Pack every package before any manifest is swapped, so pnpm always
-          # resolves workspace: against untouched versions.
-          for dir in "${pkgs[@]}"; do
-            out=$(mktemp -d)
-            ( cd "$dir" && pnpm pack --pack-destination "$out" )
-            tar -xzOf "$out"/*.tgz package/package.json > "$dir/package.json.resolved"
-          done
-
-          for dir in "${pkgs[@]}"; do
-            mv "$dir/package.json.resolved" "$dir/package.json"
-            name=$(node -p "require('./$dir/package.json').name")
-            version=$(node -p "require('./$dir/package.json').version")
-            # Idempotent: a version already on the registry would abort the
-            # loop, which matters when a package was bootstrapped by hand.
-            if npm view "$name@$version" version >/dev/null 2>&1; then
-              echo "$name@$version is already published, skipping"
-              continue
-            fi
-            ( cd "$dir" && npm publish --tag next --access public )
-          done
+          pnpm -r publish --tag next --no-git-checks --access public
 
       - name: Publish 🚀 PRODUCTION
         if: '!github.event.release.prerelease'
         run: |
-          set -euo pipefail
-          # pnpm 11 runs its own OIDC token exchange, it 404s here, and pnpm
-          # then falls back to publishing unauthenticated. pnpm 10 did no
-          # exchange of its own: it delegated to npm, whose exchange works and
-          # is what published v4.29.8-beta.0 with a signed provenance
-          # statement. So pnpm only packs, to resolve the workspace: protocol,
-          # and npm does the publishing.
-          pkgs=(packages/core-components \
-                packages/react-hooks-components \
-                packages/react-components)
-
-          # Pack every package before any manifest is swapped, so pnpm always
-          # resolves workspace: against untouched versions.
-          for dir in "${pkgs[@]}"; do
-            out=$(mktemp -d)
-            ( cd "$dir" && pnpm pack --pack-destination "$out" )
-            tar -xzOf "$out"/*.tgz package/package.json > "$dir/package.json.resolved"
-          done
-
-          for dir in "${pkgs[@]}"; do
-            mv "$dir/package.json.resolved" "$dir/package.json"
-            name=$(node -p "require('./$dir/package.json').name")
-            version=$(node -p "require('./$dir/package.json').version")
-            # Idempotent: a version already on the registry would abort the
-            # loop, which matters when a package was bootstrapped by hand.
-            if npm view "$name@$version" version >/dev/null 2>&1; then
-              echo "$name@$version is already published, skipping"
-              continue
-            fi
-            ( cd "$dir" && npm publish --access public )
-          done
-
-      - name: npm debug log 🔎
-        if: failure()
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-          for f in "$HOME"/.npm/_logs/*-debug-0.log; do
-            echo "===== $f ====="
-            cat "$f"
-          done
+          pnpm -r publish --no-git-checks --access public
 
       - name: Post to a Slack channel
         id: slack
-        uses: slackapi/slack-github-action@v3.0.5
+        uses: slackapi/slack-github-action@v1.25.0
         with:
-          webhook: ${{ secrets.PIPELINE_SLACK_CHANNEL_WEBHOOK_URL }}
-          webhook-type: incoming-webhook
           # Slack channel id, channel name, or user id to post message.
           # See also: https://api.slack.com/methods/chat.postMessage#channels
           # channel-id: 'pipeline'
@@ -191,3 +97,6 @@ jobs:
                 }
               ]
             }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.PIPELINE_SLACK_CHANNEL_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
