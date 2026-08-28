@@ -1,4 +1,13 @@
-import { type JSX, type ReactNode, type RefObject, useContext, useEffect, useReducer } from "react"
+import {
+  type JSX,
+  type ReactNode,
+  type RefObject,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useSyncExternalStore,
+} from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
@@ -10,7 +19,9 @@ import placeOrderReducer, {
   setPlaceOrderStatus,
 } from "#reducers/PlaceOrderReducer"
 import useCustomContext from "#utils/hooks/useCustomContext"
+import { useMissingTermsCheckboxWarning } from "#utils/hooks/useMissingTermsCheckboxWarning"
 import { useOrganizationConfig } from "#utils/organization"
+import { getAcceptedSnapshot, subscribe as subscribeToTerms } from "#utils/termsAcceptanceStore"
 import { setPlaceOrder } from "../../reducers/PlaceOrderReducer"
 
 interface Props {
@@ -37,6 +48,20 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
   const organizationConfig = useOrganizationConfig({
     accessToken: config.accessToken,
   })
+  // Privacy & terms acceptance lives in a module-level store because
+  // <PrivacyAndTermsCheckbox> is a sibling of <PlaceOrderButton>, not a child.
+  // Subscribing here is what makes the button react the moment it changes.
+  const orderId = order?.id
+  const stableSubscribe = useCallback(
+    (listener: () => void) => subscribeToTerms(orderId, listener),
+    [orderId]
+  )
+  const termsAccepted = useSyncExternalStore(
+    stableSubscribe,
+    useCallback(() => getAcceptedSnapshot(orderId), [orderId]),
+    // c8 ignore next — server snapshot only used during SSR hydration
+    () => false
+  )
   // biome-ignore lint/correctness/useExhaustiveDependencies: Infinite loop
   useEffect(() => {
     if (!include?.includes("shipments.available_shipping_methods")) {
@@ -89,9 +114,12 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
         },
         privacyUrl: organizationConfig?.urls?.privacy,
         termsUrl: organizationConfig?.urls?.terms,
+        termsAccepted,
       })
     }
-  }, [order, include, includeLoaded, organizationConfig])
+  }, [order, include, includeLoaded, organizationConfig, termsAccepted])
+  useMissingTermsCheckboxWarning(state.termsBlocking, orderId)
+
   const contextValue = {
     ...state,
     _isProvided: true as const,
@@ -127,6 +155,7 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
         },
         privacyUrl: organizationConfig?.urls?.privacy,
         termsUrl: organizationConfig?.urls?.terms,
+        termsAccepted,
       })
     },
     setButtonRef: (ref: RefObject<HTMLButtonElement | null>) => {

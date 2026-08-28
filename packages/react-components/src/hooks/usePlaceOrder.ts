@@ -1,5 +1,5 @@
 import type { RefObject } from "react"
-import { useCallback, useContext, useEffect, useMemo, useReducer } from "react"
+import { useCallback, useContext, useEffect, useMemo, useReducer, useSyncExternalStore } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import placeOrderReducer, {
@@ -10,23 +10,18 @@ import placeOrderReducer, {
   setPlaceOrder,
   setPlaceOrderStatus,
 } from "#reducers/PlaceOrderReducer"
+import { useMissingTermsCheckboxWarning } from "#utils/hooks/useMissingTermsCheckboxWarning"
 import { useOrganizationConfig } from "#utils/organization"
-
-/**
- * Custom DOM event dispatched by `<PrivacyAndTermsCheckbox>` in standalone mode
- * so that a sibling `<PlaceOrderButton>` can re-run `placeOrderPermitted` when
- * the checkbox state changes.
- */
-export const PLACE_ORDER_RECHECK_EVENT = "cl:placeorder:recheck"
+import { getAcceptedSnapshot, subscribe as subscribeToTerms } from "#utils/termsAcceptanceStore"
 
 /**
  * Manages place-order state in standalone mode.
  *
  * When `isStandalone` is `true` the hook replicates the behaviour of
  * `<PlaceOrderContainer>`: it registers the required resource includes on
- * `OrderContext`, evaluates `placeOrderPermitted` whenever the order changes,
- * and returns a fully-bound context value ready to be passed to
- * `<PlaceOrderContext.Provider>`.
+ * `OrderContext`, evaluates `placeOrderPermitted` whenever the order or privacy
+ * & terms acceptance changes, and returns a fully-bound context value ready to
+ * be passed to `<PlaceOrderContext.Provider>`.
  *
  * When `isStandalone` is `false` (i.e. a `<PlaceOrderContainer>` parent is
  * already present) all effects are no-ops and the returned value is unused —
@@ -44,6 +39,19 @@ export function usePlaceOrder({
     useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
   const organizationConfig = useOrganizationConfig({ accessToken: config.accessToken })
+  // <PrivacyAndTermsCheckbox> is a sibling of <PlaceOrderButton>, so acceptance
+  // travels through a module-level store rather than React context.
+  const orderId = order?.id
+  const stableSubscribe = useCallback(
+    (listener: () => void) => subscribeToTerms(orderId, listener),
+    [orderId]
+  )
+  const termsAccepted = useSyncExternalStore(
+    stableSubscribe,
+    useCallback(() => getAcceptedSnapshot(orderId), [orderId]),
+    // c8 ignore next — server snapshot only used during SSR hydration
+    () => false
+  )
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: mirrors PlaceOrderContainer behavior
   useEffect(() => {
@@ -87,28 +95,12 @@ export function usePlaceOrder({
         options,
         privacyUrl: organizationConfig?.urls?.privacy,
         termsUrl: organizationConfig?.urls?.terms,
+        termsAccepted,
       })
     }
-  }, [order, include, includeLoaded, organizationConfig, isStandalone])
+  }, [order, include, includeLoaded, organizationConfig, isStandalone, termsAccepted])
 
-  // Re-run placeOrderPermitted when PrivacyAndTermsCheckbox signals a change
-  useEffect(() => {
-    if (!isStandalone) return
-    const recheck = (): void => {
-      if (order) {
-        placeOrderPermitted({
-          config,
-          dispatch,
-          order,
-          options,
-          privacyUrl: organizationConfig?.urls?.privacy,
-          termsUrl: organizationConfig?.urls?.terms,
-        })
-      }
-    }
-    window.addEventListener(PLACE_ORDER_RECHECK_EVENT, recheck)
-    return () => window.removeEventListener(PLACE_ORDER_RECHECK_EVENT, recheck)
-  }, [isStandalone, order, config, options, organizationConfig])
+  useMissingTermsCheckboxWarning(isStandalone ? state.termsBlocking : false, orderId)
 
   const setButtonRefCallback = useCallback(
     (ref: RefObject<HTMLButtonElement | null>) => setButtonRef(ref, dispatch),
@@ -129,8 +121,9 @@ export function usePlaceOrder({
       options,
       privacyUrl: organizationConfig?.urls?.privacy,
       termsUrl: organizationConfig?.urls?.terms,
+      termsAccepted,
     })
-  }, [config, order, options, organizationConfig])
+  }, [config, order, options, organizationConfig, termsAccepted])
 
   return useMemo(
     () => ({
