@@ -10,6 +10,7 @@ import placeOrderReducer, {
   setPlaceOrder,
   setPlaceOrderStatus,
 } from "#reducers/PlaceOrderReducer"
+import { useHalfConfiguredTermsWarning } from "#utils/hooks/useHalfConfiguredTermsWarning"
 import { useMissingTermsCheckboxWarning } from "#utils/hooks/useMissingTermsCheckboxWarning"
 import { useOrganizationConfig } from "#utils/organization"
 import { getAcceptedSnapshot, subscribe as subscribeToTerms } from "#utils/termsAcceptanceStore"
@@ -101,6 +102,10 @@ export function usePlaceOrder({
   }, [order, include, includeLoaded, organizationConfig, isStandalone, termsAccepted])
 
   useMissingTermsCheckboxWarning(isStandalone ? state.termsBlocking : false, orderId)
+  useHalfConfiguredTermsWarning(
+    organizationConfig?.urls?.privacy ?? order?.privacy_url,
+    organizationConfig?.urls?.terms ?? order?.terms_url
+  )
 
   const setButtonRefCallback = useCallback(
     (ref: RefObject<HTMLButtonElement | null>) => setButtonRef(ref, dispatch),

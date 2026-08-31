@@ -19,6 +19,7 @@ import placeOrderReducer, {
   setPlaceOrderStatus,
 } from "#reducers/PlaceOrderReducer"
 import useCustomContext from "#utils/hooks/useCustomContext"
+import { useHalfConfiguredTermsWarning } from "#utils/hooks/useHalfConfiguredTermsWarning"
 import { useMissingTermsCheckboxWarning } from "#utils/hooks/useMissingTermsCheckboxWarning"
 import { useOrganizationConfig } from "#utils/organization"
 import { getAcceptedSnapshot, subscribe as subscribeToTerms } from "#utils/termsAcceptanceStore"
@@ -119,6 +120,10 @@ export function PlaceOrderContainer(props: Props): JSX.Element {
     }
   }, [order, include, includeLoaded, organizationConfig, termsAccepted])
   useMissingTermsCheckboxWarning(state.termsBlocking, orderId)
+  useHalfConfiguredTermsWarning(
+    organizationConfig?.urls?.privacy ?? order?.privacy_url,
+    organizationConfig?.urls?.terms ?? order?.terms_url
+  )
 
   const contextValue = {
     ...state,
