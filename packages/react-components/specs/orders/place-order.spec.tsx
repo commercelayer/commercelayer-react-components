@@ -9,7 +9,13 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import PaymentMethodContext, { defaultPaymentMethodContext } from "#context/PaymentMethodContext"
 import PlaceOrderContext, { defaultPlaceOrderContext } from "#context/PlaceOrderContext"
-import { PLACE_ORDER_RECHECK_EVENT, usePlaceOrder } from "#hooks/usePlaceOrder"
+import { usePlaceOrder } from "#hooks/usePlaceOrder"
+import {
+  getAcceptedSnapshot,
+  getCheckboxCount,
+  resetTermsAcceptanceStore,
+  setAccepted,
+} from "#utils/termsAcceptanceStore"
 
 vi.mock("@commercelayer/core-components", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@commercelayer/core-components")>()
@@ -386,8 +392,13 @@ describe("PlaceOrderButton (standalone)", () => {
   })
 
   it("stays disabled when paymentMethodErrors clear but privacy/terms checkbox is not checked", async () => {
-    localStorage.clear()
-    // Order with privacy/terms URLs — checkbox NOT checked (nothing in localStorage)
+    resetTermsAcceptanceStore()
+    // A card IS selected, so `card.brand` is truthy and the enabling condition is
+    // live — without this the test passes on the wrong factor and would still pass
+    // with the privacy/terms gate deleted entirely.
+    const getCardDetails = (await import("#utils/getCardDetails")).default
+    vi.mocked(getCardDetails).mockReturnValue({ brand: "visa" } as never)
+    // Order with privacy/terms URLs — nothing accepted in the store
     const order = {
       ...MOCK_ORDER,
       privacy_url: "https://example.com/privacy",
@@ -424,10 +435,11 @@ describe("PlaceOrderButton (standalone)", () => {
     await waitFor(() => {
       expect(screen.getByRole("button").hasAttribute("disabled")).toBe(true)
     })
+    vi.mocked(getCardDetails).mockReturnValue({ brand: "" } as never)
   })
 
   it("stays disabled when no payment method is selected even if errors clear", async () => {
-    localStorage.clear()
+    resetTermsAcceptanceStore()
     const orderNoPayment = {
       ...MOCK_ORDER,
       payment_method: null,
@@ -536,20 +548,66 @@ describe("PlaceOrderButton (container mode)", () => {
 // ---------------------------------------------------------------------------
 
 describe("PlaceOrderButton (free order)", () => {
-  it("is enabled for free order when permitted", async () => {
+  beforeEach(() => {
+    resetTermsAcceptanceStore()
+  })
+
+  // A real free order carries no payment method at all.
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  const FREE_NO_PAYMENT: any = {
+    ...MOCK_ORDER_FREE,
+    payment_method: null,
+    payment_source: null,
+  }
+
+  async function renderFree(
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    order: any,
+    currentPaymentMethodType?: string
+  ): Promise<boolean> {
     render(
-      <Providers order={MOCK_ORDER_FREE}>
+      <Providers order={order} currentPaymentMethodType={currentPaymentMethodType}>
         <PlaceOrderContainer>
           <PlaceOrderButton />
         </PlaceOrderContainer>
       </Providers>
     )
-    const btn = screen.getByRole("button")
-    // free order + isPermitted from container → not disabled
-    await waitFor(() => {
-      // button may eventually be enabled
-      expect(btn).toBeDefined()
+    const btn = await waitFor(() => screen.getByRole("button"))
+    // Let the container dispatch and the button's effect settle.
+    await act(async () => {
+      await Promise.resolve()
     })
+    return !btn.hasAttribute("disabled")
+  }
+
+  it("is enabled for a complete free order with no payment method", async () => {
+    expect(await renderFree(FREE_NO_PAYMENT, undefined)).toBe(true)
+  })
+
+  it("is disabled for a free order missing the billing address", async () => {
+    expect(await renderFree({ ...FREE_NO_PAYMENT, billing_address: null }, undefined)).toBe(false)
+  })
+
+  it("is disabled for a shippable free order missing the shipping address", async () => {
+    expect(
+      await renderFree(
+        {
+          ...FREE_NO_PAYMENT,
+          shipping_address: null,
+          line_items: [{ item_type: "skus", id: "li-1" }],
+        },
+        undefined
+      )
+    ).toBe(false)
+  })
+
+  it("is disabled for a free order whose privacy/terms are not accepted", async () => {
+    expect(
+      await renderFree(
+        { ...FREE_NO_PAYMENT, privacy_url: "https://o/p", terms_url: "https://o/t" },
+        undefined
+      )
+    ).toBe(false)
   })
 })
 
@@ -559,12 +617,12 @@ describe("PlaceOrderButton (free order)", () => {
 
 describe("PrivacyAndTermsCheckbox (standalone)", () => {
   beforeEach(() => {
-    localStorage.clear()
+    resetTermsAcceptanceStore()
     vi.clearAllMocks()
   })
 
   afterEach(() => {
-    localStorage.clear()
+    resetTermsAcceptanceStore()
   })
 
   it("renders a checkbox input", () => {
@@ -602,67 +660,73 @@ describe("PrivacyAndTermsCheckbox (standalone)", () => {
     })
   })
 
-  it("dispatches PLACE_ORDER_RECHECK_EVENT on change in standalone mode", async () => {
-    const handler = vi.fn()
-    window.addEventListener(PLACE_ORDER_RECHECK_EVENT, handler)
-
-    render(
-      <Providers
-        order={{
-          ...MOCK_ORDER,
-          privacy_url: "https://example.com/privacy",
-          terms_url: "https://example.com/terms",
-        }}
-      >
-        <PrivacyAndTermsCheckbox />
-      </Providers>
-    )
-
-    await waitFor(() => {
-      expect(screen.getByRole("checkbox").getAttribute("disabled")).toBeNull()
-    })
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole("checkbox"))
-    })
-
-    expect(handler).toHaveBeenCalledTimes(1)
-    window.removeEventListener(PLACE_ORDER_RECHECK_EVENT, handler)
-  })
-
-  it("writes to localStorage on change", async () => {
-    render(
-      <Providers
-        order={{
-          ...MOCK_ORDER,
-          privacy_url: "https://example.com/privacy",
-          terms_url: "https://example.com/terms",
-        }}
-      >
-        <PrivacyAndTermsCheckbox />
-      </Providers>
-    )
-
-    await waitFor(() => {
-      expect(screen.getByRole("checkbox").getAttribute("disabled")).toBeNull()
-    })
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole("checkbox"))
-    })
-
-    expect(localStorage.getItem("privacy-terms")).toBe("true")
-  })
-
-  it("cleans up localStorage on unmount", () => {
-    localStorage.setItem("privacy-terms", "true")
+  it("registers itself in the store while mounted", async () => {
     const { unmount } = render(
-      <Providers>
+      <Providers
+        order={{
+          ...MOCK_ORDER,
+          privacy_url: "https://example.com/privacy",
+          terms_url: "https://example.com/terms",
+        }}
+      >
         <PrivacyAndTermsCheckbox />
       </Providers>
     )
+    await waitFor(() => {
+      expect(getCheckboxCount("order-1")).toBe(1)
+    })
     unmount()
-    expect(localStorage.getItem("privacy-terms")).toBeNull()
+    expect(getCheckboxCount("order-1")).toBe(0)
+  })
+
+  it("records acceptance in the store on change", async () => {
+    render(
+      <Providers
+        order={{
+          ...MOCK_ORDER,
+          privacy_url: "https://example.com/privacy",
+          terms_url: "https://example.com/terms",
+        }}
+      >
+        <PrivacyAndTermsCheckbox />
+      </Providers>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole("checkbox").getAttribute("disabled")).toBeNull()
+    })
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("checkbox"))
+    })
+
+    expect(getAcceptedSnapshot("order-1")).toBe(true)
+    expect((screen.getByRole("checkbox") as HTMLInputElement).checked).toBe(true)
+  })
+
+  it("resets acceptance when the last checkbox unmounts", async () => {
+    const { unmount } = render(
+      <Providers
+        order={{
+          ...MOCK_ORDER,
+          privacy_url: "https://example.com/privacy",
+          terms_url: "https://example.com/terms",
+        }}
+      >
+        <PrivacyAndTermsCheckbox />
+      </Providers>
+    )
+    await waitFor(() => {
+      expect(screen.getByRole("checkbox").getAttribute("disabled")).toBeNull()
+    })
+    await act(async () => {
+      fireEvent.click(screen.getByRole("checkbox"))
+    })
+    expect(getAcceptedSnapshot("order-1")).toBe(true)
+
+    // Consent must not outlive the control that collected it.
+    unmount()
+    expect(getAcceptedSnapshot("order-1")).toBe(false)
   })
 
   it("reads privacy/terms URL from organizationConfig when not on order", async () => {
@@ -694,155 +758,99 @@ describe("PrivacyAndTermsCheckbox (standalone)", () => {
 
 describe("PrivacyAndTermsCheckbox (container mode)", () => {
   beforeEach(() => {
-    localStorage.clear()
+    resetTermsAcceptanceStore()
     vi.clearAllMocks()
   })
 
   afterEach(() => {
-    localStorage.clear()
+    resetTermsAcceptanceStore()
   })
 
-  it("calls placeOrderPermitted from context on change", async () => {
-    const placeOrderPermittedMock = vi.fn()
+  it("toggling the checkbox flips the button inside PlaceOrderContainer", async () => {
+    const order = {
+      ...MOCK_ORDER,
+      privacy_url: "https://example.com/privacy",
+      terms_url: "https://example.com/terms",
+    }
+    const getCardDetails = (await import("#utils/getCardDetails")).default
+    vi.mocked(getCardDetails).mockReturnValue({ brand: "visa" } as never)
+
     render(
-      <Providers
-        order={{
-          ...MOCK_ORDER,
-          privacy_url: "https://example.com/privacy",
-          terms_url: "https://example.com/terms",
-        }}
-      >
-        <PlaceOrderContext.Provider
-          value={{
-            ...defaultPlaceOrderContext,
-            _isProvided: true as const,
-            placeOrderPermitted: placeOrderPermittedMock,
-          }}
-        >
+      <Providers order={order}>
+        <PlaceOrderContainer>
           <PrivacyAndTermsCheckbox />
-        </PlaceOrderContext.Provider>
+          <PlaceOrderButton />
+        </PlaceOrderContainer>
       </Providers>
     )
 
     await waitFor(() => {
       expect(screen.getByRole("checkbox").getAttribute("disabled")).toBeNull()
     })
+    expect(screen.getByRole("button").hasAttribute("disabled")).toBe(true)
 
     await act(async () => {
       fireEvent.click(screen.getByRole("checkbox"))
     })
-
-    expect(placeOrderPermittedMock).toHaveBeenCalledTimes(1)
-  })
-
-  it("does NOT dispatch PLACE_ORDER_RECHECK_EVENT in container mode", async () => {
-    const handler = vi.fn()
-    window.addEventListener(PLACE_ORDER_RECHECK_EVENT, handler)
-
-    render(
-      <Providers
-        order={{
-          ...MOCK_ORDER,
-          privacy_url: "https://example.com/privacy",
-          terms_url: "https://example.com/terms",
-        }}
-      >
-        <PlaceOrderContext.Provider
-          value={{
-            ...defaultPlaceOrderContext,
-            _isProvided: true as const,
-            placeOrderPermitted: vi.fn(),
-          }}
-        >
-          <PrivacyAndTermsCheckbox />
-        </PlaceOrderContext.Provider>
-      </Providers>
-    )
-
     await waitFor(() => {
-      expect(screen.getByRole("checkbox").getAttribute("disabled")).toBeNull()
+      expect(screen.getByRole("button").hasAttribute("disabled")).toBe(false)
     })
 
-    await act(async () => {
-      fireEvent.click(screen.getByRole("checkbox"))
-    })
-
-    expect(handler).not.toHaveBeenCalled()
-    window.removeEventListener(PLACE_ORDER_RECHECK_EVENT, handler)
+    vi.mocked(getCardDetails).mockReturnValue({ brand: "" } as never)
   })
+
 })
 
 // ---------------------------------------------------------------------------
-// usePlaceOrder hook — PLACE_ORDER_RECHECK_EVENT listener
+// usePlaceOrder hook — terms acceptance store integration
 // ---------------------------------------------------------------------------
 
-describe("usePlaceOrder RECHECK_EVENT integration", () => {
+describe("usePlaceOrder store integration (standalone)", () => {
   beforeEach(() => {
-    localStorage.clear()
+    resetTermsAcceptanceStore()
     vi.clearAllMocks()
   })
 
-  afterEach(() => {
-    localStorage.clear()
-  })
+  it("re-runs placeOrderPermitted when acceptance changes in the store", async () => {
+    const order = {
+      ...MOCK_ORDER,
+      privacy_url: "https://example.com/privacy",
+      terms_url: "https://example.com/terms",
+    }
+    const getCardDetails = (await import("#utils/getCardDetails")).default
+    vi.mocked(getCardDetails).mockReturnValue({ brand: "visa" } as never)
 
-  it("re-runs placeOrderPermitted when RECHECK event is dispatched", async () => {
-    // Render standalone PlaceOrderButton + PrivacyAndTermsCheckbox
     render(
-      <Providers
-        order={{
-          ...MOCK_ORDER,
-          privacy_url: "https://example.com/privacy",
-          terms_url: "https://example.com/terms",
-        }}
-      >
+      <Providers order={order}>
         <PrivacyAndTermsCheckbox />
         <PlaceOrderButton />
       </Providers>
     )
 
-    const checkbox = screen.getByRole("checkbox")
-    const button = screen.getByRole("button")
-
     await waitFor(() => {
-      expect(checkbox.getAttribute("disabled")).toBeNull()
+      expect(screen.getByRole("checkbox").getAttribute("disabled")).toBeNull()
     })
+    // Nothing accepted yet: the gate holds.
+    expect(screen.getByRole("button").hasAttribute("disabled")).toBe(true)
 
-    // Initially button is disabled (not permitted — privacy not accepted)
-    expect(button.getAttribute("disabled")).toBeDefined()
-
-    // Check the privacy checkbox → dispatches RECHECK → usePlaceOrder re-evaluates
-    localStorage.setItem("privacy-terms", "true")
     await act(async () => {
-      fireEvent.click(checkbox)
+      fireEvent.click(screen.getByRole("checkbox"))
     })
 
-    // RECHECK event was dispatched; hook should re-evaluate permissions
+    // The store notified the standalone hook, which recomputed isPermitted.
     await waitFor(() => {
-      expect(screen.getByRole("checkbox")).toBeDefined()
+      expect(screen.getByRole("button").hasAttribute("disabled")).toBe(false)
     })
-  })
 
-  it("usePlaceOrder does not listen for recheck event in container mode", async () => {
-    // In container mode, the button uses parentCtx, hook is no-op
-    const recheckHandler = vi.fn()
-    window.addEventListener(PLACE_ORDER_RECHECK_EVENT, recheckHandler)
+    // Unchecking must close the gate again.
+    await act(async () => {
+      fireEvent.click(screen.getByRole("checkbox"))
+    })
+    await waitFor(() => {
+      expect(screen.getByRole("button").hasAttribute("disabled")).toBe(true)
+    })
 
-    render(
-      <Providers>
-        <PlaceOrderContext.Provider
-          value={{ ...defaultPlaceOrderContext, _isProvided: true as const }}
-        >
-          <PlaceOrderButton />
-        </PlaceOrderContext.Provider>
-      </Providers>
-    )
-
-    window.dispatchEvent(new CustomEvent(PLACE_ORDER_RECHECK_EVENT))
-    // The container-mode button does not register listeners; the event is not handled by usePlaceOrder
-    expect(recheckHandler).toHaveBeenCalledTimes(1) // event fired, but no error
-
-    window.removeEventListener(PLACE_ORDER_RECHECK_EVENT, recheckHandler)
+    vi.mocked(getCardDetails).mockReturnValue({ brand: "" } as never)
   })
 })
 
@@ -1192,10 +1200,12 @@ describe("usePlaceOrder callbacks (via PlaceOrderButton standalone)", () => {
       </Providers>
     )
     await waitFor(() => expect(screen.getByRole("button")).toBeDefined())
-    // Dispatch the recheck event — exercises placeOrderPermittedCallback (line 125)
+    // Flipping acceptance in the store exercises placeOrderPermittedCallback.
     await act(async () => {
-      window.dispatchEvent(new CustomEvent(PLACE_ORDER_RECHECK_EVENT))
+      setAccepted("order-1", true)
     })
+    expect(getAcceptedSnapshot("order-1")).toBe(true)
+    // No checkbox is mounted, so the gate must still refuse to open.
     expect(screen.getByRole("button")).toBeDefined()
   })
 
@@ -1224,12 +1234,12 @@ describe("usePlaceOrder callbacks (via PlaceOrderButton standalone)", () => {
 
 describe("PrivacyAndTermsCheckbox edge cases", () => {
   beforeEach(() => {
-    localStorage.clear()
+    resetTermsAcceptanceStore()
     vi.clearAllMocks()
   })
 
   afterEach(() => {
-    localStorage.clear()
+    resetTermsAcceptanceStore()
   })
 
   it("does nothing when container mode but placeOrderPermitted is not provided", async () => {
@@ -1275,7 +1285,7 @@ describe("PrivacyAndTermsCheckbox edge cases", () => {
 
 describe("usePlaceOrder hook direct", () => {
   beforeEach(async () => {
-    localStorage.clear()
+    resetTermsAcceptanceStore()
     vi.clearAllMocks()
     const { getSdk } = await import("@commercelayer/core-components")
     vi.mocked(getSdk).mockReturnValue({
@@ -1290,7 +1300,7 @@ describe("usePlaceOrder hook direct", () => {
     } as any)
   })
 
-  afterEach(() => localStorage.clear())
+  afterEach(() => resetTermsAcceptanceStore())
 
   function wrapper({ children }: { children: ReactNode }) {
     return (
@@ -1484,11 +1494,11 @@ describe("usePlaceOrder hook direct", () => {
       )
     }
     renderHook(() => usePlaceOrder({ isStandalone: true }), { wrapper: wrapperNoOrder })
-    // Dispatch the recheck event with no order — should not throw
+    // Acceptance recorded with no order loaded must not throw.
     await act(async () => {
-      window.dispatchEvent(new CustomEvent(PLACE_ORDER_RECHECK_EVENT))
+      setAccepted(undefined, true)
     })
-    // No assertion needed: coverage is the goal; test passes if no error thrown
+    expect(getAcceptedSnapshot(undefined)).toBe(true)
   })
 
   it("covers billing_address includeLoaded else-if branch (line 75)", async () => {
@@ -1528,14 +1538,13 @@ describe("usePlaceOrder hook direct", () => {
 // PrivacyAndTermsCheckbox — !checked false branch when effect re-runs
 // ---------------------------------------------------------------------------
 
-describe("PrivacyAndTermsCheckbox !checked branch", () => {
+describe("PrivacyAndTermsCheckbox URL changes", () => {
   beforeEach(() => {
-    localStorage.clear()
+    resetTermsAcceptanceStore()
     vi.clearAllMocks()
   })
-  afterEach(() => localStorage.clear())
 
-  it("effect skips localStorage write when checked=true (line 36 false branch)", async () => {
+  it("keeps acceptance when the privacy/terms URLs change", async () => {
     const { rerender } = render(
       <Providers
         order={{ ...MOCK_ORDER, privacy_url: "https://p1.com", terms_url: "https://t1.com" }}
@@ -1549,10 +1558,9 @@ describe("PrivacyAndTermsCheckbox !checked branch", () => {
     await act(async () => {
       fireEvent.click(screen.getByRole("checkbox"))
     })
-    expect(localStorage.getItem("privacy-terms")).toBe("true")
+    expect((screen.getByRole("checkbox") as HTMLInputElement).checked).toBe(true)
 
-    // Change URLs so effect re-runs with checked=true → !checked = false → localStorage write skipped
-    // (cleanup from prior effect removes the item; since checked=true the false branch means no re-write to "false")
+    // Swapping the URLs must not silently revoke what the shopper already accepted.
     await act(async () => {
       rerender(
         <Providers
@@ -1562,7 +1570,6 @@ describe("PrivacyAndTermsCheckbox !checked branch", () => {
         </Providers>
       )
     })
-    // Cleanup removed the item; the false branch of !checked means it was NOT set to "false"
-    expect(localStorage.getItem("privacy-terms")).not.toBe("false")
+    expect((screen.getByRole("checkbox") as HTMLInputElement).checked).toBe(true)
   })
 })
