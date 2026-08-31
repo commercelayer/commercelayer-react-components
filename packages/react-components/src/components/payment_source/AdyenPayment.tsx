@@ -299,6 +299,19 @@ export function AdyenPayment({
       // @ts-expect-error no type
       const resultCode = pSource?.payment_response?.resultCode
       if (["Authorised", "Pending", "Received"].includes(resultCode)) {
+        // NOTE: unlike the `isValid` handlers above, clearing `disabled` here is
+        // load-bearing — do not remove it for symmetry with them. Adyen has already
+        // authorized the payment; all that is left is to place the order. Terms
+        // acceptance lives in memory and does not survive the reload a redirect
+        // method (Klarna, iDEAL) causes, so the button is legitimately disabled by
+        // the time we get back — and `.click()` on a disabled button is a no-op, so
+        // without this the shopper is charged for an order that is never placed.
+        //
+        // It has to be a real click rather than `setPlaceOrder`: `handleClick` also
+        // guards against already-placed and draft orders, drives the loading state,
+        // and fires the integrator's `onClick`. (The Apple/Google Pay branch below
+        // does call `setPlaceOrder` directly — express payments deliberately bypass
+        // that logic.)
         if (placeOrderButtonRef?.current != null) {
           if (placeOrderButtonRef.current.disabled) {
             placeOrderButtonRef.current.disabled = false
@@ -564,6 +577,9 @@ export function AdyenPayment({
             resultCode,
           }
         }
+        // NOTE: load-bearing, for the reason spelled out in `handleOnAdditionalDetails`
+        // — the payment is already authorized and `.click()` on a disabled button
+        // would silently drop the order.
         if (placeOrderButtonRef?.current != null) {
           if (placeOrderButtonRef.current.disabled) {
             placeOrderButtonRef.current.disabled = false
