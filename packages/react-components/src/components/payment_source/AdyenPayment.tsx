@@ -269,10 +269,13 @@ export function AdyenPayment({
           return await handleSubmit(ref.current as unknown as FormEvent<HTMLFormElement>)
         }
         setPaymentMethodErrors([])
+        // NOTE: do not touch `placeOrderButtonRef.current.disabled` here. Setting
+        // it imperatively bypasses `isPermitted`, so the button would go live
+        // while privacy & terms are still unaccepted — and React never repairs
+        // it, since its own `disabled` prop has not changed. `setPaymentRef`
+        // below is the supported channel: `PlaceOrderButton` re-runs its effect
+        // on `onsubmit` and enables itself only when `isPermitted` allows it.
         setPaymentRef({ ref })
-        if (placeOrderButtonRef?.current != null) {
-          placeOrderButtonRef.current.disabled = false
-        }
       }
     }
   }
@@ -850,10 +853,10 @@ export function AdyenPayment({
                   return await handleSubmit(ref.current as unknown as FormEvent<HTMLFormElement>)
                 }
                 setPaymentMethodErrors([])
+                // NOTE: see `handleChange` — enabling the button imperatively
+                // here is what let a Drop-in method that is valid on selection
+                // (Klarna, for one) go live with privacy & terms unaccepted.
                 setPaymentRef({ ref })
-                if (placeOrderButtonRef?.current != null) {
-                  placeOrderButtonRef.current.disabled = false
-                }
               }
             }
             if (onSelect) {
