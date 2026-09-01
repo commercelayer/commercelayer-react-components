@@ -23,6 +23,7 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
+import { getAdyenShopperLocale } from "#utils/adyenShopperLocale"
 import browserInfo, { cleanUrlBy } from "#utils/browserInfo"
 import { getPublicIP } from "#utils/getPublicIp"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
@@ -96,6 +97,21 @@ export interface AdyenPaymentConfig {
    */
   onSelect?: (component: UIElement<UIElementProps>) => void
   giftcardErrorComponent?: (message: string) => JSX.Element
+  /**
+   * The locale Adyen should use for anything **it** renders — in particular the hosted page a
+   * redirect payment method sends the shopper to (Klarna, iDEAL, …). Sent as `shopper_locale`
+   * in the payment request, and it also selects the Drop-in's own translations.
+   *
+   * Without it the locale is derived from `order.language_code`, and Adyen falls back to the
+   * merchant account default or the country code when that language cannot be expanded — which
+   * is how a Drop-in in English ends up handing over to a Klarna page in Italian.
+   *
+   * Read once when the Drop-in is built: changing it on a mounted Drop-in has no effect.
+   *
+   * @default derived from `order.language_code` (see `getAdyenShopperLocale`)
+   * @example "en-US"
+   */
+  shopperLocale?: string
 }
 
 interface Props {
@@ -106,6 +122,11 @@ interface Props {
   environment?: CoreConfiguration["environment"]
 }
 
+// Adyen's own fallback when a locale does not resolve, spelled the way Adyen documents it:
+// `language-REGION`. It used to read `en_US` here, which their client normalizes but their
+// payment request does not.
+const DEFAULT_LOCALE = "en-US"
+
 const defaultConfig: AdyenPaymentConfig = {}
 
 export function AdyenPayment({
@@ -113,7 +134,7 @@ export function AdyenPayment({
   config,
   templateCustomerSaveToWallet,
   environment = "test",
-  locale = "en_US",
+  locale = DEFAULT_LOCALE,
 }: Props): JSX.Element | null {
   const {
     cardContainerClassName,
@@ -123,6 +144,7 @@ export function AdyenPayment({
     onReady,
     onSelect,
     subscriptionPaymentMethods,
+    shopperLocale: shopperLocaleConfig,
   } = {
     ...defaultConfig,
     ...config,
@@ -147,6 +169,19 @@ export function AdyenPayment({
   const authConfig = useContext(CommerceLayerContext)
   const { placeOrderButtonRef, setPlaceOrder, status } = useContext(PlaceOrderContext)
   const { customers } = useContext(CustomerContext)
+  // Two distinct locales that Adyen does not treat as interchangeable, deliberately derived
+  // from one source. `dropInLocale` goes into the Core configuration and is client-side only:
+  // it picks the Drop-in's translation bundle. `shopperLocale` travels with the payment
+  // request and is what Adyen uses for the pages it renders itself, which is why the two must
+  // not be allowed to disagree — a Drop-in in English handing over to a Klarna page in Italian
+  // is the bug this fixes.
+  //
+  // The config value is read here rather than only in the request, so an integration that
+  // sets it moves both. `getAdyenShopperLocale` then normalizes it (`en_US`, `PT_br`) and
+  // expands a bare `language_code` into the `language-REGION` form the payment request needs,
+  // returning undefined — and so omitting the field — rather than guessing.
+  const dropInLocale = shopperLocaleConfig ?? order?.language_code ?? locale
+  const shopperLocale = getAdyenShopperLocale(dropInLocale)
   const ref = useRef<null | HTMLFormElement>(null)
   const dropinRef = useRef<Dropin | null>(null)
   // The Core instance, kept alongside the Drop-in: refreshing the amount after a partial
@@ -234,10 +269,13 @@ export function AdyenPayment({
           return await handleSubmit(ref.current as unknown as FormEvent<HTMLFormElement>)
         }
         setPaymentMethodErrors([])
+        // NOTE: do not touch `placeOrderButtonRef.current.disabled` here. Setting
+        // it imperatively bypasses `isPermitted`, so the button would go live
+        // while privacy & terms are still unaccepted — and React never repairs
+        // it, since its own `disabled` prop has not changed. `setPaymentRef`
+        // below is the supported channel: `PlaceOrderButton` re-runs its effect
+        // on `onsubmit` and enables itself only when `isPermitted` allows it.
         setPaymentRef({ ref })
-        if (placeOrderButtonRef?.current != null) {
-          placeOrderButtonRef.current.disabled = false
-        }
       }
     }
   }
@@ -261,6 +299,19 @@ export function AdyenPayment({
       // @ts-expect-error no type
       const resultCode = pSource?.payment_response?.resultCode
       if (["Authorised", "Pending", "Received"].includes(resultCode)) {
+        // NOTE: unlike the `isValid` handlers above, clearing `disabled` here is
+        // load-bearing — do not remove it for symmetry with them. Adyen has already
+        // authorized the payment; all that is left is to place the order. Terms
+        // acceptance lives in memory and does not survive the reload a redirect
+        // method (Klarna, iDEAL) causes, so the button is legitimately disabled by
+        // the time we get back — and `.click()` on a disabled button is a no-op, so
+        // without this the shopper is charged for an order that is never placed.
+        //
+        // It has to be a real click rather than `setPlaceOrder`: `handleClick` also
+        // guards against already-placed and draft orders, drives the loading state,
+        // and fires the integrator's `onClick`. (The Apple/Google Pay branch below
+        // does call `setPlaceOrder` directly — express payments deliberately bypass
+        // that logic.)
         if (placeOrderButtonRef?.current != null) {
           if (placeOrderButtonRef.current.disabled) {
             placeOrderButtonRef.current.disabled = false
@@ -349,7 +400,13 @@ export function AdyenPayment({
         origin: window.location.origin,
         redirect_from_issuer_method: "GET",
         shopper_ip: shopperIp,
-        shopperInteraction: "Ecommerce",
+        shopper_interaction: "Ecommerce",
+        // The language Adyen renders its own hosted pages in (the Klarna screen a redirect
+        // method hands over to). The Drop-in's `locale` is client-side only and never reaches
+        // Adyen, so without this the hosted page falls back to the account default or the
+        // country code. snake_case, like every attribute in this payload: it is the API that
+        // maps them onto Adyen's own camelCase names.
+        ...(shopperLocale != null ? { shopper_locale: shopperLocale } : {}),
         browser_info: {
           ...browserInfo(),
         },
@@ -520,6 +577,9 @@ export function AdyenPayment({
             resultCode,
           }
         }
+        // NOTE: load-bearing, for the reason spelled out in `handleOnAdditionalDetails`
+        // — the payment is already authorized and `.click()` on a disabled button
+        // would silently drop the order.
         if (placeOrderButtonRef?.current != null) {
           if (placeOrderButtonRef.current.disabled) {
             placeOrderButtonRef.current.disabled = false
@@ -627,7 +687,7 @@ export function AdyenPayment({
           : paymentMethodsResponse.paymentMethods
     }
     const options = {
-      locale: order?.language_code ?? locale,
+      locale: dropInLocale,
       environment,
       clientKey,
       amount: {
@@ -809,10 +869,10 @@ export function AdyenPayment({
                   return await handleSubmit(ref.current as unknown as FormEvent<HTMLFormElement>)
                 }
                 setPaymentMethodErrors([])
+                // NOTE: see `handleChange` — enabling the button imperatively
+                // here is what let a Drop-in method that is valid on selection
+                // (Klarna, for one) go live with privacy & terms unaccepted.
                 setPaymentRef({ ref })
-                if (placeOrderButtonRef?.current != null) {
-                  placeOrderButtonRef.current.disabled = false
-                }
               }
             }
             if (onSelect) {

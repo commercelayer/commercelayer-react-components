@@ -1,4 +1,3 @@
-import type { StripeElementLocale } from "@stripe/stripe-js"
 import { type JSX, useContext, useRef } from "react"
 import type { GatewayBaseType } from "#components/payment_gateways/PaymentGateway"
 import AdyenPayment from "#components/payment_source/AdyenPayment"
@@ -64,7 +63,7 @@ export function AdyenGateway(props: Props): JSX.Element | null {
   }
   const adyenSessionKey = readyAdyenSessionKey.current ?? undefined
   const paymentResource: PaymentResource = "adyen_payments"
-  const locale = order?.language_code as StripeElementLocale
+  const locale = order?.language_code ?? undefined
   if (!readonly && payment?.id !== currentPaymentMethodId) return null
   // @ts-expect-error no type
   const clientKey = paymentSource?.public_key

@@ -51,6 +51,12 @@ export interface PlaceOrderActionPayload {
   options?: PlaceOrderOptions
   placeOrderButtonRef?: RefObject<HTMLButtonElement | null>
   status: PlaceOrderStatus
+  /**
+   * True when accepting privacy & terms is the *only* thing still keeping the
+   * order from being placed. Consumers use it to warn that acceptance is
+   * required but no control is asking for it.
+   */
+  termsBlocking: boolean
 }
 
 export function setButtonRef(
@@ -78,6 +84,7 @@ export const placeOrderInitialState: PlaceOrderState = {
   errors: [],
   isPermitted: false,
   status: "standby",
+  termsBlocking: false,
 }
 
 export function setPlaceOrderErrors<V extends BaseError[]>(
@@ -102,6 +109,12 @@ interface TPlaceOrderPermittedParams {
   options?: PlaceOrderOptions
   privacyUrl?: string | null
   termsUrl?: string | null
+  /**
+   * Whether the shopper has accepted privacy & terms. Passed in by the caller
+   * (which reads `termsAcceptanceStore`) so this function stays free of hidden
+   * global reads and the gate is testable in isolation.
+   */
+  termsAccepted?: boolean
 }
 
 export function placeOrderPermitted({
@@ -111,14 +124,10 @@ export function placeOrderPermitted({
   options,
   privacyUrl,
   termsUrl,
+  termsAccepted = false,
 }: TPlaceOrderPermittedParams): void {
   if (order && config) {
     let isPermitted = true
-    const resolvedPrivacyUrl = privacyUrl ?? order.privacy_url
-    const resolvedTermsUrl = termsUrl ?? order.terms_url
-    if (resolvedPrivacyUrl && resolvedTermsUrl) {
-      isPermitted = localStorage.getItem("privacy-terms") === "true"
-    }
     const billingAddress = order.billing_address
     const shippingAddress = order.shipping_address
     const doNotShip = isDoNotShip(order.line_items)
@@ -132,10 +141,20 @@ export function placeOrderPermitted({
     if (!isEmpty(shipments) && !shipment) isPermitted = false
     // @ts-expect-error no type
     if (paymentSource?.mismatched_amounts) isPermitted = false
+
+    // Privacy & terms are checked last, so `isPermitted` still tells us whether
+    // acceptance is the *only* thing standing between the shopper and the order.
+    const resolvedPrivacyUrl = privacyUrl ?? order.privacy_url
+    const resolvedTermsUrl = termsUrl ?? order.terms_url
+    const termsRequired = Boolean(resolvedPrivacyUrl && resolvedTermsUrl)
+    const termsBlocking = termsRequired && !termsAccepted && isPermitted
+    if (termsRequired && !termsAccepted) isPermitted = false
+
     dispatch({
       type: "setPlaceOrderPermitted",
       payload: {
         isPermitted,
+        termsBlocking,
         paymentType: paymentMethod?.payment_source_type as PaymentResource,
         // @ts-expect-error no type
         paymentSecret: paymentSource?.client_secret,

@@ -107,9 +107,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         setNotPermitted(true)
       }
     }
-    if (isFree && !isPermitted) {
-      setNotPermitted(false)
-    }
+    // NOTE: no `isFree && !isPermitted` shortcut here. It used to live at this
+    // spot but was dead code: `setNotPermitted` is a state setter, so the
+    // branches below ran in the same effect pass and always overwrote it.
     if (loading) setNotPermitted(loading)
     else {
       if (paymentType === currentPaymentMethodType && paymentType) {

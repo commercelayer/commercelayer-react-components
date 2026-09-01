@@ -25,7 +25,7 @@ const adyen = vi.hoisted(() => ({
   // The Core configuration the component builds, so tests can invoke the real
   // `onSubmit` handler it installs.
   // biome-ignore lint/suspicious/noExplicitAny: test cast
-  captured: { options: null as any },
+  captured: { options: null as any, dropinOptions: null as any },
 }))
 
 vi.mock("@adyen/adyen-web/auto", () => ({
@@ -35,6 +35,10 @@ vi.mock("@adyen/adyen-web/auto", () => ({
     return { update: adyen.coreUpdate }
   }),
   Dropin: class FakeDropin {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    constructor(_core: any, options: any) {
+      adyen.captured.dropinOptions = options
+    }
     mount(selector: string): this {
       adyen.dropinMount(selector)
       return this
@@ -93,6 +97,7 @@ function Providers({
   setPaymentSource,
   setPaymentMethodErrors = vi.fn(),
   setPaymentRef = vi.fn(),
+  placeOrderButtonRef,
 }: {
   children: ReactNode
   // biome-ignore lint/suspicious/noExplicitAny: test cast
@@ -111,6 +116,8 @@ function Providers({
   setPaymentMethodErrors?: any
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   setPaymentRef?: any
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  placeOrderButtonRef?: any
 }) {
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   const paymentMethodCtx: any = {
@@ -136,7 +143,7 @@ function Providers({
       >
         <CustomerContext.Provider value={{}}>
           <PlaceOrderContext.Provider
-            value={{ ...defaultPlaceOrderContext, status: placeOrderStatus }}
+            value={{ ...defaultPlaceOrderContext, status: placeOrderStatus, placeOrderButtonRef }}
           >
             <PaymentMethodContext.Provider value={paymentMethodCtx}>
               {children}
@@ -846,5 +853,67 @@ describe("AdyenPayment when the payment source is recreated mid-flight", () => {
     const ids = setPaymentSource.mock.calls.map(([args]) => args.paymentSourceId)
     expect(ids.length).toBeGreaterThan(0)
     expect(new Set(ids)).toEqual(new Set(["ps-recreated"]))
+  })
+})
+
+// A Drop-in method that needs no input — Klarna, PayPal — reports `isValid` the moment it is
+// selected. `onSelect` used to answer that by writing `placeOrderButtonRef.current.disabled =
+// false` straight onto the DOM node, which skips `isPermitted` entirely: the button went live
+// with privacy & terms still unaccepted. React never repaired it either, because its own
+// `disabled` prop had not changed — the fiber said `true` while the DOM said `false`.
+// Selecting a method may only arm the submit wiring; enabling the button is the button's call.
+describe("AdyenPayment does not enable the place-order button behind React's back", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    adyen.captured.options = null
+    adyen.captured.dropinOptions = null
+  })
+
+  it("leaves the button disabled when a no-input method reports itself valid on selection", async () => {
+    // Stands in for the button `PlaceOrderButton` registers: React rendered it disabled
+    // because the terms are unaccepted.
+    const button = document.createElement("button")
+    button.disabled = true
+    const setPaymentRef = vi.fn()
+
+    render(
+      <Providers placeOrderButtonRef={{ current: button }} setPaymentRef={setPaymentRef}>
+        <AdyenPayment clientKey="test_CLIENTKEY" />
+      </Providers>
+    )
+    await flush()
+
+    expect(adyen.captured.dropinOptions?.onSelect).toBeTypeOf("function")
+
+    await act(async () => {
+      adyen.captured.dropinOptions.onSelect({ _id: "klarna-0", isValid: true })
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    expect(button.disabled).toBe(true)
+    // The supported channel is still used, so the button can enable itself once
+    // `isPermitted` allows it.
+    expect(setPaymentRef).toHaveBeenCalled()
+  })
+
+  it("leaves the button disabled when the Drop-in reports a valid change", async () => {
+    const button = document.createElement("button")
+    button.disabled = true
+    const setPaymentRef = vi.fn()
+
+    render(
+      <Providers placeOrderButtonRef={{ current: button }} setPaymentRef={setPaymentRef}>
+        <AdyenPayment clientKey="test_CLIENTKEY" />
+      </Providers>
+    )
+    await flush()
+
+    await act(async () => {
+      adyen.captured.options.onChange({ isValid: true })
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    expect(button.disabled).toBe(true)
+    expect(setPaymentRef).toHaveBeenCalled()
   })
 })
