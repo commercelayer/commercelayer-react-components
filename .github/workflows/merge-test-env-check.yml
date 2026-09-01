@@ -1,0 +1,12 @@
+name: merge-test-env-check
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checking testing environment
+        run: |
+          find . -type f -iname '*license*' -exec grep -iE '^\s*\S+\s+license\s*$' {} \; | sed -r 's/^\s*(.+)/\L\1/' | sort -u
