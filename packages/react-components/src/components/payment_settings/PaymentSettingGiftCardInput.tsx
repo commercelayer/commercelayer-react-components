@@ -22,17 +22,17 @@ type Props = {
  * applying a card that is not needed fails with a 422 the shopper cannot make
  * sense of.
  *
- * After the first card the input steps aside for
- * `<PaymentSettingGiftCardAddButton>`, so a shopper who is done is not left
- * looking at an empty field.
+ * Whether the field is on screen at all, on the other hand, is the
+ * application's business: a checkout that hides it behind a toggle simply does
+ * not mount this. Nothing here holds disclosure state that could fight that.
  */
 export function PaymentSettingGiftCardInput(props: Props): JSX.Element | null {
   const { children, ...p } = props
-  const { canAddGiftCard, isInputVisible, isApplying, readonly, code, setCode } = useContext(
+  const { canAddGiftCard, isApplying, readonly, code, setCode } = useContext(
     PaymentSettingGiftCardContext
   )
 
-  if (readonly === true || canAddGiftCard !== true || isInputVisible !== true) return null
+  if (readonly === true || canAddGiftCard !== true) return null
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setCode?.(event.target.value)

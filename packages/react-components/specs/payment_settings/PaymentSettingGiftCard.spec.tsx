@@ -4,7 +4,6 @@ import type { ReactNode } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { PaymentSetting } from "#components/payment_settings/PaymentSetting"
 import { PaymentSettingGiftCard } from "#components/payment_settings/PaymentSettingGiftCard"
-import { PaymentSettingGiftCardAddButton } from "#components/payment_settings/PaymentSettingGiftCardAddButton"
 import { PaymentSettingGiftCardErrors } from "#components/payment_settings/PaymentSettingGiftCardErrors"
 import { PaymentSettingGiftCardInput } from "#components/payment_settings/PaymentSettingGiftCardInput"
 import { PaymentSettingGiftCardList } from "#components/payment_settings/PaymentSettingGiftCardList"
@@ -94,7 +93,6 @@ function renderGiftCards(currentOrder: Partial<Order> | null = order(), readonly
         </PaymentSettingGiftCardList>
         <PaymentSettingGiftCardInput data-testid="input" />
         <PaymentSettingGiftCardSubmitButton data-testid="apply" />
-        <PaymentSettingGiftCardAddButton data-testid="add" />
       </PaymentSettingGiftCard>
     </Wrapper>
   )
@@ -125,7 +123,6 @@ describe("PaymentSettingGiftCard", () => {
   it("shows the input straight away when nothing is applied", () => {
     renderGiftCards()
     expect(screen.getByTestId("input")).toBeTruthy()
-    expect(screen.queryByTestId("add")).toBeNull()
   })
 
   it("applies a typed code", async () => {
@@ -322,36 +319,28 @@ describe("PaymentSettingGiftCard", () => {
     })
   })
 
+  // Whether the field is on screen is the application's business — this
+  // component holds no disclosure state — but *whether it may be offered at
+  // all* is a domain rule, and stays here.
   describe("adding another", () => {
-    it("swaps the input for the add control after the first card", () => {
+    it("keeps offering the input after the first card", () => {
       renderGiftCards(order({ payment_sessions: [giftCardSession("gift-a", 2000)] } as never))
-      expect(screen.queryByTestId("input")).toBeNull()
-      expect(screen.getByTestId("add")).toBeTruthy()
-    })
-
-    it("brings the input back when asked", async () => {
-      renderGiftCards(order({ payment_sessions: [giftCardSession("gift-a", 2000)] } as never))
-
-      await act(async () => {
-        fireEvent.click(screen.getByTestId("add"))
-      })
-
       expect(screen.getByTestId("input")).toBeTruthy()
-      expect(screen.queryByTestId("add")).toBeNull()
+      expect(screen.getByTestId("apply")).toBeTruthy()
     })
 
     // Applying a card that is not needed fails with a 422 about amount_cents,
     // which a shopper cannot act on.
-    it("offers neither once the gift cards cover the order", () => {
+    it("offers nothing once the gift cards cover the order", () => {
       renderGiftCards(order({ payment_sessions: [giftCardSession("gift-a", TOTAL)] } as never))
       expect(screen.queryByTestId("input")).toBeNull()
-      expect(screen.queryByTestId("add")).toBeNull()
+      expect(screen.queryByTestId("apply")).toBeNull()
       expect(screen.getByTestId("row")).toBeTruthy()
     })
 
     // Settling a partially-paid order is a flow this iteration does not
     // implement, so nothing more is accepted once money is taken or in flight.
-    it("offers neither once anything has been authorized", () => {
+    it("offers nothing once anything has been authorized", () => {
       renderGiftCards(
         order({
           payment_sessions: [
@@ -360,7 +349,27 @@ describe("PaymentSettingGiftCard", () => {
         } as never)
       )
       expect(screen.queryByTestId("input")).toBeNull()
-      expect(screen.queryByTestId("add")).toBeNull()
+      expect(screen.queryByTestId("apply")).toBeNull()
+    })
+
+    // The state an application needs to run a disclosure of its own: a toggle
+    // that opens by default when a card is already applied, and closes itself
+    // once one is accepted.
+    it("hands its state to a function child", () => {
+      render(
+        <Wrapper
+          currentOrder={order({ payment_sessions: [giftCardSession("gift-a", 2000)] } as never)}
+        >
+          <PaymentSettingGiftCard>
+            {({ giftCardSessions, canAddGiftCard, isCovered, remainingAmountCents }) => (
+              <div data-testid="state">
+                {`${giftCardSessions.length}|${canAddGiftCard}|${isCovered}|${remainingAmountCents}`}
+              </div>
+            )}
+          </PaymentSettingGiftCard>
+        </Wrapper>
+      )
+      expect(screen.getByTestId("state").textContent).toBe(`1|true|false|${TOTAL - 2000}`)
     })
   })
 
@@ -370,7 +379,6 @@ describe("PaymentSettingGiftCard", () => {
       expect(screen.getByTestId("row")).toBeTruthy()
       expect(screen.queryByTestId("remove")).toBeNull()
       expect(screen.queryByTestId("input")).toBeNull()
-      expect(screen.queryByTestId("add")).toBeNull()
     })
   })
 })

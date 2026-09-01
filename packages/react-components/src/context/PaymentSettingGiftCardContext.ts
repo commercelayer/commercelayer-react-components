@@ -17,10 +17,6 @@ export interface InitialPaymentSettingGiftCardContext {
    * order is not implemented.
    */
   canAddGiftCard?: boolean
-  /** Whether the shopper has asked for the input, or it is showing by default. */
-  isInputVisible?: boolean
-  /** Show the input. Used by the "add another" control. */
-  showInput?: () => void
   /** A code is being applied right now. */
   isApplying?: boolean
   /**

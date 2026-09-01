@@ -9,13 +9,14 @@ import type {
   PaymentSession,
   PaymentSetting as PaymentSettingResource,
 } from "@commercelayer/sdk"
-import { type JSX, type ReactNode, useContext, useEffect, useState } from "react"
+import { type JSX, type ReactNode, useContext, useEffect, useRef, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
 import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
 import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import type { BaseError } from "#typings/errors"
+import type { ChildrenFunction } from "#typings/index"
 
 /**
  * Payment Setting types this library can drive today.
@@ -37,8 +38,38 @@ export interface PaymentSettingOnSelectParams {
   paymentSession?: PaymentSession
 }
 
+/**
+ * The state of the setting currently being rendered.
+ *
+ * Given to `children` when it is a function, so an application can style the
+ * chosen option — a highlighted card, say — or make the whole card the click
+ * target instead of just the radio. Reading the same state off
+ * `<PaymentSettingRadioButton>`'s render prop only reaches inside the control.
+ */
+export interface PaymentSettingChildrenProps {
+  setting: PaymentSettingResource
+  /** Whether this setting is the shopper's current choice. */
+  isSelected: boolean
+  /** Whether its Payment Session is being created right now. */
+  isPending: boolean
+  /** The Payment Session backing the selection, once it exists. */
+  currentPaymentSession?: PaymentSession
+  /** Why the last selection failed, if it did. */
+  errors: BaseError[]
+  /**
+   * Choose this setting. The same call the radio makes, so an application can
+   * put it on the whole card — a second call while one is in flight is
+   * ignored, so wrapping the radio does not create two Payment Sessions.
+   */
+  selectSetting: () => Promise<void>
+}
+
 interface Props {
-  children?: ReactNode
+  /**
+   * Markup rendered once per available setting, or a function receiving that
+   * setting's state.
+   */
+  children?: ReactNode | ChildrenFunction<PaymentSettingChildrenProps>
   /**
    * Show what was chosen without letting it change — a placed order, for
    * instance. Renders only the selected setting, and keeps rendering it even
@@ -69,6 +100,11 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
   const { order, include, includeLoaded, addResourceToInclude, getOrder } = useContext(OrderContext)
   const { accessToken, interceptors } = useContext(CommerceLayerContext)
   const [pendingSettingId, setPendingSettingId] = useState<string | null>(null)
+  // Read synchronously, unlike `pendingSettingId`. One click can reach the
+  // handler twice — a card wired to `selectSetting` with the radio inside it —
+  // and both reads of the state variable would still say "idle", leaving two
+  // Payment Sessions behind for a single click.
+  const selectionInFlight = useRef(false)
   const [errors, setErrors] = useState<BaseError[]>([])
 
   // Reading a selection back needs the session's setting; telling a reusable
@@ -124,6 +160,8 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
 
   const selectSetting = async (setting: PaymentSettingResource): Promise<void> => {
     if (accessToken == null || order == null) return
+    if (selectionInFlight.current) return
+    selectionInFlight.current = true
     setErrors([])
     setPendingSettingId(setting.id)
     try {
@@ -167,6 +205,7 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
         },
       ])
     } finally {
+      selectionInFlight.current = false
       setPendingSettingId(null)
     }
   }
@@ -186,6 +225,9 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
         .map((setting) => {
           const isSelected = selectedSession?.payment_setting?.id === setting.id
           const currentPaymentSession = isSelected ? selectedSession : undefined
+          const select = async (): Promise<void> => {
+            await selectSetting(setting)
+          }
           return (
             <PaymentSettingChildrenContext.Provider
               key={setting.id}
@@ -196,12 +238,19 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
                 isPending: pendingSettingId === setting.id,
                 errors,
                 readonly,
-                selectSetting: async () => {
-                  await selectSetting(setting)
-                },
+                selectSetting: select,
               }}
             >
-              {children}
+              {typeof children === "function"
+                ? children({
+                    setting,
+                    isSelected,
+                    isPending: pendingSettingId === setting.id,
+                    currentPaymentSession,
+                    errors,
+                    selectSetting: select,
+                  })
+                : children}
             </PaymentSettingChildrenContext.Provider>
           )
         })}

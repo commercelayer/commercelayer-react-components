@@ -8,6 +8,7 @@ import { type JSX, type MouseEvent, type ReactNode, useContext, useEffect, useSt
 import Parent from "#components/utils/Parent"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
+import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
 import { PLACE_ORDER_RECHECK_EVENT } from "#hooks/usePlaceOrder"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
@@ -42,11 +43,18 @@ interface Props extends Omit<JSX.IntrinsicElements["button"], "children" | "onCl
  * refs, none of which exist here — and its upstream permission check hard-fails
  * every non-free order without a `payment_method`.
  *
- * The button stays **enabled**. Placeability cannot be read before clicking:
- * `order.placeable` is transient and never served on a GET, and it does not
- * turn true until the asynchronous authorization has succeeded — so using it as
- * a gate would disable the button precisely while payment is in progress. The
- * truth arrives after the click, from `_placeable`.
+ * **Placeability** cannot be read before clicking: `order.placeable` is
+ * transient and never served on a GET, and it does not turn true until the
+ * asynchronous authorization has succeeded — so using it as a gate would
+ * disable the button precisely while payment is in progress. The truth arrives
+ * after the click, from `_placeable`.
+ *
+ * **Whether anything is paying for the order**, on the other hand, is plain to
+ * read from the order, and is gated here: without it a shopper who removes the
+ * gift card that was covering the remainder — which deletes the session paying
+ * the difference along with it — is left looking at a live button that can only
+ * fail. The gate is the same derivation the rest of the payment UI uses, so the
+ * button cannot disagree with the selector above it.
  */
 export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
   const {
@@ -60,6 +68,7 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
     ...p
   } = props
   const { order, setOrderErrors, getOrder } = useContext(OrderContext)
+  const { isCovered, currentPaymentSession } = usePaymentSessionsState()
   const { accessToken, interceptors } = useContext(CommerceLayerContext)
   const [isLoading, setIsLoading] = useState(false)
   const organizationConfig = useOrganizationConfig({ accessToken })
@@ -88,6 +97,17 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
   const privacyUrl = order?.privacy_url ?? organizationConfig?.urls?.privacy
   const termsUrl = order?.terms_url ?? organizationConfig?.urls?.terms
   const privacyAccepted = privacyUrl && termsUrl ? privacyTermsChecked : true
+
+  // Nothing left to pay is a complete answer: gift cards can cover an order
+  // outright, and a free order has nothing to authorize. Otherwise the
+  // difference needs its session.
+  //
+  // The zero test is strict on purpose. An order fetched without
+  // `total_amount_with_taxes_cents` in its `fields` has `undefined` there, and
+  // reading that as free would enable the button on an order nothing is paying
+  // for — the same trap `isCovered` guards against with its `total > 0`.
+  const isFree = order?.total_amount_with_taxes_cents === 0
+  const isPaymentInPlace = isCovered || isFree || currentPaymentSession != null
 
   const handleClick = async (event?: MouseEvent<HTMLButtonElement>): Promise<void> => {
     event?.preventDefault()
@@ -141,7 +161,8 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
     }
   }
 
-  const disabledButton = disabled !== undefined ? disabled : !privacyAccepted
+  const disabledButton =
+    disabled !== undefined ? disabled : !privacyAccepted || !isPaymentInPlace
   const labelButton = isLoading ? loadingLabel : typeof label === "function" ? label() : label
 
   return children ? (

@@ -293,3 +293,50 @@ describe("PaymentSetting", () => {
     expect(warn).not.toHaveBeenCalled()
   })
 })
+
+// An application styling the chosen option, or making the whole card the click
+// target, needs the selection outside the radio's own render prop.
+describe("PaymentSetting children as a function", () => {
+  it("hands each setting its state", () => {
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          {({ setting, isSelected, isPending }) => (
+            <div data-testid="card">{`${setting.id}|${isSelected}|${isPending}`}</div>
+          )}
+        </PaymentSetting>
+      </Wrapper>
+    )
+    expect(screen.getByTestId("card").textContent).toBe("ps-manual|false|false")
+  })
+
+  // One click reaching both a card and the radio inside it must not leave two
+  // Payment Sessions behind: `pendingSettingId` still reads as idle in the
+  // second handler, so the guard cannot be state.
+  it("ignores a second selection while one is in flight", async () => {
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          {({ selectSetting }) => (
+            <button
+              type="button"
+              data-testid="card"
+              onClick={() => {
+                void selectSetting()
+                void selectSetting()
+              }}
+            />
+          )}
+        </PaymentSetting>
+      </Wrapper>
+    )
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("card"))
+    })
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalledTimes(1)
+    })
+  })
+})

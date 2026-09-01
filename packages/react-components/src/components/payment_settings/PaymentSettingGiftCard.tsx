@@ -1,4 +1,5 @@
 import { applyGiftCard, mapGiftCardErrors, removeGiftCard } from "@commercelayer/core-components"
+import type { PaymentSession } from "@commercelayer/sdk"
 import { type JSX, type ReactNode, useCallback, useContext, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
@@ -6,9 +7,42 @@ import PaymentSettingGiftCardContext from "#context/PaymentSettingGiftCardContex
 import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
 import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import type { BaseError } from "#typings/errors"
+import type { ChildrenFunction } from "#typings/index"
+
+/**
+ * What a consuming application needs to drive its own disclosure around the
+ * gift card controls — a "use a gift card" toggle, say.
+ *
+ * State only: applying and removing stay with the components, which already
+ * carry the rules about when they may be offered at all.
+ */
+export interface PaymentSettingGiftCardChildrenProps {
+  /** Gift cards applied to the order, oldest first. */
+  giftCardSessions: PaymentSession[]
+  /** Sum of the applied gift cards, at face value. */
+  giftCardAmountCents: number
+  /** What is still owed after the applied gift cards. */
+  remainingAmountCents: number
+  /** True when the gift cards cover the order outright. */
+  isCovered: boolean
+  /** Whether another gift card may be applied at all. */
+  canAddGiftCard: boolean
+  /** A code is being applied right now. */
+  isApplying: boolean
+  /** Gift card failures, kept apart from the payment method's. */
+  errors: BaseError[]
+  readonly: boolean
+}
 
 interface Props {
-  children?: ReactNode
+  /**
+   * Markup, or a function receiving the gift card state.
+   *
+   * The function form is what an application uses to decide whether its own
+   * section is open or closed: this component deliberately holds no such state
+   * of its own, so nothing here fights an application's toggle.
+   */
+  children?: ReactNode | ChildrenFunction<PaymentSettingGiftCardChildrenProps>
   /**
    * Show what was applied without letting anything change — a placed order, for
    * instance. Hides the input and the remove controls.
@@ -43,14 +77,7 @@ export function PaymentSettingGiftCard({ children, readonly }: Props): JSX.Eleme
   const { accessToken, interceptors } = useContext(CommerceLayerContext)
   const [errors, setErrors] = useState<BaseError[]>([])
   const [isApplying, setIsApplying] = useState(false)
-  // The shopper asks for the input again after the first card. It starts open
-  // when nothing has been applied yet, which is the common case.
-  const [inputRequested, setInputRequested] = useState(false)
   const [code, setCode] = useState("")
-
-  const showInput = useCallback(() => {
-    setInputRequested(true)
-  }, [])
 
   const apply = useCallback(
     async (code: string): Promise<void> => {
@@ -60,7 +87,6 @@ export function PaymentSettingGiftCard({ children, readonly }: Props): JSX.Eleme
       try {
         await applyGiftCard({ accessToken, interceptors, order, giftCardCode: code })
         setCode("")
-        setInputRequested(false)
         await getOrder(order.id)
       } catch (error) {
         setErrors(toGiftCardErrors(error))
@@ -95,8 +121,6 @@ export function PaymentSettingGiftCard({ children, readonly }: Props): JSX.Eleme
         remainingAmountCents: state.remainingAmountCents,
         isCovered: state.isCovered,
         canAddGiftCard: state.canAddGiftCard,
-        isInputVisible: state.giftCardSessions.length === 0 || inputRequested,
-        showInput,
         isApplying,
         code,
         setCode,
@@ -106,7 +130,18 @@ export function PaymentSettingGiftCard({ children, readonly }: Props): JSX.Eleme
         readonly,
       }}
     >
-      {children}
+      {typeof children === "function"
+        ? children({
+            giftCardSessions: state.giftCardSessions,
+            giftCardAmountCents: state.giftCardAmountCents,
+            remainingAmountCents: state.remainingAmountCents,
+            isCovered: state.isCovered,
+            canAddGiftCard: state.canAddGiftCard,
+            isApplying,
+            errors,
+            readonly: readonly === true,
+          })
+        : children}
     </PaymentSettingGiftCardContext.Provider>
   )
 }

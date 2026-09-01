@@ -22,6 +22,7 @@ vi.mock("#components/orders/PlaceOrderButtonPaymentSource", () => ({
 vi.mock("#utils/organization", () => ({ useOrganizationConfig: () => ({ urls: {} }) }))
 
 const MANUAL = { id: "ps-manual", type: "payment_setting_manuals" }
+const GIFT_CARD = { id: "ps-gift", type: "payment_setting_gift_cards" }
 
 function orderOnSessions(overrides: Partial<Order> = {}): Partial<Order> {
   return {
@@ -233,6 +234,76 @@ describe("PlaceOrderButtonPaymentSessions", () => {
 
     it("does not gate an order with no privacy and terms URLs", () => {
       renderButton()
+      expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(false)
+    })
+  })
+
+  // Removing a gift card deletes the session paying the difference along with
+  // it — its amount was fixed against the old remainder. Without this gate the
+  // shopper is left with a live button whose only possible outcome is a
+  // placeability failure.
+  describe("something has to be paying for the order", () => {
+    it("blocks the button when no session is left", () => {
+      renderButton(
+        orderOnSessions({ total_amount_with_taxes_cents: 7100, payment_sessions: [] } as never)
+      )
+      expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(true)
+    })
+
+    // A gift card is additive: on its own it pays part of the order, and the
+    // difference still needs a method. This is the same order state the bug
+    // report started from, one step earlier.
+    it("blocks the button when gift cards do not cover the order", () => {
+      renderButton(
+        orderOnSessions({
+          total_amount_with_taxes_cents: 7100,
+          payment_sessions: [
+            {
+              id: "session-gift",
+              status: "unpaid",
+              amount_cents: 2500,
+              payment_setting: GIFT_CARD,
+            },
+          ],
+        } as never)
+      )
+      expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(true)
+    })
+
+    it("allows the button when gift cards cover the order outright", () => {
+      renderButton(
+        orderOnSessions({
+          total_amount_with_taxes_cents: 7100,
+          payment_sessions: [
+            {
+              id: "session-gift",
+              status: "unpaid",
+              amount_cents: 7100,
+              payment_setting: GIFT_CARD,
+            },
+          ],
+        } as never)
+      )
+      expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(false)
+    })
+
+    it("allows the button on a free order", () => {
+      renderButton(
+        orderOnSessions({ total_amount_with_taxes_cents: 0, payment_sessions: [] } as never)
+      )
+      expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(false)
+    })
+
+    // An order fetched without the total in its `fields` reads as `undefined`,
+    // not as free.
+    it("blocks the button when the total is unknown and nothing is paying", () => {
+      renderButton(orderOnSessions({ payment_sessions: [] } as never))
+      expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(true)
+    })
+
+    // An explicit `disabled` stays the consumer's business either way.
+    it("leaves an explicit disabled prop in charge", () => {
+      renderButton(orderOnSessions({ payment_sessions: [] } as never), { disabled: false })
       expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(false)
     })
   })

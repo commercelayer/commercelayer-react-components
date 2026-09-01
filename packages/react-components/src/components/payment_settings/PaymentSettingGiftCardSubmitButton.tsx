@@ -22,11 +22,11 @@ type Props = {
  */
 export function PaymentSettingGiftCardSubmitButton(props: Props): JSX.Element | null {
   const { children, label = "Apply", ...p } = props
-  const { canAddGiftCard, isInputVisible, isApplying, readonly, code, applyGiftCard } = useContext(
+  const { canAddGiftCard, isApplying, readonly, code, applyGiftCard } = useContext(
     PaymentSettingGiftCardContext
   )
 
-  if (readonly === true || canAddGiftCard !== true || isInputVisible !== true) return null
+  if (readonly === true || canAddGiftCard !== true) return null
 
   const trimmed = (code ?? "").trim()
   const disabled = isApplying === true || trimmed === ""

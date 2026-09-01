@@ -45,6 +45,15 @@ validation persists nothing, repeating the call is cheap and side-effect free.
 it appears only in an update response. It cannot be polled by refetching the order, and it
 cannot gate a button on render.
 
+**What can gate the button on render is whether anything is paying for the order** —
+`derivePaymentSessionsState` answers that from the order alone. Amended 2026-09-01: the
+button originally had the privacy checkbox as its only gate, on the reasoning above, which
+conflated two questions. Removing the gift card that was covering the remainder also
+deletes the session paying the difference, leaving a live button whose only outcome was a
+placeability failure. The gate is now `isCovered || total === 0 || currentPaymentSession`,
+the same derivation the payment components use, so the button cannot disagree with the
+selector above it. Placeability itself is still only knowable after the click.
+
 **Coverage is enforced by a default payment rule, not by a hard-coded guard.** On the new
 model `validate_payments` is a no-op — both `validate_payment_method` and
 `validate_payment_source` return `true` when `new_payments?`
