@@ -1,0 +1,260 @@
+import { Meta, Source } from '@storybook/addon-docs/blocks';
+
+<Meta title="Getting Started/Upgrading from v4"></Meta>
+
+# Upgrading from v4
+
+This guide covers the move from `@commercelayer/react-components` **v4** to **v5**.
+
+Most of the upgrade is mechanical. No component was removed from the public API in v5 — everything exported by v4 is still exported, and the deprecated container components keep working. That means you can upgrade in two stages: get the app running on v5 first, then migrate the deprecated patterns at your own pace.
+
+There are, however, four changes that **will** break a v4 app and need to be handled up front. Their headings are marked **(breaking)**.
+
+---
+
+## At a glance
+
+| | v4.29.7 | v5.0.0 |
+| --- | --- | --- |
+| `react` peer range | `>=18.0.0` | `>=19.0.0` |
+| Sibling packages | — | `@commercelayer/core-components`, `@commercelayer/react-hooks-components` |
+| Build output | `lib/cjs` + `lib/esm` | `dist` (both CJS and ESM) |
+| Subpath exports | 20 (`./orders/*`, `./hooks/*`, …) | none — root entry only |
+| `@commercelayer/sdk` | `^6.46.0` | `8.0.0-beta.11` |
+| `<CommerceLayer>` props | `accessToken`, `endpoint`, `domain` | `accessToken`, `interceptors` |
+| Container components | required | deprecated, standalone components preferred |
+
+---
+
+## 1. Update the dependency
+
+<Source
+  language="bash"
+  dark
+  code={`# npm
+npm install @commercelayer/react-components@5
+
+# yarn
+yarn add @commercelayer/react-components@5
+
+# pnpm
+pnpm add @commercelayer/react-components@5`}
+/>
+
+v5 splits the library into three packages. `@commercelayer/core-components` (the framework-agnostic data layer) and `@commercelayer/react-hooks-components` (the SWR-based hooks) are regular dependencies of `@commercelayer/react-components`, so your package manager installs them for you. You do **not** need to add them to your `package.json`.
+
+<span title="Watch out" type="warning">
+If your `package.json` already lists `@commercelayer/core-components` or `@commercelayer/react-hooks-components` as **direct** dependencies, a direct entry shadows the transitive one: bumping `@commercelayer/react-components` alone will leave the siblings pinned at their old version, and you get two incompatible copies in the same tree.
+</span>
+
+Remove the direct entries and let them resolve through the library:
+
+<Source
+  language="bash"
+  dark
+  code={`pnpm remove @commercelayer/core-components @commercelayer/react-hooks-components
+pnpm install`}
+/>
+
+Only declare them directly if you import from them yourself — and then keep their version in lockstep with `@commercelayer/react-components`.
+
+---
+
+## 2. React 19 (breaking)
+
+The peer range moved from `>=18.0.0` to `>=19.0.0`. v5 is compiled with the React Compiler targeting React 19, so React 18 is not supported.
+
+<Source
+  language="bash"
+  dark
+  code={`npm install react@19 react-dom@19`}
+/>
+
+The published bundle already carries a `"use client"` banner, so in the Next.js App Router you don't need to add the directive yourself when importing these components.
+
+---
+
+## 3. Deep imports are gone (breaking)
+
+v4 exposed 20 subpath export patterns, which let you import a single component straight from its file. v5 publishes a **single root entry**, so every import has to come from the package root.
+
+<Source
+  language="jsx"
+  dark
+  code={`// ❌ v4 — deep import, no longer resolvable
+import { Price } from '@commercelayer/react-components/prices/Price'
+import { useOrderContainer } from '@commercelayer/react-components/hooks/useOrderContainer'
+
+// ✅ v5 — everything from the root
+import { Price, useOrderContainer } from '@commercelayer/react-components'`}
+/>
+
+Both CJS and ESM builds are still shipped, so `require()` keeps working at the root entry. Only the subpaths are affected.
+
+One component changed module while keeping its name: `DeliveryLeadTime` moved from the `skus` folder to `shipping_methods`. If you imported it from the root, nothing changes.
+
+---
+
+## 4. `<CommerceLayer>` loses `endpoint` and `domain` (breaking)
+
+In v4 you could pass an explicit `endpoint`, or a `domain` the endpoint was built from. Both props are gone. v5 derives the organization from the access token itself, so the token is all the provider needs.
+
+<Source
+  language="jsx"
+  dark
+  code={`// ❌ v4
+<CommerceLayer
+  accessToken={accessToken}
+  endpoint="https://yourdomain.commercelayer.io"
+>
+  {children}
+</CommerceLayer>
+
+// ✅ v5
+<CommerceLayer accessToken={accessToken}>
+  {children}
+</CommerceLayer>`}
+/>
+
+If you were passing `domain` to reach a non-default environment, that now belongs to how the token is issued rather than to this component — see <a href="/?path=/docs/getting-started-authentication--docs">Authentication</a>.
+
+In its place there is a new optional `interceptors` prop, to attach request and response interceptors to the underlying SDK client:
+
+<Source
+  language="jsx"
+  dark
+  code={`<CommerceLayer
+  accessToken={accessToken}
+  interceptors={{
+    response: {
+      onSuccess: (response) => response,
+      onFailure: (error) => { throw error }
+    }
+  }}
+>
+  {children}
+</CommerceLayer>`}
+/>
+
+---
+
+## 5. Migrate away from containers
+
+This is the part you can postpone. Container components still work in v5 — they forward to their replacement and log a deprecation warning in development builds only. They will be removed in the next major version.
+
+The idea behind the change is described in <a href="/?path=/docs/getting-started-containers--docs">Containers</a>: components fetch their own data and batch the requests at module level, so the wrapper that existed only to share a fetch is no longer needed.
+
+### Straight renames
+
+Same props, shorter name:
+
+| v4 (deprecated) | v5 |
+| --- | --- |
+| `<OrderContainer>` | `<Order>` |
+| `<LineItemsContainer>` | `<LineItems>` |
+| `<CustomerContainer>` | `<Customer>` |
+| `<BillingAddressContainer>` | `<BillingAddress>` |
+| `<ShippingAddressContainer>` | `<ShippingAddress>` |
+| `<ShipmentsContainer>` | `<Shipments>` |
+| `<InStockSubscriptionsContainer>` | `<InStockSubscriptions>` |
+| `<AvailabilityContainer>` | `<Availability>` |
+
+<Source
+  language="jsx"
+  dark
+  code={`// ❌ v4
+<OrderContainer orderId={orderId}>
+  <TotalAmount />
+</OrderContainer>
+
+// ✅ v5
+<Order orderId={orderId}>
+  <TotalAmount />
+</Order>`}
+/>
+
+### Containers that dissolve
+
+Here the wrapper disappears and its props move onto the components that used to sit inside it.
+
+| v4 (deprecated) | v5 |
+| --- | --- |
+| `<PricesContainer>` | `<Price skuCode="…" />` standalone, or the `usePrices` hook for batched prices |
+| `<GiftCardContainer>` | `<GiftCard>` standalone — it manages its own context |
+| `<SkusContainer>` | `<Sku skuCode="…">` standalone |
+| `<SkuListsContainer>` | `<SkuList>` standalone |
+| `<PaymentMethodsContainer>` | `<PaymentMethod>` standalone, with `config` passed directly |
+| `<PlaceOrderContainer>` | `<PlaceOrderButton>` and `<PrivacyAndTermsCheckbox>` directly |
+| `<AddressesContainer>` | `<BillingAddressForm>` and `<ShippingAddressForm>`, which take the container's props |
+
+`<AddressesContainer>` is the one that needs the most care, because its props split across two forms:
+
+<Source
+  language="jsx"
+  dark
+  code={`// ❌ v4
+<AddressesContainer isBusiness={isBusiness} shipToDifferentAddress={ship}>
+  <BillingAddressForm>…</BillingAddressForm>
+  <ShippingAddressForm>…</ShippingAddressForm>
+</AddressesContainer>
+
+// ✅ v5
+<BillingAddressForm isBusiness={isBusiness} shipToDifferentAddress={ship}>…</BillingAddressForm>
+<ShippingAddressForm shipToDifferentAddress={ship}>…</ShippingAddressForm>`}
+/>
+
+And `<PlaceOrderContainer>` simply goes away:
+
+<Source
+  language="jsx"
+  dark
+  code={`// ❌ v4
+<PlaceOrderContainer>
+  <PrivacyAndTermsCheckbox />
+  <PlaceOrderButton label="Place order" />
+</PlaceOrderContainer>
+
+// ✅ v5
+<PrivacyAndTermsCheckbox />
+<PlaceOrderButton label="Place order" />`}
+/>
+
+<span title="Tip" type="info">
+Run your app in development mode after the upgrade and watch the console: every deprecated container you are still using logs a warning naming its replacement. That list is your migration backlog.
+</span>
+
+---
+
+## 6. Dependencies you may have relied on indirectly
+
+v5 drops several transitive dependencies. If your own code imported them without declaring them, add them to your `package.json` explicitly:
+
+- `lodash` — removed
+- `jwt-decode` — removed; token decoding now happens inside `@commercelayer/core-components`
+- `iframe-resizer` v4 — replaced by `@iframe-resizer/parent` v5
+
+`@commercelayer/sdk` also jumps from `^6.46.0` to `8.0.0-beta.11`. If you use the SDK alongside these components, align your version so the two agree on the resource types.
+
+---
+
+## What's new in v5
+
+Beyond the migration, v5 adds surface you may want to adopt:
+
+- **`@commercelayer/core-components`** — the data layer on its own, usable without React. See <a href="/?path=/docs/getting-started-core-package--docs">Core package</a>.
+- **`@commercelayer/react-hooks-components`** — SWR-based hooks with caching, deduplication and loading states. See <a href="/?path=/docs/getting-started-hooks-package--docs">Hooks package</a>.
+- **`useTermsAndConditions`** — reads and updates privacy and terms acceptance, the hook behind `<PrivacyAndTermsCheckbox>`.
+- **New standalone components** — `<HostedCart>`, plus the shorter names listed above.
+- **`SkuAvailability`** — re-exported as a type from `@commercelayer/core-components`.
+
+---
+
+## Checklist
+
+1. Bump `@commercelayer/react-components` to v5.
+2. Remove any direct dependency on `core-components` or `react-hooks-components`.
+3. Move to React 19.
+4. Replace deep imports with root imports.
+5. Drop `endpoint` and `domain` from `<CommerceLayer>`.
+6. Declare any dependency you were getting transitively.
+7. Run in development and clear the deprecation warnings when convenient.
