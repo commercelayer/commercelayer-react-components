@@ -13,10 +13,15 @@ import { type JSX, type ReactNode, useContext, useEffect, useRef, useState } fro
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
+import { useAdyenRedirectResume } from "#hooks/useAdyenRedirectResume"
 import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
 import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
+import {
+  paymentSettingCreateAttributes,
+  paymentSettingUnusableReason,
+} from "#utils/paymentSettingCreateAttributes"
 
 /**
  * Payment Setting types this library can drive today.
@@ -28,7 +33,7 @@ import type { ChildrenFunction } from "#typings/index"
  * The goal is to cover all six. See the implementation table in
  * `docs/adr/2026-08-18-payment-session-lifecycle.md`.
  */
-const IMPLEMENTED_SETTING_TYPES = ["payment_setting_manuals"] as const
+const IMPLEMENTED_SETTING_TYPES = ["payment_setting_manuals", "payment_setting_adyens"] as const
 
 export interface PaymentSettingOnSelectParams {
   setting: PaymentSettingResource
@@ -128,6 +133,14 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
     }
   }, [include, includeLoaded, addResourceToInclude])
 
+  // Finishing a 3DS redirect needs no UI — `submitDetails` is a method on
+  // `adyen-web`'s core — so it runs from here, the one component the Payment
+  // Session lifecycle requires to stay mounted. Inside the gateway component it
+  // would depend on which checkout step the application happens to render, and
+  // an accordion that came back collapsed would leave a charged card on an
+  // unplaced order. Called before the bail-outs below, as a hook must be.
+  useAdyenRedirectResume()
+
   if (paymentsModel !== "payment_sessions" || order == null) return null
 
   // Nothing left to pay means nothing to choose. Gift cards can cover an order
@@ -148,14 +161,31 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
     const implemented = IMPLEMENTED_SETTING_TYPES.includes(
       setting.type as (typeof IMPLEMENTED_SETTING_TYPES)[number]
     )
-    if (!implemented && process.env.NODE_ENV !== "production") {
-      // Without this, an organization whose only configured settings are
-      // unimplemented gets a checkout with no payment options and no clue why.
-      console.warn(
-        `[commercelayer] <PaymentSetting> skipped "${setting.type}": not implemented yet.`
-      )
+    if (!implemented) {
+      if (process.env.NODE_ENV !== "production") {
+        // Without this, an organization whose only configured settings are
+        // unimplemented gets a checkout with no payment options and no clue why.
+        console.warn(
+          `[commercelayer] <PaymentSetting> skipped "${setting.type}": not implemented yet.`
+        )
+      }
+      return false
     }
-    return implemented
+
+    // Implemented, but not usable on this order: switched off, or missing the
+    // credential its gateway UI needs. Skipped for the same reason an
+    // unimplemented type is — a radio button that does nothing when clicked is
+    // worse than no radio button — and from the shopper's side the two cases
+    // are indistinguishable anyway.
+    const unusable = paymentSettingUnusableReason(setting)
+    if (unusable != null) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(`[commercelayer] <PaymentSetting> skipped "${setting.type}": ${unusable}.`)
+      }
+      return false
+    }
+
+    return true
   })
 
   const selectSetting = async (setting: PaymentSettingResource): Promise<void> => {
@@ -184,6 +214,10 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
           // The remainder after the gift cards, which the server cannot work
           // out for itself until they are authorized at place time.
           amountCents: remainingAmountCents,
+          // Whatever this setting's gateway needs to know at creation. For
+          // Adyen that is the `return_url` its session is built with, and the
+          // tokenization variant — neither of which can be added later.
+          ...paymentSettingCreateAttributes({ setting, accessToken }),
         })
       }
       const refreshed = await getOrder(order.id)

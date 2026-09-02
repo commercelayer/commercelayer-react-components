@@ -11,8 +11,8 @@ This ADR covers how the library creates, reuses and reads those sessions, and wh
 **Payment Authorization** fits. The place-order sequence itself is a separate decision:
 see `2026-08-18-place-order-split-by-payments-model.md`.
 
-This iteration implements **`payment_setting_manuals` only**. Progress against the full
-set is tracked at the bottom of this document.
+This iteration implements **`payment_setting_manuals` only**. Progress against the full set is
+tracked in `2026-09-02-adyen-payment-setting.md`.
 
 ### What the API actually does
 
@@ -238,14 +238,8 @@ is precisely why neither may act without the shopper.
 
 ### Payment Setting implementation status
 
-| Setting | Type literal | Status |
-| --- | --- | --- |
-| Manual | `payment_setting_manuals` | ✅ implemented |
-| Stripe | `payment_setting_stripes` | ⬜ not implemented |
-| Adyen | `payment_setting_adyens` | ⬜ not implemented |
-| Braintree | `payment_setting_braintrees` | ⬜ not implemented |
-| External | `payment_setting_externals` | ⬜ not implemented |
-| Gift card | `payment_setting_gift_cards` | ✅ implemented — see `2026-08-20-gift-cards-as-payment-sessions.md` |
+Moved to `2026-09-02-adyen-payment-setting.md`, which keeps the single table and names the
+ADR behind each row.
 
 ### Gift cards
 

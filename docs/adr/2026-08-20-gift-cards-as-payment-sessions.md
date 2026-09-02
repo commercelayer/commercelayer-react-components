@@ -237,11 +237,5 @@ nothing — but it is why every read searches the array rather than indexing it.
 
 ### Payment Setting implementation status
 
-| Setting | Type literal | Status |
-| --- | --- | --- |
-| Manual | `payment_setting_manuals` | ✅ implemented |
-| Gift card | `payment_setting_gift_cards` | ✅ implemented |
-| Stripe | `payment_setting_stripes` | ⬜ not implemented |
-| Adyen | `payment_setting_adyens` | ⬜ not implemented |
-| Braintree | `payment_setting_braintrees` | ⬜ not implemented |
-| External | `payment_setting_externals` | ⬜ not implemented |
+Moved to `2026-09-02-adyen-payment-setting.md`, which keeps the single table and names the
+ADR behind each row.
