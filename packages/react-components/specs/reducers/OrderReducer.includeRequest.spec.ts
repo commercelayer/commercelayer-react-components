@@ -10,9 +10,11 @@ vi.mock("@commercelayer/core-components", async (importOriginal) => {
   }
 })
 
-const { getApiOrder, addResourceToInclude, default: orderReducer } = await import(
-  "#reducers/OrderReducer"
-)
+const {
+  getApiOrder,
+  addResourceToInclude,
+  default: orderReducer,
+} = await import("#reducers/OrderReducer")
 type OrderActions = import("#reducers/OrderReducer").OrderActions
 type OrderState = import("#reducers/OrderReducer").OrderState
 

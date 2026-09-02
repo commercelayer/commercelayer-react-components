@@ -1,7 +1,7 @@
 import { act, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react"
 import { type ReactNode, useContext, useEffect } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { PlaceOrderButton } from "#components/orders/PlaceOrderButton"
+import { PlaceOrderButtonPaymentSource as PlaceOrderButton } from "#components/orders/PlaceOrderButtonPaymentSource"
 import { PlaceOrderContainer } from "#components/orders/PlaceOrderContainer"
 import { PrivacyAndTermsCheckbox } from "#components/orders/PrivacyAndTermsCheckbox"
 import CommerceLayerContext from "#context/CommerceLayerContext"
