@@ -4,12 +4,12 @@ import {
   placeOrderWithPaymentSessions,
 } from "@commercelayer/core-components"
 import type { Order } from "@commercelayer/sdk"
-import { type JSX, type MouseEvent, type ReactNode, useContext, useEffect, useState } from "react"
+import { type JSX, type MouseEvent, type ReactNode, useContext, useState } from "react"
 import Parent from "#components/utils/Parent"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
-import { PLACE_ORDER_RECHECK_EVENT } from "#hooks/usePlaceOrder"
+import { useTermsAndConditions } from "#hooks/useTermsAndConditions"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
 import { useOrganizationConfig } from "#utils/organization"
@@ -72,27 +72,11 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
   const { accessToken, interceptors } = useContext(CommerceLayerContext)
   const [isLoading, setIsLoading] = useState(false)
   const organizationConfig = useOrganizationConfig({ accessToken })
-  const [privacyTermsChecked, setPrivacyTermsChecked] = useState(
-    () => localStorage.getItem("privacy-terms") === "true"
-  )
-
   // The privacy and terms gate is a legal requirement of the checkout, not a
   // property of the payment model, so it applies here exactly as it does to the
-  // older branch — same storage key, same "only when both URLs are configured"
-  // rule as `placeOrderPermitted`.
-  //
-  // `<PrivacyAndTermsCheckbox>` announces changes through a DOM event rather
-  // than context, so there is nothing to read: we listen for the same event the
-  // older branch listens for.
-  useEffect(() => {
-    const recheck = (): void => {
-      setPrivacyTermsChecked(localStorage.getItem("privacy-terms") === "true")
-    }
-    window.addEventListener(PLACE_ORDER_RECHECK_EVENT, recheck)
-    return () => {
-      window.removeEventListener(PLACE_ORDER_RECHECK_EVENT, recheck)
-    }
-  }, [])
+  // older branch — same acceptance store, same "only when both URLs are
+  // configured" rule as `placeOrderPermitted`.
+  const { accepted: privacyTermsChecked } = useTermsAndConditions()
 
   const privacyUrl = order?.privacy_url ?? organizationConfig?.urls?.privacy
   const termsUrl = order?.terms_url ?? organizationConfig?.urls?.terms

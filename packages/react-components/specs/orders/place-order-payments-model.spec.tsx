@@ -6,6 +6,10 @@ import { PlaceOrderButton } from "#components/orders/PlaceOrderButton"
 import { PlaceOrderButtonPaymentSessions } from "#components/orders/PlaceOrderButtonPaymentSessions"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import {
+  resetTermsAcceptanceStore,
+  setAccepted as setTermsAccepted,
+} from "#utils/termsAcceptanceStore"
 
 const { placeOrderMock } = vi.hoisted(() => ({ placeOrderMock: vi.fn() }))
 
@@ -65,6 +69,7 @@ function Wrapper({
 beforeEach(() => {
   vi.clearAllMocks()
   localStorage.clear()
+  resetTermsAcceptanceStore()
   placeOrderMock.mockResolvedValue({ placed: true, order: { status: "placed" }, errors: [] })
 })
 
@@ -222,7 +227,7 @@ describe("PlaceOrderButtonPaymentSessions", () => {
     })
 
     it("allows the button once the box is checked", () => {
-      localStorage.setItem("privacy-terms", "true")
+      setTermsAccepted("order-1", true)
       renderButton(
         orderOnSessions({
           privacy_url: "https://example.com/privacy",
@@ -309,11 +314,12 @@ describe("PlaceOrderButtonPaymentSessions", () => {
   })
 })
 
-// The checkbox lives outside the button and talks to it through a DOM event.
-// In container mode it used to notify only PlaceOrderContext, which the newer
-// branch does not use — leaving the button disabled forever.
+// The checkbox is a *sibling* of the button, never its ancestor, so no provider
+// can sit above both: the acceptance store is the shared channel. Subscribing to
+// it is what keeps a `payment_sessions` button — which does not use
+// PlaceOrderContext — from staying disabled forever.
 describe("privacy checkbox reaches the payment_sessions button", () => {
-  it("enables the button when the recheck event fires", async () => {
+  it("enables the button when acceptance lands in the store", async () => {
     render(
       <Wrapper
         currentOrder={orderOnSessions({
@@ -327,8 +333,7 @@ describe("privacy checkbox reaches the payment_sessions button", () => {
     expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(true)
 
     await act(async () => {
-      localStorage.setItem("privacy-terms", "true")
-      window.dispatchEvent(new CustomEvent("cl:placeorder:recheck"))
+      setTermsAccepted("order-1", true)
     })
 
     await waitFor(() => {

@@ -41,12 +41,8 @@ export function PaymentSettingGiftCardErrors(props: Props): JSX.Element | null {
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <div {...p}>
-      {giftCardErrors.map((error, index) => (
-        <span
-          key={`${error.code}-${
-             index
-          }`}
-        >
+      {giftCardErrors.map((error) => (
+        <span key={`${error.code}-${error.field ?? ""}-${error.message ?? ""}`}>
           {error.message}
         </span>
       ))}

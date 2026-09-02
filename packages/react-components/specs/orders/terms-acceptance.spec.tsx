@@ -59,6 +59,11 @@ const ORDER: any = {
   id: "order-1",
   status: "pending",
   total_amount_with_taxes_cents: 1000,
+  // `<PlaceOrderButton>` routes on the Payments Model, and an order with
+  // neither `available_payment_methods` nor `available_payment_settings` is
+  // undetermined — it would get the inert button and every assertion here
+  // would pass for the wrong reason.
+  available_payment_methods: [{ id: "pm-1", payment_source_type: "stripe_payments" }],
   payment_method: { id: "pm-1", payment_source_type: "stripe_payments" },
   payment_source: { id: "ps-1", type: "stripe_payments" },
   billing_address: { id: "ba-1" },

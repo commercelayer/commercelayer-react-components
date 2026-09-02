@@ -171,6 +171,7 @@ export function PaymentMethod({
     onClick,
     paymentSource,
     showLoader,
+    paymentsModel,
   ])
   useEffect(() => {
     // Silencing this component in render is not enough: React runs a mounted
@@ -265,6 +266,7 @@ export function PaymentMethod({
     paymentSource,
     showLoader,
     autoSelectSinglePaymentMethod,
+    paymentsModel,
   ])
   useEffect(() => {
     if (paymentMethods) {
