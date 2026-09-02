@@ -171,3 +171,52 @@ export function hasFailedAuthorization(session: PaymentSession): boolean {
     status as (typeof TERMINAL_FAILURE_TRANSACTION_STATUSES)[number]
   )
 }
+
+/**
+ * The Payment Setting type Adyen cards are taken through.
+ *
+ * Unlike gift cards, this is one of the alternatives the shopper picks between,
+ * so it stays inside the radio group. What separates it from `manual` is that a
+ * gateway has to collect something before the order can be placed.
+ */
+export const ADYEN_SETTING_TYPE = "payment_setting_adyens"
+
+/** True when this session pays through Adyen. */
+export function isAdyenSession(session?: PaymentSession | null): boolean {
+  return session?.payment_setting?.type === ADYEN_SETTING_TYPE
+}
+
+/**
+ * The gateway-side session `adyen-web` needs, as Adyen names its own fields.
+ *
+ * Distinct from the Payment Session that owns it: this is what
+ * `AdyenCheckout({ session })` is constructed with.
+ */
+export interface AdyenSession {
+  id: string
+  sessionData: string
+}
+
+/**
+ * Read the Adyen Session out of a Payment Session.
+ *
+ * It lives in `response_data`, which is the response Commerce Layer got from
+ * Adyen `/sessions` passed through verbatim — hence Adyen's camelCase
+ * `sessionData` beside a bare `id`. That attribute is deliberately readable by
+ * sales-channel tokens (`config/attributes/payment_session.yml`, *"used by
+ * client"*), unlike `payment_authorization.response_data`, which is withheld.
+ *
+ * Returns `undefined` unless **both** fields are present and non-empty. A
+ * partial Adyen Session is not something to boot a Drop-in from, and the two
+ * ways of getting one — a consumer whose `fields` allowlist omits
+ * `response_data`, or a session whose gateway call failed — are both better
+ * reported as "no Adyen session" than as a Drop-in that fails inside the SDK.
+ */
+export function readAdyenSession(session?: PaymentSession | null): AdyenSession | undefined {
+  const data = session?.response_data
+  if (data == null || typeof data !== "object") return undefined
+  const { id, sessionData } = data as { id?: unknown; sessionData?: unknown }
+  if (typeof id !== "string" || id === "") return undefined
+  if (typeof sessionData !== "string" || sessionData === "") return undefined
+  return { id, sessionData }
+}

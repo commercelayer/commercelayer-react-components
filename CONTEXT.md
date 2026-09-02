@@ -65,6 +65,30 @@ _Avoid_: saved card (informal), wallet
 In this codebase, the React component that wires a specific gateway's UI/SDK and drives Payment Source creation for that gateway (e.g. `StripeGateway`, `AdyenGateway`).
 _Avoid_: using "gateway" to mean the Payment Method
 
+**Sessions Flow**:
+The Adyen integration mode in which the gateway is driven from the browser: Commerce Layer creates an **Adyen Session**, the **Drop-in** takes it from there, and `adyen-web` calls Adyen directly for the payment, the 3DS action and the authentication result. The counterpart is the **Advanced Flow**, where Commerce Layer makes those calls instead. Only the Sessions Flow is implementable in this library, because the Advanced Flow needs `payment_authorization.response_data`, which is withheld from sales-channel and customer tokens. Note the consequence that reads as a bug and is not one: the `/payments` call Commerce Layer makes for a Sessions Flow authorization carries no payment method and fails Adyen `14_006` — it is not the call that charges, and the outcome arrives later by webhook.
+_Avoid_: drop-in flow (the Drop-in is used in both), client-side flow (ambiguous — the Advanced Flow also has browser code)
+
+**Adyen Session**:
+The gateway-side session, distinct from the **Payment Session** that owns it. Created by Commerce Layer when the Payment Session is created, and readable as `payment_session.response_data.{id, sessionData}` — Adyen's own field names, passed through verbatim. Everything Adyen must know is fixed at that moment: `PATCH { _refresh: true }` is a no-op for Adyen, so a session with the wrong `returnUrl` or no `shopperReference` cannot be corrected, only replaced. Expires after a day, from a value Commerce Layer chooses and sends.
+_Avoid_: session (an order has Payment Sessions; say which), payment session (a different resource)
+
+**Drop-in**:
+Adyen's hosted UI component, rendered by `adyen-web` into a container this library provides. It owns the card fields, their PCI iframes, the 3DS challenge and — in the **Sessions Flow** — the call that actually charges. Its own Pay button is suppressed (`showPayButton: false`), because `<PlaceOrderButton>` starts the charge instead; that is what keeps the privacy-and-terms gate in front of every payment.
+_Avoid_: Adyen widget, card form (it is more than the fields)
+
+**Redirect Return**:
+The shopper coming back from a 3DS page hosted elsewhere, identified by `redirectResult` in the URL. Not an edge case and not avoidable: native 3DS2 is requested server-side for every Adyen payment, so the redirect variant happens whenever the card is not enrolled — the issuer's choice, not the integration's. Resuming needs no UI, since `submitDetails` is a method on the `adyen-web` core rather than on the **Drop-in**. `redirectResult` is single-use. Terms acceptance does not survive the navigation, which is why this is the one path where the library places the order without a click.
+_Avoid_: 3DS callback (nothing calls back; the shopper navigates), redirect flow (it is one branch of the Sessions Flow, not a flow)
+
+**Payment Gateway Handoff**:
+How a **Payment Gateway** component tells `<PlaceOrderButton>` that it can collect a payment, and how the button asks it to. An external store keyed by order id, carrying `{ submit, isReady }` plus the phase of a **Redirect Return** — not context, because the two components are siblings in a checkout rather than parent and child. `submit` answers with one of four outcomes, and the two that look alike matter most: a **verdict** means no money moved and a rollback is safe, while an **unknown** outcome — a network failure, an expired gateway session — means the payment may have gone through and nothing may be undone. Deliberately gateway-neutral: the button asks whether *a* gateway has registered, never which one. The same shape terms acceptance already uses, for the same reason.
+_Avoid_: payment ref (the `payment_source`-model mechanism, which publishes a form ref instead), submit handler
+
+**Client Key**:
+The public Adyen credential the browser needs, `payment_setting_adyens.public_key`. Reachable by a sales-channel or customer token through exactly one request — the order with `available_payment_settings` included — because listing payment settings is refused and there is no other way to learn a setting's id. It is optional and unvalidated server-side, so a payment setting that works for server-side charges can carry none, and a setting in that state is skipped rather than offered.
+_Avoid_: public key (ambiguous across gateways — Stripe's is a publishable key), API key (the secret credential, never served)
+
 ## Relationships
 
 - An **Order** is on exactly one **Payments Model**, permanently
@@ -78,6 +102,11 @@ _Avoid_: using "gateway" to mean the Payment Method
 - An **Order** carries zero or more **Applied Gift Cards** and at most one other **Payment Session**; that is the only split payment supported
 - Changing the Applied Gift Cards invalidates the other **Payment Session**: its `amount_cents` is fixed at creation, so once the **Remaining Amount** moves that session is not stale but wrong
 - A **Customer Payment Source** belongs to a **Customer**; selecting one sets the **Order**'s Payment Source
+- A **Payment Session** against `payment_setting_adyens` owns exactly one **Adyen Session**, reachable only through its `response_data`; replacing one means replacing the other, because neither can be updated after creation
+- The **Drop-in** takes the money, but the **Payment Authorization** is created afterwards and is only a record: in the **Sessions Flow** its own gateway call fails by construction, and it reaches `succeeded` from Adyen's webhook
+- A **Payment Authorization** on the Sessions Flow never reaches `requires_action` — the shopper's 3DS happens before it exists
+- A refused payment leaves the **Payment Session** `unpaid` but eventually carries a failed **Payment Authorization**, so the session must be replaced rather than retried
+- A **Payment Gateway** reaches `<PlaceOrderButton>` only through the **Payment Gateway Handoff**; they are siblings in a checkout, so no context connects them
 
 ## Example dialogue
 
@@ -104,6 +133,26 @@ _Avoid_: using "gateway" to mean the Payment Method
 - "the payment is done" was used for both a created **Payment Session** and a taken payment — resolved: only a `succeeded` **Payment Authorization** means paid; a session on its own means nothing was taken.
 - "placeable" was used for both the readable order attribute and the `_placeable` validation trigger — resolved in the glossary above; when someone says "check if it's placeable", ask whether they mean reading the attribute or asking the API.
 - "set payment source" was used to mean both the async operation that creates/attaches a Payment Source *and* the reducer action that stores it in state — resolved: the operation is `setPaymentSource(...)`, the reducer action is `dispatch({ type: "setPaymentSource" })`.
+
+## Example dialogue — Adyen
+
+> **Dev:** "The Drop-in has its own Pay button. Do I hide `<PlaceOrderButton>` when Adyen is selected?"
+> **Domain expert:** "The other way round. Hide Adyen's and drive it from ours. Its button charges the card directly, so it would take the money before the shopper accepted the terms — and that gate is a legal requirement of the checkout, not a property of the payment model."
+
+> **Dev:** "The authorization I created came back with a 422 from Adyen in `response_data`. Did the payment fail?"
+> **Domain expert:** "No — that call isn't the one that charges. In the **Sessions Flow** `adyen-web` already charged; Commerce Layer's own call has no payment method and always fails `14_006`. The authorization sits at `pending` until Adyen's `AUTHORISATION` webhook settles it. Which is also why the placeability loop needs longer for Adyen than for a bank transfer: you're waiting on a webhook, not a local job."
+
+> **Dev:** "Card refused. I'll put the Drop-in back to `ready` so they can try another one."
+> **Domain expert:** "Not on that session. The refusal will land a failed **Payment Authorization** on it, and a later success can't move a failed record to succeeded — the retry would be lost silently. Delete the **Payment Session** and make a new one. And warn the designer that the card fields come back empty either way; Adyen tears down the PCI iframes."
+
+> **Dev:** "Where do I get the **Client Key** from? There's no payment gateway resource any more."
+> **Domain expert:** "`setting.public_key`, off the order's `available_payment_settings` — which this library already includes on every fetch. Better than the old model, where you had to create a payment source first just to read the key. But check it's actually there: it's optional and unvalidated, so a setting that charges fine server-side can have none, and then we skip it."
+
+> **Dev:** "Should I show the 'save this card' checkbox for guests too? The order has a customer record."
+> **Domain expert:** "No — that record is often just an email. Adyen would store the token against it, and the next visitor who types that address would see the card's last four digits and be able to pay with it. Gate on the token: `isGuestToken`."
+
+> **Dev:** "The shopper came back from a 3DS page. Which component picks that up?"
+> **Domain expert:** "None of the visible ones. `submitDetails` is on the `adyen-web` core, so the resume needs no UI at all — it runs from `<PaymentSetting>`, which is the only thing guaranteed to be mounted. If it lived in the Adyen component, an accordion that reopened on a different step would leave a charged card on an unplaced order."
 
 ## Example dialogue — gift cards
 
