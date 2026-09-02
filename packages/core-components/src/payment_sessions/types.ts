@@ -71,6 +71,24 @@ export const TERMINAL_FAILURE_TRANSACTION_STATUSES = [
 ] as const satisfies readonly KnownPaymentTransactionStatus[]
 
 /**
+ * Transaction states the API will leave on its own, without anyone acting.
+ * Authorizing runs in a background job, so an authorization sits here between
+ * the `POST` that creates it and the money actually being taken.
+ *
+ * `requires_action` is deliberately **not** here. It is waiting for the
+ * *shopper* — a 3DS challenge or an equivalent redirect — so no amount of
+ * polling resolves it, and treating it as in flight would spend the whole
+ * retry budget on something that needs a flow this iteration does not
+ * implement. It is not a failure either (see
+ * `TERMINAL_FAILURE_TRANSACTION_STATUSES`), so it falls through to the
+ * placeability check and is reported as the API describes it.
+ */
+export const IN_FLIGHT_TRANSACTION_STATUSES = [
+  "pending",
+  "processing",
+] as const satisfies readonly KnownPaymentTransactionStatus[]
+
+/**
  * One reason the API gave for refusing to place an order, mapped out of a 422
  * JSON:API error object.
  *
@@ -118,6 +136,38 @@ export function hasLiveAuthorization(session: PaymentSession): boolean {
   const status = session.payment_authorization?.status
   if (status == null) return false
   return !TERMINAL_FAILURE_TRANSACTION_STATUSES.includes(
+    status as (typeof TERMINAL_FAILURE_TRANSACTION_STATUSES)[number]
+  )
+}
+
+/**
+ * True when the session's authorization is still being worked on server-side.
+ *
+ * This is the state the placeability check cannot see through: the money is
+ * neither taken nor refused, so a refusal read while this holds says nothing
+ * about whether the payment will succeed.
+ */
+export function hasAuthorizationInFlight(session: PaymentSession): boolean {
+  const status = session.payment_authorization?.status
+  if (status == null) return false
+  return IN_FLIGHT_TRANSACTION_STATUSES.includes(
+    status as (typeof IN_FLIGHT_TRANSACTION_STATUSES)[number]
+  )
+}
+
+/**
+ * True when the session's authorization reached a state it cannot leave.
+ *
+ * Note the API exposes no reason for it: a Payment Authorization carries only
+ * `status`, the balances and the gateway's raw `response_data`
+ * (`config/attributes/payment_authorization.yml` in `core-api`). So this
+ * answers *whether* waiting is pointless, never *why* the payment failed —
+ * the message still has to come from the API's own refusal.
+ */
+export function hasFailedAuthorization(session: PaymentSession): boolean {
+  const status = session.payment_authorization?.status
+  if (status == null) return false
+  return TERMINAL_FAILURE_TRANSACTION_STATUSES.includes(
     status as (typeof TERMINAL_FAILURE_TRANSACTION_STATUSES)[number]
   )
 }

@@ -50,23 +50,40 @@ function refusal(detail = "The payment doesn't cover the order.") {
 }
 
 interface SdkStub {
+  retrieve: ReturnType<typeof vi.fn>
   _placeable: ReturnType<typeof vi.fn>
   _place: ReturnType<typeof vi.fn>
   createAuthorization: ReturnType<typeof vi.fn>
 }
 
-function stubSdk(): SdkStub {
+/**
+ * The order the placeability loop reads at the top of every attempt. Defaults
+ * to the same sessions the call was given, with no authorizations on them —
+ * i.e. nothing in flight, so the loop goes straight to `_placeable`.
+ */
+function stubSdk(retrieved: Order = order([], "pending")): SdkStub {
   const stub: SdkStub = {
+    retrieve: vi.fn().mockResolvedValue(retrieved),
     _placeable: vi.fn().mockResolvedValue(order([], "pending")),
     _place: vi.fn().mockResolvedValue(order([], "placed")),
     createAuthorization: vi.fn().mockResolvedValue({ id: "auth-1" }),
   }
   getSdkMock.mockReturnValue({
-    orders: { _placeable: stub._placeable, _place: stub._place, relationship: vi.fn() },
+    orders: {
+      retrieve: stub.retrieve,
+      _placeable: stub._placeable,
+      _place: stub._place,
+      relationship: vi.fn(),
+    },
     payment_authorizations: { create: stub.createAuthorization },
     payment_sessions: { relationship: vi.fn((id: string) => ({ id, type: "payment_sessions" })) },
   })
   return stub
+}
+
+/** A session carrying an authorization in `status`. */
+function authorized(status: string, overrides: Partial<PaymentSession> = {}): PaymentSession {
+  return session({ payment_authorization: { status } as never, ...overrides })
 }
 
 /** Keeps the retry loop synchronous. The delay is asserted separately. */
@@ -307,6 +324,149 @@ describe("placeOrderWithPaymentSessions", () => {
 
       expect(sdk.createAuthorization).not.toHaveBeenCalled()
       expect(result.placed).toBe(true)
+    })
+  })
+
+  describe("waiting for the authorizations to settle", () => {
+    // Asking `_placeable` while the money is still moving produces a 422 that
+    // means nothing: it says the order is not covered because the payment has
+    // not landed yet, not because it will not.
+    it("does not ask _placeable while an authorization is in flight", async () => {
+      const sdk = stubSdk()
+      sdk.retrieve
+        .mockResolvedValueOnce(order([authorized("pending")]))
+        .mockResolvedValueOnce(order([authorized("processing")]))
+        .mockResolvedValue(order([authorized("succeeded")]))
+
+      const result = await placeOrderWithPaymentSessions({
+        accessToken: ACCESS_TOKEN,
+        order: order([session()]),
+        ...NO_WAIT,
+      })
+
+      expect(sdk.retrieve).toHaveBeenCalledTimes(3)
+      expect(sdk._placeable).toHaveBeenCalledTimes(1)
+      expect(result).toMatchObject({ placed: true, errors: [], timedOut: false })
+    })
+
+    // `requires_action` waits for the shopper, not for the server, so polling
+    // it would spend the budget on something no amount of waiting resolves.
+    it("does not wait on an authorization that requires shopper action", async () => {
+      const sdk = stubSdk(order([authorized("requires_action")]))
+
+      await placeOrderWithPaymentSessions({
+        accessToken: ACCESS_TOKEN,
+        order: order([session()]),
+        ...NO_WAIT,
+      })
+
+      expect(sdk._placeable).toHaveBeenCalledTimes(1)
+    })
+
+    // Its refusal is the only message we will have to show, so the budget
+    // running out must not mean returning nothing.
+    it("asks _placeable on the last attempt even with an authorization in flight", async () => {
+      const sdk = stubSdk(order([authorized("pending")]))
+      sdk._placeable.mockRejectedValue(refusal("Still not covered."))
+
+      const result = await placeOrderWithPaymentSessions({
+        accessToken: ACCESS_TOKEN,
+        order: order([session()]),
+        attempts: 3,
+        intervalMs: 0,
+      })
+
+      expect(sdk._placeable).toHaveBeenCalledTimes(1)
+      expect(result.timedOut).toBe(true)
+      expect(result.errors[0]?.message).toBe("Still not covered.")
+    })
+
+    // A settled failure is a verdict. Retrying would only delay the same
+    // answer, and `timedOut` would misreport it as a payment still in progress.
+    it("reports a failed authorization at once, without timing out", async () => {
+      const sdk = stubSdk(order([authorized("declined")]))
+      sdk._placeable.mockRejectedValue(refusal("The payment doesn't cover the order."))
+
+      const result = await placeOrderWithPaymentSessions({
+        accessToken: ACCESS_TOKEN,
+        order: order([session()]),
+        ...NO_WAIT,
+      })
+
+      expect(sdk._placeable).toHaveBeenCalledTimes(1)
+      expect(result).toMatchObject({ placed: false, timedOut: false })
+      expect(result.errors[0]?.message).toBe("The payment doesn't cover the order.")
+    })
+
+    // A burnt session stays on the order after the shopper re-selects. Reading
+    // it as this attempt's verdict would end the loop before the authorization
+    // just created has had a chance to settle.
+    it("ignores a failed authorization on a session that is not paying", async () => {
+      const sdk = stubSdk()
+      const burnt = session({ id: "burnt", payment_authorization: { status: "declined" } as never })
+      sdk.retrieve
+        .mockResolvedValueOnce(order([burnt, authorized("pending")]))
+        .mockResolvedValue(order([burnt, authorized("succeeded")]))
+
+      const result = await placeOrderWithPaymentSessions({
+        accessToken: ACCESS_TOKEN,
+        order: order([burnt, session()]),
+        ...NO_WAIT,
+      })
+
+      expect(sdk._placeable).toHaveBeenCalledTimes(1)
+      expect(result).toMatchObject({ placed: true, timedOut: false })
+    })
+
+    it("recognises an order auto_place already placed, before asking _placeable", async () => {
+      const sdk = stubSdk(order([], "placed"))
+
+      const result = await placeOrderWithPaymentSessions({
+        accessToken: ACCESS_TOKEN,
+        order: order([session()]),
+        ...NO_WAIT,
+      })
+
+      expect(sdk._placeable).not.toHaveBeenCalled()
+      expect(sdk._place).not.toHaveBeenCalled()
+      expect(result).toMatchObject({ placed: true, timedOut: false })
+    })
+  })
+
+  describe("the window between _placeable and _place", () => {
+    // auto_place can fire in that window. `_place` then refuses an order that
+    // was placed successfully, and reporting the refusal would tell the shopper
+    // their payment failed on an order that is paid for.
+    it("treats a _place refusal on an already placed order as success", async () => {
+      const sdk = stubSdk()
+      sdk.retrieve
+        .mockResolvedValueOnce(order([], "pending"))
+        .mockResolvedValue(order([], "placed"))
+      sdk._place.mockRejectedValue(new Error("Cannot place a placed order."))
+
+      const result = await placeOrderWithPaymentSessions({
+        accessToken: ACCESS_TOKEN,
+        order: order([session()]),
+        ...NO_WAIT,
+      })
+
+      expect(result).toMatchObject({ placed: true, errors: [], timedOut: false })
+    })
+
+    it("still reports a _place refusal when the order really is not placed", async () => {
+      const sdk = stubSdk()
+      sdk._place.mockRejectedValue(refusal("The payment doesn't cover the order."))
+
+      const result = await placeOrderWithPaymentSessions({
+        accessToken: ACCESS_TOKEN,
+        order: order([session()]),
+        attempts: 2,
+        intervalMs: 0,
+      })
+
+      expect(sdk._place).toHaveBeenCalledTimes(2)
+      expect(result).toMatchObject({ placed: false, timedOut: true })
+      expect(result.errors[0]?.message).toBe("The payment doesn't cover the order.")
     })
   })
 })

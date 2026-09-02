@@ -213,6 +213,23 @@ describe("PlaceOrderButtonPaymentSessions", () => {
     })
   })
 
+  // Authorizations may already have been created when the place threw, and the
+  // order in context still shows their sessions without one — which reads as
+  // "nothing has been charged yet". A shopper clicking again on that stale
+  // order would be authorized a second time and charged twice.
+  it("refetches the order after a thrown error, not only after a reported one", async () => {
+    placeOrderMock.mockRejectedValue(new Error("Unauthorized"))
+    renderButton(orderOnSessions())
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button"))
+    })
+
+    await waitFor(() => {
+      expect(getOrder).toHaveBeenCalledWith("order-1")
+    })
+  })
+
   describe("privacy and terms", () => {
     // A legal requirement of the checkout, not a property of the payment model,
     // so it gates this branch exactly as it gates the older one.

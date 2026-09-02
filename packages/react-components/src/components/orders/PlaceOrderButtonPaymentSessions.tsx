@@ -140,6 +140,19 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
       ]
       setOrderErrors(errors)
       onClick?.({ placed: false, errors })
+      // Refetch here too, and not only on the reported-error path above.
+      // Authorizations may well have been created before this threw, and the
+      // order in context still shows their sessions without one — which reads
+      // as "nothing has been charged yet". A shopper who clicks again on that
+      // stale order gets a second authorization over the first, and the money
+      // taken twice. Pulling the order back makes the existing
+      // `hasLiveAuthorization` guard see what actually happened.
+      try {
+        await getOrder(order.id)
+      } catch {
+        // The error already on screen is the one worth showing; a failed
+        // refetch must not replace it with a second one.
+      }
     } finally {
       setIsLoading(false)
     }

@@ -3,12 +3,27 @@ import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 import { derivePaymentSessionsState } from "./derivePaymentSessionsState"
 import { mapPlaceabilityErrors } from "./mapPlaceabilityErrors"
-import { hasLiveAuthorization, type PlaceabilityError } from "./types"
+import {
+  hasAuthorizationInFlight,
+  hasFailedAuthorization,
+  hasLiveAuthorization,
+  type PlaceabilityError,
+} from "./types"
 
-/** Attempts before the placeability check gives up. */
-export const DEFAULT_PLACEABLE_ATTEMPTS = 5
+/**
+ * Attempts before the placeability check gives up.
+ *
+ * Each attempt starts by reading the order back, so an attempt spent waiting
+ * for an authorization costs one `GET` rather than a refused `PATCH`. That
+ * makes attempts cheap enough to run more of them, more closely spaced, than
+ * when every one of them was a `_placeable` call.
+ */
+export const DEFAULT_PLACEABLE_ATTEMPTS = 8
 /** Delay between placeability attempts, in milliseconds. */
-export const DEFAULT_PLACEABLE_INTERVAL_MS = 1000
+export const DEFAULT_PLACEABLE_INTERVAL_MS = 500
+
+/** Order includes the placeability loop needs to read authorization states. */
+const AUTHORIZATION_INCLUDES = ["payment_sessions.payment_authorization"]
 
 interface PlaceOrderWithPaymentSessionsParams
   extends Pick<RequestConfig, "accessToken" | "interceptors"> {
@@ -62,12 +77,40 @@ export interface PlaceOrderWithPaymentSessionsResult {
  * point.
  *
  * **Why `_placeable` is retried instead of reported.** Authorizing is
- * asynchronous — it runs in a background job — so the first check legitimately
- * fails with "the payment doesn't cover the required percentage" while the
- * money is still being taken. Reporting that straight away would tell the
- * shopper their payment failed a second before it succeeded. Only an error that
+ * asynchronous — it runs in a background job — so a check taken while the money
+ * is still being taken legitimately fails with "the payment doesn't cover the
+ * required percentage". Reporting that straight away would tell the shopper
+ * their payment failed a second before it succeeded. Only an error that
  * survives the last attempt is real. A failed `_placeable` persists nothing, so
  * retrying is side-effect free despite the PATCH verb.
+ *
+ * **Why each attempt reads the order first.** The authorization states are the
+ * only thing that says whether a refusal is worth waiting on, and `_placeable`
+ * cannot see them — so asking it while an authorization is in flight produces a
+ * guaranteed 422 that means nothing. Reading the order first turns that wasted
+ * attempt into a cheap `GET` and buys three things:
+ *
+ * - an authorization that has already **failed** ends the loop at once, instead
+ *   of spending the whole budget waiting for a verdict that has arrived;
+ * - an order `auto_place` has already placed is recognised wherever in the
+ *   sequence it happens, not only at the point the old code looked;
+ * - the cost is flat in the number of sessions. Every authorization state
+ *   arrives in the same `GET`, so orders paying with several gift cards poll no
+ *   harder than one paying with a single method — which is what a per-session
+ *   wait, concurrent or not, could not promise.
+ *
+ * **The last attempt always asks.** When the budget runs out with an
+ * authorization still in flight, `_placeable` is called anyway: its refusal is
+ * the only message the API will give us, and returning none would leave the
+ * shopper with a failed place and nothing on screen.
+ *
+ * **A failed authorization still gets its message from `_placeable`.** A
+ * Payment Authorization carries no error attribute — only `status`, balances
+ * and the gateway's raw `response_data` — so there is nothing better to report,
+ * and inventing copy here would put payment wording in a package that has no
+ * business owning it. What changes is the timing: the refusal is returned as
+ * soon as the authorization settles, with `timedOut: false`, because a settled
+ * failure is a real answer rather than latency.
  *
  * **There is no client-side coverage gate.** Coverage is enforced by a payment
  * rule whose threshold an organization can change — it can be lowered to accept
@@ -89,11 +132,20 @@ export async function placeOrderWithPaymentSessions({
   const sdk = getSdk({ accessToken, interceptors })
   const state = derivePaymentSessionsState(order)
 
+  // The sessions paying for this order, by the same derivation the rest of the
+  // payment UI uses. Kept as a set because the placeability loop has to tell
+  // them apart from sessions merely sitting on the order: an authorization that
+  // failed on an earlier attempt stays there, and reading it as this attempt's
+  // verdict would end the loop before the authorization just created has had a
+  // chance to settle.
+  const payingSessions = [...state.giftCardSessions, state.currentPaymentSession].filter(
+    (session): session is PaymentSession => session != null
+  )
+  const payingSessionIds = new Set(payingSessions.map((session) => session.id))
+
   // Gift cards first, then the difference. Sequential, not concurrent: each
   // authorization changes what the next one is allowed to take.
-  const toAuthorize = [...state.giftCardSessions, state.currentPaymentSession]
-    .filter((session): session is PaymentSession => session != null)
-    .filter(needsAuthorization)
+  const toAuthorize = payingSessions.filter(needsAuthorization)
 
   for (const session of toAuthorize) {
     try {
@@ -112,30 +164,80 @@ export async function placeOrderWithPaymentSessions({
   let lastErrors: PlaceabilityError[] = []
 
   for (let attempt = 1; attempt <= attempts; attempt++) {
+    const isLastAttempt = attempt === attempts
+    const current = await sdk.orders.retrieve(order.id, { include: AUTHORIZATION_INCLUDES })
+
+    // `auto_place` on the Payment Setting places the order inside the
+    // authorization job, so it can be placed before we ever ask to place it.
+    if (current.status === "placed") {
+      return { placed: true, order: current, errors: [], timedOut: false }
+    }
+
+    const sessions = (current.payment_sessions ?? []).filter((session) =>
+      payingSessionIds.has(session.id)
+    )
+    const failed = sessions.some(hasFailedAuthorization)
+
+    // Nothing `_placeable` says while the money is still moving is worth
+    // reporting, so do not spend a PATCH asking — unless this is the last
+    // attempt, whose refusal is the only message we will have to show.
+    if (!failed && !isLastAttempt && sessions.some(hasAuthorizationInFlight)) {
+      await sleep(intervalMs)
+      continue
+    }
+
     try {
       const checked = await sdk.orders._placeable(order.id)
 
-      // `auto_place` on the Payment Setting places the order inside the
-      // authorization job, so it can already be placed by the time we look.
       // `_placeable` returns 200 for a placed order — `ensure_pending` only
-      // promotes drafts, it does not reject anything else — so this is a
-      // success, not a race to recover from.
+      // promotes drafts, it does not reject anything else — so a placed order
+      // here is a success, not a race to recover from.
       if (checked.status === "placed") {
         return { placed: true, order: checked, errors: [], timedOut: false }
       }
 
-      const placed = await sdk.orders._place(order.id)
-      return { placed: placed.status === "placed", order: placed, errors: [], timedOut: false }
+      return await placeOrRecover(sdk, order.id)
     } catch (error) {
       lastErrors = mapPlaceabilityErrors(error)
       // An error we cannot read as a placeability refusal is not something
       // waiting will fix — surface it instead of burning the attempts.
       if (lastErrors.length === 0) throw error
+      // A failed authorization is a verdict, not latency. Retrying would only
+      // delay the same answer, and `timedOut` would misreport a settled
+      // refusal as a payment that might still succeed.
+      if (failed) return { placed: false, errors: lastErrors, timedOut: false }
       if (attempt < attempts) await sleep(intervalMs)
     }
   }
 
   return { placed: false, errors: lastErrors, timedOut: true }
+}
+
+/**
+ * `_place` the order, treating "already placed" as the success it is.
+ *
+ * `auto_place` can fire in the window between the placeability check passing
+ * and this call. `_place` then refuses an order that was placed successfully,
+ * and — being a state error rather than a payment rule — the refusal does not
+ * map to a placeability error, so it would be rethrown as a hard failure on an
+ * order that is paid for and placed. Reading the order back is the only way to
+ * tell that apart from a genuine refusal.
+ */
+async function placeOrRecover(
+  sdk: ReturnType<typeof getSdk>,
+  orderId: string
+): Promise<PlaceOrderWithPaymentSessionsResult> {
+  try {
+    const placed = await sdk.orders._place(orderId)
+    return { placed: placed.status === "placed", order: placed, errors: [], timedOut: false }
+  } catch (error) {
+    const current = await sdk.orders.retrieve(orderId).catch(() => undefined)
+    if (current?.status === "placed") {
+      return { placed: true, order: current, errors: [], timedOut: false }
+    }
+    // Not placed after all: let the caller's loop map and report it as before.
+    throw error
+  }
 }
 
 /**
