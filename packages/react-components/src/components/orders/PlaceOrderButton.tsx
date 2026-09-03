@@ -18,6 +18,7 @@ import type { PlaceOrderOptions } from "#reducers/PlaceOrderReducer"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
 import getCardDetails from "#utils/getCardDetails"
+import { isAdyenAuthorizedResultCode, isRefusedPaymentResponse } from "#utils/paymentAuthorization"
 import { checkPaymentIntent } from "#utils/stripe/retrievePaymentIntent"
 import Parent from "../utils/Parent"
 
@@ -55,6 +56,8 @@ interface Props extends Omit<JSX.IntrinsicElements["button"], "children" | "onCl
 
 export function PlaceOrderButton(props: Props): JSX.Element {
   const ref = useRef(null)
+  /** Order id we already fired one automatic place attempt for. */
+  const autoPlaceAttemptedRef = useRef<string | null>(null)
   const {
     children,
     label = "Place order",
@@ -234,86 +237,91 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     order?.payment_source != null,
   ])
   useEffect(() => {
-    if (order?.status != null && ["draft", "pending"].includes(order?.status)) {
-      // Adyen redirect flow
-      const isAuthorized =
-        // @ts-expect-error no type
-        order?.payment_source?.payment_response?.resultCode === "Authorised"
-      const paymentDetails =
-        // @ts-expect-error no type
-        order?.payment_source?.payment_request_details?.details != null
-      const paymentStatus = order?.payment_status
-      const paymentMethodType =
-        // @ts-expect-error no type
-        order?.payment_source?.payment_response?.paymentMethod?.type
-      if (paymentType === "adyen_payments" && options?.adyen?.redirectResult && !paymentDetails) {
-        const attributes = {
-          payment_request_details: {
-            details: {
-              redirectResult: options?.adyen?.redirectResult,
-            },
+    // Adyen redirect flow
+    if (order?.status == null || !["draft", "pending"].includes(order.status)) return
+    if (paymentType !== "adyen_payments" || !autoPlaceOrder) return
+    const paymentResponse =
+      // @ts-expect-error no type
+      order?.payment_source?.payment_response
+    const paymentDetails =
+      // @ts-expect-error no type
+      order?.payment_source?.payment_request_details?.details != null
+    // NOTE: truthiness, not `!= null`: integrators pass `redirectResult` as an
+    // empty string when the shopper is *not* coming back from a redirect.
+    if (options?.adyen?.redirectResult && !paymentDetails) {
+      const attributes = {
+        payment_request_details: {
+          details: {
+            redirectResult: options?.adyen?.redirectResult,
           },
-          _details: 1,
-        }
-        setPaymentSource({
-          paymentSourceId: paymentSource?.id,
-          paymentResource: "adyen_payments",
-          attributes,
-        }).then((res) => {
-          // @ts-expect-error no type
-          const resultCode: string = res?.payment_response?.resultCode
-          // @ts-expect-error no type
-          const errorCode = res?.payment_response?.errorCode
-          // @ts-expect-error no type
-          const message = res?.payment_response?.message
-          if (["Authorised", "Pending", "Received"].includes(resultCode) && autoPlaceOrder) {
-            handleClick()
-          } else if (errorCode != null) {
-            setPaymentMethodErrors([
-              {
-                code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
-                resource: "payment_methods",
-                field: currentPaymentMethodType,
-                message,
-              },
-            ])
-          }
-        })
-      } else if (
-        paymentType === "adyen_payments" &&
-        isAuthorized &&
-        paymentDetails &&
-        autoPlaceOrder &&
-        status === "standby" &&
-        !options?.adyen?.redirectResult
-      ) {
-        // NOTE: This is a workaround for the case when the user reloads the page after selecting a customer payment source
-        if (
-          // @ts-expect-error no type
-          order?.payment_source?.payment_response?.merchantReference?.includes(order?.number)
-        ) {
-          handleClick()
-        }
-      } else if (
-        paymentType === "adyen_payments" &&
-        isAuthorized &&
-        paymentStatus === "authorized" &&
-        paymentMethodType === "giftcard" &&
-        autoPlaceOrder &&
-        status === "standby" &&
-        !options?.adyen?.redirectResult
-      ) {
-        // NOTE: This is a workaround for the case when the user reloads the page after selecting a customer payment source
-        if (
-          // @ts-expect-error no type
-          order?.payment_source?.payment_response?.merchantReference?.includes(order?.number)
-        ) {
-          handleClick()
-        }
+        },
+        _details: 1,
       }
+      setPaymentSource({
+        paymentSourceId: paymentSource?.id,
+        paymentResource: "adyen_payments",
+        attributes,
+      }).then((res) => {
+        // @ts-expect-error no type
+        const resultCode: string = res?.payment_response?.resultCode
+        // @ts-expect-error no type
+        const errorCode = res?.payment_response?.errorCode
+        // @ts-expect-error no type
+        const message = res?.payment_response?.message
+        if (isAdyenAuthorizedResultCode(resultCode)) {
+          handleClick()
+        } else if (errorCode != null) {
+          setPaymentMethodErrors([
+            {
+              code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
+              resource: "payment_methods",
+              field: currentPaymentMethodType,
+              message,
+            },
+          ])
+        }
+      })
+      return
+    }
+    /**
+     * The payment is authorized but the order is still pending. We get here when
+     * the details for this redirect were already submitted — the shopper reloaded
+     * the return URL, came back to it later, or a first place attempt did not go
+     * through. Retrying is what keeps the order from being stranded at
+     * pending + authorized, so this must NOT be gated on the absence of
+     * `redirectResult`: that parameter is still in the URL for the whole return.
+     *
+     * `isAuthorizedForThisOrder` is the guard that replaces it. A payment source
+     * cloned from the customer's wallet carries the `payment_response` of the
+     * order it was first used on, so an authorized-looking response is not by
+     * itself proof that *this* order is paid. Either of two order-scoped signals
+     * is: core reporting `payment_status === "authorized"`, or Adyen echoing this
+     * order's number in `merchantReference`. The first covers merchants who
+     * customize the merchant reference, which the reference check alone missed.
+     */
+    const isAuthorizedForThisOrder =
+      order.payment_status === "authorized" ||
+      (order.number != null && paymentResponse?.merchantReference?.includes(order.number) === true)
+    if (
+      isAdyenAuthorizedResultCode(paymentResponse?.resultCode) &&
+      isAuthorizedForThisOrder &&
+      // A place is already in flight; `status` returns to standby if it fails.
+      status !== "placing" &&
+      // One automatic attempt per order per page load: `handleClick` flips
+      // `status`, which re-runs this effect.
+      autoPlaceAttemptedRef.current !== order.id
+    ) {
+      autoPlaceAttemptedRef.current = order.id
+      handleClick()
     }
   }, [
-    options?.adyen?.redirectResult != null,
+    order?.id,
+    order?.status,
+    order?.payment_status,
+    order?.number,
+    Boolean(options?.adyen?.redirectResult),
+    paymentType,
+    status,
     // @ts-expect-error no type
     order?.payment_source?.payment_response?.resultCode,
   ])
@@ -489,7 +497,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
             paymentResource: paymentType,
             paymentSourceId: paymentSource?.id,
           })
-        : paymentSource
+        : // Fall back to the order's own payment source: on a 3DS return the
+          // Stripe redirect effect above fires as soon as `order.payment_source`
+          // is there, which can be before `PaymentMethodContext` has hydrated
+          // `paymentSource`. Without the fallback `(checkPaymentSource || isFree)`
+          // was false and the order was silently never placed.
+          (paymentSource ?? (order?.payment_source as typeof paymentSource))
     const checkPaymentSourceStatus =
       // @ts-expect-error no type
       checkPaymentSource?.payment_response?.status?.toLowerCase?.()
@@ -499,12 +512,28 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         paymentType,
         customerPayment: { payment_source: checkPaymentSource },
       })
-    if (
-      currentPaymentMethodRef?.current?.onsubmit &&
-      [!options?.paypalPayerId, !options?.adyen?.MD, !options?.checkoutCom?.session_id].every(
-        Boolean
-      )
-    ) {
+    /**
+     * Coming back from a payment redirect (PayPal, Adyen 3DS/APM, Checkout.com,
+     * Stripe 3DS) the shopper has already authorized the payment, and re-running
+     * the gateway widget's `onsubmit` here would start a *second* payment attempt.
+     * Worse, every widget reports failure from that second attempt — Adyen's
+     * `handleSubmit` always returns `false`, Stripe's `confirmPayment` rejects an
+     * intent that already succeeded — which left `isValid === false` and the order
+     * stranded at pending + authorized. Skip the widget and go straight to placing.
+     *
+     * NOTE: truthiness, not `!= null`. Integrators pass every one of these options
+     * as an empty string when the shopper is not returning from a redirect, so a
+     * null check here would skip the widget on the *normal* flow and nothing would
+     * ever be placed.
+     */
+    const isReturningFromRedirect = Boolean(
+      options?.paypalPayerId ||
+        options?.adyen?.MD ||
+        options?.adyen?.redirectResult ||
+        options?.checkoutCom?.session_id ||
+        options?.stripe?.paymentIntentClientSecret
+    )
+    if (currentPaymentMethodRef?.current?.onsubmit && !isReturningFromRedirect) {
       isValid = (await currentPaymentMethodRef.current?.onsubmit({
         // @ts-expect-error no type
         paymentSource: checkPaymentSource,
@@ -513,8 +542,10 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       })) as boolean
       if (
         !isValid &&
-        // @ts-expect-error no type
-        checkPaymentSource?.payment_response?.resultCode === "Authorised"
+        isAdyenAuthorizedResultCode(
+          // @ts-expect-error no type
+          checkPaymentSource?.payment_response?.resultCode
+        )
       ) {
         isValid = true
       }
@@ -535,6 +566,21 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         setPlaceOrder,
         onclickCallback: onClick,
       })) as boolean
+    } else if (isReturningFromRedirect) {
+      /**
+       * We skipped the widget's own validation above, so nothing has vetted this
+       * payment inside the component. Refuse only on an explicit negative signal
+       * from the gateway: methods that report nothing here (PayPal, Stripe — whose
+       * intent the redirect effect already verified — wire transfers) must stay
+       * placeable, and a refused redirect must not be placed just because we no
+       * longer re-submit it.
+       *
+       * Checkout.com is exempt: placing an order whose payment was declined is a
+       * deliberate feature there (unpaid orders), owned by the branch above.
+       */
+      if (!options?.checkoutCom?.session_id && isRefusedPaymentResponse(checkPaymentSource)) {
+        isValid = false
+      }
     } else if (card?.brand && checkPaymentSourceStatus !== "declined") {
       isValid = true
     }
