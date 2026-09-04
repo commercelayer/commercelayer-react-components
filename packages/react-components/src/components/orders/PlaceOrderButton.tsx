@@ -58,6 +58,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const ref = useRef(null)
   /** Order id we already fired one automatic place attempt for. */
   const autoPlaceAttemptedRef = useRef<string | null>(null)
+  /** Order id a place attempt is currently in flight for. */
+  const placeInFlightRef = useRef<string | null>(null)
   const {
     children,
     label = "Place order",
@@ -427,9 +429,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       // to be enabled on mount regardless of whether a payment method was selected.
     }
   }, [status])
-  const handleClick = async (e?: MouseEvent<HTMLButtonElement>): Promise<void> => {
-    e?.preventDefault()
-    e?.stopPropagation()
+  const placeOrderAttempt = async (): Promise<void> => {
     const sdk = sdkClient()
     if (sdk == null) return
     if (order == null) return
@@ -612,6 +612,32 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     } else {
       setIsLoading(false)
       setPlaceOrderStatus?.({ status: "standby" })
+    }
+  }
+  /**
+   * Serialises place attempts, one per order.
+   *
+   * Both status checks in `placeOrderAttempt` are async, so two callers racing
+   * each other read the order as still `pending` and place it twice: the
+   * automatic redirect effect above, and the programmatic click the gateway
+   * widget fires once it has authorized the payment. A second place repeats
+   * every side effect of `setPlaceOrder`, `_save_billing_address_to_customer_
+   * address_book` included, which leaves the shopper with the same address
+   * twice in their wallet.
+   */
+  const handleClick = async (e?: MouseEvent<HTMLButtonElement>): Promise<void> => {
+    e?.preventDefault()
+    e?.stopPropagation()
+    if (order == null) return
+    if (placeInFlightRef.current === order.id) return
+    placeInFlightRef.current = order.id
+    try {
+      await placeOrderAttempt()
+    } finally {
+      // Reopened on purpose. An attempt that did not place must stay retryable
+      // by an explicit click; one that did is stopped by the already-placed
+      // checks in `placeOrderAttempt` and `setPlaceOrder` instead.
+      placeInFlightRef.current = null
     }
   }
   const disabledButton = disabled !== undefined ? disabled : notPermitted

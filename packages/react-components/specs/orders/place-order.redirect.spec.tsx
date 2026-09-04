@@ -86,6 +86,7 @@ function Harness({
   onsubmit,
   status = "standby",
   paymentSource = { id: "ps-1", type: "adyen_payments" },
+  captureHandleClick,
 }: {
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   order: any
@@ -103,6 +104,11 @@ function Harness({
   status?: "standby" | "placing" | "disabled"
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   paymentSource?: any
+  /**
+   * Hands the button's own `handleClick` back to the test, so a second caller
+   * can be fired at it the way the gateway widget fires a programmatic click.
+   */
+  captureHandleClick?: (handleClick: () => Promise<void>) => void
 }): ReactNode {
   const formRef = useRef<HTMLFormElement | null>(null)
   if (onsubmit != null && formRef.current == null) {
@@ -155,7 +161,16 @@ function Harness({
                 setButtonRef: vi.fn(),
               }}
             >
-              <PlaceOrderButton />
+              {captureHandleClick != null ? (
+                <PlaceOrderButton>
+                  {({ handleClick }) => {
+                    captureHandleClick(handleClick)
+                    return <button type="button">Place order</button>
+                  }}
+                </PlaceOrderButton>
+              ) : (
+                <PlaceOrderButton />
+              )}
             </PlaceOrderContext.Provider>
           </PaymentMethodContext.Provider>
         </CustomerContext.Provider>
@@ -311,6 +326,52 @@ describe("place order on redirect return", () => {
     await waitFor(() => {
       expect(setPlaceOrder).toHaveBeenCalled()
     })
+    await settle()
+    expect(setPlaceOrder).toHaveBeenCalledTimes(1)
+  })
+
+  it("a click landing while the automatic attempt is in flight places the order once", async () => {
+    const setPlaceOrder = placeOrderSpy()
+    /**
+     * The automatic effect and the programmatic click the gateway widget fires
+     * after authorizing both reach `handleClick`, and both of its status checks
+     * are async. Holding the status lookup open puts them in flight together,
+     * which is the window that placed the order twice: two `_place` calls, and
+     * with them two `_save_billing_address_to_customer_address_book` calls, so
+     * the shopper ended up with the same address twice in their wallet.
+     */
+    let release: () => void = () => {}
+    const lookup = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    ordersRetrieve.mockImplementation(async () => {
+      await lookup
+      return { id: "order-1", status: "pending", payment_status: "authorized" }
+    })
+    let handleClick: (() => Promise<void>) | null = null
+    render(
+      <Harness
+        order={makeOrder({ resultCode: "Authorised", merchantReference: "1234" }, REDIRECT_DETAILS)}
+        paymentType="adyen_payments"
+        options={{}}
+        setPlaceOrder={setPlaceOrder}
+        setPaymentSource={vi.fn().mockResolvedValue({
+          id: "ps-1",
+          payment_response: { resultCode: "Authorised" },
+        })}
+        captureHandleClick={(fn) => {
+          handleClick = fn
+        }}
+      />
+    )
+    await waitFor(() => {
+      expect(ordersRetrieve).toHaveBeenCalled()
+    })
+    // The widget clicks while the first attempt is still waiting on the lookup.
+    const click = handleClick as unknown as () => Promise<void>
+    const second = click()
+    release()
+    await second
     await settle()
     expect(setPlaceOrder).toHaveBeenCalledTimes(1)
   })
