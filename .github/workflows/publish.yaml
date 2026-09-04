@@ -51,8 +51,10 @@ jobs:
 
       - name: Post to a Slack channel
         id: slack
-        uses: slackapi/slack-github-action@v1.25.0
+        uses: slackapi/slack-github-action@v3.0.1
         with:
+          webhook: ${{ secrets.PIPELINE_SLACK_CHANNEL_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
           # Slack channel id, channel name, or user id to post message.
           # See also: https://api.slack.com/methods/chat.postMessage#channels
           # channel-id: 'pipeline'
@@ -97,6 +99,3 @@ jobs:
                 }
               ]
             }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.PIPELINE_SLACK_CHANNEL_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
