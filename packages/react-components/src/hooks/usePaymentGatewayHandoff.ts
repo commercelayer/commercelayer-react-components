@@ -7,31 +7,34 @@ import {
 } from "#utils/paymentGatewayStore"
 
 const EMPTY: PaymentGatewayHandoff = {
-  submit: null,
-  isReady: false,
-  resumePhase: "idle",
-  resumeErrors: [],
+  collection: null,
+  collectedOutOfBand: "no",
+  errors: [],
 }
 
 /**
  * Read the **Payment Gateway Handoff** for the current order.
  *
- * On the `payment_sessions` model a gateway that has something to collect — a
- * card — registers a submit function here, and `<PlaceOrderButton>` calls it
- * before placing the order. This hook is the read side, for an application that
- * wants to build its own control instead of relying on the library's button:
- * `isReady` to gate it, `resumePhase` to render the window after a 3DS redirect
- * where the money is taken and the order is still being placed.
+ * Two axes, answering different questions.
  *
- * `submit` is `null` when no gateway has registered — a manual or gift-card-only
- * order, or a card component that has not mounted yet. That is the normal case,
- * not an error.
+ * **`collection`** — who will collect. `{ by: "host" }` carries the `submit` a
+ * control of your own can call, and whether the gateway is ready for it.
+ * `{ by: "gateway" }` means the method has its own button and yours cannot
+ * collect: disable it, and say that is why. `null` means nothing needs
+ * collecting — a manual payment, or gift cards covering the order outright. All
+ * three are normal; none is an error.
+ *
+ * **`collectedOutOfBand`** — whether a payment has already been collected
+ * without a click, leaving the order still to be placed. Returning from a 3DS
+ * redirect and a gateway's own button both produce it, and the library places
+ * the order itself on those paths.
  *
  * @example
  * ```tsx
- * const { isReady, resumePhase } = usePaymentGatewayHandoff()
- * if (resumePhase === "resuming") return <Spinner label="Completing payment…" />
- * return <MyPayButton disabled={!isReady} />
+ * const { collection, collectedOutOfBand } = usePaymentGatewayHandoff()
+ * if (collectedOutOfBand === "in-progress") return <Spinner label="Completing payment…" />
+ * if (collection?.by === "gateway") return <Hint>Use the button above to pay</Hint>
+ * return <MyPayButton disabled={collection?.by === "host" && !collection.isReady} />
  * ```
  */
 export function usePaymentGatewayHandoff(): PaymentGatewayHandoff {

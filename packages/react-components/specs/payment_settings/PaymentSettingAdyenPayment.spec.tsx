@@ -11,6 +11,7 @@ import { PaymentSettingAdyenPayment } from "#components/payment_settings/Payment
 import { PaymentSettingRadioButton } from "#components/payment_settings/PaymentSettingRadioButton"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import type { BaseError } from "#typings/errors"
 import { getHandoffSnapshot, resetPaymentGatewayStore } from "#utils/paymentGatewayStore"
 
 const adyen = vi.hoisted(() => ({
@@ -51,19 +52,30 @@ vi.mock("@adyen/adyen-web/auto", () => ({
   },
 }))
 
-const { createPaymentSessionMock, discardPaymentSessionMock } = vi.hoisted(() => ({
-  createPaymentSessionMock: vi.fn(),
-  discardPaymentSessionMock: vi.fn(),
-}))
+const { authorizeGiftCardsMock, createPaymentSessionMock, discardPaymentSessionMock } = vi.hoisted(
+  () => ({
+    authorizeGiftCardsMock: vi.fn(),
+    createPaymentSessionMock: vi.fn(),
+    discardPaymentSessionMock: vi.fn(),
+  })
+)
 
 vi.mock("@commercelayer/core-components", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@commercelayer/core-components")>()
   return {
     ...actual,
+    authorizeGiftCardSessions: authorizeGiftCardsMock,
     createPaymentSession: createPaymentSessionMock,
     discardPaymentSession: discardPaymentSessionMock,
   }
 })
+
+/** The privacy-and-terms gate, which PayPal's own click has to honour. */
+const { permitted } = vi.hoisted(() => ({ permitted: { value: true } }))
+vi.mock("#hooks/useCollectionPermitted", () => ({
+  useCollectionPermitted: () => permitted.value,
+  default: () => permitted.value,
+}))
 
 // `paymentSettingCreateAttributes` decides the tokenization variant from the
 // token, and the test token is not a real JWT.
@@ -100,6 +112,19 @@ function order(overrides: Record<string, unknown> = {}): Partial<Order> {
 
 const getOrder = vi.fn()
 
+/** The host collection this component is expected to have registered. */
+function hostCollection() {
+  const { collection } = getHandoffSnapshot("order-1")
+  if (collection?.by !== "host") {
+    throw new Error(`expected a host collection, got ${JSON.stringify(collection)}`)
+  }
+  return collection
+}
+
+function hostSubmit() {
+  return hostCollection().submit
+}
+
 function Wrapper({
   children,
   currentOrder,
@@ -130,6 +155,18 @@ function Wrapper({
   )
 }
 
+/** The tree under test, as an element, so `rerender` can re-render it. */
+function tree(currentOrder: Partial<Order> | null = order()) {
+  return (
+    <Wrapper currentOrder={currentOrder}>
+      <PaymentSetting>
+        <PaymentSettingRadioButton data-testid="radio" />
+        <PaymentSettingAdyenPayment containerClassName="dropin" />
+      </PaymentSetting>
+    </Wrapper>
+  )
+}
+
 function renderAdyen(currentOrder: Partial<Order> | null = order()) {
   return render(
     <Wrapper currentOrder={currentOrder}>
@@ -147,6 +184,8 @@ beforeEach(() => {
   adyen.isValid = true
   adyen.captured.options = null
   adyen.captured.dropinOptions = null
+  permitted.value = true
+  authorizeGiftCardsMock.mockResolvedValue({ authorizedSessionIds: [], errors: [] })
   createPaymentSessionMock.mockResolvedValue({ id: "session-new" })
   discardPaymentSessionMock.mockResolvedValue(true)
   getOrder.mockResolvedValue(order())
@@ -179,15 +218,55 @@ describe("<PaymentSettingAdyenPayment> mounting", () => {
     expect(adyen.captured.dropinOptions.showPayButton).toBeUndefined()
   })
 
-  it("offers cards only", async () => {
-    // Apple Pay, Google Pay and PayPal render their own pay buttons and submit
-    // themselves, which would bypass the place-order button and the terms gate.
+  it("offers every designed method, and only those", async () => {
+    // Restricting matters because `showPayButton: false` deletes a wallet's
+    // component rather than hiding its button, so an undesigned method would
+    // render an accordion that opens on nothing.
     renderAdyen()
 
     await waitFor(() => {
       expect(adyen.captured.options).not.toBeNull()
     })
+    expect(adyen.captured.options.allowPaymentMethods).toEqual(["scheme", "paypal"])
+  })
+
+  it("lets an application narrow the list", async () => {
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingAdyenPayment paymentMethods={["card"]} containerClassName="dropin" />
+        </PaymentSetting>
+      </Wrapper>
+    )
+
+    await waitFor(() => {
+      expect(adyen.captured.options).not.toBeNull()
+    })
     expect(adyen.captured.options.allowPaymentMethods).toEqual(["scheme"])
+    // And nothing is configured for a method that is not on offer.
+    expect(adyen.captured.dropinOptions.paymentMethodsConfiguration).toBeUndefined()
+  })
+
+  it("drops a method it has not been designed for, with a warning", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingAdyenPayment
+            paymentMethods={["card", "applepay" as never]}
+            containerClassName="dropin"
+          />
+        </PaymentSetting>
+      </Wrapper>
+    )
+
+    await waitFor(() => {
+      expect(adyen.captured.options).not.toBeNull()
+    })
+    expect(adyen.captured.options.allowPaymentMethods).toEqual(["scheme"])
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("applepay"))
   })
 
   it("disables the final animation, since a refusal replaces the session", async () => {
@@ -276,7 +355,7 @@ describe("the Payment Gateway Handoff", () => {
     renderAdyen()
 
     await waitFor(() => {
-      expect(getHandoffSnapshot("order-1").submit).not.toBeNull()
+      expect(getHandoffSnapshot("order-1").collection?.by).toBe("host")
     })
   })
 
@@ -286,7 +365,7 @@ describe("the Payment Gateway Handoff", () => {
       expect(adyen.dropinMount).toHaveBeenCalled()
     })
 
-    const submit = getHandoffSnapshot("order-1").submit
+    const submit = hostSubmit()
     let result: unknown
     await act(async () => {
       const pending = submit?.().then((r) => {
@@ -311,7 +390,7 @@ describe("the Payment Gateway Handoff", () => {
       expect(adyen.dropinMount).toHaveBeenCalled()
     })
 
-    const submit = getHandoffSnapshot("order-1").submit
+    const submit = hostSubmit()
     const result = await act(async () => await submit?.())
 
     expect(result).toEqual({ status: "incomplete" })
@@ -324,7 +403,7 @@ describe("the Payment Gateway Handoff", () => {
       expect(adyen.dropinMount).toHaveBeenCalled()
     })
 
-    const submit = getHandoffSnapshot("order-1").submit
+    const submit = hostSubmit()
     let result: unknown
     await act(async () => {
       const pending = submit?.().then((r) => {
@@ -345,7 +424,7 @@ describe("the Payment Gateway Handoff", () => {
       expect(adyen.dropinMount).toHaveBeenCalled()
     })
 
-    const submit = getHandoffSnapshot("order-1").submit
+    const submit = hostSubmit()
     let result: unknown
     await act(async () => {
       const pending = submit?.().then((r) => {
@@ -367,12 +446,12 @@ describe("the Payment Gateway Handoff", () => {
     await act(async () => {
       adyen.captured.options.onChange({ isValid: true })
     })
-    expect(getHandoffSnapshot("order-1").isReady).toBe(true)
+    expect(hostCollection().isReady).toBe(true)
 
     await act(async () => {
       adyen.captured.options.onChange({ isValid: false })
     })
-    expect(getHandoffSnapshot("order-1").isReady).toBe(false)
+    expect(hostCollection().isReady).toBe(false)
   })
 })
 
@@ -413,14 +492,14 @@ describe("who may claim to collect a payment", () => {
     await waitFor(() => {
       expect(screen.getAllByTestId("radio").length).toBeGreaterThan(0)
     })
-    expect(getHandoffSnapshot("order-1").submit).toBeNull()
+    expect(getHandoffSnapshot("order-1").collection).toBeNull()
     expect(adyen.dropinMount).not.toHaveBeenCalled()
   })
 
   it("gives the handoff up when the shopper switches away", async () => {
     const { rerender } = renderAdyen(order({ available_payment_settings: [MANUAL, ADYEN_SETTING] }))
     await waitFor(() => {
-      expect(getHandoffSnapshot("order-1").submit).not.toBeNull()
+      expect(getHandoffSnapshot("order-1").collection?.by).toBe("host")
     })
 
     rerender(
@@ -438,7 +517,7 @@ describe("who may claim to collect a payment", () => {
     )
 
     await waitFor(() => {
-      expect(getHandoffSnapshot("order-1").submit).toBeNull()
+      expect(getHandoffSnapshot("order-1").collection).toBeNull()
     })
   })
 })
@@ -492,5 +571,249 @@ describe("what this component does NOT do on a refusal", () => {
     })
     expect(adyen.dropinRemove).toHaveBeenCalled()
     expect(adyen.captured.options.session).toEqual({ id: "CS-2", sessionData: "blob-2" })
+  })
+})
+
+describe("PayPal, which owns its own click", () => {
+  /** Tell the component which method the shopper has open, as the Drop-in does. */
+  async function select(type: string): Promise<void> {
+    await act(async () => {
+      adyen.captured.dropinOptions.onSelect({ type })
+    })
+  }
+
+  function payPalConfig() {
+    const config = adyen.captured.dropinOptions.paymentMethodsConfiguration?.paypal
+    if (config == null) throw new Error("PayPal was not configured on the Drop-in")
+    return config
+  }
+
+  async function mounted(): Promise<void> {
+    renderAdyen()
+    await waitFor(() => {
+      expect(adyen.dropinMount).toHaveBeenCalled()
+    })
+  }
+
+  it("re-enables its own button, which the Core had switched off", async () => {
+    // Left false, PayPal's component returns `null` outright — the shopper gets
+    // an accordion that opens on nothing rather than a hidden button.
+    await mounted()
+    expect(payPalConfig().showPayButton).toBe(true)
+    expect(adyen.captured.options.showPayButton).toBe(false)
+  })
+
+  it("hands the place-order button a collection it cannot call", async () => {
+    // `submit` on PayPal throws by design, so the button is told who collects
+    // rather than being given a route that ends in IMPLEMENTATION_ERROR.
+    await mounted()
+    expect(getHandoffSnapshot("order-1").collection?.by).toBe("host")
+
+    await select("paypal")
+    expect(getHandoffSnapshot("order-1").collection).toEqual({ by: "gateway" })
+  })
+
+  it("hands it back when the shopper returns to the card", async () => {
+    await mounted()
+    await select("paypal")
+    await select("scheme")
+    expect(getHandoffSnapshot("order-1").collection?.by).toBe("host")
+  })
+
+  it("refuses the click when the terms have not been accepted", async () => {
+    // The gate, at the last moment before anything happens: `actions.reject()`
+    // aborts before the popup opens and before any Adyen call.
+    permitted.value = false
+    await mounted()
+
+    const actions = { resolve: vi.fn(async () => {}), reject: vi.fn(async () => {}) }
+    await act(async () => {
+      await payPalConfig().onClick({}, actions)
+    })
+
+    expect(actions.reject).toHaveBeenCalled()
+    expect(actions.resolve).not.toHaveBeenCalled()
+    expect(authorizeGiftCardsMock).not.toHaveBeenCalled()
+  })
+
+  it("says why it refused, because a dead button reads as a broken one", async () => {
+    // The click is PayPal's, so this is the only place the reason can be
+    // produced. `meta.error` is what an application keys its copy off; the
+    // message is a default for one that renders `errors` as they come.
+    permitted.value = false
+    let reported: BaseError[] = []
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingAdyenPayment containerClassName="dropin">
+            {({ errors: adyenErrors }) => {
+              reported = adyenErrors
+              return <></>
+            }}
+          </PaymentSettingAdyenPayment>
+        </PaymentSetting>
+      </Wrapper>
+    )
+    await waitFor(() => {
+      expect(adyen.captured.dropinOptions).not.toBeNull()
+    })
+
+    const actions = { resolve: vi.fn(async () => {}), reject: vi.fn(async () => {}) }
+    await act(async () => {
+      await adyen.captured.dropinOptions.paymentMethodsConfiguration.paypal.onClick({}, actions)
+    })
+
+    expect(actions.reject).toHaveBeenCalled()
+    expect(reported[0]?.meta).toEqual({ error: "TermsNotAccepted" })
+  })
+
+  it("renders its buttons disabled until the terms are accepted", async () => {
+    permitted.value = false
+    await mounted()
+
+    const initActions = { enable: vi.fn(async () => {}), disable: vi.fn(async () => {}) }
+    await act(async () => {
+      payPalConfig().onInit({}, initActions)
+    })
+    expect(initActions.disable).toHaveBeenCalled()
+  })
+
+  it("wakes every funding source's button when the terms are accepted after they render", async () => {
+    // Adyen renders four separate `paypal.Buttons()` instances — PayPal,
+    // Credit, Pay Later, Venmo — each with its own `onInit`, and
+    // `actions.enable()` reaches only the instance it came from. Keeping the
+    // last one handed over left a real shopper with a working Venmo button
+    // while PayPal and Pay Later swallowed the click, and no e2e saw it because
+    // the tests accept the terms *before* the buttons render.
+    permitted.value = false
+    const { rerender } = render(tree())
+    await waitFor(() => {
+      expect(adyen.captured.dropinOptions).not.toBeNull()
+    })
+
+    const fundingSources = ["paypal", "credit", "paylater", "venmo"].map(() => ({
+      enable: vi.fn(async () => {}),
+      disable: vi.fn(async () => {}),
+    }))
+    await act(async () => {
+      for (const actions of fundingSources) payPalConfig().onInit({}, actions)
+    })
+    for (const actions of fundingSources) {
+      expect(actions.disable).toHaveBeenCalled()
+    }
+
+    permitted.value = true
+    await act(async () => {
+      rerender(tree())
+    })
+
+    for (const [index, actions] of fundingSources.entries()) {
+      expect(actions.enable, `funding source ${index} was left disabled`).toHaveBeenCalled()
+    }
+  })
+
+  it("charges the gift cards on the click, before the popup opens", async () => {
+    // The only moment we are given: PayPal's button performs the payment, and
+    // `beforeSubmit` runs after the popup is already open — and hangs it.
+    authorizeGiftCardsMock.mockResolvedValue({ authorizedSessionIds: ["gc-1"], errors: [] })
+    await mounted()
+
+    const actions = { resolve: vi.fn(async () => {}), reject: vi.fn(async () => {}) }
+    await act(async () => {
+      await payPalConfig().onClick({}, actions)
+    })
+
+    expect(authorizeGiftCardsMock).toHaveBeenCalledTimes(1)
+    // Refetched, so the place sequence skips the cards it would otherwise
+    // authorize a second time.
+    expect(getOrder).toHaveBeenCalledWith("order-1")
+    expect(actions.resolve).toHaveBeenCalled()
+  })
+
+  it("does not open the popup when a gift card cannot be charged", async () => {
+    authorizeGiftCardsMock.mockResolvedValue({
+      authorizedSessionIds: [],
+      errors: [{ code: "VALIDATION_ERROR", message: "Gift card balance is insufficient." }],
+    })
+    await mounted()
+
+    const actions = { resolve: vi.fn(async () => {}), reject: vi.fn(async () => {}) }
+    await act(async () => {
+      await payPalConfig().onClick({}, actions)
+    })
+
+    expect(actions.reject).toHaveBeenCalled()
+    expect(actions.resolve).not.toHaveBeenCalled()
+  })
+
+  it("reports its completion as an out-of-band collection", async () => {
+    // Nobody pressed our button, so there is no promise to settle: the place
+    // button watches this and takes the order the rest of the way.
+    await mounted()
+    await select("paypal")
+
+    await act(async () => {
+      adyen.captured.options.onPaymentCompleted({ resultCode: "Authorised" })
+    })
+
+    expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("done")
+  })
+
+  it("reports a completion that is not captured funds, and still places", async () => {
+    // `Pending` and `Received` arrive as success — PayPal produces them far
+    // more than cards do — so the code is surfaced rather than assumed.
+    let seen: string | undefined
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingAdyenPayment containerClassName="dropin">
+            {({ lastResultCode }) => {
+              seen = lastResultCode
+              return <></>
+            }}
+          </PaymentSettingAdyenPayment>
+        </PaymentSetting>
+      </Wrapper>
+    )
+    await waitFor(() => {
+      expect(adyen.dropinMount).toHaveBeenCalled()
+    })
+    await select("paypal")
+
+    await act(async () => {
+      adyen.captured.options.onPaymentCompleted({ resultCode: "Pending" })
+    })
+
+    expect(seen).toBe("Pending")
+    expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("done")
+  })
+
+  it("reports a refusal as an out-of-band failure", async () => {
+    await mounted()
+    await select("paypal")
+
+    await act(async () => {
+      adyen.captured.options.onPaymentFailed({ resultCode: "Refused" })
+    })
+
+    const snapshot = getHandoffSnapshot("order-1")
+    expect(snapshot.collectedOutOfBand).toBe("failed")
+    expect(snapshot.errors[0]?.meta).toEqual({ error: "Refused" })
+  })
+
+  it("touches nothing when the shopper closes the overlay", async () => {
+    // A closed overlay arrives on `onError`, and every `onError` is an unknown
+    // outcome: the Adyen Session stays, and the shopper can click again.
+    await mounted()
+    await select("paypal")
+
+    await act(async () => {
+      adyen.captured.options.onError({ name: "CANCEL", message: "" })
+    })
+
+    expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("no")
+    expect(discardPaymentSessionMock).not.toHaveBeenCalled()
   })
 })

@@ -82,8 +82,16 @@ The shopper coming back from a 3DS page hosted elsewhere, identified by `redirec
 _Avoid_: 3DS callback (nothing calls back; the shopper navigates), redirect flow (it is one branch of the Sessions Flow, not a flow)
 
 **Payment Gateway Handoff**:
-How a **Payment Gateway** component tells `<PlaceOrderButton>` that it can collect a payment, and how the button asks it to. An external store keyed by order id, carrying `{ submit, isReady }` plus the phase of a **Redirect Return** — not context, because the two components are siblings in a checkout rather than parent and child. `submit` answers with one of four outcomes, and the two that look alike matter most: a **verdict** means no money moved and a rollback is safe, while an **unknown** outcome — a network failure, an expired gateway session — means the payment may have gone through and nothing may be undone. Deliberately gateway-neutral: the button asks whether *a* gateway has registered, never which one. The same shape terms acceptance already uses, for the same reason.
+How a **Payment Gateway** component and `<PlaceOrderButton>` reach each other. An external store keyed by order id — not context, because the two are siblings in a checkout rather than parent and child, the same shape terms acceptance already uses and for the same reason. Two axes, answering different questions. **Who collects**: the host, in which case the store carries the `submit` the button calls and whether the gateway is ready for it; the gateway itself, when the method has a **Gateway-Owned Button**; or nobody, on an order paying by bank transfer or gift card alone. And **whether a collection has already happened without us** — see **Out-of-Band Collection**. `submit` answers with one of four outcomes, and the two that look alike matter most: a **verdict** means no money moved and a rollback is safe, while an **unknown** outcome — a network failure, an expired gateway session, a cancelled overlay — means the payment may have gone through and nothing may be undone. Still gateway-neutral where it counts: the button reads who collects, never which gateway it is.
 _Avoid_: payment ref (the `payment_source`-model mechanism, which publishes a form ref instead), submit handler
+
+**Gateway-Owned Button**:
+A payment method whose own control performs the payment, so the checkout's place-order button cannot. PayPal is the case: its `submit` throws by design, because a popup needs a real user gesture and PayPal's rules require their branded button to be the thing clicked. The consequence is that the privacy-and-terms gate cannot sit in front of the place-order click for that method — it has to sit inside the method's own click. The wallets are not all alike: Apple Pay's and Google Pay's buttons *do* call the SDK's own `submit`, so those can be host-driven. Rendering your own button is a different thing from owning the click.
+_Avoid_: express payment (a different entry point into the checkout, before an address exists), self-submitting method
+
+**Out-of-Band Collection**:
+Money collected without the shopper pressing the checkout's place-order button, leaving the order still to be placed. Two things produce it and they are one mechanism: returning from a 3DS redirect, where the page reloaded and nobody clicked anything, and a **Gateway-Owned Button**, where the click was never ours. In both, the library places the order on its own initiative — the only paths where it does — and in both the privacy-and-terms gate was satisfied earlier rather than skipped: before the redirect, or inside the method's own click.
+_Avoid_: auto-place (`auto_place` on a Payment Setting is a different thing, and server-side), silent place
 
 **Client Key**:
 The public Adyen credential the browser needs, `payment_setting_adyens.public_key`. Reachable by a sales-channel or customer token through exactly one request — the order with `available_payment_settings` included — because listing payment settings is refused and there is no other way to learn a setting's id. It is optional and unvalidated server-side, so a payment setting that works for server-side charges can carry none, and a setting in that state is skipped rather than offered.
@@ -107,6 +115,9 @@ _Avoid_: public key (ambiguous across gateways — Stripe's is a publishable key
 - A **Payment Authorization** on the Sessions Flow never reaches `requires_action` — the shopper's 3DS happens before it exists
 - A refused payment leaves the **Payment Session** `unpaid` but eventually carries a failed **Payment Authorization**, so the session must be replaced rather than retried
 - A **Payment Gateway** reaches `<PlaceOrderButton>` only through the **Payment Gateway Handoff**; they are siblings in a checkout, so no context connects them
+- A method with a **Gateway-Owned Button** cannot be collected by `<PlaceOrderButton>`, so the gate moves inside that method's own click and the button disables itself with that as the reason
+- An **Out-of-Band Collection** is the only circumstance in which the library places an order without a click — and both of its causes leave the terms accepted earlier, not skipped
+- A **Payment Session** for a card and one for PayPal are the same resource through the same **Payment Setting**: which method paid is not recorded on it, because `payment_instrument` is empty for Adyen and `client_data.payment_method` must never be written
 
 ## Example dialogue
 
@@ -153,6 +164,23 @@ _Avoid_: public key (ambiguous across gateways — Stripe's is a publishable key
 
 > **Dev:** "The shopper came back from a 3DS page. Which component picks that up?"
 > **Domain expert:** "None of the visible ones. `submitDetails` is on the `adyen-web` core, so the resume needs no UI at all — it runs from `<PaymentSetting>`, which is the only thing guaranteed to be mounted. If it lived in the Adyen component, an accordion that reopened on a different step would leave a charged card on an unplaced order."
+
+## Example dialogue — PayPal
+
+> **Dev:** "I'll hide Adyen's PayPal button with `showPayButton: false` and call `dropin.submit()` from ours, like we do for cards."
+> **Domain expert:** "Neither half works. `showPayButton: false` doesn't hide PayPal's button, it deletes the whole component — the shopper gets an accordion that opens on nothing. And `submit` on PayPal throws by design: their button has to be the thing clicked, because a popup needs a real user gesture."
+
+> **Dev:** "Then the terms gate is gone for PayPal?"
+> **Domain expert:** "It moves. PayPal's own `onClick` gets an `actions.reject()` that aborts before the popup opens and before any Adyen call, and `onInit` lets you render the buttons disabled until consent. So the gate sits on the method's click instead of ours. Two mechanisms, because which one applies depends on who owns the click — and that's a property of the method, not of our code."
+
+> **Dev:** "`onPaymentCompleted` fired, so we're paid — I'll place the order."
+> **Domain expert:** "Place it, yes, but you're not paid. `Pending` and `Received` reach that callback as success, and PayPal produces them far more than cards do. The authorization stays `pending` and the loop waits, which is right — just don't tell the shopper the money is taken."
+
+> **Dev:** "The shopper closed the PayPal popup. Do I give their gift cards back?"
+> **Domain expert:** "No. A closed overlay arrives on `onError`, and every `onError` is an unknown outcome — the payment may have gone through. Same as a refused card: the gift cards stay applied and charged, they're spendable on the retry, and there's a control to remove one if the shopper gives up."
+
+> **Dev:** "I'll record `paypal` in the session's `client_data` so the recap can name it."
+> **Domain expert:** "Don't — that one key is a tripwire. Writing `client_data.payment_method` makes the API call Adyen's `/payments` for the authorization, which 422s, which fails the authorization, which invalidates the session for good. The recap not naming PayPal is a gap we've filed; that would be an unrecoverable order."
 
 ## Example dialogue — gift cards
 

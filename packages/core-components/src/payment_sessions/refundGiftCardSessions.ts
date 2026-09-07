@@ -2,10 +2,18 @@ import type { PaymentSession } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 import { mapPlaceabilityErrors } from "./mapPlaceabilityErrors"
-import type { PlaceabilityError } from "./types"
+import { hasReturnedMoney, type PlaceabilityError } from "./types"
 
-/** Attempts spent waiting for the capture a refund has to point at. */
-export const DEFAULT_REFUND_ATTEMPTS = 6
+/**
+ * Attempts spent waiting for the capture a refund points at, and then for the
+ * refund itself to settle.
+ *
+ * Both waits are background jobs, so the budget covers two of them. It was half
+ * this while the function returned as soon as it had *created* a refund — which
+ * read as success on a session whose money had not come back yet, so the row
+ * stayed on screen and an end-to-end test failed on a timing accident.
+ */
+export const DEFAULT_REFUND_ATTEMPTS = 12
 /** Delay between those attempts, in milliseconds. */
 export const DEFAULT_REFUND_INTERVAL_MS = 500
 
@@ -28,13 +36,15 @@ interface RefundGiftCardSessionsParams extends Pick<RequestConfig, "accessToken"
 }
 
 export interface RefundGiftCardSessionsResult {
+  /** Sessions whose money is back — not merely those a refund was created for. */
   refundedSessionIds: string[]
   /** Sessions still charged when this gave up, and why. */
   errors: PlaceabilityError[]
   /**
-   * True when the captures never appeared. The gift cards are still charged and
-   * the shopper's balance is still spent, so this must be surfaced rather than
-   * treated as a completed rollback.
+   * True when the budget ran out with money still to come back — the capture
+   * never appeared, or a refund was created and never settled. The gift cards
+   * are still charged and the shopper's balance still spent, so this must be
+   * surfaced rather than treated as a completed rollback.
    */
   timedOut: boolean
 }
@@ -56,14 +66,16 @@ export interface RefundGiftCardSessionsResult {
  * is precisely that situation, which is presumably why the grant is shaped this
  * way. Nothing else is refundable from a storefront.
  *
- * **Why it polls.** `payment_capture` is a required relationship on a refund,
- * and the capture is produced by the same background job that succeeds the
- * authorization — so immediately after `authorizeGiftCardSessions` returns
- * there is usually nothing to point at yet. Each attempt is one `GET`, and the
- * loop ends as soon as every session is handled.
+ * **Why it polls, twice over.** `payment_capture` is a required relationship on
+ * a refund, and the capture is produced by the same background job that succeeds
+ * the authorization — so immediately after `authorizeGiftCardSessions` returns
+ * there is usually nothing to point at yet. And creating the refund is itself
+ * only an ask: it starts `pending` and another job settles it. The loop
+ * therefore waits for the session to read `refunded`, which is the server
+ * saying the balance is back. Each attempt is one `GET`.
  *
- * A session that already carries a refund is treated as done rather than
- * refunded twice; the balance was restored the first time.
+ * A session that already carries an unsettled refund is waited on rather than
+ * refunded twice.
  *
  * Failures are collected per session instead of stopping the loop: unlike
  * authorizing, where each step changes what the next may take, refunds are
@@ -84,6 +96,17 @@ export async function refundGiftCardSessions({
 
   const sdk = getSdk({ accessToken, interceptors })
   const pending = new Set(paymentSessionIds)
+  /**
+   * Sessions a refund has already been asked for in this call.
+   *
+   * The read-back guard below is not enough on its own: it depends on the next
+   * `GET` already reflecting a refund created moments earlier, and an order
+   * fetched with a `fields` allowlist that omits `payment_refunds` never
+   * reflects it at all. Either would have us ask twice and over-credit the card.
+   * The server's own `refund_balance_cents` would probably catch it — but "the
+   * server would probably catch it" is not where a double refund belongs.
+   */
+  const requested = new Set<string>()
   const refundedSessionIds: string[] = []
   const errors: PlaceabilityError[] = []
 
@@ -92,14 +115,24 @@ export async function refundGiftCardSessions({
     const sessions = (order.payment_sessions ?? []).filter((session) => pending.has(session.id))
 
     for (const session of sessions) {
-      // Already given back, by us on an earlier attempt or by someone else.
-      if ((session.payment_refunds ?? []).length > 0) {
+      // The money is back, and the server is the one saying so: the session's
+      // own status moves to `refunded` when the refund succeeds. This is the
+      // only condition that counts as done — creating a refund is asking, not
+      // getting, and treating the ask as the answer told the shopper their card
+      // was off the order while it was still charged.
+      if (hasReturnedMoney(session)) {
+        refundedSessionIds.push(session.id)
         pending.delete(session.id)
         continue
       }
 
+      // A refund is on its way and has not settled yet. Wait for it rather than
+      // creating a second one for the same capture.
+      if (requested.has(session.id)) continue
+      if ((session.payment_refunds ?? []).length > 0) continue
+
       const capture = refundableCapture(session)
-      // The job has not run yet. Leave it pending and look again.
+      // The capture's job has not run yet. Leave it pending and look again.
       if (capture == null) continue
 
       try {
@@ -110,8 +143,9 @@ export async function refundGiftCardSessions({
           // own refund balance, which is the number we would otherwise be
           // recomputing from values it gave us.
         })
-        refundedSessionIds.push(session.id)
-        pending.delete(session.id)
+        requested.add(session.id)
+        // Deliberately still pending: the next attempt reads the session back
+        // and only then is the money actually returned.
       } catch (error) {
         const mapped = mapPlaceabilityErrors(error)
         if (mapped.length === 0) throw error

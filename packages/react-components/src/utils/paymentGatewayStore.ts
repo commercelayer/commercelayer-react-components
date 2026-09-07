@@ -3,24 +3,17 @@ import type { BaseError } from "#typings/errors"
 /**
  * Module-level store for the **Payment Gateway Handoff**, keyed by order id.
  *
- * A gateway component that has something to collect — a card, in practice —
- * registers here, and `<PlaceOrderButtonPaymentSessions>` asks it to collect
- * before placing the order. The two are *siblings* in a checkout, never
- * ancestor and descendant, so no React provider can sit above both. This is the
- * same problem `termsAcceptanceStore` solves, solved the same way, so the
- * library has one idiom rather than two.
+ * It is how a **Payment Gateway** component and `<PlaceOrderButton>` reach each
+ * other. The two are *siblings* in a checkout, never ancestor and descendant,
+ * so in standalone mode no React provider can sit above both — the same problem
+ * `termsAcceptanceStore` solves, solved the same way, so the library has one
+ * idiom rather than two.
  *
- * **Deliberately gateway-neutral.** The button asks whether *a* gateway has
- * registered, never which one. Teaching it to recognise setting types and the
- * shape of a particular gateway component is how
- * `PlaceOrderButtonPaymentSource` reached 598 lines; keeping the contract
- * anonymous is what keeps this branch readable.
- *
- * State lives in memory only. A reload starts empty, and that is correct: the
+ * State lives in memory only. A reload starts empty, and that is correct: a
  * gateway has to remount and re-register before it can be asked for anything,
- * and whether the money was already taken is read from the order, not from here.
+ * and whether money was already taken is read from the order, not from here.
  *
- * `PaymentSource`-model gateways do **not** use this. They keep their existing
+ * `payment_source`-model gateways do **not** use this. They keep their existing
  * `PlaceOrderContext` ref channel, which stays exclusive to that model.
  */
 
@@ -36,48 +29,85 @@ export type PaymentGatewaySubmitResult =
   | { status: "incomplete" }
   /**
    * The gateway refused — a **verdict**, so no money moved. `code` is the
-   * gateway's own word for it, e.g. Adyen's `resultCode`; never prose, because a
-   * package cannot know the checkout's language and the API gives no message.
+   * gateway's own word for it, e.g. Adyen's `resultCode`; never prose, because
+   * a package cannot know the checkout's language and the API gives no message.
    *
    * The distinction from `unknown` decides whether a rollback is safe.
    */
   | { status: "failed"; code: string }
   /**
    * Something broke while collecting — a network failure, an expired gateway
-   * session, an SDK error. The payment may or may not have gone through, so
-   * **nothing may be rolled back**: refunding the gift cards here could take
-   * back money for a card that did in fact charge, and the gateway's own webhook
-   * may yet settle the order. Report it and leave everything alone.
+   * session, a cancelled overlay. The payment may or may not have gone through,
+   * so **nothing may be rolled back**: giving the gift cards back here could
+   * take money for a card that did in fact charge, and the gateway's own
+   * webhook may yet settle the order. Report it and leave everything alone.
    */
   | { status: "unknown"; code: string }
 
 /**
- * Where a redirect return has got to.
+ * Who will collect the payment for this order.
  *
- * `resuming` and `resumed` exist because on that path nobody clicks anything:
- * the shopper comes back from a 3DS page with the money already taken, and the
- * order still has to be placed. The button watches this instead of a click.
+ * The distinction exists because it is a property of the **payment method**,
+ * not of this library. A card form is inert until something submits it, so the
+ * host's own button can be the pay button — which is what keeps the
+ * privacy-and-terms gate in front of every payment. A method with a
+ * **Gateway-Owned Button** cannot be collected that way: PayPal's `submit`
+ * throws by design, because a popup needs a real user gesture on their branded
+ * button. For those the gate moves inside the method's own click, and the
+ * host's button has nothing to do but say so.
  */
-export type PaymentGatewayResumePhase = "idle" | "resuming" | "resumed" | "failed"
+export type PaymentCollection =
+  /** The host's control collects, by calling `submit`. */
+  | {
+      by: "host"
+      submit: () => Promise<PaymentGatewaySubmitResult>
+      /**
+       * Whether the gateway believes it could submit right now.
+       *
+       * Not what gates the place-order button — a button disabled with no
+       * explanation is worse than a form that shows its own validation, and
+       * subscribing to this across the seam would re-render the button on every
+       * keystroke. Exposed so an application that wants that can build it.
+       */
+      isReady: boolean
+    }
+  /** The method's own control collects. The host cannot. */
+  | { by: "gateway" }
+
+/**
+ * Whether a payment has been collected without the shopper pressing the
+ * checkout's place-order button — an **Out-of-Band Collection**.
+ *
+ * Two things produce it and they are one mechanism: returning from a 3DS
+ * redirect, where the page reloaded and nobody clicked anything, and a
+ * **Gateway-Owned Button**, where the click was never ours. Both leave the
+ * order still to be placed, and both are paths where the library places it on
+ * its own initiative — the only ones.
+ */
+export type OutOfBandCollection = "no" | "in-progress" | "done" | "failed"
 
 export interface PaymentGatewayHandoff {
-  /** Ask the gateway to collect payment, or `null` when none has registered. */
-  submit: (() => Promise<PaymentGatewaySubmitResult>) | null
   /**
-   * Whether the gateway believes it could submit right now.
-   *
-   * Not what gates the place-order button — a button disabled with no
-   * explanation is worse than a form that shows its own validation, and
-   * subscribing to this across the seam would re-render the button on every
-   * keystroke. Exposed so an application that wants that behaviour can build it.
+   * How this order's payment will be collected, or `null` when nothing needs
+   * collecting — a manual payment, or gift cards covering the order outright.
    */
-  isReady: boolean
-  resumePhase: PaymentGatewayResumePhase
-  /** Why a resume failed. Empty in every other phase. */
-  resumeErrors: BaseError[]
+  collection: PaymentCollection | null
+  collectedOutOfBand: OutOfBandCollection
+  /** Why an out-of-band collection failed. Empty in every other phase. */
+  errors: BaseError[]
 }
 
 interface Entry extends PaymentGatewayHandoff {
+  /**
+   * Identity of the current registration.
+   *
+   * Deregistering must only clear what it registered: a gateway that remounts —
+   * because its Payment Session was replaced after a refusal — registers again
+   * before React runs the old cleanup, and a blind clear there would leave the
+   * button with nothing to call. Compared as an object rather than by the
+   * `submit` function, because `setCollectionReady` rebuilds the collection.
+   */
+  token: object | null
   /** Cached snapshot, so `useSyncExternalStore` compares by reference safely. */
   snapshot: PaymentGatewayHandoff
 }
@@ -99,16 +129,11 @@ function entry(orderId?: string | null): Entry {
   let e = entries.get(k)
   if (e == null) {
     e = {
-      submit: null,
-      isReady: false,
-      resumePhase: "idle",
-      resumeErrors: NO_ERRORS,
-      snapshot: {
-        submit: null,
-        isReady: false,
-        resumePhase: "idle",
-        resumeErrors: NO_ERRORS,
-      },
+      token: null,
+      collection: null,
+      collectedOutOfBand: "no",
+      errors: NO_ERRORS,
+      snapshot: { collection: null, collectedOutOfBand: "no", errors: NO_ERRORS },
     }
     entries.set(k, e)
   }
@@ -118,16 +143,15 @@ function entry(orderId?: string | null): Entry {
 /**
  * Publish a new snapshot and wake subscribers.
  *
- * The snapshot is rebuilt here and nowhere else: `useSyncExternalStore` compares
- * snapshots by identity, so returning a fresh object per read would re-render
- * forever.
+ * The snapshot is rebuilt here and nowhere else: `useSyncExternalStore`
+ * compares snapshots by identity, so returning a fresh object per read would
+ * re-render forever.
  */
 function commit(orderId: string | null | undefined, e: Entry): void {
   e.snapshot = {
-    submit: e.submit,
-    isReady: e.isReady,
-    resumePhase: e.resumePhase,
-    resumeErrors: e.resumeErrors,
+    collection: e.collection,
+    collectedOutOfBand: e.collectedOutOfBand,
+    errors: e.errors,
   }
   const set = listeners.get(key(orderId))
   if (set == null) return
@@ -152,45 +176,61 @@ export function getHandoffSnapshot(orderId?: string | null): PaymentGatewayHando
   return entry(orderId).snapshot
 }
 
-/**
- * Register a gateway's collect function. Returns the deregister function.
- *
- * Deregistering only clears what it registered. A gateway that remounts —
- * because the Payment Session was replaced after a refusal — registers the new
- * function before React runs the old cleanup, and a blind clear there would
- * leave the button with nothing to call.
- */
-export function registerPaymentGateway(
-  orderId: string | null | undefined,
-  submit: () => Promise<PaymentGatewaySubmitResult>
-): () => void {
+function register(orderId: string | null | undefined, collection: PaymentCollection): () => void {
   const e = entry(orderId)
-  e.submit = submit
+  const token = {}
+  e.token = token
+  e.collection = collection
   commit(orderId, e)
   return () => {
-    if (e.submit !== submit) return
-    e.submit = null
-    e.isReady = false
+    if (e.token !== token) return
+    e.token = null
+    e.collection = null
     commit(orderId, e)
   }
 }
 
-export function setPaymentGatewayReady(orderId: string | null | undefined, isReady: boolean): void {
+/**
+ * Register a gateway the host's own button will collect through.
+ *
+ * Returns the deregister function.
+ */
+export function registerHostCollection(
+  orderId: string | null | undefined,
+  submit: () => Promise<PaymentGatewaySubmitResult>
+): () => void {
+  return register(orderId, { by: "host", submit, isReady: false })
+}
+
+/**
+ * Register a gateway that collects through its own control.
+ *
+ * The host's button cannot call anything for these, and telling it so is the
+ * whole point: it disables itself with this as the reason rather than offering
+ * a second route to one action, where its own route leads nowhere.
+ */
+export function registerGatewayCollection(orderId: string | null | undefined): () => void {
+  return register(orderId, { by: "gateway" })
+}
+
+/** Meaningless unless the current collection is the host's; ignored otherwise. */
+export function setCollectionReady(orderId: string | null | undefined, isReady: boolean): void {
   const e = entry(orderId)
-  if (e.isReady === isReady) return
-  e.isReady = isReady
+  if (e.collection?.by !== "host") return
+  if (e.collection.isReady === isReady) return
+  e.collection = { ...e.collection, isReady }
   commit(orderId, e)
 }
 
-export function setPaymentGatewayResume(
+export function setOutOfBandCollection(
   orderId: string | null | undefined,
-  resumePhase: PaymentGatewayResumePhase,
-  resumeErrors: BaseError[] = NO_ERRORS
+  collectedOutOfBand: OutOfBandCollection,
+  errors: BaseError[] = NO_ERRORS
 ): void {
   const e = entry(orderId)
-  if (e.resumePhase === resumePhase && e.resumeErrors === resumeErrors) return
-  e.resumePhase = resumePhase
-  e.resumeErrors = resumeErrors
+  if (e.collectedOutOfBand === collectedOutOfBand && e.errors === errors) return
+  e.collectedOutOfBand = collectedOutOfBand
+  e.errors = errors
   commit(orderId, e)
 }
 

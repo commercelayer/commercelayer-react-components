@@ -9,7 +9,7 @@ import type { Order } from "@commercelayer/sdk"
 import { useContext, useEffect, useRef } from "react"
 import OrderContext from "#context/OrderContext"
 import type { BaseError } from "#typings/errors"
-import { setPaymentGatewayResume } from "#utils/paymentGatewayStore"
+import { setOutOfBandCollection } from "#utils/paymentGatewayStore"
 
 /** Adyen's own return parameters. `sessionId` is read for nothing but cleanup. */
 const REDIRECT_RESULT_PARAM = "redirectResult"
@@ -49,9 +49,11 @@ const handled = new Set<string>()
  * single-use: a reload timed after the submit would otherwise surface a failure
  * on a payment that went through.
  *
- * This reports the outcome through the Payment Gateway Handoff and does nothing
- * else. Placing the order is `<PlaceOrderButton>`'s, which watches for
- * `resumePhase: "resumed"`; recovering from a refusal is
+ * This reports the outcome through the Payment Gateway Handoff as an
+ * **Out-of-Band Collection** and does nothing else. Placing the order is
+ * `<PlaceOrderButton>`'s, which watches for `collectedOutOfBand: "done"` —
+ * the same signal a gateway's own button raises, because it is the same event;
+ * recovering from a refusal is
  * `<PaymentSettingAdyenPayment>`'s, which owns the Payment Session's
  * replacement. Neither belongs in a detection hook.
  */
@@ -113,7 +115,7 @@ async function resumeRedirect({
   redirectResult,
   refetch,
 }: ResumeRedirectParams): Promise<void> {
-  setPaymentGatewayResume(orderId, "resuming")
+  setOutOfBandCollection(orderId, "in-progress")
 
   try {
     const core = await AdyenCheckout({
@@ -122,15 +124,15 @@ async function resumeRedirect({
       session: { id: target.adyen.id, sessionData: target.adyen.sessionData },
       showPayButton: false,
       onPaymentCompleted: () => {
-        setPaymentGatewayResume(orderId, "resumed")
+        setOutOfBandCollection(orderId, "done")
       },
       onPaymentFailed: (data) => {
         const code = readResultCode(data) ?? "Refused"
-        setPaymentGatewayResume(orderId, "failed", [resumeError(code, code)])
+        setOutOfBandCollection(orderId, "failed", [resumeError(code, code)])
       },
       onError: (error) => {
         const code = error?.name ?? "Error"
-        setPaymentGatewayResume(orderId, "failed", [resumeError(code, error?.message ?? code)])
+        setOutOfBandCollection(orderId, "failed", [resumeError(code, error?.message ?? code)])
       },
     } satisfies CoreConfiguration)
 
@@ -140,7 +142,7 @@ async function resumeRedirect({
     // asynchronously.
     core.submitDetails({ details: { redirectResult } })
   } catch (error) {
-    setPaymentGatewayResume(orderId, "failed", [
+    setOutOfBandCollection(orderId, "failed", [
       resumeError(
         "SetupFailed",
         error instanceof Error ? error.message : "The payment could not be completed."

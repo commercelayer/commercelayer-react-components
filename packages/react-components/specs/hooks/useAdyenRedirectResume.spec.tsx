@@ -82,7 +82,7 @@ describe("useAdyenRedirectResume", () => {
     renderHook(() => useAdyenRedirectResume(), { wrapper: wrapper(order()) })
 
     expect(adyen.captured.options).toBeNull()
-    expect(getHandoffSnapshot("order-1").resumePhase).toBe("idle")
+    expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("no")
   })
 
   it("waits for the order rather than burning the single-use value", async () => {
@@ -135,7 +135,7 @@ describe("useAdyenRedirectResume", () => {
     adyen.captured.options.onPaymentCompleted({ resultCode: "Authorised" })
 
     await waitFor(() => {
-      expect(getHandoffSnapshot("order-1").resumePhase).toBe("resumed")
+      expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("done")
     })
   })
 
@@ -150,8 +150,8 @@ describe("useAdyenRedirectResume", () => {
 
     await waitFor(() => {
       const snapshot = getHandoffSnapshot("order-1")
-      expect(snapshot.resumePhase).toBe("failed")
-      expect(snapshot.resumeErrors[0]?.meta).toEqual({ error: "Refused" })
+      expect(snapshot.collectedOutOfBand).toBe("failed")
+      expect(snapshot.errors[0]?.meta).toEqual({ error: "Refused" })
     })
   })
 
@@ -163,8 +163,8 @@ describe("useAdyenRedirectResume", () => {
 
     await waitFor(() => {
       const snapshot = getHandoffSnapshot("order-1")
-      expect(snapshot.resumePhase).toBe("failed")
-      expect(snapshot.resumeErrors[0]?.meta).toEqual({ error: "SetupFailed" })
+      expect(snapshot.collectedOutOfBand).toBe("failed")
+      expect(snapshot.errors[0]?.meta).toEqual({ error: "SetupFailed" })
     })
   })
 

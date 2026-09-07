@@ -138,6 +138,20 @@ describe("authorizeGiftCardSessions", () => {
 describe("refundGiftCardSessions", () => {
   const capture = (id: string) => ({ id, status: "succeeded", refund_balance_cents: 2000 }) as never
 
+  /** A card still holding the money, with a capture to refund against. */
+  const charged = (captureId = "cap-1") =>
+    order([giftCard("gc-1", { status: "paid", payment_captures: [capture(captureId)] })])
+
+  /** The same card once the refund job has settled — the server's own signal. */
+  const returned = () =>
+    order([
+      giftCard("gc-1", {
+        status: "refunded",
+        payment_captures: [capture("cap-1")],
+        payment_refunds: [{ id: "refund-1", status: "succeeded" } as never],
+      }),
+    ])
+
   it("does nothing when asked for nothing", async () => {
     const { retrieve } = stubSdk()
     const result = await refundGiftCardSessions({
@@ -151,9 +165,7 @@ describe("refundGiftCardSessions", () => {
 
   it("refunds against the capture the authorization produced", async () => {
     const { retrieve, refundCreate } = stubSdk()
-    retrieve.mockResolvedValue(
-      order([giftCard("gc-1", { status: "paid", payment_captures: [capture("cap-1")] })])
-    )
+    retrieve.mockResolvedValueOnce(charged()).mockResolvedValue(returned())
 
     const result = await refundGiftCardSessions({
       accessToken: ACCESS_TOKEN,
@@ -169,13 +181,16 @@ describe("refundGiftCardSessions", () => {
     expect(result).toEqual({ refundedSessionIds: ["gc-1"], errors: [], timedOut: false })
   })
 
-  it("waits for the capture the background job has not created yet", async () => {
+  it("waits for the refund to settle, not just to be created", async () => {
+    // The regression this budget exists for. A refund starts `pending` and
+    // another job closes it, so reporting success on the create told the shopper
+    // their card was off the order while it was still charged — and the row
+    // stayed on screen, because the row goes on the session's own status.
     const { retrieve, refundCreate } = stubSdk()
     retrieve
-      .mockResolvedValueOnce(order([giftCard("gc-1", { payment_captures: [] })]))
-      .mockResolvedValueOnce(
-        order([giftCard("gc-1", { status: "paid", payment_captures: [capture("cap-1")] })])
-      )
+      .mockResolvedValueOnce(charged())
+      .mockResolvedValueOnce(charged())
+      .mockResolvedValue(returned())
 
     const result = await refundGiftCardSessions({
       accessToken: ACCESS_TOKEN,
@@ -184,7 +199,52 @@ describe("refundGiftCardSessions", () => {
       intervalMs: 0,
     })
 
-    expect(retrieve).toHaveBeenCalledTimes(2)
+    // Created once, then waited on rather than created again.
+    expect(refundCreate).toHaveBeenCalledTimes(1)
+    expect(retrieve.mock.calls.length).toBeGreaterThanOrEqual(3)
+    expect(result.refundedSessionIds).toEqual(["gc-1"])
+    expect(result.timedOut).toBe(false)
+  })
+
+  it("does not create a second refund while the first is still pending", async () => {
+    const { retrieve, refundCreate } = stubSdk()
+    // Charged, with an unsettled refund already attached.
+    retrieve.mockResolvedValue(
+      order([
+        giftCard("gc-1", {
+          status: "paid",
+          payment_captures: [capture("cap-1")],
+          payment_refunds: [{ id: "refund-1", status: "pending" } as never],
+        }),
+      ])
+    )
+
+    const result = await refundGiftCardSessions({
+      accessToken: ACCESS_TOKEN,
+      orderId: "order-1",
+      paymentSessionIds: ["gc-1"],
+      attempts: 3,
+      intervalMs: 0,
+    })
+
+    expect(refundCreate).not.toHaveBeenCalled()
+    expect(result.timedOut).toBe(true)
+  })
+
+  it("waits for the capture the background job has not created yet", async () => {
+    const { retrieve, refundCreate } = stubSdk()
+    retrieve
+      .mockResolvedValueOnce(order([giftCard("gc-1", { payment_captures: [] })]))
+      .mockResolvedValueOnce(charged())
+      .mockResolvedValue(returned())
+
+    const result = await refundGiftCardSessions({
+      accessToken: ACCESS_TOKEN,
+      orderId: "order-1",
+      paymentSessionIds: ["gc-1"],
+      intervalMs: 0,
+    })
+
     expect(refundCreate).toHaveBeenCalledTimes(1)
     expect(result.timedOut).toBe(false)
   })
@@ -207,17 +267,9 @@ describe("refundGiftCardSessions", () => {
     expect(result.timedOut).toBe(true)
   })
 
-  it("treats an already refunded session as done rather than refunding it twice", async () => {
+  it("treats a session whose money is already back as done", async () => {
     const { retrieve, refundCreate } = stubSdk()
-    retrieve.mockResolvedValue(
-      order([
-        giftCard("gc-1", {
-          status: "refunded",
-          payment_captures: [capture("cap-1")],
-          payment_refunds: [{ id: "refund-0" } as never],
-        }),
-      ])
-    )
+    retrieve.mockResolvedValue(returned())
 
     const result = await refundGiftCardSessions({
       accessToken: ACCESS_TOKEN,
@@ -227,19 +279,26 @@ describe("refundGiftCardSessions", () => {
     })
 
     expect(refundCreate).not.toHaveBeenCalled()
-    expect(result).toEqual({ refundedSessionIds: [], errors: [], timedOut: false })
+    expect(result).toEqual({ refundedSessionIds: ["gc-1"], errors: [], timedOut: false })
   })
 
   it("carries on to the next card when one refund is refused", async () => {
     // Unlike authorizing, refunds do not change what the next one may take, so
     // giving up on the second would leave the third charged for no reason.
     const { retrieve, refundCreate } = stubSdk()
-    retrieve.mockResolvedValue(
-      order([
-        giftCard("gc-1", { status: "paid", payment_captures: [capture("cap-1")] }),
-        giftCard("gc-2", { status: "paid", payment_captures: [capture("cap-2")] }),
-      ])
-    )
+    const bothCharged = order([
+      giftCard("gc-1", { status: "paid", payment_captures: [capture("cap-1")] }),
+      giftCard("gc-2", { status: "paid", payment_captures: [capture("cap-2")] }),
+    ])
+    const secondReturned = order([
+      giftCard("gc-1", { status: "paid", payment_captures: [capture("cap-1")] }),
+      giftCard("gc-2", {
+        status: "refunded",
+        payment_captures: [capture("cap-2")],
+        payment_refunds: [{ id: "refund-2", status: "succeeded" } as never],
+      }),
+    ])
+    retrieve.mockResolvedValueOnce(bothCharged).mockResolvedValue(secondReturned)
     refundCreate.mockRejectedValueOnce(apiError("Refund amount exceeds the capture."))
 
     const result = await refundGiftCardSessions({

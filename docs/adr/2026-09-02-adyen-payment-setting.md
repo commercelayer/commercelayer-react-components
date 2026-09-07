@@ -493,9 +493,19 @@ eleven keys, one already `@deprecated`, three callbacks — is what
 - **`@adyen/adyen-web/auto`**, matching the legacy component, and `allowPaymentMethods:
   ["scheme"]` on the `Core`. With `/auto` everything is registered, and
   `paymentMethodComponents` only *adds*, so `allowPaymentMethods` is how one restricts.
-  Restricting is not about the bundle: Apple Pay, Google Pay and PayPal inside the Drop-in
-  render their own pay buttons and submit themselves, which would bypass `<PlaceOrderButton>`
-  and the terms gate — the one property the whole design is built on.
+  Restricting is not about the bundle.
+  > **Corrected 2026-09-07** by `2026-09-07-paypal-through-adyen.md`. This said the wallets
+  > "render their own pay buttons and submit themselves, which would bypass
+  > `<PlaceOrderButton>` and the terms gate". Half right, and the operative half wrong.
+  > `showPayButton: false` — which this integration sets on the `Core` — does not hide those
+  > buttons: `Paypal.componentToRender()` returns `null` when it is false
+  > (`src/components/PayPal/Paypal.tsx:243`), and that is the only thing `UIElement.render()`
+  > renders. The SDK script is never downloaded. Apple Pay, Google Pay and Amazon Pay do the
+  > same, while Card degrades gracefully. So allowing a wallet here would have shipped **an
+  > empty accordion panel**, not a bypassed gate. The restriction was right; its reason was
+  > not. And the wallets are not alike: Apple Pay's and Google Pay's own buttons call
+  > `this.submit`, so a host button *can* drive them — PayPal's `submit` throws by design, and
+  > it is the only one that categorically cannot.
 - **The component renders its own mount target, and `children` renders after it.** Everywhere
   else in this library a function child *replaces* the default markup. Here it cannot: the
   Drop-in attaches to that element, so handing it to a render prop would let an application
@@ -641,13 +651,25 @@ Listed in order of what they would cost if wrong.
    re-instantiate with the values their server returned. If it is rejected, the fallback is to
    pass the `id` alone and let adyen-web rehydrate from `localStorage` — which is silently
    unavailable in private mode and from another browser. **Verify against the real gateway.**
-2. **Correctness depends on a missing `else` in `core-api`.** `action_by_status` has no default
-   branch, and that alone is why the authorization stays `pending` rather than landing in
-   `failed`. `#authorize!` also lacks the `if result.status >= 300` check its sibling `#create`
-   has. Nothing tests this. "Fixing" that asymmetry would kill every Drop-in payment *and*
-   poison the webhook that would otherwise rescue it, because `succeed` cannot be reached from
-   `failed`. **A regression spec in `core-api` pinning "a 422 from `/payments` leaves the
-   authorization `pending`" is worth more than anything we can write here.**
+2. ~~**Correctness depends on a missing `else` in `core-api`.**~~ **Retired 2026-09-07.** The
+   worry was that the authorization stayed `pending` only because `action_by_status` had no
+   default branch and `#authorize!` lacked the `status >= 300` check its sibling `#create` had —
+   so "fixing" that asymmetry would kill every Drop-in payment. `core-api` `2c1145339` did add
+   the check, and added a guard in the same commit:
+   `skip_authorize?` returns true when the session has neither a `payment_wallet` nor a
+   `client_data['payment_method']`, which is exactly our case, so **no `/payments` call is made
+   at all**. Same outcome, reached without talking to Adyen — and now pinned by an upstream
+   spec, *"does not call Adyen and leaves the authorization pending, waiting for the webhook"*.
+   The ask this entry made has been answered.
+
+   **In its place, a tripwire.** `client_data.payment_method` is `creatable`/`updatable` for a
+   sales-channel token with no `prohibited` key. Writing it — to record which method the shopper
+   picked, which is precisely what one wants once the Drop-in offers more than cards — flips
+   `skip_authorize?` to `false`. Commerce Layer then calls `/payments` with it, Adyen answers
+   422, the new `apply_response` puts the authorization in **`failed`**, `succeed` from there is
+   illegal, and `509bbb9a1` now takes the session to the new `invalidated` state, which blocks
+   further transactions. **Unrecoverable, and silent. Never write `payment_method` into
+   `client_data`.**
 3. **That `public_key` is served to sales-channel tokens is not spec-covered in `core-api`** —
    the `payment_setting_adyen` factory does not even set it. The attribute config and the read
    filter both say yes, and the playground reads it from a browser under a storefront token, but
@@ -670,7 +692,7 @@ Single source; the tables in `2026-08-18-payment-session-lifecycle.md` and
 | --- | --- | --- |
 | Manual | `payment_setting_manuals` | ✅ implemented — `2026-08-18-payment-session-lifecycle.md` |
 | Gift card | `payment_setting_gift_cards` | ✅ implemented — `2026-08-20-gift-cards-as-payment-sessions.md` |
-| Adyen | `payment_setting_adyens` | ✅ implemented — client-side Drop-in, cards only, this ADR |
+| Adyen | `payment_setting_adyens` | ✅ implemented — client-side Drop-in, cards only, this ADR. Methods within it: `2026-09-07-paypal-through-adyen.md` |
 | Stripe | `payment_setting_stripes` | ⬜ not implemented |
 | Braintree | `payment_setting_braintrees` | ⬜ not implemented |
 | External | `payment_setting_externals` | ⬜ not implemented |

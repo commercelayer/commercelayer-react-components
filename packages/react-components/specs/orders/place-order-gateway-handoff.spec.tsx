@@ -7,9 +7,10 @@ import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import {
   type PaymentGatewaySubmitResult,
-  registerPaymentGateway,
+  registerGatewayCollection,
+  registerHostCollection,
   resetPaymentGatewayStore,
-  setPaymentGatewayResume,
+  setOutOfBandCollection,
 } from "#utils/paymentGatewayStore"
 import { resetTermsAcceptanceStore } from "#utils/termsAcceptanceStore"
 
@@ -74,10 +75,10 @@ function Wrapper({
   )
 }
 
-/** Stands in for `<PaymentSettingAdyenPayment>`: registers, answers on demand. */
+/** Stands in for a card gateway: registers a host collection, answers on demand. */
 function useFakeGateway(result: PaymentGatewaySubmitResult) {
   const submit = vi.fn(async () => result)
-  registerPaymentGateway("order-1", submit)
+  registerHostCollection("order-1", submit)
   return submit
 }
 
@@ -258,6 +259,62 @@ describe("when the gateway does not complete", () => {
   })
 })
 
+describe("when the method owns its own button", () => {
+  it("renders disabled, because our own route leads nowhere", async () => {
+    // `dropin.submit()` on PayPal is IMPLEMENTATION_ERROR and no payment, so a
+    // live button would offer a second route to one action and ours would fail.
+    // Disabled rather than hidden: the reason is on the handoff, for the
+    // application to word.
+    const place = () => screen.getByTestId("place") as HTMLButtonElement
+
+    // Nothing registered, so this order is one our button can place: the
+    // assertion below is about the gateway and not about the order.
+    const { unmount } = renderButton()
+    await waitFor(() => {
+      expect(place().disabled).toBe(false)
+    })
+    unmount()
+
+    registerGatewayCollection("order-1")
+    renderButton()
+    await waitFor(() => {
+      expect(place().disabled).toBe(true)
+    })
+  })
+
+  it("collects nothing and places nothing if it is clicked anyway", async () => {
+    // A guard, not a branch: a consumer can pass `disabled={false}`, and an
+    // earlier bug had a gateway registering from a card it was not selected in.
+    registerGatewayCollection("order-1")
+    render(
+      <Wrapper currentOrder={orderWithCard()}>
+        <PlaceOrderButtonPaymentSessions data-testid="place" label="Place order" disabled={false} />
+      </Wrapper>
+    )
+
+    await clickPlace()
+
+    expect(authorizeGiftCardsMock).not.toHaveBeenCalled()
+    expect(placeOrderMock).not.toHaveBeenCalled()
+  })
+
+  it("places the order once the gateway's own button has collected", async () => {
+    // The same mechanism as a redirect return: money taken, no click of ours,
+    // order still to place. The gift cards were charged inside PayPal's own
+    // click, so nothing is authorized here.
+    registerGatewayCollection("order-1")
+    renderButton()
+
+    await act(async () => {
+      setOutOfBandCollection("order-1", "done")
+    })
+
+    await waitFor(() => {
+      expect(placeOrderMock).toHaveBeenCalledTimes(1)
+    })
+  })
+})
+
 describe("returning from a 3DS redirect", () => {
   it("places the order without a click, and without asking for the terms again", async () => {
     // Acceptance did not survive the navigation, and the money is already
@@ -268,7 +325,7 @@ describe("returning from a 3DS redirect", () => {
     expect(placeOrderMock).not.toHaveBeenCalled()
 
     await act(async () => {
-      setPaymentGatewayResume("order-1", "resumed")
+      setOutOfBandCollection("order-1", "done")
     })
 
     await waitFor(() => {
@@ -280,14 +337,14 @@ describe("returning from a 3DS redirect", () => {
     renderButton()
 
     await act(async () => {
-      setPaymentGatewayResume("order-1", "resumed")
+      setOutOfBandCollection("order-1", "done")
     })
     await waitFor(() => {
       expect(placeOrderMock).toHaveBeenCalledTimes(1)
     })
     await act(async () => {
-      setPaymentGatewayResume("order-1", "idle")
-      setPaymentGatewayResume("order-1", "resumed")
+      setOutOfBandCollection("order-1", "no")
+      setOutOfBandCollection("order-1", "done")
     })
 
     expect(placeOrderMock).toHaveBeenCalledTimes(1)
@@ -299,7 +356,7 @@ describe("returning from a 3DS redirect", () => {
     renderButton()
 
     await act(async () => {
-      setPaymentGatewayResume("order-1", "failed", [
+      setOutOfBandCollection("order-1", "failed", [
         { code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE", message: "Refused" },
       ])
     })
@@ -316,7 +373,7 @@ describe("returning from a 3DS redirect", () => {
     renderButton()
 
     await act(async () => {
-      setPaymentGatewayResume("order-1", "resuming")
+      setOutOfBandCollection("order-1", "in-progress")
     })
 
     expect((screen.getByTestId("place") as HTMLButtonElement).disabled).toBe(true)

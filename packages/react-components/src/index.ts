@@ -127,6 +127,7 @@ export * from "#components/skus/Skus"
 export * from "#components/skus/SkusContainer"
 export * from "#components/stock_transfers/StockTransfer"
 export * from "#components/stock_transfers/StockTransferField"
+export * from "#hooks/useCollectionPermitted"
 export * from "#hooks/useCommerceLayer"
 export * from "#hooks/useCustomerContainer"
 export * from "#hooks/useOrderContainer"
@@ -136,7 +137,8 @@ export * from "#hooks/usePaymentsModel"
 export * from "#hooks/useTermsAndConditions"
 export * from "#typings/errors"
 export type {
+  OutOfBandCollection,
+  PaymentCollection,
   PaymentGatewayHandoff,
-  PaymentGatewayResumePhase,
   PaymentGatewaySubmitResult,
 } from "#utils/paymentGatewayStore"
