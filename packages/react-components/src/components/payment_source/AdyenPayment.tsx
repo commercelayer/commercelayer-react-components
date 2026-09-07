@@ -28,6 +28,7 @@ import browserInfo, { cleanUrlBy } from "#utils/browserInfo"
 import { getPublicIP } from "#utils/getPublicIp"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
 import { setCustomerOrderParam } from "#utils/localStorage"
+import { isAdyenAuthorizedResultCode } from "#utils/paymentAuthorization"
 import type { PaymentSourceProps } from "./PaymentSource"
 
 interface PaymentMethodsStyle {
@@ -298,7 +299,7 @@ export function AdyenPayment({
         }))
       // @ts-expect-error no type
       const resultCode = pSource?.payment_response?.resultCode
-      if (["Authorised", "Pending", "Received"].includes(resultCode)) {
+      if (isAdyenAuthorizedResultCode(resultCode)) {
         // NOTE: unlike the `isValid` handlers above, clearing `disabled` here is
         // load-bearing — do not remove it for symmetry with them. Adyen has already
         // authorized the payment; all that is left is to place the order. Terms
@@ -567,7 +568,7 @@ export function AdyenPayment({
 
       // @ts-expect-error no type
       const issuerType = res?.payment_instrument?.issuer_type
-      if (["Authorised", "Pending", "Received"].includes(resultCode)) {
+      if (isAdyenAuthorizedResultCode(resultCode)) {
         if (["apple pay", "google pay"].includes(issuerType) && setPlaceOrder != null) {
           await setPlaceOrder({
             paymentSource: res,

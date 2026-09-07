@@ -1,6 +1,6 @@
 {
   "name": "@commercelayer/core-components",
-  "version": "5.0.0",
+  "version": "5.0.1-beta.0",
   "description": "Commerce Layer Core",
   "type": "module",
   "main": "./dist/index.js",
