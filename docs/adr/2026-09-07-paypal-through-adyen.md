@@ -432,14 +432,53 @@ whose misses are silent.
    toolchain here. It decides whether an upstream defect fails silently or as a 500, and that
    defect is not on this integration's path.
 
+### Correction: the wallets are not "host-drivable, so easier" (2026-09-07)
+
+An earlier draft of this table called Apple Pay and Google Pay an easier problem than PayPal
+because, unlike PayPal, both override `submit`: Apple Pay's calls `startSession()` and Google
+Pay's calls `loadPaymentData()`. That is true and it is not the point.
+
+Both of those must run **inside a user gesture** — Safari throws
+`Must create a new ApplePaySession from a user gesture handler`, and Google requires the same of
+`loadPaymentData()`. Our place-order sequence authorizes the gift cards _before_ it asks the
+gateway to collect, so by the time `submit()` runs the gesture is spent. The ordering is not
+negotiable either: a refused payment must never leave gift cards charged after it.
+
+So both wallets want their own button and the PayPal mechanism — gate and gift cards inside the
+method's own click — and `submit` being available changes nothing. Apple Pay adds two obstacles
+of its own: `isAvailable()` rejects outright unless `location.protocol === "https:"`, so it
+never renders on the dev server, and it needs Safari with a card in Wallet, which Playwright's
+WebKit is not and does not have. **Apple Pay cannot be covered by an e2e at all** — not the
+payment, not even the button.
+
+Google Pay has neither problem: no protocol guard in the bundle, availability decided by
+`isReadyToPay()`, and it runs in the Chromium these tests already use. It is therefore the
+second instance of the Gateway-Owned Button pattern to build, and the one that will show whether
+the abstraction generalises. Note its `onClick` is `(resolve, reject) => void` positionally, not
+PayPal's `(data, actions)`.
+
 ### Asks for the API
 
 In dependency order. The first is the one the others sit on.
 
-1. **Let a sales-channel token contribute to the Adyen session payload** — or add a
-   `Payment::Payload::Adyen::Session::*` variant carrying `lineItems`, `shopperEmail` and
-   `shopperReference`. Today `options` is `prohibited: [read, write]` and it is the only
-   extension point, so a storefront can send nothing. This also unblocks Klarna.
+1. **`Session::Base` should carry what `Payments::Base` already carries** — `lineItems` and
+   `shopperEmail`, built from the order server-side.
+
+   Re-verified at core-api `65c08cc73` (2026-09-05). Klarna requires `lineItems` — mandatory,
+   totalling `amount.value`, each with a `description` — plus `shopperEmail`.
+   `Payment::Payload::Adyen::Session::Base#to_h` sends neither. The only extension point is
+   `payment_session.options`, which `Payload::Session` delegates straight to the session
+   attribute, and `ProhibitedAttributesCheck` raises `CanCan::AccessDenied` on it for a
+   sales-channel token (`prohibited: [read, write]`, enforced `if: :sales_channel?`). So a
+   storefront cannot supply them by any route.
+
+   The earlier framing of this ask — open `options` to sales channels — was the expensive one: a
+   permissions change, with a storefront then responsible for a payload it should not be
+   composing. The cheap one is three lines in the same repository, because
+   `Payments::Base#line_items_data` already exists one class over and builds exactly this from
+   the order. No new permission, no storefront API change, and nothing to build in this library
+   until it lands.
+
 2. **Handle `PENDING` and `OFFER_CLOSED`.** Both are discarded by `CODES`, in a `retry: 0`
    worker, after a 200 has gone back to Adyen. The first leaves a delayed payment unresolvable;
    the second leaves an abandoned one with no signal.
@@ -459,9 +498,9 @@ refund happened, and `require_action` transitions only `from: :pending`, which P
 | ---------- | -------------- | ----------------------------------------------------------------------------------- |
 | Card       | `scheme`       | ✅ implemented — `2026-09-02-adyen-payment-setting.md`                              |
 | PayPal     | `paypal`       | 🟡 built; the handoff verified end to end, the payment refused by Adyen — see below |
-| Apple Pay  | `applepay`     | ⬜ deferred — host-drivable, so an easier problem than PayPal                       |
-| Google Pay | `googlepay`    | ⬜ deferred — same                                                                  |
-| Klarna     | `klarna*`      | ⬜ blocked upstream — see ask 1                                                     |
+| Apple Pay  | `applepay`     | ⬜ deferred — needs HTTPS and Safari, so **unverifiable** in this stack             |
+| Google Pay | `googlepay`    | ✅ implemented — `2026-09-07-google-pay-through-adyen.md`                           |
+| Klarna     | `klarna*`      | ⬜ blocked upstream — see ask 1, reshaped                                           |
 
 ## What the first end-to-end run established (2026-09-07)
 

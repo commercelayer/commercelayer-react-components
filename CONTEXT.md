@@ -6,7 +6,7 @@ This context covers the React components and state that let a storefront pay for
 
 **Payments Model**:
 Which of the two mutually exclusive payment models an order uses. Two values, named after the order relationship that carries the payment: **`payment_source`** (the older model: `payment_gateways` + `payment_methods` + a per-gateway payment source) and **`payment_sessions`** (the newer model: `payment_settings` + `payment_sessions`). An order is bound to one model for its whole life; it can never switch. A third transient value, `undetermined`, means the order data needed to decide has not loaded yet.
-The API version and the Payments Model are two different things: the version says what the API *can* express (`available_payment_settings` exists only from `2026-05`), the order says which model it *uses*. API version `2026-05` is backward compatible and serves both models, so two organizations on the same version can be on different Payments Models, and a single response can carry both `available_payment_methods` and `available_payment_settings`.
+The API version and the Payments Model are two different things: the version says what the API _can_ express (`available_payment_settings` exists only from `2026-05`), the order says which model it _uses_. API version `2026-05` is backward compatible and serves both models, so two organizations on the same version can be on different Payments Models, and a single response can carry both `available_payment_methods` and `available_payment_settings`.
 _Avoid_: legacy vs new (ages badly), payments version (collides with the API version, e.g. `2026-05`), v1/v2
 
 **Payment Method**:
@@ -26,7 +26,7 @@ One intended payment against an order, for an `amount_cents`, through a Payment 
 _Avoid_: payment source, charge, payment intent
 
 **Payment Authorization**:
-The record proving a Payment Session's money was actually taken. A session is only a stated *intent* to pay; a session with a `succeeded` Payment Authorization is the one and only evidence of payment on the `payment_sessions` model. Also what makes the order placeable.
+The record proving a Payment Session's money was actually taken. A session is only a stated _intent_ to pay; a session with a `succeeded` Payment Authorization is the one and only evidence of payment on the `payment_sessions` model. Also what makes the order placeable.
 _Avoid_: authorized session, payment (as a synonym for the session)
 
 **Current Payment Session**:
@@ -34,15 +34,15 @@ The Payment Session the shopper's selection points at — the one paying whateve
 _Avoid_: pending session, selected payment method, "the payment session" (an order has several)
 
 **Placeable**:
-Whether the API would accept placing the order. Two distinct things share the word: `order.placeable` and the `_placeable` trigger — but they are **not** two ways to ask the same question, and only one of them is usable. `order.placeable` is transient and served **only in an update response**, never on a `GET`, so it can never gate a button on render. The `_placeable` trigger is a `PATCH` that *validates* the order: 200 with the whole order on success, 422 with a JSON:API `errors` array on failure. Because a failed validation persists nothing, repeating it is cheap. Payment coverage is checked by a default payment rule whose threshold an organization can change — so placeability is a server judgement, never a client calculation.
+Whether the API would accept placing the order. Two distinct things share the word: `order.placeable` and the `_placeable` trigger — but they are **not** two ways to ask the same question, and only one of them is usable. `order.placeable` is transient and served **only in an update response**, never on a `GET`, so it can never gate a button on render. The `_placeable` trigger is a `PATCH` that _validates_ the order: 200 with the whole order on success, 422 with a JSON:API `errors` array on failure. Because a failed validation persists nothing, repeating it is cheap. Payment coverage is checked by a default payment rule whose threshold an organization can change — so placeability is a server judgement, never a client calculation.
 _Avoid_: "can be placed" (ambiguous between the attribute and the check), validated
 
 **Reusable Session**:
 A Payment Session the library may adopt instead of creating a new one: same Payment Setting, `status` still `unpaid`, not past `expires_at`, and with no Payment Authorization in a terminal failure state. Anything failing that predicate is abandoned in place, not deleted — an `unpaid` session counts toward nothing, and a sales-channel token may be refused the delete anyway.
-_Avoid_: pending session, stale session, orphan session (the last one is what an abandoned session *becomes*)
+_Avoid_: pending session, stale session, orphan session (the last one is what an abandoned session _becomes_)
 
 **Applied Gift Card**:
-A gift card the shopper has spent on an order — a Payment Session against a `payment_setting_gift_cards` setting. Additive rather than an alternative: an order carries zero or more of them *plus* at most one other session for the difference. Its `amount_cents` is what it covers **of this order**, capped by the server to whatever was still owed — never the card's balance, which a session does not carry at all. Removable in one of two ways, and the shopper's gesture is the same for both: **discarded** for free while nothing has been charged, or **refunded** once it has — the balance is debited the instant the authorization succeeds, and a charged session cannot be deleted at all. A refund is only available while the order is still `pending`; after placement a storefront token has no grant for it, and the card cannot come off.
+A gift card the shopper has spent on an order — a Payment Session against a `payment_setting_gift_cards` setting. Additive rather than an alternative: an order carries zero or more of them _plus_ at most one other session for the difference. Its `amount_cents` is what it covers **of this order**, capped by the server to whatever was still owed — never the card's balance, which a session does not carry at all. Removable in one of two ways, and the shopper's gesture is the same for both: **discarded** for free while nothing has been charged, or **refunded** once it has — the balance is debited the instant the authorization succeeds, and a charged session cannot be deleted at all. A refund is only available while the order is still `pending`; after placement a storefront token has no grant for it, and the card cannot come off.
 _Avoid_: gift card discount (it is a payment, not a discount), gift card balance (a different number)
 
 **Remaining Amount**:
@@ -86,8 +86,12 @@ How a **Payment Gateway** component and `<PlaceOrderButton>` reach each other. A
 _Avoid_: payment ref (the `payment_source`-model mechanism, which publishes a form ref instead), submit handler
 
 **Gateway-Owned Button**:
-A payment method whose own control performs the payment, so the checkout's place-order button cannot. PayPal is the case: its `submit` throws by design, because a popup needs a real user gesture and PayPal's rules require their branded button to be the thing clicked. The consequence is that the privacy-and-terms gate cannot sit in front of the place-order click for that method — it has to sit inside the method's own click. The wallets are not all alike: Apple Pay's and Google Pay's buttons *do* call the SDK's own `submit`, so those can be host-driven. Rendering your own button is a different thing from owning the click.
+A payment method whose own control performs the payment, so the checkout's place-order button cannot. The consequence is that the privacy-and-terms gate cannot sit in front of the place-order click for that method — it has to sit inside the method's own click. Two methods qualify and they arrive there differently. PayPal's `submit` throws outright, because a popup needs a real user gesture and PayPal's rules require their branded button to be the thing clicked. Google Pay's `submit` works, and is still no use: it calls `loadPaymentData()`, which Google requires inside the click's gesture, and the place sequence charges gift cards before it ever gets there — after that round trip the gesture is spent and the sheet never opens. Apple Pay is the same case. So rendering your own button is still a different thing from owning the click, but for a wallet the deciding question is the gesture rather than the API.
 _Avoid_: express payment (a different entry point into the checkout, before an address exists), self-submitting method
+
+**Gift Card Moment**:
+The point in a **Gateway-Owned Button** flow at which gift cards are charged, which differs per method and is not a preference. It must be before the gateway takes money — a refused payment must never leave gift cards charged after it — and it cannot be anywhere that costs the click's user gesture. For PayPal that leaves the click itself: `beforeSubmit` runs after the popup is open and rejecting it hangs the popup for good. For Google Pay the click is exactly where it cannot go, and `onAuthorized` serves instead — it fires after the shopper has chosen a card and before `/payments`, it has no gesture constraint, and rejecting it shows the reason inside Google's own sheet, which stays open for another attempt. The hook does not generalise: PayPal has one too, and using it would make the payment conditional on `actions.order` and turn a deliberate rejection into a parse error nobody can tell apart. The moment is per method, and so are the reasons.
+_Avoid_: pre-authorization (means something else on a `PaymentAuthorization`), gift card hook
 
 **Out-of-Band Collection**:
 Money collected without the shopper pressing the checkout's place-order button, leaving the order still to be placed. Two things produce it and they are one mechanism: returning from a 3DS redirect, where the page reloaded and nobody clicked anything, and a **Gateway-Owned Button**, where the click was never ours. In both, the library places the order on its own initiative — the only paths where it does — and in both the privacy-and-terms gate was satisfied earlier rather than skipped: before the redirect, or inside the method's own click.
@@ -143,7 +147,7 @@ _Avoid_: public key (ambiguous across gateways — Stripe's is a publishable key
 - "the session's type" was used to mean the gateway (e.g. "manual") — but `payment_session.type` is always the literal `"payment_sessions"` (the resource type). The gateway is `payment_session.payment_setting.type` (e.g. `payment_setting_manuals`). When someone says "the session type", ask which one they mean.
 - "the payment is done" was used for both a created **Payment Session** and a taken payment — resolved: only a `succeeded` **Payment Authorization** means paid; a session on its own means nothing was taken.
 - "placeable" was used for both the readable order attribute and the `_placeable` validation trigger — resolved in the glossary above; when someone says "check if it's placeable", ask whether they mean reading the attribute or asking the API.
-- "set payment source" was used to mean both the async operation that creates/attaches a Payment Source *and* the reducer action that stores it in state — resolved: the operation is `setPaymentSource(...)`, the reducer action is `dispatch({ type: "setPaymentSource" })`.
+- "set payment source" was used to mean both the async operation that creates/attaches a Payment Source _and_ the reducer action that stores it in state — resolved: the operation is `setPaymentSource(...)`, the reducer action is `dispatch({ type: "setPaymentSource" })`.
 
 ## Example dialogue — Adyen
 

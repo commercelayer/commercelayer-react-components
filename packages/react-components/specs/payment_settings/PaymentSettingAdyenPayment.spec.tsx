@@ -227,7 +227,7 @@ describe("<PaymentSettingAdyenPayment> mounting", () => {
     await waitFor(() => {
       expect(adyen.captured.options).not.toBeNull()
     })
-    expect(adyen.captured.options.allowPaymentMethods).toEqual(["scheme", "paypal"])
+    expect(adyen.captured.options.allowPaymentMethods).toEqual(["scheme", "paypal", "googlepay"])
   })
 
   it("lets an application narrow the list", async () => {
@@ -244,7 +244,9 @@ describe("<PaymentSettingAdyenPayment> mounting", () => {
       expect(adyen.captured.options).not.toBeNull()
     })
     expect(adyen.captured.options.allowPaymentMethods).toEqual(["scheme"])
-    // And nothing is configured for a method that is not on offer.
+    // And nothing is configured for a method that is not on offer: the cards
+    // are the one method the host's own button collects, so a configuration
+    // here would mean a wallet had been wired up invisibly.
     expect(adyen.captured.dropinOptions.paymentMethodsConfiguration).toBeUndefined()
   })
 
@@ -815,5 +817,179 @@ describe("PayPal, which owns its own click", () => {
 
     expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("no")
     expect(discardPaymentSessionMock).not.toHaveBeenCalled()
+  })
+})
+
+describe("Google Pay, whose click cannot wait", () => {
+  async function mounted(): Promise<void> {
+    renderAdyen()
+    await waitFor(() => {
+      expect(adyen.dropinMount).toHaveBeenCalled()
+    })
+  }
+
+  function googlePayConfig() {
+    const config = adyen.captured.dropinOptions.paymentMethodsConfiguration?.googlepay
+    if (config == null) throw new Error("Google Pay was not configured on the Drop-in")
+    return config
+  }
+
+  /** Tell the component the shopper has Google Pay open, as the Drop-in does. */
+  async function selectGooglePay(): Promise<void> {
+    await act(async () => {
+      adyen.captured.dropinOptions.onSelect({ type: "googlepay" })
+    })
+  }
+
+  it("re-enables its own button, which the Core had switched off", async () => {
+    await mounted()
+    expect(googlePayConfig().showPayButton).toBe(true)
+  })
+
+  it("takes collection, because the gesture cannot survive our round trip", async () => {
+    // `submit` works on Google Pay, unlike PayPal — and it is still no use:
+    // `loadPaymentData()` runs after our gift cards and Google requires it
+    // inside the click's gesture.
+    await mounted()
+    await selectGooglePay()
+    expect(getHandoffSnapshot("order-1").collection).toEqual({ by: "gateway" })
+  })
+
+  it("refuses the click synchronously when the terms are not accepted", async () => {
+    // Synchronously is the whole point: anything awaited here happens between
+    // the shopper's gesture and the sheet. Google's button has no disabled
+    // state either, so the message is all the shopper gets.
+    permitted.value = false
+    let reported: BaseError[] = []
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingAdyenPayment containerClassName="dropin">
+            {({ errors: adyenErrors }) => {
+              reported = adyenErrors
+              return <></>
+            }}
+          </PaymentSettingAdyenPayment>
+        </PaymentSetting>
+      </Wrapper>
+    )
+    await waitFor(() => {
+      expect(adyen.captured.dropinOptions).not.toBeNull()
+    })
+
+    const resolve = vi.fn()
+    const reject = vi.fn()
+    await act(async () => {
+      googlePayConfig().onClick(resolve, reject)
+    })
+
+    expect(reject).toHaveBeenCalled()
+    expect(resolve).not.toHaveBeenCalled()
+    expect(reported[0]?.meta).toEqual({ error: "TermsNotAccepted" })
+    // Not even asked for: the gift cards are not this hook's business.
+    expect(authorizeGiftCardsMock).not.toHaveBeenCalled()
+  })
+
+  it("resolves the click without touching the network", async () => {
+    await mounted()
+
+    const resolve = vi.fn()
+    const reject = vi.fn()
+    await act(async () => {
+      googlePayConfig().onClick(resolve, reject)
+    })
+
+    expect(resolve).toHaveBeenCalled()
+    expect(authorizeGiftCardsMock).not.toHaveBeenCalled()
+    expect(getOrder).not.toHaveBeenCalled()
+  })
+
+  it("charges the gift cards on the authorization, before the payment call", async () => {
+    // The moment after the sheet and before the money: Adyen calls `/payments`
+    // only once this resolves.
+    authorizeGiftCardsMock.mockResolvedValue({ authorizedSessionIds: ["gc-1"], errors: [] })
+    await mounted()
+
+    const actions = { resolve: vi.fn(), reject: vi.fn() }
+    await act(async () => {
+      googlePayConfig().onAuthorized({}, actions)
+    })
+
+    await waitFor(() => {
+      expect(actions.resolve).toHaveBeenCalled()
+    })
+    expect(authorizeGiftCardsMock).toHaveBeenCalledTimes(1)
+    // Refetched, so the place sequence skips what has already been charged.
+    expect(getOrder).toHaveBeenCalledWith("order-1")
+  })
+
+  it("hands Google the reason a gift card could not be charged", async () => {
+    // A string reaches Google's own sheet verbatim, and the sheet stays open —
+    // so the shopper can try another card instead of losing the wallet flow.
+    authorizeGiftCardsMock.mockResolvedValue({
+      authorizedSessionIds: [],
+      errors: [{ code: "VALIDATION_ERROR", message: "Gift card balance is insufficient." }],
+    })
+    await mounted()
+
+    const actions = { resolve: vi.fn(), reject: vi.fn() }
+    await act(async () => {
+      googlePayConfig().onAuthorized({}, actions)
+    })
+
+    await waitFor(() => {
+      expect(actions.reject).toHaveBeenCalledWith("Gift card balance is insufficient.")
+    })
+    expect(actions.resolve).not.toHaveBeenCalled()
+  })
+
+  it("does not burn the Adyen Session when the abort was its own", async () => {
+    // Adyen routes a rejected `onAuthorized` through the same `onPaymentFailed`
+    // a refusal arrives on. Read as a refusal it would discard the Payment
+    // Session — and the session *is* the payment, so the retry Google is
+    // offering inside its still-open sheet would have nothing to pay with.
+    authorizeGiftCardsMock.mockResolvedValue({
+      authorizedSessionIds: [],
+      errors: [{ code: "VALIDATION_ERROR", message: "Gift card balance is insufficient." }],
+    })
+    await mounted()
+    await selectGooglePay()
+
+    const actions = { resolve: vi.fn(), reject: vi.fn() }
+    await act(async () => {
+      googlePayConfig().onAuthorized({}, actions)
+    })
+    await waitFor(() => {
+      expect(actions.reject).toHaveBeenCalled()
+    })
+
+    await act(async () => {
+      adyen.captured.options.onPaymentFailed({ resultCode: "Refused" })
+    })
+
+    const snapshot = getHandoffSnapshot("order-1")
+    expect(snapshot.collectedOutOfBand).toBe("no")
+    expect(discardPaymentSessionMock).not.toHaveBeenCalled()
+  })
+
+  it("still reports a real refusal on the next attempt", async () => {
+    // The flag is consumed, so it cannot swallow the refusal that follows it.
+    await mounted()
+    await selectGooglePay()
+
+    const actions = { resolve: vi.fn(), reject: vi.fn() }
+    await act(async () => {
+      googlePayConfig().onAuthorized({}, actions)
+    })
+    await waitFor(() => {
+      expect(actions.resolve).toHaveBeenCalled()
+    })
+
+    await act(async () => {
+      adyen.captured.options.onPaymentFailed({ resultCode: "Refused" })
+    })
+
+    expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("failed")
   })
 })
