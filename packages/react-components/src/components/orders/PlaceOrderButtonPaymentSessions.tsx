@@ -6,7 +6,6 @@ import {
   DEFAULT_PLACEABLE_INTERVAL_MS,
   discardPaymentSession,
   placeOrderWithPaymentSessions,
-  refundGiftCardSessions,
 } from "@commercelayer/core-components"
 import type { Order } from "@commercelayer/sdk"
 import {
@@ -153,7 +152,6 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
     if (order == null || accessToken == null) return
 
     let working = order
-    let authorizedGiftCardIds: string[] = []
 
     if (isGatewayPayment) {
       const authorized = await authorizeGiftCardSessions({
@@ -161,7 +159,6 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
         interceptors,
         order: working,
       })
-      authorizedGiftCardIds = authorized.authorizedSessionIds
 
       if (authorized.errors.length > 0) {
         reportErrors(
@@ -177,7 +174,7 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
         return
       }
 
-      if (authorizedGiftCardIds.length > 0) {
+      if (authorized.authorizedSessionIds.length > 0) {
         working = (await getOrder(order.id)) ?? working
       }
 
@@ -190,38 +187,27 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
       }
 
       if (collected.status === "failed") {
-        // A verdict, so the rollback is safe — and it is the whole reason the
-        // gift cards go first. Failures are swallowed on purpose: the error
-        // worth showing is the gateway's, and a refund that could not be taken
-        // leaves the cards applied and visible on the order, which is the
-        // recovery surface the gift card ADR already relies on.
-        if (authorizedGiftCardIds.length > 0) {
-          const refund = await refundGiftCardSessions({
-            accessToken,
-            interceptors,
-            orderId: order.id,
-            paymentSessionIds: authorizedGiftCardIds,
-          })
-          if (
-            process.env.NODE_ENV !== "production" &&
-            (refund.timedOut || refund.errors.length > 0)
-          ) {
-            console.warn(
-              "[commercelayer] <PlaceOrderButton> could not give back every gift card charged for a refused payment. They stay applied to the order.",
-              refund
-            )
-          }
-        }
-        // The Payment Session is burnt: retrying on it is broken server-side,
-        // and until the gateway's webhook lands the failed authorization it
-        // still reads as reusable. Deleting is the only deterministic way to
-        // keep the next attempt off it.
+        // A verdict: the card took nothing.
         //
-        // Done here rather than in the gateway component because the refund
-        // above changes what is left to pay, and a replacement created before
-        // it would be sized for the wrong amount. Nothing is created in its
-        // place: the shopper picks the payment method again, which is also how
-        // they see that their gift cards came back.
+        // **The gift cards stay charged and applied**, and this is the version
+        // that replaced an automatic refund. A refused card is the *ordinary*
+        // failure of a checkout — the shopper tries another card — so giving
+        // their credit back here destroys exactly what the next attempt needs,
+        // and they cannot simply re-apply it: `canAddGiftCard` is false while
+        // anything is authorized, and the codes would have to be typed again.
+        // The first real 3DS failure went that way and left a shopper with the
+        // card charged for the remainder and their gift cards gone.
+        //
+        // Giving the money back is theirs to ask for, one card at a time,
+        // through `<PaymentSettingGiftCardRemoveButton>`. On the redirect path
+        // the library could not attribute the charges to this attempt anyway,
+        // so a control is the only honest route there — and having one route
+        // rather than two is worth more than the automation was.
+        //
+        // The Payment Session is still burnt, and still deleted: retrying on it
+        // is broken server-side, and until the gateway's webhook lands the
+        // failed authorization it goes on reading as reusable. Nothing is
+        // created in its place — the shopper picks the payment method again.
         await discardBurntSession()
         reportErrors([gatewayError(collected.code)])
         await refetch()
@@ -397,11 +383,19 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
  * and in `message` because the field is required. Inventing prose here would put
  * payment wording, in one hard-coded language, in a package that cannot know the
  * checkout's locale.
+ *
+ * **`resource: "orders"` because that is the store it goes into.** This was
+ * `payment_methods` at first, which reads more descriptively and made the error
+ * invisible: `<Errors>` matches on `resource` (`getAllErrors`), so the outlet
+ * every consumer mounts — `<Errors resource="orders">`, next to the place button
+ * — filtered out the one message telling the shopper their card was refused. The
+ * tag has to name the channel, not the subject. `payment_methods` belongs to the
+ * `payment_source` model's own error context, which this model never populates.
  */
 function gatewayError(code: string): BaseError {
   return {
     code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
-    resource: "payment_methods",
+    resource: "orders",
     message: code,
     meta: { error: code },
   }

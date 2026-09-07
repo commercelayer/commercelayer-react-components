@@ -376,6 +376,73 @@ describe("the Payment Gateway Handoff", () => {
   })
 })
 
+describe("who may claim to collect a payment", () => {
+  const MANUAL = {
+    id: "ps-manual",
+    type: "payment_setting_manuals",
+    name: "Wire Transfer",
+  } as unknown as PaymentSettingResource
+
+  const MANUAL_SESSION = {
+    id: "session-manual",
+    type: "payment_sessions",
+    status: "unpaid",
+    amount_cents: 7100,
+    payment_setting: { id: "ps-manual", type: "payment_setting_manuals" },
+  } as unknown as PaymentSession
+
+  /**
+   * `<PaymentSetting>` renders its children once per available setting, so this
+   * component is mounted inside every setting's card and returns `null` from
+   * all but one — while its effects still run.
+   *
+   * Registering a handoff from those instances told `<PlaceOrderButton>` that a
+   * gateway would collect the payment on an order paying by bank transfer. It
+   * called `submit()`, got `incomplete` back from an instance that has no
+   * Drop-in, and returned without placing anything, in silence. An end-to-end
+   * test that had passed for weeks caught it; nothing here did.
+   */
+  it("does not register while another setting is the one selected", async () => {
+    renderAdyen(
+      order({
+        available_payment_settings: [MANUAL, ADYEN_SETTING],
+        payment_sessions: [MANUAL_SESSION],
+      })
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId("radio").length).toBeGreaterThan(0)
+    })
+    expect(getHandoffSnapshot("order-1").submit).toBeNull()
+    expect(adyen.dropinMount).not.toHaveBeenCalled()
+  })
+
+  it("gives the handoff up when the shopper switches away", async () => {
+    const { rerender } = renderAdyen(order({ available_payment_settings: [MANUAL, ADYEN_SETTING] }))
+    await waitFor(() => {
+      expect(getHandoffSnapshot("order-1").submit).not.toBeNull()
+    })
+
+    rerender(
+      <Wrapper
+        currentOrder={order({
+          available_payment_settings: [MANUAL, ADYEN_SETTING],
+          payment_sessions: [MANUAL_SESSION],
+        })}
+      >
+        <PaymentSetting>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingAdyenPayment containerClassName="dropin" />
+        </PaymentSetting>
+      </Wrapper>
+    )
+
+    await waitFor(() => {
+      expect(getHandoffSnapshot("order-1").submit).toBeNull()
+    })
+  })
+})
+
 describe("what this component does NOT do on a refusal", () => {
   it("leaves replacing the burnt Payment Session to the place-order button", async () => {
     // Not an oversight. The button also decides whether the gift cards are

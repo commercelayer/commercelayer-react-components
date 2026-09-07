@@ -213,39 +213,37 @@ describe("when the gateway does not complete", () => {
     expect(discardPaymentSessionMock).not.toHaveBeenCalled()
   })
 
-  it("refunds the gift cards it charged and burns the session on a refusal", async () => {
+  it("burns the session on a refusal and leaves the gift cards charged", async () => {
+    // Deliberately no rollback. A refused card is the ordinary failure of a
+    // checkout and the shopper tries another one — giving their credit back
+    // here destroys what the next attempt needs, and they cannot re-apply it
+    // while anything is authorized. Removing a card is theirs to ask for.
     authorizeGiftCardsMock.mockResolvedValue({ authorizedSessionIds: ["gc-1"], errors: [] })
     useFakeGateway({ status: "failed", code: "Refused" })
     renderButton()
 
     await clickPlace()
 
-    expect(refundGiftCardsMock).toHaveBeenCalledWith(
-      expect.objectContaining({ paymentSessionIds: ["gc-1"] })
-    )
+    expect(refundGiftCardsMock).not.toHaveBeenCalled()
     expect(discardPaymentSessionMock).toHaveBeenCalledWith(
       expect.objectContaining({ paymentSessionId: "session-adyen" })
     )
     expect(placeOrderMock).not.toHaveBeenCalled()
+    // `resource: "orders"` is load-bearing, not descriptive: `<Errors>` matches
+    // on it, so tagging this `payment_methods` — which reads better — hid the
+    // one message telling the shopper their card was refused.
     expect(setOrderErrors).toHaveBeenCalledWith([
-      expect.objectContaining({ message: "Refused", meta: { error: "Refused" } }),
+      expect.objectContaining({
+        resource: "orders",
+        message: "Refused",
+        meta: { error: "Refused" },
+      }),
     ])
   })
 
-  it("refunds only what this attempt charged", async () => {
-    // A card charged by an earlier timed-out attempt is not ours to give back.
-    authorizeGiftCardsMock.mockResolvedValue({ authorizedSessionIds: [], errors: [] })
-    useFakeGateway({ status: "failed", code: "Refused" })
-    renderButton()
-
-    await clickPlace()
-
-    expect(refundGiftCardsMock).not.toHaveBeenCalled()
-  })
-
-  it("touches nothing when the outcome is unknown", async () => {
-    // The payment may have gone through: refunding could take back money for a
-    // card that did charge, and the session is what the webhook settles against.
+  it("leaves even the burnt session alone when the outcome is unknown", async () => {
+    // The payment may have gone through, and the session is the record the
+    // gateway's webhook settles against — deleting it would orphan the charge.
     authorizeGiftCardsMock.mockResolvedValue({ authorizedSessionIds: ["gc-1"], errors: [] })
     useFakeGateway({ status: "unknown", code: "NETWORK_ERROR" })
     renderButton()
@@ -255,7 +253,7 @@ describe("when the gateway does not complete", () => {
     expect(refundGiftCardsMock).not.toHaveBeenCalled()
     expect(discardPaymentSessionMock).not.toHaveBeenCalled()
     expect(setOrderErrors).toHaveBeenCalledWith([
-      expect.objectContaining({ meta: { error: "NETWORK_ERROR" } }),
+      expect.objectContaining({ resource: "orders", meta: { error: "NETWORK_ERROR" } }),
     ])
   })
 })

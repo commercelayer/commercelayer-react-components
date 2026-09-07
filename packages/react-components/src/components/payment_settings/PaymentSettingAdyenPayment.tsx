@@ -5,7 +5,7 @@ import {
   type ICore,
   type OnChangeData,
 } from "@adyen/adyen-web/auto"
-import { readAdyenSession } from "@commercelayer/core-components"
+import { ADYEN_SETTING_TYPE, readAdyenSession } from "@commercelayer/core-components"
 import type { PaymentSetting } from "@commercelayer/sdk"
 import { type JSX, useContext, useEffect, useRef, useState } from "react"
 import Parent from "#components/utils/Parent"
@@ -128,10 +128,24 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
   const orderId = order?.id
   const adyenSessionId = adyen?.id
   const adyenSessionData = adyen?.sessionData
-  // The same condition the container is rendered under, so the two cannot
-  // disagree. Without it in the dependency list, flipping `readonly` back to
-  // false would leave the effect never re-run and the payment form never shown.
-  const shouldMount = isSelected === true && readonly !== true
+  const isAdyen = setting?.type === ADYEN_SETTING_TYPE
+  /**
+   * Whether this instance is the live Adyen form.
+   *
+   * Both the mount effect and the handoff registration hang off it, and they
+   * have to: `<PaymentSetting>` renders its children **once per available
+   * setting**, so this component is mounted inside every setting's card and
+   * returns `null` from all but one. Its effects still run. Registering a
+   * handoff from those instances made `<PlaceOrderButton>` believe a gateway
+   * would collect the payment on an order paying by bank transfer — it called
+   * `submit()`, got `incomplete` from an instance with no Drop-in, and returned
+   * without placing anything, silently. The Adyen tests passed through it only
+   * because the selected instance happened to register last.
+   *
+   * Keeping the mount on the same flag also means flipping `readonly` back to
+   * false re-runs the effect, instead of leaving the form permanently absent.
+   */
+  const shouldMount = isAdyen && isSelected === true && readonly !== true
 
   // Build the Drop-in, once per Adyen Session. A refused payment replaces the
   // Payment Session, which changes `adyenSessionId` and remounts everything —
@@ -248,11 +262,12 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
     orderId,
   ])
 
-  // Publish the handoff. Separate from the mount effect so the button has
-  // something to call as soon as this component exists, and so a remount for a
-  // new Adyen Session does not leave a gap where `submit` is null.
+  // Publish the handoff. Separate from the mount effect so a remount for a new
+  // Adyen Session does not leave a gap where `submit` is null — but gated on the
+  // same condition, so only the selected Adyen form ever claims to be able to
+  // collect a payment.
   useEffect(() => {
-    if (readonly === true) return
+    if (!shouldMount) return
     return registerPaymentGateway(orderId, async () => {
       const dropin = dropinRef.current
       if (dropin == null) return { status: "incomplete" }
@@ -275,7 +290,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
         setIsSubmitting(false)
       }
     })
-  }, [orderId, readonly])
+  }, [orderId, shouldMount])
 
   const parentProps = {
     ...props,
@@ -285,7 +300,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
     errors,
   }
 
-  if (setting?.type !== "payment_setting_adyens") return null
+  if (!isAdyen) return null
 
   // Nothing to mount on a recap: the card was collected by Adyen and this
   // component never held it.

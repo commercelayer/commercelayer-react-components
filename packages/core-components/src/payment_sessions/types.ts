@@ -42,6 +42,36 @@ export const PAYMENT_TAKEN_SESSION_STATUSES = [
 ] as const satisfies readonly KnownPaymentSessionStatus[]
 
 /**
+ * Session states in which the money is no longer with the merchant.
+ *
+ * `app/models/payment_session.rb:55-63` — the `refund` event goes to
+ * `partially_refunded` while a balance is left and to `refunded` once it is
+ * zero. `voided` is here for completeness; for gift cards it is unreachable,
+ * because that client hard-codes auto-capture and a void then fails by
+ * construction.
+ */
+export const MONEY_RETURNED_SESSION_STATUSES = [
+  "voided",
+  "refunded",
+  "partially_refunded",
+] as const satisfies readonly KnownPaymentSessionStatus[]
+
+/**
+ * True when this session's money has been given back.
+ *
+ * Read from `status` rather than from `payment_refunds`, and that is the whole
+ * point: the refunds relationship needs `payment_sessions.payment_refunds` in
+ * the order's `include`, which nothing registers — so a check on that array is
+ * dead code in any consumer, and a refunded card would go on counting toward
+ * the order's coverage. `status` is a plain attribute, always served.
+ */
+export function hasReturnedMoney(session: PaymentSession): boolean {
+  return MONEY_RETURNED_SESSION_STATUSES.includes(
+    session.status as (typeof MONEY_RETURNED_SESSION_STATUSES)[number]
+  )
+}
+
+/**
  * `app/models/payment_transaction.rb:22-31` — initial state is `pending`.
  * Shared by all four STI subclasses: payment authorizations, captures, voids
  * and refunds run the same machine.
@@ -138,6 +168,25 @@ export function hasLiveAuthorization(session: PaymentSession): boolean {
   return !TERMINAL_FAILURE_TRANSACTION_STATUSES.includes(
     status as (typeof TERMINAL_FAILURE_TRANSACTION_STATUSES)[number]
   )
+}
+
+/**
+ * True when this session is holding money that belongs to the merchant.
+ *
+ * The conjunction that matters, and the one whose absence caused a real bug:
+ * `hasLiveAuthorization` alone says only that an authorization exists and did
+ * not fail, and it stays true after a refund — the authorization keeps its
+ * `succeeded` status forever, because what changes is the *session*. So every
+ * question of the form "is this still paying for the order?" has to ask both,
+ * and asking one of them was enough to keep a refunded gift card counting
+ * toward coverage and to leave the gift card input hidden for good.
+ *
+ * Distinct from the questions that only need one half: whether a session may be
+ * deleted, whether it still needs authorizing, whether it is the shopper's
+ * current selection. Those are about the authorization, not about the money.
+ */
+export function holdsMoney(session: PaymentSession): boolean {
+  return hasLiveAuthorization(session) && !hasReturnedMoney(session)
 }
 
 /**

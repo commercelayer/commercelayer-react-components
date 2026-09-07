@@ -271,8 +271,9 @@ every result arrives by callback:
 - **`incomplete`** — the form is empty or invalid. `dropin.submit()` shows Adyen's own
   validation and settles nothing, so without this the caller would wait forever. Nothing to
   report: this is a stop, not a failure.
-- **`failed`** — a verdict, carrying Adyen's `resultCode`. No money moved, so a rollback is
-  safe.
+- **`failed`** — a verdict, carrying Adyen's `resultCode`. No money moved on the card, so the
+  burnt session can be deleted. Note that "a rollback would be safe" is not the same as "a
+  rollback is wanted": nothing is given back here, for the reasons below.
 - **`unknown`** — a network failure, an expired Adyen Session, an SDK error. Emerged while
   writing the code: `onError` and `onPaymentFailed` are different events, and collapsing them
   would have made the rollback unsafe. **The payment may have gone through**, so nothing is
@@ -300,11 +301,11 @@ pre-authorization copy on would authorize the same cards again and take the mone
 refetch is not a refresh for the screen's benefit; it is what makes that skip work. It also keeps the property that makes the
 flow forgiving — a gift card is removable for free right up to the point the shopper commits.
 
-The exposure it creates is real and it has a remedy: a refused card leaves gift cards
-charged, and the API grants exactly the refund needed to undo that (gift card sessions, order
-`pending`). Reversing the order would trade a **common** failure for a **rare** but
-**unrecoverable** one: a card charged for the remainder with the gift cards unpaid,
-`canAddGiftCard` already false, and no way out.
+The exposure it creates is real: a refused card leaves gift cards charged. What it is **not**
+is a reason to give them back automatically — see below, where trying that is what taught us
+otherwise. Reversing the charge order would be worse still, trading a **common** failure for a
+**rare** but **unrecoverable** one: a card charged for the remainder with the gift cards
+unpaid, `canAddGiftCard` already false, and no way out.
 
 ### A refused payment burns the Commerce Layer session
 
@@ -328,22 +329,53 @@ session living in the browser, which the lifecycle ADR has already turned down o
 **The delete belongs to `<PlaceOrderButton>`, not to the gateway component**, and the first
 implementation had it the other way round. Two reasons, both found by building it:
 
-1. The button also decides whether the gift cards are given back, and a refund changes what is
-   left to pay. A replacement created by the gateway component would be sized for the
-   pre-refund remainder.
-2. Re-selecting the setting to get a fresh session does not work from inside the failure
-   handler. `selectSetting` reuses before creating, and it reads the order held in context —
-   which still contains the session just deleted. It would adopt it, handing the shopper back
-   the same burnt Adyen Session.
+Re-selecting the setting to get a fresh session does not work from inside the gateway
+component's failure handler: `selectSetting` reuses before creating, and it reads the order
+held in context — which still contains the session just deleted. It would adopt it, handing the
+shopper back the same burnt Adyen Session.
 
 So the shopper re-picks the payment method after a refusal. That is one extra click, and it is
-also how they see that their gift cards came back and the amount changed.
+also the moment they see what the failed attempt left behind.
 
-**On the redirect path the gift cards are not refunded.** They were charged on a previous page
-load, and which of them *this* attempt authorized went with it — so giving them back could
-take money for a payment that is still settling. They stay applied and visible on the order,
-the stance `2026-08-20-gift-cards-as-payment-sessions.md` already takes for a timed-out place.
-The burnt session is still deleted.
+**The gift cards are not given back, on any path.** This replaced an automatic refund, and
+the reversal is the most important thing this ADR records — because the automatic version
+shipped, was exercised against a real 3DS failure, and was wrong.
+
+What it did: on a refusal the button refunded every gift card it had authorized in that
+attempt. The reasoning was that a refusal is a verdict, so the rollback is safe. It is safe,
+and it is still wrong, because **a refused card is not the end of a checkout — it is the
+ordinary middle of one.** The shopper tries another card. Taking their credit back at that
+moment destroys exactly what the next attempt needs, and they cannot simply re-apply it:
+`canAddGiftCard` is false while anything is authorized, and the codes would have to be typed
+again from a screen that no longer shows them.
+
+The observed run, on order `qkykhrppJk`: two gift cards worth $18 charged, the 3DS password
+failed, both refunded 28 seconds later, the shopper re-picked Adyen and succeeded on the second
+attempt — and ended with $53 on their card, no gift cards, and $18 outstanding on an order that
+would not accept a gift card any more. Every step behaved as designed.
+
+On the redirect path the automation could not even be attributed: the cards were charged on a
+previous page load, and which of them *this* attempt authorized went with it. So there was
+never going to be one rule for both paths.
+
+**The shopper gets a control instead.** `<PaymentSettingGiftCardRemoveButton>`
+now renders for a charged card and refunds it, where before it rendered nothing at all — see
+the reopening note in the gift card ADR. That is deliberately a control rather than more
+automation: on the redirect path the library genuinely cannot tell which cards this attempt
+charged, but the shopper knows they want their money back, and a control puts that judgement
+where the knowledge is. The rule is `giftCardRemoval` in `core-components`, which answers
+`discard`, `refund`, or nothing.
+
+Two limits are worth stating because they are not obvious from the control:
+
+- **A refund needs the order to be `pending`.** The grant names that status exactly, so after
+  placement there is nothing to offer — and that is precisely the timed-out place, where the
+  cards are charged and the shopper most wants them back. A storefront cannot give it to them.
+- **A card is not removable while its charge is settling.** Between the authorization and the
+  capture, the delete is refused (transactions attached) and the refund has no capture to point
+  at. It lasts seconds and resolves itself, so it reads the same as "cannot" rather than getting
+  a state of its own: a control that appears, fails, then works is worse than one that appears
+  a moment late.
 
 ### The redirect return is resumed headlessly, and the library places the order
 
@@ -538,10 +570,34 @@ Both are pre-existing, both live in the lines this work already touches.
 domain layer needed nothing for the first card gateway. That is the strongest evidence the
 place-order split was cut in the right place.
 
+**A refused card leaves the gift cards charged, and that is the intended state.** They are
+still applied, still counted, and still paying for the retry. If the shopper gives up instead,
+each card carries its own remove control, which refunds it — and a refund raises the remainder
+by itself, because the session lands on `refunded`.
+
 **A refused card costs the shopper their typed card details, and their payment-method
 selection.** Adyen's error screen unmounts the PCI secured-field iframes, so the form is empty
 on every route back — including "retry the same card" — and deleting the burnt Payment Session
 leaves the radio group with nothing selected.
+
+**Two derivations were asking half a question, and `holdsMoney` is the answer to the whole
+one.** `hasLiveAuthorization` says only that an authorization exists and did not fail — and it
+stays true after a refund, because a refund changes the *session*, not the authorization, which
+keeps `succeeded` forever. So `canAddGiftCard` went false for good once any card had been
+charged and given back, and `<PaymentSettingGiftCardInput>` renders on it: the shopper whose
+card had just been refunded could never apply another one. The remainder had the same flaw for
+method sessions. Both now ask `holdsMoney`, which is the two halves conjoined and named, so the
+next question of the form "is this still paying for the order?" has one thing to call.
+
+**`isLiveGiftCard` was checking a relationship nobody includes.** It hid a refunded gift card
+by reading `payment_refunds`, which needs `payment_sessions.payment_refunds` in the order's
+`include` — and nothing registers it, nor does `ResourceIncluded` permit it. So the check never
+fired against a real order: a refunded card went on being listed and on being deducted from the
+remainder, which would have shown a coverage the order did not have, sized the next session
+against the wrong amount, and kept the place-order button live on the strength of it. It now
+reads the session's `status`, a plain attribute that is always served. The spec that covered the
+old behaviour was green throughout, because its fixture described a state the API never sends;
+it is now a regression guard against reintroducing the array check.
 
 **Deleting the burnt session can surface an older one as the selection.**
 `findCurrentPaymentSession` takes the most recent live non-gift-card session, so a shopper who

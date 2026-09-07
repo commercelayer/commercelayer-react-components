@@ -207,10 +207,15 @@ function readResultCode(data: unknown): string | undefined {
   return typeof code === "string" && code !== "" ? code : undefined
 }
 
+/**
+ * `resource: "orders"` because `<PlaceOrderButton>` puts these into the order's
+ * error store, and `<Errors>` matches on `resource` — so any other tag makes the
+ * message invisible in the outlet consumers actually mount.
+ */
 function resumeError(code: string, message: string): BaseError {
   return {
     code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
-    resource: "payment_methods",
+    resource: "orders",
     message,
     meta: { error: code },
   }

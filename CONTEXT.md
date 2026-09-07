@@ -42,7 +42,7 @@ A Payment Session the library may adopt instead of creating a new one: same Paym
 _Avoid_: pending session, stale session, orphan session (the last one is what an abandoned session *becomes*)
 
 **Applied Gift Card**:
-A gift card the shopper has spent on an order — a Payment Session against a `payment_setting_gift_cards` setting. Additive rather than an alternative: an order carries zero or more of them *plus* at most one other session for the difference. Its `amount_cents` is what it covers **of this order**, capped by the server to whatever was still owed — never the card's balance, which a session does not carry at all. Removable for free until it is authorized; after that only a refund could return the money, and the balance is debited the instant the authorization succeeds.
+A gift card the shopper has spent on an order — a Payment Session against a `payment_setting_gift_cards` setting. Additive rather than an alternative: an order carries zero or more of them *plus* at most one other session for the difference. Its `amount_cents` is what it covers **of this order**, capped by the server to whatever was still owed — never the card's balance, which a session does not carry at all. Removable in one of two ways, and the shopper's gesture is the same for both: **discarded** for free while nothing has been charged, or **refunded** once it has — the balance is debited the instant the authorization succeeds, and a charged session cannot be deleted at all. A refund is only available while the order is still `pending`; after placement a storefront token has no grant for it, and the card cannot come off.
 _Avoid_: gift card discount (it is a payment, not a discount), gift card balance (a different number)
 
 **Remaining Amount**:

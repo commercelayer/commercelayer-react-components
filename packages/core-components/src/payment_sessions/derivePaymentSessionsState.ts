@@ -1,6 +1,12 @@
 import type { Order, PaymentSession } from "@commercelayer/sdk"
 import { findCurrentPaymentSession } from "./findCurrentPaymentSession"
-import { GIFT_CARD_SETTING_TYPE, hasLiveAuthorization, isGiftCardSession } from "./types"
+import {
+  GIFT_CARD_SETTING_TYPE,
+  hasLiveAuthorization,
+  hasReturnedMoney,
+  holdsMoney,
+  isGiftCardSession,
+} from "./types"
 
 export interface PaymentSessionsState {
   /**
@@ -64,10 +70,11 @@ export function derivePaymentSessionsState(order?: Order | null): PaymentSession
   const giftCardAmountCents = sumAmounts(giftCardSessions)
 
   // A method session reduces what is left only once it has taken money — an
-  // unauthorized one is just an intent. Gift cards count as soon as applied,
-  // which is the whole reason this derivation exists.
+  // unauthorized one is just an intent, and one that has given the money back
+  // is history. Gift cards count as soon as applied, which is the whole reason
+  // this derivation exists.
   const takenMethodAmountCents = sumAmounts(
-    sessions.filter((session) => !isGiftCardSession(session) && hasLiveAuthorization(session))
+    sessions.filter((session) => !isGiftCardSession(session) && holdsMoney(session))
   )
 
   const remainingAmountCents = Math.max(0, total - giftCardAmountCents - takenMethodAmountCents)
@@ -84,7 +91,14 @@ export function derivePaymentSessionsState(order?: Order | null): PaymentSession
     giftCardAmountCents,
     remainingAmountCents,
     isCovered,
-    canAddGiftCard: remainingAmountCents > 0 && !sessions.some(hasLiveAuthorization),
+    // Nothing more may be applied once money has been taken: settling a
+    // partially-paid order is a flow this iteration does not implement.
+    //
+    // `holdsMoney` and not `hasLiveAuthorization`: a refunded session keeps its
+    // `succeeded` authorization, so the narrower test left this false for good
+    // once any card had been charged and given back — and the gift card input,
+    // which renders on this, never came back for the shopper who needed it most.
+    canAddGiftCard: remainingAmountCents > 0 && !sessions.some(holdsMoney),
     currentPaymentSession: findCurrentPaymentSession({ paymentSessions: sessions }),
     giftCardSettingId: (order?.available_payment_settings ?? []).find(
       (setting) => setting.type === GIFT_CARD_SETTING_TYPE
@@ -95,13 +109,29 @@ export function derivePaymentSessionsState(order?: Order | null): PaymentSession
 /**
  * A gift card session still worth showing: nothing failed and nothing was given
  * back. A refunded one is history, not an applied card.
+ *
+ * The "given back" half is read from the session's `status`, **not** from
+ * `payment_refunds`. That relationship needs
+ * `payment_sessions.payment_refunds` in the order's `include` and nothing
+ * registers it — so a check on the array never fires, and a card whose money
+ * had been returned would go on being listed and on being deducted from the
+ * remainder. The order would then show a coverage it does not have, size a new
+ * session against the wrong amount, and keep the place-order button live on the
+ * strength of it.
+ *
+ * A refund that is still `pending` deliberately leaves the card listed: the
+ * money has not moved yet, and the session only reaches `refunded` when it has.
+ * Hiding it earlier would raise the remainder while the balance is still spent.
  */
 function isLiveGiftCard(session: PaymentSession): boolean {
-  if ((session.payment_refunds ?? []).length > 0) return false
+  if (hasReturnedMoney(session)) return false
   const status = session.payment_authorization?.status
   if (status == null) return true
   return hasLiveAuthorization(session)
 }
+
+// `holdsMoney` is the pair of these two asked together; see its note in
+// `types.ts` for why asking only the first is a bug and not a shortcut.
 
 function sumAmounts(sessions: PaymentSession[]): number {
   return sessions.reduce((total, session) => total + (session.amount_cents ?? 0), 0)

@@ -149,6 +149,18 @@ token cannot clear the transactions, and only a refund would return the balance 
 iteration does not implement. Its remove control is therefore not rendered at all, rather
 than rendered and failing.
 
+> **Reopened** by `2026-09-02-adyen-payment-setting.md`. The premise above — "only a refund
+> would return the balance, which this iteration does not implement" — is no longer true: the
+> Adyen work implements the refund, because a card refused after the gift cards were charged
+> needs one. So a charged gift card *can* now come off the order, by refunding rather than
+> deleting, and the control is rendered for it.
+>
+> Everything else in this section stands. Deleting a charged session is still not an option
+> the API offers, so the refunded session is left in place; it lands on `refunded`, and that
+> status is what drops it out of the applied list. And the new control is narrower than it
+> looks: a storefront token may only refund a gift card while the order is still `pending`, so
+> on a placed order there is nothing to offer and the control disappears again.
+
 ### Place: gift cards first, stop at the first failure
 
 `placeOrderWithPaymentSessions` takes the order and authorizes the gift cards in sequence,

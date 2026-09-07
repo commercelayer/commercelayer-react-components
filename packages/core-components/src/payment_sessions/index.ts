@@ -10,6 +10,8 @@ export { findCurrentPaymentSession } from "./findCurrentPaymentSession"
 export { findReusablePaymentSession } from "./findReusablePaymentSession"
 export type { PaymentsModel } from "./getPaymentsModel"
 export { getPaymentsModel } from "./getPaymentsModel"
+export type { GiftCardRemoval } from "./giftCardRemoval"
+export { giftCardRemoval } from "./giftCardRemoval"
 export { invalidateCurrentPaymentSession } from "./invalidateCurrentPaymentSession"
 export { mapGiftCardErrors } from "./mapGiftCardErrors"
 export { mapPlaceabilityErrors } from "./mapPlaceabilityErrors"
@@ -42,8 +44,11 @@ export {
   hasAuthorizationInFlight,
   hasFailedAuthorization,
   hasLiveAuthorization,
+  hasReturnedMoney,
+  holdsMoney,
   isAdyenSession,
   isGiftCardSession,
+  MONEY_RETURNED_SESSION_STATUSES,
   PAYMENT_TAKEN_SESSION_STATUSES,
   readAdyenSession,
   TERMINAL_FAILURE_TRANSACTION_STATUSES,
