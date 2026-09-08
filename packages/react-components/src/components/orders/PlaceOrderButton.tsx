@@ -37,8 +37,7 @@ interface Props extends Omit<JSX.IntrinsicElements["button"], "children" | "onCl
  * This component exists so that the split is invisible to consumers: an
  * application already mounting `<PlaceOrderButton>` keeps working unchanged,
  * whichever model its orders are on. The two implementations behind it share
- * almost nothing — see
- * `docs/adr/2026-08-18-place-order-split-by-payments-model.md`.
+ * almost nothing.
  *
  * Mount `<PlaceOrderButtonPaymentSource>` or
  * `<PlaceOrderButtonPaymentSessions>` directly to skip the routing when an

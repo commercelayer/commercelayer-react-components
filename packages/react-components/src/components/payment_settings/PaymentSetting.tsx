@@ -1,8 +1,10 @@
 import {
   createPaymentSession,
+  discardPaymentSession,
   findCurrentPaymentSession,
   findReusablePaymentSession,
   GIFT_CARD_SETTING_TYPE,
+  hasLiveAuthorization,
 } from "@commercelayer/core-components"
 import type {
   Order,
@@ -30,8 +32,7 @@ import {
  * button for a setting with no implementation behind it does nothing when
  * clicked, which is worse for the shopper than not offering it.
  *
- * The goal is to cover all six. See the implementation table in
- * `docs/adr/2026-08-18-payment-session-lifecycle.md`.
+ * The goal is to cover all six.
  */
 const IMPLEMENTED_SETTING_TYPES = ["payment_setting_manuals", "payment_setting_adyens"] as const
 
@@ -200,6 +201,12 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
       // refetch that re-runs the click handler would leave another session
       // behind. Reuse is also what makes a page refresh resume the selection
       // instead of duplicating it.
+      // Read before anything changes: whatever the shopper is switching *away*
+      // from, so it can be cleared once the new selection is in place.
+      const superseded = findCurrentPaymentSession({
+        paymentSessions: order.payment_sessions,
+      })
+
       const reusable = findReusablePaymentSession({
         paymentSessions: order.payment_sessions,
         paymentSettingId: setting.id,
@@ -220,6 +227,42 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
           ...paymentSettingCreateAttributes({ setting, accessToken }),
         })
       }
+      // Clear the session the shopper just left, so the order carries one
+      // selection rather than a trail of every setting they tried.
+      //
+      // **After** the new one exists, never before: the selection is the newest
+      // session, so creating first means it is already correct when this runs,
+      // and a delete that fails leaves a state the library handles rather than
+      // an order with nothing selected. Failures are swallowed for the same
+      // reason — `findCurrentPaymentSession` picks the newest either way, so
+      // this is tidying, not correctness.
+      //
+      // Skipped when the session was adopted rather than created: there is
+      // nothing to supersede, and deleting it would delete the selection.
+      // Skipped too for anything holding money — a gift card is never the
+      // current selection, and one carrying a live authorization is not ours to
+      // undo here. The rule throughout is that sessions which took no money
+      // are deleted and everything else is abandoned.
+      if (
+        superseded != null &&
+        superseded.payment_setting?.id !== setting.id &&
+        !hasLiveAuthorization(superseded)
+      ) {
+        // Its own try: `discardPaymentSession` swallows its failures already,
+        // but a rejection escaping here would land in the catch below and turn
+        // a selection that in fact succeeded into a reported error — and skip
+        // the refetch that makes it visible.
+        try {
+          await discardPaymentSession({
+            accessToken,
+            interceptors,
+            paymentSessionId: superseded.id,
+          })
+        } catch {
+          // Nothing to report: the newest session is the selection regardless.
+        }
+      }
+
       const refreshed = await getOrder(order.id)
       onSelect?.({
         setting,

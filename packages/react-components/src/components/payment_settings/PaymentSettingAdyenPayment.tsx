@@ -54,15 +54,32 @@ export type AdyenEnvironment =
  * empty accordion panel, because `showPayButton: false` deletes its component
  * outright rather than hiding a button.
  */
-export type AdyenPaymentMethod = "card" | "paypal" | "google_pay"
+export type AdyenPaymentMethod = "card" | "paypal" | "google_pay" | "apple_pay"
 
 /** Our names to Adyen's, for `allowPaymentMethods`. */
 const ADYEN_TX_VARIANTS: Record<AdyenPaymentMethod, string> = {
   card: "scheme",
   paypal: "paypal",
   google_pay: "googlepay",
+  apple_pay: "applepay",
 }
 
+/**
+ * What a consumer gets without asking — every method but Apple Pay.
+ *
+ * Apple Pay is the one exception to "offer everything that has been built", and
+ * for a property no other method has: being offered is not evidence it can
+ * work. Cards, PayPal and Google Pay either work or filter themselves out —
+ * `isReadyToPay()`, funding eligibility, `isAvailable()`. Apple Pay's
+ * availability check only asks whether the browser and device can pay at all;
+ * whether *this domain* is registered for Apple Pay on the merchant account is
+ * settled later, at merchant validation, after the shopper has tapped. On an
+ * unregistered domain the button therefore renders and then fails.
+ *
+ * That registration is out-of-band — Adyen's Management API `addApplePayDomains`
+ * plus a `.well-known` file served publicly — and nothing here can detect it.
+ * So it is opt-in: a consumer asks for `"apple_pay"` once they have done it.
+ */
 const ALL_METHODS: AdyenPaymentMethod[] = ["card", "paypal", "google_pay"]
 
 /**
@@ -77,9 +94,14 @@ const ALL_METHODS: AdyenPaymentMethod[] = ["card", "paypal", "google_pay"]
  *
  * So "renders its own button" and "owns the click" are still different
  * questions, and for the wallets the answer to the second is the gesture, not
- * the API. Apple Pay will land here too for the same reason.
+ * the API. Apple Pay is here for exactly Google Pay's reason: `submit` calls
+ * `startSession()`, and `session.begin()` waits on the click resolving.
  */
-const OWNS_ITS_BUTTON = new Set<string>([ADYEN_TX_VARIANTS.paypal, ADYEN_TX_VARIANTS.google_pay])
+const OWNS_ITS_BUTTON = new Set<string>([
+  ADYEN_TX_VARIANTS.paypal,
+  ADYEN_TX_VARIANTS.google_pay,
+  ADYEN_TX_VARIANTS.apple_pay,
+])
 
 /**
  * PayPal's own callback signatures, which Adyen forwards verbatim into
@@ -100,27 +122,57 @@ interface PayPalOnInitActions {
 }
 
 /**
- * Google Pay's `onAuthorized` actions.
+ * A wallet's `onAuthorized` actions — Apple Pay's and Google Pay's alike.
  *
- * The hook fires once the shopper has chosen a card in Google's sheet and
- * **before** `/payments` is called — `handleAuthorization().then(makePaymentsCall)`
- * — so it is where money can still be stopped after the sheet has opened.
+ * The hook fires once the shopper has chosen a card in the wallet's own sheet
+ * and **before** `/payments` is called: both components run
+ * `handleAuthorization().then(makePaymentsCall)`. So it is where money can
+ * still be stopped after the sheet has opened, and the only such place.
  *
- * Rejecting hands Google a `PaymentDataError`: a string is shown verbatim in
- * its own sheet, which stays open for another attempt. Nothing is charged.
+ * What a rejection is *made of* is the one thing that differs. Google takes a
+ * `PaymentDataError` and shows a plain string verbatim; Apple takes an
+ * `ApplePayError`, a Safari global, and a bare string is not one. Hence
+ * `unknown` here and a per-method constructor at the call site. Neither
+ * charges anything, and both keep their sheet open for another attempt.
  */
-interface GooglePayOnAuthorizedActions {
+interface WalletOnAuthorizedActions<TError> {
   resolve: () => void
-  reject: (error?: string) => void
+  reject: (error?: TError) => void
 }
 
 /**
- * Google Pay's `onClick`, which takes its callbacks positionally rather than
- * as an actions object — `new Promise((resolve, reject) => onClick(resolve, reject))`.
- * Adyen types it `(resolve, reject) => void`; nothing to cast, but it is not
- * PayPal's shape and the two must not be written as if they were.
+ * A wallet's `onClick`, which takes its callbacks **positionally** rather than
+ * as an actions object — `new Promise((resolve, reject) => onClick(resolve, reject))`
+ * in both components, with `session.begin()` / `loadPaymentData()` waiting on
+ * it. Not PayPal's shape, and the two must not be written as if they were.
  */
-type GooglePayOnClick = (resolve: () => void, reject: () => void) => void
+type WalletOnClick = (resolve: () => void, reject: () => void) => void
+
+/**
+ * Apple's error type, if we are in a browser that has one.
+ *
+ * Safari-only and absent from the DOM lib, so it is looked up rather than
+ * imported. Looked up **when needed** and not at module load: a module-scope
+ * read would fix the answer before hydration, and would make the global
+ * untestable without a load-order trick.
+ */
+function applePayErrorCtor():
+  | (new (
+      code: string,
+      contactField?: string,
+      message?: string
+    ) => ApplePayJS.ApplePayError)
+  | undefined {
+  return (
+    globalThis as {
+      ApplePayError?: new (
+        code: string,
+        contactField?: string,
+        message?: string
+      ) => ApplePayJS.ApplePayError
+    }
+  ).ApplePayError
+}
 
 export interface PaymentSettingAdyenPaymentChildrenProps {
   /** Whether the Drop-in has a valid payment method ready to submit. */
@@ -170,11 +222,15 @@ interface Props {
    */
   locale?: string
   /**
-   * Which of the designed methods to offer. Defaults to all of them.
+   * Which of the designed methods to offer. Defaults to every one whose being
+   * offered is evidence it can work — today cards, PayPal and Google Pay.
    *
-   * Narrowing only — a merchant who does not want PayPal can turn it off
+   * Narrowing, mostly: a merchant who does not want PayPal can turn it off
    * without waiting for a release, and cannot turn on a method nobody has
-   * designed for.
+   * designed for. **`"apple_pay"` is the exception and must be asked for**,
+   * because its button renders wherever the device can pay and only fails
+   * later, at merchant validation, if this exact domain is not registered for
+   * Apple Pay on the Adyen merchant account. Pass it once that is done.
    */
   paymentMethods?: AdyenPaymentMethod[]
   /** Class on the element the Drop-in mounts into. */
@@ -200,8 +256,8 @@ interface Props {
  * For a **card**, `showPayButton: false` on the `Core` leaves the form inert and
  * `<PlaceOrderButton>` calls `submit()` through the Payment Gateway Handoff. So
  * the gate sits in front of our click — and owning that click is also what lets
- * the gift cards be authorized *before* the card, keeping the charge order the
- * gift card ADR established.
+ * the gift cards be authorized *before* the card, which a refused payment must
+ * never leave inverted.
  *
  * For **PayPal**, none of that is available: `submit` throws by design, because
  * the popup needs a real user gesture on their branded button. `showPayButton`
@@ -297,6 +353,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
   const allowedMethodsKey = allowedMethods.map((method) => ADYEN_TX_VARIANTS[method]).join(",")
   const offersPayPal = allowedMethods.includes("paypal")
   const offersGooglePay = allowedMethods.includes("google_pay")
+  const offersApplePay = allowedMethods.includes("apple_pay")
 
   const ownsItsButton = activeMethod != null && OWNS_ITS_BUTTON.has(activeMethod)
   const activeMethodRef = useRef<string | undefined>(undefined)
@@ -476,51 +533,11 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
             activeMethodRef.current = type
             setActiveMethod(type)
           },
-          ...(offersPayPal || offersGooglePay
+          ...(offersPayPal || offersGooglePay || offersApplePay
             ? {
                 paymentMethodsConfiguration: {
-                  ...(offersGooglePay
-                    ? {
-                        googlepay: {
-                          /** Same reason as PayPal's: the Core keeps `false`. */
-                          showPayButton: true,
-                          /**
-                           * The gate, and **only** the gate.
-                           *
-                           * Synchronous on purpose: whatever resolves this runs
-                           * before `loadPaymentData()`, and Google requires that
-                           * inside the click's user gesture. An `await` here is
-                           * a race we would lose intermittently — the worst kind
-                           * — so the gift cards go to `onAuthorized` instead.
-                           *
-                           * Google's button also has no enable/disable actions,
-                           * unlike PayPal's, so this message is the only thing
-                           * standing between a shopper and a control that
-                           * appears to do nothing.
-                           */
-                          onClick: ((resolve, reject) => {
-                            selfAbortedRef.current = false
-                            if (!latestRef.current.collectionPermitted) {
-                              setErrors([
-                                {
-                                  code: "VALIDATION_ERROR",
-                                  resource: "payment_methods",
-                                  message: "Accept the terms and conditions to continue.",
-                                  meta: { error: "TermsNotAccepted" },
-                                },
-                              ])
-                              reject()
-                              return
-                            }
-                            setErrors([])
-                            resolve()
-                          }) satisfies GooglePayOnClick,
-                          onAuthorized: (_data: unknown, actions: GooglePayOnAuthorizedActions) => {
-                            void onGooglePayAuthorized(actions)
-                          },
-                        },
-                      }
-                    : {}),
+                  ...(offersApplePay ? { applepay: walletConfiguration(appleError) } : {}),
+                  ...(offersGooglePay ? { googlepay: walletConfiguration(plainError) } : {}),
                   ...(offersPayPal
                     ? {
                         paypal: {
@@ -587,7 +604,86 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
      * `Promise<void> | void`, so the SDK waits for it.
      */
     /**
-     * The gift cards, on Google Pay's authorization.
+     * Google takes a plain string and shows it verbatim — its `reject` is
+     * typed `(error?: PaymentDataError | string) => void`.
+     */
+    function plainError(message: string): string {
+      return message
+    }
+
+    /**
+     * Apple takes an `ApplePayError`, and a string is not one — passed a
+     * string, `completePayment` shows its own generic failure instead. `unknown`
+     * is the only code that is not about a contact field.
+     *
+     * Whether Safari renders our message or its own wording for that code is
+     * not something the DOM contract promises, so this is written to be
+     * *correct* rather than to guarantee the copy, and the string is the
+     * fallback for a browser without the global.
+     */
+    function appleError(message: string): ApplePayJS.ApplePayError | undefined {
+      // `undefined` and not the string: `reject` is typed for an `ApplePayError`
+      // and nothing else, and a browser with no such global never rendered an
+      // Apple Pay button in the first place — so this branch is unreachable
+      // rather than a degraded one.
+      const Ctor = applePayErrorCtor()
+      return Ctor != null ? new Ctor("unknown", undefined, message) : undefined
+    }
+
+    /**
+     * Everything a wallet is configured with. Apple Pay and Google Pay share
+     * all of it but the type a rejection has to be dressed in.
+     *
+     * That they share it is the finding, not a convenience: both re-enable
+     * their own button on the Drop-in, both take a positional `onClick` whose
+     * resolution opens their sheet inside the click's gesture, and both run
+     * `onAuthorized` before `/payments`. Apple Pay was implemented by calling
+     * this function a second time.
+     */
+    function walletConfiguration<TError>(makeError: (message: string) => TError) {
+      return {
+        /** Same reason as PayPal's: the Core keeps `false` for the card. */
+        showPayButton: true,
+        /**
+         * The gate, and **only** the gate.
+         *
+         * Synchronous on purpose: whatever resolves this runs immediately
+         * before `session.begin()` / `loadPaymentData()`, which both wallets
+         * require inside the click's user gesture. An `await` here is a race we
+         * would lose intermittently — the worst kind — so the gift cards go to
+         * `onAuthorized` instead.
+         *
+         * Neither wallet's button has enable/disable actions, unlike PayPal's,
+         * so this message is the only thing standing between a shopper and a
+         * control that appears to do nothing. Both SDKs swallow the rejection
+         * itself: `.catch(() => ({}))` in Apple Pay, `.catch(() => {})` in
+         * Google Pay.
+         */
+        onClick: ((resolve, reject) => {
+          selfAbortedRef.current = false
+          if (!latestRef.current.collectionPermitted) {
+            setErrors([
+              {
+                code: "VALIDATION_ERROR",
+                resource: "payment_methods",
+                message: "Accept the terms and conditions to continue.",
+                meta: { error: "TermsNotAccepted" },
+              },
+            ])
+            reject()
+            return
+          }
+          setErrors([])
+          resolve()
+        }) satisfies WalletOnClick,
+        onAuthorized: (_data: unknown, actions: WalletOnAuthorizedActions<TError>) => {
+          void onWalletAuthorized(actions, makeError)
+        },
+      }
+    }
+
+    /**
+     * The gift cards, on a wallet's authorization.
      *
      * Not on the click, where PayPal's are: `loadPaymentData()` runs as soon as
      * the click resolves and Google requires it inside the gesture, so a round
@@ -600,7 +696,10 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
      * Google renders the message inside its own sheet and keeps it open, so a
      * gift card that cannot be charged does not cost them the wallet flow.
      */
-    async function onGooglePayAuthorized(actions: GooglePayOnAuthorizedActions): Promise<void> {
+    async function onWalletAuthorized<TError>(
+      actions: WalletOnAuthorizedActions<TError>,
+      makeError: (message: string) => TError
+    ): Promise<void> {
       const {
         order: currentOrder,
         accessToken: token,
@@ -610,7 +709,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
 
       if (currentOrder == null || token == null) {
         selfAbortedRef.current = true
-        actions.reject("The payment could not be started.")
+        actions.reject(makeError("The payment could not be started."))
         return
       }
 
@@ -631,9 +730,9 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
             }))
           )
           selfAbortedRef.current = true
-          // The first message goes into Google's sheet; the rest are on our own
-          // errors, where an application renders them in full.
-          actions.reject(authorized.errors[0]?.message)
+          // The first message goes into the wallet's own sheet; the rest are on
+          // our errors, where an application renders them in full.
+          actions.reject(makeError(authorized.errors[0]?.message ?? "A gift card was refused."))
           return
         }
         if (authorized.authorizedSessionIds.length > 0) await refetch(currentOrder.id)
@@ -647,7 +746,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
           },
         ])
         selfAbortedRef.current = true
-        actions.reject("The gift cards could not be charged.")
+        actions.reject(makeError("The gift cards could not be charged."))
         return
       }
 
@@ -747,6 +846,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
     allowedMethodsKey,
     offersPayPal,
     offersGooglePay,
+    offersApplePay,
   ])
 
   // Terms accepted — or un-accepted — after PayPal's buttons rendered. `onInit`

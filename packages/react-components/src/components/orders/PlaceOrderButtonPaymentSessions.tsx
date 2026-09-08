@@ -192,8 +192,8 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
    * The click path: authorize the gift cards, ask the gateway to collect, place.
    *
    * The gift cards go **first**, before the gateway is asked for anything. That
-   * is the charge order `2026-08-20-gift-cards-as-payment-sessions.md`
-   * established, and owning the submit is the only reason it can be kept here:
+   * is the charge order the whole design depends on, and owning the submit is
+   * the only reason it can be kept here:
    * the money leaves a card the moment the Drop-in is submitted, so leaving the
    * gift cards to `placeOrderWithPaymentSessions` — which runs afterwards —
    * would charge them second.

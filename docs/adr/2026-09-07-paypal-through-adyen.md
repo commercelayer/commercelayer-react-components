@@ -494,13 +494,13 @@ refund happened, and `require_action` transitions only `from: :pending`, which P
 
 ### Payment method status, inside `payment_setting_adyens`
 
-| Method     | adyen-web type | Status                                                                              |
-| ---------- | -------------- | ----------------------------------------------------------------------------------- |
-| Card       | `scheme`       | ✅ implemented — `2026-09-02-adyen-payment-setting.md`                              |
-| PayPal     | `paypal`       | 🟡 built; the handoff verified end to end, the payment refused by Adyen — see below |
-| Apple Pay  | `applepay`     | ⬜ deferred — needs HTTPS and Safari, so **unverifiable** in this stack             |
-| Google Pay | `googlepay`    | ✅ implemented — `2026-09-07-google-pay-through-adyen.md`                           |
-| Klarna     | `klarna*`      | ⬜ blocked upstream — see ask 1, reshaped                                           |
+| Method     | adyen-web type | Status                                                                                                 |
+| ---------- | -------------- | ------------------------------------------------------------------------------------------------------ |
+| Card       | `scheme`       | ✅ implemented — `2026-09-02-adyen-payment-setting.md`                                                 |
+| PayPal     | `paypal`       | 🟡 built; the handoff verified end to end, the payment refused by Adyen — see below                    |
+| Apple Pay  | `applepay`     | ✅ implemented, opt-in — `2026-09-07-apple-pay-through-adyen.md`; verified by hand, no e2e is possible |
+| Google Pay | `googlepay`    | ✅ implemented — `2026-09-07-google-pay-through-adyen.md`                                              |
+| Klarna     | `klarna*`      | ⬜ blocked upstream — see ask 1, reshaped                                                              |
 
 ## What the first end-to-end run established (2026-09-07)
 

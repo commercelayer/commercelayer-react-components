@@ -32,8 +32,8 @@ export interface AuthorizeGiftCardSessionsResult {
  * settings with no gateway UI that is the right place. A card is different: the
  * money leaves when the shopper submits the Drop-in, which happens *before* the
  * place sequence runs — so leaving the gift cards to that sequence would charge
- * them after the card, inverting the order
- * `2026-08-20-gift-cards-as-payment-sessions.md` established.
+ * them after the card, inverting the order — and a refused card must never
+ * leave gift cards charged after it.
  *
  * Calling this first restores it, and costs nothing downstream:
  * `placeOrderWithPaymentSessions` skips any session that already carries a live

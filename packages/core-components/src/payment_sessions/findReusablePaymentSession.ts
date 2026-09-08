@@ -1,4 +1,5 @@
 import type { PaymentSession } from "@commercelayer/sdk"
+import { findCurrentPaymentSession } from "./findCurrentPaymentSession"
 import { TERMINAL_FAILURE_TRANSACTION_STATUSES } from "./types"
 
 interface FindReusablePaymentSessionParams {
@@ -44,7 +45,24 @@ export function findReusablePaymentSession({
   amountCents,
   now = new Date(),
 }: FindReusablePaymentSessionParams): PaymentSession | undefined {
-  return (paymentSessions ?? []).find((session) => {
+  // Only the session that **is** the current selection may be adopted.
+  //
+  // Not a narrowing for tidiness: adopting any other one is unobservable, and
+  // therefore a bug. The selection is defined as the newest non-gift-card
+  // session (see `findCurrentPaymentSession`), and adopting changes no
+  // timestamp — so reusing an older session leaves the radio group pointing
+  // where it already pointed, the click does nothing, and clicking again does
+  // nothing again. A shopper who picks Adyen, switches to bank transfer, then
+  // changes their mind can never get back: their first Adyen session is still
+  // adoptable, so no new one is created, so Adyen never becomes the newest.
+  //
+  // Both reasons reuse exists for are cases where the candidate *is* the
+  // selection — a remount and a page reload — so nothing is lost by requiring
+  // it, and switching back now creates a session that can actually be selected.
+  const candidate = findCurrentPaymentSession({ paymentSessions })
+  if (candidate == null) return undefined
+
+  return [candidate].find((session) => {
     if (session.payment_setting?.id !== paymentSettingId) return false
 
     // Only when both numbers are known: an order fetched without

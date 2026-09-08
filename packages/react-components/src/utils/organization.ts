@@ -14,9 +14,8 @@ export interface OrganizationConfig {
  *
  * The config is branding and a couple of URLs; it does not change within a page
  * load. Twelve call sites ask for it — several of them components that mount
- * more than once per order — and each was doing its own request. That is the
- * "fetched several times per page load" the place-order ADR names as the reason
- * a transient failure here is likelier than it looks.
+ * more than once per order — and each was doing its own request. Fetched that
+ * often, a transient failure here is likelier than it looks.
  *
  * **Only successes are kept.** A failure deletes its entry so the next caller
  * retries, because callers retrying independently is what made a blip

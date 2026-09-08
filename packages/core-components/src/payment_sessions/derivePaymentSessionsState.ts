@@ -41,7 +41,7 @@ export interface PaymentSessionsState {
    *
    * False once anything has been authorized: money is taken or in flight, and
    * settling a partially-paid order is a flow this iteration does not
-   * implement. See the place-order ADR.
+   * implement.
    */
   canAddGiftCard: boolean
   /** The non-gift-card session paying the difference, if the shopper picked one. */

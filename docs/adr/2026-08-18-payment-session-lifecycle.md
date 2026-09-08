@@ -21,7 +21,7 @@ public docs are wrong (see "Sources that are wrong", below).
 
 **`amount_cents` is optional on create, and an explicit value is silently capped.**
 `PaymentSessionCreate` requires only `payment_setting`. Omitting `amount_cents` makes the
-server default it to the order's *remaining* amount, not the total:
+server default it to the order's _remaining_ amount, not the total:
 
 ```ruby
 # app/models/payment_session.rb:181-189
@@ -54,7 +54,7 @@ PAYMENT_TAKEN_STATES = %w(authorized paid partially_paid).freeze
 ```
 
 The `payment_sessions` table has only `expires_at`, `created_at`, `updated_at` — there is
-no `authorized_at`/`paid_at`. Transaction resources are the opposite: they *do* carry one
+no `authorized_at`/`paid_at`. Transaction resources are the opposite: they _do_ carry one
 timestamp per state.
 
 **Transactions share one state machine across all four types.** `PaymentAuthorization`,
@@ -81,13 +81,13 @@ runs in a Sidekiq job (`Workers::PaymentTransaction`, queue `payments`) dispatch
 
 ### Creation: eager, on selection, with reuse
 
-Selecting a Payment Setting creates the Payment Session immediately. The selection *is* the
+Selecting a Payment Setting creates the Payment Session immediately. The selection _is_ the
 session — that is what makes it survive a reload.
 
 Create with **`payment_setting` and `order` only**. Never send `amount_cents`; let the
 server size the session against the remaining amount.
 
-> **Superseded in one place.** Gift cards after the first *do* send an explicit
+> **Superseded in one place.** Gift cards after the first _do_ send an explicit
 > `amount_cents`, because the server's remainder does not move until a session is
 > authorized and gift cards are authorized at place time — so it would size every card for
 > the whole order. See `2026-08-20-gift-cards-as-payment-sessions.md`. The rule above still
@@ -95,6 +95,7 @@ server size the session against the remaining amount.
 
 Before creating, **reuse** an existing session when all of these hold:
 
+- it **is the order's current selection** (see the correction below), **and**
 - its `payment_setting.id` matches the selected setting, **and**
 - `status === "unpaid"`, **and**
 - `expires_at` is absent or in the future, **and**
@@ -111,18 +112,59 @@ The session is always **searched for**, never read positionally. `payment_sessio
 wrong today for orders carrying a gift-card session and will be wrong for everyone once
 split payment is supported.
 
-**The selection is single per order, and it is the most recent live session.** This
-followed from the decision not to delete: switching setting leaves the previous session on
-the order, so a per-setting reading of "is this selected?" would light up every setting the
-shopper has ever tried at once — a radio group with several selections. Taking the newest
-keeps the group coherent without deleting anything a token may be refused.
+**The selection is single per order, and it is the most recent live session.** A per-setting
+reading of "is this selected?" would light up every setting the shopper has ever tried at
+once — a radio group with several selections. Taking the newest keeps the group coherent
+whatever else is on the order.
 
-Consequence for the reuse rule above: with only one setting implemented, the *adopt* branch
-is currently unreachable through the UI, because a reusable session already reads as
-selected and the radio ignores a click on the current selection. What is reachable, and
-covered by tests, is the retry path — a burnt session does not count as the selection, so
-clicking again creates a fresh one. The adopt branch is kept because it becomes live as
-soon as a second setting exists.
+> **Corrected (2026-09-08).** This paragraph used to justify itself with "the decision not
+> to delete", and switching setting genuinely left the previous session behind — which
+> contradicted the reformulated rule two sections down, _sessions that took no money are
+> deleted_. The contradiction was not academic: an order accumulated one session per
+> setting the shopper had ever tried, and it is how the reuse bug above was found in the
+> first place.
+>
+> Switching now deletes the session it supersedes, **after** the new one exists and best
+> effort, skipping anything holding money. The recency rule stays and is not redundant: it
+> is what makes the selection correct in the window before the delete, and if the delete is
+> refused. Deletion is tidying; recency is the invariant.
+>
+> The stated reason was wrong too. `discardPaymentSession` and
+> `invalidateCurrentPaymentSession` both delete `unpaid` sessions with a storefront token
+> and are covered by green end-to-end tests. What the API refuses is deleting a session with
+> **transactions attached** — which is why the guard is "took no money", not "is deletable".
+
+Consequence for the reuse rule above: with only one setting implemented, the _adopt_ branch
+is unreachable through the UI, because a reusable session already reads as selected and the
+radio ignores a click on the current selection. What is reachable, and covered by tests, is
+the retry path — a burnt session does not count as the selection, so clicking again creates
+a fresh one. The adopt branch is kept because it becomes live as soon as a second setting
+exists.
+
+### Correction (2026-09-08): only the current selection may be adopted
+
+The paragraph above ends one step too early. The adopt branch did become live as soon as a
+second setting existed, and it was **incompatible with the rule beside it**: the selection
+is the newest session, and adopting changes no timestamp.
+
+So a shopper who picked Adyen, switched to bank transfer, then changed their mind could
+never get back. Their first Adyen session was still unpaid, unexpired and the right size, so
+it was adopted, so nothing was created, so the newest session stayed the bank transfer one —
+and the radio never moved. Clicking again did the same thing again. Found on a real order
+carrying two unpaid sessions nine seconds apart, and it was not Adyen-specific: any
+`A → B → A` gets stuck on `B`.
+
+The fix is the first bullet added above: `findReusablePaymentSession` now adopts only the
+session that already **is** the selection. Nothing is lost, because both reasons reuse
+exists for — a remount and a page reload — are exactly the cases where the candidate is the
+selection. Switching back now creates a session that can be selected, at the cost of one
+more inert `unpaid` row, which this ADR already accepts as costing nothing.
+
+Worth naming the shape of the miss, because it is the kind this design invites: two rules
+were individually correct and unreachable together, and the ADR said so — it recorded that
+the branch was untestable through the UI and would "become live" later, without asking what
+it would collide with when it did. A branch that cannot be reached is a branch whose
+interaction with everything else has not been thought through.
 
 ### Sessions that took no money are deleted; everything else is abandoned
 
@@ -195,7 +237,7 @@ Reading the selection back requires `payment_sessions.payment_authorization` in 
 cannot be told apart from a burnt one.
 
 Because selection now round-trips to the API, the radio does not light up on click. A
-per-setting pending indicator is required, and it is *not* the selection.
+per-setting pending indicator is required, and it is _not_ the selection.
 
 An organization on the new model with only unimplemented settings configured gets a
 checkout with **no payment options and no explanation**. A development-only `console.warn`
@@ -203,7 +245,7 @@ fires whenever `<PaymentSetting>` skips a setting; it is not public API and shou
 removed once the table below is complete.
 
 `<PaymentSetting>` must stay mounted even when the order turns out to be on the older
-model. It registers the payment-session includes, and that has to happen *before* the order
+model. It registers the payment-session includes, and that has to happen _before_ the order
 is fetched: adding an include afterwards does not trigger a refetch, so a component mounted
 only once the model is known would never receive its data. Consumers that mount it
 conditionally will see an order whose `payment_sessions` never expand.
@@ -217,7 +259,7 @@ rather than two entries in one list. No `<PaymentSettingErrors>` was needed.
 
 **Auto-selecting a single setting is deliberately absent.** `<PaymentMethod>` offers
 `autoSelectSinglePaymentMethod` and the symmetric prop belongs here, but the obvious
-condition is a trap: `<PaymentSetting>` renders only the *implemented* settings, so "one
+condition is a trap: `<PaymentSetting>` renders only the _implemented_ settings, so "one
 entry rendered" is not "one option offered". An organization with five settings configured
 and one implemented would have its shoppers silently committed to bank transfer while the
 card options it pays for stay invisible — and that is the situation for every organization
@@ -280,5 +322,5 @@ Three official sources were found to contradict `core-api` during the design of 
    above.
 
 A fourth, for honesty: during this design `ensure_pending` was assumed from its name to
-require a pending order. It does the opposite — it *promotes* a draft order and returns
+require a pending order. It does the opposite — it _promotes_ a draft order and returns
 `true` for every other status (`app/models/order.rb:966-969`).

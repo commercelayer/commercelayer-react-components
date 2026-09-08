@@ -230,6 +230,19 @@ describe("<PaymentSettingAdyenPayment> mounting", () => {
     expect(adyen.captured.options.allowPaymentMethods).toEqual(["scheme", "paypal", "googlepay"])
   })
 
+  it("leaves Apple Pay out until it is asked for", async () => {
+    // The one method whose being offered is not evidence it can work: its
+    // button renders wherever the device can pay, and a domain that is not
+    // registered for Apple Pay fails later, at merchant validation, after the
+    // shopper has tapped. Nothing here can detect that, so it is opt-in.
+    renderAdyen()
+    await waitFor(() => {
+      expect(adyen.captured.options).not.toBeNull()
+    })
+    expect(adyen.captured.options.allowPaymentMethods).not.toContain("applepay")
+    expect(adyen.captured.dropinOptions.paymentMethodsConfiguration.applepay).toBeUndefined()
+  })
+
   it("lets an application narrow the list", async () => {
     render(
       <Wrapper currentOrder={order()}>
@@ -991,5 +1004,176 @@ describe("Google Pay, whose click cannot wait", () => {
     })
 
     expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("failed")
+  })
+})
+
+describe("Apple Pay, which is Google Pay's shape", () => {
+  /**
+   * Apple's error type, which only Safari defines.
+   *
+   * Stood up here because it is the one thing the two wallets do not share:
+   * Adyen types Apple Pay's `reject` for an `ApplePayError` and nothing else,
+   * so a bare string — which is exactly what Google Pay wants — is silently
+   * replaced by Apple's own generic wording.
+   */
+  class FakeApplePayError {
+    constructor(
+      readonly code: string,
+      readonly contactField: string | undefined,
+      readonly message: string | undefined
+    ) {}
+  }
+
+  beforeEach(() => {
+    ;(globalThis as { ApplePayError?: unknown }).ApplePayError = FakeApplePayError
+  })
+
+  afterEach(() => {
+    delete (globalThis as { ApplePayError?: unknown }).ApplePayError
+  })
+
+  /** Apple Pay is opt-in, so every test here asks for it. */
+  async function mounted(): Promise<void> {
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingAdyenPayment
+            paymentMethods={["card", "paypal", "google_pay", "apple_pay"]}
+            containerClassName="dropin"
+          />
+        </PaymentSetting>
+      </Wrapper>
+    )
+    await waitFor(() => {
+      expect(adyen.dropinMount).toHaveBeenCalled()
+    })
+  }
+
+  function applePayConfig() {
+    const config = adyen.captured.dropinOptions.paymentMethodsConfiguration?.applepay
+    if (config == null) throw new Error("Apple Pay was not configured on the Drop-in")
+    return config
+  }
+
+  it("is configured exactly as Google Pay is", async () => {
+    // The assertion is the sameness. Both wallets re-enable their own button,
+    // take a positional `onClick` whose resolution opens their sheet inside the
+    // gesture, and run `onAuthorized` before `/payments` — so they are built by
+    // one function called twice, and this says so.
+    await mounted()
+    const googlePay = adyen.captured.dropinOptions.paymentMethodsConfiguration.googlepay
+
+    expect(applePayConfig().showPayButton).toBe(true)
+    expect(Object.keys(applePayConfig()).sort()).toEqual(Object.keys(googlePay).sort())
+  })
+
+  it("takes collection when the shopper opens it", async () => {
+    await mounted()
+    await act(async () => {
+      adyen.captured.dropinOptions.onSelect({ type: "applepay" })
+    })
+    expect(getHandoffSnapshot("order-1").collection).toEqual({ by: "gateway" })
+  })
+
+  it("refuses the click before the sheet, when the terms are not accepted", async () => {
+    permitted.value = false
+    await mounted()
+
+    const resolve = vi.fn()
+    const reject = vi.fn()
+    await act(async () => {
+      applePayConfig().onClick(resolve, reject)
+    })
+
+    expect(reject).toHaveBeenCalled()
+    expect(resolve).not.toHaveBeenCalled()
+    // `session.begin()` waits on this, and Safari wants it inside the gesture.
+    expect(authorizeGiftCardsMock).not.toHaveBeenCalled()
+  })
+
+  it("charges the gift cards on the authorization", async () => {
+    authorizeGiftCardsMock.mockResolvedValue({ authorizedSessionIds: ["gc-1"], errors: [] })
+    await mounted()
+
+    const actions = { resolve: vi.fn(), reject: vi.fn() }
+    await act(async () => {
+      applePayConfig().onAuthorized({}, actions)
+    })
+
+    await waitFor(() => {
+      expect(actions.resolve).toHaveBeenCalled()
+    })
+    expect(authorizeGiftCardsMock).toHaveBeenCalledTimes(1)
+    expect(getOrder).toHaveBeenCalledWith("order-1")
+  })
+
+  it("dresses a refusal as an ApplePayError, which is the only thing Apple takes", async () => {
+    authorizeGiftCardsMock.mockResolvedValue({
+      authorizedSessionIds: [],
+      errors: [{ code: "VALIDATION_ERROR", message: "Gift card balance is insufficient." }],
+    })
+    await mounted()
+
+    const actions = { resolve: vi.fn(), reject: vi.fn() }
+    await act(async () => {
+      applePayConfig().onAuthorized({}, actions)
+    })
+
+    await waitFor(() => {
+      expect(actions.reject).toHaveBeenCalled()
+    })
+    const [error] = actions.reject.mock.calls[0] as [FakeApplePayError]
+    expect(error).toBeInstanceOf(FakeApplePayError)
+    expect(error.message).toBe("Gift card balance is insufficient.")
+    // `unknown` is the only code that is not about a contact field.
+    expect(error.code).toBe("unknown")
+  })
+
+  it("rejects with nothing at all where Apple's error type does not exist", async () => {
+    // Unreachable in practice — no `ApplePayError` global means no Apple Pay
+    // button was ever rendered — but `reject` is typed for that class alone, so
+    // the alternative would be handing Apple a string it discards.
+    delete (globalThis as { ApplePayError?: unknown }).ApplePayError
+    authorizeGiftCardsMock.mockResolvedValue({
+      authorizedSessionIds: [],
+      errors: [{ code: "VALIDATION_ERROR", message: "Gift card balance is insufficient." }],
+    })
+    await mounted()
+
+    const actions = { resolve: vi.fn(), reject: vi.fn() }
+    await act(async () => {
+      applePayConfig().onAuthorized({}, actions)
+    })
+
+    await waitFor(() => {
+      expect(actions.reject).toHaveBeenCalledWith(undefined)
+    })
+  })
+
+  it("does not burn the Adyen Session when the abort was its own", async () => {
+    authorizeGiftCardsMock.mockResolvedValue({
+      authorizedSessionIds: [],
+      errors: [{ code: "VALIDATION_ERROR", message: "Gift card balance is insufficient." }],
+    })
+    await mounted()
+    await act(async () => {
+      adyen.captured.dropinOptions.onSelect({ type: "applepay" })
+    })
+
+    const actions = { resolve: vi.fn(), reject: vi.fn() }
+    await act(async () => {
+      applePayConfig().onAuthorized({}, actions)
+    })
+    await waitFor(() => {
+      expect(actions.reject).toHaveBeenCalled()
+    })
+
+    await act(async () => {
+      adyen.captured.options.onPaymentFailed({ resultCode: "Refused" })
+    })
+
+    expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("no")
+    expect(discardPaymentSessionMock).not.toHaveBeenCalled()
   })
 })
