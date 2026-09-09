@@ -269,3 +269,32 @@ export function readAdyenSession(session?: PaymentSession | null): AdyenSession 
   if (typeof sessionData !== "string" || sessionData === "") return undefined
   return { id, sessionData }
 }
+
+export const STRIPE_SETTING_TYPE = "payment_setting_stripes"
+
+/** Whether this session belongs to a Stripe Payment Setting. */
+export function isStripeSession(session?: PaymentSession | null): boolean {
+  return session?.payment_setting?.type === STRIPE_SETTING_TYPE
+}
+
+/**
+ * The PaymentIntent client secret Stripe Elements is built from.
+ *
+ * `response_data` is the PaymentIntent as Commerce Layer received it, so the
+ * secret is there under its own name — `Payment::Session::Stripe#create` stores
+ * `intent.to_hash`. Only the secret is read: everything else about the intent
+ * belongs to Stripe's SDK, which fetches it itself from the secret.
+ *
+ * Returns `undefined` when it is absent or empty, for the same reasons as the
+ * Adyen reader above — a consumer whose `fields` allowlist omits
+ * `response_data`, or a session whose gateway call failed. Both are better
+ * reported as "no Stripe session" than as an Elements group that fails inside
+ * the SDK.
+ */
+export function readStripeClientSecret(session?: PaymentSession | null): string | undefined {
+  const data = session?.response_data
+  if (data == null || typeof data !== "object") return undefined
+  const { client_secret: clientSecret } = data as { client_secret?: unknown }
+  if (typeof clientSecret !== "string" || clientSecret === "") return undefined
+  return clientSecret
+}

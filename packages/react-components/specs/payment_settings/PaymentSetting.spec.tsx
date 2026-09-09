@@ -9,6 +9,7 @@ import { PaymentSettingName } from "#components/payment_settings/PaymentSettingN
 import { PaymentSettingRadioButton } from "#components/payment_settings/PaymentSettingRadioButton"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import { ADYEN_RETURN_URL_MAX_LENGTH } from "#utils/paymentSettingCreateAttributes"
 
 const { createPaymentSessionMock, discardPaymentSessionMock } = vi.hoisted(() => ({
   createPaymentSessionMock: vi.fn(),
@@ -508,6 +509,37 @@ describe("<PaymentSetting> returnUrl", () => {
         })
       )
     })
+  })
+
+  it("warns when the one it would send cannot be used", async () => {
+    // The failure it replaces named nothing an application had set: Adyen's
+    // "may not exceed 1024 characters", plus a collateral "token - can't be
+    // blank" from the session's own validation. The check sits here rather than
+    // in the URL builder so it also covers a URL the application supplied.
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    const long = `https://shop.example/o-1?accessToken=${"e".repeat(1200)}`
+    expect(long.length).toBeGreaterThan(ADYEN_RETURN_URL_MAX_LENGTH)
+
+    renderAdyenOnly(long)
+    await clickIt()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("over Adyen's limit"))
+    warn.mockRestore()
+  })
+
+  it("says nothing about one that fits", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    renderAdyenOnly("https://shop.example/o-1?paymentReturn=true")
+    await clickIt()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
   })
 
   it("falls back to the current location when the application says nothing", async () => {

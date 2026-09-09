@@ -1,7 +1,7 @@
 export { applyGiftCard } from "./applyGiftCard"
 export type { AuthorizeGiftCardSessionsResult } from "./authorizeGiftCardSessions"
 export { authorizeGiftCardSessions } from "./authorizeGiftCardSessions"
-export { ADYEN_RETURN_URL_MAX_LENGTH, buildAdyenReturnUrl } from "./buildAdyenReturnUrl"
+export { buildGatewayReturnUrl } from "./buildGatewayReturnUrl"
 export { createPaymentSession } from "./createPaymentSession"
 export type { PaymentSessionsState } from "./derivePaymentSessionsState"
 export { derivePaymentSessionsState } from "./derivePaymentSessionsState"
@@ -48,8 +48,11 @@ export {
   holdsMoney,
   isAdyenSession,
   isGiftCardSession,
+  isStripeSession,
   MONEY_RETURNED_SESSION_STATUSES,
   PAYMENT_TAKEN_SESSION_STATUSES,
   readAdyenSession,
+  readStripeClientSecret,
+  STRIPE_SETTING_TYPE,
   TERMINAL_FAILURE_TRANSACTION_STATUSES,
 } from "./types"

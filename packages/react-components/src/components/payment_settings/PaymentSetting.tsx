@@ -18,6 +18,7 @@ import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContex
 import { useAdyenRedirectResume } from "#hooks/useAdyenRedirectResume"
 import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
 import { usePaymentsModel } from "#hooks/usePaymentsModel"
+import { useStripeRedirectResume } from "#hooks/useStripeRedirectResume"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
 import {
@@ -34,7 +35,11 @@ import {
  *
  * The goal is to cover all six.
  */
-const IMPLEMENTED_SETTING_TYPES = ["payment_setting_manuals", "payment_setting_adyens"] as const
+const IMPLEMENTED_SETTING_TYPES = [
+  "payment_setting_manuals",
+  "payment_setting_adyens",
+  "payment_setting_stripes",
+] as const
 
 export interface PaymentSettingOnSelectParams {
   setting: PaymentSettingResource
@@ -157,13 +162,18 @@ export function PaymentSetting({
     }
   }, [include, includeLoaded, addResourceToInclude])
 
-  // Finishing a 3DS redirect needs no UI — `submitDetails` is a method on
-  // `adyen-web`'s core — so it runs from here, the one component the Payment
-  // Session lifecycle requires to stay mounted. Inside the gateway component it
-  // would depend on which checkout step the application happens to render, and
-  // an accordion that came back collapsed would leave a charged card on an
-  // unplaced order. Called before the bail-outs below, as a hook must be.
+  // Finishing a redirect needs no UI — Adyen's `submitDetails` and Stripe's
+  // `retrievePaymentIntent` are both plain calls — so it runs from here, the one
+  // component the Payment Session lifecycle requires to stay mounted. Inside a
+  // gateway component it would depend on which checkout step the application
+  // happens to render, and an accordion that came back collapsed would leave a
+  // charged card on an unplaced order.
+  //
+  // Both are called unconditionally, as hooks must be, and each does nothing
+  // unless its own gateway's return parameters are in the URL. They cannot both
+  // fire: a return carries one gateway's parameters.
   useAdyenRedirectResume()
+  useStripeRedirectResume()
 
   if (paymentsModel !== "payment_sessions" || order == null) return null
 
@@ -338,6 +348,7 @@ export function PaymentSetting({
                 isPending: pendingSettingId === setting.id,
                 errors,
                 readonly,
+                returnUrl,
                 selectSetting: select,
               }}
             >

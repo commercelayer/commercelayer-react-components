@@ -1,4 +1,8 @@
-import { ADYEN_SETTING_TYPE, buildAdyenReturnUrl } from "@commercelayer/core-components"
+import {
+  ADYEN_SETTING_TYPE,
+  buildGatewayReturnUrl,
+  STRIPE_SETTING_TYPE,
+} from "@commercelayer/core-components"
 import type { PaymentSetting } from "@commercelayer/sdk"
 import { isGuestToken } from "#utils/isGuestToken"
 
@@ -52,11 +56,7 @@ const BUILDERS: Record<string, Builder> = {
     // gateway version 72 Adyen refuses a `returnUrl` over 1024 characters, and
     // an access token alone can exceed that. Such an application passes
     // `returnUrl` and re-authenticates the return itself.
-    ...(returnUrl != null
-      ? { clientData: { return_url: returnUrl } }
-      : typeof window !== "undefined"
-        ? { clientData: { return_url: buildAdyenReturnUrl(window.location.href) } }
-        : {}),
+    ...adyenReturnUrl(returnUrl),
     // Makes the API inject `shopperReference`, `storePaymentMethodMode:
     // askForConsent` and `recurringProcessingModel: CardOnFile`, which is what
     // renders the Drop-in's own save-card checkbox and its saved cards.
@@ -82,6 +82,47 @@ export function paymentSettingCreateAttributes(
 }
 
 /**
+ * Adyen's own cap on `returnUrl`, from gateway version 72 onwards.
+ *
+ * Over the cap, Adyen refuses the session with `Field 'returnUrl' may not
+ * exceed 1024 characters`, which Commerce Layer relays alongside `token - can't
+ * be blank` — the token is assigned before the gateway call and not persisted
+ * when it fails, so the second error is collateral and the pair points at
+ * nothing an application recognises. A storefront whose credentials live in the
+ * query string blows past it on the JWT alone.
+ *
+ * Older versions do not validate it, and `payment_setting_adyens` defaults to
+ * the newest version it supports — so an existing setting can work for months
+ * and a newly created one fail immediately.
+ */
+export const ADYEN_RETURN_URL_MAX_LENGTH = 1024
+
+/**
+ * The `client_data.return_url` for an Adyen session, and a warning if it cannot
+ * be used.
+ *
+ * The check lives here rather than in the builder because this is where the
+ * value is about to be handed to Adyen — so it also covers a `returnUrl` the
+ * application supplied, which a check inside the builder would never see.
+ */
+function adyenReturnUrl(returnUrl?: string): PaymentSettingCreateAttributes {
+  const url =
+    returnUrl ??
+    (typeof window !== "undefined" ? buildGatewayReturnUrl(window.location.href) : undefined)
+  if (url == null) return {}
+
+  if (url.length > ADYEN_RETURN_URL_MAX_LENGTH && process.env.NODE_ENV !== "production") {
+    console.warn(
+      `[commercelayer] the Adyen return URL is ${url.length} characters, over Adyen's limit of ` +
+        `${ADYEN_RETURN_URL_MAX_LENGTH}. Creating the Payment Session will fail. Pass \`returnUrl\` ` +
+        "to <PaymentSetting> with a URL this application can reload — commonly the same one " +
+        "without its access token, re-authenticating the return from storage."
+    )
+  }
+  return { clientData: { return_url: url } }
+}
+
+/**
  * Why this setting cannot be offered, or `undefined` when it can.
  *
  * The string is a development-only warning, not copy: a setting that fails here
@@ -94,11 +135,11 @@ export function paymentSettingUnusableReason(setting: PaymentSetting): string | 
   // so a gateway an organization has switched off still arrives here.
   if (setting.disabled_at != null) return "the setting is disabled"
 
-  // `public_key` is optional and, unlike `api_key` or `merchant_account`, not
-  // validated for presence, so a setting that charges perfectly well
-  // server-side can carry none. Without it there is no Client Key and the
-  // Drop-in cannot boot.
-  if (setting.type === ADYEN_SETTING_TYPE) {
+  // `public_key` is optional and, unlike `api_key`, not validated for presence,
+  // so a setting that charges perfectly well server-side can carry none.
+  // Without it the browser has no publishable credential and neither Adyen's
+  // Drop-in nor Stripe's Elements can boot.
+  if (setting.type === ADYEN_SETTING_TYPE || setting.type === STRIPE_SETTING_TYPE) {
     const key = (setting as { public_key?: string | null }).public_key
     if (typeof key !== "string" || key === "") return "the setting has no public_key"
   }
