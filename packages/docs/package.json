@@ -18,7 +18,13 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.2.1",
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
     "@commercelayer/js-auth": "^8.0.0",
+    "@commercelayer/sdk": "https://pkg.pr.new/@commercelayer/sdk@c923f75",
+    "@mdx-js/react": "^3.1.1",
+    "@storybook/addon-actions": "^9.0.8",
+    "@storybook/addon-backgrounds": "^9.0.8",
     "@storybook/addon-docs": "^10.5.3",
     "@storybook/addon-links": "^10.5.3",
     "@storybook/addon-mcp": "^0.7.0",

@@ -126,6 +126,30 @@ export function useOrderState({
     }
   }, [attributes, state?.order, lock])
 
+  // Ask for `available_payment_settings` on every order fetch, for every
+  // consumer. This is what makes the Payments Model derivable: an order that
+  // was never asked for the relationship looks exactly like an order on the
+  // older model, and `usePaymentsModel` would silently pick the wrong branch.
+  //
+  // The cost — one relationship on carts that will never show a payment method
+  // — is accepted deliberately, because the alternative is making every
+  // consumer opt in to a correctness requirement they cannot see.
+  //
+  // Note `withoutIncludes` is *not* a consumer opt-out to respect here: it
+  // starts `true` and means "nothing has asked for an include yet".
+  // Registering one is what flips it, which `addResourceToInclude` does — along
+  // with marking the resource loaded, so the two-phase idiom the containers use
+  // is belt-and-braces and one call is enough.
+  useEffect(() => {
+    if (state.include?.includes("available_payment_settings")) return
+    defaultOrderContext.addResourceToInclude({
+      newResource: ["available_payment_settings"],
+      dispatch,
+      resourcesIncluded: state.include,
+      resourceIncludedLoaded: state.includeLoaded,
+    })
+  }, [state.include, state.includeLoaded])
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: complex dep array mirrors original OrderContainer — adding all deps causes fetch loops
   useEffect(() => {
     const localOrder = persistKey ? getLocalOrder(persistKey) : orderId
