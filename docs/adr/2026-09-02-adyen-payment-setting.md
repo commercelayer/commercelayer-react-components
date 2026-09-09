@@ -7,7 +7,7 @@
 ## Context
 
 Adyen is the first Payment Setting that takes a card. Manual and gift card both ship
-without a gateway UI: selecting them *is* the whole interaction, and the money moves at
+without a gateway UI: selecting them _is_ the whole interaction, and the money moves at
 place time. A card needs a form, an SDK, a 3DS round trip and a gateway that can refuse —
 none of which the two shipped settings exercise.
 
@@ -20,7 +20,7 @@ available and we do not.
 
 ### In scope
 
-The **client-side Drop-in**, also called the *sessions flow*: Commerce Layer creates an
+The **client-side Drop-in**, also called the _sessions flow_: Commerce Layer creates an
 Adyen session, the browser hands its id and blob to `AdyenCheckout`, and adyen-web talks
 to Adyen directly. Cards only. Including the return from a 3DS redirect, which is not
 optional — see below.
@@ -36,15 +36,15 @@ optional — see below.
 - **Express / wallet payments** (Apple Pay, Google Pay, PayPal as an express button). A
   different entry point into the checkout — before an address exists — with its own
   interaction to design. Also blocked on reading `public_key` before an order exists; see
-  *Assumptions and known gaps*.
+  _Assumptions and known gaps_.
 - **Saved cards through Commerce Layer's `payment_wallets`.** The playground's ADR 0003
   makes `payment_wallets` the source of truth and uses the Drop-in only to enter a fresh
-  card. That decision was taken while designing the *advanced* flow, where reuse runs
+  card. That decision was taken while designing the _advanced_ flow, where reuse runs
   through `_internal_version: "WalletCvv"` and a server-side relay. In the sessions flow
   reuse is entirely Adyen's: the Drop-in posts `storedPaymentMethodId` plus an encrypted
   CVC to `/sessions/{id}/payments` and Commerce Layer never sees it. We therefore use
   **Adyen's wallet as the source of truth** and ignore the `payment_wallets` Commerce Layer
-  creates. See *Saving a card*.
+  creates. See _Saving a card_.
 
 ### What the API actually does
 
@@ -55,7 +55,7 @@ types are wrong (see the existing note in `2026-08-18-payment-session-lifecycle.
 Commerce Layer call Adyen `/sessions`; the response lands in `response_data`, from which the
 browser reads Adyen's own field names, `id` and `sessionData`. That attribute is deliberately
 readable by sales-channel tokens — `config/attributes/payment_session.yml:115-123` carries no
-`prohibited` key and is documented *"used by client"* — while `payment_session.options` is
+`prohibited` key and is documented _"used by client"_ — while `payment_session.options` is
 `prohibited: [read, write]` on the same resource.
 
 **Only `return_url` reaches Adyen from `client_data`.**
@@ -84,7 +84,7 @@ to be sent on the `POST`.
 In the sessions flow the card data never reaches Commerce Layer, so
 `Payment::Payload::Adyen::Payments::Base#payment_data` returns `nil`, `.compact` drops the
 key (`app/models/payment/payload/adyen/payments/base.rb:23,37,60-69`), and Adyen answers
-`14_006` — *required object 'paymentMethod' is not provided*. The Adyen Ruby client raises
+`14_006` — _required object 'paymentMethod' is not provided_. The Adyen Ruby client raises
 only on `401`/`403`, so nothing is rescued; `Payment::Session::Adyen#authorize!`
 (`app/models/payment/session/adyen.rb:68-77`) has **no** status check, unlike its own
 `#create` which does `if result.status >= 300`; and the error body carries no `resultCode`,
@@ -225,7 +225,7 @@ in the same file, where the session wins hard and warns. The default is `false`,
 bites us, but the asymmetry is worth knowing.
 
 **`paymentMethodsResponse` takes priority over the session's own list**
-(`core/core.ts:391-393`), so stored cards can be *painted* client-side without a
+(`core/core.ts:391-393`), so stored cards can be _painted_ client-side without a
 `shopperReference`. They cannot be charged. Never pass it.
 
 ## Decision
@@ -237,8 +237,8 @@ bites us, but the asymmetry is worth knowing.
 
 The alternative — let the Drop-in's own Pay button charge — bypasses the
 privacy-and-terms gate, which
-`2026-08-18-place-order-split-by-payments-model.md` establishes as *"a legal requirement of
-the checkout, not a property of the payment model"*. It also buys nothing: the money and the
+`2026-08-18-place-order-split-by-payments-model.md` establishes as _"a legal requirement of
+the checkout, not a property of the payment model"_. It also buys nothing: the money and the
 placement are separated by an asynchronous callback either way, so the continuation machinery
 is needed identically. It would add a second button and remove a legal gate in exchange for
 no code saved.
@@ -296,16 +296,26 @@ established, and it is only possible because we own the submit: if Adyen's own b
 the charge, that moment would not be ours.
 
 **The order is refetched between the two.** `placeOrderWithPaymentSessions` skips a session
-that already carries a live authorization by reading the order it was *handed*, so passing the
+that already carries a live authorization by reading the order it was _handed_, so passing the
 pre-authorization copy on would authorize the same cards again and take the money twice. The
 refetch is not a refresh for the screen's benefit; it is what makes that skip work. It also keeps the property that makes the
 flow forgiving — a gift card is removable for free right up to the point the shopper commits.
 
 The exposure it creates is real: a refused card leaves gift cards charged. What it is **not**
 is a reason to give them back automatically — see below, where trying that is what taught us
-otherwise. Reversing the charge order would be worse still, trading a **common** failure for a
-**rare** but **unrecoverable** one: a card charged for the remainder with the gift cards
-unpaid, `canAddGiftCard` already false, and no way out.
+otherwise.
+
+> **Qualified (2026-09-09).** This paragraph used to end by ruling out the reverse order
+> outright: it would trade a **common** failure for a **rare** but **unrecoverable** one — a card
+> charged for the remainder, the gift cards unpaid, `canAddGiftCard` already false and no way
+> out. Every clause of that is still true _as long as there is no way to settle the residual_,
+> which is the assumption it was resting on.
+>
+> Remove that assumption — offer the shopper the outstanding amount to pay by another means — and
+> the reverse order becomes a live option that also deletes the four per-gateway places where
+> gift cards are charged today, this one included. It is not adopted, and adopting it needs an
+> intermediate state designed rather than avoided. See
+> `2026-09-09-gift-cards-authorized-last.md`.
 
 ### A refused payment burns the Commerce Layer session
 
@@ -355,7 +365,7 @@ attempt — and ended with $53 on their card, no gift cards, and $18 outstanding
 would not accept a gift card any more. Every step behaved as designed.
 
 On the redirect path the automation could not even be attributed: the cards were charged on a
-previous page load, and which of them *this* attempt authorized went with it. So there was
+previous page load, and which of them _this_ attempt authorized went with it. So there was
 never going to be one rule for both paths.
 
 **The shopper gets a control instead.** `<PaymentSettingGiftCardRemoveButton>`
@@ -408,7 +418,7 @@ that survives a different browser, cleared storage or private mode — where ady
 **In this one path the library places the order without a click, and skips the terms gate.**
 Terms acceptance does not survive the navigation, and requiring it again would leave anyone
 who declines with a paid, unplaced order. The reasoning that makes this defensible is that
-acceptance already happened *before* the redirect — without it the place button was not
+acceptance already happened _before_ the redirect — without it the place button was not
 clickable. The library exposes `isResumingRedirect` so an application can render the checkbox
 as accepted and disabled and the button as pending; that presentation is the application's,
 per `2026-09-01-presentation-belongs-to-the-application.md`.
@@ -453,7 +463,7 @@ the choice.
 The return URL is **built, not copied**: origin plus pathname, the query preserved minus
 `redirectResult` and `sessionId`, the fragment dropped. A raw `window.location.href` bakes a
 previous attempt's `redirectResult` into the next session, and a checkout using a fragment
-would have Adyen append its query *after* the `#`. There is no prop: the value is computed
+would have Adyen append its query _after_ the `#`. There is no prop: the value is computed
 where the session is created, and a prop there would sit on a generic component.
 
 ### What the shopper is told
@@ -464,7 +474,7 @@ where the session is created, and a prop there would sit on a generic component.
 does not exist in this API, and `payment_authorization.response_data` is withheld from our
 tokens. There is nothing else. Writing copy here would put payment wording, in one hard-coded
 language, in a package that cannot know the checkout's locale — the problem mfe-checkout
-already works around by passing `label` to the gift card buttons. `resultCode` *is* a code, it
+already works around by passing `label` to the gift card buttons. `resultCode` _is_ a code, it
 comes from Adyen, and the application maps it.
 
 `disableFinalAnimation: true`, because the session is recreated on a refusal and Adyen's error
@@ -491,8 +501,8 @@ eleven keys, one already `@deprecated`, three callbacks — is what
   ignores later updates, so changing it on a mounted Drop-in requires a `key` that remounts.
   mfe-checkout does not need this (its language is fixed at load), a custom checkout might.
 - **`@adyen/adyen-web/auto`**, matching the legacy component, and `allowPaymentMethods:
-  ["scheme"]` on the `Core`. With `/auto` everything is registered, and
-  `paymentMethodComponents` only *adds*, so `allowPaymentMethods` is how one restricts.
+["scheme"]` on the `Core`. With `/auto` everything is registered, and
+  `paymentMethodComponents` only _adds_, so `allowPaymentMethods` is how one restricts.
   Restricting is not about the bundle.
   > **Corrected 2026-09-07** by `2026-09-07-paypal-through-adyen.md`. This said the wallets
   > "render their own pay buttons and submit themselves, which would bypass
@@ -504,10 +514,10 @@ eleven keys, one already `@deprecated`, three callbacks — is what
   > same, while Card degrades gracefully. So allowing a wallet here would have shipped **an
   > empty accordion panel**, not a bypassed gate. The restriction was right; its reason was
   > not. And the wallets are not alike: Apple Pay's and Google Pay's own buttons call
-  > `this.submit`, so a host button *can* drive them — PayPal's `submit` throws by design, and
+  > `this.submit`, so a host button _can_ drive them — PayPal's `submit` throws by design, and
   > it is the only one that categorically cannot.
 - **The component renders its own mount target, and `children` renders after it.** Everywhere
-  else in this library a function child *replaces* the default markup. Here it cannot: the
+  else in this library a function child _replaces_ the default markup. Here it cannot: the
   Drop-in attaches to that element, so handing it to a render prop would let an application
   that forgot to render it produce a payment form that silently never appears. `children` is
   for the chrome around it. Found by writing the mfe-checkout side — which is the ADR on
@@ -558,7 +568,7 @@ Both are pre-existing, both live in the lines this work already touches.
 - **Track burnt sessions in local state.** Rejected: a second notion of session validity in the
   browser.
 - **Commerce Layer's `payment_wallets` as the source of truth for saved cards**, as the
-  playground's ADR 0003 decided. Rejected *for this flow*: reuse there runs through the
+  playground's ADR 0003 decided. Rejected _for this flow_: reuse there runs through the
   advanced flow and an integration token. Not a contradiction of that ADR so much as a
   different flow with a different constraint.
 - **Gate `Tokenization` on `order.customer`.** Rejected: shows a saved card to anyone who types
@@ -592,7 +602,7 @@ leaves the radio group with nothing selected.
 
 **Two derivations were asking half a question, and `holdsMoney` is the answer to the whole
 one.** `hasLiveAuthorization` says only that an authorization exists and did not fail — and it
-stays true after a refund, because a refund changes the *session*, not the authorization, which
+stays true after a refund, because a refund changes the _session_, not the authorization, which
 keeps `succeeded` forever. So `canAddGiftCard` went false for good once any card had been
 charged and given back, and `<PaymentSettingGiftCardInput>` renders on it: the shopper whose
 card had just been refunded could never apply another one. The remainder had the same flaw for
@@ -612,7 +622,7 @@ it is now a regression guard against reintroducing the array check.
 **Deleting the burnt session can surface an older one as the selection.**
 `findCurrentPaymentSession` takes the most recent live non-gift-card session, so a shopper who
 tried bank transfer earlier on the same order sees that option selected again after a card
-refusal. Not wrong — it *is* their most recent surviving choice, exactly as the lifecycle ADR
+refusal. Not wrong — it _is_ their most recent surviving choice, exactly as the lifecycle ADR
 defines it — but surprising, and it is the visible cost of not recreating the session.
 
 **The redirect path ships without an end-to-end test.** `nativeThreeDS: 'preferred'` is
@@ -659,7 +669,7 @@ Listed in order of what they would cost if wrong.
    `skip_authorize?` returns true when the session has neither a `payment_wallet` nor a
    `client_data['payment_method']`, which is exactly our case, so **no `/payments` call is made
    at all**. Same outcome, reached without talking to Adyen — and now pinned by an upstream
-   spec, *"does not call Adyen and leaves the authorization pending, waiting for the webhook"*.
+   spec, _"does not call Adyen and leaves the authorization pending, waiting for the webhook"_.
    The ask this entry made has been answered.
 
    **In its place, a tripwire.** `client_data.payment_method` is `creatable`/`updatable` for a
@@ -670,6 +680,7 @@ Listed in order of what they would cost if wrong.
    illegal, and `509bbb9a1` now takes the session to the new `invalidated` state, which blocks
    further transactions. **Unrecoverable, and silent. Never write `payment_method` into
    `client_data`.**
+
 3. **That `public_key` is served to sales-channel tokens is not spec-covered in `core-api`** —
    the `payment_setting_adyen` factory does not even set it. The attribute config and the read
    filter both say yes, and the playground reads it from a browser under a storefront token, but
@@ -688,14 +699,14 @@ Listed in order of what they would cost if wrong.
 Single source; the tables in `2026-08-18-payment-session-lifecycle.md` and
 `2026-08-20-gift-cards-as-payment-sessions.md` point here.
 
-| Setting | Type literal | Status |
-| --- | --- | --- |
-| Manual | `payment_setting_manuals` | ✅ implemented — `2026-08-18-payment-session-lifecycle.md` |
-| Gift card | `payment_setting_gift_cards` | ✅ implemented — `2026-08-20-gift-cards-as-payment-sessions.md` |
-| Adyen | `payment_setting_adyens` | ✅ implemented — client-side Drop-in, cards only, this ADR. Methods within it: `2026-09-07-paypal-through-adyen.md` |
-| Stripe | `payment_setting_stripes` | ⬜ not implemented |
-| Braintree | `payment_setting_braintrees` | ⬜ not implemented |
-| External | `payment_setting_externals` | ⬜ not implemented |
+| Setting   | Type literal                 | Status                                                                                                              |
+| --------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Manual    | `payment_setting_manuals`    | ✅ implemented — `2026-08-18-payment-session-lifecycle.md`                                                          |
+| Gift card | `payment_setting_gift_cards` | ✅ implemented — `2026-08-20-gift-cards-as-payment-sessions.md`                                                     |
+| Adyen     | `payment_setting_adyens`     | ✅ implemented — client-side Drop-in, cards only, this ADR. Methods within it: `2026-09-07-paypal-through-adyen.md` |
+| Stripe    | `payment_setting_stripes`    | ⬜ not implemented                                                                                                  |
+| Braintree | `payment_setting_braintrees` | ⬜ not implemented                                                                                                  |
+| External  | `payment_setting_externals`  | ⬜ not implemented                                                                                                  |
 
 Deferred, each needing its own design: the Adyen advanced flow, express/wallet payments, saved
 cards through Commerce Layer's `payment_wallets`, settling a partially-paid order, and
