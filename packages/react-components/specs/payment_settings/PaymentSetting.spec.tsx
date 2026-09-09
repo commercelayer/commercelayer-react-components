@@ -463,3 +463,65 @@ describe("<PaymentSetting> clearing the superseded session", () => {
     expect(screen.queryByTestId("error")).toBeNull()
   })
 })
+
+/**
+ * `returnUrl`, and why it is on this component.
+ *
+ * From gateway version 72 Adyen refuses a `returnUrl` over 1024 characters, and
+ * a checkout carrying its access token in the query string exceeds that on the
+ * token alone — a JWT here is around 1.5 kB. The refusal arrives as
+ * `Field 'returnUrl' may not exceed 1024 characters` plus a collateral
+ * `token - can't be blank`, neither of which names anything the application set.
+ */
+describe("<PaymentSetting> returnUrl", () => {
+  const ADYEN = {
+    id: "ps-adyen",
+    type: "payment_setting_adyens",
+    name: "Adyen",
+    public_key: "test_ABC",
+  }
+
+  function renderAdyenOnly(returnUrl?: string) {
+    return render(
+      <Wrapper currentOrder={order({ available_payment_settings: [ADYEN] } as never)}>
+        <PaymentSetting returnUrl={returnUrl}>
+          <PaymentSettingRadioButton data-testid="radio" />
+        </PaymentSetting>
+      </Wrapper>
+    )
+  }
+
+  async function clickIt() {
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("radio"))
+    })
+  }
+
+  it("sends the one the application gave, verbatim", async () => {
+    renderAdyenOnly("https://shop.example/checkout/o-1?paymentReturn=true")
+    await clickIt()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          clientData: { return_url: "https://shop.example/checkout/o-1?paymentReturn=true" },
+        })
+      )
+    })
+  })
+
+  it("falls back to the current location when the application says nothing", async () => {
+    renderAdyenOnly()
+    await clickIt()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    const [{ clientData }] = createPaymentSessionMock.mock.calls[0] as [
+      { clientData?: { return_url?: string } },
+    ]
+    // jsdom serves the page from localhost, which is all this needs to assert:
+    // the fallback is the page, not a configured value.
+    expect(clientData?.return_url).toContain(window.location.origin)
+  })
+})

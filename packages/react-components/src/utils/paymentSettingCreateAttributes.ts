@@ -19,6 +19,11 @@ export interface PaymentSettingCreateAttributes {
 interface BuilderParams {
   setting: PaymentSetting
   accessToken?: string
+  /**
+   * Where the gateway should send the shopper back to, when the application has
+   * an opinion. Falls back to the current location.
+   */
+  returnUrl?: string
 }
 
 type Builder = (params: BuilderParams) => PaymentSettingCreateAttributes
@@ -38,13 +43,20 @@ type Builder = (params: BuilderParams) => PaymentSettingCreateAttributes
  * read: the radio would not light up and a reload would lose the choice.
  */
 const BUILDERS: Record<string, Builder> = {
-  [ADYEN_SETTING_TYPE]: ({ accessToken }) => ({
-    // The only `client_data` key the API forwards to Adyen `/sessions`. Built
-    // from the current location rather than configured, because this runs when
-    // the radio is clicked, inside a component no gateway prop can reach.
-    ...(typeof window !== "undefined"
-      ? { clientData: { return_url: buildAdyenReturnUrl(window.location.href) } }
-      : {}),
+  [ADYEN_SETTING_TYPE]: ({ accessToken, returnUrl }) => ({
+    // The only `client_data` key the API forwards to Adyen `/sessions`.
+    //
+    // Derived from the current location when the application says nothing,
+    // which is right for a checkout whose URL is reloadable as it stands. It is
+    // not right for one whose credentials live in the query string: from
+    // gateway version 72 Adyen refuses a `returnUrl` over 1024 characters, and
+    // an access token alone can exceed that. Such an application passes
+    // `returnUrl` and re-authenticates the return itself.
+    ...(returnUrl != null
+      ? { clientData: { return_url: returnUrl } }
+      : typeof window !== "undefined"
+        ? { clientData: { return_url: buildAdyenReturnUrl(window.location.href) } }
+        : {}),
     // Makes the API inject `shopperReference`, `storePaymentMethodMode:
     // askForConsent` and `recurringProcessingModel: CardOnFile`, which is what
     // renders the Drop-in's own save-card checkbox and its saved cards.

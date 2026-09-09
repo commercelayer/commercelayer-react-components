@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest"
-import { buildAdyenReturnUrl } from "./buildAdyenReturnUrl"
+import { describe, expect, it, vi } from "vitest"
+import { ADYEN_RETURN_URL_MAX_LENGTH, buildAdyenReturnUrl } from "./buildAdyenReturnUrl"
 
 describe("buildAdyenReturnUrl", () => {
   it("keeps the page the shopper is on", () => {
@@ -39,5 +39,28 @@ describe("buildAdyenReturnUrl", () => {
 
   it("returns an unparseable href untouched rather than inventing one", () => {
     expect(buildAdyenReturnUrl("not a url")).toBe("not a url")
+  })
+})
+
+describe("buildAdyenReturnUrl length guard", () => {
+  it("warns when what it derives cannot be used", () => {
+    // The failure it replaces named nothing an application had set: Adyen's
+    // "may not exceed 1024 characters", plus a collateral "token - can't be
+    // blank" from the session's own validation.
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    const long = `https://shop.example/o-1?accessToken=${"e".repeat(1200)}`
+    expect(long.length).toBeGreaterThan(ADYEN_RETURN_URL_MAX_LENGTH)
+
+    buildAdyenReturnUrl(long)
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("over Adyen's limit"))
+    warn.mockRestore()
+  })
+
+  it("says nothing about a URL that fits", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    buildAdyenReturnUrl("https://shop.example/o-1?paymentReturn=true")
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
   })
 })

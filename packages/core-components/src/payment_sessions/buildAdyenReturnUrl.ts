@@ -8,6 +8,23 @@
 const ADYEN_RETURN_PARAMS = ["redirectResult", "sessionId", "resultCode"] as const
 
 /**
+ * Adyen's own cap on `returnUrl`, from gateway version 72 onwards.
+ *
+ * Worth a constant and a warning rather than a silent overrun. A URL over the
+ * cap is refused by Adyen with `Field 'returnUrl' may not exceed 1024
+ * characters`, which Commerce Layer relays alongside `token - can't be blank` —
+ * the token is assigned before the gateway call and not persisted when it
+ * fails, so the second error is collateral and the pair points at nothing an
+ * application recognises. A storefront whose credentials live in the query
+ * string blows past it on the JWT alone.
+ *
+ * Older versions do not validate it, and `payment_setting_adyens` defaults to
+ * the newest version it supports — so an existing setting can work for months
+ * and a newly created one fail immediately.
+ */
+export const ADYEN_RETURN_URL_MAX_LENGTH = 1024
+
+/**
  * Build the `returnUrl` an Adyen Session is created with.
  *
  * Derived from where the shopper is rather than configured, because the Payment
@@ -43,5 +60,14 @@ export function buildAdyenReturnUrl(href: string): string {
   for (const param of ADYEN_RETURN_PARAMS) url.searchParams.delete(param)
   url.hash = ""
 
-  return url.toString()
+  const returnUrl = url.toString()
+  if (returnUrl.length > ADYEN_RETURN_URL_MAX_LENGTH && process.env.NODE_ENV !== "production") {
+    console.warn(
+      `[commercelayer] the Adyen returnUrl derived from this page is ${returnUrl.length} characters, ` +
+        `over Adyen's limit of ${ADYEN_RETURN_URL_MAX_LENGTH}. Creating the Payment Session will fail. ` +
+        "Pass `returnUrl` to <PaymentSetting> with a URL this application can reload — commonly the " +
+        "same one without its access token, re-authenticating the return from storage."
+    )
+  }
+  return returnUrl
 }

@@ -90,6 +90,24 @@ interface Props {
    * handler, and an unstable one is the usual route to a render loop here.
    */
   onSelect?: (params: PaymentSettingOnSelectParams) => void
+  /**
+   * Where a gateway should send the shopper back to after a redirect — a 3DS
+   * challenge on its own page, most often.
+   *
+   * Defaults to the current location, cleaned of the parameters a previous
+   * redirect left behind. Pass it when that URL is not one this application can
+   * reload as it stands, or when it is too long: from gateway version 72 Adyen
+   * refuses a `returnUrl` over 1024 characters, and a checkout carrying an
+   * access token in its query string can exceed that on the token alone. The
+   * usual answer is the same URL without the credentials, with the return
+   * re-authenticated from storage.
+   *
+   * Read when the session is created, which is when the radio is clicked, so it
+   * has to be here rather than on a gateway component: the selection *is* the
+   * session, and deferring creation to a child would leave nothing for the
+   * radio to read back.
+   */
+  returnUrl?: string
 }
 
 /**
@@ -100,7 +118,12 @@ interface Props {
  * can be mounted alongside `<PaymentMethod>` without a coordinator above: each
  * tree silently steps aside when the order is not its own.
  */
-export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Element | null {
+export function PaymentSetting({
+  children,
+  onSelect,
+  readonly,
+  returnUrl,
+}: Props): JSX.Element | null {
   const paymentsModel = usePaymentsModel()
   const { isCovered, remainingAmountCents } = usePaymentSessionsState()
   const { order, include, includeLoaded, addResourceToInclude, getOrder } = useContext(OrderContext)
@@ -224,7 +247,7 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
           // Whatever this setting's gateway needs to know at creation. For
           // Adyen that is the `return_url` its session is built with, and the
           // tokenization variant — neither of which can be added later.
-          ...paymentSettingCreateAttributes({ setting, accessToken }),
+          ...paymentSettingCreateAttributes({ setting, accessToken, returnUrl }),
         })
       }
       // Clear the session the shopper just left, so the order carries one

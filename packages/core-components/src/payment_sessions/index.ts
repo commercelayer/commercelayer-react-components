@@ -1,7 +1,7 @@
 export { applyGiftCard } from "./applyGiftCard"
 export type { AuthorizeGiftCardSessionsResult } from "./authorizeGiftCardSessions"
 export { authorizeGiftCardSessions } from "./authorizeGiftCardSessions"
-export { buildAdyenReturnUrl } from "./buildAdyenReturnUrl"
+export { ADYEN_RETURN_URL_MAX_LENGTH, buildAdyenReturnUrl } from "./buildAdyenReturnUrl"
 export { createPaymentSession } from "./createPaymentSession"
 export type { PaymentSessionsState } from "./derivePaymentSessionsState"
 export { derivePaymentSessionsState } from "./derivePaymentSessionsState"
