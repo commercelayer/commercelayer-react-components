@@ -127,6 +127,20 @@ There is an internal version that would set `setup_future_usage` server-side —
 `off_session` across eleven method types, with no consent UI, so cards would be saved without
 being asked.
 
+**Why the Element shows no save checkbox, precisely.** `setupFutureUsage` does exist among
+`Elements` options — but on `StripeElementsOptionsModeBase`, the **deferred** mode where you pass
+`mode`, `amount` and `currency` and _no_ client secret. Ours is driven by the PaymentIntent's
+secret, so that option is not ours to set. On a secret-driven Element the checkbox comes only from
+a Customer Session, which is the piece Commerce Layer does not expose. When it is available, the
+shopper's choice arrives on the Element's own change event as `value.savePaymentMethod` — the
+`onChange` this component already listens to.
+
+Not to be confused with what _looks_ like it on screen: Link's inline "Save my information for
+faster checkout" saves the card to the shopper's **Link account**, not to the merchant's Stripe
+Customer, and it appears whether or not the shopper is a customer of the store. Adyen's checkbox,
+by contrast, appears exactly when it should — `_internal_version: "Tokenization"` is gated on the
+token, so a customer token turns it on and a guest one does not.
+
 **Corrected: Commerce Layer's own wallet works today.** An earlier draft said saving was blocked
 server-side, full stop. Only the _gateway-side_ form is. `Payment::Wallet::Stripe#create` derives
 a Stripe Customer, calls `PaymentMethod.attach(payment_token, { customer: … })` and creates a
