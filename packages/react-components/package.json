@@ -65,12 +65,13 @@
     "@commercelayer/organization-config": "^2.8.4",
     "@commercelayer/react-hooks-components": "workspace:*",
     "@commercelayer/sdk": "8.0.0-beta.11",
-    "@iframe-resizer/parent": "^5.5.9",
     "@stripe/react-stripe-js": "^6.8.1",
     "@stripe/stripe-js": "^9.10.0",
     "@tanstack/react-table": "^8.21.3",
+    "@types/iframe-resizer": "^4.0.0",
     "braintree-web": "^3.143.0",
     "frames-react": "^1.2.4",
+    "iframe-resizer": "4.3.11",
     "rapid-form": "^5.0.0"
   },
   "devDependencies": {
