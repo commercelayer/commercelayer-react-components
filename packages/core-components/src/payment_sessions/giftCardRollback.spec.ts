@@ -109,6 +109,48 @@ describe("authorizeGiftCardSessions", () => {
     expect(result.authorizedSessionIds).toEqual(["gc-2"])
   })
 
+  /**
+   * Which card is charged first decides how much is stranded when a later one
+   * fails, because nothing is rolled back. A card fails when its balance has
+   * gone elsewhere, which has nothing to do with its size — so charging the
+   * small ones first makes the amount left behind the smallest it can be.
+   */
+  it("charges the smallest card first, so a later failure strands less", async () => {
+    const { create } = stubSdk()
+    await authorizeGiftCardSessions({
+      accessToken: ACCESS_TOKEN,
+      order: order([
+        giftCard("ps-big", { amount_cents: 5000 }),
+        giftCard("ps-small", { amount_cents: 500 }),
+        giftCard("ps-mid", { amount_cents: 1500 }),
+      ]),
+    })
+
+    expect(create.mock.calls.map(([body]) => body.payment_session.id)).toEqual([
+      "ps-small",
+      "ps-mid",
+      "ps-big",
+    ])
+  })
+
+  it("charges a card of unknown size last", async () => {
+    // An order fetched without `amount_cents` in its `fields` must not push an
+    // unknown to the front, where it could strand more than any known one.
+    const { create } = stubSdk()
+    await authorizeGiftCardSessions({
+      accessToken: ACCESS_TOKEN,
+      order: order([
+        giftCard("ps-unknown", { amount_cents: null as never }),
+        giftCard("ps-small", { amount_cents: 500 }),
+      ]),
+    })
+
+    expect(create.mock.calls.map(([body]) => body.payment_session.id)).toEqual([
+      "ps-small",
+      "ps-unknown",
+    ])
+  })
+
   it("stops at the first refusal rather than charging more cards", async () => {
     const { create } = stubSdk()
     create.mockResolvedValueOnce({ id: "auth-1" })

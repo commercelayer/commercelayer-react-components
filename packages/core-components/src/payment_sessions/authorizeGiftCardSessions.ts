@@ -46,6 +46,14 @@ export interface AuthorizeGiftCardSessionsResult {
  * carrying on would charge more cards for an order that is not going to be
  * placed.
  *
+ * **Smallest first**, which decides how much is stranded when one of several
+ * cards fails. Stopping at the first failure leaves everything charged before it
+ * charged, and a card fails because its balance is gone elsewhere — uncorrelated
+ * with its size. So charging the small ones first makes the amount left behind
+ * the smallest it can be: with a $5 and a $50 card, a failure on the second
+ * strands $5 rather than $50. It changes nothing else, because a session's
+ * `amount_cents` is fixed when it is created, not when it is charged.
+ *
  * Nothing is rolled back here. Whether the cards already charged should be
  * refunded depends on what the *gateway* then does, which this function cannot
  * see — see `refundGiftCardSessions`.
@@ -59,7 +67,16 @@ export async function authorizeGiftCardSessions({
   const { giftCardSessions } = derivePaymentSessionsState(order)
   const authorizedSessionIds: string[] = []
 
-  for (const session of giftCardSessions) {
+  // Copied before sorting: `giftCardSessions` is derived from the order the
+  // caller handed us, and reordering it in place would reorder what they see.
+  // An unknown amount sorts last, where it can strand nothing that a known one
+  // would not have.
+  const smallestFirst = [...giftCardSessions].sort(
+    (a, b) =>
+      (a.amount_cents ?? Number.POSITIVE_INFINITY) - (b.amount_cents ?? Number.POSITIVE_INFINITY)
+  )
+
+  for (const session of smallestFirst) {
     // Already taken, or in flight. Creating a second authorization over the
     // first is how the money gets taken twice.
     if (hasLiveAuthorization(session)) continue
