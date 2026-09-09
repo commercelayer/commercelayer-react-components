@@ -1,8 +1,10 @@
 import {
   createPaymentSession,
+  discardPaymentSession,
   findCurrentPaymentSession,
   findReusablePaymentSession,
   GIFT_CARD_SETTING_TYPE,
+  hasLiveAuthorization,
 } from "@commercelayer/core-components"
 import type {
   Order,
@@ -13,10 +15,15 @@ import { type JSX, type ReactNode, useContext, useEffect, useRef, useState } fro
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
+import { useAdyenRedirectResume } from "#hooks/useAdyenRedirectResume"
 import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
 import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
+import {
+  paymentSettingCreateAttributes,
+  paymentSettingUnusableReason,
+} from "#utils/paymentSettingCreateAttributes"
 
 /**
  * Payment Setting types this library can drive today.
@@ -25,10 +32,9 @@ import type { ChildrenFunction } from "#typings/index"
  * button for a setting with no implementation behind it does nothing when
  * clicked, which is worse for the shopper than not offering it.
  *
- * The goal is to cover all six. See the implementation table in
- * `docs/adr/2026-08-18-payment-session-lifecycle.md`.
+ * The goal is to cover all six.
  */
-const IMPLEMENTED_SETTING_TYPES = ["payment_setting_manuals"] as const
+const IMPLEMENTED_SETTING_TYPES = ["payment_setting_manuals", "payment_setting_adyens"] as const
 
 export interface PaymentSettingOnSelectParams {
   setting: PaymentSettingResource
@@ -84,6 +90,24 @@ interface Props {
    * handler, and an unstable one is the usual route to a render loop here.
    */
   onSelect?: (params: PaymentSettingOnSelectParams) => void
+  /**
+   * Where a gateway should send the shopper back to after a redirect — a 3DS
+   * challenge on its own page, most often.
+   *
+   * Defaults to the current location, cleaned of the parameters a previous
+   * redirect left behind. Pass it when that URL is not one this application can
+   * reload as it stands, or when it is too long: from gateway version 72 Adyen
+   * refuses a `returnUrl` over 1024 characters, and a checkout carrying an
+   * access token in its query string can exceed that on the token alone. The
+   * usual answer is the same URL without the credentials, with the return
+   * re-authenticated from storage.
+   *
+   * Read when the session is created, which is when the radio is clicked, so it
+   * has to be here rather than on a gateway component: the selection *is* the
+   * session, and deferring creation to a child would leave nothing for the
+   * radio to read back.
+   */
+  returnUrl?: string
 }
 
 /**
@@ -94,7 +118,12 @@ interface Props {
  * can be mounted alongside `<PaymentMethod>` without a coordinator above: each
  * tree silently steps aside when the order is not its own.
  */
-export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Element | null {
+export function PaymentSetting({
+  children,
+  onSelect,
+  readonly,
+  returnUrl,
+}: Props): JSX.Element | null {
   const paymentsModel = usePaymentsModel()
   const { isCovered, remainingAmountCents } = usePaymentSessionsState()
   const { order, include, includeLoaded, addResourceToInclude, getOrder } = useContext(OrderContext)
@@ -128,6 +157,14 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
     }
   }, [include, includeLoaded, addResourceToInclude])
 
+  // Finishing a 3DS redirect needs no UI — `submitDetails` is a method on
+  // `adyen-web`'s core — so it runs from here, the one component the Payment
+  // Session lifecycle requires to stay mounted. Inside the gateway component it
+  // would depend on which checkout step the application happens to render, and
+  // an accordion that came back collapsed would leave a charged card on an
+  // unplaced order. Called before the bail-outs below, as a hook must be.
+  useAdyenRedirectResume()
+
   if (paymentsModel !== "payment_sessions" || order == null) return null
 
   // Nothing left to pay means nothing to choose. Gift cards can cover an order
@@ -148,14 +185,31 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
     const implemented = IMPLEMENTED_SETTING_TYPES.includes(
       setting.type as (typeof IMPLEMENTED_SETTING_TYPES)[number]
     )
-    if (!implemented && process.env.NODE_ENV !== "production") {
-      // Without this, an organization whose only configured settings are
-      // unimplemented gets a checkout with no payment options and no clue why.
-      console.warn(
-        `[commercelayer] <PaymentSetting> skipped "${setting.type}": not implemented yet.`
-      )
+    if (!implemented) {
+      if (process.env.NODE_ENV !== "production") {
+        // Without this, an organization whose only configured settings are
+        // unimplemented gets a checkout with no payment options and no clue why.
+        console.warn(
+          `[commercelayer] <PaymentSetting> skipped "${setting.type}": not implemented yet.`
+        )
+      }
+      return false
     }
-    return implemented
+
+    // Implemented, but not usable on this order: switched off, or missing the
+    // credential its gateway UI needs. Skipped for the same reason an
+    // unimplemented type is — a radio button that does nothing when clicked is
+    // worse than no radio button — and from the shopper's side the two cases
+    // are indistinguishable anyway.
+    const unusable = paymentSettingUnusableReason(setting)
+    if (unusable != null) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(`[commercelayer] <PaymentSetting> skipped "${setting.type}": ${unusable}.`)
+      }
+      return false
+    }
+
+    return true
   })
 
   const selectSetting = async (setting: PaymentSettingResource): Promise<void> => {
@@ -170,6 +224,12 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
       // refetch that re-runs the click handler would leave another session
       // behind. Reuse is also what makes a page refresh resume the selection
       // instead of duplicating it.
+      // Read before anything changes: whatever the shopper is switching *away*
+      // from, so it can be cleared once the new selection is in place.
+      const superseded = findCurrentPaymentSession({
+        paymentSessions: order.payment_sessions,
+      })
+
       const reusable = findReusablePaymentSession({
         paymentSessions: order.payment_sessions,
         paymentSettingId: setting.id,
@@ -184,8 +244,48 @@ export function PaymentSetting({ children, onSelect, readonly }: Props): JSX.Ele
           // The remainder after the gift cards, which the server cannot work
           // out for itself until they are authorized at place time.
           amountCents: remainingAmountCents,
+          // Whatever this setting's gateway needs to know at creation. For
+          // Adyen that is the `return_url` its session is built with, and the
+          // tokenization variant — neither of which can be added later.
+          ...paymentSettingCreateAttributes({ setting, accessToken, returnUrl }),
         })
       }
+      // Clear the session the shopper just left, so the order carries one
+      // selection rather than a trail of every setting they tried.
+      //
+      // **After** the new one exists, never before: the selection is the newest
+      // session, so creating first means it is already correct when this runs,
+      // and a delete that fails leaves a state the library handles rather than
+      // an order with nothing selected. Failures are swallowed for the same
+      // reason — `findCurrentPaymentSession` picks the newest either way, so
+      // this is tidying, not correctness.
+      //
+      // Skipped when the session was adopted rather than created: there is
+      // nothing to supersede, and deleting it would delete the selection.
+      // Skipped too for anything holding money — a gift card is never the
+      // current selection, and one carrying a live authorization is not ours to
+      // undo here. The rule throughout is that sessions which took no money
+      // are deleted and everything else is abandoned.
+      if (
+        superseded != null &&
+        superseded.payment_setting?.id !== setting.id &&
+        !hasLiveAuthorization(superseded)
+      ) {
+        // Its own try: `discardPaymentSession` swallows its failures already,
+        // but a rejection escaping here would land in the catch below and turn
+        // a selection that in fact succeeded into a reported error — and skip
+        // the refetch that makes it visible.
+        try {
+          await discardPaymentSession({
+            accessToken,
+            interceptors,
+            paymentSessionId: superseded.id,
+          })
+        } catch {
+          // Nothing to report: the newest session is the selection regardless.
+        }
+      }
+
       const refreshed = await getOrder(order.id)
       onSelect?.({
         setting,

@@ -28,7 +28,7 @@ interface Props extends Omit<JSX.IntrinsicElements["div"], "children"> {
  */
 export function PaymentSettingGiftCardListItem(props: Props): JSX.Element {
   const { children, ...p } = props
-  const { paymentSession, code, formattedAmount, amountCents, isRemovable, isRemoving } =
+  const { paymentSession, code, formattedAmount, amountCents, removal, isRemoving } =
     useCustomContext({
       context: PaymentSettingGiftCardItemContext,
       contextComponentName: "PaymentSettingGiftCardList",
@@ -42,7 +42,7 @@ export function PaymentSettingGiftCardListItem(props: Props): JSX.Element {
     code,
     formattedAmount,
     amountCents,
-    isRemovable,
+    removal,
     isRemoving,
   }
 

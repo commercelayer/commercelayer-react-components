@@ -62,7 +62,7 @@ code cannot be applied twice while the first session is still `unpaid`
 or bound to another market all fail the same lookup and produce
 `gift_card_code: doesn't match any active gift card` (422, `source.pointer` ending
 `/gift_card_code`). A duplicate gives `has already been taken`. There is no way to tell the
-shopper *which* it was.
+shopper _which_ it was.
 
 **Once coverage is complete the API gives no clean signal.** Creating another session
 defaults its amount to zero and fails `numericality: { greater_than: 0 }` — a 422 about
@@ -125,7 +125,7 @@ amount (`payment-section.tsx:1082-1106`) and never gates its input on the remain
 ### Applying or removing invalidates the session paying the difference
 
 `amount_cents` is set once and never updatable, so a session created against a different
-remainder is not stale but *wrong*: it would still read as the shopper's selection, and at
+remainder is not stale but _wrong_: it would still read as the shopper's selection, and at
 place time we would authorize more than is owed.
 
 Both operations therefore delete it, as part of the same domain operation — binding the
@@ -149,6 +149,18 @@ token cannot clear the transactions, and only a refund would return the balance 
 iteration does not implement. Its remove control is therefore not rendered at all, rather
 than rendered and failing.
 
+> **Reopened** by `2026-09-02-adyen-payment-setting.md`. The premise above — "only a refund
+> would return the balance, which this iteration does not implement" — is no longer true: the
+> Adyen work implements the refund, because a card refused after the gift cards were charged
+> needs one. So a charged gift card _can_ now come off the order, by refunding rather than
+> deleting, and the control is rendered for it.
+>
+> Everything else in this section stands. Deleting a charged session is still not an option
+> the API offers, so the refunded session is left in place; it lands on `refunded`, and that
+> status is what drops it out of the applied list. And the new control is narrower than it
+> looks: a storefront token may only refund a gift card while the order is still `pending`, so
+> on a placed order there is nothing to offer and the control disappears again.
+
 ### Place: gift cards first, stop at the first failure
 
 `placeOrderWithPaymentSessions` takes the order and authorizes the gift cards in sequence,
@@ -159,10 +171,29 @@ Gift cards go first as a client-side safety property; nothing server-side enforc
 authorization shrinks what the next session may take, and a gift card charged after a failed
 method payment would leave the shopper's balance spent on an order that never got placed.
 
+> **What this ordering is really for (2026-09-09).** Stated as above it reads as a rule about
+> recoverability, which is true but secondary. The primary reason it holds is **simplicity**:
+> charging the gift cards first is what lets a failure _abort_, and so keeps the library out of
+> a partially-paid state — money taken, order unplaced, something still owed — that nothing here
+> implements. `canAddGiftCard` says as much in its own comment.
+>
+> The cost is that "before the money" is a different moment for every gateway, so it has been
+> found four separate times. Authorizing the gift cards **last** would collapse those four into
+> one and require that intermediate state to be designed instead. That is written up, with the
+> risk it moves and the UI questions it opens, in
+> `2026-09-09-gift-cards-authorized-last.md` — proposed, not decided.
+
 On a failure partway, it stops and reports. The cards already charged stay charged: carrying
 on would only charge more for an order that is not going to be placed, and **no rollback is
 implemented**. The gift card list is itself the recovery surface — after a reload the shopper
 sees which cards were charged and what is left to pay.
+
+> **Added (2026-09-09): smallest first.** Since nothing is rolled back, the order the cards
+> are charged in decides how much is stranded when a later one fails — and a card fails
+> because its balance went elsewhere, which is uncorrelated with its size. Charging the small
+> ones first therefore minimises what is left behind: with a $5 and a $50 card, a failure on
+> the second strands $5 instead of $50. It affects nothing else, because a session's
+> `amount_cents` is fixed at creation, not at charge time. A card of unknown size sorts last.
 
 On a **timeout** nothing is touched at all, because the payment may well have succeeded. See
 `2026-08-18-place-order-split-by-payments-model.md`.
@@ -237,11 +268,5 @@ nothing — but it is why every read searches the array rather than indexing it.
 
 ### Payment Setting implementation status
 
-| Setting | Type literal | Status |
-| --- | --- | --- |
-| Manual | `payment_setting_manuals` | ✅ implemented |
-| Gift card | `payment_setting_gift_cards` | ✅ implemented |
-| Stripe | `payment_setting_stripes` | ⬜ not implemented |
-| Adyen | `payment_setting_adyens` | ⬜ not implemented |
-| Braintree | `payment_setting_braintrees` | ⬜ not implemented |
-| External | `payment_setting_externals` | ⬜ not implemented |
+Moved to `2026-09-02-adyen-payment-setting.md`, which keeps the single table and names the
+ADR behind each row.

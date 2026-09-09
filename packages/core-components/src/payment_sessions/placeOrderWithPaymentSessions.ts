@@ -22,6 +22,24 @@ export const DEFAULT_PLACEABLE_ATTEMPTS = 8
 /** Delay between placeability attempts, in milliseconds. */
 export const DEFAULT_PLACEABLE_INTERVAL_MS = 500
 
+/**
+ * Attempts to use when a **gateway** collected the payment client-side.
+ *
+ * The defaults above are sized for a setting whose authorization is a local
+ * background job — manual, gift card — where the whole wait is one Sidekiq hop.
+ * A card taken through Adyen's Drop-in is different in kind: Commerce Layer's
+ * own gateway call fails by construction, and the authorization only reaches
+ * `succeeded` when Adyen's `AUTHORISATION` webhook arrives. That is a round trip
+ * through a third party, and four seconds is not a realistic budget for it.
+ *
+ * Exhausting these is still **not** a payment failure — the webhook may land a
+ * moment later — which is why the result reports `timedOut` separately from
+ * `errors`.
+ */
+export const DEFAULT_GATEWAY_PLACEABLE_ATTEMPTS = 20
+/** Delay between gateway placeability attempts, in milliseconds. */
+export const DEFAULT_GATEWAY_PLACEABLE_INTERVAL_MS = 1000
+
 /** Order includes the placeability loop needs to read authorization states. */
 const AUTHORIZATION_INCLUDES = ["payment_sessions.payment_authorization"]
 
