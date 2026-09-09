@@ -9,12 +9,20 @@ import { PaymentSettingName } from "#components/payment_settings/PaymentSettingN
 import { PaymentSettingRadioButton } from "#components/payment_settings/PaymentSettingRadioButton"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import { ADYEN_RETURN_URL_MAX_LENGTH } from "#utils/paymentSettingCreateAttributes"
 
-const { createPaymentSessionMock } = vi.hoisted(() => ({ createPaymentSessionMock: vi.fn() }))
+const { createPaymentSessionMock, discardPaymentSessionMock } = vi.hoisted(() => ({
+  createPaymentSessionMock: vi.fn(),
+  discardPaymentSessionMock: vi.fn(),
+}))
 
 vi.mock("@commercelayer/core-components", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@commercelayer/core-components")>()
-  return { ...actual, createPaymentSession: createPaymentSessionMock }
+  return {
+    ...actual,
+    createPaymentSession: createPaymentSessionMock,
+    discardPaymentSession: discardPaymentSessionMock,
+  }
 })
 
 const MANUAL = { id: "ps-manual", type: "payment_setting_manuals", name: "Bank transfer" }
@@ -77,6 +85,7 @@ function renderSettings(currentOrder?: Partial<Order> | null) {
 beforeEach(() => {
   vi.clearAllMocks()
   createPaymentSessionMock.mockResolvedValue({ id: "session-new" })
+  discardPaymentSessionMock.mockResolvedValue(true)
 })
 
 afterEach(() => {
@@ -338,5 +347,213 @@ describe("PaymentSetting children as a function", () => {
     await waitFor(() => {
       expect(createPaymentSessionMock).toHaveBeenCalledTimes(1)
     })
+  })
+})
+
+/**
+ * Switching setting clears what the shopper switched away from.
+ *
+ * The rule is `2026-08-20-gift-cards-as-payment-sessions.md`'s reformulation —
+ * sessions that took no money are deleted, everything else is abandoned — which
+ * the selection path had never implemented. Left undone, an order accumulated a
+ * session per setting the shopper had ever tried.
+ */
+describe("<PaymentSetting> clearing the superseded session", () => {
+  const ADYEN = { id: "ps-adyen", type: "payment_setting_adyens", name: "Adyen" }
+
+  function withBoth(sessions: unknown[]) {
+    return order({
+      available_payment_settings: [MANUAL, ADYEN],
+      payment_sessions: sessions,
+    } as never)
+  }
+
+  async function clickManual() {
+    await act(async () => {
+      fireEvent.click(screen.getAllByTestId("radio")[0] as HTMLElement)
+    })
+  }
+
+  it("deletes the session belonging to the setting just left", async () => {
+    renderSettings(
+      withBoth([
+        {
+          id: "session-adyen",
+          status: "unpaid",
+          created_at: "2026-09-08T10:57:54Z",
+          payment_setting: ADYEN,
+        },
+      ])
+    )
+
+    await clickManual()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    expect(discardPaymentSessionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ paymentSessionId: "session-adyen" })
+    )
+  })
+
+  it("does nothing at all when the setting is already selected", async () => {
+    // The radio ignores a click on the current selection, which is what keeps
+    // the adopt branch — where the superseded session *is* the selection —
+    // unreachable from a click. So the property worth pinning is that a stray
+    // click destroys nothing.
+    renderSettings(
+      withBoth([
+        {
+          id: "session-manual",
+          status: "unpaid",
+          created_at: "2026-09-08T10:57:54Z",
+          payment_setting: MANUAL,
+        },
+      ])
+    )
+
+    await clickManual()
+
+    expect(createPaymentSessionMock).not.toHaveBeenCalled()
+    expect(discardPaymentSessionMock).not.toHaveBeenCalled()
+  })
+
+  it("leaves a session that is holding money", async () => {
+    // Not ours to undo from a radio button: the API refuses to delete a session
+    // with transactions attached, and the money is a real record.
+    renderSettings(
+      withBoth([
+        {
+          id: "session-adyen",
+          status: "authorized",
+          created_at: "2026-09-08T10:57:54Z",
+          payment_setting: ADYEN,
+          payment_authorization: { status: "succeeded" },
+        },
+      ])
+    )
+
+    await clickManual()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    expect(discardPaymentSessionMock).not.toHaveBeenCalled()
+  })
+
+  it("still completes the selection when the delete fails", async () => {
+    // Tidying, not correctness: the newest session is the selection either way,
+    // so a refused delete must not turn into a failed selection.
+    discardPaymentSessionMock.mockRejectedValue(new Error("nope"))
+    renderSettings(
+      withBoth([
+        {
+          id: "session-adyen",
+          status: "unpaid",
+          created_at: "2026-09-08T10:57:54Z",
+          payment_setting: ADYEN,
+        },
+      ])
+    )
+
+    await clickManual()
+
+    await waitFor(() => {
+      expect(getOrder).toHaveBeenCalledWith("order-1")
+    })
+    expect(screen.queryByTestId("error")).toBeNull()
+  })
+})
+
+/**
+ * `returnUrl`, and why it is on this component.
+ *
+ * From gateway version 72 Adyen refuses a `returnUrl` over 1024 characters, and
+ * a checkout carrying its access token in the query string exceeds that on the
+ * token alone — a JWT here is around 1.5 kB. The refusal arrives as
+ * `Field 'returnUrl' may not exceed 1024 characters` plus a collateral
+ * `token - can't be blank`, neither of which names anything the application set.
+ */
+describe("<PaymentSetting> returnUrl", () => {
+  const ADYEN = {
+    id: "ps-adyen",
+    type: "payment_setting_adyens",
+    name: "Adyen",
+    public_key: "test_ABC",
+  }
+
+  function renderAdyenOnly(returnUrl?: string) {
+    return render(
+      <Wrapper currentOrder={order({ available_payment_settings: [ADYEN] } as never)}>
+        <PaymentSetting returnUrl={returnUrl}>
+          <PaymentSettingRadioButton data-testid="radio" />
+        </PaymentSetting>
+      </Wrapper>
+    )
+  }
+
+  async function clickIt() {
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("radio"))
+    })
+  }
+
+  it("sends the one the application gave, verbatim", async () => {
+    renderAdyenOnly("https://shop.example/checkout/o-1?paymentReturn=true")
+    await clickIt()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          clientData: { return_url: "https://shop.example/checkout/o-1?paymentReturn=true" },
+        })
+      )
+    })
+  })
+
+  it("warns when the one it would send cannot be used", async () => {
+    // The failure it replaces named nothing an application had set: Adyen's
+    // "may not exceed 1024 characters", plus a collateral "token - can't be
+    // blank" from the session's own validation. The check sits here rather than
+    // in the URL builder so it also covers a URL the application supplied.
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    const long = `https://shop.example/o-1?accessToken=${"e".repeat(1200)}`
+    expect(long.length).toBeGreaterThan(ADYEN_RETURN_URL_MAX_LENGTH)
+
+    renderAdyenOnly(long)
+    await clickIt()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("over Adyen's limit"))
+    warn.mockRestore()
+  })
+
+  it("says nothing about one that fits", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    renderAdyenOnly("https://shop.example/o-1?paymentReturn=true")
+    await clickIt()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
+
+  it("falls back to the current location when the application says nothing", async () => {
+    renderAdyenOnly()
+    await clickIt()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    const [{ clientData }] = createPaymentSessionMock.mock.calls[0] as [
+      { clientData?: { return_url?: string } },
+    ]
+    // jsdom serves the page from localhost, which is all this needs to assert:
+    // the fallback is the page, not a configured value.
+    expect(clientData?.return_url).toContain(window.location.origin)
   })
 })
