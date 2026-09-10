@@ -6,7 +6,7 @@ import { Meta, Source } from '@storybook/addon-docs/blocks';
 
 This guide covers the move from `@commercelayer/react-components` **v4** to **v5**.
 
-Most of the upgrade is mechanical. No component was removed from the public API in v5 — everything exported by v4 is still exported, and the deprecated container components keep working. That means you can upgrade in two stages: get the app running on v5 first, then migrate the deprecated patterns at your own pace.
+Most of the upgrade is mechanical. The v5 root barrel is a strict superset of v4's: every name v4 exported **from the package root** is still exported, and the deprecated container components keep working. What v5 removed is the 20 subpath entry points — and a few components were public only through those, so check section 3 before you start. Past that, you can upgrade in two stages: get the app running on v5 first, then migrate the deprecated patterns at your own pace.
 
 There are, however, four changes that **will** break a v4 app and need to be handled up front. Their headings are marked **(breaking)**.
 
@@ -92,6 +92,28 @@ import { Price, useOrderContainer } from '@commercelayer/react-components'`}
 Both CJS and ESM builds are still shipped, so `require()` keeps working at the root entry. Only the subpaths are affected.
 
 One component changed module while keeping its name: `DeliveryLeadTime` moved from the `skus` folder to `shipping_methods`. If you imported it from the root, nothing changes.
+
+### Check the names, don't assume they moved
+
+The root barrel covers everything v4 exported from the root, but some modules were public *only* through a subpath and have no root equivalent. The `context/*`, `utils/*` and `component_utils/*` trees are internal and were never intended as public API. `gift_cards/GiftCardRecipientInput` was removed from the source altogether.
+
+The individual payment provider components — `payment_source/AdyenPayment`, `StripePayment`, `PaypalPayment` and the rest — are also internal now. `<PaymentMethod>` selects the right one from the payment source type, so configure it through the `config` prop rather than rendering a provider yourself:
+
+<Source
+  language="jsx"
+  dark
+  code={`// ❌ v4 — rendering a provider directly
+import AdyenPayment from '@commercelayer/react-components/payment_source/AdyenPayment'
+
+// ✅ v5 — configure it through PaymentMethod
+import { PaymentMethod, type PaymentMethodConfig } from '@commercelayer/react-components'
+
+const config: PaymentMethodConfig = { adyenPayment: { … } }
+
+<PaymentMethod config={config} />`}
+/>
+
+Grep your own imports for `@commercelayer/react-components/` and check each name against the root barrel rather than assuming it simply moved. If a component you relied on is missing from the root, please open an issue: several were left out of the barrel unintentionally when the subpaths were removed, and those are bugs we want to fix rather than deliberate removals.
 
 ---
 
@@ -231,9 +253,18 @@ v5 drops several transitive dependencies. If your own code imported them without
 
 - `lodash` — removed
 - `jwt-decode` — removed; token decoding now happens inside `@commercelayer/core-components`
-- `iframe-resizer` v4 — replaced by `@iframe-resizer/parent` v5
 
-`@commercelayer/sdk` also jumps from `^6.46.0` to `8.0.0-beta.11`. If you use the SDK alongside these components, align your version so the two agree on the resource types.
+`@commercelayer/sdk` also jumps from `^6.46.0` to `8.0.0-beta.11`, and if you use the SDK alongside these components, **aligning your version is required, not advisory**. The SDK is a regular dependency here rather than a peer, so a consumer still on SDK 6 installs cleanly and only fails later, at typecheck, wherever an SDK-typed value crosses the boundary — an `Address` coming out of an `<AddressField>` render prop, for instance:
+
+<Source
+  language="text"
+  dark
+  code={`Type 'BingGeocoder' is not assignable to type 'Geocoder'.
+  Types of property 'type' are incompatible.
+    Type '"bing_geocoders"' is not assignable to type '"geocoders"'.`}
+/>
+
+SDK 8 adds the `BingGeocoder` variant to the nested `geocoder` union, so anything that reaches `Address` is affected — including `OrderSubscription`, through `market` → `merchant` → `address`.
 
 ---
 
