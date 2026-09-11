@@ -213,3 +213,22 @@ describe("createSharedStateStore — null key", () => {
     expect(store.getSnapshot(null).isSaving).toBe(false)
   })
 })
+
+describe("createSharedStateStore — clear", () => {
+  test("drops every key and notifies the subscribers that had state", () => {
+    const store = makeStore()
+    const first = vi.fn()
+    const second = vi.fn()
+    store.subscribe("tok:ord_1", first)
+    store.subscribe("tok:ord_2", second)
+    store.setState("tok:ord_1", { isSaving: true })
+    first.mockClear()
+    second.mockClear()
+
+    store.clear()
+
+    expect(first).toHaveBeenCalledTimes(1)
+    expect(second).not.toHaveBeenCalled()
+    expect(store.getSnapshot("tok:ord_1")).toEqual(initialState)
+  })
+})

@@ -1,4 +1,9 @@
 export type { InterceptorManager } from "@commercelayer/core-components"
+export type {
+  AddressFormError,
+  AddressFormResource,
+  AddressFormValidator,
+} from "./addresses/index"
 export { useAddressForm } from "./addresses/useAddressForm"
 export { useAvailability } from "./availability/useAvailability"
 export { useCustomer } from "./customers/useCustomer"

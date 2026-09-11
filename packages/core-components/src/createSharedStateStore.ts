@@ -55,6 +55,8 @@ export interface SharedStateStore<T extends object> {
   ) => void
   /** Drop a key's state, back to the initial snapshot. */
   reset: (key: string | null) => void
+  /** Drop every key. Meant for test isolation, since entries are long-lived. */
+  clear: () => void
 }
 
 export function createSharedStateStore<T extends object>(
@@ -138,5 +140,10 @@ export function createSharedStateStore<T extends object>(
     for (const listener of entry.listeners) listener()
   }
 
-  return { buildKey, subscribe, getSnapshot, getServerSnapshot, setState, reset }
+  function clear(): void {
+    for (const key of Array.from(store.keys())) reset(key)
+    store.clear()
+  }
+
+  return { buildKey, subscribe, getSnapshot, getServerSnapshot, setState, reset, clear }
 }
