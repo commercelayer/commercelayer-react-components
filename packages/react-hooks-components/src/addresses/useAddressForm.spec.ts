@@ -574,3 +574,59 @@ describe("useAddressForm — flags and clone ids", () => {
     expect(result.current.errors).toEqual([])
   })
 })
+
+describe("useAddressForm — caller-owned order", () => {
+  test("does not fetch when the order is handed in", () => {
+    const { result } = renderHook(() =>
+      useAddressForm({ accessToken: "token", orderId: "ord_1", order: fakeOrder as never })
+    )
+
+    expect(mocks.retrieveOrder).not.toHaveBeenCalled()
+    expect(result.current.order).toEqual(fakeOrder)
+  })
+
+  test("lets the caller apply the order update and reports back what it returns", async () => {
+    const updateOrder = vi.fn(async () => ({ order: { ...fakeOrder, _applied: true } as never }))
+
+    const { result } = renderHook(() =>
+      useAddressForm({
+        accessToken: "token",
+        orderId: "ord_1",
+        order: fakeOrder as never,
+        updateOrder,
+      })
+    )
+
+    let outcome!: Awaited<ReturnType<typeof result.current.saveAddresses>>
+    await act(async () => {
+      outcome = await result.current.saveAddresses()
+    })
+
+    expect(updateOrder).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "ord_1", attributes: expect.objectContaining({ id: "ord_1" }) })
+    )
+    expect(mocks.updateOrder).not.toHaveBeenCalled()
+    expect(outcome.success).toBe(true)
+    expect(outcome.order).toEqual({ ...fakeOrder, _applied: true })
+  })
+
+  test("reports success even when the caller's update returns nothing", async () => {
+    const updateOrder = vi.fn(async () => undefined)
+
+    const { result } = renderHook(() =>
+      useAddressForm({
+        accessToken: "token",
+        orderId: "ord_1",
+        order: fakeOrder as never,
+        updateOrder,
+      })
+    )
+
+    let outcome!: Awaited<ReturnType<typeof result.current.saveAddresses>>
+    await act(async () => {
+      outcome = await result.current.saveAddresses()
+    })
+
+    expect(outcome).toEqual({ success: true, order: undefined })
+  })
+})

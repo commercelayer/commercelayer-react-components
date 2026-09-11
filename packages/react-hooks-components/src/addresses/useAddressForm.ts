@@ -5,7 +5,7 @@ import {
   type SaveOrderAddressesParams,
   saveOrderAddresses,
 } from "@commercelayer/core-components"
-import type { Order } from "@commercelayer/sdk"
+import type { Order, OrderUpdate } from "@commercelayer/sdk"
 import { useCallback, useId, useMemo, useSyncExternalStore } from "react"
 import useSWR from "swr"
 import {
@@ -23,6 +23,21 @@ interface UseAddressFormParams {
   accessToken: string
   orderId?: string | null
   interceptors?: InterceptorManager
+  /**
+   * An order you already have. When given, the hook does not fetch it — useful
+   * when the caller already holds the order and a second request would be
+   * wasted.
+   */
+  order?: Order | null
+  /**
+   * Applies the order update yourself instead of letting the hook call the API.
+   * Use it when the order lives in a store of your own that has to learn about
+   * the change; return the updated order so the hook can report it back.
+   */
+  updateOrder?: (params: {
+    id: string
+    attributes: OrderUpdate
+  }) => Promise<{ order?: Order } | undefined>
   /**
    * Isolates this instance's form state from the other instances working on the
    * same order. Leave it out unless you deliberately render two independent
@@ -134,15 +149,19 @@ export function useAddressForm({
   accessToken,
   orderId,
   interceptors,
+  order: providedOrder,
+  updateOrder: providedUpdateOrder,
   scope,
 }: UseAddressFormParams): UseAddressFormReturn {
   const {
-    data: order,
+    data: fetchedOrder,
     isLoading,
     error: swrError,
     mutate,
   } = useSWR(
-    accessToken && orderId != null ? ["order", "retrieve", accessToken, orderId] : null,
+    providedOrder == null && accessToken && orderId != null
+      ? ["order", "retrieve", accessToken, orderId]
+      : null,
     async () => await retrieveOrder({ accessToken, interceptors, id: orderId as string }),
     {
       revalidateOnFocus: false,
@@ -156,6 +175,8 @@ export function useAddressForm({
   // A per-instance key keeps the hook behaving like plain local state until a
   // real order id arrives.
   const instanceId = useId()
+  const order = providedOrder ?? fetchedOrder
+
   const key = useMemo(
     () => buildKey({ accessToken, orderId, scope }) ?? `local:${instanceId}`,
     [accessToken, orderId, scope, instanceId]
@@ -304,6 +325,14 @@ export function useAddressForm({
           return { success: false, error: saveError }
         }
 
+        if (providedUpdateOrder != null) {
+          const applied = await providedUpdateOrder({
+            id: order.id,
+            attributes: orderAttributes,
+          })
+          return { success: true, order: applied?.order }
+        }
+
         const { id, ...attributes } = orderAttributes
         const updatedOrder = await coreUpdateOrder({
           accessToken,
@@ -321,7 +350,7 @@ export function useAddressForm({
         setState(key, { isSaving: false })
       }
     },
-    [accessToken, interceptors, order, key, mutate]
+    [accessToken, interceptors, order, key, mutate, providedUpdateOrder]
   )
 
   return {
