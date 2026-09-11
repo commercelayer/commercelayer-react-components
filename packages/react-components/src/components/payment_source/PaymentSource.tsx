@@ -3,7 +3,7 @@ import { type JSX, useContext, useEffect, useState } from "react"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
-import PaymentMethodContext from "#context/PaymentMethodContext"
+import { usePaymentMethodStateContext } from "#hooks/usePaymentMethodStateContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { LoaderType } from "#typings/index"
 import getCardDetails from "#utils/getCardDetails"
@@ -33,13 +33,15 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
   const { order } = useContext(OrderContext)
   const { payments } = useContext(CustomerContext)
   const {
-    errors,
-    currentPaymentMethodId,
-    paymentSource,
-    destroyPaymentSource,
-    currentPaymentMethodType,
-    currentCustomerPaymentSourceId,
-  } = useContext(PaymentMethodContext)
+    paymentMethodContext: {
+      errors,
+      currentPaymentMethodId,
+      paymentSource,
+      destroyPaymentSource,
+      currentPaymentMethodType,
+      currentCustomerPaymentSourceId,
+    },
+  } = usePaymentMethodStateContext()
   const [show, setShow] = useState(false)
   const [showCard, setShowCard] = useState(false)
 

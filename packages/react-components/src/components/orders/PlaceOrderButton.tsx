@@ -10,9 +10,9 @@ import {
   useState,
 } from "react"
 import OrderContext from "#context/OrderContext"
-import PaymentMethodContext from "#context/PaymentMethodContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
 import useCommerceLayer from "#hooks/useCommerceLayer"
+import { usePaymentMethodStateContext } from "#hooks/usePaymentMethodStateContext"
 import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PlaceOrderOptions } from "#reducers/PlaceOrderReducer"
 import type { BaseError } from "#typings/errors"
@@ -94,15 +94,17 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const [hasBlockingErrors, setHasBlockingErrors] = useState(false)
   const { sdkClient } = useCommerceLayer()
   const {
-    currentPaymentMethodRef,
-    loading,
-    currentPaymentMethodType,
-    paymentSource,
-    setPaymentSource,
-    setPaymentMethodErrors,
-    currentCustomerPaymentSourceId,
-    errors: paymentMethodErrors,
-  } = useContext(PaymentMethodContext)
+    paymentMethodContext: {
+      currentPaymentMethodRef,
+      loading,
+      currentPaymentMethodType,
+      paymentSource,
+      setPaymentSource,
+      setPaymentMethodErrors,
+      currentCustomerPaymentSourceId,
+      errors: paymentMethodErrors,
+    },
+  } = usePaymentMethodStateContext()
   const { order, setOrderErrors, errors } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
   useEffect(() => {

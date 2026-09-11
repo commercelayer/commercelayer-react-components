@@ -1,6 +1,6 @@
-import { act, fireEvent, render, screen } from "@testing-library/react"
+import { act, fireEvent, render, renderHook, screen } from "@testing-library/react"
 import { type ReactNode, useContext } from "react"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { PaymentMethod } from "#components/payment_methods/PaymentMethod"
 import { PaymentMethodsContainer } from "#components/payment_methods/PaymentMethodsContainer"
 import CommerceLayerContext from "#context/CommerceLayerContext"
@@ -8,6 +8,20 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import PaymentMethodContext, { defaultPaymentMethodContext } from "#context/PaymentMethodContext"
 import PlaceOrderContext, { defaultPlaceOrderContext } from "#context/PlaceOrderContext"
+import { usePaymentMethod } from "#hooks/usePaymentMethod"
+import { paymentMethodStore } from "#utils/paymentMethodStore"
+import { placeOrderStore } from "#utils/placeOrderStore"
+
+// The payment and place-order state is shared per order and outlives its
+// subscribers on purpose, so it has to be dropped between tests. Clearing
+// before each test as well as after: a fetch left in flight by the previous
+// test resolves into the store once this one has already started.
+function clearSharedStores() {
+  paymentMethodStore.clear()
+  placeOrderStore.clear()
+}
+beforeEach(clearSharedStores)
+afterEach(clearSharedStores)
 
 vi.mock("@commercelayer/core-components", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@commercelayer/core-components")>()
@@ -1315,5 +1329,93 @@ describe("PaymentMethod", () => {
 
       vi.useRealTimers()
     })
+  })
+})
+
+describe("payment-method state shared across subtrees", () => {
+  function hookWrapper({ children }: { children: ReactNode }) {
+    return (
+      <CommerceLayerContext.Provider value={{ accessToken: "shared-token" }}>
+        <OrderContext.Provider
+          value={{
+            ...defaultOrderContext,
+            orderId: "order-shared",
+            order: { id: "order-shared", status: "pending" },
+            include: ["available_payment_methods"],
+            includeLoaded: { available_payment_methods: true },
+            addResourceToInclude: vi.fn(),
+            getOrder: vi.fn(),
+            updateOrder: vi.fn(),
+          }}
+        >
+          {children}
+        </OrderContext.Provider>
+      </CommerceLayerContext.Provider>
+    )
+  }
+
+  it("a component outside the payment subtree sees what the owner sets, which is what #841 was about", async () => {
+    // `<PlaceOrderButton>` reads this state and is a sibling of the payment
+    // step, so it used to get the empty default context at the money step.
+    const owner = renderHook(() => usePaymentMethod({ isStandalone: true, isOwner: true }), {
+      wrapper: hookWrapper,
+    })
+    const reader = renderHook(() => usePaymentMethod({ isStandalone: true }), {
+      wrapper: hookWrapper,
+    })
+
+    expect(reader.result.current.loading).toBeUndefined()
+
+    await act(async () => {
+      owner.result.current.setLoading({ loading: true })
+    })
+
+    expect(reader.result.current.loading).toBe(true)
+  })
+
+  it("the payment form ref set in the payment subtree reaches the reader", async () => {
+    const owner = renderHook(() => usePaymentMethod({ isStandalone: true, isOwner: true }), {
+      wrapper: hookWrapper,
+    })
+    const reader = renderHook(() => usePaymentMethod({ isStandalone: true }), {
+      wrapper: hookWrapper,
+    })
+    const ref = { current: document.createElement("form") }
+
+    await act(async () => {
+      owner.result.current.setPaymentRef({ ref })
+    })
+
+    expect(reader.result.current.currentPaymentMethodRef).toBe(ref)
+  })
+
+  it("a reader does not refetch the payment methods", async () => {
+    const getOrder = vi.fn()
+    function readerWrapper({ children }: { children: ReactNode }) {
+      return (
+        <CommerceLayerContext.Provider value={{ accessToken: "reader-token" }}>
+          <OrderContext.Provider
+            value={{
+              ...defaultOrderContext,
+              orderId: "order-reader",
+              order: { id: "order-reader", status: "placed", payment_source: null },
+              include: [],
+              includeLoaded: {},
+              addResourceToInclude: vi.fn(),
+              getOrder,
+              updateOrder: vi.fn(),
+            }}
+          >
+            {children}
+          </OrderContext.Provider>
+        </CommerceLayerContext.Provider>
+      )
+    }
+
+    await act(async () => {
+      renderHook(() => usePaymentMethod({ isStandalone: true }), { wrapper: readerWrapper })
+    })
+
+    expect(getOrder).not.toHaveBeenCalled()
   })
 })
