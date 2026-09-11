@@ -1078,7 +1078,13 @@ describe("PaymentMethod", () => {
   describe("PaymentMethod rendering — clickableContainer advanced", () => {
     it("does not call setPaymentMethod when status is placing", async () => {
       const mockSetPaymentMethod = vi.fn().mockResolvedValue({ success: true, order: MOCK_ORDER })
-      const placingPlaceOrderContext = { ...defaultPlaceOrderContext, status: "placing" as const }
+      // `_isProvided` is what marks a container as present: without it the
+      // component reads the shared state instead of this hand-made context.
+      const placingPlaceOrderContext = {
+        ...defaultPlaceOrderContext,
+        _isProvided: true as const,
+        status: "placing" as const,
+      }
 
       await act(async () => {
         render(

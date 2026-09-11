@@ -22,7 +22,7 @@ import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import PlaceOrderContext from "#context/PlaceOrderContext"
+import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import { getAdyenShopperLocale } from "#utils/adyenShopperLocale"
 import browserInfo, { cleanUrlBy } from "#utils/browserInfo"
 import { getPublicIP } from "#utils/getPublicIp"
@@ -168,7 +168,9 @@ export function AdyenPayment({
   } = useContext(PaymentMethodContext)
   const { order, updateOrder, getOrderByFields } = useContext(OrderContext)
   const authConfig = useContext(CommerceLayerContext)
-  const { placeOrderButtonRef, setPlaceOrder, status } = useContext(PlaceOrderContext)
+  const {
+    placeOrderContext: { placeOrderButtonRef, setPlaceOrder, status },
+  } = usePlaceOrderStateContext()
   const { customers } = useContext(CustomerContext)
   // Two distinct locales that Adyen does not treat as interchangeable, deliberately derived
   // from one source. `dropInLocale` goes into the Core configuration and is client-side only:

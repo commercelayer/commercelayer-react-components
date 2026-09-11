@@ -4,8 +4,8 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import PlaceOrderContext from "#context/PlaceOrderContext"
 import { usePaymentMethod } from "#hooks/usePaymentMethod"
+import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PaymentMethodConfig, PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { LoaderType } from "#typings"
 import type { DefaultChildrenType } from "#typings/globals"
@@ -115,7 +115,9 @@ export function PaymentMethod({
   } = isStandalone ? standaloneCtx : parentCtx
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
-  const { status } = useContext(PlaceOrderContext)
+  const {
+    placeOrderContext: { status },
+  } = usePlaceOrderStateContext()
   /**
    * A partially-authorized order is mid-payment: part of the total is covered (an Adyen gift
    * card, say) and the shopper still has to pay the remainder with another method, in the
