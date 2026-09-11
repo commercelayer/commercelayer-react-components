@@ -1,13 +1,11 @@
 import type { Order } from "@commercelayer/sdk"
 import { type JSX, type ReactNode, useContext, useState } from "react"
 import Parent from "#components/utils/Parent"
-import AddressContext from "#context/AddressContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
-import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
-import { useStandaloneAddress } from "#hooks/useStandaloneAddress"
+import { useAddressStateContext } from "#hooks/useAddressStateContext"
 import type { TCustomerAddress } from "#typings/customers"
 import type { ChildrenFunction } from "#typings/index"
 import { addressesController, countryLockController } from "#utils/addressesManager"
@@ -40,22 +38,10 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     onClick,
     ...p
   } = props
-  const parentAddressContext = useContext(AddressContext)
-  // Standalone means no `<AddressesContainer>` above, which is also the case
-  // where the forms are in a sibling subtree this button cannot see through
-  // context. The shared state behind `useStandaloneAddress` is what reaches
-  // across.
-  const isStandalone = parentAddressContext.saveAddresses == null
-  const config = useContext(CommerceLayerContext)
-  const { order, orderId, updateOrder, setOrderErrors } = useContext(OrderContext)
-
-  const standalone = useStandaloneAddress({
-    isStandalone,
-    config,
-    order,
-    orderId,
-    updateOrder,
-  })
+  // Without `<AddressesContainer>` the forms sit in a sibling subtree this
+  // button cannot see through context; the shared state is what reaches across.
+  const { isStandalone, addressContext, validateAddresses } = useAddressStateContext()
+  const { order, setOrderErrors } = useContext(OrderContext)
 
   const {
     errors,
@@ -66,7 +52,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     billingAddressId,
     shippingAddressId,
     invertAddresses,
-  } = isStandalone ? standalone.standaloneContextValue : parentAddressContext
+  } = addressContext
   const {
     customerEmail: email,
     addresses,
@@ -121,12 +107,9 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     if (isStandalone) {
       // The form contexts live inside each form, so a sibling button cannot
       // read them. The forms register their validator instead.
-      const { valid } = standalone.validateAddresses()
+      const { valid } = validateAddresses()
       if (!valid) return
-    } else if (
-      billingFormCtx.errorMode === "submit" ||
-      shippingFormCtx.errorMode === "submit"
-    ) {
+    } else if (billingFormCtx.errorMode === "submit" || shippingFormCtx.errorMode === "submit") {
       const billingErrors =
         billingFormCtx.errorMode === "submit" ? (billingFormCtx.validate?.() ?? {}) : {}
       const shippingErrors =

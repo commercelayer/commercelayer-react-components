@@ -6,11 +6,11 @@ import AddressCardsTemplate, {
   type HandleSelect,
 } from "#components/utils/AddressCardsTemplate"
 import AddressChildrenContext from "#context/AddressChildrenContext"
-import AddressContext from "#context/AddressContext"
 import BillingAddressContext from "#context/BillingAddressContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import ShippingAddressContext from "#context/ShippingAddressContext"
+import { useAddressStateContext } from "#hooks/useAddressStateContext"
 import type { DefaultChildrenType } from "#typings/globals"
 import { isEmpty } from "#utils/isEmpty"
 
@@ -53,7 +53,9 @@ export function Address(props: Props): JSX.Element {
   const { addresses: addressesContext } = useContext(CustomerContext)
   const { setBillingAddress, billingCustomerAddressId } = useContext(BillingAddressContext)
   const { setShippingAddress, shippingCustomerAddressId } = useContext(ShippingAddressContext)
-  const { shipToDifferentAddress, billingAddressId, shippingAddressId } = useContext(AddressContext)
+  const {
+    addressContext: { shipToDifferentAddress, billingAddressId, shippingAddressId },
+  } = useAddressStateContext()
   const { order } = useContext(OrderContext)
   const [selected, setSelected] = useState<null | number | undefined>(null)
   const items = !isEmpty(addresses) ? addresses : (addressesContext && addressesContext) || []

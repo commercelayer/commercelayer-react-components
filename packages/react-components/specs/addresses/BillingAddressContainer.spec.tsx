@@ -6,7 +6,10 @@ import BillingAddressContext from "#context/BillingAddressContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 
-vi.mock("@commercelayer/core-components", () => ({ updateAddressReference: vi.fn() }))
+vi.mock("@commercelayer/core-components", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@commercelayer/core-components")>()),
+  updateAddressReference: vi.fn(),
+}))
 
 let latestSetBillingAddress: unknown
 

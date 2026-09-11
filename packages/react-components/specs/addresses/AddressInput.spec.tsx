@@ -5,7 +5,9 @@ import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import CustomerAddressFormContext from "#context/CustomerAddressFormContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 
-vi.mock("@commercelayer/core-components", () => ({}))
+vi.mock("@commercelayer/core-components", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@commercelayer/core-components")>()),
+}))
 
 const makeBillingCtx = (overrides: Partial<DefaultContextAddress> = {}): DefaultContextAddress =>
   ({

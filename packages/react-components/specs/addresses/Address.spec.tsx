@@ -7,7 +7,9 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import ShippingAddressContext from "#context/ShippingAddressContext"
 
-vi.mock("@commercelayer/core-components", () => ({}))
+vi.mock("@commercelayer/core-components", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@commercelayer/core-components")>()),
+}))
 
 const mockAddress: AddressType = {
   id: "addr-1",
@@ -51,6 +53,7 @@ function renderAddress(
         value={
           {
             ...defaultAddressContext,
+            saveAddresses: vi.fn(),
             setCloneAddress: vi.fn(),
             ...contextOverrides.address,
             // biome-ignore lint/suspicious/noExplicitAny: test cast
@@ -249,6 +252,7 @@ describe("Address", () => {
           value={
             {
               ...defaultAddressContext,
+              saveAddresses: vi.fn(),
               setCloneAddress: vi.fn(),
               shipToDifferentAddress: extra,
             } as any
