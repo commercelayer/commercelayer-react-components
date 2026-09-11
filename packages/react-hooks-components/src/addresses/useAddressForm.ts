@@ -169,11 +169,10 @@ export function useAddressForm({
     }
   )
 
-  // Without an order there is nothing to share and nothing to save, but the
-  // form must still hold what is being typed rather than drop it silently —
-  // that failure mode is the whole reason this state moved out of context.
-  // A per-instance key keeps the hook behaving like plain local state until a
-  // real order id arrives.
+  // Without an access token there is nobody to share with, but the form must
+  // still hold what is being typed rather than drop it silently — that failure
+  // mode is the whole reason this state moved out of context. A per-instance
+  // key keeps the hook behaving like plain local state until a token arrives.
   const instanceId = useId()
   const order = providedOrder ?? fetchedOrder
 

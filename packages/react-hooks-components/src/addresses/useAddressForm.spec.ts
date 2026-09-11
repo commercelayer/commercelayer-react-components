@@ -346,9 +346,34 @@ describe("useAddressForm — state shared across instances", () => {
     expect(aside.result.current.billingAddress).toEqual({})
   })
 
-  test("instances without an order id keep their own values", async () => {
-    const first = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
-    const second = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
+  test("instances without an order still share, which is what an address book needs", async () => {
+    const form = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
+    const button = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
+
+    act(() => {
+      form.result.current.setBillingAddress({ first_name: "John" })
+    })
+
+    await waitFor(() =>
+      expect(button.result.current.billingAddress).toEqual({ first_name: "John" })
+    )
+  })
+
+  test("an order-scoped state is separate from the order-less one", async () => {
+    const scoped = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const bookish = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
+
+    act(() => {
+      scoped.result.current.setBillingAddress({ first_name: "John" })
+    })
+
+    await waitFor(() => expect(scoped.result.current.billingAddress).toEqual({ first_name: "John" }))
+    expect(bookish.result.current.billingAddress).toEqual({})
+  })
+
+  test("instances without an access token keep their own values", async () => {
+    const first = renderHook(() => useAddressForm({ accessToken: "", orderId: null }))
+    const second = renderHook(() => useAddressForm({ accessToken: "", orderId: null }))
 
     act(() => {
       first.result.current.setBillingAddress({ first_name: "John" })

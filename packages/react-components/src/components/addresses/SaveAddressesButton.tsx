@@ -3,9 +3,11 @@ import { type JSX, type ReactNode, useContext, useState } from "react"
 import Parent from "#components/utils/Parent"
 import AddressContext from "#context/AddressContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
+import { useStandaloneAddress } from "#hooks/useStandaloneAddress"
 import type { TCustomerAddress } from "#typings/customers"
 import type { ChildrenFunction } from "#typings/index"
 import { addressesController, countryLockController } from "#utils/addressesManager"
@@ -38,6 +40,23 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     onClick,
     ...p
   } = props
+  const parentAddressContext = useContext(AddressContext)
+  // Standalone means no `<AddressesContainer>` above, which is also the case
+  // where the forms are in a sibling subtree this button cannot see through
+  // context. The shared state behind `useStandaloneAddress` is what reaches
+  // across.
+  const isStandalone = parentAddressContext.saveAddresses == null
+  const config = useContext(CommerceLayerContext)
+  const { order, orderId, updateOrder, setOrderErrors } = useContext(OrderContext)
+
+  const standalone = useStandaloneAddress({
+    isStandalone,
+    config,
+    order,
+    orderId,
+    updateOrder,
+  })
+
   const {
     errors,
     billing_address: billingAddress,
@@ -47,8 +66,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     billingAddressId,
     shippingAddressId,
     invertAddresses,
-  } = useContext(AddressContext)
-  const { order, setOrderErrors } = useContext(OrderContext)
+  } = isStandalone ? standalone.standaloneContextValue : parentAddressContext
   const {
     customerEmail: email,
     addresses,
@@ -100,16 +118,22 @@ export function SaveAddressesButton(props: Props): JSX.Element {
   const handleClick = async (): Promise<void> => {
     // When errorMode="submit", trigger validation on both forms before proceeding.
     // validate() sets errors in context and returns them synchronously.
-    if (billingFormCtx.errorMode === "submit" || shippingFormCtx.errorMode === "submit") {
+    if (isStandalone) {
+      // The form contexts live inside each form, so a sibling button cannot
+      // read them. The forms register their validator instead.
+      const { valid } = standalone.validateAddresses()
+      if (!valid) return
+    } else if (
+      billingFormCtx.errorMode === "submit" ||
+      shippingFormCtx.errorMode === "submit"
+    ) {
       const billingErrors =
         billingFormCtx.errorMode === "submit" ? (billingFormCtx.validate?.() ?? {}) : {}
       const shippingErrors =
         shippingFormCtx.errorMode === "submit" ? (shippingFormCtx.validate?.() ?? {}) : {}
       if (Object.keys(billingErrors).length > 0 || Object.keys(shippingErrors).length > 0) return
     }
-    /* v8 ignore next */
-    // biome-ignore lint/style/noNonNullAssertion: errors is always defined when handleClick is reachable
-    if (Object.keys(errors!).length === 0) {
+    if (Object.keys(errors ?? []).length === 0) {
       setOrderErrors?.([])
       let response: {
         success: boolean

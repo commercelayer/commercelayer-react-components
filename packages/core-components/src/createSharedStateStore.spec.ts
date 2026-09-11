@@ -30,10 +30,15 @@ describe("createSharedStateStore — buildKey", () => {
     )
   })
 
-  test("returns null when the access token or the order id is missing", () => {
+  test("falls back to a token-wide key when there is no order", () => {
+    const store = makeStore()
+    expect(store.buildKey({ accessToken: "tok", orderId: null })).toBe("tok:no-order")
+    expect(store.buildKey({ accessToken: "tok" })).toBe("tok:no-order")
+  })
+
+  test("returns null when there is no access token", () => {
     const store = makeStore()
     expect(store.buildKey({ accessToken: "", orderId: "ord_1" })).toBeNull()
-    expect(store.buildKey({ accessToken: "tok", orderId: null })).toBeNull()
     expect(store.buildKey({})).toBeNull()
   })
 })

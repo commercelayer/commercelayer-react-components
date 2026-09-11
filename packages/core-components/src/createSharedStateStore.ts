@@ -32,9 +32,14 @@ type StoreEntry<T> = {
 }
 
 export interface SharedStateStore<T extends object> {
-  /**
-   * Build the store key for an order. Returns `null` when the key cannot be
-   * formed, mirroring the `null` SWR key idiom: a `null` key means "inert".
+   /**
+   * Build the store key. An order id scopes the state to that order; without
+   * one the state is scoped to the access token alone, which is what an
+   * address book editing a customer's saved addresses needs — there is no
+   * order there, but the form and the button that saves it still have to agree.
+   *
+   * Returns `null` when not even an access token is available, mirroring the
+   * `null` SWR key idiom: a `null` key means "inert".
    */
   buildKey: (params: {
     accessToken?: string | null
@@ -83,8 +88,9 @@ export function createSharedStateStore<T extends object>(
     orderId?: string | null
     scope?: string
   }): string | null {
-    if (!accessToken || !orderId) return null
-    return scope ? `${accessToken}:${orderId}:${scope}` : `${accessToken}:${orderId}`
+    if (!accessToken) return null
+    const base = `${accessToken}:${orderId ?? "no-order"}`
+    return scope ? `${base}:${scope}` : base
   }
 
   function subscribe(key: string | null, listener: () => void): () => void {
