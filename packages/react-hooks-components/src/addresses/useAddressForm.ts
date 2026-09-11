@@ -45,12 +45,38 @@ interface UseAddressFormReturn {
   error: string | null
   /** Validation errors currently raised by the mounted forms. */
   errors: AddressFormError[]
+  /** Whether the shipping address differs from the billing one. */
+  shipToDifferentAddress: boolean
+  /** Whether the forms collect business fields. */
+  isBusiness: boolean
+  /** Whether the order is built around the shipping address instead. */
+  invertAddresses: boolean
+  /** Saved customer address to clone as the billing address. */
+  billingAddressCloneId?: string
+  /** Saved customer address to clone as the shipping address. */
+  shippingAddressCloneId?: string
   /** Update billing address field values. */
   setBillingAddress: (values: Record<string, unknown>) => void
   /** Update shipping address field values. */
   setShippingAddress: (values: Record<string, unknown>) => void
   /** Replace the validation errors raised by the mounted forms. */
   setErrors: (errors: AddressFormError[]) => void
+  /**
+   * Replace the errors raised by one form, leaving the other form's errors
+   * alone. Errors are matched on their `resource`.
+   */
+  setResourceErrors: (resource: AddressFormResource, errors: AddressFormError[]) => void
+  /** Update the form-wide flags. Only the given ones change. */
+  setFlags: (flags: {
+    shipToDifferentAddress?: boolean
+    isBusiness?: boolean
+    invertAddresses?: boolean
+  }) => void
+  /** Point one or both addresses at a saved customer address. */
+  setCloneIds: (cloneIds: {
+    billingAddressCloneId?: string
+    shippingAddressCloneId?: string
+  }) => void
   /**
    * Register a form's validator so that a component outside the form — a save
    * button, typically — can validate it before saving. Returns the function
@@ -163,6 +189,39 @@ export function useAddressForm({
     [key]
   )
 
+  const setResourceErrors = useCallback(
+    (resource: AddressFormResource, errors: AddressFormError[]) => {
+      setState(key, (previous) => {
+        const kept = previous.errors.filter((error) => error.resource !== resource)
+        const raised = errors.filter((error) => error.resource === resource)
+        const merged = [...kept, ...raised]
+        // Two empty lists are still two different arrays, and handing back a
+        // new one on every keystroke would re-render every subscriber.
+        if (merged.length === 0 && previous.errors.length === 0) return previous
+        return { errors: merged }
+      })
+    },
+    [key]
+  )
+
+  const setFlags = useCallback(
+    (flags: {
+      shipToDifferentAddress?: boolean
+      isBusiness?: boolean
+      invertAddresses?: boolean
+    }) => {
+      setState(key, flags)
+    },
+    [key]
+  )
+
+  const setCloneIds = useCallback(
+    (cloneIds: { billingAddressCloneId?: string; shippingAddressCloneId?: string }) => {
+      setState(key, cloneIds)
+    },
+    [key]
+  )
+
   const registerValidator = useCallback(
     (resource: AddressFormResource, validator: AddressFormValidator) => {
       setState(key, (previous) =>
@@ -215,7 +274,14 @@ export function useAddressForm({
       // Read through the store rather than closing over the rendered snapshot:
       // the values may have been typed into a form that rendered after this
       // callback was created.
-      const { billingAddress, shippingAddress } = getSnapshot(key)
+      const {
+        billingAddress,
+        shippingAddress,
+        shipToDifferentAddress,
+        invertAddresses,
+        billingAddressCloneId,
+        shippingAddressCloneId,
+      } = getSnapshot(key)
 
       setState(key, { isSaving: true })
       try {
@@ -225,6 +291,10 @@ export function useAddressForm({
           order,
           billingAddress,
           shippingAddress,
+          shipToDifferentAddress,
+          invertAddresses,
+          billingAddressCloneId,
+          shippingAddressCloneId,
           ...params,
         }
 
@@ -262,9 +332,17 @@ export function useAddressForm({
     isSaving: state.isSaving,
     error: swrError != null ? String(swrError) : null,
     errors: state.errors,
+    shipToDifferentAddress: state.shipToDifferentAddress,
+    isBusiness: state.isBusiness,
+    invertAddresses: state.invertAddresses,
+    billingAddressCloneId: state.billingAddressCloneId,
+    shippingAddressCloneId: state.shippingAddressCloneId,
     setBillingAddress,
     setShippingAddress,
     setErrors,
+    setResourceErrors,
+    setFlags,
+    setCloneIds,
     registerValidator,
     validateAddresses,
     saveAddresses,

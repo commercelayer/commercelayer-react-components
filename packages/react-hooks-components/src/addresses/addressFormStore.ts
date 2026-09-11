@@ -28,6 +28,16 @@ export interface AddressFormState {
   errors: AddressFormError[]
   /** Validators registered by the mounted forms. */
   validators: Readonly<Partial<Record<AddressFormResource, AddressFormValidator>>>
+  /** Whether the shipping address differs from the billing one. */
+  shipToDifferentAddress: boolean
+  /** Whether the forms collect business fields. */
+  isBusiness: boolean
+  /** Whether the order is built around the shipping address instead. */
+  invertAddresses: boolean
+  /** Saved customer address to clone as the billing address. */
+  billingAddressCloneId?: string
+  /** Saved customer address to clone as the shipping address. */
+  shippingAddressCloneId?: string
 }
 
 export const EMPTY_ADDRESS: Readonly<Record<string, unknown>> = Object.freeze({})
@@ -39,6 +49,11 @@ const initialState: AddressFormState = {
   isSaving: false,
   errors: EMPTY_ERRORS as AddressFormError[],
   validators: Object.freeze({}),
+  shipToDifferentAddress: false,
+  isBusiness: false,
+  invertAddresses: false,
+  billingAddressCloneId: undefined,
+  shippingAddressCloneId: undefined,
 }
 
 /**

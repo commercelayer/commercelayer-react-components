@@ -464,3 +464,113 @@ describe("useAddressForm — errors and validation", () => {
     expect(current).toHaveBeenCalled()
   })
 })
+
+describe("useAddressForm — flags and clone ids", () => {
+  test("flags set on one instance reach the other and the save call", async () => {
+    const form = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const button = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    await waitFor(() => expect(button.result.current.order).toBeDefined())
+
+    act(() => {
+      form.result.current.setFlags({ shipToDifferentAddress: true, invertAddresses: true })
+    })
+
+    await waitFor(() => expect(button.result.current.shipToDifferentAddress).toBe(true))
+    expect(button.result.current.invertAddresses).toBe(true)
+    expect(button.result.current.isBusiness).toBe(false)
+
+    await act(async () => {
+      await button.result.current.saveAddresses()
+    })
+
+    expect(mocks.saveOrderAddresses).toHaveBeenCalledWith(
+      expect.objectContaining({ shipToDifferentAddress: true, invertAddresses: true })
+    )
+  })
+
+  test("clone ids set on one instance reach the save call", async () => {
+    const card = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const button = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    await waitFor(() => expect(button.result.current.order).toBeDefined())
+
+    act(() => {
+      card.result.current.setCloneIds({ billingAddressCloneId: "addr_saved" })
+    })
+
+    await waitFor(() => expect(button.result.current.billingAddressCloneId).toBe("addr_saved"))
+
+    await act(async () => {
+      await button.result.current.saveAddresses()
+    })
+
+    expect(mocks.saveOrderAddresses).toHaveBeenCalledWith(
+      expect.objectContaining({ billingAddressCloneId: "addr_saved" })
+    )
+  })
+
+  test("explicit params win over the shared state", async () => {
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    await waitFor(() => expect(result.current.order).toBeDefined())
+
+    act(() => {
+      result.current.setCloneIds({ billingAddressCloneId: "addr_saved" })
+    })
+
+    await act(async () => {
+      await result.current.saveAddresses({ billingAddressCloneId: "addr_override" })
+    })
+
+    expect(mocks.saveOrderAddresses).toHaveBeenCalledWith(
+      expect.objectContaining({ billingAddressCloneId: "addr_override" })
+    )
+  })
+
+  test("setResourceErrors replaces one form's errors and leaves the other's alone", async () => {
+    const billing = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const shipping = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    act(() => {
+      billing.result.current.setResourceErrors("billing_address", [
+        { code: "VALIDATION_ERROR", message: "required", resource: "billing_address" },
+      ])
+      shipping.result.current.setResourceErrors("shipping_address", [
+        { code: "VALIDATION_ERROR", message: "required", resource: "shipping_address" },
+      ])
+    })
+
+    await waitFor(() => expect(billing.result.current.errors).toHaveLength(2))
+
+    act(() => {
+      billing.result.current.setResourceErrors("billing_address", [])
+    })
+
+    await waitFor(() => expect(billing.result.current.errors).toHaveLength(1))
+    expect(billing.result.current.errors[0]?.resource).toBe("shipping_address")
+  })
+
+  test("clearing errors that were already empty does not churn the state", () => {
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const before = result.current.errors
+
+    act(() => {
+      result.current.setResourceErrors("billing_address", [])
+    })
+
+    expect(result.current.errors).toBe(before)
+  })
+
+  test("errors raised for another resource are dropped", async () => {
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    act(() => {
+      result.current.setResourceErrors("billing_address", [
+        { code: "VALIDATION_ERROR", message: "required", resource: "shipping_address" },
+      ])
+    })
+
+    expect(result.current.errors).toEqual([])
+  })
+})
