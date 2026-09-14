@@ -3,6 +3,7 @@ import type { QueryParamsList } from "@commercelayer/sdk"
 import { type JSX, type ReactNode, useContext, useEffect, useMemo } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import SkuContext from "#context/SkuContext"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   /**
@@ -51,6 +52,7 @@ interface Props {
  * ```
  */
 export function SkusContainer<P extends Props>(props: P): JSX.Element {
+  useDeprecatedContainer("SkusContainer", "`<Sku>`")
   const { skus, children, queryParams } = props
   const config = useContext(CommerceLayerContext)
   const {

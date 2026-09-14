@@ -1,10 +1,124 @@
+import { useAddressForm } from "@commercelayer/react-hooks-components"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { type JSX, useEffect } from "react"
 import { SaveAddressesButton } from "#components/addresses/SaveAddressesButton"
 import AddressesContext, { defaultAddressContext } from "#context/AddressContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
+import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext, { defaultCustomerContext } from "#context/CustomerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
+
+const filledAddress = {
+  first_name: "John",
+  last_name: "Doe",
+  line_1: "123 Main St",
+  city: "NYC",
+  country_code: "US",
+  zip_code: "10001",
+  state_code: "NY",
+  phone: "+1234567890",
+}
+
+/**
+ * Stands in for the address forms: in standalone mode they publish what the
+ * customer typed to the shared state, which is where the button reads it.
+ * Each test uses its own access token so the states stay apart.
+ */
+function AddressFormStandIn({
+  accessToken,
+  orderId,
+  billingAddress,
+  shippingAddress,
+  invertAddresses,
+}: {
+  accessToken: string
+  orderId?: string
+  billingAddress?: Record<string, unknown>
+  shippingAddress?: Record<string, unknown>
+  invertAddresses?: boolean
+}): JSX.Element {
+  const { setBillingAddress, setShippingAddress, setFlags } = useAddressForm({
+    accessToken,
+    orderId,
+  })
+
+  useEffect(() => {
+    if (billingAddress != null) setBillingAddress(billingAddress)
+    if (shippingAddress != null) setShippingAddress(shippingAddress)
+    if (invertAddresses != null) setFlags({ invertAddresses })
+  }, [
+    billingAddress,
+    shippingAddress,
+    invertAddresses,
+    setBillingAddress,
+    setShippingAddress,
+    setFlags,
+  ])
+
+  return <div data-testid="form-stand-in" />
+}
+
+function renderStandaloneButton({
+  accessToken,
+  billingAddress,
+  shippingAddress,
+  invertAddresses,
+  props = {},
+  customerOverrides = {},
+  order,
+  updateOrder,
+}: {
+  accessToken: string
+  billingAddress?: Record<string, unknown>
+  shippingAddress?: Record<string, unknown>
+  invertAddresses?: boolean
+  props?: Partial<Parameters<typeof SaveAddressesButton>[0]>
+  customerOverrides?: Record<string, unknown>
+  order?: Record<string, unknown>
+  updateOrder?: (params: unknown) => Promise<unknown>
+}) {
+  const orderCtx = {
+    ...defaultOrderContext,
+    setOrderErrors: mockSetOrderErrors,
+    order,
+    orderId: order?.id,
+    updateOrder,
+  } as any
+  const customerCtx = {
+    ...defaultCustomerContext,
+    isGuest: false,
+    customerEmail: "",
+    addresses: [],
+    ...customerOverrides,
+  } as any
+
+  // No AddressesContext.Provider: the button is standalone, and the stand-in
+  // form is its sibling — the shape #841 is about.
+  return render(
+    <CommerceLayerContext.Provider value={{ accessToken } as any}>
+      <OrderContext.Provider value={orderCtx}>
+        <CustomerContext.Provider value={customerCtx}>
+          <AddressFormStandIn
+            accessToken={accessToken}
+            orderId={order?.id as string | undefined}
+            billingAddress={billingAddress}
+            shippingAddress={shippingAddress}
+            invertAddresses={invertAddresses}
+          />
+          <SaveAddressesButton {...props} />
+        </CustomerContext.Provider>
+      </OrderContext.Provider>
+    </CommerceLayerContext.Provider>
+  )
+}
+
+// The standalone save lands on core-components, through the shared address hook.
+const mockSaveOrderAddresses = vi.hoisted(() => vi.fn())
+vi.mock("@commercelayer/core-components", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@commercelayer/core-components")>()),
+  saveOrderAddresses: mockSaveOrderAddresses,
+}))
 
 const mockSaveAddresses = vi.fn()
 const mockSetOrderErrors = vi.fn()
@@ -67,6 +181,7 @@ function renderButton(
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockSaveOrderAddresses.mockResolvedValue({ success: false })
   mockSaveAddresses.mockResolvedValue({ success: true, order: { id: "ord-1" } })
 })
 
@@ -179,17 +294,49 @@ describe("SaveAddressesButton", () => {
     })
   })
 
-  it("calls createCustomerAddress when no order/saveAddresses but createCustomerAddress exists", async () => {
-    const createCustomerAddress = vi.fn()
-    renderButton(
-      {},
-      { saveAddresses: undefined, errors: [] },
-      { order: undefined },
-      { createCustomerAddress, isGuest: false, customerEmail: "" }
-    )
+  it("saves what the sibling form typed, which is what #841 was about", async () => {
+    const updateOrder = vi.fn().mockResolvedValue({ order: { id: "ord-841" } })
+    mockSaveOrderAddresses.mockResolvedValue({
+      success: true,
+      orderAttributes: { id: "ord-841" },
+    })
+
+    renderStandaloneButton({
+      accessToken: "tok-841",
+      billingAddress: filledAddress,
+      order: { id: "ord-841", customer_email: "john@example.com", requires_billing_info: false },
+      updateOrder,
+    })
+
+    await waitFor(() => expect(screen.getByRole("button")).not.toHaveProperty("disabled", true))
     fireEvent.click(screen.getByRole("button"))
+
     await waitFor(() => {
-      expect(createCustomerAddress).toHaveBeenCalled()
+      expect(mockSaveOrderAddresses).toHaveBeenCalledWith(
+        expect.objectContaining({
+          billingAddress: expect.objectContaining({ first_name: "John" }),
+        })
+      )
+    })
+    // The order is written through OrderContext, so the checkout learns about it.
+    await waitFor(() => expect(updateOrder).toHaveBeenCalled())
+  })
+
+  it("saves to the customer address book when there is no order", async () => {
+    const createCustomerAddress = vi.fn()
+    renderStandaloneButton({
+      accessToken: "tok-address-book",
+      billingAddress: filledAddress,
+      customerOverrides: { createCustomerAddress },
+    })
+
+    await waitFor(() => expect(screen.getByRole("button")).not.toHaveProperty("disabled", true))
+    fireEvent.click(screen.getByRole("button"))
+
+    await waitFor(() => {
+      expect(createCustomerAddress).toHaveBeenCalledWith(
+        expect.objectContaining({ first_name: "John" })
+      )
     })
   })
 
@@ -211,20 +358,17 @@ describe("SaveAddressesButton", () => {
     })
   })
 
-  it("calls createCustomerAddress with invertAddresses true (shippingAddress path) and addressId", async () => {
+  it("saves the shipping address to the book when the addresses are inverted", async () => {
     const createCustomerAddress = vi.fn()
-    renderButton(
-      { addressId: "my-addr" },
-      {
-        saveAddresses: undefined,
-        invertAddresses: true,
-        shippingAddressId: "ship-1",
-        shipping_address: {},
-        errors: [],
-      },
-      { order: undefined },
-      { createCustomerAddress, isGuest: false, customerEmail: "" }
-    )
+    renderStandaloneButton({
+      accessToken: "tok-address-book-inverted",
+      shippingAddress: filledAddress,
+      invertAddresses: true,
+      props: { addressId: "my-addr" },
+      customerOverrides: { createCustomerAddress },
+    })
+
+    await waitFor(() => expect(screen.getByRole("button")).not.toHaveProperty("disabled", true))
     fireEvent.click(screen.getByRole("button"))
     await waitFor(() => {
       expect(createCustomerAddress).toHaveBeenCalledWith(expect.objectContaining({ id: "my-addr" }))

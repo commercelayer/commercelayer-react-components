@@ -23,6 +23,7 @@ import addressReducer, {
 import type { TCustomerAddress } from "#typings/customers"
 import type { BaseError } from "#typings/errors"
 import { setCustomerOrderParam } from "#utils/localStorage"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   children: ReactNode
@@ -59,6 +60,7 @@ interface Props {
  * ```
  */
 export function AddressesContainer(props: Props): JSX.Element {
+  useDeprecatedContainer("AddressesContainer", "`<BillingAddressForm>` and `<ShippingAddressForm>`")
   const { children, shipToDifferentAddress = false, isBusiness, invertAddresses = false } = props
   const [state, dispatch] = useReducer(addressReducer, addressInitialState)
   const { order, orderId, updateOrder } = useContext(OrderContext)

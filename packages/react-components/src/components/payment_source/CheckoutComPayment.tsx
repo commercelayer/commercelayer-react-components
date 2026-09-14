@@ -3,7 +3,7 @@ import Parent from "#components/utils/Parent"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import PlaceOrderContext from "#context/PlaceOrderContext"
+import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
 import useExternalScript from "#utils/hooks/useExternalScript"
 import { jwt } from "#utils/jwt"
@@ -128,7 +128,9 @@ export function CheckoutComPayment({ publicKey, options, ...p }: Props): JSX.Ele
   const { setPaymentRef, setPaymentSource } = useContext(PaymentMethodContext)
   const { accessToken } = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
-  const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
+  const {
+    placeOrderContext: { setPlaceOrderStatus },
+  } = usePlaceOrderStateContext()
   const { containerClassName, templateCustomerSaveToWallet, show, ...divProps } = p
   // Everything below is read at mount time only. Keeping any of it in the effect's
   // dependencies re-ran the effect on unrelated re-renders and re-created the Flow

@@ -94,7 +94,7 @@ describe("CustomerContainer", () => {
 
     renderContainer()
 
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("CustomerContainer is deprecated"))
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("<CustomerContainer> is deprecated"))
 
     g.process = originalProcess
     warnSpy.mockRestore()

@@ -23,6 +23,7 @@ import { useHalfConfiguredTermsWarning } from "#utils/hooks/useHalfConfiguredTer
 import { useMissingTermsCheckboxWarning } from "#utils/hooks/useMissingTermsCheckboxWarning"
 import { useOrganizationConfig } from "#utils/organization"
 import { getAcceptedSnapshot, subscribe as subscribeToTerms } from "#utils/termsAcceptanceStore"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 import { setPlaceOrder } from "../../reducers/PlaceOrderReducer"
 
 interface Props {
@@ -36,6 +37,10 @@ interface Props {
  * `PlaceOrderContainer` will be removed in the next major version.
  */
 export function PlaceOrderContainer(props: Props): JSX.Element {
+  useDeprecatedContainer(
+    "PlaceOrderContainer",
+    "`<PlaceOrderButton>` and `<PrivacyAndTermsCheckbox>`"
+  )
   const { children, options } = props
   const [state, dispatch] = useReducer(placeOrderReducer, placeOrderInitialState)
   const { order, setOrder, setOrderErrors, include, addResourceToInclude, includeLoaded } =

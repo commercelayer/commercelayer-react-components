@@ -3,6 +3,7 @@ import type { JSX } from "react"
 import { Order as OrderComponent } from "#components/orders/Order"
 import type { BaseMetadataObject } from "#typings"
 import type { DefaultChildrenType } from "#typings/globals"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   children: DefaultChildrenType
@@ -60,11 +61,7 @@ interface Props {
  * </span>
  */
 export function OrderContainer(props: Props): JSX.Element {
-  if (process.env.NODE_ENV !== "production") {
-    console.warn(
-      "[commercelayer-react-components] <OrderContainer> is deprecated and will be removed in the next major version. Use <Order> instead."
-    )
-  }
+  useDeprecatedContainer("OrderContainer", "`<Order>`")
   return <OrderComponent {...props} />
 }
 

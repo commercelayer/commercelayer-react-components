@@ -11,6 +11,11 @@ export interface SaveOrderAddressesParams {
   order: Pick<Order, "id"> & {
     billing_address?: { id?: string; reference?: string | null } | null
     shipping_address?: { id?: string; reference?: string | null } | null
+    /**
+     * Only `item.do_not_ship` is read. The item is left untyped because the
+     * SDK's line item union does not surface that flag on every member.
+     */
+    line_items?: Array<{ item?: unknown } | null> | null
   }
   /**
    * Cleaned billing address data — no `billing_address_` prefix on keys.
@@ -28,6 +33,12 @@ export interface SaveOrderAddressesParams {
   shipToDifferentAddress?: boolean
   /** Customer email to set on the order. */
   customerEmail?: string
+  /**
+   * Swaps the two addresses: the shipping address becomes the one the order is
+   * built around and the billing address is the optional second one. Default:
+   * `false`.
+   */
+  invertAddresses?: boolean
 }
 
 function sanitizeMetadata(address: AddressCreate): AddressCreate {
@@ -43,6 +54,94 @@ function sanitizeMetadata(address: AddressCreate): AddressCreate {
     }
   }
   return result
+}
+
+type Sdk = ReturnType<typeof getSdk>
+
+/**
+ * The mirror image of the normal flow, with the roles of the two addresses
+ * swapped: the order is built around the shipping address and the billing one
+ * is the optional second address.
+ *
+ * Two asymmetries against the normal flow are deliberate — they are the
+ * behaviour this branch has always had: it updates an existing address without
+ * first checking that its `reference` is null, and it does not set `_refresh`.
+ */
+async function saveInvertedAddresses({
+  sdk,
+  order,
+  billingAddress,
+  billingAddressCloneId,
+  shippingAddress,
+  shippingAddressCloneId,
+  shipToDifferentAddress,
+  customerEmail,
+}: {
+  sdk: Sdk
+  order: SaveOrderAddressesParams["order"]
+  billingAddress?: Record<string, unknown>
+  billingAddressCloneId?: string
+  shippingAddress?: Record<string, unknown>
+  shippingAddressCloneId?: string
+  shipToDifferentAddress: boolean
+  customerEmail?: string
+}): Promise<OrderUpdate> {
+  const orderAttributes: OrderUpdate = {
+    id: order.id,
+    customer_email: customerEmail,
+    _billing_address_clone_id: shippingAddressCloneId,
+    _shipping_address_clone_id: shippingAddressCloneId,
+  }
+
+  const currentShippingRef = order.shipping_address?.reference
+  if (currentShippingRef != null && currentShippingRef === shippingAddressCloneId) {
+    orderAttributes._billing_address_clone_id = order.billing_address?.id
+    orderAttributes._shipping_address_clone_id = order.shipping_address?.id
+  }
+
+  const hasShippingAddress = shippingAddress != null && Object.keys(shippingAddress).length > 0
+
+  if (hasShippingAddress && !shippingAddressCloneId) {
+    delete orderAttributes._billing_address_clone_id
+    delete orderAttributes._shipping_address_clone_id
+    orderAttributes._billing_address_same_as_shipping = true
+
+    const shippingData = sanitizeMetadata(shippingAddress as unknown as AddressCreate)
+    let address: Address
+
+    if (order.shipping_address?.id != null) {
+      address = await sdk.addresses.update({ id: order.shipping_address.id, ...shippingData })
+    } else {
+      address = await sdk.addresses.create(shippingData)
+      orderAttributes.shipping_address = sdk.addresses.relationship(address.id)
+    }
+  }
+
+  if (shipToDifferentAddress) {
+    delete orderAttributes._billing_address_same_as_shipping
+
+    if (billingAddressCloneId) {
+      orderAttributes._billing_address_clone_id = billingAddressCloneId
+    }
+
+    const hasBillingAddress = billingAddress != null && Object.keys(billingAddress).length > 0
+
+    if (hasBillingAddress) {
+      delete orderAttributes._billing_address_clone_id
+
+      const billingData = sanitizeMetadata(billingAddress as unknown as AddressCreate)
+      let address: Address
+
+      if (order.billing_address?.id != null) {
+        address = await sdk.addresses.update({ id: order.billing_address.id, ...billingData })
+      } else {
+        address = await sdk.addresses.create(billingData)
+        orderAttributes.billing_address = sdk.addresses.relationship(address.id)
+      }
+    }
+  }
+
+  return orderAttributes
 }
 
 /**
@@ -76,6 +175,7 @@ export async function saveOrderAddresses({
   shippingAddressCloneId,
   shipToDifferentAddress = false,
   customerEmail,
+  invertAddresses = false,
 }: SaveOrderAddressesParams): Promise<{
   success: boolean
   orderAttributes?: OrderUpdate
@@ -83,6 +183,22 @@ export async function saveOrderAddresses({
 }> {
   try {
     const sdk = getSdk({ accessToken, interceptors })
+
+    if (invertAddresses) {
+      return {
+        success: true,
+        orderAttributes: await saveInvertedAddresses({
+          sdk,
+          order,
+          billingAddress,
+          billingAddressCloneId,
+          shippingAddress,
+          shippingAddressCloneId,
+          shipToDifferentAddress,
+          customerEmail,
+        }),
+      }
+    }
 
     const orderAttributes: OrderUpdate = {
       id: order.id,
@@ -103,7 +219,16 @@ export async function saveOrderAddresses({
     if (hasBillingAddress && !billingAddressCloneId) {
       delete orderAttributes._billing_address_clone_id
       delete orderAttributes._shipping_address_clone_id
-      orderAttributes._shipping_address_same_as_billing = true
+
+      // An order whose every line item ships nothing has no shipping address to
+      // keep in step with the billing one. `line_items` missing from the order
+      // reads as "not a digital-only order", which is how it has always read.
+      const doNotShipItems = order.line_items?.every(
+        (lineItem) => (lineItem?.item as { do_not_ship?: boolean | null } | undefined)?.do_not_ship === true
+      )
+      if (doNotShipItems !== true) {
+        orderAttributes._shipping_address_same_as_billing = true
+      }
 
       const billingData = sanitizeMetadata(billingAddress as unknown as AddressCreate)
       let address: Address

@@ -3,7 +3,7 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import PlaceOrderContext from "#context/PlaceOrderContext"
+import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { LoaderType } from "#typings"
 import getLoaderComponent from "#utils/getLoaderComponent"
@@ -57,7 +57,9 @@ export function PaymentGateway({
   const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
-  const { status } = useContext(PlaceOrderContext)
+  const {
+    placeOrderContext: { status },
+  } = usePlaceOrderStateContext()
   const {
     currentPaymentMethodId,
     config,

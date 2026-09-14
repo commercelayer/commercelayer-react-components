@@ -1,5 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react"
 import { beforeEach, describe, expect, test, vi } from "vitest"
+import { clear } from "./addressFormStore.js"
 import { useAddressForm } from "./useAddressForm.js"
 
 const mocks = vi.hoisted(() => ({
@@ -8,7 +9,10 @@ const mocks = vi.hoisted(() => ({
   updateOrder: vi.fn(),
 }))
 
-vi.mock("@commercelayer/core-components", () => ({
+// Only the network functions are faked: `createSharedStateStore` has to stay
+// real, since the state sharing is what these tests are about.
+vi.mock("@commercelayer/core-components", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@commercelayer/core-components")>()),
   saveOrderAddresses: mocks.saveOrderAddresses,
   retrieveOrder: mocks.retrieveOrder,
   updateOrder: mocks.updateOrder,
@@ -51,6 +55,8 @@ const fakeOrder = { id: "ord_1", customer_email: "user@example.com" }
 
 beforeEach(() => {
   vi.clearAllMocks()
+  // Store entries are module-level and outlive their subscribers on purpose.
+  clear()
   mocks.retrieveOrder.mockResolvedValue(fakeOrder)
   mocks.saveOrderAddresses.mockResolvedValue({
     success: true,
@@ -243,5 +249,409 @@ describe("useAddressForm", () => {
     })
 
     expect(result.current.isSaving).toBe(false)
+  })
+})
+
+describe("useAddressForm — state shared across instances", () => {
+  test("two instances on the same order see the same values", async () => {
+    const form = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const button = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    act(() => {
+      form.result.current.setBillingAddress({ first_name: "John" })
+    })
+
+    await waitFor(() =>
+      expect(button.result.current.billingAddress).toEqual({ first_name: "John" })
+    )
+  })
+
+  test("saves what a sibling instance typed, which is what #841 was about", async () => {
+    const form = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const button = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    await waitFor(() => expect(button.result.current.order).toBeDefined())
+
+    act(() => {
+      form.result.current.setBillingAddress({ first_name: "John" })
+      form.result.current.setShippingAddress({ first_name: "Jane" })
+    })
+
+    await act(async () => {
+      await button.result.current.saveAddresses()
+    })
+
+    expect(mocks.saveOrderAddresses).toHaveBeenCalledWith(
+      expect.objectContaining({
+        billingAddress: { first_name: "John" },
+        shippingAddress: { first_name: "Jane" },
+      })
+    )
+  })
+
+  test("isSaving is visible from the other instance", async () => {
+    let resolveSave!: () => void
+    mocks.saveOrderAddresses.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveSave = () => resolve({ success: true, orderAttributes: { id: "ord_1" } })
+        })
+    )
+
+    const form = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const button = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    await waitFor(() => expect(button.result.current.order).toBeDefined())
+
+    let savePromise: ReturnType<typeof button.result.current.saveAddresses>
+    act(() => {
+      savePromise = button.result.current.saveAddresses()
+    })
+
+    await waitFor(() => expect(form.result.current.isSaving).toBe(true))
+
+    act(() => {
+      resolveSave()
+    })
+    await act(async () => {
+      await savePromise
+    })
+
+    expect(form.result.current.isSaving).toBe(false)
+  })
+
+  test("a different order is independent", async () => {
+    const first = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const second = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_2" }))
+
+    act(() => {
+      first.result.current.setBillingAddress({ first_name: "John" })
+    })
+
+    await waitFor(() => expect(first.result.current.billingAddress).toEqual({ first_name: "John" }))
+    expect(second.result.current.billingAddress).toEqual({})
+  })
+
+  test("scope isolates two editors working on the same order", async () => {
+    const main = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const aside = renderHook(() =>
+      useAddressForm({ accessToken: "token", orderId: "ord_1", scope: "aside" })
+    )
+
+    act(() => {
+      main.result.current.setBillingAddress({ first_name: "John" })
+    })
+
+    await waitFor(() => expect(main.result.current.billingAddress).toEqual({ first_name: "John" }))
+    expect(aside.result.current.billingAddress).toEqual({})
+  })
+
+  test("instances without an order still share, which is what an address book needs", async () => {
+    const form = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
+    const button = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
+
+    act(() => {
+      form.result.current.setBillingAddress({ first_name: "John" })
+    })
+
+    await waitFor(() =>
+      expect(button.result.current.billingAddress).toEqual({ first_name: "John" })
+    )
+  })
+
+  test("an order-scoped state is separate from the order-less one", async () => {
+    const scoped = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const bookish = renderHook(() => useAddressForm({ accessToken: "token", orderId: null }))
+
+    act(() => {
+      scoped.result.current.setBillingAddress({ first_name: "John" })
+    })
+
+    await waitFor(() => expect(scoped.result.current.billingAddress).toEqual({ first_name: "John" }))
+    expect(bookish.result.current.billingAddress).toEqual({})
+  })
+
+  test("instances without an access token keep their own values", async () => {
+    const first = renderHook(() => useAddressForm({ accessToken: "", orderId: null }))
+    const second = renderHook(() => useAddressForm({ accessToken: "", orderId: null }))
+
+    act(() => {
+      first.result.current.setBillingAddress({ first_name: "John" })
+    })
+
+    await waitFor(() => expect(first.result.current.billingAddress).toEqual({ first_name: "John" }))
+    expect(second.result.current.billingAddress).toEqual({})
+  })
+})
+
+describe("useAddressForm — errors and validation", () => {
+  test("setErrors publishes to every instance", async () => {
+    const form = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const button = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    expect(button.result.current.errors).toEqual([])
+
+    act(() => {
+      form.result.current.setErrors([
+        { code: "VALIDATION_ERROR", message: "required", field: "first_name" },
+      ])
+    })
+
+    await waitFor(() =>
+      expect(button.result.current.errors).toEqual([
+        { code: "VALIDATION_ERROR", message: "required", field: "first_name" },
+      ])
+    )
+  })
+
+  test("a sibling can validate the mounted forms before saving", async () => {
+    const form = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const button = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    const validator = vi.fn(() => ({ first_name: { code: "EMPTY_ERROR" } }))
+    act(() => {
+      form.result.current.registerValidator("billing_address", validator)
+    })
+
+    const outcome = button.result.current.validateAddresses()
+
+    expect(validator).toHaveBeenCalledTimes(1)
+    expect(outcome.valid).toBe(false)
+    expect(outcome.fieldErrors).toEqual({
+      billing_address: { first_name: { code: "EMPTY_ERROR" } },
+    })
+  })
+
+  test("validateAddresses passes when every validator is happy", () => {
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    act(() => {
+      result.current.registerValidator("billing_address", () => ({}))
+      result.current.registerValidator("shipping_address", () => ({}))
+    })
+
+    expect(result.current.validateAddresses()).toEqual({ valid: true, fieldErrors: {} })
+  })
+
+  test("validateAddresses passes when no form is mounted", () => {
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    expect(result.current.validateAddresses()).toEqual({ valid: true, fieldErrors: {} })
+  })
+
+  test("unregistering removes the validator", () => {
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const validator = vi.fn(() => ({ first_name: { code: "EMPTY_ERROR" } }))
+
+    let unregister!: () => void
+    act(() => {
+      unregister = result.current.registerValidator("billing_address", validator)
+    })
+    act(() => {
+      unregister()
+    })
+
+    expect(result.current.validateAddresses().valid).toBe(true)
+    expect(validator).not.toHaveBeenCalled()
+  })
+
+  test("registering the same validator twice leaves the state untouched", () => {
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const validator = vi.fn(() => ({}))
+
+    act(() => {
+      result.current.registerValidator("billing_address", validator)
+    })
+    const first = result.current.errors
+    act(() => {
+      result.current.registerValidator("billing_address", validator)
+    })
+
+    expect(result.current.errors).toBe(first)
+    expect(result.current.validateAddresses().valid).toBe(true)
+  })
+
+  test("unregistering a validator that was already replaced is a no-op", () => {
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const stale = vi.fn(() => ({}))
+    const current = vi.fn(() => ({ first_name: { code: "EMPTY_ERROR" } }))
+
+    let unregisterStale!: () => void
+    act(() => {
+      unregisterStale = result.current.registerValidator("billing_address", stale)
+      result.current.registerValidator("billing_address", current)
+    })
+    act(() => {
+      unregisterStale()
+    })
+
+    expect(result.current.validateAddresses().valid).toBe(false)
+    expect(current).toHaveBeenCalled()
+  })
+})
+
+describe("useAddressForm — flags and clone ids", () => {
+  test("flags set on one instance reach the other and the save call", async () => {
+    const form = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const button = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    await waitFor(() => expect(button.result.current.order).toBeDefined())
+
+    act(() => {
+      form.result.current.setFlags({ shipToDifferentAddress: true, invertAddresses: true })
+    })
+
+    await waitFor(() => expect(button.result.current.shipToDifferentAddress).toBe(true))
+    expect(button.result.current.invertAddresses).toBe(true)
+    expect(button.result.current.isBusiness).toBe(false)
+
+    await act(async () => {
+      await button.result.current.saveAddresses()
+    })
+
+    expect(mocks.saveOrderAddresses).toHaveBeenCalledWith(
+      expect.objectContaining({ shipToDifferentAddress: true, invertAddresses: true })
+    )
+  })
+
+  test("clone ids set on one instance reach the save call", async () => {
+    const card = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const button = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    await waitFor(() => expect(button.result.current.order).toBeDefined())
+
+    act(() => {
+      card.result.current.setCloneIds({ billingAddressCloneId: "addr_saved" })
+    })
+
+    await waitFor(() => expect(button.result.current.billingAddressCloneId).toBe("addr_saved"))
+
+    await act(async () => {
+      await button.result.current.saveAddresses()
+    })
+
+    expect(mocks.saveOrderAddresses).toHaveBeenCalledWith(
+      expect.objectContaining({ billingAddressCloneId: "addr_saved" })
+    )
+  })
+
+  test("explicit params win over the shared state", async () => {
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    await waitFor(() => expect(result.current.order).toBeDefined())
+
+    act(() => {
+      result.current.setCloneIds({ billingAddressCloneId: "addr_saved" })
+    })
+
+    await act(async () => {
+      await result.current.saveAddresses({ billingAddressCloneId: "addr_override" })
+    })
+
+    expect(mocks.saveOrderAddresses).toHaveBeenCalledWith(
+      expect.objectContaining({ billingAddressCloneId: "addr_override" })
+    )
+  })
+
+  test("setResourceErrors replaces one form's errors and leaves the other's alone", async () => {
+    const billing = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const shipping = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    act(() => {
+      billing.result.current.setResourceErrors("billing_address", [
+        { code: "VALIDATION_ERROR", message: "required", resource: "billing_address" },
+      ])
+      shipping.result.current.setResourceErrors("shipping_address", [
+        { code: "VALIDATION_ERROR", message: "required", resource: "shipping_address" },
+      ])
+    })
+
+    await waitFor(() => expect(billing.result.current.errors).toHaveLength(2))
+
+    act(() => {
+      billing.result.current.setResourceErrors("billing_address", [])
+    })
+
+    await waitFor(() => expect(billing.result.current.errors).toHaveLength(1))
+    expect(billing.result.current.errors[0]?.resource).toBe("shipping_address")
+  })
+
+  test("clearing errors that were already empty does not churn the state", () => {
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+    const before = result.current.errors
+
+    act(() => {
+      result.current.setResourceErrors("billing_address", [])
+    })
+
+    expect(result.current.errors).toBe(before)
+  })
+
+  test("errors raised for another resource are dropped", async () => {
+    const { result } = renderHook(() => useAddressForm({ accessToken: "token", orderId: "ord_1" }))
+
+    act(() => {
+      result.current.setResourceErrors("billing_address", [
+        { code: "VALIDATION_ERROR", message: "required", resource: "shipping_address" },
+      ])
+    })
+
+    expect(result.current.errors).toEqual([])
+  })
+})
+
+describe("useAddressForm — caller-owned order", () => {
+  test("does not fetch when the order is handed in", () => {
+    const { result } = renderHook(() =>
+      useAddressForm({ accessToken: "token", orderId: "ord_1", order: fakeOrder as never })
+    )
+
+    expect(mocks.retrieveOrder).not.toHaveBeenCalled()
+    expect(result.current.order).toEqual(fakeOrder)
+  })
+
+  test("lets the caller apply the order update and reports back what it returns", async () => {
+    const updateOrder = vi.fn(async () => ({ order: { ...fakeOrder, _applied: true } as never }))
+
+    const { result } = renderHook(() =>
+      useAddressForm({
+        accessToken: "token",
+        orderId: "ord_1",
+        order: fakeOrder as never,
+        updateOrder,
+      })
+    )
+
+    let outcome!: Awaited<ReturnType<typeof result.current.saveAddresses>>
+    await act(async () => {
+      outcome = await result.current.saveAddresses()
+    })
+
+    expect(updateOrder).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "ord_1", attributes: expect.objectContaining({ id: "ord_1" }) })
+    )
+    expect(mocks.updateOrder).not.toHaveBeenCalled()
+    expect(outcome.success).toBe(true)
+    expect(outcome.order).toEqual({ ...fakeOrder, _applied: true })
+  })
+
+  test("reports success even when the caller's update returns nothing", async () => {
+    const updateOrder = vi.fn(async () => undefined)
+
+    const { result } = renderHook(() =>
+      useAddressForm({
+        accessToken: "token",
+        orderId: "ord_1",
+        order: fakeOrder as never,
+        updateOrder,
+      })
+    )
+
+    let outcome!: Awaited<ReturnType<typeof result.current.saveAddresses>>
+    await act(async () => {
+      outcome = await result.current.saveAddresses()
+    })
+
+    expect(outcome).toEqual({ success: true, order: undefined })
   })
 })

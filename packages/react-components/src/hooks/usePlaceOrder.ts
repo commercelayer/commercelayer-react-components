@@ -1,10 +1,10 @@
 import type { RefObject } from "react"
-import { useCallback, useContext, useEffect, useMemo, useReducer, useSyncExternalStore } from "react"
+import { useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
+import { useSharedReducer } from "#hooks/useSharedReducer"
 import placeOrderReducer, {
   type PlaceOrderOptions,
-  placeOrderInitialState,
   placeOrderPermitted,
   setButtonRef,
   setPlaceOrder,
@@ -13,6 +13,7 @@ import placeOrderReducer, {
 import { useHalfConfiguredTermsWarning } from "#utils/hooks/useHalfConfiguredTermsWarning"
 import { useMissingTermsCheckboxWarning } from "#utils/hooks/useMissingTermsCheckboxWarning"
 import { useOrganizationConfig } from "#utils/organization"
+import { placeOrderStore } from "#utils/placeOrderStore"
 import { getAcceptedSnapshot, subscribe as subscribeToTerms } from "#utils/termsAcceptanceStore"
 
 /**
@@ -31,15 +32,34 @@ import { getAcceptedSnapshot, subscribe as subscribeToTerms } from "#utils/terms
 export function usePlaceOrder({
   isStandalone,
   options,
+  isOwner = false,
 }: {
   isStandalone: boolean
   options?: PlaceOrderOptions
+  /**
+   * Whether this instance drives the state rather than only reading it. The
+   * place-order button owns it; the payment components that read the status or
+   * dispatch into it must not re-register the order includes or re-evaluate
+   * whether placing is permitted, or every one of them would do the container's
+   * job over again.
+   */
+  isOwner?: boolean
 }) {
-  const [state, dispatch] = useReducer(placeOrderReducer, placeOrderInitialState)
   const { order, setOrder, setOrderErrors, include, addResourceToInclude, includeLoaded } =
     useContext(OrderContext)
   const config = useContext(CommerceLayerContext)
-  const organizationConfig = useOrganizationConfig({ accessToken: config.accessToken })
+  // The state is shared per order rather than held by this component: the
+  // payment components that read it are siblings of the place-order button, not
+  // its descendants, so no context can reach them.
+  const [state, dispatch] = useSharedReducer(placeOrderStore, placeOrderReducer, {
+    accessToken: config.accessToken,
+    orderId: order?.id,
+  })
+  // Only the owner needs the organization config: it feeds the privacy and
+  // terms URLs into `placeOrderPermitted`. Readers skip the lookup entirely.
+  const organizationConfig = useOrganizationConfig({
+    accessToken: isOwner ? config.accessToken : undefined,
+  })
   // <PrivacyAndTermsCheckbox> is a sibling of <PlaceOrderButton>, so acceptance
   // travels through a module-level store rather than React context.
   const orderId = order?.id
@@ -56,7 +76,7 @@ export function usePlaceOrder({
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: mirrors PlaceOrderContainer behavior
   useEffect(() => {
-    if (!isStandalone) return
+    if (!isStandalone || !isOwner) return
     if (!include?.includes("shipments.available_shipping_methods")) {
       addResourceToInclude({
         newResource: [
@@ -99,23 +119,23 @@ export function usePlaceOrder({
         termsAccepted,
       })
     }
-  }, [order, include, includeLoaded, organizationConfig, isStandalone, termsAccepted])
+  }, [order, include, includeLoaded, organizationConfig, isStandalone, isOwner, termsAccepted])
 
-  useMissingTermsCheckboxWarning(isStandalone ? state.termsBlocking : false, orderId)
+  useMissingTermsCheckboxWarning(isStandalone && isOwner ? state.termsBlocking : false, orderId)
   useHalfConfiguredTermsWarning(
-    organizationConfig?.urls?.privacy ?? order?.privacy_url,
-    organizationConfig?.urls?.terms ?? order?.terms_url
+    isOwner ? (organizationConfig?.urls?.privacy ?? order?.privacy_url) : undefined,
+    isOwner ? (organizationConfig?.urls?.terms ?? order?.terms_url) : undefined
   )
 
   const setButtonRefCallback = useCallback(
     (ref: RefObject<HTMLButtonElement | null>) => setButtonRef(ref, dispatch),
-    []
+    [dispatch]
   )
 
   const setPlaceOrderStatusCallback = useCallback(
     ({ status }: Parameters<typeof setPlaceOrderStatus>[0]) =>
       setPlaceOrderStatus({ status, dispatch }),
-    []
+    [dispatch]
   )
 
   const placeOrderPermittedCallback = useCallback(() => {
@@ -128,7 +148,7 @@ export function usePlaceOrder({
       termsUrl: organizationConfig?.urls?.terms,
       termsAccepted,
     })
-  }, [config, order, options, organizationConfig, termsAccepted])
+  }, [config, order, options, organizationConfig, termsAccepted, dispatch])
 
   return useMemo(
     () => ({

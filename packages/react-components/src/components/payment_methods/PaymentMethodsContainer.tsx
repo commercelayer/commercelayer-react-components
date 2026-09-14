@@ -22,6 +22,7 @@ import type { BaseError } from "#typings/errors"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import { isEmpty } from "#utils/isEmpty"
 import { setCustomerOrderParam } from "#utils/localStorage"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   /**
@@ -39,6 +40,7 @@ interface Props {
  * `<PaymentMethod>`. This component will be removed in the next major version.
  */
 export function PaymentMethodsContainer(props: Props): JSX.Element {
+  useDeprecatedContainer("PaymentMethodsContainer", "`<PaymentMethod>`")
   const { children, config } = props
   const [state, dispatch] = useReducer(paymentMethodReducer, paymentMethodInitialState)
   const {

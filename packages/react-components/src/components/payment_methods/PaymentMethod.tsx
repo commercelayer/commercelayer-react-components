@@ -4,8 +4,8 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import PlaceOrderContext from "#context/PlaceOrderContext"
-import { usePaymentMethod } from "#hooks/usePaymentMethod"
+import { usePaymentMethodStateContext } from "#hooks/usePaymentMethodStateContext"
+import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PaymentMethodConfig, PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { LoaderType } from "#typings"
 import type { DefaultChildrenType } from "#typings/globals"
@@ -95,13 +95,13 @@ export function PaymentMethod({
   /** Latches once the methods have rendered, so the loader can never unmount them again. */
   const hasRenderedMethodsRef = useRef(false)
 
-  // Detect standalone mode: no <PaymentMethodsContainer> parent has set _isProvided.
-  const parentCtx = useContext(PaymentMethodContext)
-  const isStandalone = parentCtx._isProvided !== true
-
-  // Always call the hook (Rules of Hooks). When not standalone, effects are
-  // guarded internally and the returned value is not used.
-  const standaloneCtx = usePaymentMethod({ isStandalone, config: configProp })
+  // This component owns the payment-method state: without a container it is the
+  // one that registers the order includes and fetches the methods. Everyone
+  // else reads the same state.
+  const { isStandalone, paymentMethodContext: standaloneCtx } = usePaymentMethodStateContext({
+    config: configProp,
+    isOwner: true,
+  })
 
   const {
     paymentMethods,
@@ -112,10 +112,12 @@ export function PaymentMethod({
     setPaymentSource,
     config,
     errors,
-  } = isStandalone ? standaloneCtx : parentCtx
+  } = standaloneCtx
   const { order } = useContext(OrderContext)
   const { getCustomerPaymentSources } = useContext(CustomerContext)
-  const { status } = useContext(PlaceOrderContext)
+  const {
+    placeOrderContext: { status },
+  } = usePlaceOrderStateContext()
   /**
    * A partially-authorized order is mid-payment: part of the total is covered (an Adyen gift
    * card, say) and the shopper still has to pay the remainder with another method, in the

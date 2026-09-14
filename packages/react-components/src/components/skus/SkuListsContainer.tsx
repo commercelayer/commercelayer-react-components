@@ -11,6 +11,7 @@ import {
 } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import SkuListsContext, { type SkuListsContextType } from "#context/SkuListsContext"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   children: ReactNode
@@ -28,6 +29,7 @@ interface Props {
  * `SkuListsContainer` remains functional for backwards compatibility.
  */
 export function SkuListsContainer(props: Props): JSX.Element {
+  useDeprecatedContainer("SkuListsContainer", "`<SkuList>`")
   const { children, params } = props
   const config = useContext(CommerceLayerContext)
   const { retrieveSkuList } = useSkuLists(config.accessToken ?? "", config.interceptors)

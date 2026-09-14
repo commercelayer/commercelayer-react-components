@@ -9,8 +9,8 @@ import LineItemChildrenContext from "#context/LineItemChildrenContext"
 import LineItemContext from "#context/LineItemContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
-import PaymentMethodContext from "#context/PaymentMethodContext"
 import ShipmentContext from "#context/ShipmentContext"
+import { usePaymentMethodStateContext } from "#hooks/usePaymentMethodStateContext"
 import type { CodeErrorType } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
 
@@ -68,10 +68,12 @@ export function Errors(props: Props): JSX.Element {
   const { errors: shipmentErrors } = useContext(ShipmentContext)
   const { errors: inStockSubscriptionErrors } = useContext(InStockSubscriptionContext)
   const {
-    errors: paymentMethodErrors,
-    currentPaymentMethodType,
-    currentPaymentMethodId,
-  } = useContext(PaymentMethodContext)
+    paymentMethodContext: {
+      errors: paymentMethodErrors,
+      currentPaymentMethodType,
+      currentPaymentMethodId,
+    },
+  } = usePaymentMethodStateContext()
   const { lineItem } = useContext(LineItemChildrenContext)
   const allErrors = useMemo(
     () => [

@@ -10,10 +10,10 @@ import {
   useState,
 } from "react"
 import OrderContext from "#context/OrderContext"
-import PaymentMethodContext from "#context/PaymentMethodContext"
 import PlaceOrderContext from "#context/PlaceOrderContext"
 import useCommerceLayer from "#hooks/useCommerceLayer"
-import { usePlaceOrder } from "#hooks/usePlaceOrder"
+import { usePaymentMethodStateContext } from "#hooks/usePaymentMethodStateContext"
+import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PlaceOrderOptions } from "#reducers/PlaceOrderReducer"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
@@ -71,13 +71,13 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     ...p
   } = props
 
-  // Detect standalone mode: no <PlaceOrderContainer> parent has set _isProvided.
-  const parentCtx = useContext(PlaceOrderContext)
-  const isStandalone = parentCtx._isProvided !== true
-
-  // Always call the hook (Rules of Hooks). When not standalone, effects are
-  // guarded internally and the returned value is not used.
-  const standaloneCtx = usePlaceOrder({ isStandalone, options: optionsProp })
+  // This button owns the place-order state: without a container it is the one
+  // that registers the order includes and re-evaluates whether placing is
+  // permitted. The payment components only read the same state.
+  const { placeOrderContext } = usePlaceOrderStateContext({
+    options: optionsProp,
+    isOwner: true,
+  })
 
   const {
     isPermitted,
@@ -87,22 +87,24 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     setButtonRef,
     setPlaceOrderStatus,
     status,
-  } = isStandalone ? standaloneCtx : parentCtx
+  } = placeOrderContext
   const [notPermitted, setNotPermitted] = useState(true)
   const [forceDisable, setForceDisable] = useState(disabled)
   const [isLoading, setIsLoading] = useState(false)
   const [hasBlockingErrors, setHasBlockingErrors] = useState(false)
   const { sdkClient } = useCommerceLayer()
   const {
-    currentPaymentMethodRef,
-    loading,
-    currentPaymentMethodType,
-    paymentSource,
-    setPaymentSource,
-    setPaymentMethodErrors,
-    currentCustomerPaymentSourceId,
-    errors: paymentMethodErrors,
-  } = useContext(PaymentMethodContext)
+    paymentMethodContext: {
+      currentPaymentMethodRef,
+      loading,
+      currentPaymentMethodType,
+      paymentSource,
+      setPaymentSource,
+      setPaymentMethodErrors,
+      currentCustomerPaymentSourceId,
+      errors: paymentMethodErrors,
+    },
+  } = usePaymentMethodStateContext()
   const { order, setOrderErrors, errors } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
   useEffect(() => {
