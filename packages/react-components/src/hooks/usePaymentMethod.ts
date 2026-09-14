@@ -84,9 +84,6 @@ export function usePaymentMethod({
       })
     }
     if (config && isEmpty(state.config)) setPaymentMethodConfig(config, dispatch)
-    if (credentials && order && !state.paymentMethods) {
-      getPaymentMethods({ order, dispatch })
-    }
     if (order?.payment_source === null) {
       setCustomerOrderParam("_save_payment_source_to_customer_wallet", "false")
       dispatch({ type: "setPaymentSource", payload: { paymentSource: undefined } })
@@ -102,7 +99,6 @@ export function usePaymentMethod({
   }, [
     isStandalone,
     order,
-    credentials,
     getOrder,
     addResourceToInclude,
     include?.includes,
@@ -113,6 +109,32 @@ export function usePaymentMethod({
     isOwner,
     dispatch,
   ])
+
+  // Reading the methods off the order is not a request — `getPaymentMethods`
+  // only copies `available_payment_methods`, `payment_method` and
+  // `payment_source` into the state — so every instance may do it, owner or
+  // not. That matters where no owner is mounted at all: the order recap on the
+  // last step renders a `<PaymentSource readonly>` with no `<PaymentMethod>`
+  // anywhere near it, and used to take this state from the container.
+  useEffect(() => {
+    // The two resources the derivation below reads. A reader asks for them
+    // itself rather than relying on an owner having asked first: the order
+    // recap on the last step has no owner anywhere near it. With a container
+    // above, it is the one that registers includes and this stays out of it.
+    const needed = isStandalone
+      ? (["payment_method", "payment_source"] as const).filter(
+          (resource) => !include?.includes(resource)
+        )
+      : []
+    if (needed.length > 0) {
+      // One call for everything missing: each registration grows the include
+      // list, and the order is fetched again whenever it grows.
+      addResourceToInclude({ newResource: [...needed], resourcesIncluded: include })
+    }
+    if (credentials && order && !state.paymentMethods) {
+      getPaymentMethods({ order, dispatch })
+    }
+  }, [credentials, order, state.paymentMethods, dispatch, include, addResourceToInclude, isStandalone])
 
   const setLoading = useCallback(
     ({ loading }: { loading: boolean }) => {

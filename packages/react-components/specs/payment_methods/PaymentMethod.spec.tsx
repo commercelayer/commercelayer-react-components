@@ -295,8 +295,12 @@ describe("PaymentMethod", () => {
         render(
           <Providers
             addResourceToInclude={addResourceToInclude}
-            include={["available_payment_methods"]}
-            includeLoaded={{ available_payment_methods: true }}
+            include={["available_payment_methods", "payment_method", "payment_source"]}
+            includeLoaded={{
+              available_payment_methods: true,
+              payment_method: true,
+              payment_source: true,
+            }}
           >
             <PaymentMethod>
               <span />

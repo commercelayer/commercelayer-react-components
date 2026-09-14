@@ -1,5 +1,5 @@
 import type { Order, OrderCreate } from "@commercelayer/sdk"
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react"
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import { defaultOrderContext } from "#context/OrderContext"
 import type { OrderStorageConfig } from "#context/OrderStorageContext"
@@ -125,6 +125,51 @@ export function useOrderState({
       }
     }
   }, [attributes, state?.order, lock])
+
+  // The effect below only fetches while `state.order` is null, so every include
+  // has to be registered before the first fetch. That held while containers
+  // wrapped the whole checkout and mounted with it; a standalone component that
+  // mounts when its step opens registers its includes too late, and the order
+  // would never carry them — the payment methods being the case that surfaced
+  // it. Whenever the include list grows past what the current order was fetched
+  // with, fetch it again.
+  //
+  // Coalesced on a short timer rather than fetched per growth: components mount
+  // over several ticks and each one widens the list, so fetching on every step
+  // would fire a request per component. The same 50ms flush the SKU batch store
+  // uses, for the same reason.
+  const fetchedIncludeRef = useRef<string[]>([])
+  const includeFlushRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: keyed on the include list and the order identity on purpose; a full dep list re-runs on every state change
+  useEffect(() => {
+    const currentInclude = state.include ?? []
+    const currentOrderId = state.order?.id
+    if (currentOrderId == null) {
+      // Nothing has been fetched yet: the effect below is still in charge.
+      fetchedIncludeRef.current = currentInclude
+      return
+    }
+    const missing = currentInclude.filter(
+      (resource) => !fetchedIncludeRef.current.includes(resource)
+    )
+    if (missing.length === 0) return
+
+    if (includeFlushRef.current != null) clearTimeout(includeFlushRef.current)
+    includeFlushRef.current = setTimeout(() => {
+      includeFlushRef.current = null
+      // Record before fetching: the refetch dispatches, and without this the
+      // effect would see the same gap again and loop.
+      fetchedIncludeRef.current = currentInclude
+      getOrder(currentOrderId)
+    }, 50)
+
+    return () => {
+      if (includeFlushRef.current != null) {
+        clearTimeout(includeFlushRef.current)
+        includeFlushRef.current = null
+      }
+    }
+  }, [state.include?.length, state.order?.id])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: complex dep array mirrors original OrderContainer — adding all deps causes fetch loops
   useEffect(() => {
