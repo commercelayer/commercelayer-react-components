@@ -20,13 +20,21 @@ import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
 export function usePaymentMethodStateContext({
   config,
   isOwner = false,
+  needsPaymentResources = false,
 }: {
   config?: PaymentMethodConfig
   isOwner?: boolean
+  /** Set by the components that render the payment source. */
+  needsPaymentResources?: boolean
 } = {}) {
   const parentContext = useContext(PaymentMethodContext)
   const isStandalone = parentContext._isProvided !== true
-  const standalone = usePaymentMethod({ isStandalone, config, isOwner })
+  const standalone = usePaymentMethod({
+    isStandalone,
+    config,
+    isOwner,
+    needsPaymentResources,
+  })
 
   return {
     isStandalone,

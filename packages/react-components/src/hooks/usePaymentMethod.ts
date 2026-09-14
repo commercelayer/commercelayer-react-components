@@ -32,6 +32,7 @@ export function usePaymentMethod({
   isStandalone,
   config,
   isOwner = false,
+  needsPaymentResources = false,
 }: {
   isStandalone: boolean
   config?: PaymentMethodConfig
@@ -42,6 +43,13 @@ export function usePaymentMethod({
    * methods, or every reader would do the container's job over again.
    */
   isOwner?: boolean
+  /**
+   * Whether this instance renders the payment source and therefore needs it on
+   * the order. Only the components that show it ask for the includes: a generic
+   * consumer such as `<Errors>` is mounted on every step, and making it ask
+   * would refetch the order where nothing needs paying.
+   */
+  needsPaymentResources?: boolean
 }) {
   const {
     order,
@@ -121,11 +129,12 @@ export function usePaymentMethod({
     // itself rather than relying on an owner having asked first: the order
     // recap on the last step has no owner anywhere near it. With a container
     // above, it is the one that registers includes and this stays out of it.
-    const needed = isStandalone
-      ? (["payment_method", "payment_source"] as const).filter(
-          (resource) => !include?.includes(resource)
-        )
-      : []
+    const needed =
+      isStandalone && (isOwner || needsPaymentResources)
+        ? (["payment_method", "payment_source"] as const).filter(
+            (resource) => !include?.includes(resource)
+          )
+        : []
     if (needed.length > 0) {
       // One call for everything missing: each registration grows the include
       // list, and the order is fetched again whenever it grows.
@@ -160,6 +169,8 @@ export function usePaymentMethod({
     include,
     addResourceToInclude,
     isStandalone,
+    isOwner,
+    needsPaymentResources,
   ])
 
   const setLoading = useCallback(

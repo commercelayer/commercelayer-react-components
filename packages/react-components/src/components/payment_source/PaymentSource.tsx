@@ -33,7 +33,9 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
   const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
   const { payments } = useContext(CustomerContext)
-  const { isStandalone, paymentMethodContext } = usePaymentMethodStateContext()
+  const { isStandalone, paymentMethodContext } = usePaymentMethodStateContext({
+    needsPaymentResources: true,
+  })
   const {
     errors,
     currentPaymentMethodId,
