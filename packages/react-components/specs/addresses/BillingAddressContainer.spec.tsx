@@ -55,7 +55,7 @@ describe("BillingAddressContainer", () => {
     })
 
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("[BillingAddressContainer] is deprecated")
+      expect.stringContaining("<BillingAddressContainer> is deprecated")
     )
     warnSpy.mockRestore()
   })
