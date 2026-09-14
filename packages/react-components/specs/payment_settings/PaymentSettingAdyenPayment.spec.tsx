@@ -12,7 +12,11 @@ import { PaymentSettingRadioButton } from "#components/payment_settings/PaymentS
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import type { BaseError } from "#typings/errors"
-import { getHandoffSnapshot, resetPaymentGatewayStore } from "#utils/paymentGatewayStore"
+import {
+  getHandoffSnapshot,
+  isCollecting,
+  resetPaymentGatewayStore,
+} from "#utils/paymentGatewayStore"
 
 const adyen = vi.hoisted(() => ({
   dropinMount: vi.fn(),
@@ -452,6 +456,29 @@ describe("the Payment Gateway Handoff", () => {
     expect(result).toEqual({ status: "unknown", code: "NETWORK_ERROR" })
   })
 
+  it("marks the order as collecting from the submit until the verdict", async () => {
+    // The window `<PaymentSetting>` reads before it tidies away the session the
+    // shopper switched off: inside it the money may already have moved, and the
+    // order carries no authorization to say so.
+    renderAdyen()
+    await waitFor(() => {
+      expect(adyen.dropinMount).toHaveBeenCalled()
+    })
+    expect(isCollecting("order-1")).toBe(false)
+
+    const submit = hostSubmit()
+    await act(async () => {
+      void submit?.()
+      await Promise.resolve()
+    })
+    expect(isCollecting("order-1")).toBe(true)
+
+    await act(async () => {
+      adyen.captured.options.onPaymentCompleted({ resultCode: "Authorised" })
+    })
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
   it("publishes readiness from the Drop-in's own validity", async () => {
     renderAdyen()
     await waitFor(() => {
@@ -533,6 +560,54 @@ describe("who may claim to collect a payment", () => {
 
     await waitFor(() => {
       expect(getHandoffSnapshot("order-1").collection).toBeNull()
+    })
+  })
+
+  /**
+   * The same switch, made while the Drop-in is still working.
+   *
+   * `<PlaceOrderButton>` is awaiting the promise `submit()` returned, and every
+   * callback that could settle it is guarded by the effect's `cancelled` flag —
+   * so a component that went away mid-payment settled nothing at all. The
+   * button never reached the `finally` that clears its loading state: it stayed
+   * disabled and spinning for good, with the gift cards already charged before
+   * the submit, and the only way out was a reload.
+   *
+   * `unknown` and not `failed`: the Drop-in was submitted and Adyen may well
+   * have taken the money, so nothing may be rolled back.
+   */
+  it("settles a pending submit when the payment form goes away", async () => {
+    const { rerender } = renderAdyen(order({ available_payment_settings: [MANUAL, ADYEN_SETTING] }))
+    await waitFor(() => {
+      expect(adyen.dropinMount).toHaveBeenCalled()
+    })
+
+    const submit = hostSubmit()
+    let result: unknown
+    await act(async () => {
+      void submit?.().then((r) => {
+        result = r
+      })
+    })
+
+    await act(async () => {
+      rerender(
+        <Wrapper
+          currentOrder={order({
+            available_payment_settings: [MANUAL, ADYEN_SETTING],
+            payment_sessions: [MANUAL_SESSION],
+          })}
+        >
+          <PaymentSetting>
+            <PaymentSettingRadioButton data-testid="radio" />
+            <PaymentSettingAdyenPayment containerClassName="dropin" />
+          </PaymentSetting>
+        </Wrapper>
+      )
+    })
+
+    await waitFor(() => {
+      expect(result).toEqual({ status: "unknown", code: "Interrupted" })
     })
   })
 })
@@ -649,6 +724,25 @@ describe("PayPal, which owns its own click", () => {
     expect(actions.reject).toHaveBeenCalled()
     expect(actions.resolve).not.toHaveBeenCalled()
     expect(authorizeGiftCardsMock).not.toHaveBeenCalled()
+  })
+
+  it("marks the order as collecting once the popup is on its way", async () => {
+    // Resolving the click is what opens PayPal's window, and the shopper can
+    // sit in it for as long as they like — with our radio buttons still live
+    // behind it. Nothing on the order records that a payment is under way, so
+    // this flag is the only thing that does.
+    await mounted()
+    const actions = { resolve: vi.fn(async () => {}), reject: vi.fn(async () => {}) }
+    await act(async () => {
+      await payPalConfig().onClick({}, actions)
+    })
+    expect(actions.resolve).toHaveBeenCalled()
+    expect(isCollecting("order-1")).toBe(true)
+
+    await act(async () => {
+      adyen.captured.options.onPaymentFailed({ resultCode: "Refused" })
+    })
+    expect(isCollecting("order-1")).toBe(false)
   })
 
   it("says why it refused, because a dead button reads as a broken one", async () => {

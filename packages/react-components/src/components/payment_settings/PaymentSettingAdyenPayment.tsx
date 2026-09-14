@@ -25,6 +25,7 @@ import {
   type PaymentGatewaySubmitResult,
   registerGatewayCollection,
   registerHostCollection,
+  setCollecting,
   setCollectionReady,
   setOutOfBandCollection,
 } from "#utils/paymentGatewayStore"
@@ -454,6 +455,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
             setCollectionReady(orderId, valid)
           },
           onPaymentCompleted: (data) => {
+            setCollecting(orderId, false)
             if (cancelled) return
             // Not necessarily captured funds: `Pending` and `Received` arrive
             // here as success, and PayPal produces them far more than cards do.
@@ -472,6 +474,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
             settle({ status: "completed" })
           },
           onPaymentFailed: (data) => {
+            setCollecting(orderId, false)
             if (cancelled) return
             if (selfAbortedRef.current) {
               // Ours, not Adyen's. Already reported, nothing was charged, and
@@ -493,6 +496,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
             settle({ status: "failed", code })
           },
           onError: (error) => {
+            setCollecting(orderId, false)
             if (cancelled) return
             // **Every** `onError` is an unknown outcome, whatever its `name`
             // says. A shopper closing PayPal's overlay arrives here with
@@ -750,6 +754,10 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
         return
       }
 
+      // Past this line the wallet takes over and `/payments` follows, so from
+      // here until a callback comes back there is a payment in flight that
+      // nothing on the order records yet.
+      setCollecting(orderId, true)
       actions.resolve()
     }
 
@@ -822,11 +830,26 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
         return
       }
 
+      // Resolving opens PayPal's popup, and from here until a callback comes
+      // back there is a payment in flight that nothing on the order records
+      // yet — the authorization only exists once the money has moved.
+      setCollecting(orderId, true)
       await actions.resolve()
     }
 
     return () => {
       cancelled = true
+      // Answer the waiting `submit()` before the callbacks that would have
+      // answered it are silenced by `cancelled`. Without this a shopper who
+      // switches payment method while the Drop-in is working leaves
+      // `<PlaceOrderButton>` awaiting a promise nothing can settle: it never
+      // clears its loading state, stays disabled, and the gift cards it charged
+      // before submitting are already gone. A reload is the only way out.
+      //
+      // `unknown`, never `failed`: the Drop-in was submitted and Adyen may well
+      // take the money, so nothing may be rolled back and the session has to
+      // survive for the webhook to settle against.
+      settle({ status: "unknown", code: "Interrupted" })
       dropinRef.current = null
       payPalActionsRef.current = new Set()
       setCollectionReady(orderId, false)
@@ -888,6 +911,10 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
       }
       setErrors([])
       setIsSubmitting(true)
+      // The card's equivalent of PayPal's popup: submitted, possibly a
+      // challenge on screen, and no authorization on the order until it is
+      // over.
+      setCollecting(orderId, true)
       try {
         return await new Promise<PaymentGatewaySubmitResult>((resolve) => {
           pendingRef.current = resolve
@@ -896,6 +923,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
       } finally {
         pendingRef.current = null
         setIsSubmitting(false)
+        setCollecting(orderId, false)
       }
     })
   }, [orderId, shouldMount, ownsItsButton])

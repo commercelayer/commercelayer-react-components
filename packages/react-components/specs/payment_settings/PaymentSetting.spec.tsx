@@ -9,6 +9,7 @@ import { PaymentSettingName } from "#components/payment_settings/PaymentSettingN
 import { PaymentSettingRadioButton } from "#components/payment_settings/PaymentSettingRadioButton"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import { resetPaymentGatewayStore, setCollecting } from "#utils/paymentGatewayStore"
 import { ADYEN_RETURN_URL_MAX_LENGTH } from "#utils/paymentSettingCreateAttributes"
 
 const { createPaymentSessionMock, discardPaymentSessionMock } = vi.hoisted(() => ({
@@ -84,6 +85,7 @@ function renderSettings(currentOrder?: Partial<Order> | null) {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  resetPaymentGatewayStore()
   createPaymentSessionMock.mockResolvedValue({ id: "session-new" })
   discardPaymentSessionMock.mockResolvedValue(true)
 })
@@ -429,6 +431,33 @@ describe("<PaymentSetting> clearing the superseded session", () => {
           created_at: "2026-09-08T10:57:54Z",
           payment_setting: ADYEN,
           payment_authorization: { status: "succeeded" },
+        },
+      ])
+    )
+
+    await clickManual()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    expect(discardPaymentSessionMock).not.toHaveBeenCalled()
+  })
+
+  it("leaves a session whose gateway is still collecting", async () => {
+    // The switch a shopper can make with a gateway's own popup already open, or
+    // a card submitted and the challenge on screen. No authorization exists
+    // yet, so the money test above says nothing and the delete goes through —
+    // and what it deletes is the record the payment would have settled against.
+    // The gateway is not stopped by any of this: it can still take the money,
+    // and the order is then left with nothing to show for it.
+    setCollecting("order-1", true)
+    renderSettings(
+      withBoth([
+        {
+          id: "session-adyen",
+          status: "unpaid",
+          created_at: "2026-09-08T10:57:54Z",
+          payment_setting: ADYEN,
         },
       ])
     )

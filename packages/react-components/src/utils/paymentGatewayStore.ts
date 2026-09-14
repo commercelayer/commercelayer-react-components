@@ -108,6 +108,11 @@ interface Entry extends PaymentGatewayHandoff {
    * `submit` function, because `setCollectionReady` rebuilds the collection.
    */
   token: object | null
+  /**
+   * Whether the registered gateway is collecting right now. See
+   * `setCollecting` for why it lives here and not in the snapshot.
+   */
+  collecting: boolean
   /** Cached snapshot, so `useSyncExternalStore` compares by reference safely. */
   snapshot: PaymentGatewayHandoff
 }
@@ -132,6 +137,7 @@ function entry(orderId?: string | null): Entry {
       token: null,
       collection: null,
       collectedOutOfBand: "no",
+      collecting: false,
       errors: NO_ERRORS,
       snapshot: { collection: null, collectedOutOfBand: "no", errors: NO_ERRORS },
     }
@@ -186,6 +192,10 @@ function register(orderId: string | null | undefined, collection: PaymentCollect
     if (e.token !== token) return
     e.token = null
     e.collection = null
+    // The net under `setCollecting`: a gateway torn down mid-payment never
+    // reaches whatever would have cleared the flag, and a flag left standing
+    // would outlive the page rather than the payment.
+    e.collecting = false
     commit(orderId, e)
   }
 }
@@ -220,6 +230,30 @@ export function setCollectionReady(orderId: string | null | undefined, isReady: 
   if (e.collection.isReady === isReady) return
   e.collection = { ...e.collection, isReady }
   commit(orderId, e)
+}
+
+/**
+ * Say whether a collection is under way for this order right now.
+ *
+ * Set from the moment a gateway hands control to the payment provider — a
+ * Drop-in submitted, a wallet authorized, PayPal's popup opened — until the
+ * outcome comes back. It exists because that window is invisible from anywhere
+ * else: a Payment Session carries no authorization until money has actually
+ * moved, so until then nothing on the order tells a shopper who is mid-payment
+ * apart from one who has merely picked a method.
+ *
+ * Deliberately **not** part of the published snapshot. Nothing renders on it —
+ * it is read once, from an event handler — and publishing it would make it API
+ * before the question it belongs to has been answered: what a checkout should
+ * *do* while a payment is in flight, and how a shopper gets out of it.
+ */
+export function setCollecting(orderId: string | null | undefined, collecting: boolean): void {
+  entry(orderId).collecting = collecting
+}
+
+/** Whether a gateway is collecting for this order. See `setCollecting`. */
+export function isCollecting(orderId?: string | null): boolean {
+  return entry(orderId).collecting
 }
 
 export function setOutOfBandCollection(

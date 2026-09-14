@@ -16,6 +16,7 @@ import type { ChildrenFunction } from "#typings/index"
 import {
   type PaymentGatewaySubmitResult,
   registerHostCollection,
+  setCollecting,
   setCollectionReady,
 } from "#utils/paymentGatewayStore"
 
@@ -231,6 +232,10 @@ function StripeForm({
 
       setErrors([])
       setIsSubmitting(true)
+      // Stripe owns the shopper from here — an authentication step of its own,
+      // possibly a redirect — and the Payment Session records none of it until
+      // the money has moved. Nothing may delete that session in the meantime.
+      setCollecting(orderId, true)
       try {
         const { error, paymentIntent } = await sdk.confirmPayment({
           elements: group,
@@ -276,6 +281,7 @@ function StripeForm({
         return { status: "unknown", code: status ?? "unknown" }
       } finally {
         setIsSubmitting(false)
+        setCollecting(orderId, false)
       }
     })
   }, [orderId])

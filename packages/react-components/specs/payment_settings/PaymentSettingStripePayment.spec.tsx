@@ -11,7 +11,11 @@ import { PaymentSettingRadioButton } from "#components/payment_settings/PaymentS
 import { PaymentSettingStripePayment } from "#components/payment_settings/PaymentSettingStripePayment"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
-import { getHandoffSnapshot, resetPaymentGatewayStore } from "#utils/paymentGatewayStore"
+import {
+  getHandoffSnapshot,
+  isCollecting,
+  resetPaymentGatewayStore,
+} from "#utils/paymentGatewayStore"
 
 /**
  * A fake Stripe SDK, deliberately shallow.
@@ -138,6 +142,33 @@ beforeEach(() => {
   stripe.submit.mockResolvedValue({})
   stripe.confirmPayment.mockResolvedValue({ paymentIntent: { status: "requires_capture" } })
   getOrder.mockResolvedValue(order())
+})
+
+describe("<PaymentSettingStripePayment> while Stripe has the shopper", () => {
+  it("marks the order as collecting for the length of the confirmation", async () => {
+    // Stripe can put an authentication step in front of the shopper and take as
+    // long as it needs, and the Payment Session records none of that until the
+    // money has moved — so a switch of payment method in the meantime would
+    // find a session that looks safe to delete. Observed from inside
+    // `confirmPayment`, because that is the whole window.
+    renderStripe()
+    await waitFor(() => {
+      expect(screen.getByTestId("payment-element")).toBeTruthy()
+    })
+
+    let collectingDuringConfirm: boolean | undefined
+    stripe.confirmPayment.mockImplementation(async () => {
+      collectingDuringConfirm = isCollecting("order-1")
+      return { paymentIntent: { status: "requires_capture" } }
+    })
+
+    await act(async () => {
+      await hostSubmit()?.()
+    })
+
+    expect(collectingDuringConfirm).toBe(true)
+    expect(isCollecting("order-1")).toBe(false)
+  })
 })
 
 describe("<PaymentSettingStripePayment> mounting", () => {

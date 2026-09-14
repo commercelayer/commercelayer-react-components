@@ -21,6 +21,7 @@ import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import { useStripeRedirectResume } from "#hooks/useStripeRedirectResume"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
+import { isCollecting } from "#utils/paymentGatewayStore"
 import {
   paymentSettingCreateAttributes,
   paymentSettingUnusableReason,
@@ -276,10 +277,19 @@ export function PaymentSetting({
       // current selection, and one carrying a live authorization is not ours to
       // undo here. The rule throughout is that sessions which took no money
       // are deleted and everything else is abandoned.
+      //
+      // And skipped while a gateway is collecting, which is the same rule one
+      // step earlier: a session whose payment is *in flight* has taken no money
+      // yet, so the authorization test above passes it as deletable — and
+      // deleting it destroys the record the payment would settle against, while
+      // doing nothing to stop the payment. The shopper is charged and the order
+      // has nothing to show for it. Switching method mid-payment is left
+      // possible on purpose; only the tidying is called off.
       if (
         superseded != null &&
         superseded.payment_setting?.id !== setting.id &&
-        !hasLiveAuthorization(superseded)
+        !hasLiveAuthorization(superseded) &&
+        !isCollecting(order.id)
       ) {
         // Its own try: `discardPaymentSession` swallows its failures already,
         // but a rejection escaping here would land in the catch below and turn
