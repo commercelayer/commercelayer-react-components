@@ -134,7 +134,33 @@ export function usePaymentMethod({
     if (credentials && order && !state.paymentMethods) {
       getPaymentMethods({ order, dispatch })
     }
-  }, [credentials, order, state.paymentMethods, dispatch, include, addResourceToInclude, isStandalone])
+    // Same payment source, fresher representation: the order is fetched again
+    // after it is placed and only then carries the card's brand and last
+    // digits. Deriving once would leave the order recap showing the
+    // placeholders the source had before the payment went through — the state
+    // outlives the components that built it, so it has to follow the order.
+    const orderPaymentSource = order?.payment_source
+    if (
+      orderPaymentSource != null &&
+      state.paymentSource != null &&
+      orderPaymentSource.id === state.paymentSource.id &&
+      orderPaymentSource !== state.paymentSource
+    ) {
+      dispatch({
+        type: "setPaymentSource",
+        payload: { paymentSource: orderPaymentSource },
+      })
+    }
+  }, [
+    credentials,
+    order,
+    state.paymentMethods,
+    state.paymentSource,
+    dispatch,
+    include,
+    addResourceToInclude,
+    isStandalone,
+  ])
 
   const setLoading = useCallback(
     ({ loading }: { loading: boolean }) => {
