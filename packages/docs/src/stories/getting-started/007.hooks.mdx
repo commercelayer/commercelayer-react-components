@@ -9,7 +9,7 @@ The `@commercelayer/react-hooks-components` package provides **SWR-based React h
 These hooks handle caching, deduplication, loading states, and error handling automatically. They are used internally by the React components in this library and are available for direct use if you want to build custom UI on top of Commerce Layer data.
 
 <span type="info">
-This package requires React 18+ and depends on `swr` for data fetching and caching.
+This package requires React 19 and depends on `swr` for data fetching and caching.
 </span>
 
 ## Installation
@@ -28,10 +28,18 @@ pnpm add @commercelayer/react-hooks-components
 
 | Hook | Description |
 |---|---|
-| `useSkus` | Fetch, retrieve, and update SKUs |
-| `usePrices` | Fetch, retrieve, and update prices |
-| `useSkuLists` | Fetch and retrieve SKU lists |
+| `useAddressForm` | Billing and shipping address form state, and saving it to the order |
 | `useAvailability` | Fetch availability for a SKU code or ID |
+| `useCustomer` | Fetch a customer with their addresses, payment sources and orders |
+| `useGiftCards` | Fetch, create and update gift cards |
+| `useInStockSubscriptions` | Subscribe a customer to a SKU coming back in stock |
+| `useLineItems` | Fetch the order's line items, and update or delete them |
+| `useOrder` | Fetch, create and update an order |
+| `usePrices` | Fetch, retrieve, and update prices |
+| `useShipments` | Fetch the order's shipments and set a shipping method |
+| `useSkuList` | Retrieve a single SKU list by ID |
+| `useSkuLists` | Fetch and retrieve SKU lists |
+| `useSkus` | Fetch, retrieve, and update SKUs |
 
 ## Return shape
 

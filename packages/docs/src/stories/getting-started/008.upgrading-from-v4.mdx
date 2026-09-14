@@ -241,6 +241,28 @@ And `<PlaceOrderContainer>` simply goes away:
 <PlaceOrderButton label="Place order" />`}
 />
 
+### When the consumer is not a child
+
+The examples above put everything in one subtree. A stepped checkout does not: the button that saves both address forms has to be their sibling, and the place-order step sits outside the payment step. The standalone components handle that — the state they share lives per order rather than in the tree, so they find each other wherever they sit.
+
+Two things follow from that, and they are worth knowing before you hit them.
+
+**State that your app owns, your app publishes.** `shipToDifferentAddress` is the case in point: the container used to hold it, and once it is gone the only components that could publish it are the two address forms. If your UI unmounts a form — a transition that swaps the form for a saved-address card, say — nothing publishes the flag any more. Publish it from wherever it lives in your app instead:
+
+<Source
+  language="tsx"
+  dark
+  code={`import { useAddressForm } from "@commercelayer/react-hooks-components"
+
+const { setFlags } = useAddressForm({ accessToken, orderId })
+
+useEffect(() => {
+  setFlags({ shipToDifferentAddress })
+}, [shipToDifferentAddress, setFlags])`}
+/>
+
+**Two editors on one order need to say so.** Instances sharing an order share their form state, which is what makes the sibling button work. If you deliberately render two independent address editors for the same order, pass `scope` to keep them apart.
+
 <span title="Tip" type="info">
 Run your app in development mode after the upgrade and watch the console: every deprecated container you are still using logs a warning naming its replacement. That list is your migration backlog.
 </span>
