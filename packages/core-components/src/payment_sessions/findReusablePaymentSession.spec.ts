@@ -5,13 +5,16 @@ import { findReusablePaymentSession } from "./findReusablePaymentSession"
 const NOW = new Date("2026-08-18T12:00:00Z")
 const SETTING_ID = "setting-manual"
 
+// Real timestamps, because the selection is defined by recency: a fixture with
+// an empty `created_at` makes `Date.parse` return NaN, every comparison false,
+// and the ordering an accident of array position.
 function session(overrides: Partial<PaymentSession> = {}): PaymentSession {
   return {
     id: "session-1",
     type: "payment_sessions",
     status: "unpaid",
-    created_at: "",
-    updated_at: "",
+    created_at: "2026-08-18T11:00:00Z",
+    updated_at: "2026-08-18T11:00:00Z",
     payment_setting: { id: SETTING_ID, type: "payment_setting_manuals" },
     ...overrides,
   } as PaymentSession
@@ -118,10 +121,21 @@ describe("findReusablePaymentSession", () => {
     }
   )
 
-  it("searches the array rather than reading the first entry", () => {
-    const giftCard = session({ id: "gift", payment_setting: { id: "setting-gift-card" } as never })
-    const burnt = session({ id: "burnt", payment_authorization: { status: "failed" } as never })
-    const fresh = session({ id: "fresh" })
+  it("is not shadowed by a gift card or a burnt session", () => {
+    // Neither is the selection — one is additive, the other is failed — so the
+    // newest live session for this setting is still adoptable.
+    const giftCard = session({
+      id: "gift",
+      created_at: "2026-08-18T11:30:00Z",
+      gift_card_code: "ABC123",
+      payment_setting: { id: "setting-gift-card", type: "payment_setting_gift_cards" } as never,
+    })
+    const burnt = session({
+      id: "burnt",
+      created_at: "2026-08-18T11:40:00Z",
+      payment_authorization: { status: "failed" } as never,
+    })
+    const fresh = session({ id: "fresh", created_at: "2026-08-18T11:20:00Z" })
     expect(
       findReusablePaymentSession({
         paymentSessions: [giftCard, burnt, fresh],
@@ -129,6 +143,43 @@ describe("findReusablePaymentSession", () => {
         now: NOW,
       })
     ).toBe(fresh)
+  })
+
+  /**
+   * The regression this rule exists for.
+   *
+   * A shopper picks Adyen, changes to bank transfer, then changes back. The
+   * first Adyen session is still unpaid, unexpired and the right size, so it
+   * used to be adopted — and adopting changes no timestamp, so the newest
+   * session stayed the bank transfer one, the radio never moved, and clicking
+   * again did nothing again. Found on a real order carrying two unpaid sessions
+   * nine seconds apart.
+   */
+  it("does not adopt a session that a later selection has superseded", () => {
+    const adyen = session({
+      id: "adyen",
+      created_at: "2026-08-18T11:57:54Z",
+      payment_setting: { id: "setting-adyen", type: "payment_setting_adyens" } as never,
+    })
+    const manual = session({ id: "manual", created_at: "2026-08-18T11:58:03Z" })
+
+    expect(
+      findReusablePaymentSession({
+        paymentSessions: [adyen, manual],
+        paymentSettingId: "setting-adyen",
+        now: NOW,
+      })
+    ).toBeUndefined()
+
+    // And the one that *is* the selection stays adoptable, so a remount does
+    // not pile up a third session.
+    expect(
+      findReusablePaymentSession({
+        paymentSessions: [adyen, manual],
+        paymentSettingId: SETTING_ID,
+        now: NOW,
+      })
+    ).toBe(manual)
   })
 
   it("does not decide on statuses it has never heard of", () => {

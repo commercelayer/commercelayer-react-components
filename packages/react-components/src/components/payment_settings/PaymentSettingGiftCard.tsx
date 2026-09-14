@@ -1,4 +1,11 @@
-import { applyGiftCard, mapGiftCardErrors, removeGiftCard } from "@commercelayer/core-components"
+import type { PlaceabilityError } from "@commercelayer/core-components"
+import {
+  applyGiftCard,
+  giftCardRemoval,
+  mapGiftCardErrors,
+  refundGiftCardSessions,
+  removeGiftCard,
+} from "@commercelayer/core-components"
 import type { PaymentSession } from "@commercelayer/sdk"
 import { type JSX, type ReactNode, useCallback, useContext, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
@@ -97,18 +104,66 @@ export function PaymentSettingGiftCard({ children, readonly }: Props): JSX.Eleme
     [accessToken, interceptors, order, getOrder]
   )
 
+  /**
+   * Take one gift card back off the order.
+   *
+   * One entry point, two operations, and the caller does not choose: a card
+   * that took no money is **discarded** — its Payment Session is deleted and no
+   * balance moves — while a charged one can only be **refunded**, which
+   * restores the balance and leaves a record. Deleting a charged session is not
+   * an option the API offers: it refuses one with transactions attached and
+   * surfaces the refusal as an unhandled 500.
+   *
+   * The refunded session is not deleted afterwards, and does not need to be: it
+   * lands on `refunded`, and that status is what drops it out of the applied
+   * list and puts its amount back into the remainder. Nothing has to hide it by
+   * hand. The shopper can then re-apply the same code — the API only refuses a
+   * duplicate while the earlier session is still `unpaid`.
+   */
   const remove = useCallback(
     async (paymentSessionId: string): Promise<void> => {
       if (order == null || accessToken == null) return
       setErrors([])
       try {
-        await removeGiftCard({ accessToken, interceptors, order, paymentSessionId })
+        const paymentSession = (order.payment_sessions ?? []).find(
+          (candidate) => candidate.id === paymentSessionId
+        )
+        const removal =
+          paymentSession == null ? undefined : giftCardRemoval({ paymentSession, order, readonly })
+
+        if (removal === "refund") {
+          const result = await refundGiftCardSessions({
+            accessToken,
+            interceptors,
+            orderId: order.id,
+            paymentSessionIds: [paymentSessionId],
+          })
+          // A refusal carries the API's own words, so it is worth showing. A
+          // timeout carries none — nothing was refused, the capture the refund
+          // points at simply had not appeared — and the card is still listed
+          // and still charged, which is the truth. Reporting it would mean
+          // inventing copy in a language this package cannot know, so it is a
+          // development warning and the shopper can click again: the refund is
+          // idempotent, it skips a session that already has one.
+          if (result.errors.length > 0) {
+            setErrors(toRefundErrors(result.errors))
+          } else if (result.timedOut && process.env.NODE_ENV !== "production") {
+            console.warn(
+              `[commercelayer] <PaymentSettingGiftCardRemoveButton> gave up waiting for the capture to refund on session ${paymentSessionId}. The card is still applied and still charged.`
+            )
+          }
+        } else {
+          // `discard`. Anything the rule refused reaches here too, and
+          // `removeGiftCard` raises its own error for a charged card — which is
+          // the message worth showing rather than one of ours.
+          await removeGiftCard({ accessToken, interceptors, order, paymentSessionId })
+        }
         await getOrder(order.id)
       } catch (error) {
         setErrors(toGiftCardErrors(error))
       }
     },
-    [accessToken, interceptors, order, getOrder]
+    [accessToken, interceptors, order, getOrder, readonly]
   )
 
   if (paymentsModel !== "payment_sessions" || state.giftCardSettingId == null) return null
@@ -162,6 +217,23 @@ export function PaymentSettingGiftCard({ children, readonly }: Props): JSX.Eleme
  * The fallback is for a failure that never reached the API at all — a dropped
  * connection, say — where there is no `errors` array to read.
  */
+/**
+ * Why a refund was refused, in the API's own words.
+ *
+ * Kept apart from `toGiftCardErrors`, which maps a *thrown* error and defaults
+ * to wording about a code that could not be applied — the wrong story entirely
+ * for a card that is already on the order.
+ */
+function toRefundErrors(errors: PlaceabilityError[]): BaseError[] {
+  return errors.map((error) => ({
+    code: "VALIDATION_ERROR" as const,
+    resource: "gift_cards" as const,
+    message: error.message,
+    field: error.field,
+    ...(error.meta != null ? { meta: error.meta } : {}),
+  }))
+}
+
 function toGiftCardErrors(error: unknown): BaseError[] {
   const mapped = mapGiftCardErrors(error).map((giftCardError) => ({
     code: "INVALID_FIELD_VALUE" as const,

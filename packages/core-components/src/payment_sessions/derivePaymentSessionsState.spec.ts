@@ -108,11 +108,20 @@ describe("derivePaymentSessionsState", () => {
     }
   )
 
-  it("drops a refunded gift card", () => {
+  it("does not drop a card on the strength of a refunds array alone", () => {
+    // This test used to assert the opposite, and it was green while the
+    // behaviour was broken: the old check read `payment_refunds`, which needs
+    // `payment_sessions.payment_refunds` in the order's `include` and nothing
+    // registers it — so against a real order the check never fired and a
+    // refunded card went on covering the order. The fixture described a state
+    // the API never serves.
+    //
+    // Kept as a regression guard: the signal is `status`, and a refund that has
+    // not settled yet has not moved the money either.
     const state = derivePaymentSessionsState(
       order([giftCard("gift-a", 2000, { payment_refunds: [{ id: "refund-1" }] as never })])
     )
-    expect(state.giftCardSessions).toEqual([])
+    expect(state.giftCardSessions).toHaveLength(1)
   })
 
   it("keeps a gift card whose authorization is still in flight", () => {
@@ -179,5 +188,101 @@ describe("derivePaymentSessionsState", () => {
   it("reports no gift card setting when the order has none available", () => {
     const state = derivePaymentSessionsState(order([], [MANUAL]))
     expect(state.giftCardSettingId).toBeUndefined()
+  })
+})
+
+describe("a gift card whose money has come back", () => {
+  const AUTHORIZED = {
+    payment_authorization: { status: "succeeded" },
+  } as Partial<PaymentSession>
+
+  it("stops counting once the session reads refunded", () => {
+    // The signal has to be `status`. `payment_refunds` needs an include nobody
+    // registers, so a check on that array never fires — and a refunded card
+    // would go on covering an order it no longer pays for.
+    const state = derivePaymentSessionsState(
+      order([giftCard("gc-1", 2000, { ...AUTHORIZED, status: "refunded" })])
+    )
+    expect(state.giftCardSessions).toEqual([])
+    expect(state.giftCardAmountCents).toBe(0)
+    expect(state.remainingAmountCents).toBe(TOTAL)
+    expect(state.isCovered).toBe(false)
+  })
+
+  it("stops counting a partially refunded one too", () => {
+    const state = derivePaymentSessionsState(
+      order([giftCard("gc-1", 2000, { ...AUTHORIZED, status: "partially_refunded" })])
+    )
+    expect(state.giftCardSessions).toEqual([])
+  })
+
+  it("stops counting a voided one", () => {
+    const state = derivePaymentSessionsState(
+      order([giftCard("gc-1", 2000, { ...AUTHORIZED, status: "voided" })])
+    )
+    expect(state.giftCardSessions).toEqual([])
+  })
+
+  it("keeps listing a charged card while its refund is still pending", () => {
+    // The money has not moved yet — the session only reaches `refunded` when it
+    // has. Hiding it earlier would raise the remainder while the balance is
+    // still spent, and the shopper would be asked to pay that part twice.
+    const state = derivePaymentSessionsState(
+      order([giftCard("gc-1", 2000, { ...AUTHORIZED, status: "paid" })])
+    )
+    expect(state.giftCardSessions).toHaveLength(1)
+    expect(state.remainingAmountCents).toBe(TOTAL - 2000)
+  })
+
+  it("leaves the other cards on the order counting", () => {
+    const state = derivePaymentSessionsState(
+      order([giftCard("gc-1", 2000, { ...AUTHORIZED, status: "refunded" }), giftCard("gc-2", 1500)])
+    )
+    expect(state.giftCardSessions.map((s) => s.id)).toEqual(["gc-2"])
+    expect(state.remainingAmountCents).toBe(TOTAL - 1500)
+  })
+})
+
+describe("after a refund, the order stops being covered by that money", () => {
+  const SETTLED = {
+    payment_authorization: { status: "succeeded" },
+  } as Partial<PaymentSession>
+
+  it("lets another gift card be applied again", () => {
+    // The bug this pins: a refunded session keeps its `succeeded`
+    // authorization, so a test on the authorization alone left this false for
+    // good — and the gift card input renders on it, so the shopper whose card
+    // had just been given back could never apply another one.
+    const state = derivePaymentSessionsState(
+      order([giftCard("gift-a", 2000, { ...SETTLED, status: "refunded" })])
+    )
+    expect(state.remainingAmountCents).toBe(TOTAL)
+    expect(state.canAddGiftCard).toBe(true)
+  })
+
+  it("still refuses another one while money is genuinely held", () => {
+    const state = derivePaymentSessionsState(
+      order([giftCard("gift-a", 2000, { ...SETTLED, status: "paid" })])
+    )
+    expect(state.canAddGiftCard).toBe(false)
+  })
+
+  it("stops counting a refunded method session toward the remainder", () => {
+    const state = derivePaymentSessionsState(
+      order([
+        session({ id: "adyen-1", amount_cents: 5100, ...SETTLED, status: "refunded" } as never),
+      ])
+    )
+    expect(state.remainingAmountCents).toBe(TOTAL)
+    expect(state.isCovered).toBe(false)
+  })
+
+  it("keeps counting one that is still holding the money", () => {
+    const state = derivePaymentSessionsState(
+      order([
+        session({ id: "adyen-1", amount_cents: 5100, ...SETTLED, status: "authorized" } as never),
+      ])
+    )
+    expect(state.remainingAmountCents).toBe(TOTAL - 5100)
   })
 })
