@@ -29,6 +29,8 @@ interface Props extends Omit<JSX.IntrinsicElements["div"], "children" | "onSelec
  * It accept:
  * - a `selectedClassName` prop to define the className of selected generated address wrapper.
  * - a `disabledClassName` prop to define the className of disabled generated address wrapper.
+ *   Only honoured by the children-as-function form, which forwards it to `<AddressCardsTemplate>`:
+ *   the plain form filters out non-selectable addresses instead of rendering them disabled.
  * - an `onSelect` prop to define a custom method triggered when an address wrapper is clicked.
  * - an `addresses` prop to define a list of addresses to be used instead of the ones available from active context.
  * - a `deselect` prop to define if the current address is deselected through a custom logic.
@@ -45,6 +47,10 @@ export function Address(props: Props): JSX.Element {
     children,
     className,
     selectedClassName = "",
+    // Pulled out of `p` on purpose: it is not a DOM attribute, and `p` is spread
+    // onto a `<div>` below. The children-as-function form still receives it
+    // through `parentProps`, which spreads the untouched `props`.
+    disabledClassName: _disabledClassName,
     onSelect,
     addresses = [],
     deselect = false,

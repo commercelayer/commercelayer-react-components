@@ -14,7 +14,7 @@ import {
   type Order,
   type QueryPageSize,
 } from "@commercelayer/core-components"
-import { type JSX, useContext, useEffect, useMemo, useState } from "react"
+import { type JSX, useContext, useEffect, useMemo, useRef, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext, { type defaultOrderContext } from "#context/OrderContext"
@@ -75,6 +75,15 @@ export function useCustomerProviderValue({
   pageSize,
 }: UseCustomerProviderValueParams) {
   const [state, setState] = useState<CustomerState>(customerInitialState)
+  // The action callbacks below must keep a stable identity across state changes:
+  // consumers put them in effect dependency arrays, so a fetch that updates
+  // `state` would otherwise retrigger the very effect that fired it. Anything
+  // they need to read from the current state goes through this ref instead.
+  const stateRef = useRef(state)
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
+
   const customerId = useMemo(() => {
     if (accessToken == null) {
       return undefined
@@ -170,10 +179,8 @@ export function useCustomerProviderValue({
     withoutIncludes,
   ])
 
-  return useMemo(() => {
+  const actions = useMemo(() => {
     return {
-      isGuest,
-      ...state,
       saveCustomerUser: async (customerEmail: string) => {
         if (accessToken == null || order?.id == null) {
           return
@@ -309,7 +316,7 @@ export function useCustomerProviderValue({
           interceptors,
           address,
           customerId,
-          addresses: state.addresses ?? undefined,
+          addresses: stateRef.current.addresses ?? undefined,
         })
 
         setState((previousState) => {
@@ -407,7 +414,15 @@ export function useCustomerProviderValue({
         }))
       },
     }
-  }, [accessToken, customerId, interceptors, isGuest, order, pageSize, state, withoutIncludes])
+  }, [accessToken, customerId, interceptors, order, pageSize, withoutIncludes])
+
+  return useMemo(() => {
+    return {
+      isGuest,
+      ...state,
+      ...actions,
+    }
+  }, [actions, isGuest, state])
 }
 
 /**

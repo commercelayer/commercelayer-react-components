@@ -118,6 +118,20 @@ describe("Address", () => {
     expect(container.querySelectorAll("[data-testid='address-child']")).toHaveLength(0)
   })
 
+  it("does not leak disabledClassName onto the DOM", () => {
+    const warn = vi.spyOn(console, "error").mockImplementation(() => {})
+    renderAddress({ addresses: [mockAddress] })
+    const card = screen.getAllByTestId("address-child")[0].parentElement!
+
+    expect(card.getAttribute("disabledclassname")).toBeNull()
+    expect(card.hasAttribute("disabledClassName")).toBe(false)
+    const leaked = warn.mock.calls.some((args) =>
+      String(args[0]).includes("does not recognize the `disabledClassName` prop")
+    )
+    expect(leaked).toBe(false)
+    warn.mockRestore()
+  })
+
   it("applies selectedClassName on click", async () => {
     renderAddress({ addresses: [mockAddress] })
     const card = screen.getAllByTestId("address-child")[0].parentElement!
