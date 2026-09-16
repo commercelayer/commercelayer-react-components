@@ -44,6 +44,19 @@ jobs:
       - name: Install 📦
         run: pnpm install --frozen-lockfile
 
+      # Required before lint: react-hooks-components' lint script ends in `tsc`,
+      # which resolves @commercelayer/core-components through its dist/. On a
+      # clean checkout that directory does not exist, and the whole package
+      # fails to typecheck. Locally it passes only because a previous build left
+      # dist/ lying around — the same trap netlify.toml warns about.
+      - name: Build 🛠
+        run: >-
+          pnpm
+          --filter @commercelayer/core-components
+          --filter @commercelayer/react-hooks-components
+          --filter @commercelayer/react-components
+          build
+
       - name: Lint 🔍
         run: >-
           pnpm
@@ -52,8 +65,8 @@ jobs:
           --filter @commercelayer/react-components
           lint
 
-      # No build step: the vitest configs alias the sibling workspace packages
-      # straight to their source, so dist/ is not involved.
+      # vitest itself needs no build — its configs alias the sibling workspace
+      # packages straight to source — but the lint step above does.
       - name: Test 🧪
         run: >-
           pnpm
