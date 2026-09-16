@@ -1,6 +1,6 @@
 {
   "name": "@commercelayer/react-hooks-components",
-  "version": "5.0.3",
+  "version": "5.0.4",
   "description": "Commerce Layer React Hooks",
   "type": "module",
   "main": "./dist/index.js",
