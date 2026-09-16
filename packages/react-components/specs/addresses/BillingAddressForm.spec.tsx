@@ -107,6 +107,20 @@ describe("BillingAddressForm", () => {
     expect(screen.getByTestId("form").className).toContain("my-form")
   })
 
+  it("does not leak fieldEvent onto the DOM", () => {
+    const warn = vi.spyOn(console, "error").mockImplementation(() => {})
+    renderForm({ props: { fieldEvent: "blur" } })
+    const form = screen.getByTestId("form")
+
+    expect(form.getAttribute("fieldevent")).toBeNull()
+    expect(form.hasAttribute("fieldEvent")).toBe(false)
+    const leaked = warn.mock.calls.some((args) =>
+      String(args[0]).includes("does not recognize the `fieldEvent` prop")
+    )
+    expect(leaked).toBe(false)
+    warn.mockRestore()
+  })
+
   it("exposes errorClassName through context", async () => {
     let contextRef: { errorClassName?: string } | undefined
 

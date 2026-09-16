@@ -44,6 +44,9 @@ export function BillingAddressForm(props: Props): JSX.Element {
     errorMode = "inline",
     isBusiness: isBusiness_prop = false,
     shipToDifferentAddress: shipToDifferentAddress_prop = false,
+    // Pulled out of `p` on purpose: it is not a DOM attribute, and `p` is spread
+    // onto the <form> below. ShippingAddressForm already does the same.
+    fieldEvent: _fieldEvent = "change",
     ...p
   } = props
 

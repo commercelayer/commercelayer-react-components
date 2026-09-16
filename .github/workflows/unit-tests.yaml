@@ -1,0 +1,76 @@
+# Runs the actual test suites on pull requests.
+#
+# Deliberately not named "test": merge-test-env-check.yml already has a job
+# called `test`, which only lists licenses. Its check renders as "test / test"
+# and reads like a test run, so a red suite could sit next to a green "test"
+# check and be missed. This one renders as "unit-tests / vitest".
+#
+# `pnpm test` is not used here: the react-components script begins with
+# `pnpm audit`, which fails on any newly published advisory and would turn the
+# suite red for reasons unrelated to the change. Lint and vitest are run
+# directly instead; auditing belongs in its own scheduled workflow.
+name: unit-tests
+
+on:
+  pull_request:
+    branches-ignore:
+      - release
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: unit-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  vitest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: pnpm 🧰
+        uses: pnpm/action-setup@v6
+
+      - name: Node 🧰
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+
+      - name: Install 📦
+        run: pnpm install --frozen-lockfile
+
+      # Required before lint: react-hooks-components' lint script ends in `tsc`,
+      # which resolves @commercelayer/core-components through its dist/. On a
+      # clean checkout that directory does not exist, and the whole package
+      # fails to typecheck. Locally it passes only because a previous build left
+      # dist/ lying around — the same trap netlify.toml warns about.
+      - name: Build 🛠
+        run: >-
+          pnpm
+          --filter @commercelayer/core-components
+          --filter @commercelayer/react-hooks-components
+          --filter @commercelayer/react-components
+          build
+
+      - name: Lint 🔍
+        run: >-
+          pnpm
+          --filter @commercelayer/core-components
+          --filter @commercelayer/react-hooks-components
+          --filter @commercelayer/react-components
+          lint
+
+      # vitest itself needs no build — its configs alias the sibling workspace
+      # packages straight to source — but the lint step above does.
+      - name: Test 🧪
+        run: >-
+          pnpm
+          --filter @commercelayer/core-components
+          --filter @commercelayer/react-hooks-components
+          --filter @commercelayer/react-components
+          exec vitest run
