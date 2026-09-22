@@ -107,7 +107,10 @@ describe("<Order include>", () => {
     }
   })
 
-  it("fetches without includes when the caller declares none", async () => {
+  it("carries the line items with no prop passed at all", async () => {
+    // The floor, and the reason the prop should stay unused: an app reading the
+    // cart off the order — analytics, typically — must not have to know our
+    // resource names to get it.
     render(
       <Wrapper>
         <Order orderId="order-1">
@@ -119,6 +122,6 @@ describe("<Order include>", () => {
     await waitFor(() => {
       expect(retrieve).toHaveBeenCalled()
     })
-    expect(includesOf(retrieve.mock.calls[0])).toEqual([])
+    expect(includesOf(retrieve.mock.calls[0])).toEqual(["line_items"])
   })
 })

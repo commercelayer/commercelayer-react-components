@@ -24,6 +24,14 @@ import type { BaseMetadataObject } from "#typings"
 import type { BaseError } from "#typings/errors"
 import compareObjAttribute from "#utils/compareObjAttribute"
 
+/**
+ * Included in every order request, whoever is rendering. The order's own line
+ * items are the one relationship a caller cannot be expected to ask for: they
+ * are what an order *is*, and by the time a component that needs them mounts,
+ * the first fetch has long gone out.
+ */
+const BASE_ORDER_INCLUDE: readonly ResourceIncluded[] = ["line_items"]
+
 interface UseOrderStateConfig
   extends Pick<CommerceLayerConfig, "accessToken" | "interceptors">,
     Pick<
@@ -129,12 +137,19 @@ export function useOrderState({
     }
   }, [attributes, state?.order, lock])
 
-  // Resources the caller declared on `<Order include>`. Registering them here,
-  // rather than leaving every include to the components that need it, is the
-  // only way to be sure the *first* fetch carries them: a component registers
-  // its includes when it mounts, and one that mounts with its step — or never,
-  // because the app reads the relationship off the order itself instead of
-  // rendering our component for it — cannot register anything in time.
+  // `include` is the union of what the mounted components ask for, and every
+  // component asks when it mounts. That was in time while the containers
+  // wrapped the whole checkout and mounted with the order; a standalone
+  // component mounts with its step, so the first order carries only what the
+  // first of them asked for. The base list below is the floor: an order without
+  // its line items is not a useful order to anyone, and nothing else can be
+  // relied on to have asked for them by the time the first fetch goes out.
+  //
+  // Anything beyond the floor belongs to the component that reads it — see
+  // `<Shipments>` asking for `line_items.item` — so that a consumer never has
+  // to know our resource names. `include` on `<Order>` is the escape hatch for
+  // an app that reads a relationship off the order itself, no component of ours
+  // involved; it should stay empty in ordinary use.
   //
   // Re-registered rather than seeded once: the settling round in the fetch
   // effect below resets `include` to `[]` so every mounted component gets a
@@ -142,12 +157,12 @@ export function useOrderState({
   // Keyed on the joined list so a caller passing an array literal (a new
   // identity every render) does not re-run this on every render.
   const declaredIncludeKey = declaredInclude?.join(",") ?? ""
-  const declaredIncludeRef = useRef(declaredInclude)
-  declaredIncludeRef.current = declaredInclude
+  const declaredIncludeRef = useRef<readonly ResourceIncluded[]>([])
+  declaredIncludeRef.current = [...BASE_ORDER_INCLUDE, ...(declaredInclude ?? [])]
   // biome-ignore lint/correctness/useExhaustiveDependencies: keyed on the declared list's contents, not the array identity
   useEffect(() => {
     const declared = declaredIncludeRef.current
-    if (declared == null || declared.length === 0) return
+    if (declared.length === 0) return
     const missing = declared.filter((resource) => !state.include?.includes(resource))
     if (missing.length === 0) return
     addResourceToInclude({
