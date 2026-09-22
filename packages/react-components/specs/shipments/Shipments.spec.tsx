@@ -62,10 +62,15 @@ function Providers({
   orderId = "order-1",
   order = MOCK_ORDER_PENDING,
   getOrder = vi.fn().mockResolvedValue(MOCK_ORDER_PENDING),
+  addResourceToInclude = vi.fn(),
+  include,
   children,
 }: {
   accessToken?: string
   orderId?: string
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  addResourceToInclude?: any
+  include?: string[]
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   order?: any
   // biome-ignore lint/suspicious/noExplicitAny: test cast
@@ -74,7 +79,19 @@ function Providers({
 }) {
   return (
     <CommerceLayerContext.Provider value={{ accessToken }}>
-      <OrderContext.Provider value={{ ...defaultOrderContext, orderId, order, getOrder }}>
+      <OrderContext.Provider
+        value={
+          {
+            ...defaultOrderContext,
+            orderId,
+            order,
+            getOrder,
+            addResourceToInclude,
+            include,
+            // biome-ignore lint/suspicious/noExplicitAny: test cast
+          } as any
+        }
+      >
         {children}
       </OrderContext.Provider>
     </CommerceLayerContext.Provider>
@@ -272,6 +289,57 @@ describe("Shipments component", () => {
 
     expect(capturedErrors).toEqual(
       expect.arrayContaining([expect.objectContaining({ code: "OUT_OF_STOCK" })])
+    )
+  })
+
+  it("does not set OUT_OF_STOCK error when the line item carries no item", async () => {
+    // `item` missing means `line_items.item` was not included in the order we hold.
+    // Reading that as "no stock" hides the shipping methods behind an error the
+    // customer can do nothing about.
+    const orderWithoutItemInclude = {
+      ...MOCK_ORDER_PENDING,
+      line_items: [{ id: "li_1", item_type: "skus", quantity: 5 }],
+    }
+    mockUseShipments.mockReturnValue(defaultHookReturn({ shipments: [] }))
+
+    let capturedErrors: unknown = null
+
+    function Consumer() {
+      const { errors } = useContext(ShipmentContext)
+      capturedErrors = errors
+      return null
+    }
+
+    await act(async () => {
+      render(
+        <Providers order={orderWithoutItemInclude}>
+          <Shipments>
+            <Consumer />
+          </Shipments>
+        </Providers>
+      )
+    })
+
+    expect(capturedErrors).toEqual([])
+  })
+
+  it("asks the order for the line_items.item it reads", async () => {
+    const addResourceToInclude = vi.fn()
+
+    await act(async () => {
+      render(
+        <Providers addResourceToInclude={addResourceToInclude}>
+          <Shipments>
+            <span />
+          </Shipments>
+        </Providers>
+      )
+    })
+
+    expect(addResourceToInclude).toHaveBeenCalledWith(
+      expect.objectContaining({
+        newResource: expect.arrayContaining(["line_items", "line_items.item"]),
+      })
     )
   })
 

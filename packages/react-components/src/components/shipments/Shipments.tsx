@@ -21,7 +21,8 @@ interface Props {
 
 export function Shipments({ children, loader = "Loading..." }: Props): JSX.Element {
   const { accessToken } = useContext(CommerceLayerContext)
-  const { orderId, order, getOrder } = useContext(OrderContext)
+  const { orderId, order, getOrder, addResourceToInclude, include, includeLoaded } =
+    useContext(OrderContext)
 
   const {
     shipments,
@@ -32,6 +33,22 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
   } = useShipments({ accessToken, orderId })
 
   const [errors, setErrors] = useState<BaseError[]>([])
+
+  // The stock check below reads `line_items.item`, so this component has to ask
+  // for it like every other one does. It used to arrive by luck: the containers
+  // that register it — `<LineItemsContainer>`, the payment step — mounted with
+  // the whole checkout. Standalone, they mount with their own step, and a
+  // shipping step rendered before them saw `item` undefined on every line and
+  // reported the order out of stock (see the guard in the effect below).
+  useEffect(() => {
+    if (!include?.includes("line_items.item")) {
+      addResourceToInclude({ newResource: ["line_items", "line_items.item"] })
+    } else if (!includeLoaded?.["line_items.item"]) {
+      addResourceToInclude({
+        newResourceLoaded: { line_items: true, "line_items.item": true },
+      })
+    }
+  }, [include, includeLoaded, addResourceToInclude])
 
   // The shipments cache is keyed on (accessToken, orderId) alone, so it never
   // revalidates on its own. The API, though, re-evaluates shipments whenever the
@@ -77,6 +94,11 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
     if (order?.line_items != null && order.line_items.length > 0) {
       const hasStocks = order.line_items
         .filter(({ item_type: itemType }) => itemType === "skus")
+        // No `item` means the relationship was not included in the order we hold,
+        // not that the SKU has no stock. Judging it here turns a missing include
+        // into a blocking, and wrong, out-of-stock notice that hides the shipping
+        // methods; the effect above asks for the include, and this check waits.
+        .filter((lineItem) => "item" in lineItem && lineItem.item != null)
         .map((lineItem) => {
           const conditions =
             // @ts-expect-error no type
