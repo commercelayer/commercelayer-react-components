@@ -4,6 +4,7 @@ import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import OrderStorageContext from "#context/OrderStorageContext"
 import { useOrderState } from "#hooks/useOrderState"
+import type { ResourceIncluded } from "#reducers/OrderReducer"
 import type { BaseMetadataObject } from "#typings"
 import type { DefaultChildrenType } from "#typings/globals"
 import useCustomContext from "#utils/hooks/useCustomContext"
@@ -26,6 +27,17 @@ interface Props {
    * Callback called when the order is updated
    */
   fetchOrder?: (order: OrderSDK) => void
+  /**
+   * Relationships to include in every order request, declared up front.
+   *
+   * Child components register the includes they need when they mount, which is
+   * in time only while they all mount with the order. Declare here what the
+   * first fetch must carry anyway — typically a relationship the app reads off
+   * the order object itself (`line_items` for analytics, say) rather than
+   * through one of our components, or one whose component lives behind a step
+   * that opens later.
+   */
+  include?: readonly ResourceIncluded[]
 }
 
 /**
@@ -62,7 +74,7 @@ interface Props {
  * </span>
  */
 export function Order(props: Props): JSX.Element {
-  const { children, orderId, metadata, attributes, fetchOrder } = props
+  const { children, orderId, metadata, attributes, fetchOrder, include } = props
   const { accessToken, interceptors } = useCustomContext({
     context: CommerceLayerContext,
     contextComponentName: "CommerceLayer",
@@ -77,6 +89,7 @@ export function Order(props: Props): JSX.Element {
     metadata,
     attributes,
     fetchOrder,
+    include,
     ...storageCtx,
   })
   return <OrderContext.Provider value={orderValue}>{children}</OrderContext.Provider>

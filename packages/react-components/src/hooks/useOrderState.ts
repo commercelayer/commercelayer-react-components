@@ -5,6 +5,7 @@ import { defaultOrderContext } from "#context/OrderContext"
 import type { OrderStorageConfig } from "#context/OrderStorageContext"
 import orderReducer, {
   type AddResourceToInclude,
+  addResourceToInclude,
   addToCart,
   createOrder,
   getApiOrder,
@@ -33,6 +34,7 @@ interface UseOrderStateConfig
   metadata?: BaseMetadataObject
   attributes?: OrderCreate
   fetchOrder?: (order: Order) => void
+  include?: readonly ResourceIncluded[]
 }
 
 /**
@@ -47,6 +49,7 @@ export function useOrderState({
   metadata,
   attributes,
   fetchOrder,
+  include: declaredInclude,
   persistKey,
   clearWhenPlaced,
   getLocalOrder,
@@ -125,6 +128,35 @@ export function useOrderState({
       }
     }
   }, [attributes, state?.order, lock])
+
+  // Resources the caller declared on `<Order include>`. Registering them here,
+  // rather than leaving every include to the components that need it, is the
+  // only way to be sure the *first* fetch carries them: a component registers
+  // its includes when it mounts, and one that mounts with its step — or never,
+  // because the app reads the relationship off the order itself instead of
+  // rendering our component for it — cannot register anything in time.
+  //
+  // Re-registered rather than seeded once: the settling round in the fetch
+  // effect below resets `include` to `[]` so every mounted component gets a
+  // chance to re-declare what it needs, and a seed would be dropped by it.
+  // Keyed on the joined list so a caller passing an array literal (a new
+  // identity every render) does not re-run this on every render.
+  const declaredIncludeKey = declaredInclude?.join(",") ?? ""
+  const declaredIncludeRef = useRef(declaredInclude)
+  declaredIncludeRef.current = declaredInclude
+  // biome-ignore lint/correctness/useExhaustiveDependencies: keyed on the declared list's contents, not the array identity
+  useEffect(() => {
+    const declared = declaredIncludeRef.current
+    if (declared == null || declared.length === 0) return
+    const missing = declared.filter((resource) => !state.include?.includes(resource))
+    if (missing.length === 0) return
+    addResourceToInclude({
+      dispatch,
+      resourcesIncluded: state.include,
+      newResource: missing,
+      resourceIncludedLoaded: state.includeLoaded,
+    })
+  }, [declaredIncludeKey, state.include, state.includeLoaded])
 
   // The effect below only fetches while `state.order` is null, so every include
   // has to be registered before the first fetch. That held while containers
