@@ -5,6 +5,7 @@ import { Shipments } from "#components/shipments/Shipments"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import ShipmentContext from "#context/ShipmentContext"
+import { resetShipmentsRevisions } from "#utils/shipmentsRevision"
 
 const MOCK_SHIPMENTS = [
   {
@@ -100,6 +101,8 @@ function Providers({
 
 describe("Shipments component", () => {
   beforeEach(() => {
+    // Module state, so it would otherwise carry an order revision into the next test.
+    resetShipmentsRevisions()
     mockUseShipments.mockReturnValue(defaultHookReturn())
     mockHookSetShippingMethod.mockClear()
     vi.clearAllMocks()
@@ -633,6 +636,25 @@ describe("Shipments component", () => {
         coupon_code: "test50off",
         updated_at: NEXT_REVISION,
       })
+
+      expect(mockReload).toHaveBeenCalledTimes(1)
+    })
+
+    it("reloads on mount when the cached shipments predate the order", async () => {
+      // The shipping step closes and reopens — applying a coupon does that —
+      // so this component remounts with an empty marker while the shipments
+      // cache still holds what was fetched before. Nothing else corrects it:
+      // the step comes back showing a shipping method the API cleared, and the
+      // order goes to payment without shipping in the total.
+      // Kills: keeping the mount guard on the component alone.
+      const first = renderScenario({ order: MOCK_ORDER_PENDING })
+      await first.showOrder({ ...MOCK_ORDER_PENDING, updated_at: NEXT_REVISION })
+      expect(mockReload).toHaveBeenCalledTimes(1)
+      first.unmount()
+      mockReload.mockClear()
+
+      // Remounted on the revision before the one the cache was filled at.
+      renderScenario({ order: MOCK_ORDER_PENDING })
 
       expect(mockReload).toHaveBeenCalledTimes(1)
     })

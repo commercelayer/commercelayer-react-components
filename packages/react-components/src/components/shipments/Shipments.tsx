@@ -10,6 +10,7 @@ import type { BaseError } from "#typings/errors"
 import type { DefaultChildrenType } from "#typings/globals"
 import { canPlaceOrder } from "#utils/canPlaceOrder"
 import getLoaderComponent from "#utils/getLoaderComponent"
+import { getShipmentsRevision, recordShipmentsRevision } from "#utils/shipmentsRevision"
 
 interface Props {
   children: DefaultChildrenType
@@ -63,15 +64,24 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
   useEffect(() => {
     const updatedAt = order?.updated_at
     if (updatedAt == null) return
-    // First order we see: the initial shipments fetch is already in step with it.
+    // First order this component sees. The fetch it triggered on mount is in
+    // step with that order — unless the cache answered it with shipments
+    // fetched at an earlier revision, which is what a step that closes and
+    // reopens gets. Then the shipping method the API cleared when the totals
+    // moved stays on screen and the order is placed without shipping.
     if (syncedOrderUpdatedAt.current == null) {
+      const cachedAt = getShipmentsRevision(orderId)
       syncedOrderUpdatedAt.current = updatedAt
+      recordShipmentsRevision(orderId, updatedAt)
+      if (cachedAt == null || cachedAt === updatedAt) return
+      void reload()
       return
     }
     if (syncedOrderUpdatedAt.current === updatedAt) return
     syncedOrderUpdatedAt.current = updatedAt
+    recordShipmentsRevision(orderId, updatedAt)
     void reload()
-  }, [order?.updated_at, reload])
+  }, [order?.updated_at, reload, orderId])
 
   useEffect(() => {
     const nextErrors: BaseError[] = []
