@@ -60,6 +60,14 @@ export function useAddressFormFields({
   const [errors, setErrors] = useState<FormErrors>({})
   const [hasValidated, setHasValidated] = useState(false)
   const formRef = useRef<HTMLFormElement | null>(null)
+  // `saveAddressToCustomerAddressBook` dispatches into the order state, and the
+  // order context builds a new identity for it on every state change — so an
+  // effect that both calls it and lists it as a dependency re-runs on its own
+  // result, forever. Ticking "save this address in your account" did exactly
+  // that: React gave up with "Maximum update depth exceeded" and the error
+  // boundary blanked the customer step, taking the checkbox with it.
+  const saveToAddressBookRef = useRef(saveAddressToCustomerAddressBook)
+  saveToAddressBookRef.current = saveAddressToCustomerAddressBook
   const prefix = `${resource}_`
   const checkboxFieldName = `${resource}_save_to_customer_book`
 
@@ -199,7 +207,7 @@ export function useAddressFormFields({
             (element as HTMLInputElement | null)?.checked ??
             field.checked ??
             singleFormValue(field.value as string | string[] | undefined) === "true"
-          saveAddressToCustomerAddressBook?.({ type: resource, value: checked })
+          saveToAddressBookRef.current?.({ type: resource, value: checked })
         }
         continue
       }
@@ -236,7 +244,6 @@ export function useAddressFormFields({
     shouldSync,
     isBusiness,
     customFieldMessageError,
-    saveAddressToCustomerAddressBook,
     setAddress,
     setAddressErrors,
     resource,
@@ -255,9 +262,9 @@ export function useAddressFormFields({
       // Assign the property, not the attribute: the attribute only seeds `defaultChecked`,
       // so on a re-opened step it left the box visually unticked.
       if (checkbox != null && !checkbox.checked) checkbox.checked = true
-      saveAddressToCustomerAddressBook?.({ type: resource, value: true })
+      saveToAddressBookRef.current?.({ type: resource, value: true })
     }
-  }, [saveAddressToCustomerAddressBook, checkboxFieldName, getSaveToAddressBook, resource])
+  }, [checkboxFieldName, getSaveToAddressBook, resource])
 
   useEffect(() => {
     const checkbox = formRef.current?.querySelector<HTMLInputElement>(
@@ -268,7 +275,7 @@ export function useAddressFormFields({
       reset &&
       (Object.keys(formValues).length > 0 || Object.keys(errors).length > 0 || checked)
     ) {
-      saveAddressToCustomerAddressBook?.({ type: resource, value: false })
+      saveToAddressBookRef.current?.({ type: resource, value: false })
       formRef.current?.reset()
       setErrors((prev) => (Object.keys(prev).length > 0 ? {} : prev))
       setAddressErrors([], resource)
@@ -278,7 +285,6 @@ export function useAddressFormFields({
     reset,
     formValues,
     errors,
-    saveAddressToCustomerAddressBook,
     setAddress,
     setAddressErrors,
     resource,

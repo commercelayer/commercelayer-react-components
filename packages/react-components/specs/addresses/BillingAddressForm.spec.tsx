@@ -984,6 +984,55 @@ describe("BillingAddressForm (standalone mode)", () => {
     expect(saveAddressesMock).toHaveBeenCalled()
   })
 
+  it("does not re-dispatch save-to-address-book when the order hands out a fresh callback", async () => {
+    // `saveAddressToCustomerAddressBook` is rebuilt by the order context on every
+    // state change, and it dispatches — so an effect that calls it and also lists
+    // it as a dependency re-runs on its own result. With the box ticked that ran
+    // away into "Maximum update depth exceeded", and the error boundary blanked
+    // the whole customer step.
+    localStorageMock.getSaveBillingAddressToAddressBook.mockReturnValue(true)
+    const saveSpy = vi.fn()
+    rapidForm.useRapidForm.mockReturnValue({ refValidation: vi.fn(), values: {} })
+
+    const tree = () => (
+      // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+      <AddressesContext.Provider value={defaultAddressContext as any}>
+        <OrderContext.Provider
+          value={
+            {
+              ...defaultOrderContext,
+              order: { id: "ord-1" },
+              include: ["billing_address"],
+              includeLoaded: { billing_address: true },
+              addResourceToInclude: vi.fn(),
+              // A new identity on every render, as the real context produces.
+              saveAddressToCustomerAddressBook: (args: unknown) => saveSpy(args),
+              // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+            } as any
+          }
+        >
+          <BillingAddressForm data-testid="form">
+            <ContextProbe />
+          </BillingAddressForm>
+        </OrderContext.Provider>
+      </AddressesContext.Provider>
+    )
+
+    const { rerender } = render(tree())
+    await waitFor(() => {
+      expect(saveSpy).toHaveBeenCalledWith({ type: "billing_address", value: true })
+    })
+    const afterMount = saveSpy.mock.calls.length
+
+    for (let i = 0; i < 5; i++) {
+      await act(async () => {
+        rerender(tree())
+      })
+    }
+
+    expect(saveSpy.mock.calls.length).toBe(afterMount)
+  })
+
   it("also provides BillingAddressFormContext in standalone mode", async () => {
     let formCtxRef: { errorClassName?: string } | undefined
 
