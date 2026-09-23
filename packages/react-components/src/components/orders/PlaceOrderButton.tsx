@@ -437,6 +437,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     if (order == null) return
     let isValid = true
     let currentPaymentStatus = "unpaid"
+    /** Set when the gateway widget itself validated this attempt. */
+    let gatewayAuthorizedThisAttempt = false
 
     const isStripePayment = paymentType === "stripe_payments"
     if (!isStripePayment) {
@@ -551,6 +553,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ) {
         isValid = true
       }
+      gatewayAuthorizedThisAttempt = isValid
     } else if (
       currentPaymentMethodRef?.current?.onsubmit &&
       options?.checkoutCom?.session_id &&
@@ -586,7 +589,21 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     } else if (card?.brand && checkPaymentSourceStatus !== "declined") {
       isValid = true
     }
-    if (currentPaymentStatus === "partially_authorized") {
+    if (currentPaymentStatus === "partially_authorized" && !gatewayAuthorizedThisAttempt) {
+      /**
+       * Givex behaves like a gift card: it can cover part of the total and
+       * leave the order `partially_authorized`, with the rest still to be paid
+       * by card or another Adyen method. Placing then would take the order with
+       * the remainder unpaid, which is what this guard is here to stop.
+       *
+       * But the remainder is paid through the gateway widget, and the status
+       * above was read before the widget ran — with givex the card is only
+       * authorized as the order is placed, so the order stays
+       * `partially_authorized` right up to that point. Judging the attempt on
+       * it alone therefore rejects the very attempt that pays the rest, and
+       * nothing can ever place the order. The widget validating this attempt is
+       * the signal that the remainder has been covered.
+       */
       isValid = false
     }
     if (isValid && setPlaceOrderStatus != null) {
