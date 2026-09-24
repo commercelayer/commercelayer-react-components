@@ -233,9 +233,18 @@ export function useOrderState({
     }
   }, [fetchOrder, state.order])
 
+  // The reducer only learns the order id when the first fetch resolves, yet the
+  // caller already knows it — from the `orderId` prop or the persisted order.
+  // Exposing it right away lets the standalone components keyed on it
+  // (`<LineItems>`, `<Shipments>`) fetch in parallel with the order. Otherwise
+  // they render empty while the order loads, then swap their whole subtree for
+  // the loader once the id arrives and their own first fetch starts.
+  const knownOrderId = persistKey ? getLocalOrder(persistKey) : orderId
+
   return useMemo(() => {
     return {
       ...state,
+      orderId: state.orderId || (knownOrderId ?? state.orderId),
       managePaymentProviderGiftCards:
         // @ts-expect-error no type
         state.order?.payment_source?.payment_request_data?.payment_method?.type === "giftcard",
@@ -317,5 +326,14 @@ export function useOrderState({
         }),
       getOrderByFields,
     }
-  }, [state, config.accessToken, persistKey, config, setLocalOrder, metadata, attributes])
+  }, [
+    state,
+    knownOrderId,
+    config.accessToken,
+    persistKey,
+    config,
+    setLocalOrder,
+    metadata,
+    attributes,
+  ])
 }
