@@ -70,7 +70,13 @@ function remainingAmountIsCovered(paymentSource: unknown): boolean {
 
 export function PlaceOrderButton(props: Props): JSX.Element {
   const ref = useRef(null)
-  /** Order id we already fired one automatic place attempt for. */
+  /**
+   * The order state we already fired one automatic place attempt for, as
+   * `<order id>:<payment status>:<result code>`. Keyed on the state and not on
+   * the order alone: a partial payment reaches this effect twice, once per leg,
+   * and the gift card leg would otherwise spend the single attempt the order was
+   * allowed — leaving nothing to place it once the card covers the rest.
+   */
   const autoPlaceAttemptedRef = useRef<string | null>(null)
   /** Order id a place attempt is currently in flight for. */
   const placeInFlightRef = useRef<string | null>(null)
@@ -317,6 +323,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
      * order's number in `merchantReference`. The first covers merchants who
      * customize the merchant reference, which the reference check alone missed.
      */
+    const autoPlaceKey = `${order.id}:${order.payment_status}:${paymentResponse?.resultCode}`
     const isAuthorizedForThisOrder =
       order.payment_status === "authorized" ||
       (order.number != null && paymentResponse?.merchantReference?.includes(order.number) === true)
@@ -325,11 +332,11 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       isAuthorizedForThisOrder &&
       // A place is already in flight; `status` returns to standby if it fails.
       status !== "placing" &&
-      // One automatic attempt per order per page load: `handleClick` flips
-      // `status`, which re-runs this effect.
-      autoPlaceAttemptedRef.current !== order.id
+      // One automatic attempt per order *state*: `handleClick` flips `status`,
+      // which re-runs this effect, so repeating the same state would loop.
+      autoPlaceAttemptedRef.current !== autoPlaceKey
     ) {
-      autoPlaceAttemptedRef.current = order.id
+      autoPlaceAttemptedRef.current = autoPlaceKey
       handleClick()
     }
   }, [
