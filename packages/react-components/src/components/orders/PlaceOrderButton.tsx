@@ -54,6 +54,20 @@ interface Props extends Omit<JSX.IntrinsicElements["button"], "children" | "onCl
   options?: PlaceOrderOptions
 }
 
+/**
+ * Whether the gateway considers the order fully covered. Adyen's partial-payment
+ * order carries what is still outstanding; anything else has no remainder to
+ * speak of, so a validated attempt covers it by definition.
+ */
+function remainingAmountIsCovered(paymentSource: unknown): boolean {
+  const remaining = (
+    paymentSource as
+      | { payment_response?: { order?: { remainingAmount?: { value?: number } } } }
+      | undefined
+  )?.payment_response?.order?.remainingAmount
+  return remaining?.value == null || remaining.value === 0
+}
+
 export function PlaceOrderButton(props: Props): JSX.Element {
   const ref = useRef(null)
   /** Order id we already fired one automatic place attempt for. */
@@ -437,7 +451,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     if (order == null) return
     let isValid = true
     let currentPaymentStatus = "unpaid"
-    /** Set when the gateway widget itself validated this attempt. */
+    /** Set when the gateway validated this attempt *and* nothing is left to pay. */
     let gatewayAuthorizedThisAttempt = false
 
     const isStripePayment = paymentType === "stripe_payments"
@@ -553,7 +567,11 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       ) {
         isValid = true
       }
-      gatewayAuthorizedThisAttempt = isValid
+      // Only once nothing is left to pay. On a partial payment the gift card
+      // leg validates too — it authorized the gift card, after all — and
+      // treating that as "the remainder is covered" places the order before the
+      // shopper has even entered the card.
+      gatewayAuthorizedThisAttempt = isValid && remainingAmountIsCovered(checkPaymentSource)
     } else if (
       currentPaymentMethodRef?.current?.onsubmit &&
       options?.checkoutCom?.session_id &&
