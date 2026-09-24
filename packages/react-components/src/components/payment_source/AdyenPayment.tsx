@@ -216,6 +216,15 @@ export function AdyenPayment({
     // @ts-expect-error no type
     paymentSource?.payment_methods?.paymentMethods?.length ?? 0
 
+  /**
+   * Whether this component is still on screen. Building the Drop-in is async, and
+   * the payment step re-renders while it is in flight — applying or removing a
+   * coupon does it. Mounting after that throws out of Adyen, unhandled:
+   * "Component could not mount. Root node was not found.", and the shopper is
+   * left with a payment step that never comes back.
+   */
+  const isMountedRef = useRef(true)
+
   // Tear the Adyen instance down on real unmount only, and clear the refs so a remounted
   // component can initialize a fresh one (the init guard below is `!dropinRef.current`, so a
   // leftover reference would leave the component wired to a destroyed Drop-in forever).
@@ -225,6 +234,7 @@ export function AdyenPayment({
   // shopper's selection away mid-checkout.
   useEffect(() => {
     return () => {
+      isMountedRef.current = false
       // `remove()` rather than `unmount()`: Adyen documents it as the "destroy" cleanup — it
       // unmounts the element *and* drops it from `core.components`, so Core stops holding a
       // reference to a dead element (which `triggerAmountUpdate()` would otherwise iterate).
@@ -799,8 +809,9 @@ export function AdyenPayment({
     if (clientKey && window && (sessionReplaced || (!loadAdyen && !checkout))) {
       const initializeAdyen = async (): Promise<void> => {
         const checkout = await AdyenCheckout(options)
+        if (!isMountedRef.current) return
         checkoutRef.current = checkout
-        const dropin = new Dropin(checkout, {
+        const dropinInstance = new Dropin(checkout, {
           disableFinalAnimation: true,
           showRemovePaymentMethodButton: showStoredPaymentMethods,
           instantPaymentTypes: ["applepay", "googlepay"],
@@ -885,7 +896,11 @@ export function AdyenPayment({
           onReady() {
             if (onReady) onReady()
           },
-        }).mount("#adyen-dropin")
+        })
+        // Re-checked here and not only before `initializeAdyen()`: everything
+        // between the two is awaited, and the container goes with the component.
+        if (!isMountedRef.current || document.getElementById("adyen-dropin") == null) return
+        const dropin = dropinInstance.mount("#adyen-dropin")
         if (dropin && checkout) {
           dropinRef.current = dropin
           initializedForSourceRef.current = paymentSource?.id ?? null
