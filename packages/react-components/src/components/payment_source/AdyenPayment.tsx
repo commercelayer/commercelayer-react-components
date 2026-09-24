@@ -233,6 +233,10 @@ export function AdyenPayment({
   // place-order `status` changes, and destroying the Drop-in on those passes would throw the
   // shopper's selection away mid-checkout.
   useEffect(() => {
+    // Set on the way in, not only at declaration: Strict Mode mounts, tears down
+    // and mounts again, so a ref that is only ever cleared stays cleared — and
+    // the guard built on it would refuse to mount the Drop-in for good.
+    isMountedRef.current = true
     return () => {
       isMountedRef.current = false
       // `remove()` rather than `unmount()`: Adyen documents it as the "destroy" cleanup — it
