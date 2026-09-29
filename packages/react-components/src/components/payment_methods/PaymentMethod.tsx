@@ -165,6 +165,31 @@ export function PaymentMethod({
     paymentSource,
     showLoader,
   ])
+  // Both guards on the auto-select below are one-shot: they are set the first time it
+  // runs and never released, so the single payment method is selected, and its payment
+  // source created, exactly once per mount. The API, though, drops `payment_source`
+  // whenever the order totals move — applying a coupon does — and a latched guard then
+  // leaves the step stuck for good: no method selected, no gateway form rendered, and
+  // not one further request. Release them on the transition that invalidates them, the
+  // order losing the payment source they were set for; keying on the transition rather
+  // than on "there is none" keeps them holding through the window in which the first
+  // payment source is still being created.
+  const hadPaymentSourceRef = useRef(false)
+  useEffect(() => {
+    // Only an explicit `null` is the API saying the payment source is gone. `undefined`
+    // means this order object does not carry the relationship at all — the include has
+    // not landed on that particular read — and reading the two as one thing releases the
+    // guards mid-creation, so a second payment source is created over the first while
+    // the shopper is still on the form. `<PaymentMethodsContainer>` draws the same
+    // distinction where it clears the payment source from state.
+    if (hadPaymentSourceRef.current && order?.payment_source === null) {
+      hadPaymentSourceRef.current = false
+      loadingResourceRef.current = false
+      setPaymentSourceCreated(false)
+    } else if (order?.payment_source != null) {
+      hadPaymentSourceRef.current = true
+    }
+  }, [order?.payment_source])
   useEffect(() => {
     if (
       paymentMethods != null &&
