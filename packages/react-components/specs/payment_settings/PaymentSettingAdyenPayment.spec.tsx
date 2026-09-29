@@ -231,7 +231,14 @@ describe("<PaymentSettingAdyenPayment> mounting", () => {
     await waitFor(() => {
       expect(adyen.captured.options).not.toBeNull()
     })
-    expect(adyen.captured.options.allowPaymentMethods).toEqual(["scheme", "paypal", "googlepay"])
+    expect(adyen.captured.options.allowPaymentMethods).toEqual([
+      "scheme",
+      "paypal",
+      "googlepay",
+      "klarna",
+      "klarna_account",
+      "klarna_paynow",
+    ])
   })
 
   it("leaves Apple Pay out until it is asked for", async () => {
@@ -661,6 +668,90 @@ describe("what this component does NOT do on a refusal", () => {
     })
     expect(adyen.dropinRemove).toHaveBeenCalled()
     expect(adyen.captured.options.session).toEqual({ id: "CS-2", sessionData: "blob-2" })
+  })
+})
+
+describe("Klarna, which takes the card's route", () => {
+  async function select(component: { type: string; isValid?: boolean }): Promise<void> {
+    await act(async () => {
+      adyen.captured.dropinOptions.onSelect(component)
+    })
+  }
+
+  async function mounted(): Promise<void> {
+    renderAdyen()
+    await waitFor(() => {
+      expect(adyen.dropinMount).toHaveBeenCalled()
+    })
+  }
+
+  it("offers all three of Adyen's consumer Klarna variants when asked for Klarna", async () => {
+    // Adyen enables them per market, so which one a shopper sees is the
+    // account's and the order's country's business, not ours.
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingAdyenPayment paymentMethods={["klarna"]} containerClassName="dropin" />
+        </PaymentSetting>
+      </Wrapper>
+    )
+    await waitFor(() => {
+      expect(adyen.captured.options).not.toBeNull()
+    })
+    expect(adyen.captured.options.allowPaymentMethods).toEqual([
+      "klarna",
+      "klarna_account",
+      "klarna_paynow",
+    ])
+  })
+
+  it("leaves Adyen's own button off, so ours is the one that pays", async () => {
+    await mounted()
+    const configuration = adyen.captured.dropinOptions.paymentMethodsConfiguration ?? {}
+    expect(configuration).not.toHaveProperty("klarna")
+    expect(configuration).not.toHaveProperty("klarna_account")
+    expect(configuration).not.toHaveProperty("klarna_paynow")
+  })
+
+  it.each(["klarna", "klarna_account", "klarna_paynow"])(
+    "keeps the place-order button as the collector when %s is open",
+    async (type) => {
+      await mounted()
+      await select({ type, isValid: true })
+      expect(getHandoffSnapshot("order-1").collection?.by).toBe("host")
+    }
+  )
+
+  it("becomes ready on selection, since it has no fields to report a change", async () => {
+    await mounted()
+    await act(async () => {
+      adyen.captured.options.onChange({ isValid: false })
+    })
+    expect(hostCollection().isReady).toBe(false)
+
+    await select({ type: "klarna", isValid: true })
+    expect(hostCollection().isReady).toBe(true)
+
+    // And back: returning to a half-typed card must not keep Klarna's answer.
+    await select({ type: "scheme", isValid: false })
+    expect(hostCollection().isReady).toBe(false)
+  })
+
+  it("is submitted by the place-order button, and waits out the redirect", async () => {
+    // `submit` leaves the page for Klarna's. Nothing answers the promise before
+    // the navigation, and the order stays marked as collecting until it does.
+    await mounted()
+    await select({ type: "klarna", isValid: true })
+
+    const submit = hostSubmit()
+    await act(async () => {
+      void submit?.()
+      await Promise.resolve()
+    })
+
+    expect(adyen.dropinSubmit).toHaveBeenCalledTimes(1)
+    expect(isCollecting("order-1")).toBe(true)
   })
 })
 

@@ -55,14 +55,23 @@ export type AdyenEnvironment =
  * empty accordion panel, because `showPayButton: false` deletes its component
  * outright rather than hiding a button.
  */
-export type AdyenPaymentMethod = "card" | "paypal" | "google_pay" | "apple_pay"
+export type AdyenPaymentMethod = "card" | "paypal" | "google_pay" | "apple_pay" | "klarna"
 
-/** Our names to Adyen's, for `allowPaymentMethods`. */
-const ADYEN_TX_VARIANTS: Record<AdyenPaymentMethod, string> = {
-  card: "scheme",
-  paypal: "paypal",
-  google_pay: "googlepay",
-  apple_pay: "applepay",
+/**
+ * Our names to Adyen's, for `allowPaymentMethods`.
+ *
+ * One of ours can stand for several of Adyen's. Klarna is three tx-variants —
+ * pay later, pay over time, pay now — which Adyen offers per market, and they
+ * share one component and one flow, so a merchant choosing Klarna gets whichever
+ * of them their account and the order's country enable. `klarna_b2b` is left
+ * out: it asks for company details this library has no fields for.
+ */
+const ADYEN_TX_VARIANTS: Record<AdyenPaymentMethod, readonly string[]> = {
+  card: ["scheme"],
+  paypal: ["paypal"],
+  google_pay: ["googlepay"],
+  apple_pay: ["applepay"],
+  klarna: ["klarna", "klarna_account", "klarna_paynow"],
 }
 
 /**
@@ -70,8 +79,10 @@ const ADYEN_TX_VARIANTS: Record<AdyenPaymentMethod, string> = {
  *
  * Apple Pay is the one exception to "offer everything that has been built", and
  * for a property no other method has: being offered is not evidence it can
- * work. Cards, PayPal and Google Pay either work or filter themselves out —
- * `isReadyToPay()`, funding eligibility, `isAvailable()`. Apple Pay's
+ * work. Cards, PayPal, Google Pay and Klarna either work or filter themselves
+ * out — `isReadyToPay()`, funding eligibility, `isAvailable()`, and for Klarna
+ * Adyen itself, which lists it in the session only for a market and currency
+ * the merchant account has it enabled for. Apple Pay's
  * availability check only asks whether the browser and device can pay at all;
  * whether *this domain* is registered for Apple Pay on the merchant account is
  * settled later, at merchant validation, after the shopper has tapped. On an
@@ -81,7 +92,7 @@ const ADYEN_TX_VARIANTS: Record<AdyenPaymentMethod, string> = {
  * plus a `.well-known` file served publicly — and nothing here can detect it.
  * So it is opt-in: a consumer asks for `"apple_pay"` once they have done it.
  */
-const ALL_METHODS: AdyenPaymentMethod[] = ["card", "paypal", "google_pay"]
+const ALL_METHODS: AdyenPaymentMethod[] = ["card", "paypal", "google_pay", "klarna"]
 
 /**
  * Methods whose own control performs the payment — a **Gateway-Owned Button**.
@@ -99,9 +110,9 @@ const ALL_METHODS: AdyenPaymentMethod[] = ["card", "paypal", "google_pay"]
  * `startSession()`, and `session.begin()` waits on the click resolving.
  */
 const OWNS_ITS_BUTTON = new Set<string>([
-  ADYEN_TX_VARIANTS.paypal,
-  ADYEN_TX_VARIANTS.google_pay,
-  ADYEN_TX_VARIANTS.apple_pay,
+  ...ADYEN_TX_VARIANTS.paypal,
+  ...ADYEN_TX_VARIANTS.google_pay,
+  ...ADYEN_TX_VARIANTS.apple_pay,
 ])
 
 /**
@@ -181,8 +192,9 @@ export interface PaymentSettingAdyenPaymentChildrenProps {
   /** Whether the shopper's payment is being collected right now. */
   isSubmitting: boolean
   /**
-   * Whether a 3DS redirect is being completed. The money is already taken and
-   * the order is being placed without a click — see the redirect-resume hook.
+   * Whether a redirect is being completed — a 3DS challenge or Klarna. The money
+   * is already taken and the order is being placed without a click — see the
+   * redirect-resume hook.
    */
   isResumingRedirect: boolean
   /**
@@ -224,7 +236,8 @@ interface Props {
   locale?: string
   /**
    * Which of the designed methods to offer. Defaults to every one whose being
-   * offered is evidence it can work — today cards, PayPal and Google Pay.
+   * offered is evidence it can work — today cards, PayPal, Google Pay and
+   * Klarna.
    *
    * Narrowing, mostly: a merchant who does not want PayPal can turn it off
    * without waiting for a release, and cannot turn on a method nobody has
@@ -267,6 +280,16 @@ interface Props {
  * `null` outright — and the gate moves inside PayPal's own click, through
  * `onInit` and `onClick`. The gift cards are authorized there too, for the same
  * reason: it is the only moment before the money moves that we are given.
+ *
+ * **Klarna takes the card's route, not PayPal's.** Its component has no fields
+ * and nothing to show once the Core's `showPayButton: false` removes its
+ * "Continue to Klarna" button, it is always valid, and its `submit` leaves the
+ * page for Klarna's own — a navigation, which needs no user gesture. So
+ * `<PlaceOrderButton>` submits it like a card, the gift cards are charged
+ * first, and the shopper comes back through the redirect-resume hook, exactly
+ * as a 3DS redirect does. That rests on `useKlarnaWidget` staying at its
+ * default `false`: the widget variant renders Klarna inline with its own pay
+ * button, which would be the Gateway-Owned Button case instead.
  *
  * Renders `null` unless its setting is selected, so it can be dropped inside
  * `<PaymentSetting>` alongside other settings' components.
@@ -351,7 +374,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
    * render and the mount effect would then remount the Drop-in on every
    * keystroke. The effect splits it back, so it cannot go stale either.
    */
-  const allowedMethodsKey = allowedMethods.map((method) => ADYEN_TX_VARIANTS[method]).join(",")
+  const allowedMethodsKey = allowedMethods.flatMap((method) => ADYEN_TX_VARIANTS[method]).join(",")
   const offersPayPal = allowedMethods.includes("paypal")
   const offersGooglePay = allowedMethods.includes("google_pay")
   const offersApplePay = allowedMethods.includes("apple_pay")
@@ -533,9 +556,20 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
           // too, because `openFirstPaymentMethod` defaults to true.
           onSelect: (component) => {
             if (cancelled) return
-            const type = (component as unknown as { type?: string })?.type
+            const { type, isValid } = (component ?? {}) as unknown as {
+              type?: string
+              isValid?: unknown
+            }
             activeMethodRef.current = type
             setActiveMethod(type)
+            // Readiness follows the method, not only its fields. `onChange`
+            // fires when a component's state changes, and Klarna has no state:
+            // switching to it from a half-typed card would otherwise leave the
+            // card's `false` standing over a method that is always ready.
+            if (typeof isValid === "boolean") {
+              setIsReady(isValid)
+              setCollectionReady(orderId, isValid)
+            }
           },
           ...(offersPayPal || offersGooglePay || offersApplePay
             ? {

@@ -461,8 +461,14 @@ PayPal's `(data, actions)`.
 
 In dependency order. The first is the one the others sit on.
 
-1. **`Session::Base` should carry what `Payments::Base` already carries** — `lineItems` and
-   `shopperEmail`, built from the order server-side.
+1. ~~**`Session::Base` should carry what `Payments::Base` already carries**~~ **Answered
+   2026-09-16** by core-api `a571d062c`: the session payload now sends `lineItems` and
+   `shopperEmail`, the builders moved into the shared Adyen concern, and `amountIncludingTax`
+   gained the per-unit tax it had been missing on tax-excluded orders — without it the lines
+   summed short of `amount.value` and Adyen rejects a pay-later payment on that mismatch.
+   Verified with Klarna in examples-new-payments. What follows is the ask as it was made.
+
+   `lineItems` and `shopperEmail`, built from the order server-side.
 
    Re-verified at core-api `65c08cc73` (2026-09-05). Klarna requires `lineItems` — mandatory,
    totalling `amount.value`, each with a `description` — plus `shopperEmail`.
@@ -500,7 +506,7 @@ refund happened, and `require_action` transitions only `from: :pending`, which P
 | PayPal     | `paypal`       | 🟡 built; the handoff verified end to end, the payment refused by Adyen — see below                    |
 | Apple Pay  | `applepay`     | ✅ implemented, opt-in — `2026-09-07-apple-pay-through-adyen.md`; verified by hand, no e2e is possible |
 | Google Pay | `googlepay`    | ✅ implemented — `2026-09-07-google-pay-through-adyen.md`                                              |
-| Klarna     | `klarna*`      | ⬜ blocked upstream — see ask 1, reshaped                                                              |
+| Klarna     | `klarna*`      | ✅ implemented, on the card's route; e2e in mfe-checkout `payment-sessions-klarna.spec.ts`             |
 
 ## What the first end-to-end run established (2026-09-07)
 

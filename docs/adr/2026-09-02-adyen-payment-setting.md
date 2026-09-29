@@ -625,7 +625,10 @@ tried bank transfer earlier on the same order sees that option selected again af
 refusal. Not wrong — it _is_ their most recent surviving choice, exactly as the lifecycle ADR
 defines it — but surprising, and it is the visible cost of not recreating the session.
 
-**The redirect path ships without an end-to-end test.** `nativeThreeDS: 'preferred'` is
+**The redirect path ships without an end-to-end test** — for the card. *Update 2026-09-29:* the
+resume itself is now covered end to end by Klarna, which always leaves the page, in
+mfe-checkout's `payment-sessions-klarna.spec.ts`, alone and after a gift card. What follows
+still holds for the card's own redirect variant. `nativeThreeDS: 'preferred'` is
 hard-coded server-side, so the variant cannot be provoked on demand; it happens only when the
 card is not enrolled. Coverage is unit-level, reusing the `@adyen/adyen-web` mock idiom already
 in `specs/payment_source/AdyenPayment.spec.tsx` — a `vi.hoisted` capture object and a
@@ -660,7 +663,12 @@ Listed in order of what they would cost if wrong.
    pivot of the redirect resume, inferred from Adyen's own documentation telling integrators to
    re-instantiate with the values their server returned. If it is rejected, the fallback is to
    pass the `id` alone and let adyen-web rehydrate from `localStorage` — which is silently
-   unavailable in private mode and from another browser. **Verify against the real gateway.**
+   unavailable in private mode and from another browser. **Verified 2026-09-29** against the
+   Adyen sandbox: a Klarna payment in mfe-checkout left the page, came back with
+   `redirectResult`, and `useAdyenRedirectResume` finished it from the pre-redirect
+   `sessionData` read off `payment_session.response_data` — the order placed on its own,
+   `payment_status: authorized`. The first time the redirect path ran end to end rather than
+   in unit tests, since card 3DS stays in the page.
 2. ~~**Correctness depends on a missing `else` in `core-api`.**~~ **Retired 2026-09-07.** The
    worry was that the authorization stayed `pending` only because `action_by_status` had no
    default branch and `#authorize!` lacked the `status >= 300` check its sibling `#create` had —
