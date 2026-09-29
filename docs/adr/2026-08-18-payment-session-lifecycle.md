@@ -250,6 +250,13 @@ is fetched: adding an include afterwards does not trigger a refetch, so a compon
 only once the model is known would never receive its data. Consumers that mount it
 conditionally will see an order whose `payment_sessions` never expand.
 
+> **Amended 2026-09-29.** The refetch half no longer holds: main's `d57beb31`, merged here,
+> makes `useOrderState` fetch the order again when the include list grows past what it was
+> fetched with. A late-mounted `<PaymentSetting>` now gets its sessions, one extra request
+> later. Keeping it mounted is still right — that request is avoidable, and the redirect-resume
+> hooks live in it and must run on every page load — but a conditional mount is no longer the
+> silent failure described above. Read from the code; not exercised in a browser.
+
 ### Known debt, due with the second setting
 
 ~~`<PaymentSetting>` holds one `errors` state for the whole list.~~ **Closed** by

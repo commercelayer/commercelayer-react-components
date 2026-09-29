@@ -145,11 +145,19 @@ export function OrderList({
   const { orders, subscriptions, getCustomerOrders, getCustomerSubscriptions } =
     useContext(CustomerContext)
 
-  // Calculate default server side sorting value compatible with Commerce Layer SDK if defined in component props
-  const defaultSdkSorting =
-    sortBy.length && sortBy[0] != null
-      ? { [sortBy[0].id]: sortBy[0].desc ? "desc" : "asc" }
-      : undefined
+  // Calculate default server side sorting value compatible with Commerce Layer SDK if defined in component props.
+  // Memoized on the primitives it derives from: as a bare object literal it was a
+  // new identity on every render, which refired the fetch effect below each time.
+  const defaultSortBy = sortBy.length ? sortBy[0] : undefined
+  const defaultSortById = defaultSortBy?.id
+  const defaultSortByDesc = defaultSortBy?.desc
+  const defaultSdkSorting = useMemo(
+    () =>
+      defaultSortById != null
+        ? { [defaultSortById]: defaultSortByDesc ? "desc" : "asc" }
+        : undefined,
+    [defaultSortById, defaultSortByDesc]
+  )
 
   useEffect(() => {
     // Calculate server side sorting value compatible with Commerce Layer SDK following current sorting state

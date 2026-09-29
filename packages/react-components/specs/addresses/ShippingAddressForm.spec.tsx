@@ -599,11 +599,14 @@ describe("ShippingAddressForm", () => {
 
 // Standalone mode: ShippingAddressForm without an AddressesContainer ancestor
 
+// The standalone save goes through the shared address hook, which calls
+// `saveOrderAddresses` in core-components. Mocking there keeps the assertion
+// on the boundary that actually talks to the API.
 const saveAddressesMock = vi.hoisted(() => vi.fn())
-vi.mock("#reducers/AddressReducer", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("#reducers/AddressReducer")>()
-  return { ...actual, saveAddresses: saveAddressesMock }
-})
+vi.mock("@commercelayer/core-components", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@commercelayer/core-components")>()),
+  saveOrderAddresses: saveAddressesMock,
+}))
 
 function renderStandaloneShipping(
   overrides: {
@@ -650,7 +653,7 @@ describe("ShippingAddressForm (standalone mode)", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     localStorageMock.getSaveShippingAddressToAddressBook.mockReturnValue(false)
-    saveAddressesMock.mockResolvedValue(undefined)
+    saveAddressesMock.mockResolvedValue({ success: false })
   })
 
   it("renders without an AddressesContext provider (standalone detection)", () => {
@@ -801,7 +804,7 @@ describe("ShippingAddressForm (standalone mode)", () => {
     })
   })
 
-  it("calls saveAddresses (AddressReducer) when standaloneSaveAddresses is invoked", async () => {
+  it("reaches the core save when the standalone saveAddresses is invoked", async () => {
     let ctxRef: { saveAddresses?: unknown } | undefined
 
     function AddressCtxProbe(): JSX.Element {

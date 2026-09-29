@@ -1,9 +1,9 @@
 import { updateAddressReference } from "@commercelayer/core-components"
 import { type JSX, useCallback, useContext, useEffect, useMemo, useState } from "react"
-import AddressContext from "#context/AddressContext"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import ShippingAddressContext from "#context/ShippingAddressContext"
+import { useAddressStateContext } from "#hooks/useAddressStateContext"
 import type { DefaultChildrenType } from "#typings/globals"
 
 interface Props {
@@ -25,7 +25,9 @@ interface Props {
 export function ShippingAddress({ children }: Props): JSX.Element {
   const config = useContext(CommerceLayerContext)
   const { order } = useContext(OrderContext)
-  const { setCloneAddress } = useContext(AddressContext)
+  const {
+    addressContext: { setCloneAddress },
+  } = useAddressStateContext()
   const [cloneId, setCloneId] = useState<string>("")
   const [shippingCustomerAddressId, setShippingCustomerAddressId] = useState<string | undefined>()
 

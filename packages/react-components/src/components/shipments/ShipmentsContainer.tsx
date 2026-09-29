@@ -2,6 +2,7 @@ import { type JSX, useEffect } from "react"
 import Shipments from "#components/shipments/Shipments"
 import type { LoaderType } from "#typings"
 import type { DefaultChildrenType } from "#typings/globals"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   children: DefaultChildrenType
@@ -24,11 +25,7 @@ interface Props {
  * ```
  */
 export function ShipmentsContainer({ children, loader }: Props): JSX.Element {
-  useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[ShipmentsContainer] is deprecated. Use <Shipments> instead.")
-    }
-  }, [])
+  useDeprecatedContainer("ShipmentsContainer", "`<Shipments>`")
   return <Shipments loader={loader}>{children}</Shipments>
 }
 

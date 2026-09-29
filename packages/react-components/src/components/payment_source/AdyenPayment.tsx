@@ -22,12 +22,13 @@ import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import PlaceOrderContext from "#context/PlaceOrderContext"
+import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import { getAdyenShopperLocale } from "#utils/adyenShopperLocale"
 import browserInfo, { cleanUrlBy } from "#utils/browserInfo"
 import { getPublicIP } from "#utils/getPublicIp"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
 import { setCustomerOrderParam } from "#utils/localStorage"
+import { isAdyenAuthorizedResultCode } from "#utils/paymentAuthorization"
 import type { PaymentSourceProps } from "./PaymentSource"
 
 interface PaymentMethodsStyle {
@@ -167,7 +168,9 @@ export function AdyenPayment({
   } = useContext(PaymentMethodContext)
   const { order, updateOrder, getOrderByFields } = useContext(OrderContext)
   const authConfig = useContext(CommerceLayerContext)
-  const { placeOrderButtonRef, setPlaceOrder, status } = useContext(PlaceOrderContext)
+  const {
+    placeOrderContext: { placeOrderButtonRef, setPlaceOrder, status },
+  } = usePlaceOrderStateContext()
   const { customers } = useContext(CustomerContext)
   // Two distinct locales that Adyen does not treat as interchangeable, deliberately derived
   // from one source. `dropInLocale` goes into the Core configuration and is client-side only:
@@ -298,7 +301,7 @@ export function AdyenPayment({
         }))
       // @ts-expect-error no type
       const resultCode = pSource?.payment_response?.resultCode
-      if (["Authorised", "Pending", "Received"].includes(resultCode)) {
+      if (isAdyenAuthorizedResultCode(resultCode)) {
         // NOTE: unlike the `isValid` handlers above, clearing `disabled` here is
         // load-bearing — do not remove it for symmetry with them. Adyen has already
         // authorized the payment; all that is left is to place the order. Terms
@@ -567,7 +570,7 @@ export function AdyenPayment({
 
       // @ts-expect-error no type
       const issuerType = res?.payment_instrument?.issuer_type
-      if (["Authorised", "Pending", "Received"].includes(resultCode)) {
+      if (isAdyenAuthorizedResultCode(resultCode)) {
         if (["apple pay", "google pay"].includes(issuerType) && setPlaceOrder != null) {
           await setPlaceOrder({
             paymentSource: res,

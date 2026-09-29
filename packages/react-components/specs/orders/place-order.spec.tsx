@@ -10,6 +10,7 @@ import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import PaymentMethodContext, { defaultPaymentMethodContext } from "#context/PaymentMethodContext"
 import PlaceOrderContext, { defaultPlaceOrderContext } from "#context/PlaceOrderContext"
 import { usePlaceOrder } from "#hooks/usePlaceOrder"
+import { placeOrderStore } from "#utils/placeOrderStore"
 import {
   getAcceptedSnapshot,
   getCheckboxCount,
@@ -798,7 +799,6 @@ describe("PrivacyAndTermsCheckbox (container mode)", () => {
 
     vi.mocked(getCardDetails).mockReturnValue({ brand: "" } as never)
   })
-
 })
 
 // ---------------------------------------------------------------------------
@@ -1300,7 +1300,12 @@ describe("usePlaceOrder hook direct", () => {
     } as any)
   })
 
-  afterEach(() => resetTermsAcceptanceStore())
+  afterEach(() => {
+    resetTermsAcceptanceStore()
+    // The place-order state is shared per order and outlives its subscribers
+    // on purpose, so it has to be dropped between tests.
+    placeOrderStore.clear()
+  })
 
   function wrapper({ children }: { children: ReactNode }) {
     return (
@@ -1325,8 +1330,55 @@ describe("usePlaceOrder hook direct", () => {
     )
   }
 
+  it("a component that only reads sees what the owner sets, which is what #841 was about", async () => {
+    // The payment components are siblings of the place-order button, so this is
+    // the shape that used to leave them on the default context.
+    const owner = renderHook(() => usePlaceOrder({ isStandalone: true, isOwner: true }), {
+      wrapper,
+    })
+    const reader = renderHook(() => usePlaceOrder({ isStandalone: true }), { wrapper })
+
+    expect(reader.result.current.status).toBe("standby")
+
+    await act(async () => {
+      owner.result.current.setPlaceOrderStatus?.({ status: "placing" })
+    })
+
+    expect(reader.result.current.status).toBe("placing")
+  })
+
+  it("a reader can dispatch back to the owner", async () => {
+    const owner = renderHook(() => usePlaceOrder({ isStandalone: true, isOwner: true }), {
+      wrapper,
+    })
+    const reader = renderHook(() => usePlaceOrder({ isStandalone: true }), { wrapper })
+
+    await act(async () => {
+      reader.result.current.setPlaceOrderStatus?.({ status: "disabled" })
+    })
+
+    expect(owner.result.current.status).toBe("disabled")
+  })
+
+  it("the button ref set by the owner reaches a sibling reader", async () => {
+    const owner = renderHook(() => usePlaceOrder({ isStandalone: true, isOwner: true }), {
+      wrapper,
+    })
+    const reader = renderHook(() => usePlaceOrder({ isStandalone: true }), { wrapper })
+    // `setButtonRef` ignores a ref with nothing in it
+    const ref = { current: document.createElement("button") }
+
+    await act(async () => {
+      owner.result.current.setButtonRef?.(ref)
+    })
+
+    expect(reader.result.current.placeOrderButtonRef).toBe(ref)
+  })
+
   it("setPlaceOrderStatus callback (line 119) updates reducer status", async () => {
-    const { result } = renderHook(() => usePlaceOrder({ isStandalone: true }), { wrapper })
+    const { result } = renderHook(() => usePlaceOrder({ isStandalone: true, isOwner: true }), {
+      wrapper,
+    })
     await act(async () => {
       result.current.setPlaceOrderStatus?.({ status: "placing" })
     })
@@ -1335,7 +1387,7 @@ describe("usePlaceOrder hook direct", () => {
 
   it("placeOrderPermittedCallback (line 125) runs placeOrderPermitted", async () => {
     const { result } = renderHook(
-      () => usePlaceOrder({ isStandalone: true, options: { paypalPayerId: "p1" } }),
+      () => usePlaceOrder({ isStandalone: true, isOwner: true, options: { paypalPayerId: "p1" } }),
       { wrapper }
     )
     await act(async () => {
@@ -1345,7 +1397,9 @@ describe("usePlaceOrder hook direct", () => {
   })
 
   it("setPlaceOrder (line 149) calls the reducer setPlaceOrder", async () => {
-    const { result } = renderHook(() => usePlaceOrder({ isStandalone: true }), { wrapper })
+    const { result } = renderHook(() => usePlaceOrder({ isStandalone: true, isOwner: true }), {
+      wrapper,
+    })
     await act(async () => {
       await result.current.setPlaceOrder?.({
         paymentSource: MOCK_ORDER.payment_source,
@@ -1383,7 +1437,9 @@ describe("usePlaceOrder hook direct", () => {
         </CommerceLayerContext.Provider>
       )
     }
-    renderHook(() => usePlaceOrder({ isStandalone: true }), { wrapper: wrapperWithIncludes })
+    renderHook(() => usePlaceOrder({ isStandalone: true, isOwner: true }), {
+      wrapper: wrapperWithIncludes,
+    })
     await waitFor(() => {
       const calls = addResourceToInclude.mock.calls.map((c) => c[0])
       const shipmentsLoaded = calls.find(
@@ -1418,7 +1474,7 @@ describe("usePlaceOrder hook direct", () => {
         </CommerceLayerContext.Provider>
       )
     }
-    renderHook(() => usePlaceOrder({ isStandalone: true }), {
+    renderHook(() => usePlaceOrder({ isStandalone: true, isOwner: true }), {
       wrapper: wrapperWithShippingIncluded,
     })
     await waitFor(() => {
@@ -1461,7 +1517,9 @@ describe("usePlaceOrder hook direct", () => {
         </CommerceLayerContext.Provider>
       )
     }
-    renderHook(() => usePlaceOrder({ isStandalone: true }), { wrapper: wrapperAllLoaded })
+    renderHook(() => usePlaceOrder({ isStandalone: true, isOwner: true }), {
+      wrapper: wrapperAllLoaded,
+    })
     // Give the effect time to run — no addResourceToInclude calls for loaded resources
     await act(async () => {})
     const calls = addResourceToInclude.mock.calls.map((c) => c[0])
@@ -1493,7 +1551,9 @@ describe("usePlaceOrder hook direct", () => {
         </CommerceLayerContext.Provider>
       )
     }
-    renderHook(() => usePlaceOrder({ isStandalone: true }), { wrapper: wrapperNoOrder })
+    renderHook(() => usePlaceOrder({ isStandalone: true, isOwner: true }), {
+      wrapper: wrapperNoOrder,
+    })
     // Acceptance recorded with no order loaded must not throw.
     await act(async () => {
       setAccepted(undefined, true)
@@ -1525,7 +1585,9 @@ describe("usePlaceOrder hook direct", () => {
         </CommerceLayerContext.Provider>
       )
     }
-    renderHook(() => usePlaceOrder({ isStandalone: true }), { wrapper: wrapperWithBillingIncluded })
+    renderHook(() => usePlaceOrder({ isStandalone: true, isOwner: true }), {
+      wrapper: wrapperWithBillingIncluded,
+    })
     await waitFor(() => {
       const calls = addResourceToInclude.mock.calls.map((c) => c[0])
       const billingLoaded = calls.find((c) => c.newResourceLoaded?.billing_address === true)

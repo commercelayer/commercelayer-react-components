@@ -1,18 +1,19 @@
-import { useCallback, useContext, useEffect, useMemo, useReducer } from "react"
+import { useCallback, useContext, useEffect, useMemo } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import { defaultPaymentMethodContext } from "#context/PaymentMethodContext"
+import { useSharedReducer } from "#hooks/useSharedReducer"
 import paymentMethodReducer, {
   getPaymentMethods,
   type PaymentMethodConfig,
   type PaymentRef,
-  paymentMethodInitialState,
   setPaymentMethodConfig,
   setPaymentRef,
 } from "#reducers/PaymentMethodReducer"
 import type { BaseError } from "#typings/errors"
 import { isEmpty } from "#utils/isEmpty"
 import { setCustomerOrderParam } from "#utils/localStorage"
+import { paymentMethodStore } from "#utils/paymentMethodStore"
 
 /**
  * Manages payment method state and data-fetching in standalone mode.
@@ -30,11 +31,26 @@ import { setCustomerOrderParam } from "#utils/localStorage"
 export function usePaymentMethod({
   isStandalone,
   config,
+  isOwner = false,
+  needsPaymentResources = false,
 }: {
   isStandalone: boolean
   config?: PaymentMethodConfig
+  /**
+   * Whether this instance drives the state rather than only reading it.
+   * `<PaymentMethod>` owns it; a component that merely reads the selected
+   * method must not re-register the order includes or refetch the payment
+   * methods, or every reader would do the container's job over again.
+   */
+  isOwner?: boolean
+  /**
+   * Whether this instance renders the payment source and therefore needs it on
+   * the order. Only the components that show it ask for the includes: a generic
+   * consumer such as `<Errors>` is mounted on every step, and making it ask
+   * would refetch the order where nothing needs paying.
+   */
+  needsPaymentResources?: boolean
 }) {
-  const [state, dispatch] = useReducer(paymentMethodReducer, paymentMethodInitialState)
   const {
     order,
     getOrder,
@@ -45,9 +61,15 @@ export function usePaymentMethod({
     includeLoaded,
   } = useContext(OrderContext)
   const credentials = useContext(CommerceLayerContext)
+  // Shared per order rather than held by this component: the place-order button
+  // reads this state and is a sibling of the payment step, not its descendant.
+  const [state, dispatch] = useSharedReducer(paymentMethodStore, paymentMethodReducer, {
+    accessToken: credentials.accessToken,
+    orderId: order?.id,
+  })
 
   useEffect(() => {
-    if (!isStandalone) return
+    if (!isStandalone || !isOwner) return
     if (!include?.includes("available_payment_methods")) {
       addResourceToInclude({
         newResource: [
@@ -70,9 +92,6 @@ export function usePaymentMethod({
       })
     }
     if (config && isEmpty(state.config)) setPaymentMethodConfig(config, dispatch)
-    if (credentials && order && !state.paymentMethods) {
-      getPaymentMethods({ order, dispatch })
-    }
     if (order?.payment_source === null) {
       setCustomerOrderParam("_save_payment_source_to_customer_wallet", "false")
       dispatch({ type: "setPaymentSource", payload: { paymentSource: undefined } })
@@ -88,7 +107,6 @@ export function usePaymentMethod({
   }, [
     isStandalone,
     order,
-    credentials,
     getOrder,
     addResourceToInclude,
     include?.includes,
@@ -96,19 +114,85 @@ export function usePaymentMethod({
     state.config,
     includeLoaded?.available_payment_methods,
     config,
+    isOwner,
+    dispatch,
   ])
 
-  const setLoading = useCallback(({ loading }: { loading: boolean }) => {
-    defaultPaymentMethodContext.setLoading({ loading, dispatch })
-  }, [])
+  // Reading the methods off the order is not a request — `getPaymentMethods`
+  // only copies `available_payment_methods`, `payment_method` and
+  // `payment_source` into the state — so every instance may do it, owner or
+  // not. That matters where no owner is mounted at all: the order recap on the
+  // last step renders a `<PaymentSource readonly>` with no `<PaymentMethod>`
+  // anywhere near it, and used to take this state from the container.
+  useEffect(() => {
+    // The two resources the derivation below reads. A reader asks for them
+    // itself rather than relying on an owner having asked first: the order
+    // recap on the last step has no owner anywhere near it. With a container
+    // above, it is the one that registers includes and this stays out of it.
+    const needed =
+      isStandalone && (isOwner || needsPaymentResources)
+        ? (["payment_method", "payment_source"] as const).filter(
+            (resource) => !include?.includes(resource)
+          )
+        : []
+    if (needed.length > 0) {
+      // One call for everything missing: each registration grows the include
+      // list, and the order is fetched again whenever it grows.
+      addResourceToInclude({ newResource: [...needed], resourcesIncluded: include })
+    }
+    if (credentials && order && !state.paymentMethods) {
+      getPaymentMethods({ order, dispatch })
+    }
+    // Same payment source, fresher representation: the order is fetched again
+    // after it is placed and only then carries the card's brand and last
+    // digits. Deriving once would leave the order recap showing the
+    // placeholders the source had before the payment went through — the state
+    // outlives the components that built it, so it has to follow the order.
+    const orderPaymentSource = order?.payment_source
+    if (
+      orderPaymentSource != null &&
+      state.paymentSource != null &&
+      orderPaymentSource.id === state.paymentSource.id &&
+      orderPaymentSource !== state.paymentSource
+    ) {
+      dispatch({
+        type: "setPaymentSource",
+        payload: { paymentSource: orderPaymentSource },
+      })
+    }
+  }, [
+    credentials,
+    order,
+    state.paymentMethods,
+    state.paymentSource,
+    dispatch,
+    include,
+    addResourceToInclude,
+    isStandalone,
+    isOwner,
+    needsPaymentResources,
+  ])
 
-  const setPaymentRefCallback = useCallback(({ ref }: { ref: PaymentRef }) => {
-    setPaymentRef({ ref, dispatch })
-  }, [])
+  const setLoading = useCallback(
+    ({ loading }: { loading: boolean }) => {
+      defaultPaymentMethodContext.setLoading({ loading, dispatch })
+    },
+    [dispatch]
+  )
 
-  const setPaymentMethodErrors = useCallback((errors: BaseError[]) => {
-    defaultPaymentMethodContext.setPaymentMethodErrors(errors, dispatch)
-  }, [])
+  const setPaymentRefCallback = useCallback(
+    ({ ref }: { ref: PaymentRef }) => {
+      setPaymentRef({ ref, dispatch })
+    },
+    [dispatch]
+  )
+
+  const setPaymentMethodErrors = useCallback(
+    (errors: BaseError[]) => {
+      defaultPaymentMethodContext.setPaymentMethodErrors(errors, dispatch)
+    },
+    [dispatch]
+  )
 
   return useMemo(
     () => ({
@@ -164,6 +248,7 @@ export function usePaymentMethod({
       setLoading,
       setPaymentRefCallback,
       setPaymentMethodErrors,
+      dispatch,
     ]
   )
 }

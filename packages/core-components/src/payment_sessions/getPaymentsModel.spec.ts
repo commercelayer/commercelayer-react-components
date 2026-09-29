@@ -53,4 +53,16 @@ describe("getPaymentsModel", () => {
   it("is undetermined when the order carries neither relationship", () => {
     expect(getPaymentsModel(order())).toBe("undetermined")
   })
+
+  // A redirect return: the page fetched the order without the list of methods,
+  // but the order already says which model it is on.
+  it("reads payment_source from a payment method already on the order", () => {
+    expect(getPaymentsModel(order({ payment_method: METHOD as never }))).toBe("payment_source")
+  })
+
+  it("reads payment_source from a payment source already on the order", () => {
+    expect(getPaymentsModel(order({ payment_source: { id: "src-1" } as never }))).toBe(
+      "payment_source"
+    )
+  })
 })

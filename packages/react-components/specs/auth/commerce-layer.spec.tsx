@@ -66,4 +66,27 @@ describe("CommerceLayer component", () => {
     rerender(<CommerceLayer accessToken={token}>{child}</CommerceLayer>)
     expect(screen.getByTestId("stable-child").textContent).toBe("stable")
   })
+
+  it("keeps the context value identity stable across re-renders", () => {
+    const token = makeFakeToken("my-org")
+    const seen: unknown[] = []
+    // A fresh element each time: reusing one makes React bail out of rendering
+    // the child at all, and the test would then measure nothing.
+    const child = () => (
+      <ContextInspector
+        onContext={(ctx) => {
+          seen.push(ctx)
+        }}
+      />
+    )
+
+    const { rerender } = render(<CommerceLayer accessToken={token}>{child()}</CommerceLayer>)
+    rerender(<CommerceLayer accessToken={token}>{child()}</CommerceLayer>)
+    rerender(<CommerceLayer accessToken={token}>{child()}</CommerceLayer>)
+
+    // Consumers put values from this context into effect dependency arrays, so a
+    // fresh object on every render re-runs their effects for no reason.
+    expect(seen.length).toBeGreaterThan(1)
+    expect(new Set(seen).size).toBe(1)
+  })
 })

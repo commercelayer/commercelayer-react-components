@@ -10,7 +10,8 @@ const core = vi.hoisted(() => ({
   updateAddressReference: vi.fn(),
 }))
 
-vi.mock("@commercelayer/core-components", () => ({
+vi.mock("@commercelayer/core-components", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@commercelayer/core-components")>()),
   updateAddressReference: core.updateAddressReference,
 }))
 
@@ -64,6 +65,10 @@ function buildTree({
           value={
             {
               ...defaultAddressContext,
+              // A provided address context means a container is above: that is
+              // the only thing that supplies `saveAddresses`, and its absence
+              // is what marks standalone mode.
+              saveAddresses: vi.fn(),
               ...addressContextOverrides,
               setCloneAddress,
               // biome-ignore lint/suspicious/noExplicitAny: test provider cast

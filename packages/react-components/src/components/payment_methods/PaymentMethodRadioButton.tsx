@@ -4,7 +4,7 @@ import Parent from "#components/utils/Parent"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import PlaceOrderContext from "#context/PlaceOrderContext"
+import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { ChildrenFunction } from "#typings/index"
 import useCustomContext from "#utils/hooks/useCustomContext"
@@ -34,7 +34,9 @@ export function PaymentMethodRadioButton(props: Props): JSX.Element {
   })
   const { order } = useContext(OrderContext)
   const { setPaymentMethod, setLoading } = useContext(PaymentMethodContext)
-  const { status } = useContext(PlaceOrderContext)
+  const {
+    placeOrderContext: { status },
+  } = usePlaceOrderStateContext()
   const [disabled, setDisabled] = useState(false)
   const orderId = order?.id || ""
   const paymentResource = payment?.payment_source_type as PaymentResource

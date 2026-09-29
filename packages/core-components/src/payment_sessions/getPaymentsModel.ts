@@ -45,6 +45,14 @@ export type PaymentsModel =
 export function getPaymentsModel(order?: Order | null): PaymentsModel {
   if (order == null) return "undetermined"
   if ((order.available_payment_settings ?? []).length > 0) return "payment_sessions"
+  // An order that already carries a payment method or a payment source is on
+  // the older model for good: that is `core-api`'s own `old_payments_engaged?`,
+  // and it empties `available_payment_settings`, so this can never contradict
+  // the rule above. It is what keeps a redirect return decidable when the page
+  // that handles it fetched the order without `available_payment_methods` —
+  // otherwise the order stays undetermined, the place-order button stays inert
+  // and a payment the shopper completed is never placed.
+  if (order.payment_method != null || order.payment_source != null) return "payment_source"
   if ((order.available_payment_methods ?? []).length > 0) return "payment_source"
   return "undetermined"
 }

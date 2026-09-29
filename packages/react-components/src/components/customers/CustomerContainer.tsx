@@ -4,6 +4,7 @@ import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import type { DefaultChildrenType } from "#typings/globals"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 import { useCustomerProviderValue } from "./Customer"
 
 interface Props {
@@ -21,19 +22,7 @@ export function CustomerContainer(props: Props): JSX.Element {
   const { order, addResourceToInclude, include, includeLoaded, withoutIncludes } =
     useContext(OrderContext)
 
-  useEffect(() => {
-    const runtime = globalThis as typeof globalThis & {
-      process?: {
-        env?: {
-          NODE_ENV?: string
-        }
-      }
-    }
-
-    if (runtime.process?.env?.NODE_ENV !== "production") {
-      console.warn("CustomerContainer is deprecated. Use <Customer> component instead.")
-    }
-  }, [])
+  useDeprecatedContainer("CustomerContainer", "`<Customer>`")
 
   const customerValue = useCustomerProviderValue({
     accessToken,

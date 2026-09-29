@@ -299,4 +299,206 @@ describe("saveOrderAddresses", () => {
       expect(result.orderAttributes).toBeUndefined()
     })
   })
+
+  describe("orders whose line items do not ship", () => {
+    test("does not keep the shipping address in step when every line item does not ship", async () => {
+      const result = await saveOrderAddresses({
+        accessToken: "token",
+        order: {
+          ...baseOrder,
+          line_items: [{ item: { do_not_ship: true } }, { item: { do_not_ship: true } }],
+        },
+        billingAddress: { first_name: "John" },
+      })
+
+      expect(result.orderAttributes?._shipping_address_same_as_billing).toBeUndefined()
+    })
+
+    test("keeps it in step when at least one line item ships", async () => {
+      const result = await saveOrderAddresses({
+        accessToken: "token",
+        order: {
+          ...baseOrder,
+          line_items: [{ item: { do_not_ship: true } }, { item: { do_not_ship: false } }],
+        },
+        billingAddress: { first_name: "John" },
+      })
+
+      expect(result.orderAttributes?._shipping_address_same_as_billing).toBe(true)
+    })
+
+    test("keeps it in step when the order carries no line items", async () => {
+      const result = await saveOrderAddresses({
+        accessToken: "token",
+        order: { ...baseOrder, line_items: null },
+        billingAddress: { first_name: "John" },
+      })
+
+      expect(result.orderAttributes?._shipping_address_same_as_billing).toBe(true)
+    })
+  })
+
+  describe("inverted addresses", () => {
+    test("creates the shipping address and marks billing as same as shipping", async () => {
+      const result = await saveOrderAddresses({
+        accessToken: "token",
+        order: baseOrder,
+        invertAddresses: true,
+        shippingAddress: { first_name: "Jane" },
+      })
+
+      expect(result.success).toBe(true)
+      expect(mockCreate).toHaveBeenCalledWith({ first_name: "Jane" })
+      expect(result.orderAttributes?.shipping_address).toEqual({
+        id: "addr_new",
+        type: "addresses",
+      })
+      expect(result.orderAttributes?._billing_address_same_as_shipping).toBe(true)
+      expect(result.orderAttributes?._billing_address_clone_id).toBeUndefined()
+      expect(result.orderAttributes?._shipping_address_clone_id).toBeUndefined()
+    })
+
+    test("updates an existing shipping address without asking for a refresh", async () => {
+      const result = await saveOrderAddresses({
+        accessToken: "token",
+        order: { ...baseOrder, shipping_address: { id: "addr_existing", reference: null } },
+        invertAddresses: true,
+        shippingAddress: { first_name: "Jane" },
+      })
+
+      expect(mockUpdate).toHaveBeenCalledWith({ id: "addr_existing", first_name: "Jane" })
+      expect(result.orderAttributes?._refresh).toBeUndefined()
+      expect(result.orderAttributes?.shipping_address).toBeUndefined()
+    })
+
+    test("updates an existing shipping address even when it carries a reference", async () => {
+      await saveOrderAddresses({
+        accessToken: "token",
+        order: { ...baseOrder, shipping_address: { id: "addr_existing", reference: "ref_1" } },
+        invertAddresses: true,
+        shippingAddress: { first_name: "Jane" },
+      })
+
+      expect(mockUpdate).toHaveBeenCalledWith({ id: "addr_existing", first_name: "Jane" })
+      expect(mockCreate).not.toHaveBeenCalled()
+    })
+
+    test("clones from the shipping address id and skips address creation", async () => {
+      const result = await saveOrderAddresses({
+        accessToken: "token",
+        order: baseOrder,
+        invertAddresses: true,
+        shippingAddressCloneId: "addr_clone",
+        shippingAddress: { first_name: "Jane" },
+      })
+
+      expect(mockCreate).not.toHaveBeenCalled()
+      expect(result.orderAttributes?._billing_address_clone_id).toBe("addr_clone")
+      expect(result.orderAttributes?._shipping_address_clone_id).toBe("addr_clone")
+    })
+
+    test("reuses the order's address ids when the shipping reference matches the clone id", async () => {
+      const result = await saveOrderAddresses({
+        accessToken: "token",
+        order: {
+          ...baseOrder,
+          billing_address: { id: "addr_bill" },
+          shipping_address: { id: "addr_ship", reference: "addr_clone" },
+        },
+        invertAddresses: true,
+        shippingAddressCloneId: "addr_clone",
+      })
+
+      expect(result.orderAttributes?._billing_address_clone_id).toBe("addr_bill")
+      expect(result.orderAttributes?._shipping_address_clone_id).toBe("addr_ship")
+    })
+
+    test("creates the billing address when shipToDifferentAddress=true", async () => {
+      const result = await saveOrderAddresses({
+        accessToken: "token",
+        order: baseOrder,
+        invertAddresses: true,
+        shipToDifferentAddress: true,
+        shippingAddress: { first_name: "Jane" },
+        billingAddress: { first_name: "John" },
+      })
+
+      expect(mockCreate).toHaveBeenCalledWith({ first_name: "John" })
+      expect(result.orderAttributes?.billing_address).toEqual({
+        id: "addr_new",
+        type: "addresses",
+      })
+      expect(result.orderAttributes?._billing_address_same_as_shipping).toBeUndefined()
+    })
+
+    test("updates an existing billing address when shipToDifferentAddress=true", async () => {
+      await saveOrderAddresses({
+        accessToken: "token",
+        order: { ...baseOrder, billing_address: { id: "addr_bill", reference: null } },
+        invertAddresses: true,
+        shipToDifferentAddress: true,
+        billingAddress: { first_name: "John" },
+      })
+
+      expect(mockUpdate).toHaveBeenCalledWith({ id: "addr_bill", first_name: "John" })
+    })
+
+    test("sets the billing clone id when shipToDifferentAddress=true and no billing address is typed", async () => {
+      const result = await saveOrderAddresses({
+        accessToken: "token",
+        order: baseOrder,
+        invertAddresses: true,
+        shipToDifferentAddress: true,
+        billingAddressCloneId: "addr_clone",
+      })
+
+      expect(result.orderAttributes?._billing_address_clone_id).toBe("addr_clone")
+      expect(mockCreate).not.toHaveBeenCalled()
+    })
+
+    test("moves metadata_ prefixed keys into metadata without mutating the input", async () => {
+      const shippingAddress = { first_name: "Jane", metadata_gift: "yes" }
+
+      await saveOrderAddresses({
+        accessToken: "token",
+        order: baseOrder,
+        invertAddresses: true,
+        shippingAddress,
+      })
+
+      expect(mockCreate).toHaveBeenCalledWith({
+        first_name: "Jane",
+        metadata: { gift: "yes" },
+      })
+      expect(shippingAddress).toEqual({ first_name: "Jane", metadata_gift: "yes" })
+    })
+
+    test("returns success=false and the error when the SDK throws", async () => {
+      mockCreate.mockRejectedValueOnce(new Error("SDK exploded"))
+
+      const result = await saveOrderAddresses({
+        accessToken: "token",
+        order: baseOrder,
+        invertAddresses: true,
+        shippingAddress: { first_name: "Jane" },
+      })
+
+      expect(result.success).toBe(false)
+      expect(result.error).toBeInstanceOf(Error)
+    })
+
+    test("ignores an empty shipping address", async () => {
+      const result = await saveOrderAddresses({
+        accessToken: "token",
+        order: baseOrder,
+        invertAddresses: true,
+        shippingAddress: {},
+      })
+
+      expect(result.success).toBe(true)
+      expect(mockCreate).not.toHaveBeenCalled()
+      expect(result.orderAttributes?._billing_address_same_as_shipping).toBeUndefined()
+    })
+  })
+
 })

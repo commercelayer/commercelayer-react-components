@@ -12,8 +12,8 @@ import { type JSX, useContext, useEffect, useRef, useState } from "react"
 import Parent from "#components/utils/Parent"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
-import PlaceOrderContext from "#context/PlaceOrderContext"
 import useCommerceLayer from "#hooks/useCommerceLayer"
+import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PaymentMethodConfig } from "#reducers/PaymentMethodReducer"
 import { setCustomerOrderParam } from "#utils/localStorage"
 import type { PaymentSourceProps } from "./PaymentSource"
@@ -71,7 +71,9 @@ function StripePaymentForm({
     useContext(PaymentMethodContext)
   const { order, setOrderErrors } = useContext(OrderContext)
   const { sdkClient } = useCommerceLayer()
-  const { setPlaceOrderStatus } = useContext(PlaceOrderContext)
+  const {
+    placeOrderContext: { setPlaceOrderStatus },
+  } = usePlaceOrderStateContext()
   const elements = useElements()
   const onSubmit = async ({ event, stripe, elements }: OnSubmitArgs): Promise<boolean> => {
     if (!stripe) return false

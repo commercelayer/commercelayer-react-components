@@ -3,7 +3,9 @@ import { render, screen } from "@testing-library/react"
 import AddressesEmpty from "#components/addresses/AddressesEmpty"
 import CustomerContext from "#context/CustomerContext"
 
-vi.mock("@commercelayer/core-components", () => ({}))
+vi.mock("@commercelayer/core-components", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@commercelayer/core-components")>()),
+}))
 
 function renderEmpty(
   addresses: Address[] | null | undefined,

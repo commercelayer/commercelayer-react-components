@@ -7,7 +7,9 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import ShippingAddressContext from "#context/ShippingAddressContext"
 
-vi.mock("@commercelayer/core-components", () => ({}))
+vi.mock("@commercelayer/core-components", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@commercelayer/core-components")>()),
+}))
 
 const mockAddress: AddressType = {
   id: "addr-1",
@@ -51,6 +53,7 @@ function renderAddress(
         value={
           {
             ...defaultAddressContext,
+            saveAddresses: vi.fn(),
             setCloneAddress: vi.fn(),
             ...contextOverrides.address,
             // biome-ignore lint/suspicious/noExplicitAny: test cast
@@ -113,6 +116,20 @@ describe("Address", () => {
   it("renders nothing when no addresses", () => {
     const { container } = renderAddress({ addresses: [] })
     expect(container.querySelectorAll("[data-testid='address-child']")).toHaveLength(0)
+  })
+
+  it("does not leak disabledClassName onto the DOM", () => {
+    const warn = vi.spyOn(console, "error").mockImplementation(() => {})
+    renderAddress({ addresses: [mockAddress] })
+    const card = screen.getAllByTestId("address-child")[0].parentElement!
+
+    expect(card.getAttribute("disabledclassname")).toBeNull()
+    expect(card.hasAttribute("disabledClassName")).toBe(false)
+    const leaked = warn.mock.calls.some((args) =>
+      String(args[0]).includes("does not recognize the `disabledClassName` prop")
+    )
+    expect(leaked).toBe(false)
+    warn.mockRestore()
   })
 
   it("applies selectedClassName on click", async () => {
@@ -249,6 +266,7 @@ describe("Address", () => {
           value={
             {
               ...defaultAddressContext,
+              saveAddresses: vi.fn(),
               setCloneAddress: vi.fn(),
               shipToDifferentAddress: extra,
             } as any

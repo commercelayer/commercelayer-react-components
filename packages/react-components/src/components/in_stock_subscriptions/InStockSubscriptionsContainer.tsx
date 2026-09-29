@@ -1,6 +1,7 @@
 import { type JSX, useEffect } from "react"
 import InStockSubscriptions from "#components/in_stock_subscriptions/InStockSubscriptions"
 import type { DefaultChildrenType } from "#typings/globals"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   /**
@@ -22,13 +23,7 @@ interface Props {
  * ```
  */
 export function InStockSubscriptionsContainer({ children }: Props): JSX.Element {
-  useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(
-        "[InStockSubscriptionsContainer] is deprecated. Use <InStockSubscriptions> instead."
-      )
-    }
-  }, [])
+  useDeprecatedContainer("InStockSubscriptionsContainer", "`<InStockSubscriptions>`")
   return <InStockSubscriptions>{children}</InStockSubscriptions>
 }
 

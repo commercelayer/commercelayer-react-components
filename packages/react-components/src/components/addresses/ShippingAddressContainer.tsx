@@ -1,6 +1,7 @@
 import { type JSX, useEffect } from "react"
 import ShippingAddress from "#components/addresses/ShippingAddress"
 import type { DefaultChildrenType } from "#typings/globals"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   children: DefaultChildrenType
@@ -19,11 +20,7 @@ interface Props {
  * ```
  */
 export function ShippingAddressContainer({ children }: Props): JSX.Element {
-  useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[ShippingAddressContainer] is deprecated. Use <ShippingAddress> instead.")
-    }
-  }, [])
+  useDeprecatedContainer("ShippingAddressContainer", "`<ShippingAddress>`")
   return <ShippingAddress>{children}</ShippingAddress>
 }
 

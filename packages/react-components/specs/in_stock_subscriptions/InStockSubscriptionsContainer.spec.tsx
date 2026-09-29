@@ -66,7 +66,7 @@ describe("InStockSubscriptionsContainer", () => {
     })
 
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("[InStockSubscriptionsContainer] is deprecated")
+      expect.stringContaining("<InStockSubscriptionsContainer> is deprecated")
     )
     warnSpy.mockRestore()
   })

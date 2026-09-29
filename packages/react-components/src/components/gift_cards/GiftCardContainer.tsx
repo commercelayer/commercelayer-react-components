@@ -14,6 +14,7 @@ import GiftCardContext, {
 import OrderContext from "#context/OrderContext"
 import type { BaseError, TAPIError } from "#typings/errors"
 import getErrors from "#utils/getErrors"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 export interface GiftCardContainerProps {
   children: ReactNode
@@ -21,8 +22,6 @@ export interface GiftCardContainerProps {
 
 /** @deprecated kept for backward compatibility — remove once GiftCardContainer is no longer exported */
 export interface Props extends GiftCardContainerProps {}
-
-let _deprecationWarned = false
 
 /**
  * @deprecated `GiftCardContainer` will be removed in a future major release.
@@ -49,12 +48,7 @@ let _deprecationWarned = false
  * ```
  */
 export function GiftCardContainer(props: GiftCardContainerProps): JSX.Element {
-  if (process.env.NODE_ENV !== "production" && !_deprecationWarned) {
-    _deprecationWarned = true
-    console.warn(
-      "[commercelayer-react-components] <GiftCardContainer> is deprecated and will be removed in a future major version. Use <GiftCard> as a standalone component instead."
-    )
-  }
+  useDeprecatedContainer("GiftCardContainer", "`<GiftCard>`")
   const { children } = props
   const [errors, setErrors] = useState<BaseError[]>(giftCardInitialState.errors ?? [])
   const [loading, setLoading] = useState<boolean>(giftCardInitialState.loading ?? false)

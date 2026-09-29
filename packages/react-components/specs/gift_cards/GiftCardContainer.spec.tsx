@@ -88,13 +88,15 @@ describe("GiftCardContainer", () => {
     warnSpy.mockRestore()
   })
 
-  it("warns once in non-production environments", () => {
+  it("warns on every mount in non-production environments", () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined)
 
     renderContainer()
     renderContainer()
 
-    expect(warnSpy).toHaveBeenCalledTimes(1)
+    // Per mount rather than once per process: a container mounted again after
+    // a migration is supposed to say so again.
+    expect(warnSpy).toHaveBeenCalledTimes(2)
     expect(warnSpy).toHaveBeenCalledWith(
       expect.stringContaining("<GiftCardContainer> is deprecated")
     )

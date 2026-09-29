@@ -6,6 +6,7 @@ import PricesContext, { type PricesContextValue } from "#context/PricesContext"
 import SkuContext from "#context/SkuContext"
 import type { LoaderType } from "#typings"
 import getPricesMap from "#utils/getPrices"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   /**
@@ -55,6 +56,7 @@ export function PricesContainer({
   perPage = 10,
   filters = {},
 }: Props): JSX.Element {
+  useDeprecatedContainer("PricesContainer", "`<Price skuCode>` or the `usePrices` hook")
   const config = useContext(CommerceLayerContext)
   const { skuCodes: contextSkuCodes } = useContext(SkuContext)
   const [skuCodes, setSkuCodesState] = useState<string[]>(skuCode ? [skuCode] : [])

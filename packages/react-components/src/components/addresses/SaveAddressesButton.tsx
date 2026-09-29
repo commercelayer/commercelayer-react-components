@@ -1,11 +1,11 @@
 import type { Order } from "@commercelayer/sdk"
 import { type JSX, type ReactNode, useContext, useState } from "react"
 import Parent from "#components/utils/Parent"
-import AddressContext from "#context/AddressContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
+import { useAddressStateContext } from "#hooks/useAddressStateContext"
 import type { TCustomerAddress } from "#typings/customers"
 import type { ChildrenFunction } from "#typings/index"
 import { addressesController, countryLockController } from "#utils/addressesManager"
@@ -38,6 +38,11 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     onClick,
     ...p
   } = props
+  // Without `<AddressesContainer>` the forms sit in a sibling subtree this
+  // button cannot see through context; the shared state is what reaches across.
+  const { isStandalone, addressContext, validateAddresses } = useAddressStateContext()
+  const { order, setOrderErrors } = useContext(OrderContext)
+
   const {
     errors,
     billing_address: billingAddress,
@@ -47,8 +52,7 @@ export function SaveAddressesButton(props: Props): JSX.Element {
     billingAddressId,
     shippingAddressId,
     invertAddresses,
-  } = useContext(AddressContext)
-  const { order, setOrderErrors } = useContext(OrderContext)
+  } = addressContext
   const {
     customerEmail: email,
     addresses,
@@ -100,16 +104,19 @@ export function SaveAddressesButton(props: Props): JSX.Element {
   const handleClick = async (): Promise<void> => {
     // When errorMode="submit", trigger validation on both forms before proceeding.
     // validate() sets errors in context and returns them synchronously.
-    if (billingFormCtx.errorMode === "submit" || shippingFormCtx.errorMode === "submit") {
+    if (isStandalone) {
+      // The form contexts live inside each form, so a sibling button cannot
+      // read them. The forms register their validator instead.
+      const { valid } = validateAddresses()
+      if (!valid) return
+    } else if (billingFormCtx.errorMode === "submit" || shippingFormCtx.errorMode === "submit") {
       const billingErrors =
         billingFormCtx.errorMode === "submit" ? (billingFormCtx.validate?.() ?? {}) : {}
       const shippingErrors =
         shippingFormCtx.errorMode === "submit" ? (shippingFormCtx.validate?.() ?? {}) : {}
       if (Object.keys(billingErrors).length > 0 || Object.keys(shippingErrors).length > 0) return
     }
-    /* v8 ignore next */
-    // biome-ignore lint/style/noNonNullAssertion: errors is always defined when handleClick is reachable
-    if (Object.keys(errors!).length === 0) {
+    if (Object.keys(errors ?? []).length === 0) {
       setOrderErrors?.([])
       let response: {
         success: boolean

@@ -1,5 +1,5 @@
 import type { Order } from "@commercelayer/sdk"
-import iframeResizer from "@iframe-resizer/parent"
+import { iframeResizer } from "iframe-resizer"
 import {
   type CSSProperties,
   type JSX,

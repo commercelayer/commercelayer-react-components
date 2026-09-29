@@ -1,6 +1,7 @@
 import { type JSX, useEffect } from "react"
 import BillingAddress from "#components/addresses/BillingAddress"
 import type { DefaultChildrenType } from "#typings/globals"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   children: DefaultChildrenType
@@ -19,11 +20,7 @@ interface Props {
  * ```
  */
 export function BillingAddressContainer({ children }: Props): JSX.Element {
-  useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[BillingAddressContainer] is deprecated. Use <BillingAddress> instead.")
-    }
-  }, [])
+  useDeprecatedContainer("BillingAddressContainer", "`<BillingAddress>`")
   return <BillingAddress>{children}</BillingAddress>
 }
 

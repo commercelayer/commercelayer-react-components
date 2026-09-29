@@ -4,7 +4,9 @@ import type { DefaultContextAddress } from "#context/BillingAddressFormContext"
 import BillingAddressFormContext from "#context/BillingAddressFormContext"
 import ShippingAddressFormContext from "#context/ShippingAddressFormContext"
 
-vi.mock("@commercelayer/core-components", () => ({}))
+vi.mock("@commercelayer/core-components", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@commercelayer/core-components")>()),
+}))
 
 const OPTIONS = [
   { label: "Option A", value: "a" },

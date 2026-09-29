@@ -8,6 +8,7 @@ import lineItemReducer, {
   updateLineItem,
 } from "#reducers/LineItemReducer"
 import type { DefaultChildrenType } from "#typings/globals"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   children: DefaultChildrenType
@@ -20,6 +21,7 @@ interface Props {
  * `LineItemsContainer` requires an `OrderContext` parent and will be removed in a future major version.
  */
 export function LineItemsContainer(props: Props): JSX.Element {
+  useDeprecatedContainer("LineItemsContainer", "`<LineItems>`")
   const { children, loader = "Loading..." } = props
   const { order, addResourceToInclude, include, orderId, getOrder, includeLoaded } =
     useContext(OrderContext)

@@ -48,8 +48,17 @@ Expose a pure, public hook `usePaymentsModel()` that derives the model from `Ord
 | Condition | Result |
 | --- | --- |
 | `available_payment_settings` non-empty | `"payment_sessions"` |
+| else `payment_method` or `payment_source` present | `"payment_source"` |
 | else `available_payment_methods` non-empty | `"payment_source"` |
 | else (including "order not loaded yet") | `"undetermined"` |
+
+> **Amended 2026-09-29**, merging main's redirect-return fixes. The second row is new. An
+> order carrying a payment method or a payment source is `core-api`'s `old_payments_engaged?`
+> (`app/models/concerns/order_payments.rb`), which empties `available_payment_settings` — so the
+> row cannot contradict the first. It exists for the redirect return: a page that fetched the
+> order without `available_payment_methods` otherwise left it `"undetermined"`, the place-order
+> router rendered its inert button, and a payment the shopper had completed was never placed.
+> Main's `place-order.redirect.spec.tsx` caught it.
 
 **The precedence lives in the library, never in the consuming application.** When both
 arrays are present the new model wins and the old flow is excluded entirely.

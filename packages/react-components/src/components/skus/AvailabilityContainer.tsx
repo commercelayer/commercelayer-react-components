@@ -5,6 +5,7 @@ import CommerceLayerContext from "#context/CommerceLayerContext"
 import LineItemChildrenContext from "#context/LineItemChildrenContext"
 import SkuChildrenContext from "#context/SkuChildrenContext"
 import useCustomContext from "#utils/hooks/useCustomContext"
+import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
 
 interface Props {
   /**
@@ -48,6 +49,7 @@ export function AvailabilityContainer({
   skuId,
   getQuantity,
 }: Props): JSX.Element {
+  useDeprecatedContainer("AvailabilityContainer", "`<Availability>`")
   const { lineItem } = useContext(LineItemChildrenContext)
   const { sku } = useContext(SkuChildrenContext)
   const { accessToken, interceptors } = useCustomContext({

@@ -4,6 +4,7 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
+import { usePaymentMethodStateContext } from "#hooks/usePaymentMethodStateContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { LoaderType } from "#typings/index"
 import getCardDetails from "#utils/getCardDetails"
@@ -32,6 +33,9 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
   const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
   const { payments } = useContext(CustomerContext)
+  const { isStandalone, paymentMethodContext } = usePaymentMethodStateContext({
+    needsPaymentResources: true,
+  })
   const {
     errors,
     currentPaymentMethodId,
@@ -39,7 +43,7 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
     destroyPaymentSource,
     currentPaymentMethodType,
     currentCustomerPaymentSourceId,
-  } = useContext(PaymentMethodContext)
+  } = paymentMethodContext
   const [show, setShow] = useState(false)
   const [showCard, setShowCard] = useState(false)
 
@@ -109,7 +113,20 @@ export function PaymentSource(props: PaymentSourceProps): JSX.Element {
     setShow(true)
   }
   const gatewayProps = { ...props, show, showCard, handleEditClick, readonly }
-  return <PaymentGateway {...gatewayProps} />
+  const gateway = <PaymentGateway {...gatewayProps} />
+
+  // With no `<PaymentMethod>` or container above — the order recap on the last
+  // step is rendered exactly like that — the gateway and the payment source
+  // below would read the empty default context. Hand them the resolved state,
+  // the same way `<PaymentMethod>` does for its own children.
+  if (isStandalone) {
+    return (
+      <PaymentMethodContext.Provider value={paymentMethodContext}>
+        {gateway}
+      </PaymentMethodContext.Provider>
+    )
+  }
+  return gateway
 }
 
 export default PaymentSource
