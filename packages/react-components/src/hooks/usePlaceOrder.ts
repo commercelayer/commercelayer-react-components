@@ -1,5 +1,12 @@
 import type { RefObject } from "react"
-import { useCallback, useContext, useEffect, useMemo, useReducer, useSyncExternalStore } from "react"
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useSyncExternalStore,
+} from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import placeOrderReducer, {

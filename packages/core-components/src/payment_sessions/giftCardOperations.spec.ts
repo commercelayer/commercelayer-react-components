@@ -76,6 +76,15 @@ describe("applyGiftCard", () => {
     expect(payload).not.toHaveProperty("amount_cents")
   })
 
+  it("binds the session to the order's gift card setting", async () => {
+    const sdk = stubSdk()
+
+    await applyGiftCard({ accessToken: ACCESS_TOKEN, order: order([]), giftCardCode: "ABC" })
+
+    const payload = sdk.create.mock.calls[0]?.[0]
+    expect(payload.payment_setting).toEqual({ id: GIFT_CARD.id, type: "payment_settings" })
+  })
+
   // The decisive case. The server's remainder has not moved — the first card is
   // not authorized yet — so left to itself it would size this one for the whole
   // order. On a 7100 order with 2000 already applied, that would be 7100 again:

@@ -64,7 +64,7 @@
     "@commercelayer/core-components": "workspace:*",
     "@commercelayer/organization-config": "^2.8.4",
     "@commercelayer/react-hooks-components": "workspace:*",
-    "@commercelayer/sdk": "https://pkg.pr.new/@commercelayer/sdk@c923f75",
+    "@commercelayer/sdk": "https://pkg.pr.new/@commercelayer/sdk@57f8b0a",
     "@iframe-resizer/parent": "^5.5.9",
     "@stripe/react-stripe-js": "^6.8.1",
     "@stripe/stripe-js": "^9.10.0",

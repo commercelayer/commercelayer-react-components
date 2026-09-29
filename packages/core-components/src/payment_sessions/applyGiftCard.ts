@@ -3,6 +3,7 @@ import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 import { derivePaymentSessionsState } from "./derivePaymentSessionsState"
 import { invalidateCurrentPaymentSession } from "./invalidateCurrentPaymentSession"
+import { findGiftCardSetting } from "./types"
 
 interface ApplyGiftCardParams extends Pick<RequestConfig, "accessToken" | "interceptors"> {
   /** The order as last fetched. Its sessions decide the amount to ask for. */
@@ -45,14 +46,15 @@ export async function applyGiftCard({
 }: ApplyGiftCardParams): Promise<PaymentSession> {
   const sdk = getSdk({ accessToken, interceptors })
   const state = derivePaymentSessionsState(order)
+  const giftCardSetting = findGiftCardSetting(order)
 
-  if (state.giftCardSettingId == null) {
+  if (giftCardSetting == null) {
     throw new Error("This order has no gift card payment setting available.")
   }
 
   const session = await sdk.payment_sessions.create({
     gift_card_code: giftCardCode,
-    payment_setting: sdk.payment_settings.relationship(state.giftCardSettingId),
+    payment_setting: sdk.payment_settings.relationship(giftCardSetting.id),
     order: sdk.orders.relationship(order.id),
     // Omitted for the first card so the server sizes it against the balance;
     // supplied afterwards because the server's own remainder has not moved.

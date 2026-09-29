@@ -12,6 +12,33 @@ interface CreatePaymentSessionParams extends Pick<RequestConfig, "accessToken" |
    * to the server is not the safe default it looks like.
    */
   amountCents?: number
+  /**
+   * Data the gateway needs at session creation, from the setting's entry in the
+   * create-attribute table.
+   *
+   * Only ever sent on the `POST`, never patched afterwards: for Adyen the
+   * gateway session is built from it here, and `PATCH { _refresh: true }` is a
+   * no-op (`Payment::Session::Adyen` inherits the base's empty `refresh`), so a
+   * session created without the right `client_data` cannot be corrected — only
+   * replaced. Note the API forwards exactly one key of it to Adyen `/sessions`,
+   * `return_url`; everything else is dropped there.
+   */
+  clientData?: Record<string, unknown>
+  /**
+   * Ask Commerce Layer to store the payment instrument during this charge and
+   * turn it into a `payment_wallet` for the order's customer — which it then
+   * does on its own, from the gateway's confirmation. Nothing is written from
+   * the client.
+   *
+   * Creatable only, like everything that shapes the gateway session: Stripe's
+   * PaymentIntent gets `setup_future_usage` and a Stripe Customer at creation,
+   * Adyen's session gets `storePaymentMethodMode`, `shopperReference` and
+   * `recurringProcessingModel`. Changing one's mind means a new session.
+   *
+   * Sent only when true. A setting whose gateway cannot store instruments
+   * answers with a 422 on `vaulting` rather than ignoring it.
+   */
+  vaulting?: boolean
 }
 
 /**
@@ -43,11 +70,15 @@ export async function createPaymentSession({
   orderId,
   paymentSettingId,
   amountCents,
+  clientData,
+  vaulting,
 }: CreatePaymentSessionParams): Promise<PaymentSession> {
   const sdk = getSdk({ accessToken, interceptors })
   return await sdk.payment_sessions.create({
     payment_setting: sdk.payment_settings.relationship(paymentSettingId),
     order: sdk.orders.relationship(orderId),
+    ...(clientData != null ? { client_data: clientData } : {}),
+    ...(vaulting === true ? { vaulting: true } : {}),
     // A zero or negative amount is rejected by the API (`greater_than: 0`), and
     // there is nothing left to pay anyway — fall back to the server's own
     // sizing rather than sending a value that cannot be valid.

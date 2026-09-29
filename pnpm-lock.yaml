@@ -66,8 +66,8 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
       '@commercelayer/sdk':
-        specifier: https://pkg.pr.new/@commercelayer/sdk@c923f75
-        version: https://pkg.pr.new/@commercelayer/sdk@c923f75
+        specifier: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
+        version: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.18.5
@@ -113,8 +113,8 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
       '@commercelayer/sdk':
-        specifier: https://pkg.pr.new/@commercelayer/sdk@c923f75
-        version: https://pkg.pr.new/@commercelayer/sdk@c923f75
+        specifier: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
+        version: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
       '@mdx-js/react':
         specifier: ^3.1.1
         version: 3.1.1(@types/react@19.2.18)(react@19.2.8)
@@ -191,8 +191,8 @@ importers:
         specifier: workspace:*
         version: link:../react-hooks-components
       '@commercelayer/sdk':
-        specifier: https://pkg.pr.new/@commercelayer/sdk@c923f75
-        version: https://pkg.pr.new/@commercelayer/sdk@c923f75
+        specifier: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
+        version: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
       '@iframe-resizer/parent':
         specifier: ^5.5.9
         version: 5.5.9
@@ -316,8 +316,8 @@ importers:
         specifier: ^8.0.1
         version: 8.0.1
       '@commercelayer/sdk':
-        specifier: https://pkg.pr.new/@commercelayer/sdk@c923f75
-        version: https://pkg.pr.new/@commercelayer/sdk@c923f75
+        specifier: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
+        version: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
       '@rolldown/plugin-babel':
         specifier: ^0.2.3
         version: 0.2.3(@babel/core@8.0.1)(@babel/runtime@7.29.7)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(yaml@2.9.0))
@@ -1080,9 +1080,9 @@ packages:
     resolution: {integrity: sha512-ZlgIhQx7vu89ZD3eOCSkCe7kNb5LgEGy0p4Gayi75sxfHfJRXKkoX2NC+nkp2pFosi4SBYhlQFcd/EtzStAQGw==}
     engines: {node: '>=18', pnpm: '>=7'}
 
-  '@commercelayer/sdk@https://pkg.pr.new/@commercelayer/sdk@c923f75':
-    resolution: {integrity: sha512-34a6up4pJ+8aqI4U5tvpF88BiQ0B+EQ8SGZwC9LwEq9njtmLcAN6B8j2M78C3LFF+Tiq0FoT8NvhvIPWMksReQ==, tarball: https://pkg.pr.new/@commercelayer/sdk@c923f75}
-    version: 8.0.0-beta.10
+  '@commercelayer/sdk@https://pkg.pr.new/@commercelayer/sdk@57f8b0a':
+    resolution: {integrity: sha512-cWoOVjEpvet39vKAz5ZDKc04B7+fOzJjSEj9ryQ+5M4Tvylj6ssiJ7Mi6q2yh/TORlaqUj8IZv52SgvH7oCuXw==, tarball: https://pkg.pr.new/@commercelayer/sdk@57f8b0a}
+    version: 8.0.0-beta.13
     engines: {node: '>=20'}
 
   '@conventional-changelog/git-client@3.1.2':
@@ -6285,7 +6285,7 @@ snapshots:
       '@commercelayer/js-auth': 7.4.2
       merge-anything: 5.1.7
 
-  '@commercelayer/sdk@https://pkg.pr.new/@commercelayer/sdk@c923f75': {}
+  '@commercelayer/sdk@https://pkg.pr.new/@commercelayer/sdk@57f8b0a': {}
 
   '@conventional-changelog/git-client@3.1.2(conventional-commits-filter@6.0.1)(conventional-commits-parser@7.1.0)':
     dependencies:

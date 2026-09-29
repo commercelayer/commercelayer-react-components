@@ -1,3 +1,4 @@
+import type { GiftCardRemoval } from "@commercelayer/core-components"
 import type { PaymentSession } from "@commercelayer/sdk"
 import { createContext } from "react"
 
@@ -14,14 +15,28 @@ export interface InitialPaymentSettingGiftCardItemContext {
   formattedAmount?: string | null
   amountCents?: number | null
   /**
-   * Whether this card can still be taken off the order. False once it has been
-   * charged: authorizing a gift card debits the balance immediately, and only a
-   * refund could give it back — which this iteration does not implement.
+   * How this card can be taken off the order, if it can at all.
+   *
+   * `discard` — nothing was charged, so the Payment Session is deleted and no
+   * balance moves. `refund` — the card was charged, so the only way back is a
+   * `PaymentRefund`: slower, and a real accounting record. **Absent** — it
+   * cannot be taken off, because the subtree is readonly, because the order has
+   * left `pending` (where a storefront token has no refund grant at all), or
+   * because the charge is still settling and neither route is open yet.
+   *
+   * Which operation runs is not the consumer's choice — `removeGiftCard` is one
+   * entry point and the library decides. This is here so an application can
+   * word the two differently, confirm the second, or explain its latency.
    */
-  isRemovable?: boolean
-  /** A removal is in flight for this row. */
+  removal?: GiftCardRemoval
+  /**
+   * A removal is in flight for this row.
+   *
+   * Worth rendering: a `discard` is one request, but a `refund` waits on a
+   * background job and then polls for it.
+   */
   isRemoving?: boolean
-  /** Take this gift card off the order. */
+  /** Take this gift card off the order, whichever way `removal` says. */
   removeGiftCard?: () => Promise<void>
 }
 
