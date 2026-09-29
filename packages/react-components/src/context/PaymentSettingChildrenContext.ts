@@ -22,6 +22,20 @@ export interface InitialPaymentSettingChildrenContext {
   errors?: BaseError[]
   /** Select this setting, creating or adopting its Payment Session. */
   selectSetting?: () => Promise<void>
+  /**
+   * Whether the application should offer a "save this card" choice here.
+   * Stripe for a signed-in customer; false for Adyen, whose Drop-in asks on its
+   * own, and for every guest.
+   */
+  canSaveCard?: boolean
+  /** Whether the current Payment Session stores the card — the shopper's choice as the order records it. */
+  saveCard?: boolean
+  /**
+   * Record the shopper's choice. Replaces the Payment Session, because
+   * `vaulting` is fixed at creation — so the payment form remounts and loses
+   * what was typed. Render the control before the form.
+   */
+  setSaveCard?: (saveCard: boolean) => Promise<void>
   /** Nothing may change — the subtree is a recap, not a form. */
   readonly?: boolean
   /**

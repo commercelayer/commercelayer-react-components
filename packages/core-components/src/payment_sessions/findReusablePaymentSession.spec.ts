@@ -71,6 +71,59 @@ describe("findReusablePaymentSession", () => {
     ).toBeUndefined()
   })
 
+  // `vaulting` is fixed at creation, so the wrong kind cannot be patched into
+  // the right one — only replaced.
+  it.each([
+    [true, false],
+    [false, true],
+  ])("does not adopt a session with vaulting %s when %s is wanted", (has, wanted) => {
+    expect(
+      findReusablePaymentSession({
+        paymentSessions: [session({ vaulting: has })],
+        paymentSettingId: SETTING_ID,
+        vaulting: wanted,
+        now: NOW,
+      })
+    ).toBeUndefined()
+  })
+
+  it("adopts a session whose vaulting matches", () => {
+    const vaulting = session({ vaulting: true })
+    expect(
+      findReusablePaymentSession({
+        paymentSessions: [vaulting],
+        paymentSettingId: SETTING_ID,
+        vaulting: true,
+        now: NOW,
+      })
+    ).toBe(vaulting)
+  })
+
+  it("adopts either kind when vaulting is not asked about", () => {
+    const vaulting = session({ vaulting: true })
+    expect(
+      findReusablePaymentSession({
+        paymentSessions: [vaulting],
+        paymentSettingId: SETTING_ID,
+        now: NOW,
+      })
+    ).toBe(vaulting)
+  })
+
+  // Same rule as the amount: a `fields` allowlist without `vaulting` must not
+  // cost the order its reuse.
+  it("adopts a session that does not say whether it vaults", () => {
+    const silent = session()
+    expect(
+      findReusablePaymentSession({
+        paymentSessions: [silent],
+        paymentSettingId: SETTING_ID,
+        vaulting: true,
+        now: NOW,
+      })
+    ).toBe(silent)
+  })
+
   it("ignores an expired session", () => {
     const expired = session({ expires_at: "2026-08-18T11:59:59Z" })
     expect(

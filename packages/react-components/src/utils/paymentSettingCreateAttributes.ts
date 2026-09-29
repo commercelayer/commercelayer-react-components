@@ -17,7 +17,12 @@ import { isGuestToken } from "#utils/isGuestToken"
  */
 export interface PaymentSettingCreateAttributes {
   clientData?: Record<string, unknown>
-  internalVersion?: string
+  /**
+   * Whether the session must store the instrument. Present only for a setting
+   * that decides it on its own; absent where the shopper decides, which is what
+   * lets the adopted session carry their earlier choice.
+   */
+  vaulting?: boolean
 }
 
 interface BuilderParams {
@@ -57,9 +62,12 @@ const BUILDERS: Record<string, Builder> = {
     // an access token alone can exceed that. Such an application passes
     // `returnUrl` and re-authenticates the return itself.
     ...adyenReturnUrl(returnUrl),
-    // Makes the API inject `shopperReference`, `storePaymentMethodMode:
-    // askForConsent` and `recurringProcessingModel: CardOnFile`, which is what
-    // renders the Drop-in's own save-card checkbox and its saved cards.
+    // Makes the API send Adyen `storePaymentMethodMode: askForConsent`, the
+    // customer's `shopperReference` and the matching `recurringProcessingModel`
+    // — which is what renders the Drop-in's own save-card checkbox and the cards
+    // already stored. On for every signed-in customer and never decided here:
+    // the checkbox is where the shopper chooses. A card they tick arrives as a
+    // `payment_wallet` from Adyen's `RECURRING_CONTRACT` webhook.
     //
     // Gated on the **token**, not on `order.customer`. Commerce Layer puts a
     // customer on nearly every order that has an email and falls back to that
@@ -67,8 +75,26 @@ const BUILDERS: Record<string, Builder> = {
     // against a guest's address and show it, last four digits and expiry, to
     // the next visitor who typed the same one. `<PlaceOrderButtonPaymentSource>`
     // gates `_save_payment_source_to_customer_wallet` the same way.
-    ...(isAuthenticatedCustomer(accessToken) ? { internalVersion: "Tokenization" } : {}),
+    vaulting: isAuthenticatedCustomer(accessToken),
   }),
+}
+
+/**
+ * Whether the application should offer the shopper a "save this card" choice
+ * for this setting.
+ *
+ * Stripe only. Its Payment Element, driven by the PaymentIntent's client
+ * secret, has no consent checkbox of its own — that would take a Customer
+ * Session, which only a secret key can create — so the consent has to be the
+ * application's. Adyen's Drop-in asks on its own, which is why Adyen is not
+ * here.
+ *
+ * Gated on the token for the reason the Adyen builder is: a wallet belongs to a
+ * customer, and on a guest order Commerce Layer's customer is just whoever
+ * typed that email.
+ */
+export function offersSaveCard(params: Pick<BuilderParams, "setting" | "accessToken">): boolean {
+  return params.setting.type === STRIPE_SETTING_TYPE && isAuthenticatedCustomer(params.accessToken)
 }
 
 /**

@@ -26,6 +26,11 @@ vi.mock("@commercelayer/core-components", async (importOriginal) => {
   }
 })
 
+// A saved card is offered only to a signed-in customer, and the test token is
+// not a real JWT — so who is signed in is decided here, per test.
+const { guest } = vi.hoisted(() => ({ guest: { value: true } }))
+vi.mock("#utils/isGuestToken", () => ({ isGuestToken: () => guest.value }))
+
 const MANUAL = { id: "ps-manual", type: "payment_setting_manuals", name: "Bank transfer" }
 const STRIPE = { id: "ps-stripe", type: "payment_setting_stripes", name: "Stripe" }
 
@@ -86,6 +91,7 @@ function renderSettings(currentOrder?: Partial<Order> | null) {
 beforeEach(() => {
   vi.clearAllMocks()
   resetPaymentGatewayStore()
+  guest.value = true
   createPaymentSessionMock.mockResolvedValue({ id: "session-new" })
   discardPaymentSessionMock.mockResolvedValue(true)
 })
@@ -584,5 +590,231 @@ describe("<PaymentSetting> returnUrl", () => {
     // jsdom serves the page from localhost, which is all this needs to assert:
     // the fallback is the page, not a configured value.
     expect(clientData?.return_url).toContain(window.location.origin)
+  })
+})
+
+/**
+ * Saving a card, through `vaulting` on the Payment Session.
+ *
+ * Commerce Layer stores the card during the charge and creates the
+ * `payment_wallet` itself, so what the library owns is only *asking* — at
+ * creation, because `vaulting` cannot be patched in later — and asking only for
+ * a signed-in customer.
+ */
+describe("<PaymentSetting> saving a card", () => {
+  const ADYEN = {
+    id: "ps-adyen",
+    type: "payment_setting_adyens",
+    name: "Adyen",
+    public_key: "test_A",
+  }
+  const STRIPE_WITH_KEY = { ...STRIPE, public_key: "pk_test_A" }
+
+  function stripeSession(overrides: Record<string, unknown> = {}) {
+    return {
+      id: "session-stripe",
+      status: "unpaid",
+      created_at: "2026-09-29T10:00:00Z",
+      payment_setting: STRIPE_WITH_KEY,
+      ...overrides,
+    }
+  }
+
+  type Captured = {
+    canSaveCard: boolean
+    saveCard: boolean
+    setSaveCard: (value: boolean) => Promise<void>
+  }
+
+  /** Render the settings and keep each one's render-prop state by setting id. */
+  function renderCapturing(currentOrder: Partial<Order>) {
+    const captured: Record<string, Captured> = {}
+    render(
+      <Wrapper currentOrder={currentOrder}>
+        <PaymentSetting>
+          {({ setting, canSaveCard, saveCard, setSaveCard }) => {
+            captured[setting.id] = { canSaveCard, saveCard, setSaveCard }
+            return <PaymentSettingRadioButton data-testid={`radio-${setting.id}`} />
+          }}
+        </PaymentSetting>
+      </Wrapper>
+    )
+    return captured
+  }
+
+  it("asks Adyen to store the card for a signed-in customer, whose Drop-in then asks them", async () => {
+    guest.value = false
+    renderSettings(order({ available_payment_settings: [ADYEN] } as never))
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("radio"))
+    })
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalledWith(
+        expect.objectContaining({ vaulting: true })
+      )
+    })
+  })
+
+  it("never asks for a guest, whose order's customer is just whoever typed the email", async () => {
+    renderSettings(order({ available_payment_settings: [ADYEN] } as never))
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("radio"))
+    })
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalledWith(
+        expect.objectContaining({ vaulting: false })
+      )
+    })
+  })
+
+  it("offers the choice on Stripe to a signed-in customer, and nowhere else", () => {
+    guest.value = false
+    const captured = renderCapturing(
+      order({ available_payment_settings: [MANUAL, ADYEN, STRIPE_WITH_KEY] } as never)
+    )
+    expect(captured["ps-stripe"]?.canSaveCard).toBe(true)
+    // Adyen's Drop-in has a checkbox of its own; a second one would ask twice.
+    expect(captured["ps-adyen"]?.canSaveCard).toBe(false)
+    expect(captured["ps-manual"]?.canSaveCard).toBe(false)
+  })
+
+  it("does not offer it to a guest", () => {
+    const captured = renderCapturing(
+      order({ available_payment_settings: [STRIPE_WITH_KEY] } as never)
+    )
+    expect(captured["ps-stripe"]?.canSaveCard).toBe(false)
+  })
+
+  it("reads the choice back from the session, so a reload keeps it", () => {
+    guest.value = false
+    const captured = renderCapturing(
+      order({
+        available_payment_settings: [STRIPE_WITH_KEY],
+        payment_sessions: [stripeSession({ vaulting: true })],
+      } as never)
+    )
+    expect(captured["ps-stripe"]?.saveCard).toBe(true)
+  })
+
+  it("replaces the session when the shopper changes their mind", async () => {
+    // `vaulting` is fixed at creation, so there is nothing to patch: a new
+    // session carries the choice, and the one it replaces is cleared.
+    guest.value = false
+    const captured = renderCapturing(
+      order({
+        available_payment_settings: [STRIPE_WITH_KEY],
+        payment_sessions: [stripeSession({ vaulting: false })],
+      } as never)
+    )
+
+    await act(async () => {
+      await captured["ps-stripe"]?.setSaveCard(true)
+    })
+
+    expect(createPaymentSessionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ paymentSettingId: "ps-stripe", vaulting: true })
+    )
+    expect(discardPaymentSessionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ paymentSessionId: "session-stripe" })
+    )
+  })
+
+  it("shows the new choice at once, while the replacement is still on its way", async () => {
+    // A checkbox that does not move for the second the API takes reads as a
+    // click that was ignored.
+    guest.value = false
+    let finish: (value: unknown) => void = () => {}
+    createPaymentSessionMock.mockReturnValue(
+      new Promise((resolve) => {
+        finish = resolve
+      })
+    )
+    const captured = renderCapturing(
+      order({
+        available_payment_settings: [STRIPE_WITH_KEY],
+        payment_sessions: [stripeSession({ vaulting: false })],
+      } as never)
+    )
+
+    let pending: Promise<void> | undefined
+    act(() => {
+      pending = captured["ps-stripe"]?.setSaveCard(true)
+    })
+    await waitFor(() => {
+      expect(captured["ps-stripe"]?.saveCard).toBe(true)
+    })
+
+    await act(async () => {
+      finish({ id: "session-new" })
+      await pending
+    })
+  })
+
+  it("does nothing when the choice is already the session's", async () => {
+    guest.value = false
+    const captured = renderCapturing(
+      order({
+        available_payment_settings: [STRIPE_WITH_KEY],
+        payment_sessions: [stripeSession({ vaulting: true })],
+      } as never)
+    )
+
+    await act(async () => {
+      await captured["ps-stripe"]?.setSaveCard(true)
+    })
+
+    expect(createPaymentSessionMock).not.toHaveBeenCalled()
+    expect(discardPaymentSessionMock).not.toHaveBeenCalled()
+  })
+
+  it("leaves the session alone while its payment is in flight", async () => {
+    // The money would settle against the session being replaced, and the
+    // replacement would carry nothing.
+    guest.value = false
+    setCollecting("order-1", true)
+    const captured = renderCapturing(
+      order({
+        available_payment_settings: [STRIPE_WITH_KEY],
+        payment_sessions: [stripeSession({ vaulting: false })],
+      } as never)
+    )
+
+    await act(async () => {
+      await captured["ps-stripe"]?.setSaveCard(true)
+    })
+
+    expect(createPaymentSessionMock).not.toHaveBeenCalled()
+  })
+
+  it("starts unticked when Stripe is selected afresh", async () => {
+    // Switching back re-creates the session; nothing the shopper did there is
+    // carried over, so it starts unticked rather than storing a card unasked.
+    guest.value = false
+    renderCapturing(
+      order({
+        available_payment_settings: [MANUAL, STRIPE_WITH_KEY],
+        payment_sessions: [
+          {
+            id: "session-manual",
+            status: "unpaid",
+            created_at: "2026-09-29T10:00:00Z",
+            payment_setting: MANUAL,
+          },
+        ],
+      } as never)
+    )
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("radio-ps-stripe"))
+    })
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    expect(createPaymentSessionMock.mock.calls[0]?.[0]).not.toHaveProperty("vaulting")
   })
 })

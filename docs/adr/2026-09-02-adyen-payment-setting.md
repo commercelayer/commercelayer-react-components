@@ -153,6 +153,10 @@ Adyen**: it is only ever called from `Payment::Session::Base#authorize!`
 Adyen captures come from the `CAPTURE` webhook, driven by the capture delay in Adyen's
 Customer Area.
 
+> **Superseded 2026-09-29** — `core-api` `9edd1fb6e` removed the `Tokenization` variant in
+> favour of `vaulting` on the session, and an unknown `_internal_version` is a 422. See
+> `2026-09-29-saving-cards-through-vaulting.md`. What follows is the finding as it was.
+
 **`_internal_version: "Tokenization"` is creatable by a sales-channel token.**
 `config/attributes/payment_session.yml:172-181` is `creatable: true` with no `prohibited`
 key, and there is an explicit spec for it. It makes
@@ -424,6 +428,11 @@ as accepted and disabled and the button as pending; that presentation is the app
 per `2026-09-01-presentation-belongs-to-the-application.md`.
 
 ### Saving a card uses Adyen's wallet, not Commerce Layer's
+
+> **Superseded 2026-09-29** by `2026-09-29-saving-cards-through-vaulting.md`: the same token
+> gate and the same Drop-in checkbox, reached through `vaulting: true` instead of the removed
+> variant — and Commerce Layer's `payment_wallet` is now linked to the session and is the thing
+> the follow-up will pay with.
 
 Send `_internal_version: "Tokenization"` when the token is an authenticated customer's, and
 let the Drop-in render its own native save checkbox and its own saved cards.
@@ -707,17 +716,20 @@ Listed in order of what they would cost if wrong.
 Single source; the tables in `2026-08-18-payment-session-lifecycle.md` and
 `2026-08-20-gift-cards-as-payment-sessions.md` point here.
 
-| Setting   | Type literal                 | Status                                                                                                              |
-| --------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Manual    | `payment_setting_manuals`    | ✅ implemented — `2026-08-18-payment-session-lifecycle.md`                                                          |
-| Gift card | `payment_setting_gift_cards` | ✅ implemented — `2026-08-20-gift-cards-as-payment-sessions.md`                                                     |
-| Adyen     | `payment_setting_adyens`     | ✅ implemented — client-side Drop-in, cards only, this ADR. Methods within it: `2026-09-07-paypal-through-adyen.md` |
-| Stripe    | `payment_setting_stripes`    | ⬜ not implemented                                                                                                  |
-| Braintree | `payment_setting_braintrees` | ⬜ not implemented                                                                                                  |
-| External  | `payment_setting_externals`  | ⬜ not implemented                                                                                                  |
+| Setting   | Type literal                 | Status                                                                                                                                      |
+| --------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Manual    | `payment_setting_manuals`    | ✅ implemented — `2026-08-18-payment-session-lifecycle.md`                                                                                  |
+| Gift card | `payment_setting_gift_cards` | ✅ implemented — `2026-08-20-gift-cards-as-payment-sessions.md`                                                                             |
+| Adyen     | `payment_setting_adyens`     | ✅ implemented — client-side Drop-in, this ADR; cards, PayPal, Google Pay, Apple Pay and Klarna per `2026-09-07-paypal-through-adyen.md` |
+| Stripe    | `payment_setting_stripes`    | ✅ implemented — Payment Element, cards and whatever the Dashboard enables, `2026-09-09-stripe-payment-setting.md`                         |
+| Braintree | `payment_setting_braintrees` | ⬜ not implemented                                                                                                                          |
+| External  | `payment_setting_externals`  | ⬜ not implemented                                                                                                                          |
 
-Deferred, each needing its own design: the Adyen advanced flow, express/wallet payments, saved
-cards through Commerce Layer's `payment_wallets`, settling a partially-paid order, and
+Saving a card, on Adyen and Stripe alike, goes through `vaulting` on the session —
+`2026-09-29-saving-cards-through-vaulting.md`.
+
+Deferred, each needing its own design: the Adyen advanced flow, express/wallet payments, paying
+with a card saved as a Commerce Layer `payment_wallet`, settling a partially-paid order, and
 `autoSelectSinglePaymentSetting` — whose condition the lifecycle ADR works out but leaves
-unwritten until the rendered list and the real one converge. With three of six settings
+unwritten until the rendered list and the real one converge. With four of six settings
 implemented, they have not yet.

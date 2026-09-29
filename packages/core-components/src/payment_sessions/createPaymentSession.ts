@@ -25,14 +25,20 @@ interface CreatePaymentSessionParams extends Pick<RequestConfig, "accessToken" |
    */
   clientData?: Record<string, unknown>
   /**
-   * Gateway payload variant, e.g. `"Tokenization"` to have the API inject
-   * `shopperReference`, `storePaymentMethodMode` and `recurringProcessingModel`
-   * into the Adyen session.
+   * Ask Commerce Layer to store the payment instrument during this charge and
+   * turn it into a `payment_wallet` for the order's customer — which it then
+   * does on its own, from the gateway's confirmation. Nothing is written from
+   * the client.
    *
-   * A trigger attribute, creatable by a sales-channel token and validated by
-   * name against the setting's available variants — an unknown one is a 422.
+   * Creatable only, like everything that shapes the gateway session: Stripe's
+   * PaymentIntent gets `setup_future_usage` and a Stripe Customer at creation,
+   * Adyen's session gets `storePaymentMethodMode`, `shopperReference` and
+   * `recurringProcessingModel`. Changing one's mind means a new session.
+   *
+   * Sent only when true. A setting whose gateway cannot store instruments
+   * answers with a 422 on `vaulting` rather than ignoring it.
    */
-  internalVersion?: string
+  vaulting?: boolean
 }
 
 /**
@@ -65,19 +71,14 @@ export async function createPaymentSession({
   paymentSettingId,
   amountCents,
   clientData,
-  internalVersion,
+  vaulting,
 }: CreatePaymentSessionParams): Promise<PaymentSession> {
   const sdk = getSdk({ accessToken, interceptors })
   return await sdk.payment_sessions.create({
     payment_setting: sdk.payment_settings.relationship(paymentSettingId),
     order: sdk.orders.relationship(orderId),
     ...(clientData != null ? { client_data: clientData } : {}),
-    // Not in `PaymentSessionCreate` yet, though the API accepts it and there is
-    // a spec in `core-api` for a sales-channel token sending it. Spread rather
-    // than written inline because a spread is exempt from excess-property
-    // checking, which is what lets an attribute the SDK types do not know about
-    // through without a `@ts-expect-error` that would go stale on the next bump.
-    ...(internalVersion != null ? { _internal_version: internalVersion } : {}),
+    ...(vaulting === true ? { vaulting: true } : {}),
     // A zero or negative amount is rejected by the API (`greater_than: 0`), and
     // there is nothing left to pay anyway — fall back to the server's own
     // sizing rather than sending a value that cannot be valid.

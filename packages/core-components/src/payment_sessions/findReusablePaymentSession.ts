@@ -13,6 +13,13 @@ interface FindReusablePaymentSessionParams {
    * only where the remainder is unknown.
    */
   amountCents?: number
+  /**
+   * Whether the session has to be one that stores the instrument. When given, a
+   * session created the other way is not adopted: `vaulting` is fixed at
+   * creation, so adopting it would store a card nobody agreed to store — or
+   * fail to store one somebody did. Omit it where either kind will do.
+   */
+  vaulting?: boolean
   /** Injectable for tests. Defaults to now. */
   now?: Date
 }
@@ -43,6 +50,7 @@ export function findReusablePaymentSession({
   paymentSessions,
   paymentSettingId,
   amountCents,
+  vaulting,
   now = new Date(),
 }: FindReusablePaymentSessionParams): PaymentSession | undefined {
   // Only the session that **is** the current selection may be adopted.
@@ -69,6 +77,10 @@ export function findReusablePaymentSession({
     // `amount_cents` in its `fields` must not lose reuse altogether.
     if (amountCents != null && session.amount_cents != null && session.amount_cents !== amountCents)
       return false
+
+    // Only when the session says: an order fetched without `vaulting` in its
+    // `fields` must not lose reuse altogether, the same rule as the amount.
+    if (vaulting != null && session.vaulting != null && session.vaulting !== vaulting) return false
 
     // Anything past `unpaid` has taken money (or has been voided/refunded);
     // in both cases creating or adopting it again would be wrong.

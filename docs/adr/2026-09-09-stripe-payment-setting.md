@@ -104,6 +104,11 @@ Element confirming a burnt intent.
 
 ### Card saving is not in this iteration — but only one of its two forms is blocked
 
+> **Superseded 2026-09-29** by `2026-09-29-saving-cards-through-vaulting.md`. `core-api` added
+> `vaulting` on the session, which puts both missing pieces on the PaymentIntent — the Stripe
+> Customer and `setup_future_usage` — and links the `payment_wallet` itself. The consent stays
+> ours, as reasoned below; the save now works.
+
 Deliberately not built, having established what it would take.
 
 The consent can be **ours**: `ConfirmPaymentData` extends `PaymentIntentConfirmParams`, which

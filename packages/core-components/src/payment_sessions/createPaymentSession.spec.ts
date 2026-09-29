@@ -66,4 +66,33 @@ describe("createPaymentSession", () => {
       expect.not.objectContaining({ amount_cents: expect.any(Number) })
     )
   })
+
+  // CL stores the instrument and creates the wallet itself; all it needs is to
+  // be asked, on the POST, because the gateway session is built right there.
+  it("asks Commerce Layer to store the instrument when vaulting", async () => {
+    const create = stubSdk()
+
+    await createPaymentSession({
+      accessToken: ACCESS_TOKEN,
+      orderId: "order-1",
+      paymentSettingId: "ps-stripe",
+      amountCents: 5100,
+      vaulting: true,
+    })
+
+    expect(create).toHaveBeenCalledWith(expect.objectContaining({ vaulting: true }))
+  })
+
+  it.each([false, undefined])("sends no vaulting key when vaulting is %s", async (vaulting) => {
+    const create = stubSdk()
+
+    await createPaymentSession({
+      accessToken: ACCESS_TOKEN,
+      orderId: "order-1",
+      paymentSettingId: "ps-stripe",
+      vaulting,
+    })
+
+    expect(create.mock.calls[0]?.[0]).not.toHaveProperty("vaulting")
+  })
 })

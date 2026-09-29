@@ -23,6 +23,7 @@ import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
 import { isCollecting } from "#utils/paymentGatewayStore"
 import {
+  offersSaveCard,
   paymentSettingCreateAttributes,
   paymentSettingUnusableReason,
 } from "#utils/paymentSettingCreateAttributes"
@@ -74,6 +75,20 @@ export interface PaymentSettingChildrenProps {
    * ignored, so wrapping the radio does not create two Payment Sessions.
    */
   selectSetting: () => Promise<void>
+  /**
+   * Whether to offer a "save this card" choice for this setting — Stripe, for a
+   * signed-in customer. The library renders no control for it: the copy and the
+   * placement are the application's.
+   */
+  canSaveCard: boolean
+  /** Whether the current Payment Session stores the card. */
+  saveCard: boolean
+  /**
+   * Record the shopper's choice. `vaulting` is fixed when a Payment Session is
+   * created, so this **replaces** the session: the payment form remounts and
+   * loses whatever was typed. Put the control above the form, not under it.
+   */
+  setSaveCard: (saveCard: boolean) => Promise<void>
 }
 
 interface Props {
@@ -141,6 +156,16 @@ export function PaymentSetting({
   // Payment Sessions behind for a single click.
   const selectionInFlight = useRef(false)
   const [errors, setErrors] = useState<BaseError[]>([])
+  /**
+   * The save-card choice being stored right now, shown in place of the
+   * session's until the replacement lands. Without it the control would not
+   * move for the second the API takes to answer, and a checkbox that ignores a
+   * click reads as broken.
+   */
+  const [requestedSaveCard, setRequestedSaveCard] = useState<{
+    settingId: string
+    saveCard: boolean
+  } | null>(null)
 
   // Reading a selection back needs the session's setting; telling a reusable
   // session from a burnt one needs its authorization. Registered here rather
@@ -223,7 +248,19 @@ export function PaymentSetting({
     return true
   })
 
-  const selectSetting = async (setting: PaymentSettingResource): Promise<void> => {
+  /**
+   * Store the selection: adopt the current session when it will do, create one
+   * when it will not, and tidy away whatever it replaced.
+   *
+   * `vaulting` is the shopper's save-card choice, given only by `setSaveCard`.
+   * Without it a setting that decides for itself (Adyen) still does, and one
+   * that leaves it to the shopper (Stripe) adopts the session as it stands — so
+   * a reload keeps their choice instead of resetting it.
+   */
+  const selectSetting = async (
+    setting: PaymentSettingResource,
+    choice: { vaulting?: boolean } = {}
+  ): Promise<void> => {
     if (accessToken == null || order == null) return
     if (selectionInFlight.current) return
     selectionInFlight.current = true
@@ -241,10 +278,15 @@ export function PaymentSetting({
         paymentSessions: order.payment_sessions,
       })
 
+      const attributes = {
+        ...paymentSettingCreateAttributes({ setting, accessToken, returnUrl }),
+        ...(choice.vaulting != null ? { vaulting: choice.vaulting } : {}),
+      }
       const reusable = findReusablePaymentSession({
         paymentSessions: order.payment_sessions,
         paymentSettingId: setting.id,
         amountCents: remainingAmountCents,
+        vaulting: attributes.vaulting,
       })
       if (reusable == null) {
         await createPaymentSession({
@@ -256,9 +298,10 @@ export function PaymentSetting({
           // out for itself until they are authorized at place time.
           amountCents: remainingAmountCents,
           // Whatever this setting's gateway needs to know at creation. For
-          // Adyen that is the `return_url` its session is built with, and the
-          // tokenization variant — neither of which can be added later.
-          ...paymentSettingCreateAttributes({ setting, accessToken, returnUrl }),
+          // Adyen that is the `return_url` its session is built with; for
+          // either gateway, whether the card is stored. Neither can be added
+          // later.
+          ...attributes,
         })
       }
       // Clear the session the shopper just left, so the order carries one
@@ -272,7 +315,9 @@ export function PaymentSetting({
       // this is tidying, not correctness.
       //
       // Skipped when the session was adopted rather than created: there is
-      // nothing to supersede, and deleting it would delete the selection.
+      // nothing to supersede, and deleting it would delete the selection. Not
+      // skipped for the *same* setting: a changed save-card choice replaces the
+      // session without the shopper leaving it, and the old one has to go.
       // Skipped too for anything holding money — a gift card is never the
       // current selection, and one carrying a live authorization is not ours to
       // undo here. The rule throughout is that sessions which took no money
@@ -286,8 +331,8 @@ export function PaymentSetting({
       // has nothing to show for it. Switching method mid-payment is left
       // possible on purpose; only the tidying is called off.
       if (
+        reusable == null &&
         superseded != null &&
-        superseded.payment_setting?.id !== setting.id &&
         !hasLiveAuthorization(superseded) &&
         !isCollecting(order.id)
       ) {
@@ -348,6 +393,24 @@ export function PaymentSetting({
           const select = async (): Promise<void> => {
             await selectSetting(setting)
           }
+          const canSaveCard = readonly !== true && offersSaveCard({ setting, accessToken })
+          const saveCard =
+            requestedSaveCard?.settingId === setting.id
+              ? requestedSaveCard.saveCard
+              : currentPaymentSession?.vaulting === true
+          // A payment in flight belongs to the session it started on: replacing
+          // that session now would leave the money nothing to settle against.
+          const setSaveCard = async (value: boolean): Promise<void> => {
+            if (!canSaveCard || !isSelected || isCollecting(order.id)) return
+            setRequestedSaveCard({ settingId: setting.id, saveCard: value })
+            try {
+              await selectSetting(setting, { vaulting: value })
+            } finally {
+              // Back to the order's own answer — which is the new session's on
+              // success, and the old one's if the replacement failed.
+              setRequestedSaveCard(null)
+            }
+          }
           return (
             <PaymentSettingChildrenContext.Provider
               key={setting.id}
@@ -360,6 +423,9 @@ export function PaymentSetting({
                 readonly,
                 returnUrl,
                 selectSetting: select,
+                canSaveCard,
+                saveCard,
+                setSaveCard,
               }}
             >
               {typeof children === "function"
@@ -370,6 +436,9 @@ export function PaymentSetting({
                     currentPaymentSession,
                     errors,
                     selectSetting: select,
+                    canSaveCard,
+                    saveCard,
+                    setSaveCard,
                   })
                 : children}
             </PaymentSettingChildrenContext.Provider>
