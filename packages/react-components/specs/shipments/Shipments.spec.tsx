@@ -5,6 +5,7 @@ import { Shipments } from "#components/shipments/Shipments"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import ShipmentContext from "#context/ShipmentContext"
+import { resetShipmentsRevisions } from "#utils/shipmentsRevision"
 
 const MOCK_SHIPMENTS = [
   {
@@ -62,10 +63,15 @@ function Providers({
   orderId = "order-1",
   order = MOCK_ORDER_PENDING,
   getOrder = vi.fn().mockResolvedValue(MOCK_ORDER_PENDING),
+  addResourceToInclude = vi.fn(),
+  include,
   children,
 }: {
   accessToken?: string
   orderId?: string
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  addResourceToInclude?: any
+  include?: string[]
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   order?: any
   // biome-ignore lint/suspicious/noExplicitAny: test cast
@@ -74,7 +80,19 @@ function Providers({
 }) {
   return (
     <CommerceLayerContext.Provider value={{ accessToken }}>
-      <OrderContext.Provider value={{ ...defaultOrderContext, orderId, order, getOrder }}>
+      <OrderContext.Provider
+        value={
+          {
+            ...defaultOrderContext,
+            orderId,
+            order,
+            getOrder,
+            addResourceToInclude,
+            include,
+            // biome-ignore lint/suspicious/noExplicitAny: test cast
+          } as any
+        }
+      >
         {children}
       </OrderContext.Provider>
     </CommerceLayerContext.Provider>
@@ -83,6 +101,8 @@ function Providers({
 
 describe("Shipments component", () => {
   beforeEach(() => {
+    // Module state, so it would otherwise carry an order revision into the next test.
+    resetShipmentsRevisions()
     mockUseShipments.mockReturnValue(defaultHookReturn())
     mockHookSetShippingMethod.mockClear()
     vi.clearAllMocks()
@@ -272,6 +292,57 @@ describe("Shipments component", () => {
 
     expect(capturedErrors).toEqual(
       expect.arrayContaining([expect.objectContaining({ code: "OUT_OF_STOCK" })])
+    )
+  })
+
+  it("does not set OUT_OF_STOCK error when the line item carries no item", async () => {
+    // `item` missing means `line_items.item` was not included in the order we hold.
+    // Reading that as "no stock" hides the shipping methods behind an error the
+    // customer can do nothing about.
+    const orderWithoutItemInclude = {
+      ...MOCK_ORDER_PENDING,
+      line_items: [{ id: "li_1", item_type: "skus", quantity: 5 }],
+    }
+    mockUseShipments.mockReturnValue(defaultHookReturn({ shipments: [] }))
+
+    let capturedErrors: unknown = null
+
+    function Consumer() {
+      const { errors } = useContext(ShipmentContext)
+      capturedErrors = errors
+      return null
+    }
+
+    await act(async () => {
+      render(
+        <Providers order={orderWithoutItemInclude}>
+          <Shipments>
+            <Consumer />
+          </Shipments>
+        </Providers>
+      )
+    })
+
+    expect(capturedErrors).toEqual([])
+  })
+
+  it("asks the order for the line_items.item it reads", async () => {
+    const addResourceToInclude = vi.fn()
+
+    await act(async () => {
+      render(
+        <Providers addResourceToInclude={addResourceToInclude}>
+          <Shipments>
+            <span />
+          </Shipments>
+        </Providers>
+      )
+    })
+
+    expect(addResourceToInclude).toHaveBeenCalledWith(
+      expect.objectContaining({
+        newResource: expect.arrayContaining(["line_items", "line_items.item"]),
+      })
     )
   })
 
@@ -569,6 +640,25 @@ describe("Shipments component", () => {
       expect(mockReload).toHaveBeenCalledTimes(1)
     })
 
+    it("reloads on mount when the cached shipments predate the order", async () => {
+      // The shipping step closes and reopens — applying a coupon does that —
+      // so this component remounts with an empty marker while the shipments
+      // cache still holds what was fetched before. Nothing else corrects it:
+      // the step comes back showing a shipping method the API cleared, and the
+      // order goes to payment without shipping in the total.
+      // Kills: keeping the mount guard on the component alone.
+      const first = renderScenario({ order: MOCK_ORDER_PENDING })
+      await first.showOrder({ ...MOCK_ORDER_PENDING, updated_at: NEXT_REVISION })
+      expect(mockReload).toHaveBeenCalledTimes(1)
+      first.unmount()
+      mockReload.mockClear()
+
+      // Remounted on the revision before the one the cache was filled at.
+      renderScenario({ order: MOCK_ORDER_PENDING })
+
+      expect(mockReload).toHaveBeenCalledTimes(1)
+    })
+
     it("reloads once per order revision, not once per render", async () => {
       // Kills: refetching on every render that carries a revision differing from the
       // one the effect last acted on, rather than stamping it as synced.
@@ -618,21 +708,28 @@ describe("Shipments component", () => {
       expect(mockReload).toHaveBeenCalledTimes(1)
     })
 
+    function captureSetShippingMethod() {
+      const captured: { current?: (id: string, smId: string) => Promise<unknown> } = {}
+      function Consumer() {
+        const { setShippingMethod } = useContext(ShipmentContext)
+        captured.current = setShippingMethod
+        return null
+      }
+      return { captured, Consumer }
+    }
+
     it("suppresses only the order revision produced by our own setShippingMethod", async () => {
       // `hookSetShippingMethod` already revalidates the cache, so refetching for the
       // order update it caused is a redundant round trip.
       // Kills: dropping the stamp in setShippingMethod. The coupon step then proves the
       // suppression is scoped to our own revision and does not deafen the effect.
-      const orderAfterSelection = { ...MOCK_ORDER_PENDING, updated_at: NEXT_REVISION }
-      const getOrder = vi.fn().mockResolvedValue(orderAfterSelection)
-
-      let capturedSetShippingMethod: ((id: string, smId: string) => Promise<unknown>) | undefined
-
-      function Consumer() {
-        const { setShippingMethod } = useContext(ShipmentContext)
-        capturedSetShippingMethod = setShippingMethod
-        return null
+      const orderAfterSelection = {
+        ...MOCK_ORDER_PENDING,
+        updated_at: NEXT_REVISION,
+        shipments: [{ ...MOCK_SHIPMENTS[0], shipping_method: { id: "sm_1" } }, MOCK_SHIPMENTS[1]],
       }
+      const getOrder = vi.fn().mockResolvedValue(orderAfterSelection)
+      const { captured, Consumer } = captureSetShippingMethod()
 
       const { showOrder } = renderScenario({
         order: MOCK_ORDER_PENDING,
@@ -641,7 +738,7 @@ describe("Shipments component", () => {
       })
 
       await act(async () => {
-        await capturedSetShippingMethod?.("ship_1", "sm_1")
+        await captured.current?.("ship_1", "sm_1")
       })
 
       // OrderContext now carries the revision our own update produced.
@@ -656,6 +753,39 @@ describe("Shipments component", () => {
         coupon_code: "test50off",
         updated_at: LATER_REVISION,
       })
+      expect(mockReload).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not suppress a revision that dropped the method we just set", async () => {
+      // The race behind a checkout that could never leave the shipping step: a
+      // coupon lands between the shipping method write and the order read that
+      // follows it, and the API clears the method as part of recalculating the
+      // totals. The revision we read back is therefore one the just-revalidated
+      // shipments do NOT reflect. Stamping it as "in step" silenced the effect
+      // for good: the cached shipment kept a method the order had lost, the step
+      // stayed incomplete, and no further request was ever made.
+      // Kills: stamping on `updated_at` alone, without checking what came back.
+      const orderAfterCoupon = {
+        ...MOCK_ORDER_PENDING,
+        updated_at: NEXT_REVISION,
+        coupon_code: "test50off",
+        shipments: MOCK_SHIPMENTS, // the method we set is gone
+      }
+      const getOrder = vi.fn().mockResolvedValue(orderAfterCoupon)
+      const { captured, Consumer } = captureSetShippingMethod()
+
+      const { showOrder } = renderScenario({
+        order: MOCK_ORDER_PENDING,
+        getOrder,
+        children: <Consumer />,
+      })
+
+      await act(async () => {
+        await captured.current?.("ship_1", "sm_1")
+      })
+
+      await showOrder(orderAfterCoupon)
+
       expect(mockReload).toHaveBeenCalledTimes(1)
     })
 

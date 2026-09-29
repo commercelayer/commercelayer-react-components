@@ -115,3 +115,63 @@ describe("setPaymentSource when the payment session expired", () => {
     })
   })
 })
+
+describe("setPaymentSource when the API refuses the write with a 401", () => {
+  function unauthorized() {
+    return Object.assign(new Error("unauthorized"), {
+      errors: [
+        {
+          code: "UNAUTHORIZED",
+          status: "401",
+          title: "Access denied",
+          detail: "You are not authorized to perform this action on the requested resource.",
+        },
+      ],
+    })
+  }
+
+  function errorDispatches(dispatch: ReturnType<typeof vi.fn>) {
+    return dispatch.mock.calls.filter(([action]) => action?.type === "setErrors")
+  }
+
+  it("reports it while the order is still open", async () => {
+    // The case that matters in practice: the API refuses to update an Adyen
+    // payment source on the second leg of a partial payment. Swallowing it
+    // leaves the caller believing the card details were stored.
+    stripeCreate.mockRejectedValueOnce(unauthorized())
+    const dispatch = vi.fn()
+
+    await setPaymentSource(createParams({ dispatch }))
+
+    expect(errorDispatches(dispatch)).toHaveLength(1)
+  })
+
+  it("stays quiet once the order has been placed", async () => {
+    // The one benign reading: the order was placed while this request was in
+    // flight, so the token can no longer write to it and the checkout is over.
+    stripeCreate.mockRejectedValueOnce(unauthorized())
+    const dispatch = vi.fn()
+
+    await setPaymentSource(
+      createParams({
+        dispatch,
+        getOrder: vi.fn().mockResolvedValue({ id: "order-1", status: "placed" }),
+      }),
+    )
+
+    expect(errorDispatches(dispatch)).toHaveLength(0)
+  })
+
+  it("reports it when the order cannot be read back", async () => {
+    // Without the order we cannot tell the benign case from a failed write, and
+    // assuming the benign one hides exactly the failure this branch exists for.
+    stripeCreate.mockRejectedValueOnce(unauthorized())
+    const dispatch = vi.fn()
+
+    await setPaymentSource(
+      createParams({ dispatch, getOrder: vi.fn().mockResolvedValue(undefined) }),
+    )
+
+    expect(errorDispatches(dispatch)).toHaveLength(1)
+  })
+})

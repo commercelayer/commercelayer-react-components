@@ -407,9 +407,23 @@ async function runSetPaymentSource({
       }
       const [error] = errors
       if (error?.status === "401" && getOrder != null && order != null) {
+        /**
+         * A 401 here has one benign reading: the order was placed or approved
+         * while this request was in flight, so the token can no longer write to
+         * it and the checkout is over regardless. Every other 401 is a write
+         * that did not happen — the API refuses to update an Adyen payment
+         * source for the second leg of a partial payment, for one — and saying
+         * nothing leaves the caller believing it landed: the card details never
+         * reach the payment source and the order records the gift card as the
+         * payment method.
+         *
+         * So stay quiet for the benign case only. When the order cannot be read
+         * back at all, assume the worst rather than the best.
+         */
         const currentOrder = await getOrder(order?.id)
-        if (currentOrder?.status != null && !["placed", "approved"].includes(currentOrder.status)) {
-          console.error("Set payment source:", errors)
+        const checkoutIsOver =
+          currentOrder?.status != null && ["placed", "approved"].includes(currentOrder.status)
+        if (!checkoutIsOver) {
           setErrors({
             currentErrors,
             newErrors: errors,

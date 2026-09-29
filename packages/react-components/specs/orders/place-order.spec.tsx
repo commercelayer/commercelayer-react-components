@@ -75,6 +75,7 @@ function Providers({
   includeLoaded = {} as any,
   paymentMethodErrors = [],
   currentPaymentMethodType = "stripe_payments",
+  currentPaymentMethodRef,
 }: {
   children: ReactNode
   // biome-ignore lint/suspicious/noExplicitAny: test cast
@@ -86,6 +87,8 @@ function Providers({
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   paymentMethodErrors?: any[]
   currentPaymentMethodType?: string
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  currentPaymentMethodRef?: any
 }) {
   return (
     <CommerceLayerContext.Provider value={{ accessToken: "test-token" }}>
@@ -110,6 +113,7 @@ function Providers({
               _isProvided: true as const,
               loading: false,
               currentPaymentMethodType,
+              currentPaymentMethodRef,
               paymentSource: MOCK_ORDER.payment_source,
               setPaymentSource: vi.fn().mockResolvedValue(MOCK_ORDER.payment_source),
               setPaymentMethodErrors: vi.fn(),
@@ -981,6 +985,55 @@ describe("PlaceOrderButton handleClick", () => {
     await waitFor(() => {
       // isValid was forced false due to partially_authorized
       expect(setPlaceOrder).not.toHaveBeenCalled()
+    })
+  })
+
+  it("places a partially authorized order once the gateway covers the rest", async () => {
+    // Givex behaves like a gift card: it can cover part of the total and leave
+    // the order `partially_authorized`, with the rest paid by card through the
+    // gateway widget. That payment only authorizes as the order is placed, so
+    // the order is still `partially_authorized` when this attempt starts —
+    // rejecting it on that alone rejects the attempt that pays the remainder,
+    // and the order can never be placed at all.
+    const { getSdk } = await import("@commercelayer/core-components")
+    const sdk = vi.mocked(getSdk)() as any
+    vi.mocked(sdk.orders.retrieve).mockResolvedValueOnce({
+      id: "order-1",
+      status: "pending",
+      payment_status: "partially_authorized",
+    } as any)
+    const onsubmit = vi.fn().mockResolvedValue(true)
+    const setPlaceOrder = vi.fn().mockResolvedValue({ placed: true })
+
+    render(
+      <Providers
+        currentPaymentMethodType="adyen_payments"
+        currentPaymentMethodRef={{ current: { onsubmit } }}
+      >
+        <PlaceOrderContext.Provider
+          value={{
+            ...defaultPlaceOrderContext,
+            _isProvided: true as const,
+            isPermitted: true,
+            status: "standby",
+            paymentType: "adyen_payments",
+            options: {},
+            setPlaceOrder,
+            setPlaceOrderStatus: vi.fn(),
+          }}
+        >
+          <PlaceOrderButton />
+        </PlaceOrderContext.Provider>
+      </Providers>
+    )
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button"))
+    })
+
+    await waitFor(() => {
+      expect(onsubmit).toHaveBeenCalled()
+      expect(setPlaceOrder).toHaveBeenCalled()
     })
   })
 

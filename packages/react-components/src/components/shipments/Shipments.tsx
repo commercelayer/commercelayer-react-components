@@ -10,6 +10,7 @@ import type { BaseError } from "#typings/errors"
 import type { DefaultChildrenType } from "#typings/globals"
 import { canPlaceOrder } from "#utils/canPlaceOrder"
 import getLoaderComponent from "#utils/getLoaderComponent"
+import { getShipmentsRevision, recordShipmentsRevision } from "#utils/shipmentsRevision"
 
 interface Props {
   children: DefaultChildrenType
@@ -21,7 +22,8 @@ interface Props {
 
 export function Shipments({ children, loader = "Loading..." }: Props): JSX.Element {
   const { accessToken } = useContext(CommerceLayerContext)
-  const { orderId, order, getOrder } = useContext(OrderContext)
+  const { orderId, order, getOrder, addResourceToInclude, include, includeLoaded } =
+    useContext(OrderContext)
 
   const {
     shipments,
@@ -32,6 +34,22 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
   } = useShipments({ accessToken, orderId })
 
   const [errors, setErrors] = useState<BaseError[]>([])
+
+  // The stock check below reads `line_items.item`, so this component has to ask
+  // for it like every other one does. It used to arrive by luck: the containers
+  // that register it — `<LineItemsContainer>`, the payment step — mounted with
+  // the whole checkout. Standalone, they mount with their own step, and a
+  // shipping step rendered before them saw `item` undefined on every line and
+  // reported the order out of stock (see the guard in the effect below).
+  useEffect(() => {
+    if (!include?.includes("line_items.item")) {
+      addResourceToInclude({ newResource: ["line_items", "line_items.item"] })
+    } else if (!includeLoaded?.["line_items.item"]) {
+      addResourceToInclude({
+        newResourceLoaded: { line_items: true, "line_items.item": true },
+      })
+    }
+  }, [include, includeLoaded, addResourceToInclude])
 
   // The shipments cache is keyed on (accessToken, orderId) alone, so it never
   // revalidates on its own. The API, though, re-evaluates shipments whenever the
@@ -46,15 +64,24 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
   useEffect(() => {
     const updatedAt = order?.updated_at
     if (updatedAt == null) return
-    // First order we see: the initial shipments fetch is already in step with it.
+    // First order this component sees. The fetch it triggered on mount is in
+    // step with that order — unless the cache answered it with shipments
+    // fetched at an earlier revision, which is what a step that closes and
+    // reopens gets. Then the shipping method the API cleared when the totals
+    // moved stays on screen and the order is placed without shipping.
     if (syncedOrderUpdatedAt.current == null) {
+      const cachedAt = getShipmentsRevision(orderId)
       syncedOrderUpdatedAt.current = updatedAt
+      recordShipmentsRevision(orderId, updatedAt)
+      if (cachedAt == null || cachedAt === updatedAt) return
+      void reload()
       return
     }
     if (syncedOrderUpdatedAt.current === updatedAt) return
     syncedOrderUpdatedAt.current = updatedAt
+    recordShipmentsRevision(orderId, updatedAt)
     void reload()
-  }, [order?.updated_at, reload])
+  }, [order?.updated_at, reload, orderId])
 
   useEffect(() => {
     const nextErrors: BaseError[] = []
@@ -77,6 +104,11 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
     if (order?.line_items != null && order.line_items.length > 0) {
       const hasStocks = order.line_items
         .filter(({ item_type: itemType }) => itemType === "skus")
+        // No `item` means the relationship was not included in the order we hold,
+        // not that the SKU has no stock. Judging it here turns a missing include
+        // into a blocking, and wrong, out-of-stock notice that hides the shipping
+        // methods; the effect above asks for the include, and this check waits.
+        .filter((lineItem) => "item" in lineItem && lineItem.item != null)
         .map((lineItem) => {
           const conditions =
             // @ts-expect-error no type
@@ -124,10 +156,22 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
         if (getOrder != null && orderId != null) {
           const currentOrder = await getOrder(orderId)
           // `hookSetShippingMethod` has already revalidated the shipments cache,
-          // so this order revision is in step — stamp it so the effect above
-          // doesn't refetch shipments a second time for our own update.
-          if (currentOrder?.updated_at != null) {
+          // so the revision our own update produced needs no second fetch —
+          // stamp it and the effect above stays quiet. Another write can land
+          // while we read, though: applying a coupon clears, server-side, the
+          // very method we just set. Stamping that revision would tell the
+          // effect that the cached shipments are in step with an order they
+          // contradict, and nothing would refetch them again — the step keeps
+          // showing a method the order does not have, so it can never be
+          // completed. Stamp only when the order we read still carries what we
+          // wrote; when it does not, or when the order is not detailed enough
+          // to say, let the effect refetch.
+          const persistedShippingMethodId = currentOrder?.shipments?.find(
+            (shipment) => shipment.id === shipmentId
+          )?.shipping_method?.id
+          if (currentOrder?.updated_at != null && persistedShippingMethodId === shippingMethodId) {
             syncedOrderUpdatedAt.current = currentOrder.updated_at
+            recordShipmentsRevision(orderId, currentOrder.updated_at)
           }
           return { success: true, order: currentOrder }
         }
