@@ -70,6 +70,15 @@ session relationships are *not* global — `<PaymentSetting>` registers
 `payment_sessions.payment_setting` and `payment_sessions.payment_authorization` when it
 mounts, because only the payment UI needs them and they are the expensive part.
 
+> **Amended 2026-09-29.** Still requested on every fetch for every consumer, but no longer by
+> *registering* it: `getApiOrder` adds it to the request itself, alongside whatever the
+> components registered. The registration was an effect in `useOrderState` dispatching into
+> the include state, and that state is a two-phase handshake — components add an include, mark
+> it loaded, and the first fetch waits until the two counts agree. The extra dispatch raced it,
+> and on a page with few components (mfe-checkout's thank-you page after a reload) the order
+> was never fetched: an empty summary and no payment recap. `updateOrder` gets the include too,
+> because it re-reads the order through `getApiOrder`.
+
 Old and new components **self-silence** by consulting this hook, so both trees can be
 mounted side by side without a coordinator. No `PaymentsModelStrategy` component ships in
 this iteration.

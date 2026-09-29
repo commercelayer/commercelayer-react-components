@@ -207,9 +207,19 @@ export const getApiOrder: GetOrder = async (params): Promise<Order | undefined> 
       : undefined
   try {
     if (sdk == null) return undefined
-    if (state?.include && state.include.length > 0) {
-      options.include = state.include
-    }
+    // `available_payment_settings` on every fetch, for every consumer: an order
+    // never asked for it looks exactly like one on the older model, and
+    // `usePaymentsModel` would silently pick the wrong branch.
+    //
+    // Added to this request and never to the include *state*. That state is a
+    // two-phase handshake between the components that register includes and
+    // the effect that waits for all of them to be marked loaded before the
+    // first fetch; a separate effect dispatching into it raced that handshake,
+    // and on a page with few components — mfe-checkout's thank-you page — the
+    // order was never fetched at all. Here it rides along with whatever the
+    // components asked for, and `updateOrder` gets it too, since it re-reads
+    // the order through this function.
+    options.include = [...new Set([...(state?.include ?? []), "available_payment_settings"])]
     const order = await sdk.orders.retrieve(id ?? "", options)
     if (clearWhenPlaced && order.editable === false) {
       persistKey && deleteLocalOrder?.(persistKey)

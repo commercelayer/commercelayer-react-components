@@ -74,7 +74,11 @@ describe("getApiOrder include", () => {
     expect(options.include).toContain("line_items.item")
   })
 
-  it("omits include entirely when nothing has been registered", async () => {
+  // The one include every order carries: without it an order on the newer
+  // payments model reads as the older one. It rides on the request rather than
+  // on the include state, so it is there even when no component registered
+  // anything.
+  it("asks only for available_payment_settings when nothing has been registered", async () => {
     await getApiOrder({
       id: "order-1",
       config: { accessToken: "test-token" },
@@ -83,6 +87,18 @@ describe("getApiOrder include", () => {
     })
 
     const options = retrieve.mock.calls[0]?.[1] as { include?: string[] }
-    expect(options.include).toBeUndefined()
+    expect(options.include).toEqual(["available_payment_settings"])
+  })
+
+  it("adds available_payment_settings to what the components registered, once", async () => {
+    await getApiOrder({
+      id: "order-1",
+      config: { accessToken: "test-token" },
+      state: { include: ["line_items", "available_payment_settings"] },
+      options: {},
+    })
+
+    const options = retrieve.mock.calls[0]?.[1] as { include?: string[] }
+    expect(options.include).toEqual(["line_items", "available_payment_settings"])
   })
 })
