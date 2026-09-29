@@ -156,10 +156,22 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
         if (getOrder != null && orderId != null) {
           const currentOrder = await getOrder(orderId)
           // `hookSetShippingMethod` has already revalidated the shipments cache,
-          // so this order revision is in step — stamp it so the effect above
-          // doesn't refetch shipments a second time for our own update.
-          if (currentOrder?.updated_at != null) {
+          // so the revision our own update produced needs no second fetch —
+          // stamp it and the effect above stays quiet. Another write can land
+          // while we read, though: applying a coupon clears, server-side, the
+          // very method we just set. Stamping that revision would tell the
+          // effect that the cached shipments are in step with an order they
+          // contradict, and nothing would refetch them again — the step keeps
+          // showing a method the order does not have, so it can never be
+          // completed. Stamp only when the order we read still carries what we
+          // wrote; when it does not, or when the order is not detailed enough
+          // to say, let the effect refetch.
+          const persistedShippingMethodId = currentOrder?.shipments?.find(
+            (shipment) => shipment.id === shipmentId
+          )?.shipping_method?.id
+          if (currentOrder?.updated_at != null && persistedShippingMethodId === shippingMethodId) {
             syncedOrderUpdatedAt.current = currentOrder.updated_at
+            recordShipmentsRevision(orderId, currentOrder.updated_at)
           }
           return { success: true, order: currentOrder }
         }

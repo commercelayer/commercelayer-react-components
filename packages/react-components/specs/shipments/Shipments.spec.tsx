@@ -708,21 +708,28 @@ describe("Shipments component", () => {
       expect(mockReload).toHaveBeenCalledTimes(1)
     })
 
+    function captureSetShippingMethod() {
+      const captured: { current?: (id: string, smId: string) => Promise<unknown> } = {}
+      function Consumer() {
+        const { setShippingMethod } = useContext(ShipmentContext)
+        captured.current = setShippingMethod
+        return null
+      }
+      return { captured, Consumer }
+    }
+
     it("suppresses only the order revision produced by our own setShippingMethod", async () => {
       // `hookSetShippingMethod` already revalidates the cache, so refetching for the
       // order update it caused is a redundant round trip.
       // Kills: dropping the stamp in setShippingMethod. The coupon step then proves the
       // suppression is scoped to our own revision and does not deafen the effect.
-      const orderAfterSelection = { ...MOCK_ORDER_PENDING, updated_at: NEXT_REVISION }
-      const getOrder = vi.fn().mockResolvedValue(orderAfterSelection)
-
-      let capturedSetShippingMethod: ((id: string, smId: string) => Promise<unknown>) | undefined
-
-      function Consumer() {
-        const { setShippingMethod } = useContext(ShipmentContext)
-        capturedSetShippingMethod = setShippingMethod
-        return null
+      const orderAfterSelection = {
+        ...MOCK_ORDER_PENDING,
+        updated_at: NEXT_REVISION,
+        shipments: [{ ...MOCK_SHIPMENTS[0], shipping_method: { id: "sm_1" } }, MOCK_SHIPMENTS[1]],
       }
+      const getOrder = vi.fn().mockResolvedValue(orderAfterSelection)
+      const { captured, Consumer } = captureSetShippingMethod()
 
       const { showOrder } = renderScenario({
         order: MOCK_ORDER_PENDING,
@@ -731,7 +738,7 @@ describe("Shipments component", () => {
       })
 
       await act(async () => {
-        await capturedSetShippingMethod?.("ship_1", "sm_1")
+        await captured.current?.("ship_1", "sm_1")
       })
 
       // OrderContext now carries the revision our own update produced.
@@ -746,6 +753,39 @@ describe("Shipments component", () => {
         coupon_code: "test50off",
         updated_at: LATER_REVISION,
       })
+      expect(mockReload).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not suppress a revision that dropped the method we just set", async () => {
+      // The race behind a checkout that could never leave the shipping step: a
+      // coupon lands between the shipping method write and the order read that
+      // follows it, and the API clears the method as part of recalculating the
+      // totals. The revision we read back is therefore one the just-revalidated
+      // shipments do NOT reflect. Stamping it as "in step" silenced the effect
+      // for good: the cached shipment kept a method the order had lost, the step
+      // stayed incomplete, and no further request was ever made.
+      // Kills: stamping on `updated_at` alone, without checking what came back.
+      const orderAfterCoupon = {
+        ...MOCK_ORDER_PENDING,
+        updated_at: NEXT_REVISION,
+        coupon_code: "test50off",
+        shipments: MOCK_SHIPMENTS, // the method we set is gone
+      }
+      const getOrder = vi.fn().mockResolvedValue(orderAfterCoupon)
+      const { captured, Consumer } = captureSetShippingMethod()
+
+      const { showOrder } = renderScenario({
+        order: MOCK_ORDER_PENDING,
+        getOrder,
+        children: <Consumer />,
+      })
+
+      await act(async () => {
+        await captured.current?.("ship_1", "sm_1")
+      })
+
+      await showOrder(orderAfterCoupon)
+
       expect(mockReload).toHaveBeenCalledTimes(1)
     })
 
