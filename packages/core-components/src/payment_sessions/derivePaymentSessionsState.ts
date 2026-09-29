@@ -1,7 +1,7 @@
 import type { Order, PaymentSession } from "@commercelayer/sdk"
 import { findCurrentPaymentSession } from "./findCurrentPaymentSession"
 import {
-  GIFT_CARD_SETTING_TYPE,
+  findGiftCardSetting,
   hasLiveAuthorization,
   hasReturnedMoney,
   holdsMoney,
@@ -46,8 +46,8 @@ export interface PaymentSessionsState {
   canAddGiftCard: boolean
   /** The non-gift-card session paying the difference, if the shopper picked one. */
   currentPaymentSession?: PaymentSession
-  /** The gift card Payment Setting, when the order has one available. */
-  giftCardSettingId?: string
+  /** Whether the order has a gift card Payment Setting available. */
+  isGiftCardSettingAvailable: boolean
 }
 
 /**
@@ -100,9 +100,7 @@ export function derivePaymentSessionsState(order?: Order | null): PaymentSession
     // which renders on this, never came back for the shopper who needed it most.
     canAddGiftCard: remainingAmountCents > 0 && !sessions.some(holdsMoney),
     currentPaymentSession: findCurrentPaymentSession({ paymentSessions: sessions }),
-    giftCardSettingId: (order?.available_payment_settings ?? []).find(
-      (setting) => setting.type === GIFT_CARD_SETTING_TYPE
-    )?.id,
+    isGiftCardSettingAvailable: findGiftCardSetting(order) != null,
   }
 }
 

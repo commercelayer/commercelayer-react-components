@@ -23,7 +23,7 @@ describe("findCurrentPaymentSession", () => {
 
   // Unlike a reusable session, one that already took money is still the
   // shopper's selection — it just must not be adopted for a new payment.
-  it.each(["unpaid", "authorized", "paid", "partially_paid"])(
+  it.each(["unpaid", "authorized", "paid", "partially_paid"] as const)(
     "treats a session in status %s as the selection",
     (status) => {
       const current = session({ status })

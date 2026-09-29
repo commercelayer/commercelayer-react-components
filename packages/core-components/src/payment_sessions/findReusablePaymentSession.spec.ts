@@ -54,18 +54,22 @@ describe("findReusablePaymentSession", () => {
 
   // A session that already took money must never be adopted: `amount_cents` is
   // immutable, and re-selecting it would misreport what the shopper still owes.
-  it.each(["authorized", "paid", "partially_paid", "voided", "refunded", "partially_refunded"])(
-    "ignores a session in status %s",
-    (status) => {
-      expect(
-        findReusablePaymentSession({
-          paymentSessions: [session({ status })],
-          paymentSettingId: SETTING_ID,
-          now: NOW,
-        })
-      ).toBeUndefined()
-    }
-  )
+  it.each([
+    "authorized",
+    "paid",
+    "partially_paid",
+    "voided",
+    "refunded",
+    "partially_refunded",
+  ] as const)("ignores a session in status %s", (status) => {
+    expect(
+      findReusablePaymentSession({
+        paymentSessions: [session({ status })],
+        paymentSettingId: SETTING_ID,
+        now: NOW,
+      })
+    ).toBeUndefined()
+  })
 
   it("ignores an expired session", () => {
     const expired = session({ expires_at: "2026-08-18T11:59:59Z" })
@@ -183,6 +187,7 @@ describe("findReusablePaymentSession", () => {
   })
 
   it("does not decide on statuses it has never heard of", () => {
+    // @ts-expect-error Testing unknown status handling
     const unknown = session({ status: "some_future_state" })
     expect(
       findReusablePaymentSession({

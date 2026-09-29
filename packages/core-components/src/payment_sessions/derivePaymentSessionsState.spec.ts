@@ -44,7 +44,7 @@ describe("derivePaymentSessionsState", () => {
       remainingAmountCents: TOTAL,
       isCovered: false,
       canAddGiftCard: true,
-      giftCardSettingId: "ps-gift",
+      isGiftCardSettingAvailable: true,
     })
     expect(state.currentPaymentSession).toBeUndefined()
   })
@@ -187,7 +187,7 @@ describe("derivePaymentSessionsState", () => {
 
   it("reports no gift card setting when the order has none available", () => {
     const state = derivePaymentSessionsState(order([], [MANUAL]))
-    expect(state.giftCardSettingId).toBeUndefined()
+    expect(state.isGiftCardSettingAvailable).toBe(false)
   })
 })
 

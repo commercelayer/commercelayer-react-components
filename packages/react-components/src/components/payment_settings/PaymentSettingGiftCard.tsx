@@ -166,7 +166,7 @@ export function PaymentSettingGiftCard({ children, readonly }: Props): JSX.Eleme
     [accessToken, interceptors, order, getOrder, readonly]
   )
 
-  if (paymentsModel !== "payment_sessions" || state.giftCardSettingId == null) return null
+  if (paymentsModel !== "payment_sessions" || !state.isGiftCardSettingAvailable) return null
 
   return (
     <PaymentSettingGiftCardContext.Provider

@@ -1,4 +1,4 @@
-import type { PaymentSession } from "@commercelayer/sdk"
+import type { Order, PaymentSession, PaymentSetting } from "@commercelayer/sdk"
 
 /**
  * Status values for the `payment_sessions` payment model.
@@ -148,6 +148,18 @@ export interface PlaceabilityError {
  * difference. Everything that separates the two families keys off this literal.
  */
 export const GIFT_CARD_SETTING_TYPE = "payment_setting_gift_cards"
+
+/**
+ * The gift card Payment Setting among the order's available ones, if any.
+ *
+ * The single lookup behind both the availability flag the UI reads and the id
+ * `applyGiftCard` binds the new session to, so the two cannot disagree.
+ */
+export function findGiftCardSetting(order?: Order | null): PaymentSetting | undefined {
+  return (order?.available_payment_settings ?? []).find(
+    (setting) => setting.type === GIFT_CARD_SETTING_TYPE
+  )
+}
 
 /** True when this session spends a gift card rather than paying the difference. */
 export function isGiftCardSession(session: PaymentSession): boolean {
