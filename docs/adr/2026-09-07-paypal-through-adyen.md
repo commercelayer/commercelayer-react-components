@@ -503,7 +503,7 @@ refund happened, and `require_action` transitions only `from: :pending`, which P
 | Method     | adyen-web type | Status                                                                                                 |
 | ---------- | -------------- | ------------------------------------------------------------------------------------------------------ |
 | Card       | `scheme`       | ✅ implemented — `2026-09-02-adyen-payment-setting.md`                                                 |
-| PayPal     | `paypal`       | 🟡 built; the handoff verified end to end, the payment refused by Adyen — see below                    |
+| PayPal     | `paypal`       | ✅ implemented — paying e2e green since the sandbox buyer was fixed (2026-09-29); see below                |
 | Apple Pay  | `applepay`     | ✅ implemented, opt-in — `2026-09-07-apple-pay-through-adyen.md`; verified by hand, no e2e is possible |
 | Google Pay | `googlepay`    | ✅ implemented — `2026-09-07-google-pay-through-adyen.md`                                              |
 | Klarna     | `klarna*`      | ✅ implemented, on the card's route; e2e in mfe-checkout `payment-sessions-klarna.spec.ts`             |
@@ -534,6 +534,19 @@ The library's own behaviour on that refusal is what it should be, and this run i
 the burnt Payment Session was discarded, the order came back `pending` / `unpaid` with **zero**
 payment sessions, the setting was deselected, and the shopper was told. Nothing was left behind
 for a second attempt to trip over.
+
+### Update 2026-09-29: the refusal was the sandbox buyer
+
+Once the sandbox buyer was fixed on the PayPal side, both paying tests went green with the
+credentials already in mfe-checkout (`NP_PAYPAL_EMAIL`, `NP_PAYPAL_PASSWORD`): the whole order in
+31 s, the gift card plus remainder in 27 s. Nothing in the library changed. One run of the gift
+card test was refused and the next passed, so a single `Refused` here is not evidence of a
+regression; its reason, as always on this path, is only in Adyen's Customer Area.
+
+Noticed on the way and not the cause: with a gift card applied the Adyen session's `lineItems`
+still sum to the order's lines ($69) while `amount` is the remainder ($58), because
+`Payment::Payload::Adyen#line_items_data` reads the order and never the session. PayPal accepts
+it; a method that insists the two agree may not.
 
 ### The closed gate is reported from PayPal's click
 

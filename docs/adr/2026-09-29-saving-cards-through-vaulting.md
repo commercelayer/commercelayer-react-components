@@ -97,12 +97,22 @@ through Commerce Layer — a list of `payment_wallets` and a session created wit
 creates a new Stripe PaymentMethod, and `link_wallet!` looks an existing wallet up by
 `payment_token` — the `pm_` id — so saving the same card again makes another wallet. Adyen does
 not have the problem: the same card comes back with the same stored token and the wallet is
-reused. A wallet linked to a payment session cannot be deleted (423 — `has_many
-:payment_sessions, dependent: :restrict_with_exception`), and a customer token may not send
-`_cancel` (401 — `prohibited: [write]` for sales-channel tokens); on Stripe `cancel_wallet`
-would be a no-op anyway for a wallet with no SetupIntent. Two asks follow for `core-api`:
-deduplicate Stripe wallets by `card.fingerprint`, and let a customer retire a wallet that is in
-use. The second matters to the saved-cards follow-up, where a shopper will expect to remove one.
+reused. A wallet linked to a payment session cannot be deleted by any token (423 — `has_many
+:payment_sessions, dependent: :restrict_with_exception`, a model-level rule), and a customer
+token may not send `_cancel` (401 — `prohibited: [write]` for sales-channel tokens).
+
+An integration token may send `_cancel`, and what it does depends on the gateway. On Adyen,
+`Payment::Wallet::Adyen#cancel` deletes the stored payment method at Adyen and moves the wallet
+to `canceled`. On Stripe it does not retire a vaulted wallet: `cancel_wallet` runs, since
+`PaymentWallet.factory` always assigns a `token` (a random hex when none is given), but
+`Payment::Wallet::Stripe#cancel` calls `SetupIntent.cancel(wallet.token)` — and a wallet linked
+from a PaymentIntent has no SetupIntent, so Stripe answers with an error that `rescue_and_log`
+swallows, and the wallet stays `succeeded`. Read from the code, not tried.
+
+Two asks follow for `core-api`: deduplicate Stripe wallets by `card.fingerprint`, and let a
+customer retire a wallet that is in use — which on Stripe means detaching the `pm_` from the
+Customer rather than cancelling a SetupIntent. The second matters to the saved-cards follow-up,
+where a shopper will expect to remove one.
 
 **Verified end to end** in mfe-checkout's `payment-sessions-vaulting.spec.ts` on a customer
 order, for both gateways, on 2026-09-29: the session reads `vaulting: true` and a
