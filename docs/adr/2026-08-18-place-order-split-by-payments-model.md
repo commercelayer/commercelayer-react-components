@@ -94,6 +94,20 @@ effects that read `payment_source.payment_response` on an order that has none; r
 `null` makes the button appear late, which is a visible change even though the mount
 hierarchy is identical.
 
+> **Superseded 2026-09-29.** The router now mounts the `payment_source` branch for every
+> model but `payment_sessions`, `"undetermined"` included. Two things changed. Main's shared
+> place-order store (`fcd0dfa1`) made that button the **owner** of the place-order state:
+> without a container above it, it is what registers the shipment and address includes and
+> works out whether placing is permitted. And an order on the older model stays
+> `"undetermined"` until the payment step asks for `available_payment_methods`. Together they
+> meant the placeholder left the delivery step without its shipping methods, and mfe-checkout on
+> `feat/new-react-components` stuck before payment — the placeholder was never safe, only
+> masked by `<PlaceOrderContainer>` registering the includes itself. The redirect effects the
+> original reasoning worried about wait for an order and a payment source, as they did before
+> the split; `payment_sessions` is the only model recognisable on the first fetch, because
+> `available_payment_settings` is included for every order, so it is the only one that needs
+> its own branch.
+
 `PlaceOrderContext` stays exclusive to the `payment_source` model. The new branch has no
 children to serve, and `PrivacyAndTermsCheckbox` already communicates through the
 `PLACE_ORDER_RECHECK_EVENT` DOM event rather than context. A consumer that still mounts the
@@ -155,8 +169,8 @@ prop on `PlaceOrderButtonPaymentSessions`, which forwards it.
 
 ## Consequences
 
-The router must render a button itself for the `undetermined` window, so `label` and the
-render-prop are handled at that level too, not only inside the branches.
+~~The router must render a button itself for the `undetermined` window~~ — no longer: since
+2026-09-29 that window gets the `payment_source` branch, see above.
 
 **A 200 from `_placeable` is not proof of payment.** Three routes bypass the coverage rule,
 none of them defensible from the client:

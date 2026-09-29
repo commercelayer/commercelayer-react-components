@@ -1,6 +1,5 @@
 import type { Order } from "@commercelayer/sdk"
 import type { JSX, ReactNode } from "react"
-import Parent from "#components/utils/Parent"
 import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import type { PlaceOrderOptions } from "#reducers/PlaceOrderReducer"
 import type { BaseError } from "#typings/errors"
@@ -58,53 +57,49 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     ...p
   } = props
 
-  switch (paymentsModel) {
-    case "payment_source":
-      return (
-        <PlaceOrderButtonPaymentSource
-          {...p}
-          label={label}
-          loadingLabel={loadingLabel}
-          autoPlaceOrder={autoPlaceOrder}
-          options={options}
-          disabled={disabled}
-          onClick={onClick}
-        >
-          {children}
-        </PlaceOrderButtonPaymentSource>
-      )
-    case "payment_sessions":
-      return (
-        <PlaceOrderButtonPaymentSessions
-          {...p}
-          label={label}
-          loadingLabel={loadingLabel}
-          placeableAttempts={placeableAttempts}
-          placeableIntervalMs={placeableIntervalMs}
-          disabled={disabled}
-          onClick={onClick}
-        >
-          {children}
-        </PlaceOrderButtonPaymentSessions>
-      )
-    default: {
-      // The model is not knowable until the order has loaded. Render an inert
-      // button rather than delegating or hiding: mounting the `payment_source`
-      // branch would start five redirect effects that read a payment source
-      // this order may not have, and rendering `null` would make the button
-      // appear late — a visible change for applications upgrading, even though
-      // the mount hierarchy is identical.
-      const labelButton = typeof label === "function" ? label() : label
-      const handleClick = async (): Promise<void> => undefined
-      return children ? (
-        <Parent {...{ ...props, disabled: true, handleClick }}>{children}</Parent>
-      ) : (
-        <button type="button" disabled {...p}>
-          {labelButton}
-        </button>
-      )
-    }
+  // `payment_sessions` is the only model that can be recognised on the first
+  // fetch — `available_payment_settings` is included for every order — so it is
+  // the only one that needs its own branch. Everything else, `undetermined`
+  // included, gets the `payment_source` button, and gets it **from the start**.
+  //
+  // Not an inert placeholder while undetermined, although that was the first
+  // design. The `payment_source` button owns the place-order state: without a
+  // container above it, it is what registers the shipment and address includes
+  // and works out whether placing is permitted. An order on the older model
+  // stays undetermined until the payment step asks for its methods, so a
+  // placeholder there left the delivery step without its shipping methods and
+  // the checkout stuck before payment. Mounted early, it behaves exactly as it
+  // did before the split; its redirect effects wait for an order and a payment
+  // source like they always have, and an order that turns out to be on the
+  // newer model swaps it out as soon as it loads.
+  if (paymentsModel === "payment_sessions") {
+    return (
+      <PlaceOrderButtonPaymentSessions
+        {...p}
+        label={label}
+        loadingLabel={loadingLabel}
+        placeableAttempts={placeableAttempts}
+        placeableIntervalMs={placeableIntervalMs}
+        disabled={disabled}
+        onClick={onClick}
+      >
+        {children}
+      </PlaceOrderButtonPaymentSessions>
+    )
   }
+  return (
+    <PlaceOrderButtonPaymentSource
+      {...p}
+      label={label}
+      loadingLabel={loadingLabel}
+      autoPlaceOrder={autoPlaceOrder}
+      options={options}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {children}
+    </PlaceOrderButtonPaymentSource>
+  )
 }
 
 export default PlaceOrderButton

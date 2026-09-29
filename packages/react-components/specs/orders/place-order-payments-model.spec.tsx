@@ -94,31 +94,27 @@ describe("PlaceOrderButton routing", () => {
     expect(screen.getByRole("button").textContent).toBe("Pay now")
   })
 
-  // Neither branch may run before the model is known: mounting the older one
-  // would start redirect effects reading a payment source this order has not
-  // got, and rendering nothing would make the button appear late — a visible
-  // change for applications that only ever mounted <PlaceOrderButton>.
-  it("renders an inert button while the model is undetermined", () => {
+  // The older branch from the start, not a placeholder. It owns the
+  // place-order state — the shipment and address includes, whether placing is
+  // permitted — and an order on the older model stays undetermined until the
+  // payment step asks for its methods. A placeholder there left the delivery
+  // step without its shipping methods and the checkout stuck before payment.
+  it("mounts the payment_source button while the model is undetermined", () => {
     render(
       <Wrapper currentOrder={null}>
         <PlaceOrderButton label="Pay now" />
       </Wrapper>
     )
-    const button = screen.getByRole("button") as HTMLButtonElement
-    expect(button.textContent).toBe("Pay now")
-    expect(button.disabled).toBe(true)
+    expect(screen.getByRole("button").textContent).toBe("payment_source branch")
   })
 
-  it("does not place anything while the model is undetermined", async () => {
+  it("mounts the payment_source button for an order that has not said which model it is on", () => {
     render(
-      <Wrapper currentOrder={null}>
+      <Wrapper currentOrder={{ id: "order-1" } as Partial<Order>}>
         <PlaceOrderButton />
       </Wrapper>
     )
-    await act(async () => {
-      fireEvent.click(screen.getByRole("button"))
-    })
-    expect(placeOrderMock).not.toHaveBeenCalled()
+    expect(screen.getByRole("button").textContent).toBe("payment_source branch")
   })
 })
 
