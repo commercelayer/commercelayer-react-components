@@ -80,6 +80,16 @@ export function Shipment({
   const setShippingMethodRef = useRef(setShippingMethod)
   setShippingMethodRef.current = setShippingMethod
 
+  // Shipments that this component has already auto-selected a method for, keyed
+  // `<shipment id>:<shipping method id>`. The effect re-runs on every new
+  // `shipments` identity, and the refetch that follows a selection lands before
+  // the API reports the method as set — so without this the same shipment gets
+  // selected twice, and a caller passing a callback (analytics, typically) is
+  // told about it twice. An entry is dropped as soon as the data catches up, so
+  // a method the API clears later — applying a coupon does that — is selected
+  // again.
+  const autoSelectedRef = useRef<Set<string>>(new Set())
+
   useEffect(() => {
     if (shipments != null) {
       if (autoSelectSingleShippingMethod) {
@@ -92,15 +102,22 @@ export function Shipment({
             if (!shipment?.shipping_method && isSingle) {
               const [shippingMethod] = availableShippingMethods
               if (shippingMethod && setShippingMethodRef.current != null) {
+                const key = `${shipment.id}:${shippingMethod.id}`
+                if (autoSelectedRef.current.has(key)) continue
+                autoSelectedRef.current.add(key)
                 const { success, order } = await setShippingMethodRef.current(
                   shipment.id,
                   shippingMethod.id
                 )
+                if (!success) autoSelectedRef.current.delete(key)
                 if (typeof autoSelectSingleShippingMethod === "function" && success) {
                   autoSelectSingleShippingMethod(order)
                 }
               }
             } else {
+              if (shipment?.shipping_method != null) {
+                autoSelectedRef.current.delete(`${shipment.id}:${shipment.shipping_method.id}`)
+              }
               setTimeout(() => {
                 setLoading(false)
               }, 200)

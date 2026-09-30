@@ -54,9 +54,29 @@ interface Props extends Omit<JSX.IntrinsicElements["button"], "children" | "onCl
   options?: PlaceOrderOptions
 }
 
+/**
+ * Whether the gateway considers the order fully covered. Adyen's partial-payment
+ * order carries what is still outstanding; anything else has no remainder to
+ * speak of, so a validated attempt covers it by definition.
+ */
+function remainingAmountIsCovered(paymentSource: unknown): boolean {
+  const remaining = (
+    paymentSource as
+      | { payment_response?: { order?: { remainingAmount?: { value?: number } } } }
+      | undefined
+  )?.payment_response?.order?.remainingAmount
+  return remaining?.value == null || remaining.value === 0
+}
+
 export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
   const ref = useRef(null)
-  /** Order id we already fired one automatic place attempt for. */
+  /**
+   * The order state we already fired one automatic place attempt for, as
+   * `<order id>:<payment status>:<result code>`. Keyed on the state and not on
+   * the order alone: a partial payment reaches this effect twice, once per leg,
+   * and the gift card leg would otherwise spend the single attempt the order was
+   * allowed — leaving nothing to place it once the card covers the rest.
+   */
   const autoPlaceAttemptedRef = useRef<string | null>(null)
   /** Order id a place attempt is currently in flight for. */
   const placeInFlightRef = useRef<string | null>(null)
@@ -303,6 +323,7 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
      * order's number in `merchantReference`. The first covers merchants who
      * customize the merchant reference, which the reference check alone missed.
      */
+    const autoPlaceKey = `${order.id}:${order.payment_status}:${paymentResponse?.resultCode}`
     const isAuthorizedForThisOrder =
       order.payment_status === "authorized" ||
       (order.number != null && paymentResponse?.merchantReference?.includes(order.number) === true)
@@ -311,11 +332,11 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
       isAuthorizedForThisOrder &&
       // A place is already in flight; `status` returns to standby if it fails.
       status !== "placing" &&
-      // One automatic attempt per order per page load: `handleClick` flips
-      // `status`, which re-runs this effect.
-      autoPlaceAttemptedRef.current !== order.id
+      // One automatic attempt per order *state*: `handleClick` flips `status`,
+      // which re-runs this effect, so repeating the same state would loop.
+      autoPlaceAttemptedRef.current !== autoPlaceKey
     ) {
-      autoPlaceAttemptedRef.current = order.id
+      autoPlaceAttemptedRef.current = autoPlaceKey
       handleClick()
     }
   }, [
@@ -437,6 +458,8 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
     if (order == null) return
     let isValid = true
     let currentPaymentStatus = "unpaid"
+    /** Set when the gateway validated this attempt *and* nothing is left to pay. */
+    let gatewayAuthorizedThisAttempt = false
 
     const isStripePayment = paymentType === "stripe_payments"
     if (!isStripePayment) {
@@ -551,6 +574,11 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
       ) {
         isValid = true
       }
+      // Only once nothing is left to pay. On a partial payment the gift card
+      // leg validates too — it authorized the gift card, after all — and
+      // treating that as "the remainder is covered" places the order before the
+      // shopper has even entered the card.
+      gatewayAuthorizedThisAttempt = isValid && remainingAmountIsCovered(checkPaymentSource)
     } else if (
       currentPaymentMethodRef?.current?.onsubmit &&
       options?.checkoutCom?.session_id &&
@@ -586,7 +614,21 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
     } else if (card?.brand && checkPaymentSourceStatus !== "declined") {
       isValid = true
     }
-    if (currentPaymentStatus === "partially_authorized") {
+    if (currentPaymentStatus === "partially_authorized" && !gatewayAuthorizedThisAttempt) {
+      /**
+       * Givex behaves like a gift card: it can cover part of the total and
+       * leave the order `partially_authorized`, with the rest still to be paid
+       * by card or another Adyen method. Placing then would take the order with
+       * the remainder unpaid, which is what this guard is here to stop.
+       *
+       * But the remainder is paid through the gateway widget, and the status
+       * above was read before the widget ran — with givex the card is only
+       * authorized as the order is placed, so the order stays
+       * `partially_authorized` right up to that point. Judging the attempt on
+       * it alone therefore rejects the very attempt that pays the rest, and
+       * nothing can ever place the order. The widget validating this attempt is
+       * the signal that the remainder has been covered.
+       */
       isValid = false
     }
     if (isValid && setPlaceOrderStatus != null) {

@@ -69,6 +69,7 @@ export type UnsetOrderState = (dispatch: Dispatch<OrderActions>) => void
 export type ResourceIncluded =
   | "billing_address"
   | "shipping_address"
+  | "line_items"
   | "line_items.line_item_options.sku_option"
   | "line_items.item"
   | "available_customer_payment_sources.payment_source"
@@ -834,6 +835,17 @@ const orderReducer = (state: OrderState, reducer: OrderActions): OrderState => {
       return { ...state, ...payload }
     }
     const merged = [...new Set([...(state.include ?? []), ...(payload.include ?? [])])]
+    // `includeLoaded` accumulates for the same reason `include` does, and it is the
+    // half that decides whether the fetch runs at all: `useOrderState` waits for as
+    // many loaded flags as there are includes. A dispatcher that read the state
+    // before a sibling's dispatch in the same effect pass carries only its own flags,
+    // and replacing the map with that snapshot leaves the two lists permanently out
+    // of step — no fetch is ever issued, which reads as a blank page rather than as a
+    // missing include.
+    const mergedLoaded = {
+      ...(state.includeLoaded ?? {}),
+      ...(payload.includeLoaded ?? {}),
+    }
     return {
       ...state,
       ...payload,
@@ -841,6 +853,7 @@ const orderReducer = (state: OrderState, reducer: OrderActions): OrderState => {
       // report `includeLoaded` omit it, and turning `undefined` into `[]` would flip
       // the `include?.length === 0` checks in `useOrderState`.
       include: merged.length > 0 ? merged : state.include,
+      includeLoaded: Object.keys(mergedLoaded).length > 0 ? mergedLoaded : state.includeLoaded,
     }
   }
   return baseReducer<OrderState, OrderActions, OrderActionType[]>(state, reducer, actionType)

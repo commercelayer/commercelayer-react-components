@@ -682,6 +682,111 @@ describe("PaymentMethod", () => {
       )
     })
 
+    it("selects the single payment method again once the order loses its payment source", async () => {
+      // The checkout that could never be paid: with one payment method the auto-select
+      // runs once, and the guards it sets are never released. Apply a coupon and the API
+      // clears `payment_source` server-side while recalculating the totals — from then on
+      // no method is selected, the gateway form is never rendered, and the page makes no
+      // further request at all.
+      // Kills: leaving the guards latched for the lifetime of the mount.
+      const orderWithSource = {
+        ...MOCK_ORDER_SINGLE,
+        payment_source: { id: "ps-1", type: "stripe_payments" },
+      }
+      const mockSetPaymentMethod = vi
+        .fn()
+        .mockResolvedValue({ success: true, order: MOCK_ORDER_SINGLE })
+      const mockSetPaymentSource = vi
+        .fn()
+        .mockResolvedValue({ id: "ps-2", type: "stripe_payments" })
+
+      const tree = (order: unknown, paymentSource: unknown) => (
+        <Providers order={order}>
+          <MockPaymentMethodProvider
+            paymentMethods={MOCK_ORDER_SINGLE.available_payment_methods}
+            paymentSource={paymentSource}
+            setPaymentMethod={mockSetPaymentMethod}
+            setPaymentSource={mockSetPaymentSource}
+          >
+            <PaymentMethod autoSelectSinglePaymentMethod>
+              <span>method</span>
+            </PaymentMethod>
+          </MockPaymentMethodProvider>
+        </Providers>
+      )
+
+      let view: ReturnType<typeof render> | undefined
+      await act(async () => {
+        view = render(tree(orderWithSource, { id: "ps-1", type: "stripe_payments" }))
+      })
+
+      // Nothing to do while the order already has a payment source.
+      expect(mockSetPaymentSource).not.toHaveBeenCalled()
+
+      // The coupon: the order comes back without the payment source it had.
+      await act(async () => {
+        view?.rerender(tree({ ...MOCK_ORDER_SINGLE, payment_source: null }, null))
+      })
+
+      expect(mockSetPaymentSource).toHaveBeenCalled()
+      expect(mockSetPaymentMethod).toHaveBeenCalledWith(
+        expect.objectContaining({ paymentResource: "stripe_payments" })
+      )
+    })
+
+    it("does not create a second payment source when an order arrives without the include", async () => {
+      // `undefined` is "this read does not carry the relationship", not "there is no
+      // payment source". Treating them alike released the guards while the first payment
+      // source was still being attached, and a second one was created over it — two
+      // POSTs a second apart, and a 3DS result landing on the source the order no longer
+      // points at.
+      // Kills: releasing the guards on `payment_source == null` instead of `=== null`.
+      const mockSetPaymentSource = vi
+        .fn()
+        .mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
+
+      const tree = (order: unknown, paymentSource: unknown) => (
+        <Providers order={order}>
+          <MockPaymentMethodProvider
+            paymentMethods={MOCK_ORDER_SINGLE.available_payment_methods}
+            paymentSource={paymentSource}
+            setPaymentSource={mockSetPaymentSource}
+          >
+            <PaymentMethod autoSelectSinglePaymentMethod>
+              <span>method</span>
+            </PaymentMethod>
+          </MockPaymentMethodProvider>
+        </Providers>
+      )
+
+      let view: ReturnType<typeof render> | undefined
+      await act(async () => {
+        view = render(tree(MOCK_ORDER_SINGLE, null))
+      })
+      expect(mockSetPaymentSource).toHaveBeenCalledTimes(1)
+
+      // The order now carries the payment source that call created...
+      await act(async () => {
+        view?.rerender(
+          tree(
+            { ...MOCK_ORDER_SINGLE, payment_source: { id: "ps-1" } },
+            { id: "ps-1", type: "stripe_payments" }
+          )
+        )
+      })
+
+      // ...and then a refetch lands without the include at all.
+      const { payment_source: _omitted, ...orderWithoutInclude } = {
+        ...MOCK_ORDER_SINGLE,
+        payment_source: undefined,
+      }
+      await act(async () => {
+        view?.rerender(tree(orderWithoutInclude, null))
+      })
+
+      expect(mockSetPaymentSource).toHaveBeenCalledTimes(1)
+    })
+
     it("calls autoSelectSinglePaymentMethod callback when provided as function", async () => {
       const callbackFn = vi.fn()
       const mockSetPaymentMethod = vi

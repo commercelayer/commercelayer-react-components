@@ -226,6 +226,47 @@ describe("Shipment", () => {
       expect(onAutoSelect).not.toHaveBeenCalled()
     })
 
+    it("does not auto-select the same shipment twice while the data catches up", async () => {
+      // The refetch that follows a selection lands before the API reports the
+      // method as set, so the effect re-runs on identical data with a new
+      // identity. Selecting again is harmless server-side but tells a caller's
+      // callback — analytics, in practice — about it a second time.
+      const onAutoSelect = vi.fn()
+      const stale = [
+        makeShipment({ shipping_method: null, available_shipping_methods: [SHIPPING_METHOD_A] }),
+      ]
+      const tree = (shipments: unknown) => (
+        <ShipmentContext.Provider
+          value={
+            {
+              shipments,
+              deliveryLeadTimes: DELIVERY_LEAD_TIMES,
+              setShippingMethod: mockSetShippingMethod,
+              // biome-ignore lint/suspicious/noExplicitAny: test cast
+            } as any
+          }
+        >
+          <Shipment
+            // biome-ignore lint/suspicious/noExplicitAny: test cast
+            autoSelectSingleShippingMethod={onAutoSelect as any}
+            loader={<span data-testid="loader">loading</span>}
+          >
+            <Capture />
+          </Shipment>
+        </ShipmentContext.Provider>
+      )
+
+      const { rerender } = render(tree(stale))
+      await waitFor(() => expect(mockSetShippingMethod).toHaveBeenCalledTimes(1))
+
+      await act(async () => {
+        rerender(tree(stale.map((shipment) => ({ ...shipment }))))
+      })
+
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(1)
+      expect(onAutoSelect).toHaveBeenCalledTimes(1)
+    })
+
     it("does not auto-select when more than one method is available", async () => {
       renderShipment({
         shipments: [makeShipment({ shipping_method: null })],

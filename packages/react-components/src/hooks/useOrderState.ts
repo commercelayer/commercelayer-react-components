@@ -5,6 +5,7 @@ import { defaultOrderContext } from "#context/OrderContext"
 import type { OrderStorageConfig } from "#context/OrderStorageContext"
 import orderReducer, {
   type AddResourceToInclude,
+  addResourceToInclude,
   addToCart,
   createOrder,
   getApiOrder,
@@ -23,6 +24,14 @@ import type { BaseMetadataObject } from "#typings"
 import type { BaseError } from "#typings/errors"
 import compareObjAttribute from "#utils/compareObjAttribute"
 
+/**
+ * Included in every order request, whoever is rendering. The order's own line
+ * items are the one relationship a caller cannot be expected to ask for: they
+ * are what an order *is*, and by the time a component that needs them mounts,
+ * the first fetch has long gone out.
+ */
+const BASE_ORDER_INCLUDE: readonly ResourceIncluded[] = ["line_items"]
+
 interface UseOrderStateConfig
   extends Pick<CommerceLayerConfig, "accessToken" | "interceptors">,
     Pick<
@@ -33,6 +42,7 @@ interface UseOrderStateConfig
   metadata?: BaseMetadataObject
   attributes?: OrderCreate
   fetchOrder?: (order: Order) => void
+  include?: readonly ResourceIncluded[]
 }
 
 /**
@@ -47,6 +57,7 @@ export function useOrderState({
   metadata,
   attributes,
   fetchOrder,
+  include: declaredInclude,
   persistKey,
   clearWhenPlaced,
   getLocalOrder,
@@ -125,6 +136,42 @@ export function useOrderState({
       }
     }
   }, [attributes, state?.order, lock])
+
+  // `include` is the union of what the mounted components ask for, and every
+  // component asks when it mounts. That was in time while the containers
+  // wrapped the whole checkout and mounted with the order; a standalone
+  // component mounts with its step, so the first order carries only what the
+  // first of them asked for. The base list below is the floor: an order without
+  // its line items is not a useful order to anyone, and nothing else can be
+  // relied on to have asked for them by the time the first fetch goes out.
+  //
+  // Anything beyond the floor belongs to the component that reads it — see
+  // `<Shipments>` asking for `line_items.item` — so that a consumer never has
+  // to know our resource names. `include` on `<Order>` is the escape hatch for
+  // an app that reads a relationship off the order itself, no component of ours
+  // involved; it should stay empty in ordinary use.
+  //
+  // Re-registered rather than seeded once: the settling round in the fetch
+  // effect below resets `include` to `[]` so every mounted component gets a
+  // chance to re-declare what it needs, and a seed would be dropped by it.
+  // Keyed on the joined list so a caller passing an array literal (a new
+  // identity every render) does not re-run this on every render.
+  const declaredIncludeKey = declaredInclude?.join(",") ?? ""
+  const declaredIncludeRef = useRef<readonly ResourceIncluded[]>([])
+  declaredIncludeRef.current = [...BASE_ORDER_INCLUDE, ...(declaredInclude ?? [])]
+  // biome-ignore lint/correctness/useExhaustiveDependencies: keyed on the declared list's contents, not the array identity
+  useEffect(() => {
+    const declared = declaredIncludeRef.current
+    if (declared.length === 0) return
+    const missing = declared.filter((resource) => !state.include?.includes(resource))
+    if (missing.length === 0) return
+    addResourceToInclude({
+      dispatch,
+      resourcesIncluded: state.include,
+      newResource: missing,
+      resourceIncludedLoaded: state.includeLoaded,
+    })
+  }, [declaredIncludeKey, state.include, state.includeLoaded])
 
   // The effect below only fetches while `state.order` is null, so every include
   // has to be registered before the first fetch. That held while containers
@@ -233,9 +280,18 @@ export function useOrderState({
     }
   }, [fetchOrder, state.order])
 
+  // The reducer only learns the order id when the first fetch resolves, yet the
+  // caller already knows it — from the `orderId` prop or the persisted order.
+  // Exposing it right away lets the standalone components keyed on it
+  // (`<LineItems>`, `<Shipments>`) fetch in parallel with the order. Otherwise
+  // they render empty while the order loads, then swap their whole subtree for
+  // the loader once the id arrives and their own first fetch starts.
+  const knownOrderId = persistKey ? getLocalOrder(persistKey) : orderId
+
   return useMemo(() => {
     return {
       ...state,
+      orderId: state.orderId || (knownOrderId ?? state.orderId),
       managePaymentProviderGiftCards:
         // @ts-expect-error no type
         state.order?.payment_source?.payment_request_data?.payment_method?.type === "giftcard",
@@ -317,5 +373,14 @@ export function useOrderState({
         }),
       getOrderByFields,
     }
-  }, [state, config.accessToken, persistKey, config, setLocalOrder, metadata, attributes])
+  }, [
+    state,
+    knownOrderId,
+    config.accessToken,
+    persistKey,
+    config,
+    setLocalOrder,
+    metadata,
+    attributes,
+  ])
 }

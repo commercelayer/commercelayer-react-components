@@ -74,6 +74,31 @@ describe("getApiOrder include", () => {
     expect(options.include).toContain("line_items.item")
   })
 
+  it("keeps the loaded flags of every dispatcher in the same effect pass", () => {
+    // `useOrderState` only fetches once there are as many loaded flags as there are
+    // includes, so a dispatch that dropped a sibling's flags would not fetch a partial
+    // order — it would never fetch at all.
+    let state = { include: [], includeLoaded: {} } as unknown as Required<OrderState>
+    const dispatch = (action: OrderActions) => {
+      state = orderReducer(state, action)
+    }
+    const snapshot = state.includeLoaded
+
+    addResourceToInclude({ dispatch, newResource: "line_items" })
+    // Reads the same pre-dispatch snapshot the sibling above read.
+    addResourceToInclude({
+      dispatch,
+      newResource: "shipments.shipping_method",
+      resourceIncludedLoaded: snapshot,
+    })
+
+    expect(state.includeLoaded).toEqual({
+      line_items: true,
+      "shipments.shipping_method": true,
+    })
+    expect(Object.keys(state.includeLoaded)).toHaveLength(state.include.length)
+  })
+
   // The one include every order carries: without it an order on the newer
   // payments model reads as the older one. It rides on the request rather than
   // on the include state, so it is there even when no component registered
