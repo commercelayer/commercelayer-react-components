@@ -12,7 +12,7 @@ import {
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import OrderStorageContext from "#context/OrderStorageContext"
-import { subscribe, unsubscribe } from "#utils/events"
+import { type TEventDetail, subscribe, unsubscribe } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import { jwt } from "#utils/jwt"
@@ -237,7 +237,13 @@ export function HostedCart({
       prevOpenRef.current = open
       setOpen(open)
     }
-    const openCartHandler = (): void => {
+    const openCartHandler = (event: Event): void => {
+      // `openAdd` governs only the implicit open that follows adding an item.
+      // A deliberate <CartLink type="mini"> click must always open the panel —
+      // that pairing is the documented way to use a mini cart, and gating the
+      // subscription itself on `openAdd` made it impossible.
+      const source = (event as CustomEvent<TEventDetail | undefined>).detail?.source
+      if (source === "add-to-cart" && !openAdd) return
       window.document.body.style.overflow = "hidden"
       if (src == null && resolvedOrderId == null) {
         setOrder(true)
@@ -251,7 +257,7 @@ export function HostedCart({
         }, 300)
       }
     }
-    if (openAdd && type === "mini") {
+    if (type === "mini") {
       subscribe("open-cart", openCartHandler)
     }
     if (src == null && resolvedOrderId == null && !ignore && isOpen) {
@@ -272,7 +278,7 @@ export function HostedCart({
     }
     return (): void => {
       ignore = true
-      if (openAdd && type === "mini") {
+      if (type === "mini") {
         unsubscribe("open-cart", openCartHandler)
       }
     }
