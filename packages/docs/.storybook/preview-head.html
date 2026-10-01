@@ -11,3 +11,13 @@
 <script>
   window.global = window;
 </script>
+
+<!--
+  The examples in these docs style themselves with Tailwind utility classes, and
+  `Getting Started/Styling` tells the reader so. This tag is what makes those
+  classes resolve. It was lost in 213b4d3a, when the legacy v4 storybook package
+  was deleted along with its own preview-head.html, and every `className`-styled
+  example rendered unstyled until it came back. Do not remove it without also
+  converting those examples and updating 004.styling.mdx.
+-->
+<script src="https://cdn.tailwindcss.com"></script>
