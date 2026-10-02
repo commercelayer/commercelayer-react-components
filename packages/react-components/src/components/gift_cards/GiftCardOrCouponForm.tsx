@@ -1,3 +1,4 @@
+import { isCreatedWithVersion } from "@commercelayer/core-components"
 import type { Order } from "@commercelayer/sdk"
 import { useRapidForm } from "rapid-form"
 import { type JSX, useCallback, useContext, useEffect, useState } from "react"
@@ -41,13 +42,22 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
 
   // Derive the active code type from the current order state
   useEffect(() => {
-    // On the `payment_sessions` model a gift card is not an order-level code:
-    // it is spent by creating a Payment Session against a gift-card Payment
-    // Setting, so it appears among the payment methods instead. Writing
-    // `gift_card_code` on the order there is meaningless, and letting it
-    // through would silently apply a gift card that no session reflects — so
-    // this overrides an explicit `codeType` too, rather than trusting it.
-    if (paymentsModel === "payment_sessions") {
+    // An order created with API version 2026-05 takes only the coupon here.
+    // Its gift cards are spent by creating a Payment Session against a
+    // gift-card Payment Setting, and the API no longer validates nor applies
+    // the order-level one: `gift_card_code` is stored unchecked, and so is
+    // anything sent as `gift_card_or_coupon_code`, which tries the gift card
+    // first — a coupon typed there is kept as a gift card code and never
+    // discounts. This holds even when the order also offers the older
+    // payment methods, and it overrides an explicit `codeType` too.
+    //
+    // What decides it is the version the order was created with, since the API
+    // fixes the payment engine then. Until that is readable — the SDK drops the
+    // `meta` it arrives in — the payments model stands in for it, as it did
+    // before.
+    const couponOnly =
+      isCreatedWithVersion(order, "2026-05") ?? paymentsModel === "payment_sessions"
+    if (couponOnly) {
       setType("coupon_code")
       return
     }
