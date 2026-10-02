@@ -310,3 +310,55 @@ export function readStripeClientSecret(session?: PaymentSession | null): string 
   if (typeof clientSecret !== "string" || clientSecret === "") return undefined
   return clientSecret
 }
+
+/**
+ * What the shopper paid with, as the API describes it.
+ *
+ * `payment_instrument` is one shape for every gateway: each
+ * `Payment::Instrument::*` class in `core-api` maps its gateway's own response
+ * onto these keys (`app/models/payment/instrument/`), so a Visa reads the same
+ * whether Stripe, Adyen or Checkout.com took it. Card instruments fill the
+ * `card_*` keys, account-based ones (PayPal, SEPA, an external gateway's
+ * wallet) the `account_*` keys; any key may be absent.
+ *
+ * Transcribed by hand because the SDK does not type it on `PaymentSession`.
+ * **Re-check against `core-api` whenever the SDK is upgraded.**
+ */
+export interface PaymentInstrument {
+  /** e.g. `card`, a wallet such as `apple_pay`, or the issuer's name on Adyen. */
+  issuer_type?: string
+  issuer?: string
+  /** The gateway's id for the payment method, e.g. Stripe's `pm_…`. */
+  payment_id?: string
+  /** The card brand as the gateway names it, e.g. `visa`. */
+  card_type?: string
+  card_last_digits?: string
+  card_expiry_month?: number | string
+  card_expiry_year?: number | string
+  card_holder_name?: string
+  card_fingerprint?: string
+  account_id?: string
+  account_email?: string
+  account_status?: string
+  account_holder_type?: string
+  account_last_digits?: string
+  account_fingerprint?: string
+}
+
+/**
+ * Read the payment instrument out of a Payment Session.
+ *
+ * The API fills it once the payment is authorized (`fill_payment_instrument!`,
+ * called from `PaymentAuthorization`), or from a stored wallet when one is
+ * attached, and defaults the column to `{}` until then. So an empty object, as
+ * much as a missing one, means "nothing known yet" and reads as `undefined` —
+ * which is also what a consumer whose `fields` allowlist omits it gets.
+ */
+export function readPaymentInstrument(
+  session?: PaymentSession | null
+): PaymentInstrument | undefined {
+  const data = (session as { payment_instrument?: unknown } | null | undefined)?.payment_instrument
+  if (data == null || typeof data !== "object" || Array.isArray(data)) return undefined
+  if (Object.keys(data).length === 0) return undefined
+  return data as PaymentInstrument
+}

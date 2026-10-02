@@ -168,6 +168,13 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
     })
 
     if (result.placed) {
+      // The context still holds the order from before the money moved: the
+      // sessions read as unpaid and carry no `payment_instrument`, which the
+      // API fills only as it authorizes them. Whatever renders the recap next
+      // reads that context, so it is brought up to date first. `result.order`
+      // cannot stand in for it — `_place` returns it without the includes the
+      // recap needs.
+      await refetch()
       onClick?.({ placed: true, order: result.order })
       return
     }
