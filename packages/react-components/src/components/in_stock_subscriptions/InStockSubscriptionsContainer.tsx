@@ -1,4 +1,4 @@
-import { type JSX, useEffect } from "react"
+import type { JSX } from "react"
 import InStockSubscriptions from "#components/in_stock_subscriptions/InStockSubscriptions"
 import type { DefaultChildrenType } from "#typings/globals"
 import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"
