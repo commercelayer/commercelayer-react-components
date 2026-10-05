@@ -52,9 +52,8 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
     // payment methods, and it overrides an explicit `codeType` too.
     //
     // What decides it is the version the order was created with, since the API
-    // fixes the payment engine then. Until that is readable — the SDK drops the
-    // `meta` it arrives in — the payments model stands in for it, as it did
-    // before.
+    // fixes the payment engine then. When the order does not say — the API did
+    // not report it — the payments model stands in for it.
     const couponOnly =
       isCreatedWithVersion(order, "2026-05") ?? paymentsModel === "payment_sessions"
     if (couponOnly) {

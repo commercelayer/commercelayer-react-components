@@ -75,7 +75,7 @@ describe("GiftCardOrCouponForm by the API version the order was created with", (
     renderForm({
       id: "order-1",
       available_payment_methods: [{ id: "pm-1" }],
-      created_with_version: "2026-05",
+      meta: { created_with_version: "2026-05" },
     } as never)
     expect(inputName()).toBe("coupon_code")
   })
@@ -85,7 +85,7 @@ describe("GiftCardOrCouponForm by the API version the order was created with", (
       {
         id: "order-1",
         available_payment_methods: [{ id: "pm-1" }],
-        created_with_version: "2026-05",
+        meta: { created_with_version: "2026-05" },
       } as never,
       "gift_card_code"
     )
@@ -96,7 +96,7 @@ describe("GiftCardOrCouponForm by the API version the order was created with", (
     renderForm({
       id: "order-1",
       available_payment_methods: [{ id: "pm-1" }],
-      created_with_version: "2017-08",
+      meta: { created_with_version: "2017-08" },
     } as never)
     expect(inputName()).toBe("gift_card_or_coupon_code")
   })
@@ -107,17 +107,8 @@ describe("GiftCardOrCouponForm by the API version the order was created with", (
     renderForm({
       id: "order-1",
       available_payment_settings: [MANUAL],
-      created_with_version: "2017-08",
+      meta: { created_with_version: "2017-08" },
     } as never)
     expect(inputName()).toBe("gift_card_or_coupon_code")
-  })
-
-  it("reads the version where the API sends it, under meta", () => {
-    renderForm({
-      id: "order-1",
-      available_payment_methods: [{ id: "pm-1" }],
-      meta: { created_with_version: "2026-05" },
-    } as never)
-    expect(inputName()).toBe("coupon_code")
   })
 })

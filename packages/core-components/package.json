@@ -56,6 +56,6 @@
   },
   "dependencies": {
     "@commercelayer/js-auth": "^8.0.0",
-    "@commercelayer/sdk": "https://pkg.pr.new/@commercelayer/sdk@57f8b0a"
+    "@commercelayer/sdk": "https://pkg.pr.new/@commercelayer/sdk@4d57c9f"
   }
 }
