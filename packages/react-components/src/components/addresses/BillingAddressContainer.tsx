@@ -1,4 +1,4 @@
-import { type JSX, useEffect } from "react"
+import type { JSX } from "react"
 import BillingAddress from "#components/addresses/BillingAddress"
 import type { DefaultChildrenType } from "#typings/globals"
 import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"

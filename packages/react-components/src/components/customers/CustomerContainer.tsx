@@ -1,5 +1,5 @@
 import type { QueryPageSize } from "@commercelayer/sdk"
-import { type JSX, useContext, useEffect } from "react"
+import { type JSX, useContext } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
