@@ -38,7 +38,7 @@ import {
   SkuField,
 } from '@commercelayer/react-components'
 
-<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+<CommerceLayer accessToken="...">
   <SkuListsContainer>
     <SkuList id="yZjQIDxrly">
       <Skus>
@@ -59,7 +59,7 @@ import {
         code={`
 import { CommerceLayer, SkuList, Skus, SkuField } from '@commercelayer/react-components'
 
-<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+<CommerceLayer accessToken="...">
   <SkuList id="yZjQIDxrly">
     <Skus>
       <SkuField attribute="name" tagElement="h2" />
