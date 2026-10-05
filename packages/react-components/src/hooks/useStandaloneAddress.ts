@@ -144,8 +144,16 @@ export function useStandaloneAddress({
     [setCloneIds]
   )
 
+  // The return type is annotated rather than inferred. `saveAddresses` resolves
+  // to an `Order` that react-hooks-components inlines into its own bundled
+  // declarations instead of importing it from @commercelayer/sdk, so an inferred
+  // type here names something no consumer can reach and declaration emit fails
+  // with TS4058. Naming the sdk's `Order`, which this file already imports,
+  // keeps the emitted types resolvable.
   const standaloneSaveAddresses = useCallback(
-    async (params: { customerEmail?: string; customerAddress?: ICustomerAddress } = {}) => {
+    async (
+      params: { customerEmail?: string; customerAddress?: ICustomerAddress } = {}
+    ): Promise<{ success: boolean; order?: Order; error?: unknown }> => {
       const { customerEmail, customerAddress } = params
       const chosenAddress =
         customerAddress?.id == null
