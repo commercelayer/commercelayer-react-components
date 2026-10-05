@@ -34,7 +34,7 @@ function AvailabilityDocsPage(): JSX.Element {
         code={`
 import { CommerceLayer, Availability, AvailabilityTemplate } from '@commercelayer/react-components'
 
-<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+<CommerceLayer accessToken="...">
   <Availability skuCode="TSHIRTMM000000FFFFFFXLXX">
     <AvailabilityTemplate labels={{ available: 'In stock', outOfStock: 'Out of stock' }} />
   </Availability>

@@ -31,7 +31,7 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
     // so equal lengths mean identical contents — dispatching it would only mint a fresh
     // `errors` array reference, which this effect depends on, re-firing it forever
     // (React 19 hard-crashes with "Maximum update depth exceeded"). Same identity-churn
-    // failure class as docs/adr/0001-payment-source-effect-invariants.md.
+    // failure class as docs/adr/0003-payment-source-effect-invariants.md.
     if (fieldErrors.length === current.length) return
     setOrderErrors(fieldErrors)
     onSubmit?.({ value: "", success: false })
