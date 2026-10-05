@@ -8,7 +8,7 @@ A collection of reusable React components that makes it super fast and simple to
 
 # Getting started
 
-For a constantly updated list of the available and soon-to-come micro frontends provided by Commerce Layer's react componente, please refer to [this interactive documentation](https://commercelayer.github.io/commercelayer-react-components) that will provide you with all the necessary information about the involved web components and help you get started in a snap.
+For a constantly updated list of the available components, please refer to [this interactive documentation](https://commercelayer.github.io/commercelayer-react-components) that will provide you with all the necessary information about the involved web components and help you get started in a snap.
 
 ## Installation
 
@@ -27,17 +27,17 @@ pnpm add @commercelayer/react-components
 
 ## Authentication
 
-All requests to Commerce Layer API must be authenticated with an [OAuth2](https://oauth.net/2/) bearer token. Hence, to use these components, you need to get a valid access token. Once you got it, you can pass it as prop — together with the endpoint of your Commerce Layer organization — to the `CommerceLayer` component, as follow:
+All requests to Commerce Layer API must be authenticated with an [OAuth2](https://oauth.net/2/) bearer token. Hence, to use these components, you need to get a valid access token. Once you got it, you can pass it as prop to the `CommerceLayer` component, as follow:
 
 ```tsx
-<CommerceLayer
-  accessToken="your-access-token"
-  endpoint="https://yourdomain.commercelayer.io">
+<CommerceLayer accessToken="your-access-token">
 
   {/* ... child components */}
 
 </CommerceLayer>
 ```
+
+> Coming from v4? `endpoint` and `domain` are gone — v5 derives your organization from the token itself. See [Upgrading from v4](https://commercelayer.github.io/commercelayer-react-components/?path=/docs/getting-started-upgrading-from-v4--docs) for the full list of breaking changes.
 
 This token will be used to authorize the API calls of all its child components. That's why the presence of (at least) one `CommerceLayer` component is mandatory — it must wrap every other component you need to use.
 

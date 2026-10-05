@@ -1,4 +1,4 @@
-# ADR 0001 — Payment-source effect invariants
+# ADR 0003 — Payment-source effect invariants
 
 - Status: Accepted
 - Component: `src/components/payment_gateways/PaymentGateway.tsx`

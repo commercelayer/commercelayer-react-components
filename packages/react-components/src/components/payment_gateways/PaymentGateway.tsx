@@ -52,7 +52,7 @@ export function PaymentGateway({
   const [loading, setLoading] = useState(true)
   // Guards against the effect re-entering and firing a second `setPaymentSource`
   // before the first (fire-and-forget) request resolves and settles state.
-  // See docs/adr/0001-payment-source-effect-invariants.md.
+  // See docs/adr/0003-payment-source-effect-invariants.md.
   const settingPaymentSourceRef = useRef(false)
   const { payment, expressPayments } = useContext(PaymentMethodChildrenContext)
   const { order } = useContext(OrderContext)
@@ -89,7 +89,7 @@ export function PaymentGateway({
   // ends the mismatched-amounts loop: a customer-sources refetch that only mints new
   // `order`/`paymentSource` object identities no longer re-fires the effect, while a real
   // field change (a flipped `mismatched_amounts`, a new source id, a status transition)
-  // still does. See docs/adr/0001-payment-source-effect-invariants.md.
+  // still does. See docs/adr/0003-payment-source-effect-invariants.md.
   const onPaymentSync = useEffectEvent((): void => {
     if (
       payment?.id === currentPaymentMethodId &&
@@ -183,13 +183,13 @@ export function PaymentGateway({
 
   // The array below is a deliberate trigger set, not the effect body's reads —
   // `onPaymentSync` (a useEffectEvent) reads the latest values, so the linter sees these
-  // deps as "more than necessary". See docs/adr/0001-payment-source-effect-invariants.md.
+  // deps as "more than necessary". See docs/adr/0003-payment-source-effect-invariants.md.
   // biome-ignore lint/correctness/useExhaustiveDependencies: deliberate trigger set, see ADR 0001
   useEffect(() => {
     onPaymentSync()
     // Reactive triggers only: stable ids/scalars, never whole objects. `order` and `config`
     // are read latest inside `onPaymentSync`, so listing their identities here would re-fire
-    // the effect on meaningless refetch churn. See docs/adr/0001-payment-source-effect-invariants.md.
+    // the effect on meaningless refetch churn. See docs/adr/0003-payment-source-effect-invariants.md.
   }, [
     order?.payment_method?.id,
     order?.payment_method?.payment_source_type,
