@@ -1,4 +1,4 @@
-import { type JSX, useEffect, useState } from "react"
+import { type JSX, type ReactNode, useEffect, useState } from "react"
 import CustomerContext from "#context/CustomerContext"
 import CustomerPaymentSourceContext from "#context/CustomerPaymentSourceContext"
 import type { PaymentResource } from "#reducers/PaymentMethodReducer"
@@ -14,7 +14,7 @@ interface Props {
   loader?: string | JSX.Element
 }
 
-export function CustomerPaymentSource({ children, loader = "Loading..." }: Props): JSX.Element {
+export function CustomerPaymentSource({ children, loader = "Loading..." }: Props): ReactNode {
   const [loading, setLoading] = useState(true)
   const { payments, deleteCustomerPayment } = useCustomContext({
     context: CustomerContext,

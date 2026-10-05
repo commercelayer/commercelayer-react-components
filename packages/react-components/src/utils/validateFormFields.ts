@@ -10,7 +10,20 @@ const EMAIL_PATTERN =
   // eslint-disable-next-line no-useless-escape
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
-type FormField = HTMLInputElement | HTMLSelectElement
+type FormField = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+
+/**
+ * An `HTMLFormControlsCollection` also yields buttons, fieldsets and outputs, so
+ * membership has to be checked rather than asserted. Mirrors `getFormElement` in
+ * `CustomerAddressForm`.
+ */
+function isFormField(element: Element): element is FormField {
+  return (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLSelectElement ||
+    element instanceof HTMLTextAreaElement
+  )
+}
 
 export type ValidateFormFields = <R extends string[]>(
   fields: HTMLFormControlsCollection,
@@ -57,7 +70,9 @@ export const validateValue: ValidateValue = (val, name, type, resource) => {
 const validateFormFields: ValidateFormFields = (fields, required, resourceType) => {
   const errors: BaseError[] = []
   let values = { metadata: {} }
-  Array.from(fields).forEach((v: FormField) => {
+  Array.from(fields).forEach((element) => {
+    if (!isFormField(element)) return
+    const v = element
     const isTick = "checked" in v
     const val = isTick || (v.value === "on" ? false : v.value)
     const attrName = v.getAttribute("name")
