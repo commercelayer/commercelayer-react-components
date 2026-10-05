@@ -1,28 +1,17 @@
-import { jwtDecode } from "@commercelayer/js-auth"
+import { type JWTSalesChannel, jwtDecode } from "@commercelayer/js-auth"
 
-interface JWT {
-  application: {
-    id: string
-    kind: "sales_channel" | "integration"
-    public: boolean
-  }
-  exp: number
-  market: {
-    id: string[]
-    price_list_id: string
-    stock_location_ids: string[]
-    geocoder_id: null | string
-    allows_external_prices: boolean
-  }
-  organization: {
-    id: string
-    slug: string
-  }
-  owner: { id: string; type: "Customer" }
-  rand: number
-  test: boolean
-}
-
-export function jwt(accessToken: string): JWT {
-  return jwtDecode(accessToken).payload as JWT
+/**
+ * Decode a Commerce Layer access token.
+ *
+ * The shape comes from `@commercelayer/js-auth` rather than a local copy. The
+ * copy this replaced had drifted: it declared `owner` and `market` as always
+ * present when both are optional, and carried a `price_list_id` that is not in
+ * the token and that nothing here ever read.
+ *
+ * The cast narrows to the one payload kind this library authenticates with.
+ * `jwtIsSalesChannel`, from the same package, is the checked alternative for a
+ * caller that has to handle other kinds.
+ */
+export function jwt(accessToken: string): JWTSalesChannel {
+  return jwtDecode(accessToken).payload as JWTSalesChannel
 }
