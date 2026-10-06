@@ -63,8 +63,8 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
       '@commercelayer/sdk':
-        specifier: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
-        version: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
+        specifier: ^8.0.0
+        version: 8.0.0
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.18.5
@@ -110,8 +110,8 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
       '@commercelayer/sdk':
-        specifier: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
-        version: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
+        specifier: ^8.0.0
+        version: 8.0.0
       '@mdx-js/react':
         specifier: ^3.1.1
         version: 3.1.1(@types/react@19.2.18)(react@19.2.8)
@@ -188,8 +188,8 @@ importers:
         specifier: workspace:*
         version: link:../react-hooks-components
       '@commercelayer/sdk':
-        specifier: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
-        version: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
+        specifier: ^8.0.0
+        version: 8.0.0
       '@stripe/react-stripe-js':
         specifier: ^6.8.1
         version: 6.8.1(@stripe/stripe-js@9.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -316,8 +316,8 @@ importers:
         specifier: ^8.0.1
         version: 8.0.1
       '@commercelayer/sdk':
-        specifier: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
-        version: https://pkg.pr.new/@commercelayer/sdk@57f8b0a
+        specifier: ^8.0.0
+        version: 8.0.0
       '@rolldown/plugin-babel':
         specifier: ^0.2.3
         version: 0.2.3(@babel/core@8.0.1)(@babel/runtime@7.29.7)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(yaml@2.9.0))
@@ -1113,9 +1113,8 @@ packages:
     resolution: {integrity: sha512-ZlgIhQx7vu89ZD3eOCSkCe7kNb5LgEGy0p4Gayi75sxfHfJRXKkoX2NC+nkp2pFosi4SBYhlQFcd/EtzStAQGw==}
     engines: {node: '>=18', pnpm: '>=7'}
 
-  '@commercelayer/sdk@https://pkg.pr.new/@commercelayer/sdk@57f8b0a':
-    resolution: {integrity: sha512-cWoOVjEpvet39vKAz5ZDKc04B7+fOzJjSEj9ryQ+5M4Tvylj6ssiJ7Mi6q2yh/TORlaqUj8IZv52SgvH7oCuXw==, tarball: https://pkg.pr.new/@commercelayer/sdk@57f8b0a}
-    version: 8.0.0-beta.13
+  '@commercelayer/sdk@8.0.0':
+    resolution: {integrity: sha512-cdlMwi3wvK79hs9LTlE8nLsEx7JM1JNPJmtOCDRNzjG/sUiezfO96qDbQmP1Qd2PtUtapcAEqUgDmj59rtGlVw==}
     engines: {node: '>=20'}
 
   '@csstools/color-helpers@6.1.0':
@@ -4853,7 +4852,7 @@ snapshots:
       '@commercelayer/js-auth': 7.4.2
       merge-anything: 5.1.7
 
-  '@commercelayer/sdk@https://pkg.pr.new/@commercelayer/sdk@57f8b0a': {}
+  '@commercelayer/sdk@8.0.0': {}
 
   '@csstools/color-helpers@6.1.0': {}
 
