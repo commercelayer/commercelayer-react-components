@@ -50,7 +50,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@babel/core": "^8.0.1",
-    "@commercelayer/sdk": "https://pkg.pr.new/@commercelayer/sdk@57f8b0a",
+    "@commercelayer/sdk": "^8.0.1",
     "@rolldown/plugin-babel": "^0.2.3",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.17",
