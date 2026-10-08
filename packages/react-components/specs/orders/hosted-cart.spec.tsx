@@ -183,21 +183,7 @@ describe("HostedCart component", () => {
       })
     })
 
-    // Opening the panel used to put the cart in a reload loop: the open handler
-    // assigns `src`, the cart answers the load with an `update` message, that
-    // calls `getOrder`, the render that follows re-runs the effect - which has
-    // `setOrder` and `resolveCartUrl` in its dependency list, both redeclared
-    // every render - and the effect assigned `src` again. Measured at 9 reloads
-    // in 12 seconds on the deployed docs. Assigning the property re-navigates an
-    // iframe even when the URL has not changed, so the count is what matters.
-    it("assigns the iframe src once when the panel is opened", async () => {
-      const { cartIframe } = renderMiniCart()
-
-      await waitFor(() => {
-        expect(cartIframe()).toBeTruthy()
-      })
-
-      const iframe = cartIframe() as HTMLIFrameElement
+    const countSrcAssignments = (iframe: HTMLIFrameElement): { count: () => number } => {
       const descriptor = Object.getOwnPropertyDescriptor(
         HTMLIFrameElement.prototype,
         "src"
@@ -211,6 +197,24 @@ describe("HostedCart component", () => {
           descriptor.set?.call(iframe, value)
         },
       })
+      return { count: () => assignments }
+    }
+
+    // The iframe loads once and stays loaded behind the closed panel, so there is
+    // nothing to fetch when it slides open. Reloading anyway made the reader watch
+    // the cart's own skeleton: measured on the deployed docs, the drawer finished
+    // sliding at ~800ms while the cart only settled at ~2.4s, and the products
+    // arrived with a jump. Assigning the property re-navigates an iframe even when
+    // the URL has not changed, so the count is what matters.
+    it("does not reload the cart when the panel opens with nothing new to show", async () => {
+      const { cartIframe } = renderMiniCart()
+
+      await waitFor(() => {
+        expect(cartIframe()).toBeTruthy()
+      })
+
+      const iframe = cartIframe() as HTMLIFrameElement
+      const { count } = countSrcAssignments(iframe)
 
       fireEvent.click(screen.getByText("Open mini cart"))
 
@@ -219,7 +223,37 @@ describe("HostedCart component", () => {
       })
       await new Promise((resolve) => setTimeout(resolve, 500))
 
-      expect(assignments).toBe(1)
+      expect(count()).toBe(0)
+    })
+
+    // Adding an item puts the order ahead of what the iframe is showing. The panel
+    // is shut here - `openAdd` is false - so nothing opens, but the staleness has
+    // to survive until the next deliberate open, which must then reload exactly
+    // once. More than once means the render that follows is reassigning `src`
+    // again, which is what used to drive the reload loop.
+    it("reloads once on the next open after an item has been added", async () => {
+      const { cartIframe } = renderMiniCart({ openAdd: false })
+
+      await waitFor(() => {
+        expect(cartIframe()).toBeTruthy()
+      })
+
+      const iframe = cartIframe() as HTMLIFrameElement
+      const { count } = countSrcAssignments(iframe)
+
+      publish("open-cart", { source: "add-to-cart" })
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      expect(panelOf(iframe)?.style.right).toBe("-25rem")
+      expect(count()).toBe(0)
+
+      fireEvent.click(screen.getByText("Open mini cart"))
+
+      await waitFor(() => {
+        expect(panelOf(iframe)?.style.right).toBe("0px")
+      })
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      expect(count()).toBe(1)
     })
 
     // The iframe carries 20px of horizontal padding on top of `minWidth: 100%`.
