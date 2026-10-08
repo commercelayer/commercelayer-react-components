@@ -5,8 +5,8 @@ import { HostedCart } from "#components/orders/HostedCart"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import OrderStorageContext from "#context/OrderStorageContext"
-import * as applicationLinkUtils from "#utils/getApplicationLink"
 import { publish } from "#utils/events"
+import * as applicationLinkUtils from "#utils/getApplicationLink"
 import * as organizationUtils from "#utils/organization"
 
 const accessToken =
@@ -100,7 +100,10 @@ describe("HostedCart component", () => {
   describe("mini cart opening", () => {
     const renderMiniCart = (
       props: { openAdd?: boolean } = {}
-    ): { panel: () => HTMLElement | null | undefined } => {
+    ): {
+      panel: () => HTMLElement | null | undefined
+      cartIframe: () => HTMLIFrameElement | null
+    } => {
       localStorage.setItem("mini-cart-key", "order-id-1")
       vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue(null)
       vi.spyOn(applicationLinkUtils, "getApplicationLink").mockImplementation(
@@ -128,6 +131,7 @@ describe("HostedCart component", () => {
 
       return {
         panel: () => container.querySelector('iframe[title="Cart"]')?.parentElement,
+        cartIframe: () => container.querySelector('iframe[title="Cart"]'),
       }
     }
 
@@ -175,6 +179,21 @@ describe("HostedCart component", () => {
       await waitFor(() => {
         expect(panel()?.style.right).toBe("0px")
       })
+    })
+
+    // The iframe carries 20px of horizontal padding on top of `minWidth: 100%`.
+    // Under the default content box that makes it 40px wider than the 23rem
+    // panel, so the right edge of the cart - prices and quantity steppers -
+    // hangs off the side of the viewport. Measured at 408px against a 368px
+    // panel on the deployed docs before `box-sizing` was set.
+    it("keeps the cart iframe padding inside the panel width", async () => {
+      const { cartIframe } = renderMiniCart()
+
+      await waitFor(() => {
+        expect(cartIframe()).toBeTruthy()
+      })
+
+      expect(cartIframe()?.style.boxSizing).toBe("border-box")
     })
   })
 })
