@@ -284,9 +284,14 @@ export function HostedCart({
         }
       })
     }
-    if (src != null && ref.current != null) {
-      ref.current.src = src
-    }
+    // Nothing reassigns `src` here. The iframe already carries `src={src}` in the
+    // JSX, so React keeps the attribute in sync, and assigning the property again
+    // re-navigates the iframe even when the URL is identical. This effect re-runs
+    // on every render - `setOrder` and `resolveCartUrl` are redeclared each time
+    // and sit in the dependency list - and the cart answers each load with an
+    // `update` message, which calls `getOrder`, which renders again. That closed
+    // the loop: measured at 9 reloads in 12 seconds on the deployed docs, against
+    // none while the panel stayed shut.
     return (): void => {
       ignore = true
       if (type === "mini") {
