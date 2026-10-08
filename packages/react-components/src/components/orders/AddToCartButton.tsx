@@ -185,7 +185,7 @@ export function AddToCartButton(props: Props): JSX.Element {
             .then(async (res) => {
               getOrder && orderId && (await getOrder(orderId))
               if (!buyNowMode) {
-                publish("open-cart")
+                publish("open-cart", { source: "add-to-cart" })
               }
               return res
             })
@@ -251,7 +251,7 @@ export function AddToCartButton(props: Props): JSX.Element {
           .then(async (res) => {
             getOrder && orderId && (await getOrder(orderId))
             if (!buyNowMode) {
-              publish("open-cart")
+              publish("open-cart", { source: "add-to-cart" })
             }
             return res
           })

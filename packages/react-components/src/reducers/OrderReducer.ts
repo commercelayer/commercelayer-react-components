@@ -600,7 +600,7 @@ export async function addToCart(
             : (organizationConfig?.links?.checkout ?? href)
           location.href = redirectUrl
         } else if (openMiniCart) {
-          publish("open-cart")
+          publish("open-cart", { source: "add-to-cart" })
         }
         return { success: true, orderId: id }
       }

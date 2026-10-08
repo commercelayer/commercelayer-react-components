@@ -12,7 +12,7 @@ import {
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import OrderStorageContext from "#context/OrderStorageContext"
-import { subscribe, unsubscribe } from "#utils/events"
+import { subscribe, type TEventDetail, unsubscribe } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import { jwt } from "#utils/jwt"
@@ -49,6 +49,11 @@ const defaultIframeStyle = {
   border: "none",
   paddingLeft: "20px",
   paddingRight: "20px",
+  // The horizontal padding has to be drawn inside the 100% width, not added to
+  // it. Without this the iframe measures 23rem + 40px and overhangs the mini
+  // cart panel it sits in, clipping the right edge of the cart - prices and
+  // quantity steppers included - against the edge of the viewport.
+  boxSizing: "border-box",
 } satisfies CSSProperties
 
 const defaultContainerStyle = {
@@ -143,6 +148,19 @@ interface Props extends Omit<JSX.IntrinsicElements["div"], "children" | "style">
  * View the `<CartLink />` component documentation for more details and examples.
  * </span>
  *
+ * <span title="Refreshing the panel" type="info">
+ * The iframe loads once and stays loaded behind the closed panel, so opening it is instant.
+ * It is reloaded on the next open only after an item has been added through `<AddToCartButton>`.
+ * An order changed by any other means - your own calls, or the line item components on the same
+ * page - will not be picked up until the panel is reloaded for some other reason.
+ * </span>
+ *
+ * <span title="One mini cart per document" type="warning">
+ * The open signal is broadcast on `document`, so it is not addressed to a particular cart.
+ * Render at most one `<HostedCart type="mini">` per document: if there are several, a single
+ * `<CartLink type="mini" />` click opens all of them.
+ * </span>
+ *
  */
 export function HostedCart({
   type,
@@ -157,6 +175,9 @@ export function HostedCart({
   const ref = useRef<HTMLIFrameElement>(null)
   const loadedOrderIdRef = useRef<string | null>(null)
   const prevOpenRef = useRef<boolean | undefined>(undefined)
+  // Whether the order has moved on since the iframe last loaded, so that the
+  // panel only pays for a reload when there is something new to show.
+  const staleRef = useRef(false)
   const { accessToken } = useCustomContext({
     context: CommerceLayerContext,
     contextComponentName: "CommerceLayer",
@@ -237,13 +258,30 @@ export function HostedCart({
       prevOpenRef.current = open
       setOpen(open)
     }
-    const openCartHandler = (): void => {
+    const openCartHandler = (event: Event): void => {
+      // `openAdd` governs only the implicit open that follows adding an item.
+      // A deliberate <CartLink type="mini"> click must always open the panel —
+      // that pairing is the documented way to use a mini cart, and gating the
+      // subscription itself on `openAdd` made it impossible.
+      const source = (event as CustomEvent<TEventDetail | undefined>).detail?.source
+      // An item was just added, so whatever the iframe is showing is now behind
+      // the order. Recorded even when the panel stays shut, so that the next
+      // deliberate open still refreshes.
+      if (source === "add-to-cart") staleRef.current = true
+      if (source === "add-to-cart" && !openAdd) return
       window.document.body.style.overflow = "hidden"
       if (src == null && resolvedOrderId == null) {
         setOrder(true)
       } else {
-        if (src != null && ref.current != null) {
+        // The iframe has been loaded and rendered all along, behind the closed
+        // panel, so opening is instant unless there is a reason to reload. There
+        // used to be no condition here, and reloading on every open threw away a
+        // cart that was ready: the drawer finished sliding at ~800ms while the
+        // cart's own skeleton stayed up until ~2.4s, measured on the deployed
+        // docs, and the products appeared with a jump.
+        if (staleRef.current && src != null && ref.current != null) {
           ref.current.src = src
+          staleRef.current = false
         }
         setTimeout(() => {
           if (handleOpen != null) handleOpen()
@@ -251,7 +289,7 @@ export function HostedCart({
         }, 300)
       }
     }
-    if (openAdd && type === "mini") {
+    if (type === "mini") {
       subscribe("open-cart", openCartHandler)
     }
     if (src == null && resolvedOrderId == null && !ignore && isOpen) {
@@ -267,12 +305,17 @@ export function HostedCart({
         }
       })
     }
-    if (src != null && ref.current != null) {
-      ref.current.src = src
-    }
+    // Nothing reassigns `src` here. The iframe already carries `src={src}` in the
+    // JSX, so React keeps the attribute in sync, and assigning the property again
+    // re-navigates the iframe even when the URL is identical. This effect re-runs
+    // on every render - `setOrder` and `resolveCartUrl` are redeclared each time
+    // and sit in the dependency list - and the cart answers each load with an
+    // `update` message, which calls `getOrder`, which renders again. That closed
+    // the loop: measured at 9 reloads in 12 seconds on the deployed docs, against
+    // none while the panel stayed shut.
     return (): void => {
       ignore = true
-      if (openAdd && type === "mini") {
+      if (type === "mini") {
         unsubscribe("open-cart", openCartHandler)
       }
     }
