@@ -98,6 +98,8 @@ describe("HostedCart component", () => {
   })
 
   describe("mini cart opening", () => {
+    const panelOf = (iframe: HTMLIFrameElement): HTMLElement | null => iframe.parentElement
+
     const renderMiniCart = (
       props: { openAdd?: boolean } = {}
     ): {
@@ -179,6 +181,45 @@ describe("HostedCart component", () => {
       await waitFor(() => {
         expect(panel()?.style.right).toBe("0px")
       })
+    })
+
+    // Opening the panel used to put the cart in a reload loop: the open handler
+    // assigns `src`, the cart answers the load with an `update` message, that
+    // calls `getOrder`, the render that follows re-runs the effect - which has
+    // `setOrder` and `resolveCartUrl` in its dependency list, both redeclared
+    // every render - and the effect assigned `src` again. Measured at 9 reloads
+    // in 12 seconds on the deployed docs. Assigning the property re-navigates an
+    // iframe even when the URL has not changed, so the count is what matters.
+    it("assigns the iframe src once when the panel is opened", async () => {
+      const { cartIframe } = renderMiniCart()
+
+      await waitFor(() => {
+        expect(cartIframe()).toBeTruthy()
+      })
+
+      const iframe = cartIframe() as HTMLIFrameElement
+      const descriptor = Object.getOwnPropertyDescriptor(
+        HTMLIFrameElement.prototype,
+        "src"
+      ) as PropertyDescriptor
+      let assignments = 0
+      Object.defineProperty(iframe, "src", {
+        configurable: true,
+        get: () => descriptor.get?.call(iframe),
+        set: (value: string) => {
+          assignments += 1
+          descriptor.set?.call(iframe, value)
+        },
+      })
+
+      fireEvent.click(screen.getByText("Open mini cart"))
+
+      await waitFor(() => {
+        expect(panelOf(iframe)?.style.right).toBe("0px")
+      })
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      expect(assignments).toBe(1)
     })
 
     // The iframe carries 20px of horizontal padding on top of `minWidth: 100%`.
