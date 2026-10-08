@@ -885,6 +885,28 @@ describe("BillingAddressForm (standalone mode)", () => {
     })
   })
 
+  it("exposes invertAddresses prop via AddressesContext in standalone mode", async () => {
+    let ctxRef: { invertAddresses?: boolean } | undefined
+
+    function InvertProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandalone({
+      // The shared state is keyed by access token + orderId, so a dedicated
+      // orderId keeps the flag published here out of the other tests.
+      orderOverrides: { order: { id: "ord-invert-on" }, orderId: "ord-invert-on" },
+      props: { invertAddresses: true },
+      children: <InvertProbe />,
+    })
+
+    await waitFor(() => {
+      expect(ctxRef?.invertAddresses).toBe(true)
+    })
+  })
+
   it("standaloneSetAddress dispatches to own reducer", async () => {
     let ctxRef: { setAddress?: unknown; billing_address?: unknown } | undefined
 
