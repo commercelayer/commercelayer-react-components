@@ -5,6 +5,7 @@ let endpoint: string | undefined
 let customerAccessToken: string | undefined
 let customerEmpty: string | undefined
 let customerWithLowData: string | undefined
+let integrationToken: string | undefined
 
 export async function getAccessToken(
   type: TokenType = "sales_channel"
@@ -35,6 +36,14 @@ export async function getAccessToken(
           }
         }
         break
+      case "integration":
+        if (integrationToken != null) {
+          return {
+            accessToken: integrationToken,
+            endpoint,
+          }
+        }
+        break
       case "sales_channel":
       default:
         if (accessToken != null) {
@@ -57,6 +66,9 @@ export async function getAccessToken(
       break
     case "customer_with_low_data":
       customerWithLowData = token
+      break
+    case "integration":
+      integrationToken = token
       break
     case "sales_channel":
     default:

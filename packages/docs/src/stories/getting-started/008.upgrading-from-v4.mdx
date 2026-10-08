@@ -20,7 +20,7 @@ There are, however, four changes that **will** break a v4 app and need to be han
 | Sibling packages | — | `@commercelayer/core-components`, `@commercelayer/react-hooks-components` |
 | Build output | `lib/cjs` + `lib/esm` | `dist` (both CJS and ESM) |
 | Subpath exports | 20 (`./orders/*`, `./hooks/*`, …) | none — root entry only |
-| `@commercelayer/sdk` | `^6.46.0` | `8.0.0-beta.11` |
+| `@commercelayer/sdk` | `^6.46.0` | `8.0.2` |
 | `<CommerceLayer>` props | `accessToken`, `endpoint`, `domain` | `accessToken`, `interceptors` |
 | Container components | required | deprecated, standalone components preferred |
 
@@ -276,7 +276,7 @@ v5 drops several transitive dependencies. If your own code imported them without
 - `lodash` — removed
 - `jwt-decode` — removed; token decoding now happens inside `@commercelayer/core-components`
 
-`@commercelayer/sdk` also jumps from `^6.46.0` to `8.0.0-beta.11`, and if you use the SDK alongside these components, **aligning your version is required, not advisory**. The SDK is a regular dependency here rather than a peer, so a consumer still on SDK 6 installs cleanly and only fails later, at typecheck, wherever an SDK-typed value crosses the boundary — an `Address` coming out of an `<AddressField>` render prop, for instance:
+`@commercelayer/sdk` also jumps from `^6.46.0` to `8.0.2`, and if you use the SDK alongside these components, **aligning your version is required, not advisory**. The SDK is a regular dependency here rather than a peer, so a consumer still on SDK 6 installs cleanly and only fails later, at typecheck, wherever an SDK-typed value crosses the boundary — an `Address` coming out of an `<AddressField>` render prop, for instance:
 
 <Source
   language="text"
@@ -287,6 +287,21 @@ v5 drops several transitive dependencies. If your own code imported them without
 />
 
 SDK 8 adds the `BingGeocoder` variant to the nested `geocoder` union, so anything that reaches `Address` is affected — including `OrderSubscription`, through `market` → `merchant` → `address`.
+
+If you build your own SDK client, note that SDK 8 is a version-aware build: `apiVersion` is a required option and becomes part of the request URL.
+
+<Source
+  language="jsx"
+  dark
+  code={`import { CommerceLayer } from '@commercelayer/sdk'
+
+const cl = CommerceLayer({
+  accessToken: 'your-access-token',
+  apiVersion: '2026-05',
+})`}
+/>
+
+The accepted values are `'2017-08'` and `'2026-05'`. The types are generated for `'2026-05'`; fields that only exist in the older version are kept and marked `@deprecated`, so you can target `'2017-08'` while you migrate. These components pin `'2026-05'` internally and do not take the option from you.
 
 ---
 

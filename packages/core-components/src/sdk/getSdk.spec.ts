@@ -49,6 +49,10 @@ describe("getSdk", () => {
     expect(CommerceLayer).toHaveBeenCalledWith({
       accessToken: "fake-token",
       organization: "my-org",
+      // Required since the SDK became a version-aware build in 8.0.2, and it
+      // lands in the request path - `/api/2026-05/orders`. Asserted here so the
+      // version the library talks to cannot be changed without a failing test.
+      apiVersion: "2026-05",
     })
     expect(result).toBe(mockSdkInstance)
   })

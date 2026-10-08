@@ -21,10 +21,21 @@ function SkuListsInspector({ onCapture }: { onCapture: (v: Record<string, unknow
 describe("SkuListsContainer component", () => {
   beforeEach<SkuListsCtx>(async (ctx) => {
     const { accessToken, endpoint } = await getAccessToken()
-    if (accessToken != null && endpoint != null) {
+    // The id is looked up with an integration token on purpose. API version
+    // `2026-05` refuses `GET /sku_lists` to a sales channel token, where the
+    // legacy unversioned API allowed it. Measured against the API with one
+    // sales channel token: the listing answers 401, while the retrieve the
+    // container actually performs - `/api/2026-05/sku_lists/<id>?include=skus` -
+    // answers 200. Only the fixture needs the wider credentials; the components
+    // below still run on the sales channel token, which is what a storefront has.
+    const { accessToken: integrationToken } = await getAccessToken("integration")
+    if (accessToken != null && endpoint != null && integrationToken != null) {
       ctx.accessToken = accessToken
       ctx.endpoint = endpoint
-      const lists = await getSkuLists({ accessToken, params: { pageSize: 1 } })
+      const lists = await getSkuLists({
+        accessToken: integrationToken,
+        params: { pageSize: 1 },
+      })
       ctx.skuListId = lists.first()?.id ?? ""
     } else {
       ctx.skip()
