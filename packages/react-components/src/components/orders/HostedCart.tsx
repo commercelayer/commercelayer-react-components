@@ -49,6 +49,11 @@ const defaultIframeStyle = {
   border: "none",
   paddingLeft: "20px",
   paddingRight: "20px",
+  // The horizontal padding has to be drawn inside the 100% width, not added to
+  // it. Without this the iframe measures 23rem + 40px and overhangs the mini
+  // cart panel it sits in, clipping the right edge of the cart - prices and
+  // quantity steppers included - against the edge of the viewport.
+  boxSizing: "border-box",
 } satisfies CSSProperties
 
 const defaultContainerStyle = {
