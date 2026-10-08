@@ -12,7 +12,7 @@ import {
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import OrderStorageContext from "#context/OrderStorageContext"
-import { type TEventDetail, subscribe, unsubscribe } from "#utils/events"
+import { subscribe, type TEventDetail, unsubscribe } from "#utils/events"
 import { getApplicationLink } from "#utils/getApplicationLink"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import { jwt } from "#utils/jwt"
@@ -141,6 +141,12 @@ interface Props extends Omit<JSX.IntrinsicElements["div"], "children" | "style">
  * When set as `mini` cart, it requires the `<CartLink type='mini' />` component to be on the same page,
  * to show the cart when clicked. <br />
  * View the `<CartLink />` component documentation for more details and examples.
+ * </span>
+ *
+ * <span title="One mini cart per document" type="warning">
+ * The open signal is broadcast on `document`, so it is not addressed to a particular cart.
+ * Render at most one `<HostedCart type="mini">` per document: if there are several, a single
+ * `<CartLink type="mini" />` click opens all of them.
  * </span>
  *
  */
