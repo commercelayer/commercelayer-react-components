@@ -1,5 +1,5 @@
 import { useLineItems } from "@commercelayer/react-hooks-components"
-import { type JSX, useContext } from "react"
+import { type JSX, useCallback, useContext } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import LineItemContext, { type LineItemContextValue } from "#context/LineItemContext"
 import OrderContext from "#context/OrderContext"
@@ -36,7 +36,7 @@ export function LineItems({
   onDelete,
 }: Props): JSX.Element {
   const { accessToken } = useContext(CommerceLayerContext)
-  const { orderId } = useContext(OrderContext)
+  const { orderId, getOrder } = useContext(OrderContext)
 
   const {
     lineItems: allLineItems,
@@ -52,6 +52,17 @@ export function LineItems({
       ? allLineItems.filter((li) => types.includes(li.item_type as TLineItem))
       : allLineItems
 
+  // The hook keeps its own list of line items; the order does not come with
+  // it. Everything that reads an amount — `<SubTotalAmount>`, `<TotalAmount>`,
+  // `<TaxesAmount>` — reads the order out of `OrderContext`, so without this
+  // the quantity changes on screen while the totals keep the old figures until
+  // the page is reloaded. `<LineItemsContainer>` refetched the order through
+  // the reducer's `getOrder`; standalone, this is where that has to happen.
+  const refreshOrder = useCallback(async (): Promise<void> => {
+    if (orderId == null || orderId === "") return
+    await getOrder(orderId)
+  }, [orderId, getOrder])
+
   const errors: BaseError[] = error
     ? [{ code: "INTERNAL_SERVER_ERROR", message: error, resource: "line_items" }]
     : []
@@ -63,10 +74,12 @@ export function LineItems({
     loader,
     updateLineItem: async (lineItemId, quantity = 1, hasExternalPrice) => {
       await hookUpdate(lineItemId, quantity, hasExternalPrice)
+      await refreshOrder()
       onUpdate?.(lineItemId)
     },
     deleteLineItem: async (lineItemId) => {
       await hookDelete(lineItemId)
+      await refreshOrder()
       onDelete?.(lineItemId)
     },
     reload: async () => {
