@@ -41,6 +41,7 @@ const IMPLEMENTED_SETTING_TYPES = [
   "payment_setting_manuals",
   "payment_setting_adyens",
   "payment_setting_stripes",
+  "payment_setting_braintrees",
 ] as const
 
 export interface PaymentSettingOnSelectParams {
@@ -256,10 +257,15 @@ export function PaymentSetting({
    * Without it a setting that decides for itself (Adyen) still does, and one
    * that leaves it to the shopper (Stripe) adopts the session as it stands — so
    * a reload keeps their choice instead of resetting it.
+   *
+   * `replace` skips the reuse: a new session is created even when the current
+   * one would otherwise be adopted, and the current one is cleared like any
+   * superseded selection. For a gateway that has found its session unusable in
+   * a way the reuse predicate cannot see.
    */
   const selectSetting = async (
     setting: PaymentSettingResource,
-    choice: { vaulting?: boolean } = {}
+    choice: { vaulting?: boolean; replace?: boolean } = {}
   ): Promise<void> => {
     if (accessToken == null || order == null) return
     if (selectionInFlight.current) return
@@ -282,12 +288,15 @@ export function PaymentSetting({
         ...paymentSettingCreateAttributes({ setting, accessToken, returnUrl }),
         ...(choice.vaulting != null ? { vaulting: choice.vaulting } : {}),
       }
-      const reusable = findReusablePaymentSession({
-        paymentSessions: order.payment_sessions,
-        paymentSettingId: setting.id,
-        amountCents: remainingAmountCents,
-        vaulting: attributes.vaulting,
-      })
+      const reusable =
+        choice.replace === true
+          ? undefined
+          : findReusablePaymentSession({
+              paymentSessions: order.payment_sessions,
+              paymentSettingId: setting.id,
+              amountCents: remainingAmountCents,
+              vaulting: attributes.vaulting,
+            })
       if (reusable == null) {
         await createPaymentSession({
           accessToken,
@@ -411,6 +420,11 @@ export function PaymentSetting({
               setRequestedSaveCard(null)
             }
           }
+          // Same guard as above: a payment in flight belongs to its session.
+          const renewPaymentSession = async (): Promise<void> => {
+            if (!isSelected || isCollecting(order.id)) return
+            await selectSetting(setting, { replace: true })
+          }
           return (
             <PaymentSettingChildrenContext.Provider
               key={setting.id}
@@ -426,6 +440,7 @@ export function PaymentSetting({
                 canSaveCard,
                 saveCard,
                 setSaveCard,
+                renewPaymentSession,
               }}
             >
               {typeof children === "function"
