@@ -27,6 +27,12 @@ interface Props extends Omit<JSX.IntrinsicElements["form"], "onSubmit"> {
    */
   shipToDifferentAddress?: boolean
   /**
+   * Whether the shipping address is the primary one, so that it is the billing
+   * address that gets derived from it.
+   * Used in standalone mode (without `<AddressesContainer>`).
+   */
+  invertAddresses?: boolean
+  /**
    * Controls when validation errors are displayed.
    * - `"inline"` (default): errors appear as the user types each field.
    * - `"submit"`: errors appear only after the user clicks Save (via `SaveAddressesButton`).
@@ -46,6 +52,9 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     errorMode = "inline",
     isBusiness: isBusiness_prop = false,
     shipToDifferentAddress: shipToDifferentAddress_prop = true,
+    // Left undefined when not passed, so that a form which says nothing about
+    // the flag does not publish a `false` over what the other form published.
+    invertAddresses: invertAddresses_prop,
     ...p
   } = props
 
@@ -56,7 +65,9 @@ export function ShippingAddressForm(props: Props): JSX.Element {
   const shipToDifferentAddress = isStandalone
     ? shipToDifferentAddress_prop
     : (parentAddressContext.shipToDifferentAddress ?? shipToDifferentAddress_prop)
-  const invertAddresses = isStandalone ? false : (parentAddressContext.invertAddresses ?? false)
+  const invertAddresses = isStandalone
+    ? (invertAddresses_prop ?? false)
+    : (parentAddressContext.invertAddresses ?? false)
   const shouldSync = shipToDifferentAddress || invertAddresses
 
   const config = useContext(CommerceLayerContext)
@@ -78,7 +89,7 @@ export function ShippingAddressForm(props: Props): JSX.Element {
     updateOrder,
     isBusiness,
     shipToDifferentAddress,
-    invertAddresses,
+    invertAddresses: invertAddresses_prop,
   })
 
   const setAddress = isStandalone
