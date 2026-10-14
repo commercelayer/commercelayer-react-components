@@ -500,6 +500,71 @@ describe("<PaymentSetting> clearing the superseded session", () => {
   })
 })
 
+describe("PaymentSetting selection errors", () => {
+  const BRAINTREE = { id: "ps-braintree", type: "payment_setting_braintrees", name: "Braintree" }
+
+  function renderWithErrors(currentOrder: Partial<Order>) {
+    return render(
+      <Wrapper currentOrder={currentOrder}>
+        <PaymentSetting>
+          {({ setting, errors }) => (
+            <div data-testid={`setting-${setting.id}`}>
+              <PaymentSettingRadioButton data-testid={`radio-${setting.id}`} />
+              {errors.length > 0 && (
+                <span data-testid={`error-${setting.id}`}>
+                  {errors.map((e) => e.message).join(" ")}
+                </span>
+              )}
+            </div>
+          )}
+        </PaymentSetting>
+      </Wrapper>
+    )
+  }
+
+  it("reports the failure under the setting that failed only", async () => {
+    createPaymentSessionMock.mockRejectedValue(new Error("boom"))
+    renderWithErrors(order({ available_payment_settings: [MANUAL, BRAINTREE] } as never))
+
+    fireEvent.click(screen.getByTestId(`radio-${BRAINTREE.id}`))
+
+    await waitFor(() => {
+      expect(screen.getByTestId(`error-${BRAINTREE.id}`).textContent).toBe("boom")
+    })
+    expect(screen.queryByTestId(`error-${MANUAL.id}`)).toBeNull()
+  })
+
+  it("carries the API's detail when the SDK error has no message", async () => {
+    // What the SDK throws for a 500 on the session create: an ApiError whose
+    // `message` is empty, with the API's errors alongside.
+    const apiError = Object.assign(new Error(""), {
+      errors: [{ title: "Invalid query", detail: "invalid query", status: "500" }],
+    })
+    createPaymentSessionMock.mockRejectedValue(apiError)
+    renderWithErrors(order({ available_payment_settings: [MANUAL, BRAINTREE] } as never))
+
+    fireEvent.click(screen.getByTestId(`radio-${BRAINTREE.id}`))
+
+    await waitFor(() => {
+      expect(screen.getByTestId(`error-${BRAINTREE.id}`).textContent).toBe("invalid query")
+    })
+  })
+
+  it("clears the failure when another setting is picked", async () => {
+    createPaymentSessionMock.mockRejectedValueOnce(new Error("boom"))
+    renderWithErrors(order({ available_payment_settings: [MANUAL, BRAINTREE] } as never))
+
+    fireEvent.click(screen.getByTestId(`radio-${BRAINTREE.id}`))
+    await screen.findByTestId(`error-${BRAINTREE.id}`)
+
+    fireEvent.click(screen.getByTestId(`radio-${MANUAL.id}`))
+
+    await waitFor(() => {
+      expect(screen.queryByTestId(`error-${BRAINTREE.id}`)).toBeNull()
+    })
+  })
+})
+
 /**
  * `returnUrl`, and why it is on this component.
  *

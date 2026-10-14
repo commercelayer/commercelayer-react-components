@@ -68,7 +68,11 @@ export interface PaymentSettingChildrenProps {
   isPending: boolean
   /** The Payment Session backing the selection, once it exists. */
   currentPaymentSession?: PaymentSession
-  /** Why the last selection failed, if it did. */
+  /**
+   * Why the last selection of this setting failed, if it did. Empty for every
+   * other setting, so it can be rendered once per setting without the error
+   * appearing under each of them.
+   */
   errors: BaseError[]
   /**
    * Choose this setting. The same call the radio makes, so an application can
@@ -132,6 +136,34 @@ interface Props {
   returnUrl?: string
 }
 
+const NO_ERRORS: BaseError[] = []
+
+const SELECTION_FAILED = "The payment method could not be selected."
+
+/**
+ * Why a selection failed, in the shape `errors` gives the application.
+ *
+ * The SDK's `ApiError` has an empty `message` and keeps the API's own errors
+ * in `errors`, so taking `message` alone hands the application a blank string
+ * for exactly the failures it most needs to show — a `500` from the session
+ * create, for one. The first API error's detail is carried instead, with its
+ * title and status, and a fixed sentence when there is nothing to carry.
+ */
+function selectionError(error: unknown): BaseError {
+  const apiError = (
+    error as { errors?: Array<{ title?: string; detail?: string; status?: string }> } | null
+  )?.errors?.[0]
+  const message = error instanceof Error ? error.message.trim() : ""
+  return {
+    code: "VALIDATION_ERROR",
+    resource: "payment_methods",
+    message: message || apiError?.detail || apiError?.title || SELECTION_FAILED,
+    ...(apiError?.title != null ? { title: apiError.title } : {}),
+    ...(apiError?.detail != null ? { detail: apiError.detail } : {}),
+    ...(apiError?.status != null ? { status: String(apiError.status) } : {}),
+  }
+}
+
 /**
  * Iterate the order's `available_payment_settings` and render `children` once
  * per setting, with that setting in context.
@@ -156,7 +188,13 @@ export function PaymentSetting({
   // and both reads of the state variable would still say "idle", leaving two
   // Payment Sessions behind for a single click.
   const selectionInFlight = useRef(false)
-  const [errors, setErrors] = useState<BaseError[]>([])
+  // Kept with the setting that failed. Every setting renders from this one
+  // component, so errors held for the whole group would show under each of
+  // them — under the bank transfer, say, when it was the card that failed.
+  const [selectionErrors, setSelectionErrors] = useState<{
+    settingId: string
+    errors: BaseError[]
+  } | null>(null)
   /**
    * The save-card choice being stored right now, shown in place of the
    * session's until the replacement lands. Without it the control would not
@@ -270,7 +308,7 @@ export function PaymentSetting({
     if (accessToken == null || order == null) return
     if (selectionInFlight.current) return
     selectionInFlight.current = true
-    setErrors([])
+    setSelectionErrors(null)
     setPendingSettingId(setting.id)
     try {
       // Reuse before creating. `amount_cents` is immutable, so there is no
@@ -370,14 +408,7 @@ export function PaymentSetting({
         }),
       })
     } catch (error) {
-      setErrors([
-        {
-          code: "VALIDATION_ERROR",
-          resource: "payment_methods",
-          message:
-            error instanceof Error ? error.message : "The payment method could not be selected.",
-        },
-      ])
+      setSelectionErrors({ settingId: setting.id, errors: [selectionError(error)] })
     } finally {
       selectionInFlight.current = false
       setPendingSettingId(null)
@@ -399,6 +430,8 @@ export function PaymentSetting({
         .map((setting) => {
           const isSelected = selectedSession?.payment_setting?.id === setting.id
           const currentPaymentSession = isSelected ? selectedSession : undefined
+          const errors =
+            selectionErrors?.settingId === setting.id ? selectionErrors.errors : NO_ERRORS
           const select = async (): Promise<void> => {
             await selectSetting(setting)
           }
