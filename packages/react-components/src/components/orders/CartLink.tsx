@@ -95,7 +95,7 @@ export function CartLink(props: Props): JSX.Element | null {
     event.preventDefault()
     event.stopPropagation()
     if (type === "mini") {
-      publish("open-cart")
+      publish("open-cart", { source: "cart-link" })
       return
     }
     const orderId = order?.id ?? (await createOrder({}))
