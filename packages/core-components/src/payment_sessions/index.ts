@@ -1,4 +1,10 @@
 export { applyGiftCard } from "./applyGiftCard"
+export type { AuthorizeBraintreePaymentSessionResult } from "./authorizeBraintreePaymentSession"
+export {
+  authorizeBraintreePaymentSession,
+  DEFAULT_BRAINTREE_AUTHORIZATION_ATTEMPTS,
+  DEFAULT_BRAINTREE_AUTHORIZATION_INTERVAL_MS,
+} from "./authorizeBraintreePaymentSession"
 export type { AuthorizeGiftCardSessionsResult } from "./authorizeGiftCardSessions"
 export { authorizeGiftCardSessions } from "./authorizeGiftCardSessions"
 export { buildGatewayReturnUrl } from "./buildGatewayReturnUrl"
@@ -41,6 +47,7 @@ export type {
 } from "./types"
 export {
   ADYEN_SETTING_TYPE,
+  BRAINTREE_SETTING_TYPE,
   GIFT_CARD_SETTING_TYPE,
   hasAuthorizationInFlight,
   hasFailedAuthorization,
@@ -48,11 +55,13 @@ export {
   hasReturnedMoney,
   holdsMoney,
   isAdyenSession,
+  isBraintreeSession,
   isGiftCardSession,
   isStripeSession,
   MONEY_RETURNED_SESSION_STATUSES,
   PAYMENT_TAKEN_SESSION_STATUSES,
   readAdyenSession,
+  readBraintreeClientToken,
   readPaymentInstrument,
   readStripeClientSecret,
   STRIPE_SETTING_TYPE,

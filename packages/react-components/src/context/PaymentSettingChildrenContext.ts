@@ -36,6 +36,18 @@ export interface InitialPaymentSettingChildrenContext {
    * what was typed. Render the control before the form.
    */
   setSaveCard?: (saveCard: boolean) => Promise<void>
+  /**
+   * Replace the current Payment Session with a fresh one for the same setting,
+   * for a gateway whose session went stale while still looking reusable.
+   *
+   * Braintree's is the case: its client token expires a day after the session
+   * is created, the session itself only after two, and nothing regenerates the
+   * token — `_refresh` does nothing for Braintree. So a checkout reopened the
+   * next day adopts a session the gateway's SDK then refuses to boot from, and
+   * only the gateway component can tell. Does nothing while a payment is being
+   * collected, for the reason `setSaveCard` does not.
+   */
+  renewPaymentSession?: () => Promise<void>
   /** Nothing may change — the subtree is a recap, not a form. */
   readonly?: boolean
   /**

@@ -17,8 +17,15 @@ import {
  * for an authorization costs one `GET` rather than a refused `PATCH`. That
  * makes attempts cheap enough to run more of them, more closely spaced, than
  * when every one of them was a `_placeable` call.
+ *
+ * The budget, about fifteen seconds, is sized for a slow queue rather than a
+ * typical one. The authorization job usually finishes within a second, and the
+ * loop returns as soon as it does, so a larger budget costs nothing then. When
+ * the queue is busy it can take several seconds — six was seen on staging —
+ * and running out first leaves a shopper who has paid with an unplaced order
+ * and nothing on screen.
  */
-export const DEFAULT_PLACEABLE_ATTEMPTS = 8
+export const DEFAULT_PLACEABLE_ATTEMPTS = 30
 /** Delay between placeability attempts, in milliseconds. */
 export const DEFAULT_PLACEABLE_INTERVAL_MS = 500
 
@@ -30,7 +37,7 @@ export const DEFAULT_PLACEABLE_INTERVAL_MS = 500
  * A card taken through Adyen's Drop-in is different in kind: Commerce Layer's
  * own gateway call fails by construction, and the authorization only reaches
  * `succeeded` when Adyen's `AUTHORISATION` webhook arrives. That is a round trip
- * through a third party, and four seconds is not a realistic budget for it.
+ * through a third party, so it gets a longer budget and a slower pace.
  *
  * Exhausting these is still **not** a payment failure — the webhook may land a
  * moment later — which is why the result reports `timedOut` separately from

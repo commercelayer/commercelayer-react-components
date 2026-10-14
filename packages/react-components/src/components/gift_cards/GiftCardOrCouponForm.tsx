@@ -43,10 +43,14 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
   useEffect(() => {
     // On the `payment_sessions` model a gift card is not an order-level code:
     // it is spent by creating a Payment Session against a gift-card Payment
-    // Setting, so it appears among the payment methods instead. Writing
-    // `gift_card_code` on the order there is meaningless, and letting it
-    // through would silently apply a gift card that no session reflects — so
-    // this overrides an explicit `codeType` too, rather than trusting it.
+    // Setting, so it appears among the payment methods instead. The API counts
+    // an order-level gift card as the older payments being engaged, so letting
+    // one through here would take the order off the model the shopper is
+    // paying on — which is why this overrides an explicit `codeType` too.
+    //
+    // The API version the order was created with does not matter: an order
+    // created with 2026-05 on a market without Payment Settings is on the
+    // older model, and takes an order-level gift card like any other.
     if (paymentsModel === "payment_sessions") {
       setType("coupon_code")
       return
