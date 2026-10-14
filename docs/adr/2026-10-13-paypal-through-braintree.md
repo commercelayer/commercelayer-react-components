@@ -1,8 +1,8 @@
 # PayPal through Braintree: the card's server path, Adyen's PayPal button
 
 **Date:** 2026-10-13
-**Status:** accepted — unit-tested and verified server-side; the browser run is waiting on a PayPal
-sandbox account being linked to the Braintree sandbox
+**Status:** accepted — unit-tested, verified server-side, and run end to end in the browser on
+2026-10-14
 **Scope:** `<PaymentSettingBraintreePayPal>`, one-time PayPal payments on the `payment_sessions`
 model. Saving a PayPal account (vault flow, billing agreements) is out of scope, blocked on the same
 missing session `vaulting` as Braintree cards.
@@ -68,11 +68,20 @@ with Braintree's code. That warning is how `PAYPAL_SANDBOX_ACCOUNT_NOT_LINKED` w
 
 ## Consequences
 
-**The browser run is pending.** mfe-checkout's `payment-sessions-braintree-paypal.spec.ts` covers
+**The browser run passes.** mfe-checkout's `payment-sessions-braintree-paypal.spec.ts` covers
 rendering, the terms gate, a full payment and a gift-card split, and reads the payer's email back
-from `payment_instrument`. It needs the link above, and a PayPal sandbox **buyer** that belongs to
-the linked business account: it reads `NP_BRAINTREE_PAYPAL_*` and falls back to the Adyen buyer in
-`NP_PAYPAL_*` — which, by the Adyen precedent, will most likely be refused.
+from `payment_instrument`. All four passed on 2026-10-14, once the account was linked. The buyer
+comes from `NP_BRAINTREE_PAYPAL_*` with a fallback to `NP_PAYPAL_*`; the Adyen sandbox buyer in
+the latter was accepted, so the Braintree-specific pair is not needed today. PayPal's SDK mounts
+three iframes in the button's container, so the spec targets `iframe.component-frame`.
+
+**Linking PayPal broke session creation, server-side.** Commerce Layer stored the whole client
+token as the session's `token`, under a unique btree index whose rows are capped at about 2704
+bytes. Tokens were 2528 characters with PayPal unlinked; linking adds PayPal's configuration to
+them, and every Braintree session create then failed with a `500 INVALID_QUERY`. Fixed in
+`core-api` on 2026-10-14. Nothing changed here: the component reads the client token from
+`response_data.clientToken` only. What did change, found through it, is how a failed selection
+is reported — see `PaymentSetting.tsx`'s `selectionError`, scoped to the setting that failed.
 
 **mfe-checkout groups Braintree's wallets.** Apple Pay and PayPal sit in one block above the card
 fields with a single "or pay by card" divider, shown only when the block has something in it — so a
