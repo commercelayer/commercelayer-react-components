@@ -1,5 +1,6 @@
 import { useLineItems } from "@commercelayer/react-hooks-components"
-import { type JSX, useCallback, useContext } from "react"
+import type { LineItem } from "@commercelayer/sdk"
+import { type JSX, useCallback, useContext, useEffect, useRef } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import LineItemContext, { type LineItemContextValue } from "#context/LineItemContext"
 import OrderContext from "#context/OrderContext"
@@ -28,6 +29,21 @@ interface Props {
   onDelete?: (lineItemId: string) => void
 }
 
+/**
+ * What tells two versions of an order's line items apart: one added or
+ * removed changes the ids, one edited changes its `updated_at`. `undefined`
+ * when the list is unknown, as on an order fetched without its line items.
+ */
+function lineItemsSignature(
+  lineItems: ReadonlyArray<Pick<LineItem, "id" | "updated_at">> | null | undefined
+): string | undefined {
+  if (lineItems == null) return undefined
+  return lineItems
+    .map(({ id, updated_at }) => `${id}@${updated_at}`)
+    .sort()
+    .join(",")
+}
+
 export function LineItems({
   children,
   types,
@@ -36,7 +52,7 @@ export function LineItems({
   onDelete,
 }: Props): JSX.Element {
   const { accessToken } = useContext(CommerceLayerContext)
-  const { orderId, getOrder } = useContext(OrderContext)
+  const { orderId, order, getOrder } = useContext(OrderContext)
 
   const {
     lineItems: allLineItems,
@@ -62,6 +78,30 @@ export function LineItems({
     if (orderId == null || orderId === "") return
     await getOrder(orderId)
   }, [orderId, getOrder])
+
+  // The other direction. When the order is updated externally and refetched,
+  // the hook's cache does not revalidate on its own, so the totals would move
+  // while the list, `<LineItemsCount>` and `<LineItemsEmpty>` stayed behind.
+  // Every order comes with its line items, so compare them with the cached
+  // ones and revalidate only when they differ: after our own update or delete
+  // the cache is already fresh, and the order that follows matches it.
+  const orderLineItems = order?.id === orderId ? order?.line_items : undefined
+  const orderSignature = lineItemsSignature(orderLineItems)
+  const cacheSignature = lineItemsSignature(allLineItems)
+  // Read through a ref rather than listed as dependencies: the check has to
+  // run when the order changes, not when the cache does. Otherwise our own
+  // update, which refreshes the cache before the order, would trigger it too.
+  const cacheRef = useRef({ signature: cacheSignature, isLoading })
+  useEffect(() => {
+    cacheRef.current = { signature: cacheSignature, isLoading }
+  }, [cacheSignature, isLoading])
+  useEffect(() => {
+    const cache = cacheRef.current
+    // still loading: the first fetch is already on its way and will be current
+    if (orderSignature == null || cache.isLoading) return
+    if (orderSignature === cache.signature) return
+    void hookReload()
+  }, [orderSignature, hookReload])
 
   const errors: BaseError[] = error
     ? [{ code: "INTERNAL_SERVER_ERROR", message: error, resource: "line_items" }]

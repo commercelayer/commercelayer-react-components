@@ -1,3 +1,4 @@
+import type { Order } from "@commercelayer/sdk"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { type ReactNode, useContext } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
@@ -9,8 +10,21 @@ import LineItemContext from "#context/LineItemContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 
 const MOCK_LINE_ITEMS = [
-  { id: "li_1", item_type: "skus", quantity: 2, name: "Baby Onesie", sku_code: "BABYONBU" },
-  { id: "li_2", item_type: "gift_cards", quantity: 1, name: "Gift Card" },
+  {
+    id: "li_1",
+    item_type: "skus",
+    quantity: 2,
+    name: "Baby Onesie",
+    sku_code: "BABYONBU",
+    updated_at: "2026-10-16T10:00:00.000Z",
+  },
+  {
+    id: "li_2",
+    item_type: "gift_cards",
+    quantity: 1,
+    name: "Gift Card",
+    updated_at: "2026-10-16T10:00:00.000Z",
+  },
 ]
 
 const mockUpdateLineItem = vi.fn().mockResolvedValue({ id: "li_1" })
@@ -47,15 +61,19 @@ function defaultHookReturn(overrides = {}) {
 function Providers({
   accessToken = "token",
   orderId = "order-1",
+  order,
   children,
 }: {
   accessToken?: string
   orderId?: string
+  order?: Order
   children: ReactNode
 }) {
   return (
     <CommerceLayerContext.Provider value={{ accessToken }}>
-      <OrderContext.Provider value={{ ...defaultOrderContext, orderId, getOrder: mockGetOrder }}>
+      <OrderContext.Provider
+        value={{ ...defaultOrderContext, orderId, order, getOrder: mockGetOrder }}
+      >
         {children}
       </OrderContext.Provider>
     </CommerceLayerContext.Provider>
@@ -453,5 +471,128 @@ describe("LineItems component", () => {
     )
 
     expect(capturedErrors).toEqual([])
+  })
+})
+
+// When the order is updated externally and refetched, the line items cache has
+// to follow, or the totals move while the list stays behind. See issue #874.
+describe("LineItems component when the order is refetched", () => {
+  function orderWith(lineItems: Array<Record<string, unknown>> | undefined, id = "order-1") {
+    return { id, line_items: lineItems } as unknown as Order
+  }
+
+  beforeEach(() => {
+    mockUseLineItems.mockReturnValue(defaultHookReturn())
+    mockReload.mockClear()
+  })
+
+  it("does not reload the line items when the order brings the same ones", () => {
+    const { rerender } = render(
+      <Providers order={orderWith(MOCK_LINE_ITEMS)}>
+        <LineItems>
+          <span />
+        </LineItems>
+      </Providers>
+    )
+    rerender(
+      <Providers order={orderWith([...MOCK_LINE_ITEMS].reverse())}>
+        <LineItems>
+          <span />
+        </LineItems>
+      </Providers>
+    )
+
+    expect(mockReload).not.toHaveBeenCalled()
+  })
+
+  it("reloads the line items when the order brings one more", () => {
+    const { rerender } = render(
+      <Providers order={orderWith(MOCK_LINE_ITEMS)}>
+        <LineItems>
+          <span />
+        </LineItems>
+      </Providers>
+    )
+    rerender(
+      <Providers
+        order={orderWith([
+          ...MOCK_LINE_ITEMS,
+          { id: "li_3", item_type: "skus", updated_at: "2026-10-16T10:05:00.000Z" },
+        ])}
+      >
+        <LineItems>
+          <span />
+        </LineItems>
+      </Providers>
+    )
+
+    expect(mockReload).toHaveBeenCalledOnce()
+  })
+
+  it("reloads the line items when the order brings one less", () => {
+    render(
+      <Providers order={orderWith([MOCK_LINE_ITEMS[0]])}>
+        <LineItems>
+          <span />
+        </LineItems>
+      </Providers>
+    )
+
+    expect(mockReload).toHaveBeenCalledOnce()
+  })
+
+  it("reloads the line items when one of them has changed", () => {
+    render(
+      <Providers
+        order={orderWith([
+          { ...MOCK_LINE_ITEMS[0], quantity: 3, updated_at: "2026-10-16T10:05:00.000Z" },
+          MOCK_LINE_ITEMS[1],
+        ])}
+      >
+        <LineItems>
+          <span />
+        </LineItems>
+      </Providers>
+    )
+
+    expect(mockReload).toHaveBeenCalledOnce()
+  })
+
+  it("does not reload the line items while their first fetch is in flight", () => {
+    mockUseLineItems.mockReturnValue(defaultHookReturn({ lineItems: [], isLoading: true }))
+
+    render(
+      <Providers order={orderWith(MOCK_LINE_ITEMS)}>
+        <LineItems>
+          <span />
+        </LineItems>
+      </Providers>
+    )
+
+    expect(mockReload).not.toHaveBeenCalled()
+  })
+
+  it("does not reload the line items when the order came without them", () => {
+    render(
+      <Providers order={orderWith(undefined)}>
+        <LineItems>
+          <span />
+        </LineItems>
+      </Providers>
+    )
+
+    expect(mockReload).not.toHaveBeenCalled()
+  })
+
+  it("ignores an order other than the one the line items belong to", () => {
+    render(
+      <Providers orderId="order-1" order={orderWith([MOCK_LINE_ITEMS[0]], "order-2")}>
+        <LineItems>
+          <span />
+        </LineItems>
+      </Providers>
+    )
+
+    expect(mockReload).not.toHaveBeenCalled()
   })
 })

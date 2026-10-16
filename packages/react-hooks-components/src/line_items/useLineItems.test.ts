@@ -7,7 +7,7 @@ import { createElement } from "react"
 import { SWRConfig } from "swr"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { InterceptorManager } from "../index"
-import { useLineItems } from "./useLineItems"
+import { useLineItems, useReloadLineItems } from "./useLineItems"
 
 const swrWrapper = ({ children }: { children: ReactNode }) =>
   createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
@@ -213,5 +213,64 @@ describe("useLineItems", () => {
     })
 
     await expect(result.current.deleteLineItem("li_1")).rejects.toThrow("accessToken is required")
+  })
+})
+
+describe("useReloadLineItems", () => {
+  const accessToken = "test-token"
+  const orderId = "order-1"
+
+  beforeEach(() => {
+    mockGetLineItems.mockReset()
+    mockGetLineItems.mockResolvedValue(MOCK_LINE_ITEMS)
+  })
+
+  it("refetches the line items held by a mounted useLineItems", async () => {
+    const { result } = renderHook(
+      () => ({
+        list: useLineItems({ accessToken, orderId }),
+        reloadLineItems: useReloadLineItems(),
+      }),
+      { wrapper: swrWrapper }
+    )
+    await waitFor(() => expect(result.current.list.lineItems).toEqual(MOCK_LINE_ITEMS))
+
+    const added = { id: "li_3", item_type: "skus", quantity: 1 }
+    mockGetLineItems.mockResolvedValueOnce([...MOCK_LINE_ITEMS, added])
+    await act(async () => {
+      await result.current.reloadLineItems({ accessToken, orderId })
+    })
+
+    expect(mockGetLineItems).toHaveBeenCalledTimes(2)
+    // settled only once the mounted list holds the new data
+    expect(result.current.list.lineItems).toEqual([...MOCK_LINE_ITEMS, added])
+  })
+
+  it("leaves the line items of another order alone", async () => {
+    const { result } = renderHook(
+      () => ({
+        list: useLineItems({ accessToken, orderId }),
+        reloadLineItems: useReloadLineItems(),
+      }),
+      { wrapper: swrWrapper }
+    )
+    await waitFor(() => expect(result.current.list.lineItems).toEqual(MOCK_LINE_ITEMS))
+
+    await act(async () => {
+      await result.current.reloadLineItems({ accessToken, orderId: "order-2" })
+    })
+
+    expect(mockGetLineItems).toHaveBeenCalledOnce()
+  })
+
+  it("does nothing without an order id or an access token", async () => {
+    const { result } = renderHook(() => useReloadLineItems(), { wrapper: swrWrapper })
+
+    await act(async () => {
+      await result.current({ accessToken, orderId: null })
+      await result.current({ orderId })
+    })
+
+    expect(mockGetLineItems).not.toHaveBeenCalled()
   })
 })

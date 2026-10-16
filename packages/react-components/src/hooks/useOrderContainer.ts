@@ -24,7 +24,7 @@ interface TReturnOrder
     OrderState,
     "loading" | "include" | "includeLoaded" | "withoutIncludes" | "orderId"
   > {
-  /** Refetch the current order and update the context */
+  /** Refetch the current order and its line items, and update the context once both are in */
   reloadOrder: () => Promise<OrderState["order"]>
   /** Allow to add a SKU or a Bundle to the order stored in the context */
   addToCart: (params: TAddToCartParams) => ReturnType<typeof addToCart>
@@ -41,6 +41,7 @@ export function useOrderContainer(): TReturnOrder {
     return {
       order: ctx.order,
       reloadOrder: async () => {
+        if (ctx.reloadOrder != null) return await ctx.reloadOrder()
         if (ctx?.order?.id) return await ctx?.getOrder(ctx?.order?.id)
         return undefined
       },

@@ -1,3 +1,4 @@
+import { useReloadLineItems } from "@commercelayer/react-hooks-components"
 import type { Order, OrderCreate } from "@commercelayer/sdk"
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
@@ -10,6 +11,7 @@ import orderReducer, {
   createOrder,
   getApiOrder,
   getOrderByFields,
+  type OrderActions,
   type OrderCodeType,
   orderInitialState,
   paymentSourceRequest,
@@ -65,6 +67,7 @@ export function useOrderState({
   deleteLocalOrder,
 }: UseOrderStateConfig) {
   const [state, dispatch] = useReducer(orderReducer, orderInitialState)
+  const reloadLineItems = useReloadLineItems()
   const [lock, setLock] = useState(false)
   const [lockOrder, setLockOrder] = useState(true)
 
@@ -302,6 +305,22 @@ export function useOrderState({
       setOrder: (order: Order) => setOrder(order, dispatch),
       getOrder: async (id: string): Promise<Order | undefined> =>
         await getApiOrder({ id, dispatch, config, state }),
+      // The line items live in their own cache, so refetching the order alone
+      // leaves a mounted list behind until it notices and fetches them in turn:
+      // two round trips, with the totals showing before the rows. Fetch both at
+      // once, and hold the order's actions until the line items are in so the
+      // whole cart updates together.
+      reloadOrder: async (): Promise<Order | undefined> => {
+        const id = state.order?.id
+        if (id == null) return undefined
+        const held: OrderActions[] = []
+        const [order] = await Promise.all([
+          getApiOrder({ id, dispatch: (action) => held.push(action), config, state }),
+          reloadLineItems({ accessToken: config.accessToken, orderId: id }),
+        ])
+        for (const action of held) dispatch(action)
+        return order
+      },
       setOrderErrors: (errors: BaseError[]) => setOrderErrors({ dispatch, errors }),
       createOrder: async (): Promise<string> =>
         await createOrder({
@@ -382,5 +401,6 @@ export function useOrderState({
     setLocalOrder,
     metadata,
     attributes,
+    reloadLineItems,
   ])
 }
