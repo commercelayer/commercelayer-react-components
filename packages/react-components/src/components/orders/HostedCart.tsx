@@ -267,9 +267,10 @@ export function HostedCart({
         }
       })
     }
-    if (src != null && ref.current != null) {
-      ref.current.src = src
-    }
+    // `src` is applied by the `<iframe src>` prop. Assigning `ref.current.src`
+    // here would reload the cart on every run of this effect, which runs on
+    // every render: the cart's "update" message refreshes the order, the
+    // re-render reloaded the iframe, and the reloaded cart sent "update" again.
     return (): void => {
       ignore = true
       if (openAdd && type === "mini") {
