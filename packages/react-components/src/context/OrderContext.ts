@@ -25,6 +25,8 @@ interface DefaultContext extends OrderState {
   saveAddressToCustomerAddressBook: SaveAddressToCustomerAddressBook
   addResourceToInclude: typeof addResourceToInclude
   getOrder: getOrderContext
+  /** Refetches the current order together with its line items. */
+  reloadOrder?: () => Promise<undefined | Order>
   updateOrder: typeof updateOrder
   setOrder: (order: Order) => void
   paymentSourceRequest: typeof paymentSourceRequest
