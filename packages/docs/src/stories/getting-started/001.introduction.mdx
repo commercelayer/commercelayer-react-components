@@ -42,14 +42,12 @@ import { CommerceLayer, ...otherComponents } from '@commercelayer/react-componen
 `}
         />
 
-But you can also leverage treeshaking by importing only the components you need from its folder using either default or named export, as follow:
+Every component comes from the package root. v5 ships a single entry point, so
+subpath imports like `@commercelayer/react-components/orders/OrderContainer` no
+longer resolve — your bundler will fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`.
 
-    <Source
-          language="jsx"
-          dark
-          code={`
-import OrderContainer from '@commercelayer/react-components/orders/OrderContainer'
-// or
-import { OrderContainer } from '@commercelayer/react-components/orders/OrderContainer'
-`}
-        />
+<span title="Coming from v4?" type="info">
+Deep imports were removed in v5, along with the `<OrderContainer>` this page used
+to reach for. See <a href="/?path=/docs/getting-started-upgrading-from-v4--docs">Upgrading from v4</a>
+for the full list of breaking changes.
+</span>

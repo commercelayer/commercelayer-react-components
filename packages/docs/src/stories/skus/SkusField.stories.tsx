@@ -6,7 +6,7 @@ import CommerceLayer from "../_internals/CommerceLayer"
 
 function Wrapper({ children }: { children: ReactNode }): JSX.Element {
   return (
-    <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
+    <CommerceLayer accessToken="my-access-token">
       <Sku skuCode="POLOMXXX000000FFFFFFLXXX">{children}</Sku>
     </CommerceLayer>
   )
@@ -42,7 +42,7 @@ function SkuFieldDocsPage(): JSX.Element {
         code={`
 import { CommerceLayer, Sku, SkuField } from '@commercelayer/react-components'
 
-<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+<CommerceLayer accessToken="...">
   <Sku skuCode="TSHIRTWS000000FFFFFFLXXX">
     <SkuField attribute="name" tagElement="h2" />
     <SkuField attribute="description" tagElement="p" />
@@ -138,7 +138,7 @@ export const SkuImageAsImgTag: Story = {
 export const ChildrenProps: Story = {
   name: "SkuField — children render prop",
   render: () => (
-    <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
+    <CommerceLayer accessToken="my-access-token">
       <Sku skuCode="5PANECAP9D9CA1FFFFFFXXXX">
         <SkuField attribute="metadata" tagElement="div">
           {(childrenProps: any) => (

@@ -26,7 +26,6 @@ export function useGetToken<T extends UseGetTokenOptions>(
   options?: T
 ): {
   accessToken: string
-  endpoint: string
 } {
   const mode = options?.mode ?? "guest"
   const [accessToken, setAccessToken] = useState(Cookie.get(getAccessTokenCookieName(mode)) ?? "")
@@ -76,7 +75,6 @@ export function useGetToken<T extends UseGetTokenOptions>(
 
   return {
     accessToken,
-    endpoint: `https://${slug}.${domain}`,
   }
 }
 
