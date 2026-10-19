@@ -252,6 +252,52 @@ describe("Customer (standalone)", () => {
   })
 })
 
+describe("Customer (standalone) order refresh", () => {
+  it("refreshes the order from OrderContext when the customer is saved", async () => {
+    core.saveCustomerUser.mockResolvedValue(undefined)
+    const getOrder = vi.fn().mockResolvedValue(undefined)
+    let saveCustomerUser: ((email: string) => Promise<void>) | undefined
+
+    function SaveProbe(): JSX.Element {
+      const ctx = useContext(CustomerContext)
+      saveCustomerUser = ctx.saveCustomerUser
+      return <div />
+    }
+
+    render(
+      // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+      <CommerceLayerContext.Provider value={{ accessToken: VALID_TOKEN } as any}>
+        <OrderContext.Provider
+          value={
+            {
+              ...defaultOrderContext,
+              addResourceToInclude: vi.fn(),
+              order: { id: "ord-9" },
+              getOrder,
+              // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+            } as any
+          }
+        >
+          <Customer>
+            <SaveProbe />
+          </Customer>
+        </OrderContext.Provider>
+      </CommerceLayerContext.Provider>
+    )
+
+    await waitFor(() => expect(saveCustomerUser).toBeDefined())
+
+    await act(async () => {
+      await saveCustomerUser?.("new@example.com")
+    })
+
+    expect(core.saveCustomerUser).toHaveBeenCalledWith(
+      expect.objectContaining({ customerEmail: "new@example.com", orderId: "ord-9" })
+    )
+    expect(getOrder).toHaveBeenCalledWith("ord-9")
+  })
+})
+
 describe("useCustomerProviderValue", () => {
   function HookConsumer(params: Parameters<typeof useCustomerProviderValue>[0]): JSX.Element {
     const value = useCustomerProviderValue(params)
@@ -295,6 +341,112 @@ describe("useCustomerProviderValue", () => {
     await waitFor(() => {
       expect(screen.getByTestId("customer-email").textContent).toBe("new@example.com")
     })
+  })
+
+  // `saveCustomerUser` writes `customer_email` on the order itself, so the order
+  // held by `OrderContext` has to be refetched — same class of bug as #867.
+  it("saveCustomerUser refreshes the order", async () => {
+    core.saveCustomerUser.mockResolvedValue(undefined)
+    const getOrder = vi.fn().mockResolvedValue(undefined)
+    let contextRef: ReturnType<typeof useCustomerProviderValue> | undefined
+
+    function Capture(params: Parameters<typeof useCustomerProviderValue>[0]): JSX.Element {
+      const value = useCustomerProviderValue(params)
+      contextRef = value
+      return (
+        <CustomerContext.Provider value={value}>
+          <ContextProbe />
+        </CustomerContext.Provider>
+      )
+    }
+
+    render(
+      <Capture
+        accessToken={VALID_TOKEN}
+        addResourceToInclude={addResourceToInclude}
+        getOrder={getOrder}
+        order={{ id: "ord-1" } as any}
+      />
+    )
+
+    await waitFor(() => expect(contextRef).toBeDefined())
+
+    await act(async () => {
+      await contextRef?.saveCustomerUser?.("new@example.com")
+    })
+
+    expect(getOrder).toHaveBeenCalledWith("ord-1")
+  })
+
+  it("saves the email before refreshing the order", async () => {
+    const calls: string[] = []
+    core.saveCustomerUser.mockImplementationOnce(async () => {
+      calls.push("save")
+    })
+    const getOrder = vi.fn().mockImplementation(async () => {
+      calls.push("getOrder")
+      return undefined
+    })
+    let contextRef: ReturnType<typeof useCustomerProviderValue> | undefined
+
+    function Capture(params: Parameters<typeof useCustomerProviderValue>[0]): JSX.Element {
+      const value = useCustomerProviderValue(params)
+      contextRef = value
+      return (
+        <CustomerContext.Provider value={value}>
+          <ContextProbe />
+        </CustomerContext.Provider>
+      )
+    }
+
+    render(
+      <Capture
+        accessToken={VALID_TOKEN}
+        addResourceToInclude={addResourceToInclude}
+        getOrder={getOrder}
+        order={{ id: "ord-1" } as any}
+      />
+    )
+
+    await waitFor(() => expect(contextRef).toBeDefined())
+
+    await act(async () => {
+      await contextRef?.saveCustomerUser?.("new@example.com")
+    })
+
+    expect(calls).toEqual(["save", "getOrder"])
+  })
+
+  it("does not refresh the order when there is no order to save onto", async () => {
+    const getOrder = vi.fn().mockResolvedValue(undefined)
+    let contextRef: ReturnType<typeof useCustomerProviderValue> | undefined
+
+    function Capture(params: Parameters<typeof useCustomerProviderValue>[0]): JSX.Element {
+      const value = useCustomerProviderValue(params)
+      contextRef = value
+      return (
+        <CustomerContext.Provider value={value}>
+          <ContextProbe />
+        </CustomerContext.Provider>
+      )
+    }
+
+    render(
+      <Capture
+        accessToken={VALID_TOKEN}
+        addResourceToInclude={addResourceToInclude}
+        getOrder={getOrder}
+      />
+    )
+
+    await waitFor(() => expect(contextRef).toBeDefined())
+
+    await act(async () => {
+      await contextRef?.saveCustomerUser?.("new@example.com")
+    })
+
+    expect(core.saveCustomerUser).not.toHaveBeenCalled()
+    expect(getOrder).not.toHaveBeenCalled()
   })
 
   it("saveCustomerUser is a no-op when accessToken is missing", async () => {
