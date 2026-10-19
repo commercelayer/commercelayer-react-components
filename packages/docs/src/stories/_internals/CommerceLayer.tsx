@@ -6,15 +6,14 @@ type DefaultChildrenType = JSX.Element[] | JSX.Element | null
 interface Props {
   children: DefaultChildrenType
   accessToken: "customer-access-token" | "customer-orders-access-token" | "my-access-token" // guest token
-  endpoint?: string
 }
 
 /**
  * Custom setup for the `CommerceLayer` component that can be used in Storybook.
- * without exposing the `accessToken` and `endpoint` props.
+ * without exposing the `accessToken` prop.
  */
 function CommerceLayer({ children, ...props }: Props): JSX.Element {
-  const { accessToken, endpoint } = useGetToken({
+  const { accessToken } = useGetToken({
     mode:
       props.accessToken === "customer-access-token"
         ? "customer"
@@ -24,7 +23,7 @@ function CommerceLayer({ children, ...props }: Props): JSX.Element {
   })
 
   return (
-    <CommerceLayerComponent accessToken={accessToken} endpoint={endpoint}>
+    <CommerceLayerComponent accessToken={accessToken}>
       {children}
     </CommerceLayerComponent>
   )

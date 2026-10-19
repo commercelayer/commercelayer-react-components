@@ -292,7 +292,7 @@ export interface SetPaymentSourceParams extends Omit<PaymentMethodState, "config
 // effect firing `create` twice before the first request settles). Keyed per order,
 // resource and operation path so different operations never merge; entries are removed
 // once settled, so a later legitimate re-create still runs.
-// See docs/adr/0001-payment-source-effect-invariants.md.
+// See docs/adr/0003-payment-source-effect-invariants.md.
 const inFlightPaymentSourceRequests = new Map<
   string,
   Promise<PaymentSourceType | undefined | null>
