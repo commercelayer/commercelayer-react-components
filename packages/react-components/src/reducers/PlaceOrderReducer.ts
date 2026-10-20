@@ -206,8 +206,13 @@ export async function setPlaceOrder({
     const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const { options, paymentType } = state
     try {
-      // Prevent extra place order
-      const lastOrderStatus = await sdk.orders.retrieve(order.id)
+      // Prevent extra place order. The same `include` the place paths below ask for: this
+      // order is handed back to `onClick` exactly like theirs, and an app reading the card
+      // brand off `payment_method` or building an analytics event out of `line_items`
+      // cannot tell which branch produced it. Adyen reaches this branch regularly — the
+      // order is sometimes placed server-side on `_authorize`, before the button sends
+      // `_place` — so a bare order here is not a rare corner.
+      const lastOrderStatus = await sdk.orders.retrieve(order.id, { include })
       if (lastOrderStatus.status === "placed") {
         return {
           placed: true,
