@@ -214,6 +214,11 @@ export async function setPlaceOrder({
       // `_place` — so a bare order here is not a rare corner.
       const lastOrderStatus = await sdk.orders.retrieve(order.id, { include })
       if (lastOrderStatus.status === "placed") {
+        // Publish it, like both place paths below do. Returning `placed: true` while the
+        // context still holds a pending order splits the library's own view of the order:
+        // `setPaymentSource` guards writes with `order?.status === "placed"` read from
+        // there, and `<PaymentGateway>` clears its loader on the same reading.
+        if (setOrder) setOrder(lastOrderStatus)
         return {
           placed: true,
           order: lastOrderStatus,

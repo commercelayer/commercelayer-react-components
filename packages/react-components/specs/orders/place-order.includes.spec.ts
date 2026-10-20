@@ -35,6 +35,7 @@ describe("setPlaceOrder pre-check", () => {
     }
     orders.retrieve.mockResolvedValue(placed)
 
+    const setOrder = vi.fn()
     const result = await setPlaceOrder({
       state: STATE,
       // biome-ignore lint/suspicious/noExplicitAny: test cast
@@ -42,9 +43,13 @@ describe("setPlaceOrder pre-check", () => {
       // biome-ignore lint/suspicious/noExplicitAny: test cast
       config: { accessToken: "token" } as any,
       include: INCLUDE,
+      setOrder,
     })
 
     expect(orders.retrieve).toHaveBeenCalledWith("order-1", { include: INCLUDE })
+    // Published too, like both place paths do: `setPaymentSource` reads
+    // `order.status === "placed"` off the context to refuse writes on a placed order.
+    expect(setOrder).toHaveBeenCalledWith(placed)
     expect(result.placed).toBe(true)
     // What the app reads to tell a card from a wallet, and to build its analytics events.
     expect(result.order?.payment_method).toBeDefined()
