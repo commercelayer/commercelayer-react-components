@@ -1039,3 +1039,103 @@ describe("useCustomerProviderValue", () => {
     expect(core.getCustomerPaymentSources).toHaveBeenCalled()
   })
 })
+
+// #880: the email written on the way out of `saveCustomerUser` landed after both awaits —
+// the PATCH and, since #869, the order refetch — so it undid anything that happened while
+// the request was in flight. A shopper correcting a typo mid-request had the old address
+// put back, which re-enabled <SaveAddressesButton> under a visible validation error.
+describe("Customer (standalone) email published while a save is in flight", () => {
+  /** A save that only resolves when the test says so, plus the context it is called from. */
+  function renderWithPendingSave() {
+    let releaseSave: () => void = () => {}
+    core.saveCustomerUser.mockImplementation(
+      async () =>
+        await new Promise<void>((resolve) => {
+          releaseSave = resolve
+        })
+    )
+    const getOrder = vi.fn().mockResolvedValue(undefined)
+    const ctx: {
+      saveCustomerUser?: (email: string) => Promise<void>
+      setCustomerEmail?: (email: string) => void
+    } = {}
+
+    function Probe(): JSX.Element {
+      const value = useContext(CustomerContext)
+      ctx.saveCustomerUser = value.saveCustomerUser
+      ctx.setCustomerEmail = value.setCustomerEmail
+      return <div data-testid="customer-email">{value.customerEmail ?? "none"}</div>
+    }
+
+    render(
+      // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+      <CommerceLayerContext.Provider value={{ accessToken: VALID_TOKEN } as any}>
+        <OrderContext.Provider
+          value={
+            {
+              ...defaultOrderContext,
+              addResourceToInclude: vi.fn(),
+              order: { id: "ord-880" },
+              getOrder,
+              // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+            } as any
+          }
+        >
+          <Customer>
+            <Probe />
+          </Customer>
+        </OrderContext.Provider>
+      </CommerceLayerContext.Provider>
+    )
+
+    return { ctx, getOrder, release: () => releaseSave() }
+  }
+
+  const email = () => screen.getByTestId("customer-email").textContent
+
+  it("does not put the saved email back over a newer one", async () => {
+    const { ctx, getOrder, release } = renderWithPendingSave()
+    await waitFor(() => expect(ctx.saveCustomerUser).toBeDefined())
+
+    // The shopper blurs a valid address: the PATCH goes out and does not resolve yet.
+    let saving: Promise<void> | undefined
+    await act(async () => {
+      saving = ctx.saveCustomerUser?.("valid@example.com")
+    })
+
+    // Then corrects it to something the form rejects, which only goes through
+    // `setCustomerEmail` — there is no save for an address that does not validate.
+    await act(async () => {
+      ctx.setCustomerEmail?.("john@gmail")
+    })
+    expect(email()).toBe("john@gmail")
+
+    // The first save lands now, and must not speak for an address already replaced.
+    await act(async () => {
+      release()
+      await saving
+    })
+
+    expect(email()).toBe("john@gmail")
+    expect(getOrder).toHaveBeenCalledWith("ord-880")
+  })
+
+  it("publishes the email as soon as it is asked to save it", async () => {
+    const { ctx, release } = renderWithPendingSave()
+    await waitFor(() => expect(ctx.saveCustomerUser).toBeDefined())
+
+    let saving: Promise<void> | undefined
+    await act(async () => {
+      saving = ctx.saveCustomerUser?.("valid@example.com")
+    })
+
+    // Still in flight: everything reading the email off the context sees it already.
+    expect(email()).toBe("valid@example.com")
+
+    await act(async () => {
+      release()
+      await saving
+    })
+    expect(email()).toBe("valid@example.com")
+  })
+})
