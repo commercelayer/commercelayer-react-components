@@ -81,14 +81,21 @@ export function Shipment({
   setShippingMethodRef.current = setShippingMethod
 
   // Shipments that this component has already auto-selected a method for, keyed
-  // `<shipment id>:<shipping method id>`. The effect re-runs on every new
-  // `shipments` identity, and the refetch that follows a selection lands before
-  // the API reports the method as set — so without this the same shipment gets
+  // `<shipment id>:<shipping method id>`, and whether that selection is still in
+  // flight. The effect re-runs on every new `shipments` identity, and the
+  // refetch that follows a selection lands while it is in flight, before the
+  // API reports the method as set — so without this the same shipment gets
   // selected twice, and a caller passing a callback (analytics, typically) is
-  // told about it twice. An entry is dropped as soon as the data catches up, so
-  // a method the API clears later — applying a coupon does that — is selected
-  // again.
-  const autoSelectedRef = useRef<Set<string>>(new Set())
+  // told about it twice.
+  //
+  // Once the selection has resolved, its own refetch is behind us: shipments
+  // that arrive later still without the method mean the API cleared it —
+  // applying a coupon does that — and the shipment is selected again. Waiting
+  // for the data to show the method set before forgetting the selection is not
+  // enough: a coupon applied while the selection is in flight clears the method
+  // before any refetch reports it, and the shipment would stay unselected, and
+  // the step on the loader, for good.
+  const autoSelectedRef = useRef<Map<string, "pending" | "settled">>(new Map())
 
   useEffect(() => {
     if (shipments != null) {
@@ -103,13 +110,14 @@ export function Shipment({
               const [shippingMethod] = availableShippingMethods
               if (shippingMethod && setShippingMethodRef.current != null) {
                 const key = `${shipment.id}:${shippingMethod.id}`
-                if (autoSelectedRef.current.has(key)) continue
-                autoSelectedRef.current.add(key)
+                if (autoSelectedRef.current.get(key) === "pending") continue
+                autoSelectedRef.current.set(key, "pending")
                 const { success, order } = await setShippingMethodRef.current(
                   shipment.id,
                   shippingMethod.id
                 )
-                if (!success) autoSelectedRef.current.delete(key)
+                if (success) autoSelectedRef.current.set(key, "settled")
+                else autoSelectedRef.current.delete(key)
                 if (typeof autoSelectSingleShippingMethod === "function" && success) {
                   autoSelectSingleShippingMethod(order)
                 }
