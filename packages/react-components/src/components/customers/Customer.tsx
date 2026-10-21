@@ -199,6 +199,18 @@ export function useCustomerProviderValue({
           return
         }
 
+        // Before the awaits, not after. Published afterwards, this write lands late
+        // enough to undo whatever happened while the request was in flight: a shopper
+        // who corrects the address mid-request has already gone through
+        // `setCustomerEmail`, and the resolving save would put the old address back —
+        // re-enabling `<SaveAddressesButton>` under a visible validation error and
+        // saving the superseded email. Writing on the way in makes the last caller
+        // win, which is the one the shopper typed last.
+        setState((previousState) => ({
+          ...previousState,
+          customerEmail,
+        }))
+
         await coreSaveCustomerUser({
           accessToken: accessToken ?? "",
           interceptors,
@@ -214,11 +226,6 @@ export function useCustomerProviderValue({
         // `<CustomerContainer>` used to go through `OrderContext.updateOrder`,
         // which refetched; the direct write replaced it.
         await getOrderRef.current?.(order.id)
-
-        setState((previousState) => ({
-          ...previousState,
-          customerEmail,
-        }))
       },
       setCustomerErrors: (errors: BaseError[]) => {
         setState((previousState) => ({
