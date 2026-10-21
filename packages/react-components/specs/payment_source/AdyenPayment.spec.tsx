@@ -917,3 +917,99 @@ describe("AdyenPayment does not enable the place-order button behind React's bac
     expect(setPaymentRef).toHaveBeenCalled()
   })
 })
+
+// Adyen is excluded from <PaymentGateway>'s loader swap on purpose — see the test above —
+// which left it as the one gateway with no placeholder at all: an empty box while the client
+// key, the script and the Drop-in came up, where every other gateway shows the app's `loader`.
+describe("AdyenPayment shows the same placeholder as the other gateways", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    adyen.captured.options = null
+  })
+
+  it("renders the loader until the Drop-in has mounted, then drops it", async () => {
+    render(
+      <Providers setPaymentSource={vi.fn(async () => PAYMENT_SOURCE)} updateOrder={vi.fn()}>
+        <AdyenPayment
+          clientKey="test_CLIENTKEY"
+          loaderComponent={<span data-testid="payment-skeleton">Loading…</span>}
+        />
+      </Providers>
+    )
+
+    // Nothing has resolved yet: this is the window the shopper used to spend looking at an
+    // empty area.
+    expect(screen.getByTestId("payment-skeleton")).toBeDefined()
+
+    await flush()
+
+    expect(adyen.dropinMount).toHaveBeenCalledTimes(1)
+    expect(screen.queryByTestId("payment-skeleton")).toBeNull()
+  })
+
+  it("carries the loader down from PaymentGateway's own `loader` prop", async () => {
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const order: any = {
+      ...ORDER,
+      payment_method: { id: "pm-1", payment_source_type: "adyen_payments" },
+      payment_source: { id: "ps-1", mismatched_amounts: false },
+    }
+    // biome-ignore lint/suspicious/noExplicitAny: test cast
+    const source: any = { ...PAYMENT_SOURCE, public_key: "test_CLIENTKEY" }
+
+    render(
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      <CommerceLayerContext.Provider value={{ accessToken: TEST_TOKEN } as any}>
+        {/* biome-ignore lint/suspicious/noExplicitAny: test cast */}
+        <OrderContext.Provider value={{ order, updateOrder: vi.fn() } as any}>
+          {/* biome-ignore lint/suspicious/noExplicitAny: test cast */}
+          <CustomerContext.Provider value={{} as any}>
+            {/* biome-ignore lint/suspicious/noExplicitAny: test cast */}
+            <PlaceOrderContext.Provider value={{ status: "standby" } as any}>
+              <PaymentMethodChildrenContext.Provider
+                value={
+                  {
+                    payment: { id: "pm-1", payment_source_type: "adyen_payments" },
+                    expressPayments: false,
+                    // biome-ignore lint/suspicious/noExplicitAny: test cast
+                  } as any
+                }
+              >
+                <PaymentMethodContext.Provider
+                  value={
+                    {
+                      currentPaymentMethodId: "pm-1",
+                      currentPaymentMethodType: "adyen_payments",
+                      config: {},
+                      setPaymentSource: vi.fn(async () => source),
+                      paymentSource: source,
+                      paymentMethods: [{ id: "pm-1" }],
+                      errors: [],
+                      setPaymentMethodErrors: vi.fn(),
+                      setPaymentRef: vi.fn(),
+                      // biome-ignore lint/suspicious/noExplicitAny: test cast
+                    } as any
+                  }
+                >
+                  <PaymentGateway
+                    show
+                    showCard={false}
+                    handleEditClick={() => {}}
+                    loader={<span data-testid="payment-skeleton">Loading…</span>}
+                  />
+                </PaymentMethodContext.Provider>
+              </PaymentMethodChildrenContext.Provider>
+            </PlaceOrderContext.Provider>
+          </CustomerContext.Provider>
+        </OrderContext.Provider>
+      </CommerceLayerContext.Provider>
+    )
+
+    expect(screen.getByTestId("payment-skeleton")).toBeDefined()
+
+    await flush()
+
+    expect(adyen.dropinMount).toHaveBeenCalledTimes(1)
+    expect(screen.queryByTestId("payment-skeleton")).toBeNull()
+  })
+})
