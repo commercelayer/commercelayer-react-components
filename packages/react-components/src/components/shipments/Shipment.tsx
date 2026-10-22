@@ -66,6 +66,11 @@ function ShipmentItem({
   )
 }
 
+// How many times a shipment is auto-selected in a row while the API keeps
+// reporting no method afterwards. A coupon clears the method once; an API that
+// never reports it set must not turn the selection into a loop.
+const MAX_AUTO_SELECT_ATTEMPTS = 3
+
 export function Shipment({
   children,
   loader = "Loading...",
@@ -97,6 +102,15 @@ export function Shipment({
   // the step on the loader, for good.
   const autoSelectedRef = useRef<Map<string, "pending" | "settled">>(new Map())
 
+  // The latest shipments, read when a selection resolves. The refetch the
+  // selection makes after its PATCH is in here by then, and if it still has no
+  // method the API cleared it while the selection was in flight. That has to be
+  // acted on there and then: the refetches that follow bring the same data, and
+  // SWR hands back the previous array when a refetch is deep-equal to it, so no
+  // new `shipments` identity ever re-runs the effect.
+  const shipmentsRef = useRef(shipments)
+  shipmentsRef.current = shipments
+
   useEffect(() => {
     if (shipments != null) {
       if (autoSelectSingleShippingMethod) {
@@ -111,15 +125,22 @@ export function Shipment({
               if (shippingMethod && setShippingMethodRef.current != null) {
                 const key = `${shipment.id}:${shippingMethod.id}`
                 if (autoSelectedRef.current.get(key) === "pending") continue
-                autoSelectedRef.current.set(key, "pending")
-                const { success, order } = await setShippingMethodRef.current(
-                  shipment.id,
-                  shippingMethod.id
-                )
-                if (success) autoSelectedRef.current.set(key, "settled")
-                else autoSelectedRef.current.delete(key)
-                if (typeof autoSelectSingleShippingMethod === "function" && success) {
-                  autoSelectSingleShippingMethod(order)
+                for (let attempt = 1; attempt <= MAX_AUTO_SELECT_ATTEMPTS; attempt++) {
+                  autoSelectedRef.current.set(key, "pending")
+                  const { success, order } = await setShippingMethodRef.current(
+                    shipment.id,
+                    shippingMethod.id
+                  )
+                  if (!success) {
+                    autoSelectedRef.current.delete(key)
+                    break
+                  }
+                  autoSelectedRef.current.set(key, "settled")
+                  if (typeof autoSelectSingleShippingMethod === "function") {
+                    autoSelectSingleShippingMethod(order)
+                  }
+                  const latest = shipmentsRef.current?.find(({ id }) => id === shipment.id)
+                  if (latest == null || latest.shipping_method != null) break
                 }
               }
             } else {

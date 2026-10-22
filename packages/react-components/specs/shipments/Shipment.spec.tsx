@@ -255,18 +255,31 @@ describe("Shipment", () => {
       ]
     }
 
-    it("does not auto-select the same shipment twice while the data catches up", async () => {
-      // The refetch that follows a selection lands while it is still in flight,
-      // before the API reports the method as set, so the effect re-runs on
-      // identical data with a new identity. Selecting again is harmless
-      // server-side but tells a caller's callback — analytics, in practice —
-      // about it a second time.
-      let resolveSelection: (value: unknown) => void = () => {}
+    function deferSelection() {
+      let resolve: (value: unknown) => void = () => {}
       mockSetShippingMethod.mockReturnValueOnce(
-        new Promise((resolve) => {
-          resolveSelection = resolve
+        new Promise((r) => {
+          resolve = r
         })
       )
+      return (value: unknown = { success: true, order: { id: "order-1" } }) =>
+        act(async () => {
+          resolve(value)
+        })
+    }
+
+    function selected() {
+      return [makeShipment({ available_shipping_methods: [SHIPPING_METHOD_A] })]
+    }
+
+    it("does not auto-select the same shipment twice while the data catches up", async () => {
+      // A refetch that started before the selection lands while it is in
+      // flight, before the API reports the method as set, so the effect re-runs
+      // on identical data with a new identity. Selecting again is harmless
+      // server-side but tells a caller's callback — analytics, in practice —
+      // about it a second time. The refetch the selection makes itself, after
+      // its PATCH, does show the method.
+      const resolveSelection = deferSelection()
       const onAutoSelect = vi.fn()
       const tree = autoSelectTree(onAutoSelect)
 
@@ -277,25 +290,22 @@ describe("Shipment", () => {
         rerender(tree(unselected()))
       })
       await act(async () => {
-        resolveSelection({ success: true, order: { id: "order-1" } })
+        rerender(tree(selected()))
       })
+      await resolveSelection()
 
       expect(mockSetShippingMethod).toHaveBeenCalledTimes(1)
       expect(onAutoSelect).toHaveBeenCalledTimes(1)
     })
 
-    it("selects again when the method is cleared after the selection has resolved", async () => {
-      // Kills: keeping the dedupe key until the data reports the method as set.
-      // Applying a coupon while the selection is in flight clears the method
-      // before any refetch shows it set (#887): the refetch inside the selection
-      // and every later one carry no method, the shipment is never selected
-      // again, and the step stays on the loader.
-      let resolveSelection: (value: unknown) => void = () => {}
-      mockSetShippingMethod.mockReturnValueOnce(
-        new Promise((resolve) => {
-          resolveSelection = resolve
-        })
-      )
+    it("selects again at once when the selection's own refetch shows the method cleared", async () => {
+      // Kills: waiting for a later `shipments` update to notice the reset.
+      // A coupon applied while the selection is in flight clears the method
+      // (#887), and the refetch inside the selection already shows it gone. The
+      // refetches after it bring the very same data, and SWR hands back the
+      // previous array when a refetch is deep-equal to it, so the effect is
+      // never re-run: the shipment stayed unselected and the step on the loader.
+      const resolveFirst = deferSelection()
       const tree = autoSelectTree(true)
 
       const { rerender } = render(tree(unselected()))
@@ -305,22 +315,51 @@ describe("Shipment", () => {
       await act(async () => {
         rerender(tree(unselected()))
       })
-      await act(async () => {
-        resolveSelection({ success: true, order: { id: "order-1" } })
-      })
-      expect(mockSetShippingMethod).toHaveBeenCalledTimes(1)
+      const resolveSecond = deferSelection()
+      await resolveFirst()
 
-      // The refetch the coupon's order revision triggers.
-      await act(async () => {
-        rerender(tree(unselected()))
-      })
+      // No further `shipments` update arrives, and the shipment is selected again.
       expect(mockSetShippingMethod).toHaveBeenCalledTimes(2)
       expect(mockSetShippingMethod).toHaveBeenLastCalledWith("ship_1", "sm_1")
 
       await act(async () => {
-        rerender(tree([makeShipment({ available_shipping_methods: [SHIPPING_METHOD_A] })]))
+        rerender(tree(selected()))
       })
+      await resolveSecond()
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(2)
       await waitFor(() => expect(screen.getByTestId("child")).toBeDefined())
+    })
+
+    it("selects again when the method is cleared by a later update", async () => {
+      // The other way a reset shows up: the selection's own refetch has the
+      // method, and a later one, with a new identity, has it gone.
+      const resolveSelection = deferSelection()
+      const tree = autoSelectTree(true)
+
+      const { rerender } = render(tree(unselected()))
+      await waitFor(() => expect(mockSetShippingMethod).toHaveBeenCalledTimes(1))
+      await act(async () => {
+        rerender(tree(selected()))
+      })
+      await resolveSelection()
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(1)
+
+      deferSelection()
+      await act(async () => {
+        rerender(tree(unselected()))
+      })
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(2)
+    })
+
+    it("stops selecting again when the API never reports the method as set", async () => {
+      // A bound, not a loop: every selection succeeds and every refetch still
+      // shows no method.
+      const tree = autoSelectTree(true)
+
+      render(tree(unselected()))
+      await act(async () => {})
+
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(3)
     })
 
     it("selects again when a selection that failed sees the shipment still unselected", async () => {
@@ -330,6 +369,7 @@ describe("Shipment", () => {
       const { rerender } = render(tree(unselected()))
       await waitFor(() => expect(mockSetShippingMethod).toHaveBeenCalledTimes(1))
 
+      deferSelection()
       await act(async () => {
         rerender(tree(unselected()))
       })
