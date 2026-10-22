@@ -259,6 +259,50 @@ describe("Address", () => {
     })
   })
 
+  it("publishes a preselected shipping address without waiting for another dependency to change", async () => {
+    // Kills: highlighting the card from `shippingCustomerAddressId` in one pass
+    // and publishing it only on a later pass. With every input already settled
+    // when the list mounts — the shipping list that appears when a billing
+    // address outside the country lock forces "ship to different address" —
+    // nothing re-runs the effect: the card shows as selected, the shared state
+    // has no shipping address, and the save button stays disabled.
+    renderAddress(
+      { addresses: [mockAddress, mockAddress2] },
+      {
+        shipping: {
+          setShippingAddress: mockSetShippingAddress,
+          shippingCustomerAddressId: "cust-addr-2",
+        },
+      }
+    )
+    await waitFor(() => {
+      const cards = screen.getAllByTestId("address-child").map((el) => el.parentElement!)
+      expect(cards[1].className).toContain("selected")
+    })
+    expect(mockSetShippingAddress).toHaveBeenCalledWith("addr-2", {
+      customerAddressId: "cust-addr-2",
+    })
+  })
+
+  it("publishes a preselected billing address without waiting for another dependency to change", async () => {
+    renderAddress(
+      { addresses: [mockAddress, mockAddress2] },
+      {
+        billing: {
+          setBillingAddress: mockSetBillingAddress,
+          billingCustomerAddressId: "cust-addr-2",
+        },
+      }
+    )
+    await waitFor(() => {
+      const cards = screen.getAllByTestId("address-child").map((el) => el.parentElement!)
+      expect(cards[1].className).toContain("selected")
+    })
+    expect(mockSetBillingAddress).toHaveBeenCalledWith("addr-2", {
+      customerAddressId: "cust-addr-2",
+    })
+  })
+
   it("calls setBillingAddress via effect re-run when dep changes after address is selected", async () => {
     const Wrapper = ({ extra }: { extra: boolean }) => (
       <OrderContext.Provider value={{ ...defaultOrderContext } as any}>
