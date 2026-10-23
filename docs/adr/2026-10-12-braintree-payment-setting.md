@@ -139,3 +139,56 @@ end-to-end tests use a different card per test.
 needed), PayPal and Venmo through Braintree, and Apple Pay / Google Pay — which Commerce Layer would
 authorize as any other nonce, but whose `payment_instrument` comes back empty, since
 `Payment::Instrument::Braintree` knows only cards, PayPal, Venmo and US bank accounts.
+
+## Correction, 2026-10-23: Braintree sessions accept `vaulting`
+
+"No session `vaulting`" above no longer holds. Since 2026-10-19 a Braintree Payment Session takes
+`vaulting: true`, and saving a card works the way it does on Stripe: Commerce Layer asks Braintree to
+store the payment method once the transaction succeeds, on the setting's merchant account and against
+the customer, and links the `payment_wallet` to the session by itself. A declined payment stores
+nothing. A 3DS-verified nonce is stored like any other.
+
+**Decision: the consent is the application's, as on Stripe.** Hosted Fields are bare inputs with no
+checkbox of their own, so `offersSaveCard` now answers `true` for Braintree and a signed-in customer,
+and `<PaymentSetting>` exposes `canSaveCard` / `saveCard` / `setSaveCard` for it unchanged — changing the
+choice replaces the session, the form remounts on the new client token, and a guest never sends
+`vaulting` (`2026-09-29-saving-cards-through-vaulting.md`).
+
+**The choice covers the session, not the card.** Card fields, Apple Pay and PayPal through Braintree
+pay one session, so a ticked box applies to whichever of them pays. The library leaves it at that; the
+application should word the control as saving a payment method rather than a card.
+
+**PayPal through Braintree is paid, not stored.** Verified in the browser on staging: on a session
+with `vaulting`, a PayPal approval is authorized as usual and the order placed, but no wallet is
+linked — Braintree does not vault a one-time PayPal approval, and skips it without failing the
+transaction. Storing it would take PayPal's billing-agreement flow, loaded for vaulting, which does
+not sit with the `authorize` intent this component uses for every setting. Left out.
+
+**The renewal keeps the choice.** An expired client token renews the session (above), and the
+renewal now carries the old session's `vaulting` over. Before, it dropped it: the shopper's box stayed
+ticked on screen while the new session stored nothing.
+
+**One 3DS instance per page, never torn down.** The first browser run of a saved card hung on
+"placing": no challenge, no lookup, nothing in the console but Cardinal's `Multiple appenders use the
+same name Console Appender`. Ticking the box replaces the session, and the form remounts on the new
+client token — which, as written, meant a second 3DS instance. 3DS runs on Cardinal, a single global
+that sets up once per page: the second instance configures it again and asks it to set up again,
+Cardinal neither repeats its setup (one `Order/JWT/Init` in the trace) nor tells the newcomer it
+already happened, and the newcomer waits for a device-data reference that never arrives. Tearing the
+first instance down did not help either: `braintree-web` removes its Cardinal listeners with
+`Cardinal.off`, which drops every listener for those events on the page.
+
+So the page keeps one instance (`pageThreeDSecureInstance` in `utils/braintree.ts`): the first form
+creates it, every later form uses it, and no form tears it down — the fields are still torn down with
+their form. It stays bound to the client it was created with, which the lookup accepts for a nonce
+tokenized by a later form, since both are the same merchant's; the browser run passes that way. A
+creation that fails is forgotten, so the next form tries again.
+
+This was not a vaulting bug. Any second card form on the page had it — a renewed session, a refused
+card's replacement, or the shopper picking another method and coming back to the card — and the
+ticked box made it the common path. What remains: an instance created from a client token that has
+since expired (a page left open for a day) cannot be replaced without reloading the page.
+
+**Verified:** a card nonce on a `vaulting` session on staging is `succeeded`, with a `payment_wallet`
+whose `payment_data` is `{ details_type, brand_code, last4, expiration_month, expiration_year, id,
+customer_id }`. **Still out of scope:** paying with a stored card, as for every gateway.

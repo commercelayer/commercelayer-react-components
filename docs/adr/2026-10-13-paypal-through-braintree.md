@@ -86,3 +86,12 @@ is reported — see `PaymentSetting.tsx`'s `selectionError`, scoped to the setti
 **mfe-checkout groups Braintree's wallets.** Apple Pay and PayPal sit in one block above the card
 fields with a single "or pay by card" divider, shown only when the block has something in it — so a
 browser with neither shows the card fields alone.
+
+## Correction, 2026-10-23: sessions accept `vaulting`, PayPal is still not stored
+
+The scope above says saving a PayPal account is blocked on session `vaulting`. Braintree sessions
+accept it now, and cards are stored (`2026-10-12-braintree-payment-setting.md`, correction of the same
+date). A PayPal approval made by this component is not: on a `vaulting` session it is authorized and
+the order placed, but Braintree does not vault a one-time approval and no wallet is linked. Storing it
+would take PayPal's billing-agreement flow, which does not sit with the `authorize` intent chosen
+above, so it stays out of scope — for a different reason than the one given.
