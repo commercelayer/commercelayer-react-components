@@ -1,5 +1,6 @@
 import {
   ADYEN_SETTING_TYPE,
+  BRAINTREE_SETTING_TYPE,
   buildGatewayReturnUrl,
   STRIPE_SETTING_TYPE,
 } from "@commercelayer/core-components"
@@ -80,21 +81,34 @@ const BUILDERS: Record<string, Builder> = {
 }
 
 /**
+ * Settings whose payment form cannot ask for consent to store the instrument,
+ * so the application has to.
+ *
+ * - **Stripe:** its Payment Element, driven by the PaymentIntent's client
+ *   secret, has no consent checkbox of its own — that would take a Customer
+ *   Session, which only a secret key can create.
+ * - **Braintree:** Hosted Fields are bare inputs, with no checkbox to offer.
+ *   The choice covers the whole session, so a shopper who ticks it and then
+ *   pays through Apple Pay or PayPal on the same setting stores that instead
+ *   of a card: the copy should say "payment method", not "card".
+ *
+ * Adyen's Drop-in asks on its own, which is why Adyen is not here.
+ */
+const CONSENT_BY_APPLICATION: readonly string[] = [STRIPE_SETTING_TYPE, BRAINTREE_SETTING_TYPE]
+
+/**
  * Whether the application should offer the shopper a "save this card" choice
  * for this setting.
- *
- * Stripe only. Its Payment Element, driven by the PaymentIntent's client
- * secret, has no consent checkbox of its own — that would take a Customer
- * Session, which only a secret key can create — so the consent has to be the
- * application's. Adyen's Drop-in asks on its own, which is why Adyen is not
- * here.
  *
  * Gated on the token for the reason the Adyen builder is: a wallet belongs to a
  * customer, and on a guest order Commerce Layer's customer is just whoever
  * typed that email.
  */
 export function offersSaveCard(params: Pick<BuilderParams, "setting" | "accessToken">): boolean {
-  return params.setting.type === STRIPE_SETTING_TYPE && isAuthenticatedCustomer(params.accessToken)
+  return (
+    CONSENT_BY_APPLICATION.includes(params.setting.type) &&
+    isAuthenticatedCustomer(params.accessToken)
+  )
 }
 
 /**

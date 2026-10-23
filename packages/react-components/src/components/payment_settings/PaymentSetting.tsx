@@ -81,9 +81,11 @@ export interface PaymentSettingChildrenProps {
    */
   selectSetting: () => Promise<void>
   /**
-   * Whether to offer a "save this card" choice for this setting — Stripe, for a
-   * signed-in customer. The library renders no control for it: the copy and the
-   * placement are the application's.
+   * Whether to offer a "save this card" choice for this setting — Stripe or
+   * Braintree, for a signed-in customer. The library renders no control for it:
+   * the copy and the placement are the application's. On Braintree the choice
+   * covers the whole session, so Apple Pay or PayPal paid through the same
+   * setting is stored too: word it as a payment method, not a card.
    */
   canSaveCard: boolean
   /** Whether the current Payment Session stores the card. */
@@ -454,9 +456,16 @@ export function PaymentSetting({
             }
           }
           // Same guard as above: a payment in flight belongs to its session.
+          // The renewal carries the shopper's save-card choice over: it stands
+          // in for the session it replaces, and nothing on screen tells them
+          // the choice was dropped — the first they would hear of it is a card
+          // missing from their next checkout.
           const renewPaymentSession = async (): Promise<void> => {
             if (!isSelected || isCollecting(order.id)) return
-            await selectSetting(setting, { replace: true })
+            await selectSetting(setting, {
+              replace: true,
+              vaulting: currentPaymentSession?.vaulting ?? undefined,
+            })
           }
           return (
             <PaymentSettingChildrenContext.Provider
