@@ -1,4 +1,5 @@
 import type { PaymentSession } from "@commercelayer/sdk"
+import type { ThreeDSecure } from "braintree-web/three-d-secure"
 
 /**
  * braintree-web ships CommonJS, so a dynamic `import()` of one of its subpaths
@@ -31,4 +32,44 @@ export function braintreeErrorCode(error: unknown): string | undefined {
 export function sessionAmount(session: PaymentSession): string {
   const amount = session.amount_float ?? (session.amount_cents ?? 0) / 100
   return amount.toFixed(2)
+}
+
+let pageThreeDSecure: Promise<ThreeDSecure> | null = null
+
+/**
+ * The page's 3DS instance: created by the first caller, handed to every later
+ * one, and never torn down.
+ *
+ * One per page because Cardinal, which 3DS runs on, can be set up only once per
+ * page. A second instance configures it again and asks it to set up again, and
+ * Cardinal neither repeats its setup nor tells the new instance that it already
+ * happened — so the new instance waits for a device-data reference that never
+ * comes, and its first payment hangs on "placing". A card form that replaces
+ * another — the save-card box ticked, a session renewed, the shopper coming
+ * back to the card — is exactly that second instance.
+ *
+ * Kept for the same reason it is never torn down: tearing it down removes its
+ * Cardinal listeners, and nothing could set them up again. The instance stays
+ * bound to the client it was created with, which is fine for a card form
+ * replacing another: the lookup is the same merchant's, and the nonce it
+ * verifies is the new form's.
+ *
+ * A creation that fails is forgotten, so the next form tries again.
+ */
+export function pageThreeDSecureInstance(
+  create: () => Promise<ThreeDSecure>
+): Promise<ThreeDSecure> {
+  if (pageThreeDSecure == null) {
+    const created = create()
+    pageThreeDSecure = created
+    created.catch(() => {
+      if (pageThreeDSecure === created) pageThreeDSecure = null
+    })
+  }
+  return pageThreeDSecure
+}
+
+/** Forget the page's 3DS instance. For tests, which share the module. */
+export function resetPageThreeDSecure(): void {
+  pageThreeDSecure = null
 }

@@ -25,7 +25,12 @@ import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContex
 import { useStickySessionValue } from "#hooks/useStickySessionValue"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
-import { braintreeErrorCode, interopDefault, sessionAmount } from "#utils/braintree"
+import {
+  braintreeErrorCode,
+  interopDefault,
+  pageThreeDSecureInstance,
+  sessionAmount,
+} from "#utils/braintree"
 import {
   type PaymentGatewaySubmitResult,
   registerHostCollection,
@@ -368,8 +373,13 @@ function BraintreeForm({
             fields: hostedFieldsFields,
             styles: current.styles ?? DEFAULT_STYLES,
           }) as Promise<HostedFields>,
+          // The page's instance, not one of this form's own: Cardinal sets up
+          // once per page, so a form replacing another could never set up a
+          // second one. See `pageThreeDSecureInstance`.
           threeDSecureModule != null
-            ? (threeDSecureModule.create({ client, version: 2 }) as Promise<ThreeDSecure>)
+            ? pageThreeDSecureInstance(
+                () => threeDSecureModule.create({ client, version: 2 }) as Promise<ThreeDSecure>
+              )
             : Promise.resolve(null),
         ])
         booted = { client, hostedFields, threeDSecure }
@@ -542,18 +552,18 @@ function renderedFields(fields: Props["fields"]): PaymentSettingBraintreeFieldNa
   return fields?.cardholderName != null ? ["cardholderName", ...names] : names
 }
 
-/** Best effort: a torn-down page has nothing left to report a failure to. */
-function teardown({ hostedFields, threeDSecure }: BraintreeInstances): void {
+/**
+ * Best effort: a torn-down page has nothing left to report a failure to.
+ *
+ * The fields only. 3DS is the page's, and tearing it down would strip
+ * Cardinal's listeners for good — the next form could not set them up again.
+ */
+function teardown({ hostedFields }: BraintreeInstances): void {
   // `teardown()` returns a promise when given no callback, which the typings
   // do not say; wrapped so a rejection is caught either way.
   Promise.resolve()
     .then(() => hostedFields.teardown())
     .catch(() => {})
-  if (threeDSecure != null) {
-    Promise.resolve()
-      .then(() => threeDSecure.teardown())
-      .catch(() => {})
-  }
 }
 
 /**

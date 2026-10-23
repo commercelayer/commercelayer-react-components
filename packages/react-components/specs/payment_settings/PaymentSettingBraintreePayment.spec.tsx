@@ -10,6 +10,7 @@ import { PaymentSetting } from "#components/payment_settings/PaymentSetting"
 import { PaymentSettingBraintreePayment } from "#components/payment_settings/PaymentSettingBraintreePayment"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import { resetPageThreeDSecure } from "#utils/braintree"
 import {
   getHandoffSnapshot,
   isCollecting,
@@ -191,6 +192,7 @@ function verified(info: {
 beforeEach(() => {
   vi.clearAllMocks()
   resetPaymentGatewayStore()
+  resetPageThreeDSecure()
   bt.listeners = {}
   bt.clientCreate.mockResolvedValue({ name: "client" })
   bt.hostedFieldsCreate.mockResolvedValue({
@@ -275,13 +277,66 @@ describe("<PaymentSettingBraintreePayment> mounting", () => {
     expect(bt.threeDSecureCreate).not.toHaveBeenCalled()
   })
 
-  it("tears Braintree down when the form goes away", async () => {
+  it("tears the fields down when the form goes away, and leaves 3DS to the page", async () => {
     const { unmount } = await renderLoaded()
     unmount()
     await waitFor(() => {
       expect(bt.hostedFieldsTeardown).toHaveBeenCalled()
-      expect(bt.threeDSecureTeardown).toHaveBeenCalled()
     })
+    // Tearing 3DS down strips Cardinal's listeners, and Cardinal cannot be set
+    // up again on this page: the next form would have no 3DS that works.
+    expect(bt.threeDSecureTeardown).not.toHaveBeenCalled()
+  })
+
+  // Cardinal sets up once per page. A second 3DS instance never hears that
+  // setup completed, and its first payment hangs.
+  it("reuses the page's 3DS when a form replaces another", async () => {
+    const { rerender } = await renderLoaded()
+    bt.clientCreate.mockResolvedValue({ name: "second client" })
+
+    rerender(
+      <Wrapper
+        currentOrder={order({
+          payment_sessions: [
+            {
+              ...BRAINTREE_SESSION,
+              id: "session-bt-2",
+              response_data: { clientToken: "client-token-2" },
+            },
+          ],
+        })}
+      >
+        <PaymentSetting>
+          <PaymentSettingBraintreePayment containerClassName="braintree" />
+        </PaymentSetting>
+      </Wrapper>
+    )
+
+    await waitFor(() => {
+      expect(bt.clientCreate).toHaveBeenCalledWith({ authorization: "client-token-2" })
+      expect(bt.hostedFieldsCreate).toHaveBeenCalledTimes(2)
+    })
+    expect(bt.threeDSecureCreate).toHaveBeenCalledTimes(1)
+
+    // And the replacement pays through it.
+    await act(async () => {
+      bt.listeners.validityChange?.({ fields: { number: { isValid: true } } })
+    })
+    const result = await submit()
+    expect(result).toEqual({ status: "completed" })
+    expect(bt.verifyCard).toHaveBeenCalledTimes(1)
+  })
+
+  it("tries 3DS again on the next form when creating it failed", async () => {
+    bt.threeDSecureCreate.mockRejectedValueOnce({ code: "THREEDS_NOT_ENABLED" })
+    const { unmount } = renderBraintree()
+    await waitFor(() => {
+      expect(screen.getByTestId("error-code").textContent).toBe("THREEDS_NOT_ENABLED")
+    })
+    unmount()
+
+    await renderLoaded()
+    expect(bt.threeDSecureCreate).toHaveBeenCalledTimes(2)
   })
 
   // `response_data` is not in every consumer's `fields` allowlist: a refetch
