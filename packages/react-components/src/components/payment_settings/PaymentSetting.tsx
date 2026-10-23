@@ -82,8 +82,8 @@ export interface PaymentSettingChildrenProps {
    */
   selectSetting: () => Promise<void>
   /**
-   * Whether to offer a "save this card" choice for this setting — Stripe or
-   * Braintree, for a signed-in customer. The library renders no control for it:
+   * Whether to offer a "save this card" choice for this setting — Stripe,
+   * Braintree or PayPal, for a signed-in customer. The library renders no control for it:
    * the copy and the placement are the application's. On Braintree the choice
    * goes with the session, not with the card fields, so an Apple Pay payment on
    * the same setting is stored too: word it as a payment method, not a card.

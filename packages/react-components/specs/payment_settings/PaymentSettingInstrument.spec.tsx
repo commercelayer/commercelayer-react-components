@@ -214,4 +214,20 @@ describe("PaymentSettingInstrument", () => {
       "American express •••• 0005|//data.commercelayer.app/assets/images/icons/credit-cards/color/amex.svg"
     )
   })
+
+  // PayPal fills no issuer type either; whatever pays its setting is PayPal.
+  it("names PayPal for the PayPal payment setting", () => {
+    renderInstrument(
+      order(
+        { account_id: "PAYER1", account_email: "buyer@personal.example.com" },
+        {
+          id: "ps-paypal",
+          type: "payment_setting_paypals",
+          name: "PayPal",
+          client_id: "paypal-client-id",
+        }
+      )
+    )
+    expect(screen.getByTestId("instrument").textContent).toBe("PayPal")
+  })
 })
