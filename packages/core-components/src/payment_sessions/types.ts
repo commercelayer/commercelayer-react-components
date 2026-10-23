@@ -312,6 +312,43 @@ export function readStripeClientSecret(session?: PaymentSession | null): string 
 }
 
 /**
+ * The Payment Setting type Braintree cards are taken through.
+ *
+ * The odd one out among the card gateways: the setting carries no credential a
+ * browser can use — its `public_key` is half of Braintree's server-side API key
+ * pair, not a publishable key — so everything the browser needs arrives with
+ * the Payment Session instead.
+ */
+export const BRAINTREE_SETTING_TYPE = "payment_setting_braintrees"
+
+/** Whether this session belongs to a Braintree Payment Setting. */
+export function isBraintreeSession(session?: PaymentSession | null): boolean {
+  return session?.payment_setting?.type === BRAINTREE_SETTING_TYPE
+}
+
+/**
+ * The client token `braintree-web` is booted with.
+ *
+ * Commerce Layer asks Braintree's GraphQL API for one when the session is
+ * created (`createClientToken`, scoped to the setting's merchant account and to
+ * no customer) and stores it in `response_data` under Braintree's own camelCase
+ * name — `Payment::Session::Braintree#create_client_token` in `core-api`. It is
+ * per session, which is why a Braintree form cannot exist before its session
+ * does.
+ *
+ * Returns `undefined` when it is absent or empty, for the same reasons as the
+ * Adyen and Stripe readers: a consumer whose `fields` allowlist omits
+ * `response_data`, or a session whose gateway call failed.
+ */
+export function readBraintreeClientToken(session?: PaymentSession | null): string | undefined {
+  const data = session?.response_data
+  if (data == null || typeof data !== "object") return undefined
+  const { clientToken } = data as { clientToken?: unknown }
+  if (typeof clientToken !== "string" || clientToken === "") return undefined
+  return clientToken
+}
+
+/**
  * What the shopper paid with, as the API describes it.
  *
  * `payment_instrument` is one shape for every gateway: each

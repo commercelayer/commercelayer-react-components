@@ -369,6 +369,57 @@ describe("returning from a 3DS redirect", () => {
     expect(placeOrderMock).not.toHaveBeenCalled()
   })
 
+  // A refusal is the ordinary end of an attempt, not of the checkout: the
+  // shopper picks the method again and pays through the same wallet on the
+  // same page. Hearing only the first outcome ever left the second attempt's
+  // money taken and the order never placed.
+  it("places a later attempt that succeeds after a refusal", async () => {
+    renderButton()
+
+    await act(async () => {
+      setOutOfBandCollection("order-1", "failed", [
+        { code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE", message: "declined" },
+      ])
+    })
+    await waitFor(() => {
+      expect(discardPaymentSessionMock).toHaveBeenCalledTimes(1)
+    })
+
+    await act(async () => {
+      setOutOfBandCollection("order-1", "in-progress")
+    })
+    await act(async () => {
+      setOutOfBandCollection("order-1", "done")
+    })
+
+    await waitFor(() => {
+      expect(placeOrderMock).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("reports a second refusal once the phase has moved on from the first", async () => {
+    renderButton()
+
+    await act(async () => {
+      setOutOfBandCollection("order-1", "failed", [
+        { code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE", message: "first" },
+      ])
+    })
+    await act(async () => {
+      setOutOfBandCollection("order-1", "in-progress")
+    })
+    await act(async () => {
+      setOutOfBandCollection("order-1", "failed", [
+        { code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE", message: "second" },
+      ])
+    })
+
+    await waitFor(() => {
+      expect(setOrderErrors).toHaveBeenCalledWith([expect.objectContaining({ message: "second" })])
+    })
+    expect(discardPaymentSessionMock).toHaveBeenCalledTimes(2)
+  })
+
   it("shows the button as busy while the redirect is being completed", async () => {
     renderButton()
 

@@ -64,4 +64,16 @@ describe("GiftCardOrCouponForm on the payment_sessions model", () => {
     renderForm({ id: "order-1", available_payment_methods: [{ id: "pm-1" }] } as never)
     expect(inputName()).toBe("gift_card_or_coupon_code")
   })
+
+  // The API applies an order-level gift card to an order created with 2026-05
+  // as long as it is on the older model, so the creation version must not
+  // narrow the field down to the coupon.
+  it("offers the combined field on an order created with 2026-05 on the payment_source model", () => {
+    renderForm({
+      id: "order-1",
+      available_payment_methods: [{ id: "pm-1" }],
+      meta: { created_with_version: "2026-05" },
+    } as never)
+    expect(inputName()).toBe("gift_card_or_coupon_code")
+  })
 })

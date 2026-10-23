@@ -90,7 +90,7 @@ A payment method whose own control performs the payment, so the checkout's place
 _Avoid_: express payment (a different entry point into the checkout, before an address exists), self-submitting method
 
 **Payments Gateway (`payment_sessions`)**:
-A gateway implemented for this model, of which there are two: `payment_setting_adyens` through Adyen's Drop-in and `payment_setting_stripes` through Stripe's Payment Element. Both take their publishable credential from the setting's `public_key` and their session from `response_data` — Adyen's `{ id, sessionData }`, Stripe's `client_secret` — and both are collected by the checkout's own button for cards. Where they diverge is what a session _is_: Adyen's is built once at creation from `client_data.return_url`, immutable afterwards, while Stripe's is a PaymentIntent whose return URL is given at confirmation. That is why the return URL is a prop on `<PaymentSetting>` rather than a gateway's own: one gateway needs it before the shopper has done anything, the other only at the end.
+A gateway implemented for this model, of which there are three: `payment_setting_adyens` through Adyen's Drop-in, `payment_setting_stripes` through Stripe's Payment Element and `payment_setting_braintrees` through Braintree's Hosted Fields. All three take their session from `response_data` — Adyen's `{ id, sessionData }`, Stripe's `client_secret`, Braintree's **Client Token** — and all three are collected by the checkout's own button for cards. Adyen and Stripe also take a publishable credential from the setting's `public_key`; Braintree takes nothing from the setting, because its `public_key` is half of a server-side key pair. Where they diverge is what a session _is_ and where the money moves. Adyen's is built once at creation from `client_data.return_url`, immutable afterwards, while Stripe's is a PaymentIntent whose return URL is given at confirmation — which is why the return URL is a prop on `<PaymentSetting>` rather than a gateway's own: one gateway needs it before the shopper has done anything, the other only at the end. And Braintree is the one whose charge is server-side: the browser turns the card into a nonce, 3DS included, and the money moves inside the **Payment Authorization**, when Commerce Layer relays that nonce to Braintree.
 _Avoid_: payment gateway (the `payment_source` model's own component family, unrelated), provider
 
 **Gift Card Moment**:
@@ -104,6 +104,10 @@ _Avoid_: auto-place (`auto_place` on a Payment Setting is a different thing, and
 **Client Key**:
 The public Adyen credential the browser needs, `payment_setting_adyens.public_key`. Reachable by a sales-channel or customer token through exactly one request — the order with `available_payment_settings` included — because listing payment settings is refused and there is no other way to learn a setting's id. It is optional and unvalidated server-side, so a payment setting that works for server-side charges can carry none, and a setting in that state is skipped rather than offered.
 _Avoid_: public key (ambiguous across gateways — Stripe's is a publishable key), API key (the secret credential, never served)
+
+**Client Token**:
+Braintree's browser credential, `payment_session.response_data.clientToken` — per **Payment Session**, minted by Commerce Layer when the session is created, scoped to the setting's merchant account and to no customer. There is no static one: the setting carries nothing a browser can use, so a Braintree form cannot exist before its session does. It expires a day after creation while the session lasts two, and nothing regenerates it (`_refresh` does nothing for Braintree), so a stale one is cured only by a new session.
+_Avoid_: tokenization key (Braintree's static alternative, which Commerce Layer does not expose), public key (on Braintree that is the server-side API key's other half)
 
 ## Relationships
 
@@ -125,6 +129,7 @@ _Avoid_: public key (ambiguous across gateways — Stripe's is a publishable key
 - A **Payment Gateway** reaches `<PlaceOrderButton>` only through the **Payment Gateway Handoff**; they are siblings in a checkout, so no context connects them
 - A method with a **Gateway-Owned Button** cannot be collected by `<PlaceOrderButton>`, so the gate moves inside that method's own click and the button disables itself with that as the reason
 - An **Out-of-Band Collection** is the only circumstance in which the library places an order without a click — and both of its causes leave the terms accepted earlier, not skipped
+- A **Payment Session** against `payment_setting_braintrees` owns one **Client Token**, and is charged by its **Payment Authorization**: the nonce goes on the session as `client_data.payment_method_id`, and the authorization relays it to Braintree in a background job. Commerce Layer makes no 3DS check of its own, so whatever enforces 3DS has to run in the browser before the nonce is sent
 - A **Payment Session** for a card and one for PayPal are the same resource through the same **Payment Setting**: which method paid is not recorded on it, because `payment_instrument` is empty for Adyen and `client_data.payment_method` must never be written
 
 ## Example dialogue
@@ -189,6 +194,20 @@ _Avoid_: public key (ambiguous across gateways — Stripe's is a publishable key
 
 > **Dev:** "I'll record `paypal` in the session's `client_data` so the recap can name it."
 > **Domain expert:** "Don't — that one key is a tripwire. Writing `client_data.payment_method` makes the API call Adyen's `/payments` for the authorization, which 422s, which fails the authorization, which invalidates the session for good. The recap not naming PayPal is a gap we've filed; that would be an unrecoverable order."
+
+## Example dialogue — Braintree
+
+> **Dev:** "Where's Braintree's key? The setting has a `public_key`."
+> **Domain expert:** "That's half of the API key pair Commerce Layer charges with — useless in a browser. Braintree boots from the **Client Token** on the session, which is why there's no form until the shopper has picked Braintree."
+
+> **Dev:** "The Hosted Fields gave me a nonce. Am I done?"
+> **Domain expert:** "Nothing has been charged yet. Put the nonce on the session as `client_data.payment_method_id`, create the **Payment Authorization**, and wait for it to leave `pending` — that's when Braintree takes the money. Unlike Adyen there's no webhook to wait for: the authorization settles in a second or two, and its status is the verdict."
+
+> **Dev:** "Braintree's 3DS said the liability didn't shift, but Commerce Layer would authorize the card anyway?"
+> **Domain expert:** "It would — it authorizes any nonce it's given. So the 3DS outcome is enforced by us, before the authorization: a shopper who could have authenticated and didn't is refused; a card 3DS couldn't cover at all goes ahead unless the application asks for `requireLiabilityShift`."
+
+> **Dev:** "I'll test a decline with `fake-processor-declined-visa-nonce`."
+> **Domain expert:** "That nonce gets charged. Commerce Layer talks to Braintree's GraphQL API, where the sandbox declines on the *amount* — anything from 2000.00 to 2999.99."
 
 ## Example dialogue — gift cards
 
