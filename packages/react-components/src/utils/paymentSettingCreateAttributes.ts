@@ -88,9 +88,10 @@ const BUILDERS: Record<string, Builder> = {
  *   secret, has no consent checkbox of its own — that would take a Customer
  *   Session, which only a secret key can create.
  * - **Braintree:** Hosted Fields are bare inputs, with no checkbox to offer.
- *   The choice covers the whole session, so a shopper who ticks it and then
- *   pays through Apple Pay or PayPal on the same setting stores that instead
- *   of a card: the copy should say "payment method", not "card".
+ *   The choice goes with the session, not with the card fields: a shopper who
+ *   ticks it and then pays with Apple Pay on the same setting may store that
+ *   instead, so the copy should say "payment method", not "card". PayPal
+ *   through Braintree is paid but never stored.
  *
  * Adyen's Drop-in asks on its own, which is why Adyen is not here.
  */

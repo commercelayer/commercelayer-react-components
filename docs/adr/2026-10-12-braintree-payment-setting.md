@@ -155,8 +155,11 @@ choice replaces the session, the form remounts on the new client token, and a gu
 `vaulting` (`2026-09-29-saving-cards-through-vaulting.md`).
 
 **The choice covers the session, not the card.** Card fields, Apple Pay and PayPal through Braintree
-pay one session, so a ticked box applies to whichever of them pays. The library leaves it at that; the
-application should word the control as saving a payment method rather than a card.
+pay one session, so a ticked box goes with whichever of them pays. For a card it is verified; for
+PayPal the payment goes through and nothing is stored (below); for Apple Pay it is **not verified** —
+Braintree can vault an Apple Pay card, so it may be stored, but no browser run has tried it, since
+Apple Pay cannot be driven headless. The library leaves it at that; the application should word the
+control as saving a payment method rather than a card.
 
 **PayPal through Braintree is paid, not stored.** Verified in the browser on staging: on a session
 with `vaulting`, a PayPal approval is authorized as usual and the order placed, but no wallet is
