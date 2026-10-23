@@ -42,6 +42,7 @@ const IMPLEMENTED_SETTING_TYPES = [
   "payment_setting_adyens",
   "payment_setting_stripes",
   "payment_setting_braintrees",
+  "payment_setting_paypals",
 ] as const
 
 export interface PaymentSettingOnSelectParams {
