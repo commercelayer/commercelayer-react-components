@@ -17,12 +17,10 @@
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^5.2.1",
     "@commercelayer/js-auth": "^8.0.0",
     "@storybook/addon-docs": "^10.6.3",
     "@storybook/addon-links": "^10.6.3",
     "@storybook/addon-mcp": "^0.7.0",
-    "@storybook/addon-onboarding": "^10.6.3",
     "@storybook/icons": "^2.1.0",
     "@storybook/react": "^10.6.3",
     "@storybook/react-vite": "^10.6.3",

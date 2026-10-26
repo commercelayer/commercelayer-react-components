@@ -28,7 +28,7 @@
     "components"
   ],
   "scripts": {
-    "check-exports": "attw --pack .",
+    "check-exports": "pnpm dlx @arethetypeswrong/cli@0.18.5 --pack .",
     "lint": "biome lint --error-on-warnings ./src && tsc",
     "lint:fix": "pnpm biome lint --write ./src",
     "test": "pnpm run lint && vitest run --silent",
@@ -48,7 +48,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.18.5",
     "@babel/core": "^8.0.1",
     "@commercelayer/sdk": "8.0.2",
     "@rolldown/plugin-babel": "^0.2.3",

@@ -12,7 +12,6 @@ minimumReleaseAgeExclude:
   - rapid-form@4.0.3
   - '@storybook/addon-docs@10.5.3'
   - '@storybook/addon-links@10.5.3'
-  - '@storybook/addon-onboarding@10.5.3'
   - '@storybook/csf-plugin@10.5.3'
   - '@storybook/react-dom-shim@10.5.3'
   - '@storybook/react-vite@10.5.3'
