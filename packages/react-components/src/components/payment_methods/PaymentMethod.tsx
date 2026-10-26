@@ -174,6 +174,19 @@ export function PaymentMethod({
   // order losing the payment source they were set for; keying on the transition rather
   // than on "there is none" keeps them holding through the window in which the first
   // payment source is still being created.
+  // Whether this instance is still on screen. The payment step can close while the
+  // auto-select below is between its two calls — a coupon applied while the shipping
+  // method is being selected sends the accordion back to Delivery — and reopen a moment
+  // later. An unmounted instance that goes on to create the payment source leaves the
+  // reopened one, which knows nothing of it, to create a second: two checkout.com
+  // payment sessions on the page, and the order pointing at only one of them.
+  const isMountedRef = useRef(false)
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
   const hadPaymentSourceRef = useRef(false)
   useEffect(() => {
     // Only an explicit `null` is the API saying the payment source is gone. `undefined`
@@ -213,6 +226,10 @@ export function PaymentMethod({
               const paymentMethodId = paymentMethod?.id
               const paymentResource = paymentMethod?.payment_source_type as PaymentResource
               await setPaymentMethod({ paymentResource, paymentMethodId })
+              if (!isMountedRef.current) {
+                setLoadingPlaceOrder({ loading: false })
+                return
+              }
               let attributes: Record<string, unknown> | undefined = {}
               if (config != null && paymentResource === "paypal_payments") {
                 attributes = getPaypalAttributes(paymentResource, config)
