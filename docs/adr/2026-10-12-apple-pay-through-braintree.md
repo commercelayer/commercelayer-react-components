@@ -1,7 +1,8 @@
 # Apple Pay through Braintree: a button beside the card, not a method inside it
 
 **Date:** 2026-10-12
-**Status:** accepted — unit-tested; the Safari run on a registered domain is still to do
+**Status:** accepted — unit-tested, and run in Safari on the sandbox on 2026-10-26 (see the
+note at the end)
 **Scope:** `<PaymentSettingBraintreeApplePay>`, on the `payment_sessions` model, beside the card
 fields of `2026-10-12-braintree-payment-setting.md`. Google Pay is deferred: in `PRODUCTION`
 Google requires a merchant ID in the payment data request, which only the browser can send and
@@ -106,3 +107,25 @@ with Braintree's association file served on it, Apple Pay enabled there, and a s
 on Chrome; tapping opens the sheet (the gesture survived); merchant validation passes; the order
 places after on-device authorization; a gift card that cannot be charged shows something legible in
 the sheet; and what the thank-you recap shows with an empty `payment_instrument`.
+
+## Run in Safari, 2026-10-26
+
+Run by hand in Safari against the Braintree sandbox, on a guest order of $71.00: the button showed,
+the sheet opened from the tap, merchant validation passed, and the order was placed after
+on-device authorization — the session `authorized` and its authorization `succeeded`.
+
+**The instrument is not empty, and it names the card.** The gap expected under Context did not
+show: Braintree reported the payment as a card — `details_type: CreditCardDetails`, brand
+`MASTERCARD` and the last four digits of the Wallet card — so `payment_instrument` was filled like
+any card's, and the recap read "Mastercard •••• 0049". Nothing in it says Apple Pay, so the recap
+cannot name the wallet; it shows the card, which is also what `<PaymentSettingInstrument>` prefers
+when a card was paid through a wallet.
+
+**The recap's icon was broken.** Braintree spells brands in upper case and in full (`MASTERCARD`,
+`AMERICAN_EXPRESS`), and the icon set's files are lower case and short (`mastercard.svg`,
+`amex.svg`), so the URL built from the brand as given missed the file. `<PaymentSettingInstrument>`
+now maps the gateway's spelling onto the file name.
+
+**Still not run:** a gift card that cannot be charged while the sheet is open, and saving — the
+order was a guest's, so the session did not ask to store the card, and whether Apple Pay is stored
+on a session that does remains unverified.
