@@ -82,3 +82,7 @@ overrides:
   undici@>=7.0.0 <7.28.0: ^7.28.0
   undici@>=7.0.0 <7.29.0: ^7.29.0
   undici@>=7.23.0 <7.28.0: ^7.28.0
+  # security fixes — pnpm audit, 2026-10-26
+  brace-expansion@>=4.0.0 <5.0.12: ^5.0.12
+  source-map-js@>=1.0.0 <1.2.2: ^1.2.2
+  undici@>=8.0.0 <8.12.2: ^8.12.2
