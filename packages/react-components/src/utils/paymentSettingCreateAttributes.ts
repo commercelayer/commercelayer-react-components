@@ -89,7 +89,7 @@ const BUILDERS: Record<string, Builder> = {
  *   Session, which only a secret key can create.
  * - **Braintree:** Hosted Fields are bare inputs, with no checkbox to offer.
  *   The choice goes with the session, not with the card fields: a shopper who
- *   ticks it and then pays with Apple Pay on the same setting may store that
+ *   ticks it and then pays with Apple Pay on the same setting stores that
  *   instead, so the copy should say "payment method", not "card". PayPal
  *   through Braintree is paid but never stored.
  *

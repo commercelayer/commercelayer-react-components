@@ -126,6 +126,10 @@ when a card was paid through a wallet.
 `amex.svg`), so the URL built from the brand as given missed the file. `<PaymentSettingInstrument>`
 now maps the gateway's spelling onto the file name.
 
-**Still not run:** a gift card that cannot be charged while the sheet is open, and saving — the
-order was a guest's, so the session did not ask to store the card, and whether Apple Pay is stored
-on a session that does remains unverified.
+**Saving works.** A second run, on a signed-in customer's order with the save box ticked: the
+session carried `vaulting`, the authorization asked Braintree to store the payment method once the
+transaction succeeded, and Commerce Layer linked a `payment_wallet` to the session. Its
+`payment_data` reads like a card's — `CreditCardDetails`, `MASTERCARD`, the last four digits — so
+a list of stored wallets will show it as that card, not as Apple Pay.
+
+**Still not run:** a gift card that cannot be charged while the sheet is open.

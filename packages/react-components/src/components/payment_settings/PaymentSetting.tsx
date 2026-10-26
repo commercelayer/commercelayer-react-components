@@ -85,8 +85,8 @@ export interface PaymentSettingChildrenProps {
    * Braintree, for a signed-in customer. The library renders no control for it:
    * the copy and the placement are the application's. On Braintree the choice
    * goes with the session, not with the card fields, so an Apple Pay payment on
-   * the same setting may be stored too: word it as a payment method, not a
-   * card. A PayPal payment through Braintree is not stored either way.
+   * the same setting is stored too: word it as a payment method, not a card.
+   * A PayPal payment through Braintree is not stored either way.
    */
   canSaveCard: boolean
   /** Whether the current Payment Session stores the card. */
