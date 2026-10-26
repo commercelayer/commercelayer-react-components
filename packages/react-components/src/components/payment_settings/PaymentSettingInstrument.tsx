@@ -101,6 +101,27 @@ function inferredIssuerType(
   return undefined
 }
 
+/**
+ * Card brands whose icon file is not simply the brand in lower case.
+ *
+ * The icon set names its files in lower case (`mastercard.svg`, `amex.svg`),
+ * while gateways spell brands their own way — Braintree in upper case and in
+ * full (`MASTERCARD`, `AMERICAN_EXPRESS`), Adyen and Stripe in short (`mc`,
+ * `amex`). A name that misses a file is a broken image on the recap.
+ */
+const CARD_ICONS: Record<string, string> = {
+  american_express: "amex",
+  diners_club: "diners",
+  union_pay: "unionpay",
+  uk_maestro: "maestro",
+}
+
+/** The icon file for a card brand, as the gateway spelled it. */
+function cardIcon(cardType: string): string {
+  const name = cardType.toLowerCase().replace(/[\s-]+/g, "_")
+  return CARD_ICONS[name] ?? name
+}
+
 /** Same rule as `<PaymentSourceBrandName>`, so both models name a brand alike. */
 function readableBrand(brand?: string): string | undefined {
   if (brand == null || brand === "") return undefined
@@ -145,7 +166,7 @@ export function PaymentSettingInstrument({
   const issuer = ISSUERS[issuerType ?? ""]
   const issuerName = isCard ? undefined : (issuer?.name ?? readableBrand(issuerType))
   const label = isCard ? `${brandName} •••• ${cardLastDigits}` : (issuerName ?? brandName ?? "")
-  const icon = isCard ? cardType : issuer?.icon
+  const icon = isCard && cardType != null ? cardIcon(cardType) : issuer?.icon
 
   const childrenProps: PaymentSettingInstrumentChildrenProps = {
     ...props,

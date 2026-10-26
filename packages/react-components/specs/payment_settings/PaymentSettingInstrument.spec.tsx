@@ -152,7 +152,8 @@ describe("PaymentSettingInstrument", () => {
       </PaymentSettingInstrument>
     )
     expect(screen.getByTestId("custom").textContent).toBe(
-      "American express|4242|1/2028|//data.commercelayer.app/assets/images/icons/credit-cards/color/american_express.svg"
+      // `amex.svg`: the icon set has no `american_express.svg`.
+      "American express|4242|1/2028|//data.commercelayer.app/assets/images/icons/credit-cards/color/amex.svg"
     )
   })
 
@@ -178,5 +179,39 @@ describe("PaymentSettingInstrument", () => {
       )
     )
     expect(screen.getByTestId("instrument").textContent).toBe("Visa •••• 1881")
+  })
+
+  // As the API stores an Apple Pay payment through Braintree: a plain card, in
+  // Braintree's upper case. The icon set's files are lower case.
+  it("points at the icon set's file whatever case the gateway spells the brand in", () => {
+    renderInstrument(
+      order(
+        {
+          card_type: "MASTERCARD",
+          card_last_digits: "0049",
+          card_expiry_month: 12,
+          card_expiry_year: 2026,
+        },
+        BRAINTREE
+      ),
+      <PaymentSettingInstrument>
+        {({ label, iconUrl }) => <span data-testid="custom">{`${label}|${iconUrl}`}</span>}
+      </PaymentSettingInstrument>
+    )
+    expect(screen.getByTestId("custom").textContent).toBe(
+      "Mastercard •••• 0049|//data.commercelayer.app/assets/images/icons/credit-cards/color/mastercard.svg"
+    )
+  })
+
+  it("folds Braintree's long brand names onto the icon set's short ones", () => {
+    renderInstrument(
+      order({ card_type: "AMERICAN_EXPRESS", card_last_digits: "0005" }, BRAINTREE),
+      <PaymentSettingInstrument>
+        {({ label, iconUrl }) => <span data-testid="custom">{`${label}|${iconUrl}`}</span>}
+      </PaymentSettingInstrument>
+    )
+    expect(screen.getByTestId("custom").textContent).toBe(
+      "American express •••• 0005|//data.commercelayer.app/assets/images/icons/credit-cards/color/amex.svg"
+    )
   })
 })
