@@ -49,12 +49,24 @@ a loop — treat them as load-bearing.
    `getCustomerPaymentSources()` fires only when a source was actually (re)created
    (the `recreated` flag), so a no-op pass can never re-arm the effect.
 
-3. **Two layers of concurrency protection, kept in sync.**
+3. **Three layers of protection against duplicate payment sources, kept in sync.**
    - `settingPaymentSourceRef` in the component skips a whole reconcile pass while a
      previous fire-and-forget request is still in flight.
    - `inFlightPaymentSourceRequests` in `setPaymentSource` coalesces genuinely
      concurrent duplicate calls, keyed per order/resource/operation, and removes the
      entry once settled so a later legitimate re-create still runs.
+   - `lastPaymentSourceCreates` in `setPaymentSource` remembers, per order and
+     resource, the create that settled last and the `updated_at` of the order read
+     back after it. A create request whose order has no payment source and is **no
+     newer** than that revision gets the source that was created instead of a second
+     one. Coalescing alone did not cover this: a single-method order has two creators
+     — `<PaymentMethod>`'s auto-select and `<PaymentGateway>`'s reconcile — and the
+     second acted on an order read before the first create, a few hundred ms after it
+     settled. With checkout.com that put two payment sessions on the page and the 3DS
+     on a source the order no longer pointed at (mfe-checkout,
+     `payments-checkoutcom.spec.ts:446`). A legitimate re-create still runs: an order
+     that moved on and has no payment source (the API dropped it, as applying a coupon
+     does), a mismatched source, or an order without `updated_at` to compare.
 
 ## Consequences
 
