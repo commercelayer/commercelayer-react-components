@@ -1,8 +1,7 @@
 # PayPal as a payment setting: PayPal's v6 button on the order Commerce Layer creates
 
 **Date:** 2026-10-23
-**Status:** proposed — unit-tested; the browser run waits on a staging environment serving the
-setting's `client_id`
+**Status:** accepted — run in the browser on staging on 2026-10-27
 **Scope:** `<PaymentSettingPayPalPayment>`, for `payment_setting_paypals` (PayPal Orders v2 through
 Commerce Layer) on the `payment_sessions` model: one-time payments and saving the PayPal account.
 Paying with a stored account is out of scope, as for every gateway. The `payment_source` model's
@@ -102,11 +101,11 @@ nothing under it.
 
 ## Consequences
 
-**The browser run has not happened yet.** As of 2026-10-27 the staging environment the end-to-end
-tests run against does not serve the setting's `client_id` yet, so the library skips the setting and
-mfe-checkout's `payment-sessions-paypal-setting.spec.ts` cannot reach the button. The spec covers
-the handoff to PayPal's button, the terms gate, a whole order, a gift-card split and saving the
-account on a customer created for the run.
+**Verified in the browser on staging, 2026-10-27.** mfe-checkout's
+`payment-sessions-paypal-setting.spec.ts` passes, one test at a time: the place button handed over
+to PayPal's, the terms gate refusing a click before the terms are accepted, a whole order paid
+through PayPal's window with the recap naming PayPal, a gift card charged before PayPal takes the
+rest, and a PayPal account stored as a wallet on a customer created for the run.
 
 **Paying with a stored PayPal account** — a session with the `payment_wallet` relationship, which
 PayPal processes without a window — belongs to the stored-wallet follow-up all gateways share.
