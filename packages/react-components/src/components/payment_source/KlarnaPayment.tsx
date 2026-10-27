@@ -7,7 +7,6 @@ import useExternalScript from "#utils/hooks/useExternalScript"
 import type { PaymentSourceProps } from "./PaymentSource"
 
 // import PlaceOrderContext from '#context/PlaceOrderContext'
-// import { tr } from '@faker-js/faker'
 
 interface KlarnaResponse {
   show_form: boolean

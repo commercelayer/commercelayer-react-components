@@ -28,13 +28,10 @@
     "test": "pnpm audit --prod --audit-level high && (pnpm audit || exit 0) && pnpm lint && vitest run --silent",
     "coverage": "vitest run --coverage",
     "test:e2e": "NODE_ENV=test playwright test",
-    "test:e2e:coverage": "nyc pnpm test:e2e && pnpm coverage:report",
-    "coverage:report": "nyc report --reporter=html",
     "build": "tsdown && pnpm check-compiler",
     "build:watch": "tsdown --watch",
-    "dev": "NODE_OPTIONS='--inspect' next dev",
     "check-compiler": "node -e \"for (const f of ['dist/index.js','dist/index.cjs']) if (!require('fs').readFileSync(f,'utf8').includes('react/compiler-runtime')) { console.error('React Compiler output missing in ' + f); process.exit(1) }\"",
-    "check-exports": "attw --pack .",
+    "check-exports": "pnpm dlx @arethetypeswrong/cli@0.18.5 --pack .",
     "ci": "pnpm build && pnpm check-exports && pnpm lint"
   },
   "repository": {
@@ -75,10 +72,8 @@
     "rapid-form": "^5.0.0"
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.18.5",
     "@babel/core": "^8.0.1",
     "@commercelayer/js-auth": "^8.0.0",
-    "@faker-js/faker": "^10.5.0",
     "@playwright/test": "^1.61.1",
     "@rolldown/plugin-babel": "^0.2.3",
     "@testing-library/dom": "^10.4.1",
@@ -89,7 +84,7 @@
     "@types/react-test-renderer": "^19.1.0",
     "@types/react-window": "^2.0.0",
     "@vitejs/plugin-react": "^6.0.3",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.12",
     "babel-plugin-react-compiler": "^1.0.0",
     "jsdom": "^30.0.1",
     "msw": "^2.15.0",
@@ -100,9 +95,9 @@
     "tsdown": "^0.22.12",
     "tslib": "^2.8.1",
     "typescript": "^6.0.3",
-    "vite": "^8.1.5",
+    "vite": "^8.3.5",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.12"
   },
   "peerDependencies": {
     "react": ">=19.0.0"

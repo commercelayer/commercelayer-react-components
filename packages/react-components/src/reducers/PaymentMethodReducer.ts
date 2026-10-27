@@ -298,10 +298,28 @@ const inFlightPaymentSourceRequests = new Map<
   Promise<PaymentSourceType | undefined | null>
 >()
 
+// The create that settled last, per order and resource, with the revision of the order
+// read back after it. Coalescing only covers calls that overlap; a single-method order
+// has two components that create its payment source — <PaymentMethod> auto-selecting it,
+// <PaymentGateway> reconciling it — and the second one acted on an order read before
+// the first create, still without a payment source, a few hundred ms after that create
+// settled. A caller whose order is no newer than that read-back revision gets the source
+// that was created; one whose order moved on and still has none — the API dropped it,
+// as applying a coupon does — creates again. Without a revision to compare, it creates.
+// See docs/adr/0003-payment-source-effect-invariants.md.
+const lastPaymentSourceCreates = new Map<
+  string,
+  { paymentSource: PaymentSourceType; orderUpdatedAt: string }
+>()
+
+function createKey(orderId: string, paymentResource: PaymentResource): string {
+  return `${orderId}:${paymentResource}:create`
+}
+
 export async function setPaymentSource(
   params: SetPaymentSourceParams
 ): Promise<PaymentSourceType | undefined | null> {
-  const { order, paymentResource, customerPaymentSourceId, paymentSourceId } = params
+  const { order, paymentResource, customerPaymentSourceId, paymentSourceId, dispatch } = params
   // Without a stable order id there is no real request to coalesce.
   if (order?.id == null) {
     return runSetPaymentSource(params)
@@ -312,6 +330,24 @@ export async function setPaymentSource(
   const existing = inFlightPaymentSourceRequests.get(key)
   if (existing != null) {
     return existing
+  }
+  const isCreate = customerPaymentSourceId == null && paymentSourceId == null
+  const lastCreate = isCreate ? lastPaymentSourceCreates.get(key) : undefined
+  if (
+    lastCreate != null &&
+    order.payment_source == null &&
+    order.updated_at != null &&
+    Date.parse(order.updated_at) <= Date.parse(lastCreate.orderUpdatedAt)
+  ) {
+    dispatch?.({
+      type: "setPaymentSource",
+      payload: {
+        paymentSource: lastCreate.paymentSource,
+        errors: [],
+        currentCustomerPaymentSourceId: null,
+      },
+    })
+    return lastCreate.paymentSource
   }
   const request = runSetPaymentSource(params).finally(() => {
     inFlightPaymentSourceRequests.delete(key)
@@ -345,6 +381,13 @@ async function runSetPaymentSource({
             order: sdk.orders.relationship(order.id),
           }
           paymentSource = await sdk[paymentResource].create(attrs)
+          const readBack = getOrder ? await getOrder(order.id) : undefined
+          if (readBack?.updated_at != null) {
+            lastPaymentSourceCreates.set(createKey(order.id, paymentResource), {
+              paymentSource,
+              orderUpdatedAt: readBack.updated_at,
+            })
+          }
         } else {
           const attrs = {
             id: paymentSourceId,
@@ -355,7 +398,7 @@ async function runSetPaymentSource({
               ? await sdk[paymentResource].update(attrs)
               : await sdk[paymentResource].retrieve(paymentSourceId)
         }
-        getOrder && (await getOrder(order.id))
+        if (paymentSourceId != null) getOrder && (await getOrder(order.id))
         if (dispatch) {
           dispatch({
             type: "setPaymentSource",
