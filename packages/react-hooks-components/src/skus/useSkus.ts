@@ -1,4 +1,5 @@
 import {
+  fetchInChunks,
   getSkus,
   type InterceptorManager,
   retrieveSku,
@@ -26,7 +27,7 @@ interface UseSkusReturn {
   isValidating: boolean
   action: UseAction
   fetchSkus: (params?: Parameters<typeof getSkus>[0]["params"]) => void
-  /** Register a SKU code for batched fetching. Triggers a debounced single API request. */
+  /** Register a SKU code for batched fetching. Triggers a debounced batched request (one per 25 codes). */
   registerSku: (code: string) => void
   /** Unregister a SKU code previously added via `registerSku`. */
   unregisterSku: (code: string) => void
@@ -43,9 +44,10 @@ type UseAction = "get" | "retrieve" | "update" | null
  * Custom hook for managing Commerce Layer SKUs with SWR caching.
  *
  * Includes automatic batching support via `registerSku` / `unregisterSku`:
- * multiple calls within 50 ms are collapsed into a single API request using a
- * module-level store and `useSyncExternalStore`. All hook instances sharing the
- * same `accessToken` hit the same SWR cache key, so only one network request fires.
+ * multiple calls within 50 ms are collapsed into one batch using a module-level
+ * store and `useSyncExternalStore`. All hook instances sharing the same
+ * `accessToken` hit the same SWR cache key, so the batch is fetched once, with one
+ * request per 25 codes.
  *
  * @param accessToken - Commerce Layer API access token
  * @param interceptors - Optional SDK interceptors for request/response customization
@@ -61,6 +63,8 @@ type UseAction = "get" | "retrieve" | "update" | null
 export function useSkus(accessToken: string, interceptors?: InterceptorManager): UseSkusReturn {
   const [params, setParams] = useState<Parameters<typeof getSkus>[0]["params"]>()
   const [shouldFetch, setShouldFetch] = useState(false)
+  /** Codes of the standalone batch, or null when the last fetch was a manual one. */
+  const [batchCodes, setBatchCodes] = useState<readonly string[] | null>(null)
   const [action, setAction] = useState<UseAction>(null)
 
   // Subscribe to the module-level batch store for this access token.
@@ -78,8 +82,21 @@ export function useSkus(accessToken: string, interceptors?: InterceptorManager):
   )
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<Sku[]>(
-    shouldFetch && accessToken ? ["skus", "get", accessToken, params] : null,
+    shouldFetch && accessToken
+      ? batchCodes != null
+        ? ["skus", "batch", accessToken, batchCodes]
+        : ["skus", "get", accessToken, params]
+      : null,
     async (): Promise<Sku[]> => {
+      if (batchCodes != null) {
+        return await fetchInChunks(batchCodes, (codes, pageSize) =>
+          getSkus({
+            accessToken,
+            params: { filters: { code_in: codes.join(",") }, pageSize },
+            interceptors,
+          })
+        )
+      }
       return await getSkus({ accessToken, params, interceptors })
     },
     {
@@ -89,18 +106,20 @@ export function useSkus(accessToken: string, interceptors?: InterceptorManager):
   )
 
   const fetchSkus = useCallback((newParams?: Parameters<typeof getSkus>[0]["params"]) => {
+    setBatchCodes(null)
     setParams(newParams)
     setShouldFetch(true)
     setAction("get")
   }, [])
 
   // Auto-fetch whenever the batch store snapshot changes (new SKU codes registered).
-  // All instances with the same token call fetchSkus with the same params —
-  // SWR deduplicates to exactly one network request.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: fetchSkus is stable (useCallback with empty deps)
+  // All instances with the same token share the same snapshot, hence the same
+  // SWR key — SWR deduplicates to one request per chunk of codes.
   useEffect(() => {
     if (skuCodesList.length === 0 || !accessToken) return
-    fetchSkus({ filters: { code_in: [...skuCodesList].join(",") } })
+    setBatchCodes(skuCodesList)
+    setShouldFetch(true)
+    setAction("get")
   }, [skuCodesList, accessToken])
 
   const registerSku = useCallback(
