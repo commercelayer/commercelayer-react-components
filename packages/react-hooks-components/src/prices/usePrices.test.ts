@@ -5,19 +5,14 @@ import { act, renderHook, waitFor } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { createElement } from "react"
 import { SWRConfig } from "swr"
-import { beforeEach, describe, expect, vi } from "vitest"
+import { describe, expect, vi } from "vitest"
 import { coreIntegrationTest, coreTest } from "#extender"
 import { usePrices } from "./usePrices"
 
 const swrWrapper = ({ children }: { children: ReactNode }) =>
   createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
 
-const domain = import.meta.env.VITE_DOMAIN
-
 describe("usePrices", () => {
-  beforeEach(({ skip }) => {
-    if (domain == null) skip()
-  })
   coreTest("should return a list of prices", async ({ accessToken }) => {
     const token = accessToken?.accessToken
     const { result } = renderHook(() => usePrices(token))
@@ -196,7 +191,7 @@ describe("usePrices", () => {
     act(() => {
       result.current.fetchPrices({
         filters: {
-          sku_code_eq: "DIGITALPRODUCT",
+          sku_code_eq: "TSHIRTMM000000E63E74MXXX",
         },
       })
     })
@@ -324,7 +319,7 @@ describe("usePrices", () => {
     const { result } = renderHook(() => usePrices(token))
 
     act(() => {
-      result.current.registerSku("DIGITALPRODUCT")
+      result.current.registerSku("TSHIRTMM000000E63E74MXXX")
     })
 
     await waitFor(
@@ -341,8 +336,8 @@ describe("usePrices", () => {
     const { result } = renderHook(() => usePrices(token))
 
     act(() => {
-      result.current.registerSku("DIGITALPRODUCT")
-      result.current.registerSku("DIGITALPRODUCT") // duplicate — no-op
+      result.current.registerSku("TSHIRTMM000000E63E74MXXX")
+      result.current.registerSku("TSHIRTMM000000E63E74MXXX") // duplicate — no-op
     })
 
     await waitFor(
@@ -362,10 +357,10 @@ describe("usePrices", () => {
 
       // Two different SKUs in rapid succession — second call hits the clearTimeout branch (line 80)
       act(() => {
-        result.current.registerSku("DIGITALPRODUCT")
+        result.current.registerSku("TSHIRTMM000000E63E74MXXX")
       })
       act(() => {
-        result.current.registerSku("SHIRT-S")
+        result.current.registerSku("BABYONBU000000E63E7412MX")
       })
 
       await waitFor(
@@ -383,7 +378,7 @@ describe("usePrices", () => {
     const { result } = renderHook(() => usePrices(token))
 
     act(() => {
-      result.current.registerSku("DIGITALPRODUCT")
+      result.current.registerSku("TSHIRTMM000000E63E74MXXX")
     })
 
     await waitFor(
@@ -395,7 +390,7 @@ describe("usePrices", () => {
 
     // unregister existing code
     act(() => {
-      result.current.unregisterSku("DIGITALPRODUCT")
+      result.current.unregisterSku("TSHIRTMM000000E63E74MXXX")
     })
 
     // unregister non-existent code — no-op branch
@@ -408,7 +403,7 @@ describe("usePrices", () => {
     const { result } = renderHook(() => usePrices(""))
 
     act(() => {
-      result.current.registerSku("DIGITALPRODUCT")
+      result.current.registerSku("TSHIRTMM000000E63E74MXXX")
     })
 
     // Wait for the 50ms debounce to fire — early-return branch (line 83) is hit
