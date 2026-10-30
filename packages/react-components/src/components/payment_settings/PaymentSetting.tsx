@@ -11,7 +11,16 @@ import type {
   PaymentSession,
   PaymentSetting as PaymentSettingResource,
 } from "@commercelayer/sdk"
-import { type JSX, type ReactNode, useContext, useEffect, useRef, useState } from "react"
+import {
+  type JSX,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
@@ -21,7 +30,7 @@ import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import { useStripeRedirectResume } from "#hooks/useStripeRedirectResume"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
-import { isCollecting } from "#utils/paymentGatewayStore"
+import { isCollecting, subscribe } from "#utils/paymentGatewayStore"
 import {
   offersSaveCard,
   paymentSettingCreateAttributes,
@@ -67,6 +76,14 @@ export interface PaymentSettingChildrenProps {
   isSelected: boolean
   /** Whether its Payment Session is being created right now. */
   isPending: boolean
+  /**
+   * Whether a payment is under way for this order, through whichever setting.
+   * The selection cannot change until it ends: `selectSetting` does nothing and
+   * `<PaymentSettingRadioButton>` is disabled. The same for every setting, so
+   * an application can grey out the alternatives and say why on the selected
+   * one.
+   */
+  isCollecting: boolean
   /** The Payment Session backing the selection, once it exists. */
   currentPaymentSession?: PaymentSession
   /**
@@ -78,7 +95,8 @@ export interface PaymentSettingChildrenProps {
   /**
    * Choose this setting. The same call the radio makes, so an application can
    * put it on the whole card — a second call while one is in flight is
-   * ignored, so wrapping the radio does not create two Payment Sessions.
+   * ignored, so wrapping the radio does not create two Payment Sessions. Also
+   * ignored while `isCollecting`.
    */
   selectSetting: () => Promise<void>
   /**
@@ -186,6 +204,23 @@ export function PaymentSetting({
   const { isCovered, remainingAmountCents } = usePaymentSessionsState()
   const { order, include, includeLoaded, addResourceToInclude, getOrder } = useContext(OrderContext)
   const { accessToken, interceptors } = useContext(CommerceLayerContext)
+  // Subscribed rather than read, so the radios lock and unlock on their own as
+  // a payment starts and ends. To this one flag and not to the whole handoff,
+  // which also changes whenever a form turns valid or invalid — and every
+  // setting's subtree, payment forms included, renders from here. The handlers
+  // below still read the store directly: a render is not guaranteed to have
+  // happened in between.
+  const orderId = order?.id
+  const subscribeToHandoff = useCallback(
+    (listener: () => void) => subscribe(orderId, listener),
+    [orderId]
+  )
+  const collecting = useSyncExternalStore(
+    subscribeToHandoff,
+    () => isCollecting(orderId),
+    // c8 ignore next — server snapshot only used during SSR hydration
+    () => false
+  )
   const [pendingSettingId, setPendingSettingId] = useState<string | null>(null)
   // Read synchronously, unlike `pendingSettingId`. One click can reach the
   // handler twice — a card wired to `selectSetting` with the radio inside it —
@@ -311,6 +346,10 @@ export function PaymentSetting({
   ): Promise<void> => {
     if (accessToken == null || order == null) return
     if (selectionInFlight.current) return
+    // A payment is under way, and it belongs to the session it started on.
+    // Switching now would unmount the gateway collecting it, which discards
+    // whatever it had in flight without stopping the payment.
+    if (isCollecting(order.id)) return
     selectionInFlight.current = true
     setSelectionErrors(null)
     setPendingSettingId(setting.id)
@@ -379,8 +418,11 @@ export function PaymentSetting({
       // yet, so the authorization test above passes it as deletable — and
       // deleting it destroys the record the payment would settle against, while
       // doing nothing to stop the payment. The shopper is charged and the order
-      // has nothing to show for it. Switching method mid-payment is left
-      // possible on purpose; only the tidying is called off.
+      // has nothing to show for it. The lock at the top refuses a switch begun
+      // mid-payment, but not a payment begun mid-switch: the old gateway is
+      // still on screen while the new session is created, and nothing stops
+      // the shopper paying through it in that second. So it is checked again
+      // here, where it decides.
       if (
         reusable == null &&
         superseded != null &&
@@ -477,6 +519,7 @@ export function PaymentSetting({
                 currentPaymentSession,
                 isSelected,
                 isPending: pendingSettingId === setting.id,
+                isCollecting: collecting,
                 errors,
                 readonly,
                 returnUrl,
@@ -492,6 +535,7 @@ export function PaymentSetting({
                     setting,
                     isSelected,
                     isPending: pendingSettingId === setting.id,
+                    isCollecting: collecting,
                     currentPaymentSession,
                     errors,
                     selectSetting: select,

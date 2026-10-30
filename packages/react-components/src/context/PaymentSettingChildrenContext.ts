@@ -19,6 +19,11 @@ export interface InitialPaymentSettingChildrenContext {
    * true once the API has answered.
    */
   isPending?: boolean
+  /**
+   * Whether a payment is under way for this order, through whichever setting.
+   * The selection is locked until it ends.
+   */
+  isCollecting?: boolean
   errors?: BaseError[]
   /** Select this setting, creating or adopting its Payment Session. */
   selectSetting?: () => Promise<void>

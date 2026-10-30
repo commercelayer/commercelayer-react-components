@@ -212,9 +212,11 @@ function PayPalButton({
             // Closed before approving: nothing reached PayPal's order. The gift
             // cards charged on the click stay charged and applied, as after any
             // interrupted payment — they count toward the next attempt.
+            setCollecting(latestRef.current.order?.id, false)
             setIsSubmitting(false)
           },
           onError: (error) => {
+            setCollecting(latestRef.current.order?.id, false)
             setIsSubmitting(false)
             if (startRefusedRef.current) {
               startRefusedRef.current = false
@@ -273,6 +275,11 @@ function PayPalButton({
     setErrors([])
     setLastErrorCode(undefined)
     startRefusedRef.current = false
+    // PayPal's window opens now, and the payment method is locked until it
+    // closes: switching would unmount this button under a window the shopper
+    // can still approve. Every way out releases it — approval, cancel, error,
+    // and the start refused below.
+    setCollecting(orderId, true)
 
     const paypalOrder = (async (): Promise<{ orderId: string }> => {
       let refusal: BaseError[] | null = null
@@ -304,6 +311,7 @@ function PayPalButton({
     })()
 
     checkout.start({ presentationMode: "auto" }, paypalOrder).catch((error: unknown) => {
+      setCollecting(orderId, false)
       setIsSubmitting(false)
       if (startRefusedRef.current) return
       fail(paypalErrorCode(error), "PayPal could not be opened.")
@@ -313,7 +321,11 @@ function PayPalButton({
   /** PayPal approved: take the money through Commerce Layer, then report it. */
   async function onApprove(): Promise<void> {
     const current = latestRef.current
-    if (current.accessToken == null) return
+    if (current.accessToken == null) {
+      // The click locked the payment method; nothing past here would release it.
+      setCollecting(orderId, false)
+      return
+    }
 
     setIsSubmitting(true)
     // From here a payment is in flight that nothing on the order records yet:
