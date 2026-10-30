@@ -16,6 +16,7 @@ import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PlaceOrderOptions } from "#reducers/PlaceOrderReducer"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
+import { saveAddressesToCustomerAddressBook } from "#utils/customerOrderOptions"
 import getCardDetails from "#utils/getCardDetails"
 import { isAdyenAuthorizedResultCode, isRefusedPaymentResponse } from "#utils/paymentAuthorization"
 import { checkPaymentIntent } from "#utils/stripe/retrievePaymentIntent"
@@ -558,6 +559,11 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         options?.stripe?.paymentIntentClientSecret
     )
     if (currentPaymentMethodRef?.current?.onsubmit && !isReturningFromRedirect) {
+      // Before the widget, which may redirect to the gateway: with an `auto_place` method
+      // the backend can place the order before the shopper is back, and then nothing on the
+      // return attempts a place that would send them (#904). A refused flag stays set, and
+      // `setPlaceOrder` sends it again.
+      await saveAddressesToCustomerAddressBook(sdk, order.id).catch(() => undefined)
       isValid = (await currentPaymentMethodRef.current?.onsubmit({
         // @ts-expect-error no type
         paymentSource: checkPaymentSource,
