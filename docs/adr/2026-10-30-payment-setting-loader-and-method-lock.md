@@ -1,7 +1,7 @@
 # A loader while a payment setting loads, and a locked method while a payment is under way
 
 **Date:** 2026-10-30
-**Status:** accepted — covered by unit specs; not yet run in the browser
+**Status:** accepted — run in the browser on staging on 2026-10-30 (Braintree and PayPal; Stripe and Adyen by unit specs only)
 **Scope:** `<PaymentSetting>`, its gateway components and the Payment Gateway Handoff on the
 `payment_sessions` model. Issues #901 (no loading state) and #842 (method switchable mid-payment).
 The `payment_source` model's loaders are untouched.
@@ -103,6 +103,23 @@ the back button. The session a payment settles against is protected on its own, 
 Closing the window or the sheet is how a shopper abandons today, and it releases the lock. An
 explicit "abandon payment" control — and what it should do to a session and to gift cards already
 charged — is left for a follow-up.
+
+## Verification
+
+Run in mfe-checkout on 2026-10-30, against the `react-components@072402e` preview, on an order in
+`alessani`'s `USANEWPAYMENTS` market, which offers Braintree and PayPal. The page was watched with a
+`MutationObserver` rather than screenshots, so a gap of a single frame would have shown:
+
+- **Braintree selected:** one skeleton, under Braintree only, from the click (session pending, radios
+  disabled) through the client boot, gone the moment Hosted Fields' iframes were in the DOM — about
+  three seconds, with no frame between the two waits that showed nothing.
+- **Switching Braintree → PayPal:** Braintree's form stayed until the new session existed, and
+  PayPal's skeleton ran until its button rendered.
+- **PayPal through Braintree, and PayPal as a setting:** opening the window set `isCollecting`,
+  disabled both radios and showed the checkout's "payment in progress" note; closing the window
+  released all three.
+
+Stripe and Adyen are not offered in that market and were not run in the browser.
 
 ## Consequences
 
