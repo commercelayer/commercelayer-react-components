@@ -13,9 +13,10 @@ import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
 import { useCollectionPermitted } from "#hooks/useCollectionPermitted"
+import { usePaymentSettingLoader } from "#hooks/usePaymentSettingLoader"
 import { useStickySessionValue } from "#hooks/useStickySessionValue"
 import type { BaseError } from "#typings/errors"
-import type { ChildrenFunction } from "#typings/index"
+import type { ChildrenFunction, LoaderType } from "#typings/index"
 import {
   registerGatewayCollection,
   setCollecting,
@@ -54,6 +55,11 @@ interface Props {
   type?: PaymentSettingPayPalButtonType
   /** Class on the element wrapping PayPal's button. */
   className?: string
+  /**
+   * Shown until PayPal's button is on screen, in place of `<PaymentSetting>`'s
+   * `loader` for this setting.
+   */
+  loader?: LoaderType
 }
 
 /**
@@ -79,9 +85,10 @@ interface Props {
  */
 export function PaymentSettingPayPalPayment(props: Props): JSX.Element | null {
   const { children } = props
-  const { setting, currentPaymentSession, isSelected, readonly } = useContext(
+  const { setting, currentPaymentSession, isSelected, isPending, readonly } = useContext(
     PaymentSettingChildrenContext
   )
+  const loader = usePaymentSettingLoader(props.loader)
   const isPayPal = setting?.type === PAYPAL_SETTING_TYPE
   const clientId = readPayPalClientId(setting)
   // Remembered across a refetch whose `fields` leave `token` out, so the button
@@ -94,18 +101,26 @@ export function PaymentSettingPayPalPayment(props: Props): JSX.Element | null {
 
   if (!isPayPal) return null
   if (!shouldMount || clientId == null || paypalOrderId == null || currentPaymentSession == null) {
-    return children != null ? (
-      <Parent
-        {...{
-          isLoaded: false,
-          isUnavailable: false,
-          isSubmitting: false,
-          errors: [],
-        }}
-      >
-        {children}
-      </Parent>
-    ) : null
+    // The Payment Session — and with it the PayPal order — is being created
+    // for this setting: the first half of the wait.
+    const placeholder = isPending === true && readonly !== true ? loader : null
+    return (
+      <>
+        {placeholder}
+        {children != null ? (
+          <Parent
+            {...{
+              isLoaded: false,
+              isUnavailable: false,
+              isSubmitting: false,
+              errors: [],
+            }}
+          >
+            {children}
+          </Parent>
+        ) : null}
+      </>
+    )
   }
 
   return (
@@ -115,6 +130,7 @@ export function PaymentSettingPayPalPayment(props: Props): JSX.Element | null {
     <PayPalButton
       key={clientId}
       {...props}
+      loader={loader}
       clientId={clientId}
       paypalOrderId={paypalOrderId}
       session={currentPaymentSession}
@@ -129,7 +145,9 @@ function PayPalButton({
   clientId,
   paypalOrderId,
   session,
-}: Props & {
+  loader,
+}: Omit<Props, "loader"> & {
+  loader: JSX.Element | null
   clientId: string
   paypalOrderId: string
   session: PaymentSession
@@ -373,6 +391,9 @@ function PayPalButton({
 
   return (
     <>
+      {/* Until the button is up, and not once PayPal turns out to be
+          unavailable: no button is coming then. */}
+      {!isLoaded && !isUnavailable ? loader : null}
       {isLoaded ? (
         <div className={className}>
           {/* A custom element PayPal's SDK registers once its script has loaded. */}

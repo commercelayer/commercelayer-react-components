@@ -1,6 +1,7 @@
 import type { PaymentSession, PaymentSetting } from "@commercelayer/sdk"
 import { createContext } from "react"
 import type { BaseError } from "#typings/errors"
+import type { LoaderType } from "#typings/index"
 
 export interface InitialPaymentSettingChildrenContext {
   /** The Payment Setting this subtree renders, from `available_payment_settings`. */
@@ -65,6 +66,11 @@ export interface InitialPaymentSettingChildrenContext {
    * context. Passing it down keeps one public prop rather than one per gateway.
    */
   returnUrl?: string
+  /**
+   * The `loader` given to `<PaymentSetting>`, which each gateway component
+   * shows until its own form has painted.
+   */
+  loader?: LoaderType
 }
 
 const initial: InitialPaymentSettingChildrenContext = {}

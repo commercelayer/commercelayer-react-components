@@ -428,6 +428,90 @@ describe("<PaymentSetting> while a payment is being collected", () => {
 })
 
 /**
+ * The first of the two waits behind `loader`: the Payment Session being
+ * created. Each gateway component covers the second, its SDK painting, in its
+ * own spec.
+ */
+describe("<PaymentSetting> loader", () => {
+  const OTHER_MANUAL = { id: "ps-manual-2", type: "payment_setting_manuals", name: "Cash" }
+
+  /** A session create that answers only when the test says so. */
+  function deferCreate(): () => Promise<void> {
+    let finish: (session: unknown) => void = () => undefined
+    createPaymentSessionMock.mockReturnValue(
+      new Promise((resolve) => {
+        finish = resolve
+      })
+    )
+    return async () => {
+      await act(async () => {
+        finish({ id: "session-new" })
+      })
+    }
+  }
+
+  function renderWithLoader(manualLoader?: ReactNode) {
+    return render(
+      <Wrapper
+        currentOrder={order({ available_payment_settings: [MANUAL, OTHER_MANUAL] } as never)}
+      >
+        <PaymentSetting loader={<span data-testid="loader" />}>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingManualPayment
+            {...(manualLoader != null ? { loader: manualLoader as never } : {})}
+          />
+        </PaymentSetting>
+      </Wrapper>
+    )
+  }
+
+  it("shows under the setting being selected while its session is created", async () => {
+    const finishCreate = deferCreate()
+    renderWithLoader()
+    expect(screen.queryByTestId("loader")).toBeNull()
+
+    await act(async () => {
+      fireEvent.click(screen.getAllByTestId("radio")[1] as HTMLElement)
+    })
+    // Once, under the setting clicked — not under every setting.
+    expect(screen.getAllByTestId("loader")).toHaveLength(1)
+
+    await finishCreate()
+    await waitFor(() => {
+      expect(screen.queryByTestId("loader")).toBeNull()
+    })
+  })
+
+  it("gives way to a component's own loader", async () => {
+    deferCreate()
+    renderWithLoader(<span data-testid="own-loader" />)
+
+    await act(async () => {
+      fireEvent.click(screen.getAllByTestId("radio")[0] as HTMLElement)
+    })
+    expect(screen.getByTestId("own-loader")).toBeTruthy()
+    expect(screen.queryByTestId("loader")).toBeNull()
+  })
+
+  it("shows nothing when the application passes none", async () => {
+    deferCreate()
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingManualPayment />
+        </PaymentSetting>
+      </Wrapper>
+    )
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("radio"))
+    })
+    expect(screen.queryByTestId("loader")).toBeNull()
+  })
+})
+
+/**
  * Switching setting clears what the shopper switched away from.
  *
  * The rule is `2026-08-20-gift-cards-as-payment-sessions.md`'s reformulation —

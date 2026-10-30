@@ -2,8 +2,9 @@ import type { PaymentSession } from "@commercelayer/sdk"
 import type { JSX, ReactNode } from "react"
 import Parent from "#components/utils/Parent"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
+import { usePaymentSettingLoader } from "#hooks/usePaymentSettingLoader"
 import type { BaseError } from "#typings/errors"
-import type { ChildrenFunction } from "#typings/index"
+import type { ChildrenFunction, LoaderType } from "#typings/index"
 import useCustomContext from "#utils/hooks/useCustomContext"
 
 interface ChildrenProps extends Omit<Props, "children"> {
@@ -26,6 +27,11 @@ interface Props {
    * example the bank details for a wire transfer.
    */
   instructions?: ReactNode
+  /**
+   * Shown while the Payment Session is created, in place of `<PaymentSetting>`'s
+   * `loader` for this setting. There is no gateway to wait for after that.
+   */
+  loader?: LoaderType
 }
 
 /**
@@ -43,12 +49,14 @@ interface Props {
  */
 export function PaymentSettingManualPayment(props: Props): JSX.Element | null {
   const { children, instructions } = props
-  const { setting, currentPaymentSession, isSelected, isPending, errors } = useCustomContext({
-    context: PaymentSettingChildrenContext,
-    contextComponentName: "PaymentSetting",
-    currentComponentName: "PaymentSettingManualPayment",
-    key: "setting",
-  })
+  const loader = usePaymentSettingLoader(props.loader)
+  const { setting, currentPaymentSession, isSelected, isPending, errors, readonly } =
+    useCustomContext({
+      context: PaymentSettingChildrenContext,
+      contextComponentName: "PaymentSetting",
+      currentComponentName: "PaymentSettingManualPayment",
+      key: "setting",
+    })
 
   if (setting?.type !== "payment_setting_manuals") return null
 
@@ -60,8 +68,19 @@ export function PaymentSettingManualPayment(props: Props): JSX.Element | null {
     errors: errors ?? [],
   }
 
-  if (children) return <Parent {...parentProps}>{children}</Parent>
-  if (isSelected !== true) return null
+  // Selecting is the whole interaction here, so the session being created is
+  // the only wait there is.
+  const placeholder = isPending === true && readonly !== true ? loader : null
+
+  if (children) {
+    return (
+      <>
+        {placeholder}
+        <Parent {...parentProps}>{children}</Parent>
+      </>
+    )
+  }
+  if (isSelected !== true) return placeholder
   return <>{instructions}</>
 }
 

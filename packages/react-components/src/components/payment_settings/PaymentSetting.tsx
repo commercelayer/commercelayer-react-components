@@ -29,7 +29,7 @@ import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
 import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import { useStripeRedirectResume } from "#hooks/useStripeRedirectResume"
 import type { BaseError } from "#typings/errors"
-import type { ChildrenFunction } from "#typings/index"
+import type { ChildrenFunction, LoaderType } from "#typings/index"
 import { isCollecting, subscribe } from "#utils/paymentGatewayStore"
 import {
   offersSaveCard,
@@ -156,6 +156,20 @@ interface Props {
    * radio to read back.
    */
   returnUrl?: string
+  /**
+   * Shown where a setting's payment form will appear, from the click that
+   * selects it until the gateway has painted: first while its Payment Session
+   * is created, then while the gateway's SDK loads and mounts. The same
+   * `loader` the `payment_source` components take, so a checkout passes its
+   * existing skeleton once.
+   *
+   * Rendered by each gateway component, because only the gateway knows when
+   * its form is on screen — and next to its form rather than in place of it,
+   * because the SDKs mount into a node that has to be in the DOM, and swapping
+   * a mounted form out loses whatever the shopper had typed. A gateway
+   * component's own `loader` wins over this one. Nothing is shown without it.
+   */
+  loader?: LoaderType
 }
 
 const NO_ERRORS: BaseError[] = []
@@ -199,6 +213,7 @@ export function PaymentSetting({
   onSelect,
   readonly,
   returnUrl,
+  loader,
 }: Props): JSX.Element | null {
   const paymentsModel = usePaymentsModel()
   const { isCovered, remainingAmountCents } = usePaymentSessionsState()
@@ -523,6 +538,7 @@ export function PaymentSetting({
                 errors,
                 readonly,
                 returnUrl,
+                loader,
                 selectSetting: select,
                 canSaveCard,
                 saveCard,
