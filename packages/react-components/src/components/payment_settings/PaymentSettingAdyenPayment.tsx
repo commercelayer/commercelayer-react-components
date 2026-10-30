@@ -20,6 +20,7 @@ import { useCollectionPermitted } from "#hooks/useCollectionPermitted"
 import { usePaymentGatewayHandoff } from "#hooks/usePaymentGatewayHandoff"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
+import { applePayError } from "#utils/applePay"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import {
   type PaymentGatewaySubmitResult,
@@ -159,32 +160,6 @@ interface WalletOnAuthorizedActions<TError> {
  * it. Not PayPal's shape, and the two must not be written as if they were.
  */
 type WalletOnClick = (resolve: () => void, reject: () => void) => void
-
-/**
- * Apple's error type, if we are in a browser that has one.
- *
- * Safari-only and absent from the DOM lib, so it is looked up rather than
- * imported. Looked up **when needed** and not at module load: a module-scope
- * read would fix the answer before hydration, and would make the global
- * untestable without a load-order trick.
- */
-function applePayErrorCtor():
-  | (new (
-      code: string,
-      contactField?: string,
-      message?: string
-    ) => ApplePayJS.ApplePayError)
-  | undefined {
-  return (
-    globalThis as {
-      ApplePayError?: new (
-        code: string,
-        contactField?: string,
-        message?: string
-      ) => ApplePayJS.ApplePayError
-    }
-  ).ApplePayError
-}
 
 export interface PaymentSettingAdyenPaymentChildrenProps {
   /** Whether the Drop-in has a valid payment method ready to submit. */
@@ -574,7 +549,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
           ...(offersPayPal || offersGooglePay || offersApplePay
             ? {
                 paymentMethodsConfiguration: {
-                  ...(offersApplePay ? { applepay: walletConfiguration(appleError) } : {}),
+                  ...(offersApplePay ? { applepay: walletConfiguration(applePayError) } : {}),
                   ...(offersGooglePay ? { googlepay: walletConfiguration(plainError) } : {}),
                   ...(offersPayPal
                     ? {
@@ -647,25 +622,6 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
      */
     function plainError(message: string): string {
       return message
-    }
-
-    /**
-     * Apple takes an `ApplePayError`, and a string is not one — passed a
-     * string, `completePayment` shows its own generic failure instead. `unknown`
-     * is the only code that is not about a contact field.
-     *
-     * Whether Safari renders our message or its own wording for that code is
-     * not something the DOM contract promises, so this is written to be
-     * *correct* rather than to guarantee the copy, and the string is the
-     * fallback for a browser without the global.
-     */
-    function appleError(message: string): ApplePayJS.ApplePayError | undefined {
-      // `undefined` and not the string: `reject` is typed for an `ApplePayError`
-      // and nothing else, and a browser with no such global never rendered an
-      // Apple Pay button in the first place — so this branch is unreachable
-      // rather than a degraded one.
-      const Ctor = applePayErrorCtor()
-      return Ctor != null ? new Ctor("unknown", undefined, message) : undefined
     }
 
     /**

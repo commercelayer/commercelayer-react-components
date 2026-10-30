@@ -1,5 +1,4 @@
 import { readStripeClientSecret, STRIPE_SETTING_TYPE } from "@commercelayer/core-components"
-import type { PaymentSession } from "@commercelayer/sdk"
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import {
   loadStripe,
@@ -11,6 +10,7 @@ import { type JSX, useContext, useEffect, useMemo, useRef, useState } from "reac
 import Parent from "#components/utils/Parent"
 import OrderContext from "#context/OrderContext"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
+import { useStickySessionValue } from "#hooks/useStickySessionValue"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
 import {
@@ -117,7 +117,7 @@ export function PaymentSettingStripePayment(props: Props): JSX.Element | null {
 
   const isStripe = setting?.type === STRIPE_SETTING_TYPE
   const publishableKey = (setting as { public_key?: string | null } | undefined)?.public_key
-  const clientSecret = useStickyClientSecret(currentPaymentSession)
+  const clientSecret = useStickySessionValue(currentPaymentSession, readStripeClientSecret)
 
   /**
    * Only the selected setting's Element is live.
@@ -160,34 +160,6 @@ export function PaymentSettingStripePayment(props: Props): JSX.Element | null {
       </Elements>
     </div>
   )
-}
-
-/**
- * The client secret, remembered across a refetch that arrives without it.
- *
- * `response_data` is not in every consumer's `fields` allowlist, and a checkout
- * that refetches the order for its own reasons — after a gift card, say — can
- * hand this component a copy of the *same session* with the secret missing.
- * Read literally that means "no session", the Elements group unmounts, and the
- * card the shopper was halfway through typing is gone. It cost a test that
- * looked like a mistyped card number: only the first keystroke had survived.
- *
- * So a secret is kept until the **session** changes, which is the only thing
- * that actually invalidates it. A different session id drops it, because then
- * the old secret belongs to a payment that is no longer the selection.
- */
-function useStickyClientSecret(session?: PaymentSession): string | undefined {
-  const sessionId = session?.id
-  const remembered = useRef<{ sessionId?: string; secret?: string }>({})
-  const read = readStripeClientSecret(session)
-
-  // Written during render on purpose: this is a cache of a value derived from
-  // the props, not state anything renders from, and an effect would leave one
-  // render showing no form at all — which is the unmount this exists to avoid.
-  if (read != null) remembered.current = { sessionId, secret: read }
-  else if (remembered.current.sessionId !== sessionId) remembered.current = {}
-
-  return read ?? remembered.current.secret
 }
 
 /**

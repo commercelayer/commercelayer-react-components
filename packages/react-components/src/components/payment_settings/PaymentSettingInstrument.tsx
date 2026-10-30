@@ -1,4 +1,8 @@
-import { type PaymentInstrument, readPaymentInstrument } from "@commercelayer/core-components"
+import {
+  BRAINTREE_SETTING_TYPE,
+  type PaymentInstrument,
+  readPaymentInstrument,
+} from "@commercelayer/core-components"
 import type { JSX, ReactNode } from "react"
 import Parent from "#components/utils/Parent"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
@@ -11,7 +15,10 @@ export interface PaymentSettingInstrumentChildrenProps
   paymentInstrument: PaymentInstrument
   /** True when the brand and last digits of a card are known. */
   isCard: boolean
-  /** The payment method as the gateway names it, e.g. `paypal` or `klarna_account`. */
+  /**
+   * The payment method as the gateway names it, e.g. `paypal` or
+   * `klarna_account` — or as inferred, for a gateway that names none.
+   */
   issuerType?: string
   /**
    * `issuerType` made readable, with each gateway's spelling folded into one:
@@ -75,6 +82,46 @@ const ISSUERS: Record<string, { name: string; icon?: string }> = {
   amazonpay: { name: "Amazon Pay" },
 }
 
+/**
+ * The payment method, when the gateway did not name it.
+ *
+ * Braintree fills no `issuer_type`, so a PayPal payment through it would read
+ * as nothing at all. Among its instruments only PayPal's carries an
+ * `account_email` — Venmo's has a username, a bank account its last digits —
+ * so that is what names it.
+ */
+function inferredIssuerType(
+  instrument: PaymentInstrument,
+  settingType: string | undefined,
+  isCard: boolean
+): string | undefined {
+  if (instrument.issuer_type != null && instrument.issuer_type !== "") return instrument.issuer_type
+  if (isCard) return undefined
+  if (settingType === BRAINTREE_SETTING_TYPE && instrument.account_email != null) return "paypal"
+  return undefined
+}
+
+/**
+ * Card brands whose icon file is not simply the brand in lower case.
+ *
+ * The icon set names its files in lower case (`mastercard.svg`, `amex.svg`),
+ * while gateways spell brands their own way — Braintree in upper case and in
+ * full (`MASTERCARD`, `AMERICAN_EXPRESS`), Adyen and Stripe in short (`mc`,
+ * `amex`). A name that misses a file is a broken image on the recap.
+ */
+const CARD_ICONS: Record<string, string> = {
+  american_express: "amex",
+  diners_club: "diners",
+  union_pay: "unionpay",
+  uk_maestro: "maestro",
+}
+
+/** The icon file for a card brand, as the gateway spelled it. */
+function cardIcon(cardType: string): string {
+  const name = cardType.toLowerCase().replace(/[\s-]+/g, "_")
+  return CARD_ICONS[name] ?? name
+}
+
 /** Same rule as `<PaymentSourceBrandName>`, so both models name a brand alike. */
 function readableBrand(brand?: string): string | undefined {
   if (brand == null || brand === "") return undefined
@@ -100,7 +147,7 @@ export function PaymentSettingInstrument({
   fallback,
   ...props
 }: PaymentSettingInstrumentProps): JSX.Element | null {
-  const { currentPaymentSession } = useCustomContext({
+  const { currentPaymentSession, setting } = useCustomContext({
     context: PaymentSettingChildrenContext,
     contextComponentName: "PaymentSetting",
     currentComponentName: "PaymentSettingInstrument",
@@ -115,16 +162,17 @@ export function PaymentSettingInstrument({
   // A card wins over its wallet: a card paid through Apple Pay is still
   // recognised by the shopper as their Visa ending in 4242.
   const isCard = brandName != null && cardLastDigits != null
-  const issuer = ISSUERS[instrument.issuer_type ?? ""]
-  const issuerName = isCard ? undefined : (issuer?.name ?? readableBrand(instrument.issuer_type))
+  const issuerType = inferredIssuerType(instrument, setting?.type, isCard)
+  const issuer = ISSUERS[issuerType ?? ""]
+  const issuerName = isCard ? undefined : (issuer?.name ?? readableBrand(issuerType))
   const label = isCard ? `${brandName} •••• ${cardLastDigits}` : (issuerName ?? brandName ?? "")
-  const icon = isCard ? cardType : issuer?.icon
+  const icon = isCard && cardType != null ? cardIcon(cardType) : issuer?.icon
 
   const childrenProps: PaymentSettingInstrumentChildrenProps = {
     ...props,
     paymentInstrument: instrument,
     isCard,
-    issuerType: instrument.issuer_type,
+    issuerType,
     issuerName,
     cardType,
     brandName,

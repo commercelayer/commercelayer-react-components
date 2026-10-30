@@ -26,16 +26,18 @@ const VISA = {
   card_expiry_month: 1,
 }
 
-function order(paymentInstrument: unknown): Partial<Order> {
+const BRAINTREE = { id: "ps-braintree", type: "payment_setting_braintrees", name: "Braintree" }
+
+function order(paymentInstrument: unknown, setting: object = STRIPE): Partial<Order> {
   return {
     id: "order-1",
-    available_payment_settings: [STRIPE],
+    available_payment_settings: [setting],
     payment_sessions: [
       {
         id: "session-1",
         type: "payment_sessions",
         status: "authorized",
-        payment_setting: STRIPE,
+        payment_setting: setting,
         payment_instrument: paymentInstrument,
       },
     ],
@@ -150,7 +152,66 @@ describe("PaymentSettingInstrument", () => {
       </PaymentSettingInstrument>
     )
     expect(screen.getByTestId("custom").textContent).toBe(
-      "American express|4242|1/2028|//data.commercelayer.app/assets/images/icons/credit-cards/color/american_express.svg"
+      // `amex.svg`: the icon set has no `american_express.svg`.
+      "American express|4242|1/2028|//data.commercelayer.app/assets/images/icons/credit-cards/color/amex.svg"
+    )
+  })
+
+  // Braintree names no method: a PayPal payment through it would read as
+  // nothing. As the API stores it for a PayPal approval through Braintree.
+  it("names PayPal through Braintree, whose instrument carries no issuer type", () => {
+    renderInstrument(
+      order({ account_id: "JE6HTK628998C", account_email: "buyer@personal.example.com" }, BRAINTREE)
+    )
+    expect(screen.getByTestId("instrument").textContent).toBe("PayPal")
+  })
+
+  it("still names a Braintree card by its brand and digits", () => {
+    renderInstrument(
+      order(
+        {
+          card_type: "VISA",
+          card_last_digits: "1881",
+          card_expiry_month: 12,
+          card_expiry_year: 2027,
+        },
+        BRAINTREE
+      )
+    )
+    expect(screen.getByTestId("instrument").textContent).toBe("Visa •••• 1881")
+  })
+
+  // As the API stores an Apple Pay payment through Braintree: a plain card, in
+  // Braintree's upper case. The icon set's files are lower case.
+  it("points at the icon set's file whatever case the gateway spells the brand in", () => {
+    renderInstrument(
+      order(
+        {
+          card_type: "MASTERCARD",
+          card_last_digits: "0049",
+          card_expiry_month: 12,
+          card_expiry_year: 2026,
+        },
+        BRAINTREE
+      ),
+      <PaymentSettingInstrument>
+        {({ label, iconUrl }) => <span data-testid="custom">{`${label}|${iconUrl}`}</span>}
+      </PaymentSettingInstrument>
+    )
+    expect(screen.getByTestId("custom").textContent).toBe(
+      "Mastercard •••• 0049|//data.commercelayer.app/assets/images/icons/credit-cards/color/mastercard.svg"
+    )
+  })
+
+  it("folds Braintree's long brand names onto the icon set's short ones", () => {
+    renderInstrument(
+      order({ card_type: "AMERICAN_EXPRESS", card_last_digits: "0005" }, BRAINTREE),
+      <PaymentSettingInstrument>
+        {({ label, iconUrl }) => <span data-testid="custom">{`${label}|${iconUrl}`}</span>}
+      </PaymentSettingInstrument>
+    )
+    expect(screen.getByTestId("custom").textContent).toBe(
+      "American express •••• 0005|//data.commercelayer.app/assets/images/icons/credit-cards/color/amex.svg"
     )
   })
 })

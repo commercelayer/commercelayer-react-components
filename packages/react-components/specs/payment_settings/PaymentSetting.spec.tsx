@@ -1,6 +1,6 @@
 import type { Order } from "@commercelayer/sdk"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
-import type { ReactNode } from "react"
+import { type ReactNode, useContext } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { PaymentMethod } from "#components/payment_methods/PaymentMethod"
 import { PaymentSetting } from "#components/payment_settings/PaymentSetting"
@@ -9,6 +9,7 @@ import { PaymentSettingName } from "#components/payment_settings/PaymentSettingN
 import { PaymentSettingRadioButton } from "#components/payment_settings/PaymentSettingRadioButton"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
 import { resetPaymentGatewayStore, setCollecting } from "#utils/paymentGatewayStore"
 import { ADYEN_RETURN_URL_MAX_LENGTH } from "#utils/paymentSettingCreateAttributes"
 
@@ -500,6 +501,71 @@ describe("<PaymentSetting> clearing the superseded session", () => {
   })
 })
 
+describe("PaymentSetting selection errors", () => {
+  const BRAINTREE = { id: "ps-braintree", type: "payment_setting_braintrees", name: "Braintree" }
+
+  function renderWithErrors(currentOrder: Partial<Order>) {
+    return render(
+      <Wrapper currentOrder={currentOrder}>
+        <PaymentSetting>
+          {({ setting, errors }) => (
+            <div data-testid={`setting-${setting.id}`}>
+              <PaymentSettingRadioButton data-testid={`radio-${setting.id}`} />
+              {errors.length > 0 && (
+                <span data-testid={`error-${setting.id}`}>
+                  {errors.map((e) => e.message).join(" ")}
+                </span>
+              )}
+            </div>
+          )}
+        </PaymentSetting>
+      </Wrapper>
+    )
+  }
+
+  it("reports the failure under the setting that failed only", async () => {
+    createPaymentSessionMock.mockRejectedValue(new Error("boom"))
+    renderWithErrors(order({ available_payment_settings: [MANUAL, BRAINTREE] } as never))
+
+    fireEvent.click(screen.getByTestId(`radio-${BRAINTREE.id}`))
+
+    await waitFor(() => {
+      expect(screen.getByTestId(`error-${BRAINTREE.id}`).textContent).toBe("boom")
+    })
+    expect(screen.queryByTestId(`error-${MANUAL.id}`)).toBeNull()
+  })
+
+  it("carries the API's detail when the SDK error has no message", async () => {
+    // What the SDK throws for a 500 on the session create: an ApiError whose
+    // `message` is empty, with the API's errors alongside.
+    const apiError = Object.assign(new Error(""), {
+      errors: [{ title: "Invalid query", detail: "invalid query", status: "500" }],
+    })
+    createPaymentSessionMock.mockRejectedValue(apiError)
+    renderWithErrors(order({ available_payment_settings: [MANUAL, BRAINTREE] } as never))
+
+    fireEvent.click(screen.getByTestId(`radio-${BRAINTREE.id}`))
+
+    await waitFor(() => {
+      expect(screen.getByTestId(`error-${BRAINTREE.id}`).textContent).toBe("invalid query")
+    })
+  })
+
+  it("clears the failure when another setting is picked", async () => {
+    createPaymentSessionMock.mockRejectedValueOnce(new Error("boom"))
+    renderWithErrors(order({ available_payment_settings: [MANUAL, BRAINTREE] } as never))
+
+    fireEvent.click(screen.getByTestId(`radio-${BRAINTREE.id}`))
+    await screen.findByTestId(`error-${BRAINTREE.id}`)
+
+    fireEvent.click(screen.getByTestId(`radio-${MANUAL.id}`))
+
+    await waitFor(() => {
+      expect(screen.queryByTestId(`error-${BRAINTREE.id}`)).toBeNull()
+    })
+  })
+})
+
 /**
  * `returnUrl`, and why it is on this component.
  *
@@ -609,6 +675,7 @@ describe("<PaymentSetting> saving a card", () => {
     public_key: "test_A",
   }
   const STRIPE_WITH_KEY = { ...STRIPE, public_key: "pk_test_A" }
+  const BRAINTREE = { id: "ps-braintree", type: "payment_setting_braintrees", name: "Braintree" }
 
   function stripeSession(overrides: Record<string, unknown> = {}) {
     return {
@@ -671,12 +738,14 @@ describe("<PaymentSetting> saving a card", () => {
     })
   })
 
-  it("offers the choice on Stripe to a signed-in customer, and nowhere else", () => {
+  it("offers the choice on Stripe and Braintree to a signed-in customer, and nowhere else", () => {
     guest.value = false
     const captured = renderCapturing(
-      order({ available_payment_settings: [MANUAL, ADYEN, STRIPE_WITH_KEY] } as never)
+      order({ available_payment_settings: [MANUAL, ADYEN, STRIPE_WITH_KEY, BRAINTREE] } as never)
     )
     expect(captured["ps-stripe"]?.canSaveCard).toBe(true)
+    // Hosted Fields are bare inputs: there is no checkbox of Braintree's own.
+    expect(captured["ps-braintree"]?.canSaveCard).toBe(true)
     // Adyen's Drop-in has a checkbox of its own; a second one would ask twice.
     expect(captured["ps-adyen"]?.canSaveCard).toBe(false)
     expect(captured["ps-manual"]?.canSaveCard).toBe(false)
@@ -788,6 +857,74 @@ describe("<PaymentSetting> saving a card", () => {
     })
 
     expect(createPaymentSessionMock).not.toHaveBeenCalled()
+  })
+
+  describe("renewing a session", () => {
+    /** Keep each setting's `renewPaymentSession`, which only gateway components see. */
+    function renderRenewing(currentOrder: Partial<Order>) {
+      const renew: Record<string, () => Promise<void>> = {}
+      function Capture() {
+        const { setting, renewPaymentSession } = useContext(PaymentSettingChildrenContext)
+        if (setting != null && renewPaymentSession != null) renew[setting.id] = renewPaymentSession
+        return null
+      }
+      render(
+        <Wrapper currentOrder={currentOrder}>
+          <PaymentSetting>
+            <Capture />
+          </PaymentSetting>
+        </Wrapper>
+      )
+      return renew
+    }
+
+    function braintreeSession(overrides: Record<string, unknown> = {}) {
+      return {
+        id: "session-braintree",
+        status: "unpaid",
+        created_at: "2026-10-23T10:00:00Z",
+        payment_setting: BRAINTREE,
+        ...overrides,
+      }
+    }
+
+    it("keeps the save-card choice on the session that replaces an expired one", async () => {
+      // Nothing on screen would tell the shopper the choice was dropped; the
+      // first they would hear of it is a card missing from the next checkout.
+      guest.value = false
+      const renew = renderRenewing(
+        order({
+          available_payment_settings: [BRAINTREE],
+          payment_sessions: [braintreeSession({ vaulting: true })],
+        } as never)
+      )
+
+      await act(async () => {
+        await renew["ps-braintree"]?.()
+      })
+
+      expect(createPaymentSessionMock).toHaveBeenCalledWith(
+        expect.objectContaining({ paymentSettingId: "ps-braintree", vaulting: true })
+      )
+    })
+
+    it("does not add a choice the shopper never made", async () => {
+      guest.value = false
+      const renew = renderRenewing(
+        order({
+          available_payment_settings: [BRAINTREE],
+          payment_sessions: [braintreeSession({ vaulting: false })],
+        } as never)
+      )
+
+      await act(async () => {
+        await renew["ps-braintree"]?.()
+      })
+
+      expect(createPaymentSessionMock).toHaveBeenCalledWith(
+        expect.objectContaining({ paymentSettingId: "ps-braintree", vaulting: false })
+      )
+    })
   })
 
   it("starts unticked when Stripe is selected afresh", async () => {

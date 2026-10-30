@@ -355,15 +355,35 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
     await refetch()
   }
 
-  const outOfBandHandledRef = useRef(false)
+  /**
+   * Which out-of-band outcome this button has already acted on.
+   *
+   * A `done` is acted on once and never again: the phase can be republished —
+   * a resume hook running twice, a store written by two components — and
+   * placing on each would place twice. A `failed` is different, because a
+   * refusal is the ordinary end of an attempt and the shopper makes another:
+   * picks the method again and pays through the same wallet on the same page.
+   * Acting on a failure only once *ever* left that second attempt's `done`
+   * unheard — the money taken and the order never placed. So a handled failure
+   * re-arms the button for whatever outcome comes next, and a further failure
+   * is heard once the phase has moved on from the first.
+   */
+  const outOfBandHandledRef = useRef<"none" | "failed" | "done">("none")
   useEffect(() => {
-    if (collectedOutOfBand === "done" && !outOfBandHandledRef.current) {
-      outOfBandHandledRef.current = true
+    if (collectedOutOfBand === "done" && outOfBandHandledRef.current !== "done") {
+      outOfBandHandledRef.current = "done"
       void outOfBandRef.current()
       return
     }
-    if (collectedOutOfBand === "failed" && !outOfBandHandledRef.current) {
-      outOfBandHandledRef.current = true
+    if (
+      (collectedOutOfBand === "no" || collectedOutOfBand === "in-progress") &&
+      outOfBandHandledRef.current === "failed"
+    ) {
+      outOfBandHandledRef.current = "none"
+      return
+    }
+    if (collectedOutOfBand === "failed" && outOfBandHandledRef.current === "none") {
+      outOfBandHandledRef.current = "failed"
       setOrderErrors(outOfBandErrors)
       // Burnt for the same reason as a refusal on our own click, so it goes the
       // same way. The gift cards are **not** given back here: on a redirect
