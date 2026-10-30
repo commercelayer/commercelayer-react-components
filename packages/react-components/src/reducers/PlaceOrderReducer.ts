@@ -250,7 +250,11 @@ export async function setPlaceOrder({
           _save_shipping_address_to_customer_address_book: true,
         })
       }
-      if (paymentType === "stripe_payments" && paymentSource != null) {
+      // Not on the return from Stripe: the payment is confirmed by then, and the current URL
+      // never matches the stored one because Stripe appends its own parameters. The PATCH
+      // would be one more write that an `auto_place` method can turn into a 401 (#900).
+      const isStripeReturn = options?.stripe?.paymentIntentClientSecret != null
+      if (paymentType === "stripe_payments" && paymentSource != null && !isStripeReturn) {
         const ps = paymentSource as StripePayment
         const currentUrl = window.location.href
         // @ts-expect-error no type
@@ -328,6 +332,17 @@ export async function setPlaceOrder({
       }
       // biome-ignore lint/suspicious/noExplicitAny: No type for error
     } catch (error: any) {
+      // An `auto_place` method places the order in the background, so it can land between
+      // the pre-check above and the writes after it, which the API then refuses (#900). The
+      // order is placed: report it like the pre-check does rather than as an error.
+      const latest = await sdk.orders.retrieve(order.id, { include }).catch(() => null)
+      if (latest?.status === "placed") {
+        if (setOrder) setOrder(latest)
+        return {
+          placed: true,
+          order: latest,
+        }
+      }
       const errors = getErrors({
         error,
         resource: "orders",
