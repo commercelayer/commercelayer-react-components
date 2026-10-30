@@ -280,9 +280,11 @@ function PayPalButton({
         // The popup was closed before approving: nothing reached Braintree.
         // The gift cards charged on the click stay charged and applied, as
         // after any interrupted payment — they count toward the next attempt.
+        releasePopup()
         setIsSubmitting(false)
       },
       onError: (error) => {
+        releasePopup()
         fail(braintreeErrorCode(error) ?? "PAYPAL_ERROR", "PayPal could not complete the payment.")
         setIsSubmitting(false)
       },
@@ -292,9 +294,27 @@ function PayPalButton({
       // The container went away while PayPal was rendering into it.
     })
     return () => {
+      // This button registers nothing on the handoff, so no deregistration
+      // clears the lock its popup took. Released here instead, or a button
+      // unmounted under an open popup would leave the payment method locked
+      // for the rest of the page. Only the popup's hold: an approval already
+      // being authorized finishes on its own and releases it then.
+      releasePopup()
       void buttons.close().catch(() => {})
     }
   }, [booted])
+
+  /**
+   * Whether this button's popup is open and holding the payment-method lock.
+   * Tracked apart from the authorization that follows an approval, which
+   * releases the lock itself, so an unmount can release exactly what it owns.
+   */
+  const popupOpenRef = useRef(false)
+  const releasePopup = (): void => {
+    if (!popupOpenRef.current) return
+    popupOpenRef.current = false
+    setCollecting(latestRef.current.order?.id, false)
+  }
 
   /**
    * PayPal's click: the gate, then the gift cards — before the popup goes on.
@@ -346,13 +366,25 @@ function PayPalButton({
       await actions.reject()
       return
     }
+    // Resolving opens the popup, and the payment method is locked until it
+    // closes: switching would unmount this button under a popup the shopper can
+    // still approve. Released by cancel, error, the approval taking over, or
+    // this button going away.
+    popupOpenRef.current = true
+    setCollecting(current.order.id, true)
     await actions.resolve()
   }
 
   /** PayPal approved: hand the nonce to Commerce Layer and report the verdict. */
   async function onApprove(checkout: PayPalCheckout, data: Record<string, unknown>): Promise<void> {
     const current = latestRef.current
-    if (current.accessToken == null) return
+    // The popup's hold ends here; the authorization takes the lock over
+    // without letting go of it in between.
+    popupOpenRef.current = false
+    if (current.accessToken == null) {
+      setCollecting(orderId, false)
+      return
+    }
 
     setIsSubmitting(true)
     // From here a payment is in flight that nothing on the order records yet:

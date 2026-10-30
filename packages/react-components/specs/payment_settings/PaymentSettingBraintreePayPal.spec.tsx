@@ -362,3 +362,76 @@ describe("<PaymentSettingBraintreePayPal> the approval", () => {
     expect(authorizeMock).not.toHaveBeenCalled()
   })
 })
+
+/**
+ * PayPal's popup is a payment under way: switching method while it is open
+ * would unmount the button under a popup the shopper can still approve. This
+ * button registers nothing on the handoff, so no deregistration releases the
+ * lock for it — every way out has to, including the button going away.
+ */
+describe("<PaymentSettingBraintreePayPal> the payment-method lock", () => {
+  it("is taken as the popup goes on", async () => {
+    await renderAvailable()
+    expect(isCollecting("order-1")).toBe(false)
+
+    const actions = await click()
+
+    expect(actions.resolve).toHaveBeenCalled()
+    expect(isCollecting("order-1")).toBe(true)
+  })
+
+  it("is not taken when the click is refused", async () => {
+    permitted.value = false
+    await renderAvailable()
+
+    await click()
+
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
+  it("is released when the shopper closes the popup", async () => {
+    await renderAvailable()
+    await click()
+
+    act(() => {
+      pp.options.onCancel()
+    })
+
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
+  it("is released when PayPal reports an error", async () => {
+    await renderAvailable()
+    await click()
+
+    act(() => {
+      pp.options.onError(new Error("popup blocked"))
+    })
+
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
+  it("is held through the approval and released once it is answered", async () => {
+    await renderAvailable()
+    await click()
+
+    let collectingDuringAuthorization: boolean | undefined
+    authorizeMock.mockImplementation(async () => {
+      collectingDuringAuthorization = isCollecting("order-1")
+      return { status: "authorized" }
+    })
+    await approve()
+
+    expect(collectingDuringAuthorization).toBe(true)
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
+  it("is released when the button goes away under an open popup", async () => {
+    const { unmount } = await renderAvailable()
+    await click()
+
+    unmount()
+
+    expect(isCollecting("order-1")).toBe(false)
+  })
+})
