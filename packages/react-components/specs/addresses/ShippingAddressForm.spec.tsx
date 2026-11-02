@@ -824,6 +824,70 @@ describe("ShippingAddressForm (standalone mode)", () => {
     expect(saveAddressesMock).toHaveBeenCalled()
   })
 
+  it("exposes invertAddresses via AddressesContext in standalone mode", async () => {
+    let ctxRef: { invertAddresses?: boolean } | undefined
+
+    function InvertProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({
+      // The shared state is keyed by access token + orderId, so a dedicated
+      // orderId keeps the flag published here out of the other tests.
+      orderOverrides: { order: { id: "ord-invert-on" }, orderId: "ord-invert-on" },
+      props: { invertAddresses: true },
+      children: <InvertProbe />,
+    })
+
+    await waitFor(() => {
+      expect(ctxRef?.invertAddresses).toBe(true)
+    })
+  })
+
+  it("leaves invertAddresses false when the prop is not passed", async () => {
+    let ctxRef: { invertAddresses?: boolean } | undefined
+
+    function InvertProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({
+      orderOverrides: { order: { id: "ord-invert-default" }, orderId: "ord-invert-default" },
+      children: <InvertProbe />,
+    })
+
+    await waitFor(() => {
+      expect(ctxRef?.invertAddresses).toBe(false)
+    })
+  })
+
+  it("syncs the shipping address with invertAddresses=true and shipToDifferentAddress=false", async () => {
+    let ctxRef: { shipping_address?: Record<string, unknown> } | undefined
+
+    function AddressCtxProbe(): JSX.Element {
+      const ctx = useContext(AddressesContext)
+      ctxRef = ctx as typeof ctxRef
+      return <div />
+    }
+
+    renderStandaloneShipping({
+      orderOverrides: { order: { id: "ord-invert-sync" }, orderId: "ord-invert-sync" },
+      props: { invertAddresses: true, shipToDifferentAddress: false },
+      values: {
+        shipping_address_first_name: { value: "Carla", required: true },
+      },
+      children: <AddressCtxProbe />,
+    })
+
+    await waitFor(() => {
+      expect(ctxRef?.shipping_address?.first_name).toBe("Carla")
+    })
+  })
+
   it("also provides ShippingAddressFormContext in standalone mode", async () => {
     let formCtxRef: { errorClassName?: string } | undefined
 

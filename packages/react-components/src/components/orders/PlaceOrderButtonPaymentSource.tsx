@@ -10,7 +10,6 @@ import {
   useState,
 } from "react"
 import OrderContext from "#context/OrderContext"
-import PlaceOrderContext from "#context/PlaceOrderContext"
 import useCommerceLayer from "#hooks/useCommerceLayer"
 import { usePaymentMethodStateContext } from "#hooks/usePaymentMethodStateContext"
 import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"

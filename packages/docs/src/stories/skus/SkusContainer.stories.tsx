@@ -106,7 +106,7 @@ export const Default: Story = {
     skus: ["POLOMXXX000000FFFFFFLXXX", "CROPTOPWFFFFFF000000XSXX"],
   },
   render: (args) => (
-    <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
+    <CommerceLayer accessToken="my-access-token">
       <SkusContainer {...args}>
         <Skus>
           <div style={{ marginBottom: 12 }}>
@@ -131,7 +131,7 @@ export const WithQueryParams: Story = {
     },
   },
   render: (args) => (
-    <CommerceLayer accessToken="my-access-token" endpoint="https://demo-store.commercelayer.io">
+    <CommerceLayer accessToken="my-access-token">
       <SkusContainer {...args}>
         <Skus>
           <div style={{ marginBottom: 12 }}>

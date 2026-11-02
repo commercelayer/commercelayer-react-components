@@ -81,6 +81,79 @@ describe("setPaymentSource request coalescing", () => {
   })
 })
 
+describe("setPaymentSource after a create has just settled", () => {
+  // Two components create the payment source of a single-method order: <PaymentMethod>
+  // auto-selecting it and <PaymentGateway> reconciling it. The second one acted on an
+  // order read before the first create — still no payment source — a few hundred ms
+  // after that create settled, past the in-flight coalescing: two payment sources, and
+  // with checkout.com two payment sessions while the order points at only one.
+  const BEFORE = "2026-10-26T10:00:00.000Z"
+  const AFTER = "2026-10-26T10:00:01.000Z"
+  const LATER = "2026-10-26T10:00:05.000Z"
+
+  function orderAt(id: string, updatedAt: string, paymentSource: unknown = null) {
+    return { id, status: "pending", updated_at: updatedAt, payment_source: paymentSource }
+  }
+
+  it("hands a caller whose order predates the create the source it created", async () => {
+    // Kills: forgetting the create as soon as it settles.
+    const readBack = orderAt("order-stale", AFTER, { id: "sp-1" })
+    await setPaymentSource(
+      createParams({
+        order: orderAt("order-stale", BEFORE),
+        getOrder: vi.fn().mockResolvedValue(readBack),
+      })
+    )
+    const dispatch = vi.fn()
+
+    const result = await setPaymentSource(
+      createParams({ order: orderAt("order-stale", BEFORE), dispatch })
+    )
+
+    expect(stripeCreate).toHaveBeenCalledTimes(1)
+    expect(result).toEqual({ id: "sp-1", type: "stripe_payments" })
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "setPaymentSource",
+        payload: expect.objectContaining({
+          paymentSource: { id: "sp-1", type: "stripe_payments" },
+        }),
+      })
+    )
+  })
+
+  it("creates again once the order has moved on and lost its payment source", async () => {
+    // A coupon drops the payment source server-side: that is a legitimate re-create.
+    await setPaymentSource(
+      createParams({
+        order: orderAt("order-moved", BEFORE),
+        getOrder: vi.fn().mockResolvedValue(orderAt("order-moved", AFTER, { id: "sp-1" })),
+      })
+    )
+
+    await setPaymentSource(createParams({ order: orderAt("order-moved", LATER) }))
+
+    expect(stripeCreate).toHaveBeenCalledTimes(2)
+  })
+
+  it("recreates a mismatched payment source whatever the revision", async () => {
+    await setPaymentSource(
+      createParams({
+        order: orderAt("order-mismatch", BEFORE),
+        getOrder: vi.fn().mockResolvedValue(orderAt("order-mismatch", AFTER, { id: "sp-1" })),
+      })
+    )
+
+    await setPaymentSource(
+      createParams({
+        order: orderAt("order-mismatch", BEFORE, { id: "sp-1", mismatched_amounts: true }),
+      })
+    )
+
+    expect(stripeCreate).toHaveBeenCalledTimes(2)
+  })
+})
+
 describe("setPaymentSource when the payment session expired", () => {
   it("returns undefined and clears the payment source instead of reporting a balance", async () => {
     const expired = Object.assign(new Error("expired"), {
@@ -102,7 +175,7 @@ describe("setPaymentSource when the payment session expired", () => {
         dispatch,
         // biome-ignore lint/suspicious/noExplicitAny: test cast
         order: { id: "order-1", status: "pending", payment_source: { id: "sp-1" } } as any,
-      }),
+      })
     )
 
     // The caller must be able to tell "the call failed" from "the card is empty":
@@ -156,7 +229,7 @@ describe("setPaymentSource when the API refuses the write with a 401", () => {
       createParams({
         dispatch,
         getOrder: vi.fn().mockResolvedValue({ id: "order-1", status: "placed" }),
-      }),
+      })
     )
 
     expect(errorDispatches(dispatch)).toHaveLength(0)
@@ -169,7 +242,7 @@ describe("setPaymentSource when the API refuses the write with a 401", () => {
     const dispatch = vi.fn()
 
     await setPaymentSource(
-      createParams({ dispatch, getOrder: vi.fn().mockResolvedValue(undefined) }),
+      createParams({ dispatch, getOrder: vi.fn().mockResolvedValue(undefined) })
     )
 
     expect(errorDispatches(dispatch)).toHaveLength(1)

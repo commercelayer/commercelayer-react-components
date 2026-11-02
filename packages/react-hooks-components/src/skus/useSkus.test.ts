@@ -5,19 +5,14 @@ import { act, renderHook, waitFor } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { createElement } from "react"
 import { SWRConfig } from "swr"
-import { beforeEach, describe, expect } from "vitest"
+import { describe, expect } from "vitest"
 import { coreIntegrationTest, coreTest } from "#extender"
 import { useSkus } from "./useSkus"
 
 const swrWrapper = ({ children }: { children: ReactNode }) =>
   createElement(SWRConfig, { value: { provider: () => new Map() } }, children)
 
-const domain = import.meta.env.VITE_DOMAIN
-
 describe("useSkus", () => {
-  beforeEach(({ skip }) => {
-    if (domain == null) skip()
-  })
   coreIntegrationTest("should return a list of SKUs", async ({ accessToken }) => {
     const token = accessToken?.accessToken
     const { result } = renderHook(() => useSkus(token))
@@ -186,7 +181,7 @@ describe("useSkus", () => {
     act(() => {
       result.current.fetchSkus({
         filters: {
-          code_eq: "DIGITALPRODUCT",
+          code_eq: "TSHIRTMM000000E63E74MXXX",
         },
       })
     })

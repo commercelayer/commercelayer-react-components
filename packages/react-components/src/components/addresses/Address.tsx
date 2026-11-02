@@ -68,25 +68,36 @@ export function Address(props: Props): JSX.Element {
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentional effect with stable context refs
   useEffect(() => {
     if (items && !deselect) {
+      // The card preselected below has to be published in this same pass.
+      // `selected` is this render's value and is not a dependency, so a
+      // publish keyed on it alone waits for some other input to change and
+      // re-run the effect — and when everything has already arrived by the
+      // time the list mounts, nothing does: the card shows as selected while
+      // the shared state holds no address, and the save button stays disabled.
+      let current = selected
       items.forEach((address, k) => {
         if (billingCustomerAddressId) {
           const preselected = address.reference === billingCustomerAddressId
-          if (preselected && selected === null) {
+          if (preselected && current === null) {
+            current = k
             setSelected(k)
           }
         }
-        if (!billingAddressId && k === selected && setBillingAddress && address.reference != null) {
+        if (!billingAddressId && k === current && setBillingAddress && address.reference != null) {
           setBillingAddress(address.id, {
             customerAddressId: address.reference,
           })
         }
         if (shippingCustomerAddressId) {
           const preselected = address.reference === shippingCustomerAddressId
-          preselected && selected === null && setSelected(k)
+          if (preselected && current === null) {
+            current = k
+            setSelected(k)
+          }
         }
         if (
           !shippingAddressId &&
-          k === selected &&
+          k === current &&
           setShippingAddress &&
           address.reference != null
         ) {

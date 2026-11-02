@@ -23,6 +23,7 @@ export function AdyenGateway(props: Props): JSX.Element | null {
     showCard,
     handleEditClick,
     children,
+    loaderComponent,
     templateCustomerCards,
     templateCustomerSaveToWallet,
     ...p
@@ -120,6 +121,7 @@ export function AdyenGateway(props: Props): JSX.Element | null {
         <AdyenPayment
           key={adyenSessionKey}
           templateCustomerSaveToWallet={templateCustomerSaveToWallet}
+          loaderComponent={loaderComponent}
           clientKey={clientKey}
           locale={locale}
           environment={environment}
@@ -131,6 +133,7 @@ export function AdyenGateway(props: Props): JSX.Element | null {
   return (
     <AdyenPayment
       key={adyenSessionKey}
+      loaderComponent={loaderComponent}
       clientKey={clientKey}
       locale={locale}
       config={paymentConfig}

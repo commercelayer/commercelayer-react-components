@@ -50,7 +50,7 @@ import {
   AddToCartButton,
 } from '@commercelayer/react-components'
 
-<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+<CommerceLayer accessToken="...">
   <OrderStorage persistKey="my-cart">
     <Order>
       <AddToCartButton skuCode="TSHIRTWS000000FFFFFFLXXX" label="Add to cart" quantity="1" />

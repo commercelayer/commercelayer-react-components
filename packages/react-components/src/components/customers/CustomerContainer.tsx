@@ -1,5 +1,5 @@
 import type { QueryPageSize } from "@commercelayer/sdk"
-import { type JSX, useContext, useEffect } from "react"
+import { type JSX, useContext } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext from "#context/OrderContext"
@@ -19,7 +19,7 @@ interface Props {
 export function CustomerContainer(props: Props): JSX.Element {
   const { children, isGuest, addressesPageSize } = props
   const { accessToken, interceptors } = useContext(CommerceLayerContext)
-  const { order, addResourceToInclude, include, includeLoaded, withoutIncludes } =
+  const { order, addResourceToInclude, getOrder, include, includeLoaded, withoutIncludes } =
     useContext(OrderContext)
 
   useDeprecatedContainer("CustomerContainer", "`<Customer>`")
@@ -29,6 +29,7 @@ export function CustomerContainer(props: Props): JSX.Element {
     interceptors,
     order,
     addResourceToInclude,
+    getOrder,
     include,
     includeLoaded,
     withoutIncludes,

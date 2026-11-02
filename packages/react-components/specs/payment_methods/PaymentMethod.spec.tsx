@@ -787,6 +787,55 @@ describe("PaymentMethod", () => {
       expect(mockSetPaymentSource).toHaveBeenCalledTimes(1)
     })
 
+    it("does not create a payment source once it has unmounted mid-selection", async () => {
+      // The payment step can close while the auto-select is between its two calls:
+      // a coupon applied while the shipping method is being selected sends the
+      // accordion back to Delivery, and the step reopens a moment later. The
+      // unmounted instance still went on to create a payment source, the reopened
+      // one — knowing nothing of it — created another, and checkout.com ended up
+      // with two payment sessions on the page and the order pointing at the second.
+      // Kills: creating the payment source without checking the instance is still mounted.
+      let resolveMethod: (value: unknown) => void = () => {}
+      const mockSetPaymentMethod = vi.fn(
+        () =>
+          new Promise((resolve) => {
+            resolveMethod = resolve
+          })
+      )
+      const mockSetPaymentSource = vi
+        .fn()
+        .mockResolvedValue({ id: "ps-1", type: "stripe_payments" })
+      const mockSetLoading = vi.fn()
+
+      let view: ReturnType<typeof render> | undefined
+      await act(async () => {
+        view = render(
+          <Providers order={MOCK_ORDER_SINGLE}>
+            <MockPaymentMethodProvider
+              paymentMethods={MOCK_ORDER_SINGLE.available_payment_methods}
+              setPaymentMethod={mockSetPaymentMethod}
+              setPaymentSource={mockSetPaymentSource}
+              setLoadingPlaceOrder={mockSetLoading}
+            >
+              <PaymentMethod autoSelectSinglePaymentMethod>
+                <span>method</span>
+              </PaymentMethod>
+            </MockPaymentMethodProvider>
+          </Providers>
+        )
+      })
+      expect(mockSetPaymentMethod).toHaveBeenCalledTimes(1)
+
+      view?.unmount()
+      await act(async () => {
+        resolveMethod({ success: true, order: MOCK_ORDER_SINGLE })
+      })
+
+      expect(mockSetPaymentSource).not.toHaveBeenCalled()
+      // The place-order loader it raised is lowered again, not left on for good.
+      expect(mockSetLoading).toHaveBeenLastCalledWith({ loading: false })
+    })
+
     it("calls autoSelectSinglePaymentMethod callback when provided as function", async () => {
       const callbackFn = vi.fn()
       const mockSetPaymentMethod = vi

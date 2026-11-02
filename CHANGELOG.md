@@ -1,3 +1,14 @@
+# Changelog
+
+Release notes for **v4 and later** live in
+[GitHub Releases](https://github.com/commercelayer/commercelayer-react-components/releases),
+generated from the merged pull requests.
+
+What follows is the historical changelog, frozen at `3.12.7` (2022-05-26). It is
+kept because it is accurate for the versions it covers; it is not updated.
+
+---
+
 ## [3.12.7](https://github.com/commercelayer/commercelayer-react-components/compare/v3.12.6...v3.12.7) (2022-05-26)
 
 

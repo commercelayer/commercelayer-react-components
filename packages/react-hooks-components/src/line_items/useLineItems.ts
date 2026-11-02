@@ -6,12 +6,47 @@ import {
 } from "@commercelayer/core-components"
 import type { LineItem } from "@commercelayer/sdk"
 import { useCallback } from "react"
-import useSWR, { type KeyedMutator } from "swr"
+import useSWR, { type KeyedMutator, useSWRConfig } from "swr"
 
 interface UseLineItemsParams {
   accessToken?: string
   orderId?: string | null
   interceptors?: InterceptorManager
+}
+
+type LineItemsOfOrder = Pick<UseLineItemsParams, "accessToken" | "orderId">
+
+function lineItemsKey(
+  accessToken: LineItemsOfOrder["accessToken"],
+  orderId: LineItemsOfOrder["orderId"]
+): readonly [string, string, string, string] | null {
+  return accessToken && orderId ? ["line_items", "get", accessToken, orderId] : null
+}
+
+/**
+ * React hook that returns a function to refetch the line items of an order
+ * from outside `useLineItems`, for code that changes the order and must not
+ * leave a mounted list behind.
+ *
+ * The returned promise settles once the mounted `useLineItems` hooks hold the
+ * new list. It does nothing when no hook is mounted for that order.
+ *
+ * @example
+ * ```tsx
+ * const reloadLineItems = useReloadLineItems()
+ * await reloadLineItems({ accessToken, orderId: 'xYzAbCdE' })
+ * ```
+ */
+export function useReloadLineItems(): (params: LineItemsOfOrder) => Promise<void> {
+  const { mutate } = useSWRConfig()
+  return useCallback(
+    async ({ accessToken, orderId }: LineItemsOfOrder): Promise<void> => {
+      const key = lineItemsKey(accessToken, orderId)
+      if (key == null) return
+      await mutate(key)
+    },
+    [mutate]
+  )
 }
 
 interface UseLineItemsReturn {
@@ -52,7 +87,7 @@ export function useLineItems({
   orderId,
   interceptors,
 }: UseLineItemsParams): UseLineItemsReturn {
-  const swrKey = accessToken && orderId ? ["line_items", "get", accessToken, orderId] : null
+  const swrKey = lineItemsKey(accessToken, orderId)
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<LineItem[]>(
     swrKey,
