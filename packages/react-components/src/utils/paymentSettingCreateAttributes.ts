@@ -2,6 +2,8 @@ import {
   ADYEN_SETTING_TYPE,
   BRAINTREE_SETTING_TYPE,
   buildGatewayReturnUrl,
+  PAYPAL_SETTING_TYPE,
+  readPayPalClientId,
   STRIPE_SETTING_TYPE,
 } from "@commercelayer/core-components"
 import type { PaymentSetting } from "@commercelayer/sdk"
@@ -78,6 +80,26 @@ const BUILDERS: Record<string, Builder> = {
     // gates `_save_payment_source_to_customer_wallet` the same way.
     vaulting: isAuthenticatedCustomer(accessToken),
   }),
+  [PAYPAL_SETTING_TYPE]: () => ({
+    // Required whenever the session stores the PayPal account, and refused
+    // without them, though PayPal's window here is a popup that never sends
+    // the shopper to either. Sent on every session rather than only on a
+    // vaulting one, because whether it vaults is the shopper's choice and is
+    // merged in after this runs.
+    //
+    // The page without its query string, and never the application's
+    // `returnUrl`: nobody is sent here, so nothing needs reloading, and a
+    // checkout's query string can carry its access token — which has no
+    // business reaching PayPal.
+    ...(typeof window !== "undefined"
+      ? {
+          clientData: {
+            return_url: window.location.origin + window.location.pathname,
+            cancel_url: window.location.origin + window.location.pathname,
+          },
+        }
+      : {}),
+  }),
 }
 
 /**
@@ -92,10 +114,17 @@ const BUILDERS: Record<string, Builder> = {
  *   ticks it and then pays with Apple Pay on the same setting stores that
  *   instead, so the copy should say "payment method", not "card". PayPal
  *   through Braintree is paid but never stored.
+ * - **PayPal:** its window asks the shopper to agree to future payments only
+ *   once the session has asked to store the account, so the asking has to
+ *   come first, from the application.
  *
  * Adyen's Drop-in asks on its own, which is why Adyen is not here.
  */
-const CONSENT_BY_APPLICATION: readonly string[] = [STRIPE_SETTING_TYPE, BRAINTREE_SETTING_TYPE]
+const CONSENT_BY_APPLICATION: readonly string[] = [
+  STRIPE_SETTING_TYPE,
+  BRAINTREE_SETTING_TYPE,
+  PAYPAL_SETTING_TYPE,
+]
 
 /**
  * Whether the application should offer the shopper a "save this card" choice
@@ -183,6 +212,12 @@ export function paymentSettingUnusableReason(setting: PaymentSetting): string | 
   if (setting.type === ADYEN_SETTING_TYPE || setting.type === STRIPE_SETTING_TYPE) {
     const key = (setting as { public_key?: string | null }).public_key
     if (typeof key !== "string" || key === "") return "the setting has no public_key"
+  }
+
+  // PayPal's SDK loads with the setting's `client_id`, which a setting can be
+  // read without — a consumer's `fields` allowlist, for one.
+  if (setting.type === PAYPAL_SETTING_TYPE && readPayPalClientId(setting) == null) {
+    return "the setting has no client_id"
   }
 
   return undefined

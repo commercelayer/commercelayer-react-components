@@ -1,5 +1,6 @@
 import {
   BRAINTREE_SETTING_TYPE,
+  PAYPAL_SETTING_TYPE,
   type PaymentInstrument,
   readPaymentInstrument,
 } from "@commercelayer/core-components"
@@ -85,10 +86,10 @@ const ISSUERS: Record<string, { name: string; icon?: string }> = {
 /**
  * The payment method, when the gateway did not name it.
  *
- * Braintree fills no `issuer_type`, so a PayPal payment through it would read
- * as nothing at all. Among its instruments only PayPal's carries an
- * `account_email` — Venmo's has a username, a bank account its last digits —
- * so that is what names it.
+ * Neither Braintree nor PayPal fills `issuer_type`, so a PayPal payment would
+ * read as nothing at all. Whatever pays a PayPal setting is PayPal. Among
+ * Braintree's instruments only PayPal's carries an `account_email` — Venmo's
+ * has a username, a bank account its last digits — so that is what names it.
  */
 function inferredIssuerType(
   instrument: PaymentInstrument,
@@ -97,6 +98,7 @@ function inferredIssuerType(
 ): string | undefined {
   if (instrument.issuer_type != null && instrument.issuer_type !== "") return instrument.issuer_type
   if (isCard) return undefined
+  if (settingType === PAYPAL_SETTING_TYPE) return "paypal"
   if (settingType === BRAINTREE_SETTING_TYPE && instrument.account_email != null) return "paypal"
   return undefined
 }

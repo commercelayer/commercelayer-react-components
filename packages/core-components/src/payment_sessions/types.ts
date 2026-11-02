@@ -349,6 +349,48 @@ export function readBraintreeClientToken(session?: PaymentSession | null): strin
 }
 
 /**
+ * The Payment Setting type for PayPal taken on its own, through PayPal's Orders
+ * API — not PayPal as one of Adyen's or Braintree's methods.
+ *
+ * The setting carries the browser credential, `client_id`; the PayPal order is
+ * created with the Payment Session, and the session's `token` is its id.
+ */
+export const PAYPAL_SETTING_TYPE = "payment_setting_paypals"
+
+/** Whether this session belongs to a PayPal Payment Setting. */
+export function isPayPalSession(session?: PaymentSession | null): boolean {
+  return session?.payment_setting?.type === PAYPAL_SETTING_TYPE
+}
+
+/**
+ * The client id PayPal's JS SDK loads with: the public half of the setting's
+ * PayPal REST app.
+ *
+ * Returned in `order.available_payment_settings`, but not declared on the SDK's
+ * `PaymentSettingPaypal` type, hence the read through `unknown`. `undefined`
+ * when it is absent or empty — the setting cannot be offered then.
+ */
+export function readPayPalClientId(setting?: PaymentSetting | null): string | undefined {
+  const clientId = (setting as { client_id?: unknown } | null | undefined)?.client_id
+  if (typeof clientId !== "string" || clientId === "") return undefined
+  return clientId
+}
+
+/**
+ * The PayPal order the session pays: the session's `token`.
+ *
+ * Created by Commerce Layer when the session is, for the session's amount, so a
+ * session for the remainder after gift cards is an order for the remainder.
+ * `undefined` when the session has none — its creation reached PayPal and
+ * failed, or a consumer's `fields` allowlist leaves `token` out.
+ */
+export function readPayPalOrderId(session?: PaymentSession | null): string | undefined {
+  const token = session?.token
+  if (typeof token !== "string" || token === "") return undefined
+  return token
+}
+
+/**
  * What the shopper paid with, as the API describes it.
  *
  * `payment_instrument` is one shape for every gateway: each

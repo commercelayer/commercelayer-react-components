@@ -7,6 +7,12 @@ export {
 } from "./authorizeBraintreePaymentSession"
 export type { AuthorizeGiftCardSessionsResult } from "./authorizeGiftCardSessions"
 export { authorizeGiftCardSessions } from "./authorizeGiftCardSessions"
+export type { AuthorizePaymentSessionResult } from "./authorizePaymentSession"
+export {
+  authorizePaymentSession,
+  DEFAULT_AUTHORIZATION_ATTEMPTS,
+  DEFAULT_AUTHORIZATION_INTERVAL_MS,
+} from "./authorizePaymentSession"
 export { buildGatewayReturnUrl } from "./buildGatewayReturnUrl"
 export { createPaymentSession } from "./createPaymentSession"
 export type { PaymentSessionsState } from "./derivePaymentSessionsState"
@@ -57,12 +63,16 @@ export {
   isAdyenSession,
   isBraintreeSession,
   isGiftCardSession,
+  isPayPalSession,
   isStripeSession,
   MONEY_RETURNED_SESSION_STATUSES,
   PAYMENT_TAKEN_SESSION_STATUSES,
+  PAYPAL_SETTING_TYPE,
   readAdyenSession,
   readBraintreeClientToken,
   readPaymentInstrument,
+  readPayPalClientId,
+  readPayPalOrderId,
   readStripeClientSecret,
   STRIPE_SETTING_TYPE,
   TERMINAL_FAILURE_TRANSACTION_STATUSES,

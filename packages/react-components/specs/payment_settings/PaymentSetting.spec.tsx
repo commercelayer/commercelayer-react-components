@@ -676,6 +676,35 @@ describe("<PaymentSetting> saving a card", () => {
   }
   const STRIPE_WITH_KEY = { ...STRIPE, public_key: "pk_test_A" }
   const BRAINTREE = { id: "ps-braintree", type: "payment_setting_braintrees", name: "Braintree" }
+  const PAYPAL = {
+    id: "ps-paypal",
+    type: "payment_setting_paypals",
+    name: "PayPal",
+    client_id: "paypal-client-id",
+  }
+
+  // Refused without them whenever the account is stored, though PayPal's popup
+  // never sends anyone to either — and the page's query string can carry the
+  // access token, which has no business reaching PayPal.
+  it("gives PayPal the page as its return and cancel URLs, without the query string", async () => {
+    window.history.replaceState(null, "", "/checkout/order-1?accessToken=secret")
+    renderSettings(order({ available_payment_settings: [PAYPAL] } as never))
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("radio"))
+    })
+
+    const page = `${window.location.origin}/checkout/order-1`
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          paymentSettingId: "ps-paypal",
+          clientData: { return_url: page, cancel_url: page },
+        })
+      )
+    })
+    window.history.replaceState(null, "", "/")
+  })
 
   function stripeSession(overrides: Record<string, unknown> = {}) {
     return {
@@ -738,14 +767,18 @@ describe("<PaymentSetting> saving a card", () => {
     })
   })
 
-  it("offers the choice on Stripe and Braintree to a signed-in customer, and nowhere else", () => {
+  it("offers the choice on Stripe, Braintree and PayPal to a signed-in customer, and nowhere else", () => {
     guest.value = false
     const captured = renderCapturing(
-      order({ available_payment_settings: [MANUAL, ADYEN, STRIPE_WITH_KEY, BRAINTREE] } as never)
+      order({
+        available_payment_settings: [MANUAL, ADYEN, STRIPE_WITH_KEY, BRAINTREE, PAYPAL],
+      } as never)
     )
     expect(captured["ps-stripe"]?.canSaveCard).toBe(true)
     // Hosted Fields are bare inputs: there is no checkbox of Braintree's own.
     expect(captured["ps-braintree"]?.canSaveCard).toBe(true)
+    // PayPal's window asks for future payments only once the session has.
+    expect(captured["ps-paypal"]?.canSaveCard).toBe(true)
     // Adyen's Drop-in has a checkbox of its own; a second one would ask twice.
     expect(captured["ps-adyen"]?.canSaveCard).toBe(false)
     expect(captured["ps-manual"]?.canSaveCard).toBe(false)
