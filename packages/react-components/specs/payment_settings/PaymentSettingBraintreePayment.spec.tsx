@@ -387,6 +387,49 @@ describe("<PaymentSettingBraintreePayment> mounting", () => {
   })
 })
 
+describe("<PaymentSettingBraintreePayment> loader", () => {
+  it("shows beside the fields until Hosted Fields has painted", async () => {
+    let finishFields: () => void = () => undefined
+    // The instance `beforeEach` sets up, handed over only when the test says so.
+    const fields = await bt.hostedFieldsCreate()
+    bt.hostedFieldsCreate.mockClear()
+    bt.hostedFieldsCreate.mockReturnValue(
+      new Promise((resolve) => {
+        finishFields = () => {
+          resolve(fields)
+        }
+      })
+    )
+    const { container } = renderBraintree(order(), { loader: <span data-testid="loader" /> })
+
+    await waitFor(() => {
+      expect(bt.hostedFieldsCreate).toHaveBeenCalledTimes(1)
+    })
+    // Beside and never instead: Hosted Fields mounts into these containers.
+    expect(screen.getByTestId("loader")).toBeTruthy()
+    expect(container.querySelector(".braintree")).not.toBeNull()
+
+    await act(async () => {
+      finishFields()
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId("loaded").textContent).toBe("yes")
+    })
+    expect(screen.queryByTestId("loader")).toBeNull()
+  })
+
+  it("stops when the form could not be loaded, since no fields are coming", async () => {
+    bt.hostedFieldsCreate.mockRejectedValue({ code: "HOSTED_FIELDS_TIMEOUT" })
+    renderBraintree(order(), { loader: <span data-testid="loader" /> })
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-code").textContent).toBe("HOSTED_FIELDS_TIMEOUT")
+    })
+    expect(screen.queryByTestId("loader")).toBeNull()
+  })
+})
+
 describe("<PaymentSettingBraintreePayment> an expired client token", () => {
   // The token lives a day and the session two, so a checkout reopened the next
   // day adopts a session Braintree will not boot from.

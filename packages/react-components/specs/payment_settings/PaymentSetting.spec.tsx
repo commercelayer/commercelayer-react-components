@@ -360,6 +360,158 @@ describe("PaymentSetting children as a function", () => {
 })
 
 /**
+ * A payment under way locks the payment method. Switching would unmount the
+ * gateway collecting it, which discards whatever it had in flight without
+ * stopping the payment.
+ */
+describe("<PaymentSetting> while a payment is being collected", () => {
+  const OTHER_MANUAL = { id: "ps-manual-2", type: "payment_setting_manuals", name: "Cash" }
+
+  it("refuses to switch method, however the selection is made", async () => {
+    setCollecting("order-1", true)
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          {({ selectSetting }) => (
+            <button
+              type="button"
+              data-testid="card"
+              onClick={() => {
+                void selectSetting()
+              }}
+            />
+          )}
+        </PaymentSetting>
+      </Wrapper>
+    )
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("card"))
+    })
+
+    expect(createPaymentSessionMock).not.toHaveBeenCalled()
+  })
+
+  it("disables every radio for as long as the payment lasts", () => {
+    renderSettings(order({ available_payment_settings: [MANUAL, OTHER_MANUAL] } as never))
+    const radios = (): HTMLInputElement[] => screen.getAllByTestId("radio") as HTMLInputElement[]
+    expect(radios().map((radio) => radio.disabled)).toEqual([false, false])
+
+    act(() => {
+      setCollecting("order-1", true)
+    })
+    expect(radios().map((radio) => radio.disabled)).toEqual([true, true])
+
+    // A stuck selector is the failure that matters most: a shopper who cannot
+    // change method and is not told why has no way out but a reload.
+    act(() => {
+      setCollecting("order-1", false)
+    })
+    expect(radios().map((radio) => radio.disabled)).toEqual([false, false])
+  })
+
+  it("tells the application why, so it can say so", () => {
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          {({ isCollecting }) => <div data-testid="card">{String(isCollecting)}</div>}
+        </PaymentSetting>
+      </Wrapper>
+    )
+    expect(screen.getByTestId("card").textContent).toBe("false")
+
+    act(() => {
+      setCollecting("order-1", true)
+    })
+    expect(screen.getByTestId("card").textContent).toBe("true")
+  })
+})
+
+/**
+ * The first of the two waits behind `loader`: the Payment Session being
+ * created. Each gateway component covers the second, its SDK painting, in its
+ * own spec.
+ */
+describe("<PaymentSetting> loader", () => {
+  const OTHER_MANUAL = { id: "ps-manual-2", type: "payment_setting_manuals", name: "Cash" }
+
+  /** A session create that answers only when the test says so. */
+  function deferCreate(): () => Promise<void> {
+    let finish: (session: unknown) => void = () => undefined
+    createPaymentSessionMock.mockReturnValue(
+      new Promise((resolve) => {
+        finish = resolve
+      })
+    )
+    return async () => {
+      await act(async () => {
+        finish({ id: "session-new" })
+      })
+    }
+  }
+
+  function renderWithLoader(manualLoader?: ReactNode) {
+    return render(
+      <Wrapper
+        currentOrder={order({ available_payment_settings: [MANUAL, OTHER_MANUAL] } as never)}
+      >
+        <PaymentSetting loader={<span data-testid="loader" />}>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingManualPayment
+            {...(manualLoader != null ? { loader: manualLoader as never } : {})}
+          />
+        </PaymentSetting>
+      </Wrapper>
+    )
+  }
+
+  it("shows under the setting being selected while its session is created", async () => {
+    const finishCreate = deferCreate()
+    renderWithLoader()
+    expect(screen.queryByTestId("loader")).toBeNull()
+
+    await act(async () => {
+      fireEvent.click(screen.getAllByTestId("radio")[1] as HTMLElement)
+    })
+    // Once, under the setting clicked — not under every setting.
+    expect(screen.getAllByTestId("loader")).toHaveLength(1)
+
+    await finishCreate()
+    await waitFor(() => {
+      expect(screen.queryByTestId("loader")).toBeNull()
+    })
+  })
+
+  it("gives way to a component's own loader", async () => {
+    deferCreate()
+    renderWithLoader(<span data-testid="own-loader" />)
+
+    await act(async () => {
+      fireEvent.click(screen.getAllByTestId("radio")[0] as HTMLElement)
+    })
+    expect(screen.getByTestId("own-loader")).toBeTruthy()
+    expect(screen.queryByTestId("loader")).toBeNull()
+  })
+
+  it("shows nothing when the application passes none", async () => {
+    deferCreate()
+    render(
+      <Wrapper currentOrder={order()}>
+        <PaymentSetting>
+          <PaymentSettingRadioButton data-testid="radio" />
+          <PaymentSettingManualPayment />
+        </PaymentSetting>
+      </Wrapper>
+    )
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("radio"))
+    })
+    expect(screen.queryByTestId("loader")).toBeNull()
+  })
+})
+
+/**
  * Switching setting clears what the shopper switched away from.
  *
  * The rule is `2026-08-20-gift-cards-as-payment-sessions.md`'s reformulation —
@@ -450,14 +602,19 @@ describe("<PaymentSetting> clearing the superseded session", () => {
     expect(discardPaymentSessionMock).not.toHaveBeenCalled()
   })
 
-  it("leaves a session whose gateway is still collecting", async () => {
-    // The switch a shopper can make with a gateway's own popup already open, or
-    // a card submitted and the challenge on screen. No authorization exists
-    // yet, so the money test above says nothing and the delete goes through —
-    // and what it deletes is the record the payment would have settled against.
-    // The gateway is not stopped by any of this: it can still take the money,
-    // and the order is then left with nothing to show for it.
-    setCollecting("order-1", true)
+  it("leaves a session whose gateway started collecting mid-switch", async () => {
+    // The lock refuses a switch begun mid-payment, but not a payment begun
+    // mid-switch: the old gateway stays on screen while the new session is
+    // created, and the shopper can pay through it in that second. No
+    // authorization exists yet, so the money test above says nothing and the
+    // delete would go through — destroying the record the payment would settle
+    // against, without stopping the payment.
+    let finishCreate: (session: unknown) => void = () => undefined
+    createPaymentSessionMock.mockReturnValue(
+      new Promise((resolve) => {
+        finishCreate = resolve
+      })
+    )
     renderSettings(
       withBoth([
         {
@@ -470,9 +627,18 @@ describe("<PaymentSetting> clearing the superseded session", () => {
     )
 
     await clickManual()
-
     await waitFor(() => {
       expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    act(() => {
+      setCollecting("order-1", true)
+    })
+    await act(async () => {
+      finishCreate({ id: "session-new" })
+    })
+
+    await waitFor(() => {
+      expect(getOrder).toHaveBeenCalled()
     })
     expect(discardPaymentSessionMock).not.toHaveBeenCalled()
   })

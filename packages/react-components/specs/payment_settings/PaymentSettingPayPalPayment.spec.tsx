@@ -4,6 +4,7 @@ import type {
   PaymentSetting as PaymentSettingResource,
 } from "@commercelayer/sdk"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
+import type { ReactNode } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { PaymentSetting } from "#components/payment_settings/PaymentSetting"
 import { PaymentSettingPayPalPayment } from "#components/payment_settings/PaymentSettingPayPalPayment"
@@ -90,7 +91,7 @@ function order(overrides: Record<string, unknown> = {}): Partial<Order> {
 
 const getOrder = vi.fn()
 
-function renderPayPal(currentOrder: Partial<Order> = order()) {
+function renderPayPal(currentOrder: Partial<Order> = order(), loader?: ReactNode) {
   return render(
     <CommerceLayerContext.Provider value={{ accessToken: "token" } as never}>
       <OrderContext.Provider
@@ -108,7 +109,7 @@ function renderPayPal(currentOrder: Partial<Order> = order()) {
           } as never
         }
       >
-        <PaymentSetting>
+        <PaymentSetting {...(loader != null ? { loader: loader as never } : {})}>
           <PaymentSettingPayPalPayment className="paypal">
             {({ lastErrorCode, isUnavailable }) => (
               <>
@@ -361,6 +362,120 @@ describe("<PaymentSettingPayPalPayment> the approval", () => {
 
     expect(authorizeMock).not.toHaveBeenCalled()
     expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("no")
+  })
+})
+
+/**
+ * PayPal's window is a payment under way: switching method while it is open
+ * would unmount the button under a window the shopper can still approve. Every
+ * way out has to release the lock, or the selector is stuck for good.
+ */
+describe("<PaymentSettingPayPalPayment> the payment-method lock", () => {
+  async function click() {
+    await act(async () => {
+      fireEvent.click(button() as Element)
+    })
+  }
+
+  it("is taken on the click, as PayPal's window opens", async () => {
+    await renderAvailable()
+    expect(isCollecting("order-1")).toBe(false)
+
+    await click()
+
+    expect(isCollecting("order-1")).toBe(true)
+  })
+
+  it("is released when the shopper closes the window", async () => {
+    await renderAvailable()
+    await click()
+
+    act(() => {
+      pp.options.onCancel({})
+    })
+
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
+  it("is released when PayPal reports an error", async () => {
+    await renderAvailable()
+    await click()
+
+    act(() => {
+      pp.options.onError({ code: "ERR_DEV_UNABLE_TO_OPEN_POPUP" })
+    })
+
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
+  it("is released when a refused gift card closes the window", async () => {
+    authorizeGiftCardsMock.mockResolvedValue({
+      authorizedSessionIds: [],
+      errors: [{ message: "Insufficient balance", meta: { error: "GiftCardRefused" } }],
+    })
+    pp.start.mockImplementation((_options: unknown, orderPromise: Promise<unknown>) =>
+      orderPromise.then(() => undefined)
+    )
+    await renderAvailable()
+
+    await act(async () => {
+      fireEvent.click(button() as Element)
+      await startedOrder().catch(() => undefined)
+    })
+
+    await waitFor(() => {
+      expect(isCollecting("order-1")).toBe(false)
+    })
+  })
+
+  it("is held through the approval and released once it is answered", async () => {
+    await renderAvailable()
+    await click()
+
+    let collectingDuringAuthorization: boolean | undefined
+    authorizeMock.mockImplementation(async () => {
+      collectingDuringAuthorization = isCollecting("order-1")
+      return { status: "authorized" }
+    })
+    await approve()
+
+    expect(collectingDuringAuthorization).toBe(true)
+    expect(isCollecting("order-1")).toBe(false)
+  })
+})
+
+describe("<PaymentSettingPayPalPayment> loader", () => {
+  it("shows until PayPal's button is on screen", async () => {
+    let finishLoad: () => void = () => undefined
+    pp.loadCoreSdkScript.mockReturnValue(
+      new Promise((resolve) => {
+        finishLoad = () => {
+          resolve({ createInstance: pp.createInstance })
+        }
+      })
+    )
+    renderPayPal(order(), <span data-testid="loader" />)
+    expect(screen.getByTestId("loader")).toBeTruthy()
+
+    await act(async () => {
+      finishLoad()
+    })
+
+    await waitFor(() => {
+      expect(button()).not.toBeNull()
+    })
+    expect(screen.queryByTestId("loader")).toBeNull()
+  })
+
+  it("stops when PayPal turns out to be unavailable, since no button is coming", async () => {
+    pp.isEligible.mockReturnValue(false)
+    vi.spyOn(console, "warn").mockImplementation(() => undefined)
+    renderPayPal(order(), <span data-testid="loader" />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId("paypal-unavailable").textContent).toBe("yes")
+    })
+    expect(screen.queryByTestId("loader")).toBeNull()
   })
 })
 

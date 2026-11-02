@@ -21,15 +21,21 @@ type Props = {
  * *is* the Payment Session, so what the shopper sees always reflects what the
  * API stored. The cost is that the radio does not light up on click — it lights
  * up once the session exists. `disabled` covers that round trip.
+ *
+ * Also disabled while a payment is under way, through this setting or another:
+ * the payment method is locked until it ends. Tell the shopper why with
+ * `isCollecting`, from `usePaymentGatewayHandoff` or `<PaymentSetting>`'s
+ * function children.
  */
 export function PaymentSettingRadioButton(props: Props): JSX.Element | null {
   const { children, ...p } = props
-  const { setting, isSelected, isPending, selectSetting, readonly } = useCustomContext({
-    context: PaymentSettingChildrenContext,
-    contextComponentName: "PaymentSetting",
-    currentComponentName: "PaymentSettingRadioButton",
-    key: "setting",
-  })
+  const { setting, isSelected, isPending, isCollecting, selectSetting, readonly } =
+    useCustomContext({
+      context: PaymentSettingChildrenContext,
+      contextComponentName: "PaymentSetting",
+      currentComponentName: "PaymentSettingRadioButton",
+      key: "setting",
+    })
 
   // A recap has nothing to pick, and a disabled checked radio reads as a broken
   // control rather than a statement. The setting's name is the recap.
@@ -37,14 +43,15 @@ export function PaymentSettingRadioButton(props: Props): JSX.Element | null {
 
   const checked = isSelected === true
   const id = setting?.id
+  const disabled = isPending === true || isCollecting === true
 
   const handleOnChange = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
     event.stopPropagation()
-    if (checked || isPending === true) return
+    if (checked || disabled) return
     await selectSetting?.()
   }
 
-  const parentProps = { handleOnChange, checked, id, disabled: isPending, ...props }
+  const parentProps = { handleOnChange, checked, id, disabled, ...props }
 
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
@@ -54,7 +61,7 @@ export function PaymentSettingRadioButton(props: Props): JSX.Element | null {
       id={id}
       name={`payment-setting-${setting?.id ?? ""}`}
       checked={checked}
-      disabled={isPending === true}
+      disabled={disabled}
       onChange={(event) => {
         void handleOnChange(event)
       }}

@@ -18,8 +18,9 @@ import OrderContext from "#context/OrderContext"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
 import { useCollectionPermitted } from "#hooks/useCollectionPermitted"
 import { usePaymentGatewayHandoff } from "#hooks/usePaymentGatewayHandoff"
+import { usePaymentSettingLoader } from "#hooks/usePaymentSettingLoader"
 import type { BaseError } from "#typings/errors"
-import type { ChildrenFunction } from "#typings/index"
+import type { ChildrenFunction, LoaderType } from "#typings/index"
 import { applePayError } from "#utils/applePay"
 import useCustomContext from "#utils/hooks/useCustomContext"
 import {
@@ -162,6 +163,11 @@ interface WalletOnAuthorizedActions<TError> {
 type WalletOnClick = (resolve: () => void, reject: () => void) => void
 
 export interface PaymentSettingAdyenPaymentChildrenProps {
+  /**
+   * Whether the Drop-in is on screen. Not `isReady`, which says the shopper
+   * has filled it in.
+   */
+  isLoaded: boolean
   /** Whether the Drop-in has a valid payment method ready to submit. */
   isReady: boolean
   /** Whether the shopper's payment is being collected right now. */
@@ -224,6 +230,11 @@ interface Props {
   paymentMethods?: AdyenPaymentMethod[]
   /** Class on the element the Drop-in mounts into. */
   containerClassName?: string
+  /**
+   * Shown until the Drop-in has painted, in place of `<PaymentSetting>`'s
+   * `loader` for this setting.
+   */
+  loader?: LoaderType
 }
 
 /**
@@ -271,7 +282,8 @@ interface Props {
  */
 export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
   const { children, environment, locale, containerClassName, paymentMethods = ALL_METHODS } = props
-  const { setting, currentPaymentSession, isSelected, readonly } = useCustomContext({
+  const loader = usePaymentSettingLoader(props.loader)
+  const { setting, currentPaymentSession, isSelected, isPending, readonly } = useCustomContext({
     context: PaymentSettingChildrenContext,
     contextComponentName: "PaymentSetting",
     currentComponentName: "PaymentSettingAdyenPayment",
@@ -313,6 +325,14 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
    */
   const selfAbortedRef = useRef(false)
 
+  /**
+   * Whether the Drop-in has painted — Adyen's `onReady`, which comes after
+   * `/setup` and after the method list is drawn. Back to false whenever the
+   * Drop-in is rebuilt on a new Adyen Session, because so is the form.
+   */
+  const [isLoaded, setIsLoaded] = useState(false)
+  /** No Drop-in is coming: `/setup` was refused. Ends the loader's wait. */
+  const [hasSetupFailed, setHasSetupFailed] = useState(false)
   const [isReady, setIsReady] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<BaseError[]>([])
@@ -414,6 +434,8 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
 
     let cancelled = false
     let dropin: Dropin | undefined
+    setIsLoaded(false)
+    setHasSetupFailed(false)
 
     /** Answer the waiting `submit()`, if there is one. */
     const settle = (result: PaymentGatewaySubmitResult): void => {
@@ -526,6 +548,10 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
         // message the shopper needs is reported through `errors` instead.
         dropin = new Dropin(core, {
           disableFinalAnimation: true,
+          onReady: () => {
+            if (cancelled) return
+            setIsLoaded(true)
+          },
           // Who collects changes with the shopper's choice inside the Drop-in,
           // and this is the only signal for it. It fires for the first method
           // too, because `openFirstPaymentMethod` defaults to true.
@@ -588,6 +614,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
         dropinRef.current = dropin
       } catch (error) {
         if (cancelled) return
+        setHasSetupFailed(true)
         // `AdyenCheckout()` rejects when `/sessions/{id}/setup` is refused —
         // an expired Adyen Session, or a Client Key not authorized for this
         // origin, which is indistinguishable from a network error here.
@@ -920,6 +947,7 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
 
   const parentProps = {
     ...props,
+    isLoaded,
     isReady,
     isSubmitting,
     isResumingRedirect: collectedOutOfBand === "in-progress",
@@ -932,7 +960,25 @@ export function PaymentSettingAdyenPayment(props: Props): JSX.Element | null {
 
   // Nothing to mount on a recap: the card was collected by Adyen and this
   // component never held it.
-  const container = shouldMount ? <div ref={containerRef} className={containerClassName} /> : null
+  const mountTarget = shouldMount ? <div ref={containerRef} className={containerClassName} /> : null
+
+  // Two waits, one after the other, with no gap between them: the Payment
+  // Session being created, before this setting is even the selection, then
+  // `/setup` and the Drop-in painting. Rendered beside the mount target and
+  // never in place of it — `mount()` needs that node in the DOM, and hiding it
+  // would mount Adyen's card iframes into a hidden element. A setup that
+  // failed stops it: there is an error to show instead, and no Drop-in coming.
+  const isMounting =
+    shouldMount && adyenSessionId != null && clientKey != null && !isLoaded && !hasSetupFailed
+  const isCreatingSession = !shouldMount && isPending === true && readonly !== true
+  const placeholder = isMounting || isCreatingSession ? loader : null
+  const container =
+    placeholder != null || mountTarget != null ? (
+      <>
+        {placeholder}
+        {mountTarget}
+      </>
+    ) : null
 
   // The container is rendered by this component and `children` after it, rather
   // than `children` replacing it as elsewhere in the library. The Drop-in mounts

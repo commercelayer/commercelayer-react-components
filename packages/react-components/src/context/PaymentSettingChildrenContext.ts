@@ -1,6 +1,7 @@
 import type { PaymentSession, PaymentSetting } from "@commercelayer/sdk"
 import { createContext } from "react"
 import type { BaseError } from "#typings/errors"
+import type { LoaderType } from "#typings/index"
 
 export interface InitialPaymentSettingChildrenContext {
   /** The Payment Setting this subtree renders, from `available_payment_settings`. */
@@ -19,6 +20,11 @@ export interface InitialPaymentSettingChildrenContext {
    * true once the API has answered.
    */
   isPending?: boolean
+  /**
+   * Whether a payment is under way for this order, through whichever setting.
+   * The selection is locked until it ends.
+   */
+  isCollecting?: boolean
   errors?: BaseError[]
   /** Select this setting, creating or adopting its Payment Session. */
   selectSetting?: () => Promise<void>
@@ -60,6 +66,11 @@ export interface InitialPaymentSettingChildrenContext {
    * context. Passing it down keeps one public prop rather than one per gateway.
    */
   returnUrl?: string
+  /**
+   * The `loader` given to `<PaymentSetting>`, which each gateway component
+   * shows until its own form has painted.
+   */
+  loader?: LoaderType
 }
 
 const initial: InitialPaymentSettingChildrenContext = {}

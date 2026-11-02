@@ -10,9 +10,10 @@ import { type JSX, useContext, useEffect, useMemo, useRef, useState } from "reac
 import Parent from "#components/utils/Parent"
 import OrderContext from "#context/OrderContext"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
+import { usePaymentSettingLoader } from "#hooks/usePaymentSettingLoader"
 import { useStickySessionValue } from "#hooks/useStickySessionValue"
 import type { BaseError } from "#typings/errors"
-import type { ChildrenFunction } from "#typings/index"
+import type { ChildrenFunction, LoaderType } from "#typings/index"
 import {
   type PaymentGatewaySubmitResult,
   registerHostCollection,
@@ -59,6 +60,11 @@ const VERDICT_ERROR_TYPES = ["card_error"] as const
 const defaultOptions: StripePaymentElementOptions = { layout: "tabs" }
 
 export interface PaymentSettingStripePaymentChildrenProps {
+  /**
+   * Whether the Payment Element is on screen. Not `isReady`, which says the
+   * shopper has filled it in.
+   */
+  isLoaded: boolean
   /** Whether the Payment Element has a complete method ready to confirm. */
   isReady: boolean
   /** A confirmation is in flight, started by `<PlaceOrderButton>`. */
@@ -87,6 +93,11 @@ interface Props {
   options?: StripePaymentElementOptions
   /** Class on the element wrapping the Payment Element. */
   containerClassName?: string
+  /**
+   * Shown until the Payment Element has painted, in place of `<PaymentSetting>`'s
+   * `loader` for this setting.
+   */
+  loader?: LoaderType
 }
 
 /**
@@ -111,9 +122,10 @@ interface Props {
  */
 export function PaymentSettingStripePayment(props: Props): JSX.Element | null {
   const { children, options, containerClassName } = props
-  const { setting, currentPaymentSession, isSelected, readonly } = useContext(
+  const { setting, currentPaymentSession, isSelected, isPending, readonly } = useContext(
     PaymentSettingChildrenContext
   )
+  const loader = usePaymentSettingLoader(props.loader)
 
   const isStripe = setting?.type === STRIPE_SETTING_TYPE
   const publishableKey = (setting as { public_key?: string | null } | undefined)?.public_key
@@ -143,11 +155,23 @@ export function PaymentSettingStripePayment(props: Props): JSX.Element | null {
 
   if (!isStripe) return null
   if (!shouldMount || stripePromise == null || clientSecret == null) {
+    // The Payment Session is being created for this setting: the first half
+    // of the wait, before there is anything for Stripe to mount.
+    const placeholder = isPending === true && readonly !== true ? loader : null
     // No form to show, but `children` still gets to render its chrome — a recap
     // line, or the reason a setting with no publishable key shows nothing.
-    return children != null ? (
-      <Parent {...{ ...props, isReady: false, isSubmitting: false, errors: [] }}>{children}</Parent>
-    ) : null
+    return (
+      <>
+        {placeholder}
+        {children != null ? (
+          <Parent
+            {...{ ...props, isLoaded: false, isReady: false, isSubmitting: false, errors: [] }}
+          >
+            {children}
+          </Parent>
+        ) : null}
+      </>
+    )
   }
 
   return (
@@ -156,7 +180,7 @@ export function PaymentSettingStripePayment(props: Props): JSX.Element | null {
           created and ignored afterwards, so a session replaced after a refusal
           would otherwise leave the Element confirming the burnt intent. */}
       <Elements key={clientSecret} stripe={stripePromise} options={{ clientSecret }}>
-        <StripeForm {...props} options={{ ...defaultOptions, ...options }} />
+        <StripeForm {...props} options={{ ...defaultOptions, ...options }} loader={loader} />
       </Elements>
     </div>
   )
@@ -169,12 +193,20 @@ export function PaymentSettingStripePayment(props: Props): JSX.Element | null {
 function StripeForm({
   children,
   options,
-}: Props & { options: StripePaymentElementOptions }): JSX.Element {
+  loader,
+}: Omit<Props, "loader"> & {
+  options: StripePaymentElementOptions
+  loader: JSX.Element | null
+}): JSX.Element {
   const stripe = useStripe()
   const elements = useElements()
   const { order } = useContext(OrderContext)
   const { returnUrl } = useContext(PaymentSettingChildrenContext)
 
+  const [isLoaded, setIsLoaded] = useState(false)
+  // Stripe never paints after this, so the loader has to stop on it too, or it
+  // would stand in for a form that is not coming.
+  const [hasLoadFailed, setHasLoadFailed] = useState(false)
   const [isReady, setIsReady] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<BaseError[]>([])
@@ -263,11 +295,23 @@ function StripeForm({
     setCollectionReady(orderId, event.complete)
   }
 
-  const parentProps = { isReady, isSubmitting, lastErrorCode, errors }
+  const parentProps = { isLoaded, isReady, isSubmitting, lastErrorCode, errors }
 
   return (
     <>
-      <PaymentElement options={options} onChange={handleChange} />
+      {/* Beside the Element, never instead of it: the Element mounts into its
+          own node, which has to be in the DOM for `ready` to ever fire. */}
+      {!isLoaded && !hasLoadFailed ? loader : null}
+      <PaymentElement
+        options={options}
+        onChange={handleChange}
+        onReady={() => {
+          setIsLoaded(true)
+        }}
+        onLoadError={() => {
+          setHasLoadFailed(true)
+        }}
+      />
       {children != null ? <Parent {...parentProps}>{children}</Parent> : null}
     </>
   )

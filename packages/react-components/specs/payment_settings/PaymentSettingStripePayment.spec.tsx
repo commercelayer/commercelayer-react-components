@@ -32,7 +32,13 @@ const stripe = vi.hoisted(() => ({
   // The `onChange` handler the Payment Element was given, so a test can report
   // the form complete without a real Element.
   // biome-ignore lint/suspicious/noExplicitAny: test cast
-  captured: { onChange: null as any, options: null as any, elementsOptions: null as any },
+  captured: {
+    onChange: null as any,
+    onReady: null as any,
+    onLoadError: null as any,
+    options: null as any,
+    elementsOptions: null as any,
+  },
 }))
 
 vi.mock("@stripe/stripe-js", () => ({
@@ -49,9 +55,11 @@ vi.mock("@stripe/react-stripe-js", () => ({
     return children
   },
   // biome-ignore lint/suspicious/noExplicitAny: test cast
-  PaymentElement: ({ options, onChange }: any) => {
+  PaymentElement: ({ options, onChange, onReady, onLoadError }: any) => {
     stripe.captured.options = options
     stripe.captured.onChange = onChange
+    stripe.captured.onReady = onReady
+    stripe.captured.onLoadError = onLoadError
     return <div data-testid="payment-element" />
   },
   useStripe: () => ({ confirmPayment: stripe.confirmPayment }),
@@ -267,6 +275,44 @@ describe("<PaymentSettingStripePayment> mounting", () => {
     )
 
     expect(screen.queryByTestId("payment-element")).toBeNull()
+  })
+
+  describe("loader", () => {
+    function renderWithLoader() {
+      return render(
+        <Wrapper currentOrder={order()}>
+          <PaymentSetting loader={<span data-testid="loader" />}>
+            <PaymentSettingStripePayment />
+          </PaymentSetting>
+        </Wrapper>
+      )
+    }
+
+    it("shows beside the Element until Stripe reports it ready", async () => {
+      renderWithLoader()
+      await waitFor(() => {
+        expect(screen.getByTestId("payment-element")).toBeTruthy()
+      })
+      expect(screen.getByTestId("loader")).toBeTruthy()
+
+      act(() => {
+        stripe.captured.onReady()
+      })
+      expect(screen.queryByTestId("loader")).toBeNull()
+      expect(screen.getByTestId("payment-element")).toBeTruthy()
+    })
+
+    it("stops when the Element fails to load, since it will never paint", async () => {
+      renderWithLoader()
+      await waitFor(() => {
+        expect(screen.getByTestId("loader")).toBeTruthy()
+      })
+
+      act(() => {
+        stripe.captured.onLoadError({ elementType: "payment", error: {} })
+      })
+      expect(screen.queryByTestId("loader")).toBeNull()
+    })
   })
 
   it("defaults the Element to the tabs layout, and lets it be overridden", async () => {

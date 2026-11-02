@@ -95,9 +95,20 @@ export interface PaymentGatewayHandoff {
   collectedOutOfBand: OutOfBandCollection
   /** Why an out-of-band collection failed. Empty in every other phase. */
   errors: BaseError[]
+  /**
+   * Whether a payment is under way right now, through whichever gateway: from
+   * the moment the payment provider takes over until its outcome comes back.
+   * See `setCollecting`.
+   *
+   * While it is true the shopper cannot change payment method, and
+   * `<PaymentSetting>` refuses the switch. Read it to say why, in the checkout's
+   * own words: a selector that stops responding with no explanation reads as
+   * broken, and nothing tells the shopper a reload would not fix it.
+   */
+  isCollecting: boolean
 }
 
-interface Entry extends PaymentGatewayHandoff {
+interface Entry extends Omit<PaymentGatewayHandoff, "isCollecting"> {
   /**
    * Identity of the current registration.
    *
@@ -108,10 +119,7 @@ interface Entry extends PaymentGatewayHandoff {
    * `submit` function, because `setCollectionReady` rebuilds the collection.
    */
   token: object | null
-  /**
-   * Whether the registered gateway is collecting right now. See
-   * `setCollecting` for why it lives here and not in the snapshot.
-   */
+  /** Whether a gateway is collecting right now. See `setCollecting`. */
   collecting: boolean
   /** Cached snapshot, so `useSyncExternalStore` compares by reference safely. */
   snapshot: PaymentGatewayHandoff
@@ -139,7 +147,12 @@ function entry(orderId?: string | null): Entry {
       collectedOutOfBand: "no",
       collecting: false,
       errors: NO_ERRORS,
-      snapshot: { collection: null, collectedOutOfBand: "no", errors: NO_ERRORS },
+      snapshot: {
+        collection: null,
+        collectedOutOfBand: "no",
+        errors: NO_ERRORS,
+        isCollecting: false,
+      },
     }
     entries.set(k, e)
   }
@@ -158,6 +171,7 @@ function commit(orderId: string | null | undefined, e: Entry): void {
     collection: e.collection,
     collectedOutOfBand: e.collectedOutOfBand,
     errors: e.errors,
+    isCollecting: e.collecting,
   }
   const set = listeners.get(key(orderId))
   if (set == null) return
@@ -194,7 +208,7 @@ function register(orderId: string | null | undefined, collection: PaymentCollect
     e.collection = null
     // The net under `setCollecting`: a gateway torn down mid-payment never
     // reaches whatever would have cleared the flag, and a flag left standing
-    // would outlive the page rather than the payment.
+    // would lock the shopper's payment method for the rest of the page.
     e.collecting = false
     commit(orderId, e)
   }
@@ -242,13 +256,27 @@ export function setCollectionReady(orderId: string | null | undefined, isReady: 
  * moved, so until then nothing on the order tells a shopper who is mid-payment
  * apart from one who has merely picked a method.
  *
- * Deliberately **not** part of the published snapshot. Nothing renders on it —
- * it is read once, from an event handler — and publishing it would make it API
- * before the question it belongs to has been answered: what a checkout should
- * *do* while a payment is in flight, and how a shopper gets out of it.
+ * Published as `isCollecting`, and it locks the payment method: switching
+ * mid-payment unmounts the gateway that is collecting, which discards whatever
+ * it had in flight without stopping the payment itself.
+ *
+ * Every path that sets it has to clear it on every outcome — a cancelled popup
+ * included — because a stuck lock leaves the shopper unable to change method
+ * with no way of knowing why. Deregistering clears it too, as the net under a
+ * gateway torn down mid-payment. There is no timeout: a wallet sheet or a
+ * PayPal window can legitimately stay open for minutes, and unlocking under it
+ * would bring back exactly the switch this prevents.
+ *
+ * The lock is the shopper's experience, not the payment's safety. It does not
+ * survive a reload, so the session a payment settles against has to be
+ * protected on its own — which is why `<PaymentSetting>` also reads it before
+ * deleting a superseded session.
  */
 export function setCollecting(orderId: string | null | undefined, collecting: boolean): void {
-  entry(orderId).collecting = collecting
+  const e = entry(orderId)
+  if (e.collecting === collecting) return
+  e.collecting = collecting
+  commit(orderId, e)
 }
 
 /** Whether a gateway is collecting for this order. See `setCollecting`. */

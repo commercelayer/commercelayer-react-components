@@ -22,9 +22,10 @@ import Parent from "#components/utils/Parent"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
+import { usePaymentSettingLoader } from "#hooks/usePaymentSettingLoader"
 import { useStickySessionValue } from "#hooks/useStickySessionValue"
 import type { BaseError } from "#typings/errors"
-import type { ChildrenFunction } from "#typings/index"
+import type { ChildrenFunction, LoaderType } from "#typings/index"
 import {
   braintreeErrorCode,
   interopDefault,
@@ -128,6 +129,14 @@ interface Props {
    * the merchant carrying the risk, which is Braintree's own default.
    */
   requireLiabilityShift?: boolean
+  /**
+   * Shown until the fields have painted, in place of `<PaymentSetting>`'s
+   * `loader` for this setting. Braintree's placeholder is this form's alone:
+   * `<PaymentSettingBraintreePayPal>` and `<PaymentSettingBraintreeApplePay>`
+   * belong to the same setting, and three placeholders for one wait would be
+   * two too many.
+   */
+  loader?: LoaderType
 }
 
 type VerifyCardOptions = ThreeDSecureVerifyOptions & {
@@ -180,9 +189,9 @@ const UNFINISHED_FORM_CODES = ["HOSTED_FIELDS_FIELDS_EMPTY", "HOSTED_FIELDS_FIEL
  */
 export function PaymentSettingBraintreePayment(props: Props): JSX.Element | null {
   const { children } = props
-  const { setting, currentPaymentSession, isSelected, readonly, renewPaymentSession } = useContext(
-    PaymentSettingChildrenContext
-  )
+  const { setting, currentPaymentSession, isSelected, isPending, readonly, renewPaymentSession } =
+    useContext(PaymentSettingChildrenContext)
+  const loader = usePaymentSettingLoader(props.loader)
 
   const isBraintree = setting?.type === BRAINTREE_SETTING_TYPE
   const clientToken = useStickySessionValue(currentPaymentSession, readBraintreeClientToken)
@@ -211,13 +220,23 @@ export function PaymentSettingBraintreePayment(props: Props): JSX.Element | null
 
   if (!isBraintree) return null
   if (!shouldMount || clientToken == null || currentPaymentSession == null) {
+    // The Payment Session is being created for this setting: the first half
+    // of the wait, before there is a client token to boot from.
+    const placeholder = isPending === true && readonly !== true ? loader : null
     // No form to show, but `children` still gets to render its chrome — a recap
     // line, or the reason a session without a client token shows nothing.
-    return children != null ? (
-      <Parent {...{ ...props, isLoaded: false, isReady: false, isSubmitting: false, errors: [] }}>
-        {children}
-      </Parent>
-    ) : null
+    return (
+      <>
+        {placeholder}
+        {children != null ? (
+          <Parent
+            {...{ ...props, isLoaded: false, isReady: false, isSubmitting: false, errors: [] }}
+          >
+            {children}
+          </Parent>
+        ) : null}
+      </>
+    )
   }
 
   /**
@@ -237,6 +256,7 @@ export function PaymentSettingBraintreePayment(props: Props): JSX.Element | null
     <BraintreeForm
       key={clientToken}
       {...props}
+      loader={loader}
       clientToken={clientToken}
       session={currentPaymentSession}
       onClientTokenRefused={onClientTokenRefused}
@@ -262,7 +282,9 @@ function BraintreeForm({
   clientToken,
   session,
   onClientTokenRefused,
-}: Props & {
+  loader,
+}: Omit<Props, "loader"> & {
+  loader: JSX.Element | null
   clientToken: string
   session: PaymentSession
   onClientTokenRefused: () => Promise<void> | null
@@ -533,6 +555,11 @@ function BraintreeForm({
 
   return (
     <>
+      {/* Beside the fields, never instead of them: Hosted Fields mounts its
+          iframes into these containers, so they have to be in the DOM. Stops
+          on a boot that failed — a renewal still under way keeps it up, since
+          a new form follows — because no fields are coming after that. */}
+      {!isLoaded && errors.length === 0 ? loader : null}
       <div className={containerClassName}>
         {fieldNames.includes("cardholderName") ? field("cardholderName") : null}
         {field("number")}

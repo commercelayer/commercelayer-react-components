@@ -3,6 +3,7 @@ import type {
   PaymentSession,
   PaymentSetting as PaymentSettingResource,
 } from "@commercelayer/sdk"
+import { AdyenCheckout } from "@adyen/adyen-web/auto"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -332,6 +333,46 @@ describe("<PaymentSettingAdyenPayment> mounting", () => {
       expect(adyen.dropinMount).toHaveBeenCalledTimes(1)
     })
     expect(screen.getByTestId("chrome").textContent).toBe("idle")
+  })
+
+  describe("loader", () => {
+    function renderWithLoader() {
+      return render(
+        <Wrapper currentOrder={order()}>
+          <PaymentSetting loader={<span data-testid="loader" />}>
+            <PaymentSettingAdyenPayment containerClassName="dropin" />
+          </PaymentSetting>
+        </Wrapper>
+      )
+    }
+
+    it("shows beside the mount target until the Drop-in is ready", async () => {
+      // Beside and never instead: `mount()` needs its node in the DOM, and
+      // unmounting a Drop-in loses the shopper's method and typed details.
+      const { container } = renderWithLoader()
+
+      await waitFor(() => {
+        expect(adyen.dropinMount).toHaveBeenCalledTimes(1)
+      })
+      expect(screen.getByTestId("loader")).toBeTruthy()
+      expect(container.querySelector(".dropin")).not.toBeNull()
+
+      act(() => {
+        adyen.captured.dropinOptions.onReady()
+      })
+      expect(screen.queryByTestId("loader")).toBeNull()
+      expect(container.querySelector(".dropin")).not.toBeNull()
+    })
+
+    it("stops when /setup is refused, since no Drop-in is coming", async () => {
+      vi.mocked(AdyenCheckout).mockRejectedValueOnce(new Error("Client Key not authorized"))
+      renderWithLoader()
+
+      await waitFor(() => {
+        expect(screen.queryByTestId("loader")).toBeNull()
+      })
+      expect(adyen.dropinMount).not.toHaveBeenCalled()
+    })
   })
 
   it("does not mount without an Adyen Session on the order", async () => {
