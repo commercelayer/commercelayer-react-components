@@ -81,6 +81,9 @@ vi.mock("#hooks/useCollectionPermitted", () => ({
   default: () => permitted.value,
 }))
 
+// Selecting the setting looks up the shopper's IP from a third party.
+vi.mock("#utils/getPublicIp", () => ({ getPublicIP: vi.fn(async () => "203.0.113.7") }))
+
 // `paymentSettingCreateAttributes` decides the tokenization variant from the
 // token, and the test token is not a real JWT.
 vi.mock("#utils/isGuestToken", () => ({ isGuestToken: () => true }))

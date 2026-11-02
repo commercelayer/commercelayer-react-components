@@ -327,7 +327,7 @@ export function PaymentSetting({
       })
 
       const attributes = {
-        ...paymentSettingCreateAttributes({ setting, accessToken, returnUrl }),
+        ...(await paymentSettingCreateAttributes({ setting, accessToken, returnUrl })),
         ...(choice.vaulting != null ? { vaulting: choice.vaulting } : {}),
       }
       const reusable =
@@ -349,7 +349,8 @@ export function PaymentSetting({
           // out for itself until they are authorized at place time.
           amountCents: remainingAmountCents,
           // Whatever this setting's gateway needs to know at creation. For
-          // Adyen that is the `return_url` its session is built with; for
+          // Adyen that is the `return_url` its session is built with and the
+          // shopper's IP its server-side authorizations carry; for
           // either gateway, whether the card is stored. Neither can be added
           // later.
           ...attributes,
