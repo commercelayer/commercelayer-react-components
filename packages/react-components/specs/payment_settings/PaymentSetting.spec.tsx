@@ -32,6 +32,12 @@ vi.mock("@commercelayer/core-components", async (importOriginal) => {
 const { guest } = vi.hoisted(() => ({ guest: { value: true } }))
 vi.mock("#utils/isGuestToken", () => ({ isGuestToken: () => guest.value }))
 
+// The Adyen session carries the shopper's IP, looked up from a third party.
+const { getPublicIPMock } = vi.hoisted(() => ({
+  getPublicIPMock: vi.fn(async () => "203.0.113.7"),
+}))
+vi.mock("#utils/getPublicIp", () => ({ getPublicIP: getPublicIPMock }))
+
 const MANUAL = { id: "ps-manual", type: "payment_setting_manuals", name: "Bank transfer" }
 const STRIPE = { id: "ps-stripe", type: "payment_setting_stripes", name: "Stripe" }
 
@@ -95,6 +101,7 @@ beforeEach(() => {
   guest.value = true
   createPaymentSessionMock.mockResolvedValue({ id: "session-new" })
   discardPaymentSessionMock.mockResolvedValue(true)
+  getPublicIPMock.mockResolvedValue("203.0.113.7")
 })
 
 afterEach(() => {
@@ -772,10 +779,43 @@ describe("<PaymentSetting> returnUrl", () => {
     await waitFor(() => {
       expect(createPaymentSessionMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          clientData: { return_url: "https://shop.example/checkout/o-1?paymentReturn=true" },
+          clientData: {
+            return_url: "https://shop.example/checkout/o-1?paymentReturn=true",
+            shopper_ip: "203.0.113.7",
+          },
         })
       )
     })
+  })
+
+  // Adyen `/sessions` ignores it; Adyen `/payments`, which Commerce Layer calls
+  // itself for a stored card, reads it from the session's `client_data`.
+  it("sends the shopper's IP alongside it", async () => {
+    renderAdyenOnly()
+    await clickIt()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    const [{ clientData }] = createPaymentSessionMock.mock.calls[0] as [
+      { clientData?: { return_url?: string; shopper_ip?: string } },
+    ]
+    expect(clientData?.shopper_ip).toBe("203.0.113.7")
+  })
+
+  it("leaves the IP out, and still creates the session, when the lookup fails", async () => {
+    getPublicIPMock.mockResolvedValueOnce("")
+    renderAdyenOnly()
+    await clickIt()
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalled()
+    })
+    const [{ clientData }] = createPaymentSessionMock.mock.calls[0] as [
+      { clientData?: { return_url?: string; shopper_ip?: string } },
+    ]
+    expect(clientData).not.toHaveProperty("shopper_ip")
+    expect(clientData?.return_url).toContain(window.location.origin)
   })
 
   it("warns when the one it would send cannot be used", async () => {

@@ -7,6 +7,7 @@ import {
   STRIPE_SETTING_TYPE,
 } from "@commercelayer/core-components"
 import type { PaymentSetting } from "@commercelayer/sdk"
+import { getPublicIP } from "#utils/getPublicIp"
 import { isGuestToken } from "#utils/isGuestToken"
 
 /**
@@ -38,7 +39,9 @@ interface BuilderParams {
   returnUrl?: string
 }
 
-type Builder = (params: BuilderParams) => PaymentSettingCreateAttributes
+type Builder = (
+  params: BuilderParams
+) => PaymentSettingCreateAttributes | Promise<PaymentSettingCreateAttributes>
 
 /**
  * Per-setting-type creation attributes, as a table.
@@ -55,16 +58,8 @@ type Builder = (params: BuilderParams) => PaymentSettingCreateAttributes
  * read: the radio would not light up and a reload would lose the choice.
  */
 const BUILDERS: Record<string, Builder> = {
-  [ADYEN_SETTING_TYPE]: ({ accessToken, returnUrl }) => ({
-    // The only `client_data` key the API forwards to Adyen `/sessions`.
-    //
-    // Derived from the current location when the application says nothing,
-    // which is right for a checkout whose URL is reloadable as it stands. It is
-    // not right for one whose credentials live in the query string: from
-    // gateway version 72 Adyen refuses a `returnUrl` over 1024 characters, and
-    // an access token alone can exceed that. Such an application passes
-    // `returnUrl` and re-authenticates the return itself.
-    ...adyenReturnUrl(returnUrl),
+  [ADYEN_SETTING_TYPE]: async ({ accessToken, returnUrl }) => ({
+    ...(await adyenClientData(returnUrl)),
     // Makes the API send Adyen `storePaymentMethodMode: askForConsent`, the
     // customer's `shopperReference` and the matching `recurringProcessingModel`
     // — which is what renders the Drop-in's own save-card checkbox and the cards
@@ -145,10 +140,10 @@ export function offersSaveCard(params: Pick<BuilderParams, "setting" | "accessTo
  * Attributes to add to `createPaymentSession` for this setting. Empty for every
  * setting with nothing to collect.
  */
-export function paymentSettingCreateAttributes(
+export async function paymentSettingCreateAttributes(
   params: BuilderParams
-): PaymentSettingCreateAttributes {
-  return BUILDERS[params.setting.type]?.(params) ?? {}
+): Promise<PaymentSettingCreateAttributes> {
+  return (await BUILDERS[params.setting.type]?.(params)) ?? {}
 }
 
 /**
@@ -168,18 +163,45 @@ export function paymentSettingCreateAttributes(
 export const ADYEN_RETURN_URL_MAX_LENGTH = 1024
 
 /**
- * The `client_data.return_url` for an Adyen session, and a warning if it cannot
- * be used.
+ * The `client_data` an Adyen session is created with.
+ *
+ * - `return_url` is forwarded to Adyen `/sessions`. Derived from the current
+ *   location when the application says nothing, which is right for a checkout
+ *   whose URL is reloadable as it stands. It is not right for one whose
+ *   credentials live in the query string: from gateway version 72 Adyen
+ *   refuses a `returnUrl` over 1024 characters, and an access token alone can
+ *   exceed that. Such an application passes `returnUrl` and re-authenticates
+ *   the return itself.
+ * - `shopper_ip` is not forwarded to `/sessions`. It is read when Commerce
+ *   Layer authorizes through Adyen `/payments` itself — a stored card, or a
+ *   payment method sent in `client_data` — where the request leaves from
+ *   Commerce Layer's servers, so the IP Adyen uses for its risk checks has to
+ *   be passed along. Sent at creation because that is the only time
+ *   `client_data` is set here. Left out when the lookup fails: an empty string
+ *   is not an IP.
+ */
+async function adyenClientData(returnUrl?: string): Promise<PaymentSettingCreateAttributes> {
+  if (typeof window === "undefined") return {}
+  const url = adyenReturnUrl(returnUrl)
+  const shopperIp = await getPublicIP()
+  return {
+    clientData: {
+      return_url: url,
+      ...(shopperIp !== "" ? { shopper_ip: shopperIp } : {}),
+    },
+  }
+}
+
+/**
+ * The `client_data.return_url` for an Adyen session, with a warning if it
+ * cannot be used.
  *
  * The check lives here rather than in the builder because this is where the
  * value is about to be handed to Adyen — so it also covers a `returnUrl` the
  * application supplied, which a check inside the builder would never see.
  */
-function adyenReturnUrl(returnUrl?: string): PaymentSettingCreateAttributes {
-  const url =
-    returnUrl ??
-    (typeof window !== "undefined" ? buildGatewayReturnUrl(window.location.href) : undefined)
-  if (url == null) return {}
+function adyenReturnUrl(returnUrl?: string): string {
+  const url = returnUrl ?? buildGatewayReturnUrl(window.location.href)
 
   if (url.length > ADYEN_RETURN_URL_MAX_LENGTH && process.env.NODE_ENV !== "production") {
     console.warn(
@@ -189,7 +211,7 @@ function adyenReturnUrl(returnUrl?: string): PaymentSettingCreateAttributes {
         "without its access token, re-authenticating the return from storage."
     )
   }
-  return { clientData: { return_url: url } }
+  return url
 }
 
 /**
