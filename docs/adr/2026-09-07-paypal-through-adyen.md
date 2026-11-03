@@ -196,13 +196,42 @@ each leaves a hole.
 2. **`PENDING` and `OFFER_CLOSED` webhooks are discarded.** Neither is in
    `Response::AdyenEvent::Standard::CODES`, so the handler's constructor raises
    `UnsupportedEventType` — inside a Sidekiq job with `retry: 0`, after the controller has
-   already answered `200 "[accepted]"`. A delayed PayPal payment therefore has **no resolution
-   path**: the authorization stays `pending` forever.
-3. **`payment_session.payment_instrument` is always `{}` for Adyen.** `Payment::Session::Adyen`
+   already answered `200 "[accepted]"`. ~~A delayed PayPal payment therefore has **no resolution
+   path**: the authorization stays `pending` forever.~~ **Narrowed 2026-11-03**, see below.
+3. ~~**`payment_session.payment_instrument` is always `{}` for Adyen.**~~ **Fixed upstream
+   2026-10-01**, see below. As written: `Payment::Session::Adyen`
    overrides neither `payment_data` nor `refresh`, so after a reload the order cannot say
    whether the shopper paid by card or by PayPal. The recap cannot name it.
-4. **`auto_capture` is inert for Adyen** — no `auto_capture!` call and nothing in the payload —
-   so a PayPal sale cannot be auto-captured from a storefront.
+4. ~~**`auto_capture` is inert for Adyen**~~ **Not a storefront gap**, see below. As written: no
+   `auto_capture!` call and nothing in the payload, so a PayPal sale cannot be auto-captured from
+   a storefront.
+
+> **Re-checked against core-api `master` (`45e1145ac`) on 2026-11-03.**
+>
+> - **Gap 2 is still open, but it does not leave every delayed payment unresolved.**
+>   `Response::AdyenEvent::Standard::CODES_MAPPING` still lacks both codes, and the
+>   `payments`-queue worker (`Workers::PaymentSetting`, `retry: 0`) still raises
+>   `UnsupportedEventType` on them in `Payment::EventHandler::Base#check!`. But `PENDING` carries
+>   no verdict. What settles a held PayPal payment is the later `AUTHORISATION` webhook (we expect
+>   Adyen to send it but have not checked Adyen's documentation), and that one is handled: the
+>   authorization succeeds and the session is authorized. With `auto_place` on the setting,
+>   `PaymentSession`'s `authorize` event then places the order by itself
+>   (`order.place! if order && auto_place?`). **The remaining hole is `auto_place` off:** money
+>   authorized, shopper gone, and nothing places the order. `OFFER_CLOSED` matters less to this
+>   integration than stated: the Payment Authorization is created only after `onPaymentCompleted`,
+>   so a PayPal payment abandoned in its window usually has no authorization to leave open.
+> - **Gap 3 is fixed.** core-api `f4851b994` ("fill the payment session instrument for every
+>   gateway", in tags since `v4.0.0`) adds `Payment::Session::Adyen#payment_data`, which builds
+>   the instrument from the authorization's `response_data` through
+>   `Payment::Instrument::Adyen::Base.from_payment_response`: brand, last four, expiry, holder,
+>   `paypalEmail`, IBAN, and an issuer type that falls back to `paypal` when a PayPal email is
+>   present. `PaymentAuthorization#change_session_status!` fills it on success, and `34e282f13`
+>   (2026-10-23) refills it from the wallet once late card details arrive.
+> - **Gap 4 does not reach the storefront.** It is still true that Adyen's `authorize!` never
+>   calls `auto_capture!` and the session payload sends no capture setting, so when an Adyen
+>   payment is captured is decided by the merchant's Adyen account, not by the Commerce Layer flag.
+>   Placing the order depends only on the authorization, so the checkout behaves the same either
+>   way. It is a merchant-facing inconsistency for core-api, not a gap in this integration.
 
 Two more, recorded because they will be met eventually and are not on our path today:
 `CANCEL_OR_REFUND` always books a `PaymentVoid`, never a `PaymentRefund`; and `require_action`
@@ -302,8 +331,11 @@ the webhook. It is the card mechanism with a longer window.
 
 Which means `onPaymentCompleted` must branch on `data.resultCode` rather than assume captured
 funds, and the placeability budget — 20 attempts at 1s, sized for an Adyen webhook — is not
-sized for a PayPal eCheck. The honest position is that a genuinely delayed PayPal payment has
-no resolution path today, because gap 2 discards the `PENDING` webhook.
+sized for a PayPal eCheck. ~~The honest position is that a genuinely delayed PayPal payment has
+no resolution path today, because gap 2 discards the `PENDING` webhook.~~ Corrected 2026-11-03: a
+delayed payment is still resolved by the later `AUTHORISATION` webhook, and placed by core-api
+when the setting has `auto_place`. Without `auto_place` nobody places it once the shopper has
+left. The loop's timeout is still what the shopper sees either way.
 
 ### Only `onPaymentFailed` is a verdict
 
@@ -395,12 +427,18 @@ whenever the selected method owns its own; PayPal's, inside the expanded row.
 `resultCode`. This is a behaviour change for the card path too, where the same callback
 previously only ever meant `Authorised`.
 
-**A delayed PayPal payment has no resolution path.** `PENDING` is discarded upstream, so the
-authorization stays `pending`, the placeability loop exhausts, and the shopper is told we are
-still checking — which is true and unhelpful. This is the first real case of the open question
-the place-order ADR left: what a timeout should actually show.
+**A delayed PayPal payment ends in a timeout for the shopper.** ~~has no resolution path~~
+(narrowed 2026-11-03, see the re-check under _What the API actually does_). The authorization
+stays `pending` until the final `AUTHORISATION` webhook, the placeability loop exhausts, and the
+shopper is told we are still checking — which is true and unhelpful. The order is placed later
+only if the setting has `auto_place`. This is the first real case of the open question the
+place-order ADR left: what a timeout should actually show. The Drop-in already reports
+`resultCode: "Pending"` client-side, so a dedicated "your payment is being processed" outcome
+needs nothing from the API. It is only honest with `auto_place` on.
 
-**The recap cannot name PayPal.** `payment_instrument` is empty for Adyen, and
+~~**The recap cannot name PayPal.**~~ **Fixed upstream 2026-10-01** (core-api `f4851b994`):
+`payment_instrument` is now filled for Adyen sessions from the authorization's response. As
+written: `payment_instrument` is empty for Adyen, and
 `client_data.payment_method` — the obvious place to record it — is the tripwire above. So the
 order, after a reload, knows a payment happened through the Adyen setting and not which method.
 
@@ -486,13 +524,21 @@ In dependency order. The first is the one the others sit on.
    until it lands.
 
 2. **Handle `PENDING` and `OFFER_CLOSED`.** Both are discarded by `CODES`, in a `retry: 0`
-   worker, after a 200 has gone back to Adyen. The first leaves a delayed payment unresolvable;
-   the second leaves an abandoned one with no signal.
-3. **Populate `payment_instrument` for Adyen sessions.** `Payment::Instrument::Adyen::Account`
+   worker, after a 200 has gone back to Adyen. ~~The first leaves a delayed payment
+   unresolvable;~~ The first leaves a held payment indistinguishable from one whose webhook has
+   not arrived yet; the second leaves an abandoned one with no signal. Still open on 2026-11-03.
+   The shape of the fix: `PENDING` moves the session's authorization `pending → processing`
+   (the `process` event exists and is legal from `pending`), creating it if there is none yet, as
+   `authorisation` already does; `OFFER_CLOSED` cancels or expires an authorization still open.
+   Both need an entry in `CODES_MAPPING` and a handler method, since
+   `Payment::EventHandler::Adyen#call` derives the method from the event code's first word.
+3. ~~**Populate `payment_instrument` for Adyen sessions.**~~ **Answered 2026-10-01** by core-api
+   `f4851b994`. As asked: `Payment::Instrument::Adyen::Account`
    already knows how to describe a `paypal` account; nothing invokes it, because
    `Payment::Session::Adyen` overrides neither `payment_data` nor `refresh`.
-4. **Make `auto_capture` real for Adyen, or stop advertising it** — it is writable, readable,
-   documented, and does nothing.
+4. ~~**Make `auto_capture` real for Adyen, or stop advertising it**~~ **Withdrawn 2026-11-03**
+   as an ask from this library: capture timing does not affect placing the order. It stays a
+   core-api inconsistency: the flag is writable, readable, documented, and does nothing for Adyen.
 
 Two more worth filing, not on this path: `CANCEL_OR_REFUND` books a `PaymentVoid` where a
 refund happened, and `require_action` transitions only `from: :pending`, which PayPal's
