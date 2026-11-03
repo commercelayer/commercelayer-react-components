@@ -166,6 +166,9 @@ importers:
       '@commercelayer/sdk':
         specifier: 8.0.2
         version: 8.0.2
+      '@paypal/paypal-js':
+        specifier: ^11.2.2
+        version: 11.3.0
       '@stripe/react-stripe-js':
         specifier: ^6.8.1
         version: 6.8.1(@stripe/stripe-js@9.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1257,6 +1260,9 @@ packages:
 
   '@paypal/paypal-js@10.0.2':
     resolution: {integrity: sha512-k9UFibQSLgO63ip9t5klAHCOC1OOrZZtD2HnkxGzphfLkEYAIleIGDaS0NuIRB7mgbbzjRi44lQdCCbSm9ebcQ==}
+
+  '@paypal/paypal-js@11.3.0':
+    resolution: {integrity: sha512-Sn0M20QICbV8AeVcMvwQ1QWDX/JaxPgLsxrUFUshYC/W3gMVUZXlpmO/6z3JOhrhk9PU4HZLTYb/F0A/xMwHVw==}
 
   '@playwright/test@1.62.1':
     resolution: {integrity: sha512-DTcUc8qii+cpHvtOwggMtBRMjKZHXYWdw8syRYu2vtzuq4Wxphqq4NfCs5Zt44L6mA8rfDfj+PHnxFc/FeK6mQ==}
@@ -4155,6 +4161,10 @@ snapshots:
       typescript: 4.9.5
 
   '@paypal/paypal-js@10.0.2':
+    dependencies:
+      promise-polyfill: 8.3.0
+
+  '@paypal/paypal-js@11.3.0':
     dependencies:
       promise-polyfill: 8.3.0
 

@@ -1,16 +1,61 @@
 # React Components — Payment
 
-This context covers the React components and state that let a storefront select a payment method and attach a payment source to an order during checkout.
+This context covers the React components and state that let a storefront pay for an order during checkout, under either Payments Model.
 
 ## Language
 
+**Payments Model**:
+Which of the two mutually exclusive payment models an order uses. Two values, named after the order relationship that carries the payment: **`payment_source`** (the older model: `payment_gateways` + `payment_methods` + a per-gateway payment source) and **`payment_sessions`** (the newer model: `payment_settings` + `payment_sessions`). An order is bound to one model for its whole life; it can never switch. A third transient value, `undetermined`, means the order data needed to decide has not loaded yet.
+The API version and the Payments Model are two different things: the version says what the API _can_ express (`available_payment_settings` exists only from `2026-05`), the order says which model it _uses_. API version `2026-05` is backward compatible and serves both models, so two organizations on the same version can be on different Payments Models, and a single response can carry both `available_payment_methods` and `available_payment_settings`.
+_Avoid_: legacy vs new (ages badly), payments version (collides with the API version, e.g. `2026-05`), v1/v2
+
 **Payment Method**:
-A selectable payment option on an order (a configured gateway option, e.g. "Stripe"). Backed by the `payment_method` resource.
+A selectable payment option on an order (a configured gateway option, e.g. "Stripe"). Backed by the `payment_method` resource. Belongs to the `payment_source` Payments Model only.
 _Avoid_: gateway (as a synonym), payment type
 
 **Payment Source**:
-The concrete payment instrument record attached to a single order (e.g. `stripe_payment`, `adyen_payment`, `wire_transfer`). Created per order from the selected Payment Method.
+The concrete payment instrument record attached to a single order (e.g. `stripe_payment`, `adyen_payment`, `wire_transfer`). Created per order from the selected Payment Method. Belongs to the `payment_source` Payments Model only.
 _Avoid_: payment, card, token
+
+**Payment Setting**:
+A configured payment gateway (Stripe, Adyen, Manual, Gift Card, …) at the organization/market level, modelled per-provider (`payment_setting_manuals`, `payment_setting_stripes`, …). The `payment_sessions`-model counterpart of a Payment Method + Payment Gateway pair. An order lists the ones it can use in `available_payment_settings`.
+_Avoid_: payment gateway, payment method
+
+**Payment Session**:
+One intended payment against an order, for an `amount_cents`, through a Payment Setting. The `payment_sessions`-model counterpart of a Payment Source. Its lifecycle is Payment Session → Payment Authorization → Payment Capture (→ Payment Refund). An order can carry several sessions (split payment) — unlike a Payment Source, of which there is at most one. `amount_cents` is set once and never updated; omit it on create and the server sizes the session to the order's remaining amount, while an explicit value is silently capped to it. Its `status` is one of seven values (`unpaid`, `authorized`, `voided`, `paid`, `partially_paid`, `refunded`, `partially_refunded`) and only the middle three count as payment taken.
+_Avoid_: payment source, charge, payment intent
+
+**Payment Authorization**:
+The record proving a Payment Session's money was actually taken. A session is only a stated _intent_ to pay; a session with a `succeeded` Payment Authorization is the one and only evidence of payment on the `payment_sessions` model. Also what makes the order placeable.
+_Avoid_: authorized session, payment (as a synonym for the session)
+
+**Current Payment Session**:
+The Payment Session the shopper's selection points at — the one paying whatever the Applied Gift Cards do not. It is the shopper's choice made durable: the order has no `payment_setting` relationship, so the selection is read back as `order.payment_sessions[].payment_setting`. Browser state is a rendering cache of it, never the authority. There is at most one, it is the most recent live non-gift-card session, and **gift card sessions are never it** — those are additive, and several are live at once. Its `amount_cents` covers the Remaining Amount at the moment it was created, not the order total.
+_Avoid_: pending session, selected payment method, "the payment session" (an order has several)
+
+**Placeable**:
+Whether the API would accept placing the order. Two distinct things share the word: `order.placeable` and the `_placeable` trigger — but they are **not** two ways to ask the same question, and only one of them is usable. `order.placeable` is transient and served **only in an update response**, never on a `GET`, so it can never gate a button on render. The `_placeable` trigger is a `PATCH` that _validates_ the order: 200 with the whole order on success, 422 with a JSON:API `errors` array on failure. Because a failed validation persists nothing, repeating it is cheap. Payment coverage is checked by a default payment rule whose threshold an organization can change — so placeability is a server judgement, never a client calculation.
+_Avoid_: "can be placed" (ambiguous between the attribute and the check), validated
+
+**Reusable Session**:
+A Payment Session the library may adopt instead of creating a new one: same Payment Setting, `status` still `unpaid`, not past `expires_at`, and with no Payment Authorization in a terminal failure state. Anything failing that predicate is abandoned in place, not deleted — an `unpaid` session counts toward nothing, and a sales-channel token may be refused the delete anyway.
+_Avoid_: pending session, stale session, orphan session (the last one is what an abandoned session _becomes_)
+
+**Applied Gift Card**:
+A gift card the shopper has spent on an order — a Payment Session against a `payment_setting_gift_cards` setting. Additive rather than an alternative: an order carries zero or more of them _plus_ at most one other session for the difference. Its `amount_cents` is what it covers **of this order**, capped by the server to whatever was still owed — never the card's balance, which a session does not carry at all. Removable in one of two ways, and the shopper's gesture is the same for both: **discarded** for free while nothing has been charged, or **refunded** once it has — the balance is debited the instant the authorization succeeds, and a charged session cannot be deleted at all. A refund is only available while the order is still `pending`; after placement a storefront token has no grant for it, and the card cannot come off.
+_Avoid_: gift card discount (it is a payment, not a discount), gift card balance (a different number)
+
+**Remaining Amount**:
+What the shopper still has to pay: the order total, less the Applied Gift Cards at face value, less any other session that has already taken money. Derived on the client, because `order.session_amount_cents` — despite its name meaning the same thing — does not move until a session is authorized, and gift cards are authorized at place time. The figures summed are the ones the server computed per session.
+_Avoid_: session amount (the API's name for the same idea, but only after authorization), balance, outstanding total
+
+**Coverage**:
+Whether the Remaining Amount has reached zero, so no other payment method is needed. Requires the order total to be known: an order fetched without `total_amount_with_taxes_cents` looks free, and treating that as covered hides the whole payment step.
+_Avoid_: paid (coverage is intent; only a succeeded Payment Authorization means paid), fully funded
+
+**Undetermined**:
+The window in which the order has not yet been loaded with the relationship needed to tell the Payments Model apart, so neither payment tree may be mounted. It is an observable state that every consumer must render something for — not a transient detail that can be ignored.
+_Avoid_: loading (the order may well be loaded; what is missing is the include), unknown
 
 **Customer Payment Source**:
 A Payment Source saved to a Customer for reuse across orders (a stored card). Selected via the order's `_customer_payment_source_id`.
@@ -20,17 +65,157 @@ _Avoid_: saved card (informal), wallet
 In this codebase, the React component that wires a specific gateway's UI/SDK and drives Payment Source creation for that gateway (e.g. `StripeGateway`, `AdyenGateway`).
 _Avoid_: using "gateway" to mean the Payment Method
 
+**Sessions Flow**:
+The Adyen integration mode in which the gateway is driven from the browser: Commerce Layer creates an **Adyen Session**, the **Drop-in** takes it from there, and `adyen-web` calls Adyen directly for the payment, the 3DS action and the authentication result. The counterpart is the **Advanced Flow**, where Commerce Layer makes those calls instead. Only the Sessions Flow is implementable in this library, because the Advanced Flow needs `payment_authorization.response_data`, which is withheld from sales-channel and customer tokens. Note the consequence that reads as a bug and is not one: the `/payments` call Commerce Layer makes for a Sessions Flow authorization carries no payment method and fails Adyen `14_006` — it is not the call that charges, and the outcome arrives later by webhook.
+_Avoid_: drop-in flow (the Drop-in is used in both), client-side flow (ambiguous — the Advanced Flow also has browser code)
+
+**Adyen Session**:
+The gateway-side session, distinct from the **Payment Session** that owns it. Created by Commerce Layer when the Payment Session is created, and readable as `payment_session.response_data.{id, sessionData}` — Adyen's own field names, passed through verbatim. Everything Adyen must know is fixed at that moment: `PATCH { _refresh: true }` is a no-op for Adyen, so a session with the wrong `returnUrl` or no `shopperReference` cannot be corrected, only replaced. Expires after a day, from a value Commerce Layer chooses and sends.
+_Avoid_: session (an order has Payment Sessions; say which), payment session (a different resource)
+
+**Drop-in**:
+Adyen's hosted UI component, rendered by `adyen-web` into a container this library provides. It owns the card fields, their PCI iframes, the 3DS challenge and — in the **Sessions Flow** — the call that actually charges. Its own Pay button is suppressed (`showPayButton: false`), because `<PlaceOrderButton>` starts the charge instead; that is what keeps the privacy-and-terms gate in front of every payment.
+_Avoid_: Adyen widget, card form (it is more than the fields)
+
+**Redirect Return**:
+The shopper coming back from a 3DS page hosted elsewhere, identified by `redirectResult` in the URL. Not an edge case and not avoidable: native 3DS2 is requested server-side for every Adyen payment, so the redirect variant happens whenever the card is not enrolled — the issuer's choice, not the integration's. Resuming needs no UI, since `submitDetails` is a method on the `adyen-web` core rather than on the **Drop-in**. `redirectResult` is single-use. Terms acceptance does not survive the navigation, which is why this is the one path where the library places the order without a click.
+_Avoid_: 3DS callback (nothing calls back; the shopper navigates), redirect flow (it is one branch of the Sessions Flow, not a flow)
+
+**Payment Gateway Handoff**:
+How a **Payment Gateway** component and `<PlaceOrderButton>` reach each other. An external store keyed by order id — not context, because the two are siblings in a checkout rather than parent and child, the same shape terms acceptance already uses and for the same reason. Three questions, answered separately. **Who collects**: the host, in which case the store carries the `submit` the button calls and whether the gateway is ready for it; the gateway itself, when the method has a **Gateway-Owned Button**; or nobody, on an order paying by bank transfer or gift card alone. **Whether a collection has already happened without us** — see **Out-of-Band Collection**. And **whether a payment is under way right now** (`isCollecting`): from the moment the provider takes over — a card submitted, PayPal's window open, a wallet authorized — until its outcome comes back; the payment method is locked for that long, because switching would unmount the gateway mid-payment. `submit` answers with one of four outcomes, and the two that look alike matter most: a **verdict** means no money moved and a rollback is safe, while an **unknown** outcome — a network failure, an expired gateway session, a cancelled overlay — means the payment may have gone through and nothing may be undone. Still gateway-neutral where it counts: the button reads who collects, never which gateway it is.
+_Avoid_: payment ref (the `payment_source`-model mechanism, which publishes a form ref instead), submit handler
+
+**Gateway-Owned Button**:
+A payment method whose own control performs the payment, so the checkout's place-order button cannot. The consequence is that the privacy-and-terms gate cannot sit in front of the place-order click for that method — it has to sit inside the method's own click. Two methods qualify and they arrive there differently. PayPal's `submit` throws outright, because a popup needs a real user gesture and PayPal's rules require their branded button to be the thing clicked. Google Pay's `submit` works, and is still no use: it calls `loadPaymentData()`, which Google requires inside the click's gesture, and the place sequence charges gift cards before it ever gets there — after that round trip the gesture is spent and the sheet never opens. Apple Pay is the same case, and adds one of its own: whether the page's domain is registered for Apple Pay on the merchant account is settled at merchant validation, _after_ the shopper has tapped — so unlike every other method, being offered is not evidence it can work, and it has to be asked for rather than defaulted. So rendering your own button is still a different thing from owning the click, but for a wallet the deciding question is the gesture rather than the API.
+_Avoid_: express payment (a different entry point into the checkout, before an address exists), self-submitting method
+
+**Payments Gateway (`payment_sessions`)**:
+A gateway implemented for this model, of which there are three: `payment_setting_adyens` through Adyen's Drop-in, `payment_setting_stripes` through Stripe's Payment Element and `payment_setting_braintrees` through Braintree's Hosted Fields. All three take their session from `response_data` — Adyen's `{ id, sessionData }`, Stripe's `client_secret`, Braintree's **Client Token** — and all three are collected by the checkout's own button for cards. Adyen and Stripe also take a publishable credential from the setting's `public_key`; Braintree takes nothing from the setting, because its `public_key` is half of a server-side key pair. Where they diverge is what a session _is_ and where the money moves. Adyen's is built once at creation from `client_data.return_url`, immutable afterwards, while Stripe's is a PaymentIntent whose return URL is given at confirmation — which is why the return URL is a prop on `<PaymentSetting>` rather than a gateway's own: one gateway needs it before the shopper has done anything, the other only at the end. And Braintree is the one whose charge is server-side: the browser turns the card into a nonce, 3DS included, and the money moves inside the **Payment Authorization**, when Commerce Layer relays that nonce to Braintree.
+_Avoid_: payment gateway (the `payment_source` model's own component family, unrelated), provider
+
+**Gift Card Moment**:
+The point in a **Gateway-Owned Button** flow at which gift cards are charged, which differs per method and is not a preference. It must be before the gateway takes money — a refused payment must never leave gift cards charged after it — and it cannot be anywhere that costs the click's user gesture. For PayPal that leaves the click itself: `beforeSubmit` runs after the popup is open and rejecting it hangs the popup for good. For Google Pay the click is exactly where it cannot go, and `onAuthorized` serves instead — it fires after the shopper has chosen a card and before `/payments`, it has no gesture constraint, and rejecting it shows the reason inside Google's own sheet, which stays open for another attempt. The hook does not generalise: PayPal has one too, and using it would make the payment conditional on `actions.order` and turn a deliberate rejection into a parse error nobody can tell apart. The moment is per method, and so are the reasons.
+_Avoid_: pre-authorization (means something else on a `PaymentAuthorization`), gift card hook
+
+**Out-of-Band Collection**:
+Money collected without the shopper pressing the checkout's place-order button, leaving the order still to be placed. Two things produce it and they are one mechanism: returning from a 3DS redirect, where the page reloaded and nobody clicked anything, and a **Gateway-Owned Button**, where the click was never ours. In both, the library places the order on its own initiative — the only paths where it does — and in both the privacy-and-terms gate was satisfied earlier rather than skipped: before the redirect, or inside the method's own click.
+_Avoid_: auto-place (`auto_place` on a Payment Setting is a different thing, and server-side), silent place
+
+**Client Key**:
+The public Adyen credential the browser needs, `payment_setting_adyens.public_key`. Reachable by a sales-channel or customer token through exactly one request — the order with `available_payment_settings` included — because listing payment settings is refused and there is no other way to learn a setting's id. It is optional and unvalidated server-side, so a payment setting that works for server-side charges can carry none, and a setting in that state is skipped rather than offered.
+_Avoid_: public key (ambiguous across gateways — Stripe's is a publishable key), API key (the secret credential, never served)
+
+**Client Token**:
+Braintree's browser credential, `payment_session.response_data.clientToken` — per **Payment Session**, minted by Commerce Layer when the session is created, scoped to the setting's merchant account and to no customer. There is no static one: the setting carries nothing a browser can use, so a Braintree form cannot exist before its session does. It expires a day after creation while the session lasts two, and nothing regenerates it (`_refresh` does nothing for Braintree), so a stale one is cured only by a new session.
+_Avoid_: tokenization key (Braintree's static alternative, which Commerce Layer does not expose), public key (on Braintree that is the server-side API key's other half)
+
 ## Relationships
 
-- An **Order** has at most one **Payment Method** and one **Payment Source**
-- A **Payment Source** is created from the selected **Payment Method**
+- An **Order** is on exactly one **Payments Model**, permanently
+- On the `payment_source` model: an **Order** has at most one **Payment Method** and one **Payment Source**; the Payment Source is created from the selected Payment Method
+- On the `payment_sessions` model: an **Order** has zero or more **Payment Sessions**, each created from one **Payment Setting**
+- There is no `order.payment_setting`: the selected **Payment Setting** is reachable only through `order.payment_sessions[].payment_setting`
+- A **Payment Session** has at most one **Payment Authorization**; a session without one has taken no money, and one whose authorization failed stays `unpaid` and is abandoned rather than deleted
+- A **Payment Session** only counts toward the order's paid amount once its **Payment Authorization** has succeeded — and for a manual Payment Setting that happens in a background job, so it is never immediate
+- An **Order** on the `payment_sessions` model can still carry `available_payment_methods`: API version `2026-05` is additive, and the new model simply takes precedence
+- On the `payment_sessions` model a gift card is a **Payment Session**, so it never changes `order.total_amount_with_taxes_cents` — unlike the older model, where it was a negative line item and the total already came back net
+- An **Order** carries zero or more **Applied Gift Cards** and at most one other **Payment Session**; that is the only split payment supported
+- Changing the Applied Gift Cards invalidates the other **Payment Session**: its `amount_cents` is fixed at creation, so once the **Remaining Amount** moves that session is not stale but wrong
 - A **Customer Payment Source** belongs to a **Customer**; selecting one sets the **Order**'s Payment Source
+- A **Payment Session** against `payment_setting_adyens` owns exactly one **Adyen Session**, reachable only through its `response_data`; replacing one means replacing the other, because neither can be updated after creation
+- The **Drop-in** takes the money, but the **Payment Authorization** is created afterwards and is only a record: in the **Sessions Flow** its own gateway call fails by construction, and it reaches `succeeded` from Adyen's webhook
+- A **Payment Authorization** on the Sessions Flow never reaches `requires_action` — the shopper's 3DS happens before it exists
+- A refused payment leaves the **Payment Session** `unpaid` but eventually carries a failed **Payment Authorization**, so the session must be replaced rather than retried
+- A **Payment Gateway** reaches `<PlaceOrderButton>` only through the **Payment Gateway Handoff**; they are siblings in a checkout, so no context connects them
+- A method with a **Gateway-Owned Button** cannot be collected by `<PlaceOrderButton>`, so the gate moves inside that method's own click and the button disables itself with that as the reason
+- An **Out-of-Band Collection** is the only circumstance in which the library places an order without a click — and both of its causes leave the terms accepted earlier, not skipped
+- A **Payment Session** against `payment_setting_braintrees` owns one **Client Token**, and is charged by its **Payment Authorization**: the nonce goes on the session as `client_data.payment_method_id`, and the authorization relays it to Braintree in a background job. Commerce Layer makes no 3DS check of its own, so whatever enforces 3DS has to run in the browser before the nonce is sent
+- A **Payment Session** for a card and one for PayPal are the same resource through the same **Payment Setting**: which method paid is not recorded on it, because `payment_instrument` is empty for Adyen and `client_data.payment_method` must never be written
 
 ## Example dialogue
 
 > **Dev:** "When the shopper picks Stripe, do we create the **Payment Source** in the `StripePayment` component?"
 > **Domain expert:** "No — Stripe has no dedicated creation component. The `StripeGateway`/`PaymentGateway` effect creates the **Payment Source** once the **Payment Method** is selected. Adyen and Braintree, by contrast, create it inside their own components."
 
+> **Dev:** "So on the `payment_sessions` model, `<PaymentGateway>` picks the manual component instead?"
+> **Domain expert:** "No. `<PaymentGateway>` only exists on the `payment_source` model — it switches on `payment_source_type`, which the newer model has no equivalent of. On the `payment_sessions` model there are no Payment Methods to iterate, so nothing ever mounts it. The two models are two separate component trees, chosen once per order."
+
+> **Dev:** "The shopper picked bank transfer and the button says the payment doesn't cover the order. Do I show that?"
+> **Domain expert:** "Not yet. Authorizing a manual payment runs in a background job, so the first `_placeable` fails while the money is still being taken. Retry a few times first — that error is only true if it survives the last attempt."
+
+> **Dev:** "Their previous attempt failed. Do I delete that Payment Session before making a new one?"
+> **Domain expert:** "No. It stayed `unpaid`, so it counts toward nothing — leave it. And a sales-channel token may not be allowed to delete it anyway, once a failed authorization is hanging off it."
+
+> **Dev:** "Where does the library keep which Payment Setting the shopper picked?"
+> **Domain expert:** "On the order. The Payment Session is created when they pick, so the choice is `order.payment_sessions[].payment_setting` — it survives a reload, and on a mismatch the order wins over local state. What browser state adds is only the rendering of it."
+
 ## Flagged ambiguities
 
-- "set payment source" was used to mean both the async operation that creates/attaches a Payment Source *and* the reducer action that stores it in state — resolved: the operation is `setPaymentSource(...)`, the reducer action is `dispatch({ type: "setPaymentSource" })`.
+- ~~Gift cards on the `payment_sessions` model are undecided and out of scope.~~ **Resolved.** A gift card is spent by creating a Payment Session against a `payment_setting_gift_cards` setting — it is a payment method, not an order-level code. On the `payment_sessions` model `GiftCardOrCouponForm` therefore works on the coupon only, overriding an explicit `codeType="gift_card_code"`. Note the trigger named in the original entry never existed: there is no `_gift_card_or_coupon_code`, only the plain order attribute `gift_card_or_coupon_code`, and the components write `gift_card_code` / `coupon_code` directly. See `docs/adr/2026-08-20-gift-cards-as-payment-sessions.md` for the full lifecycle.
+- **Three official sources are wrong about this domain**, so verify against `core-api` rather than the SDK types or the docs: `available_payment_methods` is annotated `@deprecated Last available in API version 2017-08` but is still served on `2026-05`; `payment_type` is documented as `"manual_payment"` but the real values are uppercase (`MANUAL`, `GIFT_CARD`, …); and both `status` fields are typed as bare `string` with a single `@example`, hiding state machines of seven and eight values.
+- "the session's type" was used to mean the gateway (e.g. "manual") — but `payment_session.type` is always the literal `"payment_sessions"` (the resource type). The gateway is `payment_session.payment_setting.type` (e.g. `payment_setting_manuals`). When someone says "the session type", ask which one they mean.
+- "the payment is done" was used for both a created **Payment Session** and a taken payment — resolved: only a `succeeded` **Payment Authorization** means paid; a session on its own means nothing was taken.
+- "placeable" was used for both the readable order attribute and the `_placeable` validation trigger — resolved in the glossary above; when someone says "check if it's placeable", ask whether they mean reading the attribute or asking the API.
+- "set payment source" was used to mean both the async operation that creates/attaches a Payment Source _and_ the reducer action that stores it in state — resolved: the operation is `setPaymentSource(...)`, the reducer action is `dispatch({ type: "setPaymentSource" })`.
+
+## Example dialogue — Adyen
+
+> **Dev:** "The Drop-in has its own Pay button. Do I hide `<PlaceOrderButton>` when Adyen is selected?"
+> **Domain expert:** "The other way round. Hide Adyen's and drive it from ours. Its button charges the card directly, so it would take the money before the shopper accepted the terms — and that gate is a legal requirement of the checkout, not a property of the payment model."
+
+> **Dev:** "The authorization I created came back with a 422 from Adyen in `response_data`. Did the payment fail?"
+> **Domain expert:** "No — that call isn't the one that charges. In the **Sessions Flow** `adyen-web` already charged; Commerce Layer's own call has no payment method and always fails `14_006`. The authorization sits at `pending` until Adyen's `AUTHORISATION` webhook settles it. Which is also why the placeability loop needs longer for Adyen than for a bank transfer: you're waiting on a webhook, not a local job."
+
+> **Dev:** "Card refused. I'll put the Drop-in back to `ready` so they can try another one."
+> **Domain expert:** "Not on that session. The refusal will land a failed **Payment Authorization** on it, and a later success can't move a failed record to succeeded — the retry would be lost silently. Delete the **Payment Session** and make a new one. And warn the designer that the card fields come back empty either way; Adyen tears down the PCI iframes."
+
+> **Dev:** "Where do I get the **Client Key** from? There's no payment gateway resource any more."
+> **Domain expert:** "`setting.public_key`, off the order's `available_payment_settings` — which this library already includes on every fetch. Better than the old model, where you had to create a payment source first just to read the key. But check it's actually there: it's optional and unvalidated, so a setting that charges fine server-side can have none, and then we skip it."
+
+> **Dev:** "Should I show the 'save this card' checkbox for guests too? The order has a customer record."
+> **Domain expert:** "No — that record is often just an email. Adyen would store the token against it, and the next visitor who types that address would see the card's last four digits and be able to pay with it. Gate on the token: `isGuestToken`."
+
+> **Dev:** "The shopper came back from a 3DS page. Which component picks that up?"
+> **Domain expert:** "None of the visible ones. `submitDetails` is on the `adyen-web` core, so the resume needs no UI at all — it runs from `<PaymentSetting>`, which is the only thing guaranteed to be mounted. If it lived in the Adyen component, an accordion that reopened on a different step would leave a charged card on an unplaced order."
+
+## Example dialogue — PayPal
+
+> **Dev:** "I'll hide Adyen's PayPal button with `showPayButton: false` and call `dropin.submit()` from ours, like we do for cards."
+> **Domain expert:** "Neither half works. `showPayButton: false` doesn't hide PayPal's button, it deletes the whole component — the shopper gets an accordion that opens on nothing. And `submit` on PayPal throws by design: their button has to be the thing clicked, because a popup needs a real user gesture."
+
+> **Dev:** "Then the terms gate is gone for PayPal?"
+> **Domain expert:** "It moves. PayPal's own `onClick` gets an `actions.reject()` that aborts before the popup opens and before any Adyen call, and `onInit` lets you render the buttons disabled until consent. So the gate sits on the method's click instead of ours. Two mechanisms, because which one applies depends on who owns the click — and that's a property of the method, not of our code."
+
+> **Dev:** "`onPaymentCompleted` fired, so we're paid — I'll place the order."
+> **Domain expert:** "Place it, yes, but you're not paid. `Pending` and `Received` reach that callback as success, and PayPal produces them far more than cards do. The authorization stays `pending` and the loop waits, which is right — just don't tell the shopper the money is taken."
+
+> **Dev:** "The shopper closed the PayPal popup. Do I give their gift cards back?"
+> **Domain expert:** "No. A closed overlay arrives on `onError`, and every `onError` is an unknown outcome — the payment may have gone through. Same as a refused card: the gift cards stay applied and charged, they're spendable on the retry, and there's a control to remove one if the shopper gives up."
+
+> **Dev:** "I'll record `paypal` in the session's `client_data` so the recap can name it."
+> **Domain expert:** "Don't — that one key is a tripwire. Writing `client_data.payment_method` makes the API call Adyen's `/payments` for the authorization, which 422s, which fails the authorization, which invalidates the session for good. The recap not naming PayPal is a gap we've filed; that would be an unrecoverable order."
+
+## Example dialogue — Braintree
+
+> **Dev:** "Where's Braintree's key? The setting has a `public_key`."
+> **Domain expert:** "That's half of the API key pair Commerce Layer charges with — useless in a browser. Braintree boots from the **Client Token** on the session, which is why there's no form until the shopper has picked Braintree."
+
+> **Dev:** "The Hosted Fields gave me a nonce. Am I done?"
+> **Domain expert:** "Nothing has been charged yet. Put the nonce on the session as `client_data.payment_method_id`, create the **Payment Authorization**, and wait for it to leave `pending` — that's when Braintree takes the money. Unlike Adyen there's no webhook to wait for: the authorization settles in a second or two, and its status is the verdict."
+
+> **Dev:** "Braintree's 3DS said the liability didn't shift, but Commerce Layer would authorize the card anyway?"
+> **Domain expert:** "It would — it authorizes any nonce it's given. So the 3DS outcome is enforced by us, before the authorization: a shopper who could have authenticated and didn't is refused; a card 3DS couldn't cover at all goes ahead unless the application asks for `requireLiabilityShift`."
+
+> **Dev:** "I'll test a decline with `fake-processor-declined-visa-nonce`."
+> **Domain expert:** "That nonce gets charged. Commerce Layer talks to Braintree's GraphQL API, where the sandbox declines on the *amount* — anything from 2000.00 to 2999.99."
+
+## Example dialogue — gift cards
+
+> **Dev:** "The shopper applied a $50 gift card on a $71 order. Why is the API still saying $71 is left?"
+> **Domain expert:** "Because nothing has been authorized yet. `session_amount_cents` only drops once a session has taken money, and gift cards are authorized at place time so they can still be removed. The **Remaining Amount** you show is derived on the client."
+
+> **Dev:** "So for the second gift card I just leave `amount_cents` out again?"
+> **Domain expert:** "No — that is the one exception. The server would size it against a remainder that has not moved, so it would ask for the whole order. Send the real remainder; the server clamps it down if it disagrees, never up."
+
+> **Dev:** "The shopper wants to take a gift card off, but the order was already placed. Do I delete the session?"
+> **Domain expert:** "You cannot. Authorizing a gift card debits the balance straight away, and the API refuses to delete a session with transactions on it — it comes back as a 500. Only a refund would return that money, and we do not implement one, so the remove control is not rendered at all."

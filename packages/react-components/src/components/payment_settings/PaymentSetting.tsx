@@ -1,0 +1,571 @@
+import {
+  createPaymentSession,
+  discardPaymentSession,
+  findCurrentPaymentSession,
+  findReusablePaymentSession,
+  GIFT_CARD_SETTING_TYPE,
+  hasLiveAuthorization,
+} from "@commercelayer/core-components"
+import type {
+  Order,
+  PaymentSession,
+  PaymentSetting as PaymentSettingResource,
+} from "@commercelayer/sdk"
+import {
+  type JSX,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react"
+import CommerceLayerContext from "#context/CommerceLayerContext"
+import OrderContext from "#context/OrderContext"
+import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
+import { useAdyenRedirectResume } from "#hooks/useAdyenRedirectResume"
+import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
+import { usePaymentsModel } from "#hooks/usePaymentsModel"
+import { useStripeRedirectResume } from "#hooks/useStripeRedirectResume"
+import type { BaseError } from "#typings/errors"
+import type { ChildrenFunction, LoaderType } from "#typings/index"
+import { isCollecting, subscribe } from "#utils/paymentGatewayStore"
+import {
+  offersSaveCard,
+  paymentSettingCreateAttributes,
+  paymentSettingUnusableReason,
+} from "#utils/paymentSettingCreateAttributes"
+
+/**
+ * Payment Setting types this library can drive today.
+ *
+ * Anything not listed is skipped entirely rather than rendered inert: a radio
+ * button for a setting with no implementation behind it does nothing when
+ * clicked, which is worse for the shopper than not offering it.
+ *
+ * The goal is to cover all six.
+ */
+const IMPLEMENTED_SETTING_TYPES = [
+  "payment_setting_manuals",
+  "payment_setting_adyens",
+  "payment_setting_stripes",
+  "payment_setting_braintrees",
+  "payment_setting_paypals",
+] as const
+
+export interface PaymentSettingOnSelectParams {
+  setting: PaymentSettingResource
+  /** The order as refetched after the selection was stored. */
+  order?: Order
+  /** The Payment Session backing the selection. */
+  paymentSession?: PaymentSession
+}
+
+/**
+ * The state of the setting currently being rendered.
+ *
+ * Given to `children` when it is a function, so an application can style the
+ * chosen option — a highlighted card, say — or make the whole card the click
+ * target instead of just the radio. Reading the same state off
+ * `<PaymentSettingRadioButton>`'s render prop only reaches inside the control.
+ */
+export interface PaymentSettingChildrenProps {
+  setting: PaymentSettingResource
+  /** Whether this setting is the shopper's current choice. */
+  isSelected: boolean
+  /** Whether its Payment Session is being created right now. */
+  isPending: boolean
+  /**
+   * Whether a payment is under way for this order, through whichever setting.
+   * The selection cannot change until it ends: `selectSetting` does nothing and
+   * `<PaymentSettingRadioButton>` is disabled. The same for every setting, so
+   * an application can grey out the alternatives and say why on the selected
+   * one.
+   */
+  isCollecting: boolean
+  /** The Payment Session backing the selection, once it exists. */
+  currentPaymentSession?: PaymentSession
+  /**
+   * Why the last selection of this setting failed, if it did. Empty for every
+   * other setting, so it can be rendered once per setting without the error
+   * appearing under each of them.
+   */
+  errors: BaseError[]
+  /**
+   * Choose this setting. The same call the radio makes, so an application can
+   * put it on the whole card — a second call while one is in flight is
+   * ignored, so wrapping the radio does not create two Payment Sessions. Also
+   * ignored while `isCollecting`.
+   */
+  selectSetting: () => Promise<void>
+  /**
+   * Whether to offer a "save this card" choice for this setting — Stripe,
+   * Braintree or PayPal, for a signed-in customer. The library renders no control for it:
+   * the copy and the placement are the application's. On Braintree the choice
+   * goes with the session, not with the card fields, so an Apple Pay payment on
+   * the same setting is stored too: word it as a payment method, not a card.
+   * A PayPal payment through Braintree is not stored either way.
+   */
+  canSaveCard: boolean
+  /** Whether the current Payment Session stores the card. */
+  saveCard: boolean
+  /**
+   * Record the shopper's choice. `vaulting` is fixed when a Payment Session is
+   * created, so this **replaces** the session: the payment form remounts and
+   * loses whatever was typed. Put the control above the form, not under it.
+   */
+  setSaveCard: (saveCard: boolean) => Promise<void>
+}
+
+interface Props {
+  /**
+   * Markup rendered once per available setting, or a function receiving that
+   * setting's state.
+   */
+  children?: ReactNode | ChildrenFunction<PaymentSettingChildrenProps>
+  /**
+   * Show what was chosen without letting it change — a placed order, for
+   * instance. Renders only the selected setting, and keeps rendering it even
+   * once nothing is left to pay.
+   */
+  readonly?: boolean
+  /**
+   * Fired once the selection has been stored and the order refetched — not on
+   * click. The counterpart of `<PaymentMethod>`'s `onClick`.
+   *
+   * Keep the identity stable (`useCallback`): it is read during the selection
+   * handler, and an unstable one is the usual route to a render loop here.
+   */
+  onSelect?: (params: PaymentSettingOnSelectParams) => void
+  /**
+   * Where a gateway should send the shopper back to after a redirect — a 3DS
+   * challenge on its own page, most often.
+   *
+   * Defaults to the current location, cleaned of the parameters a previous
+   * redirect left behind. Pass it when that URL is not one this application can
+   * reload as it stands, or when it is too long: from gateway version 72 Adyen
+   * refuses a `returnUrl` over 1024 characters, and a checkout carrying an
+   * access token in its query string can exceed that on the token alone. The
+   * usual answer is the same URL without the credentials, with the return
+   * re-authenticated from storage.
+   *
+   * Read when the session is created, which is when the radio is clicked, so it
+   * has to be here rather than on a gateway component: the selection *is* the
+   * session, and deferring creation to a child would leave nothing for the
+   * radio to read back.
+   */
+  returnUrl?: string
+  /**
+   * Shown where a setting's payment form will appear, from the click that
+   * selects it until the gateway has painted: first while its Payment Session
+   * is created, then while the gateway's SDK loads and mounts. The same
+   * `loader` the `payment_source` components take, so a checkout passes its
+   * existing skeleton once.
+   *
+   * Rendered by each gateway component, because only the gateway knows when
+   * its form is on screen — and next to its form rather than in place of it,
+   * because the SDKs mount into a node that has to be in the DOM, and swapping
+   * a mounted form out loses whatever the shopper had typed. A gateway
+   * component's own `loader` wins over this one. Nothing is shown without it.
+   */
+  loader?: LoaderType
+}
+
+const NO_ERRORS: BaseError[] = []
+
+const SELECTION_FAILED = "The payment method could not be selected."
+
+/**
+ * Why a selection failed, in the shape `errors` gives the application.
+ *
+ * The SDK's `ApiError` has an empty `message` and keeps the API's own errors
+ * in `errors`, so taking `message` alone hands the application a blank string
+ * for exactly the failures it most needs to show — a `500` from the session
+ * create, for one. The first API error's detail is carried instead, with its
+ * title and status, and a fixed sentence when there is nothing to carry.
+ */
+function selectionError(error: unknown): BaseError {
+  const apiError = (
+    error as { errors?: Array<{ title?: string; detail?: string; status?: string }> } | null
+  )?.errors?.[0]
+  const message = error instanceof Error ? error.message.trim() : ""
+  return {
+    code: "VALIDATION_ERROR",
+    resource: "payment_methods",
+    message: message || apiError?.detail || apiError?.title || SELECTION_FAILED,
+    ...(apiError?.title != null ? { title: apiError.title } : {}),
+    ...(apiError?.detail != null ? { detail: apiError.detail } : {}),
+    ...(apiError?.status != null ? { status: String(apiError.status) } : {}),
+  }
+}
+
+/**
+ * Iterate the order's `available_payment_settings` and render `children` once
+ * per setting, with that setting in context.
+ *
+ * Renders nothing unless the order is on the `payment_sessions` model, so it
+ * can be mounted alongside `<PaymentMethod>` without a coordinator above: each
+ * tree silently steps aside when the order is not its own.
+ */
+export function PaymentSetting({
+  children,
+  onSelect,
+  readonly,
+  returnUrl,
+  loader,
+}: Props): JSX.Element | null {
+  const paymentsModel = usePaymentsModel()
+  const { isCovered, remainingAmountCents } = usePaymentSessionsState()
+  const { order, include, includeLoaded, addResourceToInclude, getOrder } = useContext(OrderContext)
+  const { accessToken, interceptors } = useContext(CommerceLayerContext)
+  // Subscribed rather than read, so the radios lock and unlock on their own as
+  // a payment starts and ends. To this one flag and not to the whole handoff,
+  // which also changes whenever a form turns valid or invalid — and every
+  // setting's subtree, payment forms included, renders from here. The handlers
+  // below still read the store directly: a render is not guaranteed to have
+  // happened in between.
+  const orderId = order?.id
+  const subscribeToHandoff = useCallback(
+    (listener: () => void) => subscribe(orderId, listener),
+    [orderId]
+  )
+  const collecting = useSyncExternalStore(
+    subscribeToHandoff,
+    () => isCollecting(orderId),
+    // c8 ignore next — server snapshot only used during SSR hydration
+    () => false
+  )
+  const [pendingSettingId, setPendingSettingId] = useState<string | null>(null)
+  // Read synchronously, unlike `pendingSettingId`. One click can reach the
+  // handler twice — a card wired to `selectSetting` with the radio inside it —
+  // and both reads of the state variable would still say "idle", leaving two
+  // Payment Sessions behind for a single click.
+  const selectionInFlight = useRef(false)
+  // Kept with the setting that failed. Every setting renders from this one
+  // component, so errors held for the whole group would show under each of
+  // them — under the bank transfer, say, when it was the card that failed.
+  const [selectionErrors, setSelectionErrors] = useState<{
+    settingId: string
+    errors: BaseError[]
+  } | null>(null)
+  /**
+   * The save-card choice being stored right now, shown in place of the
+   * session's until the replacement lands. Without it the control would not
+   * move for the second the API takes to answer, and a checkbox that ignores a
+   * click reads as broken.
+   */
+  const [requestedSaveCard, setRequestedSaveCard] = useState<{
+    settingId: string
+    saveCard: boolean
+  } | null>(null)
+
+  // Reading a selection back needs the session's setting; telling a reusable
+  // session from a burnt one needs its authorization. Registered here rather
+  // than globally: two levels of nesting on a collection is the expensive part
+  // of the payload, and only this subtree needs it.
+  useEffect(() => {
+    const needed = [
+      "payment_sessions.payment_setting",
+      "payment_sessions.payment_authorization",
+    ] as const
+    if (!needed.every((resource) => include?.includes(resource))) {
+      addResourceToInclude({ newResource: [...needed] })
+    } else if (needed.some((resource) => includeLoaded?.[resource] !== true)) {
+      addResourceToInclude({
+        newResourceLoaded: {
+          "payment_sessions.payment_setting": true,
+          "payment_sessions.payment_authorization": true,
+        },
+      })
+    }
+  }, [include, includeLoaded, addResourceToInclude])
+
+  // Finishing a redirect needs no UI — Adyen's `submitDetails` and Stripe's
+  // `retrievePaymentIntent` are both plain calls — so it runs from here, the one
+  // component the Payment Session lifecycle requires to stay mounted. Inside a
+  // gateway component it would depend on which checkout step the application
+  // happens to render, and an accordion that came back collapsed would leave a
+  // charged card on an unplaced order.
+  //
+  // Both are called unconditionally, as hooks must be, and each does nothing
+  // unless its own gateway's return parameters are in the URL. They cannot both
+  // fire: a return carries one gateway's parameters.
+  useAdyenRedirectResume()
+  useStripeRedirectResume()
+
+  if (paymentsModel !== "payment_sessions" || order == null) return null
+
+  // Nothing left to pay means nothing to choose. Gift cards can cover an order
+  // outright, and offering a payment method then is not merely redundant:
+  // creating that session fails with a 422 about `amount_cents` having to be
+  // greater than zero, which is not something a shopper can act on.
+  //
+  // Readonly is exempt — a placed order is covered by definition, and hiding
+  // what was used is the opposite of the point.
+  if (readonly !== true && isCovered) return null
+
+  const settings = (order.available_payment_settings ?? []).filter((setting) => {
+    // Gift cards are handled by <PaymentSettingGiftCard>, not here: they are
+    // additive rather than one of the alternatives this group picks between.
+    // Skipped silently — they are implemented, just elsewhere.
+    if (setting.type === GIFT_CARD_SETTING_TYPE) return false
+
+    const implemented = IMPLEMENTED_SETTING_TYPES.includes(
+      setting.type as (typeof IMPLEMENTED_SETTING_TYPES)[number]
+    )
+    if (!implemented) {
+      if (process.env.NODE_ENV !== "production") {
+        // Without this, an organization whose only configured settings are
+        // unimplemented gets a checkout with no payment options and no clue why.
+        console.warn(
+          `[commercelayer] <PaymentSetting> skipped "${setting.type}": not implemented yet.`
+        )
+      }
+      return false
+    }
+
+    // Implemented, but not usable on this order: switched off, or missing the
+    // credential its gateway UI needs. Skipped for the same reason an
+    // unimplemented type is — a radio button that does nothing when clicked is
+    // worse than no radio button — and from the shopper's side the two cases
+    // are indistinguishable anyway.
+    const unusable = paymentSettingUnusableReason(setting)
+    if (unusable != null) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(`[commercelayer] <PaymentSetting> skipped "${setting.type}": ${unusable}.`)
+      }
+      return false
+    }
+
+    return true
+  })
+
+  /**
+   * Store the selection: adopt the current session when it will do, create one
+   * when it will not, and tidy away whatever it replaced.
+   *
+   * `vaulting` is the shopper's save-card choice, given only by `setSaveCard`.
+   * Without it a setting that decides for itself (Adyen) still does, and one
+   * that leaves it to the shopper (Stripe) adopts the session as it stands — so
+   * a reload keeps their choice instead of resetting it.
+   *
+   * `replace` skips the reuse: a new session is created even when the current
+   * one would otherwise be adopted, and the current one is cleared like any
+   * superseded selection. For a gateway that has found its session unusable in
+   * a way the reuse predicate cannot see.
+   */
+  const selectSetting = async (
+    setting: PaymentSettingResource,
+    choice: { vaulting?: boolean; replace?: boolean } = {}
+  ): Promise<void> => {
+    if (accessToken == null || order == null) return
+    if (selectionInFlight.current) return
+    // A payment is under way, and it belongs to the session it started on.
+    // Switching now would unmount the gateway collecting it, which discards
+    // whatever it had in flight without stopping the payment.
+    if (isCollecting(order.id)) return
+    selectionInFlight.current = true
+    setSelectionErrors(null)
+    setPendingSettingId(setting.id)
+    try {
+      // Reuse before creating. `amount_cents` is immutable, so there is no
+      // "update the existing session" path — without this, every remount or
+      // refetch that re-runs the click handler would leave another session
+      // behind. Reuse is also what makes a page refresh resume the selection
+      // instead of duplicating it.
+      // Read before anything changes: whatever the shopper is switching *away*
+      // from, so it can be cleared once the new selection is in place.
+      const superseded = findCurrentPaymentSession({
+        paymentSessions: order.payment_sessions,
+      })
+
+      const attributes = {
+        ...(await paymentSettingCreateAttributes({ setting, accessToken, returnUrl })),
+        ...(choice.vaulting != null ? { vaulting: choice.vaulting } : {}),
+      }
+      const reusable =
+        choice.replace === true
+          ? undefined
+          : findReusablePaymentSession({
+              paymentSessions: order.payment_sessions,
+              paymentSettingId: setting.id,
+              amountCents: remainingAmountCents,
+              vaulting: attributes.vaulting,
+            })
+      if (reusable == null) {
+        await createPaymentSession({
+          accessToken,
+          interceptors,
+          orderId: order.id,
+          paymentSettingId: setting.id,
+          // The remainder after the gift cards, which the server cannot work
+          // out for itself until they are authorized at place time.
+          amountCents: remainingAmountCents,
+          // Whatever this setting's gateway needs to know at creation. For
+          // Adyen that is the `return_url` its session is built with and the
+          // shopper's IP its server-side authorizations carry; for
+          // either gateway, whether the card is stored. Neither can be added
+          // later.
+          ...attributes,
+        })
+      }
+      // Clear the session the shopper just left, so the order carries one
+      // selection rather than a trail of every setting they tried.
+      //
+      // **After** the new one exists, never before: the selection is the newest
+      // session, so creating first means it is already correct when this runs,
+      // and a delete that fails leaves a state the library handles rather than
+      // an order with nothing selected. Failures are swallowed for the same
+      // reason — `findCurrentPaymentSession` picks the newest either way, so
+      // this is tidying, not correctness.
+      //
+      // Skipped when the session was adopted rather than created: there is
+      // nothing to supersede, and deleting it would delete the selection. Not
+      // skipped for the *same* setting: a changed save-card choice replaces the
+      // session without the shopper leaving it, and the old one has to go.
+      // Skipped too for anything holding money — a gift card is never the
+      // current selection, and one carrying a live authorization is not ours to
+      // undo here. The rule throughout is that sessions which took no money
+      // are deleted and everything else is abandoned.
+      //
+      // And skipped while a gateway is collecting, which is the same rule one
+      // step earlier: a session whose payment is *in flight* has taken no money
+      // yet, so the authorization test above passes it as deletable — and
+      // deleting it destroys the record the payment would settle against, while
+      // doing nothing to stop the payment. The shopper is charged and the order
+      // has nothing to show for it. The lock at the top refuses a switch begun
+      // mid-payment, but not a payment begun mid-switch: the old gateway is
+      // still on screen while the new session is created, and nothing stops
+      // the shopper paying through it in that second. So it is checked again
+      // here, where it decides.
+      if (
+        reusable == null &&
+        superseded != null &&
+        !hasLiveAuthorization(superseded) &&
+        !isCollecting(order.id)
+      ) {
+        // Its own try: `discardPaymentSession` swallows its failures already,
+        // but a rejection escaping here would land in the catch below and turn
+        // a selection that in fact succeeded into a reported error — and skip
+        // the refetch that makes it visible.
+        try {
+          await discardPaymentSession({
+            accessToken,
+            interceptors,
+            paymentSessionId: superseded.id,
+          })
+        } catch {
+          // Nothing to report: the newest session is the selection regardless.
+        }
+      }
+
+      const refreshed = await getOrder(order.id)
+      onSelect?.({
+        setting,
+        order: refreshed,
+        paymentSession: findCurrentPaymentSession({
+          paymentSessions: refreshed?.payment_sessions ?? order.payment_sessions,
+          paymentSettingId: setting.id,
+        }),
+      })
+    } catch (error) {
+      setSelectionErrors({ settingId: setting.id, errors: [selectionError(error)] })
+    } finally {
+      selectionInFlight.current = false
+      setPendingSettingId(null)
+    }
+  }
+
+  // One selection for the whole order, not one per setting. Switching setting
+  // leaves the previous session behind — it is inert and may not be deletable
+  // with a sales-channel token — so without this every setting the shopper has
+  // tried would render as selected at the same time.
+  const selectedSession = findCurrentPaymentSession({ paymentSessions: order.payment_sessions })
+
+  return (
+    <>
+      {settings
+        .filter(
+          (setting) => readonly !== true || selectedSession?.payment_setting?.id === setting.id
+        )
+        .map((setting) => {
+          const isSelected = selectedSession?.payment_setting?.id === setting.id
+          const currentPaymentSession = isSelected ? selectedSession : undefined
+          const errors =
+            selectionErrors?.settingId === setting.id ? selectionErrors.errors : NO_ERRORS
+          const select = async (): Promise<void> => {
+            await selectSetting(setting)
+          }
+          const canSaveCard = readonly !== true && offersSaveCard({ setting, accessToken })
+          const saveCard =
+            requestedSaveCard?.settingId === setting.id
+              ? requestedSaveCard.saveCard
+              : currentPaymentSession?.vaulting === true
+          // A payment in flight belongs to the session it started on: replacing
+          // that session now would leave the money nothing to settle against.
+          const setSaveCard = async (value: boolean): Promise<void> => {
+            if (!canSaveCard || !isSelected || isCollecting(order.id)) return
+            setRequestedSaveCard({ settingId: setting.id, saveCard: value })
+            try {
+              await selectSetting(setting, { vaulting: value })
+            } finally {
+              // Back to the order's own answer — which is the new session's on
+              // success, and the old one's if the replacement failed.
+              setRequestedSaveCard(null)
+            }
+          }
+          // Same guard as above: a payment in flight belongs to its session.
+          // The renewal carries the shopper's save-card choice over: it stands
+          // in for the session it replaces, and nothing on screen tells them
+          // the choice was dropped — the first they would hear of it is a card
+          // missing from their next checkout.
+          const renewPaymentSession = async (): Promise<void> => {
+            if (!isSelected || isCollecting(order.id)) return
+            await selectSetting(setting, {
+              replace: true,
+              vaulting: currentPaymentSession?.vaulting ?? undefined,
+            })
+          }
+          return (
+            <PaymentSettingChildrenContext.Provider
+              key={setting.id}
+              value={{
+                setting,
+                currentPaymentSession,
+                isSelected,
+                isPending: pendingSettingId === setting.id,
+                isCollecting: collecting,
+                errors,
+                readonly,
+                returnUrl,
+                loader,
+                selectSetting: select,
+                canSaveCard,
+                saveCard,
+                setSaveCard,
+                renewPaymentSession,
+              }}
+            >
+              {typeof children === "function"
+                ? children({
+                    setting,
+                    isSelected,
+                    isPending: pendingSettingId === setting.id,
+                    isCollecting: collecting,
+                    currentPaymentSession,
+                    errors,
+                    selectSetting: select,
+                    canSaveCard,
+                    saveCard,
+                    setSaveCard,
+                  })
+                : children}
+            </PaymentSettingChildrenContext.Provider>
+          )
+        })}
+    </>
+  )
+}
+
+export default PaymentSetting

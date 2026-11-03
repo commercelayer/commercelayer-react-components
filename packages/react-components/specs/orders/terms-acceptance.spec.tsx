@@ -59,6 +59,10 @@ const ORDER: any = {
   id: "order-1",
   status: "pending",
   total_amount_with_taxes_cents: 1000,
+  // `<PlaceOrderButton>` routes on the Payments Model. Stated outright so the
+  // suite exercises the older branch on purpose rather than by falling through
+  // from an undetermined order.
+  available_payment_methods: [{ id: "pm-1", payment_source_type: "stripe_payments" }],
   payment_method: { id: "pm-1", payment_source_type: "stripe_payments" },
   payment_source: { id: "ps-1", type: "stripe_payments" },
   billing_address: { id: "ba-1" },

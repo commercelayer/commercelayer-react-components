@@ -1,0 +1,443 @@
+import type { Order, PaymentSession, PaymentSetting } from "@commercelayer/sdk"
+
+/**
+ * Status values for the `payment_sessions` payment model.
+ *
+ * The SDK types every one of these as a bare `string`, so these unions are
+ * transcribed by hand from the AASM state machines in `core-api`. Each is
+ * widened with `(string & {})` so an unknown value stays assignable: the
+ * server can add a state without breaking consumers, and every branch that
+ * decides on a status is required to have a `default`.
+ *
+ * **Re-check these against `core-api` whenever the SDK is upgraded.**
+ */
+
+/** Any value the API may send, while still autocompleting the known ones. */
+type Widen<T extends string> = T | (string & {})
+
+/**
+ * `app/models/payment_session.rb:21-28` — initial state is `unpaid`.
+ * Note there are no per-state timestamp columns on payment sessions, unlike
+ * transactions, so `status` is the only way to read a session's state.
+ */
+export type KnownPaymentSessionStatus =
+  | "unpaid"
+  | "authorized"
+  | "voided"
+  | "paid"
+  | "partially_paid"
+  | "refunded"
+  | "partially_refunded"
+
+export type PaymentSessionStatus = Widen<KnownPaymentSessionStatus>
+
+/**
+ * The subset of session states that count toward the order's paid amount.
+ * `app/models/payment_session.rb:15` (`PAYMENT_TAKEN_STATES`).
+ */
+export const PAYMENT_TAKEN_SESSION_STATUSES = [
+  "authorized",
+  "paid",
+  "partially_paid",
+] as const satisfies readonly KnownPaymentSessionStatus[]
+
+/**
+ * Session states in which the money is no longer with the merchant.
+ *
+ * `app/models/payment_session.rb:55-63` — the `refund` event goes to
+ * `partially_refunded` while a balance is left and to `refunded` once it is
+ * zero. `voided` is here for completeness; for gift cards it is unreachable,
+ * because that client hard-codes auto-capture and a void then fails by
+ * construction.
+ */
+export const MONEY_RETURNED_SESSION_STATUSES = [
+  "voided",
+  "refunded",
+  "partially_refunded",
+] as const satisfies readonly KnownPaymentSessionStatus[]
+
+/**
+ * True when this session's money has been given back.
+ *
+ * Read from `status` rather than from `payment_refunds`, and that is the whole
+ * point: the refunds relationship needs `payment_sessions.payment_refunds` in
+ * the order's `include`, which nothing registers — so a check on that array is
+ * dead code in any consumer, and a refunded card would go on counting toward
+ * the order's coverage. `status` is a plain attribute, always served.
+ */
+export function hasReturnedMoney(session: PaymentSession): boolean {
+  return MONEY_RETURNED_SESSION_STATUSES.includes(
+    session.status as (typeof MONEY_RETURNED_SESSION_STATUSES)[number]
+  )
+}
+
+/**
+ * `app/models/payment_transaction.rb:22-31` — initial state is `pending`.
+ * Shared by all four STI subclasses: payment authorizations, captures, voids
+ * and refunds run the same machine.
+ */
+export type KnownPaymentTransactionStatus =
+  | "pending"
+  | "requires_action"
+  | "processing"
+  | "succeeded"
+  | "declined"
+  | "failed"
+  | "canceled"
+  | "expired"
+
+export type PaymentTransactionStatus = Widen<KnownPaymentTransactionStatus>
+
+/**
+ * Transaction states a session cannot recover from. A session carrying an
+ * authorization in one of these is burnt: it stays `unpaid` forever, because
+ * only a `succeeded` authorization transitions the session.
+ */
+export const TERMINAL_FAILURE_TRANSACTION_STATUSES = [
+  "declined",
+  "failed",
+  "canceled",
+  "expired",
+] as const satisfies readonly KnownPaymentTransactionStatus[]
+
+/**
+ * Transaction states the API will leave on its own, without anyone acting.
+ * Authorizing runs in a background job, so an authorization sits here between
+ * the `POST` that creates it and the money actually being taken.
+ *
+ * `requires_action` is deliberately **not** here. It is waiting for the
+ * *shopper* — a 3DS challenge or an equivalent redirect — so no amount of
+ * polling resolves it, and treating it as in flight would spend the whole
+ * retry budget on something that needs a flow this iteration does not
+ * implement. It is not a failure either (see
+ * `TERMINAL_FAILURE_TRANSACTION_STATUSES`), so it falls through to the
+ * placeability check and is reported as the API describes it.
+ */
+export const IN_FLIGHT_TRANSACTION_STATUSES = [
+  "pending",
+  "processing",
+] as const satisfies readonly KnownPaymentTransactionStatus[]
+
+/**
+ * One reason the API gave for refusing to place an order, mapped out of a 422
+ * JSON:API error object.
+ *
+ * Note that every payment-rule failure — insufficient coverage, a payment
+ * setting the order is not allowed to use — arrives with the same
+ * `field: "payment_action"`, distinguishable only by `message`.
+ */
+export interface PlaceabilityError {
+  /** JSON:API error `code`, e.g. `"VALIDATION_ERROR"`. */
+  code: string
+  /** Human-readable reason. For payment rules this is the rule's message. */
+  message: string
+  /**
+   * Last segment of `source.pointer`, so `/data/attributes/payment_action`
+   * becomes `"payment_action"`. Base errors (`/data`) become `"base"`.
+   */
+  field?: string
+  /** Symbolic reason from `meta.error`, when the API sends one. */
+  meta?: { error: string }
+}
+
+/**
+ * The Payment Setting type a gift card is spent through.
+ *
+ * Gift cards are the one setting that is *additive* rather than an alternative:
+ * an order carries zero or more of them plus at most one other session for the
+ * difference. Everything that separates the two families keys off this literal.
+ */
+export const GIFT_CARD_SETTING_TYPE = "payment_setting_gift_cards"
+
+/**
+ * The gift card Payment Setting among the order's available ones, if any.
+ *
+ * The single lookup behind both the availability flag the UI reads and the id
+ * `applyGiftCard` binds the new session to, so the two cannot disagree.
+ */
+export function findGiftCardSetting(order?: Order | null): PaymentSetting | undefined {
+  return (order?.available_payment_settings ?? []).find(
+    (setting) => setting.type === GIFT_CARD_SETTING_TYPE
+  )
+}
+
+/** True when this session spends a gift card rather than paying the difference. */
+export function isGiftCardSession(session: PaymentSession): boolean {
+  return session.payment_setting?.type === GIFT_CARD_SETTING_TYPE
+}
+
+/**
+ * True when the session is carrying a Payment Authorization that has not failed
+ * — i.e. money is either taken or in flight.
+ *
+ * Note this is *not* "paid": an authorization can still be `pending` while its
+ * background job runs. What it rules out is a session the shopper may still
+ * change freely.
+ */
+export function hasLiveAuthorization(session: PaymentSession): boolean {
+  const status = session.payment_authorization?.status
+  if (status == null) return false
+  return !TERMINAL_FAILURE_TRANSACTION_STATUSES.includes(
+    status as (typeof TERMINAL_FAILURE_TRANSACTION_STATUSES)[number]
+  )
+}
+
+/**
+ * True when this session is holding money that belongs to the merchant.
+ *
+ * The conjunction that matters, and the one whose absence caused a real bug:
+ * `hasLiveAuthorization` alone says only that an authorization exists and did
+ * not fail, and it stays true after a refund — the authorization keeps its
+ * `succeeded` status forever, because what changes is the *session*. So every
+ * question of the form "is this still paying for the order?" has to ask both,
+ * and asking one of them was enough to keep a refunded gift card counting
+ * toward coverage and to leave the gift card input hidden for good.
+ *
+ * Distinct from the questions that only need one half: whether a session may be
+ * deleted, whether it still needs authorizing, whether it is the shopper's
+ * current selection. Those are about the authorization, not about the money.
+ */
+export function holdsMoney(session: PaymentSession): boolean {
+  return hasLiveAuthorization(session) && !hasReturnedMoney(session)
+}
+
+/**
+ * True when the session's authorization is still being worked on server-side.
+ *
+ * This is the state the placeability check cannot see through: the money is
+ * neither taken nor refused, so a refusal read while this holds says nothing
+ * about whether the payment will succeed.
+ */
+export function hasAuthorizationInFlight(session: PaymentSession): boolean {
+  const status = session.payment_authorization?.status
+  if (status == null) return false
+  return IN_FLIGHT_TRANSACTION_STATUSES.includes(
+    status as (typeof IN_FLIGHT_TRANSACTION_STATUSES)[number]
+  )
+}
+
+/**
+ * True when the session's authorization reached a state it cannot leave.
+ *
+ * Note the API exposes no reason for it: a Payment Authorization carries only
+ * `status`, the balances and the gateway's raw `response_data`
+ * (`config/attributes/payment_authorization.yml` in `core-api`). So this
+ * answers *whether* waiting is pointless, never *why* the payment failed —
+ * the message still has to come from the API's own refusal.
+ */
+export function hasFailedAuthorization(session: PaymentSession): boolean {
+  const status = session.payment_authorization?.status
+  if (status == null) return false
+  return TERMINAL_FAILURE_TRANSACTION_STATUSES.includes(
+    status as (typeof TERMINAL_FAILURE_TRANSACTION_STATUSES)[number]
+  )
+}
+
+/**
+ * The Payment Setting type Adyen cards are taken through.
+ *
+ * Unlike gift cards, this is one of the alternatives the shopper picks between,
+ * so it stays inside the radio group. What separates it from `manual` is that a
+ * gateway has to collect something before the order can be placed.
+ */
+export const ADYEN_SETTING_TYPE = "payment_setting_adyens"
+
+/** True when this session pays through Adyen. */
+export function isAdyenSession(session?: PaymentSession | null): boolean {
+  return session?.payment_setting?.type === ADYEN_SETTING_TYPE
+}
+
+/**
+ * The gateway-side session `adyen-web` needs, as Adyen names its own fields.
+ *
+ * Distinct from the Payment Session that owns it: this is what
+ * `AdyenCheckout({ session })` is constructed with.
+ */
+export interface AdyenSession {
+  id: string
+  sessionData: string
+}
+
+/**
+ * Read the Adyen Session out of a Payment Session.
+ *
+ * It lives in `response_data`, which is the response Commerce Layer got from
+ * Adyen `/sessions` passed through verbatim — hence Adyen's camelCase
+ * `sessionData` beside a bare `id`. That attribute is deliberately readable by
+ * sales-channel tokens (`config/attributes/payment_session.yml`, *"used by
+ * client"*), unlike `payment_authorization.response_data`, which is withheld.
+ *
+ * Returns `undefined` unless **both** fields are present and non-empty. A
+ * partial Adyen Session is not something to boot a Drop-in from, and the two
+ * ways of getting one — a consumer whose `fields` allowlist omits
+ * `response_data`, or a session whose gateway call failed — are both better
+ * reported as "no Adyen session" than as a Drop-in that fails inside the SDK.
+ */
+export function readAdyenSession(session?: PaymentSession | null): AdyenSession | undefined {
+  const data = session?.response_data
+  if (data == null || typeof data !== "object") return undefined
+  const { id, sessionData } = data as { id?: unknown; sessionData?: unknown }
+  if (typeof id !== "string" || id === "") return undefined
+  if (typeof sessionData !== "string" || sessionData === "") return undefined
+  return { id, sessionData }
+}
+
+export const STRIPE_SETTING_TYPE = "payment_setting_stripes"
+
+/** Whether this session belongs to a Stripe Payment Setting. */
+export function isStripeSession(session?: PaymentSession | null): boolean {
+  return session?.payment_setting?.type === STRIPE_SETTING_TYPE
+}
+
+/**
+ * The PaymentIntent client secret Stripe Elements is built from.
+ *
+ * `response_data` is the PaymentIntent as Commerce Layer received it, so the
+ * secret is there under its own name — `Payment::Session::Stripe#create` stores
+ * `intent.to_hash`. Only the secret is read: everything else about the intent
+ * belongs to Stripe's SDK, which fetches it itself from the secret.
+ *
+ * Returns `undefined` when it is absent or empty, for the same reasons as the
+ * Adyen reader above — a consumer whose `fields` allowlist omits
+ * `response_data`, or a session whose gateway call failed. Both are better
+ * reported as "no Stripe session" than as an Elements group that fails inside
+ * the SDK.
+ */
+export function readStripeClientSecret(session?: PaymentSession | null): string | undefined {
+  const data = session?.response_data
+  if (data == null || typeof data !== "object") return undefined
+  const { client_secret: clientSecret } = data as { client_secret?: unknown }
+  if (typeof clientSecret !== "string" || clientSecret === "") return undefined
+  return clientSecret
+}
+
+/**
+ * The Payment Setting type Braintree cards are taken through.
+ *
+ * The odd one out among the card gateways: the setting carries no credential a
+ * browser can use — its `public_key` is half of Braintree's server-side API key
+ * pair, not a publishable key — so everything the browser needs arrives with
+ * the Payment Session instead.
+ */
+export const BRAINTREE_SETTING_TYPE = "payment_setting_braintrees"
+
+/** Whether this session belongs to a Braintree Payment Setting. */
+export function isBraintreeSession(session?: PaymentSession | null): boolean {
+  return session?.payment_setting?.type === BRAINTREE_SETTING_TYPE
+}
+
+/**
+ * The client token `braintree-web` is booted with.
+ *
+ * Commerce Layer asks Braintree's GraphQL API for one when the session is
+ * created (`createClientToken`, scoped to the setting's merchant account and to
+ * no customer) and stores it in `response_data` under Braintree's own camelCase
+ * name — `Payment::Session::Braintree#create_client_token` in `core-api`. It is
+ * per session, which is why a Braintree form cannot exist before its session
+ * does.
+ *
+ * Returns `undefined` when it is absent or empty, for the same reasons as the
+ * Adyen and Stripe readers: a consumer whose `fields` allowlist omits
+ * `response_data`, or a session whose gateway call failed.
+ */
+export function readBraintreeClientToken(session?: PaymentSession | null): string | undefined {
+  const data = session?.response_data
+  if (data == null || typeof data !== "object") return undefined
+  const { clientToken } = data as { clientToken?: unknown }
+  if (typeof clientToken !== "string" || clientToken === "") return undefined
+  return clientToken
+}
+
+/**
+ * The Payment Setting type for PayPal taken on its own, through PayPal's Orders
+ * API — not PayPal as one of Adyen's or Braintree's methods.
+ *
+ * The setting carries the browser credential, `client_id`; the PayPal order is
+ * created with the Payment Session, and the session's `token` is its id.
+ */
+export const PAYPAL_SETTING_TYPE = "payment_setting_paypals"
+
+/** Whether this session belongs to a PayPal Payment Setting. */
+export function isPayPalSession(session?: PaymentSession | null): boolean {
+  return session?.payment_setting?.type === PAYPAL_SETTING_TYPE
+}
+
+/**
+ * The client id PayPal's JS SDK loads with: the public half of the setting's
+ * PayPal REST app.
+ *
+ * Returned in `order.available_payment_settings`, but not declared on the SDK's
+ * `PaymentSettingPaypal` type, hence the read through `unknown`. `undefined`
+ * when it is absent or empty — the setting cannot be offered then.
+ */
+export function readPayPalClientId(setting?: PaymentSetting | null): string | undefined {
+  const clientId = (setting as { client_id?: unknown } | null | undefined)?.client_id
+  if (typeof clientId !== "string" || clientId === "") return undefined
+  return clientId
+}
+
+/**
+ * The PayPal order the session pays: the session's `token`.
+ *
+ * Created by Commerce Layer when the session is, for the session's amount, so a
+ * session for the remainder after gift cards is an order for the remainder.
+ * `undefined` when the session has none — its creation reached PayPal and
+ * failed, or a consumer's `fields` allowlist leaves `token` out.
+ */
+export function readPayPalOrderId(session?: PaymentSession | null): string | undefined {
+  const token = session?.token
+  if (typeof token !== "string" || token === "") return undefined
+  return token
+}
+
+/**
+ * What the shopper paid with, as the API describes it.
+ *
+ * `payment_instrument` is one shape for every gateway: each
+ * `Payment::Instrument::*` class in `core-api` maps its gateway's own response
+ * onto these keys (`app/models/payment/instrument/`), so a Visa reads the same
+ * whether Stripe, Adyen or Checkout.com took it. Card instruments fill the
+ * `card_*` keys, account-based ones (PayPal, SEPA, an external gateway's
+ * wallet) the `account_*` keys; any key may be absent.
+ *
+ * Transcribed by hand because the SDK does not type it on `PaymentSession`.
+ * **Re-check against `core-api` whenever the SDK is upgraded.**
+ */
+export interface PaymentInstrument {
+  /** e.g. `card`, a wallet such as `apple_pay`, or the issuer's name on Adyen. */
+  issuer_type?: string
+  issuer?: string
+  /** The gateway's id for the payment method, e.g. Stripe's `pm_…`. */
+  payment_id?: string
+  /** The card brand as the gateway names it, e.g. `visa`. */
+  card_type?: string
+  card_last_digits?: string
+  card_expiry_month?: number | string
+  card_expiry_year?: number | string
+  card_holder_name?: string
+  card_fingerprint?: string
+  account_id?: string
+  account_email?: string
+  account_status?: string
+  account_holder_type?: string
+  account_last_digits?: string
+  account_fingerprint?: string
+}
+
+/**
+ * Read the payment instrument out of a Payment Session.
+ *
+ * The API fills it once the payment is authorized (`fill_payment_instrument!`,
+ * called from `PaymentAuthorization`), or from a stored wallet when one is
+ * attached, and defaults the column to `{}` until then. So an empty object, as
+ * much as a missing one, means "nothing known yet" and reads as `undefined` —
+ * which is also what a consumer whose `fields` allowlist omits it gets.
+ */
+export function readPaymentInstrument(
+  session?: PaymentSession | null
+): PaymentInstrument | undefined {
+  const data = (session as { payment_instrument?: unknown } | null | undefined)?.payment_instrument
+  if (data == null || typeof data !== "object" || Array.isArray(data)) return undefined
+  if (Object.keys(data).length === 0) return undefined
+  return data as PaymentInstrument
+}

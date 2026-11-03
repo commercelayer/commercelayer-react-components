@@ -10,9 +10,11 @@ vi.mock("@commercelayer/core-components", async (importOriginal) => {
   }
 })
 
-const { getApiOrder, addResourceToInclude, default: orderReducer } = await import(
-  "#reducers/OrderReducer"
-)
+const {
+  getApiOrder,
+  addResourceToInclude,
+  default: orderReducer,
+} = await import("#reducers/OrderReducer")
 type OrderActions = import("#reducers/OrderReducer").OrderActions
 type OrderState = import("#reducers/OrderReducer").OrderState
 
@@ -97,7 +99,11 @@ describe("getApiOrder include", () => {
     expect(Object.keys(state.includeLoaded)).toHaveLength(state.include.length)
   })
 
-  it("omits include entirely when nothing has been registered", async () => {
+  // The one include every order carries: without it an order on the newer
+  // payments model reads as the older one. It rides on the request rather than
+  // on the include state, so it is there even when no component registered
+  // anything.
+  it("asks only for available_payment_settings when nothing has been registered", async () => {
     await getApiOrder({
       id: "order-1",
       config: { accessToken: "test-token" },
@@ -106,6 +112,18 @@ describe("getApiOrder include", () => {
     })
 
     const options = retrieve.mock.calls[0]?.[1] as { include?: string[] }
-    expect(options.include).toBeUndefined()
+    expect(options.include).toEqual(["available_payment_settings"])
+  })
+
+  it("adds available_payment_settings to what the components registered, once", async () => {
+    await getApiOrder({
+      id: "order-1",
+      config: { accessToken: "test-token" },
+      state: { include: ["line_items", "available_payment_settings"] },
+      options: {},
+    })
+
+    const options = retrieve.mock.calls[0]?.[1] as { include?: string[] }
+    expect(options.include).toEqual(["line_items", "available_payment_settings"])
   })
 })

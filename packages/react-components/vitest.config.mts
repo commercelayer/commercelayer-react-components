@@ -11,7 +11,9 @@ export default defineConfig({
       react: path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
       swr: path.resolve(__dirname, "node_modules/swr"),
-      "@commercelayer/react-hooks-components": path.resolve("../react-hooks-components/src/index.ts"),
+      "@commercelayer/react-hooks-components": path.resolve(
+        "../react-hooks-components/src/index.ts"
+      ),
       "@commercelayer/core-components": path.resolve("../core-components/src/index.ts"),
       "#sdk": path.resolve(__dirname, "../core-components/src/sdk/index.ts"),
       "#types": path.resolve(__dirname, "../core-components/src/types/index.ts"),

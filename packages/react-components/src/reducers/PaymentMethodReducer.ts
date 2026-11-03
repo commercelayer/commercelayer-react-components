@@ -292,7 +292,6 @@ export interface SetPaymentSourceParams extends Omit<PaymentMethodState, "config
 // effect firing `create` twice before the first request settles). Keyed per order,
 // resource and operation path so different operations never merge; entries are removed
 // once settled, so a later legitimate re-create still runs.
-// See docs/adr/0003-payment-source-effect-invariants.md.
 const inFlightPaymentSourceRequests = new Map<
   string,
   Promise<PaymentSourceType | undefined | null>
@@ -306,7 +305,6 @@ const inFlightPaymentSourceRequests = new Map<
 // settled. A caller whose order is no newer than that read-back revision gets the source
 // that was created; one whose order moved on and still has none — the API dropped it,
 // as applying a coupon does — creates again. Without a revision to compare, it creates.
-// See docs/adr/0003-payment-source-effect-invariants.md.
 const lastPaymentSourceCreates = new Map<
   string,
   { paymentSource: PaymentSourceType; orderUpdatedAt: string }
