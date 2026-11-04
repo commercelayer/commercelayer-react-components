@@ -14,7 +14,7 @@ merchant ID in the payment data request, and `payment_setting_braintrees` has no
 one. Two things changed since. PayPal's certification review of the Braintree integration asked
 which wallets are offered, and Google Pay was enabled on the sandbox merchant behind
 `new-payments-demo`. A sandbox merchant pays in Google's `TEST` environment, which needs no
-merchant ID, so the component can be built and run before core-api has an attribute for it.
+merchant ID, so the component can be built and run before the setting has an attribute for it.
 
 Verified against the installed `braintree-web@3.144.0`:
 
@@ -32,7 +32,7 @@ Verified against the installed `braintree-web@3.144.0`:
   a card on a device (a network token with the device's cryptogram) and `false` for a card saved
   to the Google account (the card number itself).
 
-core-api treats a Google Pay nonce like any other: `client_data.payment_method_id` is relayed to
+The API treats a Google Pay nonce like any other: `client_data.payment_method_id` is relayed to
 `authorizePaymentMethod` / `chargePaymentMethod` unchanged.
 
 ## Decision
@@ -95,12 +95,12 @@ second time through Google's sheet would be a second PayPal flow to support for 
 `googleMerchantId` is optional. A production merchant without it renders nothing and logs
 `GOOGLE_MERCHANT_ID_MISSING` in development. The Apple Pay ADR's point still holds: mfe-checkout
 is hosted for every organization, so a prop isn't somewhere it can keep a merchant's ID. Its home
-is an attribute on `payment_setting_braintrees`, requested from core-api separately. Once that
+is an attribute on `payment_setting_braintrees`, which the API doesn't have yet. Once that
 attribute exists, the component reads it and the prop becomes an override.
 
 ## Consequences
 
-**Production waits on core-api.** mfe-checkout offers Google Pay through Braintree on sandbox
+**Production waits on the payment setting.** mfe-checkout offers Google Pay through Braintree on sandbox
 merchants only, until the setting carries the merchant ID.
 
 **A refused gift card is the only failure shown inside Google's sheet.** Everything after the sheet
