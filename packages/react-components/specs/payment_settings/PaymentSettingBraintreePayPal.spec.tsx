@@ -13,6 +13,7 @@ import {
   getHandoffSnapshot,
   isCollecting,
   resetPaymentGatewayStore,
+  setCollecting,
 } from "#utils/paymentGatewayStore"
 
 const NAMESPACE = "commercelayerBraintreePayPal"
@@ -426,12 +427,86 @@ describe("<PaymentSettingBraintreePayPal> the payment-method lock", () => {
     expect(isCollecting("order-1")).toBe(false)
   })
 
+  // The card form is mid-payment on the same Payment Session.
+  it("opens nothing while another route is collecting", async () => {
+    await renderAvailable()
+    setCollecting("order-1", true)
+
+    const actions = await click()
+
+    expect(actions.reject).toHaveBeenCalled()
+    expect(actions.resolve).not.toHaveBeenCalled()
+    expect(authorizeGiftCardsMock).not.toHaveBeenCalled()
+  })
+
+  it("is held while the gift cards are charged, before the popup goes on", async () => {
+    await renderAvailable()
+    let collectingDuringGiftCards: boolean | undefined
+    authorizeGiftCardsMock.mockImplementation(async () => {
+      collectingDuringGiftCards = isCollecting("order-1")
+      return { authorizedSessionIds: [], errors: [] }
+    })
+
+    await click()
+
+    expect(collectingDuringGiftCards).toBe(true)
+  })
+
+  it("is released when a gift card is refused", async () => {
+    authorizeGiftCardsMock.mockResolvedValue({
+      authorizedSessionIds: [],
+      errors: [{ code: "VALIDATION_ERROR", message: "The gift card balance is too low." }],
+    })
+    await renderAvailable()
+
+    const actions = await click()
+
+    expect(actions.reject).toHaveBeenCalled()
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
   it("is released when the button goes away under an open popup", async () => {
     const { unmount } = await renderAvailable()
     await click()
 
     unmount()
 
+    expect(isCollecting("order-1")).toBe(false)
+  })
+})
+
+describe("<PaymentSettingBraintreePayPal> a click after a partly charged attempt", () => {
+  const REFUSED = {
+    authorizedSessionIds: ["session-gc-small"],
+    errors: [{ code: "VALIDATION_ERROR", message: "The gift card balance is too low." }],
+  }
+
+  // One card charged, the next refused: clicked again on the order held
+  // before, the first card would be charged again.
+  it("charges the gift cards on the order refetched after the refusal", async () => {
+    const refetched = order({ marker: 2 })
+    getOrder.mockResolvedValue(refetched)
+    authorizeGiftCardsMock.mockResolvedValueOnce(REFUSED)
+    await renderAvailable()
+
+    await click()
+    expect(getOrder).toHaveBeenCalledWith("order-1")
+    await click()
+
+    expect(authorizeGiftCardsMock).toHaveBeenCalledTimes(2)
+    expect(authorizeGiftCardsMock.mock.calls[1]?.[0]).toMatchObject({ order: refetched })
+  })
+
+  it("charges nothing more until the order could be refetched", async () => {
+    getOrder.mockRejectedValue(new Error("network"))
+    authorizeGiftCardsMock.mockResolvedValueOnce(REFUSED)
+    await renderAvailable()
+
+    await click()
+    const actions = await click()
+
+    expect(authorizeGiftCardsMock).toHaveBeenCalledTimes(1)
+    expect(actions.reject).toHaveBeenCalled()
     expect(isCollecting("order-1")).toBe(false)
   })
 })
