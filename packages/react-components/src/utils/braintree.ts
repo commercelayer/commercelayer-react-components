@@ -1,5 +1,10 @@
-import type { PaymentSession } from "@commercelayer/sdk"
-import type { ThreeDSecure } from "braintree-web/three-d-secure"
+import type { Address, Order, PaymentSession } from "@commercelayer/sdk"
+import type {
+  ThreeDSecure,
+  ThreeDSecureBillingAddress,
+  ThreeDSecureVerifyOptions,
+  ThreeDSecureVerifyPayload,
+} from "braintree-web/three-d-secure"
 
 /**
  * braintree-web ships CommonJS, so a dynamic `import()` of one of its subpaths
@@ -72,4 +77,78 @@ export function pageThreeDSecureInstance(
 /** Forget the page's 3DS instance. For tests, which share the module. */
 export function resetPageThreeDSecure(): void {
   pageThreeDSecure = null
+}
+
+type VerifyCardOptions = ThreeDSecureVerifyOptions & {
+  onLookupComplete: (data: unknown, next: () => void) => void
+}
+
+/**
+ * Run 3DS on a card nonce, for the session's amount, and resolve with the
+ * verified payload. Rejects with Braintree's error when 3DS itself fails; a
+ * shopper who did not authenticate resolves, and `liabilityRefusal` decides.
+ */
+export function verifyCard(
+  threeDSecure: ThreeDSecure,
+  {
+    nonce,
+    bin,
+    session,
+    order,
+  }: { nonce: string; bin: string; session: PaymentSession; order?: Order | null }
+): Promise<ThreeDSecureVerifyPayload> {
+  const options: VerifyCardOptions = {
+    nonce,
+    bin,
+    amount: sessionAmount(session),
+    // Both optional, and both raise the share of shoppers who authenticate
+    // without a challenge.
+    email: order?.customer_email ?? undefined,
+    billingAddress: threeDSecureBillingAddress(order),
+    collectDeviceData: true,
+    // Required by 3DS v2, which pauses after the issuer lookup until this
+    // calls `next` — and missing from the typings.
+    onLookupComplete: (_data, next) => {
+      next()
+    },
+  }
+  // The typings declare the promise-returning overload as `void`.
+  return threeDSecure.verifyCard(options) as unknown as Promise<ThreeDSecureVerifyPayload>
+}
+
+/**
+ * Why the 3DS outcome refuses the payment, or `undefined` when it does not.
+ *
+ * Commerce Layer authorizes a nonce whatever its 3DS outcome — it sends no 3DS
+ * parameter and checks no liability shift — so this is the only place the
+ * outcome is enforced.
+ */
+export function liabilityRefusal(
+  verified: ThreeDSecureVerifyPayload,
+  requireLiabilityShift: boolean
+): string | undefined {
+  const info = verified.threeDSecureInfo
+  if (info.liabilityShifted) return undefined
+  // Possible and not shifted: the shopper failed or abandoned the challenge.
+  if (info.liabilityShiftPossible || requireLiabilityShift) {
+    return (info as { status?: string }).status ?? "liability_not_shifted"
+  }
+  return undefined
+}
+
+/** The order's billing address, as 3DS names its parts. */
+function threeDSecureBillingAddress(order?: Order | null): ThreeDSecureBillingAddress | undefined {
+  const address: Address | null | undefined = order?.billing_address
+  if (address == null) return undefined
+  return {
+    givenName: address.first_name ?? undefined,
+    surname: address.last_name ?? undefined,
+    phoneNumber: address.phone ?? undefined,
+    streetAddress: address.line_1 ?? undefined,
+    extendedAddress: address.line_2 ?? undefined,
+    locality: address.city ?? undefined,
+    region: address.state_code ?? undefined,
+    postalCode: address.zip_code ?? undefined,
+    countryCodeAlpha2: address.country_code ?? undefined,
+  }
 }

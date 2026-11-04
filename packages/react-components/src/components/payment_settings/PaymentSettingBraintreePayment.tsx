@@ -3,7 +3,7 @@ import {
   BRAINTREE_SETTING_TYPE,
   readBraintreeClientToken,
 } from "@commercelayer/core-components"
-import type { Address, Order, PaymentSession } from "@commercelayer/sdk"
+import type { PaymentSession } from "@commercelayer/sdk"
 import type { Client } from "braintree-web/client"
 import type {
   HostedFields,
@@ -11,12 +11,7 @@ import type {
   HostedFieldsField,
   HostedFieldsTokenizePayload,
 } from "braintree-web/hosted-fields"
-import type {
-  ThreeDSecure,
-  ThreeDSecureBillingAddress,
-  ThreeDSecureVerifyOptions,
-  ThreeDSecureVerifyPayload,
-} from "braintree-web/three-d-secure"
+import type { ThreeDSecure, ThreeDSecureVerifyPayload } from "braintree-web/three-d-secure"
 import { type JSX, useContext, useEffect, useId, useRef, useState } from "react"
 import Parent from "#components/utils/Parent"
 import CommerceLayerContext from "#context/CommerceLayerContext"
@@ -29,8 +24,9 @@ import type { ChildrenFunction, LoaderType } from "#typings/index"
 import {
   braintreeErrorCode,
   interopDefault,
+  liabilityRefusal,
   pageThreeDSecureInstance,
-  sessionAmount,
+  verifyCard,
 } from "#utils/braintree"
 import {
   type PaymentGatewaySubmitResult,
@@ -137,10 +133,6 @@ interface Props {
    * two too many.
    */
   loader?: LoaderType
-}
-
-type VerifyCardOptions = ThreeDSecureVerifyOptions & {
-  onLookupComplete: (data: unknown, next: () => void) => void
 }
 
 const DEFAULT_STYLES: Record<string, Record<string, string>> = {
@@ -471,25 +463,12 @@ function BraintreeForm({
         if (instances.threeDSecure != null) {
           let verified: ThreeDSecureVerifyPayload
           try {
-            const options: VerifyCardOptions = {
+            verified = await verifyCard(instances.threeDSecure, {
               nonce: card.nonce,
               bin: card.details.bin,
-              amount: sessionAmount(current.session),
-              // Both optional, and both raise the share of shoppers who
-              // authenticate without a challenge.
-              email: current.order?.customer_email ?? undefined,
-              billingAddress: threeDSecureBillingAddress(current.order),
-              collectDeviceData: true,
-              // Required by 3DS v2, which pauses after the issuer lookup until
-              // this calls `next` — and missing from the typings.
-              onLookupComplete: (_data, next) => {
-                next()
-              },
-            }
-            // The typings declare the promise-returning overload as `void`.
-            verified = await (instances.threeDSecure.verifyCard(
-              options
-            ) as unknown as Promise<ThreeDSecureVerifyPayload>)
+              session: current.session,
+              order: current.order,
+            })
           } catch (error) {
             const code = braintreeErrorCode(error) ?? "THREEDS_FAILED"
             fail(code, "The card could not be authenticated.")
@@ -591,43 +570,6 @@ function teardown({ hostedFields }: BraintreeInstances): void {
   Promise.resolve()
     .then(() => hostedFields.teardown())
     .catch(() => {})
-}
-
-/**
- * Why the 3DS outcome refuses the payment, or `undefined` when it does not.
- *
- * Commerce Layer authorizes a nonce whatever its 3DS outcome — it sends no 3DS
- * parameter and checks no liability shift — so this is the only place the
- * outcome is enforced.
- */
-function liabilityRefusal(
-  verified: ThreeDSecureVerifyPayload,
-  requireLiabilityShift: boolean
-): string | undefined {
-  const info = verified.threeDSecureInfo
-  if (info.liabilityShifted) return undefined
-  // Possible and not shifted: the shopper failed or abandoned the challenge.
-  if (info.liabilityShiftPossible || requireLiabilityShift) {
-    return (info as { status?: string }).status ?? "liability_not_shifted"
-  }
-  return undefined
-}
-
-/** The order's billing address, as 3DS names its parts. */
-function threeDSecureBillingAddress(order?: Order | null): ThreeDSecureBillingAddress | undefined {
-  const address: Address | null | undefined = order?.billing_address
-  if (address == null) return undefined
-  return {
-    givenName: address.first_name ?? undefined,
-    surname: address.last_name ?? undefined,
-    phoneNumber: address.phone ?? undefined,
-    streetAddress: address.line_1 ?? undefined,
-    extendedAddress: address.line_2 ?? undefined,
-    locality: address.city ?? undefined,
-    region: address.state_code ?? undefined,
-    postalCode: address.zip_code ?? undefined,
-    countryCodeAlpha2: address.country_code ?? undefined,
-  }
 }
 
 /**
