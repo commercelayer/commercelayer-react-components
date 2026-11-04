@@ -98,6 +98,46 @@ is hosted for every organization, so a prop isn't somewhere it can keep a mercha
 is an attribute on `payment_setting_braintrees`, which the API doesn't have yet. Once that
 attribute exists, the component reads it and the prop becomes an override.
 
+### The payment is reserved from the click, and the place button honours it
+
+Found in review. The click checked only this button's own `isSubmitting`, and the shared
+collecting flag went up only once Google's sheet had closed with a card. That left two gaps. A
+click while the card form was mid-payment opened a second payment on the same Payment Session.
+And while the sheet was open, gift cards included, the card route stayed live.
+
+So the click now does two things. It refuses to open the sheet while anything is collecting for
+the order, and it raises the flag itself before `loadPaymentData()`, holding it until the sheet
+closes and whatever follows it is over. Every way out lowers it: cancel, an error from Google, the
+authorization finishing, the button unmounting.
+
+The flag had one reader that mattered, `<PaymentSetting>`'s method lock. `<PlaceOrderButton>`
+disabled itself only on the out-of-band phase, which a wallet reaches only once it holds a nonce.
+So the place button now also reads `isCollecting`. While another route holds it, the button is
+disabled, and a click is ignored even when an application overrides `disabled`. Its own click
+raises the flag too, while the card form collects, and it is busy then anyway.
+
+Apple Pay through Braintree had both gaps and gets the same fix. Its sheet stays open after a
+failure, so the lock lasts from the tap until `oncancel`, or until a success closes the sheet. It
+is never released while an authorization is still running.
+
+### A retry in the sheet runs on a refetched order
+
+Also found in review. `authorizeGiftCardSessions` stops at the first refused card and returns
+both the sessions it charged and the errors. It skips a session with a live authorization by
+reading the order it is handed. The refusal path returned to Google's sheet without refetching
+the order, so a retry in the same sheet saw the first card as unpaid and could charge it again.
+
+`authorizeWalletGiftCards` (`utils/walletGiftCards.ts`) now wraps the call for both Braintree
+wallets. It refetches the order whenever anything may have been charged: a card authorized, or an
+error nobody can read. Until that refetch has succeeded, the next attempt doesn't start. The
+refetched order is used until the context has caught up with it, so a quick retry doesn't depend
+on a re-render.
+
+The other gift-card callers share the gap: PayPal through Braintree, the PayPal setting and
+Adyen's wallets. Each one rejects on a partial failure without refetching, and the next click
+starts from the stale order. They are left for a follow-up. `<PlaceOrderButton>` already refetches
+on a refusal.
+
 ## Consequences
 
 **Production waits on the payment setting.** mfe-checkout offers Google Pay through Braintree on sandbox
@@ -111,10 +151,11 @@ for a decline, the place button's outlet.
 API when another integration on the page has already loaded it. A failed load is forgotten, so the
 next mount retries.
 
-**What runs in a test.** Eighteen unit specs, against a fake `PaymentsClient` that plays the sheet,
-cover availability (including the production merchant ID), the gate, cancellation, the gift-card
-moment, 3DS for network-tokenized and plain cards, a failed challenge, a decline and an unreadable
-token. As with Adyen, the browser run needs a signed-in Google account, so the mfe-checkout e2e
+**What runs in a test.** Twenty-five unit specs, against a fake `PaymentsClient` that plays the
+sheet, cover availability (including the production merchant ID), the gate, cancellation, the
+gift-card moment, 3DS for network-tokenized and plain cards, a failed challenge, a decline, an
+unreadable token, the payment lock, and a retry after a partly charged attempt. The Apple Pay and
+place-button specs cover the lock on their side. As with Adyen, the browser run needs a signed-in Google account, so the mfe-checkout e2e
 stops where the sheet opens.
 
 **Run by hand in Chrome, 2026-11-04.** A signed-in Google account paid an order on the sandbox
