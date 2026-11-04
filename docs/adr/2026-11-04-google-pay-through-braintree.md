@@ -118,7 +118,9 @@ raises the flag too, while the card form collects, and it is busy then anyway.
 
 Apple Pay through Braintree had both gaps and gets the same fix. Its sheet stays open after a
 failure, so the lock lasts from the tap until `oncancel`, or until a success closes the sheet. It
-is never released while an authorization is still running.
+is never released while an authorization is still running. PayPal through Braintree took its lock
+only once the gift cards were charged, just before the popup opened. It now checks and takes the
+lock at the start of its click, and releases it on every refusal.
 
 ### A retry in the sheet runs on a refetched order
 
@@ -127,15 +129,16 @@ both the sessions it charged and the errors. It skips a session with a live auth
 reading the order it is handed. The refusal path returned to Google's sheet without refetching
 the order, so a retry in the same sheet saw the first card as unpaid and could charge it again.
 
-`authorizeWalletGiftCards` (`utils/walletGiftCards.ts`) now wraps the call for both Braintree
-wallets. It refetches the order whenever anything may have been charged: a card authorized, or an
+`authorizeWalletGiftCards` (`utils/walletGiftCards.ts`) now wraps the call for all three
+Braintree wallets. It refetches the order whenever anything may have been charged: a card authorized, or an
 error nobody can read. Until that refetch has succeeded, the next attempt doesn't start. The
 refetched order is used until the context has caught up with it, so a quick retry doesn't depend
 on a re-render.
 
-The other gift-card callers share the gap: PayPal through Braintree, the PayPal setting and
-Adyen's wallets. Each one rejects on a partial failure without refetching, and the next click
-starts from the stale order. They are left for a follow-up. `<PlaceOrderButton>` already refetches
+PayPal through Braintree has no sheet to retry in, since a refusal closes its popup, but the next
+click started from the same stale order. It goes through the helper too. The other gift-card
+callers share the gap: the PayPal setting and Adyen's wallets. Each one rejects on a partial
+failure without refetching. They are left for a follow-up. `<PlaceOrderButton>` already refetches
 on a refusal.
 
 ## Consequences
