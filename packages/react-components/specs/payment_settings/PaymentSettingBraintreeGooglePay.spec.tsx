@@ -15,6 +15,7 @@ import {
   getHandoffSnapshot,
   isCollecting,
   resetPaymentGatewayStore,
+  setCollecting,
 } from "#utils/paymentGatewayStore"
 
 /**
@@ -494,5 +495,113 @@ describe("<PaymentSettingBraintreeGooglePay> the payment", () => {
     })
     expect(authorizeMock).not.toHaveBeenCalled()
     expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("no")
+  })
+})
+
+describe("<PaymentSettingBraintreeGooglePay> the payment lock", () => {
+  // The card form is mid-payment on the same Payment Session.
+  it("opens nothing while another route is collecting", async () => {
+    await renderAvailable()
+    setCollecting("order-1", true)
+
+    await pay()
+
+    expect(paymentsClient().loadPaymentData).not.toHaveBeenCalled()
+  })
+
+  it("holds the lock from the click until the sheet is closed", async () => {
+    await renderAvailable()
+    let closeSheet: (reason: unknown) => void = () => {}
+    paymentsClient().loadPaymentData.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          closeSheet = reject
+        })
+    )
+
+    await pay()
+    expect(isCollecting("order-1")).toBe(true)
+
+    await act(async () => {
+      closeSheet({ statusCode: "CANCELED" })
+    })
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
+  it("holds the lock while the gift cards are charged", async () => {
+    await renderAvailable()
+    let collectingDuringGiftCards: boolean | undefined
+    authorizeGiftCardsMock.mockImplementation(async () => {
+      collectingDuringGiftCards = isCollecting("order-1")
+      return { authorizedSessionIds: [], errors: [] }
+    })
+
+    await pay()
+
+    expect(collectingDuringGiftCards).toBe(true)
+  })
+
+  it("releases the lock when Google cannot open the sheet", async () => {
+    await renderAvailable()
+    paymentsClient().loadPaymentData.mockRejectedValueOnce({ statusCode: "DEVELOPER_ERROR" })
+
+    await pay()
+
+    expect(isCollecting("order-1")).toBe(false)
+    expect(screen.getByTestId("google-pay-error").textContent).toBe("DEVELOPER_ERROR")
+  })
+})
+
+describe("<PaymentSettingBraintreeGooglePay> a retry in the same sheet", () => {
+  const REFUSED = {
+    authorizedSessionIds: ["session-gc-small"],
+    errors: [{ code: "VALIDATION_ERROR", message: "The gift card balance is too low." }],
+  }
+
+  /** The shopper trying again in Google's sheet, which stayed open. */
+  async function retryInSheet() {
+    await act(async () => {
+      await paymentsClient().options.paymentDataCallbacks.onPaymentAuthorized(PAYMENT_DATA)
+    })
+  }
+
+  // One card charged, the next refused: retried on the order held before, the
+  // first card would be charged again.
+  it("retries on the order refetched after a partly charged attempt", async () => {
+    const refetched = order({ id: "order-1", payment_sessions: [BRAINTREE_SESSION], marker: 2 })
+    getOrder.mockResolvedValue(refetched)
+    authorizeGiftCardsMock.mockResolvedValueOnce(REFUSED)
+    await renderAvailable()
+
+    await pay()
+    expect(getOrder).toHaveBeenCalledWith("order-1")
+
+    await retryInSheet()
+
+    expect(authorizeGiftCardsMock).toHaveBeenCalledTimes(2)
+    expect(authorizeGiftCardsMock.mock.calls[1]?.[0]).toMatchObject({ order: refetched })
+  })
+
+  it("charges nothing more until the order could be refetched", async () => {
+    getOrder.mockRejectedValue(new Error("network"))
+    authorizeGiftCardsMock.mockResolvedValueOnce(REFUSED)
+    await renderAvailable()
+
+    await pay()
+    await retryInSheet()
+
+    expect(authorizeGiftCardsMock).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("google-pay-error").textContent).toBe("OrderNotReconciled")
+  })
+
+  // An error nobody can read may have come after some cards were charged.
+  it("refetches the order after an error it cannot read", async () => {
+    authorizeGiftCardsMock.mockRejectedValueOnce(new Error("boom"))
+    await renderAvailable()
+
+    await pay()
+
+    expect(getOrder).toHaveBeenCalledWith("order-1")
+    expect(paymentsClient().sheetAnswers[0]).toMatchObject({ transactionState: "ERROR" })
   })
 })

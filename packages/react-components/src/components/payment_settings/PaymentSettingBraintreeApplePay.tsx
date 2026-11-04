@@ -1,6 +1,5 @@
 import {
   authorizeBraintreePaymentSession,
-  authorizeGiftCardSessions,
   BRAINTREE_SETTING_TYPE,
   readBraintreeClientToken,
 } from "@commercelayer/core-components"
@@ -18,7 +17,8 @@ import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
 import { applePayError, applePaySessionCtor } from "#utils/applePay"
 import { braintreeErrorCode, interopDefault, sessionAmount } from "#utils/braintree"
-import { setCollecting, setOutOfBandCollection } from "#utils/paymentGatewayStore"
+import { isCollecting, setCollecting, setOutOfBandCollection } from "#utils/paymentGatewayStore"
+import { authorizeWalletGiftCards, type GiftCardReconciliation } from "#utils/walletGiftCards"
 
 /**
  * The Apple Pay JS version this is written against: version 3 is the first with
@@ -164,6 +164,36 @@ function ApplePayButton({
     return error
   }
 
+  /**
+   * Whether the order held here may be missing gift cards an earlier attempt
+   * charged. Kept across attempts in the same sheet; see `authorizeWalletGiftCards`.
+   */
+  const reconciliationRef = useRef<GiftCardReconciliation>({ pending: false })
+
+  /**
+   * The payment lock this button holds: from the tap until the sheet is gone
+   * and nothing it started is still in flight. Apple keeps the sheet open
+   * after a failure, so the lock outlives a refused attempt and is released by
+   * `oncancel` — or by the authorization finishing, if it is still running when
+   * the sheet goes.
+   */
+  const sheetOpenRef = useRef(false)
+  const authorizingRef = useRef(false)
+  const releaseIfIdle = (): void => {
+    if (sheetOpenRef.current || authorizingRef.current) return
+    setCollecting(latestRef.current.order?.id, false)
+  }
+  const closeSheet = (): void => {
+    if (!sheetOpenRef.current) return
+    sheetOpenRef.current = false
+    releaseIfIdle()
+  }
+
+  // A sheet still open when the button goes away must not leave the payment
+  // method locked for the rest of the page.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: releases on unmount only
+  useEffect(() => closeSheet, [])
+
   // Find out whether Apple Pay can be offered at all, and boot Braintree for it.
   // In an effect, not during render: the answer is the browser's, and reading
   // it while rendering would disagree with the server-rendered markup.
@@ -227,8 +257,11 @@ function ApplePayButton({
    */
   const handleClick = (): void => {
     const Session = applePaySessionCtor()
-    if (Session == null || isSubmitting) return
     const current = latestRef.current
+    // Another route is already paying on this session — the card form, or this
+    // button's own sheet — and a second one would race it to the same Payment
+    // Session. The place button shows that payment as busy.
+    if (Session == null || isSubmitting || isCollecting(current.order?.id)) return
 
     if (!current.collectionPermitted) {
       // The only place this can be said: the shopper pressed Apple's button,
@@ -255,6 +288,16 @@ function ApplePayButton({
       return
     }
 
+    // The payment is reserved from here: the card route and the payment-method
+    // switch stay locked while the sheet is open, gift cards included.
+    sheetOpenRef.current = true
+    setCollecting(current.order?.id, true)
+    // A new sheet starts from the order the context holds by now.
+    reconciliationRef.current.order = undefined
+    sheet.oncancel = () => {
+      closeSheet()
+    }
+
     sheet.onvalidatemerchant = (event) => {
       applePay
         .performValidation({
@@ -273,6 +316,7 @@ function ApplePayButton({
             "Apple Pay is not available right now."
           )
           sheet.abort()
+          closeSheet()
         })
     }
 
@@ -307,8 +351,11 @@ function ApplePayButton({
             ? { status: Session.STATUS_SUCCESS }
             : { status: Session.STATUS_FAILURE, errors: error != null ? [error] : [] }
         )
+        // A success closes the sheet; a failure leaves it open for another try.
+        if (succeeded) sheetOpenRef.current = false
       } catch {
         // The sheet has already closed; what matters is reported below.
+        sheetOpenRef.current = false
       }
     }
 
@@ -318,39 +365,27 @@ function ApplePayButton({
     }
 
     setIsSubmitting(true)
+    authorizingRef.current = true
     try {
       // Gift cards first, as on every other path: a refused payment must never
       // leave them charged after it.
-      try {
-        const authorized = await authorizeGiftCardSessions({
-          accessToken: current.accessToken,
-          interceptors: current.interceptors,
-          order: current.order,
-        })
-        if (authorized.errors.length > 0) {
-          const message = authorized.errors[0]?.message ?? "A gift card was refused."
-          setLastErrorCode("GiftCardRefused")
-          setErrors(
-            authorized.errors.map((error) => ({
-              code: "VALIDATION_ERROR" as const,
-              resource: "orders" as const,
-              message: error.message,
-              field: error.field,
-              meta: { error: error.meta?.error ?? "GiftCardRefused" },
-            }))
-          )
-          // Apple keeps the sheet open on a failure, so the shopper can try again.
-          complete(false, message)
-          return
-        }
-        // So the place sequence, which runs once this has collected, skips the
-        // cards it would otherwise authorize a second time.
-        if (authorized.authorizedSessionIds.length > 0) {
-          await current.getOrder(current.order.id)
-        }
-      } catch {
-        fail("GiftCardRefused", "The gift cards could not be charged.")
-        complete(false, "The gift cards could not be charged.")
+      const charged = await authorizeWalletGiftCards({
+        accessToken: current.accessToken,
+        interceptors: current.interceptors,
+        order: current.order,
+        getOrder: current.getOrder,
+        reconciliation: reconciliationRef.current,
+      })
+      if (charged.status === "refused") {
+        setLastErrorCode("GiftCardRefused")
+        setErrors(charged.errors)
+        // Apple keeps the sheet open on a failure, so the shopper can try again.
+        complete(false, charged.message)
+        return
+      }
+      if (charged.status === "failed") {
+        fail(charged.code, charged.message)
+        complete(false, charged.message)
         return
       }
 
@@ -410,7 +445,9 @@ function ApplePayButton({
       complete(false, "The payment could not be confirmed.")
       setOutOfBandCollection(orderId, "failed", [reported])
     } finally {
-      setCollecting(orderId, false)
+      authorizingRef.current = false
+      // Kept while the sheet is still open after a failure: `oncancel` lets go.
+      releaseIfIdle()
       setIsSubmitting(false)
     }
   }

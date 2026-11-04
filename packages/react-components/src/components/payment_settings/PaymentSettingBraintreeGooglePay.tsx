@@ -1,6 +1,5 @@
 import {
   authorizeBraintreePaymentSession,
-  authorizeGiftCardSessions,
   BRAINTREE_SETTING_TYPE,
   readBraintreeClientToken,
 } from "@commercelayer/core-components"
@@ -29,7 +28,8 @@ import {
   verifyCard,
 } from "#utils/braintree"
 import { loadGooglePaymentsApi } from "#utils/googlePay"
-import { setCollecting, setOutOfBandCollection } from "#utils/paymentGatewayStore"
+import { isCollecting, setCollecting, setOutOfBandCollection } from "#utils/paymentGatewayStore"
+import { authorizeWalletGiftCards, type GiftCardReconciliation } from "#utils/walletGiftCards"
 
 type PaymentData = google.payments.api.PaymentData
 type PaymentDataRequest = google.payments.api.PaymentDataRequest
@@ -221,6 +221,12 @@ function GooglePayButton({
   }
 
   /**
+   * Whether the order held here may be missing gift cards an earlier attempt
+   * charged. Kept across attempts in the same sheet; see `authorizeWalletGiftCards`.
+   */
+  const reconciliationRef = useRef<GiftCardReconciliation>({ pending: false })
+
+  /**
    * The gift cards, while Google's sheet is still open. Registered once with
    * the payments client, so it reads everything from the ref.
    */
@@ -232,41 +238,45 @@ function GooglePayButton({
     if (current.order == null || current.accessToken == null) {
       return sheetError("The payment could not be started.")
     }
-    try {
-      const authorized = await authorizeGiftCardSessions({
-        accessToken: current.accessToken,
-        interceptors: current.interceptors,
-        order: current.order,
-      })
-      if (authorized.errors.length > 0) {
-        const message = authorized.errors[0]?.message ?? "A gift card was refused."
-        setLastErrorCode("GiftCardRefused")
-        setErrors(
-          authorized.errors.map((error) => ({
-            code: "VALIDATION_ERROR" as const,
-            resource: "orders" as const,
-            message: error.message,
-            field: error.field,
-            meta: { error: error.meta?.error ?? "GiftCardRefused" },
-          }))
-        )
-        // Google keeps the sheet open on an error, so the shopper can try again.
-        return sheetError(message)
-      }
-      // So the place sequence, which runs once this has collected, skips the
-      // cards it would otherwise authorize a second time.
-      if (authorized.authorizedSessionIds.length > 0) {
-        await current.getOrder(current.order.id)
-      }
-      // A refusal shown on an earlier try in the same sheet no longer applies.
-      setErrors([])
-      setLastErrorCode(undefined)
-      return { transactionState: "SUCCESS" }
-    } catch {
-      fail("GiftCardRefused", "The gift cards could not be charged.")
-      return sheetError("The gift cards could not be charged.")
+    const charged = await authorizeWalletGiftCards({
+      accessToken: current.accessToken,
+      interceptors: current.interceptors,
+      order: current.order,
+      getOrder: current.getOrder,
+      reconciliation: reconciliationRef.current,
+    })
+    if (charged.status === "refused") {
+      setLastErrorCode("GiftCardRefused")
+      setErrors(charged.errors)
+      // Google keeps the sheet open on an error, so the shopper can try again.
+      return sheetError(charged.message)
     }
+    if (charged.status === "failed") {
+      fail(charged.code, charged.message)
+      return sheetError(charged.message)
+    }
+    // A refusal shown on an earlier try in the same sheet no longer applies.
+    setErrors([])
+    setLastErrorCode(undefined)
+    return { transactionState: "SUCCESS" }
   }
+
+  /**
+   * Whether this button's sheet is open and holding the payment lock. Tracked
+   * apart from the authorization that follows, which takes the lock over, so
+   * an unmount releases exactly what it owns.
+   */
+  const sheetOpenRef = useRef(false)
+  const releaseSheet = (): void => {
+    if (!sheetOpenRef.current) return
+    sheetOpenRef.current = false
+    setCollecting(latestRef.current.order?.id, false)
+  }
+
+  // A sheet still open when the button goes away must not leave the payment
+  // method locked for the rest of the page.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: releases on unmount only
+  useEffect(() => releaseSheet, [])
 
   // Find out whether Google Pay can be offered at all, and boot Braintree for
   // it. In an effect, not during render: the answer is the browser's.
@@ -347,7 +357,10 @@ function GooglePayButton({
   const handleClickRef = useRef<() => void>(() => {})
   handleClickRef.current = (): void => {
     const current = latestRef.current
-    if (instances == null || current.isSubmitting) return
+    // Another route is already paying on this session — the card form, or this
+    // button's own sheet — and a second one would race it to the same Payment
+    // Session. The place button shows that payment as busy.
+    if (instances == null || current.isSubmitting || isCollecting(current.order?.id)) return
 
     if (!current.collectionPermitted) {
       // The only place this can be said: the shopper pressed Google's button,
@@ -357,6 +370,14 @@ function GooglePayButton({
     }
     setErrors([])
     setLastErrorCode(undefined)
+
+    // The sheet opens now, and the payment is reserved until it closes and
+    // whatever follows it is over: the card route and the payment-method switch
+    // stay locked meanwhile, gift cards included. Every way out releases it.
+    sheetOpenRef.current = true
+    setCollecting(current.order?.id, true)
+    // A new sheet starts from the order the context holds by now.
+    reconciliationRef.current.order = undefined
 
     const request = paymentDataRequest(instances.googlePayment, {
       googleMerchantId,
@@ -369,6 +390,7 @@ function GooglePayButton({
         void onPaymentData(instances, paymentData)
       },
       (error: unknown) => {
+        releaseSheet()
         // The shopper closing the sheet is not a failure.
         const code = (error as { statusCode?: string } | null)?.statusCode
         if (code === "CANCELED") return
@@ -403,7 +425,13 @@ function GooglePayButton({
     paymentData: PaymentData
   ): Promise<void> {
     const current = latestRef.current
-    if (current.accessToken == null) return
+    // The sheet's hold ends here; the authorization takes the lock over
+    // without letting go of it in between.
+    sheetOpenRef.current = false
+    if (current.accessToken == null) {
+      setCollecting(orderId, false)
+      return
+    }
 
     setIsSubmitting(true)
     // From here a payment is in flight that nothing on the order records yet:

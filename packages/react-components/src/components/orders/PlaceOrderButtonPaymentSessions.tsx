@@ -97,7 +97,12 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
   // property of the payment model. It lives in one hook because a gateway with
   // its own button has to ask the same question — see `useCollectionPermitted`.
   const collectionPermitted = useCollectionPermitted()
-  const { collection, collectedOutOfBand, errors: outOfBandErrors } = usePaymentGatewayHandoff()
+  const {
+    collection,
+    collectedOutOfBand,
+    isCollecting: gatewayCollecting,
+    errors: outOfBandErrors,
+  } = usePaymentGatewayHandoff()
 
   // Nothing left to pay is a complete answer: gift cards can cover an order
   // outright, and a free order has nothing to authorize. Otherwise the
@@ -321,6 +326,9 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
   const handleClick = async (event?: MouseEvent<HTMLButtonElement>): Promise<void> => {
     event?.preventDefault()
     event?.stopPropagation()
+    // The button is disabled for it, but an application can override
+    // `disabled`, and a second payment racing a wallet's is not an option.
+    if (gatewayCollecting && !isLoading) return
     await place(collectAndPlace)
   }
 
@@ -394,8 +402,13 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
     }
   }, [collectedOutOfBand, outOfBandErrors, setOrderErrors])
 
-  const isCollecting = collectedOutOfBand === "in-progress" || collectedOutOfBand === "done"
-  const busy = isLoading || isCollecting
+  const collectedElsewhere = collectedOutOfBand === "in-progress" || collectedOutOfBand === "done"
+  const busy = isLoading || collectedElsewhere
+  // A payment another route started — a wallet's sheet open, its gift cards
+  // being charged — is not this button's to race on the same Payment Session.
+  // Its own click sets the flag too, while it collects through the card form;
+  // that is `isLoading`, and the button is busy then anyway.
+  const otherRouteCollecting = gatewayCollecting && !isLoading
   // A method with its own button cannot be collected through this one, so the
   // button says so rather than offering a second route to one action where its
   // own route leads nowhere: `submit` on such a gateway throws by design.
@@ -403,7 +416,11 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
   const disabledButton =
     disabled !== undefined
       ? disabled
-      : isCollecting || cannotCollect || !collectionPermitted || !isPaymentInPlace
+      : collectedElsewhere ||
+        otherRouteCollecting ||
+        cannotCollect ||
+        !collectionPermitted ||
+        !isPaymentInPlace
   const labelButton = busy ? loadingLabel : typeof label === "function" ? label() : label
 
   return children ? (
