@@ -1,6 +1,5 @@
 import {
   authorizeBraintreePaymentSession,
-  authorizeGiftCardSessions,
   BRAINTREE_SETTING_TYPE,
   readBraintreeClientToken,
 } from "@commercelayer/core-components"
@@ -17,7 +16,8 @@ import { useStickySessionValue } from "#hooks/useStickySessionValue"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
 import { braintreeErrorCode, interopDefault, sessionAmount } from "#utils/braintree"
-import { setCollecting, setOutOfBandCollection } from "#utils/paymentGatewayStore"
+import { isCollecting, setCollecting, setOutOfBandCollection } from "#utils/paymentGatewayStore"
+import { authorizeWalletGiftCards, type GiftCardReconciliation } from "#utils/walletGiftCards"
 
 /**
  * The global PayPal's SDK is loaded under.
@@ -305,9 +305,16 @@ function PayPalButton({
   }, [booted])
 
   /**
-   * Whether this button's popup is open and holding the payment-method lock.
-   * Tracked apart from the authorization that follows an approval, which
-   * releases the lock itself, so an unmount can release exactly what it owns.
+   * Whether the order held here may be missing gift cards an earlier click
+   * charged. Kept across clicks; see `authorizeWalletGiftCards`.
+   */
+  const reconciliationRef = useRef<GiftCardReconciliation>({ pending: false })
+
+  /**
+   * Whether this button holds the payment lock for its popup — from the click,
+   * while the gift cards are charged, until the popup closes. Tracked apart
+   * from the authorization that follows an approval, which releases the lock
+   * itself, so an unmount can release exactly what it owns.
    */
   const popupOpenRef = useRef(false)
   const releasePopup = (): void => {
@@ -324,6 +331,13 @@ function PayPalButton({
    */
   async function onClick(actions: PayPalButtonsActions): Promise<void> {
     const current = latestRef.current
+    // Another route is already paying on this session — the card form, or a
+    // wallet's sheet — and a second one would race it to the same Payment
+    // Session. The place button shows that payment as busy.
+    if (isCollecting(current.order?.id)) {
+      await actions.reject()
+      return
+    }
     if (!current.collectionPermitted) {
       fail("TermsNotAccepted", "Accept the terms and conditions to continue.")
       await actions.reject()
@@ -336,42 +350,34 @@ function PayPalButton({
     }
     setErrors([])
     setLastErrorCode(undefined)
-    try {
-      const authorized = await authorizeGiftCardSessions({
-        accessToken: current.accessToken,
-        interceptors: current.interceptors,
-        order: current.order,
-      })
-      if (authorized.errors.length > 0) {
-        setLastErrorCode("GiftCardRefused")
-        setErrors(
-          authorized.errors.map((error) => ({
-            code: "VALIDATION_ERROR" as const,
-            resource: "orders" as const,
-            message: error.message,
-            field: error.field,
-            meta: { error: error.meta?.error ?? "GiftCardRefused" },
-          }))
-        )
-        await actions.reject()
-        return
-      }
-      // So the place sequence, which runs once this has collected, skips the
-      // cards it would otherwise authorize a second time.
-      if (authorized.authorizedSessionIds.length > 0) {
-        await current.getOrder(current.order.id)
-      }
-    } catch {
-      fail("GiftCardRefused", "The gift cards could not be charged.")
+
+    // The payment is reserved from here, gift cards included, and the popup
+    // holds it once it opens: switching would unmount this button under a
+    // popup the shopper can still approve. Released by every refusal below,
+    // cancel, error, the approval taking over, or this button going away.
+    popupOpenRef.current = true
+    setCollecting(current.order.id, true)
+
+    const charged = await authorizeWalletGiftCards({
+      accessToken: current.accessToken,
+      interceptors: current.interceptors,
+      order: current.order,
+      getOrder: current.getOrder,
+      reconciliation: reconciliationRef.current,
+    })
+    if (charged.status === "refused") {
+      setLastErrorCode("GiftCardRefused")
+      setErrors(charged.errors)
+      releasePopup()
       await actions.reject()
       return
     }
-    // Resolving opens the popup, and the payment method is locked until it
-    // closes: switching would unmount this button under a popup the shopper can
-    // still approve. Released by cancel, error, the approval taking over, or
-    // this button going away.
-    popupOpenRef.current = true
-    setCollecting(current.order.id, true)
+    if (charged.status === "failed") {
+      fail(charged.code, charged.message)
+      releasePopup()
+      await actions.reject()
+      return
+    }
     await actions.resolve()
   }
 
