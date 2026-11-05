@@ -118,6 +118,12 @@ export interface AdyenPaymentConfig {
 interface Props {
   clientKey?: string
   config?: AdyenPaymentConfig
+  /**
+   * Shown until the Drop-in has mounted. `<PaymentGateway>` builds it from the `loader`
+   * prop and hands it down, so Adyen waits behind the same placeholder as every other
+   * gateway instead of behind an empty box.
+   */
+  loaderComponent?: JSX.Element
   templateCustomerSaveToWallet?: PaymentSourceProps["templateCustomerSaveToWallet"]
   locale?: CoreConfiguration["locale"]
   environment?: CoreConfiguration["environment"]
@@ -133,6 +139,7 @@ const defaultConfig: AdyenPaymentConfig = {}
 export function AdyenPayment({
   clientKey,
   config,
+  loaderComponent,
   templateCustomerSaveToWallet,
   environment = "test",
   locale = DEFAULT_LOCALE,
@@ -930,13 +937,27 @@ export function AdyenPayment({
     availablePaymentMethodsCount,
     sessionExpiredAt,
   ])
-  return !clientKey && !loadAdyen && !checkout ? null : (
+  // Two windows where this component has nothing to show: before the client key and the
+  // Adyen script arrive, and between `#adyen-dropin` being rendered and the Drop-in
+  // painting into it. Both used to read as an empty box, while every other gateway shows
+  // the `loader` the app passed — `<PaymentGateway>` returns that loader in place of the
+  // gateway, and Adyen is excluded from the swap on purpose, because being unmounted
+  // costs the Drop-in the shopper's selection and typed-in details.
+  //
+  // So the loader is rendered *alongside* the mount target rather than instead of it:
+  // `#adyen-dropin` has to stay in the DOM for `mount()` to find it, and hiding it would
+  // mean mounting Adyen's card iframes into a hidden node.
+  if (!clientKey && !loadAdyen && !checkout) {
+    return loaderComponent ?? null
+  }
+  return (
     <form
       ref={ref}
       onSubmit={(e) => {
         handleSubmit(e)
       }}
     >
+      {checkout == null && loaderComponent}
       <div className={cardContainerClassName} id="adyen-dropin" />
       {giftcardError != null && giftcardErrorComponent
         ? giftcardErrorComponent(giftcardError)

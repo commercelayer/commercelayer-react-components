@@ -1,4 +1,4 @@
-import { type JSX, useEffect } from "react"
+import type { JSX } from "react"
 import ShippingAddress from "#components/addresses/ShippingAddress"
 import type { DefaultChildrenType } from "#typings/globals"
 import { useDeprecatedContainer } from "#utils/useDeprecatedContainer"

@@ -225,6 +225,14 @@ Here the wrapper disappears and its props move onto the components that used to 
 <ShippingAddressForm shipToDifferentAddress={ship}>…</ShippingAddressForm>`}
 />
 
+`invertAddresses` goes the same way — pass it to whichever form sets it, and the other components read it back from the shared state:
+
+<Source
+  language="jsx"
+  dark
+  code={`<ShippingAddressForm invertAddresses shipToDifferentAddress={false}>…</ShippingAddressForm>`}
+/>
+
 And `<PlaceOrderContainer>` simply goes away:
 
 <Source

@@ -33,9 +33,12 @@ export const parameters: Parameters = {
         ["Availability", "Price", "Order"],
         "Skus",
         ["Sku"],
+        // "Examples" has no stories yet — the four flows are planned, and the
+        // ordering is already here so they land in the right place. "Hooks"
+        // used to be listed too and was dropped: the hooks package is
+        // documented under Getting Started, not as a story section.
         "Examples",
         ["Listing Page", "Shopping Cart", "Checkout Page", "My Account"],
-        "Hooks",
       ],
     },
   },

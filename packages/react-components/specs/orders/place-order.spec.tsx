@@ -1688,3 +1688,90 @@ describe("PrivacyAndTermsCheckbox URL changes", () => {
     expect((screen.getByRole("checkbox") as HTMLInputElement).checked).toBe(true)
   })
 })
+
+// Characterization of the gift-card dispatcher, written to answer one question: does
+// publishing the placed order into the context — which every place path does, and which the
+// pre-check branch now does too — make `<PlaceOrderButton>` announce the same order more
+// than once? It does not, and these pin why: the effect depends on `order.id`,
+// `order.status` and `order.payment_status`, all primitives, so a fresh order object
+// carrying the same state does not re-run it. They pass before and after that change; their
+// job is to keep it that way.
+describe("PlaceOrderButton Adyen gift-card dispatch", () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  const placedOrder: any = {
+    ...MOCK_ORDER,
+    status: "placed",
+    payment_status: "authorized",
+    payment_method: { id: "pm-1", payment_source_type: "adyen_payments" },
+  }
+
+  it("dispatches onClick once per order state, not once per render", async () => {
+    const onClick = vi.fn()
+
+    const { rerender } = render(
+      <Providers order={placedOrder} currentPaymentMethodType="adyen_payments">
+        <PlaceOrderButton onClick={onClick} />
+      </Providers>
+    )
+    await act(async () => {})
+
+    expect(onClick).toHaveBeenCalledTimes(1)
+
+    // A fresh object for the same order state — what `setOrder` hands over, and what any
+    // re-render under OrderContext produces.
+    await act(async () => {
+      rerender(
+        <Providers order={{ ...placedOrder }} currentPaymentMethodType="adyen_payments">
+          <PlaceOrderButton onClick={onClick} />
+        </Providers>
+      )
+    })
+
+    expect(onClick).toHaveBeenCalledTimes(1)
+  })
+
+  it("stays quiet until the order is placed, then dispatches once", async () => {
+    const onClick = vi.fn()
+
+    // The order the shopper is still paying for: nothing to announce.
+    const { rerender } = render(
+      <Providers
+        order={{ ...placedOrder, status: "pending", payment_status: "unpaid" }}
+        currentPaymentMethodType="adyen_payments"
+      >
+        <PlaceOrderButton onClick={onClick} />
+      </Providers>
+    )
+    await act(async () => {})
+    expect(onClick).not.toHaveBeenCalled()
+
+    // The gift card covers it: Adyen authorizes and the order is placed without a click.
+    await act(async () => {
+      rerender(
+        <Providers order={placedOrder} currentPaymentMethodType="adyen_payments">
+          <PlaceOrderButton onClick={onClick} />
+        </Providers>
+      )
+    })
+    expect(onClick).toHaveBeenCalledTimes(1)
+    expect(onClick).toHaveBeenCalledWith(
+      expect.objectContaining({ placed: true, order: expect.objectContaining({ id: "order-1" }) })
+    )
+
+    // And a different order is a different event — the guard is not a latch on the component.
+    await act(async () => {
+      rerender(
+        <Providers
+          order={{ ...placedOrder, id: "order-2" }}
+          currentPaymentMethodType="adyen_payments"
+        >
+          <PlaceOrderButton onClick={onClick} />
+        </Providers>
+      )
+    })
+    expect(onClick).toHaveBeenCalledTimes(2)
+  })
+})
+

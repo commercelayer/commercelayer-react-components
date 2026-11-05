@@ -40,7 +40,7 @@ function SkusDocsPage(): JSX.Element {
         code={`
 import { CommerceLayer, Sku, SkuField } from '@commercelayer/react-components'
 
-<CommerceLayer accessToken="..." endpoint="https://yourdomain.commercelayer.io">
+<CommerceLayer accessToken="...">
   <Sku skuCode="TSHIRTWS000000FFFFFFLXXX">
     <SkuField attribute="name" tagElement="h2" />
     <SkuField attribute="description" tagElement="p" />

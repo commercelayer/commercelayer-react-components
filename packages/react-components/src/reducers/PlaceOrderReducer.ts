@@ -4,7 +4,7 @@ import type { Dispatch, RefObject } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { BaseError } from "#typings/errors"
 import baseReducer from "#utils/baseReducer"
-import { saveBillingAddress, saveShippingAddress, saveToWallet } from "#utils/customerOrderOptions"
+import { saveAddressesToCustomerAddressBook, saveToWallet } from "#utils/customerOrderOptions"
 import getErrors from "#utils/getErrors"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
 import { isEmpty } from "#utils/isEmpty"
@@ -206,9 +206,22 @@ export async function setPlaceOrder({
     const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const { options, paymentType } = state
     try {
-      // Prevent extra place order
-      const lastOrderStatus = await sdk.orders.retrieve(order.id)
+      // Prevent extra place order. The same `include` the place paths below ask for: this
+      // order is handed back to `onClick` exactly like theirs, and an app reading the card
+      // brand off `payment_method` or building an analytics event out of `line_items`
+      // cannot tell which branch produced it. Adyen reaches this branch regularly — the
+      // order is sometimes placed server-side on `_authorize`, before the button sends
+      // `_place` — so a bare order here is not a rare corner.
+      const lastOrderStatus = await sdk.orders.retrieve(order.id, { include })
       if (lastOrderStatus.status === "placed") {
+        // Publish it, like both place paths below do. Returning `placed: true` while the
+        // context still holds a pending order splits the library's own view of the order:
+        // `setPaymentSource` guards writes with `order?.status === "placed"` read from
+        // there, and `<PaymentGateway>` clears its loader on the same reading.
+        // Placed in the background, so the place path below never ran to send the address
+        // book flags (#904). A refused one must not turn a placed order into a failure.
+        await saveAddressesToCustomerAddressBook(sdk, order.id).catch(() => undefined)
+        if (setOrder) setOrder(lastOrderStatus)
         return {
           placed: true,
           order: lastOrderStatus,
@@ -228,19 +241,12 @@ export async function setPlaceOrder({
         id: order.id,
         _place: true,
       }
-      if (saveBillingAddress()) {
-        await sdk.orders.update({
-          id: order.id,
-          _save_billing_address_to_customer_address_book: true,
-        })
-      }
-      if (saveShippingAddress()) {
-        await sdk.orders.update({
-          id: order.id,
-          _save_shipping_address_to_customer_address_book: true,
-        })
-      }
-      if (paymentType === "stripe_payments" && paymentSource != null) {
+      await saveAddressesToCustomerAddressBook(sdk, order.id)
+      // Not on the return from Stripe: the payment is confirmed by then, and the current URL
+      // never matches the stored one because Stripe appends its own parameters. The PATCH
+      // would be one more write that an `auto_place` method can turn into a 401 (#900).
+      const isStripeReturn = options?.stripe?.paymentIntentClientSecret != null
+      if (paymentType === "stripe_payments" && paymentSource != null && !isStripeReturn) {
         const ps = paymentSource as StripePayment
         const currentUrl = window.location.href
         // @ts-expect-error no type
@@ -318,6 +324,18 @@ export async function setPlaceOrder({
       }
       // biome-ignore lint/suspicious/noExplicitAny: No type for error
     } catch (error: any) {
+      // An `auto_place` method places the order in the background, so it can land between
+      // the pre-check above and the writes after it, which the API then refuses (#900). The
+      // order is placed: report it like the pre-check does rather than as an error.
+      const latest = await sdk.orders.retrieve(order.id, { include }).catch(() => null)
+      if (latest?.status === "placed") {
+        await saveAddressesToCustomerAddressBook(sdk, order.id).catch(() => undefined)
+        if (setOrder) setOrder(latest)
+        return {
+          placed: true,
+          order: latest,
+        }
+      }
       const errors = getErrors({
         error,
         resource: "orders",

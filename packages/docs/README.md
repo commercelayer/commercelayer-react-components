@@ -1,50 +1,39 @@
-# React + TypeScript + Vite
+# Documentation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The Storybook site published at
+[commercelayer.github.io/commercelayer-react-components](https://commercelayer.github.io/commercelayer-react-components).
 
-Currently, two official plugins are available:
+This package is private: it is never published to npm, it only builds the site.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Running it
 
-## Expanding the ESLint configuration
+From the repository root:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+pnpm docs:dev     # dev server on http://localhost:6006
+pnpm docs:build   # static build into storybook-static/
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+`docs:build` needs the libraries built first (`pnpm build`), which is what both
+`netlify.toml` and `.github/workflows/gh-pages.yaml` do.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## How it resolves the components
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+`.storybook/main.ts` aliases `@commercelayer/react-components` to
+`packages/react-components/src/index.ts`, so the site renders the **sources**
+rather than `dist/`. A change to a component shows up in the dev server without
+rebuilding the library — and, by the same token, the site can show behaviour
+that is not in any published version yet.
+
+## Where things live
+
+| Path | What |
+|---|---|
+| `src/stories/getting-started/` | the prose pages, as MDX |
+| `src/stories/<domain>/` | component stories, CSF3 |
+| `src/stories/_internals/` | helpers the stories share: the token hook, the `CommerceLayer` wrapper, the order fixture |
+| `.storybook/` | config, theme, and the "View repository" toolbar addon |
+
+Prop tables are not written by hand: `react-docgen-typescript` extracts them
+from the TSDoc comments in the component sources at build time, so a prop
+documented there shows up here on its own.

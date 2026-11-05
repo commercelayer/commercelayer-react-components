@@ -22,6 +22,8 @@ const ordersRetrieve = vi
   .fn()
   .mockResolvedValue({ id: "order-1", status: "pending", payment_status: "authorized" })
 
+const ordersUpdate = vi.fn().mockResolvedValue({ id: "order-1", status: "placed" })
+
 vi.mock("@commercelayer/core-components", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@commercelayer/core-components")>()
   return {
@@ -29,7 +31,7 @@ vi.mock("@commercelayer/core-components", async (importOriginal) => {
     getSdk: vi.fn().mockReturnValue({
       orders: {
         retrieve: (...args: unknown[]) => ordersRetrieve(...args),
-        update: vi.fn().mockResolvedValue({ id: "order-1", status: "placed" }),
+        update: (...args: unknown[]) => ordersUpdate(...args),
       },
     }),
   }
@@ -444,6 +446,69 @@ describe("place order on redirect return", () => {
     })
     await waitFor(() => {
       expect(setPlaceOrder).toHaveBeenCalled()
+    })
+  })
+
+  describe("address book flags (#904)", () => {
+    const BILLING = "_save_billing_address_to_customer_address_book"
+    const NORMAL_FLOW = {
+      paypalPayerId: "",
+      adyen: { redirectResult: "" },
+      checkoutCom: { session_id: "" },
+      stripe: { paymentIntentClientSecret: "" },
+    }
+
+    beforeEach(() => {
+      localStorage.clear()
+      ordersUpdate.mockResolvedValue({ id: "order-1", status: "pending" })
+    })
+
+    it("sends them before the widget submits, which may redirect to the gateway", async () => {
+      // An `auto_place` method can have the order placed by the backend before the shopper
+      // is back, and then nothing on the return attempts a place to send them.
+      localStorage.setItem(BILLING, "true")
+      const onsubmit = vi.fn().mockResolvedValue(true)
+      const { getByRole } = render(
+        <Harness
+          order={makeOrder(undefined)}
+          paymentType="adyen_payments"
+          options={NORMAL_FLOW}
+          setPlaceOrder={placeOrderSpy()}
+          setPaymentSource={vi.fn().mockResolvedValue({ id: "ps-1" })}
+          onsubmit={onsubmit}
+        />
+      )
+      getByRole("button").click()
+      await waitFor(() => expect(onsubmit).toHaveBeenCalled())
+
+      expect(ordersUpdate).toHaveBeenCalledWith({ id: "order-1", [BILLING]: true })
+      expect(ordersUpdate.mock.invocationCallOrder[0]).toBeLessThan(
+        onsubmit.mock.invocationCallOrder[0] as number
+      )
+      // Cleared, so the return from the gateway does not send it a second time.
+      expect(localStorage.getItem(BILLING)).toBe("false")
+    })
+
+    it("leaves them to the place path on the return from a redirect", async () => {
+      localStorage.setItem(BILLING, "true")
+      const setPlaceOrder = placeOrderSpy()
+      render(
+        <Harness
+          order={makeOrder(undefined)}
+          paymentType="adyen_payments"
+          options={{ adyen: { redirectResult: "REDIRECT-RESULT" } }}
+          setPlaceOrder={setPlaceOrder}
+          setPaymentSource={vi.fn().mockResolvedValue({
+            id: "ps-1",
+            payment_response: { resultCode: "Authorised" },
+          })}
+          onsubmit={widgetOnsubmit()}
+        />
+      )
+      await waitFor(() => expect(setPlaceOrder).toHaveBeenCalled())
+
+      expect(ordersUpdate).not.toHaveBeenCalledWith(expect.objectContaining({ [BILLING]: true }))
+      expect(localStorage.getItem(BILLING)).toBe("true")
     })
   })
 

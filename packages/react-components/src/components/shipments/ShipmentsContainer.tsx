@@ -1,4 +1,4 @@
-import { type JSX, useEffect } from "react"
+import type { JSX } from "react"
 import Shipments from "#components/shipments/Shipments"
 import type { LoaderType } from "#typings"
 import type { DefaultChildrenType } from "#typings/globals"

@@ -18,6 +18,7 @@ import { type JSX, useContext, useEffect, useMemo, useRef, useState } from "reac
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
 import OrderContext, { type defaultOrderContext } from "#context/OrderContext"
+import type { getOrderContext } from "#reducers/OrderReducer"
 import type {
   CustomerState,
   DeleteCustomerAddressParams,
@@ -50,6 +51,12 @@ interface UseCustomerProviderValueParams {
   interceptors?: InterceptorManager
   order?: Order
   addResourceToInclude: typeof defaultOrderContext.addResourceToInclude
+  /**
+   * Refetches the order into `OrderContext`. Saving the customer writes
+   * `customer_email` on the order itself, so the order everyone else reads has
+   * to learn about it.
+   */
+  getOrder?: getOrderContext
   include?: string[]
   includeLoaded?: Record<string, boolean>
   withoutIncludes?: boolean
@@ -68,6 +75,7 @@ export function useCustomerProviderValue({
   interceptors,
   order,
   addResourceToInclude,
+  getOrder,
   include,
   includeLoaded,
   withoutIncludes,
@@ -83,6 +91,11 @@ export function useCustomerProviderValue({
   useEffect(() => {
     stateRef.current = state
   }, [state])
+
+  // Same reason, and `getOrder` is rebuilt on every order state change: read it
+  // through a ref so the actions below do not take it as a dependency.
+  const getOrderRef = useRef(getOrder)
+  getOrderRef.current = getOrder
 
   const customerId = useMemo(() => {
     if (accessToken == null) {
@@ -186,6 +199,18 @@ export function useCustomerProviderValue({
           return
         }
 
+        // Before the awaits, not after. Published afterwards, this write lands late
+        // enough to undo whatever happened while the request was in flight: a shopper
+        // who corrects the address mid-request has already gone through
+        // `setCustomerEmail`, and the resolving save would put the old address back —
+        // re-enabling `<SaveAddressesButton>` under a visible validation error and
+        // saving the superseded email. Writing on the way in makes the last caller
+        // win, which is the one the shopper typed last.
+        setState((previousState) => ({
+          ...previousState,
+          customerEmail,
+        }))
+
         await coreSaveCustomerUser({
           accessToken: accessToken ?? "",
           interceptors,
@@ -193,10 +218,14 @@ export function useCustomerProviderValue({
           orderId: order.id,
         })
 
-        setState((previousState) => ({
-          ...previousState,
-          customerEmail,
-        }))
+        // That call is an order update — `customer_email` lives on the order,
+        // not on a resource of our own. Without the refetch the order in
+        // `OrderContext` keeps `customer_email: null`, and everything reading
+        // it off the order (the Klarna, Stripe and Braintree payment sources
+        // prefill the payer from there) acts as if no email had been given.
+        // `<CustomerContainer>` used to go through `OrderContext.updateOrder`,
+        // which refetched; the direct write replaced it.
+        await getOrderRef.current?.(order.id)
       },
       setCustomerErrors: (errors: BaseError[]) => {
         setState((previousState) => ({
@@ -436,13 +465,14 @@ export function Customer(props: Props): JSX.Element {
     currentComponentName: "Customer",
     key: "accessToken",
   })
-  const { order, addResourceToInclude, include, includeLoaded, withoutIncludes } =
+  const { order, addResourceToInclude, getOrder, include, includeLoaded, withoutIncludes } =
     useContext(OrderContext)
   const customerValue = useCustomerProviderValue({
     accessToken,
     interceptors,
     order,
     addResourceToInclude,
+    getOrder,
     include,
     includeLoaded,
     withoutIncludes,

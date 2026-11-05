@@ -142,3 +142,34 @@ describe("useSkus — interceptors", () => {
     expect(result.current.skus).toContainEqual(updated)
   })
 })
+
+describe("useSkus — batching", () => {
+  beforeEach(() => {
+    mockGetSkus.mockClear()
+  })
+
+  it("splits a batch wider than one page into requests of 25 codes", async () => {
+    const accessToken = "batch-token"
+    const codes = Array.from({ length: 30 }, (_, i) => `SKU-${i}`)
+    const { result, unmount } = renderHook(() => useSkus(accessToken), {
+      wrapper: ({ children }) => swrWrapper({ children }),
+    })
+
+    act(() => {
+      for (const code of codes) result.current.registerSku(code)
+    })
+
+    await waitFor(() => {
+      expect(mockGetSkus).toHaveBeenCalledTimes(2)
+    })
+    const requested = mockGetSkus.mock.calls.map(([{ params }]) => params)
+    expect(requested.map((p) => p.pageSize)).toEqual([25, 25])
+    expect(requested.map((p) => p.filters.code_in.split(",").length)).toEqual([25, 5])
+    expect(requested.flatMap((p) => p.filters.code_in.split(","))).toEqual(codes)
+    await waitFor(() => {
+      expect(result.current.skus).toHaveLength(2)
+    })
+
+    unmount()
+  })
+})

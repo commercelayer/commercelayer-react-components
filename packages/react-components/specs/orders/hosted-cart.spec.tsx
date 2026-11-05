@@ -271,4 +271,49 @@ describe("HostedCart component", () => {
       expect(cartIframe()?.style.boxSizing).toBe("border-box")
     })
   })
+
+  it("does not reload the iframe when the order is refreshed", async () => {
+    vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue(null)
+    vi.spyOn(applicationLinkUtils, "getApplicationLink").mockImplementation(
+      ({ orderId }) => `https://test-cart.local/cart/${orderId}`
+    )
+    // React sets `src` as an attribute: the property setter only sees the
+    // component's own `iframe.src = ...` assignments, each of which reloads it.
+    const srcSetter = vi.spyOn(HTMLIFrameElement.prototype, "src", "set")
+
+    const storage = {
+      persistKey: "cart-key",
+      clearWhenPlaced: true,
+      getLocalOrder: vi.fn(),
+      setLocalOrder: vi.fn(),
+      deleteLocalOrder: vi.fn(),
+    }
+    // `getOrder`, called on the cart's "update" message, puts a new order
+    // object with the same id in the context on every refresh.
+    const renderWithOrder = (order: { id: string; updated_at: string }) => (
+      <CommerceLayerContext.Provider value={{ accessToken }}>
+        <OrderContext.Provider
+          value={{ ...defaultOrderContext, order: order as never, createOrder: vi.fn() }}
+        >
+          <OrderStorageContext.Provider value={storage}>
+            <HostedCart type="mini" openAdd />
+          </OrderStorageContext.Provider>
+        </OrderContext.Provider>
+      </CommerceLayerContext.Provider>
+    )
+
+    const { rerender, container } = render(renderWithOrder({ id: "order-id", updated_at: "0" }))
+    await waitFor(() => {
+      expect(container.querySelector("iframe")?.getAttribute("src")).toBe(
+        "https://test-cart.local/cart/order-id"
+      )
+    })
+    srcSetter.mockClear()
+
+    for (let i = 1; i <= 3; i++) {
+      rerender(renderWithOrder({ id: "order-id", updated_at: `${i}` }))
+    }
+
+    expect(srcSetter).not.toHaveBeenCalled()
+  })
 })

@@ -1,4 +1,4 @@
-import { type JSX, useContext, useEffect, useRef } from "react"
+import { type JSX, useCallback, useContext, useEffect, useRef } from "react"
 import Parent from "#components/utils/Parent"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
@@ -52,6 +52,11 @@ interface Component {
   }>
 }
 
+interface FlowComponent {
+  mount: (element: HTMLElement | null) => void
+  unmount?: () => void
+}
+
 interface CheckoutWebComponent {
   appearance?: Partial<Appearance>
   showPayButton?: boolean
@@ -71,9 +76,7 @@ interface CheckoutWebComponent {
   ) => Promise<void>
   onChange?: (component: Component) => void
   onError?: (component: Component, error: unknown) => void
-  create?: (type: "flow") => {
-    mount: (element: HTMLElement | null) => void
-  }
+  create?: (type: "flow") => FlowComponent
   componentOptions?: {
     card?: {
       displayCardholderName?: "hidden" | "top" | "bottom"
@@ -148,12 +151,39 @@ export function CheckoutComPayment({ publicKey, options, ...p }: Props): JSX.Ele
   setPlaceOrderStatusRef.current = setPlaceOrderStatus
   // Guards against mounting the Flow twice for the same payment source.
   const mountedForRef = useRef<string | null>(null)
+  // The Flow on screen. A new payment source comes with a new payment session, and the
+  // Flow built for the old one has to go: left mounted next to the new one, it took the
+  // shopper's card and sent its token and 3DS to a payment source the order no longer
+  // pointed at, so the shopper came back from 3DS to the payment step.
+  const flowRef = useRef<FlowComponent | null>(null)
+  // Unmounting the Flow is not enough: if the shopper had already typed a valid card,
+  // its `onChange` installed a submit handler on the form, bound to the old payment
+  // source, and that handler outlives the Flow.
+  const dropFlow = useCallback((): void => {
+    flowRef.current?.unmount?.()
+    flowRef.current = null
+    if (ref.current) ref.current.onsubmit = null
+  }, [])
+  useEffect(
+    () => () => {
+      dropFlow()
+      mountedForRef.current = null
+    },
+    [dropFlow]
+  )
   // Depending on the `order.payment_source` object rather than its id remounts the Flow
   // on every order refetch and wipes the shopper's card input. The id is the only part
   // that should re-trigger; everything else is read through the refs above.
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentional — see above
   useEffect(() => {
     const ps = order?.payment_source
+    // Only an explicit `null` says the payment source is gone — applying a coupon drops
+    // it. `undefined` is an order read without the include, and must leave the Flow be.
+    if (ps === null && flowRef.current != null) {
+      dropFlow()
+      mountedForRef.current = null
+      return
+    }
     if (loaded && window && ps && accessToken) {
       // @ts-expect-error no type
       const publicKey = ps.public_key
@@ -180,9 +210,14 @@ export function CheckoutComPayment({ publicKey, options, ...p }: Props): JSX.Ele
               },
             },
             onChange: (component) => {
+              // A Flow that has been replaced must not install its submit handler.
+              if (mountedForRef.current !== ps.id) return
               if (ref.current) {
                 if (component.isValid()) {
                   ref.current.onsubmit = async (): Promise<boolean> => {
+                    // Whoever still holds this handler, it belongs to a Flow that may
+                    // have been replaced; it must not authorize the old source.
+                    if (mountedForRef.current !== ps.id) return false
                     const element = ref.current?.elements
                     const savePaymentSourceToCustomerWallet =
                       // @ts-expect-error no type
@@ -240,8 +275,13 @@ export function CheckoutComPayment({ publicKey, options, ...p }: Props): JSX.Ele
               }
             },
           } satisfies CheckoutWebComponent)
-          const flowComponent = checkout.create("flow")
+          // The payment source may have been replaced while the script built this
+          // one; a Flow for it would be mounted over the current one.
+          if (mountedForRef.current !== ps.id) return
+          dropFlow()
+          const flowComponent: FlowComponent = checkout.create("flow")
           flowComponent.mount(document.getElementById("flow-container"))
+          flowRef.current = flowComponent
         }
         // Belt and braces: even if the effect were re-entered for the same payment
         // source, don't build and mount a second Flow over the first.

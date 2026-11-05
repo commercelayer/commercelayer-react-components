@@ -24,7 +24,10 @@ export async function getOrganizationConfig(
   })
   return getMfeConfig({
     jsonConfig: organization.config ?? {},
-    market: `market:id:${market.id.join(",")}`,
+    // `market` is only in the token when the scope asked for it, and
+    // getMfeConfig treats it as optional: without it the organization-level
+    // config applies. Reading `market.id` unconditionally used to throw here.
+    market: market != null ? `market:id:${market.id.join(",")}` : undefined,
     params: config.params,
   })
 }
