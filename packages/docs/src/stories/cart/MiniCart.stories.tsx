@@ -61,7 +61,17 @@ function App() {
         Click the button to open the slide-in panel. The <code>handleOpen</code> callback keeps
         external state in sync when the overlay or close icon is clicked inside the cart.
       </p>
-      <Canvas of={Default} />
+      {/*
+        Both canvases render in their own iframe on purpose. A docs page renders
+        every inline story into one document, and that breaks the mini cart twice
+        over: `subscribe` listens on `document`, so a single `<CartLink>` click
+        opens every mini cart on the page, and Storybook's canvas wrapper carries
+        an identity `transform`, which makes it the containing block for the
+        panel's `position: fixed` — the drawer gets trapped in the canvas box and
+        the cart content is clipped. An iframe per story gives each one its own
+        document and viewport, so the panel behaves the way it does on a real page.
+      */}
+      <Canvas of={Default} story={{ inline: false, height: "600px" }} />
       <hr />
       <h2>Auto-open on add to cart</h2>
       <p>
@@ -69,7 +79,7 @@ function App() {
         <code>{"<AddToCartButton>"}</code> successfully adds an item to the order. Click{" "}
         <strong>Add to cart</strong> below to trigger the flow.
       </p>
-      <Canvas of={OpenOnAdd} />
+      <Canvas of={OpenOnAdd} story={{ inline: false, height: "600px" }} />
     </>
   )
 }
