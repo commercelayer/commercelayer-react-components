@@ -30,8 +30,7 @@ export function GiftCardOrCouponForm(props: Props): JSX.Element | null {
     // Bail when filtering removes nothing. `fieldErrors` is an order-preserving subset,
     // so equal lengths mean identical contents — dispatching it would only mint a fresh
     // `errors` array reference, which this effect depends on, re-firing it forever
-    // (React 19 hard-crashes with "Maximum update depth exceeded"). Same identity-churn
-    // failure class as docs/adr/0003-payment-source-effect-invariants.md.
+    // (React 19 hard-crashes with "Maximum update depth exceeded").
     if (fieldErrors.length === current.length) return
     setOrderErrors(fieldErrors)
     onSubmit?.({ value: "", success: false })
