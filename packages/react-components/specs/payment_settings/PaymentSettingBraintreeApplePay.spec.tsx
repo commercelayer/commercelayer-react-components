@@ -13,6 +13,7 @@ import {
   getHandoffSnapshot,
   isCollecting,
   resetPaymentGatewayStore,
+  setCollecting,
 } from "#utils/paymentGatewayStore"
 
 /**
@@ -68,6 +69,7 @@ class FakeApplePaySession {
   onvalidatemerchant: ((event: any) => void) | null = null
   // biome-ignore lint/suspicious/noExplicitAny: test double for Apple's event handlers
   onpaymentauthorized: ((event: any) => void) | null = null
+  oncancel: (() => void) | null = null
   begin = vi.fn()
   abort = vi.fn()
   completeMerchantValidation = vi.fn()
@@ -414,5 +416,90 @@ describe("<PaymentSettingBraintreeApplePay> the payment", () => {
     await authorizeIn(sheet)
 
     expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("done")
+  })
+})
+
+describe("<PaymentSettingBraintreeApplePay> the payment lock", () => {
+  // The card form is mid-payment on the same Payment Session.
+  it("opens nothing while another route is collecting", async () => {
+    await renderAvailable()
+    setCollecting("order-1", true)
+
+    fireEvent.click(screen.getByRole("button", { name: "Pay with Apple Pay" }))
+
+    expect(FakeApplePaySession.instances).toHaveLength(0)
+  })
+
+  it("holds the lock from the tap until the sheet is cancelled", async () => {
+    await renderAvailable()
+
+    const sheet = tap()
+    expect(isCollecting("order-1")).toBe(true)
+
+    act(() => {
+      sheet.oncancel?.()
+    })
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
+  // Apple keeps the sheet open after a refused gift card, for another try.
+  it("keeps the lock while the sheet stays open after a refusal", async () => {
+    authorizeGiftCardsMock.mockResolvedValue({
+      authorizedSessionIds: [],
+      errors: [{ code: "VALIDATION_ERROR", message: "The gift card balance is too low." }],
+    })
+    await renderAvailable()
+    const sheet = tap()
+
+    await authorizeIn(sheet)
+    expect(isCollecting("order-1")).toBe(true)
+
+    act(() => {
+      sheet.oncancel?.()
+    })
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
+  it("releases the lock once a payment has gone through", async () => {
+    await renderAvailable()
+
+    await authorizeIn(tap())
+
+    expect(isCollecting("order-1")).toBe(false)
+  })
+
+  it("releases the lock when merchant validation fails", async () => {
+    bt.performValidation.mockRejectedValue({ code: "APPLE_PAY_MERCHANT_VALIDATION_FAILED" })
+    await renderAvailable()
+    const sheet = tap()
+
+    await act(async () => {
+      sheet.onvalidatemerchant?.({ validationURL: "https://apple-pay-gateway.apple.com/x" })
+    })
+
+    expect(isCollecting("order-1")).toBe(false)
+  })
+})
+
+describe("<PaymentSettingBraintreeApplePay> a retry in the same sheet", () => {
+  // One card charged, the next refused: retried on the order held before, the
+  // first card would be charged again.
+  it("retries on the order refetched after a partly charged attempt", async () => {
+    const refetched = order({ marker: 2 })
+    getOrder.mockResolvedValue(refetched)
+    authorizeGiftCardsMock.mockResolvedValueOnce({
+      authorizedSessionIds: ["session-gc-small"],
+      errors: [{ code: "VALIDATION_ERROR", message: "The gift card balance is too low." }],
+    })
+    await renderAvailable()
+    const sheet = tap()
+
+    await authorizeIn(sheet)
+    expect(getOrder).toHaveBeenCalledWith("order-1")
+    sheet.completePayment.mockClear()
+    await authorizeIn(sheet)
+
+    expect(authorizeGiftCardsMock).toHaveBeenCalledTimes(2)
+    expect(authorizeGiftCardsMock.mock.calls[1]?.[0]).toMatchObject({ order: refetched })
   })
 })

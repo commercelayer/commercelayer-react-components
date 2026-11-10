@@ -10,6 +10,7 @@ import {
   registerGatewayCollection,
   registerHostCollection,
   resetPaymentGatewayStore,
+  setCollecting,
   setOutOfBandCollection,
 } from "#utils/paymentGatewayStore"
 import { resetTermsAcceptanceStore } from "#utils/termsAcceptanceStore"
@@ -312,6 +313,49 @@ describe("when the method owns its own button", () => {
     await waitFor(() => {
       expect(placeOrderMock).toHaveBeenCalledTimes(1)
     })
+  })
+})
+
+describe("while another route is collecting", () => {
+  // A wallet's sheet is open, or its gift cards are being charged: a card
+  // payment now would race it to the same Payment Session.
+  it("renders disabled, and comes back once that route lets go", async () => {
+    useFakeGateway({ status: "completed" })
+    const place = () => screen.getByTestId("place") as HTMLButtonElement
+    renderButton()
+    await waitFor(() => {
+      expect(place().disabled).toBe(false)
+    })
+
+    act(() => {
+      setCollecting("order-1", true)
+    })
+    await waitFor(() => {
+      expect(place().disabled).toBe(true)
+    })
+
+    act(() => {
+      setCollecting("order-1", false)
+    })
+    await waitFor(() => {
+      expect(place().disabled).toBe(false)
+    })
+  })
+
+  it("collects nothing if it is clicked anyway", async () => {
+    const submit = useFakeGateway({ status: "completed" })
+    setCollecting("order-1", true)
+    render(
+      <Wrapper currentOrder={orderWithCard()}>
+        <PlaceOrderButtonPaymentSessions data-testid="place" label="Place order" disabled={false} />
+      </Wrapper>
+    )
+
+    await clickPlace()
+
+    expect(authorizeGiftCardsMock).not.toHaveBeenCalled()
+    expect(submit).not.toHaveBeenCalled()
+    expect(placeOrderMock).not.toHaveBeenCalled()
   })
 })
 
