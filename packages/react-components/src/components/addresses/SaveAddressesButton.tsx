@@ -41,7 +41,11 @@ export function SaveAddressesButton(props: Props): JSX.Element {
   // Without `<AddressesContainer>` the forms sit in a sibling subtree this
   // button cannot see through context; the shared state is what reaches across.
   const { isStandalone, addressContext, validateAddresses } = useAddressStateContext()
-  const { order, setOrderErrors } = useContext(OrderContext)
+  const { order, orderId, setOrderErrors } = useContext(OrderContext)
+  // Inside an order context whose order has not loaded yet. A click here used to fall
+  // through to the address-book branch below, which is meant for saving with no order at
+  // all (#925): it is not, and the order write it should have made never happens.
+  const orderLoading = orderId != null && order == null
 
   const {
     errors,
@@ -99,9 +103,17 @@ export function SaveAddressesButton(props: Props): JSX.Element {
   // NOTE: This is a temporary fix to avoid the button to be disabled when the user is editing an address
   const invertAddressesDisable = invertAddresses && shippingAddressId ? false : shippingDisable
   const disable =
-    disabled || customerEmail || billingDisable || invertAddressesDisable || countryLockDisable
+    disabled ||
+    orderLoading ||
+    customerEmail ||
+    billingDisable ||
+    invertAddressesDisable ||
+    countryLockDisable
 
   const handleClick = async (): Promise<void> => {
+    // The button is disabled meanwhile, but an app rendering its own control through
+    // `children` can still call this.
+    if (orderLoading) return
     // When errorMode="submit", trigger validation on both forms before proceeding.
     // validate() sets errors in context and returns them synchronously.
     if (isStandalone) {
@@ -151,9 +163,14 @@ export function SaveAddressesButton(props: Props): JSX.Element {
             ? { ...formCleaner(shippingAddress) }
             : { ...formCleaner(billingAddress) }
           if (addressId) address.id = addressId
-          createCustomerAddress(address as TCustomerAddress)
-          response = {
-            success: true,
+          // Awaited: success is what the save did, not that it was started. A guest has no
+          // customer to save to, and the rejection used to escape uncaught while the app
+          // was told the address had been saved.
+          try {
+            await createCustomerAddress(address as TCustomerAddress)
+            response = { success: true }
+          } catch (error) {
+            console.error("SaveAddressesButton: saving to the address book failed", error)
           }
           break
         }

@@ -626,3 +626,60 @@ describe("SaveAddressesButton (errorMode='submit')", () => {
     expect(mockSaveAddresses).not.toHaveBeenCalled()
   })
 })
+
+// #925: in the checkout, a click that landed before the order had loaded fell through to the
+// address-book branch. That branch fired `createCustomerAddress` without waiting for it and
+// reported success at once; for a guest the call rejects ("customerId is required"), nothing
+// caught it, and the app got `{ success: true }` for a save that never happened.
+describe("SaveAddressesButton before the order is loaded (#925)", () => {
+  it("stays disabled while the order context has an id but no order yet", () => {
+    renderButton({}, {}, { order: undefined, orderId: "ord-1" })
+    expect(screen.getByRole("button")).toHaveProperty("disabled", true)
+  })
+
+  it("becomes clickable once the order is there", () => {
+    renderButton({}, {}, { orderId: "ord-1" })
+    expect(screen.getByRole("button")).toHaveProperty("disabled", false)
+  })
+
+  it("does not report success when saving to the address book fails", async () => {
+    const createCustomerAddress = vi
+      .fn()
+      .mockRejectedValue(new Error("customerId is required to create a customer address"))
+    renderStandaloneButton({
+      accessToken: "tok-925-fail",
+      billingAddress: filledAddress,
+      customerOverrides: { createCustomerAddress },
+      props: { onClick: mockOnClick },
+    })
+    await waitFor(() => expect(screen.getByRole("button")).not.toHaveProperty("disabled", true))
+    fireEvent.click(screen.getByRole("button"))
+    await waitFor(() => expect(createCustomerAddress).toHaveBeenCalled())
+    await new Promise((r) => setTimeout(r, 50))
+    expect(mockOnClick).not.toHaveBeenCalled()
+    // Enabled again, so the shopper can retry.
+    expect(screen.getByRole("button")).toHaveProperty("disabled", false)
+  })
+
+  it("reports success only after the address book save resolves", async () => {
+    let resolve: () => void = () => {}
+    const createCustomerAddress = vi.fn(
+      () =>
+        new Promise<void>((r) => {
+          resolve = r
+        })
+    )
+    renderStandaloneButton({
+      accessToken: "tok-925-ok",
+      billingAddress: filledAddress,
+      customerOverrides: { createCustomerAddress },
+      props: { onClick: mockOnClick },
+    })
+    await waitFor(() => expect(screen.getByRole("button")).not.toHaveProperty("disabled", true))
+    fireEvent.click(screen.getByRole("button"))
+    await waitFor(() => expect(createCustomerAddress).toHaveBeenCalled())
+    expect(mockOnClick).not.toHaveBeenCalled()
+    await act(async () => resolve())
+    await waitFor(() => expect(mockOnClick).toHaveBeenCalledWith({ success: true }))
+  })
+})
