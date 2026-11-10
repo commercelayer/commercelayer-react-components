@@ -9,6 +9,7 @@ import { PaymentSetting } from "#components/payment_settings/PaymentSetting"
 import { PaymentSettingBraintreeApplePay } from "#components/payment_settings/PaymentSettingBraintreeApplePay"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import { resetPageDeviceData } from "#utils/braintree"
 import {
   getHandoffSnapshot,
   isCollecting,
@@ -22,6 +23,7 @@ import {
  * it tells the sheet and the handoff about each outcome.
  */
 const bt = vi.hoisted(() => ({
+  dataCollectorCreate: vi.fn(),
   clientCreate: vi.fn(),
   applePayCreate: vi.fn(),
   createPaymentRequest: vi.fn(),
@@ -31,7 +33,10 @@ const bt = vi.hoisted(() => ({
 }))
 
 vi.mock("braintree-web/client", () => ({ default: { create: bt.clientCreate } }))
+vi.mock("braintree-web/data-collector", () => ({ default: { create: bt.dataCollectorCreate } }))
 vi.mock("braintree-web/apple-pay", () => ({ default: { create: bt.applePayCreate } }))
+
+const DEVICE_DATA = '{"correlation_id":"fraudnet-session"}'
 
 const { authorizeMock, authorizeGiftCardsMock } = vi.hoisted(() => ({
   authorizeMock: vi.fn(),
@@ -177,6 +182,8 @@ async function authorizeIn(sheet: FakeApplePaySession) {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  resetPageDeviceData()
+  bt.dataCollectorCreate.mockResolvedValue({ deviceData: DEVICE_DATA })
   resetPaymentGatewayStore()
   permitted.value = true
   FakeApplePaySession.instances = []
@@ -322,7 +329,11 @@ describe("<PaymentSettingBraintreeApplePay> the payment", () => {
 
     expect(bt.tokenize).toHaveBeenCalledWith({ token: { paymentData: "apple-token" } })
     expect(authorizeMock).toHaveBeenCalledWith(
-      expect.objectContaining({ paymentSessionId: "session-bt", nonce: "apple-pay-nonce" })
+      expect.objectContaining({
+        paymentSessionId: "session-bt",
+        nonce: "apple-pay-nonce",
+        deviceData: DEVICE_DATA,
+      })
     )
     // Gift cards before anything reaches Braintree.
     expect(authorizeGiftCardsMock.mock.invocationCallOrder[0]).toBeLessThan(
@@ -501,5 +512,29 @@ describe("<PaymentSettingBraintreeApplePay> a retry in the same sheet", () => {
 
     expect(authorizeGiftCardsMock).toHaveBeenCalledTimes(2)
     expect(authorizeGiftCardsMock.mock.calls[1]?.[0]).toMatchObject({ order: refetched })
+  })
+})
+
+describe("<PaymentSettingBraintreeApplePay> device data", () => {
+  it("collects device data once offered, with the component's client", async () => {
+    await renderAvailable()
+
+    await waitFor(() => {
+      expect(bt.dataCollectorCreate).toHaveBeenCalledWith({ client: expect.anything() })
+    })
+  })
+
+  it("pays without device data when the data collector fails", async () => {
+    bt.dataCollectorCreate.mockRejectedValue(new Error("DATA_COLLECTOR_REQUIRES_CREATE_OPTIONS"))
+    await renderAvailable()
+    const sheet = tap()
+
+    await authorizeIn(sheet)
+
+    expect(sheet.completePayment).toHaveBeenCalledWith({ status: 0 })
+
+    expect(authorizeMock).toHaveBeenCalledWith(
+      expect.objectContaining({ nonce: "apple-pay-nonce", deviceData: undefined })
+    )
   })
 })

@@ -23,8 +23,10 @@ import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction, LoaderType } from "#typings/index"
 import {
   braintreeErrorCode,
+  collectPageDeviceData,
   interopDefault,
   liabilityRefusal,
+  pageDeviceData,
   pageThreeDSecureInstance,
   verifyCard,
 } from "#utils/braintree"
@@ -402,6 +404,7 @@ function BraintreeForm({
           return
         }
         instancesRef.current = booted
+        collectPageDeviceData(client)
 
         hostedFields.on("validityChange", (event: HostedFieldsEvent) => {
           const complete = Object.values(event.fields).every((field) => field.isValid)
@@ -488,6 +491,7 @@ function BraintreeForm({
           interceptors: current.interceptors,
           paymentSessionId: current.session.id,
           nonce,
+          deviceData: await pageDeviceData(),
         })
 
         if (result.status === "authorized") return { status: "completed" }

@@ -21,6 +21,12 @@ interface AuthorizeBraintreePaymentSessionParams
    * `verifyCard` handed back, not the one it was given. Single use.
    */
   nonce: string
+  /**
+   * The device data `braintree-web`'s data collector returned, sent with the
+   * nonce for Braintree's fraud checks. Optional: a payment without it is
+   * authorized all the same.
+   */
+  deviceData?: string
   /** Polls of the authorization before giving up. */
   attempts?: number
   /** Delay between polls, in milliseconds. */
@@ -38,9 +44,10 @@ export type AuthorizeBraintreePaymentSessionResult = AuthorizePaymentSessionResu
  * 3DS), and the money moves when Commerce Layer relays the nonce to Braintree's
  * `authorizePaymentMethod` — or `chargePaymentMethod`, with `auto_capture`.
  *
- * 1. `PATCH client_data.payment_method_id` on the session. The only place the
- *    nonce is read from (`Payment::Payload::Braintree#payment_method_id`), and
- *    storing it calls nobody.
+ * 1. `PATCH client_data.payment_method_id` on the session, with
+ *    `client_data.device_data` when there is any. The only place the API reads
+ *    the nonce from — and the device data, which it relays to Braintree as
+ *    `riskData.deviceData`. Storing them calls nobody.
  * 2. `POST` a Payment Authorization. Commerce Layer answers `pending` at once
  *    and runs the gateway call in a background job.
  * 3. Poll it until it leaves `pending`. Usually one or two seconds.
@@ -60,6 +67,7 @@ export async function authorizeBraintreePaymentSession({
   interceptors,
   paymentSessionId,
   nonce,
+  deviceData,
   attempts = DEFAULT_BRAINTREE_AUTHORIZATION_ATTEMPTS,
   intervalMs = DEFAULT_BRAINTREE_AUTHORIZATION_INTERVAL_MS,
 }: AuthorizeBraintreePaymentSessionParams): Promise<AuthorizeBraintreePaymentSessionResult> {
@@ -70,7 +78,10 @@ export async function authorizeBraintreePaymentSession({
   try {
     await sdk.payment_sessions.update({
       id: paymentSessionId,
-      client_data: { payment_method_id: nonce },
+      client_data: {
+        payment_method_id: nonce,
+        ...(deviceData != null && deviceData !== "" ? { device_data: deviceData } : {}),
+      },
     })
   } catch (error) {
     return { status: "refused", code: apiErrorCode(error) ?? "payment_method_not_stored" }

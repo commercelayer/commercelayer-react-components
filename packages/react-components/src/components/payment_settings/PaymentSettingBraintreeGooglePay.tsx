@@ -21,8 +21,10 @@ import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
 import {
   braintreeErrorCode,
+  collectPageDeviceData,
   interopDefault,
   liabilityRefusal,
+  pageDeviceData,
   pageThreeDSecureInstance,
   sessionAmount,
   verifyCard,
@@ -330,6 +332,7 @@ function GooglePayButton({
         if (cancelled) return
         if (!result) throw notOffered("GOOGLE_PAY_NOT_READY")
         setInstances({ client, googlePayment: booted, paymentsClient })
+        collectPageDeviceData(client)
       } catch (error) {
         // Not offered, and not the shopper's problem: most often Google Pay is
         // simply not enabled on the Braintree merchant
@@ -492,6 +495,7 @@ function GooglePayButton({
         interceptors: current.interceptors,
         paymentSessionId: current.session.id,
         nonce,
+        deviceData: await pageDeviceData(),
       })
 
       if (result.status === "authorized") {

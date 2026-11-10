@@ -9,6 +9,7 @@ import { PaymentSetting } from "#components/payment_settings/PaymentSetting"
 import { PaymentSettingBraintreePayPal } from "#components/payment_settings/PaymentSettingBraintreePayPal"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
+import { resetPageDeviceData } from "#utils/braintree"
 import {
   getHandoffSnapshot,
   isCollecting,
@@ -27,6 +28,7 @@ const NAMESPACE = "commercelayerBraintreePayPal"
  * part: the click, the approval, the cancel.
  */
 const pp = vi.hoisted(() => ({
+  dataCollectorCreate: vi.fn(),
   clientCreate: vi.fn(),
   checkoutCreate: vi.fn(),
   loadPayPalSDK: vi.fn(),
@@ -41,7 +43,10 @@ const pp = vi.hoisted(() => ({
 }))
 
 vi.mock("braintree-web/client", () => ({ default: { create: pp.clientCreate } }))
+vi.mock("braintree-web/data-collector", () => ({ default: { create: pp.dataCollectorCreate } }))
 vi.mock("braintree-web/paypal-checkout", () => ({ default: { create: pp.checkoutCreate } }))
+
+const DEVICE_DATA = '{"correlation_id":"fraudnet-session"}'
 
 const { authorizeMock, authorizeGiftCardsMock } = vi.hoisted(() => ({
   authorizeMock: vi.fn(),
@@ -148,6 +153,8 @@ async function approve() {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  resetPageDeviceData()
+  pp.dataCollectorCreate.mockResolvedValue({ deviceData: DEVICE_DATA })
   resetPaymentGatewayStore()
   permitted.value = true
   pp.options = null
@@ -308,7 +315,11 @@ describe("<PaymentSettingBraintreePayPal> the approval", () => {
 
     expect(pp.tokenizePayment).toHaveBeenCalledWith({ orderID: "EC-1", payerID: "PAYER-1" })
     expect(authorizeMock).toHaveBeenCalledWith(
-      expect.objectContaining({ paymentSessionId: "session-bt", nonce: "paypal-nonce" })
+      expect.objectContaining({
+        paymentSessionId: "session-bt",
+        nonce: "paypal-nonce",
+        deviceData: DEVICE_DATA,
+      })
     )
     expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("done")
   })
@@ -508,5 +519,28 @@ describe("<PaymentSettingBraintreePayPal> a click after a partly charged attempt
     expect(authorizeGiftCardsMock).toHaveBeenCalledTimes(1)
     expect(actions.reject).toHaveBeenCalled()
     expect(isCollecting("order-1")).toBe(false)
+  })
+})
+
+describe("<PaymentSettingBraintreePayPal> device data", () => {
+  it("collects device data once offered, with the component's client", async () => {
+    await renderAvailable()
+
+    await waitFor(() => {
+      expect(pp.dataCollectorCreate).toHaveBeenCalledWith({ client: expect.anything() })
+    })
+  })
+
+  it("pays without device data when the data collector fails", async () => {
+    pp.dataCollectorCreate.mockRejectedValue(new Error("DATA_COLLECTOR_REQUIRES_CREATE_OPTIONS"))
+    await renderAvailable()
+
+    await approve()
+
+    expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("done")
+
+    expect(authorizeMock).toHaveBeenCalledWith(
+      expect.objectContaining({ nonce: "paypal-nonce", deviceData: undefined })
+    )
   })
 })

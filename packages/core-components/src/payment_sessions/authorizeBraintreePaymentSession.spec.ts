@@ -55,7 +55,7 @@ describe("authorizeBraintreePaymentSession", () => {
     vi.clearAllMocks()
   })
 
-  // `client_data.payment_method_id` is the one place core-api reads the nonce
+  // `client_data.payment_method_id` is the one place the API reads the nonce
   // from, and the authorization is what makes it relay it to Braintree.
   it("stores the nonce on the session before authorizing it", async () => {
     const { update, create } = stubSdk()
@@ -70,6 +70,32 @@ describe("authorizeBraintreePaymentSession", () => {
       payment_session: { id: "session-bt", type: "payment_sessions" },
     })
     expect(update.mock.invocationCallOrder[0]).toBeLessThan(create.mock.invocationCallOrder[0] ?? 0)
+  })
+
+  // The API relays `client_data.device_data` to Braintree's fraud checks.
+  it("stores the device data beside the nonce", async () => {
+    const { update } = stubSdk()
+
+    await authorize({ deviceData: '{"correlation_id":"abc"}' })
+
+    expect(update).toHaveBeenCalledWith({
+      id: "session-bt",
+      client_data: {
+        payment_method_id: "nonce-after-3ds",
+        device_data: '{"correlation_id":"abc"}',
+      },
+    })
+  })
+
+  it("leaves device data out when there is none", async () => {
+    const { update } = stubSdk()
+
+    await authorize({ deviceData: "" })
+
+    expect(update).toHaveBeenCalledWith({
+      id: "session-bt",
+      client_data: { payment_method_id: "nonce-after-3ds" },
+    })
   })
 
   it("waits out the pending authorization until Braintree answers", async () => {

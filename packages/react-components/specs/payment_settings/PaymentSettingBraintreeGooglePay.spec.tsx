@@ -9,7 +9,7 @@ import { PaymentSetting } from "#components/payment_settings/PaymentSetting"
 import { PaymentSettingBraintreeGooglePay } from "#components/payment_settings/PaymentSettingBraintreeGooglePay"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
-import { resetPageThreeDSecure } from "#utils/braintree"
+import { resetPageDeviceData, resetPageThreeDSecure } from "#utils/braintree"
 import { resetGooglePaymentsApi } from "#utils/googlePay"
 import {
   getHandoffSnapshot,
@@ -24,6 +24,7 @@ import {
  * what it tells the sheet and the handoff about each outcome.
  */
 const bt = vi.hoisted(() => ({
+  dataCollectorCreate: vi.fn(),
   clientCreate: vi.fn(),
   googlePaymentCreate: vi.fn(),
   createPaymentDataRequest: vi.fn(),
@@ -34,8 +35,11 @@ const bt = vi.hoisted(() => ({
 }))
 
 vi.mock("braintree-web/client", () => ({ default: { create: bt.clientCreate } }))
+vi.mock("braintree-web/data-collector", () => ({ default: { create: bt.dataCollectorCreate } }))
 vi.mock("braintree-web/google-payment", () => ({ default: { create: bt.googlePaymentCreate } }))
 vi.mock("braintree-web/three-d-secure", () => ({ default: { create: bt.threeDSecureCreate } }))
+
+const DEVICE_DATA = '{"correlation_id":"fraudnet-session"}'
 
 const { authorizeMock, authorizeGiftCardsMock } = vi.hoisted(() => ({
   authorizeMock: vi.fn(),
@@ -183,6 +187,8 @@ function card(isNetworkTokenized: boolean) {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  resetPageDeviceData()
+  bt.dataCollectorCreate.mockResolvedValue({ deviceData: DEVICE_DATA })
   resetPaymentGatewayStore()
   resetPageThreeDSecure()
   resetGooglePaymentsApi()
@@ -354,7 +360,11 @@ describe("<PaymentSettingBraintreeGooglePay> the payment", () => {
     expect(paymentsClient().sheetAnswers).toEqual([{ transactionState: "SUCCESS" }])
     expect(bt.parseResponse).toHaveBeenCalledWith(PAYMENT_DATA)
     expect(authorizeMock).toHaveBeenCalledWith(
-      expect.objectContaining({ paymentSessionId: "session-bt", nonce: "google-pay-nonce" })
+      expect.objectContaining({
+        paymentSessionId: "session-bt",
+        nonce: "google-pay-nonce",
+        deviceData: DEVICE_DATA,
+      })
     )
     // Gift cards before anything reaches Braintree.
     expect(authorizeGiftCardsMock.mock.invocationCallOrder[0]).toBeLessThan(
@@ -603,5 +613,30 @@ describe("<PaymentSettingBraintreeGooglePay> a retry in the same sheet", () => {
 
     expect(getOrder).toHaveBeenCalledWith("order-1")
     expect(paymentsClient().sheetAnswers[0]).toMatchObject({ transactionState: "ERROR" })
+  })
+})
+
+describe("<PaymentSettingBraintreeGooglePay> device data", () => {
+  it("collects device data once offered, with the component's client", async () => {
+    await renderAvailable()
+
+    await waitFor(() => {
+      expect(bt.dataCollectorCreate).toHaveBeenCalledWith({ client: expect.anything() })
+    })
+  })
+
+  it("pays without device data when the data collector fails", async () => {
+    bt.dataCollectorCreate.mockRejectedValue(new Error("DATA_COLLECTOR_REQUIRES_CREATE_OPTIONS"))
+    await renderAvailable()
+
+    await pay()
+
+    await waitFor(() => {
+      expect(getHandoffSnapshot("order-1").collectedOutOfBand).toBe("done")
+    })
+
+    expect(authorizeMock).toHaveBeenCalledWith(
+      expect.objectContaining({ nonce: "google-pay-nonce", deviceData: undefined })
+    )
   })
 })

@@ -10,7 +10,7 @@ import { PaymentSetting } from "#components/payment_settings/PaymentSetting"
 import { PaymentSettingBraintreePayment } from "#components/payment_settings/PaymentSettingBraintreePayment"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
-import { resetPageThreeDSecure } from "#utils/braintree"
+import { resetPageDeviceData, resetPageThreeDSecure } from "#utils/braintree"
 import {
   getHandoffSnapshot,
   isCollecting,
@@ -26,6 +26,7 @@ import {
  * four, which is where its decisions are.
  */
 const bt = vi.hoisted(() => ({
+  dataCollectorCreate: vi.fn(),
   clientCreate: vi.fn(),
   hostedFieldsCreate: vi.fn(),
   threeDSecureCreate: vi.fn(),
@@ -39,8 +40,11 @@ const bt = vi.hoisted(() => ({
 }))
 
 vi.mock("braintree-web/client", () => ({ default: { create: bt.clientCreate } }))
+vi.mock("braintree-web/data-collector", () => ({ default: { create: bt.dataCollectorCreate } }))
 vi.mock("braintree-web/hosted-fields", () => ({ default: { create: bt.hostedFieldsCreate } }))
 vi.mock("braintree-web/three-d-secure", () => ({ default: { create: bt.threeDSecureCreate } }))
+
+const DEVICE_DATA = '{"correlation_id":"fraudnet-session"}'
 
 const { authorizeMock, createPaymentSessionMock, discardPaymentSessionMock } = vi.hoisted(() => ({
   authorizeMock: vi.fn(),
@@ -191,6 +195,8 @@ function verified(info: {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  resetPageDeviceData()
+  bt.dataCollectorCreate.mockResolvedValue({ deviceData: DEVICE_DATA })
   resetPaymentGatewayStore()
   resetPageThreeDSecure()
   bt.listeners = {}
@@ -523,7 +529,11 @@ describe("<PaymentSettingBraintreePayment> collecting", () => {
     )
     // The nonce 3DS handed back, not the one it was given.
     expect(authorizeMock).toHaveBeenCalledWith(
-      expect.objectContaining({ paymentSessionId: "session-bt", nonce: "nonce-after-3ds" })
+      expect.objectContaining({
+        paymentSessionId: "session-bt",
+        nonce: "nonce-after-3ds",
+        deviceData: DEVICE_DATA,
+      })
     )
   })
 
@@ -654,5 +664,26 @@ describe("<PaymentSettingBraintreePayment> collecting", () => {
 
     await expect(submit()).resolves.toMatchObject({ status: "unknown" })
     expect(isCollecting("order-1")).toBe(false)
+  })
+})
+
+describe("<PaymentSettingBraintreePayment> device data", () => {
+  it("collects device data once offered, with the component's client", async () => {
+    await renderLoaded()
+
+    await waitFor(() => {
+      expect(bt.dataCollectorCreate).toHaveBeenCalledWith({ client: expect.anything() })
+    })
+  })
+
+  it("pays without device data when the data collector fails", async () => {
+    bt.dataCollectorCreate.mockRejectedValue(new Error("DATA_COLLECTOR_REQUIRES_CREATE_OPTIONS"))
+    await renderLoaded()
+
+    await expect(submit()).resolves.toEqual({ status: "completed" })
+
+    expect(authorizeMock).toHaveBeenCalledWith(
+      expect.objectContaining({ nonce: "nonce-after-3ds", deviceData: undefined })
+    )
   })
 })
