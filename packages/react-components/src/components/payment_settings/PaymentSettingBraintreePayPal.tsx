@@ -15,7 +15,13 @@ import { useCollectionPermitted } from "#hooks/useCollectionPermitted"
 import { useStickySessionValue } from "#hooks/useStickySessionValue"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
-import { braintreeErrorCode, interopDefault, sessionAmount } from "#utils/braintree"
+import {
+  braintreeErrorCode,
+  collectPageDeviceData,
+  interopDefault,
+  pageDeviceData,
+  sessionAmount,
+} from "#utils/braintree"
 import { isCollecting, setCollecting, setOutOfBandCollection } from "#utils/paymentGatewayStore"
 import { authorizeWalletGiftCards, type GiftCardReconciliation } from "#utils/walletGiftCards"
 
@@ -228,6 +234,7 @@ function PayPalButton({
           throw new Error("PayPal is not eligible for this buyer or currency.")
         }
         setBooted({ checkout: instance, paypal })
+        collectPageDeviceData(client)
       } catch (error) {
         // Not offered, and not the shopper's problem: most often PayPal is not
         // enabled on the Braintree merchant. An expired client token is the
@@ -418,6 +425,7 @@ function PayPalButton({
         interceptors: current.interceptors,
         paymentSessionId: current.session.id,
         nonce,
+        deviceData: await pageDeviceData(),
       })
 
       if (result.status === "authorized") {
