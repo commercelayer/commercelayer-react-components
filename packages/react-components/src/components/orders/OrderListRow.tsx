@@ -37,16 +37,6 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
   const cell = row?.getVisibleCells().filter((cell) => cell.column.id === field)
   const isLastRow = row?.getVisibleCells().at(-1)?.column.id === field
   const As = "td"
-  const ActionRow = (): JSX.Element | null => {
-    return (
-      (showActions && isLastRow && actionsComponent && (
-        <As data-testid="action-cell" {...p} className={actionsContainerClassName}>
-          <Parent {...parentProps}>{actionsComponent}</Parent>
-        </As>
-      )) ||
-      null
-    )
-  }
   const parentProps = {
     ...p,
     field,
@@ -54,12 +44,21 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
     row,
     cell,
   }
+  // An element, not a component defined in here: a component created on every render is
+  // a new type each time, so React would remount the actions cell.
+  const actionRow =
+    (showActions && isLastRow && actionsComponent && (
+      <As data-testid="action-cell" {...p} className={actionsContainerClassName}>
+        <Parent {...parentProps}>{actionsComponent}</Parent>
+      </As>
+    )) ||
+    null
   return children ? (
     <>
       <As>
         <Parent {...parentProps}>{children}</Parent>
       </As>
-      <ActionRow />
+      {actionRow}
     </>
   ) : (
     <>
@@ -74,7 +73,7 @@ export function OrderListRow({ field, children, ...p }: Props): JSX.Element {
           </As>
         )
       })}
-      <ActionRow />
+      {actionRow}
     </>
   )
 }

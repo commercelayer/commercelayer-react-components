@@ -54,7 +54,7 @@
     "vitest": "^4.1.12"
   },
   "dependencies": {
-    "@commercelayer/js-auth": "^8.0.0",
-    "@commercelayer/sdk": "8.0.2"
+    "@commercelayer/js-auth": "^8.1.0",
+    "@commercelayer/sdk": "8.0.4"
   }
 }
