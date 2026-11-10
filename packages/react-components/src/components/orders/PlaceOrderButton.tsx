@@ -70,6 +70,11 @@ function remainingAmountIsCovered(paymentSource: unknown): boolean {
 
 export function PlaceOrderButton(props: Props): JSX.Element {
   const ref = useRef(null)
+  // Set once the Stripe intent on the return url turns out unpaid. That url keeps the client
+  // secret after the verdict, and without this every later click would still count as a
+  // return from the redirect: it skipped the widget and asked the API to place an order
+  // nobody had paid for, so the shopper could not pay again without a clean url.
+  const stripeReturnUnpaidRef = useRef(false)
   /**
    * The order state we already fired one automatic place attempt for, as
    * `<order id>:<payment status>:<result code>`. Keyed on the state and not on
@@ -242,6 +247,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
             }, 1000)
             break
           case "invalid":
+            stripeReturnUnpaidRef.current = true
             setPaymentMethodErrors([
               {
                 code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
@@ -556,7 +562,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         options?.adyen?.MD ||
         options?.adyen?.redirectResult ||
         options?.checkoutCom?.session_id ||
-        options?.stripe?.paymentIntentClientSecret
+        (options?.stripe?.paymentIntentClientSecret && !stripeReturnUnpaidRef.current)
     )
     if (currentPaymentMethodRef?.current?.onsubmit && !isReturningFromRedirect) {
       // Before the widget, which may redirect to the gateway: with an `auto_place` method

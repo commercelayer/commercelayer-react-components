@@ -421,6 +421,43 @@ describe("place order on redirect return", () => {
     expect(onsubmit).not.toHaveBeenCalled()
   })
 
+  // The shopper came back without paying — they cancelled at the bank, or the cart changed
+  // while they were away and Stripe voided the authorization. The return url still carries
+  // the client secret, and every later click used to skip the widget and go straight to
+  // `_place`, which the API refuses: the shopper could not pay again without reloading a
+  // clean url.
+  it("Stripe return with an unpaid intent lets the shopper pay again through the widget", async () => {
+    const { checkPaymentIntent } = await import("#utils/stripe/retrievePaymentIntent")
+    vi.mocked(checkPaymentIntent).mockResolvedValueOnce({
+      status: "invalid",
+      message: "The payment was not completed. Please try again.",
+    })
+    const setPlaceOrder = placeOrderSpy()
+    const onsubmit = vi.fn().mockResolvedValue(true)
+    const order = makeOrder(undefined)
+    order.payment_method.payment_source_type = "stripe_payments"
+    order.payment_source = { id: "ps-1", type: "stripe_payments", publishable_key: "pk_test" }
+    const { getByRole } = render(
+      <Harness
+        order={order}
+        paymentType="stripe_payments"
+        options={{ stripe: { paymentIntentClientSecret: "pi_secret" } }}
+        setPlaceOrder={setPlaceOrder}
+        setPaymentSource={vi.fn().mockResolvedValue({ id: "ps-1", type: "stripe_payments" })}
+        paymentSource={{ id: "ps-1", type: "stripe_payments" }}
+        onsubmit={onsubmit}
+      />
+    )
+    await waitFor(() => expect(checkPaymentIntent).toHaveBeenCalled())
+    await settle()
+    expect(setPlaceOrder).not.toHaveBeenCalled()
+
+    getByRole("button").click()
+
+    await waitFor(() => expect(onsubmit).toHaveBeenCalled())
+    await waitFor(() => expect(setPlaceOrder).toHaveBeenCalled())
+  })
+
   it("the normal flow still lets the widget validate the payment", async () => {
     const setPlaceOrder = placeOrderSpy()
     // Integrators pass empty strings when the shopper is not returning from a redirect.
