@@ -196,14 +196,20 @@ export async function setPlaceOrder({
     placed: false,
   }
   if (state && config && order) {
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const isAlreadyPlaced = order?.status === "placed"
     if (isAlreadyPlaced) {
+      // Placed in the background — an `auto_place` method, while the shopper was on the
+      // gateway's page — and loaded that way, so the order in hand may lack the includes the
+      // app builds its thank-you page and analytics from. Re-read it like the pre-check below
+      // does (#924). Still placed if the re-read fails: hand back what we have.
+      const placed = await sdk.orders.retrieve(order.id, { include }).catch(() => order)
+      if (setOrder && placed !== order) setOrder(placed)
       return {
         placed: true,
-        order,
+        order: placed,
       }
     }
-    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const { options, paymentType } = state
     try {
       // Prevent extra place order. The same `include` the place paths below ask for: this

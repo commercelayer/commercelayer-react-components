@@ -58,3 +58,58 @@ describe("setPlaceOrder pre-check", () => {
     expect(orders.update).not.toHaveBeenCalled()
   })
 })
+
+// #924: when the order in context is already `placed` — an `auto_place` method placed it in the
+// background while the shopper was on the gateway's page, and the checkout reloaded on it —
+// `setPlaceOrder` handed that order back as fetched, without the included data the app builds
+// the thank-you page and the `purchase` event from. The payment recap was missing and the
+// summary stayed on "Loading…".
+describe("setPlaceOrder on an order already placed in context", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it("re-reads it with the includes and publishes it", async () => {
+    const placed = {
+      id: "order-1",
+      status: "placed",
+      payment_method: { id: "pm-1", payment_source_type: "klarna_payments" },
+      line_items: [{ id: "li-1" }],
+    }
+    orders.retrieve.mockResolvedValue(placed)
+
+    const setOrder = vi.fn()
+    const result = await setPlaceOrder({
+      state: STATE,
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      order: { id: "order-1", status: "placed" } as any,
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      config: { accessToken: "token" } as any,
+      include: INCLUDE,
+      setOrder,
+    })
+
+    expect(orders.retrieve).toHaveBeenCalledWith("order-1", { include: INCLUDE })
+    expect(setOrder).toHaveBeenCalledWith(placed)
+    expect(result).toEqual({ placed: true, order: placed })
+    expect(orders.update).not.toHaveBeenCalled()
+  })
+
+  it("still reports it placed, with the order it has, when the re-read fails", async () => {
+    orders.retrieve.mockRejectedValue(new Error("network"))
+    const inContext = { id: "order-1", status: "placed" }
+
+    const result = await setPlaceOrder({
+      state: STATE,
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      order: inContext as any,
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      config: { accessToken: "token" } as any,
+      include: INCLUDE,
+      setOrder: vi.fn(),
+    })
+
+    expect(result).toEqual({ placed: true, order: inContext })
+    expect(orders.update).not.toHaveBeenCalled()
+  })
+})
