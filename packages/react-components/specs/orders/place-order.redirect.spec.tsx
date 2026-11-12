@@ -9,7 +9,7 @@
  * placing it.
  */
 import { render, waitFor } from "@testing-library/react"
-import { type ReactNode, useRef } from "react"
+import { type ReactNode, useRef, useState } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { PlaceOrderButton } from "#components/orders/PlaceOrderButton"
 import CommerceLayerContext from "#context/CommerceLayerContext"
@@ -17,6 +17,7 @@ import CustomerContext from "#context/CustomerContext"
 import OrderContext, { defaultOrderContext } from "#context/OrderContext"
 import PaymentMethodContext, { defaultPaymentMethodContext } from "#context/PaymentMethodContext"
 import PlaceOrderContext, { defaultPlaceOrderContext } from "#context/PlaceOrderContext"
+import { setPlaceOrder as reducerSetPlaceOrder } from "#reducers/PlaceOrderReducer"
 
 const ordersRetrieve = vi
   .fn()
@@ -89,6 +90,8 @@ function Harness({
   status = "standby",
   paymentSource = { id: "ps-1", type: "adyen_payments" },
   captureHandleClick,
+  onClick,
+  setOrder = vi.fn(),
 }: {
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   order: any
@@ -111,6 +114,10 @@ function Harness({
    * can be fired at it the way the gateway widget fires a programmatic click.
    */
   captureHandleClick?: (handleClick: () => Promise<void>) => void
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  onClick?: any
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  setOrder?: any
 }): ReactNode {
   const formRef = useRef<HTMLFormElement | null>(null)
   if (onsubmit != null && formRef.current == null) {
@@ -128,7 +135,7 @@ function Harness({
           // biome-ignore lint/suspicious/noExplicitAny: test cast
           includeLoaded: {} as any,
           addResourceToInclude: vi.fn(),
-          setOrder: vi.fn(),
+          setOrder,
           setOrderErrors: vi.fn(),
           getOrder: vi.fn().mockResolvedValue(order),
           updateOrder: vi.fn().mockResolvedValue({ success: true }),
@@ -164,14 +171,14 @@ function Harness({
               }}
             >
               {captureHandleClick != null ? (
-                <PlaceOrderButton>
+                <PlaceOrderButton onClick={onClick}>
                   {({ handleClick }) => {
                     captureHandleClick(handleClick)
                     return <button type="button">Place order</button>
                   }}
                 </PlaceOrderButton>
               ) : (
-                <PlaceOrderButton />
+                <PlaceOrderButton onClick={onClick} />
               )}
             </PlaceOrderContext.Provider>
           </PaymentMethodContext.Provider>
@@ -192,6 +199,65 @@ function widgetOnsubmit(): ReturnType<typeof vi.fn> {
 
 async function settle(): Promise<void> {
   await new Promise((r) => setTimeout(r, 300))
+}
+
+const INCLUDE = ["payment_method", "payment_source", "line_items"]
+
+/** The order as core returns it once it has placed it, with the includes the app reads. */
+const PLACED_ORDER = {
+  id: "order-1",
+  number: "1234",
+  status: "placed",
+  payment_status: "authorized",
+  payment_method: { id: "pm-1", payment_source_type: "adyen_payments" },
+  payment_source: { id: "ps-1", type: "adyen_payments" },
+  line_items: [{ id: "li-1" }],
+}
+
+/** The reducer's `setPlaceOrder`, wired the way `<PlaceOrderContainer>` wires it. */
+function reducerPlaceOrder(
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  order: any,
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  setOrder: any,
+  paymentType = "adyen_payments"
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+): any {
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  return async (params: any) =>
+    await reducerSetPlaceOrder({
+      ...params,
+      order,
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      state: { options: {}, paymentType, errors: [], isPermitted: true } as any,
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      config: { accessToken: "test-token" } as any,
+      include: INCLUDE,
+      setOrder,
+    })
+}
+
+/**
+ * A harness whose order is real state: publishing the placed order re-renders the
+ * button with it, the way `<OrderContainer>` does.
+ */
+// biome-ignore lint/suspicious/noExplicitAny: test cast
+function StatefulAdyenReturn({ onClick }: { onClick: any }): ReactNode {
+  const [order, setOrder] = useState(makeOrder(undefined))
+  return (
+    <Harness
+      order={order}
+      paymentType="adyen_payments"
+      options={{ adyen: { redirectResult: "REDIRECT-RESULT" } }}
+      setPlaceOrder={reducerPlaceOrder(order, setOrder)}
+      setPaymentSource={vi.fn().mockResolvedValue({
+        id: "ps-1",
+        payment_response: { resultCode: "Authorised" },
+      })}
+      onClick={onClick}
+      setOrder={setOrder}
+    />
+  )
 }
 
 describe("place order on redirect return", () => {
@@ -573,6 +639,110 @@ describe("place order on redirect return", () => {
     })
   })
 
+  // #929: core can place the order on authorization, between the `_details` response and
+  // the button's own status check. The button then reported `placed: true` with the order
+  // from context, still `pending`, and never published the placed one, so the app stayed on
+  // the checkout with the order placed on the server.
+  describe("an order core placed before the button could (#929)", () => {
+    it("Adyen redirect return hands onClick the placed order and publishes it", async () => {
+      const order = makeOrder(undefined)
+      const setOrder = vi.fn()
+      const onClick = vi.fn()
+      ordersRetrieve.mockResolvedValue(PLACED_ORDER)
+      render(
+        <Harness
+          order={order}
+          paymentType="adyen_payments"
+          options={{ adyen: { redirectResult: "REDIRECT-RESULT" } }}
+          setPlaceOrder={reducerPlaceOrder(order, setOrder)}
+          setPaymentSource={vi.fn().mockResolvedValue({
+            id: "ps-1",
+            payment_response: { resultCode: "Authorised" },
+          })}
+          onClick={onClick}
+          setOrder={setOrder}
+        />
+      )
+      await waitFor(() => {
+        expect(onClick).toHaveBeenCalled()
+      })
+      await settle()
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect(onClick).toHaveBeenCalledWith({ placed: true, order: PLACED_ORDER })
+      // Read with the includes the app builds the thank-you page from, and published.
+      expect(ordersRetrieve).toHaveBeenCalledWith("order-1", { include: INCLUDE })
+      expect(setOrder).toHaveBeenCalledWith(PLACED_ORDER)
+      expect(ordersUpdate).not.toHaveBeenCalled()
+    })
+
+    it("a click on a method with no redirect gets the placed order too", async () => {
+      const order = makeOrder(undefined)
+      order.payment_method.payment_source_type = "wire_transfers"
+      order.payment_source.type = "wire_transfers"
+      const setOrder = vi.fn()
+      const onClick = vi.fn()
+      let handleClick: (() => Promise<void>) | undefined
+      render(
+        <Harness
+          order={order}
+          paymentType="wire_transfers"
+          options={{}}
+          setPlaceOrder={reducerPlaceOrder(order, setOrder, "wire_transfers")}
+          setPaymentSource={vi.fn().mockResolvedValue({ id: "ps-1", type: "wire_transfers" })}
+          paymentSource={{ id: "ps-1", type: "wire_transfers" }}
+          onClick={onClick}
+          setOrder={setOrder}
+          captureHandleClick={(fn) => {
+            handleClick = fn
+          }}
+        />
+      )
+      await settle()
+      expect(onClick).not.toHaveBeenCalled()
+      ordersRetrieve.mockResolvedValue(PLACED_ORDER)
+      await handleClick?.()
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect(onClick).toHaveBeenCalledWith({ placed: true, order: PLACED_ORDER })
+      expect(setOrder).toHaveBeenCalledWith(PLACED_ORDER)
+      expect(ordersUpdate).not.toHaveBeenCalled()
+    })
+
+    it("still reports it placed, with the order it has, when it cannot be read again", async () => {
+      const order = makeOrder(undefined)
+      const onClick = vi.fn()
+      ordersRetrieve.mockResolvedValue(PLACED_ORDER)
+      render(
+        <Harness
+          order={order}
+          paymentType="adyen_payments"
+          options={{ adyen: { redirectResult: "REDIRECT-RESULT" } }}
+          setPlaceOrder={vi.fn().mockResolvedValue({ placed: false, errors: [] })}
+          setPaymentSource={vi.fn().mockResolvedValue({
+            id: "ps-1",
+            payment_response: { resultCode: "Authorised" },
+          })}
+          onClick={onClick}
+        />
+      )
+      await waitFor(() => {
+        expect(onClick).toHaveBeenCalled()
+      })
+      expect(onClick).toHaveBeenCalledWith({ placed: true, order })
+    })
+
+    it("reports it once when the published order re-renders the button", async () => {
+      const onClick = vi.fn()
+      ordersRetrieve.mockResolvedValue(PLACED_ORDER)
+      render(<StatefulAdyenReturn onClick={onClick} />)
+      await waitFor(() => {
+        expect(onClick).toHaveBeenCalled()
+      })
+      await settle()
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect(onClick).toHaveBeenLastCalledWith({ placed: true, order: PLACED_ORDER })
+    })
+  })
+
   describe("guards that must keep the order unplaced", () => {
     it("an authorized response from an earlier order (cloned wallet source) is NEVER placed", async () => {
       const setPlaceOrder = placeOrderSpy()
@@ -648,26 +818,25 @@ describe("place order on redirect return", () => {
     })
 
     it("a placed order is not placed again", async () => {
-      const setPlaceOrder = placeOrderSpy()
-      ordersRetrieve.mockResolvedValue({
-        id: "order-1",
-        status: "placed",
-        payment_status: "authorized",
-      })
+      // The real `setPlaceOrder`: the button hands an already-placed order to it (#929),
+      // and it is its pre-check that keeps `_place` from being sent.
+      const order = makeOrder(
+        { resultCode: "Authorised", merchantReference: "1234" },
+        REDIRECT_DETAILS
+      )
+      ordersRetrieve.mockResolvedValue(PLACED_ORDER)
       render(
         <Harness
-          order={makeOrder(
-            { resultCode: "Authorised", merchantReference: "1234" },
-            REDIRECT_DETAILS
-          )}
+          order={order}
           paymentType="adyen_payments"
           options={{}}
-          setPlaceOrder={setPlaceOrder}
+          setPlaceOrder={reducerPlaceOrder(order, vi.fn())}
           setPaymentSource={vi.fn().mockResolvedValue({ id: "ps-1" })}
         />
       )
       await settle()
-      expect(setPlaceOrder).not.toHaveBeenCalled()
+      expect(ordersRetrieve).toHaveBeenCalled()
+      expect(ordersUpdate).not.toHaveBeenCalled()
     })
   })
 })
