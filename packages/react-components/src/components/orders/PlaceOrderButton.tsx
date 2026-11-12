@@ -85,6 +85,12 @@ export function PlaceOrderButton(props: Props): JSX.Element {
   const autoPlaceAttemptedRef = useRef<string | null>(null)
   /** Order id a place attempt is currently in flight for. */
   const placeInFlightRef = useRef<string | null>(null)
+  /**
+   * Id of the order whose placement `placeOrderAttempt` already reported to `onClick`
+   * (#929). Publishing that order re-renders the button with it `placed`, and the Adyen
+   * effect below, there for orders nothing else reports, would report it a second time.
+   */
+  const placedReportedRef = useRef<string | null>(null)
   const {
     children,
     label = "Place order",
@@ -360,7 +366,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     if (
       order?.status === "placed" &&
       order?.payment_status === "authorized" &&
-      paymentType === "adyen_payments"
+      paymentType === "adyen_payments" &&
+      placedReportedRef.current !== order.id
     ) {
       // Dispatch the onClick callback when the order is placed and the payment status is authorized (Adyen with gift card)
       onClick?.({
@@ -484,9 +491,25 @@ export function PlaceOrderButton(props: Props): JSX.Element {
 
       if (isAlreadyPlaced) {
         /**
-         * Order already placed
+         * Order already placed: core places it on authorization, and that can land
+         * between the gateway's answer and the status check above (#929). The order
+         * in context is still `pending` then, and an app handed that one stays on the
+         * checkout. `setPlaceOrder` re-reads it with the includes, publishes it and
+         * sends no `_place`, its own pre-check finding it placed.
          */
         setPlaceOrderStatus?.({ status: "placing" })
+        // Before the call, not after: `setPlaceOrder` publishes the order, and the
+        // render that follows can run its effects before this function resumes.
+        placedReportedRef.current = order.id
+        const alreadyPlaced = await setPlaceOrder?.({
+          paymentSource,
+          currentCustomerPaymentSourceId,
+        })
+        if (alreadyPlaced?.placed && alreadyPlaced.order != null) {
+          onClick?.(alreadyPlaced)
+          return
+        }
+        // Still placed if it could not be read again: hand back what we have.
         onClick?.({
           placed: true,
           order: order,
