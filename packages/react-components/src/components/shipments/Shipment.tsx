@@ -111,11 +111,35 @@ export function Shipment({
   const shipmentsRef = useRef(shipments)
   shipmentsRef.current = shipments
 
+  // A shipping step that closes unmounts this component while a selection is
+  // still in flight. Nothing it renders is on screen any more, and the data it
+  // holds stops updating: `shipmentsRef` stays at the last render, which usually
+  // predates the selection's own refetch, so every check read as "the API
+  // cleared the method". Once unmounted, a run selects nothing more.
+  const isMountedRef = useRef(false)
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
+  // When each selection settled, on a counter that only moves forward. A run
+  // walks the `shipments` it started with, awaiting each selection in turn, so
+  // by the time it reaches a later shipment another run may have selected it,
+  // and the run's copy still shows it unselected. A shipment settled after the
+  // run started is left alone: if the API has cleared it since, that arrives
+  // as new `shipments`, and the run those start selects it again.
+  const settledAtRef = useRef<Map<string, number>>(new Map())
+  const selectionClockRef = useRef(0)
+
   useEffect(() => {
     if (shipments != null) {
       if (autoSelectSingleShippingMethod) {
+        const startedAt = selectionClockRef.current
         const autoSelect = async (): Promise<void> => {
           for (const shipment of shipments) {
+            if (!isMountedRef.current) return
             // Normalise once: `isSingle` below already proves the array is present, so
             // a second fallback at the destructuring site would be unreachable.
             const availableShippingMethods = shipment?.available_shipping_methods ?? []
@@ -125,6 +149,7 @@ export function Shipment({
               if (shippingMethod && setShippingMethodRef.current != null) {
                 const key = `${shipment.id}:${shippingMethod.id}`
                 if (autoSelectedRef.current.get(key) === "pending") continue
+                if ((settledAtRef.current.get(key) ?? -1) > startedAt) continue
                 for (let attempt = 1; attempt <= MAX_AUTO_SELECT_ATTEMPTS; attempt++) {
                   autoSelectedRef.current.set(key, "pending")
                   const { success, order } = await setShippingMethodRef.current(
@@ -136,16 +161,38 @@ export function Shipment({
                     break
                   }
                   autoSelectedRef.current.set(key, "settled")
+                  selectionClockRef.current += 1
+                  settledAtRef.current.set(key, selectionClockRef.current)
                   if (typeof autoSelectSingleShippingMethod === "function") {
                     autoSelectSingleShippingMethod(order)
                   }
-                  const latest = shipmentsRef.current?.find(({ id }) => id === shipment.id)
+                  if (!isMountedRef.current) return
+                  // The order the selection read back after its PATCH is the
+                  // freshest word on whether the method stuck. The shipments
+                  // only take over when that order does not say: it lacks this
+                  // shipment, or was read without `shipments.shipping_method`
+                  // (undefined, where a cleared method is null).
+                  const readBack = order?.shipments?.find(({ id }) => id === shipment.id)
+                  const latest =
+                    readBack?.shipping_method !== undefined
+                      ? readBack
+                      : shipmentsRef.current?.find(({ id }) => id === shipment.id)
                   if (latest == null || latest.shipping_method != null) break
                 }
               }
             } else {
               if (shipment?.shipping_method != null) {
-                autoSelectedRef.current.delete(`${shipment.id}:${shipment.shipping_method.id}`)
+                const key = `${shipment.id}:${shipment.shipping_method.id}`
+                // A selection still in flight keeps its marker: data showing the
+                // method can land before its PATCH resolves, and without the
+                // marker an older run reaching this shipment would select it
+                // again. The data counts as a settle all the same, so older runs
+                // leave the shipment alone.
+                if (autoSelectedRef.current.get(key) !== "pending") {
+                  autoSelectedRef.current.delete(key)
+                }
+                selectionClockRef.current += 1
+                settledAtRef.current.set(key, selectionClockRef.current)
               }
               setTimeout(() => {
                 setLoading(false)
