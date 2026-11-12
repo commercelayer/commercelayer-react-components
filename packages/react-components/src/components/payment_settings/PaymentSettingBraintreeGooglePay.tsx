@@ -2,6 +2,7 @@ import {
   authorizeBraintreePaymentSession,
   BRAINTREE_SETTING_TYPE,
   readBraintreeClientToken,
+  readBraintreeGooglePayMerchantId,
 } from "@commercelayer/core-components"
 import type { PaymentSession } from "@commercelayer/sdk"
 import type { Client } from "braintree-web/client"
@@ -82,6 +83,10 @@ interface Props {
    * Required when the Braintree merchant is a production one, where nothing
    * renders without it; a sandbox merchant pays in Google's `TEST`
    * environment, which needs none.
+   *
+   * Normally left out: the organization sets it on the Braintree payment
+   * setting, and the button reads it from there. Passing it overrides the
+   * setting's.
    */
   googleMerchantId?: string
   /** The store's name, as Google's sheet shows it. */
@@ -157,6 +162,7 @@ export function PaymentSettingBraintreeGooglePay(props: Props): JSX.Element | nu
     <GooglePayButton
       key={clientToken}
       {...props}
+      googleMerchantId={props.googleMerchantId ?? readBraintreeGooglePayMerchantId(setting)}
       clientToken={clientToken}
       session={currentPaymentSession}
     />

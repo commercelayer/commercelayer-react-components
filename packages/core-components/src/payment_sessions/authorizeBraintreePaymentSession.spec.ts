@@ -1,6 +1,7 @@
+import type { PaymentSetting } from "@commercelayer/sdk"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { authorizeBraintreePaymentSession } from "./authorizeBraintreePaymentSession"
-import { readBraintreeClientToken } from "./types"
+import { readBraintreeClientToken, readBraintreeGooglePayMerchantId } from "./types"
 
 const { getSdkMock } = vi.hoisted(() => ({ getSdkMock: vi.fn() }))
 vi.mock("#sdk", () => ({ getSdk: getSdkMock }))
@@ -183,5 +184,24 @@ describe("readBraintreeClientToken", () => {
     ["the snake_case spelling", { response_data: { client_token: "abc" } }],
   ])("returns undefined for %s", (_label, session) => {
     expect(readBraintreeClientToken(session as never)).toBeUndefined()
+  })
+})
+
+describe("readBraintreeGooglePayMerchantId", () => {
+  it("reads the Google Pay merchant ID the setting carries, which the SDK type leaves out", () => {
+    const setting = { type: "payment_setting_braintrees", google_pay_merchant_id: "BCR2DN4T" }
+    expect(readBraintreeGooglePayMerchantId(setting as unknown as PaymentSetting)).toBe("BCR2DN4T")
+  })
+
+  // Optional on the setting: most merchants don't offer Google Pay, and a
+  // sandbox merchant needs none.
+  it("reads nothing from a setting without one", () => {
+    expect(
+      readBraintreeGooglePayMerchantId({ type: "payment_setting_braintrees" } as PaymentSetting)
+    ).toBeUndefined()
+    expect(
+      readBraintreeGooglePayMerchantId({ google_pay_merchant_id: "" } as unknown as PaymentSetting)
+    ).toBeUndefined()
+    expect(readBraintreeGooglePayMerchantId(null)).toBeUndefined()
   })
 })
