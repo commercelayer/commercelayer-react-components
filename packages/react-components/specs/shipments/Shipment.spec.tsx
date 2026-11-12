@@ -362,6 +362,170 @@ describe("Shipment", () => {
       expect(mockSetShippingMethod).toHaveBeenCalledTimes(3)
     })
 
+    function twoUnselected() {
+      return [
+        makeShipment({ shipping_method: null, available_shipping_methods: [SHIPPING_METHOD_A] }),
+        makeShipment({
+          id: "ship_2",
+          shipping_method: null,
+          available_shipping_methods: [SHIPPING_METHOD_B],
+        }),
+      ]
+    }
+
+    it("selects nothing more once the step has unmounted it", async () => {
+      // A shipping step that closes while a selection is in flight unmounts
+      // the component, and the shipments it last rendered never catch up. They
+      // used to read as unselected for the rest of the run: the same shipment
+      // was PATCHed up to three times, and the next one too, while the shopper
+      // was already paying.
+      const resolveSelection = deferSelection()
+      const onAutoSelect = vi.fn()
+      const tree = autoSelectTree(onAutoSelect)
+
+      const { unmount } = render(tree(twoUnselected()))
+      await waitFor(() => expect(mockSetShippingMethod).toHaveBeenCalledTimes(1))
+
+      unmount()
+      await resolveSelection()
+
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(1)
+      // The selection did happen, so the caller still hears about it once.
+      expect(onAutoSelect).toHaveBeenCalledTimes(1)
+    })
+
+    it("leaves a shipment that another run selected while this one was busy", async () => {
+      // Run 1 is waiting on ship_1. New `shipments` start run 2, which skips
+      // ship_1 (in flight) and selects ship_2. When ship_1 resolves, run 1 moves
+      // on to ship_2 with the array it started with, where ship_2 is still
+      // unselected — it used to PATCH it a second time.
+      const resolveFirst = deferSelection()
+      const tree = autoSelectTree(true)
+
+      const { rerender } = render(tree(twoUnselected()))
+      await waitFor(() => expect(mockSetShippingMethod).toHaveBeenCalledTimes(1))
+
+      mockSetShippingMethod.mockResolvedValueOnce({
+        success: true,
+        order: { id: "order-1", shipments: [{ id: "ship_2", shipping_method: SHIPPING_METHOD_B }] },
+      })
+      await act(async () => {
+        rerender(tree(twoUnselected()))
+      })
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(2)
+      expect(mockSetShippingMethod).toHaveBeenLastCalledWith("ship_2", "sm_2")
+
+      await resolveFirst({
+        success: true,
+        order: {
+          id: "order-1",
+          shipments: [
+            { id: "ship_1", shipping_method: SHIPPING_METHOD_A },
+            { id: "ship_2", shipping_method: SHIPPING_METHOD_B },
+          ],
+        },
+      })
+
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(2)
+    })
+
+    it("leaves a shipment whose selection is in flight when data already shows it set", async () => {
+      // Run 2 is waiting on ship_2 when shipments showing both methods set land.
+      // That used to drop ship_2's in-flight marker, so run 1, resuming after
+      // ship_1 with the array it started with, selected ship_2 a second time.
+      const resolveFirst = deferSelection()
+      const tree = autoSelectTree(true)
+
+      const { rerender } = render(tree(twoUnselected()))
+      await waitFor(() => expect(mockSetShippingMethod).toHaveBeenCalledTimes(1))
+
+      const resolveSecond = deferSelection()
+      await act(async () => {
+        rerender(tree(twoUnselected()))
+      })
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(2)
+
+      await act(async () => {
+        rerender(
+          tree([
+            makeShipment({ available_shipping_methods: [SHIPPING_METHOD_A] }),
+            makeShipment({
+              id: "ship_2",
+              shipping_method: SHIPPING_METHOD_B,
+              available_shipping_methods: [SHIPPING_METHOD_B],
+            }),
+          ])
+        )
+      })
+      await resolveFirst()
+      await resolveSecond()
+
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(2)
+    })
+
+    it("keeps a selection in flight marked when data showing it set lands first", async () => {
+      // Shipments showing the method land before the selection's PATCH has
+      // resolved, then an older refetch lands with it still unselected. The
+      // first used to drop the in-flight marker, so the second selected again.
+      const resolveSelection = deferSelection()
+      const tree = autoSelectTree(true)
+
+      const { rerender } = render(tree(unselected()))
+      await waitFor(() => expect(mockSetShippingMethod).toHaveBeenCalledTimes(1))
+
+      await act(async () => {
+        rerender(tree(selected()))
+      })
+      await act(async () => {
+        rerender(tree(unselected()))
+      })
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(1)
+
+      await resolveSelection({
+        success: true,
+        order: { id: "order-1", shipments: [{ id: "ship_1", shipping_method: SHIPPING_METHOD_A }] },
+      })
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(1)
+    })
+
+    it("trusts the order the selection read back over shipments that lag behind", async () => {
+      // The shipments refetch has not rendered yet when the selection resolves,
+      // but the order it read back after the PATCH already has the method.
+      const resolveSelection = deferSelection()
+      const tree = autoSelectTree(true)
+
+      render(tree(unselected()))
+      await waitFor(() => expect(mockSetShippingMethod).toHaveBeenCalledTimes(1))
+
+      await resolveSelection({
+        success: true,
+        order: { id: "order-1", shipments: [{ id: "ship_1", shipping_method: SHIPPING_METHOD_A }] },
+      })
+
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(1)
+    })
+
+    it("selects again when the order read back shows the method cleared", async () => {
+      // A coupon applied while the selection is in flight: the read-back order
+      // says so even before any shipments refetch does.
+      const resolveFirst = deferSelection()
+      const tree = autoSelectTree(true)
+
+      const { rerender } = render(tree(unselected()))
+      await waitFor(() => expect(mockSetShippingMethod).toHaveBeenCalledTimes(1))
+      await act(async () => {
+        rerender(tree(selected()))
+      })
+
+      deferSelection()
+      await resolveFirst({
+        success: true,
+        order: { id: "order-1", shipments: [{ id: "ship_1", shipping_method: null }] },
+      })
+
+      expect(mockSetShippingMethod).toHaveBeenCalledTimes(2)
+    })
+
     it("selects again when a selection that failed sees the shipment still unselected", async () => {
       mockSetShippingMethod.mockResolvedValueOnce({ success: false })
       const tree = autoSelectTree(true)
