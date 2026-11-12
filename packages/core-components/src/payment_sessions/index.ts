@@ -70,6 +70,7 @@ export {
   PAYPAL_SETTING_TYPE,
   readAdyenSession,
   readBraintreeClientToken,
+  readBraintreeGooglePayMerchantId,
   readPaymentInstrument,
   readPayPalClientId,
   readPayPalOrderId,

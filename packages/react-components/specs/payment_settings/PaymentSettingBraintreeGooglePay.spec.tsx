@@ -298,6 +298,47 @@ describe("<PaymentSettingBraintreeGooglePay> availability", () => {
     expect(paymentsClient().options.environment).toBe("PRODUCTION")
   })
 
+  // The organization sets it on the setting, so a checkout passes nothing.
+  it("reads the Google merchant ID from the Braintree payment setting", async () => {
+    bt.createPaymentDataRequest.mockImplementation((overrides: object = {}) => ({
+      apiVersion: 2,
+      apiVersionMinor: 0,
+      environment: "PRODUCTION",
+      allowedPaymentMethods: [{ type: "CARD", parameters: {} }],
+      ...overrides,
+    }))
+    await renderAvailable(
+      order({
+        available_payment_settings: [
+          { ...BRAINTREE_SETTING, google_pay_merchant_id: "setting-merchant" },
+        ],
+      })
+    )
+    expect(bt.googlePaymentCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ googleMerchantId: "setting-merchant" })
+    )
+    expect(bt.createPaymentDataRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        merchantInfo: expect.objectContaining({ merchantId: "setting-merchant" }),
+      })
+    )
+    expect(paymentsClient().options.environment).toBe("PRODUCTION")
+  })
+
+  it("prefers the googleMerchantId prop over the setting's", async () => {
+    await renderAvailable(
+      order({
+        available_payment_settings: [
+          { ...BRAINTREE_SETTING, google_pay_merchant_id: "setting-merchant" },
+        ],
+      }),
+      { googleMerchantId: "prop-merchant" }
+    )
+    expect(bt.googlePaymentCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ googleMerchantId: "prop-merchant" })
+    )
+  })
+
   // The client token is per session, so before the shopper selects there is
   // nothing to boot from.
   it("renders nothing until Braintree is the selection", async () => {

@@ -317,7 +317,8 @@ export function readStripeClientSecret(session?: PaymentSession | null): string 
  * The odd one out among the card gateways: the setting carries no credential a
  * browser can use — its `public_key` is half of Braintree's server-side API key
  * pair, not a publishable key — so everything the browser needs arrives with
- * the Payment Session instead.
+ * the Payment Session instead. The one exception is Google Pay's merchant ID:
+ * see `readBraintreeGooglePayMerchantId`.
  */
 export const BRAINTREE_SETTING_TYPE = "payment_setting_braintrees"
 
@@ -346,6 +347,25 @@ export function readBraintreeClientToken(session?: PaymentSession | null): strin
   const { clientToken } = data as { clientToken?: unknown }
   if (typeof clientToken !== "string" || clientToken === "") return undefined
   return clientToken
+}
+
+/**
+ * The merchant ID Google issues to the merchant, which Google Pay through
+ * Braintree needs with a production Braintree merchant. A sandbox merchant
+ * pays in Google's `TEST` environment and needs none.
+ *
+ * Set by the organization on the setting, and returned in
+ * `order.available_payment_settings`, but not declared on the SDK's
+ * `PaymentSettingBraintree` type, hence the read through `unknown`.
+ * `undefined` when it is absent or empty.
+ */
+export function readBraintreeGooglePayMerchantId(
+  setting?: PaymentSetting | null
+): string | undefined {
+  const merchantId = (setting as { google_pay_merchant_id?: unknown } | null | undefined)
+    ?.google_pay_merchant_id
+  if (typeof merchantId !== "string" || merchantId === "") return undefined
+  return merchantId
 }
 
 /**

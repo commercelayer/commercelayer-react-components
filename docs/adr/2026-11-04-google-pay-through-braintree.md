@@ -98,6 +98,12 @@ is hosted for every organization, so a prop isn't somewhere it can keep a mercha
 is an attribute on `payment_setting_braintrees`, which the API doesn't have yet. Once that
 attribute exists, the component reads it and the prop becomes an override.
 
+**Update 2026-11-10 (#918).** The setting now carries it as `google_pay_merchant_id`. The
+organization sets it on the setting, and `order.available_payment_settings` returns it.
+`readBraintreeGooglePayMerchantId` (core-components) reads it, through `unknown` because the SDK
+doesn't declare it yet. `<PaymentSettingBraintreeGooglePay>` passes the prop when there is one,
+and the setting's value otherwise. With neither, a production merchant is still not offered.
+
 ### The payment is reserved from the click, and the place button honours it
 
 Found in review. The click checked only this button's own `isSubmitting`, and the shared
@@ -145,6 +151,8 @@ on a refusal.
 
 **Production waits on the payment setting.** mfe-checkout offers Google Pay through Braintree on sandbox
 merchants only, until the setting carries the merchant ID.
+Since #918 it reads the merchant ID from the setting, so a production merchant is offered Google
+Pay once the organization sets `google_pay_merchant_id`, with no change to mfe-checkout.
 
 **A refused gift card is the only failure shown inside Google's sheet.** Everything after the sheet
 closes (a failed challenge, a decline) is shown on the page through the component's children and,
