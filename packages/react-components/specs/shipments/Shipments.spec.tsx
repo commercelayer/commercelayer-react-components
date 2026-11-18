@@ -1,5 +1,5 @@
 import { act, render, screen } from "@testing-library/react"
-import { type ReactNode, useContext } from "react"
+import { type ContextType, type ReactNode, useContext } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { Shipments } from "#components/shipments/Shipments"
 import CommerceLayerContext from "#context/CommerceLayerContext"
@@ -97,6 +97,14 @@ function Providers({
       </OrderContext.Provider>
     </CommerceLayerContext.Provider>
   )
+}
+
+type ShipmentContextValue = ContextType<typeof ShipmentContext>
+
+/** Hands every render's ShipmentContext value to the test. */
+function CaptureShipmentContext({ onRender }: { onRender: (ctx: ShipmentContextValue) => void }) {
+  onRender(useContext(ShipmentContext))
+  return null
 }
 
 describe("Shipments component", () => {
@@ -504,6 +512,73 @@ describe("Shipments component", () => {
     })
 
     expect(result).toEqual({ success: false })
+  })
+
+  it("setShippingMethod refetches the shipments when the update fails (#884)", async () => {
+    // Saving the address again can replace the shipment, and a click on the
+    // stale one gets a 404. Swallowing it left the old id on screen, so every
+    // click after that failed the same way until something else refetched.
+    mockHookSetShippingMethod.mockRejectedValueOnce(new Error("RECORD_NOT_FOUND"))
+    const seen: ShipmentContextValue[] = []
+
+    render(
+      <Providers>
+        <Shipments>
+          <CaptureShipmentContext onRender={(ctx) => seen.push(ctx)} />
+        </Shipments>
+      </Providers>
+    )
+    expect(mockReload).not.toHaveBeenCalled()
+
+    let result: unknown
+    await act(async () => {
+      result = await seen.at(-1)?.setShippingMethod?.("ship_stale", "sm_1")
+    })
+
+    expect(result).toEqual({ success: false })
+    expect(mockReload).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not refetch the shipments when the update succeeds", async () => {
+    const seen: ShipmentContextValue[] = []
+
+    render(
+      <Providers>
+        <Shipments>
+          <CaptureShipmentContext onRender={(ctx) => seen.push(ctx)} />
+        </Shipments>
+      </Providers>
+    )
+
+    await act(async () => {
+      await seen.at(-1)?.setShippingMethod?.("ship_1", "sm_1")
+    })
+
+    expect(mockHookSetShippingMethod).toHaveBeenCalledTimes(1)
+    expect(mockReload).not.toHaveBeenCalled()
+  })
+
+  describe("isRefreshing (#884)", () => {
+    function renderAndCapture() {
+      const seen: ShipmentContextValue[] = []
+      render(
+        <Providers>
+          <Shipments>
+            <CaptureShipmentContext onRender={(ctx) => seen.push(ctx)} />
+          </Shipments>
+        </Providers>
+      )
+      return seen.map((ctx) => ctx.isRefreshing)
+    }
+
+    it("is true while the shipments revalidate after the first load", () => {
+      mockUseShipments.mockReturnValue(defaultHookReturn({ isValidating: true }))
+      expect(renderAndCapture().at(-1)).toBe(true)
+    })
+
+    it("is false when nothing is being fetched", () => {
+      expect(renderAndCapture().at(-1)).toBe(false)
+    })
   })
 
   it("does not cause infinite re-renders when useShipments returns a new array reference on every call", async () => {

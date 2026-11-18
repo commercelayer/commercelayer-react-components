@@ -27,7 +27,7 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
   const { shippingMethod, currentShippingMethodId, shipmentId } = useContext(
     ShippingMethodChildrenContext
   )
-  const { setShippingMethod } = useContext(ShipmentContext)
+  const { setShippingMethod, isRefreshing } = useContext(ShipmentContext)
   const shippingMethodId = shippingMethod?.id
   const name = `shipment-${shipmentId ?? ""}`
   const id = `${name}-${shippingMethodId ?? ""}`
@@ -55,20 +55,25 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
     }
     setDisabled(false)
   }
+  // While `<Shipments>` refetches after an order change, this radio may show a
+  // method the API has cleared — checked, so a click fires no change event — or
+  // belong to a shipment the order replaced, so a click PATCHes a 404. Neither
+  // can be told apart from a good click until the refetch lands, so wait for it.
+  const isDisabled = disabled || isRefreshing === true
   const parentProps = {
     shippingMethod,
     shipmentId,
     handleOnChange,
     name,
     id,
-    disabled,
+    disabled: isDisabled,
     ...props,
   }
   return children ? (
     <Parent {...parentProps}>{children}</Parent>
   ) : (
     <input
-      disabled={disabled}
+      disabled={isDisabled}
       type="radio"
       name={name}
       id={id}
