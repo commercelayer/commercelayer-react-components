@@ -301,7 +301,8 @@ export async function setPlaceOrder({
           const orderUpdated = await sdk.orders.update(updateAttributes, {
             include,
           })
-          if (setOrder) setOrder(orderUpdated)
+          // Before publishing the placed order, not after: an app that leaves the checkout as
+          // soon as it sees the order placed would drop the request on the way out (#940).
           await savePaymentSourceToCustomerWallet(sdk, orderUpdated).catch((error) => {
             // Avoid to interrupt the process if the order is already placed
             const errors = getErrors({
@@ -311,6 +312,7 @@ export async function setPlaceOrder({
             })
             if (setOrderErrors) setOrderErrors(errors)
           })
+          if (setOrder) setOrder(orderUpdated)
           updateOrderSubscriptionCustomerPaymentSource(orderUpdated, paymentType, sdk)
           return {
             placed: true,

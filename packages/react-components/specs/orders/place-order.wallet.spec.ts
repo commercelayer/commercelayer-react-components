@@ -154,6 +154,20 @@ describe("setPlaceOrder saves the card to the wallet on its own place path", () 
     expect(localStorage.getItem(WALLET)).toBe("false")
   })
 
+  it("sends the flag before publishing the placed order", async () => {
+    // An app that leaves the checkout on the placed order would drop a request still to go.
+    localStorage.setItem(WALLET, "true")
+
+    const { result, setOrder } = place()
+    await result
+
+    const walletCall = orders.update.mock.calls.findIndex(([attributes]) => attributes[WALLET])
+    expect(setOrder).toHaveBeenCalledWith(PLACED)
+    expect(orders.update.mock.invocationCallOrder[walletCall]).toBeLessThan(
+      setOrder.mock.invocationCallOrder[0]
+    )
+  })
+
   it("reports a refused flag without failing the placed order", async () => {
     localStorage.setItem(WALLET, "true")
     orders.update.mockImplementation(async (attributes) => {
