@@ -21,7 +21,7 @@ type Props = {
 } & Omit<JSX.IntrinsicElements["input"], "onChange" | "ref" | "children">
 
 export function ShippingMethodRadioButton(props: Props): JSX.Element {
-  const { onChange, children, ...p } = props
+  const { onChange, onClick, children, ...p } = props
   const [checked, setChecked] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const { shippingMethod, currentShippingMethodId, shipmentId } = useContext(
@@ -81,6 +81,18 @@ export function ShippingMethodRadioButton(props: Props): JSX.Element {
         e.preventDefault()
         e.stopPropagation()
         handleOnChange()
+      }}
+      onClick={(e) => {
+        onClick?.(e)
+        // A checked radio fires no change event, so a click on it would be
+        // lost. It is not always a no-op, though: when the order changes, the
+        // API can clear the method before anything here knows — the order in
+        // memory is as stale as the shipments until it is read again — and
+        // the radio stays checked on a method the shipment no longer has.
+        // Persisting the selection again costs a request that changes nothing
+        // when it is still in place. An unchecked radio is handled by
+        // `onChange`, so it is not persisted twice.
+        if (checked) handleOnChange()
       }}
       checked={checked}
       {...p}

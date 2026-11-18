@@ -217,4 +217,53 @@ describe("ShippingMethodRadioButton component", () => {
       expect(seen.at(-1)).toBe(true)
     })
   })
+
+  describe("a click on the radio that is already checked (#884)", () => {
+    // Before the refetch even starts, the order held in memory is as stale as
+    // the shipments, so nothing can tell that the API cleared the method. The
+    // only way not to lose the click is to persist it anyway.
+    it("persists the selection again", async () => {
+      const setShippingMethod = vi.fn().mockResolvedValue({ success: true })
+      renderRadioButton({ currentShippingMethodId: "sm_1", setShippingMethod })
+      expect((screen.getByTestId("radio") as HTMLInputElement).checked).toBe(true)
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("radio"))
+      })
+
+      expect(setShippingMethod).toHaveBeenCalledTimes(1)
+      expect(setShippingMethod).toHaveBeenCalledWith("ship_1", "sm_1")
+    })
+
+    it("persists an unchecked radio once, not once per event", async () => {
+      // Clicking an unchecked radio fires both click and change.
+      const setShippingMethod = vi.fn().mockResolvedValue({ success: true })
+      renderRadioButton({ currentShippingMethodId: "sm_99", setShippingMethod })
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("radio"))
+      })
+
+      expect(setShippingMethod).toHaveBeenCalledTimes(1)
+    })
+
+    it("still calls an onClick passed by the caller", async () => {
+      const onClick = vi.fn()
+      const setShippingMethod = vi.fn().mockResolvedValue({ success: true })
+      render(
+        <ShipmentContextProvider setShippingMethod={setShippingMethod}>
+          <ShippingMethodProvider shippingMethod={MOCK_SHIPPING_METHOD} shipmentId="ship_1">
+            <ShippingMethodRadioButton data-testid="radio" onClick={onClick} />
+          </ShippingMethodProvider>
+        </ShipmentContextProvider>
+      )
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("radio"))
+      })
+
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect(setShippingMethod).toHaveBeenCalledTimes(1)
+    })
+  })
 })
