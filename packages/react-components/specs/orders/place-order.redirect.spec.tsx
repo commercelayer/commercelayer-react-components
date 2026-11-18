@@ -92,6 +92,8 @@ function Harness({
   captureHandleClick,
   onClick,
   setOrder = vi.fn(),
+  getOrder,
+  setPlaceOrderStatus = vi.fn(),
 }: {
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   order: any
@@ -118,6 +120,10 @@ function Harness({
   onClick?: any
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   setOrder?: any
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  getOrder?: any
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  setPlaceOrderStatus?: any
 }): ReactNode {
   const formRef = useRef<HTMLFormElement | null>(null)
   if (onsubmit != null && formRef.current == null) {
@@ -137,7 +143,7 @@ function Harness({
           addResourceToInclude: vi.fn(),
           setOrder,
           setOrderErrors: vi.fn(),
-          getOrder: vi.fn().mockResolvedValue(order),
+          getOrder: getOrder ?? vi.fn().mockResolvedValue(order),
           updateOrder: vi.fn().mockResolvedValue({ success: true }),
         }}
       >
@@ -166,7 +172,7 @@ function Harness({
                 status,
                 paymentSource,
                 setPlaceOrder,
-                setPlaceOrderStatus: vi.fn(),
+                setPlaceOrderStatus,
                 setButtonRef: vi.fn(),
               }}
             >
@@ -837,6 +843,135 @@ describe("place order on redirect return", () => {
       await settle()
       expect(ordersRetrieve).toHaveBeenCalled()
       expect(ordersUpdate).not.toHaveBeenCalled()
+    })
+  })
+})
+
+// #941: the API dropped the PayPal payment (a shipping method change landed while it was
+// being created) and the context still held it. The click redirected to its stale
+// `approval_url`, and the shopper came back to ORDER_NOT_APPROVED.
+describe("place order with PayPal when the order lost its payment source", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  function paypalOrder(totalCents = 1000) {
+    const order = makeOrder(undefined)
+    order.payment_method.payment_source_type = "paypal_payments"
+    order.payment_source.type = "paypal_payments"
+    order.total_amount_with_taxes_cents = totalCents
+    return order
+  }
+
+  function freshRead(paymentSource: unknown) {
+    ordersRetrieve.mockResolvedValue({
+      id: "order-1",
+      status: "pending",
+      payment_status: "unpaid",
+      payment_source: paymentSource,
+    })
+  }
+
+  it("does not redirect to the stale payment, and reloads the order instead", async () => {
+    freshRead(null)
+    const setPlaceOrder = placeOrderSpy()
+    const setPaymentSource = vi.fn().mockResolvedValue({ id: "ps-1", type: "paypal_payments" })
+    const getOrder = vi.fn().mockResolvedValue(undefined)
+    const setPlaceOrderStatus = vi.fn()
+    // The PayPal widget: it is what enables the button in the normal flow.
+    const onsubmit = vi.fn().mockResolvedValue(true)
+    const { getByRole } = render(
+      <Harness
+        order={paypalOrder()}
+        paymentType="paypal_payments"
+        options={{}}
+        setPlaceOrder={setPlaceOrder}
+        setPaymentSource={setPaymentSource}
+        paymentSource={{ id: "ps-1", type: "paypal_payments" }}
+        getOrder={getOrder}
+        onsubmit={onsubmit}
+        setPlaceOrderStatus={setPlaceOrderStatus}
+      />
+    )
+    getByRole("button").click()
+    await waitFor(() => {
+      expect(getOrder).toHaveBeenCalledWith("order-1")
+    })
+    await settle()
+    // `setPlaceOrder` is where PayPal redirects to `approval_url`.
+    expect(setPlaceOrder).not.toHaveBeenCalled()
+    expect(setPaymentSource).not.toHaveBeenCalled()
+    expect(setPlaceOrderStatus).toHaveBeenCalledWith({ status: "standby" })
+    expect(setPlaceOrderStatus).not.toHaveBeenCalledWith({ status: "placing" })
+    expect(onsubmit).not.toHaveBeenCalled()
+  })
+
+  it("uses the payment source the order has, not the one the context still holds", async () => {
+    freshRead({ id: "ps-new", type: "paypal_payments" })
+    const setPlaceOrder = placeOrderSpy()
+    const setPaymentSource = vi.fn().mockResolvedValue({ id: "ps-new", type: "paypal_payments" })
+    const { getByRole } = render(
+      <Harness
+        order={paypalOrder()}
+        paymentType="paypal_payments"
+        options={{}}
+        setPlaceOrder={setPlaceOrder}
+        setPaymentSource={setPaymentSource}
+        paymentSource={{ id: "ps-1", type: "paypal_payments" }}
+        onsubmit={vi.fn().mockResolvedValue(true)}
+      />
+    )
+    getByRole("button").click()
+    await waitFor(() => {
+      expect(setPlaceOrder).toHaveBeenCalled()
+    })
+    expect(setPaymentSource).toHaveBeenCalledWith(
+      expect.objectContaining({ paymentSourceId: "ps-new" })
+    )
+    expect(setPlaceOrder).toHaveBeenCalledWith(
+      expect.objectContaining({ paymentSource: { id: "ps-new", type: "paypal_payments" } })
+    )
+  })
+
+  it("still places a free order, which never has a payment source", async () => {
+    freshRead(null)
+    const setPlaceOrder = placeOrderSpy()
+    const { getByRole } = render(
+      <Harness
+        order={paypalOrder(0)}
+        paymentType="paypal_payments"
+        options={{}}
+        setPlaceOrder={setPlaceOrder}
+        setPaymentSource={vi.fn().mockResolvedValue(undefined)}
+        paymentSource={{ id: "ps-1", type: "paypal_payments" }}
+      />
+    )
+    getByRole("button").click()
+    await waitFor(() => {
+      expect(setPlaceOrder).toHaveBeenCalled()
+    })
+  })
+
+  it("leaves other gateways on the payment source in the context", async () => {
+    freshRead(null)
+    const setPlaceOrder = placeOrderSpy()
+    const setPaymentSource = vi.fn().mockResolvedValue({ id: "ps-1", type: "wire_transfers" })
+    const { getByRole } = render(
+      <Harness
+        order={makeOrder(undefined)}
+        paymentType="wire_transfers"
+        options={{}}
+        setPlaceOrder={setPlaceOrder}
+        setPaymentSource={setPaymentSource}
+        paymentSource={{ id: "ps-1", type: "wire_transfers" }}
+        onsubmit={vi.fn().mockResolvedValue(true)}
+      />
+    )
+    getByRole("button").click()
+    await waitFor(() => {
+      expect(setPaymentSource).toHaveBeenCalledWith(
+        expect.objectContaining({ paymentSourceId: "ps-1" })
+      )
     })
   })
 })
