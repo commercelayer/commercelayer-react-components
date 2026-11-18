@@ -16,7 +16,10 @@ import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PlaceOrderOptions } from "#reducers/PlaceOrderReducer"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
-import { saveAddressesToCustomerAddressBook } from "#utils/customerOrderOptions"
+import {
+  saveAddressesToCustomerAddressBook,
+  savePaymentSourceToCustomerWallet,
+} from "#utils/customerOrderOptions"
 import getCardDetails from "#utils/getCardDetails"
 import { isAdyenAuthorizedResultCode, isRefusedPaymentResponse } from "#utils/paymentAuthorization"
 import { checkPaymentIntent } from "#utils/stripe/retrievePaymentIntent"
@@ -91,6 +94,8 @@ export function PlaceOrderButton(props: Props): JSX.Element {
    * effect below, there for orders nothing else reports, would report it a second time.
    */
   const placedReportedRef = useRef<string | null>(null)
+  /** The order the placed-and-authorized effect already sent the wallet flag for (#940). */
+  const walletSavedRef = useRef<string | null>(null)
   const {
     children,
     label = "Place order",
@@ -370,10 +375,26 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       placedReportedRef.current !== order.id
     ) {
       // Dispatch the onClick callback when the order is placed and the payment status is authorized (Adyen with gift card)
-      onClick?.({
-        placed: true,
-        order: order,
-      })
+      const placedOrder = order
+      const report = (): void => {
+        onClick?.({
+          placed: true,
+          order: placedOrder,
+        })
+      }
+      const sdk = sdkClient()
+      if (sdk == null || walletSavedRef.current === placedOrder.id) {
+        report()
+        return
+      }
+      // An `auto_place` method placed the order on `_authorize`, and the read-back published
+      // it: the app is told here, and `setPlaceOrder`, which sends the wallet flag, never
+      // runs (#940). Send it first — the app may leave the checkout on this callback — and
+      // once per order: the ref holds off a second run before the first has cleared the flag.
+      walletSavedRef.current = placedOrder.id
+      void savePaymentSourceToCustomerWallet(sdk, placedOrder)
+        .catch(() => undefined)
+        .then(report)
     }
   }, [order?.id, order?.payment_status, order?.status, paymentType != null])
   useEffect(() => {
