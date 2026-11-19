@@ -136,7 +136,7 @@ export function PlaceOrderButton(props: Props): JSX.Element {
       errors: paymentMethodErrors,
     },
   } = usePaymentMethodStateContext()
-  const { order, setOrderErrors, errors } = useContext(OrderContext)
+  const { order, setOrderErrors, errors, getOrder } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
   useEffect(() => {
     if (hasBlockingErrors) {
@@ -473,6 +473,11 @@ export function PlaceOrderButton(props: Props): JSX.Element {
     let currentPaymentStatus = "unpaid"
     /** Set when the gateway validated this attempt *and* nothing is left to pay. */
     let gatewayAuthorizedThisAttempt = false
+    /**
+     * The payment source the order has right now: `null` when it has none, `undefined`
+     * when it was not read (Stripe skips the read below).
+     */
+    let orderPaymentSourceId: string | null | undefined
 
     const isStripePayment = paymentType === "stripe_payments"
     if (!isStripePayment) {
@@ -481,10 +486,17 @@ export function PlaceOrderButton(props: Props): JSX.Element {
        * and to prevent placing a draft order
        * @see https://docs.commercelayer.io/core/how-tos/placing-orders/checkout/placing-the-order
        */
-      const { status, payment_status: paymentStatus } = await sdk.orders.retrieve(order?.id, {
+      const {
+        status,
+        payment_status: paymentStatus,
+        payment_source: orderPaymentSource,
+      } = await sdk.orders.retrieve(order?.id, {
         fields: ["status", "payment_status", "payment_source"],
         include: ["payment_source"],
       })
+      // Included above, so `null` really means "no payment source".
+      orderPaymentSourceId =
+        orderPaymentSource === undefined ? undefined : (orderPaymentSource?.id ?? null)
       const isAlreadyPlaced = status === "placed"
       const isDraftOrder = status === "draft"
       currentPaymentStatus = paymentStatus ?? "unpaid"
@@ -542,6 +554,18 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         return
       }
     }
+    if (paymentType === "paypal_payments" && orderPaymentSourceId === null && !isFree) {
+      /**
+       * The API dropped the PayPal payment — a shipping method change does that — while
+       * the context still holds it. Its `approval_url` belongs to a PayPal order this
+       * order no longer points at: the shopper would approve it and come back to
+       * `ORDER_NOT_APPROVED` (#941). Publish the order as it is, so the gateway creates
+       * a new payment, and let the shopper place again once it is there.
+       */
+      await getOrder?.(order.id)
+      setPlaceOrderStatus?.({ status: "standby" })
+      return
+    }
     setIsLoading(true)
     // setForceDisable(true)
     const checkPaymentSource =
@@ -549,7 +573,9 @@ export function PlaceOrderButton(props: Props): JSX.Element {
         ? await setPaymentSource({
             // @ts-expect-error no type not be undefined
             paymentResource: paymentType,
-            paymentSourceId: paymentSource?.id,
+            // The order's own payment source when it has one: the context can still hold
+            // one the API has since replaced.
+            paymentSourceId: orderPaymentSourceId ?? paymentSource?.id,
           })
         : // Fall back to the order's own payment source: on a 3DS return the
           // Stripe redirect effect above fires as soon as `order.payment_source`

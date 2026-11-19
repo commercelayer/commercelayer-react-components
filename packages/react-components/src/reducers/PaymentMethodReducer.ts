@@ -380,8 +380,20 @@ async function runSetPaymentSource({
           }
           paymentSource = await sdk[paymentResource].create(attrs)
           const readBack = getOrder ? await getOrder(order.id) : undefined
-          if (readBack?.updated_at != null) {
-            lastPaymentSourceCreates.set(createKey(order.id, paymentResource), {
+          // A read-back that loaded the payment source and found it gone, or found
+          // another one, shows the API already dropped this create — a shipping method
+          // change landing while it was in flight does that (#941). Remembering it would
+          // hand that dead source to every later create at this revision, and PayPal
+          // would then redirect to its stale `approval_url`. `undefined` only means the
+          // payment source was not included in the read, which says nothing either way.
+          const droppedByApi =
+            readBack?.payment_source !== undefined &&
+            readBack.payment_source?.id !== paymentSource.id
+          const key = createKey(order.id, paymentResource)
+          if (droppedByApi) {
+            lastPaymentSourceCreates.delete(key)
+          } else if (readBack?.updated_at != null) {
+            lastPaymentSourceCreates.set(key, {
               paymentSource,
               orderUpdatedAt: readBack.updated_at,
             })

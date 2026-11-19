@@ -152,6 +152,75 @@ describe("setPaymentSource after a create has just settled", () => {
 
     expect(stripeCreate).toHaveBeenCalledTimes(2)
   })
+
+  // #941: a shipping method change lands while the create is in flight and the API drops
+  // the new source. The read-back already shows the order at its final revision without
+  // it, so every later create at that revision used to be handed the dead source.
+  it("creates again when the read-back already lacks the source it created", async () => {
+    await setPaymentSource(
+      createParams({
+        order: orderAt("order-dropped", BEFORE),
+        getOrder: vi.fn().mockResolvedValue(orderAt("order-dropped", AFTER, null)),
+      })
+    )
+
+    const result = await setPaymentSource(createParams({ order: orderAt("order-dropped", AFTER) }))
+
+    expect(stripeCreate).toHaveBeenCalledTimes(2)
+    expect(result).toEqual({ id: "sp-1", type: "stripe_payments" })
+  })
+
+  it("creates again when the read-back shows another source", async () => {
+    await setPaymentSource(
+      createParams({
+        order: orderAt("order-other", BEFORE),
+        getOrder: vi.fn().mockResolvedValue(orderAt("order-other", AFTER, { id: "sp-other" })),
+      })
+    )
+
+    await setPaymentSource(createParams({ order: orderAt("order-other", BEFORE) }))
+
+    expect(stripeCreate).toHaveBeenCalledTimes(2)
+  })
+
+  it("forgets an earlier create once a later read-back shows it dropped", async () => {
+    // Kills: skipping the `set` but leaving the previous entry in place.
+    await setPaymentSource(
+      createParams({
+        order: orderAt("order-forget", BEFORE),
+        getOrder: vi.fn().mockResolvedValue(orderAt("order-forget", AFTER, { id: "sp-1" })),
+      })
+    )
+    // A newer order without a source creates for real; the API drops that one too.
+    stripeCreate.mockResolvedValueOnce({ id: "sp-2", type: "stripe_payments" })
+    await setPaymentSource(
+      createParams({
+        order: orderAt("order-forget", LATER),
+        getOrder: vi.fn().mockResolvedValue(orderAt("order-forget", LATER, null)),
+      })
+    )
+
+    // Not newer than the first entry: without the delete it would get `sp-1` back.
+    await setPaymentSource(createParams({ order: orderAt("order-forget", AFTER) }))
+
+    expect(stripeCreate).toHaveBeenCalledTimes(3)
+  })
+
+  it("still hands over the source when the read-back did not include it", async () => {
+    // `undefined` means the payment source was not in the read's include, not that the
+    // API dropped it: the single-method double create must stay suppressed.
+    const notIncluded = { id: "order-noinc", status: "pending", updated_at: AFTER }
+    await setPaymentSource(
+      createParams({
+        order: orderAt("order-noinc", BEFORE),
+        getOrder: vi.fn().mockResolvedValue(notIncluded),
+      })
+    )
+
+    await setPaymentSource(createParams({ order: orderAt("order-noinc", BEFORE) }))
+
+    expect(stripeCreate).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe("setPaymentSource when the payment session expired", () => {
