@@ -29,6 +29,7 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
     shipments,
     deliveryLeadTimes,
     isLoading,
+    isValidating,
     reload,
     setShippingMethod: hookSetShippingMethod,
   } = useShipments({ accessToken, orderId })
@@ -177,23 +178,34 @@ export function Shipments({ children, loader = "Loading..." }: Props): JSX.Eleme
         }
         return { success: true }
       } catch {
+        // Typically a 404: saving the address again can replace the shipment,
+        // and the click came from the shipments still on screen. Left alone,
+        // they keep the old id and every later click fails the same way.
+        void reload()
         return { success: false }
       }
     },
-    [order, hookSetShippingMethod, getOrder, orderId]
+    [order, hookSetShippingMethod, getOrder, orderId, reload]
   )
 
   const setShipmentErrors = useCallback((errs: BaseError[]) => setErrors(errs), [])
+
+  // While a refetch is in flight the shipments on screen are the ones from
+  // before the order changed, and SWR keeps serving them: a radio can be
+  // checked on a method the API cleared, or carry a shipment id the order no
+  // longer has. The first load shows the loader instead, so it is not counted.
+  const isRefreshing = isValidating && !isLoading
 
   const contextValue = useMemo(
     () => ({
       shipments: shipments.length > 0 ? shipments : null,
       deliveryLeadTimes,
       errors,
+      isRefreshing,
       setShipmentErrors: setShipmentErrors as SetShipmentErrors,
       setShippingMethod,
     }),
-    [shipments, deliveryLeadTimes, errors, setShipmentErrors, setShippingMethod]
+    [shipments, deliveryLeadTimes, errors, isRefreshing, setShipmentErrors, setShippingMethod]
   )
 
   if (isLoading) {

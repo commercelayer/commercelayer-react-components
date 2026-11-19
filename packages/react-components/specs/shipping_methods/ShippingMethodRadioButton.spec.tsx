@@ -9,13 +9,15 @@ function renderRadioButton({
   currentShippingMethodId = "sm_1",
   setShippingMethod = vi.fn().mockResolvedValue({ success: true }),
   onChange,
+  isRefreshing,
 }: {
   currentShippingMethodId?: string
+  isRefreshing?: boolean
   setShippingMethod?: (id: string, smId: string) => Promise<{ success: boolean; order?: object }>
   onChange?: (params: object) => void
 } = {}) {
   return render(
-    <ShipmentContextProvider setShippingMethod={setShippingMethod}>
+    <ShipmentContextProvider setShippingMethod={setShippingMethod} isRefreshing={isRefreshing}>
       <ShippingMethodProvider
         shippingMethod={MOCK_SHIPPING_METHOD}
         currentShippingMethodId={currentShippingMethodId}
@@ -177,5 +179,91 @@ describe("ShippingMethodRadioButton component", () => {
     const radio = screen.getByTestId("radio")
     expect(radio.getAttribute("name")).toBe("shipment-ship_1")
     expect(radio.getAttribute("id")).toBe("shipment-ship_1-")
+  })
+
+  // #884: after the order changes (a coupon applied or removed, an address saved
+  // again) `<Shipments>` refetches the shipments, and until that lands the
+  // radios show the previous ones. A click there either hits a radio still
+  // checked on a method the API cleared — no change event, no request — or
+  // PATCHes a shipment the order no longer has.
+  describe("while the shipments are being refreshed (#884)", () => {
+    it("is disabled while the shipments are refreshing, enabled otherwise", () => {
+      const { unmount } = renderRadioButton({ isRefreshing: true })
+      expect((screen.getByTestId("radio") as HTMLInputElement).disabled).toBe(true)
+      unmount()
+
+      // Positive control: the same radio outside a refresh is clickable.
+      renderRadioButton({ isRefreshing: false })
+      expect((screen.getByTestId("radio") as HTMLInputElement).disabled).toBe(false)
+    })
+
+    it("hands the disabled state to a render-prop child while refreshing", () => {
+      const seen: Array<boolean | undefined> = []
+      const tree = (isRefreshing: boolean) => (
+        <ShipmentContextProvider isRefreshing={isRefreshing}>
+          <ShippingMethodProvider shippingMethod={MOCK_SHIPPING_METHOD} shipmentId="ship_1">
+            <ShippingMethodRadioButton>
+              {(props) => {
+                seen.push((props as { disabled?: boolean }).disabled)
+                return <span />
+              }}
+            </ShippingMethodRadioButton>
+          </ShippingMethodProvider>
+        </ShipmentContextProvider>
+      )
+      const { rerender } = render(tree(false))
+      expect(seen.at(-1)).toBe(false)
+      rerender(tree(true))
+      expect(seen.at(-1)).toBe(true)
+    })
+  })
+
+  describe("a click on the radio that is already checked (#884)", () => {
+    // Before the refetch even starts, the order held in memory is as stale as
+    // the shipments, so nothing can tell that the API cleared the method. The
+    // only way not to lose the click is to persist it anyway.
+    it("persists the selection again", async () => {
+      const setShippingMethod = vi.fn().mockResolvedValue({ success: true })
+      renderRadioButton({ currentShippingMethodId: "sm_1", setShippingMethod })
+      expect((screen.getByTestId("radio") as HTMLInputElement).checked).toBe(true)
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("radio"))
+      })
+
+      expect(setShippingMethod).toHaveBeenCalledTimes(1)
+      expect(setShippingMethod).toHaveBeenCalledWith("ship_1", "sm_1")
+    })
+
+    it("persists an unchecked radio once, not once per event", async () => {
+      // Clicking an unchecked radio fires both click and change.
+      const setShippingMethod = vi.fn().mockResolvedValue({ success: true })
+      renderRadioButton({ currentShippingMethodId: "sm_99", setShippingMethod })
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("radio"))
+      })
+
+      expect(setShippingMethod).toHaveBeenCalledTimes(1)
+    })
+
+    it("still calls an onClick passed by the caller", async () => {
+      const onClick = vi.fn()
+      const setShippingMethod = vi.fn().mockResolvedValue({ success: true })
+      render(
+        <ShipmentContextProvider setShippingMethod={setShippingMethod}>
+          <ShippingMethodProvider shippingMethod={MOCK_SHIPPING_METHOD} shipmentId="ship_1">
+            <ShippingMethodRadioButton data-testid="radio" onClick={onClick} />
+          </ShippingMethodProvider>
+        </ShipmentContextProvider>
+      )
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("radio"))
+      })
+
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect(setShippingMethod).toHaveBeenCalledTimes(1)
+    })
   })
 })
