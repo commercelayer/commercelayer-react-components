@@ -2,6 +2,8 @@ import { act, fireEvent, render, renderHook, screen } from "@testing-library/rea
 import { type ReactNode, useContext } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { PaymentMethod } from "#components/payment_methods/PaymentMethod"
+import { PaymentMethodName } from "#components/payment_methods/PaymentMethodName"
+import { PaymentMethodRadioButton } from "#components/payment_methods/PaymentMethodRadioButton"
 import { PaymentMethodsContainer } from "#components/payment_methods/PaymentMethodsContainer"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import CustomerContext from "#context/CustomerContext"
@@ -68,6 +70,7 @@ function Providers({
   addResourceToInclude = vi.fn(),
   include = [],
   includeLoaded = {},
+  updateOrder = vi.fn().mockResolvedValue({ success: true }),
 }: {
   children: ReactNode
   // biome-ignore lint/suspicious/noExplicitAny: test cast
@@ -76,6 +79,8 @@ function Providers({
   include?: string[]
   // biome-ignore lint/suspicious/noExplicitAny: test cast
   includeLoaded?: any
+  // biome-ignore lint/suspicious/noExplicitAny: test cast
+  updateOrder?: any
 }) {
   return (
     <CommerceLayerContext.Provider value={{ accessToken: "test-token" }}>
@@ -88,7 +93,7 @@ function Providers({
           includeLoaded,
           addResourceToInclude,
           getOrder: vi.fn().mockResolvedValue(order),
-          updateOrder: vi.fn().mockResolvedValue({ success: true }),
+          updateOrder,
         }}
       >
         <CustomerContext.Provider value={{}}>
@@ -1315,6 +1320,68 @@ describe("PaymentMethod", () => {
       })
 
       expect(onClickFn).toHaveBeenCalled()
+    })
+
+    // These two render without a mocked payment-method context, so the clicks go
+    // through the real `setPaymentMethod` down to the order update.
+    describe("one payment method update at a time (#944)", () => {
+      /** An order update held in flight until `settle` is called. */
+      function heldUpdateOrder(order: unknown) {
+        let settle: () => void = () => {}
+        const updateOrder = vi.fn(
+          () =>
+            new Promise((resolve) => {
+              settle = () => resolve({ success: true, order })
+            })
+        )
+        return { updateOrder, settle: () => settle() }
+      }
+
+      it("updates the order once when a payment method label is clicked", async () => {
+        const { updateOrder, settle } = heldUpdateOrder(MOCK_ORDER)
+
+        await act(async () => {
+          render(
+            <Providers updateOrder={updateOrder}>
+              <PaymentMethod clickableContainer onClick={vi.fn()}>
+                <PaymentMethodRadioButton />
+                <PaymentMethodName />
+              </PaymentMethod>
+            </Providers>
+          )
+        })
+
+        // The browser follows the click on the label with a click on its radio:
+        // both reach the container.
+        await act(async () => {
+          fireEvent.click(screen.getByText("Stripe"))
+        })
+
+        expect(updateOrder).toHaveBeenCalledTimes(1)
+        await act(async () => settle())
+      })
+
+      it("does not update the order again for a click while auto-select is setting the method", async () => {
+        const { updateOrder, settle } = heldUpdateOrder(MOCK_ORDER_SINGLE)
+
+        await act(async () => {
+          render(
+            <Providers order={MOCK_ORDER_SINGLE} updateOrder={updateOrder}>
+              <PaymentMethod autoSelectSinglePaymentMethod clickableContainer onClick={vi.fn()}>
+                <span>method</span>
+              </PaymentMethod>
+            </Providers>
+          )
+        })
+        expect(updateOrder).toHaveBeenCalledTimes(1)
+
+        await act(async () => {
+          fireEvent.click(screen.getByTestId("stripe_payments"))
+        })
+
+        expect(updateOrder).toHaveBeenCalledTimes(1)
+        await act(async () => settle())
+      })
     })
   })
 

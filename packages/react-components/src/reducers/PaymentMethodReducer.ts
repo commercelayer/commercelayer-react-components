@@ -210,7 +210,50 @@ interface TSetPaymentMethodParams {
   paymentResource?: PaymentResource
 }
 
-export async function setPaymentMethod({
+type SetPaymentMethodResponse = {
+  success: boolean
+  order?: Order
+  error?: { errors: BaseError[] }
+}
+
+// One payment method update per order at a time. A click on a payment method's label
+// reaches a clickable <PaymentMethod> twice — the browser follows it with a click on the
+// radio the label points at — and a click can land while the single-method auto-select
+// is still setting the method, so the same update went out twice at once (#944). A call
+// for the method already being set joins that request; a call for another method waits
+// for it and goes out next, so the order keeps the last selection. Entries are removed
+// once settled, so a later call updates again.
+const inFlightPaymentMethodRequests = new Map<
+  string,
+  { paymentMethodId: string; request: Promise<SetPaymentMethodResponse> }
+>()
+
+export async function setPaymentMethod(
+  params: TSetPaymentMethodParams
+): Promise<SetPaymentMethodResponse> {
+  const { order, paymentMethodId } = params
+  // Without a stable order id there is no real request to serialize.
+  if (order?.id == null) {
+    return runSetPaymentMethod(params)
+  }
+  const orderId = order.id
+  const existing = inFlightPaymentMethodRequests.get(orderId)
+  if (existing?.paymentMethodId === paymentMethodId) {
+    return existing.request
+  }
+  const run = () => runSetPaymentMethod(params)
+  const request = (
+    existing == null ? run() : existing.request.catch(() => undefined).then(run)
+  ).finally(() => {
+    if (inFlightPaymentMethodRequests.get(orderId)?.request === request) {
+      inFlightPaymentMethodRequests.delete(orderId)
+    }
+  })
+  inFlightPaymentMethodRequests.set(orderId, { paymentMethodId, request })
+  return request
+}
+
+async function runSetPaymentMethod({
   config,
   dispatch,
   order,
@@ -218,11 +261,7 @@ export async function setPaymentMethod({
   updateOrder,
   setOrderErrors,
   paymentResource,
-}: TSetPaymentMethodParams): Promise<{
-  success: boolean
-  order?: Order
-  error?: { errors: BaseError[] }
-}> {
+}: TSetPaymentMethodParams): Promise<SetPaymentMethodResponse> {
   let response: { success: boolean; order?: Order } = {
     success: false,
   }
