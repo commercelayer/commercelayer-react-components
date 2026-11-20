@@ -41,3 +41,21 @@ export async function saveAddressesToCustomerAddressBook(
     setCustomerOrderParam("_save_shipping_address_to_customer_address_book", "false")
   }
 }
+
+/**
+ * Sends the wallet flag the shopper checked, for an order with something to pay, and clears
+ * it once the API accepts it. It lives in localStorage like the address book flags, so
+ * without clearing it a second pass — the return from a gateway redirect, a second click —
+ * would send it again and could save the card twice (#940).
+ */
+export async function savePaymentSourceToCustomerWallet(
+  sdk: ReturnType<typeof getSdk>,
+  order: { id: string; total_amount_cents?: number | null }
+): Promise<void> {
+  if (!saveToWallet() || (order.total_amount_cents ?? 0) <= 0) return
+  await sdk.orders.update({
+    id: order.id,
+    _save_payment_source_to_customer_wallet: true,
+  })
+  setCustomerOrderParam("_save_payment_source_to_customer_wallet", "false")
+}

@@ -975,3 +975,118 @@ describe("place order with PayPal when the order lost its payment source", () =>
     })
   })
 })
+
+// #940: an `auto_place` method placed the order on `_authorize` and the read-back published it.
+// The placed-and-authorized effect tells the app directly, so `setPlaceOrder` never runs to
+// send the wallet flag.
+describe("an Adyen order published placed and authorized", () => {
+  const WALLET = "_save_payment_source_to_customer_wallet"
+
+  function placedAdyenOrder() {
+    const order = makeOrder({ resultCode: "Authorised" })
+    order.status = "placed"
+    order.payment_status = "authorized"
+    order.total_amount_cents = 1000
+    return order
+  }
+
+  function renderPlaced(onClick: ReturnType<typeof vi.fn>) {
+    return render(
+      <Harness
+        order={placedAdyenOrder()}
+        paymentType="adyen_payments"
+        options={{}}
+        setPlaceOrder={placeOrderSpy()}
+        setPaymentSource={vi.fn()}
+        onClick={onClick}
+      />
+    )
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    localStorage.clear()
+    ordersUpdate.mockResolvedValue({ id: "order-1", status: "placed" })
+  })
+
+  it("sends the wallet flag before telling the app the order is placed", async () => {
+    localStorage.setItem(WALLET, "true")
+    const onClick = vi.fn()
+
+    renderPlaced(onClick)
+
+    await waitFor(() => {
+      expect(onClick).toHaveBeenCalledWith(expect.objectContaining({ placed: true }))
+    })
+    const walletCalls = ordersUpdate.mock.calls.filter(([attributes]) => attributes[WALLET])
+    expect(walletCalls).toEqual([[{ id: "order-1", [WALLET]: true }]])
+    expect(ordersUpdate.mock.invocationCallOrder[0]).toBeLessThan(
+      onClick.mock.invocationCallOrder[0]
+    )
+    expect(localStorage.getItem(WALLET)).toBe("false")
+  })
+
+  it("still tells the app when the wallet flag is refused", async () => {
+    localStorage.setItem(WALLET, "true")
+    ordersUpdate.mockRejectedValue(new Error("refused"))
+    const onClick = vi.fn()
+
+    renderPlaced(onClick)
+
+    await waitFor(() => {
+      expect(onClick).toHaveBeenCalledWith(expect.objectContaining({ placed: true }))
+    })
+  })
+
+  it("sends nothing when the shopper did not ask to save the card", async () => {
+    const onClick = vi.fn()
+
+    renderPlaced(onClick)
+
+    await waitFor(() => {
+      expect(onClick).toHaveBeenCalledWith(expect.objectContaining({ placed: true }))
+    })
+    expect(ordersUpdate).not.toHaveBeenCalled()
+  })
+
+  it("sends the flag once when the effect runs again for the same order", async () => {
+    localStorage.setItem(WALLET, "true")
+    // Held, so a second run lands before the first has cleared the flag.
+    let release!: () => void
+    ordersUpdate.mockImplementation(
+      () =>
+        new Promise((r) => {
+          release = () => r({ id: "order-1", status: "placed" })
+        })
+    )
+    const onClick = vi.fn()
+    const { rerender } = renderPlaced(onClick)
+    const second = placedAdyenOrder()
+    second.payment_status = "paid"
+    rerender(
+      <Harness
+        order={second}
+        paymentType="adyen_payments"
+        options={{}}
+        setPlaceOrder={placeOrderSpy()}
+        setPaymentSource={vi.fn()}
+        onClick={onClick}
+      />
+    )
+    second.payment_status = "authorized"
+    rerender(
+      <Harness
+        order={{ ...second }}
+        paymentType="adyen_payments"
+        options={{}}
+        setPlaceOrder={placeOrderSpy()}
+        setPaymentSource={vi.fn()}
+        onClick={onClick}
+      />
+    )
+    release()
+    await settle()
+
+    expect(ordersUpdate).toHaveBeenCalledTimes(1)
+  })
+})
