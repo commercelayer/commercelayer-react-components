@@ -7,6 +7,10 @@ import * as barrel from "../../src/index"
  * `dist` entirely. Its own spec still passes, because specs import from the
  * source file. This guard fails as soon as a component module exports
  * something the root barrel does not.
+ *
+ * Runtime exports only: types vanish at runtime, and `components/utils` is
+ * skipped below, so the types public props rely on are listed by hand in
+ * `src/index.ts`.
  */
 
 // Internal on purpose: gateways are picked by `PaymentGateway` from the
