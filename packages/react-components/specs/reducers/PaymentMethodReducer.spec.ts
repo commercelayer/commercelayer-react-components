@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { setPaymentSource } from "#reducers/PaymentMethodReducer"
+import { setPaymentMethod, setPaymentSource } from "#reducers/PaymentMethodReducer"
 
 const stripeCreate = vi.fn()
 const wireCreate = vi.fn()
@@ -10,6 +10,7 @@ vi.mock("@commercelayer/core-components", async (importOriginal) => {
     ...actual,
     getSdk: vi.fn(() => ({
       orders: { relationship: vi.fn().mockReturnValue({}) },
+      payment_methods: { relationship: vi.fn((id: string) => ({ id })) },
       stripe_payments: { create: stripeCreate },
       wire_transfers: { create: wireCreate },
     })),
@@ -315,5 +316,88 @@ describe("setPaymentSource when the API refuses the write with a 401", () => {
     )
 
     expect(errorDispatches(dispatch)).toHaveLength(1)
+  })
+})
+
+describe("setPaymentMethod one update per order at a time (#944)", () => {
+  /** An order update that settles only when the test says so. */
+  function deferredUpdateOrder() {
+    const pending: Array<() => void> = []
+    const updateOrder = vi.fn(
+      () =>
+        new Promise((resolve) => {
+          pending.push(() => resolve({ success: true, order: ORDER }))
+        })
+    )
+    const settleNext = () => pending.shift()?.()
+    return { updateOrder, settleNext }
+  }
+
+  function methodParams(paymentMethodId: string, overrides: Record<string, unknown> = {}) {
+    return createParams({ paymentMethodId, setOrderErrors: vi.fn(), ...overrides })
+  }
+
+  function sentMethodIds(updateOrder: ReturnType<typeof vi.fn>) {
+    return updateOrder.mock.calls.map(
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      ([{ attributes }]: any) => attributes.payment_method.id
+    )
+  }
+
+  it("sends one update for two concurrent calls with the same method", async () => {
+    const updateOrder = vi.fn().mockResolvedValue({ success: true, order: ORDER })
+
+    const [first, second] = await Promise.all([
+      setPaymentMethod(methodParams("pm_stripe", { updateOrder })),
+      setPaymentMethod(methodParams("pm_stripe", { updateOrder })),
+    ])
+
+    expect(updateOrder).toHaveBeenCalledTimes(1)
+    expect(first).toEqual({ success: true, order: ORDER })
+    expect(second).toBe(first)
+  })
+
+  it("updates again for a call after the first settles", async () => {
+    const updateOrder = vi.fn().mockResolvedValue({ success: true, order: ORDER })
+
+    await setPaymentMethod(methodParams("pm_stripe", { updateOrder }))
+    await setPaymentMethod(methodParams("pm_stripe", { updateOrder }))
+
+    expect(updateOrder).toHaveBeenCalledTimes(2)
+  })
+
+  it("sends another method only once the one in flight settles, and keeps it", async () => {
+    const { updateOrder, settleNext } = deferredUpdateOrder()
+    const dispatch = vi.fn()
+
+    const stripe = setPaymentMethod(methodParams("pm_stripe", { updateOrder, dispatch }))
+    const wire = setPaymentMethod(methodParams("pm_wire", { updateOrder, dispatch }))
+    expect(sentMethodIds(updateOrder)).toEqual(["pm_stripe"])
+
+    settleNext()
+    await stripe
+    expect(sentMethodIds(updateOrder)).toEqual(["pm_stripe", "pm_wire"])
+    settleNext()
+    await wire
+
+    expect(dispatch).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ currentPaymentMethodId: "pm_wire" }),
+      })
+    )
+  })
+
+  it("does not hold up another order's update", async () => {
+    const { updateOrder, settleNext } = deferredUpdateOrder()
+
+    const first = setPaymentMethod(methodParams("pm_stripe", { updateOrder }))
+    const second = setPaymentMethod(
+      methodParams("pm_stripe", { updateOrder, order: { ...ORDER, id: "order-2" } })
+    )
+
+    expect(updateOrder).toHaveBeenCalledTimes(2)
+    settleNext()
+    settleNext()
+    await Promise.all([first, second])
   })
 })
