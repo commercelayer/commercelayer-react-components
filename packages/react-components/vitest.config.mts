@@ -60,10 +60,13 @@ export default defineConfig({
       "#reducers/*": path.resolve(__dirname, "src/reducers/*"),
       "#context/*": path.resolve(__dirname, "src/context/*"),
       "#typings/*": path.resolve(__dirname, "src/typings/*"),
-      "#typings": path.resolve(__dirname, "src/typings/index"),
+      // Object aliases match by prefix in insertion order: the bare "#typings"
+      // key must follow the specific ones, or it rewrites "#typings/errors"
+      // to "src/typings/index/errors".
       "#typings/customers": path.resolve(__dirname, "src/typings/customers"),
       "#typings/errors": path.resolve(__dirname, "src/typings/errors"),
       "#typings/globals": path.resolve(__dirname, "src/typings/globals"),
+      "#typings": path.resolve(__dirname, "src/typings/index"),
       "#utils/*": path.resolve(__dirname, "src/utils/*"),
       "#config/*": path.resolve(__dirname, "src/config/*"),
       "#hooks/*": path.resolve(__dirname, "src/hooks/*"),
