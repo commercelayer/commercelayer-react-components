@@ -144,13 +144,13 @@ export function BraintreePayment({
     hostedFieldsInstance,
     threeDSInstance,
   }: SubmitProps): Promise<boolean> => {
-    const savePaymentSourceToCustomerWallet: string =
+    const saveToWalletCheckbox =
       // @ts-expect-error no type
-      event?.elements?.save_payment_source_to_customer_wallet?.checked
-    if (savePaymentSourceToCustomerWallet)
+      event?.elements?.save_payment_source_to_customer_wallet
+    if (saveToWalletCheckbox)
       setCustomerOrderParam(
         "_save_payment_source_to_customer_wallet",
-        savePaymentSourceToCustomerWallet
+        String(Boolean(saveToWalletCheckbox.checked))
       )
     if (hostedFieldsInstance) {
       try {
@@ -227,8 +227,6 @@ export function BraintreePayment({
   // down and re-create the Braintree client in a cycle.
   const initializedRef = useRef(false)
   useEffect(() => {
-    if (!ref && authorization)
-      setCustomerOrderParam("_save_payment_source_to_customer_wallet", "false")
     let cancelled = false
     if (authorization && !initializedRef.current && !isEmpty(window)) {
       initializedRef.current = true
