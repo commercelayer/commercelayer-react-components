@@ -97,6 +97,42 @@ describe("HostedCart component", () => {
     })
   })
 
+  // https://github.com/commercelayer/commercelayer-react-components/issues/955
+  it("renders once the access token arrives after the first render", async () => {
+    localStorage.setItem("late-token-key", "order-id-1")
+    vi.spyOn(organizationUtils, "getOrganizationConfig").mockResolvedValue(null)
+    vi.spyOn(applicationLinkUtils, "getApplicationLink").mockImplementation(
+      ({ orderId }) => `https://test-cart.local/cart/${orderId}`
+    )
+    const tree = (token?: string) => (
+      <CommerceLayerContext.Provider value={{ accessToken: token }}>
+        <OrderContext.Provider value={defaultOrderContext}>
+          <OrderStorageContext.Provider
+            value={{
+              persistKey: "late-token-key",
+              clearWhenPlaced: true,
+              getLocalOrder: vi.fn(),
+              setLocalOrder: vi.fn(),
+              deleteLocalOrder: vi.fn(),
+            }}
+          >
+            <HostedCart />
+          </OrderStorageContext.Provider>
+        </OrderContext.Provider>
+      </CommerceLayerContext.Provider>
+    )
+
+    const { rerender, container } = render(tree())
+    expect(container.querySelector("iframe")).toBeNull()
+
+    expect(() => rerender(tree(accessToken))).not.toThrow()
+    await waitFor(() => {
+      expect(container.querySelector("iframe")?.getAttribute("src")).toBe(
+        "https://test-cart.local/cart/order-id-1"
+      )
+    })
+  })
+
   describe("mini cart opening", () => {
     const panelOf = (iframe: HTMLIFrameElement): HTMLElement | null => iframe.parentElement
 
