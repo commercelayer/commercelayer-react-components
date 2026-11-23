@@ -46,8 +46,7 @@ export function setErrors<D extends Dispatch<any>>({
       : (item: BaseError) => item[filterBy as keyof BaseError]
   const excludeValues = new Set(newErrors.map(getValue))
   const errorsDifference = currentErrors.filter((item) => !excludeValues.has(getValue(item)))
-  const mergeErrors = currentErrors?.length === 0 ? newErrors : errorsDifference
-  const errors = [...(currentErrors || []), ...mergeErrors]
+  const errors = [...errorsDifference, ...newErrors]
   if (dispatch != null) {
     dispatch({
       type: "setErrors",
