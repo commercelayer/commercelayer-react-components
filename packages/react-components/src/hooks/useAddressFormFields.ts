@@ -212,7 +212,12 @@ export function useAddressFormFields({
         continue
       }
 
-      if (field.value != null && (field.value || field.required === false)) {
+      // A cleared optional field must be sent as "": the save PATCHes the address in
+      // place, so a dropped key keeps its old value (#956).
+      if (
+        field.value != null &&
+        (field.value || field.required === false || element?.required === false)
+      ) {
         addressValues[name.replace(prefix, "")] = field.value
       }
     }

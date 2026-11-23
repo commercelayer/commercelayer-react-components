@@ -3,7 +3,8 @@
 // parameter instead of checking, so a named <button> was collected as if it were
 // a field, while <textarea> was missing from the FormField union even though
 // MetadataInput, CustomerInput and GiftCardOrCouponInput all render one.
-import validateFormFields from "#utils/validateFormFields"
+import type { AddressCreate } from "@commercelayer/sdk"
+import validateFormFields, { fieldsExist } from "#utils/validateFormFields"
 
 function formWith(html: string): HTMLFormControlsCollection {
   const form = document.createElement("form")
@@ -68,5 +69,27 @@ describe("validateFormFields", () => {
     const { values } = validateFormFields(fields, [], "addresses")
 
     expect(values).toMatchObject({ first_name: true })
+  })
+})
+
+// A cleared optional field is now sent as "" (#956); a field present only as ""
+// must not count as filled, or the save button would open on a blank phone.
+describe("fieldsExist", () => {
+  const filled = {
+    city: "Milano",
+    country_code: "IT",
+    first_name: "Jane",
+    last_name: "Doe",
+    line_1: "Via Roma 1",
+    phone: "555",
+    zip_code: "20100",
+  }
+
+  it("treats an empty-string required field as missing", () => {
+    expect(fieldsExist({ ...filled, phone: "" } as AddressCreate)).toBe(true)
+  })
+
+  it("accepts empty-string optional fields", () => {
+    expect(fieldsExist({ ...filled, line_2: "", company: "" } as AddressCreate)).toBe(false)
   })
 })
