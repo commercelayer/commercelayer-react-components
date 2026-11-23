@@ -72,7 +72,8 @@ export function CustomerAddressForm(props: Props): JSX.Element {
   const setFormRef = useCallback(
     (node: HTMLFormElement | null) => {
       formRef.current = node
-      refValidation(node)
+      // Track optional fields too, or rapid-form never reports them.
+      refValidation(node, { trackUnvalidatedFields: true })
     },
     [refValidation]
   )
@@ -182,14 +183,21 @@ export function CustomerAddressForm(props: Props): JSX.Element {
       if (input != null) {
         input.setCustomValidity("")
         input.value = String(value)
-        input.dispatchEvent(new Event("change", { bubbles: true }))
+        // rapid-form listens to `input`, not `change`.
+        input.dispatchEvent(new Event("input", { bubbles: true }))
       }
 
       clearFieldError(name)
+      // setAddress replaces the whole address, so send every field, not just this one.
+      const allValues: Record<string, unknown> = {}
+      for (const el of Array.from(formRef.current?.elements ?? [])) {
+        const inputEl = el as HTMLInputElement
+        if (!inputEl.name?.startsWith("billing_address_") || inputEl.type === "checkbox") continue
+        if (inputEl.value) allValues[inputEl.name.replace("billing_address_", "")] = inputEl.value
+      }
+      allValues[name.replace("billing_address_", "")] = value
       setAddress({
-        values: {
-          [name.replace("billing_address_", "")]: value,
-        } as TCustomerAddress,
+        values: allValues as TCustomerAddress,
         resource: "billing_address",
       })
     },
@@ -207,7 +215,7 @@ export function CustomerAddressForm(props: Props): JSX.Element {
       if (input != null) {
         input.setCustomValidity("")
         input.value = ""
-        input.dispatchEvent(new Event("change", { bubbles: true }))
+        input.dispatchEvent(new Event("input", { bubbles: true }))
       }
       clearFieldError(name)
     },
