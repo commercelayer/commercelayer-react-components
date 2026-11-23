@@ -1,4 +1,4 @@
-import type { QueryPageSize } from "@commercelayer/sdk"
+import type { CustomerAddress, QueryPageSize } from "@commercelayer/sdk"
 import { getSdk } from "#sdk"
 import type { RequestConfig } from "#types"
 import type { Address } from "./types"
@@ -15,13 +15,22 @@ export async function getCustomerAddresses({
   accessToken,
   interceptors,
   isOrderAvailable,
-  pageSize = 10,
+  pageSize = 25,
 }: GetCustomerAddressesParams): Promise<Address[]> {
   const sdk = getSdk({ accessToken, interceptors })
-  const customerAddresses = await sdk.customer_addresses.list({
-    include: ["address"],
-    pageSize,
-  })
+  let customerAddresses: CustomerAddress[] = []
+  let currentPage = 1
+  let totalPages = 1
+  do {
+    const response = await sdk.customer_addresses.list({
+      include: ["address"],
+      pageSize,
+      pageNumber: currentPage,
+    })
+    customerAddresses = customerAddresses.concat(response)
+    totalPages = response.meta.pageCount
+    currentPage++
+  } while (currentPage <= totalPages)
 
   const addresses = customerAddresses.reduce<Address[]>((result, customerAddress) => {
     if (customerAddress.address == null) {
