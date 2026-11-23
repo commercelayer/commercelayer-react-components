@@ -211,11 +211,12 @@ export async function invertedAddressesHandler({
       })
     }
     let address: Address | undefined
-    if (order?.shipping_address?.id) {
+    if (order?.shipping_address?.id && order?.shipping_address?.reference == null) {
       address = await sdk.addresses.update({
         id: order.shipping_address.id,
         ...shippingAddress,
       })
+      orderAttributes._refresh = true
     } else {
       address = await sdk.addresses.create(shippingAddress)
       orderAttributes.shipping_address = sdk.addresses.relationship(address.id)
@@ -245,11 +246,12 @@ export async function invertedAddressesHandler({
         })
       }
       let address: Address | undefined
-      if (order?.billing_address?.id) {
+      if (order?.billing_address?.id && order?.billing_address?.reference == null) {
         address = await sdk.addresses.update({
           id: order.billing_address.id,
           ...billingAddress,
         })
+        orderAttributes._refresh = true
       } else {
         address = await sdk.addresses.create(billingAddress)
         orderAttributes.billing_address = sdk.addresses.relationship(address.id)
