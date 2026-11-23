@@ -1,5 +1,10 @@
 import { PaymentRequestButtonElement, useStripe } from "@stripe/react-stripe-js"
-import type { PaymentRequest } from "@stripe/stripe-js"
+import type {
+  PaymentRequest,
+  PaymentRequestPaymentMethodEvent,
+  PaymentRequestShippingAddressEvent,
+  PaymentRequestShippingOptionEvent,
+} from "@stripe/stripe-js"
 import { type JSX, useContext, useEffect, useState } from "react"
 import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
@@ -54,8 +59,9 @@ export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | nul
       })
   }, [stripe, order?.total_amount_with_taxes_cents, order])
 
-  if (paymentRequest != null && stripe != null) {
-    paymentRequest.on("shippingaddresschange", async (ev) => {
+  useEffect(() => {
+    if (paymentRequest == null || stripe == null) return
+    const onShippingAddressChange = async (ev: PaymentRequestShippingAddressEvent) => {
       if (order != null && accessToken != null) {
         const requiresBillingInfo = order?.requires_billing_info ?? false
         const orderWithShipments = await setExpressFakeAddress({
@@ -95,8 +101,8 @@ export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | nul
           status: "fail",
         })
       }
-    })
-    paymentRequest.on("shippingoptionchange", async (ev) => {
+    }
+    const onShippingOptionChange = async (ev: PaymentRequestShippingOptionEvent) => {
       if (order != null && accessToken != null) {
         const updatedOrder = await setExpressShippingMethod({
           orderId: order.id,
@@ -121,8 +127,8 @@ export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | nul
           status: "fail",
         })
       }
-    })
-    paymentRequest.on("paymentmethod", async (ev) => {
+    }
+    const onPaymentMethod = async (ev: PaymentRequestPaymentMethodEvent) => {
       if (order?.id == null) throw new Error("Order is null")
       if (paymentMethods == null) throw new Error("Payment methods are null")
       const [paymentMethod] = getAvailableExpressPayments(paymentMethods)
@@ -187,6 +193,7 @@ export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | nul
         } else {
           // Report to the browser that the confirmation was successful, prompting
           // it to close the browser payment method collection interface.
+          // The sheet accepts a single complete(), so the place below cannot report to it.
           ev.complete("success")
           // Check if the PaymentIntent requires any actions and if so let Stripe.js
           // handle the flow. If using an API version older than "2019-02-11"
@@ -208,7 +215,6 @@ export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | nul
               }
               try {
                 const order = await setExpressPlaceOrder(placeOrderParams)
-                ev.complete("success")
                 await expressRedirectUrl({
                   order,
                   config: {
@@ -217,7 +223,6 @@ export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | nul
                 })
               } catch (err) {
                 console.error("Place order:", err)
-                ev.complete("fail")
               }
             }
           } else {
@@ -231,7 +236,6 @@ export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | nul
             }
             try {
               const order = await setExpressPlaceOrder(placeOrderParams)
-              ev.complete("success")
               await expressRedirectUrl({
                 order,
                 config: {
@@ -240,12 +244,22 @@ export function StripeExpressPayment({ clientSecret }: Props): JSX.Element | nul
               })
             } catch (err) {
               console.error("Place order:", err)
-              ev.complete("fail")
             }
           }
         }
       }
-    })
+    }
+    paymentRequest.on("shippingaddresschange", onShippingAddressChange)
+    paymentRequest.on("shippingoptionchange", onShippingOptionChange)
+    paymentRequest.on("paymentmethod", onPaymentMethod)
+    return () => {
+      paymentRequest.off("shippingaddresschange", onShippingAddressChange)
+      paymentRequest.off("shippingoptionchange", onShippingOptionChange)
+      paymentRequest.off("paymentmethod", onPaymentMethod)
+    }
+  }, [paymentRequest, stripe, order, accessToken, paymentMethods, paymentSource, clientSecret])
+
+  if (paymentRequest != null && stripe != null) {
     return <PaymentRequestButtonElement className="" options={{ paymentRequest }} />
   }
 
