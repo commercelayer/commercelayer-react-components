@@ -78,6 +78,31 @@ describe("usePrices — interceptors", () => {
     expect(mockUpdatePrice).toHaveBeenCalledWith(expect.objectContaining({ interceptors }))
   })
 
+  it("keeps a sibling's prices when another instance with the same key clears", async () => {
+    const cache = new Map()
+    const wrapper = ({ children }: { children: ReactNode }) =>
+      createElement(SWRConfig, { value: { provider: () => cache } }, children)
+
+    const a = renderHook(() => usePrices(accessToken), { wrapper })
+    const b = renderHook(() => usePrices(accessToken), { wrapper })
+
+    act(() => {
+      a.result.current.fetchPrices()
+      b.result.current.fetchPrices()
+    })
+    await waitFor(() => {
+      expect(b.result.current.prices).toEqual(mockPrices)
+    })
+
+    act(() => {
+      a.result.current.clearPrices()
+    })
+    await act(() => new Promise((r) => setTimeout(r, 50)))
+
+    expect(a.result.current.prices).toEqual([])
+    expect(b.result.current.prices).toEqual(mockPrices)
+  })
+
   it("works without interceptors", async () => {
     const { result } = renderHook(() => usePrices(accessToken), {
       wrapper: ({ children }) => swrWrapper({ children }),

@@ -89,6 +89,33 @@ describe("useAvailability", () => {
     })
   })
 
+  it("keeps a sibling's data when another instance with the same key clears", async () => {
+    const mock = await getCoreMock()
+    mock.mockResolvedValueOnce(mockAvailability)
+    const cache = new Map()
+    const wrapper = ({ children }: { children: ReactNode }) =>
+      createElement(SWRConfig, { value: { provider: () => cache } }, children)
+
+    const a = renderHook(() => useAvailability("test-token"), { wrapper })
+    const b = renderHook(() => useAvailability("test-token"), { wrapper })
+
+    act(() => {
+      a.result.current.fetchAvailability({ skuCode: SKU_CODE })
+      b.result.current.fetchAvailability({ skuCode: SKU_CODE })
+    })
+    await waitFor(() => {
+      expect(b.result.current.availability?.quantity).toBe(5)
+    })
+
+    act(() => {
+      a.result.current.clearAvailability()
+    })
+    await act(() => new Promise((r) => setTimeout(r, 50)))
+
+    expect(a.result.current.availability).toBeNull()
+    expect(b.result.current.availability?.quantity).toBe(5)
+  })
+
   it("should set error when fetcher throws", async () => {
     const mock = await getCoreMock()
     mock.mockRejectedValueOnce(new Error("Unauthorized"))

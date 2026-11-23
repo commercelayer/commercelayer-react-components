@@ -63,12 +63,7 @@ export function useSkuLists(
 
   const clearSkuLists = useCallback(() => {
     setShouldFetch(false)
-    // c8 ignore start
-    mutate(undefined, false)?.catch(() => {
-      // cache may be destroyed (e.g. isolated SWRConfig in tests)
-    })
-    // c8 ignore end
-  }, [mutate])
+  }, [])
 
   return {
     skuLists: data ?? [],
