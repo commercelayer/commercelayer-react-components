@@ -773,13 +773,15 @@ export async function removeGiftCardOrCouponCode({
         dispatch,
         state,
       })
+      // updateOrder has already dispatched its errors: keep them
+      if (!orderUpdated.success) return { success: false }
       dispatch({
         type: "setErrors",
         payload: {
           errors: [],
         },
       })
-      return { success: true, order: orderUpdated?.order }
+      return { success: true, order: orderUpdated.order }
     }
     return { success: false }
   } catch (error: any) {
