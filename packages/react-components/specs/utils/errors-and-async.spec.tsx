@@ -63,7 +63,24 @@ describe("setErrors", () => {
   it("keeps existing errors that the new batch does not supersede", () => {
     const result = setErrors({ currentErrors: [err("A"), err("B")], newErrors: [err("B")] })
 
-    expect(result.map((e) => e.code)).toEqual(["A", "B", "A"])
+    expect(result.map((e) => e.code)).toEqual(["A", "B"])
+  })
+
+  it("an existing error plus a different new one yields both, no duplicates", () => {
+    const result = setErrors({ currentErrors: [err("A")], newErrors: [err("B")] })
+
+    expect(result.map((e) => e.code)).toEqual(["A", "B"])
+  })
+
+  it("a new error with the same code replaces the old one", () => {
+    const stale = { ...err("A"), message: "old" }
+    const fresh = { ...err("A"), message: "new" }
+
+    expect(setErrors({ currentErrors: [stale], newErrors: [fresh] })).toEqual([fresh])
+  })
+
+  it("keeps the current errors unchanged when there are no new ones", () => {
+    expect(setErrors({ currentErrors: [err("A")], newErrors: [] })).toEqual([err("A")])
   })
 
   it("filters by a custom key", () => {
@@ -73,7 +90,7 @@ describe("setErrors", () => {
       filterBy: "field",
     })
 
-    expect(result.map((e) => e.field)).toEqual(["email", "city", "city"])
+    expect(result.map((e) => e.field)).toEqual(["city", "email"])
   })
 
   it("filters by a predicate function", () => {
@@ -83,7 +100,7 @@ describe("setErrors", () => {
       filterBy: (item) => item.field,
     })
 
-    expect(result.map((e) => e.field)).toEqual(["email", "city", "city"])
+    expect(result.map((e) => e.field)).toEqual(["city", "email"])
   })
 
   it("dispatches the merged errors when a dispatch is given", () => {
