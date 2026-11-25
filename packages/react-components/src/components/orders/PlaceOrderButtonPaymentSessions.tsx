@@ -5,6 +5,7 @@ import {
   DEFAULT_PLACEABLE_ATTEMPTS,
   DEFAULT_PLACEABLE_INTERVAL_MS,
   discardPaymentSession,
+  getSdk,
   placeOrderWithPaymentSessions,
 } from "@commercelayer/core-components"
 import type { Order } from "@commercelayer/sdk"
@@ -25,6 +26,11 @@ import { usePaymentGatewayHandoff } from "#hooks/usePaymentGatewayHandoff"
 import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
+import {
+  saveAddressesToCustomerAddressBook,
+  saveBillingAddress,
+  saveShippingAddress,
+} from "#utils/customerOrderOptions"
 
 interface ChildrenProps extends Omit<Props, "children"> {
   handleClick: () => Promise<void>
@@ -158,6 +164,23 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
     })
   }
 
+  /**
+   * Send the address book flags the shopper checked. Each one is cleared once the API
+   * accepts it, so calling this again sends only what is still missing.
+   *
+   * A refusal is swallowed: saving an address is not worth failing a payment over, and
+   * the call after the place tries again. The API saves the address on a placed order
+   * as well, so that second call still counts.
+   */
+  const saveAddresses = async (orderId: string): Promise<void> => {
+    if (accessToken == null || !(saveBillingAddress() || saveShippingAddress())) return
+    try {
+      await saveAddressesToCustomerAddressBook(getSdk({ accessToken, interceptors }), orderId)
+    } catch {
+      // Swallowed on purpose, see above.
+    }
+  }
+
   /** Take the order the rest of the way, for a payment that is already in place. */
   const placeCollected = async (working: Order): Promise<void> => {
     if (accessToken == null) return
@@ -173,6 +196,11 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
     })
 
     if (result.placed) {
+      // Before the app hears the order is placed, since it may leave the checkout on that
+      // callback. This is the only send on a collection nobody clicked for (a 3DS
+      // redirect that came back, a wallet's own button), and it retries a flag the send
+      // before the collection had refused.
+      await saveAddresses(working.id)
       // The context still holds the order from before the money moved: the
       // sessions read as unpaid and carry no `payment_instrument`, which the
       // API fills only as it authorizes them. Whatever renders the recap next
@@ -224,6 +252,11 @@ export function PlaceOrderButtonPaymentSessions(props: Props): JSX.Element {
     // is what happened when a gateway component registered from a card it was
     // not rendering.
     if (collection?.by === "gateway") return
+
+    // Before anything is charged or collected. A setting with `auto_place` can place the
+    // order while the shopper is away on a redirect, and if they never come back no
+    // later step of ours runs to send the flags.
+    await saveAddresses(order.id)
 
     let working = order
 
