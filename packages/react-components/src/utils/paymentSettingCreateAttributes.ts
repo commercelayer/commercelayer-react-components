@@ -2,6 +2,8 @@ import {
   ADYEN_SETTING_TYPE,
   BRAINTREE_SETTING_TYPE,
   buildGatewayReturnUrl,
+  CHECKOUT_COM_RETURN_PARAM,
+  CHECKOUT_COM_SETTING_TYPE,
   PAYPAL_SETTING_TYPE,
   readPayPalClientId,
   STRIPE_SETTING_TYPE,
@@ -75,6 +77,7 @@ const BUILDERS: Record<string, Builder> = {
     // gates `_save_payment_source_to_customer_wallet` the same way.
     vaulting: isAuthenticatedCustomer(accessToken),
   }),
+  [CHECKOUT_COM_SETTING_TYPE]: ({ returnUrl }) => checkoutComClientData(returnUrl),
   [PAYPAL_SETTING_TYPE]: () => ({
     // Required whenever the session stores the PayPal account, and refused
     // without them, though PayPal's window here is a popup that never sends
@@ -112,6 +115,10 @@ const BUILDERS: Record<string, Builder> = {
  * - **PayPal:** its window asks the shopper to agree to future payments only
  *   once the session has asked to store the account, so the asking has to
  *   come first, from the application.
+ * - **Checkout.com:** its web components store the card when the payment
+ *   session says so, without a word to the shopper. The API asks for storage
+ *   when the session has `vaulting: true`, so the choice has to be made before
+ *   the session exists.
  *
  * Adyen's Drop-in asks on its own, which is why Adyen is not here.
  */
@@ -119,6 +126,7 @@ const CONSENT_BY_APPLICATION: readonly string[] = [
   STRIPE_SETTING_TYPE,
   BRAINTREE_SETTING_TYPE,
   PAYPAL_SETTING_TYPE,
+  CHECKOUT_COM_SETTING_TYPE,
 ]
 
 /**
@@ -215,6 +223,44 @@ function adyenReturnUrl(returnUrl?: string): string {
 }
 
 /**
+ * The `client_data` a Checkout.com session is created with: the URLs
+ * Checkout.com sends the shopper back to after a 3DS redirect.
+ *
+ * Required on every session, not only on one that will redirect: the API
+ * creates a Checkout.com payment session for each Payment Session, and
+ * Checkout.com refuses one without them. Which of the two the shopper comes
+ * back to is the only word on the outcome a browser gets — the payment itself
+ * can only be read with the secret key — so each carries
+ * `CHECKOUT_COM_RETURN_PARAM` with a different value.
+ *
+ * Built from the application's `returnUrl` when it has one, for the reason
+ * Adyen's is: a checkout whose credentials live in the query string wants them
+ * kept out of a URL handed to a gateway.
+ */
+function checkoutComClientData(returnUrl?: string): PaymentSettingCreateAttributes {
+  if (typeof window === "undefined") return {}
+  const base = returnUrl ?? buildGatewayReturnUrl(window.location.href)
+  return {
+    clientData: {
+      success_url: withReturnParam(base, "success"),
+      failure_url: withReturnParam(base, "failure"),
+    },
+  }
+}
+
+function withReturnParam(base: string, outcome: "success" | "failure"): string {
+  try {
+    const url = new URL(base)
+    url.searchParams.set(CHECKOUT_COM_RETURN_PARAM, outcome)
+    return url.toString()
+  } catch {
+    // Not a URL we can add to. Checkout.com will refuse the session, which is
+    // better reported by the API than guessed at here.
+    return base
+  }
+}
+
+/**
  * Why this setting cannot be offered, or `undefined` when it can.
  *
  * The string is a development-only warning, not copy: a setting that fails here
@@ -230,8 +276,12 @@ export function paymentSettingUnusableReason(setting: PaymentSetting): string | 
   // `public_key` is optional and, unlike `api_key`, not validated for presence,
   // so a setting that charges perfectly well server-side can carry none.
   // Without it the browser has no publishable credential and neither Adyen's
-  // Drop-in nor Stripe's Elements can boot.
-  if (setting.type === ADYEN_SETTING_TYPE || setting.type === STRIPE_SETTING_TYPE) {
+  // Drop-in, Stripe's Elements nor Checkout.com's web components can boot.
+  if (
+    setting.type === ADYEN_SETTING_TYPE ||
+    setting.type === STRIPE_SETTING_TYPE ||
+    setting.type === CHECKOUT_COM_SETTING_TYPE
+  ) {
     const key = (setting as { public_key?: string | null }).public_key
     if (typeof key !== "string" || key === "") return "the setting has no public_key"
   }

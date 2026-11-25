@@ -142,6 +142,21 @@ describe("PaymentSetting", () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining("payment_setting_stripes"))
   })
 
+  // Without its public key Checkout.com's card form cannot boot.
+  it("skips a Checkout.com setting the browser has no key for", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined)
+    renderSettings(
+      order({
+        available_payment_settings: [
+          MANUAL,
+          { id: "ps-cko", type: "payment_setting_checkout_coms", name: "CKO" },
+        ],
+      } as never)
+    )
+    expect(screen.getAllByTestId("name")).toHaveLength(1)
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("public_key"))
+  })
+
   describe("selection", () => {
     it("creates a Payment Session when the setting is chosen", async () => {
       renderSettings(order())
@@ -888,6 +903,12 @@ describe("<PaymentSetting> saving a card", () => {
     name: "PayPal",
     client_id: "paypal-client-id",
   }
+  const CHECKOUT_COM = {
+    id: "ps-cko",
+    type: "payment_setting_checkout_coms",
+    name: "Checkout.com",
+    public_key: "pk_sbox_A",
+  }
 
   // Refused without them whenever the account is stored, though PayPal's popup
   // never sends anyone to either — and the page's query string can carry the
@@ -910,6 +931,38 @@ describe("<PaymentSetting> saving a card", () => {
       )
     })
     window.history.replaceState(null, "", "/")
+  })
+
+  // Checkout.com refuses a payment session without them, and appends the same
+  // payment id to both — so the marker is the only thing that tells them apart.
+  it("gives Checkout.com a success and a failure URL it can be told apart by", async () => {
+    renderSettings(
+      order({
+        available_payment_settings: [
+          {
+            id: "ps-cko",
+            type: "payment_setting_checkout_coms",
+            name: "CKO",
+            public_key: "pk_sbox_A",
+          },
+        ],
+      } as never)
+    )
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("radio"))
+    })
+
+    await waitFor(() => {
+      expect(createPaymentSessionMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          paymentSettingId: "ps-cko",
+          clientData: {
+            success_url: `${window.location.origin}/?checkout_com_return=success`,
+            failure_url: `${window.location.origin}/?checkout_com_return=failure`,
+          },
+        })
+      )
+    })
   })
 
   function stripeSession(overrides: Record<string, unknown> = {}) {
@@ -973,13 +1026,22 @@ describe("<PaymentSetting> saving a card", () => {
     })
   })
 
-  it("offers the choice on Stripe, Braintree and PayPal to a signed-in customer, and nowhere else", () => {
+  it("offers the choice on Stripe, Braintree, PayPal and Checkout.com to a signed-in customer, and nowhere else", () => {
     guest.value = false
     const captured = renderCapturing(
       order({
-        available_payment_settings: [MANUAL, ADYEN, STRIPE_WITH_KEY, BRAINTREE, PAYPAL],
+        available_payment_settings: [
+          MANUAL,
+          ADYEN,
+          STRIPE_WITH_KEY,
+          BRAINTREE,
+          PAYPAL,
+          CHECKOUT_COM,
+        ],
       } as never)
     )
+    // Checkout.com's card form stores the card without asking.
+    expect(captured["ps-cko"]?.canSaveCard).toBe(true)
     expect(captured["ps-stripe"]?.canSaveCard).toBe(true)
     // Hosted Fields are bare inputs: there is no checkbox of Braintree's own.
     expect(captured["ps-braintree"]?.canSaveCard).toBe(true)

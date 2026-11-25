@@ -58,6 +58,7 @@
   "homepage": "https://github.com/commercelayer/commercelayer-react-components#readme",
   "dependencies": {
     "@adyen/adyen-web": "^6.48.1",
+    "@checkout.com/checkout-web-components": "^1.14.0",
     "@commercelayer/core-components": "workspace:*",
     "@commercelayer/organization-config": "^2.8.5",
     "@commercelayer/react-hooks-components": "workspace:*",

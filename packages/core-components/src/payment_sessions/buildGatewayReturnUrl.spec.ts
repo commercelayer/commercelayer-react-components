@@ -28,6 +28,14 @@ describe("buildGatewayReturnUrl", () => {
     )
   })
 
+  it("strips Checkout.com's return parameters and our marker on them", () => {
+    expect(
+      buildGatewayReturnUrl(
+        "https://shop.example/c?keep=1&checkout_com_return=success&cko-payment-id=pay_1&cko-session-id=sid_1&cko-payment-session-id=ps_1"
+      )
+    ).toBe("https://shop.example/c?keep=1")
+  })
+
   it("drops the fragment", () => {
     // Adyen appends its parameters as a query string. A returnUrl ending in a
     // fragment would come back as `#payment?redirectResult=…`, which nothing
