@@ -188,10 +188,9 @@ export function HostedCart({
   const { persistKey } = useContext(OrderStorageContext)
   const [src, setSrc] = useState<string | undefined>()
 
-  if (accessToken == null) return null
-
-  const token: string = accessToken
-  const slug = jwt(token).organization.slug ?? ""
+  // Hooks below must run on every render, so the no-token return waits until after them.
+  const token: string = accessToken ?? ""
+  const slug = accessToken == null ? "" : (jwt(accessToken).organization.slug ?? "")
 
   async function resolveCartUrl(orderId: string): Promise<string> {
     const config = await getOrganizationConfig({
@@ -225,7 +224,6 @@ export function HostedCart({
     }
   }
 
-  // biome-ignore lint/correctness/useHookAtTopLevel: hook is called after an early return; refactoring would require restructuring the whole component
   const onMessage = useCallback(
     (data: IframeData): void => {
       switch (data.message.type) {
@@ -250,8 +248,8 @@ export function HostedCart({
     [type, isOpen, handleOpen, getOrder]
   )
 
-  // biome-ignore lint/correctness/useHookAtTopLevel: hook is called after an early return; refactoring would require restructuring the whole component
   useEffect(() => {
+    if (accessToken == null) return
     const resolvedOrderId = order?.id ?? localStorage.getItem(persistKey)
     let ignore = false
     if (open != null && prevOpenRef.current !== open) {
@@ -332,9 +330,9 @@ export function HostedCart({
     isOpen,
     openAdd,
     handleOpen,
+    accessToken,
   ])
 
-  // biome-ignore lint/correctness/useHookAtTopLevel: hook is called after an early return; refactoring would require restructuring the whole component
   useEffect(() => {
     if (ref.current == null) return
     iframeResizer(
@@ -345,6 +343,9 @@ export function HostedCart({
       ref.current
     )
   }, [onMessage])
+
+  if (accessToken == null) return null
+
   /**
    * Close the cart.
    */
