@@ -146,10 +146,7 @@ export function usePrices(accessToken: string, interceptors?: InterceptorManager
   const clearPrices = useCallback(() => {
     setShouldFetch(false)
     setAction(null)
-    // c8 ignore start
-    mutate(undefined, false).catch(() => {})
-    // c8 ignore end
-  }, [mutate])
+  }, [])
 
   const clearError = useCallback(() => mutate(data, false), [mutate, data])
 
