@@ -5,6 +5,7 @@ import OrderContext from "#context/OrderContext"
 import PaymentMethodChildrenContext from "#context/PaymentMethodChildrenContext"
 import PaymentMethodContext from "#context/PaymentMethodContext"
 import { usePaymentMethodStateContext } from "#hooks/usePaymentMethodStateContext"
+import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PaymentMethodConfig, PaymentResource } from "#reducers/PaymentMethodReducer"
 import type { LoaderType } from "#typings"
@@ -88,6 +89,7 @@ export function PaymentMethod({
   config: configProp,
   ...p
 }: Props): JSX.Element {
+  const paymentsModel = usePaymentsModel()
   const [loading, setLoading] = useState(true)
   const [paymentSelected, setPaymentSelected] = useState("")
   const [paymentSourceCreated, setPaymentSourceCreated] = useState(false)
@@ -125,6 +127,13 @@ export function PaymentMethod({
    */
   const isPartiallyAuthorized = order?.payment_status === "partially_authorized"
   useEffect(() => {
+    // Silencing this component in render is not enough: React runs a mounted
+    // component's effects whatever it returns, so without this the newer
+    // model's orders get a payment_method written behind the tree that is
+    // supposed to be inactive — and the API then drops
+    // available_payment_settings, flipping the order onto the older model for
+    // good.
+    if (paymentsModel === "payment_sessions") return
     if (paymentMethods != null && !isEmpty(paymentMethods) && expressPayments) {
       const [paymentMethod] = getAvailableExpressPayments(paymentMethods)
       if (!paymentSource && paymentMethod != null) {
@@ -164,6 +173,7 @@ export function PaymentMethod({
     onClick,
     paymentSource,
     showLoader,
+    paymentsModel,
   ])
   // Both guards on the auto-select below are one-shot: they are set the first time it
   // runs and never released, so the single payment method is selected, and its payment
@@ -204,6 +214,13 @@ export function PaymentMethod({
     }
   }, [order?.payment_source])
   useEffect(() => {
+    // Silencing this component in render is not enough: React runs a mounted
+    // component's effects whatever it returns, so without this the newer
+    // model's orders get a payment_method written behind the tree that is
+    // supposed to be inactive — and the API then drops
+    // available_payment_settings, flipping the order onto the older model for
+    // good.
+    if (paymentsModel === "payment_sessions") return
     if (
       paymentMethods != null &&
       !paymentSourceCreated &&
@@ -293,6 +310,7 @@ export function PaymentMethod({
     paymentSource,
     showLoader,
     autoSelectSinglePaymentMethod,
+    paymentsModel,
   ])
   useEffect(() => {
     if (paymentMethods) {
@@ -435,6 +453,14 @@ export function PaymentMethod({
   if (!loading) hasRenderedMethodsRef.current = true
   const content =
     !loading || hasRenderedMethodsRef.current ? <>{components}</> : getLoaderComponent(loader)
+
+  // Step aside on the `payment_sessions` model. API version 2026-05 is
+  // additive, so an order on the newer model still carries
+  // `available_payment_methods` and this component would happily render them
+  // alongside the newer tree — two sets of payment options, one of them
+  // meaningless. This is where the precedence rule actually takes effect, and
+  // it is what lets both trees be mounted together with no coordinator above.
+  if (paymentsModel === "payment_sessions") return <></>
 
   // In standalone mode provide the context so that child components
   // (PaymentSource, PaymentGateway, etc.) can read payment state without

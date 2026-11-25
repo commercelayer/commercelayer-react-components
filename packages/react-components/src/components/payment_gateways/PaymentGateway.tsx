@@ -183,7 +183,7 @@ export function PaymentGateway({
   // The array below is a deliberate trigger set, not the effect body's reads —
   // `onPaymentSync` (a useEffectEvent) reads the latest values, so the linter sees these
   // deps as "more than necessary".
-  // biome-ignore lint/correctness/useExhaustiveDependencies: deliberate trigger set
+  // biome-ignore lint/correctness/useExhaustiveDependencies: deliberate trigger set — the effect body reads the latest values through useEffectEvent
   useEffect(() => {
     onPaymentSync()
     // Reactive triggers only: stable ids/scalars, never whole objects. `order` and `config`

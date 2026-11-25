@@ -122,6 +122,11 @@ describe("<Order include>", () => {
     await waitFor(() => {
       expect(retrieve).toHaveBeenCalled()
     })
-    expect(includesOf(retrieve.mock.calls[0])).toEqual(["line_items"])
+    // Plus the one include the payments model needs on every order, which
+    // `getApiOrder` adds to the request itself; nothing else.
+    expect(includesOf(retrieve.mock.calls[0])).toEqual([
+      "line_items",
+      "available_payment_settings",
+    ])
   })
 })
