@@ -16,6 +16,10 @@ import { usePlaceOrderStateContext } from "#hooks/usePlaceOrderStateContext"
 import type { PlaceOrderOptions } from "#reducers/PlaceOrderReducer"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction } from "#typings/index"
+import {
+  saveAddressesToCustomerAddressBook,
+  savePaymentSourceToCustomerWallet,
+} from "#utils/customerOrderOptions"
 import getCardDetails from "#utils/getCardDetails"
 import { isAdyenAuthorizedResultCode, isRefusedPaymentResponse } from "#utils/paymentAuthorization"
 import { checkPaymentIntent } from "#utils/stripe/retrievePaymentIntent"
@@ -69,6 +73,11 @@ function remainingAmountIsCovered(paymentSource: unknown): boolean {
 
 export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
   const ref = useRef(null)
+  // Set once the Stripe intent on the return url turns out unpaid. That url keeps the client
+  // secret after the verdict, and without this every later click would still count as a
+  // return from the redirect: it skipped the widget and asked the API to place an order
+  // nobody had paid for, so the shopper could not pay again without a clean url.
+  const stripeReturnUnpaidRef = useRef(false)
   /**
    * The order state we already fired one automatic place attempt for, as
    * `<order id>:<payment status>:<result code>`. Keyed on the state and not on
@@ -79,6 +88,14 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
   const autoPlaceAttemptedRef = useRef<string | null>(null)
   /** Order id a place attempt is currently in flight for. */
   const placeInFlightRef = useRef<string | null>(null)
+  /**
+   * Id of the order whose placement `placeOrderAttempt` already reported to `onClick`
+   * (#929). Publishing that order re-renders the button with it `placed`, and the Adyen
+   * effect below, there for orders nothing else reports, would report it a second time.
+   */
+  const placedReportedRef = useRef<string | null>(null)
+  /** The order the placed-and-authorized effect already sent the wallet flag for (#940). */
+  const walletSavedRef = useRef<string | null>(null)
   const {
     children,
     label = "Place order",
@@ -124,7 +141,7 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
       errors: paymentMethodErrors,
     },
   } = usePaymentMethodStateContext()
-  const { order, setOrderErrors, errors } = useContext(OrderContext)
+  const { order, setOrderErrors, errors, getOrder } = useContext(OrderContext)
   const isFree = order?.total_amount_with_taxes_cents === 0
   useEffect(() => {
     if (hasBlockingErrors) {
@@ -241,6 +258,7 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
             }, 1000)
             break
           case "invalid":
+            stripeReturnUnpaidRef.current = true
             setPaymentMethodErrors([
               {
                 code: "PAYMENT_INTENT_AUTHENTICATION_FAILURE",
@@ -353,13 +371,30 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
     if (
       order?.status === "placed" &&
       order?.payment_status === "authorized" &&
-      paymentType === "adyen_payments"
+      paymentType === "adyen_payments" &&
+      placedReportedRef.current !== order.id
     ) {
       // Dispatch the onClick callback when the order is placed and the payment status is authorized (Adyen with gift card)
-      onClick?.({
-        placed: true,
-        order: order,
-      })
+      const placedOrder = order
+      const report = (): void => {
+        onClick?.({
+          placed: true,
+          order: placedOrder,
+        })
+      }
+      const sdk = sdkClient()
+      if (sdk == null || walletSavedRef.current === placedOrder.id) {
+        report()
+        return
+      }
+      // An `auto_place` method placed the order on `_authorize`, and the read-back published
+      // it: the app is told here, and `setPlaceOrder`, which sends the wallet flag, never
+      // runs (#940). Send it first — the app may leave the checkout on this callback — and
+      // once per order: the ref holds off a second run before the first has cleared the flag.
+      walletSavedRef.current = placedOrder.id
+      void savePaymentSourceToCustomerWallet(sdk, placedOrder)
+        .catch(() => undefined)
+        .then(report)
     }
   }, [order?.id, order?.payment_status, order?.status, paymentType != null])
   useEffect(() => {
@@ -459,6 +494,11 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
     let currentPaymentStatus = "unpaid"
     /** Set when the gateway validated this attempt *and* nothing is left to pay. */
     let gatewayAuthorizedThisAttempt = false
+    /**
+     * The payment source the order has right now: `null` when it has none, `undefined`
+     * when it was not read (Stripe skips the read below).
+     */
+    let orderPaymentSourceId: string | null | undefined
 
     const isStripePayment = paymentType === "stripe_payments"
     if (!isStripePayment) {
@@ -467,19 +507,42 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
        * and to prevent placing a draft order
        * @see https://docs.commercelayer.io/core/how-tos/placing-orders/checkout/placing-the-order
        */
-      const { status, payment_status: paymentStatus } = await sdk.orders.retrieve(order?.id, {
+      const {
+        status,
+        payment_status: paymentStatus,
+        payment_source: orderPaymentSource,
+      } = await sdk.orders.retrieve(order?.id, {
         fields: ["status", "payment_status", "payment_source"],
         include: ["payment_source"],
       })
+      // Included above, so `null` really means "no payment source".
+      orderPaymentSourceId =
+        orderPaymentSource === undefined ? undefined : (orderPaymentSource?.id ?? null)
       const isAlreadyPlaced = status === "placed"
       const isDraftOrder = status === "draft"
       currentPaymentStatus = paymentStatus ?? "unpaid"
 
       if (isAlreadyPlaced) {
         /**
-         * Order already placed
+         * Order already placed: core places it on authorization, and that can land
+         * between the gateway's answer and the status check above (#929). The order
+         * in context is still `pending` then, and an app handed that one stays on the
+         * checkout. `setPlaceOrder` re-reads it with the includes, publishes it and
+         * sends no `_place`, its own pre-check finding it placed.
          */
         setPlaceOrderStatus?.({ status: "placing" })
+        // Before the call, not after: `setPlaceOrder` publishes the order, and the
+        // render that follows can run its effects before this function resumes.
+        placedReportedRef.current = order.id
+        const alreadyPlaced = await setPlaceOrder?.({
+          paymentSource,
+          currentCustomerPaymentSourceId,
+        })
+        if (alreadyPlaced?.placed && alreadyPlaced.order != null) {
+          onClick?.(alreadyPlaced)
+          return
+        }
+        // Still placed if it could not be read again: hand back what we have.
         onClick?.({
           placed: true,
           order: order,
@@ -512,6 +575,18 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
         return
       }
     }
+    if (paymentType === "paypal_payments" && orderPaymentSourceId === null && !isFree) {
+      /**
+       * The API dropped the PayPal payment — a shipping method change does that — while
+       * the context still holds it. Its `approval_url` belongs to a PayPal order this
+       * order no longer points at: the shopper would approve it and come back to
+       * `ORDER_NOT_APPROVED` (#941). Publish the order as it is, so the gateway creates
+       * a new payment, and let the shopper place again once it is there.
+       */
+      await getOrder?.(order.id)
+      setPlaceOrderStatus?.({ status: "standby" })
+      return
+    }
     setIsLoading(true)
     // setForceDisable(true)
     const checkPaymentSource =
@@ -519,7 +594,9 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
         ? await setPaymentSource({
             // @ts-expect-error no type not be undefined
             paymentResource: paymentType,
-            paymentSourceId: paymentSource?.id,
+            // The order's own payment source when it has one: the context can still hold
+            // one the API has since replaced.
+            paymentSourceId: orderPaymentSourceId ?? paymentSource?.id,
           })
         : // Fall back to the order's own payment source: on a 3DS return the
           // Stripe redirect effect above fires as soon as `order.payment_source`
@@ -555,9 +632,14 @@ export function PlaceOrderButtonPaymentSource(props: Props): JSX.Element {
         options?.adyen?.MD ||
         options?.adyen?.redirectResult ||
         options?.checkoutCom?.session_id ||
-        options?.stripe?.paymentIntentClientSecret
+        (options?.stripe?.paymentIntentClientSecret && !stripeReturnUnpaidRef.current)
     )
     if (currentPaymentMethodRef?.current?.onsubmit && !isReturningFromRedirect) {
+      // Before the widget, which may redirect to the gateway: with an `auto_place` method
+      // the backend can place the order before the shopper is back, and then nothing on the
+      // return attempts a place that would send them (#904). A refused flag stays set, and
+      // `setPlaceOrder` sends it again.
+      await saveAddressesToCustomerAddressBook(sdk, order.id).catch(() => undefined)
       isValid = (await currentPaymentMethodRef.current?.onsubmit({
         // @ts-expect-error no type
         paymentSource: checkPaymentSource,

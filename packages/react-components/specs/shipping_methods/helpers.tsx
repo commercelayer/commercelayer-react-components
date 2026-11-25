@@ -89,8 +89,10 @@ export function ShipmentChildrenProvider({
 export function ShipmentContextProvider({
   children,
   setShippingMethod,
+  isRefreshing,
 }: {
   children: ReactNode
+  isRefreshing?: boolean
   setShippingMethod?: (
     shipmentId: string,
     shippingMethodId: string
@@ -100,6 +102,7 @@ export function ShipmentContextProvider({
     <ShipmentContext.Provider
       value={{
         ...defaultShipmentContext,
+        isRefreshing,
         // biome-ignore lint/suspicious/noExplicitAny: test cast
         setShippingMethod: setShippingMethod as any,
       }}

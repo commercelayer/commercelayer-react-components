@@ -618,7 +618,7 @@ export async function addToCart(
             : (organizationConfig?.links?.checkout ?? href)
           location.href = redirectUrl
         } else if (openMiniCart) {
-          publish("open-cart")
+          publish("open-cart", { source: "add-to-cart" })
         }
         return { success: true, orderId: id }
       }
@@ -791,13 +791,15 @@ export async function removeGiftCardOrCouponCode({
         dispatch,
         state,
       })
+      // updateOrder has already dispatched its errors: keep them
+      if (!orderUpdated.success) return { success: false }
       dispatch({
         type: "setErrors",
         payload: {
           errors: [],
         },
       })
-      return { success: true, order: orderUpdated?.order }
+      return { success: true, order: orderUpdated.order }
     }
     return { success: false }
   } catch (error: any) {

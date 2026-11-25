@@ -4,7 +4,10 @@ import type { Dispatch, RefObject } from "react"
 import type { CommerceLayerConfig } from "#context/CommerceLayerContext"
 import type { BaseError } from "#typings/errors"
 import baseReducer from "#utils/baseReducer"
-import { saveBillingAddress, saveShippingAddress, saveToWallet } from "#utils/customerOrderOptions"
+import {
+  saveAddressesToCustomerAddressBook,
+  savePaymentSourceToCustomerWallet,
+} from "#utils/customerOrderOptions"
 import getErrors from "#utils/getErrors"
 import { hasSubscriptions } from "#utils/hasSubscriptions"
 import { isEmpty } from "#utils/isEmpty"
@@ -196,14 +199,24 @@ export async function setPlaceOrder({
     placed: false,
   }
   if (state && config && order) {
+    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const isAlreadyPlaced = order?.status === "placed"
     if (isAlreadyPlaced) {
+      // Placed in the background — an `auto_place` method, while the shopper was on the
+      // gateway's page — and loaded that way, so the order in hand may lack the includes the
+      // app builds its thank-you page and analytics from. Re-read it like the pre-check below
+      // does (#924). Still placed if the re-read fails: hand back what we have.
+      const placed = await sdk.orders.retrieve(order.id, { include }).catch(() => order)
+      // No place path ran to save the card the shopper asked to keep (#940). The address
+      // book flags went out before the gateway redirect (#904); the card only exists once it
+      // is authorized, so the wallet flag could not. A refused one leaves the order placed.
+      await savePaymentSourceToCustomerWallet(sdk, placed).catch(() => undefined)
+      if (setOrder && placed !== order) setOrder(placed)
       return {
         placed: true,
-        order,
+        order: placed,
       }
     }
-    const sdk = getSdk({ accessToken: config.accessToken!, interceptors: config.interceptors })
     const { options, paymentType } = state
     try {
       // Prevent extra place order. The same `include` the place paths below ask for: this
@@ -218,6 +231,11 @@ export async function setPlaceOrder({
         // context still holds a pending order splits the library's own view of the order:
         // `setPaymentSource` guards writes with `order?.status === "placed"` read from
         // there, and `<PaymentGateway>` clears its loader on the same reading.
+        // Placed in the background, so the place path below never ran to send the address
+        // book flags (#904) or the wallet flag (#940). A refused one must not turn a placed
+        // order into a failure.
+        await saveAddressesToCustomerAddressBook(sdk, order.id).catch(() => undefined)
+        await savePaymentSourceToCustomerWallet(sdk, lastOrderStatus).catch(() => undefined)
         if (setOrder) setOrder(lastOrderStatus)
         return {
           placed: true,
@@ -238,19 +256,12 @@ export async function setPlaceOrder({
         id: order.id,
         _place: true,
       }
-      if (saveBillingAddress()) {
-        await sdk.orders.update({
-          id: order.id,
-          _save_billing_address_to_customer_address_book: true,
-        })
-      }
-      if (saveShippingAddress()) {
-        await sdk.orders.update({
-          id: order.id,
-          _save_shipping_address_to_customer_address_book: true,
-        })
-      }
-      if (paymentType === "stripe_payments" && paymentSource != null) {
+      await saveAddressesToCustomerAddressBook(sdk, order.id)
+      // Not on the return from Stripe: the payment is confirmed by then, and the current URL
+      // never matches the stored one because Stripe appends its own parameters. The PATCH
+      // would be one more write that an `auto_place` method can turn into a 401 (#900).
+      const isStripeReturn = options?.stripe?.paymentIntentClientSecret != null
+      if (paymentType === "stripe_payments" && paymentSource != null && !isStripeReturn) {
         const ps = paymentSource as StripePayment
         const currentUrl = window.location.href
         // @ts-expect-error no type
@@ -274,15 +285,7 @@ export async function setPlaceOrder({
       }
       switch (paymentType) {
         case "braintree_payments": {
-          const total = order?.total_amount_cents ?? 0
-          await Promise.all([
-            saveToWallet() &&
-              total > 0 &&
-              sdk.orders.update({
-                id: order.id,
-                _save_payment_source_to_customer_wallet: true,
-              }),
-          ])
+          await savePaymentSourceToCustomerWallet(sdk, order)
           const orderUpdated = await sdk.orders.update(updateAttributes, {
             include,
           })
@@ -298,28 +301,19 @@ export async function setPlaceOrder({
           const orderUpdated = await sdk.orders.update(updateAttributes, {
             include,
           })
-          const total = orderUpdated?.total_amount_cents ?? 0
-          if (setOrder) setOrder(orderUpdated)
-          await Promise.all([
-            saveToWallet() &&
-              total > 0 &&
-              sdk.orders
-                .update({
-                  id: order.id,
-                  _save_payment_source_to_customer_wallet: true,
-                })
-                .catch((error) => {
-                  // Avoid to interrupt the process if the order is already placed
-                  const errors = getErrors({
-                    error,
-                    resource: "orders",
-                    field: paymentType,
-                  })
-                  if (setOrderErrors) setOrderErrors(errors)
-                }),
-          ]).then(() => {
-            updateOrderSubscriptionCustomerPaymentSource(orderUpdated, paymentType, sdk)
+          // Before publishing the placed order, not after: an app that leaves the checkout as
+          // soon as it sees the order placed would drop the request on the way out (#940).
+          await savePaymentSourceToCustomerWallet(sdk, orderUpdated).catch((error) => {
+            // Avoid to interrupt the process if the order is already placed
+            const errors = getErrors({
+              error,
+              resource: "orders",
+              field: paymentType,
+            })
+            if (setOrderErrors) setOrderErrors(errors)
           })
+          if (setOrder) setOrder(orderUpdated)
+          updateOrderSubscriptionCustomerPaymentSource(orderUpdated, paymentType, sdk)
           return {
             placed: true,
             order: orderUpdated,
@@ -328,6 +322,19 @@ export async function setPlaceOrder({
       }
       // biome-ignore lint/suspicious/noExplicitAny: No type for error
     } catch (error: any) {
+      // An `auto_place` method places the order in the background, so it can land between
+      // the pre-check above and the writes after it, which the API then refuses (#900). The
+      // order is placed: report it like the pre-check does rather than as an error.
+      const latest = await sdk.orders.retrieve(order.id, { include }).catch(() => null)
+      if (latest?.status === "placed") {
+        await saveAddressesToCustomerAddressBook(sdk, order.id).catch(() => undefined)
+        await savePaymentSourceToCustomerWallet(sdk, latest).catch(() => undefined)
+        if (setOrder) setOrder(latest)
+        return {
+          placed: true,
+          order: latest,
+        }
+      }
       const errors = getErrors({
         error,
         resource: "orders",

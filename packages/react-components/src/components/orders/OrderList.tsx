@@ -310,8 +310,9 @@ export function OrderList({
   const totalRows =
     type === "orders" ? (orders?.meta.recordCount ?? 0) : (subscriptions?.meta.recordCount ?? 0)
 
-  const Pagination = (): JSX.Element | null =>
-    !showPagination ? null : (
+  // An element, not a component defined in here: a component created on every render is
+  // a new type each time, so React would remount the whole pagination subtree.
+  const paginationElement = !showPagination ? null : (
       <OrderListPagination.Provider
         value={{
           canNextPage: table.getCanNextPage(),
@@ -338,7 +339,7 @@ export function OrderList({
       value={{ orders: type === "orders" ? orders : subscriptions }}
     >
       {rowsComponents}
-      <Pagination />
+      {paginationElement}
     </OrderListChildrenContext.Provider>
   ) : (
     <>
@@ -348,7 +349,7 @@ export function OrderList({
       </TableHtmlElement>
       {totalRows <= pageSize ? null : (
         <div className={paginationContainerClassName}>
-          <Pagination />
+          {paginationElement}
         </div>
       )}
     </>

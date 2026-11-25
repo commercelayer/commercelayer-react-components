@@ -210,7 +210,50 @@ interface TSetPaymentMethodParams {
   paymentResource?: PaymentResource
 }
 
-export async function setPaymentMethod({
+type SetPaymentMethodResponse = {
+  success: boolean
+  order?: Order
+  error?: { errors: BaseError[] }
+}
+
+// One payment method update per order at a time. A click on a payment method's label
+// reaches a clickable <PaymentMethod> twice — the browser follows it with a click on the
+// radio the label points at — and a click can land while the single-method auto-select
+// is still setting the method, so the same update went out twice at once (#944). A call
+// for the method already being set joins that request; a call for another method waits
+// for it and goes out next, so the order keeps the last selection. Entries are removed
+// once settled, so a later call updates again.
+const inFlightPaymentMethodRequests = new Map<
+  string,
+  { paymentMethodId: string; request: Promise<SetPaymentMethodResponse> }
+>()
+
+export async function setPaymentMethod(
+  params: TSetPaymentMethodParams
+): Promise<SetPaymentMethodResponse> {
+  const { order, paymentMethodId } = params
+  // Without a stable order id there is no real request to serialize.
+  if (order?.id == null) {
+    return runSetPaymentMethod(params)
+  }
+  const orderId = order.id
+  const existing = inFlightPaymentMethodRequests.get(orderId)
+  if (existing?.paymentMethodId === paymentMethodId) {
+    return existing.request
+  }
+  const run = () => runSetPaymentMethod(params)
+  const request = (
+    existing == null ? run() : existing.request.catch(() => undefined).then(run)
+  ).finally(() => {
+    if (inFlightPaymentMethodRequests.get(orderId)?.request === request) {
+      inFlightPaymentMethodRequests.delete(orderId)
+    }
+  })
+  inFlightPaymentMethodRequests.set(orderId, { paymentMethodId, request })
+  return request
+}
+
+async function runSetPaymentMethod({
   config,
   dispatch,
   order,
@@ -218,11 +261,7 @@ export async function setPaymentMethod({
   updateOrder,
   setOrderErrors,
   paymentResource,
-}: TSetPaymentMethodParams): Promise<{
-  success: boolean
-  order?: Order
-  error?: { errors: BaseError[] }
-}> {
+}: TSetPaymentMethodParams): Promise<SetPaymentMethodResponse> {
   let response: { success: boolean; order?: Order } = {
     success: false,
   }
@@ -380,8 +419,20 @@ async function runSetPaymentSource({
           }
           paymentSource = await sdk[paymentResource].create(attrs)
           const readBack = getOrder ? await getOrder(order.id) : undefined
-          if (readBack?.updated_at != null) {
-            lastPaymentSourceCreates.set(createKey(order.id, paymentResource), {
+          // A read-back that loaded the payment source and found it gone, or found
+          // another one, shows the API already dropped this create — a shipping method
+          // change landing while it was in flight does that (#941). Remembering it would
+          // hand that dead source to every later create at this revision, and PayPal
+          // would then redirect to its stale `approval_url`. `undefined` only means the
+          // payment source was not included in the read, which says nothing either way.
+          const droppedByApi =
+            readBack?.payment_source !== undefined &&
+            readBack.payment_source?.id !== paymentSource.id
+          const key = createKey(order.id, paymentResource)
+          if (droppedByApi) {
+            lastPaymentSourceCreates.delete(key)
+          } else if (readBack?.updated_at != null) {
+            lastPaymentSourceCreates.set(key, {
               paymentSource,
               orderUpdatedAt: readBack.updated_at,
             })

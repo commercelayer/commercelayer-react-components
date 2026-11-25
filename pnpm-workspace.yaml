@@ -27,7 +27,7 @@ minimumReleaseAgeExclude:
   - valibot@1.4.2
   - nx@22.7.2 || 22.7.7
   - nanoid@3.3.16 || 3.3.17
-  - '@commercelayer/sdk@8.0.2'
+  - '@commercelayer/sdk@8.0.2 || 8.0.4'
 
 onlyBuiltDependencies:
   - esbuild

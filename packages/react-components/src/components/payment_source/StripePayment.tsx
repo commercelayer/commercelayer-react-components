@@ -291,7 +291,11 @@ export function StripePayment({
   }
   return isLoaded && stripe != null && clientSecret != null ? (
     <div className={containerClassName} {...divProps}>
-      <Elements stripe={stripe} options={elementsOptions}>
+      {/* Keyed on the secret: <Elements> reads `options.clientSecret` only when it mounts
+          and ignores any later value, so a recreated payment source (a cart change leaves the
+          old one `mismatched_amounts`) would otherwise be paid on the old intent, for the old
+          amount. The new key builds a new Elements group for the new intent. */}
+      <Elements key={clientSecret} stripe={stripe} options={elementsOptions}>
         {expressPayments ? (
           <StripeExpressPayment clientSecret={clientSecret} />
         ) : (

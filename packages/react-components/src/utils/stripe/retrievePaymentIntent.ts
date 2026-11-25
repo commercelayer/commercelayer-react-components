@@ -27,6 +27,8 @@ interface PaymentIntentValidationProps {
 
 type PaymentVerificationState = "valid" | "invalid" | "processing"
 
+const UNPAID_INTENT_MESSAGE = "The payment was not completed. Please try again."
+
 function paymentIntentValidation({
   paymentIntent,
 }: PaymentIntentValidationProps): PaymentVerificationState {
@@ -68,8 +70,10 @@ export async function checkPaymentIntent({
   const paymentIntent = paymentIntentResult.paymentIntent
   const error = paymentIntent?.last_payment_error
   const status = paymentIntentValidation({ paymentIntent })
-  return {
-    status,
-    message: status === "invalid" && error?.message != null ? error.message : "",
-  }
+  if (status !== "invalid") return { status, message: "" }
+  // An intent can be unpaid with no error recorded on it: when the order's amount changes
+  // while the shopper is on the gateway's page, the intent is updated and Stripe sends it
+  // back to `requires_confirmation`, voiding the authorization given there. An empty
+  // message would leave the shopper on the payment step with no reason shown.
+  return { status, message: error?.message ?? UNPAID_INTENT_MESSAGE }
 }
