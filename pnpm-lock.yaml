@@ -154,6 +154,9 @@ importers:
       '@adyen/adyen-web':
         specifier: ^6.48.1
         version: 6.48.1
+      '@checkout.com/checkout-web-components':
+        specifier: ^1.14.0
+        version: 1.14.0
       '@commercelayer/core-components':
         specifier: workspace:*
         version: link:../core-components
@@ -601,6 +604,9 @@ packages:
   '@bramus/specificity@2.4.2':
     resolution: {integrity: sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==}
     hasBin: true
+
+  '@checkout.com/checkout-web-components@1.14.0':
+    resolution: {integrity: sha512-1AgCVNkfcnF8JjG6dzfzC3Z2OIIghREv2LOFxiywUQEQt23uV4D6t1r3rTi5Nzil0qofol1AoDh+TCxXGY3KUQ==}
 
   '@commercelayer/js-auth@7.4.2':
     resolution: {integrity: sha512-ifRcoAL1R7o5AU5w4bgmSnNMEWXDc11A+yZwAAZMEkAYrrsaud1X/3xmgY1e0yIXK8AAdIiqfW/Rm/4DdWwAQA==}
@@ -3839,6 +3845,8 @@ snapshots:
   '@bramus/specificity@2.4.2':
     dependencies:
       css-tree: 3.2.1
+
+  '@checkout.com/checkout-web-components@1.14.0': {}
 
   '@commercelayer/js-auth@7.4.2': {}
 

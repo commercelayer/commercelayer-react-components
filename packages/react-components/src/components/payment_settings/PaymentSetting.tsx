@@ -25,6 +25,7 @@ import CommerceLayerContext from "#context/CommerceLayerContext"
 import OrderContext from "#context/OrderContext"
 import PaymentSettingChildrenContext from "#context/PaymentSettingChildrenContext"
 import { useAdyenRedirectResume } from "#hooks/useAdyenRedirectResume"
+import { useCheckoutComRedirectResume } from "#hooks/useCheckoutComRedirectResume"
 import { usePaymentSessionsState } from "#hooks/usePaymentSessionsState"
 import { usePaymentsModel } from "#hooks/usePaymentsModel"
 import { useStripeRedirectResume } from "#hooks/useStripeRedirectResume"
@@ -52,6 +53,7 @@ const IMPLEMENTED_SETTING_TYPES = [
   "payment_setting_stripes",
   "payment_setting_braintrees",
   "payment_setting_paypals",
+  "payment_setting_checkout_coms",
 ] as const
 
 export interface PaymentSettingOnSelectParams {
@@ -101,7 +103,7 @@ export interface PaymentSettingChildrenProps {
   selectSetting: () => Promise<void>
   /**
    * Whether to offer a "save this card" choice for this setting — Stripe,
-   * Braintree or PayPal, for a signed-in customer. The library renders no control for it:
+   * Braintree, PayPal or Checkout.com, for a signed-in customer. The library renders no control for it:
    * the copy and the placement are the application's. On Braintree the choice
    * goes with the session, not with the card fields, so an Apple Pay payment on
    * the same setting is stored too: word it as a payment method, not a card.
@@ -281,18 +283,20 @@ export function PaymentSetting({
     }
   }, [include, includeLoaded, addResourceToInclude])
 
-  // Finishing a redirect needs no UI — Adyen's `submitDetails` and Stripe's
-  // `retrievePaymentIntent` are both plain calls — so it runs from here, the one
+  // Finishing a redirect needs no UI — Adyen's `submitDetails`, Stripe's
+  // `retrievePaymentIntent` and the API call recording a Checkout.com payment
+  // are all plain calls — so it runs from here, the one
   // component the Payment Session lifecycle requires to stay mounted. Inside a
   // gateway component it would depend on which checkout step the application
   // happens to render, and an accordion that came back collapsed would leave a
   // charged card on an unplaced order.
   //
-  // Both are called unconditionally, as hooks must be, and each does nothing
-  // unless its own gateway's return parameters are in the URL. They cannot both
-  // fire: a return carries one gateway's parameters.
+  // All are called unconditionally, as hooks must be, and each does nothing
+  // unless its own gateway's return parameters are in the URL. No two can fire
+  // together: a return carries one gateway's parameters.
   useAdyenRedirectResume()
   useStripeRedirectResume()
+  useCheckoutComRedirectResume()
 
   if (paymentsModel !== "payment_sessions" || order == null) return null
 

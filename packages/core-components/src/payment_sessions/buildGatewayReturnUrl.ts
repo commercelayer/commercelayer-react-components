@@ -1,3 +1,5 @@
+import { CHECKOUT_COM_RETURN_PARAM } from "./types"
+
 /**
  * Query parameters a gateway adds when it sends the shopper back.
  *
@@ -7,10 +9,14 @@
  * stale `payment_intent_client_secret` would have Stripe report the outcome of
  * an attempt that is over.
  *
- * Both gateways' parameters are removed whichever one is being built for. They
- * cannot collide — a return carries one gateway's — and a checkout that
+ * Every gateway's parameters are removed whichever one is being built for.
+ * They cannot collide — a return carries one gateway's — and a checkout that
  * switched setting between attempts would otherwise hand the new gateway the
  * old one's leftovers.
+ *
+ * Checkout.com's include `CHECKOUT_COM_RETURN_PARAM`, which is ours rather
+ * than theirs: it is put on the `success_url` and `failure_url` to tell the two
+ * apart, so it is just as single-use as what Checkout.com appends.
  */
 const GATEWAY_RETURN_PARAMS = [
   "redirectResult",
@@ -19,6 +25,10 @@ const GATEWAY_RETURN_PARAMS = [
   "payment_intent",
   "payment_intent_client_secret",
   "redirect_status",
+  CHECKOUT_COM_RETURN_PARAM,
+  "cko-payment-id",
+  "cko-session-id",
+  "cko-payment-session-id",
 ] as const
 
 /**

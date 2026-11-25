@@ -35,6 +35,7 @@ export {
   DEFAULT_PLACEABLE_INTERVAL_MS,
   placeOrderWithPaymentSessions,
 } from "./placeOrderWithPaymentSessions"
+export { recordCheckoutComPayment } from "./recordCheckoutComPayment"
 export type { RefundGiftCardSessionsResult } from "./refundGiftCardSessions"
 export {
   DEFAULT_REFUND_ATTEMPTS,
@@ -54,6 +55,8 @@ export type {
 export {
   ADYEN_SETTING_TYPE,
   BRAINTREE_SETTING_TYPE,
+  CHECKOUT_COM_RETURN_PARAM,
+  CHECKOUT_COM_SETTING_TYPE,
   GIFT_CARD_SETTING_TYPE,
   hasAuthorizationInFlight,
   hasFailedAuthorization,
@@ -62,6 +65,7 @@ export {
   holdsMoney,
   isAdyenSession,
   isBraintreeSession,
+  isCheckoutComSession,
   isGiftCardSession,
   isPayPalSession,
   isStripeSession,
@@ -71,6 +75,7 @@ export {
   readAdyenSession,
   readBraintreeClientToken,
   readBraintreeGooglePayMerchantId,
+  readCheckoutComPaymentSession,
   readPaymentInstrument,
   readPayPalClientId,
   readPayPalOrderId,

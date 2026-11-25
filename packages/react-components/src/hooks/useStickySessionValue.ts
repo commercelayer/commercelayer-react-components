@@ -18,12 +18,12 @@ import { useRef } from "react"
  * that actually invalidates it. A different session id drops it, because then
  * the old value belongs to a payment that is no longer the selection.
  */
-export function useStickySessionValue(
+export function useStickySessionValue<T = string>(
   session: PaymentSession | undefined,
-  read: (session?: PaymentSession) => string | undefined
-): string | undefined {
+  read: (session?: PaymentSession) => T | undefined
+): T | undefined {
   const sessionId = session?.id
-  const remembered = useRef<{ sessionId?: string; value?: string }>({})
+  const remembered = useRef<{ sessionId?: string; value?: T }>({})
   const value = read(session)
 
   // Written during render on purpose: this is a cache of a value derived from

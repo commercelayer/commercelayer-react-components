@@ -312,6 +312,60 @@ export function readStripeClientSecret(session?: PaymentSession | null): string 
 }
 
 /**
+ * The Payment Setting type Checkout.com cards are taken through.
+ *
+ * Like Stripe's, the setting carries the browser credential, `public_key`, and
+ * the gateway-side session arrives with the Payment Session.
+ */
+export const CHECKOUT_COM_SETTING_TYPE = "payment_setting_checkout_coms"
+
+/**
+ * The query parameter that tells a return from Checkout.com's `success_url`
+ * apart from one from its `failure_url`.
+ *
+ * Ours, not Checkout.com's: it appends the payment id to both, and the payment
+ * itself cannot be read from a browser, since that takes the secret key. The
+ * alternative is recording a declined payment and letting its authorization
+ * fail, which burns a session the shopper could have tried another card on.
+ */
+export const CHECKOUT_COM_RETURN_PARAM = "checkout_com_return"
+
+/** Whether this session belongs to a Checkout.com Payment Setting. */
+export function isCheckoutComSession(session?: PaymentSession | null): boolean {
+  return session?.payment_setting?.type === CHECKOUT_COM_SETTING_TYPE
+}
+
+/**
+ * The Checkout.com payment session its web components mount on.
+ *
+ * `response_data` is Checkout.com's answer to the payment session request,
+ * passed through whole, and the web components are built from the whole
+ * object: `loadCheckoutWebComponents({ paymentSession })` reads `id`,
+ * `payment_session_secret` and `payment_session_token` from it, and whatever
+ * else Checkout.com sent is theirs to read. So it is returned as it stands,
+ * checked only for the two fields nothing works without.
+ *
+ * Returns `undefined` when either is absent or empty, for the reasons the
+ * Adyen reader gives: a consumer whose `fields` allowlist omits
+ * `response_data`, or a session whose gateway call failed, are both better
+ * reported as "no Checkout.com session" than as a component that fails inside
+ * the SDK.
+ */
+export function readCheckoutComPaymentSession(
+  session?: PaymentSession | null
+): Record<string, unknown> | undefined {
+  const data = session?.response_data
+  if (data == null || typeof data !== "object") return undefined
+  const { id, payment_session_secret: secret } = data as {
+    id?: unknown
+    payment_session_secret?: unknown
+  }
+  if (typeof id !== "string" || id === "") return undefined
+  if (typeof secret !== "string" || secret === "") return undefined
+  return data as Record<string, unknown>
+}
+
+/**
  * The Payment Setting type Braintree cards are taken through.
  *
  * The odd one out among the card gateways: the setting carries no credential a
