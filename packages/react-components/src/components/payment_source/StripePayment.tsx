@@ -105,13 +105,13 @@ function StripePaymentForm({
         return false
       }
     }
-    const savePaymentSourceToCustomerWallet: string =
+    const saveToWalletCheckbox =
       // @ts-expect-error no type
-      event?.elements?.save_payment_source_to_customer_wallet?.checked
-    if (savePaymentSourceToCustomerWallet)
+      event?.elements?.save_payment_source_to_customer_wallet
+    if (saveToWalletCheckbox)
       setCustomerOrderParam(
         "_save_payment_source_to_customer_wallet",
-        savePaymentSourceToCustomerWallet
+        String(Boolean(saveToWalletCheckbox.checked))
       )
     if (elements != null) {
       const billingInfo = order?.billing_address

@@ -255,13 +255,13 @@ export function AdyenPayment({
     }
   }, [])
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<boolean> => {
-    const savePaymentSourceToCustomerWallet: string =
+    const saveToWalletCheckbox =
       // @ts-expect-error no type
-      e?.elements?.save_payment_source_to_customer_wallet?.checked
-    if (savePaymentSourceToCustomerWallet)
+      e?.elements?.save_payment_source_to_customer_wallet
+    if (saveToWalletCheckbox)
       setCustomerOrderParam(
         "_save_payment_source_to_customer_wallet",
-        savePaymentSourceToCustomerWallet
+        String(Boolean(saveToWalletCheckbox.checked))
       )
     if (dropinRef.current) {
       // `Dropin.submit()` throws synchronously when it has no `activePaymentMethod` — e.g.
@@ -792,7 +792,6 @@ export function AdyenPayment({
         handleSubmit()
       },
     } satisfies CoreConfiguration
-    if (!ref && clientKey) setCustomerOrderParam("_save_payment_source_to_customer_wallet", "false")
     // An expired `order_data` makes the reducer destroy the payment source and a fresh one
     // takes its place. The Drop-in bakes Adyen's session in at creation, so the instance on
     // screen is still talking to the session the API now rejects, and the shopper's retry

@@ -116,6 +116,24 @@ describe("StripePayment", () => {
     expect(elements.clientSecret).toBe("pi_new_secret_b")
   })
 
+  // Issue #953: ticking "save card", having the payment refused, then unticking left "true"
+  // in localStorage, and the next card was saved to the wallet against the shopper's choice.
+  it("clears the save-to-wallet flag when the checkbox is unticked", async () => {
+    localStorage.setItem("_save_payment_source_to_customer_wallet", "true")
+    render(tree("pi_old_secret_a"))
+    await waitFor(() => expect(registeredForm()).toBeDefined())
+    const checkbox = document.createElement("input")
+    checkbox.type = "checkbox"
+    checkbox.name = "save_payment_source_to_customer_wallet"
+    registeredForm().appendChild(checkbox)
+
+    await act(async () => {
+      await registeredForm().onsubmit()
+    })
+
+    expect(localStorage.getItem("_save_payment_source_to_customer_wallet")).toBe("false")
+  })
+
   it("keeps the same Elements group while the client secret does not change", async () => {
     const { rerender } = render(tree("pi_old_secret_a"))
     await waitFor(() => expect(groups).toHaveLength(1))

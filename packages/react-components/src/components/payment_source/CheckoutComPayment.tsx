@@ -219,13 +219,13 @@ export function CheckoutComPayment({ publicKey, options, ...p }: Props): JSX.Ele
                     // have been replaced; it must not authorize the old source.
                     if (mountedForRef.current !== ps.id) return false
                     const element = ref.current?.elements
-                    const savePaymentSourceToCustomerWallet =
+                    const saveToWalletCheckbox =
                       // @ts-expect-error no type
-                      element?.save_payment_source_to_customer_wallet?.checked
-                    if (savePaymentSourceToCustomerWallet)
+                      element?.save_payment_source_to_customer_wallet
+                    if (saveToWalletCheckbox)
                       setCustomerOrderParam(
                         "_save_payment_source_to_customer_wallet",
-                        savePaymentSourceToCustomerWallet
+                        String(Boolean(saveToWalletCheckbox.checked))
                       )
                     const { data } = await component.tokenize()
                     const token = data?.token
