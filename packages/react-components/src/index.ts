@@ -97,6 +97,8 @@ export * from "#components/payment_settings/PaymentSettingBraintreeApplePay"
 export * from "#components/payment_settings/PaymentSettingBraintreeGooglePay"
 export * from "#components/payment_settings/PaymentSettingBraintreePayment"
 export * from "#components/payment_settings/PaymentSettingBraintreePayPal"
+export * from "#components/payment_settings/PaymentSettingCheckoutComApplePay"
+export * from "#components/payment_settings/PaymentSettingCheckoutComGooglePay"
 export * from "#components/payment_settings/PaymentSettingCheckoutComPayment"
 export * from "#components/payment_settings/PaymentSettingGiftCard"
 export * from "#components/payment_settings/PaymentSettingGiftCardErrors"
@@ -168,6 +170,12 @@ export type {
 export type { AddressCardsTemplateChildren } from "#components/utils/AddressCardsTemplate"
 export type { BaseInputProps } from "#components/utils/BaseInput"
 export type { BaseFieldProps } from "#components/utils/BaseField"
+export type {
+  CheckoutComWalletMethod,
+  CheckoutComWalletOptions,
+  CheckoutComWalletProps,
+  PaymentSettingCheckoutComWalletChildrenProps,
+} from "#components/utils/CheckoutComWallet"
 export type { CustomerCardsTemplateChildren } from "#components/utils/PaymentCardsTemplate"
 export type { TGenericChildrenProps, TResources } from "#components/utils/GenericFieldComponent"
 export type { Country, States } from "#utils/countryStateCity"

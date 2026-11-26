@@ -1,6 +1,5 @@
 import {
   type CardComponentOptions,
-  type CheckoutError,
   type Component,
   loadCheckoutWebComponents,
   type Options,
@@ -20,6 +19,7 @@ import { usePaymentSettingLoader } from "#hooks/usePaymentSettingLoader"
 import { useStickySessionValue } from "#hooks/useStickySessionValue"
 import type { BaseError } from "#typings/errors"
 import type { ChildrenFunction, LoaderType } from "#typings/index"
+import { checkoutComError, checkoutComOutcome, isSandboxKey } from "#utils/checkoutCom"
 import {
   type PaymentGatewaySubmitResult,
   registerHostCollection,
@@ -239,7 +239,7 @@ function CheckoutComCard({
       const code = "payment_not_recorded"
       setLastErrorCode(code)
       setErrors([
-        gatewayError(
+        checkoutComError(
           error instanceof Error && error.message !== ""
             ? error.message
             : "The payment could not be recorded.",
@@ -297,14 +297,14 @@ function CheckoutComCard({
               // errors land here too when validation was shown on purpose.
               if (error.type !== "Submit") {
                 setHasLoadFailed(true)
-                setErrors([gatewayError(error.message, error.code)])
+                setErrors([checkoutComError(error.message, error.code)])
               }
               return
             }
-            const result = submitResult(error)
+            const result = checkoutComOutcome(error)
             if (result.status === "failed" || result.status === "unknown") {
               setLastErrorCode(result.code)
-              setErrors([gatewayError(error.message, result.code)])
+              setErrors([checkoutComError(error.message, result.code)])
             }
             settle(result)
           },
@@ -320,7 +320,7 @@ function CheckoutComCard({
         if (cancelled) return
         setHasLoadFailed(true)
         setErrors([
-          gatewayError(
+          checkoutComError(
             error instanceof Error ? error.message : "Checkout.com could not be loaded.",
             "load_failed"
           ),
@@ -399,51 +399,6 @@ function CheckoutComCard({
       {children != null ? <Parent {...parentProps}>{children}</Parent> : null}
     </>
   )
-}
-
-/**
- * What a Checkout.com error means for the payment in flight.
- *
- * - **Submit:** the form was not complete. A stop, shown by the form itself.
- * - **Declined or aborted:** a verdict, so no money moved. The code is the
- *   decline reason Checkout.com gave, when it gave one.
- * - **Everything else** — a network failure, a request that failed midway —
- *   leaves the outcome unknown: the payment may have reached Checkout.com.
- */
-function submitResult(error: CheckoutError): PaymentGatewaySubmitResult {
-  if (error.type === "Submit") return { status: "incomplete" }
-  if (error.type === "Request") {
-    if (error.code === "payment_request_declined") {
-      const [reason] = error.details.requestErrorCodes ?? []
-      return { status: "failed", code: reason ?? error.code }
-    }
-    if (error.code === "payment_request_aborted") {
-      return { status: "failed", code: error.details.abortReason ?? error.code }
-    }
-  }
-  return { status: "unknown", code: error.code }
-}
-
-/**
- * Checkout.com's keys say which environment they belong to: `pk_sbox_` for the
- * sandbox, and `pk_test_` on accounts older than that convention.
- */
-function isSandboxKey(publicKey: string): boolean {
-  return publicKey.startsWith("pk_sbox_") || publicKey.startsWith("pk_test_")
-}
-
-/**
- * A refusal carrying Checkout.com's own code, tagged `orders`: `<Errors>`
- * matches on `resource`, and the place-order button writes what it gets from
- * the handoff into the order's error state.
- */
-function gatewayError(message: string | undefined, code: string): BaseError {
-  return {
-    code: "VALIDATION_ERROR",
-    resource: "orders",
-    message: message ?? "The payment was not completed.",
-    meta: { error: code },
-  }
 }
 
 export default PaymentSettingCheckoutComPayment
