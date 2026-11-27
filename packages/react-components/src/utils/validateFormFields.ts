@@ -102,13 +102,17 @@ export function fieldsExist(
 ): boolean {
   if (!address.business) {
     const required = schema.filter((v) => !["line_2", "company", "state_code"].includes(v))
-    const validAddress = Object.keys(address).filter((k) => required.includes(k))
+    const validAddress = Object.keys(address).filter(
+      (k) => required.includes(k) && address[k as keyof AddressCreate] !== ""
+    )
     return required.length > validAddress.length
   }
   const required = schema.filter(
     (v) => !["first_name", "last_name", "line_2", "state_code"].includes(v)
   )
-  const validAddress = Object.keys(address).filter((k) => required.includes(k))
+  const validAddress = Object.keys(address).filter(
+    (k) => required.includes(k) && address[k as keyof AddressCreate] !== ""
+  )
   return required.length > validAddress.length
 }
 

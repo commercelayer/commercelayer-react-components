@@ -145,6 +145,69 @@ describe("BillingAddressForm (real rapid-form)", () => {
     })
   })
 
+  it("sends an empty string when a pre-filled optional field is cleared (#956)", async () => {
+    const setAddress = vi.fn()
+    const addressContext = {
+      ...defaultAddressContext,
+      setAddressErrors: vi.fn(),
+      setAddress,
+      saveAddresses: vi.fn(),
+    }
+    const orderContext = {
+      ...defaultOrderContext,
+      order: { id: "ord-clear" },
+      include: ["billing_address"],
+      includeLoaded: { billing_address: true },
+      addResourceToInclude: vi.fn(),
+    }
+
+    render(
+      // biome-ignore lint/suspicious/noExplicitAny: test provider cast
+      <AddressesContext.Provider value={addressContext as any}>
+        {/* biome-ignore lint/suspicious/noExplicitAny: test provider cast */}
+        <OrderContext.Provider value={orderContext as any}>
+          <BillingAddressForm data-testid="form">
+            <AddressInput
+              name="billing_address_line_1"
+              data-testid="line-1"
+              required
+              value="Via Roma 1"
+            />
+            <AddressInput
+              name="billing_address_line_2"
+              data-testid="line-2"
+              required={false}
+              value="Apt 4B"
+            />
+          </BillingAddressForm>
+        </OrderContext.Provider>
+      </AddressesContext.Provider>
+    )
+
+    await waitFor(() => {
+      const lastCall = setAddress.mock.calls[setAddress.mock.calls.length - 1][0]
+      expect(lastCall.values).toMatchObject({ line_1: "Via Roma 1", line_2: "Apt 4B" })
+    })
+
+    await act(async () => {
+      fireEvent.input(screen.getByTestId("line-2"), { target: { value: "" } })
+    })
+
+    await waitFor(() => {
+      const lastCall = setAddress.mock.calls[setAddress.mock.calls.length - 1][0]
+      expect(lastCall.values).toMatchObject({ line_1: "Via Roma 1", line_2: "" })
+    })
+
+    // A cleared required field is still never sent as "", so the save gate stays closed.
+    await act(async () => {
+      fireEvent.input(screen.getByTestId("line-1"), { target: { value: "" } })
+    })
+
+    for (const [call] of setAddress.mock.calls) {
+      expect(call.values.line_1).not.toBe("")
+    }
+  })
+
   it("captures changes on fields mounted after the form wiring (child-only commit)", async () => {
     // Regression test for the intermittent mfe-checkout race: the checkout mounts
     // the address fields only after an async settings fetch resolves, in a render
