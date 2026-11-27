@@ -197,6 +197,61 @@ describe("CheckoutComPayment", () => {
     )
   })
 
+  describe("onsubmit after _authorize", () => {
+    async function submitWith(paymentSourceResponse: object): Promise<boolean> {
+      setPaymentSource.mockResolvedValue(paymentSourceResponse)
+      const { container } = render(tree("ps-1"))
+      await act(async () => {})
+      const tokenize = vi.fn(async () => ({ data: { token: "tok_1" } }))
+      act(() => {
+        flows[0]?.options.onChange({ ...validCard, tokenize })
+      })
+      const form = container.querySelector("form") as HTMLFormElement
+      let result = false
+      await act(async () => {
+        // biome-ignore lint/suspicious/noExplicitAny: test cast
+        result = await (form.onsubmit as any)?.call(form, new Event("submit"))
+      })
+      return result
+    }
+
+    it.each(["Authorized", "Captured"])(
+      "places the order when the card is %s without 3DS",
+      async (status) => {
+        expect(await submitWith({ ...paymentSource("ps-1"), payment_response: { status } })).toBe(
+          true
+        )
+      }
+    )
+
+    it.each(["Declined", "Card Verified"])(
+      "does not place the order when the card is %s",
+      async (status) => {
+        expect(await submitWith({ ...paymentSource("ps-1"), payment_response: { status } })).toBe(
+          false
+        )
+      }
+    )
+
+    it("redirects to 3DS and does not place the order when pending", async () => {
+      const location = window.location
+      // biome-ignore lint/suspicious/noExplicitAny: test cast
+      ;(window as any).location = { href: "" }
+      try {
+        const result = await submitWith({
+          ...paymentSource("ps-1"),
+          payment_response: { status: "Pending" },
+          redirect_uri: "https://3ds.example/challenge",
+        })
+        expect(result).toBe(false)
+        expect(window.location.href).toBe("https://3ds.example/challenge")
+      } finally {
+        // biome-ignore lint/suspicious/noExplicitAny: test cast
+        ;(window as any).location = location
+      }
+    })
+  })
+
   it("unmounts the Flow when the component unmounts", async () => {
     const { unmount } = render(tree("ps-1"))
     await act(async () => {})

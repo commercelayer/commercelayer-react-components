@@ -249,6 +249,9 @@ export function CheckoutComPayment({ publicKey, options, ...p }: Props): JSX.Ele
                         return false
                       }
                       if (paymentStatus === "declined") return false
+                      // Frictionless (no 3DS) authorization: nothing left to wait for, place the order.
+                      if (paymentStatus === "authorized" || paymentStatus === "captured")
+                        return true
                     }
                     return false
                   }
